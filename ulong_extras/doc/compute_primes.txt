@@ -1,0 +1,57 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+void n_compute_trial_factor_primes(ulong num_primes)
+
+   Precomputes num_primes primes and their double precomputed
+   inverses and stores them in flint_primes and flint_prime_inverse
+   respectively.
+
+   The algorithm is a simple sieve of erasthothenes with the 
+   constant array flint_small_primes as a starting point.
+
+   In order to compute a sieve size, a lower bound on the size of
+   n s.t. pi(n) >= num_primes is needed. For this we use the 
+   estimate that for n > 17, pi(n) > n/log(n). 
+
+   We start with n = 16384 and consider consecutive values of
+   n/log(n) until we exceed num_primes. Actually we take an 
+   approximation to log(n) which is slightly too large (as log_2(n)
+   = log(n)/log(2), i.e. log(n) = log(2)*log_2(n) < 0.7*log_2(n),
+   then we can use the approximation 0.7*log_2(n)).
+
+   The sieve works by marking all multiples of small primes in
+   the sieve, but the sieve does not contain entries for numbers
+   below the current cutoff (the function may have already been 
+   called before). 
+
+   One only needs to start sieving with p^2 as all smaller multiples 
+   of p have already been marked off. 
+
+   At first p^2 may be less than the start of the sieve (the old 
+   cutoff), so this case is dealt with separately, but for all 
+   primes p beyond that all multiples of p starting at p^2 are 
+   marked off in the sieve.
+
+   As the small prime cutoff is currently 1030, primes can be 
+   computed up to almost n = 2^20, in fact floor(n/log_2(n)*0.7) = 
+   74898 primes which actually takes us to 949937.
