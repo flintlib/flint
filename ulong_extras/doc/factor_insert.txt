@@ -1,0 +1,36 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
+
+   
+   Inserts the given prime power factor p^exp into the n_factor_t
+   factors. See the docs for n_factor_trial for a description of
+   the n_factor_t type. 
+
+   The algorithm performs a simple search to see if p already 
+   exists as a prime factor in the structure. If so the exponent
+   there is increased by the supplied exponent. Otherwise a new 
+   factor p^exp is added to the end of the structure.
+
+   There is no test code for this function other than its use by
+   the various factoring functions, which have test code.
