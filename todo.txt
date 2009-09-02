@@ -28,6 +28,3 @@ Enhancements
 * Implement a combined p-1 and p+1 primality test as per http://primes.utm.edu/prove/prove3_3.html
 
 * Implement a quadratic sieve and use it in n_factor once things get too large for SQUFOF
-
-
-
