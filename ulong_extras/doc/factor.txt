@@ -1,0 +1,47 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
+
+   Factors n with no restrictions on n. If the prime factors are 
+   required to be certified prime, one may set proved to 1, 
+   otherwise set it to 0, and they will only be probable primes
+   (with no known counterexamples to the conjecture that they are
+   in fact all prime).
+
+   For details on the n_factor_t structure, see n_factor_trial.
+
+   This function first tries trial factoring with a number of primes
+   specified by FLINT_FACTOR_TRIAL_PRIMES. If the cofactor is 1 or
+   prime the function returns with all the factors.
+
+   If not the cofactor is placed in the array factor_arr. Whilst there
+   are factors remaining in there which have not been split, the 
+   algorithm continues. At each step each factor is first checked to 
+   determine if it is a perfect power. If so it is replaced by the 
+   power that has been found. Next if the factor is small enough and
+   composite, in particular, less than FLINT_FACTOR_ONE_LINE_MAX
+   then n_factor_one_line is called with FLINT_FACTOR_ONE_LINE_ITERS
+   to try and split the factor. If that fails or the factor is too large 
+   for n_factor_one_line then n_factor_SQUFOF is called, with 
+   FLINT_FACTOR_SQUFOF_ITERS. If that fails an error results and
+   the program aborts. However this should not happen in practice. 
