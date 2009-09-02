@@ -1,0 +1,33 @@
+TODO
+====
+
+* in is_prime_pocklington allow the cofactor to be a perfect power not just prime
+
+* make n_gcd take arguments in either order and use throughout FLINT-Lite
+
+* have make check bomb out if one of the tests aborts
+
+* factor out some common code between n_is_perfect_power235 and n_factor_power235
+
+* test factor_partial1
+
+* add profile code for factor_trial, factor_one_line, factor_SQUFOF
+
+Maybe
+=====
+
+* have n_is_prime_pocklington factor n-1 up to sqrt(n) rather than using these n_factor_partial1 and n_factor_trial_gcd functions, which are a bit of a kludge
+
+* make n_factor_t an array of length 1 so it can be passed by reference automatically, as per mpz_t's, etc
+
+Enhancements
+============
+
+* Implement a primality test which only requires factoring of n-1 up to n^1/3 or n^1/4
+
+* Implement a combined p-1 and p+1 primality test as per http://primes.utm.edu/prove/prove3_3.html
+
+* Implement a quadratic sieve and use it in n_factor once things get too large for SQUFOF
+
+
+
