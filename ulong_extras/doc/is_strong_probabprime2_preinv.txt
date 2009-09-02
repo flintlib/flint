@@ -1,0 +1,35 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+int n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a, mp_limb_t d)
+
+   Tests if n is a strong probable prime to the base a. We require that
+   d is set to the largest odd factor of n - 1 and npre is a precomputed
+   inverse of n computed with n_preinvert_limb. We require a to be reduced 
+   mod n and not 0 and n to be odd.
+
+   If we write n - 1 = d*2^s where d is odd then n is a strong probable
+   prime to the base a (an a-SPRP) if either a^d = 1 (mod n) or 
+   (a^d)^(2^r) = -1 (mod n) for some r less than s.
+
+   A description of strong probable primes is given here:
+   http://mathworld.wolfram.com/StrongPseudoprime.html
