@@ -1,0 +1,38 @@
+mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+
+    Core2 11.8 cycles
+    K8 17.2 cycles
+    K10 17.1
+
+mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+
+    Core2 22.1 cycles
+    K8 23.3 cycles
+    K10 27.7 cycles
+
+mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+
+    Core2 42.2 cycles
+    K8 43.4-50.0 cycles
+    K10 29.9 cycles
+
+mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
+                                     mp_limb_t n, mp_limb_t ninv)
+
+    Core2 ??
+    K8 ??
+    K10 ??
+
+mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
+                                         mp_limb_t n, double ninv)
+
+    Core2 15.7 cycles
+    K8 25.6 cycles
+    K10 31.7 cycles
+
+mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
+                                      mp_limb_t n, mp_limb_t ninv)
+
+    Core2 35.9 cycles
+    K8 42.0 cycles
+    K10 35.1 cycles
