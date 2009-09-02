@@ -1,0 +1,33 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+int n_is_probabprime_fibonacci(mp_limb_t n)
+
+   Letting F_j be the j-th element of the Fibonacci sequence 
+   0, 1, 1, 2, 3, 5, ... starting at j = 0. Then if n is prime
+   we have F_{n - (n/5)} = 0 mod n, where (n/5) is the Jacobi
+   symbol.
+ 
+   See page 142 and following of Pomerance and Crandall : Primes
+   a computational perspective for details.
+
+   We require that n is not divisible by 2 or 5. 
