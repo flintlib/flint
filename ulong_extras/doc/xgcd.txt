@@ -1,0 +1,49 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
+
+   Returns the gcd g of x and y and unsigned values a and b such that
+   a*x - b*y = g. We require x >= y.
+
+   We claim that computing the extended gcd via the euclidean algorithm
+   always results in cofactor |a| < x/2, |b| < x/2, with perhaps some
+   small degenerate exceptions.
+
+   We proceed by induction. 
+
+   Suppose we are at some step of the algorithm, with 
+   xn = q*yn + r, with r >= 1 and suppose 1 = s*yn - t*r with 
+   s < yn/2, t < yn/2 by hypothesis. 
+
+   Write 1 = s*yn - t*(xn - q*yn) = (s + t*q)*yn - t*xn. 
+
+   It suffices to show that (s + t*q) < xn/2 as t < yn/2 < xn/2, which 
+   will complete the induction step. 
+
+   But at the previous step in the backsubstitution we would have had 
+   1 = s*r - c*d with s < r/2 and c < r/2. 
+
+   Then s + t*q < r/2 + yn/2*q = (r+q*yn)/2 = xn/2. 
+
+   See gcd for a description of the branching in the algorithm, which 
+   is faster than using division.
