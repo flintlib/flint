@@ -1,0 +1,101 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+link/fmpz_reentrant.c <-- fmpz.c
+
+   The file fmpz.c is a symbolic link and if it points to fmpz_reentrant.c
+   then the fmpz module is threadsafe, though a little slower when using
+   integers which are larger than FLINT_BITS - 2 bits.
+
+fmpz
+
+   an fmpz is implemented as a long. When its second most significant bit 
+   is 0 the fmpz represents an ordinary signed long integer whose absolute
+   value is at most FLINT_BITS - 2 bits.
+
+   When the second most significant bit is 1 then the value represents a 
+   pointer (the pointer is shifted right 2 bits and the second msb is set
+   to 1 - this relies on the fact that malloc always allocates memory
+   blocks on a 4 or 8 byte boundary).
+
+fmpz_t
+  
+   an array of length 1 of fmpz's. This is used to pass fmpz's around by
+   reference without fuss, similar to the way mpz_t's work.
+
+COEFF_MAX
+ 
+   the largest (positive) value an fmpz can be if just a long
+
+COEFF_MIN
+ 
+   the smallest (negative) value an fmpz can be if just a long
+
+fmpz PTR_TO_COEFF(__mpz_struct * ptr)
+
+   a macro to convert an mpz_t (or more generally any __mpz_struct *) to an 
+   fmpz (shifts the pointer right by 2 and sets the second most significant 
+   bit). 
+
+__mpz_struct * COEFF_TO_PTR(fmpz f)
+
+   a macro to convert an fmpz which represents a pointer into an actual 
+   pointer to an __mpz_struct (i.e. to an mpz_t)
+
+int COEFF_IS_MPZ(fmpz f)
+
+   a macro which returns 1 if f represents an mpz_t, otherwise 0 is returned.
+
+fmpz _fmpz_new_mpz(void)
+
+   initialises a new mpz_t and returns a pointer to it (in the fmpz format).
+   This is only used internally.
+
+void _fmpz_clear_mpz(fmpz f)
+
+   clears the mpz_t "pointed to" by the fmpz f. This is only used internally.
+
+__mpz_struct * _fmpz_promote(fmpz_t f)
+
+   if f doesn't represent an mpz_t, initialise one and associate it to f.
+
+__mpz_struct * _fmpz_promote_val(fmpz_t f)
+
+   if f doesn't represent an mpz_t, initialise one and associate it to f, but
+   preserve the value of f.
+
+void _fmpz_demote(fmpz_t f)
+
+   if f represents an mpz_t clear it and make f just represent a long.
+
+void _fmpz_demote_val(fmpz_t f)
+
+   if f represents an mpz_t and its value will fit in a long, preserve the 
+   value in f which we make to represent a long, and clear the mpz_t.
+
+
+
+
+
+
+   
+
