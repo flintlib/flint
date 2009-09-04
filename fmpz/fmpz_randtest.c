@@ -28,8 +28,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits)
+void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
 {
+   mp_bitcnt_t bits = n_randint(bits_in + 1);
+   
    if (bits <= 62)
    {
       _fmpz_demote(f);

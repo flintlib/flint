@@ -40,8 +40,7 @@ int main(void)
    {
       fmpz_t a, b;
 
-      mp_limb_t bits = n_randint(63);
-      fmpz_randtest(a, bits);
+      fmpz_randtest(a, 62);
       
       *b = *a;
 
