@@ -41,8 +41,7 @@ int main(void)
       fmpz_t a, b;
 
       mp_limb_t bits = n_randint(63);
-      *a = n_randbits(bits);
-      if (n_randint(2)) *a = -*a;
+      fmpz_randtest(a, bits);
       
       *b = *a;
 

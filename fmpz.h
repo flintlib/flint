@@ -23,10 +23,57 @@
  
 ******************************************************************************/
 
-#ifndef _H
-#define _H
+#ifndef FMPZ_H
+#define FMPZ_H
 
 #include <mpir.h>
+
+typedef long fmpz;
+typedef fmpz fmpz_t[1];
+
+// maximum positive value a small coefficient can have
+#define COEFF_MAX ((1L<<(FLINT_BITS-2))-1L)
+
+// minimum negative value a small coefficient can have
+#define COEFF_MIN (-((1L<<(FLINT_BITS-2))-1L))
+
+// turn a pointer to an __mpz_struct into a fmpz_t
+#define PTR_TO_COEFF(xxx) ((((ulong)xxx)>>2) | (1L<<(FLINT_BITS - 2))) 
+
+// turns an fmpz into a pointer to an mpz
+#define COEFF_TO_PTR(xxx) ((__mpz_struct *) (xxx<<2))
+
+#define COEFF_IS_MPZ(xxx) ((xxx>>(FLINT_BITS-2)) == 1L) // is xxx a pointer not an integer
+
+extern gmp_randstate_t fmpz_randstate;
+
+fmpz _fmpz_new_mpz(void);
+
+void _fmpz_clear_mpz(fmpz f);
+
+__mpz_struct * _fmpz_promote(fmpz_t f);
+
+__mpz_struct * _fmpz_promote_val(fmpz_t f);
+
+static inline
+void _fmpz_demote(fmpz_t f)
+{
+	if (COEFF_IS_MPZ(*f)) 
+	{
+		_fmpz_clear_mpz(*f);
+		(*f) = 0L;
+	}
+}
+
+void _fmpz_demote_val(fmpz_t f);
+
+void fmpz_randinit(void);
+
+void fmpz_randclear(void);
+
+void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
+
+
 
 #endif
 

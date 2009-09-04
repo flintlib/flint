@@ -17,41 +17,28 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2009 William Hart
- 
-******************************************************************************/
+   Copyright (C) 2009 William Hart
 
-#ifndef FLINT_H
-#define FLINT_H
+*****************************************************************************/
 
 #include <mpir.h>
-#include "longlong.h"
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
-#define ulong unsigned long
-#define FLINT_BITS 64
-
-#define mp_bitcnt_t unsigned long
-
-#define FLINT_ASSERT(param)
-
-#define FLINT_MAX(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz1) : (zzz2))
-#define FLINT_MIN(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz2) : (zzz1))
-#define FLINT_ABS(zzz) ((long)(zzz) < 0 ? (-zzz) : (zzz))
-
-#define r_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)>>(shift)))
-
-#define l_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)<<(shift)))
-
-static inline 
-unsigned int FLINT_BIT_COUNT(mp_limb_t x)
+void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits)
 {
-   unsigned int zeros = FLINT_BITS;
-   if (x) count_leading_zeros(zeros, x);
-   return FLINT_BITS - zeros;
+   if (bits <= 62)
+   {
+      _fmpz_demote(f);
+      *f = n_randbits(bits);
+      if (n_randint(2)) *f = -*f;
+   } else
+   {
+      __mpz_struct * mpz_ptr = _fmpz_promote(f);
+      mpz_rrandomb(mpz_ptr, fmpz_randstate, bits);
+      if (n_randint(2)) mpz_neg(mpz_ptr, mpz_ptr);
+   }
 }
-
-#endif
