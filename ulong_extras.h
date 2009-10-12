@@ -226,6 +226,9 @@ mp_limb_t n_factor_trial_gcd(n_factor_t * factors, mp_limb_t n);
 
 mp_limb_t n_factor_partial1(n_factor_t * factors, mp_limb_t n);
 
+mp_limb_t n_factor_partial(n_factor_t * factors, 
+                           mp_limb_t n, mp_limb_t limit, int proved);
+
 mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n);
 
 mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters);

@@ -1,0 +1,44 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+mp_limb_t n_factor_partial(n_factor_t * factors, 
+                     mp_limb_t n, mp_limb_t limit, int proved)
+
+
+   Factor n, but stop when the product of prime factors so far 
+   exceeds limit. 
+   
+   One requires an initialised n_factor_t structure, but factors
+   will be added by default to an already used n_factor_t. Use 
+   the function n_factor_init defined in ulong_extras if 
+   initialisation has not already been completed on factors.
+   
+   Once completed, num will contain the number of distinct 
+   prime factors found. The field p is an array of mp_limb_t's 
+   containing the distinct prime factors, exp an array 
+   containing the corresponding exponents.
+
+   The return value is the unfactored cofactor after 
+   factoring is done. 
+
+   The factors are proved prime if proved is 1, otherwise
+   they are merely probably prime.   
