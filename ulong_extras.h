@@ -216,6 +216,9 @@ void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp);
 mp_limb_t n_factor_trial_range(n_factor_t * factors, 
                          mp_limb_t n, ulong start, ulong num_primes);
 
+mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
+                 mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
+
 mp_limb_t n_factor_trial(n_factor_t * factors, 
                                   mp_limb_t n, mp_limb_t num_primes);
 
