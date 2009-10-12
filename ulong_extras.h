@@ -224,8 +224,6 @@ mp_limb_t n_factor_trial(n_factor_t * factors,
 
 mp_limb_t n_factor_trial_gcd(n_factor_t * factors, mp_limb_t n);
 
-mp_limb_t n_factor_partial1(n_factor_t * factors, mp_limb_t n);
-
 mp_limb_t n_factor_partial(n_factor_t * factors, 
                            mp_limb_t n, mp_limb_t limit, int proved);
 
