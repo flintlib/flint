@@ -9,14 +9,10 @@ TODO
 
 * factor out some common code between n_is_perfect_power235 and n_factor_power235
 
-* test factor_partial1
-
 * add profile code for factor_trial, factor_one_line, factor_SQUFOF
 
 Maybe
 =====
-
-* have n_is_prime_pocklington factor n-1 up to sqrt(n) rather than using these n_factor_partial1 and n_factor_trial_gcd functions, which are a bit of a kludge
 
 * make n_factor_t an array of length 1 so it can be passed by reference automatically, as per mpz_t's, etc
 
