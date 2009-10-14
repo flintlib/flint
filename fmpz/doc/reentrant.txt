@@ -65,10 +65,10 @@ int COEFF_IS_MPZ(fmpz f)
 
    a macro which returns 1 if f represents an mpz_t, otherwise 0 is returned.
 
-fmpz _fmpz_new_mpz(void)
+__mpz_struct * _fmpz_new_mpz(void)
 
-   initialises a new mpz_t and returns a pointer to it (in the fmpz format).
-   This is only used internally.
+   initialises a new mpz_t and returns a pointer to it. This is only used 
+   internally.
 
 void _fmpz_clear_mpz(fmpz f)
 
