@@ -78,6 +78,10 @@ void _fmpz_clear_mpz(fmpz f)
    relinquished the mpz associated to f to the internal cache of unused mpz's,
    fmpz_unused_arr. This is only used internally.
 
+void _fmpz_cleanup()
+
+   cleans up the internal stack of mpz's, clearing any unused mpz's.
+
 __mpz_struct * _fmpz_promote(fmpz_t f)
 
    if f doesn't represent an mpz_t, initialise one and associate it to f.

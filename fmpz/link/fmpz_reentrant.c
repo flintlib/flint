@@ -40,6 +40,10 @@ void _fmpz_clear_mpz(fmpz f)
    mpz_clear(COEFF_TO_PTR(f));	
 }
 
+void _fmpz_cleanup(void)
+{
+}
+
 __mpz_struct * _fmpz_promote(fmpz_t f)
 {
    if (!COEFF_IS_MPZ(*f)) 
