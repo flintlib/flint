@@ -11,6 +11,18 @@ TODO
 
 * add profile code for factor_trial, factor_one_line, factor_SQUFOF
 
+* Use fmpz_init and fmpz_clear in the t-fmpz test
+
+* Write a FLINT-Lite memory manager, both reentrant and non-reentrant stack based versions
+
+* Write a configure script for FLINT-Lite which has an option for reentrant/non-reentrant
+
+* fmpz_single currently hangs on to all mpz's. It might be better to release ones that are 
+  over a certain size (careful, checking every single one might be expensive. It might be
+  better to have some kind of garbage collection; then again checking whether the garbage
+  collection needs to be run every time also costs time, though a garbage collector can do
+  more).
+
 Maybe
 =====
 
