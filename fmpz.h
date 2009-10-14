@@ -47,7 +47,7 @@ typedef fmpz fmpz_t[1];
 
 extern gmp_randstate_t fmpz_randstate;
 
-fmpz _fmpz_new_mpz(void);
+__mpz_struct * _fmpz_new_mpz(void);
 
 void _fmpz_clear_mpz(fmpz f);
 

@@ -40,6 +40,8 @@ int main(void)
    {
       fmpz_t a, b;
 
+      *a = 0L;
+
       fmpz_randtest(a, 62);
       
       *b = *a;
