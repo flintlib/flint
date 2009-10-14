@@ -69,6 +69,20 @@ void _fmpz_demote(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f);
 
+static inline
+void fmpz_init(fmpz_t f)
+{
+	(*f) = 0L;
+}
+
+void fmpz_init2(fmpz_t f, ulong limbs);
+
+static inline
+void fmpz_clear(fmpz_t f)
+{
+	_fmpz_demote(f);
+}
+
 void fmpz_randinit(void);
 
 void fmpz_randclear(void);
