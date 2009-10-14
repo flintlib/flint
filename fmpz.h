@@ -89,9 +89,8 @@ void fmpz_randclear(void);
 
 void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
 
-
-
 #endif
+
 
 
 
