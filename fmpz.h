@@ -119,6 +119,16 @@ void fmpz_print(fmpz_t x)
 	else gmp_printf("%Zd", COEFF_TO_PTR(*x));
 }
 
+static inline
+void fmpz_swap(fmpz_t f, fmpz_t g)
+{
+	if (f == g) return; // swapping not required
+	
+	fmpz t = *f;
+   *f = *g;
+	*g = t;
+}
+
 #endif
 
 
