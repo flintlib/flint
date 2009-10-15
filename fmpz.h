@@ -89,7 +89,16 @@ void fmpz_randclear(void);
 
 void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
 
+long fmpz_get_si(const fmpz_t f);
+
+ulong fmpz_get_ui(const fmpz_t f);
+
+void fmpz_set_si(fmpz_t f, const long val);
+
+void fmpz_set_ui(fmpz_t f, const ulong val);
+
 #endif
+
 
 
 

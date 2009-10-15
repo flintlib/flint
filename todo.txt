@@ -23,6 +23,8 @@ TODO
   collection needs to be run every time also costs time, though a garbage collector can do
   more).
 
+* Implement a z_randtest() function and use in fmpz_get/set_si 
+
 Maybe
 =====
 
