@@ -112,6 +112,13 @@ void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
 
+static inline 
+void fmpz_print(fmpz_t x)
+{
+	if (!COEFF_IS_MPZ(*x)) printf("%ld", *x);
+	else gmp_printf("%Zd", COEFF_TO_PTR(*x));
+}
+
 #endif
 
 
