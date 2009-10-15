@@ -67,6 +67,9 @@ int main(void)
       }
 
       fmpz_clear(a);
+
+      mpz_clear(b);
+      mpz_clear(c);
    }
 
    gmp_randclear(state);
