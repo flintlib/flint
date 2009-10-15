@@ -108,6 +108,10 @@ void fmpz_zero(fmpz_t f)
    (*f) = 0L;
 }
 
+void fmpz_set(fmpz_t f, const fmpz_t g);
+
+int fmpz_equal(const fmpz_t f, const fmpz_t g);
+
 #endif
 
 
