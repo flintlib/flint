@@ -97,6 +97,17 @@ void fmpz_set_si(fmpz_t f, const long val);
 
 void fmpz_set_ui(fmpz_t f, const ulong val);
 
+void fmpz_get_mpz(mpz_t x, const fmpz_t f);
+
+void fmpz_set_mpz(fmpz_t f, const mpz_t x);
+
+static inline
+void fmpz_zero(fmpz_t f)
+{
+   _fmpz_demote(f);	
+   (*f) = 0L;
+}
+
 #endif
 
 
