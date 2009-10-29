@@ -64,13 +64,13 @@ int main(void)
       pl2 = 0UL;
       ph2 = 0UL;
       bit = 1UL;
-      for (int i = 0; i < 64; i++)
+      for (int i = 0; i < FLINT_BITS; i++)
       {
          if (m2 & bit)
          {
             pl2 += (m1 << i);
             ph2 += (pl2 < pl2old);
-            ph2 += r_shift(m1, 64 - i);
+            ph2 += r_shift(m1, FLINT_BITS - i);
             pl2old = pl2;
          }
          bit <<= 1;

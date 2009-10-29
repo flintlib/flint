@@ -120,8 +120,8 @@
     mp_limb_t __w1;							      \
     mp_limb_t __xm0 = (u), __xm1 = (v);		\
     umul_ppmm (__w1, w0, __xm0, __xm1);		\
-    (w1) = __w1 - (-(__xm0 >> 63) & __xm1)	\
-		- (-(__xm1 >> 63) & __xm0);		      \
+    (w1) = __w1 - (-(__xm0 >> (FLINT_BITS-1)) & __xm1)	\
+		- (-(__xm1 >> (FLINT_BITS-1)) & __xm0);		      \
   } while (0)
 
 #define invert_limb(invxl, xl)                        \
