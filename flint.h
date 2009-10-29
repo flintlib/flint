@@ -30,7 +30,13 @@
 #include "longlong.h"
 
 #define ulong unsigned long
+
+#if __GMP_BITS_PER_MP_LIMB == 64
 #define FLINT_BITS 64
+#define FLINT64 1
+#else 
+#define FLINT_BITS 32
+#endif
 
 #define FLINT_ASSERT(param)
 

@@ -23,6 +23,9 @@
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 
+// this will eventually be replaced by a flag set by configure
+#if __GMP_BITS_PER_MP_LIMB == 64 /* x86 : 64 bit */
+
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                  \
   __asm__ ("addq %5,%q1\n\tadcq %3,%q0"					      \
 	   : "=r" (sh), "=&r" (sl)					                  \
@@ -66,6 +69,51 @@
     FLINT_ASSERT ((x) != 0);							                           \
     __asm__ ("bsfq %1,%q0" : "=r" (count) : "rm" ((mp_limb_t)(x)));	\
   } while (0)
+
+#else /* x86 : 32 bit */
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl) \
+  __asm__ ("addl %5,%k1\n\tadcl %3,%k0"					\
+	   : "=r" (sh), "=&r" (sl)					\
+	   : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),			\
+	     "%1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl) \
+  __asm__ ("subl %5,%k1\n\tsbbl %3,%k0"					\
+	   : "=r" (sh), "=&r" (sl)					\
+	   : "0" ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),			\
+	     "1" ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))
+
+#define umul_ppmm(w1, w0, u, v) \
+  __asm__ ("mull %3"							\
+	   : "=a" (w0), "=d" (w1)					\
+	   : "%0" ((mp_limb_t)(u)), "rm" ((mp_limb_t)(v)))
+
+#define udiv_qrnnd(q, r, n1, n0, dx) \
+  __asm__ ("divl %4"	\
+	   : "=a" (q), "=d" (r)						\
+	   : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+
+#define sdiv_qrnnd(q, r, n1, n0, dx) \
+  __asm__ ("idivl %4"	\
+	   : "=a" (q), "=d" (r)						\
+	   : "0" ((mp_limb_t)(n0)), "1" ((mp_limb_t)(n1)), "rm" ((mp_limb_t)(dx)))
+
+#define count_leading_zeros(count, x)					\
+  do {									\
+    mp_limb_t __cbtmp;							\
+    FLINT_ASSERT ((x) != 0);							\
+    __asm__ ("bsrl %1,%0" : "=r" (__cbtmp) : "rm" ((mp_limb_t)(x)));	\
+    (count) = __cbtmp ^ 31;						\
+  } while (0)
+
+#define count_trailing_zeros(count, x)					\
+  do {									\
+    FLINT_ASSERT ((x) != 0);							\
+    __asm__ ("bsfl %1,%0" : "=r" (count) : "rm" ((mp_limb_t)(x)));	\
+  } while (0)
+
+#endif /* x86 */
 
 #define smul_ppmm(w1, w0, u, v)              \
   do {									            \
