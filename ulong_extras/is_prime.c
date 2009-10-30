@@ -29,12 +29,17 @@
 
 int n_is_prime(mp_limb_t n)
 {
-   if (n < 10000000000000000UL) return n_is_probabprime(n);
+#if FLINT64
+   if (n < 10000000000000000UL) 
+#endif
+      return n_is_probabprime(n);
    
+#if FLINT64
    if (!n_is_probabprime(n)) return 0;
    
    int isprime = n_is_prime_pocklington(n, 100);
    if (isprime != -1) return isprime;
 
    return n_is_prime_pseudosquare(n);
+#endif
 }
