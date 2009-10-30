@@ -42,7 +42,11 @@ int main(void)
       
       do
       {
+#if FLINT64
          bits = n_randint(44);
+#else
+         bits = n_randint(20);
+#endif
          n1 = n_randbits(bits + 1);
       } while (n_is_prime(n1) || (n1 == 1UL));
       
