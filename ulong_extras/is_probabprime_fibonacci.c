@@ -111,7 +111,7 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 	m = (n - n_jacobi(5L, n))/2; // cannot overflow as (5/n) = 0 for n = 2^64-1
 
-   if (FLINT_BIT_COUNT(n) <= 53)
+   if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
    {
       double npre = n_precompute_inverse(n);
 	
