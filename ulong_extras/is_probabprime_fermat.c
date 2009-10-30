@@ -30,7 +30,7 @@
 
 int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
 {
-	if (FLINT_BIT_COUNT(n) <= 53) return (n_powmod(i, n - 1, n) == 1UL);
+	if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS) return (n_powmod(i, n - 1, n) == 1UL);
    else 
    {
       if ((mp_limb_signed_t) (n - 1) < 0L)
