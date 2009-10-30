@@ -50,7 +50,7 @@ int n_is_probabprime_BPSW(mp_limb_t n)
 		d = n - 1UL;
 		while ((d & 1UL) == 0UL) d >>= 1;
 
-		if (FLINT_BIT_COUNT(n) <= 53)
+		if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
       {
          double npre = n_precompute_inverse(n);
          if (n_is_strong_probabprime_precomp(n, npre, 2L, d) == 0) return 0;

@@ -151,7 +151,7 @@ int n_is_probabprime_lucas(mp_limb_t n)
          A = n_submod(n_invmod(Q, n), 2UL, n);
    }
 
-   if (FLINT_BIT_COUNT(n) <= 53)
+   if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
    {
       double npre = n_precompute_inverse(n);
 	   V = lchain_precomp(n + 1, A, n, npre);
