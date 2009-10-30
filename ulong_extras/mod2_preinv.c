@@ -33,6 +33,6 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
    mp_limb_t q, r;
 
    count_leading_zeros(norm, n);
-   udiv_qrnnd_preinv(q, r, r_shift(a, 64-norm), a<<norm, n<<norm, ninv);
+   udiv_qrnnd_preinv(q, r, r_shift(a, FLINT_BITS-norm), a<<norm, n<<norm, ninv);
    return (r>>norm);
 }
