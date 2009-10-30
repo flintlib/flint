@@ -44,7 +44,11 @@ int main(void)
          n1 = n_randtest();
       while (n_is_prime(n1) || (n1 == 1UL));
 
+#if FLINT64
       n2 = n_factor_SQUFOF(n1, 10000);
+#else
+      n2 = n_factor_SQUFOF(n1, 2000);
+#endif
       
       if (n2)
       {
