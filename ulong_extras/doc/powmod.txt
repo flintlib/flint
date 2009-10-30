@@ -22,8 +22,8 @@
 
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
-   Returns (a ^ exp) % n. We require n < 2^53 and 0 <= a < n. There
-   are no restrictions on exp, i.e. it can be negative.
+   Returns (a ^ exp) % n. We require n < 2^FLINT_D_BITS and 0 <= a < n. 
+   There are no restrictions on exp, i.e. it can be negative.
 
    This is implemented by precomputing an inverse and calling the 
    precomp version of this function.
