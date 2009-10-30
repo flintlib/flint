@@ -44,14 +44,14 @@ int main(void)
 
       mpz_init(d_m);
 
-      mp_limb_t bits = n_randint(52) + 2;
+      mp_limb_t bits = n_randint(FLINT_D_BITS-1) + 2;
       do
       {
          d = n_randbits(bits) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
-      } while (FLINT_BIT_COUNT(d) > 53);
+      } while (FLINT_BIT_COUNT(d) > FLINT_D_BITS);
       if (d == 2UL) d++;
          
       for (ulong j = 0; j < 100; j++)
@@ -82,7 +82,7 @@ int main(void)
 
       mpz_init(d_m);
 
-      mp_limb_t bits = n_randint(50) + 4;
+      mp_limb_t bits = n_randint(FLINT_D_BITS-3) + 4;
       do
       {
          d = n_randbits(bits) | 1;
@@ -104,7 +104,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 1000) 
+   if (count > 2000) 
    {
       printf("FAIL\n");
       printf("count = %lu\n", count);
