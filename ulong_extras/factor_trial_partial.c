@@ -27,58 +27,28 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
+   unsigned int exp;
+   mp_limb_t p;
+   double ppre;
+   (*prod) = 1;
 
-   if (n % 2 == 0)
+   n_compute_primes(num_primes);
+
+   for (ulong i = 0; i < num_primes; i++)
    {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
-
-   n1 = n - 1;
-	
-   n_factor_init(&factors);
-
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
-
-   ninv = n_preinvert_limb(n);
-
-   for (i = factors.num - 1; i >= 0 ; i--)
-	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
-
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
-
-		if (j == iterations)
+      p = flint_primes[i];
+      if (p*p > n) break;
+      ppre = flint_prime_inverses[i];
+      exp = n_remove2_precomp(&n, p, ppre);
+      if (exp) 
       {
-			return -1;
-		}
-	}
-
-	if (n_gcd(n, c) != 1UL) return 0;
-
-	return 1;
+         n_factor_insert(factors, p, exp);
+         (*prod) *= n_pow(p, exp);
+         if (*prod > limit) break;
+      }
+   }
+       
+   return n;
 }

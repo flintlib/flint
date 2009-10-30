@@ -56,5 +56,5 @@ library-recursive:
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = ulong_extras
+BUILD_DIRS = ulong_extras fmpz
 

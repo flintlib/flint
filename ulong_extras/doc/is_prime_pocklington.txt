@@ -23,13 +23,12 @@
 int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
    Tests if n is a prime using the Pocklington-Lehmer primality
-   test. This does not fully implement the algorithm. If 1 is 
-   returned n has been proved prime. If 0 is returned n is 
-   composite. However -1 may be returned if nothing was proved 
-   either way. This happens perhaps 8% of the time. 
+   test. If 1 is returned n has been proved prime. If 0 is returned 
+   n is composite. However -1 may be returned if nothing was proved 
+   either way due to the number of iterations being too small. 
 
    The most time consuming part of the algorithm is factoring 
-   n - 1. For this reason n_factor_partial1 is used, which uses
+   n - 1. For this reason n_factor_partial is used, which uses
    a combination of trial factoring and "one line" factor to 
    try to quickly factor n. Additionally if the cofactor is
    less than the square root of n - 1 the algorithm can still

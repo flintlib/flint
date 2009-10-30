@@ -26,59 +26,34 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
-
-   if (n % 2 == 0)
-   {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
-
-   n1 = n - 1;
+   long size = (long) x->_mp_size;
 	
-   n_factor_init(&factors);
-
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
-
-   ninv = n_preinvert_limb(n);
-
-   for (i = factors.num - 1; i >= 0 ; i--)
+	if (size == 0L) // x is zero
+	{
+		fmpz_zero(f);
+	} else if (size == 1L) // x is positive and 1 limb
+	{
+	   fmpz_set_ui(f, mpz_get_ui(x));
+	} else if (size == -1L) // x is negative and 1 limb
+   {
+	   ulong uval = mpz_get_ui(x);
+		if (uval <= COEFF_MAX) // x is small
+		{		   
+		   _fmpz_demote(f);			
+		   *f = -uval;
+		} else // x is large but one limb
+		{		
+		   __mpz_struct * mpz_ptr = _fmpz_promote(f);
+			mpz_set_ui(mpz_ptr, uval);
+			mpz_neg(mpz_ptr, mpz_ptr);		
+		}
+	} else // x is more than one limb
 	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
-
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
-
-		if (j == iterations)
-      {
-			return -1;
-		}
-	}
-
-	if (n_gcd(n, c) != 1UL) return 0;
-
-	return 1;
+		__mpz_struct * mpz_ptr = _fmpz_promote(f);
+		mpz_set(mpz_ptr, x);		
+	}			
 }

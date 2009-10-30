@@ -26,59 +26,13 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+int fmpz_equal(const fmpz_t f, const fmpz_t g)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
-
-   if (n % 2 == 0)
-   {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
-
-   n1 = n - 1;
+	if (f == g) return 1; // aliased inputs
 	
-   n_factor_init(&factors);
-
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
-
-   ninv = n_preinvert_limb(n);
-
-   for (i = factors.num - 1; i >= 0 ; i--)
-	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
-
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
-
-		if (j == iterations)
-      {
-			return -1;
-		}
-	}
-
-	if (n_gcd(n, c) != 1UL) return 0;
-
-	return 1;
+	if (!COEFF_IS_MPZ(*f)) return (*f == *g); // if f is large it can't be equal to g
+	else if (!COEFF_IS_MPZ(*g)) return 0; // f is large, so if g isn't....
+	else return (mpz_cmp(COEFF_TO_PTR(*f), COEFF_TO_PTR(*g)) == 0); 
 }

@@ -38,6 +38,8 @@
 #define FLINT_BITS 32
 #endif
 
+#define mp_bitcnt_t unsigned long
+
 #define FLINT_ASSERT(param)
 
 #define FLINT_MAX(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz1) : (zzz2))

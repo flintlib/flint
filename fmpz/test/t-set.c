@@ -23,62 +23,61 @@
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+int main(void)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
+   int result;
+   printf("set....");
+   fflush(stdout);
 
-   if (n % 2 == 0)
+   gmp_randstate_t state;
+   gmp_randinit_default(state);
+   
+   for (ulong i = 0; i < 100000UL; i++) 
    {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
+      fmpz_t a, b;
+      mpz_t c, d;
+      mp_bitcnt_t bits;
 
-   n1 = n - 1;
-	
-   n_factor_init(&factors);
+      mpz_init(c);
+      mpz_init(d);
 
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
+      bits = n_randint(200) + 1;
+      
+      mpz_rrandomb(c, state, bits);
+      if (n_randint(2)) mpz_neg(c, c);
 
-   ninv = n_preinvert_limb(n);
+      fmpz_init(a);
+      fmpz_init(b);
+      
+      fmpz_set_mpz(a, c);
+      fmpz_set(b, a);
+      fmpz_get_mpz(d, b);
+      
+      result = (mpz_cmp(c, d) == 0);
 
-   for (i = factors.num - 1; i >= 0 ; i--)
-	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
-
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
-
-		if (j == iterations)
+      if (!result)
       {
-			return -1;
-		}
-	}
+         printf("FAIL\n");
+         gmp_printf("c = %Zd, d = %Zd\n", c, d);
+         abort();
+      }
 
-	if (n_gcd(n, c) != 1UL) return 0;
+      fmpz_clear(a);
+      fmpz_clear(b);
 
-	return 1;
+      mpz_clear(c);
+      mpz_clear(d);
+   }
+
+   gmp_randclear(state);
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }

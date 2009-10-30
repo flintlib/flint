@@ -1,7 +1,5 @@
 /*============================================================================
 
-    Copyright (C) 2009 William Hart
-
     This file is part of FLINT.
 
     FLINT is free software; you can redistribute it and/or modify
@@ -19,19 +17,19 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
+/****************************************************************************
 
-mp_limb_t n_factor_partial1(n_factor_t * factors, mp_limb_t n)
+   Copyright (C) 2009 William Hart
 
-   This is a factoring algorithm which tries to not expend much
-   effort on factoring n. It is used by n_is_prime_pocklington.
+*****************************************************************************/
 
-   One requires an initialised n_factor_t structure. Use the
-   function n_factor_init defined in ulong_extras for this. 
+#include <mpir.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
 
-   If a composite cofactor still remains, this is returned, 
-   otherwise all the factors found are inserted into the 
-   n_factor_t as per n_factor_trial.
-
-   It starts with trial factoring using n_factor_trial_gcd. If a
-   cofactor is returned, if it isn't prime, we expend some energy 
-   on trying to split it with n_factor_one_line.
+void fmpz_get_mpz(mpz_t x, const fmpz_t f)
+{
+	if (!COEFF_IS_MPZ(*f)) mpz_set_si(x, *f); // set x to small value
+	else mpz_set(x, COEFF_TO_PTR(*f)); // set x to large value
+}

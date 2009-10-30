@@ -23,49 +23,60 @@
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-mp_limb_t n_factor_partial1(n_factor_t * factors, mp_limb_t n)
+int main(void)
 {
-   mp_limb_t n1, n2;
-   mp_limb_t cofactor = n_factor_trial_gcd(factors, n);
+   int result;
+   printf("swap....");
+   fflush(stdout);
 
-   if (cofactor == 1UL) return 1UL;
+   fmpz_randinit();
 
-   if (!n_is_prime(cofactor))
+   for (ulong i = 0; i < 100000UL; i++) 
    {
-      n1 = n_factor_one_line(cofactor, FLINT_FACTOR_PARTIAL1_CUTOFF);
-      if (!n1) return cofactor;
+      fmpz_t a, b;
+      mpz_t c, d;
+      
+      fmpz_init(a);
+      fmpz_init(b);
 
-      n2 = cofactor/n1;
+      mpz_init(c);
+      mpz_init(d);
 
-      if (!n_is_prime(n2)) 
+      fmpz_randtest(a, 200);
+      fmpz_randtest(b, 200);
+      
+      fmpz_get_mpz(c, a);
+
+      fmpz_swap(a, b);
+
+      fmpz_get_mpz(d, b);
+
+      result = (mpz_cmp(c, d) == 0);
+
+      if (!result)
       {
-         if (!n_is_prime(n1)) return cofactor;
-
-         factors->p[factors->num] = n1;
-         factors->exp[factors->num++] = n_remove(&cofactor, n1);
-
-         return cofactor;
-      } else
-      {
-         factors->p[factors->num] = n2;
-         factors->exp[factors->num++] = n_remove(&cofactor, n2);
-
-         if (!n_is_prime(cofactor)) return cofactor;
-
-         factors->p[factors->num] = cofactor;
-         factors->exp[factors->num++] = 1;
-
-         return 1UL;
+         printf("FAIL\n");
+         gmp_printf("c = %Zd, d = %Zd\n", c, d);
+         abort();
       }
-   } else
-   {
-      factors->p[factors->num] = cofactor;
-      factors->exp[factors->num++] = 1;
 
-      return 1UL;
+      fmpz_clear(a);
+      fmpz_clear(b);
+
+      mpz_clear(c);
+      mpz_clear(d);
    }
+
+   fmpz_randclear();
+
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }

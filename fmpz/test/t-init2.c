@@ -23,62 +23,41 @@
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+int main(void)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
-
-   if (n % 2 == 0)
+   int result;
+   printf("init/init2/clear....");
+   fflush(stdout);
+   
+   for (ulong i = 0; i < 100000UL; i++) 
    {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
+      fmpz_t a;
 
-   n1 = n - 1;
-	
-   n_factor_init(&factors);
+      fmpz_init2(a, n_randint(100));
+      fmpz_clear(a);      
+   }
 
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
+   for (ulong i = 0; i < 100000UL; i++) 
+   {
+      fmpz_t a;
 
-   ninv = n_preinvert_limb(n);
+      fmpz_init(a);
+      fmpz_randtest(a, 62);
+      
+      _fmpz_promote_val(a);
+      _fmpz_demote_val(a);
 
-   for (i = factors.num - 1; i >= 0 ; i--)
-	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
+      fmpz_clear(a);
+   }
 
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
-
-		if (j == iterations)
-      {
-			return -1;
-		}
-	}
-
-	if (n_gcd(n, c) != 1UL) return 0;
-
-	return 1;
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }

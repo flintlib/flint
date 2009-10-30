@@ -53,9 +53,6 @@ mp_limb_t flint_primes_cutoff = 0;
 
 double * flint_prime_inverses;
 
-mp_limb_t * prime_prod = NULL;
-mp_size_t prime_prod_n;
-
 ulong flint_num_primes = 0;
 pthread_mutex_t flint_num_primes_mutex;
 
@@ -179,20 +176,6 @@ void n_compute_primes(ulong num)
    flint_num_primes = num_primes;
 
    free(sieve);
-
-   if (!prime_prod)
-   {
-      prime_prod = malloc((FLINT_NUM_FACTOR_GCD_PRIMES/3)*sizeof(mp_limb_t));
-      prime_prod_n = 1;
-      prime_prod[0] = 1UL;
-
-      for (int i = 0; i < FLINT_NUM_FACTOR_GCD_PRIMES; i++)
-      {
-         mp_limb_t cy;
-         prime_prod[prime_prod_n] = cy = mpn_mul_1(prime_prod, prime_prod, prime_prod_n, flint_primes[i]);
-         if (cy) prime_prod_n++;
-      }
-   }
    
    pthread_mutex_unlock(&flint_num_primes_mutex);
 }

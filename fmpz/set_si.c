@@ -23,43 +23,20 @@
 
 *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int main(void)
+void fmpz_set_si(fmpz_t f, const long val)
 {
-   int result;
-   printf("factor_trial_gcd....");
-   fflush(stdout);
- 
-   for (ulong i = 0; i < 10000UL; i++) /* Test random numbers */
-   {
-      mp_limb_t n1, n2;
-      n_factor_t factors;
-
-      n_factor_init(&factors);
-
-      n1 = n_randtest_not_zero();
-      n2 = n_factor_trial_gcd(&factors, n1);
-      
-      for (ulong i = 0; i < factors.num; i++)
-      {
-         n2 *= n_pow(factors.p[i], factors.exp[i]);
-      }
-
-      result = (n1 == n2);
-
-      if (!result)
-      {
-         printf("FAIL\n");
-         printf("n1 = %lu, n2 = %lu\n", n1, n2); 
-         abort();
-      }
-   }
-   
-   printf("PASS\n");
-   return 0;
+   if (FLINT_ABS(val) > COEFF_MAX) // val is large
+	{
+		__mpz_struct * mpz_coeff = _fmpz_promote(f);
+		mpz_set_si(mpz_coeff, val);		
+	} else 
+	{
+		_fmpz_demote(f);	
+		*f = val; // val is small
+	}
 }

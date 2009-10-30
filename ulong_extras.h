@@ -50,12 +50,9 @@ typedef struct factor_s
 #define FLINT_PSEUDOSQUARES_CUTOFF 1000
 
 #define FLINT_FACTOR_TRIAL_PRIMES 3000
-#define FLINT_FACTOR_PARTIAL1_CUTOFF 2000
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
 #define FLINT_FACTOR_ONE_LINE_MAX (1UL<<39)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
-#define FLINT_NUM_FACTOR_GCD_PRIMES 2000
-#define FLINT_FACTOR_GCD_LIMIT 17389
 
 extern const unsigned int flint_primes_small[];
 
@@ -66,10 +63,6 @@ extern double * flint_prime_inverses;
 extern mp_limb_t flint_num_primes;
 
 extern mp_limb_t flint_primes_cutoff;
-
-extern mp_limb_t * prime_prod;
-
-extern mp_size_t prime_prod_n;
 
 mp_limb_t n_randlimb(void);
 
@@ -216,12 +209,14 @@ void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp);
 mp_limb_t n_factor_trial_range(n_factor_t * factors, 
                          mp_limb_t n, ulong start, ulong num_primes);
 
+mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
+                 mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
+
 mp_limb_t n_factor_trial(n_factor_t * factors, 
                                   mp_limb_t n, mp_limb_t num_primes);
 
-mp_limb_t n_factor_trial_gcd(n_factor_t * factors, mp_limb_t n);
-
-mp_limb_t n_factor_partial1(n_factor_t * factors, mp_limb_t n);
+mp_limb_t n_factor_partial(n_factor_t * factors, 
+                           mp_limb_t n, mp_limb_t limit, int proved);
 
 mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n);
 
