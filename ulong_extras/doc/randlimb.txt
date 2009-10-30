@@ -22,8 +22,10 @@
 
 n_randlimb()
 
-   Returns a uniformly pseudo random limb. The algorithm generates
-   two random half limbs s_j, j = 0, 1, by iterating respectively 
-   v_{i+1} = (v_i*a + b)%p_j for some initial seed v_0, randomly 
-   chosen values a and b and p_0 = 4294967311 = nextprime(2^32) 
-   and p_1 = nextprime(p_0).
+   Returns a uniformly pseudo random limb. 
+
+   The algorithm generates two random half limbs s_j, j = 0, 1, 
+   by iterating respectively v_{i+1} = (v_i*a + b)%p_j for some 
+   initial seed v_0, randomly chosen values a and b and p_0 = 
+   4294967311 = nextprime(2^32) on a 64 bit machine and p_0 = 
+   nextprime(2^16) on a 32 bit machine and p_1 = nextprime(p_0).   

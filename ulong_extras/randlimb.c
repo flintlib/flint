@@ -27,6 +27,8 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+#if FLINT64
+
 mp_limb_t __randval = 4035456057UL;
 mp_limb_t __randval2 = 6748392731UL;
 
@@ -37,3 +39,18 @@ mp_limb_t n_randlimb(void)
     
    return __randval + (__randval2<<32);
 }
+
+#else
+
+mp_limb_t __randval = 3119766748UL;
+mp_limb_t __randval2 = 4225528843UL;
+
+mp_limb_t n_randlimb(void) 
+{   
+   __randval = (__randval*1573677563UL +  1626832774UL)%65537UL;
+   __randval2 = (__randval2*897228705UL +  1626832774UL)% 65539UL;
+    
+   return __randval + (__randval2<<16);
+}
+
+#endif
