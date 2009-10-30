@@ -42,7 +42,7 @@ int main(void)
 
       *a = 0L;
 
-      fmpz_randtest(a, 62);
+      fmpz_randtest(a, FLINT_BITS-2);
       
       *b = *a;
 

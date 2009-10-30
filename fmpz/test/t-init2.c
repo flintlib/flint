@@ -49,7 +49,7 @@ int main(void)
       fmpz_t a;
 
       fmpz_init(a);
-      fmpz_randtest(a, 62);
+      fmpz_randtest(a, FLINT_BITS-2);
       
       _fmpz_promote_val(a);
       _fmpz_demote_val(a);

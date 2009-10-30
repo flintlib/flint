@@ -32,7 +32,7 @@ void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
 {
    mp_bitcnt_t bits = n_randint(bits_in + 1);
    
-   if (bits <= 62)
+   if (bits <= FLINT_BITS - 2)
    {
       _fmpz_demote(f);
       *f = n_randbits(bits);
