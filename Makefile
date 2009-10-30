@@ -43,7 +43,7 @@ check: all $(LOBJS) library
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
 
 library: library-recursive $(LIB_OBJS)
-	$(CC) -fPIC -shared $(LIB_OBJS) -lmpir -lm -o libflint.a
+	$(CC) -fPIC -shared $(LIB_OBJS) -lmpir -lm -o libflint.so
 
 library-recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) library;) 
