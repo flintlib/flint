@@ -35,7 +35,9 @@ int n_is_probabprime(mp_limb_t n)
 
    if (n_is_perfect_power235(n)) return 0;
    
+#if FLINT64
    if (n >= 10000000000000000UL) return n_is_probabprime_BPSW(n);
+#endif
 
 	mp_limb_t d = n - 1;
    unsigned int norm;
@@ -43,9 +45,12 @@ int n_is_probabprime(mp_limb_t n)
    count_trailing_zeros(norm, d);
    d >>= norm;
 
+#if FLINT64
    if (n < 1122004669633UL)
+#else
+   if (n < 2147483648UL)
+#endif  
    {
-      
       if (n < FLINT_ODDPRIME_SMALL_CUTOFF)
          return n_is_oddprime_small(n);
 
@@ -62,12 +67,15 @@ int n_is_probabprime(mp_limb_t n)
          else return 0;
       }
 
+#if FLINT64
       if (n < 4759123141UL)
       {
+#endif
          if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
             && n_is_strong_probabprime_precomp(n, npre, 7UL, d) 
             && n_is_strong_probabprime_precomp(n, npre, 61UL, d)) return 1;
          else return 0;
+#if FLINT64
       }
       
       if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
@@ -77,8 +85,9 @@ int n_is_probabprime(mp_limb_t n)
             if (n != 46856248255981UL) return 1;
 
       return 0;
+#endif
    }
-   
+
 	mp_limb_t ninv = n_preinvert_limb(n);
    
    if (n_is_strong_probabprime2_preinv(n, ninv, 2UL, d) 
