@@ -40,7 +40,7 @@ int main(void)
       mp_limb_t a, b, d, r1, r2, norm, p1, p2, dinv;
       double dpre;
 
-      mp_limb_t bits = n_randint(53) + 1;
+      mp_limb_t bits = n_randint(FLINT_D_BITS) + 1;
       d = n_randbits(bits);
       a = n_randint(d);
       b = n_randint(d);

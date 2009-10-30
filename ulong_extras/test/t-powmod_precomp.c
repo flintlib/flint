@@ -46,7 +46,7 @@ int main(void)
       mpz_init(d_m);
       mpz_init(r2_m);
       
-      mp_limb_t bits = n_randint(53) + 1;
+      mp_limb_t bits = n_randint(FLINT_D_BITS) + 1;
       d = n_randbits(bits);
       do
       {
