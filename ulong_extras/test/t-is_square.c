@@ -39,7 +39,7 @@ int main(void)
    {
       mp_limb_t a, s, bits;
       
-      bits = n_randint(32) + 1;
+      bits = n_randint(FLINT_BITS/2) + 1;
       a = n_randbits(bits);
       s = a*a + n_randint(2*a) + 1;
 
@@ -57,7 +57,7 @@ int main(void)
    {
       mp_limb_t a, s, bits;
       
-      bits = n_randint(32);
+      bits = n_randint(FLINT_BITS/2);
       a = n_randbits(bits);
       s = a*a;
 
