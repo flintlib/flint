@@ -1,4 +1,4 @@
-CC=gcc -enable-auto-import
+CC=gcc
 CFLAGS=-std=c99 -O2
 LIBS=-L$(CURDIR) -L/home/wbhart/mpir-trunk/.libs -lmpir -lm
 INCS=-I$(CURDIR) -I/home/wbhart/mpir-trunk/

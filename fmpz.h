@@ -26,6 +26,7 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
+#include <stdio.h>
 #include <mpir.h>
 
 typedef long fmpz;
