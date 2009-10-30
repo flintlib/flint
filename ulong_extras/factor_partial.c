@@ -71,7 +71,10 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
            
          if ((factor >= cutoff) && !is_prime2(factor, proved))
 		   {
-		      if (((factor < FLINT_FACTOR_ONE_LINE_MAX) &&
+		      if ((
+#if FLINT64
+                 (factor < FLINT_FACTOR_ONE_LINE_MAX) &&
+#endif
                  (cofactor = n_factor_one_line(factor, FLINT_FACTOR_ONE_LINE_ITERS))) 
               || (cofactor = n_factor_SQUFOF(factor, FLINT_FACTOR_SQUFOF_ITERS)))
 				{
