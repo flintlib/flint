@@ -83,7 +83,7 @@ int main(void)
 
       base = n_randtest_not_zero();
       n1 = base;
-      exp = n_randint(64/FLINT_BIT_COUNT(n1)) + 1;
+      exp = n_randint(FLINT_BITS/FLINT_BIT_COUNT(n1)) + 1;
       n1 = n_pow(base, exp);
 
       orig_n = n1;
