@@ -31,5 +31,5 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double npre)
 {
    mp_limb_t quot = (mp_limb_t) ((double) a * npre);
    mp_limb_t rem = a - quot*n;
-   return rem - (n & (((mp_limb_signed_t) (n - rem - 1))>>63));
+   return rem - (n & (((mp_limb_signed_t) (n - rem - 1))>>(FLINT_BITS-1)));
 }

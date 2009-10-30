@@ -33,9 +33,11 @@
 
 #if __GMP_BITS_PER_MP_LIMB == 64
 #define FLINT_BITS 64
+#define FLINT_D_BITS 53
 #define FLINT64 1
 #else 
 #define FLINT_BITS 32
+#define FLINT_D_BITS 31
 #endif
 
 #define mp_bitcnt_t unsigned long
