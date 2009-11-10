@@ -142,6 +142,8 @@ mp_bitcnt_t fmpz_bits(const fmpz_t f);
 
 void fmpz_neg(fmpz_t f1, const fmpz_t f2);
 
+void fmpz_abs(fmpz_t f1, const fmpz_t f2);
+
 #endif
 
 
