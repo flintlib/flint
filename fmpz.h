@@ -148,6 +148,8 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_sub(fmpz_t f, const fmpz_t g, fmpz_t h);
 
+void fmpz_mul_ui(fmpz_t f, const fmpz_t g, const ulong x);
+
 #endif
 
 
