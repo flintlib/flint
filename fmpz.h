@@ -138,6 +138,8 @@ mp_size_t fmpz_size(const fmpz_t f);
 
 int fmpz_sgn(const fmpz_t f);
 
+mp_bitcnt_t fmpz_bits(const fmpz_t f);
+
 #endif
 
 
