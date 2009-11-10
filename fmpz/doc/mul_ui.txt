@@ -22,5 +22,5 @@
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, const ulong x)
 
-   Set f to be g*x where x is an unsigned single limb.
+   Set f to be g*x where x is an unsigned long.
  
