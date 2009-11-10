@@ -30,6 +30,8 @@ Maybe
 
 * make n_factor_t an array of length 1 so it can be passed by reference automatically, as per mpz_t's, etc
 
+* figure out how to write robust test code for fmpz_read (which reads from stdin), perhaps using a pipe.
+
 Enhancements
 ============
 
