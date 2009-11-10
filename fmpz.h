@@ -132,6 +132,8 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
+int fmpz_cmp(const fmpz_t f, const fmpz_t g);
+
 #endif
 
 
