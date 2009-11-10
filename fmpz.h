@@ -130,6 +130,8 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
 	*g = t;
 }
 
+int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
+
 #endif
 
 
