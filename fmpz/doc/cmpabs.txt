@@ -22,6 +22,6 @@
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
-   Returns a negative value if f < g, positive value if g < f, 
+   Returns a negative value if |f| < |g|, positive value if |g| < |f|, 
    otherwise returns 0.
  
