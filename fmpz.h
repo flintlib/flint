@@ -136,6 +136,8 @@ int fmpz_cmp(const fmpz_t f, const fmpz_t g);
 
 mp_size_t fmpz_size(const fmpz_t f);
 
+int fmpz_sgn(const fmpz_t f);
+
 #endif
 
 
