@@ -22,5 +22,5 @@
 
 void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, const ulong x)
 
-   Set f to be f+g*x where x is an unsigned long.
+   Set f to be f + g*x where x is an unsigned long.
  
