@@ -158,6 +158,8 @@ void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, const ulong exp);
 
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, const ulong exp);
 
+void fmpz_add_ui(fmpz_t f, const fmpz_t g, const ulong x);
+
 #endif
 
 
