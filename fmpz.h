@@ -194,6 +194,8 @@ void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+double fmpz_get_d_2exp(long * exp, const fmpz_t f);
+
 #endif
 
 
