@@ -46,10 +46,5 @@ double fmpz_get_d_2exp(long * exp, const fmpz_t f)
       if (d < 0L) return __gmpn_get_d(&d_abs, 1L, -1L, -*exp);
       else return __gmpn_get_d(&d, 1L, 1L, -*exp);
    } else 
-	{
-		
-		double ret = mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
-		
-		return ret;
-	}
+	   return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
 }
