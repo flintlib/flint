@@ -52,8 +52,10 @@ int main(void)
       mpz_init(f);
       
       fmpz_randtest(a, 200);
+      fmpz_randtest(b, 200);
       
       fmpz_get_mpz(d, a);
+      fmpz_get_mpz(e, b);
       x = n_randtest();
 
       fmpz_submul_ui(b, a, x);
