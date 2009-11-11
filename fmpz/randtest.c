@@ -23,6 +23,8 @@
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -43,4 +45,16 @@ void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
       mpz_rrandomb(mpz_ptr, fmpz_randstate, bits);
       if (n_randint(2)) mpz_neg(mpz_ptr, mpz_ptr);
    }
+}
+
+void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in)
+{
+   if (bits_in == 0)
+   {
+      printf("Exception : 0 passed to fmpz_randtest_not_zero\n");
+      abort();
+   }
+
+   fmpz_randtest(f, bits_in);
+   if (fmpz_is_zero(f)) fmpz_set_ui(f, 1UL);
 }

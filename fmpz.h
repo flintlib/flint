@@ -90,6 +90,8 @@ void fmpz_randclear(void);
 
 void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
 
+void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
+
 long fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
@@ -107,6 +109,12 @@ void fmpz_zero(fmpz_t f)
 {
    _fmpz_demote(f);	
    (*f) = 0L;
+}
+
+static inline
+int fmpz_is_zero(fmpz_t f)
+{
+   return (*f == 0);
 }
 
 void fmpz_set(fmpz_t f, const fmpz_t g);
