@@ -172,6 +172,8 @@ void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp);
 
+ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong h);
+
 #endif
 
 
