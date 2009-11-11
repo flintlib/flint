@@ -32,7 +32,7 @@ ulong z_gcd(long a, long b)
 {
    ulong ua = FLINT_ABS(a);
    ulong ub = FLINT_ABS(b);
-   long g;
+   ulong g;
 
    if (ua >= ub) g = n_gcd(ua, ub);
    else g = n_gcd(ub, ua);
