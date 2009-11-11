@@ -42,7 +42,7 @@ void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp)
    {
       ulong u1 = (long) FLINT_ABS(c1);
       ulong bits = (long) FLINT_BIT_COUNT(u1);
-      if (exp*bits <= FLINT_BITS - 2)
+      if ((bits <= 1) || (exp*bits <= FLINT_BITS - 2))
       {
          fmpz_set_ui(f, n_pow(u1, exp));
       } else
