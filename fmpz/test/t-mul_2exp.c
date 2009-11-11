@@ -66,7 +66,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd\n", d, e, f);
+         gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
          abort();
       }
 
@@ -106,7 +106,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd\n", d, e, f);
+         gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
          abort();
       }
 
