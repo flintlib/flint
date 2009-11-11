@@ -22,4 +22,5 @@
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f)
 
-   Returns f as a normalized double with 2-exponent exp.  
+   Returns f as a normalized double along with a 2-exponent exp,
+   i.e. if r is the return value then f = r*2^exp, to within 1 ULP.  
