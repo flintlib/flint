@@ -112,7 +112,7 @@ void fmpz_zero(fmpz_t f)
 }
 
 static inline
-int fmpz_is_zero(fmpz_t f)
+int fmpz_is_zero(const fmpz_t f)
 {
    return (*f == 0);
 }
