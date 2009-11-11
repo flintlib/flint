@@ -50,19 +50,16 @@ int main(void)
 
       fmpz_randtest(a, 200);
 
-      output = fmpz_get_d_2exp( &exp, a);
+      output = fmpz_get_d_2exp(&exp, a);
 
-      if (exp != 0)
-         result = ( (fabs(output) > 0.49) && (fabs(output) < 1.1) );
-      else
-         result = 1;
+      result = (fmpz_bits(a) == exp);
       
       if (!result)
       {
          printf("FAIL\n");
          printf("a = "); fmpz_print(a); printf("\n");
          printf("output = %f\n", output);
-         printf("exp = %ld\n", exp);
+         printf("exp = %ld, bits = %lu\n", exp, fmpz_bits(a));
          abort();
       }
 
