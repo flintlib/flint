@@ -192,6 +192,8 @@ void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
 #endif
 
 
