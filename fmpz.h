@@ -184,6 +184,8 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
 #endif
 
 
