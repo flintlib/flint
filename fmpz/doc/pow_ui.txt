@@ -22,5 +22,5 @@
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp)
 
-   Set f to be g^x where x is an unsigned long.
- 
+   Set f to be g^x where x is an unsigned long. If exp is 0
+   and g is 0, then f will be set to 1. 
