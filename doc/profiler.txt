@@ -64,8 +64,8 @@ prof_repeat()
    {
       myfunc_t * params = (myfunc_t *) arg;
 
-      ulong a = arg->a;
-      ulong b = arg->b;
+      ulong a = params->a;
+      ulong b = params->b;
 
       for (ulong i = 0; i < count; i++)
       {
