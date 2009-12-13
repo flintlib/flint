@@ -146,3 +146,15 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x)
    the polynomial is extended and zero coefficients inserted if 
    necessary.
 
+********************************************************************************
+
+  Input/output
+
+********************************************************************************
+
+void fmpz_poly_print(fmpz_poly_t poly)
+
+   Print the polynomial to stdout. First the length of the polynomial is
+   printed. If the length is not zero two spaces are printed after the 
+   length, then a space separated list of coefficients is printed, starting
+   with the constant coefficient.

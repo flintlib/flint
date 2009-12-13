@@ -84,6 +84,8 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x);
 
 void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n);
 
+void fmpz_poly_print(fmpz_poly_t poly);
+
 #endif
 
 
