@@ -161,13 +161,18 @@ void fmpz_poly_print(fmpz_poly_t poly)
 
 ********************************************************************************
 
-  Assignment, negation, reverse
+  Assignment, swap, negation, reverse
 
 ********************************************************************************
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set poly1 to equal poly2.
+
+void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
+
+   Swap poly1 and poly2. This is done efficiently without copying data
+   by swapping pointers, etc.
 
 ********************************************************************************
 
