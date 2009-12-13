@@ -69,6 +69,11 @@ void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
    to have the given length. Discarded coefficients are not necessarily 
    set to zero.
 
+void fmpz_poly_zero(fmpz_poly_t poly)
+
+   Set the polynomial to the zero polynomial, i.e. set the length to 
+   zero.
+
 ********************************************************************************
 
   Random polynomials
@@ -213,3 +218,15 @@ void _fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set res to poly1 - poly2. 
+
+********************************************************************************
+
+  Scalar Multiplication
+
+********************************************************************************
+
+void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+   Set poly1 to poly2 times the unsigned long x.
+
+

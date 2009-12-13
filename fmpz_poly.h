@@ -77,6 +77,12 @@ void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
    }  
 }
 
+static inline
+void fmpz_poly_zero(fmpz_poly_t poly)
+{
+   _fmpz_poly_set_length(poly, 0);
+}
+
 void fmpz_poly_randinit(void);
 
 void fmpz_poly_randclear(void);
@@ -114,6 +120,8 @@ void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t p
 void _fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x);
 
 #endif
 
