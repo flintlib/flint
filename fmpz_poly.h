@@ -19,55 +19,55 @@
 ===============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2009 William Hart
+ Copyright (C) 2006, 2007, 2008, 2009 William Hart
+ Copyright (C) 2009, Andy Novocin
  
 ******************************************************************************/
 
-#ifndef FLINT_H
-#define FLINT_H
+#ifndef FMPZ_POLY_H
+#define FMPZ_POLY_H
 
 #include <mpir.h>
-#include "longlong.h"
+#include "fmpz.h"
 
-#define ulong unsigned long
-
-#if __GMP_BITS_PER_MP_LIMB == 64
-#define FLINT_BITS 64
-#define FLINT_D_BITS 53
-#define FLINT64 1
-#else 
-#define FLINT_BITS 32
-#define FLINT_D_BITS 31
-#endif
-
-#define mp_bitcnt_t unsigned long
-
-#define FLINT_ASSERT(param)
-
-#define FLINT_MAX(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz1) : (zzz2))
-#define FLINT_MIN(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz2) : (zzz1))
-#define FLINT_ABS(zzz) ((long)(zzz) < 0 ? (-zzz) : (zzz))
-
-#define r_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)>>(shift)))
-
-#define l_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)<<(shift)))
-
-static inline 
-unsigned int FLINT_BIT_COUNT(mp_limb_t x)
+typedef struct
 {
-   unsigned int zeros = FLINT_BITS;
-   if (x) count_leading_zeros(zeros, x);
-   return FLINT_BITS - zeros;
+   fmpz * coeffs;
+   ulong alloc;
+   ulong length;
+} fmpz_poly_struct;
+
+typedef fmpz_poly_struct fmpz_poly_t[1];
+
+void fmpz_poly_init(fmpz_poly_t poly);
+
+void fmpz_poly_init2(fmpz_poly_t poly, const ulong alloc);
+
+void fmpz_poly_realloc(fmpz_poly_t poly, const ulong alloc);
+
+void fmpz_poly_fit_length(fmpz_poly_t poly, const ulong length);
+
+void fmpz_poly_clear(fmpz_poly_t poly);
+
+void _fmpz_poly_normalise(fmpz_poly_t poly);
+
+static inline
+void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
+{
+	if (poly->length > length) // only truncate if necessary
+   {
+      ulong i;
+      for (i = length; i < poly->length; i++)
+			_fmpz_demote(poly->coeffs + i);
+		poly->length = length;
+      _fmpz_poly_normalise(poly);
+   }  
 }
 
-#define mpn_zero(xxx, nnn) \
-   do \
-   { \
-      ulong ixxx; \
-      for (ixxx = 0; ixxx < (nnn); ixxx++) \
-         (xxx)[ixxx] = 0UL; \
-   } while (0)
-
 #endif
+
+
+
+
+
+
