@@ -60,6 +60,7 @@ int main(void)
       }
 
       fmpz_poly_clear(a);
+      fmpz_poly_clear(b);
    }
    
    for (ulong i = 0; i < 10000UL; i++) 
@@ -93,6 +94,7 @@ int main(void)
       fmpz_clear(x1);
       fmpz_clear(x2);
       fmpz_poly_clear(a);
+      fmpz_poly_clear(b);
    }
 
    fmpz_poly_randclear();
