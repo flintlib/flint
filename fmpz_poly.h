@@ -72,6 +72,10 @@ void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
 
 void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
 
+long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n);
+
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x);
+
 #endif
 
 

@@ -98,3 +98,22 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_i
    zero and the polynomial generated is guaranteed not to be the 
    zero polynomial. One must call fmpz_poly_randinit before calling
    this function.
+
+********************************************************************************
+
+  Coefficient get/set
+
+********************************************************************************
+
+long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n)
+   
+   Get coefficient n of poly as a long. The result is undefined if the 
+   value does not fit into a long. Coefficient number is from zero and if
+   n is set to a value beyond the end of the polynomial, zero is returned.
+
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
+
+   Set coefficient n of poly to the long value x. Coefficient numbering
+   starts from zero and if n is beyond the current length of poly then
+   the polynomial is extended and zero coefficients inserted if 
+   necessary.
