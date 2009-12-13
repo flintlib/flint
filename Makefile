@@ -38,7 +38,7 @@ recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir);) 
 
 check: all $(LOBJS) library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) -lflint $(LIBS);)
 	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
 
