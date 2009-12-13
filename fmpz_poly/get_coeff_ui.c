@@ -24,21 +24,14 @@
 *****************************************************************************/
 
 #include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
+ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n)
 {
-   fmpz_poly_fit_length(poly, n + 1);
+   if (n + 1 > poly->length) // coefficient is beyond end of polynomial
+      return 0;
    
-	if (n + 1 > poly->length) // insert zeroes between end of poly and new coeff if needed
-   {
-      mpn_zero(poly->coeffs + poly->length, n - poly->length);
-      poly->length = n+1;
-   }
-   
-	fmpz_set_si(poly->coeffs + n, x);
-   _fmpz_poly_normalise(poly); // we may have set leading coefficient to zero
+	return fmpz_get_ui(poly->coeffs + n);
 }

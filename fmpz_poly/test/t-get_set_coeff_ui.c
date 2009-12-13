@@ -19,26 +19,53 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
+   Copyright (C) 2009 William Hart
+
 *****************************************************************************/
 
-#include <mpir.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
+int main(void)
 {
-   fmpz_poly_fit_length(poly, n + 1);
+   int result;
+   printf("get/set_coeff_ui....");
+   fflush(stdout);
    
-	if (n + 1 > poly->length) // insert zeroes between end of poly and new coeff if needed
+   ulong i, j, coeff;
+   ulong n1, n2;
+   
+   for (i = 0; i < 1000UL; i++) 
    {
-      mpn_zero(poly->coeffs + poly->length, n - poly->length);
-      poly->length = n+1;
+      fmpz_poly_t a;
+      ulong length;
+
+      fmpz_poly_init(a);
+      length = n_randint(100) + 1;
+
+      for (j = 0; j < 1000; j++)
+      {
+         n1 = n_randtest();
+         coeff = n_randint(length);
+         fmpz_poly_set_coeff_ui(a, coeff, n1);
+         n2 = fmpz_poly_get_coeff_ui(a, coeff);
+
+         result = (n1 == n2);
+         if (!result)
+         {
+            printf("Error: n1 = %lu, n2 = %lu, coeff = %lu, length = %lu\n", n1, n2, coeff, length);
+            abort();
+         }
+      }
+
+      fmpz_poly_clear(a);      
    }
-   
-	fmpz_set_si(poly->coeffs + n, x);
-   _fmpz_poly_normalise(poly); // we may have set leading coefficient to zero
+      
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }

@@ -117,3 +117,16 @@ void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
    starts from zero and if n is beyond the current length of poly then
    the polynomial is extended and zero coefficients inserted if 
    necessary.
+
+long fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n)
+   
+   Get coefficient n of poly as a ulong. The result is undefined if the 
+   value does not fit into a ulong. Coefficient number is from zero and if
+   n is set to a value beyond the end of the polynomial, zero is returned.
+
+void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x)
+
+   Set coefficient n of poly to the ulong value x. Coefficient numbering
+   starts from zero and if n is beyond the current length of poly then
+   the polynomial is extended and zero coefficients inserted if 
+   necessary.

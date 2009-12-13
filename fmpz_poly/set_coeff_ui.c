@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
+void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x)
 {
    fmpz_poly_fit_length(poly, n + 1);
    
@@ -39,6 +39,6 @@ void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
       poly->length = n+1;
    }
    
-	fmpz_set_si(poly->coeffs + n, x);
+	fmpz_set_ui(poly->coeffs + n, x);
    _fmpz_poly_normalise(poly); // we may have set leading coefficient to zero
 }

@@ -76,6 +76,10 @@ long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n);
 
 void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x);
 
+ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n);
+
+void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x);
+
 #endif
 
 
