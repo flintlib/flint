@@ -28,6 +28,8 @@ TODO
 * Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and fmpz_invert, 
   respectively
 
+* Add fmpz_poly module
+
 Maybe
 =====
 
