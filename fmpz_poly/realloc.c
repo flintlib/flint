@@ -31,9 +31,10 @@
 
 void fmpz_poly_realloc(fmpz_poly_t poly, const ulong alloc)
 {
-   if (!alloc) // alloc == 0, clear up
+   if (!alloc) // alloc == 0, clear up, reinitialise
    {
          fmpz_poly_clear(poly);
+         fmpz_poly_init(poly);
 			return;
    }  
    

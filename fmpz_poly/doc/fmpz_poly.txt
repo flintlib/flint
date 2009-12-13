@@ -1,0 +1,70 @@
+/*============================================================================
+
+    Copyright (C) 2008, 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+********************************************************************************
+
+  Memory management
+
+********************************************************************************
+
+void fmpz_poly_init(fmpz_poly_t poly)
+
+   Initialise the poly for use. The length is set to zero.
+
+void fmpz_poly_init2(fmpz_poly_t poly, const ulong alloc)
+
+   Initialise the poly with space for at least alloc coefficients and
+   set the length to zero. The alloc coefficients are all set to zero.
+
+void fmpz_poly_realloc(fmpz_poly_t poly, const ulong alloc)
+
+   Reallocate the given polynomial to have space for alloc coefficients.
+   If alloc is set to zero then the polynomial is cleared and then
+   reinitialised. If the current length is greater than alloc the poly
+   is first truncated to length alloc.
+
+void fmpz_poly_fit_length(fmpz_poly_t poly, const ulong length)
+
+   If length is currently greater that the number of coefficients
+   allocated, then the polynomial is reallocated to have space for at
+   least length coefficients. No data is lost when calling this 
+   function. The function efficiently deals with the case where 
+   fit_length is called many times in small increments by at least 
+   doubling the number of allocated coefficients when length is larger 
+   than the number of coefficients currently allocated.
+
+void fmpz_poly_clear(fmpz_poly_t poly)
+
+   Clear the given poly, releasing any memory used. The poly must
+   be reinitialised in order to be used again.
+
+void _fmpz_poly_normalise(fmpz_poly_t poly)
+
+   Set the length of poly so that the top coefficient is nonzero. If
+   all coefficients are zero, the length is set to zero. This function
+   is mainly used internally, as all functions guarantee normalisation.
+
+void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
+
+   If the current length of poly is greater than length, it is truncated
+   to have the given length. Discarded coefficients are not necessarily 
+   set to zero.
