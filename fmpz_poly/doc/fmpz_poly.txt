@@ -229,4 +229,8 @@ void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
    Set poly1 to poly2 times the unsigned long x.
 
+void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+   Set poly1 to poly2 times the signed long x.
+
 
