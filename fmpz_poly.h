@@ -105,6 +105,8 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2);
 
+void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
+
 #endif
 
 
