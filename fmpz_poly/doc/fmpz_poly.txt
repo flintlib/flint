@@ -158,3 +158,24 @@ void fmpz_poly_print(fmpz_poly_t poly)
    printed. If the length is not zero two spaces are printed after the 
    length, then a space separated list of coefficients is printed, starting
    with the constant coefficient.
+
+********************************************************************************
+
+  Assignment, negation, reverse
+
+********************************************************************************
+
+void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Set poly1 to equal poly2.
+
+********************************************************************************
+
+  Comparison
+
+********************************************************************************
+
+int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Return 1 if poly1 is equal to poly2, otherwise return 0. Polys are
+   assumed to be normalised.

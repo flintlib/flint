@@ -52,6 +52,19 @@ void fmpz_poly_clear(fmpz_poly_t poly);
 void _fmpz_poly_normalise(fmpz_poly_t poly);
 
 static inline
+void _fmpz_poly_set_length(fmpz_poly_t poly, const ulong length)
+{
+	if (poly->length > length) // demote coefficients beyond new length
+   {
+      ulong i;
+      for (i = length; i < poly->length; i++)
+			_fmpz_demote(poly->coeffs + i);	
+   } 
+
+	poly->length = length;
+}
+
+static inline
 void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
 {
 	if (poly->length > length) // only truncate if necessary
@@ -85,6 +98,10 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x);
 void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n);
 
 void fmpz_poly_print(fmpz_poly_t poly);
+
+void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 #endif
 
