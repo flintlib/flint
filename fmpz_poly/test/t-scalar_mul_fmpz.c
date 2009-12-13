@@ -34,7 +34,7 @@
 int main(void)
 {
    int result;
-   printf("scalar_mul_ui....");
+   printf("scalar_mul_fmpz....");
    fflush(stdout);
    
    fmpz_poly_randinit();
@@ -43,14 +43,16 @@ int main(void)
    for (ulong i = 0; i < 10000UL; i++) 
    {
       fmpz_poly_t a, b;
-      ulong n = n_randtest();
+      fmpz_t n;
+      fmpz_init(n);
+      fmpz_randtest(n, 200);
 
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_randtest(a, n_randint(100), n_randint(200));
       
-      fmpz_poly_scalar_mul_ui(b, a, n);
-      fmpz_poly_scalar_mul_ui(a, a, n);
+      fmpz_poly_scalar_mul_fmpz(b, a, n);
+      fmpz_poly_scalar_mul_fmpz(a, a, n);
       
       result = (fmpz_poly_equal(a, b));
       if (!result)
@@ -61,39 +63,40 @@ int main(void)
          abort();
       }
 
+      fmpz_clear(n);
       fmpz_poly_clear(a);
       fmpz_poly_clear(b);
    }
 
-   // check (a*n1)*n2 = a*(n1*n2)
+   // compare with fmpz_poly_scalar_mul_si
    for (ulong i = 0; i < 10000UL; i++) 
    {
       fmpz_poly_t a, b, c;
-      ulong n1 = n_randbits(FLINT_BITS/2);
-      ulong n2 = n_randbits(FLINT_BITS/2);
+      fmpz_t n1;
+      fmpz_init(n1);
+      long n = (long) n_randbits(FLINT_BITS - 1);
+      if (n_randint(2)) n = -n;
+      fmpz_set_si(n1, n);
 
       fmpz_poly_init(a);
       fmpz_poly_init(b);
-      fmpz_poly_init(c);
       fmpz_poly_randtest(a, n_randint(100), n_randint(200));
       
-      fmpz_poly_scalar_mul_ui(b, a, n1);
-      fmpz_poly_scalar_mul_ui(c, b, n2);
-      fmpz_poly_scalar_mul_ui(b, a, n1*n2);
-
-      result = (fmpz_poly_equal(b, c));
+      fmpz_poly_scalar_mul_fmpz(b, a, n1);
+      fmpz_poly_scalar_mul_si(a, a, n);
+      
+      result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error n1 = %lu, n2 = %lu:\n", n1, n2);
+         printf("Error:\n");
          fmpz_poly_print(a); printf("\n\n");
          fmpz_poly_print(b); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
          abort();
       }
 
+      fmpz_clear(n1);
       fmpz_poly_clear(a);
       fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
    }
 
    fmpz_poly_randclear();

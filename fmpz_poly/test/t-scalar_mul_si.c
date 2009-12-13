@@ -39,10 +39,10 @@ int main(void)
    
    fmpz_poly_randinit();
    
-   // check aliasing of a and c
+   // check aliasing of a and b
    for (ulong i = 0; i < 10000UL; i++) 
    {
-      fmpz_poly_t a, b, c;
+      fmpz_poly_t a, b;
       long n = (long) n_randtest();
 
       fmpz_poly_init(a);
