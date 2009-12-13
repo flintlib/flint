@@ -70,7 +70,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL\n");
-         printf("a = %lu, exp = %lu, d = %lu\n", a, exp, d); 
+         printf("a = %lu, exp = %ld, d = %lu\n", a, exp, d); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();
       }
