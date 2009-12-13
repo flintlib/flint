@@ -38,9 +38,13 @@ recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir);) 
 
 check: all $(LOBJS) library
+ifndef MOD
 	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) -lflint $(LIBS);)
 	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
+else
+	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;)
+endif
 
 library: library-recursive $(LIB_OBJS)
 	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS) -lmpir -lm -o libflint.so

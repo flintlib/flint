@@ -64,6 +64,14 @@ void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
    }  
 }
 
+void fmpz_poly_randinit(void);
+
+void fmpz_poly_randclear(void);
+
+void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
+
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
+
 #endif
 
 
