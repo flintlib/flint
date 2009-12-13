@@ -80,6 +80,10 @@ ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n);
 
 void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x);
 
+void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x);
+
+void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n);
+
 #endif
 
 
