@@ -127,6 +127,10 @@ void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x);
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
 
+void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n);
+
+void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n);
+
 #endif
 
 
