@@ -38,6 +38,7 @@ void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
    for (i = 0; i < length; i++)
       fmpz_randtest(f->coeffs + i, bits_in);
    
+   _fmpz_poly_set_length(f, length);
    _fmpz_poly_normalise(f);
 }
 
