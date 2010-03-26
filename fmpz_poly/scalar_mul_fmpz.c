@@ -35,8 +35,18 @@ void _fmpz_poly_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, co
 		 
 	if (!COEFF_IS_MPZ(c))
 	{
-        for (i = 0; i < len2; i++)
-			fmpz_mul_si(poly1 + i, poly2 + i, c);
+        if (c == 0)
+		    for (i = 0; i < len2; i++)
+			    fmpz_zero(poly1 + i);
+		else if (c == 1)
+		    for (i = 0; i < len2; i++)
+			    fmpz_set(poly1 + i, poly2 + i);
+		else if (c == -1)
+		    for (i = 0; i < len2; i++)
+			    fmpz_neg(poly1 + i, poly2 + i);
+		else
+		    for (i = 0; i < len2; i++)
+			    fmpz_mul_si(poly1 + i, poly2 + i, c);
 	} else
 	{
         for (i = 0; i < len2; i++)
@@ -52,21 +62,7 @@ void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const
 	    fmpz_poly_zero(poly1);
 		return;
 	}
-	
-	// special case, muliply by 1
-	if (*x == 1L)
-	{
-	    fmpz_poly_set(poly1, poly2);
-		return;
-	}
-	
-	// special case, muliply by -1
-	if (*x == -1L)
-	{
-	    fmpz_poly_neg(poly1, poly2);
-		return;
-	}
-	
+		
 	fmpz_poly_fit_length(poly1, poly2->length);
 	
 	_fmpz_poly_scalar_mul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);

@@ -42,12 +42,13 @@ void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1,
       long i, j;
       
       // Set res[i] = poly1[i]*poly2[0] 
-      if (poly2[0])
+      _fmpz_poly_scalar_mul_fmpz(res, poly1, len1, poly2);
+	  /*if (poly2[0])
 		for (i = 0; i < len1; i++)
            fmpz_mul(res + i, poly1 + i, poly2);
 	  else 
 		for (i = 0; i < len1; i++)
-           fmpz_zero(res + i);
+           fmpz_zero(res + i);*/
    
       // Set res[i+len1-1] = in1[len1-1]*in2[i]
       if (poly1[len1 - 1])
