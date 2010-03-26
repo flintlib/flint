@@ -40,7 +40,7 @@ int main(void)
    fmpz_poly_randinit();
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (ulong i = 0; i < 2000UL; i++) 
    {
       fmpz_poly_t a, b, c;
       
@@ -67,28 +67,25 @@ int main(void)
       fmpz_poly_clear(c);
    }
 
-   // check (a*n1)*n2 = a*(n1*n2)
-   /*for (ulong i = 0; i < 10000UL; i++) 
+   // check aliasing of a and c
+   for (ulong i = 0; i < 2000UL; i++) 
    {
       fmpz_poly_t a, b, c;
-      ulong n1 = n_randbits(FLINT_BITS/2);
-      ulong n2 = n_randbits(FLINT_BITS/2);
-
+      
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+   
+	  fmpz_poly_mul_classical(a, b, c);
+      fmpz_poly_mul_classical(c, b, c);
       
-      fmpz_poly_scalar_mul_ui(b, a, n1);
-      fmpz_poly_scalar_mul_ui(c, b, n2);
-      fmpz_poly_scalar_mul_ui(b, a, n1*n2);
-
-      result = (fmpz_poly_equal(b, c));
+      result = (fmpz_poly_equal(a, c));
       if (!result)
       {
-         printf("Error n1 = %lu, n2 = %lu:\n", n1, n2);
+         printf("Error:\n");
          fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
          fmpz_poly_print(c); printf("\n\n");
          abort();
       }
@@ -96,7 +93,44 @@ int main(void)
       fmpz_poly_clear(a);
       fmpz_poly_clear(b);
       fmpz_poly_clear(c);
-   }*/
+   }
+
+   // check (b*c)+(b*d) = b*(c+d)
+   for (ulong i = 0; i < 2000UL; i++) 
+   {
+      fmpz_poly_t a1, a2, b, c, d;
+      
+      fmpz_poly_init(a1);
+      fmpz_poly_init(a2);
+      fmpz_poly_init(b);
+      fmpz_poly_init(c);
+      fmpz_poly_init(d);
+      fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+      fmpz_poly_randtest(c, n_randint(100), n_randint(200));
+      fmpz_poly_randtest(d, n_randint(100), n_randint(200));
+      
+	  fmpz_poly_mul_classical(a1, b, c);
+	  fmpz_poly_mul_classical(a2, b, d);
+      fmpz_poly_add(a1, a1, a2);
+
+	  fmpz_poly_add(c, c, d);
+      fmpz_poly_mul_classical(a2, b, c);
+	  
+      result = (fmpz_poly_equal(a1, a2));
+      if (!result)
+      {
+		 printf("Error:\n");
+		 fmpz_poly_print(a1); printf("\n\n");
+         fmpz_poly_print(a2); printf("\n\n");
+         abort();
+      }
+
+      fmpz_poly_clear(a1);
+      fmpz_poly_clear(a2);
+      fmpz_poly_clear(b);
+      fmpz_poly_clear(c);
+      fmpz_poly_clear(d);
+   }
 
    fmpz_poly_randclear();
       
