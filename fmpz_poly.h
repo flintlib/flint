@@ -89,7 +89,8 @@ void fmpz_poly_randclear(void);
 
 void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, 
+                                       ulong length, mp_bitcnt_t bits_in);
 
 long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n);
 
@@ -101,7 +102,8 @@ void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x);
 
 void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x);
 
-void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n);
+void fmpz_poly_get_coeff_fmpz(fmpz_t x, 
+                                    const fmpz_poly_t poly, const ulong n);
 
 void fmpz_poly_print(fmpz_poly_t poly);
 
@@ -113,23 +115,36 @@ void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2);
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
 
-void _fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+void _fmpz_poly_add(fmpz * res, const fmpz * poly1, ulong len1, 
+					                      const fmpz * poly2, ulong len2);
 
-void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                   const fmpz_poly_t poly2);
 
-void _fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, 
+					                        const fmpz * poly2, ulong len2);
 
-void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                   const fmpz_poly_t poly2);
 
 void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x);
 
-void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x);
+void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
+                                   const fmpz_poly_t poly2, const fmpz_t x);
 
-void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n);
+void fmpz_poly_shift_left(fmpz_poly_t res, 
+                                     const fmpz_poly_t poly, const ulong n);
 
-void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n);
+void fmpz_poly_shift_right(fmpz_poly_t res, 
+                                     const fmpz_poly_t poly, const ulong n);
+
+void _fmpz_poly_mul_classical(fmpz_poly_t res, 
+                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+void fmpz_poly_mul_classical(fmpz_poly_t res, 
+                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 #endif
 

@@ -201,7 +201,8 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
 ********************************************************************************
 
-void _fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+void _fmpz_poly_add(fmpz * res, const fmpz * poly1, ulong len1, 
+                                                      const fmpz * poly2, ulong len2)
 
    Set res to poly1 + poly2. It is assumed that res has sufficient space for the longer
    of the two polynomials.
@@ -210,7 +211,8 @@ void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t p
 
    Set res to poly1 + poly2. 
 
-void _fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, 
+                                                      const fmpz * poly2, ulong len2)
 
    Set res to poly1 - poly2. It is assumed that res has sufficient space for the longer
    of the two polynomials.
