@@ -204,8 +204,8 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, ulong len1, 
                                                       const fmpz * poly2, ulong len2)
 
-   Set res to poly1 + poly2. It is assumed that res has sufficient space for the longer
-   of the two polynomials.
+   Set res to {poly1, len1} + {poly2, len2}. It is assumed that res has sufficient 
+   space for the longer of the two polynomials.
 
 void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
@@ -214,8 +214,8 @@ void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t p
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, 
                                                       const fmpz * poly2, ulong len2)
 
-   Set res to poly1 - poly2. It is assumed that res has sufficient space for the longer
-   of the two polynomials.
+   Set res to {poly1, len1} - {poly2, len2}. It is assumed that res has sufficient 
+   space for the longer of the two polynomials.
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
@@ -248,3 +248,21 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, const ulong 
 
    Set res to poly shifted right by n coeffs. If n is bigger than the 
    current length of poly, res is set to the zero polynomial.
+
+********************************************************************************
+
+  Multiplication
+
+********************************************************************************
+
+void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, ulong len1, 
+                                                  const fmpz * poly2, ulong len2)
+
+   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
+   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
+   inputs with outputs is allowed.
+
+void fmpz_poly_mul_classical(fmpz_poly_t res, 
+                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Set res to poly1 multiplied by poly2.

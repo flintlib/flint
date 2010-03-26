@@ -47,8 +47,8 @@ int main(void)
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(100), n_randint(200));
+      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
    
 	  fmpz_poly_mul_classical(a, b, c);
       fmpz_poly_mul_classical(b, b, c);
