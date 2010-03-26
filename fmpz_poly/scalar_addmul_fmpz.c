@@ -38,11 +38,9 @@ void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2,
         if (c == 0)
 		    return;
 		else if (c == 1)
-		    for (i = 0; i < len2; i++)
-			    fmpz_add(poly1 + i, poly1 + i, poly2 + i);
+		    _fmpz_poly_add(poly1, poly1, len2, poly2, len2);
 		else if (c == -1)
-		    for (i = 0; i < len2; i++)
-			    fmpz_sub(poly1 + i, poly1 + i, poly2 + i);
+		    _fmpz_poly_sub(poly1, poly1, len2, poly2, len2);
 		else if (c > 0)
 		    for (i = 0; i < len2; i++)
 			    fmpz_addmul_ui(poly1 + i, poly2 + i, c);
