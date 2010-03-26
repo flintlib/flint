@@ -28,7 +28,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_sub(fmpz_t f, const fmpz_t g, fmpz_t h)
+void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
 	fmpz c1 = *g;
 	fmpz c2 = *h;
