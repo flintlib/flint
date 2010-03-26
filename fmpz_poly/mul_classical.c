@@ -32,51 +32,22 @@
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, 
 							              ulong len1, const fmpz * poly2, ulong len2)
 {
-   ulong len_out = len1 + len2 - 1;
-   
    if ((len1 == 1) && (len2 == 1)) // Special case if the length of both inputs is 1
    {
       fmpz_mul(res, poly1, poly2);      
    } else // Ordinary case
    {
-      long i, j;
+      long i;
       
       // Set res[i] = poly1[i]*poly2[0] 
       _fmpz_poly_scalar_mul_fmpz(res, poly1, len1, poly2);
-	  /*if (poly2[0])
-		for (i = 0; i < len1; i++)
-           fmpz_mul(res + i, poly1 + i, poly2);
-	  else 
-		for (i = 0; i < len1; i++)
-           fmpz_zero(res + i);*/
-   
+	  
       // Set res[i+len1-1] = in1[len1-1]*in2[i]
-      if (poly1[len1 - 1])
-	     for (i = 1; i < len2; i++)
-            fmpz_mul(res + i + len1 - 1, poly1 + len1 - 1, poly2 + i);  
-	  else 
-         for (i = 1; i < len2; i++)
-            fmpz_zero(res + i + len1 - 1);
-      
+      _fmpz_poly_scalar_mul_fmpz(res + len1, poly2 + 1, len2 - 1, poly1 + len1 - 1);
+	    
       // out[i+j] += in1[i]*in2[j] 
       for (i = 0; i < len1 - 1; i++)
-      {      
-         fmpz c = poly1[i];
-		 if (c)
-		 {
-		    if (!COEFF_IS_MPZ(c))
-		    {
-		       if (c < 0L) 
-			      for (j = 1; j < len2; j++)
-                     fmpz_submul_ui(res + i + j, poly2 + j, -c);
-			   else
-                  for (j = 1; j < len2; j++)
-				     fmpz_addmul_ui(res + i + j, poly2 + j, c);
-		    } else
-		       for (j = 1; j < len2; j++)
-                  fmpz_addmul(res + i + j, poly1 + i, poly2 + j);
-	     }
-      }
+         _fmpz_poly_scalar_addmul_fmpz(res + i + 1, poly2 + 1, len2 - 1, poly1 + i);
    } 
 }
 
