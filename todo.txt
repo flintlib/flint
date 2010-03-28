@@ -30,7 +30,7 @@ TODO
 
 * Write test code for fmpz_poly_scalar_addmul_fmpz
 
-* Write _fmpz_poly_zero/neg/set/scalar_mul_si and use in _fmpz_poly_scalar_addmul_fmpz
+* Write test code for fmpz_vec functions
 
 Maybe
 =====
