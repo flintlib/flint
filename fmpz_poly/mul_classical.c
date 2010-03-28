@@ -26,6 +26,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 // Assumes poly1 and poly2 are not length 0
@@ -47,7 +48,7 @@ void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1,
 	    
       // out[i+j] += in1[i]*in2[j] 
       for (i = 0; i < len1 - 1; i++)
-         _fmpz_poly_scalar_addmul_fmpz(res + i + 1, poly2 + 1, len2 - 1, poly1 + i);
+         _fmpz_vec_scalar_addmul_fmpz(res + i + 1, poly2 + 1, len2 - 1, poly1 + i);
    } 
 }
 

@@ -19,7 +19,7 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+   Copyright (C) 2010 William Hart
    
 *****************************************************************************/
 
@@ -27,20 +27,11 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
-void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
+void _fmpz_vec_add(fmpz * res, const fmpz * vec1, const fmpz * vec2, ulong len2)
 {
-	// either scalar or input poly is zero
-	if ((*x == 0) || (poly2->length == 0)) 
-	{
-	    return;
-	}
-		
-	fmpz_poly_fit_length(poly1, poly2->length);
-	
-	_fmpz_vec_scalar_addmul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
-
-	_fmpz_poly_set_length(poly1, poly2->length);
+	ulong i;
+    for (i = 0; i < len2; i++)
+        fmpz_add(res + i, vec1 + i, vec2 + i); 
 }
 

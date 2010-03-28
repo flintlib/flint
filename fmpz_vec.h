@@ -35,9 +35,23 @@ void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2);
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2);
 
-void _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, ulong len2, long c);
+void _fmpz_vec_scalar_mul_si(fmpz * vec1, 
+							 const fmpz * vec2, ulong len2, long c);
 
-void _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x);
+void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
+		            const fmpz * vec2, ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
+						     const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, 
+	                const fmpz * poly2, ulong len2, const fmpz_t x);
+
+void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
+				                     const fmpz * vec2, ulong len2);
+
+void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
+				                     const fmpz * vec2, ulong len2);
 
 #endif
 
