@@ -29,7 +29,7 @@
 #include <mpir.h>
 #include "fmpz.h"
 
-
+void _fmpz_vec_zero(fmpz * vec1, ulong len1);
 
 #endif
 

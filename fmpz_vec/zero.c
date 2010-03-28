@@ -27,46 +27,11 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
-void _fmpz_poly_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x)
+void _fmpz_vec_zero(fmpz * vec1, ulong len1)
 {
-	long i;
-	fmpz c = *x;
-		 
-	if (!COEFF_IS_MPZ(c))
-	{
-        if (c == 0)
-		    _fmpz_vec_zero(poly1, len2);
-		else if (c == 1)
-		    for (i = 0; i < len2; i++)
-			    fmpz_set(poly1 + i, poly2 + i);
-		else if (c == -1)
-		    for (i = 0; i < len2; i++)
-			    fmpz_neg(poly1 + i, poly2 + i);
-		else
-		    for (i = 0; i < len2; i++)
-			    fmpz_mul_si(poly1 + i, poly2 + i, c);
-	} else
-	{
-        for (i = 0; i < len2; i++)
-			fmpz_mul(poly1 + i, poly2 + i, x);
-	}
-}
-
-void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
-{
-	// either scalar or input poly is zero
-	if ((*x == 0) || (poly2->length == 0)) 
-	{
-	    fmpz_poly_zero(poly1);
-		return;
-	}
-		
-	fmpz_poly_fit_length(poly1, poly2->length);
+	ulong i;
 	
-	_fmpz_poly_scalar_mul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
-
-	_fmpz_poly_set_length(poly1, poly2->length);
+	for (i = 0; i < len1; i++)
+		fmpz_zero(vec1 + i);
 }
-
