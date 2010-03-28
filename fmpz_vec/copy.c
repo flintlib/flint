@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_copy(fmpz * vec1, fmpz * vec2, ulong len2)
+void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2)
 {
 	ulong i;
 	

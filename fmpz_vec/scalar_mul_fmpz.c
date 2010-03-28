@@ -17,32 +17,35 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 William Hart
- 
-******************************************************************************/
-
-#ifndef FMPZ_VEC_H
-#define FMPZ_VEC_H
+   Copyright (C) 2010 William Hart
+   
+*****************************************************************************/
 
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-void _fmpz_vec_zero(fmpz * vec1, ulong len1);
-
-void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2);
-
-void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2);
-
-void _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, ulong len2, long c);
-
-void _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x);
-
-#endif
-
-
-
-
-
-
+void _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x)
+{
+	long i;
+	fmpz c = *x;
+		 
+	if (!COEFF_IS_MPZ(c))
+	{
+        if (c == 0)
+		    _fmpz_vec_zero(poly1, len2);
+		else if (c == 1)
+		    _fmpz_vec_copy(poly1, poly2, len2);
+		else if (c == -1)
+		    _fmpz_vec_neg(poly1, poly2, len2);
+		else
+		    _fmpz_vec_scalar_mul_si(poly1, poly2, len2, c);
+	} else
+	{
+        for (i = 0; i < len2; i++)
+			fmpz_mul(poly1 + i, poly2 + i, x);
+	}
+}

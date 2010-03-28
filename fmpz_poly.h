@@ -131,9 +131,6 @@ void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x);
 
-void _fmpz_poly_scalar_mul_fmpz(fmpz * poly1, 
-						    const fmpz * poly2, ulong len2, const fmpz_t x);
-
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 

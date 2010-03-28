@@ -40,10 +40,10 @@ void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1,
       long i;
       
       // Set res[i] = poly1[i]*poly2[0] 
-      _fmpz_poly_scalar_mul_fmpz(res, poly1, len1, poly2);
+      _fmpz_vec_scalar_mul_fmpz(res, poly1, len1, poly2);
 	  
       // Set res[i+len1-1] = in1[len1-1]*in2[i]
-      _fmpz_poly_scalar_mul_fmpz(res + len1, poly2 + 1, len2 - 1, poly1 + len1 - 1);
+      _fmpz_vec_scalar_mul_fmpz(res + len1, poly2 + 1, len2 - 1, poly1 + len1 - 1);
 	    
       // out[i+j] += in1[i]*in2[j] 
       for (i = 0; i < len1 - 1; i++)
