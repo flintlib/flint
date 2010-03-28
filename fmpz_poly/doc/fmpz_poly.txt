@@ -302,3 +302,17 @@ void fmpz_poly_mulhigh_classical(fmpz_poly_t res,
 
   Set the first start coefficients of res to zero and the remainder to the 
   corresponding coefficients of poly1*poly2.
+
+void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, 
+				          ulong len1, const fmpz * poly2, ulong len2)
+
+  Set res to the middle len1 - len2 + 1 coefficients of {poly1, len1}*{poly2, len2},
+  i.e. the coefficient from degree len2 - 1 to len1 - 1 inclusive. Assumes neither 
+  len1 nor len2 is zero and that len1 >= len2.
+
+void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
+                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+  Set res to the middle poly1->length - poly2->length + 1 coefficients of poly1*poly,
+  i.e. the coefficient from degree len2 - 1 to len1 - 1 inclusive. Assumes that len1 
+  >= len2.
