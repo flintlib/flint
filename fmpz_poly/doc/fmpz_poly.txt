@@ -277,3 +277,28 @@ void fmpz_poly_mul_classical(fmpz_poly_t res,
                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set res to poly1 multiplied by poly2.
+
+void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
+		           ulong len1, const fmpz * poly2, ulong len2, ulong trunc)
+
+   Set {res, trunc} to the first trunc coefficients of {poly1, len1} multiplied
+   by {poly2, len2}. Assumes 0 < trunc <= len1 + len2 - 1. Assumes neither len1
+   nor len2 is zero. 
+
+void fmpz_poly_mullow_classical(fmpz_poly_t res, 
+                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
+
+  Set res to the first trunc coefficients of poly1*poly2.
+
+void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, 
+		           ulong len1, const fmpz * poly2, ulong len2, ulong start)
+
+  Set the first start coefficients of res to zero and the remainder to the
+  corresponding coefficients of {poly1, len1}*{poly2, len2}. Assumes start
+  <= len1 + len2 - 1. Assumes neither len1 nor len2 is zero.
+
+void fmpz_poly_mulhigh_classical(fmpz_poly_t res, 
+                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong start)
+
+  Set the first start coefficients of res to zero and the remainder to the 
+  corresponding coefficients of poly1*poly2.

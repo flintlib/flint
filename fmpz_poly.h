@@ -149,9 +149,21 @@ void fmpz_poly_shift_right(fmpz_poly_t res,
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, ulong len1, 
 							                const fmpz * poly2, ulong len2);
 
-
 void fmpz_poly_mul_classical(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
+				   ulong len1, const fmpz * poly2, ulong len2, ulong trunc);
+
+void fmpz_poly_mullow_classical(fmpz_poly_t res, 
+             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc);
+
+void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, 
+				   ulong len1, const fmpz * poly2, ulong len2, ulong start);
+
+void fmpz_poly_mulhigh_classical(fmpz_poly_t res, 
+             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong start);
+
 
 #endif
 
