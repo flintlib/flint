@@ -35,6 +35,8 @@ void _fmpz_vec_copy(fmpz * vec1, fmpz * vec2, ulong len2);
 
 void _fmpz_vec_neg(fmpz * vec1, fmpz * vec2, ulong len2);
 
+void _fmpz_vec_scalar_mul_si(fmpz * vec1, fmpz * vec2, ulong len2, long c);
+
 #endif
 
 
