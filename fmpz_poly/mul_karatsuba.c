@@ -30,6 +30,27 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+/**
+   Implements karatsuba multiplication. There is no basecase crossover, so this is
+   only efficient when the coefficients are large (the main usage case).
+
+   The algorithm is the "odd/even" Karatsuba algorithm. Let f(x) = f1(x^2) + x*f2(x^2),
+   g(x) = g1(x^2) + x*g2(x^2), then f(x)*g(x) = f1(x^2)*g1(x^2) + x^2*f2(x^2)*g2(x^2)
+   + x*((f1(x^2) + f2(x^2))*(g1(x^2) + g2(x^2)) - f1(x^2)*g1(x^2) - f2(x^2)*g2(x^2)).
+
+   Thus only three multiplications are performed (and numerous additions and subtractions).
+   
+   Instead of working with polynomials with the usual ordering, reverse binary ordering 
+   is used, i.e. for length 2^3 (zero padded) terms of degree 110 and 011 in binary are
+   swapped, etc.
+
+   The advantage of working in this format is that the first half of the coefficients of f
+   will be the coefficients of f1, and the second half, those of f2, etc. This applies 
+   right down the recursion. The only tricky bit is when multiplying by x. One must undo 
+   the revbin to shift by one term to the left.
+*/
+
+// computes the reverse binary of a binary number of the given number of bits
 ulong revbin(ulong in, ulong bits)
 {
    ulong out = 0, i;
@@ -44,6 +65,8 @@ ulong revbin(ulong in, ulong bits)
    return out;
 }
 
+// switches the coefficients of poly in of length len into a
+// poly out of length 2^bits
 void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
 {
    ulong i;
@@ -52,6 +75,8 @@ void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
       out[revbin(i, bits)] = in[i];
 }
 
+// switches the coefficients of poly in of length 2^bits into a
+// poly out of length len
 void revbin2(fmpz * out, const fmpz * in, ulong len, ulong bits)
 {
    ulong i;
@@ -60,6 +85,7 @@ void revbin2(fmpz * out, const fmpz * in, ulong len, ulong bits)
       out[i] = in[revbin(i, bits)];
 }
 
+// in1 += x*in2 assuming both in1 and in2 are revbin'd
 void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, ulong bits)
 {
    ulong i, j;
@@ -71,9 +97,12 @@ void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, ulong bits)
    }
 }
 
-// Assumes rev2 immediately follows rev1
-void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, ulong length, fmpz * temp, ulong bits)
+// recursive Karatsuba assuming polynomials are in revbin format
+// Assumes rev1 and rev2 are both of length 2^bits and that temp has 
+// space for 2^bits coefficients
+void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, ulong bits)
 {
+   ulong length = (1L<<bits);
    ulong m = length/2, i;
    
    if (length == 1)
@@ -86,11 +115,11 @@ void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, ulong l
    _fmpz_vec_add(temp, rev1, rev1 + m, m);
    _fmpz_vec_add(temp + m, rev2, rev2 + m, m);
 
-   _fmpz_poly_mul_kara_recursive(out, rev1, rev2, m, temp + 2*m, bits - 1);
+   _fmpz_poly_mul_kara_recursive(out, rev1, rev2, temp + 2*m, bits - 1);
    
-   _fmpz_poly_mul_kara_recursive(out + length, temp, temp + m, m, temp + 2*m, bits - 1);
+   _fmpz_poly_mul_kara_recursive(out + length, temp, temp + m, temp + 2*m, bits - 1);
 
-   _fmpz_poly_mul_kara_recursive(temp, rev1 + m, rev2 + m, m, temp + 2*m, bits - 1);
+   _fmpz_poly_mul_kara_recursive(temp, rev1 + m, rev2 + m, temp + 2*m, bits - 1);
 
    _fmpz_vec_sub(out + length, out + length, out, length); 
    _fmpz_vec_sub(out + length, out + length, temp, length); 
@@ -117,7 +146,7 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
    revbin1(rev1, poly1, len1, loglen);
    revbin1(rev2, poly2, len2, loglen);
 
-   _fmpz_poly_mul_kara_recursive(out, rev1, rev2, length, temp, loglen);  
+   _fmpz_poly_mul_kara_recursive(out, rev1, rev2, temp, loglen);  
 
    revbin2(res, out, len1 + len2 - 1, loglen + 1);
    
