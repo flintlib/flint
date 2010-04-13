@@ -170,6 +170,9 @@ void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
+                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
 #endif
 
 

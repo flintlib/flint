@@ -316,3 +316,16 @@ void fmpz_poly_mulmid_classical(fmpz_poly_t res,
   Set res to the middle poly1->length - poly2->length + 1 coefficients of poly1*poly,
   i.e. the coefficient from degree len2 - 1 to len1 - 1 inclusive. Assumes that len1 
   >= len2.
+
+void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
+                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Set res to poly1 multiplied by poly2.
+
+void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
+                                      ulong len1, const fmpz * poly2, ulong len2)
+
+   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
+   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
+   inputs with outputs is allowed. Also assumes len1 >= len2.
+
