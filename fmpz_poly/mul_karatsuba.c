@@ -50,6 +50,8 @@
    the revbin to shift by one term to the left.
 */
 
+void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, ulong bits);
+
 const ulong revtab1[2] = { 0, 1 };
 const ulong revtab2[4] = { 0, 2, 1, 3 };
 const ulong revtab3[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
@@ -62,7 +64,7 @@ ulong revbin(ulong in, ulong bits)
 {
    ulong out = 0, i;
    
-   if (bits < 3)
+   if (bits <= 4)
       return revtab[bits][in];
 
    for (i = 0; i < bits; i++)
@@ -144,6 +146,12 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
    fmpz * rev1, * rev2, * out, * temp;
    ulong loglen = 0, length;
 
+   if (len1 == 1)
+   {
+      fmpz_mul(res, poly1, poly2);
+      return;
+   }
+
    while ((1L<<loglen) < len1) loglen++;
    length = (1L<<loglen);
 
@@ -158,9 +166,11 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
 
    _fmpz_poly_mul_kara_recursive(out, rev1, rev2, temp, loglen);  
 
+   _fmpz_vec_clear(res, len1 + len2 - 1);
    revbin2(res, out, len1 + len2 - 1, loglen + 1);
    
    _fmpz_vec_clear(temp, 2*length);
+   free(temp);
    free(out);
    free(rev1);
 }

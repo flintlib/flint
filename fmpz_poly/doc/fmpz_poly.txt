@@ -329,3 +329,18 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
    len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
    inputs with outputs is allowed. Also assumes len1 >= len2.
 
+void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
+                                                   const fmpz * poly2, ulong len)
+
+   Set res to poly1 multiplied by poly2 and truncate to the given length. It is 
+   assumed that poly1 and poly2 are precisely the given length (possibly zero
+   padded). Assumes len is not zero.
+
+void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
+
+   Set res to poly1 multiplied by poly2 and truncate to the given length. It is 
+   assumed that poly1 and poly2 are at most the given length.
+
+
+

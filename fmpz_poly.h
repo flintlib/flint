@@ -173,6 +173,14 @@ void fmpz_poly_mulmid_classical(fmpz_poly_t res,
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
+							    ulong len1, const fmpz * poly2, ulong len2);
+
+void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong len);
+
+void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
+                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
+
 #endif
 
 

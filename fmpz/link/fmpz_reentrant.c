@@ -37,7 +37,8 @@ __mpz_struct * _fmpz_new_mpz(void)
 
 void _fmpz_clear_mpz(fmpz f)
 {
-   mpz_clear(COEFF_TO_PTR(f));	
+   mpz_clear(COEFF_TO_PTR(f));
+   free(COEFF_TO_PTR(f));	
 }
 
 void _fmpz_cleanup(void)
