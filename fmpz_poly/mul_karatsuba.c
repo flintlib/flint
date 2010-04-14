@@ -157,7 +157,7 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
 
    rev1 = (fmpz *) calloc(2*length, sizeof(fmpz *)); 
    out = (fmpz *) calloc(2*length, sizeof(fmpz *)); 
-   temp = (fmpz *) calloc(2*length, sizeof(fmpz *)); 
+   temp = _fmpz_vec_init(2*length); 
    
    rev2 = rev1 + length;
    
@@ -166,11 +166,10 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
 
    _fmpz_poly_mul_kara_recursive(out, rev1, rev2, temp, loglen);  
 
-   _fmpz_vec_clear(res, len1 + len2 - 1);
+   _fmpz_vec_zero(res, len1 + len2 - 1);
    revbin2(res, out, len1 + len2 - 1, loglen + 1);
    
    _fmpz_vec_clear(temp, 2*length);
-   free(temp);
    free(out);
    free(rev1);
 }

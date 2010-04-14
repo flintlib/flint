@@ -29,6 +29,8 @@
 #include <mpir.h>
 #include "fmpz.h"
 
+fmpz * _fmpz_vec_init(ulong length);
+
 void _fmpz_vec_clear(fmpz * in1, ulong length);
 
 void _fmpz_vec_zero(fmpz * vec1, ulong len1);

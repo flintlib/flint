@@ -88,12 +88,11 @@ void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz *
    while ((1L<<loglen) < len) loglen++;
    length = (1L<<loglen);
 
-   temp = (fmpz *) calloc(2*length, sizeof(fmpz)); 
+   temp = _fmpz_vec_init(2*length); 
    
    _fmpz_poly_mulhigh_kara_recursive(res, poly1, poly2, temp, len);  
 
    _fmpz_vec_clear(temp, 2*length);
-   free(temp);
 }
 
 void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 

@@ -34,4 +34,7 @@ void _fmpz_vec_clear(fmpz * in1, ulong length)
    
    for (i = 0; i < length; i++)
       fmpz_clear(in1 + i);
+
+   free(in1);
 }
+
