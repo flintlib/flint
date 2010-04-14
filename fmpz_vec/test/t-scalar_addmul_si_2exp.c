@@ -42,7 +42,7 @@ int main(void)
    // compare with alternative method of computation
    for (ulong i = 0; i < 10000UL; i++) 
    {
-      fmpz * a, * b, * c;
+      fmpz * a, * b, * c, * d;
       ulong length = n_randint(100);
       long x;
 	  mp_bitcnt_t exp;
@@ -50,6 +50,7 @@ int main(void)
       a = _fmpz_vec_init(length);
 	  b = _fmpz_vec_init(length);
 	  c = _fmpz_vec_init(length);
+	  d = _fmpz_vec_init(length);
 	  
       _fmpz_vec_randtest(a, length, n_randint(200));
       _fmpz_vec_randtest(b, length, n_randint(200));
@@ -60,7 +61,8 @@ int main(void)
       exp = n_randint(200);
 
       _fmpz_vec_scalar_addmul_si_2exp(b, a, length, x, exp);
-      _fmpz_vec_scalar_addmul_si_2exp(c, a, length, x, exp);
+      _fmpz_vec_scalar_mul_2exp(d, a, length, exp);
+      _fmpz_vec_scalar_addmul_si(c, d, length, x);
       
       result = (_fmpz_vec_equal(b, c, length));
       if (!result)
@@ -75,6 +77,7 @@ int main(void)
       _fmpz_vec_clear(a, length);
       _fmpz_vec_clear(b, length);
       _fmpz_vec_clear(c, length);
+      _fmpz_vec_clear(d, length);
    }
 
    _fmpz_vec_randclear();
