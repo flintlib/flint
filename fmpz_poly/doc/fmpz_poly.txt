@@ -342,5 +342,21 @@ void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
    Set res to poly1 multiplied by poly2 and truncate to the given length. It is 
    assumed that poly1 and poly2 are at most the given length.
 
+void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
+                                                    const fmpz * poly2, ulong len)
+
+   Set res to poly1 multiplied by poly2 and truncate at the top to the given length.
+   The first len - 1 coefficients are set to zero. It is assumed that poly1 and poly2 
+   are precisely the given length (possibly zero padded). Assumes len is not zero.
+
+void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
+                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
+
+   Set the first length - 1 coefficients of the result to zero and the remaining
+   coefficients to the corresponding coefficients of the product of poly1 and poly2. 
+   Assumes poly1 and poly2 are at most of the given length.
+
+
+
 
 
