@@ -19,23 +19,40 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
+   Copyright (C) 2009 William Hart
+
 *****************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "ulong_extras.h"
 
-void _fmpz_vec_clear(fmpz * in1, ulong length)
+int main(void)
 {
-   ulong i;
+   int result;
+   printf("init/clear....");
+   fflush(stdout);
    
-   for (i = 0; i < length; i++)
-      fmpz_clear(in1 + i);
+   // compare with alternative method of computation
+   for (ulong i = 0; i < 10000UL; i++) 
+   {
+      fmpz * a;
+      ulong j;
+	  
+	  ulong length = n_randint(100) + 1;
+      
+	  a = _fmpz_vec_init(length);
+      for (j = 0; j < length; j++)
+	     fmpz_zero(a + j);
 
-   free(in1);
+	  _fmpz_vec_clear(a, length);
+   }
+
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }
-
