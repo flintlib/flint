@@ -55,6 +55,9 @@ void _fmpz_vec_add(fmpz * res, const fmpz * vec1,
 void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
 				                     const fmpz * vec2, ulong len2);
 
+void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
+	              const fmpz * vec2, ulong len2, long c, ulong exp);
+
 #endif
 
 
