@@ -33,9 +33,19 @@ fmpz * _fmpz_vec_init(ulong length);
 
 void _fmpz_vec_clear(fmpz * in1, ulong length);
 
+void _fmpz_vec_randinit(void);
+
+void _fmpz_vec_randclear(void);
+
+void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in);
+
+void _fmpz_vec_print(fmpz * vec, ulong length);
+
 void _fmpz_vec_zero(fmpz * vec1, ulong len1);
 
 void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2);
+
+int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong length);
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2);
 

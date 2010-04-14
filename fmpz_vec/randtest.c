@@ -19,15 +19,22 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
+   Copyright (C) 2009, 2010 William Hart
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-void fmpz_poly_randinit(void)
+void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in)
 {
-   fmpz_randinit();
+   ulong i;
+
+   for (i = 0; i < length; i++)
+      fmpz_randtest(f + i, bits_in);
 }
+

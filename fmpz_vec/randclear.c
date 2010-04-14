@@ -27,7 +27,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_poly_randinit(void)
+void _fmpz_vec_randclear(void)
 {
-   fmpz_randinit();
+   fmpz_randclear();
 }

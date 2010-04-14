@@ -19,15 +19,24 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
-
+   Copyright (C) 2008, 2009, 2010 William Hart
+   
 *****************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-void fmpz_poly_randinit(void)
+int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong length)
 {
-   fmpz_randinit();
+   ulong i;
+	
+   if (vec1 == vec2) return 1; // same polynomial
+
+   for (i = 0; i < length; i++) // check if coefficients the same
+      if (!fmpz_equal(vec1 + i, vec2 + i)) 
+         return 0;
+
+   return 1;
 }

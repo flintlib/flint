@@ -32,6 +32,8 @@ TODO
 
 * Write test code for fmpz_vec functions
 
+* get rid of global random states
+
 Maybe
 =====
 

@@ -19,15 +19,29 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
-
+   Copyright (C) 2008, 2009, 2010 William Hart
+   
 *****************************************************************************/
 
 #include <mpir.h>
+#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-void fmpz_poly_randinit(void)
+void _fmpz_vec_print(fmpz * vec, ulong length)
 {
-   fmpz_randinit();
+   ulong i;
+   
+   printf("%lu", length);
+   
+   if (length == 0) return;
+
+   printf(" ");
+
+   for (i = 0; i < length; i++)
+   {
+      printf(" ");
+      fmpz_print(vec + i);
+   }
 }
