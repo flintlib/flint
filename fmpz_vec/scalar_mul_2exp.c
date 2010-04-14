@@ -19,38 +19,19 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
-
+   Copyright (C) 2010 William Hart
+   
 *****************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
-void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, const ulong exp)
+void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, const fmpz * vec2, ulong len2, ulong exp)
 {
-	fmpz d = *g;
-
-	if (!COEFF_IS_MPZ(d)) // g is small
-	{
-		ulong dabs = FLINT_ABS(d);
-		ulong bits = FLINT_BIT_COUNT(dabs);
-		if (bits == 0)
-		{
-		   fmpz_set_si(f, 0);
-		} else if (bits + exp <= FLINT_BITS - 2) // result will fit in small
-		{
-		   fmpz_set_si(f, d<<exp);
-		} else // result is large
-		{	
-		   __mpz_struct * mpz_ptr = _fmpz_promote(f); // g is saved
-           mpz_set_si(mpz_ptr, d); 
-	       mpz_mul_2exp(mpz_ptr, mpz_ptr, exp);	
-		}
-	} else // g is large
-	{  
-		__mpz_struct * mpz_ptr = _fmpz_promote(f); // g is already large
-        mpz_mul_2exp(mpz_ptr, COEFF_TO_PTR(d), exp);   	
-	}
+	ulong i;
+	
+	for (i = 0; i < len2; i++)
+		fmpz_mul_2exp(vec1 + i, vec2 + i, exp);
 }
