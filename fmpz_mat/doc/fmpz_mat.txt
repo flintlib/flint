@@ -74,3 +74,12 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
    bits. The remainder of the first column is zero. Running down the rest of
    the diagonal are the values 2^bits with all remaining entries zero.
   
+void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
+   
+   Set a square matrix mat of even dimension to a random "NTRU like" matrix.
+   The matrix is broken into four square submatrices. The top left submatrix
+   is set to the identity. The bottom left submatrix is set to the zero 
+   matrix. The bottom right submatrix is set to q times the identity matrix.
+   Finally the top right submatrix has the following format. A random vector
+   h of length r/2 is created, with random signed entries of the given number
+   of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 

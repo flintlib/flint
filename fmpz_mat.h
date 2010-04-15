@@ -56,6 +56,8 @@ void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits);
 
 void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2);
 
+void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
+
 #endif
 
 
