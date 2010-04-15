@@ -17,49 +17,43 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 William Hart
- 
-******************************************************************************/
+   Copyright (C) 2010 William Hart
+   
+*****************************************************************************/
 
-#ifndef FMPZ_MAT_H
-#define FMPZ_MAT_H
-
+#include <stdlib.h>
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 
-typedef struct
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
-   fmpz * entries;
-   ulong r;
-   ulong c;
-   fmpz ** rows;
-} fmpz_mat_struct;
+   ulong r, c, i, j;
 
-// fmpz_mat_t allows reference-like semantics for fmpz_mat_struct
-typedef fmpz_mat_struct fmpz_mat_t[1];
+   r = mat->r;
+   c = mat->c;
 
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols);
-
-void fmpz_mat_clear(fmpz_mat_t mat);
-
-void fmpz_mat_print(fmpz_mat_t mat); 
-
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
-
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2);
-
-#endif
-
-
-
-
-
+   if (c != r)
+   {
+	  printf("Exception: fmpz_mat_randsimdioph called on an ill-formed matrix\n");
+      abort();
+   }
+   
+   fmpz_set_ui(mat->rows[0], 1);
+   fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
+   for (j = 1; j < c; j++)
+      fmpz_randbits(mat->rows[0] + j, bits);
+   for (i = 1; i < r; i++)
+   {
+      for (j = 0; j < i; j++)
+		 fmpz_zero(mat->rows[i] + j);
+	  fmpz_set_ui(mat->rows[i] + i, 1);
+	  fmpz_mul_2exp(mat->rows[i] + i, mat->rows[i] + i, bits);
+      for (j = i + 1; j < c; j++)
+		  fmpz_zero(mat->rows[i] + j);
+   }
+}
 

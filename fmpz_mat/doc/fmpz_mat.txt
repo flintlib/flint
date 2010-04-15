@@ -66,4 +66,11 @@ void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
    random integers in the left hand column and an identity matrix in the 
    remaining square submatrix.
 
- 
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+
+   Set mat to a random "simultaneous diophantine" matrix. The matrix must
+   be square. The top left entry is set to 2^bits2. The remainder of that
+   row is then set to signed random integers of the given number of binary 
+   bits. The remainder of the first column is zero. Running down the rest of
+   the diagonal are the values 2^bits with all remaining entries zero.
+  
