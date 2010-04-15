@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99 -O2
-LIBS=-L$(CURDIR) -L/home/wbhart/mpir-trunk/.libs -lmpir -lm
-INCS=-I$(CURDIR) -I/home/wbhart/mpir-trunk/
+LIBS=-L$(CURDIR) -L/home/wbhart/mpir-trunk/.libs -L/home/wbhart/mpfr-2.4.1/.libs -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I/home/wbhart/mpir-trunk/ -I/home/wbhart/mpfr-2.4.1
 export
 
 SOURCES = $(wildcard *.c)
@@ -60,5 +60,5 @@ library-recursive:
 %.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-BUILD_DIRS = ulong_extras fmpz fmpz_vec fmpz_poly fmpz_mat LLL
+BUILD_DIRS = ulong_extras fmpz fmpz_vec fmpz_poly fmpz_mat mpfr_mat LLL
 
