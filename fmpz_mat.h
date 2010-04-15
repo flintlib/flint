@@ -44,6 +44,10 @@ void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols);
 
 void fmpz_mat_clear(fmpz_mat_t mat);
 
+void fmpz_mat_print(fmpz_mat_t mat); 
+
+void fmpz_mat_print_pretty(fmpz_mat_t mat);
+
 #endif
 
 

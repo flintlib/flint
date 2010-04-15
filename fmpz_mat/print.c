@@ -1,8 +1,5 @@
 /*============================================================================
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
-
     This file is part of FLINT.
 
     FLINT is free software; you can redistribute it and/or modify
@@ -20,32 +17,53 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
+/****************************************************************************
 
-********************************************************************************
+   Copyright (C) 2010 William Hart
+   
+*****************************************************************************/
 
-  Memory management
-
-********************************************************************************
-
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols)
-
-   Initialise a matrix with the given number of rows and columns for use. 
-
-void fmpz_mat_clear(fmpz_mat_t mat)
-
-   Clear the given matrix.
+#include <stdlib.h>
+#include <mpir.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 
 void fmpz_mat_print(fmpz_mat_t mat) 
-
-   Print the given matrix to stdout. The format is the number of rows, a
-   space, the number of columns, two spaces, then a space separated list
-   of coefficients.
+{
+   ulong i, j; 
+   ulong r = mat->r;
+   ulong c = mat->c;
+	
+   printf("%ld %ld  ", r, c);
+   for (i = 0; i < r; i++) 
+   {
+      for (j = 0; j < c; j++) 
+      { 
+         fmpz_print(mat->rows[i] + j); 
+	  if (j < c - 1) printf(" "); 
+      }
+      if (i != r - 1) printf(" "); 
+   }  
+   printf("\n"); 
+}
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat) 
-
-   Print the given matrix to stdout. The format is an opening square bracket
-   then on each line a row of the matrix, followed by a closing square 
-   bracket. Each row is written as an opening square bracket followed by a
-   space separated list of coefficients followed by a closing square bracket.
-
-
+{
+   ulong i, j; 
+   ulong r = mat->r;
+   ulong c = mat->c;
+	
+   printf("[");
+   for (i = 0; i < r; i++) 
+   {
+      printf("[");
+      for (j = 0; j < c; j++)
+      { 
+         fmpz_print(mat->rows[i] + j); 
+         if (j < c - 1) printf(" "); 
+      }
+      if (i != r - 1) printf("]\n"); 
+   }  
+   printf("]]\n"); 
+}
