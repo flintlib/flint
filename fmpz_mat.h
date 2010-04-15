@@ -48,6 +48,10 @@ void fmpz_mat_print(fmpz_mat_t mat);
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat);
 
+void fmpz_mat_randinit(void);
+
+void fmpz_mat_randclear(void);
+
 void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
 
 void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);

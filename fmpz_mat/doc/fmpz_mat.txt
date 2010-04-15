@@ -48,6 +48,14 @@ void fmpz_mat_print_pretty(fmpz_mat_t mat)
    bracket. Each row is written as an opening square bracket followed by a
    space separated list of coefficients followed by a closing square bracket.
 
+void fmpz_mat_randinit(void)
+
+   Initialise the fmpz_mat randstate.
+
+void fmpz_mat_randclear(void)
+
+   Clear the fmpz_mat randstate.
+
 void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits)
 
    Sets the entries of mat to random signed integers whose absolute values
