@@ -57,3 +57,13 @@ void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
 
    Sets the entries of mat to random signed integers whose absolute values 
    have a random number of bits up to the given number of bits inclusive.
+
+void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
+
+   Set mat to be a random "integer relations" matrix, with signed entries up 
+   to the given number of bits. The number of columns of mat must be equal 
+   to one more than the number of rows. The format of the matrix is a set of
+   random integers in the left hand column and an identity matrix in the 
+   remaining square submatrix.
+
+ 
