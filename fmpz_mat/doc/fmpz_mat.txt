@@ -102,3 +102,11 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
    h of length r/2 is created, with random signed entries of the given number
    of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
 
+void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
+
+  Set a square matrix mat to a random "ajtai" matrix. The diagonal entries 
+  (i, i) are set to a random entry in the range [1, 2^{b-1}] inclusive where
+  b = floor((2*r - i)^alpha) for some double parameter alpha. The entries below 
+  the diagonal in column i are set to a random entry in the range (-2^b + 1, 
+  2^b - 1) whilst the entries to the right of the diagonal in row i are set to
+  zero. 
