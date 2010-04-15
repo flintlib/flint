@@ -17,45 +17,27 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 William Hart
- 
-******************************************************************************/
+   Copyright (C) 2010 William Hart
+   
+*****************************************************************************/
 
-#ifndef FMPZ_MAT_H
-#define FMPZ_MAT_H
-
+#include <stdlib.h>
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 
-typedef struct
+void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits)
 {
-   fmpz * entries;
-   ulong r;
-   ulong c;
-   fmpz ** rows;
-} fmpz_mat_struct;
+   ulong r, c, i, j;
 
-// fmpz_mat_t allows reference-like semantics for fmpz_mat_struct
-typedef fmpz_mat_struct fmpz_mat_t[1];
+   r = mat->r;
+   c = mat->c;
 
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols);
-
-void fmpz_mat_clear(fmpz_mat_t mat);
-
-void fmpz_mat_print(fmpz_mat_t mat); 
-
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
-
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-#endif
-
-
-
-
-
+   for (i = 0; i < r; i++)
+      for (j = 0; j < c; j++)
+	     fmpz_randbits(mat->rows[i] + j, bits);
+}
 

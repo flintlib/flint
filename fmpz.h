@@ -88,6 +88,8 @@ void fmpz_randinit(void);
 
 void fmpz_randclear(void);
 
+void fmpz_randbits(fmpz_t f, mp_bitcnt_t bits);
+
 void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
 
 void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
