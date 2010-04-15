@@ -34,6 +34,8 @@ TODO
 
 * get rid of global random states
 
+* add fmpz_mat/randajtai2.c based on Stehle's matrix.cpp in fpLLL (requires mpfr_t's).
+
 Maybe
 =====
 
