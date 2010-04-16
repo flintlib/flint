@@ -46,5 +46,6 @@ void mpfr_mat_init(mpfr_mat_t mat, ulong rows, ulong cols, ulong prec)
    
    mat->r = rows;
    mat->c = cols;
+   mat->prec = prec;
 }
 

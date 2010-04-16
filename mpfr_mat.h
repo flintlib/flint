@@ -34,6 +34,7 @@ typedef struct
    __mpfr_struct * entries;
    ulong r;
    ulong c;
+   mp_bitcnt_t prec;
    __mpfr_struct ** rows;
 } mpfr_mat_struct;
 

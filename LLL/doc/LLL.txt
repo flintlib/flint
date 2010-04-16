@@ -21,4 +21,20 @@
 
 ===============================================================================*/
 
+void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, 
+                                       ulong a, ulong kappa, ulong zeroes)
 
+   Given a matrix B with rows b_i, the Gram-Schmidt Orthogonalisation of B is defined by
+   b_0* = b_0, b_i* = b_i - sum_{j=0}^{i-1} mu_{i,j} b_j*, where 
+   mu_{i,j} = <b_i, b_j*> / ||b_j*||^2.
+
+   For convenience, we denote r_{i,j} = <b_i, b_j*> and G_{i,j} = <b_i, b_j}
+
+   Given the relevant values of r_{i,j}, mu_{i,j} and G_{i,j} for j < kappa this function 
+   computes r_{kappa,j} for a <= j < kappa. 
+
+   Note r_{k,j} = <b_k, b_j*> = <b_k, b_j> - sum_{l=0}^{j-1} mu_{j,l} <b_k, b_l*>
+   = G_{k,j} - sum{l=0}^{j-1} mu_{j,l} r_{k,l}.
+
+   As a refinement, we allow the first rows of B to be zero, the number of which is given 
+   by the parameter zeroes.
