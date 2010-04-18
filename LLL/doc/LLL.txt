@@ -38,3 +38,6 @@ void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G,
 
    As a refinement, we allow the first rows of B to be zero, the number of which is given 
    by the parameter zeroes.
+
+   Upon return, max is set to the absolute value of the maximum mu[kappa][i] which is 
+   computed in the range a <= j < kappa.

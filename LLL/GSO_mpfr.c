@@ -29,6 +29,7 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
+#include "mpfr_vec.h"
 #include "mpfr_mat.h"
 #include "fmpz_mat.h"
 
@@ -44,31 +45,20 @@ void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, ulong a, ul
   
   for (i = a; i < kappa; i++)
   {
-      if (i > zeroes + 2)
+      if (i >= zeroes + 2)
 	  {
-	     mpfr_mul(tmp, mu->rows[i] + zeroes + 1, r->rows[kappa] + zeroes + 1, GMP_RNDN);
-		 mpfr_set_z(rtmp, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
-		 mpfr_sub(rtmp, rtmp, tmp, GMP_RNDN);
-		 for (j = zeroes + 2; j < i - 1; j++)
-	     {
-	        mpfr_mul(tmp, mu->rows[i] + j, r->rows[kappa] + j, GMP_RNDN);
-			mpfr_sub(rtmp, rtmp, tmp, GMP_RNDN);
-	     }
-	     mpfr_mul(tmp, mu->rows[i] + i - 1, r->rows[kappa] + i - 1, GMP_RNDN);
-		 mpfr_sub(r->rows[kappa] + i, rtmp, tmp, GMP_RNDN);
-	  } else if (i == zeroes + 2)
-	  {	      
-	     mpfr_mul(tmp, mu->rows[i] + zeroes + 1, r->rows[kappa] + zeroes + 1, GMP_RNDN);
-		 mpfr_set_z(rtmp, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
+	     mpfr_set_z(rtmp, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
+		 _mpfr_vec_scalar_product(tmp, mu->rows[i] + zeroes + 1, r->rows[kappa] + zeroes + 1, i - zeroes - 1);
 		 mpfr_sub(r->rows[kappa] + i, rtmp, tmp, GMP_RNDN);
 	  } else
 	     mpfr_set_z(r->rows[kappa] + i, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
       
       mpfr_div(mu->rows[kappa] + i, r->rows[kappa] + i, r->rows[i] + i, GMP_RNDN);
-      mpfr_abs(rtmp, mu->rows[kappa] + i, GMP_RNDN);
-	  if (mpfr_cmp(rtmp, max) > 0)
-		 mpfr_set(max, rtmp, GMP_RNDN);
+      if (mpfr_cmpabs(mu->rows[kappa] + i, max) > 0)
+		 mpfr_set(max, mu->rows[kappa] + i, GMP_RNDN);
    }
+
+   mpfr_abs(max, max, GMP_RNDN);
 
    mpfr_clear(tmp);
    mpfr_clear(rtmp);

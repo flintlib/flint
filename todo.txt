@@ -36,12 +36,16 @@ TODO
 
 * add fmpz_mat/randajtai2.c based on Stehle's matrix.cpp in fpLLL (requires mpfr_t's).
 
+* add a cache of mpfr's which can be used as tenporaries for functions like _mpfr_vec_scalar_product
+
 Maybe
 =====
 
 * make n_factor_t an array of length 1 so it can be passed by reference automatically, as per mpz_t's, etc
 
-* figure out how to write robust test code for fmpz_read (which reads from stdin), perhaps using a pipe.
+* figure out how to write robust test code for fmpz_read (which reads from stdin), perhaps using a pipe
+
+* a type mpfr which is an alias for __mpfr_struct and using throughout
 
 Enhancements
 ============
