@@ -19,57 +19,56 @@
 ===============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2009 William Hart
+ Copyright (C) 2010 William Hart
  
 ******************************************************************************/
 
-#ifndef FLINT_H
-#define FLINT_H
+#ifndef MFPR_POLY_H
+#define MPFR_POLY_H
 
 #include <mpir.h>
-#include <mpfr.h>
-#include "longlong.h"
+#include <mpfr.h> 
+#include "flint.h"
 
-#define ulong unsigned long
-
-#if __GMP_BITS_PER_MP_LIMB == 64
-#define FLINT_BITS 64
-#define FLINT_D_BITS 53
-#define FLINT64 1
-#else 
-#define FLINT_BITS 32
-#define FLINT_D_BITS 31
-#endif
-
-#define mp_bitcnt_t unsigned long
-typedef __mpfr_struct mpfr; // we define this here as there is no mpfr.h
-
-#define FLINT_ASSERT(param)
-
-#define FLINT_MAX(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz1) : (zzz2))
-#define FLINT_MIN(zzz1, zzz2) ((zzz1) > (zzz2) ? (zzz2) : (zzz1))
-#define FLINT_ABS(zzz) ((long)(zzz) < 0 ? (-zzz) : (zzz))
-
-#define r_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)>>(shift)))
-
-#define l_shift(in, shift) \
-   ((shift == FLINT_BITS) ? 0L : ((in)<<(shift)))
-
-static inline 
-unsigned int FLINT_BIT_COUNT(mp_limb_t x)
+typedef struct
 {
-   unsigned int zeros = FLINT_BITS;
-   if (x) count_leading_zeros(zeros, x);
-   return FLINT_BITS - zeros;
+   __mpfr_struct * coeffs;
+   ulong length;
+   ulong alloc;
+   mp_bitcnt_t prec;
+} mpfr_poly_struct;
+
+// fmpz_poly_t allows reference-like semantics for fmpz_poly_struct
+typedef mpfr_poly_struct mpfr_poly_t[1];
+
+extern gmp_randstate_t mpfr_poly_randstate;
+
+void mpfr_poly_init(mpfr_poly_t poly, mp_bitcnt_t prec);
+
+void mpfr_poly_init2(mpfr_poly_t poly, const ulong alloc, mp_bitcnt_t prec);
+
+void mpfr_poly_realloc(mpfr_poly_t poly, const ulong alloc);
+
+void mpfr_poly_fit_length(mpfr_poly_t poly, const ulong length);
+
+void mpfr_poly_clear(mpfr_poly_t poly);
+
+static inline
+void _mpfr_poly_set_length(mpfr_poly_t poly, ulong length)
+{
+   poly->length = length;
 }
 
-#define mpn_zero(xxx, nnn) \
-   do \
-   { \
-      ulong ixxx; \
-      for (ixxx = 0; ixxx < nnn; ixxx++) \
-         (xxx)[ixxx] = 0UL; \
-   } while (0)
+void mpfr_poly_randinit(void);
+
+void mpfr_poly_randclear(void);
+
+void mpfr_poly_randtest(mpfr_poly_t poly, ulong length);
 
 #endif
+
+
+
+
+
+

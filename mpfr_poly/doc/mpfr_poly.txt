@@ -1,0 +1,76 @@
+/*============================================================================
+
+    Copyright (C) 2010 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+********************************************************************************
+
+  Memory management
+
+********************************************************************************
+
+void mpfr_poly_init(mpfr_poly_t poly, mp_bitcnt_t prec)
+
+   Initialise a polynomial with the given precision for use. The 
+   precision is the exact precision of the entries.
+
+void mpfr_poly_init2(mpfr_poly_t poly, const ulong alloc, mp_bitcnt_t prec)
+
+   Initialise a polynomial with the given precision and with space
+   for the given number of coefficients (which are initialised). 
+   The precision is the exact precision of the entries.
+
+void mpfr_poly_realloc(mpfr_poly_t poly, const ulong alloc)
+
+   Reallocate the polynomial to have space for the given number of
+   coefficients. If alloc == 0 the polynomial is cleared and 
+   reinitialised. If the current polynomial length is less than
+   alloc, the polynomial is truncated to have length alloc.
+
+void mpfr_poly_fit_length(mpfr_poly_t poly, const ulong length)
+
+   Reallocate the polynomial to have space for at least the given
+   number of coefficients. The polynomial will not be made smaller
+   however and thus no data can be lost.
+
+void _mpfr_poly_set_length(mpfr_poly_t poly, length)
+
+   Set the length of poly to the given value. No attempt is made to
+   zero extra coefficients or to reallocate the polynomial, i.e.
+   poly->alloc is assumed to be at least the given length.
+
+void mpfr_poly_clear(mpfr_poly_t poly)
+ 
+   Clear the given polynomial.
+
+void mpfr_poly_randinit(void)
+
+   Initialise the global mpfr_poly randstate.
+
+void mpfr_poly_randclear(void)
+
+   Clear the global mpfr_poly randstate.
+
+void mpfr_poly_randtest(mpfr_poly_t pol, ulong length)
+
+   Set the coefficients of pol to uniform random values in the range
+   [0, 1) and with the given length. The precision is taken to be
+   the precision pol was initialised to.
+
