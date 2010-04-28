@@ -26,6 +26,7 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
+#include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
 void mpfr_poly_clear(mpfr_poly_t poly)
