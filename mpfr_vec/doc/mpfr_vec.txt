@@ -36,7 +36,26 @@ void _mpfr_vec_clear(__mpfr_struct * vec, ulong length)
  
    Clear the given vector.
 
-void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
+********************************************************************************
+
+  Arithmetic
+
+********************************************************************************
+
+void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, ulong length)
+
+   Copy the vector vec2 of the given length into vec1. No check is made to ensure
+   vec1 and vec2 are different.
+
+void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, ulong length)
+
+   Add the given vectors of the given length together and store the result in res.
+
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c)
+   
+   Multiply the vector with given length by the scalar c and set res to the result.
+
+void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
                                              __mpfr_struct * vec2, ulong length)
 
    Set res to the scalar product of {vec1, length} with {vec2, length}. Assumes

@@ -74,3 +74,26 @@ void mpfr_poly_randtest(mpfr_poly_t pol, ulong length)
    [0, 1) and with the given length. The precision is taken to be
    the precision pol was initialised to.
 
+void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
+
+   Efficiently swap the two polynomials.
+
+void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, ulong len1,
+                             mpfr * in2, ulong len2, mp_bitcnt_t prec)
+
+   Set res to the product of the polynomials in1 of length len1 and in2
+   of length len2 and the given precision coefficients. Assumes neither
+   len1 or len2 are zero and that len1 >= len2.
+
+void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
+                                                    mpfr_poly_t poly2)
+
+   Set res to the product of poly1 and poly2, using the classical
+   algorithm.
+
+void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
+					                   mpfr_poly_t poly2)
+
+   Set res to the product of poly1 and poly2, using the Fast Hartley
+   transform algorithm.
+

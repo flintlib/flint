@@ -65,6 +65,27 @@ void mpfr_poly_randclear(void);
 
 void mpfr_poly_randtest(mpfr_poly_t poly, ulong length);
 
+static inline
+void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
+{
+   ulong t;
+   mpfr * tc = poly1->coeffs;
+   poly1->coeffs = poly2->coeffs;
+   poly2->coeffs = tc;
+   t = poly1->length;
+   poly1->length = poly2->length;
+   poly2->length = t;
+   t = poly1->alloc;
+   poly1->alloc = poly2->alloc;
+   poly2->alloc = t;
+}
+
+void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, ulong len1,
+                             mpfr * in2, ulong len2, mp_bitcnt_t prec);
+
+void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
+                                                    mpfr_poly_t poly2);
+
 void _mpfr_poly_FHT(mpfr * coeffs, ulong n, mp_bitcnt_t prec);
 
 void _mpfr_poly_convolution_trans(mpfr * coeffs1, 
@@ -76,6 +97,9 @@ void _mpfr_poly_scale(mpfr * coeffs, ulong n);
 
 void _mpfr_poly_convolution_FHT(mpfr * coeffs1, 
 					mpfr * coeffs2, ulong n, mp_bitcnt_t prec);
+
+void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
+					                                 mpfr_poly_t poly2);
 
 #endif
 

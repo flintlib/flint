@@ -17,33 +17,23 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 William Hart
- 
-******************************************************************************/
+   Copyright (C) 2010 William Hart
+   
+*****************************************************************************/
 
-#ifndef MFPR_VEC_H
-#define MPFR_VEC_H
-
+#include <stdlib.h>
 #include <mpir.h>
-#include <mpfr.h> 
+#include <mpfr.h>
+#include "flint.h"
+#include "mpfr_vec.h"
 
-__mpfr_struct * _mpfr_vec_init(ulong length, mp_bitcnt_t prec);
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c)
+{
+   ulong i;
 
-void _mpfr_vec_clear(__mpfr_struct * vec, ulong length);
-
-void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, ulong length);
-
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, ulong length);
-
-void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-								    __mpfr_struct * vec2, ulong length);
-
-#endif
-
-
-
-
-
+   for (i = 0; i < length; i++)
+      mpfr_mul(res, vec, c, GMP_RNDN);
+}
 
