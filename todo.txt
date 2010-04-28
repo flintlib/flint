@@ -38,6 +38,8 @@ TODO
 
 * add a cache of mpfr's which can be used as tenporaries for functions like _mpfr_vec_scalar_product
 
+* test code for ulong_extras/revbin.c
+
 Maybe
 =====
 

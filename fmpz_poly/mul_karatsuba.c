@@ -29,6 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
 /**
    Implements karatsuba multiplication. There is no basecase crossover, so this is
@@ -52,31 +53,6 @@
 
 void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, ulong bits);
 
-const ulong revtab1[2] = { 0, 1 };
-const ulong revtab2[4] = { 0, 2, 1, 3 };
-const ulong revtab3[8] = { 0, 4, 2, 6, 1, 5, 3, 7 };
-const ulong revtab4[16] = { 0, 8, 4, 12, 2, 10, 6, 14, 1, 9, 5, 13, 3, 11, 7, 15 };
-
-const ulong * revtab[5] = { NULL, revtab1, revtab2, revtab3, revtab4 };
-
-// computes the reverse binary of a binary number of the given number of bits
-ulong revbin(ulong in, ulong bits)
-{
-   ulong out = 0, i;
-   
-   if (bits <= 4)
-      return revtab[bits][in];
-
-   for (i = 0; i < bits; i++)
-   {   
-      out <<= 1;
-      out += (in & 1);
-      in >>= 1;
-   }
-
-   return out;
-}
-
 // switches the coefficients of poly in of length len into a
 // poly out of length 2^bits
 void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
@@ -84,7 +60,7 @@ void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
    ulong i;
  
    for (i = 0; i < len; i++)
-      out[revbin(i, bits)] = in[i];
+      out[n_revbin(i, bits)] = in[i];
 }
 
 // switches the coefficients of poly in of length 2^bits into a
@@ -94,7 +70,7 @@ void revbin2(fmpz * out, const fmpz * in, ulong len, ulong bits)
    ulong i;
  
    for (i = 0; i < len; i++)
-      out[i] = in[revbin(i, bits)];
+      out[i] = in[n_revbin(i, bits)];
 }
 
 // in1 += x*in2 assuming both in1 and in2 are revbin'd
@@ -104,7 +80,7 @@ void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, ulong bits)
    
    for (i = 0; i < (1L<<bits) - 1; i++)
    {
-      j = revbin(revbin(i, bits) + 1, bits);
+      j = n_revbin(n_revbin(i, bits) + 1, bits);
       fmpz_add(in1 + j, in1 + j, in2 + i);
    }
 }

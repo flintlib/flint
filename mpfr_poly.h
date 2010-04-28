@@ -67,6 +67,16 @@ void mpfr_poly_randtest(mpfr_poly_t poly, ulong length);
 
 void _mpfr_poly_FHT(mpfr * coeffs, ulong n, mp_bitcnt_t prec);
 
+void _mpfr_poly_convolution_trans(mpfr * coeffs1, 
+                    mpfr * coeffs2, ulong n, mp_bitcnt_t prec);
+
+void _mpfr_poly_revbin(mpfr * coeffs, ulong n);
+
+void _mpfr_poly_scale(mpfr * coeffs, ulong n);
+
+void _mpfr_poly_convolution_FHT(mpfr * coeffs1, 
+					mpfr * coeffs2, ulong n, mp_bitcnt_t prec);
+
 #endif
 
 

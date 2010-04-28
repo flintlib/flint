@@ -35,34 +35,45 @@
 int main(void)
 {
    int result;
-   printf("FHT....");
+   printf("convolution_FHT....");
    fflush(stdout);
 
    mpfr_poly_randinit();
    
-   for (ulong i = 0; i < 1000UL; i++) 
+   for (ulong i = 0; i < 10UL; i++) 
    {
-      mpfr_poly_t a, b;
-      ulong n = n_randint(10);
+      mpfr_poly_t a, b, c1, c2, d1, d2;
+      ulong n = 10;//n_randint(10);
 	  ulong length = (1L<<n);
-	  ulong prec = n_randint(100) + 50*MPFR_PREC_MIN;
+	  ulong prec = 100;//n_randint(100) + 50*MPFR_PREC_MIN;
       
       mpfr_poly_init2(a, length, prec);
       mpfr_poly_init2(b, length, prec);
-      mpfr_poly_randtest(a, length);
+      /*mpfr_poly_init2(c1, length, prec);
+      mpfr_poly_init2(d1, length, prec);
+      mpfr_poly_init2(c2, length, prec);
+      mpfr_poly_init2(d2, length, prec);*/
       
-	  //_mpfr_vec_copy(b->coeffs, a->coeffs, length);
-	  for (ulong j = 0; j < length; j++)
-	     mpfr_set(b->coeffs + j, a->coeffs + j, GMP_RNDN);
+	  mpfr_poly_randtest(a, length);
+      mpfr_poly_randtest(b, length);
+      /*mpfr_poly_randtest(c1, length);
+      mpfr_poly_randtest(d1, length);*/
+      
+	  /*for (ulong j = 0; j < length; j++)
+		  mpfr_set(b->coeffs + j, a->coeffs + j, GMP_RNDN);
 
-	  _mpfr_poly_FHT(a->coeffs, n, prec);
-      _mpfr_poly_revbin(a->coeffs, n);
-	 
-      _mpfr_poly_FHT(a->coeffs, n, prec);      
-	  _mpfr_poly_revbin(a->coeffs, n);
-	
-	  _mpfr_poly_scale(a->coeffs, n);
-	  
+	  for (ulong j = 0; j < length; j++)
+		  mpfr_set(c2->coeffs + j, c1->coeffs + j, GMP_RNDN);
+
+	  for (ulong j = 0; j < length; j++)
+		  mpfr_set(d2->coeffs + j, d1->coeffs + j, GMP_RNDN);*/
+
+	  for (ulong j = 0; j < 100; j++)
+		  _mpfr_poly_convolution_FHT(a->coeffs, b->coeffs, n, prec);
+      /*_mpfr_poly_convolution_FHT(a->coeffs, d1->coeffs, n, prec);
+      _mpfr_poly_convolution_FHT(b->coeffs, d2->coeffs, n, prec);
+      _mpfr_poly_convolution_FHT(b->coeffs, c2->coeffs, n, prec);
+      
 	  for (ulong j = 0; j < length; j++)
 	  {
 	     mpfr_sub(a->coeffs + j, a->coeffs + j, b->coeffs + j, GMP_RNDN);
@@ -74,10 +85,14 @@ int main(void)
 			 printf("Error in coeff %ld\n", j);
 			 abort();
 		 }
-	  }
+	  }*/
 
       mpfr_poly_clear(a);
       mpfr_poly_clear(b);
+     /* mpfr_poly_clear(c1);
+      mpfr_poly_clear(d1);
+      mpfr_poly_clear(c2);
+      mpfr_poly_clear(d2);*/
    }
    
    mpfr_poly_randclear();
