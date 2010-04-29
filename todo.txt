@@ -40,6 +40,10 @@ TODO
 
 * test code for ulong_extras/revbin.c
 
+* add test code for numerous mpfr_vec functions and mpfr_poly_mul_classical
+
+* make use of mpfr type througout LLL, mpfr_vec and mpfr_mat modules
+
 Maybe
 =====
 
