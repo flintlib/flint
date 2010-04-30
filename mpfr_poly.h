@@ -59,6 +59,15 @@ void _mpfr_poly_set_length(mpfr_poly_t poly, ulong length)
    poly->length = length;
 }
 
+static inline
+void mpfr_poly_set_prec(mpfr_poly_t poly, ulong prec)
+{
+   ulong i;
+   for (i = 0; i < poly->alloc; i++)
+      mpfr_prec_round(poly->coeffs + i, prec, GMP_RNDN);
+   poly->prec = prec;
+}
+
 void mpfr_poly_randinit(void);
 
 void mpfr_poly_randclear(void);

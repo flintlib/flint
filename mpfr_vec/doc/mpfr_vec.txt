@@ -55,6 +55,10 @@ void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c)
    
    Multiply the vector with given length by the scalar c and set res to the result.
 
+void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, ulong length, mp_bitcnt_t exp)
+
+   Multiply the given vector of the given length by 2^exp.
+
 void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
                                              __mpfr_struct * vec2, ulong length)
 

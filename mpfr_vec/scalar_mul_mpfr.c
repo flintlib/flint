@@ -34,6 +34,6 @@ void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c)
    ulong i;
 
    for (i = 0; i < length; i++)
-      mpfr_mul(res, vec, c, GMP_RNDN);
+      mpfr_mul(res + i, vec + i, c, GMP_RNDN);
 }
 

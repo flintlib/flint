@@ -40,7 +40,7 @@ int main(void)
 
    mpfr_poly_randinit();
    
-   /*for (ulong i = 0; i < 1000UL; i++) 
+   for (ulong i = 0; i < 1000UL; i++) 
    {
       mpfr_poly_t a, b, c, d;
       ulong len1 = n_randint(200) + 1;
@@ -76,9 +76,9 @@ int main(void)
       mpfr_poly_clear(b);
       mpfr_poly_clear(c);
       mpfr_poly_clear(d);
-   }*/
+   }
    
-  mpfr_poly_t a, b, c;
+  /*mpfr_poly_t a, b;
   ulong prec = 53;
       
   mpfr_poly_init2(a, 1, prec);
@@ -91,15 +91,15 @@ int main(void)
   mpfr_set_ui(b->coeffs + 1, 1, GMP_RNDN);
   b->length = 2;
 
-  for (ulong j = 0; j < 1000; j++)
+  for (ulong j = 0; j < 10000; j++)
 	 mpfr_poly_mul_classical(a, a, b);
 
-  for (ulong j = 0; j < 1000; j++)
+  for (ulong j = 0; j < 100; j++)
      //mpfr_poly_mul_classical(b, a, a);
      mpfr_poly_mul_FHT(b, a, a);
 
    mpfr_poly_clear(a);
-   mpfr_poly_clear(b);
+   mpfr_poly_clear(b);*/
 
    mpfr_poly_randclear();
       

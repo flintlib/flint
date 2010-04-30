@@ -51,10 +51,8 @@ int main(void)
       mpfr_poly_init2(b, length, prec);
       mpfr_poly_randtest(a, length);
       
-	  //_mpfr_vec_copy(b->coeffs, a->coeffs, length);
-	  for (ulong j = 0; j < length; j++)
-	     mpfr_set(b->coeffs + j, a->coeffs + j, GMP_RNDN);
-
+	  _mpfr_vec_copy(b->coeffs, a->coeffs, length);
+	  
 	  _mpfr_poly_FHT(a->coeffs, n, prec);
       _mpfr_poly_revbin(a->coeffs, n);
 	 

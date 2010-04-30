@@ -56,6 +56,15 @@ void _mpfr_poly_set_length(mpfr_poly_t poly, length)
    zero extra coefficients or to reallocate the polynomial, i.e.
    poly->alloc is assumed to be at least the given length.
 
+void mpfr_poly_set_prec(mfpr_poly_t poly, ulong prec)
+ 
+   Sets the precision of the coefficients of poly. Assumes poly is
+   already initialised to some precision. If coefficients are at a 
+   higher precision than prec, then they are rounded down, and if
+   the new precision is higher, zeroes are added in the remaining
+   bits of the mantissa. This function will fail if prec is less
+   than MPFR_PREC_MIN (which is currently 2).
+
 void mpfr_poly_clear(mpfr_poly_t poly)
  
    Clear the given polynomial.
