@@ -60,7 +60,7 @@ ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 int main(void)
 {
    int result;
-   printf("mul_FHT....");
+   printf("mul....");
    fflush(stdout);
 
    mpfr_poly_randinit();
@@ -81,15 +81,15 @@ int main(void)
 	  mpfr_poly_randtest(a, len1);
       mpfr_poly_randtest(b, len2);
       
-	  mpfr_poly_mul_FHT(c, a, b);
-      mpfr_poly_mul_classical(d, a, b);
+	  mpfr_poly_mul(c, a, b, 8);
+	  mpfr_poly_mul_classical(d, a, b);
       
 	  mpfr_poly_set_prec(c, prec);
       mpfr_poly_set_prec(d, prec);
 
 	  if ((bits_lost(c, d) > 10) || (c->length != d->length))
 	  {
-		  printf("Error: mul_classical and mul_FHT don't agree within 30 bits\n");
+		  printf("Error: mul_classical and mul don't agree within 10 bits\n");
 		  abort();
 	  }
 
