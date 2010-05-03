@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-std=c99 -O2
-LIBS=-L$(CURDIR) -L/home/wbhart/mpir-b/.libs -L/home/wbhart/mpfr-2.4.1/.libs -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/wbhart/mpir-b/ -I/home/wbhart/mpfr-2.4.1
+LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lmpfrcx -lmpc -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I/home/wbhart/include
 export
 
 SOURCES = $(wildcard *.c)

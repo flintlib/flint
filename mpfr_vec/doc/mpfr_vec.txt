@@ -42,6 +42,10 @@ void _mpfr_vec_clear(__mpfr_struct * vec, ulong length)
 
 ********************************************************************************
 
+void _mpfr_vec_zero(mpfr * vec, ulong length)
+
+   Zero the vector {vec, length}
+
 void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, ulong length)
 
    Copy the vector vec2 of the given length into vec1. No check is made to ensure

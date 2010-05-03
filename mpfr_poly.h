@@ -43,6 +43,8 @@ typedef mpfr_poly_struct mpfr_poly_t[1];
 
 extern gmp_randstate_t mpfr_poly_randstate;
 
+#define MUL_INPLACE_CUTOFF 1000
+
 void mpfr_poly_init(mpfr_poly_t poly, mp_bitcnt_t prec);
 
 void mpfr_poly_init2(mpfr_poly_t poly, const ulong alloc, mp_bitcnt_t prec);
@@ -109,6 +111,12 @@ void _mpfr_poly_convolution_FHT(mpfr * coeffs1,
 
 void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
 					                                 mpfr_poly_t poly2);
+
+int _mpfr_poly_bound_newton(double * inter, double * slope, 
+			                        mpfr * poly, ulong len, ulong prec);
+
+void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
+				                           mpfr_poly_t poly2, ulong fb);
 
 #endif
 

@@ -26,6 +26,7 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
+#include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
 void _mpfr_poly_FHT_recursive(mpfr * coeffs, ulong n, mp_bitcnt_t prec, 

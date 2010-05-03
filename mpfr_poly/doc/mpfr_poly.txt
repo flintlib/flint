@@ -106,3 +106,29 @@ void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1,
    Set res to the product of poly1 and poly2, using the Fast Hartley
    transform algorithm.
 
+int _mpfr_poly_bound_newton(double * inter, double * slope, 
+			                mpfr * poly, ulong len, ulong prec)
+
+   Finds the slope and y-intercept of a line which lies above all the 
+   logarithms of the coefficients of poly and such that all points are
+   no further than prec below the line. Return 1 if this can be done,
+   otherwise return 0.
+
+void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
+                                            mpfr_poly_t poly2, ulong fb)
+
+   Multiplies poly1 and poly2 together. This works well if the coefficients
+   vary in magnitude according to log(P_i) = a*i + k1(i) for some small k1(i)
+   where P_i is the ith coefficient of poly1, and if a similar thing holds
+   for the coefficients of poly2, i.e. log(Q_i) = b*i + k2(i) where Q_i are
+   the coefficients of poly2.
+
+   fb should be set to some small number of bits (perhaps 0) less than the
+   precision of poly1 and poly2. It represents the number of "filter bits".
+   The output of the classical and FFT algorithms are filtered and any 
+   spurious coefficients that might arise at these steps of the algorithm
+   can be filtered out if they lie in the bottom fb bits of the Newton
+   parallelogram that is computed. This feature is useful for doing 
+   computations where a lot of cancellation may occur and spurious 
+   coefficients arise. A handful of filter bits will usually remove such
+   spurious coefficients.
