@@ -32,6 +32,31 @@
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
+ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
+{
+   mpfr_t t;
+   ulong i;
+   mpfr_init2(t, a->prec);
+   ulong lost = 0, bits, bits1, bits2;
+   double d1, d2;
+
+   for (i = 0; i < b->length; i++)
+   {
+      d1 = mpfr_get_d_2exp(&bits1, b->coeffs + i, GMP_RNDN);
+	  mpfr_sub(t, a->coeffs + i, b->coeffs + i, GMP_RNDN);
+	  d2 = mpfr_get_d_2exp(&bits2, t, GMP_RNDN);
+	  bits = a->prec - (bits1 - bits2);
+	  if (d2 == 0.0) bits = 0;
+	  if ((long) bits < 0L) bits = 0;
+	  if (bits > lost)
+		  lost = bits;
+   }
+   
+   mpfr_clear(t);
+
+   return lost;
+}
+
 int main(void)
 {
    int result;
@@ -40,13 +65,13 @@ int main(void)
 
    mpfr_poly_randinit();
    
-   /*for (ulong i = 0; i < 1000UL; i++) 
+   for (ulong i = 0; i < 1000UL; i++) 
    {
       mpfr_poly_t a, b, c, d;
       ulong len1 = n_randint(200) + 1;
 	  ulong len2 = n_randint(200) + 1;
 	  ulong len_out = len1 + len2 - 1;
-	  ulong prec = n_randint(100) + 50*MPFR_PREC_MIN;
+	  ulong prec = n_randint(100) + 53;
       
       mpfr_poly_init2(a, len1, prec);
       mpfr_poly_init2(b, len2, prec);
@@ -59,48 +84,18 @@ int main(void)
 	  mpfr_poly_mul_FHT(c, a, b);
       mpfr_poly_mul_classical(d, a, b);
       
-	  for (ulong j = 0; j < len_out; j++)
+	  if ((bits_lost(c, d) > 30) || (c->length != d->length))
 	  {
-	     mpfr_sub(c->coeffs + j, c->coeffs + j, d->coeffs + j, GMP_RNDN);
-         double d = mpfr_get_d(c->coeffs + j, GMP_RNDN);
-		 if (fabs(d) > 0.1)
-		 {
-			 printf("d = %f\n", d);
-			 printf("Error: len1 = %ld, len2 = %ld, prec = %ld\n", len1, len2, prec);
-			 printf("Error in coeff %ld\n", j);
-			 abort();
-		 }
+		  printf("Error: mul_classical and mul_FHT don't agree within 30 bits\n");
+		  abort();
 	  }
 
       mpfr_poly_clear(a);
       mpfr_poly_clear(b);
       mpfr_poly_clear(c);
       mpfr_poly_clear(d);
-   }*/
+   }
    
-  mpfr_poly_t a, b;
-  ulong prec = 53;
-      
-  mpfr_poly_init2(a, 1, prec);
-  mpfr_poly_init2(b, 2, prec);
-      
-  mpfr_set_ui(a->coeffs, 1, GMP_RNDN);
-  a->length = 1;
-
-  mpfr_set_ui(b->coeffs, 1, GMP_RNDN);
-  mpfr_set_ui(b->coeffs + 1, 1, GMP_RNDN);
-  b->length = 2;
-
-  for (ulong j = 0; j < 10000; j++)
-	 mpfr_poly_mul_classical(a, a, b);
-
-  for (ulong j = 0; j < 100; j++);
-     //mpfr_poly_mul_classical(b, a, a);
-     mpfr_poly_mul_FHT(b, a, a);
-
-   mpfr_poly_clear(a);
-   mpfr_poly_clear(b);
-
    mpfr_poly_randclear();
       
    printf("PASS\n");
