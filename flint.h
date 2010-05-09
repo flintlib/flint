@@ -64,6 +64,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
    return FLINT_BITS - zeros;
 }
 
+#if !defined(mpn_zero)
 #define mpn_zero(xxx, nnn) \
    do \
    { \
@@ -71,5 +72,11 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = 0UL; \
    } while (0)
+#endif
+
+#if !defined(mpn_store)
+extern void mpn_store(mp_limb_t * m, mp_size_t n, mp_limb_t l);
+#endif
 
 #endif
+

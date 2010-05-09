@@ -1,0 +1,42 @@
+/*============================================================================
+
+    Copyright (C) 2010 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
+		mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
+
+   Shift left the given coefficient by _shift_ bits and add it to the 
+   integer in arr in a field of the given number of bits.
+
+   shift  bits  --------------
+
+   X X X C C C C 0 0 0 0 0 0 0 
+
+   An optional borrow (of 1) can be subtracted from the coeff before 
+   it is packed. If the coeff is negative (after borrow), then a 
+   borrow will be returned by the function. 
+
+   The value of shift is assumed to be less than FLINT_BITS. All but 
+   the first shift bits of arr are assumed to be zero on entry to the
+   function.
+
+   The value of coeff may also be optionally (and notionally) negated 
+   before it is used, by setting the negate parameter to -1.

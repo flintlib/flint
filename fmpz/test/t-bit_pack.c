@@ -23,41 +23,58 @@
 
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_add_ui(fmpz_t f, const fmpz_t g, const ulong x)
+int main(void)
 {
-	fmpz c = *g;
+   int result;
+   printf("bit_pack/bit_unpack....");
+   fflush(stdout);
 
-	if (!COEFF_IS_MPZ(c)) // g is small
-	{
-        mp_limb_t sum[2];
-		if (c >= 0L) // both operands non-negative
-		{
-			add_ssaaaa(sum[1], sum[0], 0, c, 0, x);
-			if (sum[1] == 0) fmpz_set_ui(f, sum[0]); // result fits in 1 limb
-			else // result takes two limbs
-			{
-				mpz_t temp;
-				temp->_mp_d = sum;
-				temp->_mp_size = 2; // result is sum of two non-negative numbers and is hence non-negative
-				
-		        __mpz_struct * mpz_ptr = _fmpz_promote(f); // g has already been read
-				mpz_set(mpz_ptr, temp);			
-			}
-		} else // coeff is negative, x positive
-		{
-			if (-c > x) fmpz_set_si(f, x + c); // can't overflow as g is small and x smaller
-			else fmpz_set_ui(f, x + c); // won't be negative and has to be less than x
-		}
-	} else
-	{	
-		__mpz_struct * mpz_ptr2 = _fmpz_promote(f); // g is already large
-		__mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
-		mpz_add_ui(mpz_ptr2, mpz_ptr, x);
-		_fmpz_demote_val(f); // cancellation may have occurred		
-	}
+   fmpz_randinit();
+
+   for (ulong i = 0; i < 1000000UL; i++) 
+   {
+      fmpz_t a, b;
+      mp_bitcnt_t bits = n_randint(300) + 1;
+      ulong space = (300 - 1)/FLINT_BITS + 2; // 2 to accomodate shift
+      mp_limb_t * arr = (mp_limb_t *) calloc(sizeof(mp_limb_t), space);
+      mp_bitcnt_t shift = n_randint(FLINT_BITS);
+      int negate = (int) n_randint(2);
+
+	  fmpz_init(a);
+      fmpz_init(b);
+      
+      fmpz_randtest(a, bits - 1); // need one bit for sign
+      
+	  arr[0] = n_randbits(shift);
+
+      fmpz_poly_bit_pack(arr, shift, bits, a, -1, 0);
+      fmpz_poly_bit_unpack(b, arr, shift, bits, -1, 0);
+
+      result = (fmpz_cmp(a, b) == 0);
+
+      if (!result)
+      {
+         printf("FAIL\n");
+         fmpz_print(a); printf("\n");
+         fmpz_print(b); printf("\n");
+		 abort();
+      }
+
+      free(arr);
+	  fmpz_clear(a);
+      fmpz_clear(b);
+   }
+
+   fmpz_randclear();
+
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }
