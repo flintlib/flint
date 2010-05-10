@@ -357,6 +357,16 @@ void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
    Assumes poly1 and poly2 are at most of the given length.
 
 
+void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly, 
+						             ulong bit_size, int negate)
 
+   Pack the coefficients of poly into bitfields of the given bit_size, negating the
+   coefficients before packing if negate is set to -1.
+
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
+				    const mp_limb_t * arr, ulong bit_size, int negate)
+
+   Unpack the poly of given length from the array as packed into fields of the 
+   given bitsize, finally negating the coefficients if negate is set to -1.
 
 

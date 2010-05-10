@@ -20,7 +20,7 @@
 
 ===============================================================================*/
 
-int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, 
+int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, 
 	mp_bitcnt_t shift, mp_bitcnt_t bits, int negate, int borrow)
  
    A bit field of the given number of bits is extracted from arr,

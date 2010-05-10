@@ -19,7 +19,7 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2010 William Hart
+   Copyright (C) 2009 William Hart
 
 *****************************************************************************/
 
@@ -27,53 +27,56 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "ulong_extras.h"
 
 int main(void)
 {
    int result;
-   printf("bit_pack/bit_unpack....");
+   printf("bit_pack....");
    fflush(stdout);
-
-   fmpz_randinit();
-
-   for (ulong i = 0; i < 1000000UL; i++) 
+   
+   fmpz_poly_randinit();
+   
+   for (ulong i = 0; i < 30000UL; i++) 
    {
-      fmpz_t a, b;
-      mp_bitcnt_t bits = n_randint(300) + 1;
-      ulong space = (300 - 1)/FLINT_BITS + 2; // 2 to accomodate shift
-      mp_limb_t * arr = (mp_limb_t *) calloc(sizeof(mp_limb_t), space);
-      mp_bitcnt_t shift = n_randint(FLINT_BITS);
-      int negate = (int) n_randint(2);
+      fmpz_poly_t a, b;
 
-	  fmpz_init(a);
-      fmpz_init(b);
+	  ulong length = n_randint(100) + 1;
+	  ulong bits = n_randint(300) + 2;
+      mp_limb_t * arr = (mp_limb_t *) calloc((length*bits - 1)/FLINT_BITS + 1, sizeof(mp_limb_t));
+      int negate;
+
+      fmpz_poly_init(a);
+      fmpz_poly_init(b);
       
-      fmpz_randtest(a, bits - 1); // need one bit for sign
+	  do { fmpz_poly_randtest(a, length, bits - 1); } // -1 bit to handle signs
+      while (a->length == 0);
+
+	  negate = fmpz_sgn(a->coeffs + a->length - 1);
+	  if (negate > 0)
+	     negate = 0;
+
+      fmpz_poly_bit_pack(arr, a, bits, negate);
+      fmpz_poly_bit_unpack(b, a->length, arr, bits, negate);
       
-	  arr[0] = n_randbits(shift);
-
-      fmpz_bit_pack(arr, shift, bits, a, -1, 0);
-      fmpz_bit_unpack(b, arr, shift, bits, -1, 0);
-
-      result = (fmpz_cmp(a, b) == 0);
-
+      result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("FAIL\n");
-         fmpz_print(a); printf("\n");
-         fmpz_print(b); printf("\n");
-		 abort();
+         printf("Error:\n");
+         fmpz_poly_print(a); printf("\n\n");
+         fmpz_poly_print(b); printf("\n\n");
+         abort();
       }
 
       free(arr);
-	  fmpz_clear(a);
-      fmpz_clear(b);
+	  fmpz_poly_clear(a);
+      fmpz_poly_clear(b);
    }
 
-   fmpz_randclear();
-
+   fmpz_poly_randclear();
+      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

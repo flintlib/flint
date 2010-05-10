@@ -200,12 +200,12 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
-int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, 
+int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, 
 						 mp_bitcnt_t shift, mp_bitcnt_t bits,
 							   int negate, int borrow);
 
-int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
-					          mp_bitcnt_t bits, fmpz_t coeff,
+int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
+					          mp_bitcnt_t bits, const fmpz_t coeff,
 							   int negate, int borrow);
 
 #endif

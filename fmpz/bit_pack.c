@@ -27,8 +27,8 @@
 #include "flint.h"
 #include "fmpz.h"
 
-int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, fmpz_t coeff,
-							   int negate, int borrow)
+int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
+				                 const fmpz_t coeff, int negate, int borrow)
 {
    mp_limb_t save = arr[0];
    fmpz c = *coeff;
@@ -51,8 +51,17 @@ int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, fmp
 			mpn_store(arr + 1, limbs - 1, ~(mp_limb_t) 0);
 	     
 		 /* com remaining bits */
-		 if (rem_bits)
-		    arr[limbs] = (((mp_limb_t) 1)<<(rem_bits - 1)) - (mp_limb_t) 1;
+		 if (limbs)
+		 {
+			 if (rem_bits)
+		       arr[limbs] = (((mp_limb_t) 1)<<rem_bits) - (mp_limb_t) 1;
+		 } else
+		 {
+			/* mask off final limb */
+	        mask = (((mp_limb_t) 1)<<rem_bits) - (mp_limb_t) 1; 
+	        arr[limbs] &= mask;
+		 }
+		    
 	  } 
 
 	  return borrow;
@@ -145,8 +154,11 @@ int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits, fmp
 		 arr[0] = (d<<shift) + save;
 		  
 		 /* store carry from d<<shift */
-		 if (shift)
-		    arr[1] = (d>>(FLINT_BITS - shift));
+		 if (limbs + (rem_bits != 0) > 1)
+		 {
+			if (shift)
+		       arr[1] = (d>>(FLINT_BITS - shift));
+		 }
 	  } else
 	  {
          __mpz_struct * ptr = COEFF_TO_PTR(c);

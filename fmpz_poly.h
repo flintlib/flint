@@ -176,16 +176,23 @@ void fmpz_poly_mul_karatsuba(fmpz_poly_t res,
 void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
 							    ulong len1, const fmpz * poly2, ulong len2);
 
-void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong len);
+void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
+								             const fmpz * poly2, ulong len);
 
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
-                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
+            const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
 
-void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong len);
+void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
+									         const fmpz * poly2, ulong len);
 
 void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
-                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
+            const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
 
+void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly, 
+						                        ulong bit_size, int negate);
+
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
+						 const mp_limb_t * arr, ulong bit_size, int negate);
 
 #endif
 

@@ -27,7 +27,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
+int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
 							   int negate, int borrow)
 {
    mp_limb_t sign;
@@ -49,7 +49,7 @@ int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bi
 	  /* mask for the given number of bits */
 	  mask = (((mp_limb_t) 1)<<bits) - (mp_limb_t) 1;
 	  
-	  if (limbs) // field crosses a limb boundary
+	  if (limbs + (rem_bits != 0) > 1) // field crosses a limb boundary
 		 (*coeff) = ((arr[0]>>shift) + (arr[1]<<(FLINT_BITS - shift))) & mask;
       else // field is in first limb only, mask it
          (*coeff) = (arr[0]>>shift) & mask;
@@ -58,6 +58,9 @@ int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bi
 	  if (sign)
 	     (*coeff) += ((~(mp_limb_t) 0)<<bits);
       
+	  /* determine whether we need to return a borrow */
+	  sign = (*coeff < (mp_limb_signed_t) 0 ? (mp_limb_t) 1 : (mp_limb_t) 0);
+
 	  /* deal with borrow */
 	  if (borrow)
 	  {
@@ -65,9 +68,6 @@ int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bi
 		 if ((*coeff) > COEFF_MAX)
 		    fmpz_set_ui(coeff, *coeff);
 	  }
-
-	  /* determine whether we need to return a borrow */
-	  sign = (*coeff < (mp_limb_t) 0 ? 1 : 0);
 
 	  /* negate the coeff if necessary */
 	  if (negate)
@@ -120,7 +120,7 @@ int fmpz_poly_bit_unpack(fmpz_t coeff, mp_limb_t * arr, mp_bitcnt_t shift, mp_bi
 
 		 mpz_ptr->_mp_size = -l;
 
-		 sign = (l != 0);
+		 sign = 1;
 	  } else
 	  {
 	     /* deal with borrow */

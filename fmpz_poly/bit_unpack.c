@@ -20,61 +20,37 @@
 /****************************************************************************
 
    Copyright (C) 2010 William Hart
-
+   
 *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
 
-int main(void)
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
+						  const mp_limb_t * arr, ulong bit_size, int negate)
 {
-   int result;
-   printf("bit_pack/bit_unpack....");
-   fflush(stdout);
+   mp_bitcnt_t bits = 0;
+   mp_size_t limbs = 0;
 
-   fmpz_randinit();
+   ulong l = bit_size/FLINT_BITS;
+   ulong b = bit_size%FLINT_BITS;
+   ulong i;
+   int borrow = 0;
 
-   for (ulong i = 0; i < 1000000UL; i++) 
+   fmpz_poly_fit_length(poly, length);
+   _fmpz_poly_set_length(poly, length);
+
+   for (i = 0; i < length; i++)
    {
-      fmpz_t a, b;
-      mp_bitcnt_t bits = n_randint(300) + 1;
-      ulong space = (300 - 1)/FLINT_BITS + 2; // 2 to accomodate shift
-      mp_limb_t * arr = (mp_limb_t *) calloc(sizeof(mp_limb_t), space);
-      mp_bitcnt_t shift = n_randint(FLINT_BITS);
-      int negate = (int) n_randint(2);
-
-	  fmpz_init(a);
-      fmpz_init(b);
-      
-      fmpz_randtest(a, bits - 1); // need one bit for sign
-      
-	  arr[0] = n_randbits(shift);
-
-      fmpz_bit_pack(arr, shift, bits, a, -1, 0);
-      fmpz_bit_unpack(b, arr, shift, bits, -1, 0);
-
-      result = (fmpz_cmp(a, b) == 0);
-
-      if (!result)
-      {
-         printf("FAIL\n");
-         fmpz_print(a); printf("\n");
-         fmpz_print(b); printf("\n");
-		 abort();
-      }
-
-      free(arr);
-	  fmpz_clear(a);
-      fmpz_clear(b);
+      borrow = fmpz_bit_unpack(poly->coeffs + i, arr + limbs, bits, bit_size, negate, borrow);
+	  limbs += l;
+	  bits += b;
+	  if (bits >= FLINT_BITS)
+	  {
+	     bits -= FLINT_BITS;
+		 limbs++;
+	  }
    }
-
-   fmpz_randclear();
-
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
 }

@@ -20,7 +20,7 @@
 
 ===============================================================================*/
 
-int fmpz_poly_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
+int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
 		mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
 
    Shift left the given coefficient by _shift_ bits and add it to the 
