@@ -47,6 +47,21 @@ void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
    }
 }
 
+void fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in)
+{
+   mp_bitcnt_t bits = n_randint(bits_in + 1);
+   
+   if (bits <= FLINT_BITS - 2)
+   {
+      _fmpz_demote(f);
+      *f = n_randbits(bits);
+   } else
+   {
+      __mpz_struct * mpz_ptr = _fmpz_promote(f);
+      mpz_rrandomb(mpz_ptr, fmpz_randstate, bits);
+   }
+}
+
 void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in)
 {
    if (bits_in == 0)

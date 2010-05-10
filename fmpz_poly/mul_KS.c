@@ -38,40 +38,55 @@ void _fmpz_poly_mul_KS(fmpz_poly_t res,
    ulong len1 = poly1->length;
    ulong len2 = poly2->length;
    ulong i, limbs1, limbs2, log_len;
-   mp_bitcnt_t bits1 = 0, bits2 = 0, bits;
+   long bits1 = 0, bits2 = 0, bits;
    mp_limb_t * arr1, * arr2, * arr3;
+   long sign = 0;
 
    neg1 = fmpz_sgn(poly1->coeffs + len1 - 1);
    if (neg1 > 0) neg1 = 0;
 
-   for (i = 0; i < len1; i++)
-      bits1 = FLINT_MAX(bits1, fmpz_bits(poly1->coeffs + i));
-   
    neg2 = fmpz_sgn(poly2->coeffs + len2 - 1);
    if (neg2 > 0) neg2 = 0;
 
-   for (i = 0; i < len2; i++)
-      bits2 = FLINT_MAX(bits2, fmpz_bits(poly2->coeffs + i));
+   bits1 = fmpz_poly_max_bits(poly1);
+   if (bits1 < 0L) { sign = 1; bits1 = -bits1; }
+ 
+   if (poly1 != poly2)
+   {
+	  bits2 = fmpz_poly_max_bits(poly2);
+      if (bits2 < 0L) { sign = 1; bits2 = -bits2; }
+   } else
+	  bits2 = bits1;
    
    log_len = FLINT_BIT_COUNT(len2);
-   bits = bits1 + bits2 + log_len + 1;
+   bits = bits1 + bits2 + log_len + sign;
 
    limbs1 = (bits*len1 - 1)/FLINT_BITS + 1;
    limbs2 = (bits*len2 - 1)/FLINT_BITS + 1;
-   arr1 = (mp_limb_t *) calloc(limbs1, sizeof(mp_limb_t));
-   arr2 = (mp_limb_t *) calloc(limbs2, sizeof(mp_limb_t));
    
+   arr1 = (mp_limb_t *) calloc(limbs1, sizeof(mp_limb_t));
+   fmpz_poly_bit_pack(arr1, poly1, bits, neg1);
+   
+   if (poly1 != poly2)
+   {
+	  arr2 = (mp_limb_t *) calloc(limbs2, sizeof(mp_limb_t));
+      fmpz_poly_bit_pack(arr2, poly2, bits, neg2);
+   }
+
    arr3 = (mp_limb_t *) malloc((limbs1 + limbs2)*sizeof(mp_limb_t));
 
-   fmpz_poly_bit_pack(arr1, poly1, bits, neg1);
-   fmpz_poly_bit_pack(arr2, poly2, bits, neg2);
+   if (poly1 != poly2)
+	  mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
+   else
+	  mpn_mul_n(arr3, arr1, arr1, limbs1);
 
-   mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
-
-   fmpz_poly_bit_unpack(res, len1 + len2 - 1, arr3, bits, neg1 ^ neg2);
+   if (sign)
+	  fmpz_poly_bit_unpack(res, len1 + len2 - 1, arr3, bits, neg1 ^ neg2);
+   else
+	  fmpz_poly_bit_unpack_unsigned(res, len1 + len2 - 1, arr3, bits);
 
    free(arr1);
-   free(arr2);
+   if (poly1 != poly2) free(arr2);
    free(arr3);
 }
 

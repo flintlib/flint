@@ -32,7 +32,19 @@ void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits)
    Because this function depends on a global random state it isn't 
    threadsafe.
 
- void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
+void fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in)
+
+   Generates a random unsigned integer whose value has a number
+   of bits which is random from 0 up to bits inclusive.
+
+   If one requests random numbers with more than FLINT_BITS - 2 bits
+   one must first call fmpz_randinit(). When one is finished generating
+   random numbers one should call fmpz_randclear() to clean up.
+ 
+   Because this function depends on a global random state it isn't 
+   threadsafe.
+
+void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
 
    As per fmpz_randtest, but the result will not be 0. If bits_in is set
    to 0, an exception will result.

@@ -29,43 +29,67 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
-void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+int main(void)
 {
-   ulong i;
-   fmpz_poly_fit_length(f, length);
-
-   for (i = 0; i < length; i++)
-      fmpz_randtest(f->coeffs + i, bits_in);
+   int result;
+   printf("max_bits....");
+   fflush(stdout);
    
-   _fmpz_poly_set_length(f, length);
-   _fmpz_poly_normalise(f);
-}
-
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
-{
-   ulong i;
-   fmpz_poly_fit_length(f, length);
-
-   for (i = 0; i < length; i++)
-      fmpz_randtest_unsigned(f->coeffs + i, bits_in);
+   fmpz_poly_randinit();
    
-   _fmpz_poly_set_length(f, length);
-   _fmpz_poly_normalise(f);
-}
-
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
-{
-   if ((bits_in == 0) || (length == 0))
+   for (ulong i = 0; i < 10000UL; i++) 
    {
-      printf("Exception : 0 passed to fmpz_poly_randtest_not_zero\n");
-      abort();
+      fmpz_poly_t a, b, c;
+
+      fmpz_poly_init(a);
+      fmpz_poly_init(b);
+      fmpz_poly_init(c);
+      ulong bits = n_randint(200);
+	  ulong bits2;
+	  fmpz_poly_randtest(a, n_randint(100), bits);
+      
+      bits2 = fmpz_poly_max_bits(a);
+
+      result = (bits >= FLINT_ABS(bits2));
+      if (!result)
+      {
+         printf("Error:\n");
+         printf("bits = %ld, bits2 = %ld\n", bits, bits2);
+		 abort();
+      }
+
+      fmpz_poly_clear(a);
+      fmpz_poly_clear(b);
+      fmpz_poly_clear(c);
    }
 
-   fmpz_poly_randtest(f, length, bits_in);
-   if (f->length == 0) 
+   for (ulong i = 0; i < 10000UL; i++) 
    {
-      fmpz_set_ui(f->coeffs, 1UL);
-      f->length = 1;
+      fmpz_poly_t a;
+
+      fmpz_poly_init(a);
+      ulong bits = n_randint(200);
+	  ulong bits2;
+	  fmpz_poly_randtest_unsigned(a, n_randint(100), bits);
+      
+      bits2 = fmpz_poly_max_bits(a);
+
+      result = (bits >= bits2);
+      if (!result)
+      {
+         printf("Error:\n");
+         printf("bits = %ld, bits2 = %ld\n", bits, bits2);
+		 abort();
+      }
+
+      fmpz_poly_clear(a);
    }
+
+   fmpz_poly_randclear();
+      
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }

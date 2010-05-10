@@ -145,3 +145,62 @@ int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_b
 	  return sign;
    }
 }
+
+void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, 
+							             mp_bitcnt_t shift, mp_bitcnt_t bits)
+{
+   mp_limb_t cy;
+   ulong limbs = (shift + bits)/FLINT_BITS;
+   ulong rem_bits = (shift + bits)%FLINT_BITS;
+   mp_limb_t mask;
+	  
+   if (bits <= FLINT_BITS - 2) // fits into a small coeff
+   {
+      _fmpz_demote(coeff);
+
+	  /* mask for the given number of bits */
+	  mask = (((mp_limb_t) 1)<<bits) - (mp_limb_t) 1;
+	  
+	  if (limbs + (rem_bits != 0) > 1) // field crosses a limb boundary
+		 (*coeff) = ((arr[0]>>shift) + (arr[1]<<(FLINT_BITS - shift))) & mask;
+      else // field is in first limb only, mask it
+         (*coeff) = (arr[0]>>shift) & mask;
+   } else // large coefficient
+   {
+      __mpz_struct * mpz_ptr = _fmpz_promote(coeff);
+        
+	  /* the number of limbs to hold the bitfield _including_ b extra bits */
+	  ulong l = (bits - 1)/FLINT_BITS + 1;
+      ulong b = bits%FLINT_BITS;
+
+      /* allocate space for l limbs only */
+	  mpz_realloc(mpz_ptr, l);
+	  mp_limb_t * p = mpz_ptr->_mp_d;
+
+	  /* shift in l limbs */
+	  if (shift)
+	     mpn_rshift(p, arr, l, shift);
+	  else
+	     mpn_copyi(p, arr, l);
+
+	  /* shift in any rem_bits that weren't already shifted */
+	  if (limbs + (rem_bits != 0) > l)
+	     p[l - 1] += (arr[limbs]<<(FLINT_BITS - shift));
+	  
+	  /* mask off the last limb, if not full */
+	  if (b)
+	  {
+		 mask = (((mp_limb_t) 1)<<b) - (mp_limb_t) 1;
+		 p[l - 1] &= mask;
+	  }
+
+	  /* normalise */
+	  while (l && (p[l - 1] == (mp_limb_t) 0))
+		 l--;
+        
+	  mpz_ptr->_mp_size = l;
+		 
+	  /* coeff may fit in a small */
+	  _fmpz_demote_val(coeff);
+   }
+}

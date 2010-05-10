@@ -19,7 +19,7 @@
 ===============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2006, 2007, 2008, 2009 William Hart
+ Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
  Copyright (C) 2009, Andy Novocin
  
 ******************************************************************************/
@@ -88,6 +88,9 @@ void fmpz_poly_randinit(void);
 void fmpz_poly_randclear(void);
 
 void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in);
+
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, 
+                                                     mp_bitcnt_t bits_in);
 
 void fmpz_poly_randtest_not_zero(fmpz_poly_t f, 
                                        ulong length, mp_bitcnt_t bits_in);
@@ -188,14 +191,20 @@ void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
 
+long fmpz_poly_max_bits(const fmpz_poly_t poly);
+
 void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly, 
 						                        ulong bit_size, int negate);
 
 void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
 						 const mp_limb_t * arr, ulong bit_size, int negate);
 
+void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length, 
+						             const mp_limb_t * arr, ulong bit_size);
+
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
 
 #endif
 

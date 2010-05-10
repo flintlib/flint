@@ -38,14 +38,14 @@ int main(void)
 
    fmpz_randinit();
 
-   for (ulong i = 0; i < 1000000UL; i++) 
+   for (ulong i = 0; i < 500000UL; i++) 
    {
       fmpz_t a, b;
       mp_bitcnt_t bits = n_randint(300) + 1;
       ulong space = (300 - 1)/FLINT_BITS + 2; // 2 to accomodate shift
       mp_limb_t * arr = (mp_limb_t *) calloc(sizeof(mp_limb_t), space);
       mp_bitcnt_t shift = n_randint(FLINT_BITS);
-      int negate = (int) n_randint(2);
+      int negate = (int) -n_randint(2);
 
 	  fmpz_init(a);
       fmpz_init(b);
@@ -54,10 +54,43 @@ int main(void)
       
 	  arr[0] = n_randbits(shift);
 
-      fmpz_bit_pack(arr, shift, bits, a, -1, 0);
-      fmpz_bit_unpack(b, arr, shift, bits, -1, 0);
+      fmpz_bit_pack(arr, shift, bits, a, negate, 0);
+      fmpz_bit_unpack(b, arr, shift, bits, negate, 0);
 
       result = (fmpz_cmp(a, b) == 0);
+
+      if (!result)
+      {
+         printf("FAIL\n");
+         fmpz_print(a); printf("\n");
+         fmpz_print(b); printf("\n");
+		 abort();
+      }
+
+      free(arr);
+	  fmpz_clear(a);
+      fmpz_clear(b);
+   }
+
+   for (ulong i = 0; i < 500000UL; i++) 
+   {
+      fmpz_t a, b;
+      mp_bitcnt_t bits = n_randint(300) + 1;
+      ulong space = (300 - 1)/FLINT_BITS + 2; // 2 to accomodate shift
+      mp_limb_t * arr = (mp_limb_t *) calloc(sizeof(mp_limb_t), space);
+      mp_bitcnt_t shift = n_randint(FLINT_BITS);
+      
+	  fmpz_init(a);
+      fmpz_init(b);
+      
+      fmpz_randtest_unsigned(a, bits); 
+      
+	  arr[0] = n_randbits(shift);
+
+      fmpz_bit_pack(arr, shift, bits, a, 0, 0);
+      fmpz_bit_unpack_unsigned(b, arr, shift, bits);
+      
+	  result = (fmpz_cmp(a, b) == 0);
 
       if (!result)
       {

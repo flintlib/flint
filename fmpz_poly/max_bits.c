@@ -19,53 +19,29 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
-
+   Copyright (C) 2010 William Hart
+   
 *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
 {
-   ulong i;
-   fmpz_poly_fit_length(f, length);
+	ulong i;
+	long bits, max_bits = 0;
+	long sign = 1L;
 
-   for (i = 0; i < length; i++)
-      fmpz_randtest(f->coeffs + i, bits_in);
-   
-   _fmpz_poly_set_length(f, length);
-   _fmpz_poly_normalise(f);
-}
+	for (i = 0; i < poly->length; i++)
+	{
+	   bits = fmpz_bits(poly->coeffs + i);
+	   if (bits > max_bits)
+	      max_bits = bits;
+       if (fmpz_sgn(poly->coeffs + i) < 0)
+	      sign = -1L;
+	}
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
-{
-   ulong i;
-   fmpz_poly_fit_length(f, length);
-
-   for (i = 0; i < length; i++)
-      fmpz_randtest_unsigned(f->coeffs + i, bits_in);
-   
-   _fmpz_poly_set_length(f, length);
-   _fmpz_poly_normalise(f);
-}
-
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
-{
-   if ((bits_in == 0) || (length == 0))
-   {
-      printf("Exception : 0 passed to fmpz_poly_randtest_not_zero\n");
-      abort();
-   }
-
-   fmpz_poly_randtest(f, length, bits_in);
-   if (f->length == 0) 
-   {
-      fmpz_set_ui(f->coeffs, 1UL);
-      f->length = 1;
-   }
+	return max_bits*sign;
 }

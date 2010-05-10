@@ -94,6 +94,8 @@ void fmpz_randm(fmpz_t f, fmpz_t m);
 
 void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
 
+void fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in);
+
 void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
 
 long fmpz_get_si(const fmpz_t f);
@@ -201,12 +203,15 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
 int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, 
-						 mp_bitcnt_t shift, mp_bitcnt_t bits,
-							   int negate, int borrow);
+						      mp_bitcnt_t shift, mp_bitcnt_t bits,
+							     int negate, int borrow);
 
 int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
-					    mp_bitcnt_t bits, const fmpz_t coeff,
-							   int negate, int borrow);
+					         mp_bitcnt_t bits, const fmpz_t coeff,
+							     int negate, int borrow);
+
+void fmpz_bit_unpack_unsigned(fmpz_t coeff, 
+	  const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits);
 
 #endif
 

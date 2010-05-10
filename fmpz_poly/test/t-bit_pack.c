@@ -34,12 +34,12 @@
 int main(void)
 {
    int result;
-   printf("bit_pack....");
+   printf("bit_pack/bit_unpack....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
-   for (ulong i = 0; i < 30000UL; i++) 
+   for (ulong i = 0; i < 20000UL; i++) 
    {
       fmpz_poly_t a, b;
 
@@ -60,6 +60,37 @@ int main(void)
 
       fmpz_poly_bit_pack(arr, a, bits, negate);
       fmpz_poly_bit_unpack(b, a->length, arr, bits, negate);
+      
+      result = (fmpz_poly_equal(a, b));
+      if (!result)
+      {
+         printf("Error:\n");
+         fmpz_poly_print(a); printf("\n\n");
+         fmpz_poly_print(b); printf("\n\n");
+         abort();
+      }
+
+      free(arr);
+	  fmpz_poly_clear(a);
+      fmpz_poly_clear(b);
+   }
+
+   for (ulong i = 0; i < 20000UL; i++) 
+   {
+      fmpz_poly_t a, b;
+
+	  ulong length = n_randint(100) + 1;
+	  ulong bits = n_randint(300) + 1;
+      mp_limb_t * arr = (mp_limb_t *) calloc((length*bits - 1)/FLINT_BITS + 1, sizeof(mp_limb_t));
+      
+      fmpz_poly_init(a);
+      fmpz_poly_init(b);
+      
+	  do { fmpz_poly_randtest_unsigned(a, length, bits); } 
+      while (a->length == 0);
+
+	  fmpz_poly_bit_pack(arr, a, bits, 0);
+      fmpz_poly_bit_unpack_unsigned(b, a->length, arr, bits);
       
       result = (fmpz_poly_equal(a, b));
       if (!result)

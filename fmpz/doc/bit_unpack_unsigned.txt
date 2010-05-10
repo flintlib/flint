@@ -1,0 +1,29 @@
+/*============================================================================
+
+    Copyright (C) 2010 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+void fmpz_bit_unpack_unsigned(fmpz_t coeff, 
+              const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits)
+ 
+   A bit field of the given number of bits is extracted from arr,
+   starting after shift bits, and placed into coeff. 
+
+   The value of shift is expected to be less than FLINT_BITS.

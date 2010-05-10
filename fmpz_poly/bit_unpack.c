@@ -54,3 +54,29 @@ void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length,
 	  }
    }
 }
+
+void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length, 
+						           const mp_limb_t * arr, ulong bit_size)
+{
+   mp_bitcnt_t bits = 0;
+   mp_size_t limbs = 0;
+
+   ulong l = bit_size/FLINT_BITS;
+   ulong b = bit_size%FLINT_BITS;
+   ulong i;
+   
+   fmpz_poly_fit_length(poly, length);
+   _fmpz_poly_set_length(poly, length);
+
+   for (i = 0; i < length; i++)
+   {
+      fmpz_bit_unpack_unsigned(poly->coeffs + i, arr + limbs, bits, bit_size);
+	  limbs += l;
+	  bits += b;
+	  if (bits >= FLINT_BITS)
+	  {
+	     bits -= FLINT_BITS;
+		 limbs++;
+	  }
+   }
+}
