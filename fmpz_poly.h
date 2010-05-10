@@ -194,6 +194,9 @@ void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly,
 void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
 						 const mp_limb_t * arr, ulong bit_size, int negate);
 
+void fmpz_poly_mul_KS(fmpz_poly_t res, 
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
 #endif
 
 

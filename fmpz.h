@@ -205,7 +205,7 @@ int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr,
 							   int negate, int borrow);
 
 int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
-					          mp_bitcnt_t bits, const fmpz_t coeff,
+					    mp_bitcnt_t bits, const fmpz_t coeff,
 							   int negate, int borrow);
 
 #endif

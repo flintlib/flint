@@ -369,4 +369,8 @@ void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length,
    Unpack the poly of given length from the array as packed into fields of the 
    given bitsize, finally negating the coefficients if negate is set to -1.
 
+void fmpz_poly_mul_KS(fmpz_poly_t res, 
+                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Set res to poly1 multiplied by poly2.
 
