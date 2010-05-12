@@ -1,0 +1,66 @@
+/*============================================================================
+
+    Copyright (C) 2010 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+********************************************************************************
+
+  Memory management
+
+********************************************************************************
+
+void fmpz_mpoly_init(fmpz_mpoly_t poly, ulong vars, ulong ebits)
+
+   Initialised an fmpz_mpoly_t with the given number of variables, and whose 
+   exponents all fit in the given number of bits (per variable) for use.
+
+void fmpz_mpoly_init2(fmpz_mpoly_t poly, ulong alloc, ulong vars, ulong ebits)
+
+   As per fmpz_mpoly_init, except that the coefficient and exponent arrays
+   are initialised to hold up to alloc terms.
+
+void fmpz_mpoly_realloc(fmpz_mpoly_t poly, ulong alloc)
+
+   Reallocate poly to hold at most alloc terms. This reallocates both the
+   coefficient and exponent arrays. If the current length is longer than
+   alloc, the polynomial is truncated.
+
+void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, ulong length)
+
+   Ensure poly has space for at least length terms. The polynomial is 
+   never made shorter, i.e. no data can be lost.
+
+void fmpz_mpoly_clear(fmpz_mpoly_t poly)
+
+   Clear a polynomial and release any memory allocated for it. The 
+   polynomial cannot be used again until it is initialised again.
+
+********************************************************************************
+
+  Basic maninpulation
+
+********************************************************************************
+
+static inline
+void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, ulong length)
+
+   Truncate the polynomial to the given length. If length is 
+   greater than the current length of the polynomial, nothing
+   happens.
