@@ -45,9 +45,25 @@ typedef struct
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
 
+typedef struct fmpz_mpoly_entry_t fmpz_mpoly_entry_t;
+
+struct fmpz_mpoly_entry_t
+{
+   fmpz_mpoly_entry_t * next; // linked list of entries
+   ulong i1; // index of coefficient in first poly 
+   ulong i2; // index of coefficient in second poly
+};
+
+typedef struct
+{
+   fmpz exp;
+   fmpz_mpoly_entry_t * entry; 
+} fmpz_mpoly_heap_t;
+
 void fmpz_mpoly_init(fmpz_mpoly_t poly, ulong vars, ulong ebits);
 
-void fmpz_mpoly_init2(fmpz_mpoly_t poly, ulong alloc, ulong vars, ulong ebits);
+void fmpz_mpoly_init2(fmpz_mpoly_t poly, ulong alloc, 
+					                        ulong vars, ulong ebits);
 
 void fmpz_mpoly_realloc(fmpz_mpoly_t poly, ulong alloc);
 
@@ -71,6 +87,14 @@ void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, ulong length)
 	  poly->length = length;
    }  
 }
+
+void fmpz_mpoly_reheapify(fmpz_mpoly_heap_t * heap, ulong * n);
+
+void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n, 
+							     fmpz_mpoly_entry_t * entry, fmpz exp);
+
+void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, 
+						                           fmpz_mpoly_t poly2);
 
 #endif
 
