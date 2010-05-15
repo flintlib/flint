@@ -36,7 +36,9 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 {
    ulong len1 = poly1->length;
    ulong len2 = poly2->length;
-   ulong i, j;
+   ulong i, j, bits1 = 0, bits2 = 0, b, b_old;
+   int signed_c = 0;
+   fmpz_t temp;
 
    fmpz_mpoly_heap_t * heap = (fmpz_mpoly_heap_t *) malloc((len2 + 1)*sizeof(fmpz_mpoly_heap_t));
    fmpz_mpoly_entry_t * entries = (fmpz_mpoly_entry_t *) malloc(len2*sizeof(fmpz_mpoly_entry_t));
@@ -44,6 +46,30 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
    ulong n; // index of final entry in heap (0 means nothing in heap yet as indices start at 1)
    ulong len_out = 0; // length of product polynomial
    ulong res_alloc = res->alloc;
+   
+   fmpz_init(temp);
+
+   /* compute the maximum bitsize for poly1 and poly2 */
+   for (i = 0; i < len1; i++)
+   {
+      b = fmpz_bits(poly1->coeffs + i);
+	  if (b > bits1) bits1 = b;
+	  if (fmpz_sgn(poly1->coeffs + i) < 0) signed_c = 1;
+   }
+
+   for (i = 0; i < len2; i++)
+   {
+      b = fmpz_bits(poly2->coeffs + i);
+	  if (b > bits2) bits2 = b;
+	  if (fmpz_sgn(poly2->coeffs + i) < 0) signed_c = 1;
+   }
+
+   b = bits1 + bits2 + FLINT_BIT_COUNT(len2);
+   if (b < FLINT_BITS - 2) b = 0; // output will fit in a small fmpz
+   else if (!signed_c && bits1 <= FLINT_BITS - 2 && bits2 <= FLINT_BITS - 2) b = 2; // unsigned <= 3 limbs
+   else b = 3;
+
+   b_old = b;
 
    /* place all products poly1[0]*poly2[j] into our array of entries */
 
@@ -71,11 +97,15 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 	  fmpz_mpoly_entry_t * next = chain; // to iterate along chain
       fmpz_mpoly_entry_t * prev;
       fmpz exp = heap[1].exp; // current exponents
-	  mp_limb_t accum[3] = { 0, 0, 0 };
-	  mp_limb_t cy;
+	  fmpz c1, c2; // coefficients
+      mp_limb_t accum0 = 0, accum1 = 0, accum2 = 0, * ptr, cy;
+	  __mpz_struct * coeff;
 	  int sign;
 	  ulong size;
+      mp_limb_signed_t n1, n2, n3;
 
+	  b = b_old;
+      
 	  /* make sure there's enough space for the new term */
 	  if (len_out >= res_alloc)
 	  {
@@ -105,22 +135,34 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 	  do
 	  {
          prev = next;
-		 fmpz c1 = poly1->coeffs[next->i1];
-		 fmpz c2 = poly2->coeffs[next->i2];
-         mp_limb_signed_t n1, n2, n3;
-
+		 c1 = poly1->coeffs[next->i1];
+		 c2 = poly2->coeffs[next->i2];
+         
 		 /* addmul */
-		 if (!COEFF_IS_MPZ(c1) && !COEFF_IS_MPZ(c2))
+		 if (b == 0) // fits in a small fmpz
 		 {
-		    smul_ppmm(n2, n1, c1, c2);
-            n3 = (n2>>(FLINT_BITS - 1)); //sign extend
-            add_ssaaaa(cy, accum[0], (mp_limb_t) 0, accum[0], (mp_limb_t) 0, n1);
-            add_ssaaaa(accum[2], accum[1], accum[2], accum[1], (mp_limb_t) 0, cy);
-            add_ssaaaa(accum[2], accum[1], accum[2], accum[1], n3, n2);
-		 } else
+		    accum0 += ((mp_limb_signed_t) c1 * (mp_limb_signed_t) c2);
+		 } else if (b == 2) // input coeffs fit in a small and are unsigned
 		 {
-		    printf("not implemented yet\n");
-			abort();
+		    umul_ppmm(n2, n1, c1, c2);
+            add_ssaaaa(cy, accum0, (mp_limb_t) 0, accum0, (mp_limb_t) 0, n1);
+            add_ssaaaa(cy, accum1, (mp_limb_t) 0, accum1, (mp_limb_t) 0, n2 + cy); // cannot overflow  
+		    if (cy) // has overflowed
+			{
+			   b = 3;
+			   accum2 = cy;
+			}
+		 } else // general case
+		 {
+			if (!COEFF_IS_MPZ(c1) && !COEFF_IS_MPZ(c2))
+		    {
+		       smul_ppmm(n2, n1, c1, c2);
+               n3 = (n2>>(FLINT_BITS - 1)); //sign extend
+               add_ssaaaa(cy, accum0, (mp_limb_t) 0, accum0, (mp_limb_t) 0, n1);
+               add_ssaaaa(accum2, accum1, accum2, accum1, (mp_limb_t) 0, cy);
+               add_ssaaaa(accum2, accum1, accum2, accum1, n3, n2);
+		    } else
+		       fmpz_addmul(temp, poly1->coeffs + next->i1, poly2->coeffs + next->i2);
 		 }
 
 	     if (next->i1 == 0 && next->i2 < len2 - 1) // inject next entry poly1[1]*poly2[j+1]
@@ -135,41 +177,60 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 	  } while (next);
 
 	  /* store term */
-	  if (accum[2] < (mp_limb_signed_t) 0) // negate
+	  if (b == 0) // fits into a small fmpz
 	  {
-		 sign = 1;
-		 add_ssaaaa(cy, accum[0], (mp_limb_t) 0, ~accum[0], (mp_limb_t) 0, (mp_limb_t) 1);
-         add_ssaaaa(accum[2], accum[1], ~accum[2], ~accum[1], (mp_limb_t) 0, cy);
-	  } else
-	     sign = 0;
-
-	  size = 3;
-	  if (accum[2] == (mp_limb_t) 0) // normalise
-	  {
-		 size = 2;
-		 if (accum[1] == (mp_limb_t) 0)
-	     {
-	        size = 1;
-			if (accum[0] == (mp_limb_t) 0)
-			   size = 0;
+	     _fmpz_demote(res->coeffs + len_out);
+		 res->coeffs[len_out] = accum0;
+	  } else if (b == 2) // fits into two limbs unsigned
+	  {		
+		 if (accum1 != 0 || accum0 > COEFF_MAX)
+		 {
+			if (!COEFF_IS_MPZ(res->coeffs[len_out])) 
+			   coeff = _fmpz_promote(res->coeffs + len_out);
+			if (coeff->_mp_alloc < 2) mpz_realloc(coeff, 2);
+			coeff->_mp_d[0] = accum0;
+			coeff->_mp_d[1] = accum1;
+			coeff->_mp_size = 2 - (accum1 == 0);
+		 } else 
+		 {
+			_fmpz_demote(res->coeffs + len_out);
+			if (accum0 == 0) continue;
+			res->coeffs[len_out] = accum0;
 		 }
-	  }  
-
-	  if (size == 0) 
-	     continue;
-	  
-	  if (size <= 1)
-	  {
-	     fmpz_set_ui(res->coeffs + len_out, accum[0]);
-		 if (sign) fmpz_neg(res->coeffs + len_out, res->coeffs + len_out);
 	  } else
 	  {
-		 __mpz_struct * ptr = _fmpz_promote(res->coeffs + len_out);
-	     mpz_realloc(ptr, size);
-		 for (i = 0; i < size; i++)
-			ptr->_mp_d[i] = accum[i];
-		 ptr->_mp_size = size;
-         if (sign) ptr->_mp_size = -ptr->_mp_size;
+		 if (sign = (accum2 < (mp_limb_signed_t) 0)) // if negative, negate
+	     {
+		    add_ssaaaa(cy, accum0, (mp_limb_t) 0, ~accum0, (mp_limb_t) 0, (mp_limb_t) 1);
+            add_ssaaaa(accum2, accum1, ~accum2, ~accum1, (mp_limb_t) 0, cy);
+	     } 
+
+	     if (accum2 != (mp_limb_t) 0) size = 3; // normalise
+		 else if (accum1 != (mp_limb_t) 0) size = 2;
+	     else 
+		 {
+			 _fmpz_demote(res->coeffs + len_out);
+			 if (accum0 != (mp_limb_t) 0) size = 1;
+		     else continue;
+	     }
+	      
+		 if (size == 1 && accum0 <= COEFF_MAX) // fits in a small fmpz
+		 {
+			if (sign) accum0 = -accum0;
+			res->coeffs[len_out] = accum0;
+		 } else // general case
+         {
+		 	coeff = _fmpz_promote(res->coeffs + len_out);
+			ptr = mpz_realloc(coeff, 3);
+			if (sign) coeff->_mp_size = -size;
+			else coeff->_mp_size = size;
+			ptr[0] = accum0;
+			ptr[1] = accum1;
+			ptr[2] = accum2;
+	     }
+
+		 fmpz_add(res->coeffs + len_out, res->coeffs + len_out, temp); // add rest of coeff
+		 fmpz_zero(temp); // zero temp for next coefficient
 	  }
 
 	  fmpz_set_ui(res->exps + len_out, exp);
@@ -177,6 +238,7 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 	  len_out++;
    }
 
+   if (b == 3) fmpz_clear(temp);
    free(heap);
    free(entries);
 

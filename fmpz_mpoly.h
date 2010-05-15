@@ -50,8 +50,8 @@ typedef struct fmpz_mpoly_entry_t fmpz_mpoly_entry_t;
 struct fmpz_mpoly_entry_t
 {
    fmpz_mpoly_entry_t * next; // linked list of entries
-   ulong i1; // index of coefficient in first poly 
-   ulong i2; // index of coefficient in second poly
+   unsigned int i1; // index of coefficient in first poly 
+   unsigned int i2; // index of coefficient in second poly
 };
 
 typedef struct

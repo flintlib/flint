@@ -44,6 +44,12 @@ TODO
 
 * make use of mpfr type througout LLL, mpfr_vec and mpfr_mat modules
 
+* Write fmpz_mpoly_max_bits, use in t-mul_heap test code and mul_heap
+
+* Write ACCUM2 and ACCUM3 assembly functions and use in mul_heap
+
+* Make mul_heap take arrays of fmpz's as arguments and document function
+
 Maybe
 =====
 

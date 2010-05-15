@@ -74,9 +74,13 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
    } while (0)
 #endif
 
-#if !defined(mpn_store)
-extern void mpn_store(mp_limb_t * m, mp_size_t n, mp_limb_t l);
-#endif
+#define mpn_store(xxx, nnn, yyy) \
+   do \
+   { \
+      ulong ixxx; \
+      for (ixxx = 0; ixxx < nnn; ixxx++) \
+         (xxx)[ixxx] = yyy; \
+   } while (0)
 
 #endif
 

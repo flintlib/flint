@@ -1,6 +1,6 @@
 CC=gcc
-CFLAGS=-std=c99 -O2
-LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lmpfrcx -lmpc -lmpir -lmpfr -lm
+CFLAGS=-std=c99 -O3
+LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lmpir -lmpfr -lm
 INCS=-I$(CURDIR) -I/home/wbhart/include
 export
 

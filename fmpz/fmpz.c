@@ -1,1 +1,1 @@
-link/fmpz_reentrant.c
+link/fmpz_single.c
