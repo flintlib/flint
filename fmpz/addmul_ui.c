@@ -39,6 +39,18 @@ void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, const ulong x)
 		fmpz_mul_ui(f, g, x); // we are adding product to 0
 		return;
 	}
+    
+	if (x == 1UL) // special case, adding g*1 to f
+	{
+	   fmpz_add(f, f, g);
+	   return;
+	}
+
+	if (c1 == 1UL) // special case, adding 1*x to f
+	{
+	   fmpz_add_ui(f, f, x);
+	   return;
+	}
 
 	if (!COEFF_IS_MPZ(c1)) // c1 is small
 	{
