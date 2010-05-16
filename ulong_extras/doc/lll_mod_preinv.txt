@@ -20,19 +20,17 @@
 
 ===============================================================================*/
 
-n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
+                       mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv)
 
-   Returns a % n given a precomputed inverse of n computed by 
-   invert_limb. There are no restrictions on a or on n. 
+   Returns (a_hi, a_mi, a_lo) % n given a precomputed inverse 
+   of n computed by n_preinvert_limb(n). It is assumed that
+   a_hi is reduced mod n. There are no restrictions on on n.
 
-   The old version of this function was implemented simply by 
-   making use of udiv_qrnnd_preinv.
-
-   The new version uses the new algorithm of Granlund and 
-   Montgomery. First n is normalised and a shifted into 
-   two limbs to compensate. Then their algorithm is applied
-   verbatim and the result shifted back.
+   This function uses the algorithm of Granlund and Moller to
+   first reduce the top two limbs mod n, then does the same
+   on the bottom two limbs.
 
    See paper Improved Division by Invariant Integers (Torbjorn 
    Granlund and Niels Moller) (preprint): (pp. 4)
-   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 

@@ -1,6 +1,6 @@
 /*============================================================================
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2009, 2010 William Hart
 
     This file is part of FLINT.
 
@@ -27,5 +27,13 @@ mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo,
    n_preinvert_limb(n). There are no restrictions on a, which
    will be two limbs (a_hi, a_lo), or on n.
 
-   This function merely reduces the top limb a_hi mod n so that udiv_qrnnd_preinv
-   can be used.
+   This old version of this function merely reduced the top limb 
+   a_hi mod n so that udiv_qrnnd_preinv could be used.
+
+   The new version reduces the top limb mod n as per n_mod2_preinv
+   then the algorithm of Granlund and Moller is used again to 
+   reduce mod n.
+
+   See paper Improved Division by Invariant Integers (Torbjorn 
+   Granlund and Niels Moller) (preprint): (pp. 4)
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 

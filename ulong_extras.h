@@ -105,6 +105,9 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
 mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
                                      mp_limb_t n, mp_limb_t ninv);
 
+mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
+				     mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv);
+
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, 
                                         mp_limb_t n, double ninv);
 
