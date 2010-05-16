@@ -1,38 +1,70 @@
-mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+K10-2:
 
-    Core2 11.8 cycles
-    K8 17.2 cycles
-    K10 17.1
+Comparing an empty function with the old n_mod2_preinv, the new n_mod2_preinv, n_mod2_precomp and n_mod_precomp.
 
-mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+The timings are all for a%n with a of FLINT_BITS bits and n of the given number of bits.
 
-    Core2 22.1 cycles
-    K8 23.3 cycles
-    K10 27.7 cycles
-
-mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
-
-    Core2 42.2 cycles
-    K8 43.4-50.0 cycles
-    K10 29.9 cycles
-
-mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
-                                     mp_limb_t n, mp_limb_t ninv)
-
-    Core2 ??
-    K8 ??
-    K10 ??
-
-mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
-                                         mp_limb_t n, double ninv)
-
-    Core2 15.7 cycles
-    K8 25.6 cycles
-    K10 31.7 cycles
-
-mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
-                                      mp_limb_t n, mp_limb_t ninv)
-
-    Core2 35.9 cycles
-    K8 42.0 cycles
-    K10 35.1 cycles
+bits 1, empty 12.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 73.6 c/l
+bits 2, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 74.5 c/l
+bits 3, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 71.4 c/l
+bits 4, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 68.1 c/l
+bits 5, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 67.4 c/l
+bits 6, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 68.8 c/l
+bits 7, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 67.7 c/l
+bits 8, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 69.7 c/l
+bits 9, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 71.4 c/l
+bits 10, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 71.5 c/l
+bits 11, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 61.4 c/l
+bits 12, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 52.2 c/l
+bits 13, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 46.1 c/l
+bits 14, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 40.1 c/l
+bits 15, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 37.5 c/l
+bits 16, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 36.3 c/l
+bits 17, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.7 c/l
+bits 18, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.4 c/l
+bits 19, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.2 c/l
+bits 20, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.1 c/l
+bits 21, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.1 c/l
+bits 22, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 23, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 24, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 25, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 26, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 27, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 28, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 29, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 30, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 31, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 32, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 33, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 34, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 35, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 36, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 37, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 38, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 39, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 40, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 41, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 42, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 43, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 44, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 45, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 46, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 47, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 48, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 49, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 50, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 51, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 52, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 53, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l, pre 29.0 c/l
+bits 54, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 55, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 56, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 57, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 58, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 59, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 60, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 61, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 62, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 63, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 35.0 c/l
+bits 64, empty 9.0 c/l, old 27.0 c/l, new 21.0 c/l, pre2 16.2 c/l

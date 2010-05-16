@@ -1,6 +1,7 @@
 CC=gcc
-CFLAGS=-std=c99 -O3
-LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lmpir -lmpfr -lm
+CFLAGS=-std=c99 -O2 
+LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(CURDIR) -L/home/wbhart/lib/ -lmpir -lmpfr -lm
 INCS=-I$(CURDIR) -I/home/wbhart/include
 export
 
@@ -31,7 +32,7 @@ clean:
 	rm -f $(OBJS) $(LOBJS) $(TESTS) 
 
 profile: all profiler.o
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o $(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o $(prog) $(LIBS);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) profile;)
 
 recursive:
@@ -39,7 +40,7 @@ recursive:
 
 check: all $(LOBJS) library
 ifndef MOD
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) -lflint $(LIBS);)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
 else
@@ -47,7 +48,7 @@ else
 endif
 
 library: library-recursive $(LIB_OBJS)
-	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS) -lmpir -lm -o libflint.so
+	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o libflint.so
 
 library-recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) library;) 

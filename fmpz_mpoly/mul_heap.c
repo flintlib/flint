@@ -213,7 +213,7 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 			 if (accum0 != (mp_limb_t) 0) size = 1;
 		     else 
 			 {
-				fmpz_set(res->coeffs + len_out, temp); // add rest of coeff
+				fmpz_swap(res->coeffs + len_out, temp); // set coeff
         		fmpz_zero(temp); // zero temp for next coefficient
   		        if (fmpz_is_zero(res->coeffs + len_out)) continue;
 				else
@@ -242,6 +242,7 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 
 		 fmpz_add(res->coeffs + len_out, res->coeffs + len_out, temp); // add rest of coeff
 		 fmpz_zero(temp); // zero temp for next coefficient
+		 if (fmpz_is_zero(res->coeffs + len_out)) continue;
 	  }
 
 	  fmpz_set_ui(res->exps + len_out, exp);

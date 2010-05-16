@@ -137,8 +137,8 @@ typedef void (*profile_target_t)(void* arg, unsigned long count);
 
 void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
-#define DURATION_THRESHOLD 500
+#define DURATION_THRESHOLD 5000.0
 
-#define DURATION_TARGET 1000
+#define DURATION_TARGET 10000.0
 
 #endif // #ifndef FLINT_PROFILER_H

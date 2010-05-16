@@ -43,7 +43,7 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg)
    double max_time, min_time;
 
    // first try one loop
-   unsigned long num_trials = 1;
+   unsigned long num_trials = 8;
    init_clock(0);
    target(arg, num_trials);
    double last_time = get_clock(0);

@@ -138,6 +138,78 @@ int main(void)
    fmpz_mpoly_clear(c20);      
    fmpz_mpoly_clear(c30);      
 
+   /*
+   // f = x*y^3*z^2 + x^2*y^2*z + x*y^3*z + x*y^2*z^2 + y^3*z^2 + y^3*z + 
+   // 2*y^2*z^2 + 2*x*y*z + y^2*z + y*z^2 + y^2 + 2*y*z + z 
+
+   fmpz_mpoly_t a1, a2, a3;
+   ulong i, j;
+
+   fmpz_mpoly_init2(a1, 13, 3, 20);
+   fmpz_mpoly_init(a2, 3, 20);
+   fmpz_mpoly_init(a3, 3, 20);
+
+   fmpz_set_ui(a1->coeffs + 12, 1);
+   fmpz_set_ui(a1->coeffs + 11, 1);
+   fmpz_set_ui(a1->coeffs + 10, 1);
+   fmpz_set_ui(a1->coeffs + 9, 2);
+   fmpz_set_ui(a1->coeffs + 8, 1);
+   fmpz_set_ui(a1->coeffs + 7, 1);
+   fmpz_set_ui(a1->coeffs + 6, 1);
+   fmpz_set_ui(a1->coeffs + 5, 1);
+   fmpz_set_ui(a1->coeffs + 4, 1);
+   fmpz_set_ui(a1->coeffs + 3, 2);
+   fmpz_set_ui(a1->coeffs + 2, 2);
+   fmpz_set_ui(a1->coeffs + 1, 1);
+   fmpz_set_ui(a1->coeffs + 0, 1);
+   
+   fmpz_set_ui(a1->exps + 12, 1UL+(3UL<<20)+(2UL<<40));
+   fmpz_set_ui(a1->exps + 11, 0UL+(3UL<<20)+(2UL<<40));
+   fmpz_set_ui(a1->exps + 10, 1UL+(2UL<<20)+(2UL<<40));
+   fmpz_set_ui(a1->exps + 9, 0UL+(2UL<<20)+(2UL<<40));
+   fmpz_set_ui(a1->exps + 8, 0UL+(1UL<<20)+(2UL<<40));
+   fmpz_set_ui(a1->exps + 7, 1UL+(3UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 6, 0UL+(3UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 5, 2UL+(2UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 4, 0UL+(2UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 3, 1UL+(1UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 2, 0UL+(1UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 1, 0UL+(0UL<<20)+(1UL<<40));
+   fmpz_set_ui(a1->exps + 0, 0UL+(2UL<<20)+(0UL<<40));
+   
+   a1->length = 13;
+   mp_limb_t mask = (1UL<<19)+(1UL<<39)+(1UL<<59);
+   fmpz_mpoly_mul_heap(a2, a1, a1);
+   printf("j = 2, a2->length = %ld\n", a2->length);
+   for (j = 0; j < 49; j++)
+   {
+	  printf("j = %ld, a2->length = %ld\n", 2+2*j, a2->length);
+	  fmpz_mpoly_mul_heap(a3, a2, a1);
+      printf("j = %ld, a2->length = %ld\n", 2+2*j+1, a3->length);
+	  fmpz_mpoly_mul_heap(a2, a3, a1);
+   }
+   printf("j = %ld, a2->length = %ld\n", 2+2*j, a2->length);
+
+   fmpz_t t;
+   fmpz_init(t);
+   fmpz exp;
+
+   for (ulong k = 0; k < a2->length; k++)
+   {
+      if (fmpz_cmp(a2->coeffs + k, t) > 0)
+	  {
+		  fmpz_set(t, a2->coeffs + k);
+		  exp = a2->exps[k];
+	  }
+   }
+   
+   fmpz_print(t); printf("\n");
+   printf("%lx\n", exp);
+
+   fmpz_mpoly_clear(a1);
+   fmpz_mpoly_clear(a2);
+   fmpz_mpoly_clear(a3);*/
+
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

@@ -29,43 +29,149 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+typedef struct
+{
+   mp_bitcnt_t bits;
+   ulong type;
+} info_t;
+
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, dinv, r, norm;
-   
-   mp_limb_t * array = malloc(1000*sizeof(mp_limb_t));
-   
+   mp_limb_t n, d, dinv, r = 0, norm;
+   double dpre;
+
+   info_t * info = (info_t *) arg;
+
+   mp_bitcnt_t bits = info->bits;
+   ulong type = info->type;
+
+   mp_limb_t * arr = malloc(1024*sizeof(mp_limb_t));
+      
    for (ulong i = 0; i < count; i++)
    {
-      d = n_randtest();
+      d = n_randbits(bits);
       if (d == 0UL) d++;
 
       dinv = n_preinvert_limb(d);
+      dpre = n_precompute_inverse(d);
 
-      for (mp_size_t i = 0; i < 1000; i++)
+      for (mp_size_t j = 0; j < 1024; j++)
       {
-         array[i] = n_randtest();
+         arr[j] = n_randbits(FLINT_BITS);
       }
 
-      prof_start();
-      for (mp_size_t i = 0; i < 1000; i++)
-      {
-         r = n_mod2_preinv(array[i], d, dinv);  
-      }
-      prof_stop();
+	  switch (type)
+	  {
+	  /*case 1:
+
+         prof_start();
+         for (mp_size_t j = 0; j < 10000UL; j++)
+         {
+            r += n_empty(arr[j&1023], d, dinv);  
+         }
+	     prof_stop();
+
+	  break;*/
+
+	  case 2:
+
+         prof_start();
+         for (mp_size_t j = 0; j < 10000UL; j++)
+         {
+            r += n_mod2_preinv(arr[j&1023], d, dinv);  
+         }
+	     prof_stop();
+
+	  break;
+
+	  /*case 3:
+
+         prof_start();
+         for (mp_size_t j = 0; j < 10000UL; j++)
+         {
+            r += n_mod3_preinv(arr[j&1023], d, dinv);  
+         }
+	     prof_stop();
+
+	  break;*/
+
+	  case 4:
+
+         prof_start();
+         for (mp_size_t j = 0; j < 10000UL; j++)
+         {
+            r += n_mod2_precomp(arr[j&1023], d, dpre);  
+         }
+	     prof_stop();
+
+	  break;
+
+	  case 5:
+
+         prof_start();
+         for (mp_size_t j = 0; j < 10000UL; j++)
+         {
+            r += n_mod_precomp(arr[j&1023], d, dpre);  
+         }
+	     prof_stop();
+
+	  break;
+	  }
+
    }
+  
+   if (r == 9879875897UL) abort();
 
-   free(array);
+   free(arr);
 }
 
 int main(void)
 {
-   double min, max;
+   double min1, min2, min3, min4, min5, max;
    
-   prof_repeat(&min, &max, sample, NULL);
-   
-   printf("mod2_preinv min time is %.3f cycles, max time is %.3f cycles\n", 
-           (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+   info_t info;
+
+   for (ulong i = 1; i <= FLINT_BITS; i++)
+   {
+      info.bits = i;
+
+	  //info.type = 1;
+      //prof_repeat(&min1, &max, sample, (void *) &info);
+
+	  info.type = 2;
+      prof_repeat(&min2, &max, sample, (void *) &info);
+
+	  //info.type = 3;
+      //prof_repeat(&min3, &max, sample, (void *) &info);
+
+	  info.type = 4;
+      prof_repeat(&min4, &max, sample, (void *) &info);
+
+	  if (i >= 32 && i <= 53)
+	  {
+	     info.type = 5;
+         prof_repeat(&min5, &max, sample, (void *) &info);
+
+         printf("bits %ld, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n", 
+           i,
+		   //(min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           //(min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           (min5/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
+	     );
+
+	  } else
+	  {
+         printf("bits %ld, inv2 %.1f c/l, pre2 %.1f c/l\n", 
+           i,
+		   //(min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           //(min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
+	     );
+	  }
+   }
 
    return 0;
 }

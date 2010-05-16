@@ -31,10 +31,10 @@
 
 void sample(void * arg, ulong count)
 {
-   mp_limb_t n, d, r;
+   mp_limb_t n, d, r = 0;
    double dpre;
    
-   mp_limb_t * array = malloc(1000*sizeof(mp_limb_t));
+   mp_limb_t * array = malloc(1024*sizeof(mp_limb_t));
    
    for (ulong i = 0; i < count; i++)
    {
@@ -43,18 +43,20 @@ void sample(void * arg, ulong count)
 
       dpre = n_precompute_inverse(d);
 
-      for (mp_size_t i = 0; i < 1000; i++)
+      for (mp_size_t j = 0; j < 1024; j++)
       {
          array[i] = n_randtest();
       }
 
       prof_start();
-      for (mp_size_t i = 0; i < 1000; i++)
+      for (mp_size_t j = 0; j < 10000; j++)
       {
-         r = n_mod2_precomp(array[i], d, dpre);  
+         r += n_mod2_precomp(array[j&1023], d, dpre);  
       }
       prof_stop();
    }
+
+   if (r == 0) abort();
 
    free(array);
 }
@@ -66,7 +68,7 @@ int main(void)
    prof_repeat(&min, &max, sample, NULL);
    
    printf("mod2_precomp min time is %.3f cycles, max time is %.3f cycles\n", 
-           (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000);
+           (min/(double)FLINT_CLOCK_SCALE_FACTOR)/10000.0, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/10000.0);
 
    return 0;
 }
