@@ -38,6 +38,8 @@ void nmod_poly_init_preinv(nmod_poly_t poly,
    poly->ninv = ninv;
    poly->alloc = 0;
    poly->length = 0;
+
+   count_leading_zeros(poly->norm, n);
 }
 
 void nmod_poly_init(nmod_poly_t poly, mp_limb_t n)
