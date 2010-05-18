@@ -52,6 +52,8 @@ TODO
 
 * Write some macros for modular reduction in the nmod_poly module.
 
+* Make some assembly optimisations to nmod_poly module.
+
 Maybe
 =====
 
