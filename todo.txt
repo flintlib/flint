@@ -50,6 +50,8 @@ TODO
 
 * Make mul_heap take arrays of fmpz's as arguments and document function
 
+* Write some macros for modular reduction in the nmod_poly module.
+
 Maybe
 =====
 
