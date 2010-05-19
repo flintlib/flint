@@ -27,15 +27,14 @@
 #define NMOD_POLY_H
 
 #include <mpir.h>
+#include "nmod_vec.h"
 
 typedef struct
 {
    mp_limb_t * coeffs;
-   mp_limb_t n;
-   mp_limb_t ninv;
    ulong alloc;
    ulong length;
-   mp_bitcnt_t norm;
+   nmod_t mod;
 } nmod_poly_struct;
 
 typedef nmod_poly_struct nmod_poly_t[1];

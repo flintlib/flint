@@ -27,18 +27,12 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "nmod_vec.h"
 
-void nmod_poly_randtest(nmod_poly_t poly, ulong length)
+void _nmod_vec_reduce(mp_limb_t * res, mp_limb_t * vec, ulong len, nmod_t mod)
 {
    ulong i;
 
-   nmod_poly_fit_length(poly, length);
-   
-   for (i = 0; i < length; i++)
-      poly->coeffs[i] = n_randint(poly->mod.n);
-
-   poly->length = length;
-   _nmod_poly_normalise(poly);
+   for (i = 0 ; i < len; i++)
+	  NMOD_RED(res[i], vec[i], mod);
 }
-

@@ -19,26 +19,55 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
+   Copyright (C) 2009 William Hart
+
 *****************************************************************************/
 
-#include <mpir.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
+#include "nmod_vec.h"
 #include "ulong_extras.h"
-#include "nmod_poly.h"
 
-void nmod_poly_randtest(nmod_poly_t poly, ulong length)
+int main(void)
 {
-   ulong i;
-
-   nmod_poly_fit_length(poly, length);
+   int result;
+   printf("reduce....");
+   fflush(stdout);
    
-   for (i = 0; i < length; i++)
-      poly->coeffs[i] = n_randint(poly->mod.n);
+   for (ulong i = 0; i < 10000UL; i++) 
+   {
+      ulong j;
+	  
+	  ulong length = n_randint(100) + 1;
+	  mp_limb_t * vec = nmod_vec_init(length);
+	  mp_limb_t * vec2 = nmod_vec_init(length);
 
-   poly->length = length;
-   _nmod_poly_normalise(poly);
+	  mp_limb_t n = n_randtest_not_zero();
+	  nmod_t mod;
+	  nmod_init(&mod, n);
+
+      for (j = 0; j < length; j++)
+	  {
+	     vec[j] = n_randtest();
+		 vec2[j] = vec[j];
+	  }
+
+	  _nmod_vec_reduce(vec, vec, length, mod);
+	  for (j = 0; j < length; j++)
+	     vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
+
+	  if (!_nmod_vec_equal(vec, vec2, length))
+	  {
+	     printf("FAIL\n");
+		 printf("length = %ld, n = %ld\n", length, n);
+		 abort();
+	  }
+
+	  nmod_vec_free(vec);
+   }
+
+   printf("PASS\n");
+   return 0;
 }
-
