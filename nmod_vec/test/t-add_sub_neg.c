@@ -33,9 +33,10 @@
 int main(void)
 {
    int result;
-   printf("reduce....");
+   printf("add/sub/neg....");
    fflush(stdout);
    
+   // check (a + b) - b == a
    for (ulong i = 0; i < 10000UL; i++) 
    {
       ulong j;
@@ -43,22 +44,19 @@ int main(void)
 	  ulong length = n_randint(100) + 1;
 	  mp_limb_t * vec = nmod_vec_init(length);
 	  mp_limb_t * vec2 = nmod_vec_init(length);
+	  mp_limb_t * vec3 = nmod_vec_init(length);
 
 	  mp_limb_t n = n_randtest_not_zero();
 	  nmod_t mod;
 	  nmod_init(&mod, n);
 
-      for (j = 0; j < length; j++)
-	  {
-	     vec[j] = n_randtest();
-		 vec2[j] = vec[j];
-	  }
+      _nmod_vec_randtest(vec, length, mod);
+      _nmod_vec_randtest(vec2, length, mod);
 
-	  _nmod_vec_reduce(vec, vec, length, mod);
-	  for (j = 0; j < length; j++)
-	     vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
-
-	  if (!_nmod_vec_equal(vec, vec2, length))
+	  _nmod_vec_add(vec3, vec, vec2, length, mod);
+	  _nmod_vec_sub(vec3, vec3, vec2, length, mod);
+	  
+	  if (!_nmod_vec_equal(vec, vec3, length))
 	  {
 	     printf("FAIL\n");
 		 printf("length = %ld, n = %ld\n", length, n);
@@ -67,6 +65,40 @@ int main(void)
 
 	  nmod_vec_free(vec);
 	  nmod_vec_free(vec2);
+	  nmod_vec_free(vec3);
+   }
+
+   // check (a + -b) == a - b
+   for (ulong i = 0; i < 10000UL; i++) 
+   {
+      ulong j;
+	  
+	  ulong length = n_randint(100) + 1;
+	  mp_limb_t * vec = nmod_vec_init(length);
+	  mp_limb_t * vec2 = nmod_vec_init(length);
+	  mp_limb_t * vec3 = nmod_vec_init(length);
+
+	  mp_limb_t n = n_randtest_not_zero();
+	  nmod_t mod;
+	  nmod_init(&mod, n);
+
+      _nmod_vec_randtest(vec, length, mod);
+      _nmod_vec_randtest(vec2, length, mod);
+
+	  _nmod_vec_sub(vec3, vec, vec2, length, mod);
+	  _nmod_vec_neg(vec2, vec2, length, mod);
+	  _nmod_vec_add(vec, vec, vec2, length, mod);
+	  
+	  if (!_nmod_vec_equal(vec, vec3, length))
+	  {
+	     printf("FAIL\n");
+		 printf("length = %ld, n = %ld\n", length, n);
+		 abort();
+	  }
+
+	  nmod_vec_free(vec);
+	  nmod_vec_free(vec2);
+	  nmod_vec_free(vec3);
    }
 
    printf("PASS\n");

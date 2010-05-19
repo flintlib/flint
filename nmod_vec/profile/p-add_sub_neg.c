@@ -33,6 +33,7 @@
 typedef struct
 {
    mp_bitcnt_t bits;
+   int type;
 } info_t;
 
 void sample(void * arg, ulong count)
@@ -43,32 +44,60 @@ void sample(void * arg, ulong count)
    info_t * info = (info_t *) arg;
 
    mp_bitcnt_t bits = info->bits;
-   
-   mp_limb_t * vec = nmod_vec_init(1000);
+   int type = info->type;
+
+   n = n_randbits(bits);
+   if (n == 0UL) n++;
+      
+   nmod_init(&mod, n);
+
+   mp_limb_t * vec1 = nmod_vec_init(1000);
    mp_limb_t * vec2 = nmod_vec_init(1000);
+   mp_limb_t * res = nmod_vec_init(1000);
      
    for (mp_size_t j = 0; j < 1000; j++)
-      vec[j] = n_randlimb();
+      vec1[j] = n_randint(n);
 
-   prof_start();
-   for (ulong i = 0; i < count; i++)
+   for (mp_size_t j = 0; j < 1000; j++)
+      vec2[j] = n_randint(n);
+
+   switch (type)
    {
-      n = n_randbits(bits);
-      if (n == 0UL) n++;
-      
-	  nmod_init(&mod, n);
+   case 1:
+	  prof_start();
+      for (ulong i = 0; i < count; i++)
+      {
+         _nmod_vec_add(res, vec1, vec2, 1000, mod);
+      }
+      prof_stop();
+      break;
 
-      _nmod_vec_reduce(vec2, vec, 1000, mod);
+   case 2:
+	  prof_start();
+      for (ulong i = 0; i < count; i++)
+      {
+         _nmod_vec_sub(res, vec1, vec2, 1000, mod);
+      }
+      prof_stop();
+      break;
+
+   case 3:
+	  prof_start();
+      for (ulong i = 0; i < count; i++)
+      {
+         _nmod_vec_neg(res, vec1, 1000, mod);
+      }
+      prof_stop();
+      break;
    }
-   prof_stop();
- 
-   nmod_vec_free(vec);
+
+   nmod_vec_free(vec1);
    nmod_vec_free(vec2);
 }
 
 int main(void)
 {
-   double min, max;
+   double min1, min2, min3, max;
    
    info_t info;
 
@@ -76,10 +105,19 @@ int main(void)
    {
       info.bits = i;
 
-	  prof_repeat(&min, &max, sample, (void *) &info);
+	  info.type = 1;
+	  prof_repeat(&min1, &max, sample, (void *) &info);
 
-      printf("bits %ld, c/l = %.1lf\n", 
-         i, (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
+	  info.type = 2;
+	  prof_repeat(&min2, &max, sample, (void *) &info);
+
+	  info.type = 3;
+	  prof_repeat(&min3, &max, sample, (void *) &info);
+
+      printf("bits %ld, add = %.1lf c/l, sub = %.1lf c/l, neg = %.1lf c/l\n", 
+         i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+         i, (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+         i, (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
 	  );
    }
 

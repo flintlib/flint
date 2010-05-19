@@ -19,56 +19,20 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2009 William Hart
-
+   Copyright (C) 2010 William Hart
+   
 *****************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "nmod_vec.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
 
-int main(void)
+void _nmod_vec_randtest(mp_limb_t * vec, ulong len, nmod_t mod)
 {
-   int result;
-   printf("reduce....");
-   fflush(stdout);
-   
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      ulong j;
-	  
-	  ulong length = n_randint(100) + 1;
-	  mp_limb_t * vec = nmod_vec_init(length);
-	  mp_limb_t * vec2 = nmod_vec_init(length);
+   ulong i;
 
-	  mp_limb_t n = n_randtest_not_zero();
-	  nmod_t mod;
-	  nmod_init(&mod, n);
-
-      for (j = 0; j < length; j++)
-	  {
-	     vec[j] = n_randtest();
-		 vec2[j] = vec[j];
-	  }
-
-	  _nmod_vec_reduce(vec, vec, length, mod);
-	  for (j = 0; j < length; j++)
-	     vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
-
-	  if (!_nmod_vec_equal(vec, vec2, length))
-	  {
-	     printf("FAIL\n");
-		 printf("length = %ld, n = %ld\n", length, n);
-		 abort();
-	  }
-
-	  nmod_vec_free(vec);
-	  nmod_vec_free(vec2);
-   }
-
-   printf("PASS\n");
-   return 0;
+   for (i = 0 ; i < len; i++)
+      vec[i] = (n_randtest() % mod.n);
 }
