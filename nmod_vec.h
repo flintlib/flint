@@ -171,6 +171,9 @@ void _nmod_vec_sub(mp_limb_t * res, mp_limb_t * vec1,
 void _nmod_vec_neg(mp_limb_t * res, mp_limb_t * vec, 
 				                             ulong len, nmod_t mod);
 
+void _nmod_vec_scalar_mul(mp_limb_t * res, mp_limb_t * vec, 
+				                ulong len, nmod_t mod, mp_limb_t c);
+
 #endif
 
 
