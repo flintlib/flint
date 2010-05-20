@@ -26,3 +26,132 @@
 
 ********************************************************************************
 
+mp_ptr nmod_vec_init(ulong length)
+
+   Return a vector of the given length. The entries are not necessarily
+   zero.
+
+void nmod_vec_free(mp_ptr vec)
+
+   Free the memory used by the given vector.
+
+********************************************************************************
+
+  Modular reduction
+
+********************************************************************************
+
+void nmod_init(nmod_t * mod, mp_limb_t n)
+
+   Initialise the given nmod_t structure for reduction modulo n
+   with a precomputed inverse.
+
+NMOD_RED2(r, a_hi, a_lo, mod)
+
+   Macro to set r to (a_hi, a_lo) % mod.n. The mod parameter must be
+   a valid nmod_t structure. It is assumed that a_hi is already 
+   reduced modulo mod.n.
+
+NMOD_RED(r, a, mod)
+
+   Macro to set r to a % mod.n. The mod parameter must be a valid 
+   nmod_t structure.
+
+
+NMOD2_RED2(r, a_hi, a_lo, mod) 
+ 
+   Macro to set r to (a_hi, a_lo) % mod.n. The mod parameter must be
+   a valid nmod_t structure. No assumptions are made about a_hi.
+
+
+NMOD_RED3(r, a_hi, a_me, a_lo, mod)
+
+   Macro to set r to (a_hi, a_me, a_lo) % mod.n. The mod parameter must 
+   be a valid nmod_t structure. It is assumed that a_hi is already 
+   reduced modulo mod.n.
+   
+mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+   Return (a + b) modulo mod.n. It is assumed that mod is no more than 
+   FLINT_BITS - 1 bits. It is assumed that a and b are already reduced
+   modulo mod.n.
+
+mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+   Return (a + b) modulo mod.n. No assumptions are made about mod.n.
+   It is assumed that a and b are already reduced modulo mod.n.
+
+mp_limb_t _nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+   Return (a - b) modulo mod.n. It is assumed that mod is no more than 
+   FLINT_BITS - 1 bits. It is assumed that a and b are already reduced
+   modulo mod.n.
+
+mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+   Return (a - b) modulo mod.n. No assumptions are made about mod.n.
+   It is assumed that a and b are already reduced modulo mod.n.
+
+mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
+
+   Return -a modulo mod.n. It is assumed that a is already reduced 
+   modulo mod.n, but no assumptions are made about the latter.
+
+********************************************************************************
+
+  Random functions
+
+********************************************************************************
+
+void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod);
+
+********************************************************************************
+
+  Basic manipulation and comparison
+
+********************************************************************************
+
+void _nmod_vec_zero(mp_ptr vec, long length)
+
+   Zero the given vector of the given length.
+
+void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long length)
+
+   Copy length entries from the vector vec to res.
+
+int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long length)
+
+   Return 1 if { vec, length } == { vec2, length }, else return 0.
+
+void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
+
+   Reduce the entries of { vec, len } modulo mod.n and set res to the
+   result.
+
+********************************************************************************
+
+  Arithmetic operations
+
+********************************************************************************
+
+
+void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
+				     mp_srcptr vec2, long len, nmod_t mod)
+
+   Set { res, len } = { vec1, len } + { vec2, len }.
+
+void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
+				     mp_srcptr vec2, long len, nmod_t mod)
+
+   Set { res, len } = { vec1, len } - { vec2, len }.
+
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
+
+   Set { res, len } = - { vec, len }.
+
+void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
+				        long len, nmod_t mod, mp_limb_t c)
+
+   Set { res, len } = { vec, len }*c.
+
+
