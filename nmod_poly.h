@@ -31,7 +31,7 @@
 
 typedef struct
 {
-   mp_limb_t * coeffs;
+   mp_ptr coeffs;
    ulong alloc;
    ulong length;
    nmod_t mod;

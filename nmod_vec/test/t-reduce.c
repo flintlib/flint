@@ -36,13 +36,13 @@ int main(void)
    printf("reduce....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
-      ulong j;
+      long j;
 	  
 	  ulong length = n_randint(100) + 1;
-	  mp_limb_t * vec = nmod_vec_init(length);
-	  mp_limb_t * vec2 = nmod_vec_init(length);
+	  mp_ptr vec = nmod_vec_init(length);
+	  mp_ptr vec2 = nmod_vec_init(length);
 
 	  mp_limb_t n = n_randtest_not_zero();
 	  nmod_t mod;

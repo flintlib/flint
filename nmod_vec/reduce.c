@@ -29,9 +29,9 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_reduce(mp_limb_t * res, mp_limb_t * vec, ulong len, nmod_t mod)
+void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 {
-   ulong i;
+   long i;
 
    for (i = 0 ; i < len; i++)
 	  NMOD_RED(res[i], vec[i], mod);

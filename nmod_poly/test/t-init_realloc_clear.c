@@ -35,7 +35,7 @@ int main(void)
    printf("init/init2/realloc/clear....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
       nmod_poly_t a;
 
@@ -45,7 +45,7 @@ int main(void)
       nmod_poly_clear(a);      
    }
 
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
       nmod_poly_t a;
 
@@ -57,7 +57,7 @@ int main(void)
       nmod_poly_clear(a);      
    }
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
       nmod_poly_t a;
 

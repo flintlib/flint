@@ -41,7 +41,7 @@ void nmod_poly_realloc(nmod_poly_t poly, ulong alloc)
 	  return;
    }
 
-   poly->coeffs = (mp_limb_t *) realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
+   poly->coeffs = (mp_ptr) realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
    
    poly->alloc = alloc;
    

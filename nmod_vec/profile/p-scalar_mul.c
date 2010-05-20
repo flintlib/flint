@@ -33,7 +33,7 @@
 typedef struct
 {
    mp_bitcnt_t bits;
-   ulong length;
+   long length;
 } info_t;
 
 void sample(void * arg, ulong count)
@@ -46,10 +46,10 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    ulong length = info->length;
 
-   mp_limb_t * vec = nmod_vec_init(length);
-   mp_limb_t * vec2 = nmod_vec_init(length);
+   mp_ptr vec = nmod_vec_init(length);
+   mp_ptr vec2 = nmod_vec_init(length);
      
-   for (ulong i = 0; i < count; i++)
+   for (long i = 0; i < count; i++)
    {
       n = n_randbits(bits);
       if (n == 0UL) n++;
@@ -60,7 +60,7 @@ void sample(void * arg, ulong count)
 	  nmod_init(&mod, n);
 
       prof_start();
-      for (ulong j = 0; j < 30; j++)
+      for (long j = 0; j < 30; j++)
 		 _nmod_vec_scalar_mul(vec2, vec, length, mod, c);
 	  prof_stop();
    }
@@ -75,7 +75,7 @@ int main(void)
    
    info_t info;
 
-   for (ulong i = 2; i <= FLINT_BITS; i++)
+   for (mp_bitcnt_t i = 2; i <= FLINT_BITS; i++)
    {
       info.bits = i;
 

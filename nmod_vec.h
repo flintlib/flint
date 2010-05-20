@@ -26,6 +26,7 @@
 #ifndef NMOD_VEC_H
 #define NMOD_VEC_H
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "longlong.h"
 #include "ulong_extras.h"
@@ -84,8 +85,6 @@ mp_limb_t _nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
    return  ((((mp_limb_signed_t)diff)>>(FLINT_BITS - 1)) & mod.n) + diff;
 }
 
-void _nmod_vec_randtest(mp_limb_t * vec, ulong len, nmod_t mod);
-
 static inline
 mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
@@ -125,33 +124,35 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 }
 
 static inline
-mp_limb_t * nmod_vec_init(ulong length)
+mp_ptr nmod_vec_init(ulong length)
 {
-   return (mp_limb_t *) malloc(length*sizeof(mp_limb_t));
+   return (mp_ptr) malloc(length*sizeof(mp_limb_t));
 }
 
 static inline
-void nmod_vec_free(mp_limb_t * vec)
+void nmod_vec_free(mp_ptr vec)
 {
    free(vec);
 }
 
+void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod);
+
 static inline
-void _nmod_vec_zero(mp_limb_t * vec, ulong length)
+void _nmod_vec_zero(mp_ptr vec, long length)
 {
    mpn_zero(vec, length);
 }
 
 static inline
-void _nmod_vec_copy(mp_limb_t * res, mp_limb_t * vec, ulong length)
+void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long length)
 {
    mpn_copyi(res, vec, length);
 }
 
 static inline
-int _nmod_vec_equal(mp_limb_t * vec, mp_limb_t * vec2, ulong length)
+int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long length)
 {
-   ulong i;
+   long i;
 
    for (i = 0; i < length; i++)
       if (vec[i] != vec2[i]) return 0;
@@ -159,20 +160,20 @@ int _nmod_vec_equal(mp_limb_t * vec, mp_limb_t * vec2, ulong length)
    return 1;
 }
 
-void _nmod_vec_reduce(mp_limb_t * res, mp_limb_t * vec, 
-					                         ulong len, nmod_t mod);
+void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
+					                         long len, nmod_t mod);
 
-void _nmod_vec_add(mp_limb_t * res, mp_limb_t * vec1, 
-				           mp_limb_t * vec2, ulong len, nmod_t mod);
+void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
+				           mp_srcptr vec2, long len, nmod_t mod);
 
-void _nmod_vec_sub(mp_limb_t * res, mp_limb_t * vec1, 
-				           mp_limb_t * vec2, ulong len, nmod_t mod);
+void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
+				           mp_srcptr vec2, long len, nmod_t mod);
 
-void _nmod_vec_neg(mp_limb_t * res, mp_limb_t * vec, 
-				                             ulong len, nmod_t mod);
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
+				                             long len, nmod_t mod);
 
-void _nmod_vec_scalar_mul(mp_limb_t * res, mp_limb_t * vec, 
-				                ulong len, nmod_t mod, mp_limb_t c);
+void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
+				                long len, nmod_t mod, mp_limb_t c);
 
 #endif
 

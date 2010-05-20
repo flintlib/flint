@@ -29,10 +29,10 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_sub(mp_limb_t * res, mp_limb_t * vec1, 
-				   mp_limb_t * vec2, ulong len, nmod_t mod)
+void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
+				   mp_srcptr vec2, long len, nmod_t mod)
 {
-   ulong i;
+   long i;
    
    if (mod.norm)
    {

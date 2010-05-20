@@ -31,7 +31,7 @@
 
 void nmod_poly_randtest(nmod_poly_t poly, ulong length)
 {
-   ulong i;
+   long i;
 
    nmod_poly_fit_length(poly, length);
    

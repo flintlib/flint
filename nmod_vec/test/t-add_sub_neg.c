@@ -37,14 +37,12 @@ int main(void)
    fflush(stdout);
    
    // check (a + b) - b == a
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
-      ulong j;
-	  
-	  ulong length = n_randint(100) + 1;
-	  mp_limb_t * vec = nmod_vec_init(length);
-	  mp_limb_t * vec2 = nmod_vec_init(length);
-	  mp_limb_t * vec3 = nmod_vec_init(length);
+      long length = n_randint(100) + 1;
+	  mp_ptr vec = nmod_vec_init(length);
+	  mp_ptr vec2 = nmod_vec_init(length);
+	  mp_ptr vec3 = nmod_vec_init(length);
 
 	  mp_limb_t n = n_randtest_not_zero();
 	  nmod_t mod;
@@ -69,14 +67,12 @@ int main(void)
    }
 
    // check (a + -b) == a - b
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (long i = 0; i < 10000UL; i++) 
    {
-      ulong j;
-	  
-	  ulong length = n_randint(100) + 1;
-	  mp_limb_t * vec = nmod_vec_init(length);
-	  mp_limb_t * vec2 = nmod_vec_init(length);
-	  mp_limb_t * vec3 = nmod_vec_init(length);
+      ulong length = n_randint(100) + 1;
+	  mp_ptr vec = nmod_vec_init(length);
+	  mp_ptr vec2 = nmod_vec_init(length);
+	  mp_ptr vec3 = nmod_vec_init(length);
 
 	  mp_limb_t n = n_randtest_not_zero();
 	  nmod_t mod;
