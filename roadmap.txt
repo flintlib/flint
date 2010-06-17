@@ -12,9 +12,50 @@ to consider working on to improve flint2.
 fmpz_poly
 ---------
 
+fmpz_poly_mul_SS (mul_SS) - missing
+   Schoenhage-Strassen algorithm (SSA) for multiplying polynomials. Note SSA relies on a very 
+   sophisticated FFT such as the one developed for MPIR, (but not used by MPIR yet), written by 
+   Bill Hart.
+
+fmpz_poly_mullow_SS_n (mullow_SS_n.c) - missing
+   Computes the low n coefficients of an n x n multiplication. Relies on an FFT capable of 
+   outputting only the low coefficients. Assumes the input polynomials (zero padded if
+   necessary) are of the given length.
+
+fmpz_poly_mulhigh_SS_n (mulhigh_SS_n.c) - missing
+   Computes the high n coefficients of an n x n multiplication. Relies on an FFT capable of 
+   outputting only the low coefficients. Assumes the input polynomials (zero padded if
+   necessary) are of the given length.
+
+fmpz_poly_mulmid_SS_n (mulmid_SS_n.c) - missing
+   Use the FFT wraparound trick to obtain the middle product directly with the FFT.
+
+fmpz_poly_mulmid_karatsuba (mulmid_karatsuba.c) - missing
+   Implement a toom42 middle product for polynomials. This should be a transposition of the
+   karatsuba algorithm as per Tellegen's principle.
+
+fmpz_poly_mullow_KS_n (mullow_KS_n.c) - missing
+   Computes the low n coefficients of an n x n multiplication. Relies on an FFT capable of 
+   outputting only the low coefficients. Assumes the input polynomials (zero padded if
+   necessary) are of the given length.
+
+fmpz_poly_mulhigh_KS_n (mulhigh_KS_n.c) - missing
+   Computes the high n coefficients of an n x n multiplication. Relies on an FFT capable of 
+   outputting only the low coefficients. Assumes the input polynomials (zero padded if
+   necessary) are of the given length.
+
+fmpz_poly_mulmid_KS_n (mulmid_KS_n.c) - missing
+   Use the FFT wraparound trick to obtain the middle product using Kronecker Segmentation.
+
 fmpz_poly_mul (mul.c) 
    currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
    algorithm (SSA) is added, it should be used. Also need cutoffs to be tuned per architecture.
-   Note SSA relies on a very sophisticated FFT such as the one developed for MPIR, (but not
-   used by MPIR yet), written by Bill Hart.
+   
+fmpz_poly_mullow_n (mullow_n.c) - missing
+   Computes the low n coefficients of an n x n multiplication. Use tuned cutoffs to select
+   the other implemented algorithms for this.
+
+fmpz_poly_mulhigh_n (mulhigh_n.c) - missing
+   Computes the high n coefficients of an n x n multiplication. Use tuned cutoffs to select
+   the other implemented algorithms for this.
 
