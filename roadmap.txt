@@ -1,0 +1,20 @@
+FLINT 2 Roadmap
+===============
+
+This documents sets out a list of functions which have been implemented in flint2 which are
+not intended to be optimal implementations, and thus can be significantly improved in future
+and also lists functions which have not been added, which would improve performance and
+functionality were they added. 
+
+Thus this document serves as a roadmap. Functions listed here are candidates for contributors
+to consider working on to improve flint2.
+
+fmpz_poly
+---------
+
+fmpz_poly_mul (mul.c) 
+   currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
+   algorithm (SSA) is added, it should be used. Also need cutoffs to be tuned per architecture.
+   Note SSA relies on a very sophisticated FFT such as the one developed for MPIR, (but not
+   used by MPIR yet), written by Bill Hart.
+
