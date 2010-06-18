@@ -1,0 +1,380 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+/*******************************************************************************
+
+   Initialisation/clearing and memory management
+
+*******************************************************************************/
+
+void fmpz_init(fmpz_t f)
+
+   A small fmpz_t is initialised, i.e. just a long. The value is set 
+   to zero.
+ 
+void fmpz_init2(fmpz_t f, ulong limbs)
+
+   Initialises the given fmpz_t to have space for the given number
+   of limbs. It is not necessary to call this function except to 
+   save time. A call to fmpz_init(f) will do just fine.
+
+   If limbs is zero then a small fmpz_t is allocated, i.e. just
+   a long. The value is also set to zero.
+
+void fmpz_clear(fmpz_t f)
+
+   Clears the given fmpz_t, releasing any memory associated
+   with it (either back to the stack or the OS, depending on
+   whether the reentrant or non-reentrant version of FLINT-Lite
+   is built).
+
+/*******************************************************************************
+
+   Random generation
+
+*******************************************************************************/
+
+void fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
+
+   Generates a random signed integer whose absolute value has the given
+   number of bits.
+
+   If one requests random numbers with more than FLINT_BITS - 2 bits
+   one must first call fmpz_randinit(). When one is finished generating
+   random numbers one should call fmpz_randclear() to clean up.
+ 
+   Because this function depends on a global random state it isn't 
+   threadsafe.
+
+void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits)
+
+   Generates a random signed integer whose absolute value has a number
+   of bits which is random from 0 up to bits inclusive.
+
+   If one requests random numbers with more than FLINT_BITS - 2 bits
+   one must first call fmpz_randinit(). When one is finished generating
+   random numbers one should call fmpz_randclear() to clean up.
+ 
+   Because this function depends on a global random state it isn't 
+   threadsafe.
+
+void fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in)
+
+   Generates a random unsigned integer whose value has a number
+   of bits which is random from 0 up to bits inclusive.
+
+   If one requests random numbers with more than FLINT_BITS - 2 bits
+   one must first call fmpz_randinit(). When one is finished generating
+   random numbers one should call fmpz_randclear() to clean up.
+ 
+   Because this function depends on a global random state it isn't 
+   threadsafe.
+
+void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
+
+   As per fmpz_randtest, but the result will not be 0. If bits_in is set
+   to 0, an exception will result.
+
+void fmpz_randm(fmpz_t f, fmpz_t m)
+
+   Generates a random integer in the range 0 to m - 1 inclusive.
+
+/*******************************************************************************
+
+   Conversion
+
+*******************************************************************************/
+ 
+ulong fmpz_get_si(const fmpz_t f)
+
+   Returns f as a signed long. The result is undefined
+   if f does not fit into a long.
+
+ulong fmpz_get_ui(const fmpz_t f)
+
+   Returns f as an unsigned long. The result is undefined
+   if f does not fit into an unsigned long or is negative.
+
+double fmpz_get_d_2exp(long * exp, const fmpz_t f)
+
+   Returns f as a normalized double along with a 2-exponent exp,
+   i.e. if r is the return value then f = r*2^exp, to within 1 ULP.  
+
+void fmpz_get_mpz(mpz_t x, const fmpz_t f)
+
+   Returns f as an mpz_t.  
+ 
+void fmpz_set_si(fmpz_t f, const ulong val)
+
+   Sets f to the given signed long value.
+ 
+void fmpz_set_ui(fmpz_t f, const ulong val)
+
+   Sets f to the given unsigned long value.
+ 
+void fmpz_set_mpz(fmpz_t f, const mpz_t x)
+
+   Sets f to the given mpz_t value.
+ 
+/*******************************************************************************
+
+   Input/output
+
+*******************************************************************************/
+
+void fmpz_read(fmpz_t f)
+
+   Reads a multiprecision integer from stdin. The format is
+   an option minus sign, followed by one or more digits. The
+   first digit should be nonzero unless it is the only digit.
+
+void fmpz_print(fmpz_t x)
+
+   Prints the value x to stdout (no carriage return is printed).
+   The value is printed as either 0, the decimal digits of a 
+   positive integer, or a minus sign followed by the digits of 
+   a negative integer.
+
+/*******************************************************************************
+
+   Basic properties and manipulation
+
+*******************************************************************************/
+
+mp_bitcnt_t fmpz_bits(const fmpz_t f)
+
+   Returns the number of bits required to store the absolute
+   value of f. If f is 0 then 0 is returned.
+
+mp_size_t fmpz_size(const fmpz_t f)
+
+   Returns the number of limbs required to store the absolute
+   value of f. If f == 0, then 0 is returned.
+
+int fmpz_sgn(const fmpz_t f)
+
+   Returns -1 is the sign of f is negative, +1 if it is positive,
+   otherwise returns 0.
+
+void fmpz_swap(fmpz_t f, fmpz_t g)
+
+   Efficiently swap f and g. No data is copied.
+
+void fmpz_set(fmpz_t f, const fmpz_t g)
+
+   Sets f to equal g.
+ 
+void fmpz_zero(fmpz_t f)
+
+   Sets f to zero.
+
+/*******************************************************************************
+
+   Comparison
+
+*******************************************************************************/
+
+int fmpz_cmp(const fmpz_t f, const fmpz_t g)
+
+   Returns a negative value if f < g, positive value if g < f, 
+   otherwise returns 0.
+ 
+int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
+
+   Returns a negative value if |f| < |g|, positive value if |g| < |f|, 
+   otherwise returns 0.
+
+int fmpz_equal(const fmpz_t f, const fmpz_t g)
+
+   Returns 1 if f is equal to g, otherwise returns 0.
+
+int fmpz_is_zero(fmpz_t f)
+
+   Returns 1 if f is 0, otherwise returns 0.
+ 
+/*******************************************************************************
+
+   Basic arithmetic
+
+*******************************************************************************/
+
+void fmpz_neg(fmpz_t f1, const fmpz_t f2)
+
+   Sets f1 to -f2.
+ 
+void fmpz_abs(fmpz_t f1, const fmpz_t f2)
+
+   Sets f1 to the absolute value of f2.
+
+void fmpz_add_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be g + x where x is an unsigned long.
+
+void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to be g + h.
+ 
+void fmpz_sub_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be g - x where x is an unsigned long.
+
+void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to be g - h.
+ 
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, const long x)
+
+   Set f to be g*x where x is a signed long.
+
+void fmpz_mul_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be g*x where x is an unsigned long.
+
+void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to g*h.
+
+void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, const ulong exp)
+
+   Set f to be g*2^exp.
+ 
+void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be f + g*x where x is an unsigned long.
+ 
+void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to be f + g*h.
+
+void fmpz_submul_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be f - g*x where x is an unsigned long.
+
+void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to be f - g*h.
+
+void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to the quotient of g by h, rounding up towards
+   infinity. If h is 0 an exception is raised.
+
+void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to the quotient of g by h, rounding down towards
+   minus infinity. If h is 0 an exception is raised.
+
+void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, const ulong exp)
+
+   Set f to be g divided by 2^exp, but rounded down.
+ 
+void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Sets f to the quotient of g and h, assuming that the
+   division is exact, i.e. g is a multiple of h. If h is 
+   0 and exception is raised.
+
+ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong x)
+
+   Set f to be g mod x where x is an unsigned long. If x is
+   0 an exception will result.
+
+void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to the remainder of g divided by h. The remainder
+   is always taken to be positive.
+ 
+void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp)
+
+   Set f to be g^x where x is an unsigned long. If exp is 0
+   and g is 0, then f will be set to 1. 
+
+/*******************************************************************************
+
+   GCD and extended GCD
+   
+*******************************************************************************/
+
+void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to the greatest common divisor of g and h. The 
+   result is always positive, even if one of g and h is
+   negative.
+
+/*******************************************************************************
+
+   Modular arithmetic
+   
+*******************************************************************************/
+
+int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+   Set f to the inverse of g mod h. The value of h may not be
+   0 otherwise an exception results. If the inverse exists the
+   return value will be nonzero, otherwise the return value will
+   be 0 and the value of f undefined. 
+
+/*******************************************************************************
+
+   Bit packing/unpacking
+
+*******************************************************************************/
+
+int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
+		mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
+
+   Shift left the given coefficient by _shift_ bits and add it to the 
+   integer in arr in a field of the given number of bits.
+
+   shift  bits  --------------
+
+   X X X C C C C 0 0 0 0 0 0 0 
+
+   An optional borrow (of 1) can be subtracted from the coeff before 
+   it is packed. If the coeff is negative (after borrow), then a 
+   borrow will be returned by the function. 
+
+   The value of shift is assumed to be less than FLINT_BITS. All but 
+   the first shift bits of arr are assumed to be zero on entry to the
+   function.
+
+   The value of coeff may also be optionally (and notionally) negated 
+   before it is used, by setting the negate parameter to -1.
+
+int fmpz_bit_unpack(fmpz_t coeff, mp_limb_t * arr, 
+	mp_bitcnt_t shift, mp_bitcnt_t bits, int negate, int borrow)
+ 
+   A bit field of the given number of bits is extracted from arr,
+   starting after shift bits, and placed into coeff. An optional
+   borrow (of 1) may be added to the coefficient. If the result is
+   negative, a borrow of 1 is returned. Finally, the resulting 
+   coeff may be negated by setting the negate parameter to -1.
+
+   The value of shift is expected to be less than FLINT_BITS.
+
+void fmpz_bit_unpack_unsigned(fmpz_t coeff, 
+              const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits)
+ 
+   A bit field of the given number of bits is extracted from arr,
+   starting after shift bits, and placed into coeff. 
+
+   The value of shift is expected to be less than FLINT_BITS.
