@@ -1,0 +1,840 @@
+/*============================================================================
+
+    Copyright (C) 2009 William Hart
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+===============================================================================*/
+
+********************************************************************************
+
+  Random functions 
+
+********************************************************************************
+
+n_randlimb()
+
+   Returns a uniformly pseudo random limb. 
+
+   The algorithm generates two random half limbs s_j, j = 0, 1, 
+   by iterating respectively v_{i+1} = (v_i*a + b)%p_j for some 
+   initial seed v_0, randomly chosen values a and b and p_0 = 
+   4294967311 = nextprime(2^32) on a 64 bit machine and p_0 = 
+   nextprime(2^16) on a 32 bit machine and p_1 = nextprime(p_0).  
+
+n_randbits()
+
+   Returns a uniformly pseudo random number with the given number of 
+   bits. The most sifnificant bit is always set, unless zero is passed,
+   in which case zero is returned.
+
+n_randint()
+
+   Returns a uniformly pseudo random number up to but not including
+   the given limit. If zero is passed as a parameter, an entire random
+   limb is returned.
+
+n_randtest()
+
+   Returns a uniformly pseudo random number with a random number of bits,
+   from 0 to 64. This random function is mainly used for testing purposes.
+
+n_randtest_not_zero()
+
+   As for n_randtest(), but does not return 0.
+
+********************************************************************************
+
+  Basic arithmetic 
+
+********************************************************************************
+
+mp_limb_t n_pow(mp_limb_t n, ulong exp)
+
+   Returns n^exp. No checking is done for overflow. The exponent
+   may be zero. We define 0^0 = 0.
+
+   The algorithm simply uses a for loop. Repeated squaring is
+   unlikely to speed up this algorithm.
+
+********************************************************************************
+
+  Miscellaneous
+
+********************************************************************************
+
+ulong n_revbin(ulong in, ulong bits)
+
+   Returns the binary reverse of in, assuming it is the given 
+   number of bits long, e.g. n_revbin(10110, 6) will return
+   110100.
+
+********************************************************************************
+
+  Basic arithmetic with precomputed inverses
+
+********************************************************************************
+
+n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+
+   Returns a % n given a precomputed inverse of n computed by 
+   n_precompute_inverse(n). We require n < 2^53 and n < 
+   2^(FLINT_BITS-1) and 0 <= a < n^2.
+
+   We assume the processor is in the standard round to nearest
+   mode. Thus ninv is correct to 53 binary bits (the least significant 
+   bit of which we shall call a place) and can be at most half a place
+   out. When a is multiplied by n, the binary representation
+   of a is exact and the mantissa is < 2, thus we see that m*ninv 
+   can be at most one out in the mantissa. We now truncate m*ninv
+   to the nearest integer, which is always a round down. Either we 
+   already have an integer, or we need to make a change down of at 
+   least 1 in the last place. In the latter case we either get 
+   precisely the exact quotient or below it as when we rounded the
+   product to the nearest place we changed by at most half a place.
+   In the case that truncating to an integer takes us below the
+   exact quotient, we have rounded down by less than 1 plus half a 
+   place. But as the product is less than n and n is less than 2^53,
+   half a place is less than 1, thus we are out by less than 2 from 
+   the exact quotient, i.e. the quotient we have computed is the 
+   quotient we are after or one too small. That leaves only the case 
+   where we had to round up to the nearest place which happened to 
+   be an integer, so that truncating to an integer didn't change 
+   anything. But this implies that the exact quotient a/n is less 
+   than 1/2^54 from an integer. But this is impossible, as n < 2^53. 
+   Thus the quotient we have computed is either exactly what we are 
+   after, or one too small.
+
+n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
+
+   Returns a % n given a precomputed inverse of n computed by 
+   n_precompute_inverse(n). There are no restrictions on a or 
+   on n.
+
+   As for mod_precomp for n < 2^53 and a < n^2 the computed 
+   quotient is either what we are after or one too small. We 
+   deal with these cases. Otherwise we can be sure that the 
+   top 52 bits of the quotient are computed correctly. We take
+   the remainder and adjust the quotient by multiplying the
+   remainder by ninv to compute another approximate quotient as
+   per mod_precomp. Now the remainder may have been either 
+   negative or positive, so the quotient we compute may be one
+   out in either direction. 
+
+n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
+
+   Returns a % n given a precomputed inverse of n computed by 
+   invert_limb. There are no restrictions on a or on n. 
+
+   The old version of this function was implemented simply by 
+   making use of udiv_qrnnd_preinv.
+
+   The new version uses the new algorithm of Granlund and 
+   Montgomery. First n is normalised and a shifted into 
+   two limbs to compensate. Then their algorithm is applied
+   verbatim and the result shifted back.
+
+   See paper Improved Division by Invariant Integers (Torbjorn 
+   Granlund and Niels Moller) (preprint): (pp. 4)
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
+
+mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
+
+   Returns a % n given a precomputed inverse of n computed by 
+   n_precompute_inverse(n) and sets q to the quotient. There 
+   are no restrictions on a or on n.
+
+   This is as for mod2_precomp with some additional care taken
+   to retain the quotient information. There are also special
+   cases to deal with the case where a is already reduced mod
+   n and where n is 64 bits and a is not reduced mod n.
+
+mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
+                                     mp_limb_t n, mp_limb_t ninv)
+
+   Returns a % n given a precomputed inverse of n computed by 
+   n_preinvert_limb(n). There are no restrictions on a, which
+   will be two limbs (a_hi, a_lo), or on n.
+
+   The old version of this function merely reduced the top limb 
+   a_hi mod n so that udiv_qrnnd_preinv could be used.
+
+   The new version reduces the top limb mod n as per n_mod2_preinv
+   then the algorithm of Granlund and Moller is used again to 
+   reduce mod n.
+
+   See paper Improved Division by Invariant Integers (Torbjorn 
+   Granlund and Niels Moller) (preprint): (pp. 4)
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
+
+mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
+                       mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv)
+
+   Returns (a_hi, a_mi, a_lo) % n given a precomputed inverse 
+   of n computed by n_preinvert_limb(n). It is assumed that
+   a_hi is reduced mod n. There are no restrictions on on n.
+
+   This function uses the algorithm of Granlund and Moller to
+   first reduce the top two limbs mod n, then does the same
+   on the bottom two limbs.
+
+   See paper Improved Division by Invariant Integers (Torbjorn 
+   Granlund and Niels Moller) (preprint): (pp. 4)
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
+
+n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
+
+   Returns (a * b) % n given a precomputed inverse of n computed by 
+   n_precompute_inverse(n). We require n < 2^53 and 0 <= a, b < n.
+
+   We assume the processor is in the standard round to nearest
+   mode. Thus ninv is correct to 53 binary bits (the least significant 
+   bit of which we shall call a place) and can be at most half a place
+   out. The product of a and b is computed with error at most half a 
+   place. When a*b is multiplied by n we find that the exact quotient
+   and computed quotient differ by less than two places. As the quotient 
+   is less than n this means that the exact quotient is at most 1 away
+   from the computed quotient. We truncate this quotient to an integer
+   which reduces the value by less than 1. We end up with a value which
+   can be no more than two above the quotient we are after and no less 
+   than two below. However an argument similar to that for n_mod_precomp
+   shows that the truncated computed quotient cannot be two smaller than 
+   the truncated exact quotient. In other words the computed integer 
+   quotient is at most two above and one below the quotient we are after.
+
+n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
+
+   Returns (a * b) % n given a precomputed inverse of n computed by 
+   n_preinvert_limb. There are no restrictions on a, b or on n. This 
+   is implemented by multiplying using umul_ppmm and then reducing
+   using n_ll_mod_preinv.
+
+********************************************************************************
+
+  GCD, extended GCD
+
+********************************************************************************
+
+mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
+
+   Returns the gcd g of x and y. We require x >= y.
+
+   The algorithm is a slight embelishment of the Euclidean algorithm
+   which uses some branches to avoid most divisions.
+
+   One wishes to compute the quotient and remainder of u3/v3 without 
+   division where possible. This is accomplished when u3 < 4*v3, i.e. 
+   the quotient is either 1, 2 or 3.
+
+   We first compute s = u3 - v3. If s < v3, i.e. u3 < 2*v3, we know the
+   quotient is 1, else if s < 2*v3, i.e. u3 < 3*v3 we know the quotient 
+   is 2. In the remaining cases, the quotient must be 3. When the quotient
+   is 4 or above, we use division. However this happens rarely for 
+   generic inputs.
+
+mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
+
+   Returns the gcd g of x and y and computes 0 <= a < y s.t. a*x = gcd(x, y)
+   mod y, when this is defined. We require 0 <= x < y.
+
+   This is merely an adaption of the xgcd algorithm with appropriate 
+   normalisation.
+
+mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y)
+
+   Returns the gcd g of x and y and unsigned values a and b such that
+   a*x - b*y = g. We require x >= y.
+
+   We claim that computing the extended gcd via the euclidean algorithm
+   always results in cofactor |a| < x/2, |b| < x/2, with perhaps some
+   small degenerate exceptions.
+
+   We proceed by induction. 
+
+   Suppose we are at some step of the algorithm, with 
+   xn = q*yn + r, with r >= 1 and suppose 1 = s*yn - t*r with 
+   s < yn/2, t < yn/2 by hypothesis. 
+
+   Write 1 = s*yn - t*(xn - q*yn) = (s + t*q)*yn - t*xn. 
+
+   It suffices to show that (s + t*q) < xn/2 as t < yn/2 < xn/2, which 
+   will complete the induction step. 
+
+   But at the previous step in the backsubstitution we would have had 
+   1 = s*r - c*d with s < r/2 and c < r/2. 
+
+   Then s + t*q < r/2 + yn/2*q = (r+q*yn)/2 = xn/2. 
+
+   See gcd for a description of the branching in the algorithm, which 
+   is faster than using division.
+
+********************************************************************************
+
+  Jacobi/kronecker symbols
+
+********************************************************************************
+
+int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+
+   Compute the Jacobi symbol of x mod y. Assumes y is positive and odd
+   and for performance reasons that gcd(x, y) = 1.
+
+   This is just a straightforward application of the law of quadratic
+   reciprocity. For performance, divisions are replaced with some 
+   comparisons and subtractions where possible.
+
+********************************************************************************
+
+  Modular Arithmetic
+
+********************************************************************************
+
+mp_limb_t n_addmod(mp_limb_t a, mp_limb_t b, mp_limb_t n)
+
+   Returns (a + b) mod n.
+
+mp_limb_t n_submod(mp_limb_t a, mp_limb_t b, mp_limb_t n)
+
+   Returns (a - b) mod n.
+
+mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y)
+
+   Returns a value a s.t. 0 <= a < y s.t. a*x = gcd(x, y) mod y, 
+   when this is defined. We require 0 <= x < y.
+
+   Specifically, when x is coprime to y, a is the inverse of x in Z/yZ.
+
+   This is merely an adaption of the xgcd algorithm with appropriate 
+   normalisation.
+
+mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
+
+   Returns (a ^ exp) % n given a precomputed inverse of n computed by 
+   n_precompute_inverse(n). We require n < 2^53 and 0 <= a < n. There
+   are no restrictions on exp, i.e. it can be negative.
+
+   This is implemented as a standard binary powering algorithm using
+   repeated squaring (and reducing mod n at each step).
+
+mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
+
+   Returns (a ^ exp) % n. We require n < 2^FLINT_D_BITS and 0 <= a < n. 
+   There are no restrictions on exp, i.e. it can be negative.
+
+   This is implemented by precomputing an inverse and calling the 
+   precomp version of this function.
+
+mp_limb_t n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
+
+   Returns (a ^ exp) % n given a precomputed inverse of n computed by 
+   n_preinvert_limb(n). We require 0 <= a < n, but there are no restrictions
+   on n or on exp, i.e. it can be negative.
+
+   This is implemented as a standard binary powering algorithm using
+   repeated squaring (and reducing mod n at each step).
+
+mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
+
+   Returns (a ^ exp) % n. We require 0 <= a < n, but there are no restrictions
+   on n or on exp, i.e. it can be negative.
+
+   This is implemented by precomputing and inverse limb and calling the preinv
+   version of this function.
+
+********************************************************************************
+
+  Primality testing
+
+********************************************************************************
+
+void n_compute_trial_factor_primes(ulong num_primes)
+
+   Precomputes num_primes primes and their double precomputed
+   inverses and stores them in flint_primes and flint_prime_inverse
+   respectively.
+
+   The algorithm is a simple sieve of erasthothenes with the 
+   constant array flint_small_primes as a starting point.
+
+   In order to compute a sieve size, a lower bound on the size of
+   n s.t. pi(n) >= num_primes is needed. For this we use the 
+   estimate that for n > 17, pi(n) > n/log(n). 
+
+   We start with n = 16384 and consider consecutive values of
+   n/log(n) until we exceed num_primes. Actually we take an 
+   approximation to log(n) which is slightly too large (as log_2(n)
+   = log(n)/log(2), i.e. log(n) = log(2)*log_2(n) < 0.7*log_2(n),
+   then we can use the approximation 0.7*log_2(n)).
+
+   The sieve works by marking all multiples of small primes in
+   the sieve, but the sieve does not contain entries for numbers
+   below the current cutoff (the function may have already been 
+   called before). 
+
+   One only needs to start sieving with p^2 as all smaller multiples 
+   of p have already been marked off. 
+
+   At first p^2 may be less than the start of the sieve (the old 
+   cutoff), so this case is dealt with separately, but for all 
+   primes p beyond that all multiples of p starting at p^2 are 
+   marked off in the sieve.
+
+   As the small prime cutoff is currently 1030, primes can be 
+   computed up to almost n = 2^20, in fact floor(n/log_2(n)*0.7) = 
+   74898 primes which actually takes us to 949937.
+
+int n_is_oddprime_small(mp_limb_t n) 
+   
+   Returns 1 if n is an odd prime smaller than FLINT_ODDPRIME_SMALL_CUTOFF.
+   Expects n to be odd and smaller than the cutoff. 
+
+   This function merely uses a lookup table with one bit allocated for each
+   odd number up to the cutoff.
+
+int n_is_oddprime_binary(mp_limb_t n) 
+   
+   This function performs a simple binary search through 
+   flint_primes for n. If it exists in the array it returns
+   1, otherwise 0. For the algorithm to operate correctly 
+   n should be odd and >= 17. 
+
+   The algorithm works by taking two approximations to
+   pi(n). The upper approximation is 1.25506 n / ln n, the
+   lower by n/ln n. These bounds are due to Rosser and 
+   Schoenfeld 1962 which are valid for n >= 17. 
+
+   We use the number of bits in n (or one less) to form an 
+   approximation to ln n, taking care to use a value too
+   small or too large to maintain the inequality.
+
+   Once we have bounds on where to look in the table, we 
+   refine our search with a simple binary algorithm, taking
+   the top or bottom of the current interval as necessary.
+
+int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+
+   Tests if n is a prime using the Pocklington-Lehmer primality
+   test. If 1 is returned n has been proved prime. If 0 is returned 
+   n is composite. However -1 may be returned if nothing was proved 
+   either way due to the number of iterations being too small. 
+
+   The most time consuming part of the algorithm is factoring 
+   n - 1. For this reason n_factor_partial is used, which uses
+   a combination of trial factoring and "one line" factor to 
+   try to quickly factor n. Additionally if the cofactor is
+   less than the square root of n - 1 the algorithm can still
+   proceed.
+
+   One can also specify a number of iterations if less time 
+   should be taken. Simply set this to ~0L if this is irrelevant.
+   In most cases a greater number of iterations will not 
+   significantly affect timings as most of the time is spent 
+   factoring.
+
+   See;
+   http://mathworld.wolfram.com/PocklingtonsTheorem.html
+   for a description of the algorithm.
+
+int n_is_prime_pseudosquare(mp_limb_t n)
+
+   Tests if n is a prime according to Theorem 2.7 of "Some
+   results on pseudosquares" by Lukes, Patterson and Williams,
+   Math. Comp. vol 65, No. 213. pp 361-372. See
+   http://www.ams.org/mcom/1996-65-213/S0025-5718-96-00678-3/S0025-5718-96-00678-3.pdf
+
+   We first factor N using trial division up to some limit B.
+   In fact we use FLINT_PSEUDOSQUARES_CUTOFF primes in the trial
+   factoring.
+
+   Next we compute N/B and find the next pseudosquare L_p above
+   this value, using a static table as per:
+   http://research.att.com/~njas/sequences/b002189.txt
+ 
+   As noted in the text, if p is prime then step 3 will pass. This
+   test rejects many composites, and so by this time we suspect
+   that p is prime. If N is 3 or 7 mod 8, we are done, and N is 
+   prime.
+
+   We now run a probable prime test, for which no known 
+   counterexamples are known, to reject any composites. We then 
+   proceed to prove N prime by executing step 4. In the case that
+   N is 1 mod 8, if step 4 fails, we extend the number of primes
+   p_i at step 3 and hope to find one which passes step 4. We take
+   the test one past the largest p for which we have pseudosquares
+   L_p tabulated, as this already corresponds to the next L_p which 
+   is bigger than 2^64 and hence larger than any prime we might be
+   testing.
+
+   As explained in the text, condition 4 cannot fail if N is prime.
+
+   The possibility exists that the probable prime test declares a
+   composite prime. However in that case an error is printed, as
+   that would be of independent interest.
+
+int n_is_prime(mp_limb_t n)
+
+   Tests if n is a prime. Up to 10^16 this simply calls n_is_probabprime
+   which is a primality test up to that limit. Beyond that point it
+   calls n_is_probable prime and returns 0 if n is composite, then it
+   calls n_is_prime_pocklington which proves the primality of n in most
+   cases. As a fallback, n_is_prime_pseudosquare is called, which will
+   unconditionally prove the primality of n.
+
+int n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a, mp_limb_t d)
+
+   Tests if n is a strong probable prime to the base a. We require that
+   d is set to the largest odd factor of n - 1 and npre is a precomputed
+   inverse of n computed with n_precompute_inverse. We also require that
+   n < 2^53, a to be reduced mod n and not 0 and n to be odd.
+
+   If we write n - 1 = d*2^s where d is odd then n is a strong probable
+   prime to the base a (an a-SPRP) if either a^d = 1 (mod n) or 
+   (a^d)^(2^r) = -1 (mod n) for some r less than s.
+
+   A description of strong probable primes is given here:
+   http://mathworld.wolfram.com/StrongPseudoprime.html
+
+int n_is_strong_probabprime2_preinv(mp_limb_t n, mp_limb_t ninv, mp_limb_t a, mp_limb_t d)
+
+   Tests if n is a strong probable prime to the base a. We require that
+   d is set to the largest odd factor of n - 1 and npre is a precomputed
+   inverse of n computed with n_preinvert_limb. We require a to be reduced 
+   mod n and not 0 and n to be odd.
+
+   If we write n - 1 = d*2^s where d is odd then n is a strong probable
+   prime to the base a (an a-SPRP) if either a^d = 1 (mod n) or 
+   (a^d)^(2^r) = -1 (mod n) for some r less than s.
+
+   A description of strong probable primes is given here:
+   http://mathworld.wolfram.com/StrongPseudoprime.html
+
+int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
+
+   Returns 1 is n is a base i Fermat probable prime. Requires n != 0,
+   1 < i < n and that i does not divide n.
+
+   By Fermat's Little Theorem i^n-1 is not congruent to 1 then n is 
+   not prime.
+
+int n_is_probabprime_fibonacci(mp_limb_t n)
+
+   Letting F_j be the j-th element of the Fibonacci sequence 
+   0, 1, 1, 2, 3, 5, ... starting at j = 0. Then if n is prime
+   we have F_{n - (n/5)} = 0 mod n, where (n/5) is the Jacobi
+   symbol.
+ 
+   See page 142 and following of Pomerance and Crandall : Primes
+   a computational perspective for details.
+
+   We require that n is not divisible by 2 or 5. 
+
+int n_is_probabprime_BPSW(mp_limb_t n)
+
+   Implements the Bailey-Pomerance-Selfridge-Wagstaff probable primality
+   test. There are no known counterexamples to this being a primality test.
+   See Pomerance and Crandall : Primes a computational perspective for 
+   details.
+
+int n_is_probabprime_lucas(mp_limb_t n)
+
+   See page 143 and following of Pomerance and Crandall : 
+   Primes a computational perspective, for details of Lucas
+   pseudoprimes. 
+
+   We implement a variant of the Lucas pseudoprime test as
+   described here:
+   http://www.jstor.org/sici?sici=0025-5718(198010)35%3A152%3C1391%3ALP%3E2.0.CO%3B2-N
+
+int n_is_probabprime(mp_limb_t n)
+
+   Tests if n is a probable prime. Up to FLINT_ODDPRIME_SMALL_CUTOFF
+   this algorithm uses n_is_oddprime_small which uses a lookup table.
+   Next it calls n_compute_primes with the maximum table size and uses 
+   this table to perform a binary search for n up to the table limit.
+   Then up to 10^16 it uses a number of strong probable prime tests,
+   n_is_strong_probabprime_precomp, etc., for various bases. The output 
+   of the algorithm is guaranteed to be correct up to this bound due to
+   exhaustive tables, described here:
+   http://uucode.com/obf/dalbec/alg.html
+
+   Beyond that point the BPSW probabilistic primality test is used,
+   n_is_probabprime_BPSW. There are no known counterexamples, but it
+   may well declare some composites to be prime.
+
+********************************************************************************
+
+  Square root and perfect power testing
+
+********************************************************************************
+
+mp_limb_t n_sqrt(mp_limb_t a)
+
+   
+   Computes the integer truncation of the square root of a. The integer
+   itself can be represented exactly and its square root is computed
+   to the nearest place. If a is one below a square, the rounding may be
+   up, whereas if it is one above a square, the rounding will be down.
+   Thus the square root may be one too large in some instance. We also 
+   have to be careful when the square of this too large value causes an
+   overflow. The same assumptions hold for a single precision float so
+   long as the square root itself can be represented in a single float, 
+   i.e. for a < 281474976710656 = 2^46.
+
+mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
+
+   Computes the integer truncation of the square root of a. The integer
+   itself can be represented exactly and its square root is computed
+   to the nearest place. If a is one below a square, the rounding may be
+   up, whereas if it is one above a square, the rounding will be down.
+   Thus the square root may be one too large in some instance. We also 
+   have to be careful when the square of this too large value causes an
+   overflow. The same assumptions hold for a single precision float so
+   long as the square root itself can be represented in a single float, 
+   i.e. for a < 281474976710656 = 2^46. The remainder is computed by 
+   subtracting the square of the computed square root from a.
+
+int n_is_square(mp_limb_t x)
+   
+   Returns 1 if x is a square, otherwise 0.
+
+   This code first checks if x is a square mod 64, 63 = 3x3x7 and 65 = 5x13,
+   using lookup tables, and if so it then takes a square root and checks 
+   that the square of this equals the original value. 
+
+int n_is_perfect_power235(mp_limb_t n)
+
+   Returns 1 if n is a perfect square, cube or fifth power. 
+  
+   This function uses a series of modular tests to reject most
+   non 235-powers. Each modular test returns a value from 0 - 7
+   whose bits respectively indicate whether the value is a square,
+   cube or fifth power modulo the given modulus. When these are
+   logically ANDed together, this gives a powerful test which will
+   reject most non-235 powers. 
+
+   If a bit remains set indicating it may be a square, a standard
+   square root test is performed. Similarly a cube root or fifth 
+   root can be taken, if indicated, to determine whether the power
+   of that root is exactly equal to n.
+
+********************************************************************************
+
+  Factorisation
+
+********************************************************************************
+
+int n_remove(mp_limb_t * n, mp_limb_t p)
+
+   Remove the highest possible power of p from n, replacing
+   n with the quotient. The return value is that highest 
+   power of p that divided n. Assumes n is not 0.
+
+   For p = 2 trailing zeroes are counted. For other primes
+   p is repeatedly squared and stored in a table of powers
+   with the current highest power of p removed at each step
+   until no higher power can be removed. The algorithm then
+   proceeds down the power tree again removing powers of p
+   until none remain.
+
+int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre)
+
+   Remove the highest possible power of p from n, replacing
+   n with the quotient. The return value is that highest 
+   power of p that divided n. Assumes n is not 0. We require
+   ppre to be set to a precomputed inverse of p computed 
+   with n_precompute_inverse.
+
+   For p = 2 trailing zeroes are counted. For other primes
+   p we make repeated use of n_divrem2_precomp until division
+   by p is no longer possible.
+
+void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp)
+   
+   Inserts the given prime power factor p^exp into the n_factor_t
+   factors. See the docs for n_factor_trial for a description of
+   the n_factor_t type. 
+
+   The algorithm performs a simple search to see if p already 
+   exists as a prime factor in the structure. If so the exponent
+   there is increased by the supplied exponent. Otherwise a new 
+   factor p^exp is added to the end of the structure.
+
+   There is no test code for this function other than its use by
+   the various factoring functions, which have test code.
+
+mp_limb_t n_factor_trial_range(n_factor_t * factors,
+                  mp_limb_t n, ulong start, ulong num_primes)
+
+   Trial factor n with the first num_primes primes, but
+   starting at the prime in flint_primes with index start. 
+   
+   One requires an initialised n_factor_t structure, but factors
+   will be added by default to an already used n_factor_t. Use 
+   the function n_factor_init defined in ulong_extras if 
+   initialisation has not already been completed on factors.
+   
+   Once completed, num will contain the number of distinct 
+   prime factors found. The field p is an array of mp_limb_t's 
+   containing the distinct prime factors, exp an array 
+   containing the corresponding exponents.
+
+   The return value is the unfactored cofactor after trial 
+   factoring is done.
+
+   The function calls compute_primes automatically. See
+   the docs for that function regarding limits.
+
+   The algorithm stops when the current prime has a square 
+   exceeding n, as no prime factor of n can exceed this 
+   unless n is prime.
+
+   The precomputed inverses of all the primes computed by
+   n_compute_primes are utilised with the n_remove2_precomp
+   function.
+
+mp_limb_t n_factor_trial(n_factor_t * factors, mp_limb_t n, ulong num_primes)
+
+   This function calls n_factor_trial_range, with the value of 
+   0 for start. By default this adds factors to an already existing
+   n_factor_t or to a newly initialised one.
+
+mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n)
+
+   Returns 0 if n is not a perfect square, cube or fifth power.
+   Otherwise it returns the root and sets exp to either 2, 3 or
+   5 appropriately. 
+  
+   This function uses a series of modular tests to reject most
+   non 235-powers. Each modular test returns a value from 0 - 7
+   whose bits respectively indicate whether the value is a square,
+   cube or fifth power modulo the given modulus. When these are
+   logically ANDed together, this gives a powerful test which will
+   reject most non-235 powers. 
+
+   If a bit remains set indicating it may be a square, a standard
+   square root test is performed. Similarly a cube root or fifth 
+   root can be taken, if indicated, to determine whether the power
+   of that root is exactly equal to n.
+
+mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
+
+   This implements Bill Hart's "One Line" factor algorithm.
+   It is a variant of Fermat's algorithm which cycles through
+   a large number of multipliers instead of incrementing the
+   square root. It is faster than SQUFOF for < about 40 bits.
+   
+   The algorithm is described in full in Hart's paper, "A One 
+   Line Factoring Algorithm". See:
+   http://sage.math.washington.edu/home/wbhart/onelinefactor.pdf
+
+mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
+
+   Attempts to split n using the given number of iterations
+   of SQUFOF. Simply set iters to ~0L for maximum persistence.
+
+   The version of SQUFOF imlemented here is as described in 
+   "Square form factoring" by Jason Gower and Sam Wagstaff,
+   Math. Comp. 77, 2008, pp 551-588, see:
+   http://www.ams.org/mcom/2008-77-261/S0025-5718-07-02010-8/home.html
+
+   We start by trying SQUFOF directly on n. If that fails we
+   multiply it by each of the primes in flint_primes_small in
+   turn. As this multiplication may result in a two limb value
+   we allow this in our implementation of SQUFOF. As SQUFOF 
+   works with values about half the size of n it only needs 
+   single limb arithmetic internally.
+
+   If SQUFOF fails to factor n we teturn 0, however with 
+
+void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
+
+   Factors n with no restrictions on n. If the prime factors are 
+   required to be certified prime, one may set proved to 1, 
+   otherwise set it to 0, and they will only be probable primes
+   (with no known counterexamples to the conjecture that they are
+   in fact all prime).
+
+   For details on the n_factor_t structure, see n_factor_trial.
+
+   This function first tries trial factoring with a number of primes
+   specified by FLINT_FACTOR_TRIAL_PRIMES. If the cofactor is 1 or
+   prime the function returns with all the factors.
+
+   If not the cofactor is placed in the array factor_arr. Whilst there
+   are factors remaining in there which have not been split, the 
+   algorithm continues. At each step each factor is first checked to 
+   determine if it is a perfect power. If so it is replaced by the 
+   power that has been found. Next if the factor is small enough and
+   composite, in particular, less than FLINT_FACTOR_ONE_LINE_MAX
+   then n_factor_one_line is called with FLINT_FACTOR_ONE_LINE_ITERS
+   to try and split the factor. If that fails or the factor is too large 
+   for n_factor_one_line then n_factor_SQUFOF is called, with 
+   FLINT_FACTOR_SQUFOF_ITERS. If that fails an error results and
+   the program aborts. However this should not happen in practice. 
+
+mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
+                  mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
+
+   Trial factor n with the first num_primes primes, but
+   stop when the product of prime factors so far exceeds limit. 
+   
+   One requires an initialised n_factor_t structure, but factors
+   will be added by default to an already used n_factor_t. Use 
+   the function n_factor_init defined in ulong_extras if 
+   initialisation has not already been completed on factors.
+   
+   Once completed, num will contain the number of distinct 
+   prime factors found. The field p is an array of mp_limb_t's 
+   containing the distinct prime factors, exp an array 
+   containing the corresponding exponents.
+
+   The return value is the unfactored cofactor after trial 
+   factoring is done. The value prod will be set to the product
+   of the factors found.
+
+   The function calls compute_primes automatically. See
+   the docs for that function regarding limits.
+
+   The algorithm stops when the current prime has a square 
+   exceeding n, as no prime factor of n can exceed this 
+   unless n is prime.
+
+   The precomputed inverses of all the primes computed by
+   n_compute_primes are utilised with the n_remove2_precomp
+   function.
+
+mp_limb_t n_factor_partial(n_factor_t * factors, 
+                     mp_limb_t n, mp_limb_t limit, int proved)
+
+   Factor n, but stop when the product of prime factors so far 
+   exceeds limit. 
+   
+   One requires an initialised n_factor_t structure, but factors
+   will be added by default to an already used n_factor_t. Use 
+   the function n_factor_init defined in ulong_extras if 
+   initialisation has not already been completed on factors.
+   
+   Once completed, num will contain the number of distinct 
+   prime factors found. The field p is an array of mp_limb_t's 
+   containing the distinct prime factors, exp an array 
+   containing the corresponding exponents.
+
+   The return value is the unfactored cofactor after 
+   factoring is done. 
+
+   The factors are proved prime if proved is 1, otherwise
+   they are merely probably prime.   
