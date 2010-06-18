@@ -114,6 +114,10 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+long fmpz_poly_max_bits(const fmpz_poly_t poly);
+
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly);
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2);
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
@@ -191,8 +195,6 @@ void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length);
 
-long fmpz_poly_max_bits(const fmpz_poly_t poly);
-
 void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly, 
 						                        ulong bit_size, int negate);
 
@@ -205,6 +207,8 @@ void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length,
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void fmpz_poly_mul(fmpz_poly_t res, 
+                          const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 #endif
 

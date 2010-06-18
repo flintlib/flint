@@ -47,6 +47,12 @@ fmpz_poly_mulhigh_KS_n (mulhigh_KS_n.c) - missing
 fmpz_poly_mulmid_KS_n (mulmid_KS_n.c) - missing
    Use the FFT wraparound trick to obtain the middle product using Kronecker Segmentation.
 
+fmpz_poly_mul_KS2 (mul_KS2.c) - missing
+   Implement David Harvey's KS2 algorithm when coefficients have small coefficients.
+
+fmpz_poly_mul_KS4 (mul_KS4.c) - missing
+   Implement David Harvey's KS4 algorithm when coefficients have small coefficients.
+
 fmpz_poly_mul (mul.c) 
    currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
    algorithm (SSA) is added, it should be used. Also need cutoffs to be tuned per architecture.

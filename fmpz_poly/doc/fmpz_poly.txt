@@ -193,7 +193,7 @@ void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
 ********************************************************************************
 
-  Comparison
+  Comparison and coefficient sizes
 
 ********************************************************************************
 
@@ -202,6 +202,16 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
    Return 1 if poly1 is equal to poly2, otherwise return 0. Polys are
    assumed to be normalised.
 
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
+
+   If b is the maximum number of bits of the absolute value of any coefficient of
+   poly, then if any coefficient of poly is negative, -b is return, else b is
+   returned.
+
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+
+   Returns the maximum number of limbs of any coefficient of poly. The function
+   ignores the signs of the coefficients.
 
 ********************************************************************************
 
@@ -383,14 +393,14 @@ void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length,
    Unpack the poly of given length from the array as packed into fields of the 
    given bitsize. The coefficients are assumed to be unsigned.
 
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
-
-   If b is the maximum number of bits of the absolute value of any coefficient of
-   poly, then if any coefficient of poly is negative, -b is return, else b is
-   returned.
-
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                                  const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set res to poly1 multiplied by poly2.
+
+void fmpz_poly_mul(fmpz_poly_t res, 
+             const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+   Set res to poly1 multiplied by poly2. Chooses an optimal algorithm from the 
+   choices above.
 
