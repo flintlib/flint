@@ -86,3 +86,58 @@ void nmod_poly_randtest(nmod_poly_t poly, ulong length)
 
    Generate a random polynomial with up to the given length.
 
+********************************************************************************
+
+  Comparison
+
+********************************************************************************
+
+int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
+
+   Return 1 if the polynomials are equal, otherwise 0.
+
+********************************************************************************
+
+  Input/output
+
+********************************************************************************
+
+int nmod_poly_print(nmod_poly_t a)
+
+   Print the polynomial to stdout. If the length is 0, only 0 is printed. 
+   Otherwise the length followed by two spaces, followed by a space 
+   separated list of coefficients is printed, beginning with the constant
+   coefficient.
+
+********************************************************************************
+
+  Basic arithmetic
+
+********************************************************************************
+
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
+
+   Set res to -poly1.
+
+void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
+					    mp_srcptr poly2, ulong len2, nmod_t mod)
+
+   Set {res to poly1, len1} + { poly2, len2}. There are no restrictions on the
+   lengths.
+
+void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
+				                           const nmod_poly_t poly2)
+
+   Set {res to poly1, len1} + { poly2, len2}. 
+
+void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, ulong len1, 
+					    mp_srcptr poly2, ulong len2, nmod_t mod)
+
+   Set {res to poly1, len1} - { poly2, len2}. There are no restrictions on the
+   lengths.
+
+void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
+				                           const nmod_poly_t poly2)
+
+   Set {res to poly1, len1} - { poly2, len2}.
+

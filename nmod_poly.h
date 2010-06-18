@@ -26,6 +26,7 @@
 #ifndef NMOD_POLY_H
 #define NMOD_POLY_H
 
+#include <stdio.h>
 #include <mpir.h>
 #include "nmod_vec.h"
 
@@ -64,6 +65,51 @@ void _nmod_poly_normalise(nmod_poly_t poly)
 }
 
 void nmod_poly_randtest(nmod_poly_t poly, ulong length);
+
+static inline
+int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
+{
+   if (a->length != b->length)
+	  return 0;
+
+   if (a != b)
+      if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
+	     return 0;
+
+   return 1;
+}
+
+static inline
+void nmod_poly_print(nmod_poly_t a)
+{
+   ulong i;
+   
+   if (a->length == 0)
+   {
+	  printf("0");
+	  return;
+   }
+   
+   printf("%lu  ", a->length);
+
+   for (i = 0; i < a->length - 1; i++)
+      printf("%lu ", a->coeffs[i]);
+   printf("%lu", a->coeffs[i]);
+}
+
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
+
+void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
+					           mp_srcptr poly2, ulong len2, nmod_t mod);
+
+void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
+				                               const nmod_poly_t poly2);
+
+void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, ulong len1, 
+					           mp_srcptr poly2, ulong len2, nmod_t mod);
+
+void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
+				                               const nmod_poly_t poly2);
 
 #endif
 
