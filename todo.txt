@@ -54,6 +54,8 @@ TODO
 
 * Make some assembly optimisations to nmod_poly module.
 
+* add test code for fmpz_poly_max_limbs
+
 Maybe
 =====
 

@@ -57,11 +57,14 @@ fmpz_poly_mul (mul.c)
    currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
    algorithm (SSA) is added, it should be used. Also need cutoffs to be tuned per architecture.
    
-fmpz_poly_mullow_n (mullow_n.c) - missing
+fmpz_poly_mullow_n (mullow_n.c) 
    Computes the low n coefficients of an n x n multiplication. Use tuned cutoffs to select
-   the other implemented algorithms for this.
+   the other implemented algorithms for this. Also use other algorithms for this when they
+   become available.
 
-fmpz_poly_mulhigh_n (mulhigh_n.c) - missing
+fmpz_poly_mulhigh_n (mulhigh_n.c)
    Computes the high n coefficients of an n x n multiplication. Use tuned cutoffs to select
-   the other implemented algorithms for this.
+   the other implemented algorithms for this. Also use other algorithms for this when they
+   become available.
+
 

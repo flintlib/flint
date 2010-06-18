@@ -210,6 +210,12 @@ void fmpz_poly_mul_KS(fmpz_poly_t res,
 void fmpz_poly_mul(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void fmpz_poly_mullow_n(fmpz_poly_t res, 
+             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc);
+
+void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n);
+
 #endif
 
 
