@@ -36,7 +36,7 @@ TODO
 
 * add fmpz_mat/randajtai2.c based on Stehle's matrix.cpp in fpLLL (requires mpfr_t's).
 
-* add a cache of mpfr's which can be used as tenporaries for functions like _mpfr_vec_scalar_product
+* add a cache of mpfr's which can be used as temporaries for functions like _mpfr_vec_scalar_product
 
 * test code for ulong_extras/revbin.c
 
