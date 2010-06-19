@@ -80,6 +80,10 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 
    Efficiently swap poly1 and poly2 by swapping pointers internally. 
 
+ulong nmod_poly_max_bits(nmod_poly_t poly)
+
+   Return the maximum number of bits of any coefficient of poly.
+
 ********************************************************************************
 
   Random generation
@@ -186,3 +190,15 @@ void nmod_poly_mul_classical(nmod_poly_t res,
 
    Set res to poly1 * poly2.
 
+void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
+                     mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod)
+
+   Set res to poly1 * poly2 assuming the output coefficients are at most bits_in
+   bits wide. If bits_in is set to 0 an appropriate value is computed automatically.
+   Assumed length1 >= length2 > 0.
+
+void nmod_poly_mul_KS(nmod_poly_t res, 
+                const nmod_poly_t poly1, const nmod_poly_t poly2, ulong bits_in)
+
+   Set res to poly1 * poly2 assuming the output coefficients are at most bits_in
+   bits wide. If bits_in is set to 0 an appropriate value is computed automatically.

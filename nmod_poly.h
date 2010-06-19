@@ -58,6 +58,12 @@ void nmod_poly_clear(nmod_poly_t poly);
 void nmod_poly_fit_length(nmod_poly_t poly, ulong alloc);
 
 static inline
+ulong nmod_poly_max_bits(nmod_poly_t poly)
+{
+   return _nmod_vec_max_bits(poly->coeffs, poly->length);
+}
+
+static inline
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
@@ -151,6 +157,11 @@ void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly,
 void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
 						          ulong length, ulong bits, nmod_t mod);
 
+void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
+            mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod);
+
+void nmod_poly_mul_KS(nmod_poly_t res, 
+       const nmod_poly_t poly1, const nmod_poly_t poly2, ulong bits_in);
 
 #endif
 

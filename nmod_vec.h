@@ -151,6 +151,8 @@ void _nmod_vec_zero(mp_ptr vec, long length)
    mpn_zero(vec, length);
 }
 
+ulong _nmod_vec_max_bits(mp_srcptr vec, ulong length);
+
 static inline
 void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long length)
 {

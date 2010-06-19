@@ -135,6 +135,10 @@ void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
    Reduce the entries of { vec, len } modulo mod.n and set res to the
    result.
 
+ulong _nmod_vec_max_bits(mp_srcptr vec, ulong length)
+  
+   Return the maximum number of bits of any entry in the vector.
+
 ********************************************************************************
 
   Arithmetic operations
