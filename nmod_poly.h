@@ -97,6 +97,12 @@ void nmod_poly_print(nmod_poly_t a)
    printf("%lu", a->coeffs[i]);
 }
 
+static inline
+void nmod_poly_zero(nmod_poly_t res)
+{
+   res->length = 0;
+}
+
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
@@ -110,6 +116,9 @@ void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, ulong len1,
 
 void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
 				                               const nmod_poly_t poly2);
+
+void nmod_poly_scalar_mul(nmod_poly_t res, 
+						          const nmod_poly_t poly1, mp_limb_t c);
 
 #endif
 

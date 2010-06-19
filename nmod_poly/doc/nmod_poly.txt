@@ -115,29 +115,36 @@ int nmod_poly_print(nmod_poly_t a)
 
 ********************************************************************************
 
+void nmod_poly_zero(nmod_poly_t res)
+   
+   Set res to the zero polynomial.
+
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
    Set res to -poly1.
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
-					    mp_srcptr poly2, ulong len2, nmod_t mod)
+					     mp_srcptr poly2, ulong len2, nmod_t mod)
 
-   Set {res to poly1, len1} + { poly2, len2}. There are no restrictions on the
+   Set res to { poly1, len1 } + { poly2, len2 }. There are no restrictions on the
    lengths.
 
 void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
-				                           const nmod_poly_t poly2)
+				                            const nmod_poly_t poly2)
 
-   Set {res to poly1, len1} + { poly2, len2}. 
+   Set res to { poly1, len1 } + { poly2, len2 }. 
 
 void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, ulong len1, 
-					    mp_srcptr poly2, ulong len2, nmod_t mod)
+					     mp_srcptr poly2, ulong len2, nmod_t mod)
 
-   Set {res to poly1, len1} - { poly2, len2}. There are no restrictions on the
+   Set res to { poly1, len1 } - { poly2, len2 }. There are no restrictions on the
    lengths.
 
 void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
-				                           const nmod_poly_t poly2)
+				                            const nmod_poly_t poly2)
 
-   Set {res to poly1, len1} - { poly2, len2}.
+   Set res to { poly1, len1 } - { poly2, len2 }.
 
+void nmod_poly_scalar_mul(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
+
+   Set res to { poly1, len1 } * c, where c is reduced modulo the modulus of poly1.
