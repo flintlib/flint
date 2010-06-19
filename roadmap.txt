@@ -54,7 +54,7 @@ fmpz_poly_mul_KS4 (mul_KS4.c) - missing
    Implement David Harvey's KS4 algorithm when coefficients have small coefficients.
 
 fmpz_poly_mul (mul.c) 
-   currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
+   Currently only uses classical, karatsuba and KS multiplication. When Schoenhage-Strassen
    algorithm (SSA) is added, it should be used. Also need cutoffs to be tuned per architecture.
    
 fmpz_poly_mullow_n (mullow_n.c) 
@@ -68,3 +68,14 @@ fmpz_poly_mulhigh_n (mulhigh_n.c)
    become available.
 
 
+nmod_poly
+---------
+
+nmod_poly_mul_classical (mul_classical.c)
+   Currently two cases are distinguished: a) where the entire multiplication can be done with
+   everything accumulating in a single limb and a single final reduction, b) where reduction
+   is performed every operation. In case (b) the addmul code distinguishes the cases where 
+   the addmul will fit in a single limb and where it will not. At the very least mul_classical
+   should accumulate into 2 or 3 limbs where necessary and do a final reduction at the end.
+   Probably it makes sense to accumulate into 2 limbs and always keep the top limb reduced mod
+   n, which is less expensive. 
