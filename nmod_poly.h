@@ -185,6 +185,15 @@ void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1,
 void nmod_poly_mul_KS(nmod_poly_t res, 
        const nmod_poly_t poly1, const nmod_poly_t poly2, ulong bits_in);
 
+void nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly1, 
+				                                     nmod_poly_t poly2);
+
+void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, 
+						                nmod_poly_t poly2, ulong trunc);
+
+void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
+						                    nmod_poly_t poly2, ulong n);
+
 #endif
 
 

@@ -232,3 +232,19 @@ void nmod_poly_mul_KS(nmod_poly_t res,
 
    Set res to poly1 * poly2 assuming the output coefficients are at most bits_in
    bits wide. If bits_in is set to 0 an appropriate value is computed automatically.
+
+void nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly, nmod_poly_t poly2)
+
+   Set res to poly1 * poly2.
+
+void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, 
+						       nmod_poly_t poly2, ulong trunc)
+
+   Set res to the first trunc coefficients of poly1 * poly2.
+
+void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
+						           nmod_poly_t poly2, ulong n)
+
+   Set the high n coefficients of res to the high n coefficients of poly1 * poly2,
+   the remaining coefficients being arbitrary.
+
