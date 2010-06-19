@@ -64,6 +64,25 @@ void _nmod_poly_normalise(nmod_poly_t poly)
       poly->length--;
 }
 
+static inline
+void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
+{
+   ulong t;
+   mp_ptr tp;
+
+   t = poly1->alloc;
+   poly1->alloc = poly2->alloc;
+   poly2->alloc = t;
+
+   t = poly1->length;
+   poly1->length = poly2->length;
+   poly2->length = t;
+
+   tp = poly1->coeffs;
+   poly1->coeffs = poly2->coeffs;
+   poly2->coeffs = tp;
+}
+
 void nmod_poly_randtest(nmod_poly_t poly, ulong length);
 
 static inline
@@ -119,6 +138,19 @@ void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 
 void nmod_poly_scalar_mul(nmod_poly_t res, 
 						          const nmod_poly_t poly1, mp_limb_t c);
+
+void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
+				   ulong len1, mp_srcptr poly2, ulong len2, nmod_t mod);
+
+void nmod_poly_mul_classical(nmod_poly_t res, 
+                      const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
+						                      ulong length, ulong bits);
+
+void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
+						          ulong length, ulong bits, nmod_t mod);
+
 
 #endif
 

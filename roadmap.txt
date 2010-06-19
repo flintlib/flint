@@ -67,6 +67,30 @@ fmpz_poly_mulhigh_n (mulhigh_n.c)
    the other implemented algorithms for this. Also use other algorithms for this when they
    become available.
 
+fmpz_poly_sqr_classical_n (sqr_classical_n.c) - missing
+   Square a polynomial using a special version of the classical multiplication algorithm.
+
+fmpz_poly_sqrlow_classical_n (sqr_classical_n.c) - missing
+   Square a polynomial using a special version of the classical multiplication algorithm
+   which truncates to length n.
+
+fmpz_poly_sqr_karatsuba_n (sqr_karatsuba_n.c) - missing
+   Square a polynomial using a special version of the karatsuba multiplication algorithm.
+   Some version of the odd/even karatsuba algorithm might work here.
+
+fmpz_poly_sqr_karatsuba_n (sqr_karatsuba_n.c) - missing
+   Square a polynomial using a special version of the karatsuba multiplication algorithm
+   which truncates to length n.
+
+fmpz_poly_sqr_n (sqr_n.c) - missing
+   Square a poly using tuned crossovers for various algorithms. KS already deals optimally
+   with squaring, but there should be classical and karatsuba square algorithms.
+
+fmpz_poly_sqrlow_n (sqr_n.c) - missing
+   Square a poly using tuned crossovers for various algorithms that truncate to length n. 
+   mullow_KS will already deal optimally with truncated squaring, but there should be classical 
+   and karatsuba square algorithms which truncate. sqrhigh is probably not useful so need not 
+   be implemented.
 
 nmod_poly
 ---------
@@ -79,3 +103,15 @@ nmod_poly_mul_classical (mul_classical.c)
    should accumulate into 2 or 3 limbs where necessary and do a final reduction at the end.
    Probably it makes sense to accumulate into 2 limbs and always keep the top limb reduced mod
    n, which is less expensive. 
+
+nmod_poly_mullow_classical (mullow_classical.c) - missing
+   Should have a similar prototype as fmpz_poly_mullow_classical, but for nmod_polys.
+
+nmod_poly_mulhigh_classical (mullow_classical.c) - missing
+   Should have a similar prototype as fmpz_poly_mulhigh_classical, but for nmod_polys.
+
+nmod_poly_sqrlow_classical_n (mullow_classical.c) - missing
+   Should have a similar prototype as fmpz_poly_sqrlow_classical_n, but for nmod_polys.
+
+nmod_poly_sqr_classical_n (mullow_classical.c) - missing
+   Should have a similar prototype as fmpz_poly_sqr_classical_n, but for nmod_polys.

@@ -34,7 +34,7 @@
 int main(void)
 {
    int result;
-   printf("mul_classical....");
+   printf("mul....");
    fflush(stdout);
    
    fmpz_poly_randinit();
@@ -47,11 +47,11 @@ int main(void)
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+      fmpz_poly_randtest(b, n_randint(50), n_randint(500));
+      fmpz_poly_randtest(c, n_randint(50), n_randint(500));
    
-	  fmpz_poly_mul_classical(a, b, c);
-      fmpz_poly_mul_classical(b, b, c);
+	  fmpz_poly_mul(a, b, c);
+      fmpz_poly_mul(b, b, c);
       
       result = (fmpz_poly_equal(a, b));
       if (!result)
@@ -75,11 +75,11 @@ int main(void)
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+      fmpz_poly_randtest(b, n_randint(50), n_randint(500));
+      fmpz_poly_randtest(c, n_randint(50), n_randint(500));
    
-	  fmpz_poly_mul_classical(a, b, c);
-      fmpz_poly_mul_classical(c, b, c);
+	  fmpz_poly_mul(a, b, c);
+      fmpz_poly_mul(c, b, c);
       
       result = (fmpz_poly_equal(a, c));
       if (!result)
@@ -105,16 +105,16 @@ int main(void)
       fmpz_poly_init(b);
       fmpz_poly_init(c);
       fmpz_poly_init(d);
-      fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(100), n_randint(200));
-      fmpz_poly_randtest(d, n_randint(100), n_randint(200));
+      fmpz_poly_randtest(b, n_randint(100), n_randint(500));
+      fmpz_poly_randtest(c, n_randint(100), n_randint(500));
+      fmpz_poly_randtest(d, n_randint(100), n_randint(500));
       
-	  fmpz_poly_mul_classical(a1, b, c);
-	  fmpz_poly_mul_classical(a2, b, d);
+	  fmpz_poly_mul(a1, b, c);
+	  fmpz_poly_mul(a2, b, d);
       fmpz_poly_add(a1, a1, a2);
 
 	  fmpz_poly_add(c, c, d);
-      fmpz_poly_mul_classical(a2, b, c);
+      fmpz_poly_mul(a2, b, c);
 	  
       result = (fmpz_poly_equal(a1, a2));
       if (!result)

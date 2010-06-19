@@ -76,6 +76,10 @@ void _nmod_poly_normalise(nmod_poly_t poly)
    Internal function for normalising a poly so that the final 
    coefficient (if there are any at all) is not zero.
 
+void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
+
+   Efficiently swap poly1 and poly2 by swapping pointers internally. 
+
 ********************************************************************************
 
   Random generation
@@ -108,6 +112,28 @@ int nmod_poly_print(nmod_poly_t a)
    Otherwise the length followed by two spaces, followed by a space 
    separated list of coefficients is printed, beginning with the constant
    coefficient.
+
+********************************************************************************
+
+  Bit packing/unpacking
+
+********************************************************************************
+
+void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, ulong length, ulong bits)
+
+   Pack length coefficients of poly into fields of the given number of bits in
+   the large integer res, i.e. evaluate poly at 2^bits and store the result in 
+   res. Assumes length > 0 and bits > 0. Also assumes that no coefficient of 
+   poly is bigger than bits/2 bits. We also assume bits < 3*FLINT_BITS.
+
+void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
+                                          ulong length, ulong bits, nmod_t mod)
+
+   Unpack length coefficients stored in the big integer mpn in bit fields of 
+   the given number of bits, reduce them modulo the given modulus, then store
+   them in the polynomial res. We assume length > 0, 3*FLINT_BITS > bits > 0.
+   There are no restrictions on the size of the actual coefficients as stored
+   within the bitfields. 
 
 ********************************************************************************
 
@@ -148,3 +174,15 @@ void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 void nmod_poly_scalar_mul(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
 
    Set res to { poly1, len1 } * c, where c is reduced modulo the modulus of poly1.
+
+void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
+			       ulong len1, mp_srcptr poly2, ulong len2, nmod_t mod)
+
+   Set { res, len1 + len2 - 1 } to { poly1, len1 } * { poly2, len2 }. Assumes
+   len1 >= len2 > 0.
+
+void nmod_poly_mul_classical(nmod_poly_t res, 
+                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+
+   Set res to poly1 * poly2.
+

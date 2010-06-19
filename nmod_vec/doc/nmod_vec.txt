@@ -69,7 +69,14 @@ NMOD_RED3(r, a_hi, a_me, a_lo, mod)
    Macro to set r to (a_hi, a_me, a_lo) % mod.n. The mod parameter must 
    be a valid nmod_t structure. It is assumed that a_hi is already 
    reduced modulo mod.n.
-   
+ 
+NMOD_ADDMUL(r, a, b, mod)
+
+   Macro to set r to (r + a*b) % mod.n. The mod parameter must 
+   be a valid nmod_t structure. It is assumed that r, a, b are already 
+   reduced modulo mod.n.
+
+  
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 
    Return (a + b) modulo mod.n. It is assumed that mod is no more than 
@@ -153,5 +160,10 @@ void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec,
 				        long len, nmod_t mod, mp_limb_t c)
 
    Set { res, len } = { vec, len }*c.
+
+void _nmod_vec_scalar_addmul(mp_ptr res, mp_srcptr vec, 
+				        long len, nmod_t mod, mp_limb_t c)
+
+   Set { res, len } = { res, len } + { vec, len }*c.
 
 

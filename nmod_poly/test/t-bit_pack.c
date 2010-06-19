@@ -20,19 +20,56 @@
 /****************************************************************************
 
    Copyright (C) 2010 William Hart
-   
+
 *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "ulong_extras.h"
 
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
+int main(void)
 {
-   nmod_poly_fit_length(res, poly1->length);
-	
-   _nmod_vec_neg(res->coeffs, poly1->coeffs, poly1->length, poly1->mod);
-    
-   res->length = poly1->length;
+   int result;
+   printf("bit_pack/bit_unpack....");
+   fflush(stdout);
+   
+   // check aliasing of a and c
+   for (ulong i = 0; i < 10000UL; i++) 
+   {
+      nmod_poly_t a, b, c;
+
+      mp_limb_t n;
+	  
+	  do { n = n_randtest_not_zero(); } while (n == 1);
+	  ulong bits = 2*FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS);
+      
+	  nmod_poly_init(a, n);
+      nmod_poly_init(b, n);
+	  do { nmod_poly_randtest(a, n_randint(100)); } while (a->length == 0);
+
+      mp_ptr mpn = malloc(sizeof(mp_limb_t)*((bits * a->length - 1)/FLINT_BITS + 1));
+	  
+      _nmod_poly_bit_pack(mpn, a->coeffs, a->length, bits);
+      nmod_poly_fit_length(b, a->length);
+	  _nmod_poly_bit_unpack(b->coeffs, mpn, a->length, bits, a->mod);
+      b->length = a->length;
+
+      result = (nmod_poly_equal(a, b));
+      if (!result)
+      {
+         printf("Error:\n");
+		 nmod_poly_print(a); printf("\n\n");
+         nmod_poly_print(b); printf("\n\n");
+         abort();
+      }
+
+      nmod_poly_clear(a);
+      nmod_poly_clear(b);
+   }
+
+   printf("PASS\n");
+   return 0;
 }

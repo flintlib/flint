@@ -29,23 +29,20 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_addmul(mp_ptr res, mp_srcptr vec, 
 				                  long len, nmod_t mod, mp_limb_t c)
 {
    long i;
    
-   if (mod.norm >= FLINT_BITS/2) // products will fit in a limb
+   if (mod.norm >= FLINT_BITS/2) // addmul will fit in a limb
    {
-      mpn_mul_1(res, vec, len, c);
+      mpn_addmul_1(res, vec, len, c);
 	  _nmod_vec_reduce(res, res, len, mod);
    } else // products may take two limbs
    {
       mp_limb_t hi, lo;
 	  
 	  for (i = 0; i < len; i++)
-	  {
-	     umul_ppmm(hi, lo, vec[i], c);
-		 NMOD_RED2(res[i], hi, lo, mod); // hi already reduced mod n
-	  }
+	     NMOD_ADDMUL(res[i], vec[i], c, mod); // hi already reduced mod n
    }
 }

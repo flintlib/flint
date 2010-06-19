@@ -33,10 +33,10 @@
 int main(void)
 {
    int result;
-   printf("scalar_mul....");
+   printf("scalar_addmul....");
    fflush(stdout);
    
-   // check (a + b)*c == a*c + b*c
+   // check (a + b*c) == a + (b*c)
    for (long i = 0; i < 10000UL; i++) 
    {
       long length = n_randint(100) + 1;
@@ -51,15 +51,14 @@ int main(void)
 
       _nmod_vec_randtest(vec, length, mod);
       _nmod_vec_randtest(vec2, length, mod);
+      mpn_copyi(vec3, vec2, length);
 
-	  _nmod_vec_add(vec3, vec, vec2, length, mod);
-	  _nmod_vec_scalar_mul(vec3, vec3, length, mod, c);
-
-	  _nmod_vec_scalar_mul(vec, vec, length, mod, c);
-	  _nmod_vec_scalar_mul(vec2, vec2, length, mod, c);
-	  _nmod_vec_add(vec, vec, vec2, length, mod);
+	  _nmod_vec_scalar_mul(vec3, vec, length, mod, c);
+      _nmod_vec_add(vec3, vec3, vec2, length, mod);
 	  
-	  if (!_nmod_vec_equal(vec, vec3, length))
+	  _nmod_vec_scalar_addmul(vec2, vec, length, mod, c);
+	  
+	  if (!_nmod_vec_equal(vec2, vec3, length))
 	  {
 	     printf("FAIL\n");
 		 printf("length = %ld, n = %ld\n", length, n);

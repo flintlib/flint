@@ -67,8 +67,16 @@ typedef struct
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
 	do { \
 	   mp_limb_t v_hi;	\
-	   NMOD_RED2(v_hi, a_hi, a_lo, mod); \
+	   NMOD_RED2(v_hi, a_hi, a_me, mod); \
 	   NMOD_RED2(r, v_hi, a_lo, mod); \
+	} while (0)
+
+#define NMOD_ADDMUL(r, a, b, mod) \
+	do { \
+	   mp_limb_t a_hi, a_lo; \
+	   umul_ppmm(a_hi, a_lo, a, b); \
+	   add_ssaaaa(a_hi, a_lo, a_hi, a_lo, (mp_limb_t) 0, r); \
+	   NMOD_RED2(r, a_hi, a_lo, mod); \
 	} while (0)
 
 static inline
@@ -173,6 +181,9 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec,
 				                             long len, nmod_t mod);
 
 void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
+				                long len, nmod_t mod, mp_limb_t c);
+
+void _nmod_vec_scalar_addmul(mp_ptr res, mp_srcptr vec, 
 				                long len, nmod_t mod, mp_limb_t c);
 
 #endif
