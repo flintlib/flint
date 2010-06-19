@@ -128,6 +128,16 @@ void nmod_poly_zero(nmod_poly_t res)
    res->length = 0;
 }
 
+static inline 
+void nmod_poly_truncate(nmod_poly_t poly, ulong length)
+{
+   if (poly->length > length)
+   {
+	  poly->length = length;
+      _nmod_poly_normalise(poly);
+   }
+}
+
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
@@ -150,6 +160,12 @@ void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
 
 void nmod_poly_mul_classical(nmod_poly_t res, 
                       const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, 
+      ulong len1, mp_srcptr poly2, ulong len2, ulong trunc, nmod_t mod);
+
+void nmod_poly_mullow_classical(nmod_poly_t res, 
+         const nmod_poly_t poly1, const nmod_poly_t poly2, ulong trunc);
 
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
 						                      ulong length, ulong bits);

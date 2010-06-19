@@ -84,6 +84,11 @@ ulong nmod_poly_max_bits(nmod_poly_t poly)
 
    Return the maximum number of bits of any coefficient of poly.
 
+void nmod_poly_truncate(nmod_poly_t poly, ulong length)
+
+   Truncate poly to the given length and normalise. If length is bigger
+   than the currently length of poly, then nothing happens.
+
 ********************************************************************************
 
   Random generation
@@ -189,6 +194,17 @@ void nmod_poly_mul_classical(nmod_poly_t res,
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
 
    Set res to poly1 * poly2.
+
+void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, ulong len1, 
+                           mp_srcptr poly2, ulong len2, ulong trunc, nmod_t mod)
+
+   Set res to the first trunc coefficients of { poly1, len1 } * { poly2, len2 }.
+   Assumes len1 >= len2 > 0 and trunc != 0.
+
+void nmod_poly_mullow_classical(nmod_poly_t res, 
+                  const nmod_poly_t poly1, const nmod_poly_t poly2, ulong trunc)
+
+   Set res to the first trunc coefficients of poly1 * poly2.
 
 void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
                      mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod)
