@@ -167,6 +167,12 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1,
 void nmod_poly_mullow_classical(nmod_poly_t res, 
          const nmod_poly_t poly1, const nmod_poly_t poly2, ulong trunc);
 
+void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, 
+	  ulong len1, mp_srcptr poly2, ulong len2, ulong start, nmod_t mod);
+
+void nmod_poly_mulhigh_classical(nmod_poly_t res, 
+         const nmod_poly_t poly1, const nmod_poly_t poly2, ulong start);
+
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
 						                      ulong length, ulong bits);
 

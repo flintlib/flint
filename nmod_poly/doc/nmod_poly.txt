@@ -206,6 +206,20 @@ void nmod_poly_mullow_classical(nmod_poly_t res,
 
    Set res to the first trunc coefficients of poly1 * poly2.
 
+void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, 
+	        ulong len1, mp_srcptr poly2, ulong len2, ulong start, nmod_t mod)
+
+   Compute the product of { poly1, len1 } and { poly2, len2 } and write the 
+   coefficients from start onwards into the high coefficients of res, the remaining 
+   coefficients being arbitrary (but reduced). Assumes len1 >= len2 > 0.
+
+void nmod_poly_mulhigh_classical(nmod_poly_t res, 
+                  const nmod_poly_t poly1, const nmod_poly_t poly2, ulong start)
+
+   Compute the product of poly1 and poly2 and write the coefficients from start 
+   onwards into the high coefficients of res, the remainding coefficients being
+   arbitrary (but reduced).
+
 void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
                      mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod)
 
