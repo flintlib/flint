@@ -102,16 +102,70 @@ nmod_poly_mul_classical (mul_classical.c)
    the addmul will fit in a single limb and where it will not. At the very least mul_classical
    should accumulate into 2 or 3 limbs where necessary and do a final reduction at the end.
    Probably it makes sense to accumulate into 2 limbs and always keep the top limb reduced mod
-   n, which is less expensive. 
+   n, which is less expensive. Also, when everything fits into a single limb, mpn_mul can be
+   used directly to multiply the polys before reduction.
 
-nmod_poly_mullow_classical (mullow_classical.c) - missing
-   Should have a similar prototype as fmpz_poly_mullow_classical, but for nmod_polys.
+nmod_poly_mullow_classical (mullow_classical.c)    
+   Can be optimised in the same way as mul_classical.
 
-nmod_poly_mulhigh_classical (mullow_classical.c) - missing
-   Should have a similar prototype as fmpz_poly_mulhigh_classical, but for nmod_polys.
+nmod_poly_mulhigh_classical (mullow_classical.c) 
+   Can be optimised in the same way as mul_classical.
+
+nmod_poly_mulmid_classical (mulmid_classical.c) - missing
+   Should have a similar prototype to fmpz_poly_mulhigh_classical, but for nmod_polys.
 
 nmod_poly_sqrlow_classical_n (mullow_classical.c) - missing
-   Should have a similar prototype as fmpz_poly_sqrlow_classical_n, but for nmod_polys.
+   Should have a similar prototype to fmpz_poly_sqrlow_classical_n, but for nmod_polys.
 
 nmod_poly_sqr_classical_n (mullow_classical.c) - missing
-   Should have a similar prototype as fmpz_poly_sqr_classical_n, but for nmod_polys.
+   Should have a similar prototype to fmpz_poly_sqr_classical_n, but for nmod_polys.
+
+nmod_poly_mullow_KS_n (mullow_KS_n.c) - missing
+   When the FFT has a truncated multiplication it is good to use this to get a mullow_KS.
+
+nmod_poly_mulmid_KS_n (mulmid_KS_n.c) - missing
+   The FFT wraparound trick can be used to get a mulmid.
+
+nmod_poly_mul_KS2 (mul_KS2.c) - missing
+   David Harvey's KS2 trick.
+
+nmod_poly_mullow_KS2_n (mullow_KS2_n.c) - missing
+   David Harvey's KS2 trick, truncating.
+
+nmod_poly_mul_KS4 (mul_KS4.c) - missing
+   David Harvey's KS4 trick.
+
+nmod_poly_mullow_KS4_n (mullow_KS4_n.c) - missing
+   David Harvey's KS4 trick, truncating.
+
+nmod_poly_mul_SN.c (mul_SN.c) - missing
+   Implement the Schoenhage-Nussbaumer FFT
+
+nmod_poly_mullow_SN_n.c (mullow_SN_n.c) - missing
+   Use the Schoenhage-Nussbaumer FFT.
+
+nmod_poly_mulhigh_SN_n.c (mulhigh_SN_n.c) - missing
+   Use the Schoenhage-Nussbaumer FFT.
+
+nmod_poly_mulmid_SN.c (mulmid_SN.c) - missing
+   Use a variant of the Schoenhage-Nussbaumer FFT for middle product.
+
+nmod_poly_mul (mul.c)
+   Use the other available routines with tuned cutoffs, where available.
+
+nmod_poly_mulhigh_n (mulhigh_n.c)
+   Use the other available routines with tuned cutoffs, where available.
+
+nmod_poly_mullow_n (mullow_n.c)
+   Use the other available routines with tuned cutoffs, where available.
+
+nmod_poly_mullow_precache_n (mullow_precache_n.c) - missing
+   Precache the FFT when using the KS algorithm.
+
+nmod_poly_mulmid_n (mul.c) - missing
+   Use the other available routines with tuned cutoffs, where available.
+
+nmod_poly_mulmid_precache_n (mulmid_precache_n.c) - missing
+   Precache the FFT when using the KS middle product algorithm.
+
+
