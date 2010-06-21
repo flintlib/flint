@@ -42,6 +42,16 @@ void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in)
    Set the entries of a vector of the given length to random integers with 
    upto the given maximum number of bits per entry.
 
+long _fmpz_vec_max_bits(const fmpz * vec, ulong length)
+
+   If b is the maximum number of bits of the absolute value of any coefficient of
+   vec, then if any coefficient of vec is negative, -b is return, else b is
+   returned.
+
+ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length)
+ 
+   Return the maximum number of limbs needed to store any entry in { vec, length }.
+
 void _fmpz_vec_print(fmpz * vec, ulong length)
 
    Print the vector of given length to stdout. The format is the length

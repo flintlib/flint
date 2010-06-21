@@ -58,9 +58,11 @@ int main(void)
 	  if (negate > 0)
 	     negate = 0;
 
-      fmpz_poly_bit_pack(arr, a, bits, negate);
-      fmpz_poly_bit_unpack(b, a->length, arr, bits, negate);
-      
+      _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, negate);
+      fmpz_poly_fit_length(b, a->length);
+	  _fmpz_poly_bit_unpack(b->coeffs, a->length, arr, bits, negate);
+      _fmpz_poly_set_length(b, a->length);
+
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
@@ -89,9 +91,11 @@ int main(void)
 	  do { fmpz_poly_randtest_unsigned(a, length, bits); } 
       while (a->length == 0);
 
-	  fmpz_poly_bit_pack(arr, a, bits, 0);
-      fmpz_poly_bit_unpack_unsigned(b, a->length, arr, bits);
-      
+	  _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, 0);
+      fmpz_poly_fit_length(b, a->length);
+	  _fmpz_poly_bit_unpack_unsigned(b->coeffs, a->length, arr, bits);
+      _fmpz_poly_set_length(b, a->length);
+
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {

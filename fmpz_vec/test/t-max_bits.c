@@ -28,7 +28,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "ulong_extras.h"
 
 int main(void)
@@ -37,20 +37,19 @@ int main(void)
    printf("max_bits....");
    fflush(stdout);
    
-   fmpz_poly_randinit();
+   _fmpz_vec_randinit();
    
    for (ulong i = 0; i < 10000UL; i++) 
    {
-      fmpz_poly_t a, b, c;
+      fmpz * a;
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      ulong bits = n_randint(200);
-	  ulong bits2;
-	  fmpz_poly_randtest(a, n_randint(100), bits);
+	  ulong length = n_randint(100);
       
-      bits2 = fmpz_poly_max_bits(a);
+      a = _fmpz_vec_init(length);
+      ulong bits = n_randint(200);
+	  _fmpz_vec_randtest(a, length, bits);
+      
+      ulong bits2 = _fmpz_vec_max_bits(a, length);
 
       result = (bits >= FLINT_ABS(bits2));
       if (!result)
@@ -60,34 +59,10 @@ int main(void)
 		 abort();
       }
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
+      _fmpz_vec_clear(a, length);
    }
 
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      fmpz_poly_t a;
-
-      fmpz_poly_init(a);
-      ulong bits = n_randint(200);
-	  ulong bits2;
-	  fmpz_poly_randtest_unsigned(a, n_randint(100), bits);
-      
-      bits2 = fmpz_poly_max_bits(a);
-
-      result = (bits >= bits2);
-      if (!result)
-      {
-         printf("Error:\n");
-         printf("bits = %ld, bits2 = %ld\n", bits, bits2);
-		 abort();
-      }
-
-      fmpz_poly_clear(a);
-   }
-
-   fmpz_poly_randclear();
+   _fmpz_vec_randclear();
       
    _fmpz_cleanup();
    printf("PASS\n");

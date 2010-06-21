@@ -39,6 +39,10 @@ void _fmpz_vec_randclear(void);
 
 void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in);
 
+long _fmpz_vec_max_bits(const fmpz * vec, ulong length);
+
+ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length);
+
 void _fmpz_vec_print(fmpz * vec, ulong length);
 
 void _fmpz_vec_zero(fmpz * vec1, ulong len1);

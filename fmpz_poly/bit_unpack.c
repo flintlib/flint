@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
+void _fmpz_poly_bit_unpack(fmpz * poly, ulong length, 
 						  const mp_limb_t * arr, ulong bit_size, int negate)
 {
    mp_bitcnt_t bits = 0;
@@ -39,12 +39,9 @@ void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length,
    ulong i;
    int borrow = 0;
 
-   fmpz_poly_fit_length(poly, length);
-   _fmpz_poly_set_length(poly, length);
-
    for (i = 0; i < length; i++)
    {
-      borrow = fmpz_bit_unpack(poly->coeffs + i, arr + limbs, bits, bit_size, negate, borrow);
+      borrow = fmpz_bit_unpack(poly + i, arr + limbs, bits, bit_size, negate, borrow);
 	  limbs += l;
 	  bits += b;
 	  if (bits >= FLINT_BITS)
@@ -55,7 +52,7 @@ void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length,
    }
 }
 
-void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length, 
+void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, ulong length, 
 						           const mp_limb_t * arr, ulong bit_size)
 {
    mp_bitcnt_t bits = 0;
@@ -65,12 +62,9 @@ void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length,
    ulong b = bit_size%FLINT_BITS;
    ulong i;
    
-   fmpz_poly_fit_length(poly, length);
-   _fmpz_poly_set_length(poly, length);
-
    for (i = 0; i < length; i++)
    {
-      fmpz_bit_unpack_unsigned(poly->coeffs + i, arr + limbs, bits, bit_size);
+      fmpz_bit_unpack_unsigned(poly + i, arr + limbs, bits, bit_size);
 	  limbs += l;
 	  bits += b;
 	  if (bits >= FLINT_BITS)

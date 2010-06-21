@@ -32,8 +32,8 @@
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
              const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
 {
-   ulong limbs1 = fmpz_poly_max_limbs(poly1);
-   ulong limbs2 = fmpz_poly_max_limbs(poly2);
+   ulong limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
+   ulong limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
    ulong max_limbs = FLINT_MAX(limbs1, limbs2);
 
    if (trunc <= 4)

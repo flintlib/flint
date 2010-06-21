@@ -202,17 +202,6 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
    Return 1 if poly1 is equal to poly2, otherwise return 0. Polys are
    assumed to be normalised.
 
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
-
-   If b is the maximum number of bits of the absolute value of any coefficient of
-   poly, then if any coefficient of poly is negative, -b is return, else b is
-   returned.
-
-ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
-
-   Returns the maximum number of limbs of any coefficient of poly. The function
-   ignores the signs of the coefficients.
-
 ********************************************************************************
 
   Add/sub
@@ -375,28 +364,42 @@ void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
    Assumes poly1 and poly2 are at most of the given length.
 
 
-void fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz_poly_t poly, 
-						             ulong bit_size, int negate)
+void _fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz * poly,
+						  ulong len, ulong bit_size, int negate)   
 
    Pack the coefficients of poly into bitfields of the given bit_size, negating the
    coefficients before packing if negate is set to -1.
 
-void fmpz_poly_bit_unpack(fmpz_poly_t poly, ulong length, 
+void _fmpz_poly_bit_unpack(fmpz * poly, ulong length, 
 				    const mp_limb_t * arr, ulong bit_size, int negate)
 
    Unpack the poly of given length from the array as packed into fields of the 
    given bitsize, finally negating the coefficients if negate is set to -1.
 
-void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, ulong length, 
+void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, ulong length, 
 						  const mp_limb_t * arr, ulong bit_size)
 
    Unpack the poly of given length from the array as packed into fields of the 
    given bitsize. The coefficients are assumed to be unsigned.
 
+void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, ulong len1, 
+					                const fmpz * poly2, ulong len2)
+
+   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
+   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
+   inputs with outputs is allowed. Also assumes len1 >= len2.
+
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                                  const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set res to poly1 multiplied by poly2.
+
+void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
+				           ulong len1, const fmpz * poly2, ulong len2)
+
+   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
+   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
+   inputs with outputs is allowed. Also assumes len1 >= len2.
 
 void fmpz_poly_mul(fmpz_poly_t res, 
              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -415,3 +418,50 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
    Set the high n coefficients of res to the high n coefficients of the product of
    poly1 and poly2, assuming the latter are precisely n coefficients in length 
    (zero padded if necessary). The remaining n - 1 coefficients may be arbitrary.
+
+void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
+					       ulong A_len, const fmpz * B, ulong B_len)
+
+   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
+   is reduced mod the leading coefficient of B. If the leading coefficient of B is
+   +/-1 or the division is exact, this is the same thing as division over Q. No 
+   aliasing of input and output operands is allowed. An exception is raised if
+   B->length == 0.
+
+
+void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, ulong A_len,
+							      const fmpz * B, ulong B_len)
+
+   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
+   is reduced mod the leading coefficient of B, but discard the remainder R. If 
+   the leading coefficient of B is +/-1 or the division is exact, this is the same 
+   thing as division over Q. No aliasing of input and output operands is allowed. 
+   An exception is raised if B->length == 0.
+
+void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
+					    const fmpz * A, const fmpz * B, ulong B_len)
+
+   Compute Q, BQ such that BQ = B*Q and A = BQ + R for some R where each coefficient 
+   of R beyond B->length - 1 is reduced mod the leading coefficient of B. We assume
+   that A->length = 2*B->length - 1. If the leading coefficient of B is +/-1 or the 
+   division is exact, this is the same thing as division over Q. No aliasing of input 
+   and output operands is allowed. An exception is raised if B->length == 0.
+
+void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
+			     const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
+
+   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
+   is reduced mod the leading coefficient of B. If the leading coefficient of B is
+   +/-1 or the division is exact, this is the same thing as division over Q. No 
+   aliasing of input and output operands is allowed. An exception is raised if
+   B->length == 0.
+
+void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
+						const fmpz_poly_t A, const fmpz_poly_t B)
+
+   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
+   is reduced mod the leading coefficient of B. If the leading coefficient of B is
+   +/-1 or the division is exact, this is the same thing as division over Q. An 
+   exception is raised if B->length == 0.
+
+

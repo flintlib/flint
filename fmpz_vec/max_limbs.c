@@ -26,16 +26,16 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 
-ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length)
 {
 	ulong i;
 	long limbs, max_limbs = 0;
 	
-	for (i = 0; i < poly->length; i++)
+	for (i = 0; i < length; i++)
 	{
-	   limbs = fmpz_size(poly->coeffs + i);
+	   limbs = fmpz_size(vec + i);
 	   if (limbs > max_limbs)
 	      max_limbs = limbs;
 	}

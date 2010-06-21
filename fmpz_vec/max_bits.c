@@ -26,20 +26,20 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
+long _fmpz_vec_max_bits(const fmpz * vec, ulong length)
 {
 	ulong i;
 	long bits, max_bits = 0;
 	long sign = 1L;
 
-	for (i = 0; i < poly->length; i++)
+	for (i = 0; i < length; i++)
 	{
-	   bits = fmpz_bits(poly->coeffs + i);
+	   bits = fmpz_bits(vec + i);
 	   if (bits > max_bits)
 	      max_bits = bits;
-       if (fmpz_sgn(poly->coeffs + i) < 0)
+       if (fmpz_sgn(vec + i) < 0)
 	      sign = -1L;
 	}
 
