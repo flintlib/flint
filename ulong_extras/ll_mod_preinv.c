@@ -55,12 +55,12 @@ mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo,
    mp_limb_t q0, q1, r, norm;
    
    count_leading_zeros(norm, n);
-   n <<= norm;
-
+   
    /* reduce u1 first i.e. u1 = n_mod2_preinv(u1, n, ninv) */
    if (a_hi >= n)
    {
-      const mp_limb_t u1 = r_shift(a_hi, FLINT_BITS-norm);
+      n <<= norm;
+	  const mp_limb_t u1 = r_shift(a_hi, FLINT_BITS-norm);
 	  const mp_limb_t u0 = (a_hi<<norm);
 
 	  umul_ppmm(q1, q0, ninv, u1);
@@ -72,8 +72,9 @@ mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo,
 
 	  if (r < n) a_hi = (r>>norm);
 	  else a_hi = ((r - n)>>norm);
-   }
-   
+   } else
+      n <<= norm;
+
    /* now reduce the rest of the way */
    {
 	  const mp_limb_t u1 = (a_hi<<norm) + r_shift(a_lo, FLINT_BITS - norm);

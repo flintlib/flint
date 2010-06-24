@@ -92,6 +92,17 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 void nmod_poly_randtest(nmod_poly_t poly, ulong length);
 
 static inline
+void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
+{
+   if (a != b)
+   {
+      nmod_poly_fit_length(a, b->length);
+	  mpn_copyi(a->coeffs, b->coeffs, b->length);
+	  a->length = b->length;
+   }
+}
+
+static inline
 int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
 {
    if (a->length != b->length)
@@ -193,6 +204,12 @@ void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1,
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
 						                    nmod_poly_t poly2, ulong n);
+
+void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
+		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod);
+
+void nmod_poly_divrem_basecase(nmod_poly_t Q, 
+						   nmod_poly_t R, nmod_poly_t A, nmod_poly_t B);
 
 #endif
 
