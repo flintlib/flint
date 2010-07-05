@@ -33,12 +33,15 @@
 
 void fmpq_poly_canonicalize(fmpq_poly_t poly)
 {
+    ulong i;
     ulong length;
+    fmpz_t temp;
     
     length = poly->length;
     while (length && !poly->coeffs[length - 1]) length--;
+    poly->length = length;
     
-    if (_fmpq_poly_den_is_one(poly))
+    if (*poly->den == 1L)
         return;
     
     if (fmpq_poly_is_zero(poly))
@@ -47,8 +50,29 @@ void fmpq_poly_canonicalize(fmpq_poly_t poly)
     }
     else if (*poly->den == -1L)
     {
-        _fmpz_vec_neg(poly->coeffs, poly->coeffs, poly->length);
+        _fmpz_vec_neg(poly->coeffs, poly->coeffs, length);
         fmpz_set_si(poly->den, 1);
+    }
+    else
+    {
+        fmpz_init(temp);
+        _fmpz_vec_content(temp, poly->coeffs, length);
+        if (*temp != 1L)
+        {
+            fmpz_gcd(temp, temp, poly->den);
+            if (*temp != 1L)
+            {
+                for (i = 0; i < length; i++)
+                    fmpz_divexact(poly->coeffs + i, poly->coeffs + i, temp);
+                fmpz_divexact(poly->den, poly->den, temp);
+            }
+        }
+        fmpz_clear(temp);
+        if (fmpz_sgn(poly->den) < 0)
+        {
+            _fmpz_vec_neg(poly->coeffs, poly->coeffs, length);
+            fmpz_neg(poly->den, poly->den);
+        }
     }
 }
 

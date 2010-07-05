@@ -77,6 +77,8 @@ void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1,
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
                           const fmpz * vec2, ulong len2, ulong exp);
 
+void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len);
+
 #endif
 
 
