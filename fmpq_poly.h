@@ -16,7 +16,7 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
  Copyright (C) 2010 Sebastian Pancratz
@@ -25,7 +25,7 @@
 ******************************************************************************/
 
 #ifndef FMPQ_POLY_H
-#define FMPZ_POLY_H
+#define FMPQ_POLY_H
 
 #include <mpir.h>
 #include "fmpz.h"
