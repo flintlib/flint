@@ -33,7 +33,7 @@
 int main(void)
 {
    int result;
-   printf("gcd....");
+   printf("gcd...."); fflush(stdout);
    fflush(stdout);
 
    fmpz_randinit();
@@ -57,20 +57,19 @@ int main(void)
       fmpz_randtest(c, 200);
       fmpz_mul(a, a, c);
       fmpz_mul(b, b, c);
-
       fmpz_get_mpz(d, a);
       fmpz_get_mpz(e, b);
       
       fmpz_gcd(c, a, b);
       mpz_gcd(f, d, e);
-      
+
       fmpz_get_mpz(g, c);
          
       result = (mpz_cmp(f, g) == 0);
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL\n"); fflush(stdout);
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
          abort();
       }
@@ -84,7 +83,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-
+   printf("here\n"); fflush(stdout);
    // check aliasing of a and b
    for (ulong i = 0; i < 100000UL; i++) 
    {
@@ -111,7 +110,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL\n"); fflush(stdout);
          gmp_printf("d = %Zd, f = %Zd, g = %Zd\n", d, f, g);
          abort();
       }
@@ -123,7 +122,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-
+   printf("here2\n"); fflush(stdout);
    // test aliasing of a and c
    for (ulong i = 0; i < 100000UL; i++) 
    {
@@ -157,7 +156,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL\n"); fflush(stdout);
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
          abort();
       }
@@ -171,7 +170,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-
+   printf("here3\n"); fflush(stdout);
    // test aliasing of b and c
    for (ulong i = 0; i < 100000UL; i++) 
    {
@@ -205,7 +204,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL\n"); fflush(stdout);
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
          abort();
       }
@@ -223,6 +222,6 @@ int main(void)
    fmpz_randclear();
 
    _fmpz_cleanup();
-   printf("PASS\n");
+   printf("PASS\n"); fflush(stdout);
    return 0;
 }
