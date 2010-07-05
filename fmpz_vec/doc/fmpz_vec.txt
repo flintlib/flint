@@ -116,8 +116,8 @@ void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1,
    Set {res, len2} = {vec1, len2} += c*2^exp*{vec2, len2} where c is a signed
    long.
 
+void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
 
+    Sets res to the non-negative content of the entries in vec.  The content 
+    of a length zero vector is defined to be zero.
 
-
-
-  

@@ -17,38 +17,38 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 Sebastian Pancratz
- Copyright (C) 2010 William Hart
- 
-******************************************************************************/
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
 
-#ifndef FMPQ_POLY_H
-#define FMPZ_POLY_H
+*****************************************************************************/
 
 #include <mpir.h>
+#include <stdlib.h>
+#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
-typedef struct
+void fmpq_poly_canonicalize(fmpq_poly_t poly)
 {
-    fmpz * coeffs;
-    fmpz_t den;
-    ulong alloc;
     ulong length;
-} fmpq_poly_struct;
-
-typedef fmpq_poly_struct fmpq_poly_t[1];
-
-#define _fmpq_poly_den_is_one(poly)  (*(poly)->den == 1L)
-
-void fmpq_poly_init(fmpq_poly_t poly);
-
-void fmpq_poly_clear(fmpq_poly_t poly);
-
-void fmpq_poly_canonicalize(fmpq_poly_t poly);
-
-#endif
+    
+    length = poly->length;
+    while (length && !poly->coeffs[length - 1]) length--;
+    
+    if (_fmpq_poly_den_is_one(poly))
+        return;
+    
+    if (fmpq_poly_is_zero(poly))
+    {
+        fmpz_set_si(poly->den, 1);
+    }
+    else if (*poly->den == -1L)
+    {
+        _fmpz_vec_neg(poly->coeffs, poly->coeffs, poly->length);
+        fmpz_set_si(poly->den, 1);
+    }
+}
 

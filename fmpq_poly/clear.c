@@ -17,38 +17,28 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 ===============================================================================*/
-/******************************************************************************
+/****************************************************************************
 
- Copyright (C) 2010 Sebastian Pancratz
- Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
  
-******************************************************************************/
-
-#ifndef FMPQ_POLY_H
-#define FMPZ_POLY_H
+*****************************************************************************/
 
 #include <mpir.h>
+#include <stdlib.h>
+#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
-typedef struct
+void fmpq_poly_clear(fmpq_poly_t poly)
 {
-    fmpz * coeffs;
-    fmpz_t den;
-    ulong alloc;
-    ulong length;
-} fmpq_poly_struct;
-
-typedef fmpq_poly_struct fmpq_poly_t[1];
-
-#define _fmpq_poly_den_is_one(poly)  (*(poly)->den == 1L)
-
-void fmpq_poly_init(fmpq_poly_t poly);
-
-void fmpq_poly_clear(fmpq_poly_t poly);
-
-void fmpq_poly_canonicalize(fmpq_poly_t poly);
-
-#endif
+    ulong i;
+    if (poly->coeffs)
+    {
+        for (i = 0; i < poly->alloc; i++)
+            _fmpz_demote(poly->coeffs + i);
+        free(poly->coeffs);
+    }
+    fmpz_clear(poly->den);
+}
 
