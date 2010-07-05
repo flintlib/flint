@@ -34,10 +34,10 @@
 
 typedef struct
 {
-   fmpz * coeffs;
-   fmpz_t denom;
-   ulong alloc;
-   ulong length;
+    fmpz * coeffs;
+    fmpz_t denom;
+    ulong alloc;
+    ulong length;
 } fmpq_poly_struct;
 
 typedef fmpq_poly_struct fmpz_poly_t[1];
@@ -45,9 +45,4 @@ typedef fmpq_poly_struct fmpz_poly_t[1];
 void fmpq_poly_init(fmpq_poly_t poly);
 
 #endif
-
-
-
-
-
 
