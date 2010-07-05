@@ -32,9 +32,28 @@
 
 void fmpq_poly_init(fmpq_poly_t poly)
 {
-   poly->coeffs = NULL;
-   fmpz_init(poly->den);
-   poly->alloc  = 0;
-   poly->length = 0;
+    poly->coeffs = NULL;
+    fmpz_init(poly->den);
+    fmpz_set_si(poly->den, 1);
+    poly->alloc  = 0;
+    poly->length = 0;
+}
+
+void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc)
+{
+    if (alloc)  /* Allocate space for alloc small coeffs */
+    {
+        poly->coeffs = (fmpz *) malloc(alloc * sizeof(fmpz));
+        mpn_zero(poly->coeffs, alloc);
+    }
+    else
+    {
+        poly->coeffs = NULL;
+    }
+    
+    fmpz_init(poly->den);
+    fmpz_set_si(poly->den, 1);
+    poly->alloc  = alloc;
+    poly->length = 0;
 }
 

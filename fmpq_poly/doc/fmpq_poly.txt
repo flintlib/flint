@@ -23,11 +23,84 @@
 
 ********************************************************************************
 
-  Memory management
+    Memory management
 
 ********************************************************************************
 
 void fmpq_poly_init(fmpq_poly_t poly)
 
-   Initialise the poly for use. The length is set to zero.
+    Initialises the polynomial for use.  The length is set to zero.
+
+void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc)
+
+    Initialises the polynomial with space for at least alloc coefficients and 
+    set the length to zero. The alloc coefficients are all set to zero.
+
+void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
+
+    Reallocates the given polynomial to have space for alloc coefficients. 
+    If alloc is set to zero then the polynomial is cleared and then 
+    reinitialised.  If the current length is greater than alloc then poly 
+    is first truncated to length alloc.  Note that this might leave the 
+    rational polynomial in non-canonical form.
+
+void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong length)
+
+    If length is currently greater that the number of coefficients
+    allocated, then the polynomial is reallocated to have space for at
+    least length coefficients. No data is lost when calling this 
+    function. The function efficiently deals with the case where 
+    fit_length is called many times in small increments by at least 
+    doubling the number of allocated coefficients when length is larger 
+    than the number of coefficients currently allocated.
+
+void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length)
+    
+    Sets the length of the numerator polynomial to length, demoting 
+    coefficients beyond the new length.  Note that this method does 
+    not guarantee that the rational polynomial is in canonical form.
+
+void fmpq_poly_clear(fmpq_poly_t poly)
+    
+    Clears the given poly, releasing any memory used. The poly must
+    be reinitialised in order to be used again.
+
+void _fmpq_poly_normalise(fmpq_poly_t poly)
+
+    Sets the length of poly so that the top coefficient is nonzero.  If 
+    all coefficients are zero, the length is set to zero.  Note that 
+    this function does not guarantee the coprimality of the numerator 
+    polynomial and the integer denominator.
+
+void fmpq_poly_canonicalise(fmpq_poly_t poly)
+
+    Puts the polynomial poly into canonical form.  Firstly, the length is set 
+    to the actual length of the numerator polynomial.  For non-zero 
+    polynomials, it is then ensured that the numerator and denominator are 
+    coprime and that the denominator is positive.  The canonical form of the 
+    zero polynomial is a zero numerator polynomial and a one denominator.
+
+********************************************************************************
+
+    Assignment, swap, negation, reverse
+
+********************************************************************************
+
+void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+   Set poly1 to equal poly2.
+
+********************************************************************************
+
+    Comparison
+
+********************************************************************************
+
+int fmpq_poly_is_zero(const fmpq_poly_t poly)
+
+    Returns 1 if poly is the zero polynomial, otherwise returns 0.
+
+int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+   Return 1 if poly1 is equal to poly2, otherwise return 0.
 

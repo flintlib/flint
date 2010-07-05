@@ -42,13 +42,31 @@ typedef struct
 
 typedef fmpq_poly_struct fmpq_poly_t[1];
 
-#define _fmpq_poly_den_is_one(poly)  (*(poly)->den == 1L)
-
 void fmpq_poly_init(fmpq_poly_t poly);
+
+void fmpq_poly_init2(fmpq_poly_t poly);
+
+void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc);
 
 void fmpq_poly_clear(fmpq_poly_t poly);
 
-void fmpq_poly_canonicalize(fmpq_poly_t poly);
+void fmpq_poly_fit_length(fmpq_poly_t poly, ulong length);
+
+void _fmpq_poly_normalise(fmpq_poly_t poly);
+
+void fmpq_poly_canonicalise(fmpq_poly_t poly);
+
+void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length);
+
+void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+static inline 
+int fmpq_poly_is_zero(const fmpq_poly_t poly)
+{
+    return poly->length == 0;
+}
 
 #endif
 
