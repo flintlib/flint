@@ -44,7 +44,7 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
    fmpz c1 = *g;
 	fmpz c2 = *h;
-   fmpz temp;
+   fmpz temp = 0;
 
    if (fmpz_is_zero(g))
    {
