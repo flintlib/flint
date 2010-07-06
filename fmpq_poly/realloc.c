@@ -32,27 +32,24 @@
 
 void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
 {
-    ulong i;
-    
     if (!alloc)  /* alloc == 0.  Clear up, reinitialise */
     {
         fmpq_poly_clear(poly);
         fmpq_poly_init(poly);
         return;
     }  
-    
     if (poly->alloc)  /* Realloc */
     {
         if (poly->length > alloc)  /* Reduce the size */
         {
+            ulong i;
             for (i = alloc; i < poly->length; i++)
                 _fmpz_demote(poly->coeffs + i);
             poly->length = alloc;
             _fmpq_poly_normalise(poly);
         }
-        
         poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
-        if (poly->length < alloc)
+        if (poly->alloc < alloc)
         {
             mpn_zero(poly->coeffs + poly->alloc, alloc - poly->alloc);
         }
