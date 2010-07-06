@@ -66,10 +66,14 @@ void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2)
 
     Make a copy of {vec2, len2} into vec1.
 
-int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong length)
+int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, const ulong len)
 
-    Compares two vectors of the given length and returns 1 if they are equal
+    Compares two vectors of the given length and returns 1 if they are equal, 
     otherwise returns 0.
+
+int _fmpz_vec_is_zero(const fmpz * vec1, const ulong len)
+
+    Returns 1 if the vector vec of length len is zero, and 0 otherwise.
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2)
 
@@ -85,41 +89,10 @@ void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1,
 
     Set {vec1, len2} to {vec2, len2}*x where x is an fmpz.
 
-void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
-                                      const fmpz * vec2, ulong len2, long c)
-
-    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*c where c is a signed long.
-
-void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, 
-                             const fmpz * poly2, ulong len2, const fmpz_t x)
-
-    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*x where c is an fmpz.
-
-void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
-				                  const fmpz * vec2, ulong len2)
-
-    Set {res, len2} = {vec1, len2} + {vec2, len2}.
-
-void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
-				                  const fmpz * vec2, ulong len2)
-
-    Set {res, len2} = {vec1, len2} - {vec2, len2}.
-
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
                                    const fmpz * vec2, ulong len2, ulong exp)
 
     Set {vec1, len2} = {vec2, len2}*2^exp.
-
-void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
-                           const fmpz * vec2, ulong len2, long c, ulong exp)
-
-    Set {res, len2} = {vec1, len2} += c*2^exp*{vec2, len2} where c is a signed
-    long.
-
-void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
-
-    Sets res to the non-negative content of the entries in vec.  The content 
-    of a length zero vector is defined to be zero.
 
 void _fmpz_vec_scalar_divexact(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
 
@@ -135,4 +108,51 @@ void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, ulong len2, co
 
     Sets {vec1, len2} = {vec2, len2} / 2^exp, rounding down towards minus 
     infinity whenever the division is not exact.
+
+void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
+                                      const fmpz * vec2, ulong len2, long c)
+
+    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*c where c is a signed long.
+
+void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, 
+                             const fmpz * poly2, ulong len2, const fmpz_t x)
+
+    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*x where c is an fmpz.
+
+void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
+                           const fmpz * vec2, ulong len2, long c, ulong exp)
+
+    Set {res, len2} = {vec1, len2} += c*2^exp*{vec2, len2} where c is a signed
+    long.
+
+void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
+                                      const fmpz * vec2, ulong len2, long c)
+
+    Set {vec1, len2} to {vec1, len2} - {vec2, len2}*c where c is a signed long.
+
+void _fmpz_vec_scalar_submul_fmpz(fmpz * poly1, 
+                             const fmpz * poly2, ulong len2, const fmpz_t c)
+
+    Set {vec1, len2} to {vec1, len2} - {vec2, len2}*c where c is an fmpz.
+
+void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, 
+                           const fmpz * vec2, ulong len2, long c, ulong exp)
+
+    Set {res, len2} = {vec1, len2} -= c*2^exp*{vec2, len2} where c is a signed
+    long.
+
+void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
+				                  const fmpz * vec2, ulong len2)
+
+    Set {res, len2} = {vec1, len2} + {vec2, len2}.
+
+void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
+				                  const fmpz * vec2, ulong len2)
+
+    Set {res, len2} = {vec1, len2} - {vec2, len2}.
+
+void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
+
+    Sets res to the non-negative content of the entries in vec.  The content 
+    of a length zero vector is defined to be zero.
 

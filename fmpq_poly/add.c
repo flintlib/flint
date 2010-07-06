@@ -74,8 +74,7 @@ void _fmpq_poly_add_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen,
                 _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, rlen, _den);
                 _fmpz_vec_scalar_addmul_fmpz(rpoly, poly, len, _rden);
                 
-                for (i = 0; (i < rlen) && (*(rpoly + i) == 0); i++);
-                if (i == rlen)  /* rpoly is zero */
+                if (_fmpz_vec_is_zero(rpoly, rlen))
                     fmpz_set_si(rden, 1);
                 else
                 {
@@ -172,8 +171,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
                 _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly1 + min, len1 - min, den22);
                 _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, len2 - min, den11);
                 
-                for (i = 0; (i < max) && (*(rpoly + i) == 0); i++);
-                if (i == max)  /* rpoly is zero */
+                if (_fmpz_vec_is_zero(rpoly, max))
                     fmpz_set_si(rden, 1);
                 else
                 {
