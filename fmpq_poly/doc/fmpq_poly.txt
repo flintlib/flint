@@ -252,6 +252,41 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
 
     Returns 1 if poly is the zero polynomial, otherwise returns 0.
 
+*******************************************************************************
+
+    Arithmetic operations
+
+*******************************************************************************
+
+void _fmpq_poly_add_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen, 
+                          const fmpz * poly, const fmpz_t den, const ulong len)
+
+    Forms {rpoly, rden} = {den rpoly + rden poly, den rden}, placing the 
+    result into canonical form, that is, the denominator is a positive 
+    denominator, which is co-prime to the content of the numerator vector.
+    
+    Assumes that rpoly is initialised as a sufficiently wide vector.  The 
+    input operands are assumed to be in canonical form and are also allowed to 
+    be of length 0.
+    
+    No overlap is allowed between {rpoly, rden} and {poly, den}.
+
+void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
+                       const fmpz * poly1, const fmpz_t den1, const ulong len1,
+                       const fmpz * poly2, const fmpz_t den2, const ulong len2)
+
+    Forms {rpoly, rden} = {den2 poly1 + den1 poly2, den1 den2}, placing the 
+    result into canonical form, that is, the denominator is a positive 
+    denominator, which is co-prime to the content of the numerator vector.
+    
+    Assumes that rpoly is initialised as a sufficiently wide vector.  The 
+    input operands are assumed to be in canonical form and are also allowed to 
+    be of length 0.
+    
+    No overlap is allowed between {rpoly, rden} and either of {poly1, den1} 
+    and {poly2, den2}.  However, there may be overlap between {poly1, den1} 
+    and {poly2, den}.
+
 ********************************************************************************
 
     String conversions
