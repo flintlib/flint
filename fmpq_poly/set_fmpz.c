@@ -35,9 +35,8 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
     
     fmpq_poly_fit_length(poly, 1);
     fmpz_set(poly->coeffs, x);
-    for (i = 1; i < poly->length; i++)
-        _fmpz_demote(poly->coeffs + i);
-    _fmpq_poly_normalise(poly);
     fmpz_set_si(poly->den, 1);
+    _fmpq_poly_set_length(poly, 1);
+    _fmpq_poly_normalise(poly);
 }
 

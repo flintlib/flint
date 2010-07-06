@@ -32,8 +32,6 @@
 
 void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    ulong i;
-    
     if (poly2->length != 1)
     {
         printf("ERROR (fmpq_poly_inv).  poly2 is not invertible.\n");
@@ -52,8 +50,6 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
     else
     {
         fmpq_poly_fit_length(poly1, 1);
-        for (i = 1; i < poly1->length; i++)
-            _fmpz_demote(poly1->coeffs + i);
         if (fmpz_sgn(poly2->coeffs) > 0)
         {
             fmpz_set(poly1->coeffs, poly2->den);
@@ -64,6 +60,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
             fmpz_neg(poly1->coeffs, poly2->den);
             fmpz_neg(poly1->den, poly2->coeffs);
         }
+        _fmpq_poly_set_length(poly1, 1);
         _fmpq_poly_normalise(poly1);
     }
 }
