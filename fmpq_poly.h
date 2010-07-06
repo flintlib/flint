@@ -48,17 +48,33 @@ void fmpq_poly_init2(fmpq_poly_t poly);
 
 void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc);
 
-void fmpq_poly_clear(fmpq_poly_t poly);
-
 void fmpq_poly_fit_length(fmpq_poly_t poly, ulong length);
 
 void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length);
+
+void fmpq_poly_clear(fmpq_poly_t poly);
 
 void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void fmpq_poly_set_si(fmpq_poly_t poly, const long x);
+
+void fmpq_poly_set_ui(fmpq_poly_t poly, const ulong x);
+
+void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
+
+void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
+
+void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
+
+void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2);
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
