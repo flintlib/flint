@@ -98,6 +98,26 @@ ulong fmpq_poly_length(fmpq_poly_t poly)
 
 *******************************************************************************
 
+    Accessing the numerator and denominator
+
+********************************************************************************
+
+fmpz * fmpq_poly_numref(fmpq_poly_t poly)
+
+    Returns a reference to the numerator polynomial as a vector.  Note that 
+    this might be NULL.
+    
+    This is implemented as a macro returning (poly)->coeffs.
+
+fmpz_t fmpq_poly_denref(fmpq_poly_t poly)
+    
+    Returns a reference to the denominator as a fmpz_t.  The integer is 
+    guaranteed to be properly initialised.
+    
+    This is implemented as a macro returning (poly)->den.
+
+*******************************************************************************
+
     Assignment, swap, negation
 
 ********************************************************************************

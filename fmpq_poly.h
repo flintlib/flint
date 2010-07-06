@@ -70,6 +70,13 @@ ulong fmpq_poly_length(fmpq_poly_t poly)
     return poly->length;
 }
 
+#define fmpq_poly_numref(poly)  ((poly)->coeffs)
+
+#define fmpq_poly_denref(poly)  ((poly)->den)
+
+static inline 
+void fmpq_poly_get_num(
+
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_set_si(fmpq_poly_t poly, const long x);
