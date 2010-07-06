@@ -103,6 +103,7 @@ void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, const ulong n, const mpz_t x);
 void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, const ulong n, const mpq_t x);
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 
 static inline 
 int fmpq_poly_is_zero(const fmpq_poly_t poly)

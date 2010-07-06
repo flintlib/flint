@@ -197,7 +197,16 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, const ulong n, const mpq_t x)
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-   Return 1 if poly1 is equal to poly2, otherwise return 0.
+    Return 1 if poly1 is equal to poly2, otherwise return 0.
+
+int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
+
+    Compares the two polynomials left and right.
+    
+    Compares the two polynomials left and right, returning -1, 0, or 1 as left 
+    is less than, equal to, or greater than right.  The comparison is first 
+    done by the degree, and then, in case of a tie, by the individual 
+    coefficients from highest to lowest.
 
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 
