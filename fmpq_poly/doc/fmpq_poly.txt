@@ -133,6 +133,10 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
    Return 1 if poly1 is equal to poly2, otherwise return 0.
 
+int fmpq_poly_is_one(const fmpq_poly_t poly)
+
+    Returns 1 if poly is the constant polynomial 1, otherwise returns 0.
+
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 
     Returns 1 if poly is the zero polynomial, otherwise returns 0.

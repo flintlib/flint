@@ -84,5 +84,11 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
     return poly->length == 0;
 }
 
+static inline 
+int fmpq_poly_is_one(const fmpq_poly_t poly)
+{
+    return (poly->length == 1) && (fmpz_equal(poly->coeffs, poly->den));
+}
+
 #endif
 
