@@ -24,6 +24,9 @@
    
 ******************************************************************************/
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -152,7 +155,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
         if (mpz_sgn(z) != 0) len += 1 + denlen;  /* Denominator and /       */
         len += 3;                                /* Operator and whitespace */
         len += 1 + varlen + 1;                   /* *, x and ^              */
-        len += fmpq_poly_places(i);              /* Exponent                */
+        len += _fmpq_poly_decimal_digits(i);     /* Exponent                */
     }
     
     mpq_init(q);

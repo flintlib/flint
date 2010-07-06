@@ -38,7 +38,7 @@ void fmpq_poly_randtest(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in)
     
     for (i = 0; i < length; i++)
         fmpz_randtest(f->coeffs + i, bits_in);
-    fmpz_randtest_not_zero(f->den, bits_in);
+    fmpz_randtest_not_zero(f->den, FLINT_MAX(bits_in, 1));
     
     _fmpq_poly_set_length(f, length);
     fmpq_poly_canonicalise(f);
@@ -51,7 +51,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_i
 
    for (i = 0; i < length; i++)
       fmpz_randtest_unsigned(f->coeffs + i, bits_in);
-    fmpz_randtest_not_zero(f->den, bits_in);
+    fmpz_randtest_not_zero(f->den, FLINT_MAX(bits_in, 1));
    
    _fmpq_poly_set_length(f, length);
    fmpq_poly_canonicalise(f);
