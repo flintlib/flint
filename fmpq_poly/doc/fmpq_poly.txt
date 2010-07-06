@@ -252,3 +252,22 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
 
     Returns 1 if poly is the zero polynomial, otherwise returns 0.
 
+********************************************************************************
+
+    String conversions
+
+********************************************************************************
+
+ulong _fmpq_poly_decimal_digits(ulong n)
+
+    Ad-hoc auxiliary method, computes the number of decimal digits in n.
+
+char * fmpq_poly_to_string(const fmpq_poly_t poly)
+
+    Returns the string representation of poly.
+
+char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
+
+    Returns the pretty representation of poly using the null-terminated 
+    string var not equal to "\0" as the variable name.
+

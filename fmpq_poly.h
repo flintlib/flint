@@ -124,5 +124,11 @@ int fmpq_poly_is_one(const fmpq_poly_t poly)
     return (poly->length == 1) && (fmpz_equal(poly->coeffs, poly->den));
 }
 
+ulong _fmpq_poly_decimal_digits(ulong n);
+
+char * fmpq_poly_to_string(const fmpq_poly_t poly);
+
+char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var);
+
 #endif
 
