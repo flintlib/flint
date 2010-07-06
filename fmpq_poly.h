@@ -58,6 +58,18 @@ void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
+static inline 
+long fmpq_poly_degree(fmpq_poly_t poly)
+{
+    return (long) poly->length - 1;
+}
+
+static inline 
+ulong fmpq_poly_length(fmpq_poly_t poly)
+{
+    return poly->length;
+}
+
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_set_si(fmpq_poly_t poly, const long x);

@@ -82,6 +82,22 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
 *******************************************************************************
 
+    Polynomial parameters
+
+********************************************************************************
+
+long fmpq_poly_degree(fmpq_poly_t poly)
+
+    Returns the degree of poly, which is one less than its length, as a long. 
+    Only gives the right answer for polynomials such that the length, which is 
+    an unsigned long, fits into a long.
+
+ulong fmpq_poly_length(fmpq_poly_t poly)
+
+    Returns the length of poly.
+
+*******************************************************************************
+
     Assignment, swap, negation
 
 ********************************************************************************
