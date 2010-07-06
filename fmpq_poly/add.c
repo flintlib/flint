@@ -195,6 +195,36 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     }
 }
 
+void fmpq_poly_add_naive(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+{
+    ulong i, max, min;
+    fmpz_t x, y;
+    
+    max = FLINT_MAX(poly1->length, poly2->length);
+    min = FLINT_MIN(poly1->length, poly2->length);
+    
+    fmpq_poly_fit_length(res, max);
+    
+    fmpz_init(x);
+    fmpz_init(y);
+    for (i = 0; i < min; i++)
+    {
+        fmpz_mul(x, poly2->den, poly1->coeffs + i);
+        fmpz_mul(y, poly1->den, poly2->coeffs + i);
+        fmpz_add(res->coeffs + i, x, y);
+    }
+    for (i = min; i < poly1->length; i++)
+        fmpz_mul(res->coeffs + i, poly2->den, poly1->coeffs + i);
+    for (i = min; i < poly2->length; i++)
+        fmpz_mul(res->coeffs + i, poly1->den, poly2->coeffs + i);
+    fmpz_mul(res->den, poly1->den, poly2->den);
+    fmpz_clear(x);
+    fmpz_clear(y);
+    
+    _fmpq_poly_set_length(res, max);
+    fmpq_poly_canonicalise(res);
+}
+
 void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     ulong max = FLINT_MAX(poly1->length, poly2->length);

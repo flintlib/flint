@@ -287,6 +287,14 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     and {poly2, den2}.  However, there may be overlap between {poly1, den1} 
     and {poly2, den}.
 
+void fmpq_poly_add_naive(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+
+    Sets res to the sum of poly1 and poly2, using the naive algorithm.
+
+void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
+
+    Sets res to the sum of poly1 and poly2, using Henrici's algorithm.
+
 ********************************************************************************
 
     String conversions
