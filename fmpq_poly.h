@@ -74,6 +74,13 @@ ulong fmpq_poly_length(fmpq_poly_t poly)
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
+void fmpq_poly_randinit(void);
+void fmpq_poly_randclear(void);
+
+void fmpq_poly_randtest(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in);
+
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_set_si(fmpq_poly_t poly, const long x);
