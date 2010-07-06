@@ -268,6 +268,15 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
 
 char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
 
-    Returns the pretty representation of poly using the null-terminated 
+    Returns the pretty representation of poly, using the null-terminated 
     string var not equal to "\0" as the variable name.
+
+void fmpq_poly_print(const fmpq_poly_t poly)
+
+    Prints the string representation of poly to stdout.
+
+void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+
+    Prints the pretty representation of poly to stdout, using the 
+    null-terminated string var not equal to "\0" as the variable name.
 

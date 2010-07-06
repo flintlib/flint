@@ -130,5 +130,9 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly);
 
 char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var);
 
+void fmpq_poly_print(const fmpq_poly_t poly);
+
+void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+
 #endif
 
