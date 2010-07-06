@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     Copyright (C) 2010 William Hart
 
@@ -18,106 +18,121 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 
 fmpz * _fmpz_vec_init(ulong length)
 
-   Return an initialised vector of fmpz's of given length.
+    Return an initialised vector of fmpz's of given length.
 
 void _fmpz_vec_clear(fmpz * in1, ulong length)
  
-   Clear the entries of {vec1, len1} and free space allocated for
-   vec1.
+    Clear the entries of {vec1, len1} and free space allocated for
+    vec1.
 
 void _fmpz_vec_randinit(void)
 
-   Initialise the random state for fmpz_vec random functions.
+    Initialise the random state for fmpz_vec random functions.
 
 void _fmpz_vec_randclear(void)
 
-   Clear the random state for fmpz_vec random functions.
+    Clear the random state for fmpz_vec random functions.
 
 void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in)
 
-   Set the entries of a vector of the given length to random integers with 
-   upto the given maximum number of bits per entry.
+    Set the entries of a vector of the given length to random integers with 
+    upto the given maximum number of bits per entry.
 
 long _fmpz_vec_max_bits(const fmpz * vec, ulong length)
 
-   If b is the maximum number of bits of the absolute value of any coefficient of
-   vec, then if any coefficient of vec is negative, -b is return, else b is
-   returned.
+    If b is the maximum number of bits of the absolute value of any coefficient of
+    vec, then if any coefficient of vec is negative, -b is return, else b is
+    returned.
 
 ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length)
  
-   Return the maximum number of limbs needed to store any entry in { vec, length }.
+    Return the maximum number of limbs needed to store any entry in { vec, length }.
 
 void _fmpz_vec_print(fmpz * vec, ulong length)
 
-   Print the vector of given length to stdout. The format is the length
-   followed by two spaces, then a space separated list of coefficients. If
-   the length is zero, only 0 is printed.
+    Print the vector of given length to stdout. The format is the length
+    followed by two spaces, then a space separated list of coefficients. If
+    the length is zero, only 0 is printed.
 
 void _fmpz_vec_zero(fmpz * vec1, ulong len1)
 
-   Zero the entries of {vec1, len1}.
+    Zero the entries of {vec1, len1}.
 
 void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2)
 
-   Make a copy of {vec2, len2} into vec1.
+    Make a copy of {vec2, len2} into vec1.
 
 int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong length)
 
-   Compares two vectors of the given length and returns 1 if they are equal
-   otherwise returns 0.
+    Compares two vectors of the given length and returns 1 if they are equal
+    otherwise returns 0.
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2)
 
-   Negate {vec2, len2} and place into vec1.
+    Negate {vec2, len2} and place into vec1.
 
 void _fmpz_vec_scalar_mul_si(fmpz * vec1,
                                       const fmpz * vec2, ulong len2, long c)
 
-   Set {vec1, len2} to {vec2, len2}*c where c is a signed long.
+    Set {vec1, len2} to {vec2, len2}*c where c is a signed long.
 
 void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
                               const fmpz * vec2, ulong len2, const fmpz_t x)
 
-   Set {vec1, len2} to {vec2, len2}*x where x is an fmpz.
+    Set {vec1, len2} to {vec2, len2}*x where x is an fmpz.
 
 void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
                                       const fmpz * vec2, ulong len2, long c)
 
-   Set {vec1, len2} to {vec1, len2} + {vec2, len2}*c where c is a signed long.
+    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*c where c is a signed long.
 
 void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, 
                              const fmpz * poly2, ulong len2, const fmpz_t x)
 
-   Set {vec1, len2} to {vec1, len2} + {vec2, len2}*x where c is an fmpz.
+    Set {vec1, len2} to {vec1, len2} + {vec2, len2}*x where c is an fmpz.
 
 void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
 				                  const fmpz * vec2, ulong len2)
 
-   Set {res, len2} = {vec1, len2} + {vec2, len2}.
+    Set {res, len2} = {vec1, len2} + {vec2, len2}.
 
 void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
 				                  const fmpz * vec2, ulong len2)
 
-   Set {res, len2} = {vec1, len2} - {vec2, len2}.
+    Set {res, len2} = {vec1, len2} - {vec2, len2}.
 
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
                                    const fmpz * vec2, ulong len2, ulong exp)
 
-Set {vec1, len2} = {vec2, len2}*2^exp.
+    Set {vec1, len2} = {vec2, len2}*2^exp.
 
 void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
                            const fmpz * vec2, ulong len2, long c, ulong exp)
 
-   Set {res, len2} = {vec1, len2} += c*2^exp*{vec2, len2} where c is a signed
-   long.
+    Set {res, len2} = {vec1, len2} += c*2^exp*{vec2, len2} where c is a signed
+    long.
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
 
     Sets res to the non-negative content of the entries in vec.  The content 
     of a length zero vector is defined to be zero.
+
+void _fmpz_vec_scalar_divexact(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
+
+    Sets {vec1, len2} = {vec2, len2} / x, where the divison is assumed to be 
+    exact for every entry in vec2.
+
+void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
+
+    Sets {vec1, len2} = {vec2, len2} / x, rounding down towards minus infinity 
+    whenever the division is not exact.
+
+void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, ulong len2, const ulong exp)
+
+    Sets {vec1, len2} = {vec2, len2} / 2^exp, rounding down towards minus 
+    infinity whenever the division is not exact.
 

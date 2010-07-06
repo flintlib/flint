@@ -52,11 +52,11 @@ void fmpq_poly_clear(fmpq_poly_t poly);
 
 void fmpq_poly_fit_length(fmpq_poly_t poly, ulong length);
 
+void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length);
+
 void _fmpq_poly_normalise(fmpq_poly_t poly);
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
-
-void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length);
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
