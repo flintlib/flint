@@ -62,7 +62,7 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
             fmpz_gcd(temp, temp, poly->den);
             if (*temp != 1L)
             {
-                _fmpz_vec_scalar_divexact(poly->coeffs, poly_coeffs, length, temp);
+                _fmpz_vec_scalar_divexact(poly->coeffs, poly->coeffs, length, temp);
                 fmpz_divexact(poly->den, poly->den, temp);
             }
         }

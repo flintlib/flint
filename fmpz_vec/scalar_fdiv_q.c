@@ -32,7 +32,7 @@
 void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
 {
     ulong i;
-    for (i = 0; i < len; i++)
+    for (i = 0; i < len2; i++)
     {
         fmpz_fdiv_q(vec1 + i, vec2 + i, x);
     }
