@@ -23,43 +23,72 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
+// Assumes that rpoly and poly are either equal or disjoint blocks of memory.  
+// rden and den may be aliased, but none of them may be in rpoly.
+// Assumes that c is non-zero.  (The case c == 0 is not handled separately in 
+// this method.
+void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, 
+                              const fmpz * poly, const fmpz_t den, ulong len, 
+                              long c)
 {
     if (c == 1L)
-        fmpq_poly_set(rop, op);
+    {
+        if (rpoly != poly)
+            _fmpz_vec_copy(rpoly, poly, len);
+        fmpz_set(rden, den);
+    }
     else if (c == -1L)
-        fmpq_poly_neg(rop, op);
+    {
+        _fmpz_vec_neg(rpoly, poly, len);
+        fmpz_set(rden, den);
+    }
     else
     {
         fmpz_t d, fc;
-        fmpq_poly_fit_length(rop, op->length);
         fmpz_init(d);
         fmpz_init(fc);
-        _fmpz_poly_vec_content(d, op->coeffs, op->length);
+        _fmpz_vec_content(d, poly, len);
         fmpz_set_si(fc, c);
         fmpz_gcd(d, d, fc);
-        if (*d == 1)
+        if (*d == 1L)
         {
-            if (rop != op)
-                _fmpz_vec_copy(rop->coeffs, op->coeffs, op->length);
-            fmpz_mul(rop->den, op->den, fc);
+            if (rpoly != poly)
+                _fmpz_vec_copy(rpoly, poly, len);
+            fmpz_mul(rden, den, fc);
         }
         else
         {
-            _fmpz_vec_divexact(rop->coeffs, op->coeffs, op->length, d);
+            _fmpz_vec_scalar_divexact(rpoly, poly, len, d);
             fmpz_divexact(d, fc, d);
-            fmpz_mul(rop->den, op->den, d);
+            fmpz_mul(rden, den, d);
         }
         fmpz_clear(d);
         fmpz_clear(fc);
+    }
+}
+
+void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
+{
+    if (c == 0L)
+    {
+        printf("ERROR (fmpq_poly_scalar_div_si).  Division by 0.\n");
+        abort();
+    }
+    
+    if (rop == op)
+        _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, op->coeffs, op->den, op->length, c);
+    else
+    {
+        fmpq_poly_fit_length(rop, op->length);
+        _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, op->coeffs, op->den, op->length, c);
         _fmpq_poly_set_length(rop, op->length);
-        _fmpq_poly_normalise(rop);
     }
 }
 

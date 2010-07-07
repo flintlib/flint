@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -37,7 +38,7 @@ void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t
         abort();
     }
     
-    if (mpz_cmpabs_si(mpq_numref(c), 1) == 0)
+    if (mpz_cmpabs_ui(mpq_numref(c), 1UL) == 0)
     {
         fmpq_poly_scalar_mul_mpz(rop, op, mpq_denref(c));
         if (mpz_cmp_si(mpq_numref(c), -1) == 0)
