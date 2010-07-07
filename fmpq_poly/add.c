@@ -235,22 +235,17 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         // TODO: Implement this
         return;
     }
-    if (res == poly1)  /* In-place operations */
-    {
+    
+    if (res == poly1)
         _fmpq_poly_add_in_place(res->coeffs, res->den, res->length, 
                                 poly2->coeffs, poly2->den, poly2->length);
-        return;
-    }
-    if (res == poly2)
-    {
+    else if (res == poly2)
         _fmpq_poly_add_in_place(res->coeffs, res->den, res->length, 
                                 poly1->coeffs, poly1->den, poly1->length);
-        return;
-    }
-	
-    _fmpq_poly_add(res->coeffs, res->den, 
-                   poly1->coeffs, poly1->den, poly1->length, 
-                   poly2->coeffs, poly2->den, poly2->length);
+	else
+        _fmpq_poly_add(res->coeffs, res->den, 
+                       poly1->coeffs, poly1->den, poly1->length, 
+                       poly2->coeffs, poly2->den, poly2->length);
     
     _fmpq_poly_set_length(res, max);
     _fmpq_poly_normalise(res);
