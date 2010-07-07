@@ -46,8 +46,6 @@ void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
     poly1->coeffs = poly2->coeffs;
     poly2->coeffs = tptr;
     
-    tptr          = poly1->den;
-    poly1->den    = poly2->den;
-    poly2->den    = tptr;
+    fmpz_swap(poly1->den, poly2->den);
 }
 
