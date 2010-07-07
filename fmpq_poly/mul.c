@@ -85,7 +85,7 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         return;
     } */
     
-    if (res == poly1 | res == poly2)
+    if (res == poly2 | res == poly1)
     {
         fmpq_poly_t copy;
         fmpq_poly_init(copy);

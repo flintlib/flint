@@ -93,13 +93,7 @@ void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
-static inline 
-void fmpq_poly_zero(fmpq_poly_t poly)
-{
-    mpn_zero(poly->coeffs, poly->length);
-    fmpz_set_si(poly->den, 1);
-    poly->length = 0;
-}
+void fmpq_poly_zero(fmpq_poly_t poly);
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 

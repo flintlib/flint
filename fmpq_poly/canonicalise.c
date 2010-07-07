@@ -37,9 +37,8 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
     ulong length;
     fmpz_t temp;
     
+    _fmpq_poly_normalise(poly);
     length = poly->length;
-    while (length && !poly->coeffs[length - 1]) length--;
-    poly->length = length;
     
     if (*poly->den == 1L)
         return;
