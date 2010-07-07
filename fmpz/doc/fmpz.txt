@@ -283,6 +283,12 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
    Set f to the quotient of g by h, rounding down towards
    minus infinity. If h is 0 an exception is raised.
 
+void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
+
+   Set f to the quotient of g by h, rounding down towards
+   minus infinity and s to the remainder. If h is 0 an exception 
+   is raised.
+
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, const ulong exp)
 
    Set f to be g divided by 2^exp, but rounded down.
