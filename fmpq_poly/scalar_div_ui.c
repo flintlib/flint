@@ -29,12 +29,35 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
+void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
-    fmpz_t fc;
-    fmpz_init(fc);
-    fmpz_set_mpz(fc, c);
-    fmpq_poly_scalar_mul_fmpz(rop, op, fc);
-    fmpz_clear(fc);
+    if (c == 1UL)
+        fmpq_poly_set(rop, op);
+    else
+    {
+        fmpz_t d, fc;
+        fmpq_poly_fit_length(rop, op->length);
+        fmpz_init(d);
+        fmpz_init(fc);
+        _fmpz_poly_vec_content(d, op->coeffs, op->length);
+        fmpz_set_ui(fc, c);
+        fmpz_gcd(d, d, fc);
+        if (*d == 1)
+        {
+            if (rop != op)
+                _fmpz_vec_copy(rop->coeffs, op->coeffs, op->length);
+            fmpz_mul(rop->den, op->den, fc);
+        }
+        else
+        {
+            _fmpz_vec_divexact(rop->coeffs, op->coeffs, op->length, d);
+            fmpz_divexact(d, fc, d);
+            fmpz_mul(rop->den, op->den, d);
+        }
+        fmpz_clear(d);
+        fmpz_clear(fc);
+        _fmpq_poly_set_length(rop, op->length);
+        _fmpq_poly_normalise(rop);
+    }
 }
 
