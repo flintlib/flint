@@ -445,7 +445,7 @@ void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
    of R beyond B->length - 1 is reduced mod the leading coefficient of B. We assume
    that A->length = 2*B->length - 1. If the leading coefficient of B is +/-1 or the 
    division is exact, this is the same thing as division over Q. No aliasing of input 
-   and output operands is allowed. An exception is raised if B->length == 0.
+   and output operands is allowed. An exception is raised if B_len == 0.
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
 			     const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
@@ -454,7 +454,7 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
    is reduced mod the leading coefficient of B. If the leading coefficient of B is
    +/-1 or the division is exact, this is the same thing as division over Q. No 
    aliasing of input and output operands is allowed. An exception is raised if
-   B->length == 0.
+   B_len == 0.
 
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
 						const fmpz_poly_t A, const fmpz_poly_t B)
@@ -464,4 +464,16 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
    +/-1 or the division is exact, this is the same thing as division over Q. An 
    exception is raised if B->length == 0.
 
+void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
+			     const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
 
+   If L is the leading coefficient of B, then compute Q, R such that L^d*A = QB + R.
+   This function is used for simulating division over QQ. An exception is raised if 
+   B_len == 0. No aliasing of inputs and outputs is allowed.
+
+
+void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
+			          ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
+
+   If L is the leading coefficient of B, then compute Q, R such that L^d*A = QB + R.
+   This function is used for simulating division over QQ. 
