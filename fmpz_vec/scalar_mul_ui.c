@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
-   
+    Copyright (C) 2010 William Hart
+
 ******************************************************************************/
 
 #include <mpir.h>
@@ -28,10 +28,11 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_is_zero(const fmpz * vec, ulong len)
+void _fmpz_vec_scalar_mul_ui(fmpz * vec1, const fmpz * vec2, ulong len2, ulong c)
 {
     ulong i;
-    for (i = 0; (i < len) && (*(vec + i) == 0); i++);
-    return (i == len);
+    
+    for (i = 0; i < len2; i++)
+        fmpz_mul_ui(vec1 + i, vec2 + i, c);
 }
 
