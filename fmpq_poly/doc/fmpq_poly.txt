@@ -319,6 +319,19 @@ void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t
 
 void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
 
+void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, ulong len1, 
+                    const fmpz * poly2, const fmpz_t den2, ulong len2)
+
+    Sets {rpoly, rden} to the product of {poly1, den1} and {poly2, den2}.
+    Assumes that len1 and len2 are positive and that there is no overlap 
+    between {rpoly, rden} and any of the input arguments.  Also assumes that 
+    rpoly has space for len1 + len2 - 1 entries.
+
+void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+    Sets res to the product of poly1 and poly2.
+
 ********************************************************************************
 
     String conversions

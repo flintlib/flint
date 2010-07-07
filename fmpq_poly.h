@@ -170,6 +170,12 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
 void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c);
 void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
 
+void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, ulong len1, 
+                    const fmpz * poly2, const fmpz_t den2, ulong len2);
+
+void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
 ulong _fmpq_poly_decimal_digits(ulong n);
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly);
