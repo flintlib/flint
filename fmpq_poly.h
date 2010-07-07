@@ -150,6 +150,12 @@ void fmpq_poly_sub_naive(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_po
 
 void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c);
+void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
+void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c);
+void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c);
+void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
+
 ulong _fmpq_poly_decimal_digits(ulong n);
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly);
