@@ -182,6 +182,10 @@ void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
 
     Set poly to the rational x.
 
+void fmpq_poly_zero(fmpq_poly_t poly)
+
+    Set poly to zero.
+
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Set poly1 to the additive inverse of poly2.
