@@ -34,7 +34,7 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
 {
     fmpq_poly_fit_length(rop, op->length);
     
-    if (*op->den == 1)
+    if (*op->den == 1L)
     {
         _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, c);
         fmpz_set_si(rop->den, 1);
@@ -44,7 +44,7 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
         fmpz_t d;
         fmpz_init(d);
         fmpz_gcd(d, op->den, c);
-        if (*d == 1)
+        if (*d == 1L)
         {
             _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, c);
             fmpz_set(rop->den, op->den);

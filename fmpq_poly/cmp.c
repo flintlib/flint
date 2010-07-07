@@ -43,7 +43,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, co
             i--;
         ans = fmpz_cmp(lpoly + i, rpoly + i);
     }
-    else if (*lden == 1)  /* Here rden exceeds 1 */
+    else if (*lden == 1L)  /* Here rden exceeds 1 */
     {
         fmpz_init(lcoeff);
         fmpz_mul(lcoeff, lpoly + i, rden);
@@ -52,7 +52,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, co
         ans = fmpz_cmp(lcoeff, rpoly + i);
         fmpz_clear(lcoeff);
     }
-    else if (*rden == 1)  /* Here lden exceeds 1 */
+    else if (*rden == 1L)  /* Here lden exceeds 1 */
     {
         fmpz_init(rcoeff);
         fmpz_mul(rcoeff, rpoly + i, lden);

@@ -65,7 +65,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
     }
     
     mpz_init(z);
-    if (*poly->den == 1)
+    if (*poly->den == 1L)
     {
         denlen = 0;
     }
@@ -136,7 +136,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
     
     /* Copy the denominator into an mpz_t */
     mpz_init(z);
-    if (*poly->den == 1)
+    if (*poly->den == 1L)
     {
         denlen = 0;
     }

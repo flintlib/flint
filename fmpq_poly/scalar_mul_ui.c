@@ -33,7 +33,7 @@ void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
     fmpq_poly_fit_length(rop, op->length);
     
-    if (*op->den == 1)
+    if (*op->den == 1L)
     {
         _fmpz_vec_scalar_mul_ui(rop->coeffs, op->coeffs, op->length, c);
         fmpz_set_si(rop->den, 1);
@@ -45,7 +45,7 @@ void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
         fmpz_init(d);
         fmpz_set_ui(fc, c);
         fmpz_gcd(d, op->den, fc);
-        if (*d == 1)
+        if (*d == 1L)
         {
             _fmpz_vec_scalar_mul_ui(rop->coeffs, op->coeffs, op->length, c);
             fmpz_set(rop->den, op->den);

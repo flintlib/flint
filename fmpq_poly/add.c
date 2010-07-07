@@ -35,9 +35,9 @@ void _fmpq_poly_add_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen,
 {
     ulong i;
     
-    if (*rden == 1)
+    if (*rden == 1L)
     {
-        if (*den == 1)
+        if (*den == 1L)
             _fmpz_vec_add(rpoly, rpoly, poly, len);
         else
         {
@@ -48,14 +48,14 @@ void _fmpq_poly_add_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen,
     }
     else
     {
-        if (*den == 1)
+        if (*den == 1L)
             _fmpz_vec_scalar_addmul_fmpz(rpoly, poly, len, rden);
         else
         {
             fmpz_t d;
             fmpz_init(d);
             fmpz_gcd(d, rden, den);
-            if (*d == 1)
+            if (*d == 1L)
             {
                 /* Set rpoly = den rpoly + rden poly, rden = rden den. */
                 _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, rlen, den);
@@ -106,9 +106,9 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     ulong min = FLINT_MIN(len1, len2);
     ulong i;
     
-    if (*den1 == 1)
+    if (*den1 == 1L)
     {
-        if (*den2 == 1)
+        if (*den2 == 1L)
         {
             for (i = 0; i < min; i++)
                 fmpz_add(rpoly + i, poly1 + i, poly2 + i);
@@ -130,7 +130,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     }
     else
     {
-        if (*den2 == 1)
+        if (*den2 == 1L)
         {
             for (i = 0; i < len1; i++)
                 fmpz_set(rpoly + i, poly1 + i);
@@ -144,7 +144,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
             fmpz_t d;
             fmpz_init(d);
             fmpz_gcd(d, den1, den2);
-            if (*d == 1)
+            if (*d == 1L)
             {
                 /* First set rpoly = den2 poly1 + den1 poly2 up to min,      */
                 /* then deal with the remaining entries in either poly1 or   */
