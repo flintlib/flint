@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
@@ -19,13 +19,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 
-********************************************************************************
+*******************************************************************************
 
     Memory management
 
-********************************************************************************
+*******************************************************************************
 
 void fmpq_poly_init(fmpq_poly_t poly)
 
@@ -258,7 +258,7 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
 
 *******************************************************************************
 
-    Arithmetic operations
+    Addition and subtraction
 
 *******************************************************************************
 
@@ -300,6 +300,54 @@ void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
     Sets res to the difference of poly1 and poly2, using Henrici's algorithm.
 
+*******************************************************************************
+
+    Scalar multiplication and division
+
+*******************************************************************************
+
+void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
+                        const fmpz * poly, const fmpz_t den, ulong len, long c)
+
+    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    
+    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
+    is allocated as a sufficiently large array.  Supports exact aliasing 
+    between {rpoly, den} and {poly, den}, however, there may be no partial 
+    overlap between rpoly and poly.
+
+void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
+                       const fmpz * poly, const fmpz_t den, ulong len, ulong c)
+
+    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    
+    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
+    is allocated as a sufficiently large array.  Supports exact aliasing 
+    between {rpoly, den} and {poly, den}, however, there may be no partial 
+    overlap between rpoly and poly.
+
+void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
+                const fmpz * poly, const fmpz_t den, ulong len, const fmpz_t c)
+
+    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    
+    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
+    is allocated as a sufficiently large array.  Supports exact aliasing 
+    between {rpoly, den} and {poly, den}, however, there may be no partial 
+    overlap between rpoly and poly.  The fmpz_t c may not be part of 
+    {rpoly, rden}.
+
+void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+               const fmpz_t den, ulong len, const fmpz_t r, const fmpz_t s)
+
+    Sets {rpoly, rden} = {r, s} * {poly, den}, in lowest terms.
+    
+    Assumes that {poly, den} and {r, s} is provided in lowest terms.  Assumes 
+    that rpoly is allocated as a sufficiently large array.  Supports exact 
+    aliasing between {rpoly, den} and {poly, den}, however, there may be no 
+    partial overlap between rpoly and poly.  The fmpz_t's r and s may not be 
+    part of {rpoly, rden}.
+
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
@@ -319,6 +367,12 @@ void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
 void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c);
 
 void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
 
 void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, ulong len1, 

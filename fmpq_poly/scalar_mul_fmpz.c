@@ -29,39 +29,47 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-// rop and op may be aliased, but c may not be among the coefficients or the denominator of rop
-void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
+void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
+                                const fmpz * poly, const fmpz_t den, ulong len,
+                                const fmpz_t c)
 {
-    fmpq_poly_fit_length(rop, op->length);
-    
-    if (*op->den == 1L)
+    fmpz_t gcd;  /* GCD( den, c ) */
+    fmpz_init(gcd);
+    fmpz_set_ui(gcd, 1UL);
+    if (*c != 1L)
+        fmpz_gcd(gcd, c, den);
+    if (*gcd == 1L)
     {
-        _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, c);
-        fmpz_set_si(rop->den, 1);
+        _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, c);
+        fmpz_set(rden, den);
     }
     else
     {
-        fmpz_t d;
-        fmpz_init(d);
-        fmpz_gcd(d, op->den, c);
-        if (*d == 1L)
-        {
-            _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, c);
-            fmpz_set(rop->den, op->den);
-        }
-        else
-        {
-            fmpz_t c2;
-            fmpz_init(c2);
-            fmpz_divexact(c2, c, d);
-            _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, c2);
-            fmpz_divexact(rop->den, op->den, d);
-            fmpz_clear(c2);
-        }
-        fmpz_clear(d);
+        fmpz_t c2;
+        fmpz_init(c2);
+        fmpz_divexact(c2, c, gcd);
+        _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, c2);
+        fmpz_divexact(rden, den, gcd);
+        fmpz_clear(c2);
+    }
+    fmpz_clear(gcd);
+    
+    if (_fmpz_vec_is_zero(rpoly, len))
+        fmpz_set_ui(rden, 1UL);
+}
+
+void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
+{
+    if (fmpz_zero(c) || fmpq_poly_is_zero(op))
+    {
+        fmpq_poly_zero(rop);
+        return;
     }
     
+    fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
-    _fmpq_poly_normalise(rop);
+    
+    _fmpq_poly_scalar_mul_fmpz(rpoly->coeffs, rop->den, 
+                               op->coeffs, op->den, op->length, c);
 }
 

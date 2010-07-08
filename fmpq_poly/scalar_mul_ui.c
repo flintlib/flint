@@ -29,39 +29,44 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
+void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
+                              const fmpz * poly, const fmpz_t den, ulong len, 
+                              ulong c)
 {
-    fmpq_poly_fit_length(rop, op->length);
-    
-    if (*op->den == 1L)
+    fmpz_t gcd;  /* GCD( den, c ) */
+    fmpz_init(gcd);
+    fmpz_set_ui(gcd, c);
+    fmpz_gcd(gcd, gcd, den);
+    if (*gcd == 1L)
     {
-        _fmpz_vec_scalar_mul_ui(rop->coeffs, op->coeffs, op->length, c);
-        fmpz_set_si(rop->den, 1);
+        _fmpz_vec_scalar_mul_ui(rpoly, poly, len, c);
+        fmpz_set(rden, den);
     }
     else
     {
-        fmpz_t d, fc;
-        fmpz_init(fc);
-        fmpz_init(d);
-        fmpz_set_ui(fc, c);
-        fmpz_gcd(d, op->den, fc);
-        if (*d == 1L)
-        {
-            _fmpz_vec_scalar_mul_ui(rop->coeffs, op->coeffs, op->length, c);
-            fmpz_set(rop->den, op->den);
-        }
-        else
-        {
-            fmpz_divexact(fc, fc, d);
-            _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, op->length, fc);
-            fmpz_divexact(rop->den, op->den, d);
-        }
-        
-        fmpz_clear(fc);
-        fmpz_clear(d);
+        ulong gcd2 = fmpz_get_ui(gcd);
+        ulong c2 = c / gcd2;
+        _fmpz_vec_scalar_mul_ui(rpoly, poly, len, c2);
+        fmpz_fdiv_q_ui(rden, den, gcd2);
+    }
+    fmpz_clear(gcd);
+    
+    if (_fmpz_vec_is_zero(rpoly, len))
+        fmpz_set_ui(rden, 1UL);
+}
+
+void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
+{
+    if (c == 0L || fmpq_poly_is_zero(op))
+    {
+        fmpq_poly_zero(rop);
+        return;
     }
     
+    fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
-    _fmpq_poly_normalise(rop);
+    
+    _fmpq_poly_scalar_mul_ui(rpoly->coeffs, rop->den, 
+                             op->coeffs, op->den, op->length, c);
 }
 
