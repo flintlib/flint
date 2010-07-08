@@ -128,27 +128,15 @@ int fmpq_poly_is_one(const fmpq_poly_t poly)
     return (poly->length == 1) && (fmpz_equal(poly->coeffs, poly->den));
 }
 
-
-
-void _fmpq_poly_add_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen, 
-                          const fmpz * poly, const fmpz_t den, const ulong len);
-
 void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
-                       const fmpz * poly1, const fmpz_t den1, const ulong len1,
-                       const fmpz * poly2, const fmpz_t den2, const ulong len2);
-
-void fmpq_poly_add_naive(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+                       const fmpz * poly1, const fmpz_t den1, ulong len1,
+                       const fmpz * poly2, const fmpz_t den2, ulong len2);
 
 void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
-void _fmpq_poly_sub_in_place(fmpz * rpoly, fmpz_t rden, ulong rlen, 
-                          const fmpz * poly, const fmpz_t den, const ulong len);
-
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
-                       const fmpz * poly1, const fmpz_t den1, const ulong len1,
-                       const fmpz * poly2, const fmpz_t den2, const ulong len2);
-
-void fmpq_poly_sub_naive(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+                    const fmpz * poly1, const fmpz_t den1, ulong len1,
+                    const fmpz * poly2, const fmpz_t den2, ulong len2);
 
 void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
