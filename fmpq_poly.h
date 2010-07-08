@@ -83,9 +83,9 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_i
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
-void fmpq_poly_set_si(fmpq_poly_t poly, const long x);
+void fmpq_poly_set_si(fmpq_poly_t poly, long x);
 
-void fmpq_poly_set_ui(fmpq_poly_t poly, const ulong x);
+void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x);
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 

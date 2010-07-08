@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -31,11 +30,9 @@
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
 {
-    ulong i;
-    
     fmpq_poly_fit_length(poly, 1);
     fmpz_set(poly->coeffs, x);
-    fmpz_set_si(poly->den, 1);
+    fmpz_set_ui(poly->den, 1UL);
     _fmpq_poly_set_length(poly, 1);
     _fmpq_poly_normalise(poly);
 }
