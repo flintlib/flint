@@ -34,7 +34,7 @@ void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t
 {
     if (mpz_sgn(c) == 0)
     {
-        printf("ERROR (fmpq_poly_scalar_div_mpz).  Division by 0.\n");
+        printf("Exception: division by zero in fmpq_poly_scalar_div_mpz\n");
         abort();
     }
     

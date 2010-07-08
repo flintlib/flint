@@ -78,17 +78,20 @@ void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 {
     if (c == 0L)
     {
-        printf("ERROR (fmpq_poly_scalar_div_si).  Division by 0.\n");
+        printf("Exception: division by zero in fmpq_poly_scalar_div_si\n");
         abort();
     }
     
-    if (rop == op)
-        _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, op->coeffs, op->den, op->length, c);
-    else
+    if (fmpq_poly_is_zero(op))
     {
-        fmpq_poly_fit_length(rop, op->length);
-        _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, op->coeffs, op->den, op->length, c);
-        _fmpq_poly_set_length(rop, op->length);
+        fmpq_poly_zero(rop);
+        return;
     }
+    
+    fmpq_poly_fit_length(rop, op->length);
+    _fmpq_poly_set_length(rop, op->length);
+    
+    _fmpq_poly_scalar_div_si(rop->coeffs, rop->den, 
+                             op->coeffs, op->den, op->length, c);
 }
 
