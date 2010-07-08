@@ -40,7 +40,7 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
         fmpz_set_ui(den, 1UL);
         return;
     }
-    if (len == 0)
+    if (len == 0UL)
     {
         fmpz_set_ui(den, 1UL);
         return;
@@ -49,6 +49,8 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
     fmpz_t gcd;
     fmpz_init(gcd);
     _fmpz_vec_content(gcd, poly, len);
+    if (*gcd != 1L)
+        fmpz_gcd(gcd, gcd, den);
     if (fmpz_sgn(den) < 0)
         fmpz_neg(gcd, gcd);
     if (*gcd != 1L)
@@ -56,6 +58,7 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
         _fmpz_vec_scalar_divexact(poly, poly, len, gcd);
         fmpz_divexact(den, den, gcd);
     }
+    fmpz_clear(gcd);
 }
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly)

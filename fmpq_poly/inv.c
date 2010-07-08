@@ -34,7 +34,7 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     if (poly2->length != 1)
     {
-        printf("ERROR (fmpq_poly_inv).  poly2 is not invertible.\n");
+        printf("Exception: poly2 is not invertible in fmpq_poly_inv\n");
         abort();
     }
     
