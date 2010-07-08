@@ -216,6 +216,8 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
+void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
+
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
 int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, 
