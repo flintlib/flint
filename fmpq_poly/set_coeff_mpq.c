@@ -33,50 +33,56 @@
 
 void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, ulong n, const mpq_t x)
 {
-    int canonicalise;
-    fmpz_t s, t;
+    ulong len = poly->length;
+    int replace = (n < len && *(poly->coeffs + n) != 0L);
     
-    /* We only need to canonicalise at the end if we replace a zero          */
-    /* coefficient.                                                          */
-    canonicalise = (n < poly->length) && !(fmpz_is_zero(poly->coeffs + n));
+    if (!replace && mpq_sgn(x) == 0)
+        return;
     
-    /* Ensure there is enough space, and insert zeroes between the           */
-    /* end of poly and the new coefficient if needed                         */
-    fmpq_poly_fit_length(poly, n + 1);
-    if (n + 1 > poly->length)
+    if (n + 1UL > len)
     {
-        mpn_zero(poly->coeffs + poly->length, n - poly->length);
-        poly->length = n + 1;
+        fmpq_poly_fit_length(poly, n + 1UL); 
+        mpn_zero(poly->coeffs + len, n - len);
+        len = n + 1UL;
+        poly->length = len;
     }
     
-    fmpz_init(s);
-    fmpz_init(t);
-    fmpz_set_mpz(s, mpq_denref(x));
-    fmpz_gcd(t, s, poly->den);
-    
-    if (fmpz_equal(s, t))
+    if (replace)
     {
-        fmpz_set_mpz(s, mpq_numref(x));
-        fmpz_divexact(t, poly->den, t);
-        fmpz_mul(s, s, t);
-        fmpz_set(poly->coeffs + n, s);
+        fmpz_t c;
+        fmpz_t t;
+        fmpz_init(c);
+        fmpz_init(t);
+        
+        fmpz_set_mpz(poly->coeffs + n, mpq_numref(x));
+        _fmpz_vec_content(c, poly->coeffs, len);
+        if (*c != 1L)
+            fmpz_gcd(c, c, poly->den);
+        if (*c != 1L)
+        {
+            _fmpz_vec_scalar_divexact(poly->coeffs, poly->coeffs, len, c);
+            fmpz_divexact(poly->den, poly->den, c);
+        }
+        fmpz_set_mpz(t, mpq_denref(x));
+        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, len, t);
+        fmpz_set_mpz(poly->coeffs + n, mpq_numref(x));
+        fmpz_mul(poly->coeffs + n, poly->coeffs + n, poly->den);
+        fmpz_mul(poly->den, t, poly->den);
+        
+        _fmpq_poly_normalise(poly);
+        fmpz_clear(c);
+        fmpz_clear(t);
     }
     else
     {
-        fmpz_divexact(s, s, t);
-        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, poly->length, s);
-        
-        fmpz_divexact(poly->coeffs + n, poly->den, t);
-        fmpz_set_mpz(t, mpq_numref(x));
-        fmpz_mul(poly->coeffs + n, poly->coeffs + n, t);
-        
-        fmpz_mul(poly->den, poly->den, s);
+        fmpz_t t;
+        fmpz_init(t);
+        fmpz_set_mpz(t, mpq_denref(x));
+        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, len, t);
+        fmpz_set_mpz(poly->coeffs + n, mpq_numref(x));
+        fmpz_mul(poly->coeffs + n, poly->coeffs + n, poly->den);
+        fmpz_mul(poly->den, t, poly->den);
+        fmpz_clear(t);
     }
-    
-    if (canonicalise)
-        fmpq_poly_canonicalise(poly);
-    
-    fmpz_clear(s);
-    fmpz_clear(t);
 }
 

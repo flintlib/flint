@@ -32,18 +32,16 @@
 
 void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, ulong n, const mpz_t x)
 {
-    int canonicalise;
+    ulong len = poly->length;
+    int replace = (n < len && *(poly->coeffs + n) != 0L);
     
-    /* We only need to canonicalise at the end if we replace a zero          */
-    /* coefficient.                                                          */
-    canonicalise = (n < poly->length) && !(fmpz_is_zero(poly->coeffs + n));
+    if (!replace && mpz_sgn(x) == 0)
+        return;
     
-    /* Ensure there is enough space, and insert zeroes between the           */
-    /* end of poly and the new coefficient if needed                         */
-    fmpq_poly_fit_length(poly, n + 1);
-    if (n + 1 > poly->length)
+    if (n + 1UL > len)
     {
-        mpn_zero(poly->coeffs + poly->length, n - poly->length);
+        fmpq_poly_fit_length(poly, n + 1UL); 
+        mpn_zero(poly->coeffs + len, n - len);
         poly->length = n + 1;
     }
     
@@ -55,8 +53,8 @@ void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, ulong n, const mpz_t x)
     }
     
     fmpz_set_mpz(poly->coeffs + n, x);
-    fmpz_mul(poly->coeffs + n, poly->coeffs + n, poly->den);
-    if (canonicalise)
+    fmpz_mul_si(poly->coeffs + n, poly->coeffs + n, poly->den);
+    if (replace)
         fmpq_poly_canonicalise(poly);
 }
 

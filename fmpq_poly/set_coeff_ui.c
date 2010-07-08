@@ -30,20 +30,18 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, ulong n, const ulong x)
+void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, ulong n, ulong x)
 {
-    int canonicalise;
+    ulong len = poly->length;
+    int replace = (n < len && *(poly->coeffs + n) != 0L);
     
-    /* We only need to canonicalise at the end if we replace a zero          */
-    /* coefficient.                                                          */
-    canonicalise = (n < poly->length) && !(fmpz_is_zero(poly->coeffs + n));
+    if (!replace & x == 0UL)
+        return;
     
-    /* Ensure there is enough space, and insert zeroes between the           */
-    /* end of poly and the new coefficient if needed                         */
-    fmpq_poly_fit_length(poly, n + 1);
-    if (n + 1 > poly->length)
+    if (n + 1UL > len)
     {
-        mpn_zero(poly->coeffs + poly->length, n - poly->length);
+        fmpq_poly_fit_length(poly, n + 1UL); 
+        mpn_zero(poly->coeffs + len, n - len);
         poly->length = n + 1;
     }
     
@@ -55,7 +53,7 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, ulong n, const ulong x)
     }
     
     fmpz_mul_ui(poly->coeffs + n, poly->den, x);
-    if (canonicalise)
+    if (replace)
         fmpq_poly_canonicalise(poly);
 }
 
