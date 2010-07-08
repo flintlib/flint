@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -30,7 +30,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
+void fmpq_poly_realloc(fmpq_poly_t poly, ulong alloc)
 {
     if (!alloc)  /* alloc == 0.  Clear up, reinitialise */
     {

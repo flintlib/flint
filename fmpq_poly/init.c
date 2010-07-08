@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -34,12 +34,12 @@ void fmpq_poly_init(fmpq_poly_t poly)
 {
     poly->coeffs = NULL;
     fmpz_init(poly->den);
-    fmpz_set_si(poly->den, 1);
+    fmpz_set_ui(poly->den, 1UL);
     poly->alloc  = 0;
     poly->length = 0;
 }
 
-void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc)
+void fmpq_poly_init2(fmpq_poly_t poly, ulong alloc)
 {
     if (alloc)  /* Allocate space for alloc small coeffs */
     {
@@ -52,7 +52,7 @@ void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc)
     }
     
     fmpz_init(poly->den);
-    fmpz_set_si(poly->den, 1);
+    fmpz_set_ui(poly->den, 1UL);
     poly->alloc  = alloc;
     poly->length = 0;
 }

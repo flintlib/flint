@@ -44,9 +44,9 @@ typedef fmpq_poly_struct fmpq_poly_t[1];
 
 void fmpq_poly_init(fmpq_poly_t poly);
 
-void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc);
+void fmpq_poly_init2(fmpq_poly_t poly, ulong alloc);
 
-void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc);
+void fmpq_poly_realloc(fmpq_poly_t poly, ulong alloc);
 
 void fmpq_poly_fit_length(fmpq_poly_t poly, ulong length);
 
