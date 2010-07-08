@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -31,46 +30,31 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
+void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
+{
+    if (*den == 1L)
+        return;
+    if (len == 0)
+    {
+        fmpz_set_ui(den, 1UL);
+        return;
+    }
+    
+    fmpz_t gcd;
+    fmpz_init(gcd);
+    _fmpz_vec_content(gcd, poly, len);
+    if (fmpz_sgn(den) < 0)
+        fmpz_neg(gcd, gcd);
+    if (*gcd != 1L)
+    {
+        _fmpz_vec_scalar_divexact(poly, poly, len, gcd);
+        fmpz_divexact(den, den, gcd);
+    }
+}
+
 void fmpq_poly_canonicalise(fmpq_poly_t poly)
 {
-    ulong i;
-    ulong length;
-    fmpz_t temp;
-    
     _fmpq_poly_normalise(poly);
-    length = poly->length;
-    
-    if (*poly->den == 1L)
-        return;
-    
-    if (fmpq_poly_is_zero(poly))
-    {
-        fmpz_set_si(poly->den, 1);
-    }
-    else if (*poly->den == -1L)
-    {
-        _fmpz_vec_neg(poly->coeffs, poly->coeffs, length);
-        fmpz_set_si(poly->den, 1);
-    }
-    else
-    {
-        fmpz_init(temp);
-        _fmpz_vec_content(temp, poly->coeffs, length);
-        if (*temp != 1L)
-        {
-            fmpz_gcd(temp, temp, poly->den);
-            if (*temp != 1L)
-            {
-                _fmpz_vec_scalar_divexact(poly->coeffs, poly->coeffs, length, temp);
-                fmpz_divexact(poly->den, poly->den, temp);
-            }
-        }
-        fmpz_clear(temp);
-        if (fmpz_sgn(poly->den) < 0)
-        {
-            _fmpz_vec_neg(poly->coeffs, poly->coeffs, length);
-            fmpz_neg(poly->den, poly->den);
-        }
-    }
+    _fmpq_poly_canonicalise(poly->coeffs, poly->den, poly->length);
 }
 

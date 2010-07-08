@@ -72,6 +72,13 @@ void _fmpq_poly_normalise(fmpq_poly_t poly)
     this function does not guarantee the coprimality of the numerator 
     polynomial and the integer denominator.
 
+void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
+
+    Puts {poly, den} of length len into canonical form.
+    
+    It is assumed that the array poly contains a non-zero entry in position 
+    len - 1 whenever len > 0.  Assumes that den is non-zero.
+
 void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
     Puts the polynomial poly into canonical form.  Firstly, the length is set 
@@ -84,7 +91,7 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
     Polynomial parameters
 
-********************************************************************************
+*******************************************************************************
 
 long fmpq_poly_degree(fmpq_poly_t poly)
 
