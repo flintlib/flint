@@ -53,7 +53,7 @@ void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, ulong n, const mpz_t x)
     }
     
     fmpz_set_mpz(poly->coeffs + n, x);
-    fmpz_mul_si(poly->coeffs + n, poly->coeffs + n, poly->den);
+    fmpz_mul(poly->coeffs + n, poly->coeffs + n, poly->den);
     if (replace)
         fmpq_poly_canonicalise(poly);
 }
