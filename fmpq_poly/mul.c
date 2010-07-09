@@ -27,6 +27,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 

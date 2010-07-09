@@ -419,11 +419,11 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
    poly1 and poly2, assuming the latter are precisely n coefficients in length 
    (zero padded if necessary). The remaining n - 1 coefficients may be arbitrary.
 
-void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e)
+void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, ulong len, ulong e)
 
-    Sets res = poly^e.
+    Sets res = poly^e using binary exponentiation.
     
-    Assumes that len > 0 and e > 1.  Assumes that res is an array of length 
+    Assumes that len, e > 0..  Assumes that res is an array of length 
     at least e * (len - 1) + 1.  Allows aliasing.
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e)
@@ -432,6 +432,11 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e)
     
     Assumes that len > 0, and that res is an array of length at least 
     e * (len - 1) + 1.  Allows aliasing.
+
+void _fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+
+    Sets res = poly^e, assuming that e, len > 0.  Supports aliasing of 
+    res and poly.
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 

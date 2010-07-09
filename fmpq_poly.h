@@ -179,6 +179,11 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+    const fmpz_t den, ulong len, ulong e);
+
+void fmpq_poly_pow(fmpq_poly_t rpoly, const fmpq_poly_t poly, ulong e);
+
 ulong _fmpq_poly_decimal_digits(ulong n);
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly);

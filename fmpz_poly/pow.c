@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e)
+void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, ulong len, ulong e)
 {
     /* We need a couple of copies of the input data to allow aliasing in the */
     /* multiplication methods, call these A (= res), B, and C.  Two of them  */
@@ -43,9 +43,9 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e)
     /*   5 - (empty, base, res)                                              */
     /* We keep track of the length of the power of the base and the current  */
     /* result in lenB and lenR.                                              */
-    ulong alloc = e * (len - 1UL) + 1UL;
+    const ulong alloc = e * (len - 1UL) + 1UL;
     fmpz * A = res;
-    fmpz * B = _fmpz_vec_init(2 * alloc);
+    fmpz * B = _fmpz_vec_init(2UL * alloc);
     fmpz * C = B + alloc;
     _fmpz_vec_copy(B, poly, len);
     fmpz_set_ui(A, 1UL);
@@ -148,6 +148,14 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e)
     }
 }
 
+void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e)
+{
+    if (e < 5UL)
+        _fmpz_poly_pow_small(res, poly, len, e);
+    else
+        _fmpz_poly_pow_binexp(res, poly, len, e);
+}
+
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     if (poly->length == 0UL)
@@ -155,18 +163,19 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         fmpz_poly_zero(res);
         return;
     }
+    if (e == 0UL)
+    {
+        fmpz_poly_fit_length(res, 1UL);
+        _fmpz_poly_set_length(res, 1UL);
+        fmpz_set_ui(res->coeffs, 1UL);
+        return;
+    }
     
-    ulong len  = poly->length;
-    ulong rlen = e * (len - 1UL) + 1UL;
+    const ulong len  = poly->length;
+    const ulong rlen = e * (len - 1UL) + 1UL;
     
     fmpz_poly_fit_length(res, rlen);
     _fmpz_poly_set_length(res, rlen);
-    
-    if (e < 5)
-    {
-        _fmpz_poly_pow_small(res->coeffs, poly->coeffs, len, e);
-        return;
-    }
     
     _fmpz_poly_pow(res->coeffs, poly->coeffs, len, e);
 }
