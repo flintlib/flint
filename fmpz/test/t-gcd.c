@@ -83,7 +83,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-   printf("here\n"); fflush(stdout);
+   
    // check aliasing of a and b
    for (ulong i = 0; i < 100000UL; i++) 
    {
@@ -122,7 +122,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-   printf("here2\n"); fflush(stdout);
+   
    // test aliasing of a and c
    for (ulong i = 0; i < 100000UL; i++) 
    {
@@ -170,7 +170,7 @@ int main(void)
       mpz_clear(f);
       mpz_clear(g);
    }
-   printf("here3\n"); fflush(stdout);
+   
    // test aliasing of b and c
    for (ulong i = 0; i < 100000UL; i++) 
    {
