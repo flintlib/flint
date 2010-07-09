@@ -28,14 +28,14 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz c)
+void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c)
 {
     if (fmpz_is_zero(c))
         fmpz_poly_zero(poly);
     else
     {
         fmpz_poly_fit_length(poly, 1);
-        fmpz_set_fmpz(poly->coeffs, c);
+        fmpz_set(poly->coeffs, c);
         _fmpz_poly_set_length(poly, 1);
     }
 }
