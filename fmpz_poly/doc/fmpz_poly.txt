@@ -182,6 +182,22 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
    Set poly1 to equal poly2.
 
+void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
+
+    Sets poly to the integer c.
+
+void fmpz_poly_set_si(fmpz_poly_t poly, long c)
+
+    Sets poly to the integer c.
+
+void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c)
+
+    Sets poly to the ineger c.
+
+void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
+
+    Sets poly to the integer c.
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
    Swap poly1 and poly2. This is done efficiently without copying data
@@ -394,6 +410,21 @@ void fmpz_poly_mul_KS(fmpz_poly_t res,
 
    Set res to poly1 multiplied by poly2.
 
+void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1, 
+				            const fmpz * poly2, ulong len2, ulong trunc)
+
+    Sets {res, trunc} to the lowest trunc coefficients of the product of 
+    {poly1, len1} and {poly2, len2}.  Assumes that len1 and len2 are 
+    positive, but does allow for the polynomials to be zero-padded.  
+    The polynomials may be zero, too.  Assumes trunc is positive.  
+    Suports aliasing between res, poly1 and poly2.
+
+void fmpz_poly_mullow_KS(fmpz_poly_t res, 
+                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
+
+    Sets res to the lowest trunc coefficients of the product of poly1 and 
+    poly2.
+
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
 				           ulong len1, const fmpz * poly2, ulong len2)
 
@@ -406,6 +437,15 @@ void fmpz_poly_mul(fmpz_poly_t res,
 
    Set res to poly1 multiplied by poly2. Chooses an optimal algorithm from the 
    choices above.
+
+
+void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, 
+                         ulong len)
+
+    Sets {res, len} to the lowest len coefficients of the product of poly1 
+    and poly2.  Assumes that poly1 and poly2 are non-zero, and that they are 
+    of length precisely len, possibly zero-padded.  Assumes that len > 0.
+    Supports no aliasing.
 
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
