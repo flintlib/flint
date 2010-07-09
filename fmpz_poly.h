@@ -218,6 +218,12 @@ void fmpz_poly_mullow_n(fmpz_poly_t res,
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n);
 
+void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e);
+
+void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e);
+
+void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
 								  ulong A_len, const fmpz * B, ulong B_len);
 
