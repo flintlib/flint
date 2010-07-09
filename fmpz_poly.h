@@ -89,18 +89,6 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
     return (long) (poly->length - 1UL);
 }
 
-static inline
-void fmpz_poly_zero(fmpz_poly_t poly)
-{
-   _fmpz_poly_set_length(poly, 0);
-}
-
-static inline 
-void fmpz_poly_one(fmpz_poly_t poly)
-{
-    fmpz_poly_set_ui(poly, 1UL);
-}
-
 void fmpz_poly_randinit(void);
 
 void fmpz_poly_randclear(void);
@@ -129,6 +117,23 @@ void fmpz_poly_get_coeff_fmpz(fmpz_t x,
 void fmpz_poly_print(fmpz_poly_t poly);
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c);
+void fmpz_poly_set_si(fmpz_poly_t poly, long c);
+void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c);
+void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c);
+
+static inline
+void fmpz_poly_zero(fmpz_poly_t poly)
+{
+   _fmpz_poly_set_length(poly, 0);
+}
+
+static inline 
+void fmpz_poly_one(fmpz_poly_t poly)
+{
+    fmpz_poly_set_ui(poly, 1UL);
+}
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
@@ -224,18 +229,26 @@ void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, ulong len1,
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1, 
+				          const fmpz * poly2, ulong len2, ulong trunc);
+
+void fmpz_poly_mullow_KS(fmpz_poly_t res, 
+                const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc);
+
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
 				                ulong len1, const fmpz * poly2, ulong len2);
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, 
+                         const fmpz * poly2, ulong trunc);
+
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
              const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc);
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n);
-
 
 
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, ulong len, ulong e);
