@@ -95,6 +95,12 @@ void fmpz_poly_zero(fmpz_poly_t poly)
    _fmpz_poly_set_length(poly, 0);
 }
 
+static inline 
+void fmpz_poly_one(fmpz_poly_t poly)
+{
+    fmpz_poly_set_ui(poly, 1UL);
+}
+
 void fmpz_poly_randinit(void);
 
 void fmpz_poly_randclear(void);
