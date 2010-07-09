@@ -428,7 +428,7 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e)
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e)
 
-    Sets res = poly^e whenever 0 <= e < 4.
+    Sets res = poly^e whenever 0 <= e <= 4.
     
     Assumes that len > 0, and that res is an array of length at least 
     e * (len - 1) + 1.  Allows aliasing.

@@ -136,6 +136,15 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, ulong len, ulong e)
                 _fmpz_vec_clear(copy, alloc);
             }
             break;
+        case 4UL:
+        {
+            ulong alloc = 2UL * len - 1UL;
+            fmpz * copy = _fmpz_vec_init(alloc);
+            _fmpz_poly_mul(copy, poly, len, poly, len);
+            _fmpz_poly_mul(res, copy, alloc, copy, alloc);
+            _fmpz_vec_clear(copy, alloc);
+            break;
+        }
     }
 }
 
@@ -153,7 +162,7 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     fmpz_poly_fit_length(res, rlen);
     _fmpz_poly_set_length(res, rlen);
     
-    if (e < 4)
+    if (e < 5)
     {
         _fmpz_poly_pow_small(res->coeffs, poly->coeffs, len, e);
         return;
