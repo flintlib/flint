@@ -78,6 +78,18 @@ void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
 }
 
 static inline
+ulong fmpz_poly_length(const fmpz_poly_t poly)
+{
+    return poly->length;
+}
+
+static inline
+long fmpz_poly_degree(const fmpz_poly_t poly)
+{
+    return (long) (poly->length - 1UL);
+}
+
+static inline
 void fmpz_poly_zero(fmpz_poly_t poly)
 {
    _fmpz_poly_set_length(poly, 0);
