@@ -66,6 +66,10 @@ void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2)
 
     Make a copy of {vec2, len2} into vec1.
 
+void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, ulong len2)
+
+    Swaps the integers in {vec1, len2} and {vec2, len2}.
+
 int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, const ulong len)
 
     Compares two vectors of the given length and returns 1 if they are equal, 

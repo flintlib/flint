@@ -49,6 +49,8 @@ void _fmpz_vec_zero(fmpz * vec1, ulong len1);
 
 void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2);
 
+void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, ulong len2);
+
 int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong len);
 
 int _fmpz_vec_is_zero(const fmpz * vec, ulong len);
