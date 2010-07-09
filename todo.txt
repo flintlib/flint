@@ -56,6 +56,9 @@ TODO
 
 * add test code for fmpz_poly_max_limbs
 
+* Fix a bug in mul_KS and mullow_KS, to do with the assumption len1 >= len2 
+  and zero padding
+
 Maybe
 =====
 
