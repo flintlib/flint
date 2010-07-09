@@ -77,9 +77,10 @@ void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong len)
 {
    fmpz * temp;
-   ulong loglen = 0, length;
+   ulong loglen = 0;
+    ulong length;
 
-   if (length == 1)
+   if (len == 1)
    {
       fmpz_mul(res, poly1, poly2);
       return;
