@@ -64,6 +64,10 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, const ulong length)
 	poly->length = length;
 }
 
+void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, ulong n);
+
+void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, ulong n);
+
 static inline
 void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
 {

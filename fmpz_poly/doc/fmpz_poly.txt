@@ -63,6 +63,20 @@ void _fmpz_poly_normalise(fmpz_poly_t poly)
    all coefficients are zero, the length is set to zero. This function
    is mainly used internally, as all functions guarantee normalisation.
 
+void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, n)
+
+    This function sets {res, n} to be the reverse of {poly, len}, 
+    where poly is in fact an array of length len.  Assumes that 
+    0 < len <= n.  Supports precise aliasing of res and poly, but the 
+    behaviour is undefined in case of partial overlap.
+
+void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+
+    This function considers the polynomial poly to be of length n, 
+    notionally truncating and zero padding if required, and reverses 
+    the result.  Since the function normalises its result res may be 
+    of length less than n.
+
 void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
 
    If the current length of poly is greater than length, it is truncated
