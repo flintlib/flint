@@ -566,3 +566,8 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
 
    If L is the leading coefficient of B, then compute Q, R such that L^d*A = QB + R.
    This function is used for simulating division over QQ. 
+
+void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets res to the derivative of poly.
+

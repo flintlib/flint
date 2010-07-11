@@ -310,5 +310,7 @@ void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R,
     fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, B);
 }
 
+void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
+
 #endif
 
