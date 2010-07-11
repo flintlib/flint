@@ -42,13 +42,13 @@ void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, ulong n)
         
         res = (fmpz *) poly + (n - len);
         while (res-- != poly)
-            _fmpz_demote(res);
+            fmpz_zero(res);
     }
     else
     {
         ulong zeros = n - len;
         while (zeros--)
-            _fmpz_demote(res++);
+            fmpz_zero(res++);
         
         poly = (fmpz *) poly + (len - 1UL);
         while (len--)
