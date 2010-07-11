@@ -319,6 +319,18 @@ void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp)
    Set f to be g^x where x is an unsigned long. If exp is 0
    and g is 0, then f will be set to 1. 
 
+void fmpz_sqrt(fmpz_t f, const fmpz_t g)
+
+    Sets f to the integer part of the square root of g, where g is assumed 
+    to be non-negative.  If g is negative, an exception is raised.
+
+void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
+
+    Sets f to the integer part of the square root of g, where g is assumed 
+    to be non-negative, and sets r to the remainder, that is, the difference 
+    g - f^2.  If g is negative, an exception is raised.  The behaviour is 
+    undefined if f and r are aliases.
+
 /*******************************************************************************
 
    GCD and extended GCD
