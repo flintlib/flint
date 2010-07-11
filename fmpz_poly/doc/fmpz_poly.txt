@@ -508,6 +508,27 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     Computes res = poly^e.  If poly is zero, returns zero, so that in 
     particular 0^0 = 0.
 
+void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len)
+
+    Sets res to the non-negative content of {poly, len}.  Aliasing between 
+    res and the coefficients of poly is not supported.
+
+void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
+
+    Sets res to the non-negative content of poly.  The content of the zero 
+    polynomial is defined to be zero.  Supports aliasing, that is, res is 
+    allowed to be one of the coefficients of poly.
+
+void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, ulong len)
+
+    Sets {res, len} to {poly, len} divided by the content of {poly, len}.  
+    Assumes that {poly, len} is non-zero.  Supports aliasing of res and poly.
+
+void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
+
+    Sets res to poly divided by the content of poly.  If poly is zero, 
+    sets res to zero.
+
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
 					       ulong A_len, const fmpz * B, ulong B_len)
 

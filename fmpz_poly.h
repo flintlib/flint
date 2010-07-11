@@ -265,6 +265,10 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, ulong len, ulong e);
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
+void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len);
+
+void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly);
+
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
 								  ulong A_len, const fmpz * B, ulong B_len);
 
