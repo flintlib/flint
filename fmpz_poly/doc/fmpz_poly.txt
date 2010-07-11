@@ -286,6 +286,17 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, const ulong 
    Set res to poly shifted right by n coeffs. If n is bigger than the 
    current length of poly, res is set to the zero polynomial.
 
+*******************************************************************************
+
+    Norms
+
+*******************************************************************************
+
+void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
+
+    Sets res to the euclidean norm of poly, that is, the integer square root 
+    of the sum of the squares of the coefficients of poly.
+
 ********************************************************************************
 
   Scalar Addmul

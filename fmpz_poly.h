@@ -176,6 +176,8 @@ void fmpz_poly_shift_left(fmpz_poly_t res,
 void fmpz_poly_shift_right(fmpz_poly_t res, 
                                      const fmpz_poly_t poly, const ulong n);
 
+void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly);
+
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, ulong len1, 
 							                const fmpz * poly2, ulong len2);
 
