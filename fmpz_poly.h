@@ -269,6 +269,10 @@ void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, ulong len1, con
 
 void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, ulong len1, const fmpz * poly2, ulong len2);
+
+void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len);
 
 void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly);
