@@ -67,6 +67,39 @@ main(void)
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
     }
+    
+    // Check that content(f) primitive_part(f) = sgn(lead(f)) f
+    for (ulong i = 0; i < 1000UL; i++)
+    {
+        fmpz_poly_t f, g;
+        fmpz_t c;
+
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_init(c);
+        fmpz_poly_randtest_not_zero(f, n_randint(100) + 1, n_randint(200) + 1);
+
+        fmpz_poly_content(c, f);
+        if (fmpz_sgn(f->coeffs + f->length - 1UL) < 0)
+            fmpz_neg(c, c);
+        fmpz_poly_primitive_part(g, f);
+        fmpz_poly_scalar_mul_fmpz(g, g, c);
+        
+        result = (fmpz_poly_equal(f, g));
+        if (!result)
+        {
+            printf("Error:\n");
+            fmpz_poly_print(f);
+            printf("\n\n");
+            fmpz_poly_print(g);
+            printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(c);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+    }
 
     fmpz_poly_randclear();
 

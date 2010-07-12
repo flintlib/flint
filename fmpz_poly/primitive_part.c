@@ -34,8 +34,14 @@ void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, ulong len)
     fmpz_t x;
     fmpz_init(x);
     _fmpz_poly_content(x, poly, len);
-    while (res != high)
-        fmpz_divexact(res++, poly++, x);
+    if (fmpz_sgn(poly + (len - 1UL)) < 0)
+        fmpz_neg(x, x);
+    if (*x != 1L)
+        while (res != high)
+            fmpz_divexact(res++, poly++, x);
+    else if (res != poly)
+        while (res != high)
+            fmpz_set(res++, poly++);
     fmpz_clear(x);
 }
 
