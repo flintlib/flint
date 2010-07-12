@@ -508,6 +508,21 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     Computes res = poly^e.  If poly is zero, returns zero, so that in 
     particular 0^0 = 0.
 
+
+void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, ulong len1, 
+                                 const fmpz * poly2, ulong len2)
+
+    Computes the greatest common divisor res of {poly1, len1} and 
+    {poly2, len2}, assuming len1 >= len2 > 0.  The result is normalised to 
+    have positive leading coefficient.  Assumes that res has space for 
+    len2 coefficients.  Aliasing between res, poly1 and poly2 is supported.
+
+void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                const fmpz_poly_t poly2)
+
+    Computes the greatest common divisor res of poly1 and poly2, normalised 
+    to have non-negative leading coefficient.
+
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len)
 
     Sets res to the non-negative content of {poly, len}.  Aliasing between 
@@ -521,13 +536,15 @@ void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
 
 void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, ulong len)
 
-    Sets {res, len} to {poly, len} divided by the content of {poly, len}.  
+    Sets {res, len} to {poly, len} divided by the content of {poly, len}, 
+    and normalises the result to have non-negative leading coefficient. 
     Assumes that {poly, len} is non-zero.  Supports aliasing of res and poly.
 
 void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 
-    Sets res to poly divided by the content of poly.  If poly is zero, 
-    sets res to zero.
+    Sets res to poly divided by the content of poly, and normalises the result 
+    to have non-negative leading coefficient.  If poly is zero, sets res to 
+    zero.
 
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
 					       ulong A_len, const fmpz * B, ulong B_len)
