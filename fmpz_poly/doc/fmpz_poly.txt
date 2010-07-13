@@ -1,6 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2008, 2009 William Hart
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -18,183 +16,84 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
 
-********************************************************************************
+    Copyright (C) 2008, 2009 William Hart
 
-  Memory management
+******************************************************************************/
 
-********************************************************************************
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
 
 void fmpz_poly_init(fmpz_poly_t poly)
 
-   Initialise the poly for use. The length is set to zero.
+    Initialise the poly for use. The length is set to zero.
 
 void fmpz_poly_init2(fmpz_poly_t poly, const ulong alloc)
 
-   Initialise the poly with space for at least alloc coefficients and
-   set the length to zero. The alloc coefficients are all set to zero.
+    Initialise the poly with space for at least alloc coefficients and
+    set the length to zero. The alloc coefficients are all set to zero.
 
 void fmpz_poly_realloc(fmpz_poly_t poly, const ulong alloc)
 
-   Reallocate the given polynomial to have space for alloc coefficients.
-   If alloc is set to zero then the polynomial is cleared and then
-   reinitialised. If the current length is greater than alloc the poly
-   is first truncated to length alloc.
+    Reallocate the given polynomial to have space for alloc coefficients.
+    If alloc is set to zero then the polynomial is cleared and then
+    reinitialised. If the current length is greater than alloc the poly
+    is first truncated to length alloc.
 
 void fmpz_poly_fit_length(fmpz_poly_t poly, const ulong length)
 
-   If length is currently greater that the number of coefficients
-   allocated, then the polynomial is reallocated to have space for at
-   least length coefficients. No data is lost when calling this 
-   function. The function efficiently deals with the case where 
-   fit_length is called many times in small increments by at least 
-   doubling the number of allocated coefficients when length is larger 
-   than the number of coefficients currently allocated.
+    If length is currently greater that the number of coefficients
+    allocated, then the polynomial is reallocated to have space for at
+    least length coefficients. No data is lost when calling this 
+    function. The function efficiently deals with the case where 
+    fit_length is called many times in small increments by at least 
+    doubling the number of allocated coefficients when length is larger 
+    than the number of coefficients currently allocated.
 
 void fmpz_poly_clear(fmpz_poly_t poly)
 
-   Clear the given poly, releasing any memory used. The poly must
-   be reinitialised in order to be used again.
+    Clear the given poly, releasing any memory used. The poly must
+    be reinitialised in order to be used again.
 
 void _fmpz_poly_normalise(fmpz_poly_t poly)
 
-   Set the length of poly so that the top coefficient is nonzero. If
-   all coefficients are zero, the length is set to zero. This function
-   is mainly used internally, as all functions guarantee normalisation.
+    Set the length of poly so that the top coefficient is nonzero. If
+    all coefficients are zero, the length is set to zero. This function
+    is mainly used internally, as all functions guarantee normalisation.
 
-void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, n)
+void _fmpz_poly_set_length(fmpz_poly_t poly, const ulong newlength)
 
-    This function sets {res, n} to be the reverse of {poly, len}, 
-    where poly is in fact an array of length len.  Assumes that 
-    0 < len <= n.  Supports precise aliasing of res and poly, but the 
-    behaviour is undefined in case of partial overlap.
+    Demotes coefficients of poly beyond newlength and sets the length of 
+    poly to newlength.
 
-void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+*******************************************************************************
 
-    This function considers the polynomial poly to be of length n, 
-    notionally truncating and zero padding if required, and reverses 
-    the result.  Since the function normalises its result res may be 
-    of length less than n.
+    Polynomial parameters
 
-void fmpz_poly_truncate(fmpz_poly_t poly, const ulong length)
+*******************************************************************************
 
-   If the current length of poly is greater than length, it is truncated
-   to have the given length. Discarded coefficients are not necessarily 
-   set to zero.
+ulong fmpz_poly_length(const fmpz_poly_t poly)
 
-void fmpz_poly_zero(fmpz_poly_t poly)
+    Returns the length of poly.  The zero polynomial has length zero.
 
-   Set the polynomial to the zero polynomial, i.e. set the length to 
-   zero.
+long fmpz_poly_degree(const fmpz_poly_t poly)
 
-********************************************************************************
+    Returns the degree of poly, which is one less than its length.
 
-  Random polynomials
+*******************************************************************************
 
-********************************************************************************
+    Assignment and basic manipulation
 
-void fmpz_poly_randinit()
-   Initialise the random state for random polynomial generation. One 
-   should not call this function if fmpz_randinit has already been 
-   called. 
-
-void fmpz_poly_randclear()
-   Clear the random state initialised with fmpz_poly_randinit. One 
-   should not call this function if fmpz_randclear has already been
-   called.
-
-void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
-
-   Sets f to a random polynomial with up to the given length and where
-   each coefficient has up to the given number of bits. The coefficients
-   are signed randomly. One must call fmpz_poly_randinit before calling
-   this function.
-
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, 
-                                                     mp_bitcnt_t bits_in)
-
-   Sets f to a random polynomial with up to the given length and where
-   each coefficient has up to the given number of bits. One must call 
-   fmpz_poly_randinit before calling this function.
-
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, 
-                                                     mp_bitcnt_t bits_in)
-
-   As for fmpz_poly_randtest except that length and bits_in may not be
-   zero and the polynomial generated is guaranteed not to be the 
-   zero polynomial. One must call fmpz_poly_randinit before calling
-   this function.
-
-********************************************************************************
-
-  Coefficient get/set
-
-********************************************************************************
-
-long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n)
-   
-   Get coefficient n of poly as a long. The result is undefined if the 
-   value does not fit into a long. Coefficient numbering is from zero and 
-   if n is set to a value beyond the end of the polynomial, zero is 
-   returned.
-
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
-
-   Set coefficient n of poly to the long value x. Coefficient numbering
-   starts from zero and if n is beyond the current length of poly then
-   the polynomial is extended and zero coefficients inserted if 
-   necessary.
-
-long fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n)
-   
-   Get coefficient n of poly as a ulong. The result is undefined if the 
-   value does not fit into a ulong. Coefficient numbering is from zero and 
-   if n is set to a value beyond the end of the polynomial, zero is 
-   returned.
-
-void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x)
-
-   Set coefficient n of poly to the ulong value x. Coefficient numbering
-   starts from zero and if n is beyond the current length of poly then
-   the polynomial is extended and zero coefficients inserted if 
-   necessary.
-
-void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n)
-
-   Get coefficient n of poly as an fmpz. Coefficient numbering is from zero 
-   and if n is set to a value beyond the end of the polynomial, zero is 
-   returned.
-
-void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x)
-
-   Set coefficient n of poly to the fmpz value x. Coefficient numbering
-   starts from zero and if n is beyond the current length of poly then
-   the polynomial is extended and zero coefficients inserted if 
-   necessary.
-
-********************************************************************************
-
-  Input/output
-
-********************************************************************************
-
-void fmpz_poly_print(fmpz_poly_t poly)
-
-   Print the polynomial to stdout. First the length of the polynomial is
-   printed. If the length is not zero two spaces are printed after the 
-   length, then a space separated list of coefficients is printed, starting
-   with the constant coefficient.
-
-********************************************************************************
-
-  Assignment, swap, negation, reverse
-
-********************************************************************************
+*******************************************************************************
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-   Set poly1 to equal poly2.
+    Set poly1 to equal poly2.
 
 void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
 
@@ -212,231 +111,336 @@ void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
 
     Sets poly to the integer c.
 
+void fmpz_poly_zero(fmpz_poly_t poly)
+
+    Sets the polynomial to the zero polynomial, i.e. sets the length to 
+    zero.
+
+void fmpz_poly_one(fmpz_poly_t poly)
+
+    Sets the polynomial poly to the constant polynomial one.
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
-   Swap poly1 and poly2. This is done efficiently without copying data
-   by swapping pointers, etc.
+    Swap poly1 and poly2. This is done efficiently without copying data
+    by swapping pointers, etc.
 
-void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
+void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, n)
 
-   Set res to -poly.
+    This function sets {res, n} to be the reverse of {poly, len}, 
+    where poly is in fact an array of length len.  Assumes that 
+    0 < len <= n.  Supports precise aliasing of res and poly, but the 
+    behaviour is undefined in case of partial overlap.
 
-********************************************************************************
+void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
 
-  Comparison and coefficient sizes
+    This function considers the polynomial poly to be of length n, 
+    notionally truncating and zero padding if required, and reverses 
+    the result.  Since the function normalises its result res may be 
+    of length less than n.
 
-********************************************************************************
+void fmpz_poly_truncate(fmpz_poly_t poly, const ulong newlength)
+
+    If the current length of poly is greater than newlength, it is truncated
+    to have the given length. Discarded coefficients are not necessarily 
+    set to zero.
+
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fmpz_poly_randinit()
+
+    Initialise the random state for random polynomial generation. One 
+    should not call this function if fmpz_randinit has already been 
+    called. 
+
+void fmpz_poly_randclear()
+
+    Clear the random state initialised with fmpz_poly_randinit. One 
+    should not call this function if fmpz_randclear has already been
+    called.
+
+void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+
+    Sets f to a random polynomial with up to the given length and where
+    each coefficient has up to the given number of bits. The coefficients
+    are signed randomly. One must call fmpz_poly_randinit before calling
+    this function.
+
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, 
+                                                     mp_bitcnt_t bits_in)
+
+    Sets f to a random polynomial with up to the given length and where
+    each coefficient has up to the given number of bits. One must call 
+    fmpz_poly_randinit before calling this function.
+
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, 
+                                                     mp_bitcnt_t bits_in)
+
+    As for fmpz_poly_randtest except that length and bits_in may not be
+    zero and the polynomial generated is guaranteed not to be the 
+    zero polynomial. One must call fmpz_poly_randinit before calling
+    this function.
+
+*******************************************************************************
+
+    Getting and setting coefficients
+
+*******************************************************************************
+
+long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, const ulong n)
+   
+    Get coefficient n of poly as a long. The result is undefined if the 
+    value does not fit into a long. Coefficient numbering is from zero and 
+    if n is set to a value beyond the end of the polynomial, zero is 
+    returned.
+
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, ulong n, const long x)
+
+    Set coefficient n of poly to the long value x. Coefficient numbering
+    starts from zero and if n is beyond the current length of poly then
+    the polynomial is extended and zero coefficients inserted if 
+    necessary.
+
+long fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n)
+   
+    Get coefficient n of poly as a ulong. The result is undefined if the 
+    value does not fit into a ulong. Coefficient numbering is from zero and 
+    if n is set to a value beyond the end of the polynomial, zero is 
+    returned.
+
+void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, ulong n, const ulong x)
+
+    Set coefficient n of poly to the ulong value x. Coefficient numbering
+    starts from zero and if n is beyond the current length of poly then
+    the polynomial is extended and zero coefficients inserted if 
+    necessary.
+
+void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, const ulong n)
+
+    Get coefficient n of poly as an fmpz. Coefficient numbering is from zero 
+    and if n is set to a value beyond the end of the polynomial, zero is 
+    returned.
+
+void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, ulong n, const fmpz_t x)
+
+    Set coefficient n of poly to the fmpz value x. Coefficient numbering
+    starts from zero and if n is beyond the current length of poly then
+    the polynomial is extended and zero coefficients inserted if 
+    necessary.
+
+*******************************************************************************
+
+  Comparison
+
+*******************************************************************************
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-   Return 1 if poly1 is equal to poly2, otherwise return 0. Polys are
-   assumed to be normalised.
+    Return 1 if poly1 is equal to poly2, otherwise return 0. Polys are
+    assumed to be normalised.
 
-********************************************************************************
+*******************************************************************************
 
-  Add/sub
+    Addition and subtraction
 
-********************************************************************************
+*******************************************************************************
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, ulong len1, 
-                                                      const fmpz * poly2, ulong len2)
+                                                const fmpz * poly2, ulong len2)
 
-   Set res to {poly1, len1} + {poly2, len2}. It is assumed that res has sufficient 
-   space for the longer of the two polynomials.
+    Set res to {poly1, len1} + {poly2, len2}. It is assumed that res has 
+    sufficient space for the longer of the two polynomials.
 
-void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                       const fmpz_poly_t poly2)
 
-   Set res to poly1 + poly2. 
+    Set res to poly1 + poly2. 
 
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, 
-                                                      const fmpz * poly2, ulong len2)
+                                                const fmpz * poly2, ulong len2)
 
-   Set res to {poly1, len1} - {poly2, len2}. It is assumed that res has sufficient 
-   space for the longer of the two polynomials.
+    Set res to {poly1, len1} - {poly2, len2}. It is assumed that res has 
+    sufficient space for the longer of the two polynomials.
 
-void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                       const fmpz_poly_t poly2)
 
-   Set res to poly1 - poly2. 
+    Set res to poly1 - poly2. 
 
-********************************************************************************
+void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
-  Scalar Multiplication
+    Set res to -poly.
 
-********************************************************************************
+*******************************************************************************
+
+  Scalar multiplication
+
+*******************************************************************************
 
 void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
-   Set poly1 to poly2 times the unsigned long x.
+    Set poly1 to poly2 times the unsigned long x.
 
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 
-   Set poly1 to poly2 times the signed long x.
+    Set poly1 to poly2 times the signed long x.
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
-                                      const fmpz_poly_t poly2, const fmpz_t x)
+                                       const fmpz_poly_t poly2, const fmpz_t x)
 
-   Set poly1 to poly2 times the fmpz_t x.
-
-void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n)
-
-   Set res to poly shifted left by n coeffs. Zero coefficients are inserted.
-
-void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n)
-
-   Set res to poly shifted right by n coeffs. If n is bigger than the 
-   current length of poly, res is set to the zero polynomial.
-
-*******************************************************************************
-
-    Norms
-
-*******************************************************************************
-
-void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
-
-    Sets res to the euclidean norm of poly, that is, the integer square root 
-    of the sum of the squares of the coefficients of poly.
-
-********************************************************************************
-
-  Scalar Addmul
-
-********************************************************************************
+    Set poly1 to poly2 times the fmpz_t x.
 
 void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, 
-                                   const fmpz * poly2, ulong len2, const fmpz_t x)
+                                const fmpz * poly2, ulong len2, const fmpz_t x)
 
-   Set poly1 to poly1 + {poly2, len2} times x.
+    Set poly1 to poly1 + {poly2, len2} times x.
 
-********************************************************************************
+void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
+                                  const fmpz_t x)
 
-  Multiplication
+    Sets poly to poly1 + poly2 times x.
 
-********************************************************************************
+*******************************************************************************
 
-void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, ulong len1, 
-                                                  const fmpz * poly2, ulong len2)
+    Bit packing
 
-   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
-   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
-   inputs with outputs is allowed.
-
-void fmpz_poly_mul_classical(fmpz_poly_t res, 
-                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
-
-   Set res to poly1 multiplied by poly2.
-
-void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
-		           ulong len1, const fmpz * poly2, ulong len2, ulong trunc)
-
-   Set {res, trunc} to the first trunc coefficients of {poly1, len1} multiplied
-   by {poly2, len2}. Assumes 0 < trunc <= len1 + len2 - 1. Assumes neither len1
-   nor len2 is zero. 
-
-void fmpz_poly_mullow_classical(fmpz_poly_t res, 
-                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
-
-  Set res to the first trunc coefficients of poly1*poly2.
-
-void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, 
-		           ulong len1, const fmpz * poly2, ulong len2, ulong start)
-
-  Set the first start coefficients of res to zero and the remainder to the
-  corresponding coefficients of {poly1, len1}*{poly2, len2}. Assumes start
-  <= len1 + len2 - 1. Assumes neither len1 nor len2 is zero.
-
-void fmpz_poly_mulhigh_classical(fmpz_poly_t res, 
-                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong start)
-
-  Set the first start coefficients of res to zero and the remainder to the 
-  corresponding coefficients of poly1*poly2.
-
-void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, 
-				          ulong len1, const fmpz * poly2, ulong len2)
-
-  Set res to the middle len1 - len2 + 1 coefficients of {poly1, len1}*{poly2, len2},
-  i.e. the coefficient from degree len2 - 1 to len1 - 1 inclusive. Assumes neither 
-  len1 nor len2 is zero and that len1 >= len2.
-
-void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
-                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
-
-  Set res to the middle poly1->length - poly2->length + 1 coefficients of poly1*poly,
-  i.e. the coefficient from degree len2 - 1 to len1 - 1 inclusive. Assumes that len1 
-  >= len2.
-
-void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
-                                const fmpz_poly_t poly1, const fmpz_poly_t poly2)
-
-   Set res to poly1 multiplied by poly2.
-
-void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
-                                      ulong len1, const fmpz * poly2, ulong len2)
-
-   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
-   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
-   inputs with outputs is allowed. Also assumes len1 >= len2.
-
-void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
-                                                   const fmpz * poly2, ulong len)
-
-   Set res to poly1 multiplied by poly2 and truncate to the given length. It is 
-   assumed that poly1 and poly2 are precisely the given length (possibly zero
-   padded). Assumes len is not zero.
-
-void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
-                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
-
-   Set res to poly1 multiplied by poly2 and truncate to the given length. It is 
-   assumed that poly1 and poly2 are at most the given length.
-
-void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
-                                                    const fmpz * poly2, ulong len)
-
-   Set res to poly1 multiplied by poly2 and truncate at the top to the given length.
-   The first len - 1 coefficients are set to zero. It is assumed that poly1 and poly2 
-   are precisely the given length (possibly zero padded). Assumes len is not zero.
-
-void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
-                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
-
-   Set the first length - 1 coefficients of the result to zero and the remaining
-   coefficients to the corresponding coefficients of the product of poly1 and poly2. 
-   Assumes poly1 and poly2 are at most of the given length.
-
+*******************************************************************************
 
 void _fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz * poly,
 						  ulong len, ulong bit_size, int negate)   
 
-   Pack the coefficients of poly into bitfields of the given bit_size, negating the
-   coefficients before packing if negate is set to -1.
+    Pack the coefficients of poly into bitfields of the given bit_size, 
+    negating the coefficients before packing if negate is set to -1.
 
 void _fmpz_poly_bit_unpack(fmpz * poly, ulong length, 
 				    const mp_limb_t * arr, ulong bit_size, int negate)
 
-   Unpack the poly of given length from the array as packed into fields of the 
-   given bitsize, finally negating the coefficients if negate is set to -1.
+    Unpack the poly of given length from the array as packed into fields of the
+    given bitsize, finally negating the coefficients if negate is set to -1.
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, ulong length, 
 						  const mp_limb_t * arr, ulong bit_size)
 
-   Unpack the poly of given length from the array as packed into fields of the 
-   given bitsize. The coefficients are assumed to be unsigned.
+    Unpack the poly of given length from the array as packed into fields of the
+    given bitsize. The coefficients are assumed to be unsigned.
+
+*******************************************************************************
+
+  Multiplication
+
+*******************************************************************************
+
+void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, ulong len1, 
+                                                const fmpz * poly2, ulong len2)
+
+    Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
+    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    No aliasing of inputs with outputs is allowed.
+
+void fmpz_poly_mul_classical(fmpz_poly_t res, 
+                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Set res to poly1 multiplied by poly2.
+
+void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
+                       ulong len1, const fmpz * poly2, ulong len2, ulong trunc)
+
+    Set {res, trunc} to the first trunc coefficients of {poly1, len1} 
+    multiplied by {poly2, len2}. Assumes 0 < trunc <= len1 + len2 - 1. Assumes 
+    neither len1 nor len2 is zero.
+
+void fmpz_poly_mullow_classical(fmpz_poly_t res, 
+                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
+
+    Set res to the first trunc coefficients of poly1 * poly2.
+
+void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1,
+                       ulong len1, const fmpz * poly2, ulong len2, ulong start)
+
+    Set the first start coefficients of res to zero and the remainder to the
+    corresponding coefficients of {poly1, len1}*{poly2, len2}. Assumes start
+    <= len1 + len2 - 1. Assumes neither len1 nor len2 is zero.
+
+void fmpz_poly_mulhigh_classical(fmpz_poly_t res, 
+                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong start)
+
+    Set the first start coefficients of res to zero and the remainder to the 
+    corresponding coefficients of poly1 * poly2.
+
+void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, 
+                                    ulong len1, const fmpz * poly2, ulong len2)
+
+    Set res to the middle len1 - len2 + 1 coefficients of 
+    {poly1, len1} * {poly2, len2}, i.e. the coefficient from degree len2 - 1 
+    to len1 - 1 inclusive. Assumes neither len1 nor len2 is zero and that 
+    len1 >= len2.
+
+void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
+                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Set res to the middle poly1->length - poly2->length + 1 coefficients of 
+    poly1 * poly, i.e. the coefficient from degree len2 - 1 to len1 - 1 
+    inclusive. Assumes that len1 >= len2.
+
+void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
+                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Set res to poly1 multiplied by poly2.
+
+void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
+                                    ulong len1, const fmpz * poly2, ulong len2)
+
+    Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
+    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
+
+void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
+                                                 const fmpz * poly2, ulong len)
+
+    Set res to poly1 multiplied by poly2 and truncate to the given length. It 
+    is assumed that poly1 and poly2 are precisely the given length (possibly 
+    zero padded). Assumes len is not zero.
+
+void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
+                const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
+
+    Set res to poly1 multiplied by poly2 and truncate to the given length. It 
+    is assumed that poly1 and poly2 are at most the given length.
+
+void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
+                                                 const fmpz * poly2, ulong len)
+
+    Set res to poly1 multiplied by poly2 and truncate at the top to the given 
+    length. The first len - 1 coefficients are set to zero. It is assumed that 
+    poly1 and poly2 are precisely the given length (possibly zero padded). 
+    Assumes len is not zero.
+
+void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
+                const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
+
+    Set the first length - 1 coefficients of the result to zero and the 
+    remaining coefficients to the corresponding coefficients of the product of 
+    poly1 and poly2. Assumes poly1 and poly2 are at most of the given length.
 
 void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, ulong len1, 
-					                const fmpz * poly2, ulong len2)
+					                            const fmpz * poly2, ulong len2)
 
-   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
-   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
-   inputs with outputs is allowed. Also assumes len1 >= len2.
+    Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
+    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
 
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
-                                 const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-   Set res to poly1 multiplied by poly2.
+    Set res to poly1 multiplied by poly2.
 
 void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1, 
-				            const fmpz * poly2, ulong len2, ulong trunc)
+                                   const fmpz * poly2, ulong len2, ulong trunc)
 
     Sets {res, trunc} to the lowest trunc coefficients of the product of 
     {poly1, len1} and {poly2, len2}.  Assumes that len1 and len2 are 
@@ -453,15 +457,15 @@ void fmpz_poly_mullow_KS(fmpz_poly_t res,
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
 				           ulong len1, const fmpz * poly2, ulong len2)
 
-   Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has space for 
-   len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. No aliasing of
-   inputs with outputs is allowed. Also assumes len1 >= len2.
+    Set res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
+    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
 
 void fmpz_poly_mul(fmpz_poly_t res, 
              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-   Set res to poly1 multiplied by poly2. Chooses an optimal algorithm from the 
-   choices above.
+    Set res to poly1 multiplied by poly2. Chooses an optimal algorithm from 
+    the choices above.
 
 
 void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, 
@@ -473,16 +477,23 @@ void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2,
     Supports no aliasing.
 
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
+                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
 
-   Set res to the low trunc coefficients of poly1 times poly2.
+    Set res to the low trunc coefficients of poly1 times poly2.
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n)
+                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n)
 
-   Set the high n coefficients of res to the high n coefficients of the product of
-   poly1 and poly2, assuming the latter are precisely n coefficients in length 
-   (zero padded if necessary). The remaining n - 1 coefficients may be arbitrary.
+    Set the high n coefficients of res to the high n coefficients of the 
+    product of poly1 and poly2, assuming the latter are precisely n 
+    coefficients in length (zero padded if necessary). The remaining n - 1 
+    coefficients may be arbitrary.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
 
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, ulong len, ulong e)
 
@@ -508,6 +519,39 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     Computes res = poly^e.  If poly is zero, returns zero, so that in 
     particular 0^0 = 0.
 
+*******************************************************************************
+
+    Shifting
+
+*******************************************************************************
+
+void fmpz_poly_shift_left(fmpz_poly_t res, 
+                          const fmpz_poly_t poly, const ulong n)
+
+    Set res to poly shifted left by n coeffs. Zero coefficients are inserted.
+
+void fmpz_poly_shift_right(fmpz_poly_t res, 
+                           const fmpz_poly_t poly, const ulong n)
+
+    Set res to poly shifted right by n coeffs. If n is bigger than the 
+    current length of poly, res is set to the zero polynomial.
+
+*******************************************************************************
+
+    Norms
+
+*******************************************************************************
+
+void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
+
+    Sets res to the euclidean norm of poly, that is, the integer square root 
+    of the sum of the squares of the coefficients of poly.
+
+*******************************************************************************
+
+    Greatest common divisor
+
+*******************************************************************************
 
 void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, ulong len1, 
                                  const fmpz * poly2, ulong len2)
@@ -538,6 +582,12 @@ void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     Computes the greatest common divisor res of poly1 and poly2, normalised 
     to have non-negative leading coefficient.
 
+*******************************************************************************
+
+    Gaussian content
+
+*******************************************************************************
+
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len)
 
     Sets res to the non-negative content of {poly, len}.  Aliasing between 
@@ -561,68 +611,92 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
     to have non-negative leading coefficient.  If poly is zero, sets res to 
     zero.
 
+*******************************************************************************
+
+    Euclidean division
+
+*******************************************************************************
+
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
 					       ulong A_len, const fmpz * B, ulong B_len)
 
-   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
-   is reduced mod the leading coefficient of B. If the leading coefficient of B is
-   +/-1 or the division is exact, this is the same thing as division over Q. No 
-   aliasing of input and output operands is allowed. An exception is raised if
-   B->length == 0.
-
+    Compute Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. No aliasing of input and output operands is allowed. 
+    An exception is raised if B->length == 0.
 
 void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, ulong A_len,
 							      const fmpz * B, ulong B_len)
 
-   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
-   is reduced mod the leading coefficient of B, but discard the remainder R. If 
-   the leading coefficient of B is +/-1 or the division is exact, this is the same 
-   thing as division over Q. No aliasing of input and output operands is allowed. 
-   An exception is raised if B->length == 0.
+    Compute Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B, but discard the 
+    remainder R. If the leading coefficient of B is +/-1 or the division is 
+    exact, this is the same thing as division over Q. No aliasing of input and 
+    output operands is allowed. An exception is raised if B->length == 0.
 
 void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
 					    const fmpz * A, const fmpz * B, ulong B_len)
 
-   Compute Q, BQ such that BQ = B*Q and A = BQ + R for some R where each coefficient 
-   of R beyond B->length - 1 is reduced mod the leading coefficient of B. We assume
-   that A->length = 2*B->length - 1. If the leading coefficient of B is +/-1 or the 
-   division is exact, this is the same thing as division over Q. No aliasing of input 
-   and output operands is allowed. An exception is raised if B_len == 0.
+    Compute Q, BQ such that BQ = B*Q and A = BQ + R for some R where each 
+    coefficient of R beyond B->length - 1 is reduced mod the leading 
+    coefficient of B. We assume that A->length = 2*B->length - 1. If the 
+    leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q. No aliasing of input and output operands 
+    is allowed. An exception is raised if B_len == 0.
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
 			     const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
 
-   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
-   is reduced mod the leading coefficient of B. If the leading coefficient of B is
-   +/-1 or the division is exact, this is the same thing as division over Q. No 
-   aliasing of input and output operands is allowed. An exception is raised if
-   B_len == 0.
+    Compute Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. No aliasing of input and output operands is allowed. 
+    An exception is raised if B_len == 0.
 
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
 						const fmpz_poly_t A, const fmpz_poly_t B)
 
-   Compute Q, R such that A = B*Q + R and each coefficient of R beyond B->length - 1
-   is reduced mod the leading coefficient of B. If the leading coefficient of B is
-   +/-1 or the division is exact, this is the same thing as division over Q. An 
-   exception is raised if B->length == 0.
+    Compute Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. An exception is raised if B->length == 0.
+
+*******************************************************************************
+
+    Pseudo division
+
+*******************************************************************************
 
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
 			     const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
 
-   If L is the leading coefficient of B, then compute Q, R such that L^d*A = QB + R.
-   This function is used for simulating division over QQ. An exception is raised if 
-   B_len == 0. No aliasing of inputs and outputs is allowed.
-
+    If L is the leading coefficient of B, then compute Q, R such that 
+    L^d*A = QB + R. This function is used for simulating division over QQ. An 
+    exception is raised if B_len == 0. No aliasing of inputs and outputs is 
+    allowed.
 
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
 			          ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
-   If L is the leading coefficient of B, then compute Q, R such that L^d*A = QB + R.
-   This function is used for simulating division over QQ. 
+    If L is the leading coefficient of B, then compute Q, R such that 
+    L^d*A = QB + R. This function is used for simulating division over QQ. 
+
+*******************************************************************************
+
+    Derivative
+
+*******************************************************************************
 
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 
     Sets res to the derivative of poly.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
 
 void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, ulong len, 
                                 const fmpz_t a)
@@ -637,7 +711,8 @@ void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f,
     Evaluates the polynomial f at the integer a using Horner's rule, and 
     sets res to the result.
 
-void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, ulong len, const fmpz_t a)
+void _fmpz_poly_evaluate(fmpz_t res, 
+                         const fmpz * f, ulong len, const fmpz_t a)
 
     Evaluates the polynomial {f, len} at the integer a and sets res to the 
     result.  Aliasing between res and a or any of the coefficients of f is 
@@ -646,4 +721,17 @@ void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, ulong len, const fmpz_t a)
 void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial f at the integer a and sets res to the result.
+
+********************************************************************************
+
+    String conversions
+
+********************************************************************************
+
+void fmpz_poly_print(fmpz_poly_t poly)
+
+    Print the polynomial to stdout. First the length of the polynomial is
+    printed. If the length is not zero two spaces are printed after the 
+    length, then a space separated list of coefficients is printed, starting
+    with the constant coefficient.
 
