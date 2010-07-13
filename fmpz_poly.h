@@ -328,5 +328,15 @@ void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
+void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, ulong len, 
+                                const fmpz_t a);
+
+void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, 
+                               const fmpz_t a);
+
+void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, ulong len, const fmpz_t a);
+
+void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
+
 #endif
 
