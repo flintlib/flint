@@ -154,6 +154,14 @@ void fmpz_print(fmpz_t x)
    positive integer, or a minus sign followed by the digits of 
    a negative integer.
 
+size_t fmpz_sizeinbase(const fmpz_t f, int b)
+
+    Returns the size of f in base b, measured in numbers of digits.
+
+char * fmpz_get_str(char * str, int b, const fmpz_t f)
+
+    Returns the representation of f in base b.
+
 /*******************************************************************************
 
    Basic properties and manipulation

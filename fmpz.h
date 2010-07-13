@@ -148,6 +148,10 @@ void fmpz_print(fmpz_t x)
 	else gmp_printf("%Zd", COEFF_TO_PTR(*x));
 }
 
+size_t fmpz_sizeinbase(const fmpz_t f, int b);
+
+char * fmpz_get_str(char * str, int b, const fmpz_t f);
+
 static inline
 void fmpz_swap(fmpz_t f, fmpz_t g)
 {
