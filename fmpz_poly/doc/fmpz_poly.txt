@@ -722,13 +722,13 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial f at the integer a and sets res to the result.
 
-********************************************************************************
+*******************************************************************************
 
     String conversions
 
-********************************************************************************
+*******************************************************************************
 
-void fmpz_poly_print(fmpz_poly_t poly)
+void fmpz_poly_print(const fmpz_poly_t poly)
 
     Print the polynomial to stdout. First the length of the polynomial is
     printed. If the length is not zero two spaces are printed after the 

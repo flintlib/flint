@@ -385,7 +385,7 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
 /*  String conversions  ******************************************************/
 
-void fmpz_poly_print(fmpz_poly_t poly);
+void fmpz_poly_print(const fmpz_poly_t poly);
 
 char * _fmpz_poly_to_string(const fmpz * poly, ulong len);
 
