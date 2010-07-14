@@ -59,6 +59,10 @@ TODO
 * Fix a bug in mul_KS and mullow_KS, to do with the assumption len1 >= len2 
   and zero padding
 
+* Check and improve the functions fmpz_sizeinbase, fmpz_get_str and 
+  fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
+  functionality.  Once this has been done, also include test code for these
+
 Maybe
 =====
 
