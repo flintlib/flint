@@ -124,6 +124,8 @@ void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 
 void fmpz_set_mpz(fmpz_t f, const mpz_t x);
 
+int fmpz_set_str(fmpz_t f, char * str, int b);
+
 static inline
 void fmpz_zero(fmpz_t f)
 {

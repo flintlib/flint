@@ -134,6 +134,10 @@ void fmpz_set_ui(fmpz_t f, const ulong val)
 void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
    Sets f to the given mpz_t value.
+
+int fmpz_set_str(fmpz_t f, char * str, int b)
+
+   Sets f to the given value given in str, in base b.
  
 /*******************************************************************************
 
