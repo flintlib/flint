@@ -387,5 +387,20 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
 void fmpz_poly_print(fmpz_poly_t poly);
 
+char * _fmpz_poly_to_string(const fmpz * poly, ulong len);
+
+char * fmpz_poly_to_string(const fmpz_poly_t poly);
+
+char * _fmpz_poly_to_string_pretty(const fmpz * poly, 
+                                   ulong len, const char * x);
+
+char * fmpz_poly_to_string_pretty(const fmpz_poly_t poly, const char * x);
+
+int fmpz_poly_verify_format(const char * str);
+
+void _fmpz_poly_from_string(fmpz * poly, const char * str);
+
+int fmpz_poly_from_string(fmpz_poly_t poly, const char * str);
+
 #endif
 
