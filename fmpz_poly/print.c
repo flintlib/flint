@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2008, 2009 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -31,17 +31,15 @@
 
 void fmpz_poly_print(fmpz_poly_t poly)
 {
-   ulong i;
-   
-   printf("%lu", poly->length);
-   
-   if (poly->length == 0) return;
+    ulong i;
 
-   printf(" ");
-
-   for (i = 0; i < poly->length; i++)
-   {
-      printf(" ");
-      fmpz_print(poly->coeffs + i);
-   }
+    printf("%lu", poly->length);
+    if (poly->length == 0)
+        return;
+    printf(" ");
+    for (i = 0; i < poly->length; i++)
+    {
+        printf(" ");
+        fmpz_print(poly->coeffs + i);
+    }
 }
