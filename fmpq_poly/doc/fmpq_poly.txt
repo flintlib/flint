@@ -433,6 +433,72 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     Finds the quotient Q and remainder R of the Euclidean division of poly1 
     by poly2.
 
+*******************************************************************************
+
+    Derivative
+
+*******************************************************************************
+
+void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, ulong len)
+
+    Sets {rpoly, rden, len - 1} to the derivative of {poly, den, len}.  Does 
+    nothing if len <= 1.  Supports aliasing between the two polynomials.
+
+void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
+
+    Sets res to the derivative of poly.
+
+*******************************************************************************
+
+    Content
+
+*******************************************************************************
+
+void _fmpq_poly_content(mpq_t res, 
+                        const fmpz * poly, const fmpz_t den, ulong len)
+
+    Sets res to the content of {poly, den, len}.  If len == 0, sets res to 
+    zero.
+
+void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly)
+
+    Sets res to the content of poly.  The content of the zero polynomial 
+    is defined to be zero.
+
+void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
+                               const fmpz * poly, const fmpz_t den, ulong len)
+
+    Sets {rpoly, rden, len} to the primitive part (with non-negative leading 
+    coefficient) of {poly, den, len}.  Assumes that len > 0.  Supports 
+    aliasing between the two polynomials.
+
+void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
+
+    Sets res to the primitive part (with non-negative leading coefficient) 
+    of poly.
+
+int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, ulong len)
+
+    Returns whether the polynomial {poly, den, len} is monic.  The zero 
+    polynomial is not monic by definition.
+
+int fmpq_poly_is_monic(const fmpq_poly_t poly)
+
+    Returns whether the polynomial poly is monic.  The zero polynomial is 
+    not monic by definition.
+
+void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, ulong len)
+
+    Sets {rpoly, rden, len} to the monic scalar multiple of {poly, den, len}. 
+    Assumes that len > 0.  Supports aliasing between the two polynomials.
+
+void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
+
+    Sets res to the monic scalar multiple of poly whenever poly is non-zero. 
+    If poly is the zero polynomial, sets res to zero.
+
 ********************************************************************************
 
     String conversions
