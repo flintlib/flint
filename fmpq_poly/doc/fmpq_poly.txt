@@ -439,10 +439,6 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
 ********************************************************************************
 
-ulong _fmpq_poly_decimal_digits(ulong n)
-
-    Ad-hoc auxiliary method, computes the number of decimal digits in n.
-
 char * fmpq_poly_to_string(const fmpq_poly_t poly)
 
     Returns the string representation of poly.
