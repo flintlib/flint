@@ -34,30 +34,45 @@
 
 int fmpz_poly_verify_format(const char * str)
 {
-    size_t i, len;
+    unsigned long i, len;
     const char * s = str;
+    
     if (s == NULL || !isdigit(s[0]))
         return 0;
-    if (s[0] == '0' && s[1] != '\0')
+    if (s[0] == '0' && s[1] == '\0')
         return 1;
-    s++;
-    while (*s != '\0' && *s != ' ')
+    
+    for (s++; *s != '\0' && *s != ' '; s++)
         if (!(isdigit(*s)))
             return 0;
-        else
-            s++;
+    
     if (*s++ == '\0')
         return 0;
     
+    /* TODO:  Technically, we should check that the number fits in a long. */
     len = (ulong) atol(str);
     
-    /* Check that s is len times " ####" followed by '\0'. */
+    /* Check that s is len times " [-]####" followed by '\0'. */
     for (i = 0; i < len; i++)
     {
-        if (*s++ != ' ')
+        if (*s++ != ' ') 
             return 0;
-        if (*s == '\0' || (*s != '-' && !isdigit(*s)))
-            return 0;
+        if (*s == '-')
+        {
+            char c = *++s;
+            if (!isdigit(c) || c == '0')
+                return 0;
+        }
+        else if (isdigit(*s))
+        {
+            if (*s == '0')
+            {
+                char c = *(s + 1);
+                if (c != ' ' && c != '\0')
+                    return 0;
+            }
+        }
+        else return 0;
         while (isdigit(*++s)) ;
     }
     if (*s != '\0')
@@ -113,5 +128,6 @@ int fmpz_poly_from_string(fmpz_poly_t poly, const char * str)
     
     _fmpz_poly_set_length(poly, len);
     _fmpz_poly_normalise(poly);
+    return 1;
 }
 

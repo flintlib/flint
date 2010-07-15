@@ -50,7 +50,7 @@ int main(void)
       fmpz_poly_randtest(a, n_randint(100), n_randint(200));
     
       str = fmpz_poly_to_string(a);
-      fmpz_poly_from_string(b, str);
+      int ans = fmpz_poly_from_string(b, str);
       free(str);
 
       result = (fmpz_poly_equal(a, b));

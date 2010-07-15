@@ -737,11 +737,12 @@ void fmpz_poly_print(const fmpz_poly_t poly)
 
 char * _fmpz_poly_to_string(const fmpz * poly, ulong len)
 
-    Returns the FLINT representation of the polynomial {poly, len}.
+    Returns the plain FLINT string representation of the polynomial 
+    {poly, len}.
 
 char * fmpz_poly_to_string(const fmpz_poly_t poly)
 
-    Returns the FLINT string representation of poly.
+    Returns the plain FLINT string representation of the polynomial poly.
 
 char * _fmpz_poly_to_string_pretty(const fmpz * poly, 
                                    ulong len, const char * x)
@@ -757,15 +758,20 @@ char * fmpz_poly_to_string_pretty(const fmpz_poly_t poly, const char * x)
 int fmpz_poly_verify_format(const char * str)
 
     Verifies that the null-terminated string str contains the representation 
-    of a polynomial in the plain FLINT format.
+    of a polynomial in the plain FLINT format.  Returns 1 if this is the case, 
+    and 0 otherwise.
+    
+    If the string is not null-terminated, this method might execute invalid 
+    reads from memory, causing segmentation faults.
 
 void _fmpz_poly_from_string(fmpz * poly, const char * str)
 
-    Sets poly to the polynomial encoded in the string str.  Assumes that poly 
-    is allocated as a sufficiently large array suitable for the number of 
-    coefficients present in str.
+    Sets poly to the polynomial encoded in the null-terminated string str.  
+    Assumes that poly is allocated as a sufficiently large array suitable for 
+    the number of coefficients present in str.
 
 int fmpz_poly_from_string(fmpz_poly_t poly, const char * str)
 
-    Sets poly to the polynomial encoded in the string str.
+    Imports a polynomial from a null-terminated string.  If the string str 
+    represents a valid polynomial returns 1, otherwise returns 0.
 

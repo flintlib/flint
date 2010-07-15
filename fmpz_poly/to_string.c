@@ -47,7 +47,7 @@ char * _fmpz_poly_to_string(const fmpz * poly, ulong len)
     bound  = (ulong) (ceil(log10((double) (len + 1UL))));
     for (i = 0; i < len; i++)
         bound += fmpz_sizeinbase(poly + i, 10) + 1UL;
-    bound += len + 1UL;
+    bound += len + 2UL;
     
     strbase = malloc(bound * sizeof(char));
     str = strbase;
