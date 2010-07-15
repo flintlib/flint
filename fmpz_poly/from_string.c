@@ -39,8 +39,9 @@ int fmpz_poly_verify_format(const char * str)
     
     if (s == NULL || !isdigit(s[0]))
         return 0;
-    if (s[0] == '0' && s[1] == '\0')
-        return 1;
+    
+    if (s[0] == '0')
+        return s[1] == '\0';
     
     for (s++; *s != '\0' && *s != ' '; s++)
         if (!(isdigit(*s)))
