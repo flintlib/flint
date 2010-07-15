@@ -60,6 +60,8 @@ void fmpq_poly_clear(fmpq_poly_t poly);
 
 void _fmpq_poly_normalise(fmpq_poly_t poly);
 
+void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, ulong len);
+
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
 /*  Accessing numerator and denominator  *************************************/
@@ -246,7 +248,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 /*  Derivative  **************************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
-                           const fmpz * poly, const fmpz_t den);
+                           const fmpz * poly, const fmpz_t den, ulong len);
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
 

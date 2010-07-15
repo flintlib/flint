@@ -37,7 +37,7 @@ void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden,
     _fmpq_poly_canonicalise(rpoly, rden, len - 1UL);
 }
 
-void fmpq_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
+void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 {
     ulong len = poly->length;
     if (len < 2UL)
@@ -47,7 +47,7 @@ void fmpq_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
     }
 
     fmpq_poly_fit_length(res, len - 1UL);
-    _fmpq_poly_derivative(res->coeffs, poly->coeffs, len);
+    _fmpq_poly_derivative(res->coeffs, res->den, poly->coeffs, poly->den, len);
     _fmpq_poly_set_length(res, len - 1UL);
 }
 
