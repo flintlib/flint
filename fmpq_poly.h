@@ -252,6 +252,27 @@ void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
 
+/*  Gaussian content  ********************************************************/
+
+void _fmpq_poly_content(mpq_t res, 
+                        const fmpz * poly, const fmpz_t den, ulong len);
+
+void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly);
+
+void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
+                               const fmpz * poly, const fmpz_t den, ulong len);
+
+void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly);
+
+int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, ulong len);
+
+int fmpq_poly_is_monic(const fmpq_poly_t poly);
+
+void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, ulong len);
+
+void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly);
+
 /*  String conversion  *******************************************************/
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly);
