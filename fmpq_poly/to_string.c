@@ -27,24 +27,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
-
-ulong _fmpq_poly_decimal_digits(ulong n)
-{
-    ulong count;
-    if (n == 0UL)
-        return 1UL;
-    count = 0UL;
-    while (n > 0UL)
-    {
-        n /= 10UL;
-        count++;
-    }
-    return count;
-}
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly)
 {
@@ -74,7 +61,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
         fmpz_get_mpz(z, poly->den);
         denlen = mpz_sizeinbase(z, 10);
     }
-    len = _fmpq_poly_decimal_digits(poly->length) + 2;
+    len = (ulong) ceil(log10((double) (poly->length + 1UL))) + 2UL;
     for (i = 0; i < poly->length; i++)
     {
         fmpz_get_mpz(z, poly->coeffs + i);
@@ -155,7 +142,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
         if (mpz_sgn(z) != 0) len += 1 + denlen;  /* Denominator and /       */
         len += 3;                                /* Operator and whitespace */
         len += 1 + varlen + 1;                   /* *, x and ^              */
-        len += _fmpq_poly_decimal_digits(i);     /* Exponent                */
+        len += (ulong) ceil(log10((double) (i + 1)));  /* Exponent          */
     }
     
     mpq_init(q);
