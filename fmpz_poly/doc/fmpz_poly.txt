@@ -688,6 +688,12 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
 
 *******************************************************************************
 
+void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, ulong len) 
+
+    Sets {rpoly, len - 1} to the derivative of {poly, len}.  Also handles the 
+    cases len == 0 and len == 1 correctly.  Supports aliasing of rpoly and 
+    poly.
+
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 
     Sets res to the derivative of poly.

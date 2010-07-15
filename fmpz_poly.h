@@ -368,6 +368,8 @@ void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
 /*  Derivative  **************************************************************/
 
+void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, ulong len);
+ 
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
 /*  Evaluation  **************************************************************/
