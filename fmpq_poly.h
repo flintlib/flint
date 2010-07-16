@@ -255,9 +255,10 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
 /*  Evaluation  **************************************************************/
 
 void _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, ulong len, const mpz_t a);
+                             const fmpz_t den, ulong len, const fmpz_t a);
 
-void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a);
+void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
+                             const fmpz_t a);
 
 void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, 
                              const fmpz_t den, ulong len, const mpq_t a);
