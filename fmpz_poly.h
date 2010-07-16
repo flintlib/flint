@@ -385,6 +385,17 @@ void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, ulong len,
 
 void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
+void _fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz * f, ulong len, 
+                                const mpq_t a);
+
+void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
+                               const mpq_t a);
+
+void _fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, ulong len, 
+                         const mpq_t a);
+
+void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
+
 /*  String conversions  ******************************************************/
 
 void fmpz_poly_print(const fmpz_poly_t poly);

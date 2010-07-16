@@ -728,6 +728,30 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial f at the integer a and sets res to the result.
 
+void _fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz * f, ulong len, 
+                                    const mpq_t a)
+
+    Evaluates the polynomial {f, len} at the rational a using Horner's rule, 
+    and sets res to the result.  Aliasing between res and a or any of the 
+    coefficients of f is not supported.
+
+void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
+                                   const mpq_t a)
+
+    Evaluates the polynomial f at the rational a using Horner's rule, and 
+    sets res to the result.
+
+void _fmpz_poly_evaluate_mpq(mpq_t res, 
+                             const fmpz * f, ulong len, const mpq_t a)
+
+    Evaluates the polynomial {f, len} at the rational a and sets res to the 
+    result.  Aliasing between res and a or any of the coefficients of f is 
+    not supported.
+
+void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
+
+    Evaluates the polynomial f at the rational a and sets res to the result.
+
 *******************************************************************************
 
     String conversions
