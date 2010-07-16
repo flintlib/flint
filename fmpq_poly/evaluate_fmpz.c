@@ -38,6 +38,7 @@ _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly,
     _fmpz_poly_evaluate_horner(num, poly, len, a);
     fmpz_get_mpz(mpq_numref(res), num);
     fmpz_get_mpz(mpq_denref(res), den);
+    mpq_canonicalize(res);
     fmpz_clear(num);
 }
 

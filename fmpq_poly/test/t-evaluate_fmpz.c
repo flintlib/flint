@@ -44,8 +44,8 @@ main(void)
     // Check that (f+g)(a) = f(a) + g(a)
     for (ulong i = 0; i < 10000UL; i++)
     {
-        fmpz_t a, b, c;
-        fmpq_poly_t f, g;
+        fmpz_t a;
+        fmpq_poly_t f, g, h;
         mpq_t x, y;
 
         mpq_init(x);
@@ -53,6 +53,7 @@ main(void)
         fmpz_init(a);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
+        fmpq_poly_init(h);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpq_poly_randtest(g, n_randint(100), n_randint(200));
         fmpz_randtest(a, n_randint(100));
@@ -60,15 +61,22 @@ main(void)
         fmpq_poly_evaluate_fmpz(x, f, a);
         fmpq_poly_evaluate_fmpz(y, g, a);
         mpq_add(x, x, y);
-        fmpq_poly_add(f, f, g);
-        fmpq_poly_evaluate_fmpz(y, f, a);
+        fmpq_poly_add(h, f, g);
+        fmpq_poly_evaluate_fmpz(y, h, a);
 
         result = (mpq_equal(x, y));
         if (!result)
         {
             printf("Error:\n");
+            fmpq_poly_print(f);
+            printf("\n");
+            fmpq_poly_print(g);
+            printf("\n");
+            printf("a = ");
             fmpz_print(a);
-            printf("\n\n");
+            printf("\n");
+            gmp_printf("f(a) + g(a) = %Qd\n", x);
+            gmp_printf("(f + g)(a)  = %Qd\n", y);
             abort();
         }
 
@@ -77,6 +85,7 @@ main(void)
         fmpz_clear(a);
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
+        fmpq_poly_clear(h);
     }
 
     // Check that (f*g)(a) = f(a) * g(a)
