@@ -528,6 +528,22 @@ void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 
 ********************************************************************************
 
+    Square-free
+
+********************************************************************************
+
+int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, ulong len)
+
+    Returns whether the polynomial {poly, den, len} is square-free.
+
+int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
+
+    Returns whether the polynomial poly is square-free.  A non-zero polynomial 
+    is defined to be square-free if it has no non-unit square factors.  We 
+    also define the zero polynomial to be square-free.
+
+********************************************************************************
+
     String conversions
 
 ********************************************************************************

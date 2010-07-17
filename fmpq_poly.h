@@ -286,6 +286,12 @@ void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 
+/*  Square-free  *************************************************************/
+
+int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, ulong len);
+
+int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
+
 /*  String conversion  *******************************************************/
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly);
