@@ -46,7 +46,7 @@ void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden,
             fmpz_gcd(gcd1, gcd1, s);
     }
     if (*den != 1L && *r != 1L)
-        fmpz_gcd(gcd2, gcd2, den);
+        fmpz_gcd(gcd2, r, den);
     
     if (*gcd1 == 1L)
     {
@@ -123,7 +123,7 @@ void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t
     
     _fmpq_poly_scalar_mul_mpq(rop->coeffs, rop->den, 
                               op->coeffs, op->den, op->length, r, s);
-        
+    
     fmpz_clear(r);
     fmpz_clear(s);
 }
