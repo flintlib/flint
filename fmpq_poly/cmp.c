@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-// Compares the two non-zero polynomials, assuming they have the same degree.
+// Compares the two non-zero polynomials, assuming they have the same degree and len > 0.
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, const fmpz_t rden, const ulong len)
 {
     ulong ans, i;
@@ -39,7 +39,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, co
     i = len - 1UL;
     if (fmpz_equal(lden, rden))
     {
-        while ((i != 0) && fmpz_equal(lpoly + i, rpoly + i))
+        while (i && fmpz_equal(lpoly + i, rpoly + i))
             i--;
         ans = fmpz_cmp(lpoly + i, rpoly + i);
     }
@@ -73,7 +73,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, co
             fmpz_mul(lcoeff, lpoly + i, rden);
             fmpz_mul(rcoeff, rpoly + i, lden);
         }
-        ans = fmpz_equal(lcoeff, rcoeff);
+        ans = fmpz_cmp(lcoeff, rcoeff);
         fmpz_clear(lcoeff);
         fmpz_clear(rcoeff);
     }
@@ -82,16 +82,21 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, co
 
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 {
+    ulong len1, len2;
+    
     if (left == right)
         return 0;
     
-    if (left->length < right->length)
+    len1 = left->length;
+    len2 = right->length;
+    
+    if (len1 < len2)
         return -1;
-    else if (left->length > right->length)
+    else if (len1 > len2)
         return 1;
-    else if (left-> length == 0)
+    else if (len1 == 0)
         return 0;
     else
-        return _fmpq_poly_cmp(left->coeffs, left->den, right->coeffs, right->den, left->length);
+        return _fmpq_poly_cmp(left->coeffs, left->den, right->coeffs, right->den, len1);
 }
 
