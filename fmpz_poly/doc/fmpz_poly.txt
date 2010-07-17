@@ -525,16 +525,28 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
 *******************************************************************************
 
-void fmpz_poly_shift_left(fmpz_poly_t res, 
-                          const fmpz_poly_t poly, const ulong n)
+void _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, ulong len, ulong n)
+
+    Sets {res, len + n} to {poly, len} shifted left by n coefficients.  
+    Inserts zero coefficients at the lower end.  Assumes that len and n are 
+    positive, and that res fits len + n elements.  Supports aliasing between 
+    res and poly.
+
+void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
 
     Set res to poly shifted left by n coeffs. Zero coefficients are inserted.
 
-void fmpz_poly_shift_right(fmpz_poly_t res, 
-                           const fmpz_poly_t poly, const ulong n)
+void _fmpz_poly_shift_right(fmpz * res, const fmpz * poly, ulong len, ulong n)
 
-    Set res to poly shifted right by n coeffs. If n is bigger than the 
-    current length of poly, res is set to the zero polynomial.
+    Sets {res, len - n} to {poly, len} shifted right by n coefficients.  
+    Assumes that len and n are positive, that len > n, and that res fits 
+    len - n elements.  Supports aliasing between res and poly, although in 
+    this case the top coefficients of poly are not set to zero.
+
+void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+
+    Set res to poly shifted right by n coefficients. If n is equal to or 
+    greater than the current length of poly, res is set to the zero polynomial.
 
 *******************************************************************************
 

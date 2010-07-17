@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,41 +16,48 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, const ulong n)
+void 
+_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, ulong len, ulong n)
 {
-   if (n == 0) // special case, no shift
-	{
-		fmpz_poly_set(res, poly);
-		return;
-	}
-	
-	if (poly->length == 0) // nothing to shift
-	{
-		fmpz_poly_zero(res);
-		return;
-	}
-	
-	fmpz_poly_fit_length(res, poly->length + n);
-	
-	// copy in reverse order to avoid writing over unshifted coeffs
-	long i;
-	for (i = poly->length - 1; i >= 0; i--) 
-		fmpz_set(res->coeffs + i + n, poly->coeffs + i);
+    ulong i = len;
+    
+    /* Copy in reverse to avoid writing over unshifted coefficients */
+    while (i--)
+        fmpz_set(res + n + i, poly + i);
+    
+    for (i = 0UL; i < n; i++)
+        fmpz_zero(res + i);
+}
 
-   // insert n zeroes
-	for (i = 0; i < n; i++) fmpz_zero(res->coeffs + i);
-   
-   _fmpz_poly_set_length(res, poly->length + n);
+void
+fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+{
+    if (n == 0)
+    {
+        fmpz_poly_set(res, poly);
+        return;
+    }
+    
+    if (poly->length == 0)
+    {
+        fmpz_poly_zero(res);
+        return;
+    }
+    
+    fmpz_poly_fit_length(res, poly->length + n);
+    _fmpz_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
+    _fmpz_poly_set_length(res, poly->length + n);
 }

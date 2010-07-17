@@ -283,11 +283,13 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
 /*  Shifting  ****************************************************************/
 
-void fmpz_poly_shift_left(fmpz_poly_t res, 
-                                     const fmpz_poly_t poly, const ulong n);
+void _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, ulong len, ulong n);
 
-void fmpz_poly_shift_right(fmpz_poly_t res, 
-                                     const fmpz_poly_t poly, const ulong n);
+void _fmpz_poly_shift_right(fmpz * res, const fmpz * poly, ulong len, ulong n);
+
+void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n);
+
+void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, ulong n);
 
 /*  Norms  *******************************************************************/
 
