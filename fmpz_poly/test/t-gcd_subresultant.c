@@ -104,13 +104,14 @@ main(void)
     // Check that a divides GCD(af, ag)
     for (ulong i = 0; i < 500UL; i++)
     {
-        fmpz_poly_t a, b, d, f, g;
+        fmpz_poly_t a, d, f, g, q, r;
 
         fmpz_poly_init(a);
-        fmpz_poly_init(b);
         fmpz_poly_init(d);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
+        fmpz_poly_init(q);
+        fmpz_poly_init(r);
         fmpz_poly_randtest_not_zero(a, n_randint(24) + 1, n_randint(24) + 1);
         fmpz_poly_randtest(f, n_randint(50), n_randint(100));
         fmpz_poly_randtest(g, n_randint(50), n_randint(100));
@@ -118,28 +119,25 @@ main(void)
         fmpz_poly_mul(f, a, f);
         fmpz_poly_mul(g, a, g);
         fmpz_poly_gcd_subresultant(d, f, g);
-        fmpz_poly_gcd_subresultant(b, a, d);
-        if (fmpz_sgn(a->coeffs + a->length - 1UL) < 0)
-            fmpz_poly_neg(a, a);
         
-        result = (fmpz_poly_equal(a, b));
+        fmpz_poly_divrem_divconquer(q, r, d, a);
+        
+        result = (r->length == 0UL);
         if (!result)
         {
             printf("Error:\n");
-            fmpz_poly_print(f);
-            printf("\n\n");
-            fmpz_poly_print(g);
-            printf("\n\n");
-            fmpz_poly_print(d);
-            printf("\n\n");
+            fmpz_poly_print(f), printf("\n");
+            fmpz_poly_print(g), printf("\n");
+            fmpz_poly_print(d), printf("\n");
             abort();
         }
 
         fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
         fmpz_poly_clear(d);
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
+        fmpz_poly_clear(q);
+        fmpz_poly_clear(r);
     }
 
     fmpz_poly_randclear();
