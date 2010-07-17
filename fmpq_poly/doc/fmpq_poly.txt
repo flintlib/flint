@@ -413,6 +413,22 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
 *******************************************************************************
 
+    Shifting
+
+*******************************************************************************
+
+void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+
+    Set res to poly shifted left by n coefficients. Zero coefficients are 
+    inserted.
+
+void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+
+    Set res to poly shifted right by n coefficients. If n is equal to or 
+    greater than the current length of poly, res is set to the zero polynomial.
+
+*******************************************************************************
+
     Euclidean division
 
 *******************************************************************************

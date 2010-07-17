@@ -236,6 +236,12 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
 void fmpq_poly_pow(fmpq_poly_t rpoly, const fmpq_poly_t poly, ulong e);
 
+/*  Shifting  ****************************************************************/
+
+void fmpq_poly_shift_left(fmpq_poly_t res, const fmpq_poly_t poly, ulong n);
+
+void fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, ulong n);
+
 /*  Euclidean division  ******************************************************/
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
