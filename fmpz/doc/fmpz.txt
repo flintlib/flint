@@ -313,8 +313,20 @@ void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, const ulong exp)
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
    Sets f to the quotient of g and h, assuming that the
-   division is exact, i.e. g is a multiple of h. If h is 
-   0 and exception is raised.
+   division is exact, i.e. g is a multiple of h. If h is 0
+   an exception is raised.
+
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h)
+
+   Sets f to the quotient of g and h, assuming that the
+   division is exact, i.e. g is a multiple of h. If h is 0
+   an exception is raised.
+
+void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
+
+   Sets f to the quotient of g and h, assuming that the
+   division is exact, i.e. g is a multiple of h. If h is 0
+   an exception is raised.
 
 ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong x)
 

@@ -219,6 +219,10 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h);
+
+void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, unsigned long h);
+
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
