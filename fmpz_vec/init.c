@@ -29,8 +29,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-fmpz * _fmpz_vec_init(ulong length)
+fmpz * _fmpz_vec_init(ulong len)
 {
-  return (fmpz *) calloc(length, sizeof(fmpz));
+    return (fmpz *) calloc(len, sizeof(fmpz));
 }
 

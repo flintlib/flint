@@ -28,17 +28,17 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length)
+ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong len)
 {
-	ulong i;
-	long limbs, max_limbs = 0;
-	
-	for (i = 0; i < length; i++)
-	{
-	   limbs = fmpz_size(vec + i);
-	   if (limbs > max_limbs)
-	      max_limbs = limbs;
-	}
-
-	return max_limbs;
+    ulong i;
+    long limbs, max_limbs = 0;
+    
+    for (i = 0; i < len; i++)
+    {
+        limbs = fmpz_size(vec + i);
+        if (limbs > max_limbs)
+            max_limbs = limbs;
+    }
+    
+    return max_limbs;
 }

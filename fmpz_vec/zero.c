@@ -28,10 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_zero(fmpz * vec1, ulong len1)
+void _fmpz_vec_zero(fmpz * vec, ulong len)
 {
-	ulong i;
-	
-	for (i = 0; i < len1; i++)
-		fmpz_zero(vec1 + i);
+    ulong i;
+    for (i = 0; i < len; i++)
+        fmpz_zero(vec + i);
 }

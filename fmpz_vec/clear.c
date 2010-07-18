@@ -29,13 +29,13 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_clear(fmpz * in1, ulong length)
+void _fmpz_vec_clear(fmpz * vec, ulong len)
 {
-   ulong i;
-   
-   for (i = 0; i < length; i++)
-      fmpz_clear(in1 + i);
+    ulong i;
 
-   free(in1);
+    for (i = 0; i < len; i++)
+        fmpz_clear(vec + i);
+
+    free(vec);
 }
 

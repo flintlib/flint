@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
    
 ******************************************************************************/
 
@@ -29,25 +29,26 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_submul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x)
+void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
 {
-	long i;
-	fmpz c = *x;
-		 
-	if (!COEFF_IS_MPZ(c))
-	{
+    fmpz c = *x;
+
+    if (!COEFF_IS_MPZ(c))
+    {
         if (c == 0)
-		    return;
-		else if (c == 1)
-		    _fmpz_vec_sub(poly1, poly1, poly2, len2);
-		else if (c == -1)
-		    _fmpz_vec_add(poly1, poly1, poly2, len2);
-		else 
-			_fmpz_vec_scalar_submul_si(poly1, poly2, len2, c);
-	} else
-	{
+            return;
+        else if (c == 1)
+            _fmpz_vec_sub(vec1, vec1, vec2, len2);
+        else if (c == -1)
+            _fmpz_vec_add(vec1, vec1, vec2, len2);
+        else 
+            _fmpz_vec_scalar_submul_si(vec1, vec2, len2, c);
+    }
+    else
+    {
+        ulong i;
         for (i = 0; i < len2; i++)
-			fmpz_submul(poly1 + i, poly2 + i, x);
-	}
+            fmpz_submul(vec1 + i, vec2 + i, x);
+    }
 }
 

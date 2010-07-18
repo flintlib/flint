@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,11 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 William Hart
- 
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+
 ******************************************************************************/
 
 #ifndef FMPZ_VEC_H
@@ -29,9 +30,13 @@
 #include <mpir.h>
 #include "fmpz.h"
 
-fmpz * _fmpz_vec_init(ulong length);
+/*  Memory management  *******************************************************/
 
-void _fmpz_vec_clear(fmpz * in1, ulong length);
+fmpz * _fmpz_vec_init(ulong len);
+
+void _fmpz_vec_clear(fmpz * vec, ulong len);
+
+/*  Randomisation  ***********************************************************/
 
 void _fmpz_vec_randinit(void);
 
@@ -39,81 +44,90 @@ void _fmpz_vec_randclear(void);
 
 void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in);
 
-long _fmpz_vec_max_bits(const fmpz * vec, ulong length);
+/*  Bit sizes  ***************************************************************/
 
-ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong length);
+long _fmpz_vec_max_bits(const fmpz * vec, ulong len);
 
-void _fmpz_vec_print(fmpz * vec, ulong length);
+ulong _fmpz_vec_max_limbs(const fmpz * vec, ulong len);
 
-void _fmpz_vec_zero(fmpz * vec1, ulong len1);
+/*  Output  ******************************************************************/
+
+void _fmpz_vec_print(fmpz * vec, ulong len);
+
+/*  Assignment and basic manipulation  ***************************************/
 
 void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, ulong len2);
 
 void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, ulong len2);
 
+void _fmpz_vec_zero(fmpz * vec, ulong len);
+
+void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2);
+
+/*  Comparison  **************************************************************/
+
 int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, ulong len);
 
 int _fmpz_vec_is_zero(const fmpz * vec, ulong len);
 
-void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, ulong len2);
-
-void _fmpz_vec_scalar_mul_si(fmpz * vec1, 
-							 const fmpz * vec2, ulong len2, long c);
-
-void _fmpz_vec_scalar_mul_ui(fmpz * vec1, 
-							 const fmpz * vec2, ulong len2, ulong c);
-
-void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
-		            const fmpz * vec2, ulong len2, const fmpz_t x);
-
-void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
-                          const fmpz * vec2, ulong len2, ulong exp);
-
-void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, 
-                     const fmpz * vec2, ulong len2, const fmpz_t x);
-
-void _fmpz_vec_scalar_divexact_si(fmpz * vec1, 
-                     const fmpz * vec2, ulong len2, long c);
-
-void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, 
-                     const fmpz * vec2, ulong len2, ulong c);
-
-void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, 
-                     const fmpz * vec2, ulong len2, const fmpz_t x);
-
-void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, 
-                    const fmpz * vec2, ulong len2, const ulong exp);
-
-void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
-						     const fmpz * vec2, ulong len2, long c);
-
-void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, 
-	                const fmpz * poly2, ulong len2, const fmpz_t c);
-
-void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
-	              const fmpz * vec2, ulong len2, long c, ulong exp);
-
-void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
-						     const fmpz * vec2, ulong len2, long c);
-
-void _fmpz_vec_scalar_submul_fmpz(fmpz * poly1, 
-	                const fmpz * poly2, ulong len2, const fmpz_t c);
-
-void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, 
-	              const fmpz * vec2, ulong len2, long c, ulong exp);
+/*  Addition  ****************************************************************/
 
 void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
-				                     const fmpz * vec2, ulong len2);
+                                               const fmpz * vec2, ulong len2);
 
 void _fmpz_vec_sub(fmpz * res, const fmpz * vec1, 
-				                     const fmpz * vec2, ulong len2);
+                                               const fmpz * vec2, ulong len2);
+
+/*  Scalar multiplication and division  **************************************/
+
+void _fmpz_vec_scalar_mul_si(fmpz * vec1, 
+                                       const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_mul_ui(fmpz * vec1, 
+                                      const fmpz * vec2, ulong len2, ulong c);
+
+void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
+                               const fmpz * vec2, ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
+                                    const fmpz * vec2, ulong len2, ulong exp);
+
+void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2, 
+                                                  ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_divexact_si(fmpz * vec1, 
+                                       const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, 
+                                      const fmpz * vec2, ulong len2, ulong c);
+
+void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, 
+                               const fmpz * vec2, ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, 
+                                                 ulong len2, const ulong exp);
+
+void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
+                                       const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, const fmpz * poly2, 
+                                                  ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, 
+                                               ulong len2, long c, ulong exp);
+
+void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
+                                       const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, 
+                                                   ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, 
+                                                ulong len2, long c, ulong exp);
+
+/*  Gaussian content  ********************************************************/
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len);
 
 #endif
-
-
-
-
-
 

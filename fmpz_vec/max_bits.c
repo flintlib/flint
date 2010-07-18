@@ -28,20 +28,20 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long _fmpz_vec_max_bits(const fmpz * vec, ulong length)
+long _fmpz_vec_max_bits(const fmpz * vec, ulong len)
 {
-	ulong i;
-	long bits, max_bits = 0;
-	long sign = 1L;
+    ulong i;
+    long bits, max_bits = 0;
+    long sign = 1L;
 
-	for (i = 0; i < length; i++)
-	{
-	   bits = fmpz_bits(vec + i);
-	   if (bits > max_bits)
-	      max_bits = bits;
-       if (fmpz_sgn(vec + i) < 0)
-	      sign = -1L;
-	}
+    for (i = 0; i < len; i++)
+    {
+        bits = fmpz_bits(vec + i);
+        if (bits > max_bits)
+            max_bits = bits;
+        if (fmpz_sgn(vec + i) < 0)
+            sign = -1L;
+    }
 
-	return max_bits*sign;
+    return max_bits * sign;
 }
