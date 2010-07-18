@@ -31,7 +31,7 @@
 int _fmpz_vec_is_zero(const fmpz * vec, ulong len)
 {
     ulong i;
-    for (i = 0; (i < len) && (*(vec + i) == 0); i++);
+    for (i = 0; (i < len) && (*(vec + i) == 0); i++) ;
     return (i == len);
 }
 
