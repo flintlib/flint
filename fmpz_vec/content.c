@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -31,20 +31,8 @@
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
 {
-	ulong i;
-    fmpz_t temp;
-    
-    if (len == 0)
-    {
-        fmpz_zero(res);
-        return;
-    }
-    
-    fmpz_init(temp);
-    fmpz_abs(temp, vec);
-    for (i = 1; (*temp != 1) && (i < len); i++)
-        fmpz_gcd(temp, temp, vec + i);
-    fmpz_swap(res, temp);
-    fmpz_clear(temp);
+    fmpz_zero(res);
+    while (len--)
+        fmpz_gcd(res, res, vec + len);
 }
 
