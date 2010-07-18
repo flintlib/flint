@@ -30,10 +30,9 @@
 
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len)
 {
-    fmpz * c = (fmpz *) poly + len;
     fmpz_zero(res);
-    while (c != poly & (*res != 1L))
-        fmpz_gcd(res, res, --c);
+    while (len--)
+        fmpz_gcd(res, res, poly + len);
 }
 
 void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
