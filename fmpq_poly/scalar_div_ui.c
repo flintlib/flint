@@ -60,7 +60,7 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden,
         }
         else
         {
-            _fmpz_vec_scalar_divexact(rpoly, poly, len, d);
+            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
             fmpz_divexact(d, fc, d);
             fmpz_mul(rden, den, d);
         }

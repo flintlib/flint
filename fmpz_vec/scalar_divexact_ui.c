@@ -19,51 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpq_poly.h"
 
-void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
+void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2, 
+                                               ulong len2, ulong c)
 {
-    if (*den == 1L)
-        return;
-    if (*den == -1L)
-    {
-        _fmpz_vec_neg(poly, poly, len);
-        fmpz_set_ui(den, 1UL);
-        return;
-    }
-    if (len == 0UL)
-    {
-        fmpz_set_ui(den, 1UL);
-        return;
-    }
-    
-    fmpz_t gcd;
-    fmpz_init(gcd);
-    _fmpz_vec_content(gcd, poly, len);
-    if (*gcd != 1L)
-        fmpz_gcd(gcd, gcd, den);
-    if (fmpz_sgn(den) < 0)
-        fmpz_neg(gcd, gcd);
-    if (*gcd != 1L)
-    {
-        _fmpz_vec_scalar_divexact_fmpz(poly, poly, len, gcd);
-        fmpz_divexact(den, den, gcd);
-    }
-    fmpz_clear(gcd);
-}
-
-void fmpq_poly_canonicalise(fmpq_poly_t poly)
-{
-    _fmpq_poly_normalise(poly);
-    _fmpq_poly_canonicalise(poly->coeffs, poly->den, poly->length);
+    ulong i;
+    for (i = 0; i < len2; i++)
+        fmpz_divexact_ui(vec1 + i, vec2 + i, c);
 }
 

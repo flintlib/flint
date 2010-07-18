@@ -68,8 +68,8 @@ void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1,
     B = A + lenA;
     Q = B + lenB;
     R = Q + lenQ;
-    _fmpz_vec_scalar_divexact(A, poly1, len1, a);
-    _fmpz_vec_scalar_divexact(B, poly2, len2, b);
+    _fmpz_vec_scalar_divexact_fmpz(A, poly1, len1, a);
+    _fmpz_vec_scalar_divexact_fmpz(B, poly2, len2, b);
     s = 0UL;
     
     fmpz_init(h);
@@ -109,7 +109,7 @@ void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1,
         fmpz_pow_ui(temp, g, delta + 1UL - s);
         _fmpz_vec_scalar_mul_fmpz(R, R, lenR, temp);
         
-        _fmpz_vec_scalar_divexact(B, R, lenR, r);
+        _fmpz_vec_scalar_divexact_fmpz(B, R, lenR, r);
         lenB = lenR;
         
         olddelta = delta;
@@ -135,7 +135,7 @@ void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1,
     
     /* {res, len2} = +- (d / b) {B, lenB} */
     _fmpz_poly_content(b, B, lenB);
-    _fmpz_vec_scalar_divexact(res, B, lenB, b);
+    _fmpz_vec_scalar_divexact_fmpz(res, B, lenB, b);
     if (fmpz_sgn(res + (lenB - 1UL)) < 0)
         fmpz_neg(d, d);
     _fmpz_vec_scalar_mul_fmpz(res, res, lenB, d);

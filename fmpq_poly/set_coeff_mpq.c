@@ -60,7 +60,7 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, ulong n, const mpq_t x)
             fmpz_gcd(c, c, poly->den);
         if (*c != 1L)
         {
-            _fmpz_vec_scalar_divexact(poly->coeffs, poly->coeffs, len, c);
+            _fmpz_vec_scalar_divexact_fmpz(poly->coeffs, poly->coeffs, len, c);
             fmpz_divexact(poly->den, poly->den, c);
         }
         fmpz_set_mpz(t, mpq_denref(x));

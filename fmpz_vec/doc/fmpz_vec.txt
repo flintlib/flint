@@ -103,9 +103,19 @@ void _fmpz_vec_scalar_mul_2exp(fmpz * vec1,
 
     Set {vec1, len2} = {vec2, len2}*2^exp.
 
-void _fmpz_vec_scalar_divexact(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
+void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
 
     Sets {vec1, len2} = {vec2, len2} / x, where the divison is assumed to be 
+    exact for every entry in vec2.
+
+void _fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, ulong len2, long c)
+
+    Sets {vec1, len2} = {vec2, len2} / x, where the divison is assumed to be 
+    exact for every entry in vec2.
+
+void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, const fmpz * vec2, ulong len2, ulong c)
+
+    Sets {vec1, len2} = {vec2, len2} / c, where the divison is assumed to be 
     exact for every entry in vec2.
 
 void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)

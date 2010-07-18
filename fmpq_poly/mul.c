@@ -68,7 +68,7 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
         fmpz_t g;
         fmpz_init(g);
         fmpz_mul(g, gcd1, gcd2);
-        _fmpz_vec_scalar_divexact(rpoly, rpoly, len1 + len2 - 1, g);
+        _fmpz_vec_scalar_divexact_fmpz(rpoly, rpoly, len1 + len2 - 1, g);
         fmpz_divexact(rden, rden, g);
         fmpz_clear(g);
     }

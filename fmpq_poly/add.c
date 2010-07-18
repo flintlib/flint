@@ -78,7 +78,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
                 fmpz_mul(rden, den1, den22);
             else
             {
-                _fmpz_vec_scalar_divexact(rpoly, rpoly, max, e);
+                _fmpz_vec_scalar_divexact_fmpz(rpoly, rpoly, max, e);
                 fmpz_divexact(den11, den1, e);
                 fmpz_mul(rden, den11, den22);
             }

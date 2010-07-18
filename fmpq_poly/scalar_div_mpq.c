@@ -74,7 +74,7 @@ void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden,
         fmpz_divexact(s2, s, gcd1);
         if (*gcd2 == 1L)
         {
-            _fmpz_vec_scalar_divexact(rpoly, poly, len, gcd1);
+            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
             _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, r);
             fmpz_mul(rden, den, s2);
         }
@@ -83,7 +83,7 @@ void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden,
             fmpz_t r2;
             fmpz_init(r2);
             fmpz_divexact(r2, r, gcd2);
-            _fmpz_vec_scalar_divexact(rpoly, poly, len, gcd1);
+            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
             _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, r2);
             fmpz_divexact(rden, den, gcd2);
             fmpz_mul(rden, rden, s2);

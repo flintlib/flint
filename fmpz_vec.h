@@ -69,8 +69,14 @@ void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1,
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
                           const fmpz * vec2, ulong len2, ulong exp);
 
-void _fmpz_vec_scalar_divexact(fmpz * vec1, 
+void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, 
                      const fmpz * vec2, ulong len2, const fmpz_t x);
+
+void _fmpz_vec_scalar_divexact_si(fmpz * vec1, 
+                     const fmpz * vec2, ulong len2, long c);
+
+void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, 
+                     const fmpz * vec2, ulong len2, ulong c);
 
 void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, 
                      const fmpz * vec2, ulong len2, const fmpz_t x);
