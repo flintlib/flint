@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,70 +31,70 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("neg....");
-   fflush(stdout);
-   
-   _fmpz_vec_randinit();
-   
-   // check aliasing of a and b
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      fmpz * a, * b;
-      ulong length = n_randint(100);
-      
-      a = _fmpz_vec_init(length);
-      b = _fmpz_vec_init(length);
-      _fmpz_vec_randtest(a, length, n_randint(200));
-      
-      _fmpz_vec_neg(b, a, length);
-      _fmpz_vec_neg(a, a, length);
-      
-      result = (_fmpz_vec_equal(a, b, length));
-      if (!result)
-      {
-         printf("Error:\n");
-         _fmpz_vec_print(a, length); printf("\n\n");
-         _fmpz_vec_print(b, length); printf("\n\n");
-         abort();
-      }
+    int result;
+    printf("neg....");
+    fflush(stdout);
 
-      _fmpz_vec_clear(a, length);
-      _fmpz_vec_clear(b, length);
-   }
+    _fmpz_vec_randinit();
 
-   // check -(-a) == a
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      fmpz * a, * b;
-      ulong length = n_randint(100);
-      
-      a = _fmpz_vec_init(length);
-      b = _fmpz_vec_init(length);
-      _fmpz_vec_randtest(a, length, n_randint(200));
-      
-      _fmpz_vec_neg(b, a, length);
-      _fmpz_vec_neg(b, b, length);
-      
-      result = (_fmpz_vec_equal(a, b, length));
-      if (!result)
-      {
-         printf("Error:\n");
-         _fmpz_vec_print(a, length); printf("\n\n");
-         _fmpz_vec_print(b, length); printf("\n\n");
-         abort();
-      }
+    // Check aliasing of a and b
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpz *a, *b;
+        ulong length = n_randint(100);
 
-      _fmpz_vec_clear(a, length);
-      _fmpz_vec_clear(b, length);
-   }
+        a = _fmpz_vec_init(length);
+        b = _fmpz_vec_init(length);
+        _fmpz_vec_randtest(a, length, n_randint(200));
 
+        _fmpz_vec_neg(b, a, length);
+        _fmpz_vec_neg(a, a, length);
 
-   _fmpz_vec_randclear();
-      
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        result = (_fmpz_vec_equal(a, b, length));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(b, length), printf("\n\n");
+            abort();
+        }
+
+        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(b, length);
+    }
+
+    // Check -(-a) == a
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpz *a, *b;
+        ulong length = n_randint(100);
+
+        a = _fmpz_vec_init(length);
+        b = _fmpz_vec_init(length);
+        _fmpz_vec_randtest(a, length, n_randint(200));
+
+        _fmpz_vec_neg(b, a, length);
+        _fmpz_vec_neg(b, b, length);
+
+        result = (_fmpz_vec_equal(a, b, length));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(b, length), printf("\n\n");
+            abort();
+        }
+
+        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(b, length);
+    }
+
+    _fmpz_vec_randclear();
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

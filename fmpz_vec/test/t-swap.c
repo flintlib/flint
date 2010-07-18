@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,42 +32,46 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-int
-main(void)
+int main(void)
 {
-    int result;
-    printf("max_bits....");
-    fflush(stdout);
+   int result;
+   printf("swap....");
+   fflush(stdout);
+   
+   _fmpz_vec_randinit();
+   
+   for (ulong i = 0; i < 10000UL; i++) 
+   {
+      fmpz * a, * b, * c;
+      ulong length = n_randint(100);
+      
+      a = _fmpz_vec_init(length);
+      b = _fmpz_vec_init(length);
+      c = _fmpz_vec_init(length);
+      _fmpz_vec_randtest(a, length, n_randint(200));
+      _fmpz_vec_randtest(b, length, n_randint(200));
+      
+      _fmpz_vec_copy(c, b, length);
+      _fmpz_vec_swap(a, b, length);
 
-    _fmpz_vec_randinit();
+      result = (_fmpz_vec_equal(a, c, length));
+      if (!result)
+      {
+         printf("FAIL:\n");
+         _fmpz_vec_print(a, length), printf("\n\n");
+         _fmpz_vec_print(b, length), printf("\n\n");
+         _fmpz_vec_print(c, length), printf("\n\n");
+         abort();
+      }
 
-    for (ulong i = 0; i < 10000UL; i++)
-    {
-        fmpz * a;
-        ulong length, bits, bits2;
+      _fmpz_vec_clear(a, length);
+      _fmpz_vec_clear(b, length);
+      _fmpz_vec_clear(c, length);
+   }
 
-        length = n_randint(100);
-
-        a = _fmpz_vec_init(length);
-        bits = n_randint(200);
-        _fmpz_vec_randtest(a, length, bits);
-
-        bits2 = _fmpz_vec_max_bits(a, length);
-
-        result = (bits >= FLINT_ABS(bits2));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("bits = %ld, bits2 = %ld\n", bits, bits2);
-            abort();
-        }
-
-        _fmpz_vec_clear(a, length);
-    }
-
-    _fmpz_vec_randclear();
-
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+   _fmpz_vec_randclear();
+      
+   _fmpz_cleanup();
+   printf("PASS\n");
+   return 0;
 }
