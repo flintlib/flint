@@ -20,8 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
-   
+
 ******************************************************************************/
 
 #include <stdlib.h>
@@ -35,17 +34,22 @@
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly)
 {
-    ulong i, j;
-    ulong len;     /* Upper bound on the length          */
-    ulong denlen;  /* Size of the denominator in base 10 */
+    ulong i;
+    size_t j;
+    size_t len;     /* Upper bound on the length          */
+    size_t denlen;  /* Size of the denominator in base 10 */
     mpz_t z;
     mpq_t q;
-    
     char * str;
     
     if (poly->length == 0)
     {
-        str = calloc(2, sizeof(char));
+        str = (char *) malloc(2 * sizeof(char));
+        if (str == NULL)
+        {
+            printf("Exception: malloc failed in fmpq_poly_to_string\n");
+            abort();
+        }
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -61,19 +65,25 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
         fmpz_get_mpz(z, poly->den);
         denlen = mpz_sizeinbase(z, 10);
     }
-    len = (ulong) ceil(log10((double) (poly->length + 1UL))) + 2UL;
+    len = (size_t) ceil(log10((double) (poly->length + 1UL))) + (size_t) 2;
     for (i = 0; i < poly->length; i++)
     {
         fmpz_get_mpz(z, poly->coeffs + i);
-        len += mpz_sizeinbase(z, 10) + 1;
+        len += mpz_sizeinbase(z, 10) + (size_t) 1;
         if (mpz_sgn(z))
-            len += 2 + denlen;
+            len += denlen + (size_t) 2;
     }
     
     mpq_init(q);
-    str = calloc(len, sizeof(char));
-    sprintf(str, "%lu", poly->length);
-    for (j = 0; str[j] != '\0'; j++);
+    str = malloc(len * sizeof(char));
+    if (str == NULL)
+    {
+        printf("Exception: malloc failed in fmpq_poly_to_string\n");
+        mpz_clear(z);
+        mpq_clear(q);
+        abort();
+    }
+    j = sprintf(str, "%lu", poly->length);
     str[j++] = ' ';
     for (i = 0; i < poly->length; i++)
     {
@@ -82,7 +92,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
         fmpz_get_mpz(mpq_denref(q), poly->den);
         mpq_canonicalize(q);
         mpq_get_str(str + j, 10, q);
-        for ( ; str[j] != '\0'; j++);
+        j += strlen(str + j);
     }
     
     mpq_clear(q);
@@ -93,17 +103,23 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
 
 char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
 {
-    ulong i, j;
-    ulong len;     /* Upper bound on the length          */
-    ulong denlen;  /* Size of the denominator in base 10 */
-    ulong varlen;  /* Length of the variable name        */
-    mpz_t z;       /* op->den (if this is not 1)         */
+    ulong i;
+    size_t j;
+    size_t len;     /* Upper bound on the length          */
+    size_t denlen;  /* Size of the denominator in base 10 */
+    size_t varlen;  /* Length of the variable name        */
+    mpz_t z;        /* op->den (if this is not 1)         */
     mpq_t q;
     char * str;
     
     if (poly->length == 0)  /* Zero polynomial */
     {
-        str = calloc(2, sizeof(char));
+        str = (char *) malloc(2 * sizeof(char));
+        if (str == NULL)
+        {
+            printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+            abort();
+        }
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -138,15 +154,22 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
     for (i = 0; i < poly->length; i++)
     {
         fmpz_get_mpz(z, poly->coeffs + i);
-        len += mpz_sizeinbase(z, 10);            /* Numerator               */
-        if (mpz_sgn(z) != 0) len += 1 + denlen;  /* Denominator and /       */
-        len += 3;                                /* Operator and whitespace */
-        len += 1 + varlen + 1;                   /* *, x and ^              */
-        len += (ulong) ceil(log10((double) (i + 1)));  /* Exponent          */
+        len += mpz_sizeinbase(z, 10);                   /* Numerator         */
+        if (mpz_sgn(z) != 0) len += 1 + denlen;         /* Denominator and / */
+        len += 3;                                       /* Operator and ws   */
+        len += 1 + varlen + 1;                          /* *, x and ^        */
+        len += (size_t) ceil(log10((double) (i + 1)));  /* Exponent          */
     }
     
     mpq_init(q);
-    str = calloc(len, sizeof(char));
+    str = (char *) malloc(len * sizeof(char));
+    if (str == NULL)
+    {
+        printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+        mpz_clear(z);
+        mpq_clear(q);
+        abort();
+    }
     j = 0;
     
     /* Print the leading term */
@@ -161,15 +184,13 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
         else
         {
             mpq_get_str(str, 10, q);
-            for ( ; str[j] != '\0'; j++);
+            j += strlen(str + j);
             str[j++] = '*';
         }
     }
-    sprintf(str + j, "%s", var);
-    j += varlen;
+    j += sprintf(str + j, "%s", var);
     str[j++] = '^';
-    sprintf(str + j, "%lu", poly->length - 1UL);
-    for ( ; str[j] != '\0'; j++);
+    j += sprintf(str + j, "%lu", poly->length - 1UL);
     
     i = poly->length - 1UL;
     while (i)
@@ -194,18 +215,16 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
         str[j++] = ' ';
         
         mpq_get_str(str + j, 10, q);
-        for ( ; str[j] != '\0'; j++);
+        j += strlen(str + j);
         
         if (i > 0)
         {
             str[j++] = '*';
-            sprintf(str + j, "%s", var);
-            j += varlen;
+            j += sprintf(str + j, "%s", var);
             if (i > 1)
             {
                 str[j++] = '^';
-                sprintf(str + j, "%lu", i);
-                for ( ; str[j] != '\0'; j++);
+                j += sprintf(str + j, "%lu", i);
             }
         }
     }
