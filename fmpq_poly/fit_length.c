@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,24 +16,23 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong length)
+void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong len)
 {
-    ulong alloc;
+    ulong alloc = len;
     
-    alloc = length;
     if (alloc <= poly->alloc)
         return;
     

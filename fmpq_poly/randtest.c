@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -61,14 +61,12 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_i
 {
     if ((bits_in == 0) || (length == 0))
     {
-        printf("Exception : 0 passed to fmpz_poly_randtest_not_zero\n");
+        printf("Exception: 0 passed to fmpz_poly_randtest_not_zero\n");
         abort();
     }
 
     fmpq_poly_randtest(f, length, bits_in);
     if (f->length == 0) 
-    {
         fmpq_poly_set_ui(f, 1UL);
-    }
 }
 

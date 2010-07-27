@@ -38,7 +38,10 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 {
-    if (fmpq_poly_is_zero(poly))
+    ulong len = poly->length;
+    ulong rlen;
+    
+    if (len == 0UL)
     {
         fmpq_poly_zero(res);
         return;
@@ -49,9 +52,7 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
         return;
     }
     
-    const ulong len  = poly->length;
-    const ulong rlen = e * (len - 1UL) + 1UL;
-    
+    rlen = e * (len - 1UL) + 1UL;
     fmpq_poly_fit_length(res, rlen);
     _fmpq_poly_set_length(res, rlen);
     

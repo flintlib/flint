@@ -19,9 +19,9 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
-   
+    Copyright (C) 2010 Sebastian Pancratz
+
 ******************************************************************************/
 
 #include <mpir.h>
@@ -32,12 +32,13 @@
 
 void fmpq_poly_realloc(fmpq_poly_t poly, ulong alloc)
 {
-    if (!alloc)  /* alloc == 0.  Clear up, reinitialise */
+    if (alloc == 0)  /* Clear up, reinitialise */
     {
         fmpq_poly_clear(poly);
         fmpq_poly_init(poly);
         return;
-    }  
+    }
+
     if (poly->alloc)  /* Realloc */
     {
         if (poly->length > alloc)  /* Reduce the size */

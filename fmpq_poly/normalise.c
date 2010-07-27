@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -31,10 +31,9 @@
 
 void _fmpq_poly_normalise(fmpq_poly_t poly)
 {
-    ulong length;
-    length = poly->length;
-    while (length && !poly->coeffs[length - 1])
-        length--;
-    poly->length = length;
+    ulong len = poly->length;
+    while (len && !poly->coeffs[len - 1])
+        len--;
+    poly->length = len;
 }
 

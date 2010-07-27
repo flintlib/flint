@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,11 +29,11 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_set_length(fmpq_poly_t poly, ulong length)
+void _fmpq_poly_set_length(fmpq_poly_t poly, ulong len)
 {
     ulong i;
-    for (i = length; i < poly->length; i++)
+    for (i = len; i < poly->length; i++)
         _fmpz_demote(poly->coeffs + i);
-    poly->length = length;
+    poly->length = len;
 }
 

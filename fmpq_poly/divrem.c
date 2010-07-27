@@ -36,6 +36,8 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
 {
     ulong lenQ = lenA + (lenB - 1UL);
     ulong lenR = lenB - 1UL;
+    ulong d;
+    fmpz * lead;
     
     if (lenB == 1UL)
     {
@@ -45,8 +47,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         return;
     }
     
-    ulong d = 1UL;
-    const fmpz * lead = B + (lenB - 1UL);
+    lead = B + (lenB - 1UL);
     _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
     
     /* Determine the actual length of R */
@@ -155,7 +156,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     ulong lenR = lenB - 1UL;
     
     fmpq_poly_fit_length(Q, lenQ);
-    fmpq_poly_fit_length(R, lenA);  /* TODO: Need at least that much space */
+    fmpq_poly_fit_length(R, lenA);  /* XXX: Need at least that much space */
     
     _fmpq_poly_divrem(Q->coeffs, Q->den, R->coeffs, R->den, 
                       poly1->coeffs, poly1->den, poly1->length, 

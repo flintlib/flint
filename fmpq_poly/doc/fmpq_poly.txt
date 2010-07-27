@@ -44,19 +44,19 @@ void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
     is first truncated to length alloc.  Note that this might leave the 
     rational polynomial in non-canonical form.
 
-void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong length)
+void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong len)
 
-    If length is currently greater that the number of coefficients
+    If len is greater than the number of coefficients currently 
     allocated, then the polynomial is reallocated to have space for at
-    least length coefficients. No data is lost when calling this 
+    least len coefficients. No data is lost when calling this 
     function. The function efficiently deals with the case where 
     fit_length is called many times in small increments by at least 
-    doubling the number of allocated coefficients when length is larger 
+    doubling the number of allocated coefficients when len is larger 
     than the number of coefficients currently allocated.
 
-void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong length)
+void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong len)
     
-    Sets the length of the numerator polynomial to length, demoting 
+    Sets the length of the numerator polynomial to len, demoting 
     coefficients beyond the new length.  Note that this method does 
     not guarantee that the rational polynomial is in canonical form.
 
@@ -246,6 +246,12 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Return 1 if poly1 is equal to poly2, otherwise return 0.
 
+int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
+                        const fmpz * rpoly, const fmpz_t rden, const ulong len)
+
+    Compares two non-zero polynomials, assuming they have the same length 
+    len > 0.
+
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 
     Compares the two polynomials left and right.
@@ -364,6 +370,14 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz
 void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
 
 void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
+
+void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+                                   const fmpz_t den, ulong len, const fmpz_t c)
+
+    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    
+    Assumes that len is positive.  Supports aliasing between {rpoly, rden} 
+    and {poly, den}.
 
 void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c);
 

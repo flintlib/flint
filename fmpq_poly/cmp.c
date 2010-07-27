@@ -20,7 +20,6 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -30,8 +29,8 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-// Compares the two non-zero polynomials, assuming they have the same degree and len > 0.
-int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, const fmpz * rpoly, const fmpz_t rden, const ulong len)
+int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
+                   const fmpz * rpoly, const fmpz_t rden, const ulong len)
 {
     ulong ans, i;
     fmpz_t lcoeff, rcoeff;

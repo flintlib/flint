@@ -52,9 +52,9 @@ void fmpq_poly_init2(fmpq_poly_t poly, ulong alloc);
 
 void fmpq_poly_realloc(fmpq_poly_t poly, ulong alloc);
 
-void fmpq_poly_fit_length(fmpq_poly_t poly, ulong length);
+void fmpq_poly_fit_length(fmpq_poly_t poly, ulong len);
 
-void _fmpq_poly_set_length(fmpq_poly_t poly, ulong length);
+void _fmpq_poly_set_length(fmpq_poly_t poly, ulong len);
 
 void fmpq_poly_clear(fmpq_poly_t poly);
 
