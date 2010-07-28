@@ -38,12 +38,10 @@ main(void)
     printf("init/clear....");
     fflush(stdout);
 
-    // Compare with alternative method of computation
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpz *a;
         ulong j;
-
         ulong length = n_randint(100) + 1;
 
         a = _fmpz_vec_init(length);

@@ -98,7 +98,6 @@ main(void)
         _fmpz_vec_clear(c, length);
     }
 
-
     _fmpz_vec_randclear();
 
     _fmpz_cleanup();
