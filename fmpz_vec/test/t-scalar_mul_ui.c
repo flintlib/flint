@@ -20,8 +20,9 @@
 /******************************************************************************
 
     Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -43,9 +44,9 @@ main(void)
     // Check aliasing of a and b
     for (ulong i = 0; i < 10000UL; i++)
     {
-        fmpz *a, *b, *c;
+        fmpz *a, *b;
         ulong length = n_randint(100);
-        ulong n = n_randint(200);
+        ulong n = n_randbits(FLINT_BITS);
 
         a = _fmpz_vec_init(length);
         b = _fmpz_vec_init(length);
@@ -65,6 +66,37 @@ main(void)
 
         _fmpz_vec_clear(a, length);
         _fmpz_vec_clear(b, length);
+    }
+
+    // Check agreement with scalar_mul_fmpz
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpz *a, *b;
+        ulong length = n_randint(100);
+        ulong n = n_randbits(FLINT_BITS);
+        fmpz_t x;
+
+        a = _fmpz_vec_init(length);
+        b = _fmpz_vec_init(length);
+        fmpz_init(x);
+        _fmpz_vec_randtest(a, length, n_randint(200));
+
+        fmpz_set_ui(x, n);
+        _fmpz_vec_scalar_mul_ui(b, a, length, n);
+        _fmpz_vec_scalar_mul_fmpz(a, a, length, x);
+
+        result = (_fmpz_vec_equal(a, b, length));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(b, length), printf("\n\n");
+            abort();
+        }
+
+        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(b, length);
+        fmpz_clear(x);
     }
 
     _fmpz_vec_randclear();
