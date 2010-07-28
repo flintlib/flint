@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -48,7 +46,6 @@ main (void)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b;
-
         ulong n = n_randtest_not_zero ();
 
         fmpq_poly_init (a);
@@ -62,10 +59,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -73,15 +68,12 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // check (a/n1)/n2 = a/(n1*n2)
+    // Check (a / n1) / n2 = a / (n1 * n2)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
-
         ulong n1 = n_randbits (FLINT_BITS / 2);
-
         ulong n2 = n_randbits (FLINT_BITS / 2);
-
         if (n1 == 0UL)
             n1 = 1UL;
         if (n2 == 0UL)
@@ -100,12 +92,9 @@ main (void)
         if (!result)
         {
             printf ("Error n1 = %lu, n2 = %lu:\n", n1, n2);
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 

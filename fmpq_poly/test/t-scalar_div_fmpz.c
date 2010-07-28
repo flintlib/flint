@@ -21,8 +21,8 @@
 
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -65,10 +65,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -77,7 +75,7 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // compare with fmpq_poly_scalar_mul_si
+    // Compare with fmpq_poly_scalar_mul_si
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
@@ -104,10 +102,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 

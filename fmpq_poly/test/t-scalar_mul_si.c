@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -21,8 +20,8 @@
 
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -49,7 +48,7 @@ main (void)
     {
         fmpq_poly_t a, b;
 
-        long n = (long) n_randtest ();
+        long n = (long) n_randbits(FLINT_BITS - 1);
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
@@ -62,10 +61,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -73,7 +70,7 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // compare with fmpq_poly_scalar_mul_ui
+    // Compare with fmpq_poly_scalar_mul_ui
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
@@ -91,10 +88,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -102,15 +97,13 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // check (a*n1)*n2 = a*(n1*n2)
+    // Check n2 * (n1 a) == (n1*n2) a
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
 
-        long n1 = (long) n_randbits ((FLINT_BITS - 2) / 2);
-
-        long n2 = (long) n_randbits ((FLINT_BITS - 2) / 2);
-
+        long n1 = (long) n_randbits (FLINT_BITS / 2 - 1);
+        long n2 = (long) n_randbits (FLINT_BITS / 2 - 1);
         if (n_randint (2))
             n1 = -n1;
         if (n_randint (2))
@@ -129,12 +122,9 @@ main (void)
         if (!result)
         {
             printf ("Error n1 = %lu, n2 = %lu:\n", n1, n2);
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 

@@ -21,8 +21,8 @@
 
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -65,10 +65,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -77,7 +75,46 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // compare with fmpq_poly_scalar_mul_si
+    // Check that n (a + b) == na + nb
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpq_poly_t a, b, lhs, rhs;
+
+        fmpz_t n;
+
+        fmpz_init (n);
+        fmpz_randtest (n, 200);
+
+        fmpq_poly_init (a);
+        fmpq_poly_init (b);
+        fmpq_poly_init (lhs);
+        fmpq_poly_init (rhs);
+        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+
+        fmpq_poly_scalar_mul_fmpz (lhs, a, n);
+        fmpq_poly_scalar_mul_fmpz (rhs, b, n);
+        fmpq_poly_add (rhs, lhs, rhs);
+        fmpq_poly_add (lhs, a, b);
+        fmpq_poly_scalar_mul_fmpz (lhs, lhs, n);
+
+        result = (fmpq_poly_equal (lhs, rhs));
+        if (!result)
+        {
+            printf ("Error:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            abort ();
+        }
+
+        fmpz_clear (n);
+        fmpq_poly_clear (a);
+        fmpq_poly_clear (b);
+        fmpq_poly_clear (lhs);
+        fmpq_poly_clear (rhs);
+    }
+
+    // Compare with fmpq_poly_scalar_mul_si
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
@@ -85,7 +122,7 @@ main (void)
         fmpz_t n1;
 
         fmpz_init (n1);
-        long n = (long) n_randbits (FLINT_BITS - 1);
+        long n = (long) n_randbits (FLINT_BITS);
 
         if (n_randint (2))
             n = -n;
@@ -102,10 +139,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
