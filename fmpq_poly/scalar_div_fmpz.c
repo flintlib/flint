@@ -30,11 +30,6 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-// Assumes that rpoly and poly are either equal or disjoint blocks of memory.  
-// rden and den may be aliased, but none of them may be in rpoly.
-// Assumes that c is non-zero.  (The case c == 0 is not handled separately in 
-// this method.)
-// c may also be aliased with rden or den.
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                 const fmpz_t den, ulong len, const fmpz_t c)
 {
@@ -68,7 +63,6 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     }
 }
 
-// rop and op may be aliased, but c may not be among the coefficients of rop, but it is allowed to be the denominator
 void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
 {
     if (*c == 0L)
