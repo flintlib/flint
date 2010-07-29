@@ -34,15 +34,16 @@
 // rden and den may be aliased, but none of them may be in rpoly.
 // Assumes that c is non-zero.  (The case c == 0 is not handled separately in 
 // this method.
-void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, ulong len, 
-                              long c)
+void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
+                              const fmpz_t den, ulong len, long c)
 {
     if (c == 1L)
     {
         if (rpoly != poly)
+        {
             _fmpz_vec_copy(rpoly, poly, len);
-        fmpz_set(rden, den);
+            fmpz_set(rden, den);
+        }
     }
     else if (c == -1L)
     {
@@ -52,23 +53,18 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden,
     else
     {
         fmpz_t d, fc;
+        long sd;
         fmpz_init(d);
         fmpz_init(fc);
+        
         _fmpz_vec_content(d, poly, len);
         fmpz_set_si(fc, c);
         fmpz_gcd(d, d, fc);
-        if (*d == 1L)
-        {
-            if (rpoly != poly)
-                _fmpz_vec_copy(rpoly, poly, len);
-            fmpz_mul(rden, den, fc);
-        }
-        else
-        {
-            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
-            fmpz_divexact(d, fc, d);
-            fmpz_mul(rden, den, d);
-        }
+        sd = fmpz_get_si(d);   /* gcd of c and d fits in a long */
+        if (c < 0)  sd = -sd;  /* sd is positive before this    */
+        _fmpz_vec_scalar_divexact_si(rpoly, poly, len, sd);
+        fmpz_mul_si(rden, den, c / sd);
+        
         fmpz_clear(d);
         fmpz_clear(fc);
     }

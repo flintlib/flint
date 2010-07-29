@@ -34,9 +34,8 @@
 // rden and den may be aliased, but none of them may be in rpoly.
 // Assumes that c is non-zero.  (The case c == 0 is not handled separately in 
 // this method.
-void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, ulong len, 
-                              ulong c)
+void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+                              const fmpz_t den, ulong len, ulong c)
 {
     if (c == 1UL)
     {
@@ -47,23 +46,17 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden,
     else
     {
         fmpz_t d, fc;
+        ulong ud;
         fmpz_init(d);
         fmpz_init(fc);
         _fmpz_vec_content(d, poly, len);
         fmpz_set_ui(fc, c);
         fmpz_gcd(d, d, fc);
-        if (*d == 1L)
-        {
-            if (rpoly != poly)
-                _fmpz_vec_copy(rpoly, poly, len);
-            fmpz_mul(rden, den, fc);
-        }
-        else
-        {
-            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
-            fmpz_divexact(d, fc, d);
-            fmpz_mul(rden, den, d);
-        }
+        ud = fmpz_get_ui(d);  /* gcd of d and c fits into a ulong */
+        
+        _fmpz_vec_scalar_divexact_ui(rpoly, poly, len, ud);
+        fmpz_mul_ui(rden, den, c / ud);
+        
         fmpz_clear(d);
         fmpz_clear(fc);
     }
