@@ -78,7 +78,7 @@ main (void)
     // Compare with fmpq_poly_scalar_mul_si
     for (ulong i = 0; i < 10000UL; i++)
     {
-        fmpq_poly_t a, b, c;
+        fmpq_poly_t a, b;
 
         fmpz_t n1;
 
@@ -110,6 +110,89 @@ main (void)
         fmpz_clear (n1);
         fmpq_poly_clear (a);
         fmpq_poly_clear (b);
+    }
+
+    // Check that (a / n1) / n2 == a / (n1 * n2)
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpq_poly_t a, lhs, rhs;
+        fmpz_t n1, n2, n;
+
+        fmpz_init (n1);
+        fmpz_init (n2);
+        fmpz_init (n);
+        
+        fmpz_randtest_not_zero(n1, n_randint(100));
+        fmpz_randtest_not_zero(n2, n_randint(100));
+        fmpz_mul(n, n1, n2);
+
+        fmpq_poly_init (a);
+        fmpq_poly_init (lhs);
+        fmpq_poly_init (rhs);
+        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+
+        fmpq_poly_scalar_div_fmpz (lhs, a, n1);
+        fmpq_poly_scalar_div_fmpz (lhs, lhs, n2);
+        fmpq_poly_scalar_div_fmpz (rhs, a, n);
+
+        result = (fmpq_poly_equal (lhs, rhs));
+        if (!result)
+        {
+            printf ("Error:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (lhs), printf ("\n\n");
+            fmpq_poly_print (rhs), printf ("\n\n");
+            abort ();
+        }
+
+        fmpz_clear (n1);
+        fmpz_clear (n2);
+        fmpz_clear (n);
+        fmpq_poly_clear (a);
+        fmpq_poly_clear (lhs);
+        fmpq_poly_clear (rhs);
+    }
+
+    // Check that (a + b) / n == a/n + b/n
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpq_poly_t a, b, lhs, rhs;
+        fmpz_t n;
+
+        fmpz_init (n);
+        
+        fmpz_randtest_not_zero(n, n_randint(100));
+
+        fmpq_poly_init (a);
+        fmpq_poly_init (b);
+        fmpq_poly_init (lhs);
+        fmpq_poly_init (rhs);
+        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+
+        fmpq_poly_scalar_div_fmpz (lhs, a, n);
+        fmpq_poly_scalar_div_fmpz (rhs, b, n);
+        fmpq_poly_add (rhs, lhs, rhs);
+        fmpq_poly_add (lhs, a, b);
+        fmpq_poly_scalar_div_fmpz (lhs, lhs, n);
+
+        result = (fmpq_poly_equal (lhs, rhs));
+        if (!result)
+        {
+            printf ("Error:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            fmpz_print (n), printf("\n\n");
+            fmpq_poly_print (lhs), printf ("\n\n");
+            fmpq_poly_print (rhs), printf ("\n\n");
+            abort ();
+        }
+
+        fmpz_clear (n);
+        fmpq_poly_clear (a);
+        fmpq_poly_clear (b);
+        fmpq_poly_clear (lhs);
+        fmpq_poly_clear (rhs);
     }
 
     fmpq_poly_randclear ();
