@@ -57,7 +57,7 @@ main(void)
         _fmpz_vec_randtest(b, length, n_randint(200));
         _fmpz_vec_copy(c, b, length);
 
-        x = n_randbits(n_randint(FLINT_BITS - 1));
+        x = (long) n_randtest();
         if (n_randint(2))
             x = -x;
         exp = n_randint(200);

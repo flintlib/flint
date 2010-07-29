@@ -46,7 +46,7 @@ main(void)
     {
         fmpz *a, *b;
         ulong length = n_randint(100);
-        ulong n = n_randbits(FLINT_BITS);
+        ulong n = n_randtest();
 
         a = _fmpz_vec_init(length);
         b = _fmpz_vec_init(length);
@@ -68,7 +68,7 @@ main(void)
         _fmpz_vec_clear(b, length);
     }
 
-    // Check agreement with scalar_mul_fmpz
+    // Check agreement with _fmpz
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpz *a, *b;

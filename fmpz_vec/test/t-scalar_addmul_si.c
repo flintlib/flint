@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -44,9 +45,11 @@ main(void)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpz *a, *b, *c, *d;
-        ulong length = n_randint(100);
+        ulong length;
         long x;
 
+        length = n_randint(100);
+        
         a = _fmpz_vec_init(length);
         b = _fmpz_vec_init(length);
         c = _fmpz_vec_init(length);
@@ -56,7 +59,7 @@ main(void)
         _fmpz_vec_randtest(b, length, n_randint(200));
         _fmpz_vec_copy(c, b, length);
 
-        x = n_randbits(n_randint(FLINT_BITS - 1));
+        x = (long) n_randtest();
         if (n_randint(2))
             x = -x;
 

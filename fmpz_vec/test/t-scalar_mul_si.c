@@ -46,7 +46,7 @@ main(void)
     {
         fmpz *a, *b;
         ulong length = n_randint(100);
-        long n = (long) n_randbits(FLINT_BITS);
+        long n = (long) n_randtest();
         if (n_randint(2))
             n = -n;
 
@@ -70,59 +70,24 @@ main(void)
         _fmpz_vec_clear(b, length);
     }
 
-    // Check that n (a + b) == na + nb
-    for (ulong i = 0; i < 10000UL; i++)
-    {
-        fmpz *a, *b, *lhs, *rhs;
-        ulong length = n_randint(100);
-        long n = (long) n_randbits(FLINT_BITS);
-        if (n_randint(2))
-            n = -n;
-
-        a   = _fmpz_vec_init(length);
-        b   = _fmpz_vec_init(length);
-        lhs = _fmpz_vec_init(length);
-        rhs = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
-        _fmpz_vec_randtest(b, length, n_randint(200));
-
-        _fmpz_vec_scalar_mul_si(lhs, a, length, n);
-        _fmpz_vec_scalar_mul_si(rhs, b, length, n);
-        _fmpz_vec_add(rhs, lhs, rhs, length);
-        _fmpz_vec_add(lhs, a, b, length);
-        _fmpz_vec_scalar_mul_si(lhs, lhs, length, n);
-
-        result = (_fmpz_vec_equal(lhs, rhs, length));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
-            _fmpz_vec_print(b, length), printf("\n\n");
-            _fmpz_vec_print(lhs, length), printf("\n\n");
-            _fmpz_vec_print(rhs, length), printf("\n\n");
-            abort();
-        }
-
-        _fmpz_vec_clear(a, length);
-        _fmpz_vec_clear(b, length);
-        _fmpz_vec_clear(lhs, length);
-        _fmpz_vec_clear(rhs, length);
-    }
-
-    // Check aliasing of a and b
+    // Check agreement with _fmpz
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpz *a, *b;
-        ulong length = n_randint(100);
-        long n = (long) n_randbits(FLINT_BITS);
-        if (n_randint(2))
-            n = -n;
-
+        ulong length;
+        fmpz_t x;
+        long n;
+        
+        length = n_randint(100);
         a = _fmpz_vec_init(length);
         b = _fmpz_vec_init(length);
         _fmpz_vec_randtest(a, length, n_randint(200));
+        n = (long) n_randtest();
+        if (n_randint(2))
+            n = -n;
+        fmpz_set_si(x, n);
 
-        _fmpz_vec_scalar_mul_si(b, a, length, n);
+        _fmpz_vec_scalar_mul_fmpz(b, a, length, x);
         _fmpz_vec_scalar_mul_si(a, a, length, n);
 
         result = (_fmpz_vec_equal(a, b, length));
@@ -131,44 +96,13 @@ main(void)
             printf("FAIL:\n");
             _fmpz_vec_print(a, length), printf("\n\n");
             _fmpz_vec_print(b, length), printf("\n\n");
+            printf("%li\n\n", n);
             abort();
         }
 
         _fmpz_vec_clear(a, length);
         _fmpz_vec_clear(b, length);
-    }
-
-    // Check that n2 * (n1 * a) == (n1 * n2) * a
-    for (ulong i = 0; i < 10000UL; i++)
-    {
-        fmpz *a, *b;
-        ulong length = n_randint(100);
-        long n1 = (long) n_randbits(FLINT_BITS / 2);
-        long n2 = (long) n_randbits(FLINT_BITS / 2);
-        if (n_randint(2))
-            n1 = -n1;
-        if (n_randbits(2))
-            n2 = -n2;
-
-        a = _fmpz_vec_init(length);
-        b = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
-
-        _fmpz_vec_scalar_mul_si(b, a, length, n1);
-        _fmpz_vec_scalar_mul_si(b, b, length, n2);
-        _fmpz_vec_scalar_mul_si(a, a, length, n1 * n2);
-
-        result = (_fmpz_vec_equal(a, b, length));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
-            _fmpz_vec_print(b, length), printf("\n\n");
-            abort();
-        }
-
-        _fmpz_vec_clear(a, length);
-        _fmpz_vec_clear(b, length);
+        fmpz_clear(x);
     }
 
     _fmpz_vec_randclear();

@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
@@ -48,12 +46,14 @@ main (void)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b;
-
-        long n = (long) n_randbits(FLINT_BITS - 1);
+        long n;
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
         fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        n = (long) n_randtest();
+        if (n == 0L)
+            n = 1L;
 
         fmpq_poly_scalar_div_si (b, a, n);
         fmpq_poly_scalar_div_si (a, a, n);

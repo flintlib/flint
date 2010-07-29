@@ -326,8 +326,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     
     Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
     is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}, however, there may be no partial 
-    overlap between rpoly and poly.
+    between {rpoly, den} and {poly, den}.
 
 void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
                        const fmpz * poly, const fmpz_t den, ulong len, ulong c)
@@ -336,8 +335,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
     
     Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
     is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}, however, there may be no partial 
-    overlap between rpoly and poly.
+    between {rpoly, den} and {poly, den}.
 
 void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
                 const fmpz * poly, const fmpz_t den, ulong len, const fmpz_t c)
@@ -346,8 +344,7 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
     
     Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
     is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}, however, there may be no partial 
-    overlap between rpoly and poly.  The fmpz_t c may not be part of 
+    between {rpoly, den} and {poly, den}.  The fmpz_t c may not be part of 
     {rpoly, rden}.
 
 void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
@@ -363,23 +360,63 @@ void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 
+    Sets rop to c times op.
+
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 
-void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c)
+    Sets rop to c times op.
 
-void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
+void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, 
+                                          const fmpq_poly_t op, const fmpz_t c)
 
-void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
+    Sets rop to c times op.  Assumes that the fmpz_t c is not part of rop.
+
+void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, 
+                                           const fmpq_poly_t op, const mpz_t c)
+
+    Sets rop to c times op.
+
+void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, 
+                                           const fmpq_poly_t op, const mpq_t c)
+
+    Sets rop to c times op.
 
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                    const fmpz_t den, ulong len, const fmpz_t c)
 
     Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
     
-    Assumes that len is positive.  Supports aliasing between {rpoly, rden} 
-    and {poly, den}.
+    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
+    aliasing between {rpoly, rden} and {poly, den}.  Assumes that c is not 
+    part of {rpoly, rden}.
 
-void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c);
+void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+                                           const fmpz_t den, ulong len, long c)
+
+    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    
+    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
+    aliasing between {rpoly, rden} and {poly, den}.
+
+void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+                                          const fmpz_t den, ulong len, ulong c)
+
+    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    
+    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
+    aliasing between {rpoly, rden} and {poly, den}.
+
+void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+                   const fmpz_t den, ulong len, conts fmpz_t r, const fmpz_t s)
+
+    Sets {rpoly, rden, len} to {poly, den, len} divided by {r, s}, 
+    in lowest terms.
+    
+    Assumes that len is positive.  Assumes that {r, s} is non-zero and in 
+    lowest terms.  Supports aliasing between {rpoly, rden} and {poly, den}. 
+    The fmpz_t's r and s may not be part of {rpoly, poly}.
+
+void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 
 void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 

@@ -91,11 +91,11 @@ main(void)
         _fmpz_vec_randtest(a, length, n_randint(200));
         _fmpz_vec_randtest(b, length, n_randint(200));
 
-        _fmpz_scalar_mul_fmpz(lhs, a, length, n);
-        _fmpz_scalar_mul_fmpz(rhs, b, length, n);
-        _fmpz_add(rhs, lhs, rhs, length);
-        _fmpz_add(lhs, a, b, length);
-        _fmpz_scalar_mul_fmpz(lhs, lhs, length, n);
+        _fmpz_vec_scalar_mul_fmpz(lhs, a, length, n);
+        _fmpz_vec_scalar_mul_fmpz(rhs, b, length, n);
+        _fmpz_vec_add(rhs, lhs, rhs, length);
+        _fmpz_vec_add(lhs, a, b, length);
+        _fmpz_vec_scalar_mul_fmpz(lhs, lhs, length, n);
 
         result = (_fmpz_vec_equal(lhs, rhs, length));
         if (!result)

@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,11 +17,10 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -42,9 +40,7 @@ main (void)
     fflush (stdout);
 
     ulong i, j, coeff;
-
     long n1, n2;
-
     mpq_t n1mpq, n2mpq;
 
     mpq_init (n1mpq);
@@ -52,7 +48,6 @@ main (void)
     for (i = 0; i < 1000UL; i++)
     {
         fmpq_poly_t a;
-
         ulong length;
 
         fmpq_poly_init (a);
@@ -76,7 +71,6 @@ main (void)
                 abort ();
             }
         }
-
         fmpq_poly_clear (a);
     }
 

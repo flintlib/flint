@@ -17,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
@@ -47,8 +46,7 @@ main (void)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b;
-
-        long n = (long) n_randbits(FLINT_BITS - 1);
+        long n = (long) n_randtest();
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
