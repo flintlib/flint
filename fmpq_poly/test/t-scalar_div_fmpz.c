@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
@@ -48,7 +46,6 @@ main (void)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b;
-
         fmpz_t n;
 
         fmpz_init (n);
@@ -64,9 +61,10 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("Error (aliasing):\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
+            fmpz_print (n);
             abort ();
         }
 
@@ -78,7 +76,7 @@ main (void)
     // Compare with fmpq_poly_scalar_mul_si
     for (ulong i = 0; i < 10000UL; i++)
     {
-        fmpq_poly_t a, b;
+        fmpq_poly_t a, b, c;
 
         fmpz_t n1;
 
@@ -93,23 +91,27 @@ main (void)
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
+        fmpq_poly_init (c);
         fmpq_poly_randtest (a, n_randint (100), n_randint (200));
 
         fmpq_poly_scalar_div_fmpz (b, a, n1);
-        fmpq_poly_scalar_div_si (a, a, n);
+        fmpq_poly_scalar_div_si (c, a, n);
 
-        result = (fmpq_poly_equal (a, b));
+        result = (fmpq_poly_equal (b, c));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("Error (comparison with _si):\n");
             fmpq_poly_print (a), printf ("\n\n");
+            fmpz_print (n1), printf("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 
         fmpz_clear (n1);
         fmpq_poly_clear (a);
         fmpq_poly_clear (b);
+        fmpq_poly_clear (c);
     }
 
     // Check that (a / n1) / n2 == a / (n1 * n2)
@@ -122,8 +124,8 @@ main (void)
         fmpz_init (n2);
         fmpz_init (n);
         
-        fmpz_randtest_not_zero(n1, n_randint(100));
-        fmpz_randtest_not_zero(n2, n_randint(100));
+        fmpz_randtest_not_zero(n1, n_randint(100) + 1);
+        fmpz_randtest_not_zero(n2, n_randint(100) + 1);
         fmpz_mul(n, n1, n2);
 
         fmpq_poly_init (a);
@@ -138,8 +140,11 @@ main (void)
         result = (fmpq_poly_equal (lhs, rhs));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("Error (a / n1 / n2):\n");
             fmpq_poly_print (a), printf ("\n\n");
+            fmpz_print (n1), printf("\n\n");
+            fmpz_print (n2), printf("\n\n");
+            fmpz_print (n), printf("\n\n");
             fmpq_poly_print (lhs), printf ("\n\n");
             fmpq_poly_print (rhs), printf ("\n\n");
             abort ();
@@ -161,7 +166,7 @@ main (void)
 
         fmpz_init (n);
         
-        fmpz_randtest_not_zero(n, n_randint(100));
+        fmpz_randtest_not_zero(n, n_randint(100) + 1);
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
@@ -179,7 +184,7 @@ main (void)
         result = (fmpq_poly_equal (lhs, rhs));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("Error ((a + b) / n):\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             fmpz_print (n), printf("\n\n");

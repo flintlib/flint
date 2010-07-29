@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,11 +17,10 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -62,10 +60,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -73,13 +69,47 @@ main (void)
         fmpq_poly_clear (b);
     }
 
-    // check (a*n1)*n2 = a*(n1*n2)
+    // Check that (a + b) * n == a * n + b * n
+    for (ulong i = 0; i < 10000UL; i++)
+    {
+        fmpq_poly_t a, b, lhs, rhs;
+
+        ulong n = n_randtest ();
+
+        fmpq_poly_init (a);
+        fmpq_poly_init (b);
+        fmpq_poly_init (lhs);
+        fmpq_poly_init (rhs);
+        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+
+        fmpq_poly_scalar_mul_ui (lhs, a, n);
+        fmpq_poly_scalar_mul_ui (rhs, b, n);
+        fmpq_poly_add (rhs, lhs, rhs);
+        fmpq_poly_add (lhs, a, b);
+        fmpq_poly_scalar_mul_ui (lhs, lhs, n);
+
+        result = (fmpq_poly_equal (lhs, rhs));
+        if (!result)
+        {
+            printf ("Error:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            printf("%li\n\n", n);
+            fmpq_poly_print (lhs), printf ("\n\n");
+            fmpq_poly_print (rhs), printf ("\n\n");
+            abort ();
+        }
+
+        fmpq_poly_clear (a);
+        fmpq_poly_clear (b);
+    }
+
+    // Check (a * n1) * n2 = a * (n1 * n2)
     for (ulong i = 0; i < 10000UL; i++)
     {
         fmpq_poly_t a, b, c;
-
         ulong n1 = n_randbits (FLINT_BITS / 2);
-
         ulong n2 = n_randbits (FLINT_BITS / 2);
 
         fmpq_poly_init (a);
@@ -95,12 +125,9 @@ main (void)
         if (!result)
         {
             printf ("Error n1 = %lu, n2 = %lu:\n", n1, n2);
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 
