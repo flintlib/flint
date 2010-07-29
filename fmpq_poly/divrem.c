@@ -47,17 +47,18 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         return;
     }
     
-    lead = B + (lenB - 1UL);
+    lead = (fmpz *) B + (lenB - 1UL);
     _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
     
     /* Determine the actual length of R */
-    for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1UL)); lenR--);
+    for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1UL)); lenR--) ;
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
     if (d == 0UL || FLINT_ABS(*lead) == 1L)
     {
         fmpz_set_ui(q, 1UL);
-        _fmpq_poly_scalar_mul_mpq(Q, q, Q, q, lenQ, b, a);
+        _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
+        _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
         fmpz_set_ui(r, 1UL);
         if (lenR > 0UL)
@@ -81,7 +82,8 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         fmpz_mul(den, a, den);
         
         fmpz_set_ui(q, 1UL);
-        _fmpq_poly_scalar_mul_mpq(Q, q, Q, q, lenQ, b, den);
+        _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
+        _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, den);
         
         fmpz_set_ui(r, 1UL);
         if (lenR > 0UL)
