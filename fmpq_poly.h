@@ -141,13 +141,13 @@ int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 static inline 
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 {
-    return poly->length == 0;
+    return poly->length == 0L;
 }
 
 static inline 
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 {
-    return (poly->length == 1) && (fmpz_equal(poly->coeffs, poly->den));
+    return (poly->length == 1L) && (fmpz_equal(poly->coeffs, poly->den));
 }
 
 /*  Addition and subtraction  ************************************************/
@@ -230,9 +230,9 @@ void fmpq_poly_mul(fmpq_poly_t res,
 /*  Powering  ****************************************************************/
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                  const fmpz_t den, long len, long e);
+                                  const fmpz_t den, long len, ulong e);
 
-void fmpq_poly_pow(fmpq_poly_t rpoly, const fmpq_poly_t poly, long e);
+void fmpq_poly_pow(fmpq_poly_t rpoly, const fmpq_poly_t poly, ulong e);
 
 /*  Shifting  ****************************************************************/
 
