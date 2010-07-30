@@ -31,7 +31,7 @@
 
 // Assumes poly1 and poly2 are not length 0 and 0 != trunc <= len1 + len2 - 1
 void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, 
-							     ulong len1, const fmpz * poly2, ulong len2, ulong trunc)
+							     long len1, const fmpz * poly2, long len2, long trunc)
 {
    if ((len1 == 1 && len2 == 1) || trunc == 1) // Special case if the length of output is 1
    {
@@ -54,9 +54,9 @@ void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
 }
 
 void fmpz_poly_mullow_classical(fmpz_poly_t res, 
-                         const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong trunc)
+                         const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc)
 {
-   ulong len_out;
+   long len_out;
    
    if (poly1->length == 0 || poly2->length == 0 || trunc == 0)  
    {

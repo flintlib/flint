@@ -28,11 +28,11 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, ulong n)
+void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 {
     if (res == poly)
     {
-        fmpz * high = res + (n - 1UL);
+        fmpz * high = res + (n - 1);
         while (res < high)
         {
             fmpz t  = *res;
@@ -46,19 +46,19 @@ void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, ulong len, ulong n)
     }
     else
     {
-        ulong zeros = n - len;
+        long zeros = n - len;
         while (zeros--)
             fmpz_zero(res++);
         
-        poly = (fmpz *) poly + (len - 1UL);
+        poly = (fmpz *) poly + (len - 1);
         while (len--)
             fmpz_set(res++, poly--);
     }
 }
 
-void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 {
-    ulong len = FLINT_MIN(n, poly->length);
+    long len = FLINT_MIN(n, poly->length);
     if (len == 0)
     {
         fmpz_poly_zero(res);

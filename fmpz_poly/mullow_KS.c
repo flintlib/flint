@@ -32,17 +32,17 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1,
-                     const fmpz * poly2, ulong len2, ulong trunc)
+_fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
+                     const fmpz * poly2, long len2, long trunc)
 {
     int neg1, neg2;
-    ulong limbs1, limbs2, loglen;
+    long limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (len1--; len1 != -1UL && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
-    for (len2--; len2 != -1UL && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    for (len1--; len1 != -1 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
+    for (len2--; len2 != -1 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
     len1++;
     len2++;
     if (!len1 | !len2)
@@ -56,7 +56,7 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1,
         neg2 = 0;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
-    if (bits1 < 0L)
+    if (bits1 < 0)
     {
         sign = 1;
         bits1 = -bits1;
@@ -65,7 +65,7 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1,
     if (poly1 != poly2)
     {
         bits2 = _fmpz_vec_max_bits(poly2, len2);
-        if (bits2 < 0L)
+        if (bits2 < 0)
         {
             sign = 1;
             bits2 = -bits2;
@@ -113,10 +113,10 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, ulong len1,
 void
 fmpz_poly_mullow_KS(fmpz_poly_t res,
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                    ulong trunc)
+                    long trunc)
 {
-    const ulong len1 = poly1->length;
-    const ulong len2 = poly2->length;
+    const long len1 = poly1->length;
+    const long len2 = poly2->length;
 
     if (len1 == 0 | len2 == 0 | trunc == 0)
     {

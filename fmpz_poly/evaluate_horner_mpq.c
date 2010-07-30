@@ -30,11 +30,11 @@
 
 void 
 _fmpz_poly_evaluate_horner_mpq(mpq_t res, 
-                               const fmpz * f, ulong len, const mpq_t a)
+                               const fmpz * f, long len, const mpq_t a)
 {
-    if (len == 0UL)
+    if (len == 0L)
         mpq_set_si(res, 0, 1);
-    else if (len == 1UL)
+    else if (len == 1L)
     {
         fmpz_get_mpz(mpq_numref(res), f);
         mpz_set_ui(mpq_denref(res), 1);
@@ -42,7 +42,7 @@ _fmpz_poly_evaluate_horner_mpq(mpq_t res,
     else
     {
         mpq_t s, t;
-        fmpz * c = (fmpz *) f + (len - 1UL);
+        fmpz * c = (fmpz *) f + (len - 1L);
         mpq_init(s);
         mpq_init(t);
         fmpz_get_mpz(mpq_numref(res), c);

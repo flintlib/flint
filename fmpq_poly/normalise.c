@@ -31,7 +31,7 @@
 
 void _fmpq_poly_normalise(fmpq_poly_t poly)
 {
-    ulong len = poly->length;
+    long len = poly->length;
     while (len && !poly->coeffs[len - 1])
         len--;
     poly->length = len;

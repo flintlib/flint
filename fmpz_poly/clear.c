@@ -31,7 +31,7 @@
 
 void fmpz_poly_clear(fmpz_poly_t poly)
 {
-   ulong i;
+   long i;
    for (i = 0; i < poly->alloc; i++) // Clean up any mpz_t's
 		_fmpz_demote(poly->coeffs + i);
 	if (poly->coeffs) free(poly->coeffs); // clean up ordinary coeffs

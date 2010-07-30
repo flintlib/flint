@@ -29,8 +29,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, ulong len1, 
-                    const fmpz * poly2, ulong len2)
+void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
+                    const fmpz * poly2, long len2)
 {
     _fmpz_poly_gcd_subresultant(res, poly1, len1, poly2, len2);
 }

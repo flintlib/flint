@@ -32,13 +32,13 @@
 #include "fmpz_poly.h"
 
 char * _fmpz_poly_to_string_pretty(const fmpz * poly, 
-                                   ulong len, const char * x)
+                                   long len, const char * x)
 {
-    ulong i, bound, nz;
+    long i, bound, nz;
     fmpz * top;
     char * str, * strbase;
     
-    if (len == 0UL)
+    if (len == 0)
     {
         str = malloc(2 * sizeof(char));
         str[0] = '0';
@@ -46,7 +46,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
         return str;
     }
     
-    if (len == 1UL)
+    if (len == 1)
     {
         str = fmpz_get_str(NULL, 10, poly);
         return str;
@@ -60,7 +60,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
             bound += fmpz_sizeinbase(poly + i, 10) + 1;
             nz++;
         }
-    bound += nz * (3 + strlen(x) + (ulong) (ceil(log10((double) len))));
+    bound += nz * (3 + strlen(x) + (long) (ceil(log10((double) len))));
     
     strbase = malloc(bound * sizeof(char));
     str = strbase;

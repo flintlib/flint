@@ -30,7 +30,7 @@
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-   ulong i;
+   long i;
 	
    if (poly1 == poly2) return 1; // same polynomial
 

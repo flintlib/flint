@@ -32,7 +32,7 @@
 
 void fmpq_poly_clear(fmpq_poly_t poly)
 {
-    ulong i;
+    long i;
     if (poly->coeffs)
     {
         for (i = 0; i < poly->alloc; i++)

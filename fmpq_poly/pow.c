@@ -30,29 +30,29 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly, const fmpz_t den, ulong len, ulong e)
+                    const fmpz * poly, const fmpz_t den, long len, long e)
 {
     _fmpz_poly_pow(rpoly, poly, len, e);
     fmpz_pow_ui(rden, den, e);
 }
 
-void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
+void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, long e)
 {
-    ulong len = poly->length;
-    ulong rlen;
+    long len = poly->length;
+    long rlen;
     
-    if (len == 0UL)
+    if (len == 0)
     {
         fmpq_poly_zero(res);
         return;
     }
-    if (e == 0UL)
+    if (e == 0)
     {
         fmpq_poly_set_ui(res, 1UL);
         return;
     }
     
-    rlen = e * (len - 1UL) + 1UL;
+    rlen = e * (len - 1) + 1;
     fmpq_poly_fit_length(res, rlen);
     _fmpq_poly_set_length(res, rlen);
     

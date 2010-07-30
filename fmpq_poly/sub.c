@@ -30,11 +30,11 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, const ulong len1, 
-                    const fmpz * poly2, const fmpz_t den2, const ulong len2)
+                    const fmpz * poly1, const fmpz_t den1, long len1, 
+                    const fmpz * poly2, const fmpz_t den2, long len2)
 {
-    ulong max = FLINT_MAX(len1, len2);
-    ulong min = FLINT_MIN(len1, len2);
+    long max = FLINT_MAX(len1, len2);
+    long min = FLINT_MIN(len1, len2);
     
     fmpz_t d;
     fmpz_init(d);
@@ -104,9 +104,9 @@ void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         return;
     }
     
-    ulong len1 = poly1->length;
-    ulong len2 = poly2->length;
-    ulong max  = FLINT_MAX(poly1->length, poly2->length);
+    long len1 = poly1->length;
+    long len2 = poly2->length;
+    long max  = FLINT_MAX(poly1->length, poly2->length);
     fmpq_poly_fit_length(res, max);
     
     if (res != poly2)

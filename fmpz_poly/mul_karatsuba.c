@@ -51,13 +51,13 @@
    the revbin to shift by one term to the left.
 */
 
-void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, ulong bits);
+void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, long bits);
 
 // switches the coefficients of poly in of length len into a
 // poly out of length 2^bits
-void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
+void revbin1(fmpz * out, const fmpz * in, long len, long bits)
 {
-   ulong i;
+   long i;
  
    for (i = 0; i < len; i++)
       out[n_revbin(i, bits)] = in[i];
@@ -65,18 +65,18 @@ void revbin1(fmpz * out, const fmpz * in, ulong len, ulong bits)
 
 // switches the coefficients of poly in of length 2^bits into a
 // poly out of length len
-void revbin2(fmpz * out, const fmpz * in, ulong len, ulong bits)
+void revbin2(fmpz * out, const fmpz * in, long len, long bits)
 {
-   ulong i;
+   long i;
  
    for (i = 0; i < len; i++)
       out[i] = in[n_revbin(i, bits)];
 }
 
 // in1 += x*in2 assuming both in1 and in2 are revbin'd
-void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, ulong bits)
+void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, long bits)
 {
-   ulong i, j;
+   long i, j;
    
    for (i = 0; i < (1L<<bits) - 1; i++)
    {
@@ -88,10 +88,10 @@ void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, ulong bits)
 // recursive Karatsuba assuming polynomials are in revbin format
 // Assumes rev1 and rev2 are both of length 2^bits and that temp has 
 // space for 2^bits coefficients
-void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, ulong bits)
+void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, long bits)
 {
-   ulong length = (1L<<bits);
-   ulong m = length/2, i;
+   long length = (1L<<bits);
+   long m = length/2, i;
    
    if (length == 1)
    {
@@ -117,10 +117,11 @@ void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * 
 
 // Assumes poly1 and poly2 are not length 0 and len1 >= len2
 void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, 
-							    ulong len1, const fmpz * poly2, ulong len2)
+							    long len1, const fmpz * poly2, long len2)
 {
    fmpz * rev1, * rev2, * out, * temp;
-   ulong loglen = 0, length;
+   long loglen = 0;
+   long length;
 
    if (len1 == 1)
    {
@@ -153,7 +154,7 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
                          const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-   ulong len_out;
+   long len_out;
    
    if ((poly1->length == 0) || (poly2->length == 0))  
    {

@@ -32,24 +32,24 @@
 
 // Assumes poly1 and poly2 are not length 0 and len1 >= len2
 void
-_fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, ulong len1,
-                  const fmpz * poly2, ulong len2)
+_fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
+                  const fmpz * poly2, long len2)
 {
     int neg1, neg2;
-    ulong i, limbs1, limbs2, loglen;
+    long i, limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (i = len1 - 1; i != -1UL && !(neg1 = fmpz_sgn(poly1 + i)); i--) ;
-    for (i = len2 - 1; i != -1UL && !(neg2 = fmpz_sgn(poly2 + i)); i--) ;
+    for (i = len1 - 1; i != -1 && !(neg1 = fmpz_sgn(poly1 + i)); i--) ;
+    for (i = len2 - 1; i != -1 && !(neg2 = fmpz_sgn(poly2 + i)); i--) ;
     if (neg1 >= 0)
         neg1 = 0;
     if (neg2 >= 0)
         neg2 = 0;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
-    if (bits1 < 0L)
+    if (bits1 < 0)
     {
         sign = 1;
         bits1 = -bits1;
@@ -58,7 +58,7 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, ulong len1,
     if (poly1 != poly2)
     {
         bits2 = _fmpz_vec_max_bits(poly2, len2);
-        if (bits2 < 0L)
+        if (bits2 < 0)
         {
             sign = 1;
             bits2 = -bits2;
@@ -107,9 +107,9 @@ void
 fmpz_poly_mul_KS(fmpz_poly_t res,
                  const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const ulong len1 = poly1->length;
-    const ulong len2 = poly2->length;
-    ulong rlen;
+    const long len1 = poly1->length;
+    const long len2 = poly2->length;
+    long rlen;
 
     if (len1 == 0 | len2 == 0)
     {

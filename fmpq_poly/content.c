@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_content(mpq_t res, const fmpz * poly, 
-                        const fmpz_t den, ulong len)
+                        const fmpz_t den, long len)
 {
     fmpz_t num;
     fmpz_init(num);

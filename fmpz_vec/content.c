@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_content(fmpz_t res, const fmpz * vec, ulong len)
+void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len)
 {
     fmpz_zero(res);
     while (len--)

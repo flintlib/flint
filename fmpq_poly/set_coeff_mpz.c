@@ -30,17 +30,17 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, ulong n, const mpz_t x)
+void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, long n, const mpz_t x)
 {
-    ulong len = poly->length;
+    long len = poly->length;
     int replace = (n < len && *(poly->coeffs + n) != 0L);
     
     if (!replace && mpz_sgn(x) == 0)
         return;
     
-    if (n + 1UL > len)
+    if (n + 1 > len)
     {
-        fmpq_poly_fit_length(poly, n + 1UL); 
+        fmpq_poly_fit_length(poly, n + 1);
         mpn_zero(poly->coeffs + len, n - len);
         poly->length = n + 1;
     }

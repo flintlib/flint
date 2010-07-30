@@ -30,24 +30,24 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
-                           const fmpz * poly, const fmpz_t den, ulong len)
+                           const fmpz * poly, const fmpz_t den, long len)
 {
     _fmpz_poly_derivative(rpoly, poly, len);
     fmpz_set(rden, den);
-    _fmpq_poly_canonicalise(rpoly, rden, len - 1UL);
+    _fmpq_poly_canonicalise(rpoly, rden, len - 1);
 }
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    ulong len = poly->length;
-    if (len < 2UL)
+    long len = poly->length;
+    if (len < 2)
     {
         fmpq_poly_zero(res);
         return;
     }
 
-    fmpq_poly_fit_length(res, len - 1UL);
+    fmpq_poly_fit_length(res, len - 1);
     _fmpq_poly_derivative(res->coeffs, res->den, poly->coeffs, poly->den, len);
-    _fmpq_poly_set_length(res, len - 1UL);
+    _fmpq_poly_set_length(res, len - 1);
 }
 

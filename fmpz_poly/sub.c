@@ -28,12 +28,12 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, const fmpz * poly2, ulong len2)
+void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, long len1, const fmpz * poly2, long len2)
 {
-   ulong longer = FLINT_MAX(len1, len2);
-   ulong shorter = FLINT_MIN(len1, len2);
+   long longer = FLINT_MAX(len1, len2);
+   long shorter = FLINT_MIN(len1, len2);
 
-   ulong i;
+   long i;
    for (i = 0; i < shorter; i++) // subtract up to the length of the shorter poly
       fmpz_sub(res + i, poly1 + i, poly2 + i);   
    
@@ -48,7 +48,7 @@ void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, ulong len1, const fmpz * pol
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-   ulong longer = FLINT_MAX(poly1->length, poly2->length);
+   long longer = FLINT_MAX(poly1->length, poly2->length);
 
 	fmpz_poly_fit_length(res, longer);
    

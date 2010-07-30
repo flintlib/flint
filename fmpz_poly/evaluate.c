@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, ulong len, const fmpz_t a)
+void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 {
     _fmpz_poly_evaluate_horner(res, f, len, a);
 }

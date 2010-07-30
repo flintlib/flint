@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,9 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, ulong len2, long c, ulong exp)
+void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, long len2, long c, ulong exp)
 {
-   ulong i;
+   long i;
    fmpz_t temp;
    
    if (c == 0)
@@ -45,14 +45,14 @@ void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, ulong len2,
 
    fmpz_init(temp);
 
-   if (c == 1L) // scalar is 1, just subtract c * 2^exp times c
+   if (c == 1) // scalar is 1, just subtract c * 2^exp times c
    {
 	  for (i = 0; i < len2; i++)
 	  {
 		 fmpz_mul_2exp(temp, vec2 + i, exp);
 		 fmpz_sub(vec1 + i, vec1 + i, temp);
 	  }
-   } else if (c == -1L) // scalar is -1, add c * 2^exp
+   } else if (c == -1) // scalar is -1, add c * 2^exp
    {
       for (i = 0; i < len2; i++)
 	  {
@@ -61,7 +61,7 @@ void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, ulong len2,
 	  }
    } else // generic case
    {
-      if (c >= 0L)
+      if (c >= 0)
 	  {
 	     for (i = 0; i < len2; i++)
          {

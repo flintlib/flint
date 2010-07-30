@@ -30,7 +30,7 @@
 
 void _fmpz_poly_normalise(fmpz_poly_t poly)
 {
-   ulong length = poly->length;
+   long length = poly->length;
 	
 	while ((length) && (!poly->coeffs[length - 1])) length--;
 

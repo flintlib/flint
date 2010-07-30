@@ -32,7 +32,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong n)
+_fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
 {
     if (n <= 4)
     {
@@ -40,9 +40,9 @@ _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong n)
         return;
     }
 
-    const ulong limbs1 = _fmpz_vec_max_limbs(poly1, n);
-    const ulong limbs2 = _fmpz_vec_max_limbs(poly2, n);
-    const ulong max_limbs = FLINT_MAX(limbs1, limbs2);
+    const long limbs1 = _fmpz_vec_max_limbs(poly1, n);
+    const long limbs2 = _fmpz_vec_max_limbs(poly2, n);
+    const long max_limbs = FLINT_MAX(limbs1, limbs2);
 
     if (max_limbs > 3 & n < 20)
         _fmpz_poly_mullow_karatsuba_n(res, poly1, poly2, n);
@@ -53,10 +53,10 @@ _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong n)
 void
 fmpz_poly_mullow_n(fmpz_poly_t res,
                    const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                   ulong trunc)
+                   long trunc)
 {
-    const ulong len1 = poly1->length;
-    const ulong len2 = poly2->length;
+    const long len1 = poly1->length;
+    const long len2 = poly2->length;
 
     if (len1 == 0 | len2 == 0 | trunc == 0)
     {
@@ -77,7 +77,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
     fmpz *copy1 = poly1->coeffs;
     if (len1 < trunc)
     {
-        ulong i;
+        long i;
         copy1 = (fmpz *) calloc(trunc, sizeof(fmpz));
         for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
@@ -85,7 +85,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
     fmpz *copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
     if (poly1 != poly2 & len2 < trunc)
     {
-        ulong i;
+        long i;
         copy2 = (fmpz *) calloc(trunc, sizeof(fmpz));
         for (i = 0; i < len2; i++)
             copy2[i] = poly2->coeffs[i];

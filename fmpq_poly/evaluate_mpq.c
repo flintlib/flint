@@ -31,7 +31,7 @@
 
 void 
 _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, const fmpz_t den, 
-                        ulong len, const mpq_t a)
+                        long len, const mpq_t a)
 {
     mpq_t rden;
     mpq_init(rden);

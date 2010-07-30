@@ -29,10 +29,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, ulong len1, 
-                                const fmpz * poly2, ulong len2)
+void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
+                                const fmpz * poly2, long len2)
 {
-    ulong len, limbs1, limbs2, limbsx;
+    long len, limbs1, limbs2, limbsx;
     
     if (len1 < 5)
     {
@@ -59,9 +59,9 @@ void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, ulong len1,
 void fmpz_poly_mul(fmpz_poly_t res, 
                    const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    ulong rlen;
-    ulong len1 = poly1->length;
-    ulong len2 = poly2->length;
+    long rlen;
+    long len1 = poly1->length;
+    long len2 = poly2->length;
 
     if ((len1 == 0) | (len2 == 0))
     {

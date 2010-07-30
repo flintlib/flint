@@ -31,7 +31,7 @@
 
 // Assumes poly1 and poly2 are not length 0 and len1 >= len2
 void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, 
-							     ulong len1, const fmpz * poly2, ulong len2)
+							     long len1, const fmpz * poly2, long len2)
 {
    if ((len1 == 1) && (len2 == 1)) // Special case if the length of both inputs is 1
    {
@@ -55,7 +55,7 @@ void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
                             const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-   ulong len_out;
+   long len_out;
    
    if (poly1->length == 0 || poly2->length == 0)  
    {

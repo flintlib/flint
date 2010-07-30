@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-				const fmpz * A, ulong A_len, const fmpz * B, ulong B_len)
+				const fmpz * A, long A_len, const fmpz * B, long B_len)
 {
    if (A_len < 2*B_len - 1)
    {
@@ -39,8 +39,8 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
       const fmpz * t_A, * t_B, * t_B2;
 	  fmpz * d1q1, * d2q1;
       
-      ulong q = A_len - B_len + 1;
-      ulong q2 = B_len - q;
+      long q = A_len - B_len + 1;
+      long q2 = B_len - q;
       
 	  t_A = A + q2;
       t_B = B + q2;
@@ -83,7 +83,7 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 	  // We shift A right until it is length 2*B->length -1
       // We call this polynomial p1
       
-      ulong shift = A_len - 2*B_len + 1;
+      long shift = A_len - 2*B_len + 1;
       p1 = A + shift;
 	  
       /* 

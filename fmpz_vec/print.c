@@ -29,11 +29,11 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_print(fmpz * vec, ulong len)
+void _fmpz_vec_print(fmpz * vec, long len)
 {
-    ulong i;
+    long i;
 
-    printf("%lu", len);
+    printf("%li", len);
    
     if (len == 0)
         return;

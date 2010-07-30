@@ -31,9 +31,9 @@
 
 void fmpz_poly_print(const fmpz_poly_t poly)
 {
-    ulong i;
+    long i;
 
-    printf("%lu", poly->length);
+    printf("%li", poly->length);
     if (poly->length == 0)
         return;
     printf(" ");

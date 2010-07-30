@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_fit_length(fmpz_poly_t poly, const ulong length)
+void fmpz_poly_fit_length(fmpz_poly_t poly, long length)
 {
-   ulong alloc = length;
+   long alloc = length;
    
 	if (alloc <= poly->alloc) return;
 

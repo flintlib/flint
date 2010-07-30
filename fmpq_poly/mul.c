@@ -31,8 +31,8 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, ulong len1, 
-                    const fmpz * poly2, const fmpz_t den2, ulong len2)
+                    const fmpz * poly1, const fmpz_t den1, long len1, 
+                    const fmpz * poly2, const fmpz_t den2, long len2)
 {
     fmpz_t gcd1;  /* GCD( poly1, den2 ) */
     fmpz_t gcd2;  /* GCD( poly2, den1 ) */
@@ -95,7 +95,7 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         return;
     }
     
-    ulong len = poly1->length + poly2->length - 1;
+    long len = poly1->length + poly2->length - 1;
     fmpq_poly_fit_length(res, len);
     
     _fmpq_poly_mul(res->coeffs, res->den, 

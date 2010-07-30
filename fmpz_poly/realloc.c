@@ -29,9 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_realloc(fmpz_poly_t poly, const ulong alloc)
+void fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
 {
-   if (!alloc) // alloc == 0, clear up, reinitialise
+   if (alloc == 0) // alloc == 0, clear up, reinitialise
    {
          fmpz_poly_clear(poly);
          fmpz_poly_init(poly);

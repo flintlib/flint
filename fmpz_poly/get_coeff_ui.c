@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, const ulong n)
+ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
 {
    if (n + 1 > poly->length) // coefficient is beyond end of polynomial
       return 0;

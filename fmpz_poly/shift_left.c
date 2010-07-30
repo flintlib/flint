@@ -30,20 +30,20 @@
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, ulong len, ulong n)
+_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
 {
-    ulong i = len;
+    long i = len;
     
     /* Copy in reverse to avoid writing over unshifted coefficients */
     while (i--)
         fmpz_set(res + n + i, poly + i);
     
-    for (i = 0UL; i < n; i++)
+    for (i = 0; i < n; i++)
         fmpz_zero(res + i);
 }
 
 void
-fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 {
     if (n == 0)
     {

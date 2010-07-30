@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, ulong len2, const fmpz_t x)
+void _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, long len2, const fmpz_t x)
 {
 	long i;
 	fmpz c = *x;

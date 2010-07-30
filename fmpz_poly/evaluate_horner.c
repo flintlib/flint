@@ -28,17 +28,17 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, ulong len, 
+void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len, 
                                 const fmpz_t a)
 {
-    if (len == 0UL)
+    if (len == 0L)
         fmpz_set_ui(res, 0UL);
-    else if (len == 1UL)
+    else if (len == 1L)
         fmpz_set(res, f);
     else
     {
         fmpz_t t;
-        fmpz * c = (fmpz *) f + (len - 1UL);
+        fmpz * c = (fmpz *) f + (len - 1L);
         fmpz_init(t);
         fmpz_set(res, c);
         do {

@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, const ulong len)
+int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, const long len)
 {
-    ulong i;
+    long i;
     
     if (vec1 == vec2)
         return 1;

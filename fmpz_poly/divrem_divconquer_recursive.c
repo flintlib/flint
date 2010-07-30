@@ -31,10 +31,10 @@
 #include "fmpz_poly.h"
 
 void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
-					           const fmpz * A, const fmpz * B, ulong B_len)
+					           const fmpz * A, const fmpz * B, long B_len)
 {  
-   ulong crossover = 16;
-   ulong A_len = 2*B_len - 1;
+   long crossover = 16;
+   long A_len = 2*B_len - 1;
 
    if (B_len <= crossover) 
    {
@@ -54,8 +54,8 @@ void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
    const fmpz * d1, * d2, * d3, * d4, * p1, * p2;
    fmpz * q1, * q2, * dq1, * dq2, * d1q1, * d2q1, * d3q2, * d4q2, * t;
    
-   ulong n1 = (B_len + 1)/2;
-   ulong n2 = B_len - n1;
+   long n1 = (B_len + 1)/2;
+   long n2 = B_len - n1;
    
    /* We let B = d1*x^n2 + d2 */
    

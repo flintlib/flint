@@ -34,7 +34,7 @@
 
 char * fmpq_poly_to_string(const fmpq_poly_t poly)
 {
-    ulong i;
+    long i;
     size_t j;
     size_t len;     /* Upper bound on the length          */
     size_t denlen;  /* Size of the denominator in base 10 */
@@ -65,7 +65,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
         fmpz_get_mpz(z, poly->den);
         denlen = mpz_sizeinbase(z, 10);
     }
-    len = (size_t) ceil(log10((double) (poly->length + 1UL))) + (size_t) 2;
+    len = (size_t) ceil(log10((double) (poly->length + 1))) + (size_t) 2;
     for (i = 0; i < poly->length; i++)
     {
         fmpz_get_mpz(z, poly->coeffs + i);
@@ -83,7 +83,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
         mpq_clear(q);
         abort();
     }
-    j = sprintf(str, "%lu", poly->length);
+    j = sprintf(str, "%li", poly->length);
     str[j++] = ' ';
     for (i = 0; i < poly->length; i++)
     {
@@ -103,7 +103,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
 
 char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
 {
-    ulong i;
+    long i;
     size_t j;
     size_t len;     /* Upper bound on the length          */
     size_t denlen;  /* Size of the denominator in base 10 */
@@ -127,7 +127,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
     if (poly->length == 1)  /* Constant polynomials */
     {
         mpq_init(q);
-        fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1UL));
+        fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1));
         fmpz_get_mpz(mpq_denref(q), poly->den);
         mpq_canonicalize(q);
         str = mpq_get_str(NULL, 10, q);
@@ -173,7 +173,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
     j = 0;
     
     /* Print the leading term */
-    fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1UL));
+    fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1));
     fmpz_get_mpz(mpq_denref(q), poly->den);
     mpq_canonicalize(q);
     
@@ -190,9 +190,9 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
     }
     j += sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += sprintf(str + j, "%lu", poly->length - 1UL);
+    j += sprintf(str + j, "%li", poly->length - 1);
     
-    i = poly->length - 1UL;
+    i = poly->length - 1;
     while (i)
     {
         i--;
@@ -224,7 +224,7 @@ char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
             if (i > 1)
             {
                 str[j++] = '^';
-                j += sprintf(str + j, "%lu", i);
+                j += sprintf(str + j, "%li", i);
             }
         }
     }

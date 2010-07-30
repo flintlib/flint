@@ -31,7 +31,7 @@
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 {
-    ulong t;
+    long t;
     fmpz * tptr;
     
     t             = poly1->length;

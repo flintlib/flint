@@ -31,11 +31,11 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
-                       const fmpz * A, const fmpz_t a, ulong lenA, 
-                       const fmpz * B, const fmpz_t b, ulong lenB)
+                       const fmpz * A, const fmpz_t a, long lenA, 
+                       const fmpz * B, const fmpz_t b, long lenB)
 {
-    ulong lenQ = lenA + (lenB - 1UL);
-    ulong lenR = lenB - 1UL;
+    long lenQ = lenA + (lenB - 1);
+    long lenR = lenB - 1;
     ulong d;
     fmpz * lead;
     
@@ -47,11 +47,11 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         return;
     }
     
-    lead = (fmpz *) B + (lenB - 1UL);
+    lead = (fmpz *) B + (lenB - 1);
     _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
     
     /* Determine the actual length of R */
-    for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1UL)); lenR--) ;
+    for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
     if (d == 0UL || FLINT_ABS(*lead) == 1L)
@@ -61,7 +61,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
         fmpz_set_ui(r, 1UL);
-        if (lenR > 0UL)
+        if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
         if (*lead == -1L && d % 2UL)
@@ -86,7 +86,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, den);
         
         fmpz_set_ui(r, 1UL);
-        if (lenR > 0UL)
+        if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, den);
         
         fmpz_clear(den);

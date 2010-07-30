@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_content(fmpz_t res, const fmpz * poly, ulong len)
+void _fmpz_poly_content(fmpz_t res, const fmpz * poly, long len)
 {
     fmpz_zero(res);
     while (len--)

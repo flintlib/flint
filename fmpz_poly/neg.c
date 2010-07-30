@@ -30,7 +30,7 @@
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-	ulong i;
+	long i;
 	fmpz_poly_fit_length(res, poly->length);
 	
 	for (i = 0; i < poly->length; i++)

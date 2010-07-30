@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_mul_ui(fmpz * vec1, const fmpz * vec2, ulong len2, ulong c)
+void _fmpz_vec_scalar_mul_ui(fmpz * vec1, const fmpz * vec2, long len2, ulong c)
 {
-    ulong i;
+    long i;
     
     for (i = 0; i < len2; i++)
         fmpz_mul_ui(vec1 + i, vec2 + i, c);

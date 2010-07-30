@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long _fmpz_vec_max_bits(const fmpz * vec, ulong len)
+long _fmpz_vec_max_bits(const fmpz * vec, long len)
 {
-    ulong i;
+    long i;
     long bits, max_bits = 0;
     long sign = 1L;
 

@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, ulong len, 
+                              const fmpz * poly, const fmpz_t den, long len, 
                               ulong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
@@ -57,7 +57,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
-    if (c == 0L || fmpq_poly_is_zero(op))
+    if (c == 0 || fmpq_poly_is_zero(op))
     {
         fmpq_poly_zero(rop);
         return;

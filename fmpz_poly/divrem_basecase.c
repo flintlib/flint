@@ -30,8 +30,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, ulong A_len, 
-								const fmpz * B, ulong B_len)
+void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long A_len, 
+								const fmpz * B, long B_len)
 {
    if (B_len == 0)
    {
@@ -39,7 +39,7 @@ void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, ulong A_len,
       abort();
    }
    
-   ulong coeff = A_len;
+   long coeff = A_len;
    
    fmpz * qB;
    
@@ -70,12 +70,12 @@ void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, ulong A_len,
 	  mpn_copyi(R + B_len - 1, A + B_len - 1, coeff - B_len + 1);
    }
    
-   ulong B1;
+   long B1;
    if (want_rem) B1 = B_len;
    else B1 = B_len - 1;
-   ulong B2 = B_len;
+   long B2 = B_len;
    
-   ulong B1_orig = B1;
+   long B1_orig = B1;
    qB = _fmpz_vec_init(B1);
    
    while (coeff >= B_len)

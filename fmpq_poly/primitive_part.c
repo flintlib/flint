@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
-                               const fmpz * poly, const fmpz_t den, ulong len)
+                               const fmpz * poly, const fmpz_t den, long len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
     fmpz_set_ui(rden, 1UL);
@@ -38,8 +38,8 @@ void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    ulong len = poly->length;
-    if (len == 0UL)
+    long len = poly->length;
+    if (len == 0)
     {
         fmpq_poly_zero(res);
         return;

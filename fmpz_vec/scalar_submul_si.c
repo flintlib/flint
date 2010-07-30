@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,9 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_submul_si(fmpz * vec1, const fmpz * vec2, ulong len2, long c)
+void _fmpz_vec_scalar_submul_si(fmpz * vec1, const fmpz * vec2, long len2, long c)
 {
-	ulong i;
+	long i;
 	
 	if (c >= 0)
 		for (i = 0; i < len2; i++)

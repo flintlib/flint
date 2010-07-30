@@ -31,19 +31,19 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, ulong n, const mpq_t x)
+void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, long n, const mpq_t x)
 {
-    ulong len = poly->length;
+    long len = poly->length;
     int replace = (n < len && *(poly->coeffs + n) != 0L);
     
     if (!replace && mpq_sgn(x) == 0)
         return;
     
-    if (n + 1UL > len)
+    if (n + 1 > len)
     {
-        fmpq_poly_fit_length(poly, n + 1UL); 
+        fmpq_poly_fit_length(poly, n + 1); 
         mpn_zero(poly->coeffs + len, n - len);
-        len = n + 1UL;
+        len = n + 1;
         poly->length = len;
     }
     

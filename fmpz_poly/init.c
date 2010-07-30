@@ -37,7 +37,7 @@ void fmpz_poly_init(fmpz_poly_t poly)
    poly->length = 0;
 }
 
-void fmpz_poly_init2(fmpz_poly_t poly, const ulong alloc)
+void fmpz_poly_init2(fmpz_poly_t poly, long alloc)
 {
    if (alloc) // allocate space for alloc small coeffs
    {

@@ -53,7 +53,7 @@ void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 	
 	fmpz_poly_fit_length(poly1, poly2->length);
 	
-	ulong i;
+	long i;
 	for (i = 0; i < poly2->length; i++) 
 		fmpz_mul_si(poly1->coeffs + i, poly2->coeffs + i, x);
 

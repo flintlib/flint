@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-fmpz * _fmpz_vec_init(ulong len)
+fmpz * _fmpz_vec_init(long len)
 {
     return (fmpz *) calloc(len, sizeof(fmpz));
 }

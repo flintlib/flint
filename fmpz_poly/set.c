@@ -32,11 +32,11 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
 	if (poly1 != poly2) // aliasing is trivial
 	{
-		ulong length = poly2->length;
+		long length = poly2->length;
 	
 	   fmpz_poly_fit_length(poly1, length);
 
-		ulong i;
+		long i;
 		for (i = 0; i < length; i++)
 			fmpz_set(poly1->coeffs + i, poly2->coeffs + i);
 		

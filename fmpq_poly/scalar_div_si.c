@@ -31,9 +31,9 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
-                              const fmpz_t den, ulong len, long c)
+                              const fmpz_t den, long len, long c)
 {
-    if (c == 1L)
+    if (c == 1)
     {
         if (rpoly != poly)
         {
@@ -41,7 +41,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
             fmpz_set(rden, den);
         }
     }
-    else if (c == -1L)
+    else if (c == -1)
     {
         _fmpz_vec_neg(rpoly, poly, len);
         fmpz_set(rden, den);

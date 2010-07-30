@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, ulong len, const mpq_t a)
+_fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, long len, const mpq_t a)
 {
     _fmpz_poly_evaluate_horner_mpq(res, f, len, a);
 }

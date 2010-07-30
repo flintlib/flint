@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
-                                const fmpz * poly, const fmpz_t den, ulong len,
+                                const fmpz * poly, const fmpz_t den, long len,
                                 const fmpz_t c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */

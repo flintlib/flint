@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_is_zero(const fmpz * vec, ulong len)
+int _fmpz_vec_is_zero(const fmpz * vec, long len)
 {
-    ulong i;
+    long i;
     for (i = 0; (i < len) && (*(vec + i) == 0); i++) ;
     return (i == len);
 }

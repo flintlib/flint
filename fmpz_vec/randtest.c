@@ -30,11 +30,11 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_randtest(fmpz * f, ulong length, mp_bitcnt_t bits_in)
+void _fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits_in)
 {
-   ulong i;
+   long i;
 
-   for (i = 0; i < length; i++)
+   for (i = 0; i < len; i++)
       fmpz_randtest(f + i, bits_in);
 }
 

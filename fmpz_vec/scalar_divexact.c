@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,12 +29,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_divexact(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
+void _fmpz_vec_scalar_divexact(fmpz * vec1, const fmpz * vec2, long len2, const fmpz_t x)
 {
-    ulong i;
+    long i;
     for (i = 0; i < len2; i++)
-    {
         fmpz_divexact(vec1 + i, vec2 + i, x);
-    }
 }
 

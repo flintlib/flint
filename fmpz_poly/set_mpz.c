@@ -30,7 +30,7 @@
 
 void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
 {
-    if (c == 0UL)
+    if (mpz_sgn(c) == 0)
         fmpz_poly_zero(poly);
     else
     {

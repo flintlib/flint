@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz * pol2, fmpz * temp, ulong length);
+void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz * pol2, fmpz * temp, long length);
 
 /**
     Multiplication using truncated karatsuba. Below length 7, classical truncated multiplication
@@ -41,10 +41,10 @@ void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz 
 */
 
 // recursive Karatsuba mullow
-void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz * pol2, fmpz * temp, ulong length)
+void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz * pol2, fmpz * temp, long length)
 {
-   ulong m1 = length/2;
-   ulong m2 = length - m1;
+   long m1 = length/2;
+   long m2 = length - m1;
    int odd = (length & 1);
    
    if (length <= 6)
@@ -74,11 +74,11 @@ void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1, const fmpz 
 }
 
 // Assumes poly1 and poly2 are not length 0
-void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, ulong len)
+void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long len)
 {
    fmpz * temp;
-   ulong loglen = 0;
-    ulong length;
+   long loglen = 0;
+   long length;
 
    if (len == 1)
    {
@@ -97,9 +97,9 @@ void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, const fmpz * 
 }
 
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
-                         const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong length)
+                         const fmpz_poly_t poly1, const fmpz_poly_t poly2, long length)
 {
-   ulong i;
+   long i;
    int clear1 = 0, clear2 = 0;
    
    fmpz * pol1, * pol2;

@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, ulong len2, const fmpz_t x)
+void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, long len2, const fmpz_t x)
 {
     fmpz c = *x;
 
@@ -46,7 +46,7 @@ void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, ulong len2, co
     }
     else
     {
-        ulong i;
+        long i;
         for (i = 0; i < len2; i++)
             fmpz_submul(vec1 + i, vec2 + i, x);
     }

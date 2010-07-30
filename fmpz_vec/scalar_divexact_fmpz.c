@@ -30,9 +30,9 @@
 #include "fmpz_vec.h"
 
 void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2, 
-                                                 ulong len2, const fmpz_t x)
+                                                 long len2, const fmpz_t x)
 {
-    ulong i;
+    long i;
     fmpz c = *x;
 
 	if (!COEFF_IS_MPZ(c))

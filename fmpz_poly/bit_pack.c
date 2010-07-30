@@ -28,14 +28,14 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz * poly, ulong len, ulong bit_size, int negate)
+void _fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz * poly, long len, ulong bit_size, int negate)
 {
    mp_bitcnt_t bits = 0;
    mp_size_t limbs = 0;
 
    ulong l = bit_size/FLINT_BITS;
    ulong b = bit_size%FLINT_BITS;
-   ulong i;
+   long i;
    int borrow = 0;
 
    for (i = 0; i < len; i++)

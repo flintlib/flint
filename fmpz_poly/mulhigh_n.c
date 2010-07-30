@@ -30,11 +30,11 @@
 #include "fmpz_poly.h"
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
-             const fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong n)
+             const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 {
-   ulong limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
-   ulong limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
-   ulong max_limbs = FLINT_MAX(limbs1, limbs2);
+   long limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
+   long limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
+   long max_limbs = FLINT_MAX(limbs1, limbs2);
 
    if (n == 0)
    {

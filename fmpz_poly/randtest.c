@@ -30,9 +30,9 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpz_poly_randtest(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
 {
-   ulong i;
+   long i;
    fmpz_poly_fit_length(f, length);
 
    for (i = 0; i < length; i++)
@@ -42,9 +42,9 @@ void fmpz_poly_randtest(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
    _fmpz_poly_normalise(f);
 }
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
 {
-   ulong i;
+   long i;
    fmpz_poly_fit_length(f, length);
 
    for (i = 0; i < length; i++)
@@ -54,7 +54,7 @@ void fmpz_poly_randtest_unsigned(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_i
    _fmpz_poly_normalise(f);
 }
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
 {
    if ((bits_in == 0) || (length == 0))
    {

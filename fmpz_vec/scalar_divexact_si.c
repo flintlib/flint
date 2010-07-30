@@ -30,9 +30,9 @@
 #include "fmpz_vec.h"
 
 void _fmpz_vec_scalar_divexact_si(fmpz * vec1, const fmpz * vec2, 
-                                               ulong len2, long c)
+                                               long len2, long c)
 {
-    ulong i;
+    long i;
     for (i = 0; i < len2; i++)
         fmpz_divexact_si(vec1 + i, vec2 + i, c);
 }

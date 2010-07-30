@@ -39,7 +39,7 @@ void fmpq_poly_init(fmpq_poly_t poly)
     poly->length = 0;
 }
 
-void fmpq_poly_init2(fmpq_poly_t poly, ulong alloc)
+void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
 {
     if (alloc)  /* Allocate space for alloc small coeffs */
     {

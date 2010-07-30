@@ -36,7 +36,7 @@
 //Supports full aliasing between {rpoly, rden} and {poly, den}, but there 
 //may be no partial overlap between rpoly and poly.
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, ulong len, 
+                              const fmpz * poly, const fmpz_t den, long len, 
                               long c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
@@ -50,8 +50,8 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     }
     else
     {
-        ulong gcd2 = fmpz_get_ui(gcd);
-        long c2 = c / (long)gcd2;
+        ulong gcd2 = fmpz_get_ui(gcd);  /* long might not be enough */
+        long c2 = c / (long) gcd2;
         _fmpz_vec_scalar_mul_si(rpoly, poly, len, c2);
         fmpz_fdiv_q_ui(rden, den, gcd2);
     }
@@ -63,7 +63,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 {
-    if (c == 0L || fmpq_poly_is_zero(op))
+    if (c == 0 || fmpq_poly_is_zero(op))
     {
         fmpq_poly_zero(rop);
         return;

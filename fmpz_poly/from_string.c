@@ -34,7 +34,7 @@
 
 int fmpz_poly_verify_format(const char * str)
 {
-    unsigned long i, len;
+    long i, len;
     const char * s = str;
     
     if (s == NULL || !isdigit(s[0]))
@@ -51,7 +51,7 @@ int fmpz_poly_verify_format(const char * str)
         return 0;
     
     /* TODO:  Technically, we should check that the number fits in a long. */
-    len = (ulong) atol(str);
+    len = atol(str);
     
     /* Check that s is len times " [-]####" followed by '\0'. */
     for (i = 0; i < len; i++)
@@ -85,10 +85,10 @@ void _fmpz_poly_from_string(fmpz * poly, const char * str)
 {
     const char * s = str;
     char * v, * w;
-    ulong cur, i, len, max;
+    long cur, i, len, max;
     
-    len = (ulong) atol(str);
-    if (len == 0UL)
+    len = atol(str);
+    if (len == 0L)
         return;
     
     while (s++, *str++ != ' ') ;
@@ -117,12 +117,12 @@ void _fmpz_poly_from_string(fmpz * poly, const char * str)
 int fmpz_poly_from_string(fmpz_poly_t poly, const char * str)
 {
     int check = fmpz_poly_verify_format(str);
-    ulong len;
+    long len;
     
     if (!check)
         return 0;
     
-    len = (ulong) atol(str);
+    len = atol(str);
     fmpz_poly_fit_length(poly, len);
     
     _fmpz_poly_from_string(poly->coeffs, str);
