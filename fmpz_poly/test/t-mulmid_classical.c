@@ -107,20 +107,27 @@ int main(void)
       fmpz_poly_init(c);
       fmpz_poly_init(d);
       fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      if (b->length == 0) fmpz_poly_zero(c);
-	  else fmpz_poly_randtest(c, n_randint(b->length), n_randint(200));
+      fmpz_poly_randtest(c, n_randint(b->length + 1), n_randint(200));
       
-	  fmpz_poly_mul_classical(a, b, c);
-      fmpz_poly_truncate(a, b->length);
-	  fmpz_poly_shift_right(a, a, c->length - 1);
 	  fmpz_poly_mulmid_classical(d, b, c);
-      
-      result = (fmpz_poly_equal(a, d));
+      if (b->length == 0 || c->length == 0)
+      {
+          result = (d->length == 0);
+      }
+      else
+      {
+    	  fmpz_poly_mul_classical(a, b, c);
+          fmpz_poly_truncate(a, b->length);
+    	  fmpz_poly_shift_right(a, a, c->length - 1);
+          result = (fmpz_poly_equal(a, d));
+      }
       if (!result)
       {
          printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(d); printf("\n\n");
+         printf("b = "), fmpz_poly_print(b), printf("\n\n");
+         printf("c = "), fmpz_poly_print(c), printf("\n\n");
+         printf("a = "), fmpz_poly_print(a), printf("\n\n");
+         printf("d = "), fmpz_poly_print(d), printf("\n\n");
          abort();
       }
 
