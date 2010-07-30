@@ -19,7 +19,7 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2007 David Howden.
+   Copyright (C) 2007 David Howden
    Copyright (C) 2010 William Hart
    
 *****************************************************************************/
@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 // assumes length > 0, bits > 0
-void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, ulong bits)
+void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
 {  
    ulong current_limb = 0;
    ulong current_bit = 0;

@@ -58,7 +58,7 @@ void nmod_poly_clear(nmod_poly_t poly);
 void nmod_poly_fit_length(nmod_poly_t poly, long alloc);
 
 static inline
-long nmod_poly_max_bits(nmod_poly_t poly)
+mp_bitcnt_t nmod_poly_max_bits(nmod_poly_t poly)
 {
    return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
@@ -185,10 +185,10 @@ void nmod_poly_mulhigh_classical(nmod_poly_t res,
          const nmod_poly_t poly1, const nmod_poly_t poly2, long start);
 
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-						                      long length, ulong bits);
+						                      long length, mp_bitcnt_t bits);
 
 void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-						          long length, ulong bits, nmod_t mod);
+						          long length, mp_bitcnt_t bits, nmod_t mod);
 
 void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1, 
             mp_srcptr input2, long length2, ulong bits_in, nmod_t mod);

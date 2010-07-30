@@ -27,10 +27,10 @@
 #include "flint.h"
 #include "nmod_vec.h"
 
-long _nmod_vec_max_bits(mp_srcptr vec, long len)
+mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len)
 {
-   long bits = 0;
-   mp_limb_t mask = ~(mp_limb_t) 0;
+   mp_bitcnt_t bits = 0;
+   mp_limb_t mask   = ~(mp_limb_t) 0;
    long i;
    
    for (i = 0; i < len; i++)
@@ -39,7 +39,7 @@ long _nmod_vec_max_bits(mp_srcptr vec, long len)
       {
          bits = FLINT_BIT_COUNT(vec[i]);
          if (bits == FLINT_BITS) break;
-         else mask = ~(mp_limb_t) 0 - ((1L << bits) - 1L);
+         else mask = ~(mp_limb_t) 0 - ((1UL << bits) - 1UL);
       }
    }
    

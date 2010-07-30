@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 // assumes length > 0, bits > 0
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, ulong bits, nmod_t mod)
+void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, mp_bitcnt_t bits, nmod_t mod)
 {
    long i;
    ulong current_limb = 0;
