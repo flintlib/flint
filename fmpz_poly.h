@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2009, Andy Novocin
+    Copyright (C) 2009 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -79,7 +79,7 @@ long fmpz_poly_length(const fmpz_poly_t poly)
 static inline
 long fmpz_poly_degree(const fmpz_poly_t poly)
 {
-    return poly->length - 1L;
+    return poly->length - 1;
 }
 
 /*  Assignment and basic manipulation  ***************************************/
@@ -190,14 +190,14 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1,
 
 /*  Bit packing  *************************************************************/
 
-void _fmpz_poly_bit_pack(mp_limb_t * arr, const fmpz * poly,
-                                      long len, ulong bit_size, int negate);
+void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
+                                long len, mp_bitcnt_t bit_size, int negate);
 
 void _fmpz_poly_bit_unpack(fmpz * poly, long length, 
-                         const mp_limb_t * arr, ulong bit_size, int negate);
+                           mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long length, 
-                                     const mp_limb_t * arr, ulong bit_size);
+                                       mp_srcptr arr, mp_bitcnt_t bit_size);
 
 /*  Multiplication  **********************************************************/
 
@@ -272,13 +272,13 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /*  Powering  ****************************************************************/
 
-void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e);
+void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e);
 
-void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, long e);
+void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e);
 
-void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, long e);
+void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e);
 
-void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, long e);
+void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
 /*  Shifting  ****************************************************************/
 

@@ -28,10 +28,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long _fmpz_vec_max_limbs(const fmpz * vec, long len)
+mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len)
 {
     long i;
-    long limbs, max_limbs = 0;
+    mp_size_t limbs, max_limbs = 0;
     
     for (i = 0; i < len; i++)
     {

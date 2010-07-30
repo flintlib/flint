@@ -30,9 +30,7 @@
 
 long _fmpz_vec_max_bits(const fmpz * vec, long len)
 {
-    long i;
-    long bits, max_bits = 0;
-    long sign = 1L;
+    long i, bits, max_bits = 0, sign = 1;
 
     for (i = 0; i < len; i++)
     {

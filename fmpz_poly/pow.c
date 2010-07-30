@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e)
+void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 {
     /* We need a couple of copies of the input data to allow aliasing in the */
     /* multiplication methods, call these A (= res), B, and C.  Two of them  */
@@ -43,7 +43,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e)
     /*   5 - (empty, base, res)                                              */
     /* We keep track of the length of the power of the base and the current  */
     /* result in lenB and lenR.                                              */
-    const long alloc = e * (len - 1) + 1;
+    const long alloc = (long) e * (len - 1) + 1;
     fmpz * A = res;
     fmpz * B = _fmpz_vec_init(2 * alloc);
     fmpz * C = B + alloc;
@@ -55,7 +55,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e)
     
     while (1)
     {
-        if (e & 1)
+        if (e & 1UL)
         {
             switch (pos)
             {
@@ -70,7 +70,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e)
         }
         
         e >>= 1;
-        if (e == 0)
+        if (e == 0UL)
             break;
         
         switch (pos)
@@ -93,7 +93,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, long e)
     _fmpz_vec_clear(B, alloc);
 }
 
-void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, long e)
+void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
 {
     switch (e)
     {
@@ -148,7 +148,7 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, long e)
     }
 }
 
-void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, long e)
+void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
 {
     if (e < 5)
         _fmpz_poly_pow_small(res, poly, len, e);
@@ -156,14 +156,14 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, long e)
         _fmpz_poly_pow_binexp(res, poly, len, e);
 }
 
-void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, long e)
+void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     if (poly->length == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
-    if (e == 0)
+    if (e == 0UL)
     {
         fmpz_poly_fit_length(res, 1);
         _fmpz_poly_set_length(res, 1);
@@ -172,7 +172,7 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, long e)
     }
     
     const long len  = poly->length;
-    const long rlen = e * (len - 1) + 1;
+    const long rlen = (long) e * (len - 1) + 1;
     
     fmpz_poly_fit_length(res, rlen);
     _fmpz_poly_set_length(res, rlen);

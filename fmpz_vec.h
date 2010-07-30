@@ -48,7 +48,7 @@ void _fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits_in);
 
 long _fmpz_vec_max_bits(const fmpz * vec, long len);
 
-long _fmpz_vec_max_limbs(const fmpz * vec, long len);
+mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len);
 
 /*  Output  ******************************************************************/
 
