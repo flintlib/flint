@@ -29,9 +29,9 @@
 #include "flint.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_scale(mpfr * coeffs, ulong n)
+void _mpfr_poly_scale(mpfr * coeffs, long n)
 {
-   ulong len = (1UL<<n), i;
+   ulong i, len = (1L << n);
    
    for (i = 0; i < len; i++)
       mpfr_div_2exp(coeffs + i, coeffs + i, n, GMP_RNDN);

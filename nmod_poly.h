@@ -33,8 +33,8 @@
 typedef struct
 {
    mp_ptr coeffs;
-   ulong alloc;
-   ulong length;
+   long alloc;
+   long length;
    nmod_t mod;
 } nmod_poly_struct;
 
@@ -46,19 +46,19 @@ void nmod_poly_init_preinv(nmod_poly_t poly,
 							 mp_limb_t n, mp_limb_t ninv);
 
 void nmod_poly_init2(nmod_poly_t poly, 
-					             mp_limb_t n, ulong alloc);
+					             mp_limb_t n, long alloc);
 
 void nmod_poly_init2_preinv(nmod_poly_t poly, 
-			    mp_limb_t n, mp_limb_t ninv, ulong alloc);
+			    mp_limb_t n, mp_limb_t ninv, long alloc);
 
-void nmod_poly_realloc(nmod_poly_t poly, ulong alloc);
+void nmod_poly_realloc(nmod_poly_t poly, long alloc);
 
 void nmod_poly_clear(nmod_poly_t poly);
 
-void nmod_poly_fit_length(nmod_poly_t poly, ulong alloc);
+void nmod_poly_fit_length(nmod_poly_t poly, long alloc);
 
 static inline
-ulong nmod_poly_max_bits(nmod_poly_t poly)
+long nmod_poly_max_bits(nmod_poly_t poly)
 {
    return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
@@ -73,7 +73,7 @@ void _nmod_poly_normalise(nmod_poly_t poly)
 static inline
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
-   ulong t;
+   long t;
    mp_ptr tp;
 
    t = poly1->alloc;
@@ -89,7 +89,7 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
    poly2->coeffs = tp;
 }
 
-void nmod_poly_randtest(nmod_poly_t poly, ulong length);
+void nmod_poly_randtest(nmod_poly_t poly, long length);
 
 static inline
 void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
@@ -118,7 +118,7 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
 static inline
 void nmod_poly_print(nmod_poly_t a)
 {
-   ulong i;
+   long i;
    
    if (a->length == 0)
    {
@@ -126,7 +126,7 @@ void nmod_poly_print(nmod_poly_t a)
 	  return;
    }
    
-   printf("%lu  ", a->length);
+   printf("%li  ", a->length);
 
    for (i = 0; i < a->length - 1; i++)
       printf("%lu ", a->coeffs[i]);
@@ -140,7 +140,7 @@ void nmod_poly_zero(nmod_poly_t res)
 }
 
 static inline 
-void nmod_poly_truncate(nmod_poly_t poly, ulong length)
+void nmod_poly_truncate(nmod_poly_t poly, long length)
 {
    if (poly->length > length)
    {
@@ -151,14 +151,14 @@ void nmod_poly_truncate(nmod_poly_t poly, ulong length)
 
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
-void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, 
-					           mp_srcptr poly2, ulong len2, nmod_t mod);
+void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
+					           mp_srcptr poly2, long len2, nmod_t mod);
 
 void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
 				                               const nmod_poly_t poly2);
 
-void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, ulong len1, 
-					           mp_srcptr poly2, ulong len2, nmod_t mod);
+void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1, 
+					           mp_srcptr poly2, long len2, nmod_t mod);
 
 void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
 				                               const nmod_poly_t poly2);
@@ -167,31 +167,31 @@ void nmod_poly_scalar_mul(nmod_poly_t res,
 						          const nmod_poly_t poly1, mp_limb_t c);
 
 void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
-				   ulong len1, mp_srcptr poly2, ulong len2, nmod_t mod);
+				   long len1, mp_srcptr poly2, long len2, nmod_t mod);
 
 void nmod_poly_mul_classical(nmod_poly_t res, 
                       const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, 
-      ulong len1, mp_srcptr poly2, ulong len2, ulong trunc, nmod_t mod);
+      long len1, mp_srcptr poly2, long len2, long trunc, nmod_t mod);
 
 void nmod_poly_mullow_classical(nmod_poly_t res, 
-         const nmod_poly_t poly1, const nmod_poly_t poly2, ulong trunc);
+         const nmod_poly_t poly1, const nmod_poly_t poly2, long trunc);
 
 void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, 
-	  ulong len1, mp_srcptr poly2, ulong len2, ulong start, nmod_t mod);
+	  long len1, mp_srcptr poly2, long len2, long start, nmod_t mod);
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
-         const nmod_poly_t poly1, const nmod_poly_t poly2, ulong start);
+         const nmod_poly_t poly1, const nmod_poly_t poly2, long start);
 
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-						                      ulong length, ulong bits);
+						                      long length, ulong bits);
 
 void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-						          ulong length, ulong bits, nmod_t mod);
+						          long length, ulong bits, nmod_t mod);
 
-void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
-            mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod);
+void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1, 
+            mp_srcptr input2, long length2, ulong bits_in, nmod_t mod);
 
 void nmod_poly_mul_KS(nmod_poly_t res, 
        const nmod_poly_t poly1, const nmod_poly_t poly2, ulong bits_in);
@@ -200,13 +200,13 @@ void nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly1,
 				                                     nmod_poly_t poly2);
 
 void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, 
-						                nmod_poly_t poly2, ulong trunc);
+						                nmod_poly_t poly2, long trunc);
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
-						                    nmod_poly_t poly2, ulong n);
+						                    nmod_poly_t poly2, long n);
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
-		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod);
+		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, 
 						   nmod_poly_t R, nmod_poly_t A, nmod_poly_t B);

@@ -30,11 +30,11 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_convolution_trans(mpfr * coeffs1, mpfr * coeffs2, ulong n, mp_bitcnt_t prec)
+void _mpfr_poly_convolution_trans(mpfr * coeffs1, mpfr * coeffs2, long n, mp_bitcnt_t prec)
 {
-   ulong len2 = (1UL<<n)/2;
+   long len2 = (1L << n) / 2;
 
-   ulong i, j;
+   long i, j;
 
    mpfr_t temp, temp2, temp3, temp4;
    mpfr_init2(temp, prec);

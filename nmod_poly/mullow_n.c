@@ -28,7 +28,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, ulong trunc)
+void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, long trunc)
 {
    if (trunc <= 6)
    {
@@ -36,8 +36,8 @@ void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, u
       return;
    }
    
-   ulong bits = FLINT_BITS - poly1->mod.norm;
-   ulong bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+   long bits = FLINT_BITS - (long) poly1->mod.norm;
+   long bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
 
    if (2*bits + bits2 <= FLINT_BITS)
       nmod_poly_mullow_classical(res, poly1, poly2, trunc);

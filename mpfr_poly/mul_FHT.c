@@ -32,15 +32,15 @@
 
 void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2)
 {
-	ulong len1 = poly1->length;
-	ulong len2 = poly2->length;
-	ulong len_out = len1 + len2 - 1;
+	long len1 = poly1->length;
+	long len2 = poly2->length;
+	long len_out = len1 + len2 - 1;
     mp_bitcnt_t prec = poly1->prec;
 	mpfr * t1, * t2;
-    ulong i;
+    long i;
 
-	ulong log_length = 0;
-	ulong length;
+	long log_length = 0;
+	long length;
 
 	if (len1 == 0 || len2 == 0)
 	{
@@ -48,8 +48,8 @@ void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2)
 		return;
 	}
 
-	while ((1UL<<log_length) < len_out) log_length++;
-	length = (1UL<<log_length);
+	while ((1L<<log_length) < len_out) log_length++;
+	length = (1L<<log_length);
 
 	mpfr_poly_fit_length(res, length);
 	t1 = res->coeffs;

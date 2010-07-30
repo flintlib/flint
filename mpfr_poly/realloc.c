@@ -30,11 +30,9 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_realloc(mpfr_poly_t poly, const ulong alloc)
+void mpfr_poly_realloc(mpfr_poly_t poly, long alloc)
 {
-   ulong i;
-   
-   if (!alloc) // alloc == 0, clear up, reinitialise
+   if (alloc == 0) // clear up, reinitialise
    {
       mpfr_poly_clear(poly);
       mpfr_poly_init(poly, poly->prec);
@@ -43,6 +41,7 @@ void mpfr_poly_realloc(mpfr_poly_t poly, const ulong alloc)
    
 	if (poly->alloc) // realloc
 	{
+       long i;
 	   for (i = alloc; i < poly->alloc; i++)
 	      mpfr_clear(poly->coeffs + i);
 

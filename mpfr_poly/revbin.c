@@ -31,13 +31,13 @@
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
-void _mpfr_poly_revbin(mpfr * coeffs, ulong n)
+void _mpfr_poly_revbin(mpfr * coeffs, long n)
 {
-   ulong len = (1UL<<n), s, i;
+   long i, len = (1L << n);
    
    for (i = 0; i < len; i++)
    {
-      s = n_revbin(i, n);
+      long s = n_revbin(i, n);
 	  if (i < s)
 		  mpfr_swap(coeffs + i, coeffs + s);
    }

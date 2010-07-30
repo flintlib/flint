@@ -30,14 +30,14 @@
 #include "ulong_extras.h"
 
 void _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, 
-		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod)
+		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
    mp_limb_t c;
 
    mp_ptr R_sub;
 
-   ulong coeff = A_len - 1;
+   long coeff = A_len - 1;
    mp_ptr coeff_Q = Q - B_len + 1;
 
    mpn_copyi(R, A, A_len);
@@ -74,9 +74,9 @@ void _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
 }
 
 void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, 
-		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod)
+		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
-   ulong i;
+   long i;
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
    mp_limb_t c;
    mp_limb_t r_coeff;
@@ -97,7 +97,7 @@ void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
 	  R2[2*i + 1] = 0;
    }
 
-   ulong coeff = A_len - 1;
+   long coeff = A_len - 1;
    mp_ptr coeff_Q = Q - B_len + 1;
   
    while (coeff + 1 >= B_len)
@@ -135,9 +135,9 @@ void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
 }
 
 void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, 
-		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod)
+		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
-   ulong i;
+   long i;
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
    mp_limb_t c;
    mp_limb_t r_coeff;
@@ -160,7 +160,7 @@ void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
 	  R3[3*i + 2] = 0;
    }
 
-   ulong coeff = A_len - 1;
+   long coeff = A_len - 1;
    mp_ptr coeff_Q = Q - B_len + 1;
   
    while (coeff + 1 >= B_len)
@@ -198,9 +198,9 @@ void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
 }
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
-		mp_srcptr A, ulong A_len, mp_srcptr B, ulong B_len, nmod_t mod)
+		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
-   ulong bits = 2*(FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
+   long bits = 2*(FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
 
    if (bits <= FLINT_BITS)
       _nmod_poly_divrem_basecase_1(Q, R, A, A_len, B, B_len, mod);

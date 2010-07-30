@@ -29,10 +29,9 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, ulong length, mp_bitcnt_t exp)
+void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, long length, mp_bitcnt_t exp)
 {
-   ulong i;
-
+   long i;
    for (i = 0; i < length; i++)
       mpfr_mul_2exp(res + i, vec + i, exp, GMP_RNDN);
 }

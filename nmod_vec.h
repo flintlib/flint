@@ -132,9 +132,9 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 }
 
 static inline
-mp_ptr nmod_vec_init(ulong length)
+mp_ptr nmod_vec_init(long len)
 {
-   return (mp_ptr) malloc(length*sizeof(mp_limb_t));
+   return (mp_ptr) malloc(len * sizeof(mp_limb_t));
 }
 
 static inline
@@ -146,25 +146,25 @@ void nmod_vec_free(mp_ptr vec)
 void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod);
 
 static inline
-void _nmod_vec_zero(mp_ptr vec, long length)
+void _nmod_vec_zero(mp_ptr vec, long len)
 {
-   mpn_zero(vec, length);
+   mpn_zero(vec, len);
 }
 
-ulong _nmod_vec_max_bits(mp_srcptr vec, ulong length);
+long _nmod_vec_max_bits(mp_srcptr vec, long len);
 
 static inline
-void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long length)
+void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
 {
-   mpn_copyi(res, vec, length);
+   mpn_copyi(res, vec, len);
 }
 
 static inline
-int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long length)
+int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 {
    long i;
 
-   for (i = 0; i < length; i++)
+   for (i = 0; i < len; i++)
       if (vec[i] != vec2[i]) return 0;
 
    return 1;

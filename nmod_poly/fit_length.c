@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_fit_length(nmod_poly_t poly, ulong alloc)
+void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 {
    if (alloc > poly->alloc)
    {

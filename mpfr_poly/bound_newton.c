@@ -72,7 +72,7 @@
 */
   
 int _mpfr_poly_bound_newton(double * inter, double * slope, 
-			                               mpfr * poly, ulong len, ulong prec)
+			                               mpfr * poly, long len, ulong prec)
 {
    /*
 	  Precision things can be stored to in a double (can't be less more than
@@ -85,7 +85,7 @@ int _mpfr_poly_bound_newton(double * inter, double * slope,
 	  we want L1 to miss all the points.
    */
 	
-   ulong i, max_i, min_i;
+   long i, max_i, min_i;
    double slope1, slope2;
    double max_d, min_d;
    double k;

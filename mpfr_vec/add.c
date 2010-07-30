@@ -29,10 +29,9 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, ulong length)
+void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long length)
 {
-   ulong i;
-
+   long i;
    for (i = 0; i < length; i++)
       mpfr_add(res + i, vec1 + i, vec2 + i, GMP_RNDN);
 }

@@ -28,11 +28,11 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, mp_srcptr poly2, ulong len2, nmod_t mod)
+void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, nmod_t mod)
 {
-   ulong longer = FLINT_MAX(len1, len2);
-   ulong shorter = FLINT_MIN(len1, len2);
-   ulong i;
+   long longer = FLINT_MAX(len1, len2);
+   long shorter = FLINT_MIN(len1, len2);
+   long i;
    
    _nmod_vec_add(res, poly1, poly2, shorter, mod);
    
@@ -47,7 +47,7 @@ void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, ulong len1, mp_srcptr poly2, ul
 
 void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-   ulong longer = FLINT_MAX(poly1->length, poly2->length);
+   long longer = FLINT_MAX(poly1->length, poly2->length);
 
    nmod_poly_fit_length(res, longer);
 	

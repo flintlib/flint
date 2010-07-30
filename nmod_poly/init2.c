@@ -30,10 +30,10 @@
 #include "nmod_poly.h"
 
 void nmod_poly_init2_preinv(nmod_poly_t poly, 
-						mp_limb_t n, mp_limb_t ninv, ulong alloc)
+						mp_limb_t n, mp_limb_t ninv, long alloc)
 {
    if (alloc)
-	  poly->coeffs = (mp_ptr) malloc(alloc*sizeof(mp_limb_t));
+	  poly->coeffs = (mp_ptr) malloc(alloc * sizeof(mp_limb_t));
    else 
       poly->coeffs = NULL;
 
@@ -46,7 +46,7 @@ void nmod_poly_init2_preinv(nmod_poly_t poly,
    poly->length = 0;
 }
 
-void nmod_poly_init2(nmod_poly_t poly, mp_limb_t n, ulong alloc)
+void nmod_poly_init2(nmod_poly_t poly, mp_limb_t n, long alloc)
 {
    nmod_poly_init2_preinv(poly, n, n_preinvert_limb(n), alloc);
 }

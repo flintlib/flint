@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_convolution_FHT(mpfr * coeffs1, mpfr * coeffs2, ulong n, mp_bitcnt_t prec)
+void _mpfr_poly_convolution_FHT(mpfr * coeffs1, mpfr * coeffs2, long n, mp_bitcnt_t prec)
 {
    _mpfr_poly_FHT(coeffs1, n, prec);
    _mpfr_poly_revbin(coeffs1, n);

@@ -28,9 +28,9 @@
 #include "flint.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_randtest(mpfr_poly_t f, ulong length)
+void mpfr_poly_randtest(mpfr_poly_t f, long length)
 {
-   ulong i;
+   long i;
    mpfr_poly_fit_length(f, length);
 
    for (i = 0; i < length; i++)

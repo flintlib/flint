@@ -29,9 +29,9 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, __mpfr_struct * vec2, ulong length)
+void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, __mpfr_struct * vec2, long length)
 {
-   ulong i;
+   long i;
 
    mpfr_t tmp;
    mpfr_init(tmp);

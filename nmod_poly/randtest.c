@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_randtest(nmod_poly_t poly, ulong length)
+void nmod_poly_randtest(nmod_poly_t poly, long length)
 {
    long i;
 

@@ -28,27 +28,27 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1, 
-					   mp_srcptr input2, ulong length2, ulong bits_in, nmod_t mod)
+void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1, 
+					   mp_srcptr input2, long length2, ulong bits_in, nmod_t mod)
 {   
-   ulong len_out = length1 + length2 - 1;    
-   ulong bits; 
+   long len_out = length1 + length2 - 1;    
+   long bits; 
 
    if (!bits_in) 
    {
-      ulong bits1 = _nmod_vec_max_bits(input1, length1);
-      ulong bits2 = (input1 == input2) ? bits1 : _nmod_vec_max_bits(input2, length2);
+      long bits1 = _nmod_vec_max_bits(input1, length1);
+      long bits2 = (input1 == input2) ? bits1 : _nmod_vec_max_bits(input2, length2);
    
-      ulong log_length = FLINT_BIT_COUNT(length2);
+      long log_length = FLINT_BIT_COUNT(length2);
       
 	  bits = bits1 + bits2 + log_length;
    } else
-	  bits = bits_in;
+	  bits = (long) bits_in;
    
    mp_ptr mpn1, mpn2, res;
 
-   ulong limbs1 = (length1 * bits - 1) / FLINT_BITS + 1;
-   ulong limbs2 = (length2 * bits - 1) / FLINT_BITS + 1;
+   long limbs1 = (length1 * bits - 1) / FLINT_BITS + 1;
+   long limbs2 = (length2 * bits - 1) / FLINT_BITS + 1;
       
    mpn1 = (mp_ptr) malloc(sizeof(mp_limb_t)*limbs1);
    mpn2 = (input1 == input2) ? mpn1 : (mp_ptr) malloc(sizeof(mp_limb_t)*limbs2);
@@ -75,7 +75,7 @@ void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, ulong length1,
 void nmod_poly_mul_KS(nmod_poly_t res, 
                          const nmod_poly_t poly1, const nmod_poly_t poly2, ulong bits_in)
 {
-   ulong len_out;
+   long len_out;
    
    if ((poly1->length == 0) || (poly2->length == 0))  
    {

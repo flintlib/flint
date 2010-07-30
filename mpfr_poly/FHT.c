@@ -29,13 +29,13 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_FHT_recursive(mpfr * coeffs, ulong n, mp_bitcnt_t prec, 
-							          mpfr * costw, mpfr * sintw, ulong stride);
+void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mp_bitcnt_t prec, 
+							          mpfr * costw, mpfr * sintw, long stride);
 
-void _mpfr_poly_FHT_recursive(mpfr * coeffs, ulong n, mp_bitcnt_t prec, 
-							          mpfr * costw, mpfr * sintw, ulong stride)
+void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mp_bitcnt_t prec, 
+							          mpfr * costw, mpfr * sintw, long stride)
 {
-   ulong i;
+   long i;
    mpfr_t temp, temp2;
    mpfr * cos, * sin;
    mpfr_init2(temp, prec);
@@ -43,7 +43,7 @@ void _mpfr_poly_FHT_recursive(mpfr * coeffs, ulong n, mp_bitcnt_t prec,
   
    if (n == 0) return;
 
-   ulong len2 = (1UL<<(n - 1));
+   long len2 = (1L << (n - 1));
    
    for (i = 0; i < len2; i++)
    {
@@ -96,10 +96,10 @@ void _mpfr_poly_FHT_recursive(mpfr * coeffs, ulong n, mp_bitcnt_t prec,
    _mpfr_poly_FHT_recursive(coeffs + len2, n - 1, prec, costw, sintw, stride*2);
 }
 
-void _mpfr_poly_FHT(mpfr * coeffs, ulong n, mp_bitcnt_t prec)
+void _mpfr_poly_FHT(mpfr * coeffs, long n, mp_bitcnt_t prec)
 {
 	mpfr * cos, * sin;
-    ulong length = (1UL<<n), i;
+    long i, length = (1L << n);
 	mpfr_t t1, t2;
 
 	if (n == 0) return;

@@ -29,22 +29,22 @@
 #include <mpir.h>
 #include <mpfr.h> 
 
-__mpfr_struct * _mpfr_vec_init(ulong length, mp_bitcnt_t prec);
+__mpfr_struct * _mpfr_vec_init(long length, mp_bitcnt_t prec);
 
-void _mpfr_vec_clear(__mpfr_struct * vec, ulong length);
+void _mpfr_vec_clear(__mpfr_struct * vec, long length);
 
-void _mpfr_vec_zero(mpfr * vec, ulong length);
+void _mpfr_vec_zero(mpfr * vec, long length);
 
-void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, ulong length);
+void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long length);
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, ulong length);
+void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long length);
 
-void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, ulong length, mp_bitcnt_t exp);
+void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, long length, mp_bitcnt_t exp);
 
-void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c);
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, long length, mpfr_t c);
 
 void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-								    __mpfr_struct * vec2, ulong length);
+								    __mpfr_struct * vec2, long length);
 
 #endif
 

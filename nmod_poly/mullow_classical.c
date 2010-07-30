@@ -30,8 +30,8 @@
 #include "ulong_extras.h"
 
 // Assumes poly1 and poly2 are not length 0 and 0 != trunc <= len1 + len2 - 1
-void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, ulong len1, 
-								 mp_srcptr poly2, ulong len2, ulong trunc, nmod_t mod)
+void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1, 
+								 mp_srcptr poly2, long len2, long trunc, nmod_t mod)
 {
    if (len1 == 1 || trunc == 1) // Special case if the length of output is 1
    {
@@ -40,8 +40,8 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, ulong len1,
    {
       long i;
       
-	  ulong bits = FLINT_BITS - mod.norm;
-      ulong log_len = FLINT_BIT_COUNT(len2);
+	  long bits = FLINT_BITS - (long) mod.norm;
+      long log_len = FLINT_BIT_COUNT(len2);
       
 	  if (2*bits + log_len <= FLINT_BITS)
 	  {
@@ -79,9 +79,9 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, ulong len1,
 }
 
 void nmod_poly_mullow_classical(nmod_poly_t res, 
-                         const nmod_poly_t poly1, const nmod_poly_t poly2, ulong trunc)
+                         const nmod_poly_t poly1, const nmod_poly_t poly2, long trunc)
 {
-   ulong len_out;
+   long len_out;
    
    if (poly1->length == 0 || poly2->length == 0 || trunc == 0)  
    {

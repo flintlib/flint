@@ -28,9 +28,9 @@
 #include "flint.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_fit_length(mpfr_poly_t poly, const ulong length)
+void mpfr_poly_fit_length(mpfr_poly_t poly, long length)
 {
-   ulong alloc = length;
+   long alloc = length;
    
    if (alloc <= poly->alloc) return;
 

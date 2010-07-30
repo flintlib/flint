@@ -31,9 +31,9 @@
 
 // Assumes poly1 and poly2 are not length 0
 void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, 
-				ulong len1, mp_srcptr poly2, ulong len2, ulong start, nmod_t mod)
+				long len1, mp_srcptr poly2, long len2, long start, nmod_t mod)
 {
-   ulong m, n;
+   long m, n;
    
    _nmod_vec_zero(res, start);
    
@@ -44,9 +44,8 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
    } else // Ordinary case
    {
       long i;
-      
-      ulong bits = FLINT_BITS - mod.norm;
-      ulong log_len = FLINT_BIT_COUNT(len2);
+      long bits = FLINT_BITS - (long) mod.norm;
+      long log_len = FLINT_BIT_COUNT(len2);
       
 	  if (2*bits + log_len <= FLINT_BITS)
 	  {
@@ -94,9 +93,9 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
 }
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
-                      const nmod_poly_t poly1, const nmod_poly_t poly2, ulong start)
+                      const nmod_poly_t poly1, const nmod_poly_t poly2, long start)
 {
-   ulong len_out = poly1->length + poly2->length - 1;
+   long len_out = poly1->length + poly2->length - 1;
    
    if (poly1->length == 0 || poly2->length == 0 || start >= len_out)  
    {

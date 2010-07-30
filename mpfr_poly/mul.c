@@ -36,9 +36,9 @@
    below the precision bound, i.e. with exponent < 2*s - prec
    + filter_bits.
 */
-void _mpfr_poly_filter(mpfr * poly, ulong len, double s, ulong prec, ulong filter_bits)
+void _mpfr_poly_filter(mpfr * poly, long len, double s, ulong prec, ulong filter_bits)
 {
-   ulong i;
+   long i;
    long cutoff = ((long)(s/log(2)) - prec) + filter_bits;
    
    for (i = 0; i < len; i++)
@@ -58,8 +58,8 @@ void _mpfr_poly_filter(mpfr * poly, ulong len, double s, ulong prec, ulong filte
    We assume that all coefficients p1_i, p2_i satisfy 
      s - prec <= log|p_i| < s and len1, len2 > 0
 */
-void _mpfr_poly_mul_inplace(mpfr * poly1, ulong len1, 
-							mpfr * poly2, ulong len2, ulong prec, double s, ulong fb)
+void _mpfr_poly_mul_inplace(mpfr * poly1, long len1, 
+							mpfr * poly2, long len2, ulong prec, double s, ulong fb)
 {
    if (len1*prec < MUL_INPLACE_CUTOFF || len2*prec < MUL_INPLACE_CUTOFF) // use classical
    {
@@ -77,9 +77,9 @@ void _mpfr_poly_mul_inplace(mpfr * poly1, ulong len1,
 	  _mpfr_vec_clear(temp, len1);
    } else // use FFT
    {
-      ulong log_len = FLINT_BIT_COUNT(len1 + len2 - 1); // ceil(log_2())
-	  ulong length = (1UL<<log_len);
-      ulong i;
+      long log_len = FLINT_BIT_COUNT(len1 + len2 - 1); // ceil(log_2())
+	  long length = (1L << log_len);
+      long i;
 
 	  for (i = len1; i < length; i++)
 	     mpfr_set_ui(poly1 + i, 0, GMP_RNDN);
@@ -97,10 +97,10 @@ void _mpfr_poly_mul_inplace(mpfr * poly1, ulong len1,
    is multiplied by shift*scale^i. If shift is NULL a value of 1 is used
    for shift.
 */
-void _mpfr_poly_shift_scale(mpfr * res, mpfr * poly, ulong len, 
+void _mpfr_poly_shift_scale(mpfr * res, mpfr * poly, long len, 
 							        mpfr_t shift, mpfr_t scale, ulong prec)
 {
-   ulong i;
+   long i;
    mpfr_t mult;
    mpfr_init2(mult, prec);
 
@@ -119,15 +119,15 @@ void _mpfr_poly_shift_scale(mpfr * res, mpfr * poly, ulong len,
    mpfr_clear(mult);
 }
 
-void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, ulong len1, mpfr * poly2, ulong len2, 
-						    double s1, double i1, double i2, ulong w, ulong prec, ulong fb)
+void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, long len1, mpfr * poly2, long len2, 
+						    double s1, double i1, double i2, long w, ulong prec, ulong fb)
 {
 	mpfr * t1, * t2;
-	ulong len_out = len1 + len2 - 1;
-    ulong log_len = 0;
-	ulong length, length2;
-	ulong i;
-	ulong w1, w2;
+	long len_out = len1 + len2 - 1;
+    long log_len = 0;
+	long length, length2;
+	long i;
+	long w1, w2;
 	
 	mpfr_t shift, scale;
 
@@ -138,7 +138,7 @@ void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, ulong len1, mpfr * poly2, ul
 	w2 = FLINT_MIN(w, len2);
 	
 	log_len = FLINT_BIT_COUNT(len1 + w2 - 1);
-	length = (1UL<<log_len);
+	length = (1L << log_len);
 
 	t1 = _mpfr_vec_init(length, prec);
     t2 = _mpfr_vec_init(length, prec);
@@ -165,10 +165,10 @@ void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, ulong len1, mpfr * poly2, ul
 	
 	for (i = w2; i < len2; i += w2)
 	{
-		ulong l2 = FLINT_MIN(w2, len2 - i);
+		long l2 = FLINT_MIN(w2, len2 - i);
 
 		log_len = FLINT_BIT_COUNT(w1 + l2 - 1);
-		length2 = (1UL<<log_len);
+		length2 = (1L << log_len);
 
 		_mpfr_vec_copy(t1, poly1 + len1 - w1, w1);
 		_mpfr_vec_zero(t1 + w1, length2 - w1);
@@ -190,9 +190,9 @@ void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, ulong len1, mpfr * poly2, ul
 
 void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2, ulong fb)
 {
-	ulong len1 = poly1->length;
-	ulong len2 = poly2->length;
-	ulong len_out = len1 + len2 - 1;
+	long len1 = poly1->length;
+	long len2 = poly2->length;
+	long len_out = len1 + len2 - 1;
     mp_bitcnt_t prec = poly1->prec;
 	mpfr * p1, * p2;
 	double slope1, slope2, inter1, inter2;

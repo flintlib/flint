@@ -29,10 +29,9 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void _mpfr_vec_zero(mpfr * vec, ulong length)
+void _mpfr_vec_zero(mpfr * vec, long length)
 {
-   ulong i;
-
+   long i;
    for (i = 0; i < length; i++)
       mpfr_set_ui(vec + i, 0, GMP_RNDN);
 }

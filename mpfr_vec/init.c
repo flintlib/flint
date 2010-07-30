@@ -29,9 +29,9 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-__mpfr_struct * _mpfr_vec_init(ulong length, mp_bitcnt_t prec)
+__mpfr_struct * _mpfr_vec_init(long length, mp_bitcnt_t prec)
 {
-   ulong i;
+   long i;
    
    __mpfr_struct * vec = (__mpfr_struct *) malloc(length*sizeof(__mpfr_struct));
 
