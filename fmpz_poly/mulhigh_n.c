@@ -32,9 +32,9 @@
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
              const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 {
-   long limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
-   long limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
-   long max_limbs = FLINT_MAX(limbs1, limbs2);
+   mp_size_t limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
+   mp_size_t limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
+   mp_size_t limbsx = FLINT_MAX(limbs1, limbs2);
 
    if (n == 0)
    {
@@ -48,7 +48,7 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 	   return;
    }
   
-   if ((max_limbs > 4) && (n < 16))
+   if ((limbsx > 4) && (n < 16))
       fmpz_poly_mulhigh_karatsuba_n(res, poly1, poly2, n);
    else
       fmpz_poly_mul_KS(res, poly1, poly2);

@@ -32,7 +32,8 @@
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
                                 const fmpz * poly2, long len2)
 {
-    long len, limbs1, limbs2, limbsx;
+    long len;
+    mp_size_t limbs1, limbs2, limbsx;
     
     if (len1 < 5)
     {
