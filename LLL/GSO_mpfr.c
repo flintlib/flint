@@ -33,9 +33,9 @@
 #include "mpfr_mat.h"
 #include "fmpz_mat.h"
 
-void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, ulong a, ulong kappa, ulong zeroes)
+void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, long a, long kappa, long zeroes)
 {
-  ulong i, j;
+  long i, j;
   mpfr_t tmp, rtmp;
 
   mpfr_init2(tmp, mu->prec);

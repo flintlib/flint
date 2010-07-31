@@ -22,7 +22,7 @@
 ===============================================================================*/
 
 void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, 
-                                       ulong a, ulong kappa, ulong zeroes)
+                                       long a, long kappa, long zeroes)
 
    Given a matrix B with rows b_i, the Gram-Schmidt Orthogonalisation of B is defined by
    b_0* = b_0, b_i* = b_i - sum_{j=0}^{i-1} mu_{i,j} b_j*, where 
@@ -41,3 +41,6 @@ void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G,
 
    Upon return, max is set to the absolute value of the maximum mu[kappa][i] which is 
    computed in the range a <= j < kappa.
+
+   The parameters a, kappa, and zeroes are assumed to be non-negative.
+
