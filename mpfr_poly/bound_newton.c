@@ -100,8 +100,6 @@ int _mpfr_poly_bound_newton(double * inter, double * slope,
 	  mag[i] = mpfr_get_d(t, GMP_RNDU);
    }
 
-   mpfr_clear(t);
-
    /*
 	  Now figure out the max and min logs
    */
@@ -174,9 +172,13 @@ int _mpfr_poly_bound_newton(double * inter, double * slope,
    (*slope) = slope1;
    (*inter) = max_d - (double) max_i*slope1;
 
+   // Clean up
+   mpfr_clear(t);
+   free(mag);
+
    // if inter(L2) < inter(L1) - prec 
    if (min_d - (double) min_i*slope2 <= *inter - prec) 
-	  return 0;
-
-   return 1;
+      return 0;
+   else
+      return 1;
 }
