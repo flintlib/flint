@@ -33,10 +33,11 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * 
    mp_limb_t p;
    double ppre;
    (*prod) = 1;
+   ulong i;
 
    n_compute_primes(num_primes);
 
-   for (ulong i = 0; i < num_primes; i++)
+   for (i = 0; i < num_primes; i++)
    {
       p = flint_primes[i];
       if (p*p > n) break;

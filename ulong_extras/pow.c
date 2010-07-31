@@ -29,16 +29,16 @@
 
 mp_limb_t n_pow(mp_limb_t n, ulong exp)
 {
-   mp_limb_t res = 1UL;
+   ulong i;
+   mp_limb_t res;
 
    if (n == 0L) return 0UL;
    if (exp == 1UL) return n;
    if (exp == 0UL) return 1UL;
 
-   for (ulong i = 0; i < exp; i++)
-   {
+   res = 1UL;
+   for (i = 0; i < exp; i++)
       res *= n;
-   }
 
    return res;
 }

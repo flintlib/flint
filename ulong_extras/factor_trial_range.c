@@ -32,10 +32,11 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors, mp_limb_t n, ulong start, u
    unsigned int exp;
    mp_limb_t p;
    double ppre;
+   ulong i;
 
    n_compute_primes(num_primes);
 
-   for (ulong i = start; i < num_primes; i++)
+   for (i = start; i < num_primes; i++)
    {
       p = flint_primes[i];
       if (p*p > n) break;

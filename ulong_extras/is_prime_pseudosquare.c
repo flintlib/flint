@@ -54,6 +54,8 @@ mp_limb_t flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001,
 
 int n_is_prime_pseudosquare(mp_limb_t n)
 {
+   ulong i;
+
    if (n < 2UL) return 0;
    
    if (n & 1UL == 0UL) 
@@ -65,7 +67,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
    n_compute_primes(FLINT_PSEUDOSQUARES_CUTOFF);
    mp_limb_t p;
 
-   for (ulong i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
+   for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
    {
       p = flint_primes[i];
       if (p*p > n) return 1;

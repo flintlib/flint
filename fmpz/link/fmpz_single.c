@@ -46,6 +46,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 {
 	if (!fmpz_num_unused) // time to allocate MPZ_BLOCK more mpz_t's
 	{
+        ulong i;
 	    if (fmpz_allocated) // realloc mpz_t's and unused array
 		{
 			fmpz_arr = (__mpz_struct *) realloc(fmpz_arr, (fmpz_allocated + MPZ_BLOCK)*sizeof(__mpz_struct));
@@ -57,7 +58,7 @@ __mpz_struct * _fmpz_new_mpz(void)
 		}
 		
 		// initialise the new mpz_t's and unused array
-		for (ulong i = 0; i < MPZ_BLOCK; i++)
+		for (i = 0; i < MPZ_BLOCK; i++)
 		{
 			mpz_init(fmpz_arr + fmpz_allocated + i);
 			fmpz_unused_arr[fmpz_num_unused] = fmpz_allocated + i;
@@ -81,10 +82,9 @@ void _fmpz_clear_mpz(fmpz f)
 
 void _fmpz_cleanup(void)
 {
-	for (long i = 0; i < fmpz_num_unused; i++)
-	{
+    long i;
+	for (i = 0; i < fmpz_num_unused; i++)
 		mpz_clear(fmpz_arr + fmpz_unused_arr[i]);
-    }
 	
     if (fmpz_num_unused) free(fmpz_unused_arr);
 	if (fmpz_allocated) free(fmpz_arr);
