@@ -70,7 +70,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
     else if (*top == -1L) *str++ = '-';
     else if (!COEFF_IS_MPZ(*top)) str += sprintf(str, "%li*", *top);
     else str += gmp_sprintf(str, "%Zd*", COEFF_TO_PTR(*top));
-    str += sprintf(str, "%s^%lu", x, len);
+    str += sprintf(str, "%s^%li", x, len);
     
     while (--len, --top != poly)
     {
@@ -85,7 +85,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
             if (!COEFF_IS_MPZ(*top)) str += sprintf(str, "%li*", *top);
             else str += gmp_sprintf(str, "%Zd*", COEFF_TO_PTR(*top));
         }
-        str += sprintf(str, "%s^%lu", x, len);
+        str += sprintf(str, "%s^%li", x, len);
     }
     
     if (*top != 0L)
