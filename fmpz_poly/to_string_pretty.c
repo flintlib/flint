@@ -40,7 +40,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
     
     if (len == 0)
     {
-        str = malloc(2 * sizeof(char));
+        str = (char *) malloc(2 * sizeof(char));
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -62,7 +62,7 @@ char * _fmpz_poly_to_string_pretty(const fmpz * poly,
         }
     bound += nz * (3 + strlen(x) + (long) (ceil(log10((double) len))));
     
-    strbase = malloc(bound * sizeof(char));
+    strbase = (char *) malloc(bound * sizeof(char));
     str = strbase;
     top = (fmpz *) poly + (--len);
     

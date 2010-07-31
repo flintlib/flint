@@ -75,7 +75,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
     }
     
     mpq_init(q);
-    str = malloc(len * sizeof(char));
+    str = (char *) malloc(len * sizeof(char));
     if (str == NULL)
     {
         printf("Exception: malloc failed in fmpq_poly_to_string\n");

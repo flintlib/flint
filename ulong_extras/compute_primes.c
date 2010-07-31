@@ -140,8 +140,8 @@ void n_compute_primes(ulong num)
    
    if (!flint_num_primes) 
    {
-      flint_primes = malloc(sizeof(mp_limb_t)*num_primes);
-      flint_prime_inverses = malloc(sizeof(double)*num_primes);
+      flint_primes = (mp_limb_t *) malloc(sizeof(mp_limb_t)*num_primes);
+      flint_prime_inverses = (double *) malloc(sizeof(double)*num_primes);
    } else
    {
       flint_primes = realloc(flint_primes, sizeof(mp_limb_t)*num_primes);

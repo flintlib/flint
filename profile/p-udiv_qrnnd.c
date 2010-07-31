@@ -34,7 +34,7 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t d;
    
-   mp_limb_t * array = malloc(200*sizeof(mp_limb_t));
+   mp_limb_t * array = (mp_limb_t *) malloc(200*sizeof(mp_limb_t));
 
    d = n_randtest_not_zero();
       
