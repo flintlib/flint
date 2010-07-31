@@ -35,14 +35,15 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+    
     printf("cmp....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f;
 
@@ -63,7 +64,7 @@ main(void)
 
     // Check transitivity, i.e. f <= g <= h implies f <= h, that is 
     // NOT (f <= g <= h) OR f <= h.
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g, h;
 
@@ -94,7 +95,7 @@ main(void)
     }
 
     // Check that <, ==, or >
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g;
 

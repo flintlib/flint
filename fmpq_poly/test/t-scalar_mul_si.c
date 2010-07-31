@@ -35,7 +35,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("scalar_mul_si....");
     fflush (stdout);
@@ -43,7 +43,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of a and b
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
         long n = (long) n_randtest();
@@ -58,7 +58,7 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("FAIL:\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             abort ();
@@ -69,11 +69,10 @@ main (void)
     }
 
     // Compare with fmpq_poly_scalar_mul_ui
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-
-        ulong n = n_randbits (FLINT_BITS - 1);
+        ulong n = (ulong) n_randbits(FLINT_BITS - 1);
 
         fmpq_poly_init (a);
         fmpq_poly_init (b);
@@ -85,7 +84,7 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("FAIL:\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             abort ();
@@ -96,10 +95,9 @@ main (void)
     }
 
     // Check n2 * (n1 a) == (n1*n2) a
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-
         long n1 = (long) n_randbits (FLINT_BITS / 2 - 1);
         long n2 = (long) n_randbits (FLINT_BITS / 2 - 1);
         if (n_randint (2))
@@ -119,7 +117,8 @@ main (void)
         result = (fmpq_poly_equal (b, c));
         if (!result)
         {
-            printf ("Error n1 = %lu, n2 = %lu:\n", n1, n2);
+            printf("FAIL:\n");
+            printf("n1 = %lu, n2 = %lu:\n\n", n1, n2);
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             fmpq_poly_print (c), printf ("\n\n");
@@ -132,7 +131,6 @@ main (void)
     }
 
     fmpq_poly_randclear ();
-
     _fmpz_cleanup ();
     printf ("PASS\n");
     return 0;

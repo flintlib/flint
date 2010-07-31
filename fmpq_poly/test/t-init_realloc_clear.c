@@ -36,14 +36,14 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("init/init2/realloc/clear....");
     fflush (stdout);
 
     fmpq_poly_randinit ();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
@@ -51,7 +51,7 @@ main (void)
         fmpq_poly_clear (a);
     }
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
@@ -61,7 +61,7 @@ main (void)
         fmpq_poly_clear (a);
     }
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 

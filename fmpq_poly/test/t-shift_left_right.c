@@ -35,17 +35,17 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("shift_left/right....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check aliasing of a and b for left shift
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        ulong shift = n_randint(100);
+        long shift = (long) n_randint(100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -68,15 +68,16 @@ main(void)
     }
 
     // Check aliasing of a and b for right shift
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
+        long shift;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_randtest_not_zero(a, n_randint(100) + 1, n_randint(200) + 1);
 
-        ulong shift = n_randint(a->length);
+        shift = (long) n_randint(a->length);
 
         fmpq_poly_shift_right(b, a, shift);
         fmpq_poly_shift_right(a, a, shift);
@@ -95,10 +96,10 @@ main(void)
     }
 
     // Check shift left then right does nothing
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-        ulong shift = n_randint(100);
+        long shift = (long) n_randint(100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -124,7 +125,6 @@ main(void)
     }
 
     fmpq_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

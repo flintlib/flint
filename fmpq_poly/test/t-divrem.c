@@ -37,7 +37,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("divrem....");
     fflush (stdout);
@@ -45,7 +45,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of {q,r} and {a,b}
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, q, r;
 
@@ -64,18 +64,10 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            printf ("q = ");
-            fmpq_poly_print (q);
-            printf ("\n\n");
-            printf ("r = ");
-            fmpq_poly_print (r);
-            printf ("\n\n");
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            printf ("q = "), fmpq_poly_print (q), printf ("\n\n");
+            printf ("r = "), fmpq_poly_print (r), printf ("\n\n");
+            printf ("a = "), fmpq_poly_print (a), printf ("\n\n");
+            printf ("b = "), fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -86,7 +78,7 @@ main (void)
     }
 
     // Check aliasing of {q,r} and {b,a}
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, q, r;
 
@@ -105,18 +97,10 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            printf ("q = ");
-            fmpq_poly_print (q);
-            printf ("\n\n");
-            printf ("r = ");
-            fmpq_poly_print (r);
-            printf ("\n\n");
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            printf ("q = "), fmpq_poly_print (q), printf ("\n\n");
+            printf ("r = "), fmpq_poly_print (r), printf ("\n\n");
+            printf ("a = "), fmpq_poly_print (a), printf ("\n\n");
+            printf ("b = "), fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -127,7 +111,7 @@ main (void)
     }
 
     // check a = q b + r
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, q, r, rhs;
 
@@ -148,12 +132,8 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            printf ("a   = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("rhs = ");
-            fmpq_poly_print (rhs);
-            printf ("\n\n");
+            printf ("a   = "), fmpq_poly_print (a), printf ("\n\n");
+            printf ("rhs = "), fmpq_poly_print (rhs), printf ("\n\n");
             abort ();
         }
 

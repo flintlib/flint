@@ -36,7 +36,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("add....");
     fflush (stdout);
@@ -44,7 +44,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of a and c
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -76,7 +76,7 @@ main (void)
     }
 
     // Check aliasing of b and c
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 

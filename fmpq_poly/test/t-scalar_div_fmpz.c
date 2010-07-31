@@ -35,7 +35,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("scalar_div_fmpz....");
     fflush (stdout);
@@ -43,7 +43,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of a and b
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
         fmpz_t n;
@@ -61,7 +61,7 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error (aliasing):\n");
+            printf ("FAIL (aliasing):\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             fmpz_print (n);
@@ -74,14 +74,13 @@ main (void)
     }
 
     // Compare with fmpq_poly_scalar_mul_si
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-
         fmpz_t n1;
 
         fmpz_init (n1);
-        long n = (long) n_randbits (FLINT_BITS - 1);
+        long n = (long) n_randtest();
 
         if (n == 0L)
             n = 1L;
@@ -115,7 +114,7 @@ main (void)
     }
 
     // Check that (a / n1) / n2 == a / (n1 * n2)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, lhs, rhs;
         fmpz_t n1, n2, n;
@@ -140,7 +139,7 @@ main (void)
         result = (fmpq_poly_equal (lhs, rhs));
         if (!result)
         {
-            printf ("Error (a / n1 / n2):\n");
+            printf ("FAIL (a / n1 / n2):\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpz_print (n1), printf("\n\n");
             fmpz_print (n2), printf("\n\n");
@@ -159,7 +158,7 @@ main (void)
     }
 
     // Check that (a + b) / n == a/n + b/n
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, lhs, rhs;
         fmpz_t n;
@@ -184,7 +183,7 @@ main (void)
         result = (fmpq_poly_equal (lhs, rhs));
         if (!result)
         {
-            printf ("Error ((a + b) / n):\n");
+            printf ("FAIL ((a + b) / n):\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             fmpz_print (n), printf("\n\n");
@@ -201,7 +200,6 @@ main (void)
     }
 
     fmpq_poly_randclear ();
-
     _fmpz_cleanup ();
     printf ("PASS\n");
     return 0;

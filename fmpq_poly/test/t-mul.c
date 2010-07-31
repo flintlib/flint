@@ -37,7 +37,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("mul....");
     fflush (stdout);
@@ -45,7 +45,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of a and b
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -61,11 +61,9 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            printf ("FAIL:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
@@ -75,7 +73,7 @@ main (void)
     }
 
     // Check aliasing of a and c
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -91,11 +89,9 @@ main (void)
         result = (fmpq_poly_equal (a, c));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
+            printf ("FAIL:\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 
@@ -105,7 +101,7 @@ main (void)
     }
 
     // check (b*c)+(b*d) = b*(c+d)
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a1, a2, b, c, d;
 
@@ -128,11 +124,9 @@ main (void)
         result = (fmpq_poly_equal (a1, a2));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a1);
-            printf ("\n\n");
-            fmpq_poly_print (a2);
-            printf ("\n\n");
+            printf ("FAIL:\n");
+            fmpq_poly_print (a1), printf ("\n\n");
+            fmpq_poly_print (a2), printf ("\n\n");
             abort ();
         }
 
@@ -144,7 +138,6 @@ main (void)
     }
 
     fmpq_poly_randclear ();
-
     _fmpz_cleanup ();
     printf ("PASS\n");
     return 0;

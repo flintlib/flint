@@ -35,14 +35,15 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+    
     printf("content....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check that content(a f) = abs(a) content(f)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;
         fmpq_poly_t f;

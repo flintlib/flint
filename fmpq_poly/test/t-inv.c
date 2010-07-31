@@ -37,14 +37,14 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("inv....");
     fflush (stdout);
 
     fmpq_poly_randinit ();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -60,12 +60,9 @@ main (void)
         if (!result)
         {
             printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
+            fmpq_poly_print (a), printf ("\n\n");
+            fmpq_poly_print (b), printf ("\n\n");
+            fmpq_poly_print (c), printf ("\n\n");
             abort ();
         }
 

@@ -35,14 +35,15 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+    
     printf("derivative....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
 
@@ -57,10 +58,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpq_poly_print(a);
-            printf("\n\n");
-            fmpq_poly_print(b);
-            printf("\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -69,7 +68,7 @@ main(void)
     }
 
     // Check constants have derivative zero
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
 
@@ -83,10 +82,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpq_poly_print(a);
-            printf("\n\n");
-            fmpq_poly_print(b);
-            printf("\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -95,7 +92,7 @@ main(void)
     }
 
     // Check (f g)' = f' g + f g'
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c, d, lhs, rhs;
 
@@ -120,10 +117,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpq_poly_print(a);
-            printf("\n\n");
-            fmpq_poly_print(b);
-            printf("\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
             abort();
         }
 

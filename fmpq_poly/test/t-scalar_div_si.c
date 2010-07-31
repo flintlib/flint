@@ -35,7 +35,7 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("scalar_div_si....");
     fflush (stdout);
@@ -43,7 +43,7 @@ main (void)
     fmpq_poly_randinit ();
 
     // Check aliasing of a and b
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
         long n;
@@ -61,7 +61,7 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("FAIL:\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             abort ();
@@ -72,11 +72,10 @@ main (void)
     }
 
     // Compare with fmpq_poly_scalar_div_ui
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-
-        ulong n = n_randbits (FLINT_BITS - 1);
+        ulong n = (ulong) n_randbits(FLINT_BITS - 1);
 
         if (n == 0UL)
             n = 1UL;
@@ -91,7 +90,7 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
+            printf ("FAIL:\n");
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             abort ();
@@ -102,7 +101,7 @@ main (void)
     }
 
     // Check (a / n1) / n2 == a / (n1 * n2)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -130,7 +129,8 @@ main (void)
         result = (fmpq_poly_equal (b, c));
         if (!result)
         {
-            printf ("Error n1 = %lu, n2 = %lu:\n", n1, n2);
+            printf("FAIL:\n\n");
+            printf("n1 = %lu, n2 = %lu:\n\n", n1, n2);
             fmpq_poly_print (a), printf ("\n\n");
             fmpq_poly_print (b), printf ("\n\n");
             fmpq_poly_print (c), printf ("\n\n");
@@ -143,7 +143,6 @@ main (void)
     }
 
     fmpq_poly_randclear ();
-
     _fmpz_cleanup ();
     printf ("PASS\n");
     return 0;

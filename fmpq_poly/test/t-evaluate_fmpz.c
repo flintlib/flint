@@ -35,14 +35,15 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+    
     printf("evaluate_fmpz....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check that (f+g)(a) = f(a) + g(a)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a;
         fmpq_poly_t f, g, h;
@@ -68,13 +69,9 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
-            printf("a = ");
-            fmpz_print(a);
-            printf("\n");
+            printf("f = "), fmpq_poly_print(f), printf("\n");
+            printf("g = "), fmpq_poly_print(g), printf("\n");
+            printf("a = "), fmpz_print(a), printf("\n");
             gmp_printf("f(a) + g(a) = %Qd\n", x);
             gmp_printf("(f + g)(a)  = %Qd\n", y);
             abort();
@@ -89,7 +86,7 @@ main(void)
     }
 
     // Check that (f*g)(a) = f(a) * g(a)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b, c;
         fmpq_poly_t f, g;
@@ -114,8 +111,7 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpz_print(a);
-            printf("\n\n");
+            fmpz_print(a), printf("\n\n");
             abort();
         }
 

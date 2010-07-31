@@ -35,14 +35,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("monic/is_monic....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
     // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g;
 
@@ -57,10 +57,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
             abort();
         }
 
@@ -69,7 +67,7 @@ main(void)
     }
 
     // Check that the result of "monic" has "is_monic" return 1
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f;
 
@@ -82,8 +80,7 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
             abort();
         }
 
@@ -91,7 +88,6 @@ main(void)
     }
 
     fmpq_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

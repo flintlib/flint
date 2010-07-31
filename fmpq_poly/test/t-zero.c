@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -37,14 +35,14 @@
 int
 main (void)
 {
-    int result;
+    int i, result;
 
     printf ("zero....");
     fflush (stdout);
 
     fmpq_poly_randinit ();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
 
@@ -57,13 +55,9 @@ main (void)
         result = (fmpq_poly_equal (a, b));
         if (!result)
         {
-            printf ("Error:\n");
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
+            printf ("FAIL:\n");
+            printf ("a = "), fmpq_poly_print (a), printf ("\n\n");
+            printf ("b = "), fmpq_poly_print (b), printf ("\n\n");
             abort ();
         }
 
