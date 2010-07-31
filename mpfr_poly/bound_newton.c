@@ -78,7 +78,7 @@ int _mpfr_poly_bound_newton(double * inter, double * slope,
 	  Precision things can be stored to in a double (can't be less more than
 	  prec!
    */
-   ulong dprec = FLINT_MIN(53, prec);
+   mpfr_prec_t dprec = FLINT_MIN(53, prec);
 	
    /*
 	  First get the logarithms of all the points as doubles, rounding up, as
