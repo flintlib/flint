@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -30,8 +31,8 @@
 
 ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
 {
-   if (n + 1 > poly->length) // coefficient is beyond end of polynomial
-      return 0;
-   
-	return fmpz_get_ui(poly->coeffs + n);
+    if (n < poly->length)
+        return fmpz_get_ui(poly->coeffs + n);
+    else
+        return 0UL;
 }
