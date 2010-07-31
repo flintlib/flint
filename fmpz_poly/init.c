@@ -39,12 +39,10 @@ void fmpz_poly_init(fmpz_poly_t poly)
 
 void fmpz_poly_init2(fmpz_poly_t poly, long alloc)
 {
-   if (alloc) // allocate space for alloc small coeffs
-   {
-      poly->coeffs = (fmpz *) malloc(alloc*sizeof(fmpz));
-		mpn_zero(poly->coeffs, alloc);
-   }
-   else poly->coeffs = NULL;
+    if (alloc) // allocate space for alloc small coeffs
+        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
+    else
+        poly->coeffs = NULL;
    
    poly->alloc = alloc;
    poly->length = 0;
