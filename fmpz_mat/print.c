@@ -31,11 +31,11 @@
 
 void fmpz_mat_print(fmpz_mat_t mat) 
 {
-   ulong i, j; 
-   ulong r = mat->r;
-   ulong c = mat->c;
+   long i, j; 
+   long r = mat->r;
+   long c = mat->c;
 	
-   printf("%ld %ld  ", r, c);
+   printf("%li %li  ", r, c);
    for (i = 0; i < r; i++) 
    {
       for (j = 0; j < c; j++) 
@@ -50,9 +50,9 @@ void fmpz_mat_print(fmpz_mat_t mat)
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat) 
 {
-   ulong i, j; 
-   ulong r = mat->r;
-   ulong c = mat->c;
+   long i, j; 
+   long r = mat->r;
+   long c = mat->c;
 	
    printf("[");
    for (i = 0; i < r; i++) 

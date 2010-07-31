@@ -32,15 +32,15 @@
 typedef struct
 {
    fmpz * entries;
-   ulong r;
-   ulong c;
+   long r;
+   long c;
    fmpz ** rows;
 } fmpz_mat_struct;
 
 // fmpz_mat_t allows reference-like semantics for fmpz_mat_struct
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols);
+void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 
 void fmpz_mat_clear(fmpz_mat_t mat);
 

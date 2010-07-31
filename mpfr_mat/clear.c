@@ -33,7 +33,7 @@ void mpfr_mat_clear(mpfr_mat_t mat)
 {
    if (mat->entries) 
    {
-      ulong i;
+      long i;
       
 	  for (i = 0; i < mat->r * mat->c; i++) 
          mpfr_clear(mat->entries + i); // Clear all coefficients

@@ -34,12 +34,12 @@
 
 void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
 {
-   ulong r, c, d, i, j, k;
+   long r, c, d, i, j, k;
    fmpz * h;
 
    r = mat->r;
    c = mat->c;
-   d = r/2;
+   d = r / 2;
 
    if ((c != r) || (c != 2*d))
    {

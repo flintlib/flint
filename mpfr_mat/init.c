@@ -29,9 +29,9 @@
 #include "flint.h"
 #include "mpfr_mat.h"
 
-void mpfr_mat_init(mpfr_mat_t mat, ulong rows, ulong cols, ulong prec)
+void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec)
 {
-   ulong i;
+   long i;
 
    if ((rows) && (cols)) // allocate space for r*c small entries
    {

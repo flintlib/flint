@@ -29,9 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols)
+void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
 {
-   ulong i;
+   long i;
 
    if ((rows) && (cols)) // allocate space for r*c small entries
    {

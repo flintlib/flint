@@ -32,8 +32,8 @@
 typedef struct
 {
    __mpfr_struct * entries;
-   ulong r;
-   ulong c;
+   long r;
+   long c;
    mp_bitcnt_t prec;
    __mpfr_struct ** rows;
 } mpfr_mat_struct;
@@ -41,7 +41,7 @@ typedef struct
 // fmpz_mat_t allows reference-like semantics for fmpz_mat_struct
 typedef mpfr_mat_struct mpfr_mat_t[1];
 
-void mpfr_mat_init(mpfr_mat_t mat, ulong rows, ulong cols, mp_bitcnt_t prec);
+void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec);
 
 void mpfr_mat_clear(mpfr_mat_t mat);
 

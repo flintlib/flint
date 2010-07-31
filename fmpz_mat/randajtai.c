@@ -35,7 +35,8 @@
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
 {
-   ulong r, c, i, j, d, bits;
+   long r, c, i, j, d;
+   mp_bitcnt_t bits;
    fmpz_t tmp;
 
    r = mat->r;
@@ -52,7 +53,7 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
    
    for (i = 0; i < d; i++)
    {
-      bits = (ulong) pow((double) (2*d - i), alpha);
+      bits = (mp_bitcnt_t) pow((double) (2*d - i), alpha);
 	  
 	  fmpz_set_ui(tmp, 1);
 	  fmpz_mul_2exp(tmp, tmp, bits); 

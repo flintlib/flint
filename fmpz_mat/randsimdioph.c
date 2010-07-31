@@ -33,7 +33,7 @@
 
 void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
-   ulong r, c, i, j;
+   long r, c, i, j;
 
    r = mat->r;
    c = mat->c;
