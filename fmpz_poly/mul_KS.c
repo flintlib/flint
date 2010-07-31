@@ -41,8 +41,8 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (i = len1 - 1; i != -1 && !(neg1 = fmpz_sgn(poly1 + i)); i--) ;
-    for (i = len2 - 1; i != -1 && !(neg2 = fmpz_sgn(poly2 + i)); i--) ;
+    for (i = len1 - 1; i >= 0 && !(neg1 = fmpz_sgn(poly1 + i)); i--) ;
+    for (i = len2 - 1; i >= 0 && !(neg2 = fmpz_sgn(poly2 + i)); i--) ;
     if (neg1 >= 0)
         neg1 = 0;
     if (neg2 >= 0)

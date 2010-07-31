@@ -41,8 +41,8 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (len1--; len1 != -1 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
-    for (len2--; len2 != -1 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    for (len1--; len1 >= 0 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
+    for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
     len1++;
     len2++;
     if (!len1 | !len2)
