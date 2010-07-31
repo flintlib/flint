@@ -42,7 +42,7 @@ _fmpz_poly_evaluate_horner_mpq(mpq_t res,
     else
     {
         mpq_t s, t;
-        fmpz * c = (fmpz *) f + (len - 1L);
+        const fmpz * c = f + (len - 1L);
         mpq_init(s);
         mpq_init(t);
         fmpz_get_mpz(mpq_numref(res), c);

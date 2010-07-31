@@ -37,7 +37,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     long lenQ = lenA + (lenB - 1);
     long lenR = lenB - 1;
     ulong d;
-    fmpz * lead;
+    const fmpz * lead = B + (lenB - 1);
     
     if (lenB == 1UL)
     {
@@ -47,7 +47,6 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         return;
     }
     
-    lead = (fmpz *) B + (lenB - 1);
     _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
     
     /* Determine the actual length of R */

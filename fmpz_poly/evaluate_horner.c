@@ -38,7 +38,7 @@ void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len,
     else
     {
         fmpz_t t;
-        fmpz * c = (fmpz *) f + (len - 1L);
+        const fmpz * c = f + (len - 1L);
         fmpz_init(t);
         fmpz_set(res, c);
         do {
