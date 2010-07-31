@@ -126,11 +126,10 @@ void nmod_poly_print(nmod_poly_t a)
 	  return;
    }
    
-   printf("%li  ", a->length);
+   printf("%li ", a->length);
 
-   for (i = 0; i < a->length - 1; i++)
-      printf("%lu ", a->coeffs[i]);
-   printf("%lu", a->coeffs[i]);
+   for (i = 0; i < a->length; i++)
+      gmp_printf(" %Mu", a->coeffs[i]);
 }
 
 static inline
