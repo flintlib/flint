@@ -54,7 +54,7 @@ mp_limb_t flint_pseudosquares[] = {17, 73, 241, 1009, 2641, 8089, 18001,
 
 int n_is_prime_pseudosquare(mp_limb_t n)
 {
-   ulong i;
+   unsigned int i, j;
 
    if (n < 2UL) return 0;
    
@@ -79,7 +79,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
    mp_limb_t NB = (n - 1)/B + 1;
 
-   unsigned int i, j, m1 = 0;
+   unsigned int m1 = 0;
 
    for (i = 0; i < FLINT_NUM_PSEUDOSQUARES; i++)
    {
