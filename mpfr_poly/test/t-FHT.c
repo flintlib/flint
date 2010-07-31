@@ -29,6 +29,7 @@
 #include <mpfr.h>
 #include <math.h>
 #include "flint.h"
+#include "mpfr_vec.h"
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
