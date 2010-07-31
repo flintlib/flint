@@ -35,7 +35,7 @@ typedef struct
    __mpfr_struct * coeffs;
    long length;
    long alloc;
-   mp_bitcnt_t prec;
+   mpfr_prec_t prec;
 } mpfr_poly_struct;
 
 // fmpz_poly_t allows reference-like semantics for fmpz_poly_struct
@@ -45,9 +45,9 @@ extern gmp_randstate_t mpfr_poly_randstate;
 
 #define MUL_INPLACE_CUTOFF 1000
 
-void mpfr_poly_init(mpfr_poly_t poly, mp_bitcnt_t prec);
+void mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec);
 
-void mpfr_poly_init2(mpfr_poly_t poly, long alloc, mp_bitcnt_t prec);
+void mpfr_poly_init2(mpfr_poly_t poly, long alloc, mpfr_prec_t prec);
 
 void mpfr_poly_realloc(mpfr_poly_t poly, long alloc);
 
@@ -62,12 +62,12 @@ void _mpfr_poly_set_length(mpfr_poly_t poly, long length)
 }
 
 static inline
-void mpfr_poly_set_prec(mpfr_poly_t poly, ulong prec)
+void mpfr_poly_set_prec(mpfr_poly_t poly, mpfr_prec_t prec)
 {
    long i;
    for (i = 0; i < poly->alloc; i++)
       mpfr_prec_round(poly->coeffs + i, prec, GMP_RNDN);
-   poly->prec = (mp_bitcnt_t) prec;
+   poly->prec = prec;
 }
 
 void mpfr_poly_randinit(void);
@@ -79,44 +79,53 @@ void mpfr_poly_randtest(mpfr_poly_t poly, long length);
 static inline
 void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
 {
-   long t;
-   mpfr * tc = poly1->coeffs;
-   poly1->coeffs = poly2->coeffs;
-   poly2->coeffs = tc;
-   t = poly1->length;
-   poly1->length = poly2->length;
-   poly2->length = t;
-   t = poly1->alloc;
-   poly1->alloc = poly2->alloc;
-   poly2->alloc = t;
+    mpfr * tc;
+    long t;
+    mpfr_prec_t tp;
+
+    tc = poly1->coeffs;
+    poly1->coeffs = poly2->coeffs;
+    poly2->coeffs = tc;
+    
+    t = poly1->length;
+    poly1->length = poly2->length;
+    poly2->length = t;
+    
+    t = poly1->alloc;
+    poly1->alloc = poly2->alloc;
+    poly2->alloc = t;
+    
+    tp = poly1->prec;
+    poly1->prec = poly2->prec;
+    poly2->prec = tp;
 }
 
 void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, long len1,
-                             mpfr * in2, long len2, mp_bitcnt_t prec);
+                             mpfr * in2, long len2, mpfr_prec_t prec);
 
 void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
                                                     mpfr_poly_t poly2);
 
-void _mpfr_poly_FHT(mpfr * coeffs, long n, mp_bitcnt_t prec);
+void _mpfr_poly_FHT(mpfr * coeffs, long n, mpfr_prec_t prec);
 
 void _mpfr_poly_convolution_trans(mpfr * coeffs1, 
-                    mpfr * coeffs2, long n, mp_bitcnt_t prec);
+                    mpfr * coeffs2, long n, mpfr_prec_t prec);
 
 void _mpfr_poly_revbin(mpfr * coeffs, long n);
 
 void _mpfr_poly_scale(mpfr * coeffs, long n);
 
 void _mpfr_poly_convolution_FHT(mpfr * coeffs1, 
-					mpfr * coeffs2, long n, mp_bitcnt_t prec);
+					mpfr * coeffs2, long n, mpfr_prec_t prec);
 
 void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
 					                                 mpfr_poly_t poly2);
 
 int _mpfr_poly_bound_newton(double * inter, double * slope, 
-			                        mpfr * poly, long len, ulong prec);
+			                        mpfr * poly, long len, mpfr_prec_t prec);
 
 void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
-				                           mpfr_poly_t poly2, ulong fb);
+				                           mpfr_poly_t poly2, mpfr_prec_t fb);
 
 #endif
 

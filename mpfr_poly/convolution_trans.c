@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_convolution_trans(mpfr * coeffs1, mpfr * coeffs2, long n, mp_bitcnt_t prec)
+void _mpfr_poly_convolution_trans(mpfr * coeffs1, mpfr * coeffs2, long n, mpfr_prec_t prec)
 {
    long len2 = (1L << n) / 2;
 

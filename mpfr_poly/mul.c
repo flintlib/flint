@@ -36,7 +36,7 @@
    below the precision bound, i.e. with exponent < 2*s - prec
    + filter_bits.
 */
-void _mpfr_poly_filter(mpfr * poly, long len, double s, ulong prec, ulong filter_bits)
+void _mpfr_poly_filter(mpfr * poly, long len, double s, mpfr_prec_t prec, mpfr_prec_t filter_bits)
 {
    long i;
    long cutoff = ((long)(s/log(2)) - prec) + filter_bits;
@@ -59,7 +59,7 @@ void _mpfr_poly_filter(mpfr * poly, long len, double s, ulong prec, ulong filter
      s - prec <= log|p_i| < s and len1, len2 > 0
 */
 void _mpfr_poly_mul_inplace(mpfr * poly1, long len1, 
-							mpfr * poly2, long len2, ulong prec, double s, ulong fb)
+							mpfr * poly2, long len2, mpfr_prec_t prec, double s, mpfr_prec_t fb)
 {
    if (len1*prec < MUL_INPLACE_CUTOFF || len2*prec < MUL_INPLACE_CUTOFF) // use classical
    {
@@ -98,7 +98,7 @@ void _mpfr_poly_mul_inplace(mpfr * poly1, long len1,
    for shift.
 */
 void _mpfr_poly_shift_scale(mpfr * res, mpfr * poly, long len, 
-							        mpfr_t shift, mpfr_t scale, ulong prec)
+							        mpfr_t shift, mpfr_t scale, mpfr_prec_t prec)
 {
    long i;
    mpfr_t mult;
@@ -120,7 +120,7 @@ void _mpfr_poly_shift_scale(mpfr * res, mpfr * poly, long len,
 }
 
 void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, long len1, mpfr * poly2, long len2, 
-						    double s1, double i1, double i2, long w, ulong prec, ulong fb)
+						    double s1, double i1, double i2, long w, mpfr_prec_t prec, mpfr_prec_t fb)
 {
 	mpfr * t1, * t2;
 	long len_out = len1 + len2 - 1;
@@ -188,12 +188,12 @@ void _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, long len1, mpfr * poly2, lon
 	mpfr_clear(scale);
 }
 
-void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2, ulong fb)
+void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2, mpfr_prec_t fb)
 {
 	long len1 = poly1->length;
 	long len2 = poly2->length;
 	long len_out = len1 + len2 - 1;
-    mp_bitcnt_t prec = poly1->prec;
+    mpfr_prec_t prec = poly1->prec;
 	mpfr * p1, * p2;
 	double slope1, slope2, inter1, inter2;
 	long w;

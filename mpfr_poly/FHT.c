@@ -29,10 +29,10 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mp_bitcnt_t prec, 
+void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mpfr_prec_t prec, 
 							          mpfr * costw, mpfr * sintw, long stride);
 
-void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mp_bitcnt_t prec, 
+void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mpfr_prec_t prec, 
 							          mpfr * costw, mpfr * sintw, long stride)
 {
    long i;
@@ -96,7 +96,7 @@ void _mpfr_poly_FHT_recursive(mpfr * coeffs, long n, mp_bitcnt_t prec,
    _mpfr_poly_FHT_recursive(coeffs + len2, n - 1, prec, costw, sintw, stride*2);
 }
 
-void _mpfr_poly_FHT(mpfr * coeffs, long n, mp_bitcnt_t prec)
+void _mpfr_poly_FHT(mpfr * coeffs, long n, mpfr_prec_t prec)
 {
 	mpfr * cos, * sin;
     long i, length = (1L << n);

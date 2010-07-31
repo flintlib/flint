@@ -72,7 +72,7 @@
 */
   
 int _mpfr_poly_bound_newton(double * inter, double * slope, 
-			                               mpfr * poly, long len, ulong prec)
+	                               mpfr * poly, long len, mpfr_prec_t prec)
 {
    /*
 	  Precision things can be stored to in a double (can't be less more than

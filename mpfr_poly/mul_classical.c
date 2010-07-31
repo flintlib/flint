@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, long len1, mpfr * in2, long len2, mp_bitcnt_t prec)
+void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, long len1, mpfr * in2, long len2, mpfr_prec_t prec)
 {
    mpfr * temp;
    long i;
@@ -55,7 +55,7 @@ void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, long len1, mpfr * in2, lon
 void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, mpfr_poly_t poly2)
 {
 	long len_out;
-	mp_bitcnt_t prec = poly1->prec;
+	mpfr_prec_t prec = poly1->prec;
 
 	if (poly1->length == 0 || poly2->length == 0)
 	{
