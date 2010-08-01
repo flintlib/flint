@@ -34,23 +34,24 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("init/clear....");
     fflush(stdout);
+    _fmpz_vec_randinit();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        ulong j;
-        ulong length = n_randint(100) + 1;
+        long j, len = n_randint(100) + 1;
 
-        a = _fmpz_vec_init(length);
-        for (j = 0; j < length; j++)
+        a = _fmpz_vec_init(len);
+        for (j = 0; j < len; j++)
             fmpz_zero(a + j);
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
+    _fmpz_vec_randclear();
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

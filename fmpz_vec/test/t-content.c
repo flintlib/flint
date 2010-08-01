@@ -35,31 +35,31 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("content....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
     // Check that content(a f) = abs(a) content(f)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, c, d;
         fmpz * f;
-        ulong length = n_randint(100);
+        long len = n_randint(100);
 
         fmpz_init(a);
         fmpz_init(c);
         fmpz_init(d);
-        f = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(f, length, n_randint(200));
+        f = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(f, len, n_randint(200));
         fmpz_randtest(a, n_randint(100));
 
-        _fmpz_vec_content(c, f, length);
-        _fmpz_vec_scalar_mul_fmpz(f, f, length, a);
+        _fmpz_vec_content(c, f, len);
+        _fmpz_vec_scalar_mul_fmpz(f, f, len, a);
         fmpz_abs(a, a);
         fmpz_mul(c, a, c);
-        _fmpz_vec_content(d, f, length);
+        _fmpz_vec_content(d, f, len);
 
         result = (fmpz_equal(c, d));
         if (!result)
@@ -73,11 +73,10 @@ main(void)
         fmpz_clear(a);
         fmpz_clear(c);
         fmpz_clear(d);
-        _fmpz_vec_clear(f, length);
+        _fmpz_vec_clear(f, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

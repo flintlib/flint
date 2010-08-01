@@ -34,25 +34,26 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("max_limbs....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz * a;
-        ulong length, bits, limbs, limbs2;
+        long len, bits;
+        mp_size_t limbs, limbs2;
 
-        length = n_randint(100);
+        len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
+        a = _fmpz_vec_init(len);
         bits  = n_randint(200);
-        limbs = (bits + (ulong)(FLINT_BITS - 1)) / FLINT_BITS;
-        _fmpz_vec_randtest(a, length, bits);
+        limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
+        _fmpz_vec_randtest(a, len, bits);
 
-        limbs2 = _fmpz_vec_max_limbs(a, length);
+        limbs2 = _fmpz_vec_max_limbs(a, len);
 
         result = (limbs >= limbs2);
         if (!result)
@@ -62,11 +63,10 @@ main(void)
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

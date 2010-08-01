@@ -35,54 +35,52 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("scalar_submul_si....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
     // Compare with alternative method of computation
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;
-        ulong length = n_randint(100);
-        long x;
+        long len = n_randint(100), x;
 
-        a = _fmpz_vec_init(length);
-        b = _fmpz_vec_init(length);
-        c = _fmpz_vec_init(length);
-        d = _fmpz_vec_init(length);
+        a = _fmpz_vec_init(len);
+        b = _fmpz_vec_init(len);
+        c = _fmpz_vec_init(len);
+        d = _fmpz_vec_init(len);
 
-        _fmpz_vec_randtest(a, length, n_randint(200));
-        _fmpz_vec_randtest(b, length, n_randint(200));
-        _fmpz_vec_copy(c, b, length);
+        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_copy(c, b, len);
 
         x = (long) n_randtest();
         if (n_randint(2))
             x = -x;
 
-        _fmpz_vec_scalar_submul_si(b, a, length, x);
-        _fmpz_vec_scalar_mul_si(d, a, length, x);
-        _fmpz_vec_sub(c, c, d, length);
+        _fmpz_vec_scalar_submul_si(b, a, len, x);
+        _fmpz_vec_scalar_mul_si(d, a, len, x);
+        _fmpz_vec_sub(c, c, d, len);
 
-        result = (_fmpz_vec_equal(b, c, length));
+        result = (_fmpz_vec_equal(b, c, len));
         if (!result)
         {
             printf("FAIL:\n");
             printf("x = %ld\n", x);
-            _fmpz_vec_print(b, length), printf("\n\n");
-            _fmpz_vec_print(c, length), printf("\n\n");
+            _fmpz_vec_print(b, len), printf("\n\n");
+            _fmpz_vec_print(c, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
-        _fmpz_vec_clear(b, length);
-        _fmpz_vec_clear(c, length);
-        _fmpz_vec_clear(d, length);
+        _fmpz_vec_clear(a, len);
+        _fmpz_vec_clear(b, len);
+        _fmpz_vec_clear(c, len);
+        _fmpz_vec_clear(d, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -34,66 +34,65 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("neg....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
     // Check aliasing of a and b
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        ulong length = n_randint(100);
+        long len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
-        b = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
+        a = _fmpz_vec_init(len);
+        b = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, len, n_randint(200));
 
-        _fmpz_vec_neg(b, a, length);
-        _fmpz_vec_neg(a, a, length);
+        _fmpz_vec_neg(b, a, len);
+        _fmpz_vec_neg(a, a, len);
 
-        result = (_fmpz_vec_equal(a, b, length));
+        result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
             printf("FAIL:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
-            _fmpz_vec_print(b, length), printf("\n\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
+            _fmpz_vec_print(b, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
-        _fmpz_vec_clear(b, length);
+        _fmpz_vec_clear(a, len);
+        _fmpz_vec_clear(b, len);
     }
 
     // Check -(-a) == a
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        ulong length = n_randint(100);
+        long len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
-        b = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
+        a = _fmpz_vec_init(len);
+        b = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, len, n_randint(200));
 
-        _fmpz_vec_neg(b, a, length);
-        _fmpz_vec_neg(b, b, length);
+        _fmpz_vec_neg(b, a, len);
+        _fmpz_vec_neg(b, b, len);
 
-        result = (_fmpz_vec_equal(a, b, length));
+        result = (_fmpz_vec_equal(a, b, len));
         if (!result)
         {
             printf("FAIL:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
-            _fmpz_vec_print(b, length), printf("\n\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
+            _fmpz_vec_print(b, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
-        _fmpz_vec_clear(b, length);
+        _fmpz_vec_clear(a, len);
+        _fmpz_vec_clear(b, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
