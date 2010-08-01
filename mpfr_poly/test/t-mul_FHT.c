@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,13 +32,13 @@
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
-ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
+long bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 {
    mpfr_t t;
-   ulong i;
-   mpfr_init2(t, a->prec);
-   ulong lost = 0, bits, bits1, bits2;
+   long i;
+   long bits, bits1, bits2, lost = 0;
    double d1, d2;
+   mpfr_init2(t, a->prec);
 
    for (i = 0; i < b->length; i++)
    {
@@ -47,31 +47,30 @@ ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 	  d2 = mpfr_get_d_2exp(&bits2, t, GMP_RNDN);
 	  bits = a->prec - (bits1 - bits2);
 	  if (d2 == 0.0) bits = 0;
-	  if ((long) bits < 0L) bits = 0;
+	  if (bits < 0) bits = 0;
 	  if (bits > lost)
 		  lost = bits;
    }
    
    mpfr_clear(t);
-
    return lost;
 }
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mul_FHT....");
    fflush(stdout);
 
    mpfr_poly_randinit();
    
-   for (ulong i = 0; i < 1000UL; i++) 
+   for (i = 0; i < 1000; i++) 
    {
       mpfr_poly_t a, b, c, d;
-      ulong len1 = n_randint(200) + 1;
-	  ulong len2 = n_randint(200) + 1;
-	  ulong len_out = len1 + len2 - 1;
-	  ulong prec = n_randint(100) + 53;
+      long len1 = n_randint(200) + 1;
+	  long len2 = n_randint(200) + 1;
+	  long len_out = len1 + len2 - 1;
+	  mpfr_prec_t prec = n_randint(100) + 53;
       
       mpfr_poly_init2(a, len1, 2*prec);
       mpfr_poly_init2(b, len2, 2*prec);
@@ -89,7 +88,7 @@ int main(void)
 
 	  if ((bits_lost(c, d) > 10) || (c->length != d->length))
 	  {
-		  printf("Error: mul_classical and mul_FHT don't agree within 30 bits\n");
+		  printf("FAIL: mul_classical and mul_FHT don't agree within 30 bits\n");
 		  abort();
 	  }
 
@@ -100,7 +99,6 @@ int main(void)
    }
    
    mpfr_poly_randclear();
-      
    printf("PASS\n");
    return 0;
 }

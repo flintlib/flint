@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,37 +34,38 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("convolution_FHT....");
    fflush(stdout);
 
    mpfr_poly_randinit();
    
-   for (ulong i = 0; i < 1000UL; i++) 
+   for (i = 0; i < 1000; i++) 
    {
       mpfr_poly_t a, b, c1, c2, d1, d2;
-      ulong n = n_randint(10);
-	  ulong length = (1L<<n);
-	  ulong prec = n_randint(100) + 50*MPFR_PREC_MIN;
+      long j;
+      long n = n_randint(10);
+	  long len = (1L << n);
+	  mpfr_prec_t prec = n_randint(100) + 50*MPFR_PREC_MIN;
       
-      mpfr_poly_init2(a, length, prec);
-      mpfr_poly_init2(b, length, prec);
-      mpfr_poly_init2(c1, length, prec);
-      mpfr_poly_init2(d1, length, prec);
-      mpfr_poly_init2(c2, length, prec);
-      mpfr_poly_init2(d2, length, prec);
+      mpfr_poly_init2(a, len, prec);
+      mpfr_poly_init2(b, len, prec);
+      mpfr_poly_init2(c1, len, prec);
+      mpfr_poly_init2(d1, len, prec);
+      mpfr_poly_init2(c2, len, prec);
+      mpfr_poly_init2(d2, len, prec);
       
-	  mpfr_poly_randtest(a, length);
-      mpfr_poly_randtest(c1, length);
-      mpfr_poly_randtest(d1, length);
+	  mpfr_poly_randtest(a, len);
+      mpfr_poly_randtest(c1, len);
+      mpfr_poly_randtest(d1, len);
       
-	  for (ulong j = 0; j < length; j++)
+	  for (j = 0; j < len; j++)
 		  mpfr_set(b->coeffs + j, a->coeffs + j, GMP_RNDN);
 
-	  for (ulong j = 0; j < length; j++)
+	  for (j = 0; j < len; j++)
 		  mpfr_set(c2->coeffs + j, c1->coeffs + j, GMP_RNDN);
 
-	  for (ulong j = 0; j < length; j++)
+	  for (j = 0; j < len; j++)
 		  mpfr_set(d2->coeffs + j, d1->coeffs + j, GMP_RNDN);
 
 	  _mpfr_poly_convolution_FHT(a->coeffs, c1->coeffs, n, prec);
@@ -72,15 +73,16 @@ int main(void)
       _mpfr_poly_convolution_FHT(b->coeffs, d2->coeffs, n, prec);
       _mpfr_poly_convolution_FHT(b->coeffs, c2->coeffs, n, prec);
       
-	  for (ulong j = 0; j < length; j++)
+	  for (j = 0; j < len; j++)
 	  {
+         double d;
 	     mpfr_sub(a->coeffs + j, a->coeffs + j, b->coeffs + j, GMP_RNDN);
-         double d = mpfr_get_d(a->coeffs + j, GMP_RNDN);
+         d = mpfr_get_d(a->coeffs + j, GMP_RNDN);
 		 if (fabs(d) > 0.1)
 		 {
+             printf("FAIL:\n");
 			 printf("d = %f\n", d);
-			 printf("Error: length = %ld, prec = %ld\n", length, prec);
-			 printf("Error in coeff %ld\n", j);
+			 printf("len = %ld, j = %ld, prec = %ld\n", len, j, (long) prec);
 			 abort();
 		 }
 	  }
@@ -94,7 +96,6 @@ int main(void)
    }
    
    mpfr_poly_randclear();
-      
    printf("PASS\n");
    return 0;
 }

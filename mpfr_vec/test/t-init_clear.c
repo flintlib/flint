@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,17 +33,15 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("init/clear....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       __mpfr_struct * a;
-      ulong j;
-	  
-      ulong length = n_randint(100);
-      ulong prec = n_randint(200) + MPFR_PREC_MIN;
+      long j, length = n_randint(100);
+      mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
 
       a = _mpfr_vec_init(length, prec);
       

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <mpir.h>
@@ -32,13 +32,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("init/init2/realloc/clear....");
    fflush(stdout);
 
    mpfr_poly_randinit();
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       mpfr_poly_t a;
 
@@ -46,7 +46,7 @@ int main(void)
       mpfr_poly_clear(a);      
    }
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       mpfr_poly_t a;
 
@@ -56,7 +56,7 @@ int main(void)
       mpfr_poly_clear(a);
    }
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       mpfr_poly_t a;
       ulong prec = n_randint(100) + MPFR_PREC_MIN;
@@ -68,7 +68,6 @@ int main(void)
    }
    
    mpfr_poly_randclear();
-      
    printf("PASS\n");
    return 0;
 }
