@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,17 +33,17 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("init/clear....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       fmpz_mat_t a;
-      ulong j, k;
+      long j, k;
 	  
-      ulong rows = n_randint(100);
-      ulong cols = n_randint(100);
+      long rows = n_randint(100);
+      long cols = n_randint(100);
 
       fmpz_mat_init(a, rows, cols);
       
