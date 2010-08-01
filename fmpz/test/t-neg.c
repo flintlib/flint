@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,13 +32,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("neg....");
    fflush(stdout);
 
    fmpz_randinit();
 
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b;
       mpz_t c, d;
@@ -59,10 +59,9 @@ int main(void)
       fmpz_get_mpz(d, b);
          
       result = (mpz_cmp(c, d) == 0);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("c = %Zd, d = %Zd\n", c, d);
          abort();
       }
@@ -75,7 +74,7 @@ int main(void)
    }
 
    // check aliasing
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b;
       mpz_t c, d;
@@ -95,10 +94,9 @@ int main(void)
       fmpz_get_mpz(d, a);
          
       result = (mpz_cmp(c, d) == 0);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("c = %Zd, d = %Zd\n", c, d);
          abort();
       }
@@ -110,7 +108,6 @@ int main(void)
    }
 
    fmpz_randclear();
-
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

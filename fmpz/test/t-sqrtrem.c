@@ -34,14 +34,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("sqrtrem....");
     fflush(stdout);
 
     fmpz_randinit();
 
     // Comparison with mpz routines
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t f, r, g;
         mpz_t mf, mf2, mr, mg;
@@ -65,10 +65,9 @@ main(void)
         fmpz_get_mpz(mf2, f);
 
         result = (mpz_cmp(mf2, mf) == 0);
-
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd, mr = %Zd, mg = %Zd\n", mf, mf2,
                        mr, mg);
             abort();
@@ -85,7 +84,7 @@ main(void)
     }
 
     // Check aliasing of r and g
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t a, f;
         mpz_t ma, mf, mf2;
@@ -107,10 +106,9 @@ main(void)
         fmpz_get_mpz(mf2, f);
 
         result = (mpz_cmp(mf, mf2) == 0);
-
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("ma = %Zd, mf = %Zd, mf2 = %Zd\n", ma, mf, mf2);
             abort();
         }
@@ -124,7 +122,7 @@ main(void)
     }
 
     // Check aliasing of f and g
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t r, f;
         mpz_t mr, mf, mf2;
@@ -146,10 +144,9 @@ main(void)
         fmpz_get_mpz(mf2, f);
 
         result = (mpz_cmp(mf, mf2) == 0);
-
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("mr = %Zd, mf = %Zd, mf2 = %Zd\n", mr, mf, mf2);
             abort();
         }
@@ -163,7 +160,6 @@ main(void)
     }
 
     fmpz_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

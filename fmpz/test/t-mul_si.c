@@ -32,13 +32,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mul_si....");
    fflush(stdout);
 
    fmpz_randinit();
 
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b;
       mpz_t d, e, f;
@@ -62,10 +62,9 @@ int main(void)
       fmpz_get_mpz(f, b);
          
       result = (mpz_cmp(e, f) == 0);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %ld\n", d, e, f, x);
          abort();
       }
@@ -79,7 +78,7 @@ int main(void)
    }
 
    // check aliasing of a and b
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a;
       mpz_t d, e, f;
@@ -102,10 +101,9 @@ int main(void)
       fmpz_get_mpz(f, a);
          
       result = (mpz_cmp(e, f) == 0);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %ld\n", d, e, f, x);
          abort();
       }
@@ -118,7 +116,6 @@ int main(void)
    }
 
    fmpz_randclear();
-
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

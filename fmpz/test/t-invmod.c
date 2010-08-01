@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,13 +32,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("invmod....");
    fflush(stdout);
 
    fmpz_randinit();
 
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b, c;
       mpz_t d, e, f, g;
@@ -65,10 +65,9 @@ int main(void)
       fmpz_get_mpz(g, c);
          
       result = (((r1 == 0) && (r2 == 0)) || (mpz_cmp(f, g) == 0) && ((r1 != 0) && (r2 != 0)));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd, r1 = %d, r2 = %d\n", d, e, f, g, r1, r2);
          abort();
       }
@@ -84,7 +83,7 @@ int main(void)
    }
 
    // check aliasing of a and b
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, c;
       mpz_t d, e, f, g;
@@ -107,10 +106,9 @@ int main(void)
       fmpz_get_mpz(g, c);
          
       result = (((r1 == 0) && (r2 == 0)) || (mpz_cmp(f, g) == 0) && ((r1 != 0) && (r2 != 0)));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, f = %Zd, g = %Zd, r1 = %d, r2 = %d\n", d, f, g, r1, r2);
          abort();
       }
@@ -124,7 +122,7 @@ int main(void)
    }
 
    // test aliasing of a and c
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b;
       mpz_t d, e, f, g;
@@ -150,10 +148,9 @@ int main(void)
       fmpz_get_mpz(g, a);
          
       result = (((r1 == 0) && (r2 == 0)) || (mpz_cmp(f, g) == 0) && ((r1 != 0) && (r2 != 0)));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
          abort();
       }
@@ -168,7 +165,7 @@ int main(void)
    }
 
    // test aliasing of b and c
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a, b;
       mpz_t d, e, f, g;
@@ -192,12 +189,11 @@ int main(void)
       r2 = mpz_invert(f, d, e);
       
       fmpz_get_mpz(g, b);
-         
+      
       result = (((r1 == 0) && (r2 == 0)) || (mpz_cmp(f, g) == 0) && ((r1 != 0) && (r2 != 0)));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
          abort();
       }
@@ -212,7 +208,6 @@ int main(void)
    }
 
    fmpz_randclear();
-
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

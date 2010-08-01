@@ -34,13 +34,13 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("divexact_ui....");
     fflush(stdout);
 
     fmpz_randinit();
 
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t a, c;
         mpz_t e, f, g;
@@ -64,7 +64,6 @@ main(void)
         fmpz_get_mpz(g, a);
 
         result = (mpz_cmp(f, g) == 0);
-
         if (!result)
         {
             printf("FAIL1\n");
@@ -80,7 +79,7 @@ main(void)
     }
 
     // Test aliasing of a and c
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t a, c;
         mpz_t d, f, g;
@@ -104,10 +103,9 @@ main(void)
         fmpz_get_mpz(g, c);
 
         result = (mpz_cmp(f, g) == 0);
-
         if (!result)
         {
-            printf("FAIL2\n");
+            printf("FAIL:\n");
             gmp_printf("d = %Zd, n = %lu, f = %Zd, g = %Zd\n", d, n, f, g);
             abort();
         }
@@ -120,7 +118,6 @@ main(void)
     }
 
     fmpz_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,14 +32,14 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("get/set_mpz....");
    fflush(stdout);
 
    gmp_randstate_t state;
    gmp_randinit_default(state);
    
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       fmpz_t a;
       mpz_t b, c;
@@ -58,10 +58,9 @@ int main(void)
       fmpz_get_mpz(c, a);
 
       result = (mpz_cmp(b, c) == 0);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          gmp_printf("b = %Zd, c = %Zd\n", b, c);
          abort();
       }
