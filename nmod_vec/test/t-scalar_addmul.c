@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,36 +32,37 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("scalar_addmul....");
    fflush(stdout);
    
    // check (a + b*c) == a + (b*c)
-   for (long i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
-      long length = n_randint(100) + 1;
-	  mp_ptr vec = nmod_vec_init(length);
-	  mp_ptr vec2 = nmod_vec_init(length);
-	  mp_ptr vec3 = nmod_vec_init(length);
-
+      long len = n_randint(100) + 1;
 	  mp_limb_t n = n_randtest_not_zero();
 	  mp_limb_t c = n_randint(n);
 	  nmod_t mod;
+      
+	  mp_ptr vec = nmod_vec_init(len);
+	  mp_ptr vec2 = nmod_vec_init(len);
+	  mp_ptr vec3 = nmod_vec_init(len);
+
 	  nmod_init(&mod, n);
 
-      _nmod_vec_randtest(vec, length, mod);
-      _nmod_vec_randtest(vec2, length, mod);
-      mpn_copyi(vec3, vec2, length);
+      _nmod_vec_randtest(vec, len, mod);
+      _nmod_vec_randtest(vec2, len, mod);
+      mpn_copyi(vec3, vec2, len);
 
-	  _nmod_vec_scalar_mul(vec3, vec, length, mod, c);
-      _nmod_vec_add(vec3, vec3, vec2, length, mod);
+	  _nmod_vec_scalar_mul(vec3, vec, len, mod, c);
+      _nmod_vec_add(vec3, vec3, vec2, len, mod);
 	  
-	  _nmod_vec_scalar_addmul(vec2, vec, length, mod, c);
+	  _nmod_vec_scalar_addmul(vec2, vec, len, mod, c);
 	  
-	  if (!_nmod_vec_equal(vec2, vec3, length))
+	  if (!_nmod_vec_equal(vec2, vec3, len))
 	  {
 	     printf("FAIL\n");
-		 printf("length = %ld, n = %ld\n", length, n);
+		 printf("len = %ld, n = %ld\n", len, n);
 		 abort();
 	  }
 

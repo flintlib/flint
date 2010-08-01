@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,12 +32,12 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("divrem_basecase....");
    fflush(stdout);
    
    // check result of divrem
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, q, r, prod;
 
@@ -59,11 +59,11 @@ int main(void)
       result = (nmod_poly_equal(a, prod));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(prod); printf("\n\n");
-         nmod_poly_print(q); printf("\n\n");
-         nmod_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(prod), printf("\n\n");
+         nmod_poly_print(q), printf("\n\n");
+         nmod_poly_print(r), printf("\n\n");
 		 printf("n = %ld\n", n);
          abort();
       }
@@ -76,7 +76,7 @@ int main(void)
    }
 
    // check aliasing of a and q
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, q, r;
 
@@ -96,11 +96,11 @@ int main(void)
 	  result = (nmod_poly_equal(a, q));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         nmod_poly_print(q); printf("\n\n");
-         nmod_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
+         nmod_poly_print(q), printf("\n\n");
+         nmod_poly_print(r), printf("\n\n");
 		 printf("n = %ld\n", n);
          abort();
       }
@@ -112,7 +112,7 @@ int main(void)
    }
 
    // check aliasing of b and q
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, q, r;
 
@@ -132,11 +132,11 @@ int main(void)
 	  result = (nmod_poly_equal(b, q));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         nmod_poly_print(q); printf("\n\n");
-         nmod_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
+         nmod_poly_print(q), printf("\n\n");
+         nmod_poly_print(r), printf("\n\n");
 		 printf("n = %ld\n", n);
          abort();
       }
@@ -148,7 +148,7 @@ int main(void)
    }
 
       // check aliasing of a and r
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, q, r;
 
@@ -168,11 +168,11 @@ int main(void)
 	  result = (nmod_poly_equal(a, r));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         nmod_poly_print(q); printf("\n\n");
-         nmod_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
+         nmod_poly_print(q), printf("\n\n");
+         nmod_poly_print(r), printf("\n\n");
 		 printf("n = %ld\n", n);
          abort();
       }
@@ -184,7 +184,7 @@ int main(void)
    }
 
    // check aliasing of b and r
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, q, r;
 
@@ -204,11 +204,11 @@ int main(void)
 	  result = (nmod_poly_equal(b, r));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         nmod_poly_print(q); printf("\n\n");
-         nmod_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
+         nmod_poly_print(q), printf("\n\n");
+         nmod_poly_print(r), printf("\n\n");
 		 printf("n = %ld\n", n);
          abort();
       }

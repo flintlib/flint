@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,22 +33,22 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mulhigh_n....");
    fflush(stdout);
    
    // compare with left truncated product of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       nmod_poly_t a, b, c;
-      ulong j;
+      ulong j, n;
 
 	  mp_limb_t m = n_randtest_not_zero();
       
       nmod_poly_init(a, m);
       nmod_poly_init(b, m);
       nmod_poly_init(c, m);
-	  ulong n = n_randint(50);
+	  n = n_randint(50);
       nmod_poly_randtest(b, n);
       nmod_poly_randtest(c, n);
    
@@ -65,9 +65,9 @@ int main(void)
       result = (nmod_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
          abort();
       }
 

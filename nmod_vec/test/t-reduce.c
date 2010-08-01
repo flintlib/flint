@@ -32,36 +32,34 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("reduce....");
    fflush(stdout);
    
-   for (long i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
-      long j;
-	  
-	  ulong length = n_randint(100) + 1;
-	  mp_ptr vec = nmod_vec_init(length);
-	  mp_ptr vec2 = nmod_vec_init(length);
+	  long j, len = n_randint(100) + 1;
+	  mp_ptr vec = nmod_vec_init(len);
+	  mp_ptr vec2 = nmod_vec_init(len);
 
 	  mp_limb_t n = n_randtest_not_zero();
 	  nmod_t mod;
 	  nmod_init(&mod, n);
 
-      for (j = 0; j < length; j++)
+      for (j = 0; j < len; j++)
 	  {
 	     vec[j] = n_randtest();
 		 vec2[j] = vec[j];
 	  }
 
-	  _nmod_vec_reduce(vec, vec, length, mod);
-	  for (j = 0; j < length; j++)
+	  _nmod_vec_reduce(vec, vec, len, mod);
+	  for (j = 0; j < len; j++)
 	     vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
 
-	  if (!_nmod_vec_equal(vec, vec2, length))
+	  if (!_nmod_vec_equal(vec, vec2, len))
 	  {
 	     printf("FAIL\n");
-		 printf("length = %ld, n = %ld\n", length, n);
+		 printf("len = %ld, n = %ld\n", len, n);
 		 abort();
 	  }
 

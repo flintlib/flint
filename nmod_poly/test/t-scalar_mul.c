@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,15 +32,14 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("scalar_mul....");
    fflush(stdout);
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b;
-
       mp_limb_t n = n_randtest_not_zero();
       mp_limb_t c = n_randint(n);
 
@@ -54,9 +53,9 @@ int main(void)
       result = (nmod_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(a), printf("\n\n");
+         nmod_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -65,10 +64,9 @@ int main(void)
    }
    
    // check (a + b)*c = a*c + b*c
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a, b, d1, d2;
-
 	  mp_limb_t n = n_randtest_not_zero();
       mp_limb_t c = n_randint(n);
 
@@ -89,9 +87,9 @@ int main(void)
       result = (nmod_poly_equal(d1, d2));
       if (!result)
       {
-         printf("Error:\n");
-         nmod_poly_print(d1); printf("\n\n");
-         nmod_poly_print(d2); printf("\n\n");
+         printf("FAIL:\n");
+         nmod_poly_print(d1), printf("\n\n");
+         nmod_poly_print(d2), printf("\n\n");
          abort();
       }
 
