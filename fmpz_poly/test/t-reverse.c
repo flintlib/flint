@@ -35,17 +35,17 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("reverse....");
     fflush(stdout);
 
     fmpz_poly_randinit();
 
     // Aliasing
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b;
-        ulong n;
+        long n;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -58,12 +58,10 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("Error:\n");
-            printf("n = %lu\n\na = ", n);
-            fmpz_poly_print(a);
-            printf("\n\nb = ");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            printf("FAIL:\n");
+            printf("n = %ld\n", n);
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -72,10 +70,10 @@ main(void)
     }
 
     // Correctness (?)
-    for (ulong i = 0; i < 2000UL; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b;
-        ulong j, len, n;
+        long j, len, n;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -97,12 +95,10 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("Error:\n");
-            printf("n = %lu\n\na = ", n);
-            fmpz_poly_print(a);
-            printf("\n\nb = ");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            printf("FAIL:\n");
+            printf("n = %ld\n", n);
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -111,7 +107,6 @@ main(void)
     }
 
     fmpz_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

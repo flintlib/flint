@@ -35,14 +35,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("content....");
     fflush(stdout);
 
     fmpz_poly_randinit();
 
     // Check that content(a f) = abs(a) content(f)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, c, d;
         fmpz_poly_t f;
@@ -63,11 +63,9 @@ main(void)
         result = (fmpz_equal(c, d));
         if (!result)
         {
-            printf("Error:\n");
-            fmpz_print(c);
-            printf("\n\n");
-            fmpz_print(d);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpz_print(c), printf("\n\n");
+            fmpz_print(d), printf("\n\n");
             abort();
         }
 

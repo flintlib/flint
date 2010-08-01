@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,14 +33,14 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("pseudo_divrem_basecase....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
    // check q*b + r = a, no aliasing
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, q, r, prod;
 	  fmpz_t p;
@@ -64,11 +64,11 @@ int main(void)
       result = (fmpz_poly_equal(a, prod));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(prod); printf("\n\n");
-         fmpz_poly_print(q); printf("\n\n");
-         fmpz_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(prod), printf("\n\n");
+         fmpz_poly_print(q), printf("\n\n");
+         fmpz_poly_print(r), printf("\n\n");
          abort();
       }
 
@@ -81,7 +81,7 @@ int main(void)
    }
 
    /* check r and a alias */
-   for (ulong i = 0; i < 500UL; i++) 
+   for (i = 0; i < 500; i++) 
    {
       fmpz_poly_t a, b, q, r;
       ulong d;
@@ -99,10 +99,10 @@ int main(void)
       result = (fmpz_poly_equal(a, r));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(q); printf("\n\n");
-         fmpz_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(q), printf("\n\n");
+         fmpz_poly_print(r), printf("\n\n");
          abort();
       }
 
@@ -113,7 +113,7 @@ int main(void)
    }
 
    /* check r and b alias */
-   for (ulong i = 0; i < 500UL; i++) 
+   for (i = 0; i < 500; i++) 
    {
       fmpz_poly_t a, b, q, r;
       ulong d;
@@ -131,10 +131,10 @@ int main(void)
       result = (fmpz_poly_equal(b, r));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(q); printf("\n\n");
-         fmpz_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(q), printf("\n\n");
+         fmpz_poly_print(r), printf("\n\n");
          abort();
       }
 
@@ -145,7 +145,7 @@ int main(void)
    }
 
    /* check q and a alias */
-   for (ulong i = 0; i < 500UL; i++) 
+   for (i = 0; i < 500; i++) 
    {
       fmpz_poly_t a, b, q, r;
       ulong d;
@@ -162,10 +162,10 @@ int main(void)
       result = (fmpz_poly_equal(a, q));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(q); printf("\n\n");
-         fmpz_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(q), printf("\n\n");
+         fmpz_poly_print(r), printf("\n\n");
          abort();
       }
 
@@ -176,7 +176,7 @@ int main(void)
    }
 
    /* check q and b alias */
-   for (ulong i = 0; i < 500UL; i++) 
+   for (i = 0; i < 500; i++) 
    {
       fmpz_poly_t a, b, q, r;
       ulong d;
@@ -194,10 +194,10 @@ int main(void)
       result = (fmpz_poly_equal(b, q));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(q); printf("\n\n");
-         fmpz_poly_print(r); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(q), printf("\n\n");
+         fmpz_poly_print(r), printf("\n\n");
          abort();
       }
 
@@ -208,7 +208,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

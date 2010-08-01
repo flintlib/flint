@@ -32,32 +32,32 @@
 
 int main(void)
 {
-   int result;
+   int i, j, result;
    printf("get/set_coeff_ui....");
    fflush(stdout);
+
+   fmpz_poly_randinit();
    
-   ulong i, j, coeff;
-   ulong n1, n2;
-   
-   for (i = 0; i < 1000UL; i++) 
+   for (i = 0; i < 1000; i++) 
    {
       fmpz_poly_t a;
-      ulong length;
+      ulong n1, n2;
+      long coeff, len;
 
       fmpz_poly_init(a);
-      length = n_randint(100) + 1;
+      len = n_randint(100) + 1;
 
       for (j = 0; j < 1000; j++)
       {
          n1 = n_randtest();
-         coeff = n_randint(length);
+         coeff = n_randint(len);
          fmpz_poly_set_coeff_ui(a, coeff, n1);
          n2 = fmpz_poly_get_coeff_ui(a, coeff);
 
          result = (n1 == n2);
          if (!result)
          {
-            printf("Error: n1 = %lu, n2 = %lu, coeff = %lu, length = %lu\n", n1, n2, coeff, length);
+            printf("FAIL: n1 = %lu, n2 = %lu, coeff = %ld, length = %ld\n", n1, n2, coeff, len);
             abort();
          }
       }
@@ -65,6 +65,7 @@ int main(void)
       fmpz_poly_clear(a);      
    }
       
+   fmpz_poly_randclear();
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

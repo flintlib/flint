@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,19 +33,20 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("bit_pack/bit_unpack....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
-   for (ulong i = 0; i < 20000UL; i++) 
+   for (i = 0; i < 20000; i++) 
    {
       fmpz_poly_t a, b;
 
-	  ulong length = n_randint(100) + 1;
-	  ulong bits = n_randint(300) + 2;
-      mp_limb_t * arr = (mp_limb_t *) calloc((length*bits - 1)/FLINT_BITS + 1, sizeof(mp_limb_t));
+	  long length      = n_randint(100) + 1;
+	  mp_bitcnt_t bits = n_randint(300) + 2;
+      mp_ptr arr  = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+                                    sizeof(mp_limb_t));
       int negate;
 
       fmpz_poly_init(a);
@@ -66,7 +67,7 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
+         printf("FAIL:\n");
          fmpz_poly_print(a); printf("\n\n");
          fmpz_poly_print(b); printf("\n\n");
          abort();
@@ -77,13 +78,14 @@ int main(void)
       fmpz_poly_clear(b);
    }
 
-   for (ulong i = 0; i < 20000UL; i++) 
+   for (i = 0; i < 20000; i++) 
    {
       fmpz_poly_t a, b;
 
-	  ulong length = n_randint(100) + 1;
-	  ulong bits = n_randint(300) + 1;
-      mp_limb_t * arr = (mp_limb_t *) calloc((length*bits - 1)/FLINT_BITS + 1, sizeof(mp_limb_t));
+	  long length = n_randint(100) + 1;
+	  mp_bitcnt_t bits = n_randint(300) + 1;
+      mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+                                   sizeof(mp_limb_t));
       
       fmpz_poly_init(a);
       fmpz_poly_init(b);
@@ -99,7 +101,7 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
+         printf("FAIL:\n");
          fmpz_poly_print(a); printf("\n\n");
          fmpz_poly_print(b); printf("\n\n");
          abort();
@@ -111,7 +113,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

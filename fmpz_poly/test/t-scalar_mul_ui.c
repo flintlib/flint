@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,14 +33,14 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("scalar_mul_ui....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++)
    {
       fmpz_poly_t a, b;
       ulong n = n_randtest();
@@ -55,9 +55,9 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -66,11 +66,11 @@ int main(void)
    }
 
    // check (a*n1)*n2 = a*(n1*n2)
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       fmpz_poly_t a, b, c;
-      ulong n1 = n_randbits(FLINT_BITS/2);
-      ulong n2 = n_randbits(FLINT_BITS/2);
+      ulong n1 = n_randbits(FLINT_BITS / 2);
+      ulong n2 = n_randbits(FLINT_BITS / 2);
 
       fmpz_poly_init(a);
       fmpz_poly_init(b);
@@ -79,15 +79,15 @@ int main(void)
       
       fmpz_poly_scalar_mul_ui(b, a, n1);
       fmpz_poly_scalar_mul_ui(c, b, n2);
-      fmpz_poly_scalar_mul_ui(b, a, n1*n2);
+      fmpz_poly_scalar_mul_ui(b, a, n1 * n2);
 
       result = (fmpz_poly_equal(b, c));
       if (!result)
       {
-         printf("Error n1 = %lu, n2 = %lu:\n", n1, n2);
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
+         printf("FAIL n1 = %lu, n2 = %lu:\n", n1, n2);
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
+         fmpz_poly_print(c), printf("\n\n");
          abort();
       }
 
@@ -97,7 +97,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

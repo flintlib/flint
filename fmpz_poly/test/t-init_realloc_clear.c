@@ -32,13 +32,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("init/init2/realloc/clear....");
    fflush(stdout);
    
    fmpz_poly_randinit();
       
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       fmpz_poly_t a;
 
@@ -46,7 +46,7 @@ int main(void)
       fmpz_poly_clear(a);      
    }
 
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       fmpz_poly_t a;
 
@@ -56,7 +56,7 @@ int main(void)
       fmpz_poly_clear(a);      
    }
    
-   for (ulong i = 0; i < 10000UL; i++) 
+   for (i = 0; i < 10000; i++) 
    {
       fmpz_poly_t a;
 
@@ -67,7 +67,6 @@ int main(void)
    }
    
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,39 +32,40 @@
 
 int main(void)
 {
-   int result;
+   int i, j, result;
    printf("get/set_coeff_si....");
    fflush(stdout);
    
-   ulong i, j, coeff;
-   long n1, n2;
+   fmpz_poly_randinit();
    
-   for (i = 0; i < 1000UL; i++) 
+   for (i = 0; i < 1000; i++) 
    {
       fmpz_poly_t a;
-      ulong length;
+      long coeff, len;
+      long n1, n2;
 
       fmpz_poly_init(a);
-      length = n_randint(100) + 1;
+      len = n_randint(100) + 1;
 
       for (j = 0; j < 1000; j++)
       {
          n1 = (long) n_randtest();
-         coeff = n_randint(length);
+         coeff = n_randint(len);
          fmpz_poly_set_coeff_si(a, coeff, n1);
          n2 = fmpz_poly_get_coeff_si(a, coeff);
 
          result = (n1 == n2);
          if (!result)
          {
-            printf("Error: n1 = %ld, n2 = %ld, coeff = %lu, length = %lu\n", n1, n2, coeff, length);
+            printf("FAIL: n1 = %ld, n2 = %ld, coeff = %ld, length = %ld\n", n1, n2, coeff, len);
             abort();
          }
       }
 
       fmpz_poly_clear(a);      
    }
-      
+   
+   fmpz_poly_randclear();
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

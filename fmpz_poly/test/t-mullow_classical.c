@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,18 +33,17 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mullow_classical....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
-      long len;
-	  ulong trunc;
+      long len, trunc;
 
       fmpz_poly_init(a);
       fmpz_poly_init(b);
@@ -62,9 +61,9 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -74,7 +73,7 @@ int main(void)
    }
 
    // check aliasing of a and c
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
       long len;
@@ -96,9 +95,9 @@ int main(void)
       result = (fmpz_poly_equal(a, c));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(c), printf("\n\n");
          abort();
       }
 
@@ -108,11 +107,10 @@ int main(void)
    }
 
    // compare with mul_basecase
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c, d;
-      long len;
-	  ulong trunc;
+      long len, trunc;
 
       fmpz_poly_init(a);
       fmpz_poly_init(b);
@@ -132,9 +130,9 @@ int main(void)
       result = (fmpz_poly_equal(a, d));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(d); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(d), printf("\n\n");
          abort();
       }
 
@@ -145,7 +143,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

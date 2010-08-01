@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,14 +33,14 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mul_classical....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
       
@@ -56,9 +56,9 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -68,7 +68,7 @@ int main(void)
    }
 
    // check aliasing of a and c
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
       
@@ -84,9 +84,9 @@ int main(void)
       result = (fmpz_poly_equal(a, c));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(c), printf("\n\n");
          abort();
       }
 
@@ -96,7 +96,7 @@ int main(void)
    }
 
    // check (b*c)+(b*d) = b*(c+d)
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a1, a2, b, c, d;
       
@@ -119,9 +119,9 @@ int main(void)
       result = (fmpz_poly_equal(a1, a2));
       if (!result)
       {
-		 printf("Error:\n");
-		 fmpz_poly_print(a1); printf("\n\n");
-         fmpz_poly_print(a2); printf("\n\n");
+		 printf("FAIL:\n");
+		 fmpz_poly_print(a1), printf("\n\n");
+         fmpz_poly_print(a2), printf("\n\n");
          abort();
       }
 
@@ -133,7 +133,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

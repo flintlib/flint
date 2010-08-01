@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,8 +33,7 @@
 
 int main(void)
 {
-   int result;
-   ulong length;
+   int i, result;
 
    printf("mullow_karatsuba_n....");
    fflush(stdout);
@@ -42,26 +41,27 @@ int main(void)
    fmpz_poly_randinit();
 
    // check aliasing of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++)
    {
       fmpz_poly_t a, b, c;
+      long len;
       
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      length = n_randint(50);
-      fmpz_poly_randtest(b, length, n_randint(200));
-      fmpz_poly_randtest(c, length, n_randint(200));
+      len = n_randint(50);
+      fmpz_poly_randtest(b, len, n_randint(200));
+      fmpz_poly_randtest(c, len, n_randint(200));
    
-      fmpz_poly_mullow_karatsuba_n(a, b, c, length);
-      fmpz_poly_mullow_karatsuba_n(b, b, c, length);
+      fmpz_poly_mullow_karatsuba_n(a, b, c, len);
+      fmpz_poly_mullow_karatsuba_n(b, b, c, len);
       
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -71,26 +71,27 @@ int main(void)
    }
    
    // check aliasing of a and c
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
+      long len;
       
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-      length = n_randint(50);
-      fmpz_poly_randtest(b, length, n_randint(200));
-      fmpz_poly_randtest(c, length, n_randint(200));
+      len = n_randint(50);
+      fmpz_poly_randtest(b, len, n_randint(200));
+      fmpz_poly_randtest(c, len, n_randint(200));
    
-      fmpz_poly_mullow_karatsuba_n(a, b, c, length);
-      fmpz_poly_mullow_karatsuba_n(c, b, c, length);
+      fmpz_poly_mullow_karatsuba_n(a, b, c, len);
+      fmpz_poly_mullow_karatsuba_n(c, b, c, len);
       
       result = (fmpz_poly_equal(a, c));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(c), printf("\n\n");
          abort();
       }
 
@@ -100,28 +101,29 @@ int main(void)
    }
   
    // compare with mul_karatsuba
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c, d;
+      long len;
       
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
       fmpz_poly_init(d);
-      length = n_randint(50);
-      fmpz_poly_randtest(b, length, n_randint(200)); 
-      fmpz_poly_randtest(c, length, n_randint(200));
+      len = n_randint(50);
+      fmpz_poly_randtest(b, len, n_randint(200)); 
+      fmpz_poly_randtest(c, len, n_randint(200));
    
-      fmpz_poly_mullow_karatsuba_n(a, b, c, length);
+      fmpz_poly_mullow_karatsuba_n(a, b, c, len);
       fmpz_poly_mul_karatsuba(d, b, c);
-      fmpz_poly_truncate(d, length);
+      fmpz_poly_truncate(d, len);
       
       result = (fmpz_poly_equal(a, d));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(d); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(d), printf("\n\n");
          abort();
       }
 
@@ -132,7 +134,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

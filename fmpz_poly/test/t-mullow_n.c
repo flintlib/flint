@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -33,21 +33,22 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mullow_n....");
    fflush(stdout);
    
    fmpz_poly_randinit();
    
    // compare with truncated product of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
+      long trunc;
       
       fmpz_poly_init(a);
       fmpz_poly_init(b);
       fmpz_poly_init(c);
-	  ulong trunc = n_randint(50);
+	  trunc = n_randint(50);
       fmpz_poly_randtest(b, trunc, n_randint(200));
       fmpz_poly_randtest(c, trunc, n_randint(200));
    
@@ -58,9 +59,9 @@ int main(void)
       result = (fmpz_poly_equal(a, b));
       if (!result)
       {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
+         printf("FAIL:\n");
+         fmpz_poly_print(a), printf("\n\n");
+         fmpz_poly_print(b), printf("\n\n");
          abort();
       }
 
@@ -70,7 +71,6 @@ int main(void)
    }
 
    fmpz_poly_randclear();
-      
    _fmpz_cleanup();
    printf("PASS\n");
    return 0;

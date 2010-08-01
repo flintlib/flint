@@ -35,14 +35,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("evaluate_horner....");
     fflush(stdout);
 
     fmpz_poly_randinit();
 
     // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;
         fmpz_poly_t f;
@@ -59,11 +59,9 @@ main(void)
         result = (fmpz_equal(a, b));
         if (!result)
         {
-            printf("Error:\n");
-            fmpz_print(a);
-            printf("\n\n");
-            fmpz_print(b);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpz_print(a), printf("\n\n");
+            fmpz_print(b), printf("\n\n");
             abort();
         }
 
@@ -73,7 +71,7 @@ main(void)
     }
 
     // Check that (f+g)(a) = f(a) + g(a)
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b, c;
         fmpz_poly_t f, g;
@@ -96,11 +94,9 @@ main(void)
         result = (fmpz_equal(b, c));
         if (!result)
         {
-            printf("Error:\n");
-            fmpz_print(b);
-            printf("\n\n");
-            fmpz_print(c);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpz_print(b), printf("\n\n");
+            fmpz_print(c), printf("\n\n");
             abort();
         }
 
@@ -112,7 +108,6 @@ main(void)
     }
 
     fmpz_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
