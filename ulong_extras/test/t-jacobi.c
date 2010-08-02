@@ -37,7 +37,7 @@ int main(void)
 
    for (i = 0; i < 100000; i++) 
    {
-      mp_limb_t u, d, g;
+      mp_limb_t u, d;
       mpz_t a_m, d_m;
       mp_limb_signed_t a;
       int r1, r2;
@@ -56,7 +56,6 @@ int main(void)
       r2 = mpz_jacobi(a_m, d_m);
       
       result = (r1 == r2);
-
       if (!result)
       {
          printf("FAIL:\n");

@@ -31,26 +31,27 @@
 #include "mpfr_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/clear....");
-   fflush(stdout);
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      __mpfr_struct * a;
-      long j, length = n_randint(100);
-      mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
+    int i;
+    printf("init/clear....");
+    fflush(stdout);
 
-      a = _mpfr_vec_init(length, prec);
-      
-      for (j = 0; j < length; j++)
-         mpfr_set_ui(a + j, 0, GMP_RNDN);
+    for (i = 0; i < 10000; i++)
+    {
+        __mpfr_struct *a;
+        long j, length = n_randint(100);
+        mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
 
-      _mpfr_vec_clear(a, length);
-   }
+        a = _mpfr_vec_init(length, prec);
 
-   printf("PASS\n");
-   return 0;
+        for (j = 0; j < length; j++)
+            mpfr_set_ui(a + j, 0, GMP_RNDN);
+
+        _mpfr_vec_clear(a, length);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

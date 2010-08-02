@@ -30,37 +30,38 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("get/set_ui....");
-   fflush(stdout);
-   
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a;
-      ulong b, c;
+    int i, result;
+    printf("get/set_ui....");
+    fflush(stdout);
 
-      b = n_randtest();
-      
-      fmpz_init(a);
-      
-      fmpz_set_ui(a, b);
-      c = fmpz_get_ui(a);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        ulong b, c;
 
-      result = (b == c);
+        b = n_randtest();
 
-      if (!result)
-      {
-         printf("FAIL:\n");
-         printf("b = %ld, c = %ld\n", b, c);
-         abort();
-      }
+        fmpz_init(a);
 
-      fmpz_clear(a);
-   }
+        fmpz_set_ui(a, b);
+        c = fmpz_get_ui(a);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        result = (b == c);
+
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("b = %ld, c = %ld\n", b, c);
+            abort();
+        }
+
+        fmpz_clear(a);
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

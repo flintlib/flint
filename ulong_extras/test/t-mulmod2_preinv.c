@@ -16,7 +16,7 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-==============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
@@ -37,7 +37,7 @@ int main(void)
 
    for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t a, b, d, r1, r2, q, norm, p1, p2, dinv;
+      mp_limb_t a, b, d, r1, r2, q, p1, p2, dinv;
       
       d = n_randtest_not_zero();
       a = n_randint(d);

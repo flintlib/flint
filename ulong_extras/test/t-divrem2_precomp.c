@@ -38,7 +38,7 @@ int main(void)
 
    for (i = 0; i < 1000000UL; i++)
    {
-      mp_limb_t d, n, r1, r2, q1, q2, norm;
+      mp_limb_t d, n, r1, r2, q1, q2;
       double dpre;
 
       d = n_randtest();
@@ -53,7 +53,6 @@ int main(void)
       q2 = n/d;
 
       result = ((r1 == r2) && (q1 == q2));
-
       if (!result)
       {
          printf("FAIL:\n");

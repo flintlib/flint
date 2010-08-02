@@ -30,76 +30,80 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("cmpabs....");
-   fflush(stdout);
+    int i, result;
+    printf("cmpabs....");
+    fflush(stdout);
 
-   fmpz_randinit();
+    fmpz_randinit();
 
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b;
-      
-      fmpz_init(a);
-      fmpz_init(b);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
 
-      fmpz_randtest(a, 200);
-      
-      fmpz_set(b, a);
-      result = (fmpz_cmpabs(a, b));
-      
-      if (result != 0)
-      {
-         printf("FAIL\n");
-         printf("a = "); fmpz_print(a), printf("\n");
-         printf("b = "); fmpz_print(b), printf("\n");
-         abort();
-      }
+        fmpz_init(a);
+        fmpz_init(b);
 
-      fmpz_clear(a);
-      fmpz_clear(b);
-   }
+        fmpz_randtest(a, 200);
 
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b;
-      mpz_t c, d;
-      int r1, r2;
-      
-      fmpz_init(a);
-      fmpz_init(b);
+        fmpz_set(b, a);
+        result = (fmpz_cmpabs(a, b));
 
-      mpz_init(c);
-      mpz_init(d);
+        if (result != 0)
+        {
+            printf("FAIL\n");
+            printf("a = ");
+            fmpz_print(a), printf("\n");
+            printf("b = ");
+            fmpz_print(b), printf("\n");
+            abort();
+        }
 
-      fmpz_randtest(a, 200);
-      fmpz_randtest(b, 200);
-      
-      fmpz_get_mpz(c, a);
-      fmpz_get_mpz(d, b);
+        fmpz_clear(a);
+        fmpz_clear(b);
+    }
 
-      r1 = fmpz_cmpabs(a, b);
-      r2 = mpz_cmpabs(c, d);
-      result = ((r1 == 0 &&  r2 == 0) || (r1 > 0 && r2 > 0) || (r1 < 0 && r2 < 0));
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
+        mpz_t c, d;
+        int r1, r2;
 
-      if (!result)
-      {
-         printf("FAIL\n");
-         gmp_printf("c = %Zd, d = %Zd\n", c, d);
-         abort();
-      }
+        fmpz_init(a);
+        fmpz_init(b);
 
-      fmpz_clear(a);
-      fmpz_clear(b);
+        mpz_init(c);
+        mpz_init(d);
 
-      mpz_clear(c);
-      mpz_clear(d);
-   }
+        fmpz_randtest(a, 200);
+        fmpz_randtest(b, 200);
 
-   fmpz_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_get_mpz(c, a);
+        fmpz_get_mpz(d, b);
+
+        r1 = fmpz_cmpabs(a, b);
+        r2 = mpz_cmpabs(c, d);
+        result = ((r1 == 0 && r2 == 0) || (r1 > 0 && r2 > 0)
+                  || (r1 < 0 && r2 < 0));
+
+        if (!result)
+        {
+            printf("FAIL\n");
+            gmp_printf("c = %Zd, d = %Zd\n", c, d);
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+
+        mpz_clear(c);
+        mpz_clear(d);
+    }
+
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

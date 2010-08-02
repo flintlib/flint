@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    
+
     printf("content....");
     fflush(stdout);
 
@@ -58,7 +58,7 @@ main(void)
         mpq_init(x);
         mpq_init(y);
         mpq_init(z);
-        
+
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
@@ -68,7 +68,7 @@ main(void)
         mpq_abs(x, x);
         mpq_mul(y, x, y);
         fmpq_poly_content(z, f);
-        
+
         result = (mpq_equal(y, z));
         if (!result)
         {

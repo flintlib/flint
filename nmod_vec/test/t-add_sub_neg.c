@@ -30,75 +30,78 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("add/sub/neg....");
-   fflush(stdout);
-   
-   // check (a + b) - b == a
-   for (i = 0; i < 10000; i++) 
-   {
-      long len = n_randint(100) + 1;
-	  nmod_t mod;
-	  mp_limb_t n = n_randtest_not_zero();
-      
-	  mp_ptr vec = nmod_vec_init(len);
-	  mp_ptr vec2 = nmod_vec_init(len);
-	  mp_ptr vec3 = nmod_vec_init(len);
+    int i, result;
+    printf("add/sub/neg....");
+    fflush(stdout);
 
-	  nmod_init(&mod, n);
+    // check (a + b) - b == a
+    for (i = 0; i < 10000; i++)
+    {
+        long len = n_randint(100) + 1;
+        nmod_t mod;
+        mp_limb_t n = n_randtest_not_zero();
 
-      _nmod_vec_randtest(vec, len, mod);
-      _nmod_vec_randtest(vec2, len, mod);
+        mp_ptr vec = nmod_vec_init(len);
+        mp_ptr vec2 = nmod_vec_init(len);
+        mp_ptr vec3 = nmod_vec_init(len);
 
-	  _nmod_vec_add(vec3, vec, vec2, len, mod);
-	  _nmod_vec_sub(vec3, vec3, vec2, len, mod);
-	  
-	  if (!_nmod_vec_equal(vec, vec3, len))
-	  {
-	     printf("FAIL\n");
-		 printf("len = %ld, n = %ld\n", len, n);
-		 abort();
-	  }
+        nmod_init(&mod, n);
 
-	  nmod_vec_free(vec);
-	  nmod_vec_free(vec2);
-	  nmod_vec_free(vec3);
-   }
+        _nmod_vec_randtest(vec, len, mod);
+        _nmod_vec_randtest(vec2, len, mod);
 
-   // check (a + -b) == a - b
-   for (i = 0; i < 10000; i++) 
-   {
-      long len = n_randint(100) + 1;
-	  mp_limb_t n = n_randtest_not_zero();
-	  nmod_t mod;
-      
-	  mp_ptr vec = nmod_vec_init(len);
-	  mp_ptr vec2 = nmod_vec_init(len);
-	  mp_ptr vec3 = nmod_vec_init(len);
+        _nmod_vec_add(vec3, vec, vec2, len, mod);
+        _nmod_vec_sub(vec3, vec3, vec2, len, mod);
 
-	  nmod_init(&mod, n);
+        result = _nmod_vec_equal(vec, vec3, len);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("len = %ld, n = %ld\n", len, n);
+            abort();
+        }
 
-      _nmod_vec_randtest(vec, len, mod);
-      _nmod_vec_randtest(vec2, len, mod);
+        nmod_vec_free(vec);
+        nmod_vec_free(vec2);
+        nmod_vec_free(vec3);
+    }
 
-	  _nmod_vec_sub(vec3, vec, vec2, len, mod);
-	  _nmod_vec_neg(vec2, vec2, len, mod);
-	  _nmod_vec_add(vec, vec, vec2, len, mod);
-	  
-	  if (!_nmod_vec_equal(vec, vec3, len))
-	  {
-	     printf("FAIL\n");
-		 printf("len = %ld, n = %ld\n", len, n);
-		 abort();
-	  }
+    // check (a + -b) == a - b
+    for (i = 0; i < 10000; i++)
+    {
+        long len = n_randint(100) + 1;
+        mp_limb_t n = n_randtest_not_zero();
+        nmod_t mod;
 
-	  nmod_vec_free(vec);
-	  nmod_vec_free(vec2);
-	  nmod_vec_free(vec3);
-   }
+        mp_ptr vec = nmod_vec_init(len);
+        mp_ptr vec2 = nmod_vec_init(len);
+        mp_ptr vec3 = nmod_vec_init(len);
 
-   printf("PASS\n");
-   return 0;
+        nmod_init(&mod, n);
+
+        _nmod_vec_randtest(vec, len, mod);
+        _nmod_vec_randtest(vec2, len, mod);
+
+        _nmod_vec_sub(vec3, vec, vec2, len, mod);
+        _nmod_vec_neg(vec2, vec2, len, mod);
+        _nmod_vec_add(vec, vec, vec2, len, mod);
+
+        result = _nmod_vec_equal(vec, vec3, len);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("len = %ld, n = %ld\n", len, n);
+            abort();
+        }
+
+        nmod_vec_free(vec);
+        nmod_vec_free(vec2);
+        nmod_vec_free(vec3);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

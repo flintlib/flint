@@ -30,190 +30,191 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("divexact....");
-   fflush(stdout);
+    int i, result;
+    printf("divexact....");
+    fflush(stdout);
 
-   fmpz_randinit();
+    fmpz_randinit();
 
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b, c;
-      mpz_t d, e, f, g;
-      
-      fmpz_init(a);
-      fmpz_init(b);
-      fmpz_init(c);
-      
-      mpz_init(d);
-      mpz_init(e);
-      mpz_init(f);
-      mpz_init(g);
-      
-      fmpz_randtest(a, 200);
-      fmpz_randtest_not_zero(b, 200);
-      fmpz_mul(c, a, b);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b, c;
+        mpz_t d, e, f, g;
 
-      fmpz_get_mpz(d, b);
-      fmpz_get_mpz(e, c);
-      
-      fmpz_divexact(a, c, b);
-      mpz_divexact(f, e, d);
-      
-      fmpz_get_mpz(g, a);
-         
-      result = (mpz_cmp(f, g) == 0);
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
 
-      if (!result)
-      {
-         printf("FAIL:\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-         abort();
-      }
+        mpz_init(d);
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
 
-      fmpz_clear(a);
-      fmpz_clear(b);
-      fmpz_clear(c);
-      
-      mpz_clear(d);
-      mpz_clear(e);
-      mpz_clear(f);
-      mpz_clear(g);
-   }
+        fmpz_randtest(a, 200);
+        fmpz_randtest_not_zero(b, 200);
+        fmpz_mul(c, a, b);
 
-   // check aliasing of a and b
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b, c;
-      mpz_t d, e, f, g;
-      
-      fmpz_init(a);
-      fmpz_init(c);
-      
-      mpz_init(d);
-      mpz_init(f);
-      mpz_init(g);
-      
-      fmpz_randtest_not_zero(a, 200);
-      
-      fmpz_get_mpz(d, a);
-      
-      fmpz_divexact(c, a, a);
-      mpz_divexact(f, d, d);
-      
-      fmpz_get_mpz(g, c);
-         
-      result = (mpz_cmp(f, g) == 0);
+        fmpz_get_mpz(d, b);
+        fmpz_get_mpz(e, c);
 
-      if (!result)
-      {
-         printf("FAIL:\n");
-         gmp_printf("d = %Zd, f = %Zd, g = %Zd\n", d, f, g);
-         abort();
-      }
+        fmpz_divexact(a, c, b);
+        mpz_divexact(f, e, d);
 
-      fmpz_clear(a);
-      fmpz_clear(c);
-      
-      mpz_clear(d);
-      mpz_clear(f);
-      mpz_clear(g);
-   }
+        fmpz_get_mpz(g, a);
 
-   // test aliasing of a and c
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b, c;
-      mpz_t d, e, f, g;
-      
-      fmpz_init(a);
-      fmpz_init(b);
-      fmpz_init(c);
-      
-      mpz_init(d);
-      mpz_init(e);
-      mpz_init(f);
-      mpz_init(g);
-      
-      fmpz_randtest(a, 200);
-      fmpz_randtest_not_zero(b, 200);
-      fmpz_mul(c, a, b);
+        result = (mpz_cmp(f, g) == 0);
 
-      fmpz_get_mpz(d, c);
-      fmpz_get_mpz(e, b);
-      
-      fmpz_divexact(c, c, b);
-      mpz_divexact(f, d, e);
-      
-      fmpz_get_mpz(g, c);
-         
-      result = (mpz_cmp(f, g) == 0);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-         abort();
-      }
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
+            abort();
+        }
 
-      fmpz_clear(a);
-      fmpz_clear(b);
-      fmpz_clear(c);
-      
-      mpz_clear(d);
-      mpz_clear(e);
-      mpz_clear(f);
-      mpz_clear(g);
-   }
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
 
-   // test aliasing of b and c
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b, c;
-      mpz_t d, e, f, g;
-      
-      fmpz_init(a);
-      fmpz_init(b);
-      fmpz_init(c);
-      
-      mpz_init(d);
-      mpz_init(e);
-      mpz_init(f);
-      mpz_init(g);
-      
-      fmpz_randtest(a, 200);
-      fmpz_randtest_not_zero(b, 200);
-      fmpz_mul(c, a, b);
+        mpz_clear(d);
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+    }
 
-      fmpz_get_mpz(d, c);
-      fmpz_get_mpz(e, b);
-      
-      fmpz_divexact(b, c, b);
-      mpz_divexact(f, d, e);
-      
-      fmpz_get_mpz(g, b);
-         
-      result = (mpz_cmp(f, g) == 0);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
-         abort();
-      }
+    // check aliasing of a and b
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, c;
+        mpz_t d, f, g;
 
-      fmpz_clear(a);
-      fmpz_clear(b);
-      fmpz_clear(c);
-      
-      mpz_clear(d);
-      mpz_clear(e);
-      mpz_clear(f);
-      mpz_clear(g);
-   }
+        fmpz_init(a);
+        fmpz_init(c);
 
-   fmpz_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        mpz_init(d);
+        mpz_init(f);
+        mpz_init(g);
+
+        fmpz_randtest_not_zero(a, 200);
+
+        fmpz_get_mpz(d, a);
+
+        fmpz_divexact(c, a, a);
+        mpz_divexact(f, d, d);
+
+        fmpz_get_mpz(g, c);
+
+        result = (mpz_cmp(f, g) == 0);
+
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, f = %Zd, g = %Zd\n", d, f, g);
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(c);
+
+        mpz_clear(d);
+        mpz_clear(f);
+        mpz_clear(g);
+    }
+
+    // test aliasing of a and c
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b, c;
+        mpz_t d, e, f, g;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+
+        mpz_init(d);
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
+
+        fmpz_randtest(a, 200);
+        fmpz_randtest_not_zero(b, 200);
+        fmpz_mul(c, a, b);
+
+        fmpz_get_mpz(d, c);
+        fmpz_get_mpz(e, b);
+
+        fmpz_divexact(c, c, b);
+        mpz_divexact(f, d, e);
+
+        fmpz_get_mpz(g, c);
+
+        result = (mpz_cmp(f, g) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+
+        mpz_clear(d);
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+    }
+
+    // test aliasing of b and c
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b, c;
+        mpz_t d, e, f, g;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+
+        mpz_init(d);
+        mpz_init(e);
+        mpz_init(f);
+        mpz_init(g);
+
+        fmpz_randtest(a, 200);
+        fmpz_randtest_not_zero(b, 200);
+        fmpz_mul(c, a, b);
+
+        fmpz_get_mpz(d, c);
+        fmpz_get_mpz(e, b);
+
+        fmpz_divexact(b, c, b);
+        mpz_divexact(f, d, e);
+
+        fmpz_get_mpz(g, b);
+
+        result = (mpz_cmp(f, g) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, g = %Zd\n", d, e, f, g);
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+
+        mpz_clear(d);
+        mpz_clear(e);
+        mpz_clear(f);
+        mpz_clear(g);
+    }
+
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

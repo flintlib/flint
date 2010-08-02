@@ -31,117 +31,124 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("mullow_classical....");
-   fflush(stdout);
-   
-   // check aliasing of a and b
-   for (i = 0; i < 2000; i++) 
-   {
-      nmod_poly_t a, b, c;
-      long len, trunc;
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-      
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length);
-      
-	  nmod_poly_mullow_classical(a, b, c, trunc);
-      nmod_poly_mullow_classical(b, b, c, trunc);
-      
-      result = (nmod_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         nmod_poly_print(a), printf("\n\n");
-         nmod_poly_print(b), printf("\n\n");
-         abort();
-      }
+    int i, result;
+    printf("mullow_classical....");
+    fflush(stdout);
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
+    // check aliasing of a and b
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c;
+        long len, trunc;
+        mp_limb_t n = n_randtest_not_zero();
 
-   // check aliasing of a and c
-   for (i = 0; i < 2000; i++) 
-   {
-      nmod_poly_t a, b, c;
-      long len, trunc;
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length - 1);
-	  
-	  nmod_poly_mullow_classical(a, b, c, trunc);
-      nmod_poly_mullow_classical(c, b, c, trunc);
-      
-      result = (nmod_poly_equal(a, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         nmod_poly_print(a), printf("\n\n");
-         nmod_poly_print(c), printf("\n\n");
-         abort();
-      }
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length);
 
-   // compare with mul_basecase
-   for (i = 0; i < 2000; i++) 
-   {
-      nmod_poly_t a, b, c, d;
-      long len, trunc;
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_init(d, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length - 1);
-	  
-	  nmod_poly_mul_classical(a, b, c);
-      nmod_poly_truncate(a, trunc);
-	  nmod_poly_mullow_classical(d, b, c, trunc);
-      
-      result = (nmod_poly_equal(a, d));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         nmod_poly_print(a), printf("\n\n");
-         nmod_poly_print(d), printf("\n\n");
-         abort();
-      }
+        nmod_poly_mullow_classical(a, b, c, trunc);
+        nmod_poly_mullow_classical(b, b, c, trunc);
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-      nmod_poly_clear(d);
-   }
+        result = (nmod_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            abort();
+        }
 
-   printf("PASS\n");
-   return 0;
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    // check aliasing of a and c
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c;
+        long len, trunc;
+        mp_limb_t n = n_randtest_not_zero();
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length - 1);
+
+        nmod_poly_mullow_classical(a, b, c, trunc);
+        nmod_poly_mullow_classical(c, b, c, trunc);
+
+        result = (nmod_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    // compare with mul_basecase
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c, d;
+        long len, trunc;
+        mp_limb_t n = n_randtest_not_zero();
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length - 1);
+
+        nmod_poly_mul_classical(a, b, c);
+        nmod_poly_truncate(a, trunc);
+        nmod_poly_mullow_classical(d, b, c, trunc);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(d), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

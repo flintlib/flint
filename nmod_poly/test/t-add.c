@@ -30,72 +30,73 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("add....");
-   fflush(stdout);
-   
-   // check aliasing of a and c
-   for (i = 0; i < 10000; i++) 
-   {
-      nmod_poly_t a, b, c;
-      mp_limb_t n = n_randtest_not_zero();
+    int i, result;
+    printf("add....");
+    fflush(stdout);
 
-	  nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(a, n_randint(100));
-      nmod_poly_randtest(b, n_randint(100));
-      
-      nmod_poly_add(c, a, b);
-      nmod_poly_add(a, a, b);
+    // check aliasing of a and c
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a, b, c;
+        mp_limb_t n = n_randtest_not_zero();
 
-      result = (nmod_poly_equal(a, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         nmod_poly_print(a), printf("\n\n");
-         nmod_poly_print(b), printf("\n\n");
-         nmod_poly_print(c), printf("\n\n");
-         abort();
-      }
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(b, n_randint(100));
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
+        nmod_poly_add(c, a, b);
+        nmod_poly_add(a, a, b);
 
-   // check aliasing of b and c
-   for (i = 0; i < 10000; i++) 
-   {
-      nmod_poly_t a, b, c;
-	  mp_limb_t n = n_randtest_not_zero();
+        result = (nmod_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
+            abort();
+        }
 
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(a, n_randint(100));
-      nmod_poly_randtest(b, n_randint(100));
-      
-      nmod_poly_add(c, a, b);
-      nmod_poly_add(b, a, b);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
 
-      result = (nmod_poly_equal(b, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         nmod_poly_print(a), printf("\n\n");
-         nmod_poly_print(b), printf("\n\n");
-         nmod_poly_print(c), printf("\n\n");
-         abort();
-      }
+    // check aliasing of b and c
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a, b, c;
+        mp_limb_t n = n_randtest_not_zero();
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(b, n_randint(100));
 
-   printf("PASS\n");
-   return 0;
+        nmod_poly_add(c, a, b);
+        nmod_poly_add(b, a, b);
+
+        result = (nmod_poly_equal(b, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

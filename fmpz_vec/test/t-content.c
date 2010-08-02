@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a, c, d;
-        fmpz * f;
+        fmpz *f;
         long len = n_randint(100);
 
         fmpz_init(a);

@@ -42,14 +42,14 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        fmpz * a;
+        fmpz *a;
         long len, bits;
         mp_size_t limbs, limbs2;
 
         len = n_randint(100);
 
         a = _fmpz_vec_init(len);
-        bits  = n_randint(200);
+        bits = n_randint(200);
         limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
         _fmpz_vec_randtest(a, len, bits);
 

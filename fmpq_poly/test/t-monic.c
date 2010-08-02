@@ -49,10 +49,10 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        
+
         fmpq_poly_monic(g, f);
         fmpq_poly_monic(f, f);
-        
+
         result = (fmpq_poly_equal(f, g));
         if (!result)
         {
@@ -73,9 +73,9 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_randtest_not_zero(f, n_randint(100) + 1, n_randint(200) + 1);
-        
+
         fmpq_poly_monic(f, f);
-        
+
         result = (fmpq_poly_is_monic(f));
         if (!result)
         {

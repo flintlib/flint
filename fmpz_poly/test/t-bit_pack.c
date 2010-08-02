@@ -31,89 +31,100 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("bit_pack/bit_unpack....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   for (i = 0; i < 20000; i++) 
-   {
-      fmpz_poly_t a, b;
+    int i, result;
+    printf("bit_pack/bit_unpack....");
+    fflush(stdout);
 
-	  long length      = n_randint(100) + 1;
-	  mp_bitcnt_t bits = n_randint(300) + 2;
-      mp_ptr arr  = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
-                                    sizeof(mp_limb_t));
-      int negate;
+    fmpz_poly_randinit();
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      
-	  do { fmpz_poly_randtest(a, length, bits - 1); } // -1 bit to handle signs
-      while (a->length == 0);
+    for (i = 0; i < 20000; i++)
+    {
+        fmpz_poly_t a, b;
 
-	  negate = fmpz_sgn(a->coeffs + a->length - 1);
-	  if (negate > 0)
-	     negate = 0;
+        long length = n_randint(100) + 1;
+        mp_bitcnt_t bits = n_randint(300) + 2;
+        mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+                                     sizeof(mp_limb_t));
+        int negate;
 
-      _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, negate);
-      fmpz_poly_fit_length(b, a->length);
-	  _fmpz_poly_bit_unpack(b->coeffs, a->length, arr, bits, negate);
-      _fmpz_poly_set_length(b, a->length);
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
 
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
-         abort();
-      }
+        do
+        {
+            fmpz_poly_randtest(a, length, bits - 1);
+        }                       // -1 bit to handle signs
+        while (a->length == 0);
 
-      free(arr);
-	  fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-   }
+        negate = fmpz_sgn(a->coeffs + a->length - 1);
+        if (negate > 0)
+            negate = 0;
 
-   for (i = 0; i < 20000; i++) 
-   {
-      fmpz_poly_t a, b;
+        _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, negate);
+        fmpz_poly_fit_length(b, a->length);
+        _fmpz_poly_bit_unpack(b->coeffs, a->length, arr, bits, negate);
+        _fmpz_poly_set_length(b, a->length);
 
-	  long length = n_randint(100) + 1;
-	  mp_bitcnt_t bits = n_randint(300) + 1;
-      mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
-                                   sizeof(mp_limb_t));
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      
-	  do { fmpz_poly_randtest_unsigned(a, length, bits); } 
-      while (a->length == 0);
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a);
+            printf("\n\n");
+            fmpz_poly_print(b);
+            printf("\n\n");
+            abort();
+        }
 
-	  _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, 0);
-      fmpz_poly_fit_length(b, a->length);
-	  _fmpz_poly_bit_unpack_unsigned(b->coeffs, a->length, arr, bits);
-      _fmpz_poly_set_length(b, a->length);
+        free(arr);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+    }
 
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
-         abort();
-      }
+    for (i = 0; i < 20000; i++)
+    {
+        fmpz_poly_t a, b;
 
-      free(arr);
-	  fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-   }
+        long length = n_randint(100) + 1;
+        mp_bitcnt_t bits = n_randint(300) + 1;
+        mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+                                     sizeof(mp_limb_t));
 
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+
+        do
+        {
+            fmpz_poly_randtest_unsigned(a, length, bits);
+        }
+        while (a->length == 0);
+
+        _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, 0);
+        fmpz_poly_fit_length(b, a->length);
+        _fmpz_poly_bit_unpack_unsigned(b->coeffs, a->length, arr, bits);
+        _fmpz_poly_set_length(b, a->length);
+
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a);
+            printf("\n\n");
+            fmpz_poly_print(b);
+            printf("\n\n");
+            abort();
+        }
+
+        free(arr);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

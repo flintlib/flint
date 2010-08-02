@@ -30,44 +30,45 @@
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/init2/realloc/clear....");
-   fflush(stdout);
+    int i;
+    printf("init/init2/realloc/clear....");
+    fflush(stdout);
 
-   mpfr_poly_randinit();
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      mpfr_poly_t a;
+    mpfr_poly_randinit();
 
-      mpfr_poly_init(a, n_randint(100)+ MPFR_PREC_MIN);
-      mpfr_poly_clear(a);      
-   }
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      mpfr_poly_t a;
+    for (i = 0; i < 10000; i++)
+    {
+        mpfr_poly_t a;
 
-      mpfr_poly_init2(a, n_randint(100), n_randint(100) + MPFR_PREC_MIN);
-      mpfr_poly_realloc(a, n_randint(100));
-      mpfr_poly_realloc(a, n_randint(100));
-      mpfr_poly_clear(a);
-   }
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      mpfr_poly_t a;
-      ulong prec = n_randint(100) + MPFR_PREC_MIN;
+        mpfr_poly_init(a, n_randint(100) + MPFR_PREC_MIN);
+        mpfr_poly_clear(a);
+    }
 
-      mpfr_poly_init(a, prec);
-      mpfr_poly_randtest(a, n_randint(100));
-      
-      mpfr_poly_clear(a);
-   }
-   
-   mpfr_poly_randclear();
-   printf("PASS\n");
-   return 0;
+    for (i = 0; i < 10000; i++)
+    {
+        mpfr_poly_t a;
+
+        mpfr_poly_init2(a, n_randint(100), n_randint(100) + MPFR_PREC_MIN);
+        mpfr_poly_realloc(a, n_randint(100));
+        mpfr_poly_realloc(a, n_randint(100));
+        mpfr_poly_clear(a);
+    }
+
+    for (i = 0; i < 10000; i++)
+    {
+        mpfr_poly_t a;
+        ulong prec = n_randint(100) + MPFR_PREC_MIN;
+
+        mpfr_poly_init(a, prec);
+        mpfr_poly_randtest(a, n_randint(100));
+
+        mpfr_poly_clear(a);
+    }
+
+    mpfr_poly_randclear();
+    printf("PASS\n");
+    return 0;
 }

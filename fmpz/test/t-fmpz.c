@@ -30,35 +30,36 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("fmpz....");
-   fflush(stdout);
-   
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b;
+    int i, result;
+    printf("fmpz....");
+    fflush(stdout);
 
-      *a = 0L;
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
 
-      fmpz_randtest(a, FLINT_BITS-2);
-      
-      *b = *a;
+        *a = 0L;
 
-      _fmpz_promote_val(a);
-      _fmpz_demote_val(a);
+        fmpz_randtest(a, FLINT_BITS - 2);
 
-      result = (*b == *a);
-      
-      if (!result)
-      {
-         printf("FAIL\n");
-         abort();
-      }
-   }
+        *b = *a;
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        _fmpz_promote_val(a);
+        _fmpz_demote_val(a);
+
+        result = (*b == *a);
+
+        if (!result)
+        {
+            printf("FAIL\n");
+            abort();
+        }
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

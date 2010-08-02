@@ -37,7 +37,7 @@ int main(void)
  
    for (i = 0; i < 100000; i++) /* Test random numbers */
    {
-      mp_limb_t n1, n2, p, orig_n;
+      mp_limb_t n1, n2, orig_n;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2;
       ulong j;
@@ -73,7 +73,7 @@ int main(void)
          
    for (i = 0; i < 100000; i++) /* Test perfect powers */
    {
-      mp_limb_t n1, n2, p, orig_n, base;
+      mp_limb_t n1, n2, orig_n, base;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2, exp;
       ulong j;

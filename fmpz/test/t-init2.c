@@ -30,34 +30,35 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/init2/clear....");
-   fflush(stdout);
-   
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a;
+    int i;
+    printf("init/init2/clear....");
+    fflush(stdout);
 
-      fmpz_init2(a, n_randint(100));
-      fmpz_clear(a);      
-   }
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
 
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a;
+        fmpz_init2(a, n_randint(100));
+        fmpz_clear(a);
+    }
 
-      fmpz_init(a);
-      fmpz_randtest(a, FLINT_BITS-2);
-      
-      _fmpz_promote_val(a);
-      _fmpz_demote_val(a);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
 
-      fmpz_clear(a);
-   }
+        fmpz_init(a);
+        fmpz_randtest(a, FLINT_BITS - 2);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        _fmpz_promote_val(a);
+        _fmpz_demote_val(a);
+
+        fmpz_clear(a);
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

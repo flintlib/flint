@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    
+
     printf("evaluate_fmpz....");
     fflush(stdout);
 
@@ -88,7 +88,7 @@ main(void)
     // Check that (f*g)(a) = f(a) * g(a)
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t a, b, c;
+        fmpz_t a;
         fmpq_poly_t f, g;
         mpq_t x, y;
 

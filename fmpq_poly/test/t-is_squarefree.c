@@ -48,7 +48,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_randtest(f, n_randint(2), n_randint(200));
-        
+
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
         {
@@ -71,10 +71,10 @@ main(void)
             continue;
         fmpq_poly_init(f);
         fmpq_poly_randtest_not_zero(f, n_randint(50) + 1, n_randint(100) + 1);
-        
+
         fmpq_poly_mul(a, a, a);
         fmpq_poly_mul(f, a, f);
-        
+
         result = (!fmpq_poly_is_squarefree(f));
         if (!result)
         {

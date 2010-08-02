@@ -31,30 +31,30 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/clear....");
-   fflush(stdout);
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_mat_t a;
-      long j, k;
-	  
-      long rows = n_randint(100);
-      long cols = n_randint(100);
+    int i;
+    printf("init/clear....");
+    fflush(stdout);
 
-      fmpz_mat_init(a, rows, cols);
-      
-      for (j = 0; j < rows; j++)
-         for (k = 0; k < cols; k++)
-            fmpz_zero(a->rows[j] + k);
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_mat_t a;
+        long j, k;
+        long rows = n_randint(100);
+        long cols = n_randint(100);
 
-      fmpz_mat_clear(a);
-   }
+        fmpz_mat_init(a, rows, cols);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        for (j = 0; j < rows; j++)
+            for (k = 0; k < cols; k++)
+                fmpz_zero(a->rows[j] + k);
+
+        fmpz_mat_clear(a);
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

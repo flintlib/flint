@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    int i, result;
+    int i;
     printf("init/clear....");
     fflush(stdout);
     _fmpz_vec_randinit();

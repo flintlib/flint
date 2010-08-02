@@ -79,7 +79,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_randtest(b, n_randint(100), n_randint(200));
         n = n_randint(150);
-        
+
         len = FLINT_MIN(n, b->length);
         if (len)
         {
@@ -89,7 +89,7 @@ main(void)
             _fmpz_poly_set_length(a, n);
             _fmpz_poly_normalise(a);
         }
-        
+
         fmpz_poly_reverse(b, b, n);
 
         result = (fmpz_poly_equal(a, b));

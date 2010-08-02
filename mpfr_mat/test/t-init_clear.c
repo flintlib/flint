@@ -31,29 +31,30 @@
 #include "mpfr_mat.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/clear....");
-   fflush(stdout);
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      mpfr_mat_t a;
-      long j, k;
-      long rows = n_randint(100);
-      long cols = n_randint(100);
-      mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
+    int i;
+    printf("init/clear....");
+    fflush(stdout);
 
-      mpfr_mat_init(a, rows, cols, prec);
-      
-      for (j = 0; j < rows; j++)
-         for (k = 0; k < cols; k++)
-            mpfr_set_ui(a->rows[j] + k, 0, GMP_RNDN);
+    for (i = 0; i < 10000; i++)
+    {
+        mpfr_mat_t a;
+        long j, k;
+        long rows = n_randint(100);
+        long cols = n_randint(100);
+        mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
 
-      mpfr_mat_clear(a);
-   }
+        mpfr_mat_init(a, rows, cols, prec);
 
-   printf("PASS\n");
-   return 0;
+        for (j = 0; j < rows; j++)
+            for (k = 0; k < cols; k++)
+                mpfr_set_ui(a->rows[j] + k, 0, GMP_RNDN);
+
+        mpfr_mat_clear(a);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

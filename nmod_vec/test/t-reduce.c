@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,43 +30,45 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("reduce....");
-   fflush(stdout);
-   
-   for (i = 0; i < 10000; i++) 
-   {
-	  long j, len = n_randint(100) + 1;
-	  mp_ptr vec = nmod_vec_init(len);
-	  mp_ptr vec2 = nmod_vec_init(len);
+    int i, result;
+    printf("reduce....");
+    fflush(stdout);
 
-	  mp_limb_t n = n_randtest_not_zero();
-	  nmod_t mod;
-	  nmod_init(&mod, n);
+    for (i = 0; i < 10000; i++)
+    {
+        long j, len = n_randint(100) + 1;
+        mp_ptr vec = nmod_vec_init(len);
+        mp_ptr vec2 = nmod_vec_init(len);
 
-      for (j = 0; j < len; j++)
-	  {
-	     vec[j] = n_randtest();
-		 vec2[j] = vec[j];
-	  }
+        mp_limb_t n = n_randtest_not_zero();
+        nmod_t mod;
+        nmod_init(&mod, n);
 
-	  _nmod_vec_reduce(vec, vec, len, mod);
-	  for (j = 0; j < len; j++)
-	     vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
+        for (j = 0; j < len; j++)
+        {
+            vec[j] = n_randtest();
+            vec2[j] = vec[j];
+        }
 
-	  if (!_nmod_vec_equal(vec, vec2, len))
-	  {
-	     printf("FAIL\n");
-		 printf("len = %ld, n = %ld\n", len, n);
-		 abort();
-	  }
+        _nmod_vec_reduce(vec, vec, len, mod);
+        for (j = 0; j < len; j++)
+            vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
 
-	  nmod_vec_free(vec);
-	  nmod_vec_free(vec2);
-   }
+        result = _nmod_vec_equal(vec, vec2, len);
+        if (!_nmod_vec_equal(vec, vec2, len))
+        {
+            printf("FAIL:\n");
+            printf("len = %ld, n = %ld\n", len, n);
+            abort();
+        }
 
-   printf("PASS\n");
-   return 0;
+        nmod_vec_free(vec);
+        nmod_vec_free(vec2);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

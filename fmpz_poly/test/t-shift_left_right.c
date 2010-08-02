@@ -31,99 +31,100 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("shift_left/right....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   // check aliasing of a and b for left shift
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b;
-      long shift = n_randint(100);
+    int i, result;
+    printf("shift_left/right....");
+    fflush(stdout);
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-      
-      fmpz_poly_shift_left(b, a, shift);
-      fmpz_poly_shift_left(a, a, shift);
-      
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         abort();
-      }
+    fmpz_poly_randinit();
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-   }
+    // check aliasing of a and b for left shift
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b;
+        long shift = n_randint(100);
 
-   // check aliasing of a and b for right shift
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b;
-      long shift;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_randtest_not_zero(a, n_randint(100) + 1, n_randint(200) + 1);
-      
-      shift = n_randint(a->length);
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
 
-      fmpz_poly_shift_right(b, a, shift);
-      fmpz_poly_shift_right(a, a, shift);
-      
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         abort();
-      }
+        fmpz_poly_shift_left(b, a, shift);
+        fmpz_poly_shift_left(a, a, shift);
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-   }
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
 
-   // check shift left then right does nothing
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      long shift = n_randint(100);
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+    }
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-      
-      fmpz_poly_shift_left(b, a, shift);
-      fmpz_poly_shift_right(c, b, shift);
-      
-      result = (fmpz_poly_equal(c, a));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         fmpz_poly_print(c), printf("\n\n");
-         abort();
-      }
+    // check aliasing of a and b for right shift
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b;
+        long shift;
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_randtest_not_zero(a, n_randint(100) + 1, n_randint(200) + 1);
 
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        shift = n_randint(a->length);
+
+        fmpz_poly_shift_right(b, a, shift);
+        fmpz_poly_shift_right(a, a, shift);
+
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+    }
+
+    // check shift left then right does nothing
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b, c;
+        long shift = n_randint(100);
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+
+        fmpz_poly_shift_left(b, a, shift);
+        fmpz_poly_shift_right(c, b, shift);
+
+        result = (fmpz_poly_equal(c, a));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

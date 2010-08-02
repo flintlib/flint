@@ -30,47 +30,49 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("scalar_addmul....");
-   fflush(stdout);
-   
-   // check (a + b*c) == a + (b*c)
-   for (i = 0; i < 10000; i++) 
-   {
-      long len = n_randint(100) + 1;
-	  mp_limb_t n = n_randtest_not_zero();
-	  mp_limb_t c = n_randint(n);
-	  nmod_t mod;
-      
-	  mp_ptr vec = nmod_vec_init(len);
-	  mp_ptr vec2 = nmod_vec_init(len);
-	  mp_ptr vec3 = nmod_vec_init(len);
+    int i, result;
+    printf("scalar_addmul....");
+    fflush(stdout);
 
-	  nmod_init(&mod, n);
+    // check (a + b*c) == a + (b*c)
+    for (i = 0; i < 10000; i++)
+    {
+        long len = n_randint(100) + 1;
+        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t c = n_randint(n);
+        nmod_t mod;
 
-      _nmod_vec_randtest(vec, len, mod);
-      _nmod_vec_randtest(vec2, len, mod);
-      mpn_copyi(vec3, vec2, len);
+        mp_ptr vec = nmod_vec_init(len);
+        mp_ptr vec2 = nmod_vec_init(len);
+        mp_ptr vec3 = nmod_vec_init(len);
 
-	  _nmod_vec_scalar_mul(vec3, vec, len, mod, c);
-      _nmod_vec_add(vec3, vec3, vec2, len, mod);
-	  
-	  _nmod_vec_scalar_addmul(vec2, vec, len, mod, c);
-	  
-	  if (!_nmod_vec_equal(vec2, vec3, len))
-	  {
-	     printf("FAIL\n");
-		 printf("len = %ld, n = %ld\n", len, n);
-		 abort();
-	  }
+        nmod_init(&mod, n);
 
-	  nmod_vec_free(vec);
-	  nmod_vec_free(vec2);
-	  nmod_vec_free(vec3);
-   }
+        _nmod_vec_randtest(vec, len, mod);
+        _nmod_vec_randtest(vec2, len, mod);
+        mpn_copyi(vec3, vec2, len);
 
-   printf("PASS\n");
-   return 0;
+        _nmod_vec_scalar_mul(vec3, vec, len, mod, c);
+        _nmod_vec_add(vec3, vec3, vec2, len, mod);
+
+        _nmod_vec_scalar_addmul(vec2, vec, len, mod, c);
+
+        result = _nmod_vec_equal(vec2, vec3, len);
+        if (!_nmod_vec_equal(vec2, vec3, len))
+        {
+            printf("FAIL:\n");
+            printf("len = %ld, n = %ld\n", len, n);
+            abort();
+        }
+
+        nmod_vec_free(vec);
+        nmod_vec_free(vec2);
+        nmod_vec_free(vec3);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

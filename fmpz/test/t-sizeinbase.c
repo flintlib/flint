@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_t a;
         mpz_t b;
-        int j, base;
+        int base;
         size_t r1, r2;
 
         fmpz_init(a);

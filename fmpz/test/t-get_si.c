@@ -30,36 +30,37 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("get/set_si....");
-   fflush(stdout);
-   
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a;
-      long b, c;
+    int i, result;
+    printf("get/set_si....");
+    fflush(stdout);
 
-      b = (long) n_randtest();
-      
-      fmpz_init(a);
-      
-      fmpz_set_si(a, b);
-      c = fmpz_get_si(a);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        long b, c;
 
-      result = (b == c);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         printf("b = %ld, c = %ld\n", b, c);
-         abort();
-      }
+        b = (long) n_randtest();
 
-      fmpz_clear(a);
-   }
+        fmpz_init(a);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_set_si(a, b);
+        c = fmpz_get_si(a);
+
+        result = (b == c);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("b = %ld, c = %ld\n", b, c);
+            abort();
+        }
+
+        fmpz_clear(a);
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

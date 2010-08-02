@@ -35,44 +35,44 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
     int i, result;
 
-    printf ("neg....");
-    fflush (stdout);
+    printf("neg....");
+    fflush(stdout);
 
-    fmpq_poly_randinit ();
+    fmpq_poly_randinit();
 
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_init (c);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
 
-        fmpq_poly_neg (b, a);
-        fmpq_poly_neg (c, b);
+        fmpq_poly_neg(b, a);
+        fmpq_poly_neg(c, b);
 
-        result = (fmpq_poly_equal (a, c));
+        result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a), printf ("\n\n");
-            fmpq_poly_print (b), printf ("\n\n");
-            fmpq_poly_print (c), printf ("\n\n");
-            abort ();
+            printf("Error:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
-        fmpq_poly_clear (c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear ();
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    fmpq_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

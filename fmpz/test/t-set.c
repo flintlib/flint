@@ -30,53 +30,55 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("set....");
-   fflush(stdout);
+    int i, result;
+    printf("set....");
+    fflush(stdout);
 
-   gmp_randstate_t state;
-   gmp_randinit_default(state);
-   
-   for (i = 0; i < 100000; i++) 
-   {
-      fmpz_t a, b;
-      mpz_t c, d;
-      mp_bitcnt_t bits;
+    gmp_randstate_t state;
+    gmp_randinit_default(state);
 
-      mpz_init(c);
-      mpz_init(d);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
+        mpz_t c, d;
+        mp_bitcnt_t bits;
 
-      bits = n_randint(200) + 1;
-      
-      mpz_rrandomb(c, state, bits);
-      if (n_randint(2)) mpz_neg(c, c);
+        mpz_init(c);
+        mpz_init(d);
 
-      fmpz_init(a);
-      fmpz_init(b);
-      
-      fmpz_set_mpz(a, c);
-      fmpz_set(b, a);
-      fmpz_get_mpz(d, b);
-      
-      result = (mpz_cmp(c, d) == 0);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         gmp_printf("c = %Zd, d = %Zd\n", c, d);
-         abort();
-      }
+        bits = n_randint(200) + 1;
 
-      fmpz_clear(a);
-      fmpz_clear(b);
+        mpz_rrandomb(c, state, bits);
+        if (n_randint(2))
+            mpz_neg(c, c);
 
-      mpz_clear(c);
-      mpz_clear(d);
-   }
+        fmpz_init(a);
+        fmpz_init(b);
 
-   gmp_randclear(state);
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_set_mpz(a, c);
+        fmpz_set(b, a);
+        fmpz_get_mpz(d, b);
+
+        result = (mpz_cmp(c, d) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("c = %Zd, d = %Zd\n", c, d);
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+
+        mpz_clear(c);
+        mpz_clear(d);
+    }
+
+    gmp_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

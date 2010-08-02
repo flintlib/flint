@@ -31,119 +31,126 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("mullow_classical....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   // check aliasing of a and b
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      long len, trunc;
+    int i, result;
+    printf("mullow_classical....");
+    fflush(stdout);
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-      
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length);
-      
-	  fmpz_poly_mullow_classical(a, b, c, trunc);
-      fmpz_poly_mullow_classical(b, b, c, trunc);
-      
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         abort();
-      }
+    fmpz_poly_randinit();
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+    // check aliasing of a and b
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
+        long len, trunc;
 
-   // check aliasing of a and c
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      long len;
-	  ulong trunc;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length - 1);
-	  
-	  fmpz_poly_mullow_classical(a, b, c, trunc);
-      fmpz_poly_mullow_classical(c, b, c, trunc);
-      
-      result = (fmpz_poly_equal(a, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(c), printf("\n\n");
-         abort();
-      }
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length);
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+        fmpz_poly_mullow_classical(a, b, c, trunc);
+        fmpz_poly_mullow_classical(b, b, c, trunc);
 
-   // compare with mul_basecase
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c, d;
-      long len, trunc;
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_init(d);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) trunc = 0;
-	  else trunc = n_randint(b->length + c->length - 1);
-	  
-	  fmpz_poly_mul_classical(a, b, c);
-      fmpz_poly_truncate(a, trunc);
-	  fmpz_poly_mullow_classical(d, b, c, trunc);
-      
-      result = (fmpz_poly_equal(a, d));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(d), printf("\n\n");
-         abort();
-      }
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-      fmpz_poly_clear(d);
-   }
+    // check aliasing of a and c
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
+        long len;
+        ulong trunc;
 
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length - 1);
+
+        fmpz_poly_mullow_classical(a, b, c, trunc);
+        fmpz_poly_mullow_classical(c, b, c, trunc);
+
+        result = (fmpz_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    // compare with mul_basecase
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c, d;
+        long len, trunc;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            trunc = 0;
+        else
+            trunc = n_randint(b->length + c->length - 1);
+
+        fmpz_poly_mul_classical(a, b, c);
+        fmpz_poly_truncate(a, trunc);
+        fmpz_poly_mullow_classical(d, b, c, trunc);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(d), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

@@ -52,7 +52,7 @@ main(void)
 
         fmpz_poly_primitive_part(f, g);
         fmpz_poly_primitive_part(g, g);
-        
+
         result = (fmpz_poly_equal(f, g));
         if (!result)
         {
@@ -65,7 +65,7 @@ main(void)
         fmpz_poly_clear(f);
         fmpz_poly_clear(g);
     }
-    
+
     // Check that content(f) primitive_part(f) = sgn(lead(f)) f
     for (i = 0; i < 1000; i++)
     {
@@ -82,7 +82,7 @@ main(void)
             fmpz_neg(c, c);
         fmpz_poly_primitive_part(g, f);
         fmpz_poly_scalar_mul_fmpz(g, g, c);
-        
+
         result = (fmpz_poly_equal(f, g));
         if (!result)
         {

@@ -37,7 +37,7 @@ int main(void)
 
    for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t a, b, d, r1, r2, norm, p1, p2, dinv;
+      mp_limb_t a, b, d, r1, r2, p1, p2, dinv;
       double dpre;
 
       mp_limb_t bits = n_randint(FLINT_D_BITS) + 1;

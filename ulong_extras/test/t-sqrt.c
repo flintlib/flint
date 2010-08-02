@@ -39,7 +39,6 @@ int main(void)
    {
       mp_limb_t a, s1, s2;
       mpz_t a_m, s2_m;
-      mp_limb_signed_t exp;
 
       mpz_init(a_m);
       mpz_init(s2_m);
@@ -68,7 +67,6 @@ int main(void)
    {
       mp_limb_t a, s1, s2, bits;
       mpz_t a_m, s2_m;
-      mp_limb_signed_t exp;
 
       mpz_init(a_m);
       mpz_init(s2_m);

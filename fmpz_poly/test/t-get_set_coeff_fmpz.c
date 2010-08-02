@@ -31,51 +31,52 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, j, result;
-   printf("get/set_coeff_fmpz....");
-   fflush(stdout);
-   
-   fmpz_randinit();
+    int i, j, result;
+    printf("get/set_coeff_fmpz....");
+    fflush(stdout);
 
-   for (i = 0; i < 1000; i++) 
-   {
-      fmpz_poly_t a;
-      fmpz_t x1, x2;
-      long coeff, len;
+    fmpz_randinit();
 
-      fmpz_poly_init(a);
-      fmpz_init(x1);
-      fmpz_init(x2);
-      len = n_randint(100) + 1;
+    for (i = 0; i < 1000; i++)
+    {
+        fmpz_poly_t a;
+        fmpz_t x1, x2;
+        long coeff, len;
 
-      for (j = 0; j < 1000; j++)
-      {
-         fmpz_randtest(x1, 200);
-         coeff = n_randint(len);
-         fmpz_poly_set_coeff_fmpz(a, coeff, x1);
-         fmpz_poly_get_coeff_fmpz(x2, a, coeff);
+        fmpz_poly_init(a);
+        fmpz_init(x1);
+        fmpz_init(x2);
+        len = n_randint(100) + 1;
 
-         result = (fmpz_equal(x1, x2));
-         if (!result)
-         {
-            printf("FAIL: x1 = ");
-            fmpz_print(x1);
-            printf(", x2 = ");
-            fmpz_print(x2);
-            printf(", coeff = %ld, length = %ld\n", coeff, len);
-            abort();
-         }
-      }
+        for (j = 0; j < 1000; j++)
+        {
+            fmpz_randtest(x1, 200);
+            coeff = n_randint(len);
+            fmpz_poly_set_coeff_fmpz(a, coeff, x1);
+            fmpz_poly_get_coeff_fmpz(x2, a, coeff);
 
-      fmpz_clear(x1);
-      fmpz_clear(x2);
-      fmpz_poly_clear(a);      
-   }
-      
-   fmpz_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+            result = (fmpz_equal(x1, x2));
+            if (!result)
+            {
+                printf("FAIL: x1 = ");
+                fmpz_print(x1);
+                printf(", x2 = ");
+                fmpz_print(x2);
+                printf(", coeff = %ld, length = %ld\n", coeff, len);
+                abort();
+            }
+        }
+
+        fmpz_clear(x1);
+        fmpz_clear(x2);
+        fmpz_poly_clear(a);
+    }
+
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

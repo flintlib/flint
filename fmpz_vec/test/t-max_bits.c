@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        fmpz * a;
+        fmpz *a;
         long len, bits, bits2;
 
         len = n_randint(100);

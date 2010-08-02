@@ -32,42 +32,43 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("from_string....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b;
-      char * str;
+    int i, result;
+    printf("from_string....");
+    fflush(stdout);
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-    
-      str = fmpz_poly_to_string(a);
-      int ans = fmpz_poly_from_string(b, str);
-      free(str);
+    fmpz_poly_randinit();
 
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         abort();
-      }
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b;
+        char *str;
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-   }
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
 
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        str = fmpz_poly_to_string(a);
+        fmpz_poly_from_string(b, str);
+        free(str);
+
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

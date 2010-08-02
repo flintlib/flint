@@ -38,7 +38,7 @@ int main(void)
    for (i = 0; i < 100000; i++) 
    {
       mp_limb_t a, b, c, g, bits1, bits2, bits3, ph, pl, qh, ql;
-      mp_limb_signed_t s, t;
+      mp_limb_t s, t;
       
       bits1 = n_randint(FLINT_BITS-1) + 1;
       bits2 = n_randint(bits1) + 1;
@@ -62,7 +62,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL:\n");
-         printf("a = %lu, b = %lu, c = %lu, g = %lu, s = %ld, t = %ld\n", a, b, c, g, s, t); 
+         printf("a = %lu, b = %lu, c = %lu, g = %lu, s = %lu, t = %lu\n", a, b, c, g, s, t); 
          abort();
       }
    }

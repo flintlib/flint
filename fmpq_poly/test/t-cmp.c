@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    
+
     printf("cmp....");
     fflush(stdout);
 
@@ -49,7 +49,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        
+
         result = (fmpq_poly_cmp(f, f) == 0);
         if (!result)
         {
@@ -74,9 +74,9 @@ main(void)
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpq_poly_randtest(g, n_randint(100), n_randint(200));
         fmpq_poly_randtest(h, n_randint(100), n_randint(200));
-        
-        result = !(fmpq_poly_cmp(f, g) <= 0) || !(fmpq_poly_cmp(g, h) <= 0) 
-                                             || (fmpq_poly_cmp(f, h) <= 0);
+
+        result = !(fmpq_poly_cmp(f, g) <= 0) || !(fmpq_poly_cmp(g, h) <= 0)
+            || (fmpq_poly_cmp(f, h) <= 0);
         if (!result)
         {
             printf("FAIL:\n");
@@ -103,10 +103,10 @@ main(void)
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpq_poly_randtest(g, n_randint(100), n_randint(200));
-        
-        result = (fmpq_poly_cmp(f, g) < 0) || (fmpq_poly_equal(f, g)) 
-                                           || (fmpq_poly_cmp(f, g) > 0);
-        
+
+        result = (fmpq_poly_cmp(f, g) < 0) || (fmpq_poly_equal(f, g))
+            || (fmpq_poly_cmp(f, g) > 0);
+
         if (!result)
         {
             printf("FAIL:\n");

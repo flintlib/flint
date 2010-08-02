@@ -46,7 +46,7 @@ main(void)
         fmpz_t a;
         mpz_t b;
         int base, j;
-        char * str1, * str2;
+        char *str1, *str2;
 
         fmpz_init(a);
         mpz_init(b);

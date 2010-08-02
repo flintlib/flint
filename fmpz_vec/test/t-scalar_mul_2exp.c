@@ -43,7 +43,7 @@ main(void)
     // Check aliasing of a and b
     for (i = 0; i < 10000; i++)
     {
-        fmpz *a, *b, *c;
+        fmpz *a, *b;
         long len = n_randint(100);
         ulong exp = n_randint(200);
 
@@ -71,7 +71,7 @@ main(void)
     // Check aliasing of (a*2^e1)*2^e2 equals a*2^(e1+e2)
     for (i = 0; i < 10000; i++)
     {
-        fmpz *a, *b, *c;
+        fmpz *a, *b;
         long len = n_randint(100);
         ulong e1 = n_randint(200);
         ulong e2 = n_randint(200);

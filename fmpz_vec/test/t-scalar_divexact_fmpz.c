@@ -44,7 +44,7 @@ main(void)
     // Check aliasing of a and b
     for (i = 0; i < 10000; i++)
     {
-        fmpz *a, *b, *c;
+        fmpz *a, *b;
         fmpz_t n;
         long len = n_randint(100);
         fmpz_init(n);

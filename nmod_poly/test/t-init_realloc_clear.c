@@ -30,42 +30,43 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("init/init2/realloc/clear....");
-   fflush(stdout);
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      nmod_poly_t a;
-	  mp_limb_t n = n_randtest_not_zero();
+    int i;
+    printf("init/init2/realloc/clear....");
+    fflush(stdout);
 
-      nmod_poly_init2(a, n, n_randint(100));
-      nmod_poly_clear(a);      
-   }
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
 
-   for (i = 0; i < 10000; i++) 
-   {
-      nmod_poly_t a;
-	  mp_limb_t n = n_randtest_not_zero();
+        nmod_poly_init2(a, n, n_randint(100));
+        nmod_poly_clear(a);
+    }
 
-      nmod_poly_init2(a, n, n_randint(100));
-      nmod_poly_realloc(a, n_randint(100));
-      nmod_poly_realloc(a, n_randint(100));
-      nmod_poly_clear(a);      
-   }
-   
-   for (i = 0; i < 10000; i++) 
-   {
-      nmod_poly_t a;
-	  mp_limb_t n = n_randtest_not_zero();
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
 
-      nmod_poly_init(a, n);
-      nmod_poly_randtest(a, n_randint(100));
-      nmod_poly_clear(a);
-   }
-   
-   printf("PASS\n");
-   return 0;
+        nmod_poly_init2(a, n, n_randint(100));
+        nmod_poly_realloc(a, n_randint(100));
+        nmod_poly_realloc(a, n_randint(100));
+        nmod_poly_clear(a);
+    }
+
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
+
+        nmod_poly_init(a, n);
+        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_clear(a);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

@@ -49,7 +49,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, len, n_randint(200));
-        
+
         _fmpz_vec_zero(a, len);
 
         result = (_fmpz_vec_is_zero(a, len));

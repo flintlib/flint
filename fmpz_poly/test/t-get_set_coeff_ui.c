@@ -30,43 +30,45 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, j, result;
-   printf("get/set_coeff_ui....");
-   fflush(stdout);
+    int i, j, result;
+    printf("get/set_coeff_ui....");
+    fflush(stdout);
 
-   fmpz_poly_randinit();
-   
-   for (i = 0; i < 1000; i++) 
-   {
-      fmpz_poly_t a;
-      ulong n1, n2;
-      long coeff, len;
+    fmpz_poly_randinit();
 
-      fmpz_poly_init(a);
-      len = n_randint(100) + 1;
+    for (i = 0; i < 1000; i++)
+    {
+        fmpz_poly_t a;
+        ulong n1, n2;
+        long coeff, len;
 
-      for (j = 0; j < 1000; j++)
-      {
-         n1 = n_randtest();
-         coeff = n_randint(len);
-         fmpz_poly_set_coeff_ui(a, coeff, n1);
-         n2 = fmpz_poly_get_coeff_ui(a, coeff);
+        fmpz_poly_init(a);
+        len = n_randint(100) + 1;
 
-         result = (n1 == n2);
-         if (!result)
-         {
-            printf("FAIL: n1 = %lu, n2 = %lu, coeff = %ld, length = %ld\n", n1, n2, coeff, len);
-            abort();
-         }
-      }
+        for (j = 0; j < 1000; j++)
+        {
+            n1 = n_randtest();
+            coeff = n_randint(len);
+            fmpz_poly_set_coeff_ui(a, coeff, n1);
+            n2 = fmpz_poly_get_coeff_ui(a, coeff);
 
-      fmpz_poly_clear(a);      
-   }
-      
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+            result = (n1 == n2);
+            if (!result)
+            {
+                printf("FAIL: n1 = %lu, n2 = %lu, coeff = %ld, length = %ld\n",
+                       n1, n2, coeff, len);
+                abort();
+            }
+        }
+
+        fmpz_poly_clear(a);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

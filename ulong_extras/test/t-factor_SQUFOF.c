@@ -38,7 +38,7 @@ int main(void)
 
    for (i = 0; i < 3000; i++) /* Test random numbers */
    {
-      mp_limb_t n1, n2, bits;
+      mp_limb_t n1, n2;
 
       do
          n1 = n_randtest();
@@ -54,7 +54,6 @@ int main(void)
       {
          count++;
          result = ((n1%n2) == 0UL);
-
          if (!result)
          {
             printf("FAIL:\n");

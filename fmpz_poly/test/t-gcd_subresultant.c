@@ -111,13 +111,13 @@ main(void)
         fmpz_poly_randtest_not_zero(a, n_randint(24) + 1, n_randint(24) + 1);
         fmpz_poly_randtest(f, n_randint(50), n_randint(100));
         fmpz_poly_randtest(g, n_randint(50), n_randint(100));
-        
+
         fmpz_poly_mul(f, a, f);
         fmpz_poly_mul(g, a, g);
         fmpz_poly_gcd_subresultant(d, f, g);
-        
+
         fmpz_poly_divrem_divconquer(q, r, d, a);
-        
+
         result = (r->length == 0L);
         if (!result)
         {

@@ -31,159 +31,160 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int i, result;
-   printf("mul_KS....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
+    int i, result;
+    printf("mul_KS....");
+    fflush(stdout);
 
-   // check aliasing of a and b
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-      fmpz_poly_mul_KS(a, b, c);
-      fmpz_poly_mul_KS(b, b, c);
-      
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(b), printf("\n\n");
-         abort();
-      }
+    fmpz_poly_randinit();
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+    // check aliasing of a and b
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
 
-   // check aliasing of a and c
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-      
-      fmpz_poly_mul_KS(a, b, c);
-      fmpz_poly_mul_KS(c, b, c);
-      
-      result = (fmpz_poly_equal(a, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(c), printf("\n\n");
-         abort();
-      }
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_mul_KS(b, b, c);
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
-  
-   // check aliasing of b and c
-   for (i = 0; i < 2000; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-      fmpz_poly_set(c, b);
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
 
-      fmpz_poly_mul_KS(a, b, b);
-      fmpz_poly_mul_KS(c, b, c);
-      
-      result = (fmpz_poly_equal(a, c));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(c), printf("\n\n");
-         abort();
-      }
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
-  
-   // compare with mul_classical
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b, c, d;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_init(d);
-      fmpz_poly_randtest(b, n_randint(50), n_randint(200)); 
-      fmpz_poly_randtest(c, n_randint(50), n_randint(200));
-   
-	  fmpz_poly_mul_KS(a, b, c);
-      fmpz_poly_mul_classical(d, b, c);
-      
-      result = (fmpz_poly_equal(a, d));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(d), printf("\n\n");
-         abort();
-      }
+    // check aliasing of a and c
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-      fmpz_poly_clear(d);
-   }
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
 
-   // compare with mul_classical unsigned
-   for (i = 0; i < 10000; i++) 
-   {
-      fmpz_poly_t a, b, c, d;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_init(d);
-      fmpz_poly_randtest_unsigned(b, n_randint(50), n_randint(200)); 
-      fmpz_poly_randtest_unsigned(c, n_randint(50), n_randint(200));
-   
-	  fmpz_poly_mul_KS(a, b, c);
-      fmpz_poly_mul_classical(d, b, c);
-      
-      result = (fmpz_poly_equal(a, d));
-      if (!result)
-      {
-         printf("FAIL:\n");
-         fmpz_poly_print(a), printf("\n\n");
-         fmpz_poly_print(d), printf("\n\n");
-         abort();
-      }
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_mul_KS(c, b, c);
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-      fmpz_poly_clear(d);
-   }
+        result = (fmpz_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
 
-   fmpz_poly_randclear();
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    // check aliasing of b and c
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_set(c, b);
+
+        fmpz_poly_mul_KS(a, b, b);
+        fmpz_poly_mul_KS(c, b, c);
+
+        result = (fmpz_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    // compare with mul_classical
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b, c, d;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_mul_classical(d, b, c);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(d), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+
+    // compare with mul_classical unsigned
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b, c, d;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        fmpz_poly_randtest_unsigned(b, n_randint(50), n_randint(200));
+        fmpz_poly_randtest_unsigned(c, n_randint(50), n_randint(200));
+
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_mul_classical(d, b, c);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(d), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

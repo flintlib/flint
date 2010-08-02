@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    
+
     printf("evaluate_mpq....");
     fflush(stdout);
 
