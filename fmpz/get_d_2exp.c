@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart, Andy Novocin
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2009 Andy Novocin
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -30,21 +31,26 @@
 
 extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
 
-double fmpz_get_d_2exp(long * exp, const fmpz_t f)
+double
+fmpz_get_d_2exp(long *exp, const fmpz_t f)
 {
-   fmpz d = *f;
+    fmpz d = *f;
 
-	if (!COEFF_IS_MPZ(d))
-   {
-      if (d == 0L) 
-      {
-         (*exp) = 0L;
-         return 0.0;
-      }
-      ulong d_abs = FLINT_ABS(d);
-      (*exp) = FLINT_BIT_COUNT(d_abs);
-      if (d < 0L) return __gmpn_get_d(&d_abs, 1L, -1L, -*exp);
-      else return __gmpn_get_d(&d, 1L, 1L, -*exp);
-   } else 
-	   return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
+    if (!COEFF_IS_MPZ(d))
+    {
+        ulong d_abs;
+        if (d == 0L)
+        {
+            (*exp) = 0L;
+            return 0.0;
+        }
+        d_abs = FLINT_ABS(d);
+        (*exp) = FLINT_BIT_COUNT(d_abs);
+        if (d < 0L)
+            return __gmpn_get_d((mp_limb_t *) &d_abs, 1L, -1L, -*exp);
+        else
+            return __gmpn_get_d((mp_limb_t *) &d, 1L, 1L, -*exp);
+    }
+    else
+        return mpz_get_d_2exp(exp, COEFF_TO_PTR(d));
 }

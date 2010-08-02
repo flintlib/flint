@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -31,7 +31,6 @@ int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_b
 							   int negate, int borrow)
 {
    mp_limb_t sign;
-   mp_limb_t cy;
    ulong limbs = (shift + bits)/FLINT_BITS;
    ulong rem_bits = (shift + bits)%FLINT_BITS;
    mp_limb_t mask;
@@ -149,7 +148,6 @@ int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_b
 void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, 
 							             mp_bitcnt_t shift, mp_bitcnt_t bits)
 {
-   mp_limb_t cy;
    ulong limbs = (shift + bits)/FLINT_BITS;
    ulong rem_bits = (shift + bits)%FLINT_BITS;
    mp_limb_t mask;
