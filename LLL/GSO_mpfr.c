@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,14 +16,14 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2005-2008 Damien Stehle.
-   Copyright (C) 2007 David Cade.
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2005-2008 Damien Stehle
+    Copyright (C) 2007 David Cade
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -35,7 +35,7 @@
 
 void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, long a, long kappa, long zeroes)
 {
-  long i, j;
+  long i;
   mpfr_t tmp, rtmp;
 
   mpfr_init2(tmp, mu->prec);
