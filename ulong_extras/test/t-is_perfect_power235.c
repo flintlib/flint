@@ -63,7 +63,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL:\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d); 
+         printf("d^3 = %lu is declared not a perfect power\n", d*d*d); 
          abort();
       }
 
@@ -79,7 +79,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL:\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d); 
+         printf("d^5 = %lu is declared not a perfect power\n", d*d*d*d*d); 
          abort();
       }
 
