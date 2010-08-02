@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("udiv_qrnnd_preinv....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
       mp_limb_t d, dinv, nh, nl, q1, r1, q2, r2, norm;
 
@@ -54,10 +54,9 @@ int main(void)
       udiv_qrnnd(q2, r2, nh, nl, d);
 
       result = ((q1 == q2) && (r1 == r2));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("nh = %lu, nl = %lu, d = %lu, dinv = %lu\n", nh, nl, d, dinv); 
          printf("q1 = %lu, q2 = %lu, r1 = %lu, r2 = %lu\n", q1, q2, r1, r2);
          abort();

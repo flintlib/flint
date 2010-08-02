@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("count_leading_zeros....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
       mp_limb_t n;
       unsigned int count;
@@ -45,10 +45,9 @@ int main(void)
       count_leading_zeros(count, n);
 
       result = ((n == 0UL) || (((long)(n << count) < 0L) && (r_shift(n, FLINT_BITS-count) == 0UL)));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("n = %lu, count = %u\n", n, count); 
          abort();
       }
