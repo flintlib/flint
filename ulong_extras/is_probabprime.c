@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -29,73 +29,78 @@
 
 int n_is_probabprime(mp_limb_t n)
 {
-   if (n <= 1UL) return 0;
-   if (n == 2UL) return 1;
-   if ((n & 1UL) == 0) return 0;
+    mp_limb_t d;
+    unsigned int norm;
+	mp_limb_t ninv;
 
-   if (n_is_perfect_power235(n)) return 0;
-   
+    if (n <= 1UL) return 0;
+    if (n == 2UL) return 1;
+    if ((n & 1UL) == 0) return 0;
+
+    if (n_is_perfect_power235(n)) return 0;
+
 #if FLINT64
-   if (n >= 10000000000000000UL) return n_is_probabprime_BPSW(n);
+    if (n >= 10000000000000000UL) return n_is_probabprime_BPSW(n);
 #endif
 
-	mp_limb_t d = n - 1;
-   unsigned int norm;
-
-   count_trailing_zeros(norm, d);
-   d >>= norm;
+    d = n - 1;
+    count_trailing_zeros(norm, d);
+    d >>= norm;
 
 #if FLINT64
-   if (n < 1122004669633UL)
+    if (n < 1122004669633UL)
 #else
-   if (n < 2147483648UL)
+    if (n < 2147483648UL)
 #endif  
-   {
-      if (n < FLINT_ODDPRIME_SMALL_CUTOFF)
-         return n_is_oddprime_small(n);
+    {
+        double npre;
+        if (n < FLINT_ODDPRIME_SMALL_CUTOFF)
+            return n_is_oddprime_small(n);
 
-      n_compute_primes(74000);
-      if (n < flint_primes_cutoff)
-         return n_is_oddprime_binary(n);
+        n_compute_primes(74000);
+        if (n < flint_primes_cutoff)
+            return n_is_oddprime_binary(n);
       
-      double npre = n_precompute_inverse(n);
-      
-	   if (n < 9080191UL) 
-      { 
-         if (n_is_strong_probabprime_precomp(n, npre, 31UL, d) 
-            && n_is_strong_probabprime_precomp(n, npre, 73UL, d)) return 1;
-         else return 0;
-      }
+        npre = n_precompute_inverse(n);
+
+        if (n < 9080191UL) 
+        {
+            if (n_is_strong_probabprime_precomp(n, npre, 31UL, d)
+                && n_is_strong_probabprime_precomp(n, npre, 73UL, d)) return 1;
+            else return 0;
+        }
 
 #if FLINT64
-      if (n < 4759123141UL)
-      {
+        if (n < 4759123141UL)
+        {
 #endif
-         if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
+        if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
             && n_is_strong_probabprime_precomp(n, npre, 7UL, d) 
             && n_is_strong_probabprime_precomp(n, npre, 61UL, d)) return 1;
-         else return 0;
+        else return 0;
 #if FLINT64
-      }
-      
-      if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
-         && n_is_strong_probabprime_precomp(n, npre, 13UL, d) 
-         && n_is_strong_probabprime_precomp(n, npre, 23UL, d) 
-         && n_is_strong_probabprime_precomp(n, npre, 1662803UL, d)) 
+        }
+
+        if (n_is_strong_probabprime_precomp(n, npre, 2UL, d) 
+            && n_is_strong_probabprime_precomp(n, npre, 13UL, d) 
+            && n_is_strong_probabprime_precomp(n, npre, 23UL, d) 
+            && n_is_strong_probabprime_precomp(n, npre, 1662803UL, d))
             if (n != 46856248255981UL) return 1;
-
-      return 0;
+        return 0;
 #endif
-   }
+    }
 
-	mp_limb_t ninv = n_preinvert_limb(n);
-   
-   if (n_is_strong_probabprime2_preinv(n, ninv, 2UL, d) 
-      && n_is_strong_probabprime2_preinv(n, ninv, 3UL, d) 
-      && n_is_strong_probabprime2_preinv(n, ninv, 7UL, d) 
-      && n_is_strong_probabprime2_preinv(n, ninv, 61UL, d) 
-      && n_is_strong_probabprime2_preinv(n, ninv, 24251UL, d)) 
-         if (n != 46856248255981UL) return 1;
+	ninv = n_preinvert_limb(n);
 
-   return 0;
+    if (n_is_strong_probabprime2_preinv(n, ninv, 2UL, d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, 3UL, d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, 7UL, d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, 61UL, d) 
+        && n_is_strong_probabprime2_preinv(n, ninv, 24251UL, d))
+#if FLINT64
+        if (n != 46856248255981UL) 
+#endif
+        return 1;
+
+    return 0;
 }
