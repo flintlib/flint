@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <math.h>
@@ -30,16 +30,20 @@
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
 {
-   mp_limb_t is, res;
+    mp_limb_t is, res;
 
-   if (a >= 281474976710656UL)
-      is = (mp_limb_t) sqrt((double) a);
-   else
-      is = (mp_limb_t) sqrtf((float) a);
+#if FLINT64
+    if (a >= 281474976710656UL)
+        is = (mp_limb_t) sqrt((double) a);
+    else
+#endif
+        is = (mp_limb_t) sqrtf((float) a);
 
-   is -= (is*is > a);
-   if (is == 4294967296UL) is--;
-   (*r) = a - is*is;
+    is -= (is*is > a);
+#if FLINT64
+    if (is == 4294967296UL) is--;
+#endif
+    (*r) = a - is*is;
 
-   return is;
+    return is;
 }
