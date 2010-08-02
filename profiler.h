@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2007 William Hart and David Harvey
+    Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
 
@@ -84,7 +84,7 @@ double get_cycle_counter()
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
 static inline 
-void init_clock(unsigned long n)
+void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
@@ -92,24 +92,25 @@ void init_clock(unsigned long n)
 static inline 
 void init_all_clocks()
 {
-   for (unsigned long i = 0; i < FLINT_NUM_CLOCKS; i++)
+   int i;
+   for (i = 0; i < FLINT_NUM_CLOCKS; i++)
       clock_accum[i] = 0.0;
 }
 
 static inline 
-double get_clock(unsigned long n)
+double get_clock(int n)
 {
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
 static inline 
-void start_clock(unsigned long n)
+void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
 static inline 
-void stop_clock(unsigned long n)
+void stop_clock(int n)
 {
    double now = get_cycle_counter();
    clock_accum[n] += (now - clock_last[n]);
