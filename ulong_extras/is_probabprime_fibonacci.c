@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008 Peter Shrimpton
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2008 Peter Shrimpton
+    Copyright (C) 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -32,7 +32,7 @@ n_pair_t fchain_precomp(mp_limb_t m, mp_limb_t n, double npre)
 {
 	n_pair_t current, old;
 	int length;
-	mp_limb_t power, xy, xx, yy;
+	mp_limb_t power, xy;
 	
 	old.x = 2UL;
 	old.y = n - 3UL;
@@ -67,7 +67,7 @@ n_pair_t fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
 {
 	n_pair_t current, old;
 	int length;
-	mp_limb_t power, xy, xx, yy;
+	mp_limb_t power, xy;
 	
 	old.x = 2UL;
 	old.y = n - 3UL;
@@ -100,7 +100,7 @@ n_pair_t fchain2_preinv(mp_limb_t m, mp_limb_t n, mp_limb_t ninv)
 
 int n_is_probabprime_fibonacci(mp_limb_t n)
 {
-	mp_limb_t m, left, right;
+	mp_limb_t m;
 	n_pair_t V;
 
    if (FLINT_ABS((mp_limb_signed_t) n) <= 3UL)

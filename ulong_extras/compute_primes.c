@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 Tom Boothby
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 Tom Boothby
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdlib.h>
 #include <string.h>
@@ -58,6 +58,11 @@ pthread_mutex_t flint_num_primes_mutex;
 
 void n_compute_primes(ulong num)
 {
+   ulong num_primes, primes_cutoff;
+   ulong lg_ub, lg_ub2;
+   ulong sieve_size;
+   unsigned int i, j, p, q, oldq = 0;
+
    if (flint_num_primes >= num) return;
    
    pthread_mutex_lock(&flint_num_primes_mutex);
@@ -67,13 +72,12 @@ void n_compute_primes(ulong num)
 	   return; 
    }
 
-   ulong num_primes = FLINT_MAX(flint_num_primes, FLINT_NUM_PRIMES_SMALL);
-   ulong primes_cutoff;
+   num_primes = FLINT_MAX(flint_num_primes, FLINT_NUM_PRIMES_SMALL);
 
    if (!flint_num_primes) flint_primes_cutoff = FLINT_PRIMES_SMALL_CUTOFF;
 
-   ulong lg_ub = 14UL; // start with at least primes up to 16384
-   ulong lg_ub2 = 0UL;
+   lg_ub = 14UL; // start with at least primes up to 16384
+   lg_ub2 = 0UL;
    while (((1UL<<lg_ub) + lg_ub2*(1UL<<(lg_ub - 1)))/(ulong)(((double)lg_ub+0.5*(double)lg_ub2)*0.7) < num) 
    {   
       lg_ub += lg_ub2;
@@ -86,12 +90,9 @@ void n_compute_primes(ulong num)
       printf("Error : cannot precompute sufficiently many primes!\n");
       abort();
    }
-   ulong sieve_size = primes_cutoff/2 - flint_primes_cutoff/2;
-   sieve = (unsigned int *) malloc(sizeof(unsigned int)*sieve_size);
    
-   unsigned int p, q, oldq = 0, n_found = 0;
-   unsigned int i, j;
-
+   sieve_size = primes_cutoff/2 - flint_primes_cutoff/2;
+   sieve = (unsigned int *) malloc(sizeof(unsigned int)*sieve_size);
    
    for (j = 0; j < sieve_size; j++)
       sieve[j] = 1;
@@ -169,7 +170,6 @@ void n_compute_primes(ulong num)
       }
    }
       
-   
    flint_primes_cutoff = primes_cutoff;
    if (flint_primes_cutoff & 1) flint_primes_cutoff++;
 

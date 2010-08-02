@@ -30,7 +30,7 @@
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
 {
-    mp_limb_t is, res;
+    mp_limb_t is;
 
 #if FLINT64
     if (a >= 281474976710656UL)
