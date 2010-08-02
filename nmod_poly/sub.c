@@ -33,14 +33,14 @@ void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1, mp_srcptr poly2, lon
 {
     long i, min = FLINT_MIN(len1, len2);
 
-    _nmod_vec_sub(res, poly1, poly2, shorter, mod);
+    _nmod_vec_sub(res, poly1, poly2, min, mod);
 
     if (poly1 != res) // copy any remaining coefficients from poly1
-        for (i = shorter; i < len1; i++)
+        for (i = min; i < len1; i++)
             res[i] = poly1[i];
 
     // careful, it is *always* necessary to negate coeffs from poly2, even if this is already res
-    for (i = shorter; i < len2; i++) 
+    for (i = min; i < len2; i++) 
         res[i] = nmod_neg(poly2[i], mod);
 }
 

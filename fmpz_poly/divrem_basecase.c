@@ -34,7 +34,7 @@ void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long A_len,
                                 const fmpz * B, long B_len)
 {
     const fmpz * B_lead = B + B_len - 1; 
-    fmpz *qB, *coeffQ;
+    fmpz *qB, *coeff_Q;
     long coeff, B1, B1_orig, B2;
     int want_rem;
 

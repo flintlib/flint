@@ -35,7 +35,7 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
     long len = poly->length;
     int replace = (n < len && *(poly->coeffs + n) != 0L);
     
-    if (!replace & x == 0L)
+    if ((!replace) && (x == 0L))
         return;
     
     if (n + 1 > len)

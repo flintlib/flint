@@ -83,7 +83,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
             copy1[i] = poly1->coeffs[i];
     }
     fmpz *copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
-    if (poly1 != poly2 & len2 < trunc)
+    if (poly1 != poly2 && len2 < trunc)
     {
         long i;
         copy2 = (fmpz *) calloc(trunc, sizeof(fmpz));
@@ -102,6 +102,6 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
 
     if (copy1 != poly1->coeffs)
         free(copy1);
-    if (poly1 != poly2 & copy2 != poly2->coeffs)
+    if (poly1 != poly2 && copy2 != poly2->coeffs)
         free(copy2);
 }

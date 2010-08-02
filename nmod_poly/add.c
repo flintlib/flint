@@ -33,7 +33,7 @@ void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, mp_srcptr poly2, lon
 {
     long i, min = FLINT_MIN(len1, len2);
 
-    _nmod_vec_add(res, poly1, poly2, shorter, mod);
+    _nmod_vec_add(res, poly1, poly2, min, mod);
 
     if (poly1 != res) // copy any remaining coefficients from poly1
         for (i = min; i < len1; i++)
