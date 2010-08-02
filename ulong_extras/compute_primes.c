@@ -119,7 +119,7 @@ void n_compute_primes(ulong num)
       
       q = (p*p)/2 - flint_primes_cutoff/2;   /* index of first multiple of p left in the sieve */
         
-      for (unsigned int j = oldq; j < q; j++) /* count new primes up to p^2 */
+      for (j = oldq; j < q; j++) /* count new primes up to p^2 */
       {
          if (sieve[j]) num_primes++;
       }
@@ -133,7 +133,7 @@ void n_compute_primes(ulong num)
       }
    }
    
-   for (unsigned int j = oldq; j < sieve_size; j++) /* there may be some primes after the last p^2 */
+   for (j = oldq; j < sieve_size; j++) /* there may be some primes after the last p^2 */
    {
       if (sieve[j]) num_primes++;
    }
