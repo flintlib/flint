@@ -43,7 +43,7 @@ void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, long length, mp_bitcnt_t 
 
 void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, long length, mpfr_t c);
 
-void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
+void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
 								    __mpfr_struct * vec2, long length);
 
 #endif

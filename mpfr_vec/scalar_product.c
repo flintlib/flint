@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,19 +29,18 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void * _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, __mpfr_struct * vec2, long length)
+void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, __mpfr_struct * vec2, long length)
 {
-   long i;
+    long i;
+    mpfr_t tmp;
+    mpfr_init(tmp);
 
-   mpfr_t tmp;
-   mpfr_init(tmp);
-
-   mpfr_mul(res, vec1, vec2, GMP_RNDN);
-   for (i = 1; i < length; i++)
-   {
-      mpfr_mul(tmp, vec1 + i, vec2 + i, GMP_RNDN);
-	  mpfr_add(res, res, tmp, GMP_RNDN);
-   }
+    mpfr_mul(res, vec1, vec2, GMP_RNDN);
+    for (i = 1; i < length; i++)
+    {
+        mpfr_mul(tmp, vec1 + i, vec2 + i, GMP_RNDN);
+        mpfr_add(res, res, tmp, GMP_RNDN);
+    }
 
    mpfr_clear(tmp);
 }
