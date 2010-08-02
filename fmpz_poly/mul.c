@@ -64,7 +64,7 @@ void fmpz_poly_mul(fmpz_poly_t res,
     long len1 = poly1->length;
     long len2 = poly2->length;
 
-    if ((len1 == 0) | (len2 == 0))
+    if (len1 == 0 || len2 == 0)
     {
         fmpz_poly_zero(res);
         return;
@@ -72,7 +72,7 @@ void fmpz_poly_mul(fmpz_poly_t res,
 
     rlen = len1 + len2 - 1;
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);

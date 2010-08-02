@@ -111,13 +111,13 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
     const long len2 = poly2->length;
     long rlen;
 
-    if (len1 == 0 | len2 == 0)
+    if (len1 == 0 || len2 == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);

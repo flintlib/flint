@@ -30,30 +30,28 @@
 
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, long len1, const fmpz * poly2, long len2)
 {
-   long longer = FLINT_MAX(len1, len2);
-   long shorter = FLINT_MIN(len1, len2);
+    long i, min = FLINT_MIN(len1, len2);
 
-   long i;
-   for (i = 0; i < shorter; i++) // subtract up to the length of the shorter poly
-      fmpz_sub(res + i, poly1 + i, poly2 + i);   
-   
-   if (poly1 != res) // copy any remaining coefficients from poly1
-      for (i = shorter; i < len1; i++)
-         fmpz_set(res + i, poly1 + i);
+    for (i = 0; i < shorter; i++) // subtract up to the length of the shorter poly
+        fmpz_sub(res + i, poly1 + i, poly2 + i);   
 
-   // careful, it is *always* necessary to negate coeffs from poly2, even if this is already res
+    if (poly1 != res) // copy any remaining coefficients from poly1
+        for (i = shorter; i < len1; i++)
+            fmpz_set(res + i, poly1 + i);
+
+    // careful, it is *always* necessary to negate coeffs from poly2, even if this is already res
 	for (i = shorter; i < len2; i++) 
-      fmpz_neg(res + i, poly2 + i);
+        fmpz_neg(res + i, poly2 + i);
 }
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-   long longer = FLINT_MAX(poly1->length, poly2->length);
+    long longer = FLINT_MAX(poly1->length, poly2->length);
 
-	fmpz_poly_fit_length(res, longer);
-   
-	_fmpz_poly_sub(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs, poly2->length);
+    fmpz_poly_fit_length(res, longer);
 
-   _fmpz_poly_set_length(res, longer);
-   _fmpz_poly_normalise(res); // there may have been cancellation
+    _fmpz_poly_sub(res->coeffs, poly1->coeffs, poly1->length, poly2->coeffs, poly2->length);
+
+    _fmpz_poly_set_length(res, longer);
+    _fmpz_poly_normalise(res); // there may have been cancellation
 }

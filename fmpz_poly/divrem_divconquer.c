@@ -78,7 +78,7 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
    if (A_len > 2*B_len - 1)
    {
       const fmpz * p1;
-	  fmpz * d1q1, * dq1, * q1, * q2, * t;
+	  fmpz * d1q1, * dq1, * q1, * q2;
 	  
 	  // We shift A right until it is length 2*B->length -1
       // We call this polynomial p1

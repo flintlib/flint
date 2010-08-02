@@ -91,7 +91,7 @@ void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, long bits)
 void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2, fmpz * temp, long bits)
 {
    long length = (1L<<bits);
-   long m = length/2, i;
+   long m = length/2;
    
    if (length == 1)
    {

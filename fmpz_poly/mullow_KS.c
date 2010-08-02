@@ -118,13 +118,13 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     const long len1 = poly1->length;
     const long len2 = poly2->length;
 
-    if (len1 == 0 | len2 == 0 | trunc == 0)
+    if (len1 == 0 || len2 == 0 || trunc == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);

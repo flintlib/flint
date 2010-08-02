@@ -44,7 +44,7 @@ _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
     const long limbs2 = _fmpz_vec_max_limbs(poly2, n);
     const long max_limbs = FLINT_MAX(limbs1, limbs2);
 
-    if (max_limbs > 3 & n < 20)
+    if (max_limbs > 3 && n < 20)
         _fmpz_poly_mullow_karatsuba_n(res, poly1, poly2, n);
     else
         _fmpz_poly_mullow_KS(res, poly1, n, poly2, n, n);
@@ -58,13 +58,13 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
     const long len1 = poly1->length;
     const long len2 = poly2->length;
 
-    if (len1 == 0 | len2 == 0 | trunc == 0)
+    if (len1 == 0 || len2 == 0 || trunc == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);

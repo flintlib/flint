@@ -107,9 +107,9 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     }
     
     /* Deal with the various other cases of aliasing. */
-    if (R == poly1 | R == poly2)
+    if (R == poly1 || R == poly2)
     {
-        if (Q == poly1 | Q == poly2)
+        if (Q == poly1 || Q == poly2)
         {
             fmpq_poly_t tempQ, tempR;
             fmpq_poly_init(tempQ);
@@ -133,7 +133,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     }
     else
     {
-        if (Q == poly1 | Q == poly2)
+        if (Q == poly1 || Q == poly2)
         {
             fmpq_poly_t tempQ;
             fmpq_poly_init(tempQ);

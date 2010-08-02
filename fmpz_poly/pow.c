@@ -85,9 +85,9 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
         lenB += lenB - 1;
     }
     
-    if (pos == 2 | pos == 4)
+    if (pos == 2 || pos == 4)
         _fmpz_vec_swap(A, B, lenR);
-    if (pos == 3 | pos == 5)
+    if (pos == 3 || pos == 5)
         _fmpz_vec_swap(A, C, lenR);
     
     _fmpz_vec_clear(B, alloc);

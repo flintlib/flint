@@ -37,7 +37,6 @@ void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len)
 
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    long i;
     long len = poly->length;
     if (len < 2L)
     {
