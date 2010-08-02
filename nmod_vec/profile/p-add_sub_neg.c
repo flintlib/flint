@@ -116,8 +116,8 @@ int main(void)
 
       printf("bits %ld, add = %.1lf c/l, sub = %.1lf c/l, neg = %.1lf c/l\n", 
          i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
-         i, (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
-         i, (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
+            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+            (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
 	  );
    }
 
