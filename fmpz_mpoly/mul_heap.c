@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,15 +16,15 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-   This implementation was inspired by the reference implementation of
-   Roman Pearce.
+    This implementation was inspired by the reference implementation of
+    Roman Pearce.
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -199,7 +199,7 @@ void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly
 		 }
 	  } else
 	  {
-		 if (sign = (accum2 < (mp_limb_signed_t) 0)) // if negative, negate
+		 if ((sign = (accum2 < (mp_limb_signed_t) 0))) // if negative, negate
 	     {
 		    add_ssaaaa(cy, accum0, (mp_limb_t) 0, ~accum0, (mp_limb_t) 0, (mp_limb_t) 1);
             add_ssaaaa(accum2, accum1, ~accum2, ~accum1, (mp_limb_t) 0, cy);
