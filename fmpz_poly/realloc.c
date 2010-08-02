@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -31,25 +31,25 @@
 
 void fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
 {
-   if (alloc == 0) // alloc == 0, clear up, reinitialise
-   {
-         fmpz_poly_clear(poly);
-         fmpz_poly_init(poly);
-			return;
-   }  
-   
-	if (poly->alloc) // realloc
-	{
-		fmpz_poly_truncate(poly, alloc);
+    if (alloc == 0) // alloc == 0, clear up, reinitialise
+    {
+        fmpz_poly_clear(poly);
+        fmpz_poly_init(poly);
+        return;
+    }  
 
-		poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc*sizeof(fmpz));
-		if (alloc > poly->alloc)
-		   mpn_zero(poly->coeffs + poly->alloc, alloc - poly->alloc);
-	} else // nothing allocated already so do it now
-	{
-		poly->coeffs = (fmpz *) malloc(alloc*sizeof(fmpz));
-		mpn_zero(poly->coeffs, alloc);
-	}
-   
-   poly->alloc = alloc;  
+    if (poly->alloc) // realloc
+    {
+        fmpz_poly_truncate(poly, alloc);
+
+        poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
+        if (alloc > poly->alloc)
+            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc), alloc - poly->alloc);
+    }
+    else // nothing allocated already so do it now
+    {
+        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
+    }
+
+    poly->alloc = alloc;  
 }
