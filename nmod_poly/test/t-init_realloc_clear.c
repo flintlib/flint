@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
@@ -38,7 +39,6 @@ int main(void)
    for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a;
-
 	  mp_limb_t n = n_randtest_not_zero();
 
       nmod_poly_init2(a, n, n_randint(100));
@@ -48,7 +48,6 @@ int main(void)
    for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a;
-
 	  mp_limb_t n = n_randtest_not_zero();
 
       nmod_poly_init2(a, n, n_randint(100));
@@ -60,12 +59,10 @@ int main(void)
    for (i = 0; i < 10000; i++) 
    {
       nmod_poly_t a;
-
 	  mp_limb_t n = n_randtest_not_zero();
 
       nmod_poly_init(a, n);
       nmod_poly_randtest(a, n_randint(100));
-      
       nmod_poly_clear(a);
    }
    
