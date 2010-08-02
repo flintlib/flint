@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2009 William Hart
+    Copyright 2009 William Hart
 
 ******************************************************************************/
 
@@ -33,30 +33,31 @@
 void sample(void * arg, ulong count)
 {
    mp_limb_t d, q, r, dinv, norm;
-   
-   mp_limb_t * array = (mp_limb_t *) malloc(200*sizeof(mp_limb_t));
+   mp_ptr array = (mp_ptr) malloc(200 * sizeof(mp_limb_t));
+   ulong i;
+   int j;
    
    d = n_randtest_not_zero();
    count_leading_zeros(norm, d);
    d <<= norm;
       
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
-      for (ulong i = 0; i < 200; i+=2)
+      for (j = 0; j < 200; j+=2)
       {
          do
          {
-            array[i] = n_randtest();
-         } while (array[i] >= d);
-         array[i + 1] = n_randtest();  
+            array[j] = n_randtest();
+         } while (array[j] >= d);
+         array[j + 1] = n_randtest();  
       }
        
       invert_limb(dinv, d);
 
       prof_start();
-      for (ulong i = 0; i < 200; i+=2)
+      for (j = 0; j < 200; j+=2)
       {
-         udiv_qrnnd_preinv(q, r, array[i], array[i+1], d, dinv);
+         udiv_qrnnd_preinv(q, r, array[j], array[j+1], d, dinv);
       }
       prof_stop();
       
