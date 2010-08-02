@@ -41,7 +41,7 @@ int main(void)
    fmpz_poly_randinit();
    
    // check aliasing of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
+   for (i = 0; i < 2000; i++) 
    {
       fmpz_poly_t a, b, c;
       long len;

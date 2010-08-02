@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2009 William Hart
+    Copyright 2009 William Hart
 
 ******************************************************************************/
 
@@ -37,21 +37,19 @@ typedef struct
 void sample(void * arg, ulong count)
 {
    BPSW_t * params = (BPSW_t *) arg;
-
    ulong bits = params->bits;
-
+   ulong i;
    mp_limb_t n, d, r, norm;
    double dpre;
    
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
+      int j, res = 1;
       d = n_randbits(bits);
       while (!n_is_prime(d)) d++;
-      
-      int res = 1;
 
       prof_start();
-      for (mp_size_t i = 0; i < 1000000; i++)
+      for (j = 0; j < 1000000; j++)
          res &= n_is_probabprime_BPSW(d);
       prof_stop();
       
@@ -63,14 +61,15 @@ int main(void)
 {
    double min, max;
    BPSW_t params;
+   int i;
 
    printf("is_probabprime_BPSW:\n");
    
-   for (ulong i = 1; i <= 64; i++)
+   for (i = 1; i <= 64; i++)
    {
       params.bits = i;
       prof_repeat(&min, &max, sample, &params);
-      printf("bits = %ld, min time is %.3f cycles, max time is %.3f cycles\n", 
+      printf("bits = %d, min time is %.3f cycles, max time is %.3f cycles\n", 
            i, (min/(double)FLINT_CLOCK_SCALE_FACTOR)/1000000, (max/(double)FLINT_CLOCK_SCALE_FACTOR)/1000000);
    }
 

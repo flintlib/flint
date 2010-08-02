@@ -52,7 +52,7 @@ main(void)
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL(1):\n");
+            printf("FAIL:\n");
             fmpq_poly_print(f), printf("\n");
             abort();
         }
@@ -61,7 +61,7 @@ main(void)
     }
 
     // Check that a^2 f is not square-free
-    for (ulong i = 0; i < 200; i++)
+    for (i = 0; i < 200; i++)
     {
         fmpq_poly_t a, f;
 
@@ -78,7 +78,7 @@ main(void)
         result = (!fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL(2):\n");
+            printf("FAIL:\n");
             fmpq_poly_print(f), printf("\n");
             abort();
         }
@@ -88,7 +88,6 @@ main(void)
     }
 
     fmpq_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

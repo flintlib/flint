@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2009 William Hart
+    Copyright 2009 William Hart
 
 ******************************************************************************/
 
@@ -40,15 +40,14 @@ typedef struct
 void sample(void * arg, ulong count)
 {
    fac_one_line_t * params = (fac_one_line_t *) arg;
-   ulong res;
    mp_bitcnt_t bits = params->bits;
-   ulong primes = (1L<<(bits/3))/10 + 1;
+   ulong i, j, res, primes = (1L<<(bits/3))/10 + 1;
    n_factor_t factors;
    
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
       prof_start();
-      for (ulong j = 0; j < ITERS; j++)
+      for (j = 0; j < ITERS; j++)
 	  {
 		  n_factor_init(&factors);
 	      n_factor(&factors, params->composites[j & 1023], 0);
@@ -63,10 +62,9 @@ void fill_array(ulong * ret, mp_bitcnt_t bits)
 {
    ulong n;
    n_factor_t factors;
-  
-   ulong primes = (1<<(bits/3))/10 + 1;
+   ulong i, primes = (1<<(bits/3))/10 + 1;
    
-   for (ulong i = 0; i < 1024; i++)
+   for (i = 0; i < 1024; i++)
    {
 	  do 
 	  {
@@ -82,21 +80,21 @@ int main(void)
 {
    double min, max;
    fac_one_line_t params;
+   int i;
    
    params.composites = malloc(1024*sizeof(ulong));
 
    printf("factor_one_line:\n");
    
-   for (ulong i = 4; i <= 64; i++)
+   for (i = 4; i <= 64; i++)
    {
       fill_array(params.composites, i);
       params.bits = i;
 	  prof_repeat(&min, &max, sample, &params);
-      printf("bits = %ld, time is %.3f us\n", 
+      printf("bits = %d, time is %.3f us\n", 
 		  i, max/(double)ITERS);
    }
 
    free(params.composites);
-
    return 0;
 }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2010 William Hart
+    Copyright 2010 William Hart
 
 ******************************************************************************/
 
@@ -39,23 +39,23 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t n, d, dinv, r = 0, norm;
    double dpre;
-
    info_t * info = (info_t *) arg;
-
    mp_bitcnt_t bits = info->bits;
    ulong type = info->type;
+   ulong i;
 
-   mp_limb_t * arr = malloc(1024*sizeof(mp_limb_t));
-   mp_limb_t * arr2 = malloc(1024*sizeof(mp_limb_t));
+   mp_ptr arr  = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
+   mp_ptr arr2 = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
       
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
+      int j;
       d = n_randbits(bits);
       if (d == 0UL) d++;
 
       dinv = n_preinvert_limb(d);
       
-      for (mp_size_t j = 0; j < 1024; j++)
+      for (j = 0; j < 1024; j++)
       {
          arr[j] = n_randbits(FLINT_BITS);
          arr2[j] = n_randint(n);
@@ -86,17 +86,16 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min1, min2, min3, min4, min5, max;
-   
    info_t info;
+   int i;
 
-   for (ulong i = FLINT_BITS/2 + 1; i <= FLINT_BITS; i++)
+   for (i = FLINT_BITS/2 + 1; i <= FLINT_BITS; i++)
    {
       info.bits = i;
-
 	  info.type = 1;
       prof_repeat(&min1, &max, sample, (void *) &info);
 
-	  printf("bits %ld, ll_inv %.1f c/l\n", 
+	  printf("bits %d, ll_inv %.1f c/l\n", 
            i,
 		   (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
  	  );

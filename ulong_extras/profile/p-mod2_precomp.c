@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2009 William Hart
+    Copyright 2009 William Hart
 
 ******************************************************************************/
 
@@ -33,23 +33,24 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t n, d, r = 0;
    double dpre;
+   ulong i;
+   mp_ptr array = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
    
-   mp_limb_t * array = malloc(1024*sizeof(mp_limb_t));
-   
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
+      int j;
       d = n_randtest();
       if (d == 0UL) d++;
 
       dpre = n_precompute_inverse(d);
 
-      for (mp_size_t j = 0; j < 1024; j++)
+      for (j = 0; j < 1024; j++)
       {
-         array[i] = n_randtest();
+         array[j] = n_randtest();
       }
 
       prof_start();
-      for (mp_size_t j = 0; j < 10000; j++)
+      for (j = 0; j < 10000; j++)
       {
          r += n_mod2_precomp(array[j&1023], d, dpre);  
       }

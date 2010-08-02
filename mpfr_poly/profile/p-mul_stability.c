@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2010 William Hart
+    Copyright 2010 William Hart
 
 ******************************************************************************/
 
@@ -64,12 +64,12 @@
 
 #define PRINT 0 // print output polys
 
-ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
+long bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 {
    mpfr_t t;
-   ulong i;
+   long i;
    mpfr_init2(t, a->prec);
-   ulong lost = 0, bits, bits1, bits2;
+   long bits, bits1, bits2, lost = 0;
    double d1, d2;
 
    for (i = 0; i < b->length; i++)
@@ -79,7 +79,7 @@ ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 	  d2 = mpfr_get_d_2exp(&bits2, t, GMP_RNDN);
 	  bits = a->prec - (bits1 - bits2);
 	  if (d2 == 0.0) bits = 0;
-	  if ((long) bits < 0L) bits = 0;
+	  if (bits < 0) bits = 0;
 	  if (bits > lost)
 		  lost = bits;
    }
@@ -92,7 +92,7 @@ ulong bits_lost(mpfr_poly_t a, mpfr_poly_t b)
 #if HAVE_MPFRCX
 void mul_mpfrcx(mpfr_poly_t c, mpfr_poly_t a, mpfr_poly_t b, mpfr_poly_t temp)
 {
-	ulong len_out = a->length + b->length - 1;
+	long len_out = a->length + b->length - 1;
 	mpfr_poly_fit_length(c, len_out);
 	mpfrx_array_mul_fft (c->coeffs, a->coeffs, b->coeffs, a->length, b->length);
 	mpfrx_array_mul_karatsuba (c->coeffs, a->coeffs, b->coeffs, a->length, b->length, 1, 1, temp->coeffs);
@@ -102,9 +102,12 @@ void mul_mpfrcx(mpfr_poly_t c, mpfr_poly_t a, mpfr_poly_t b, mpfr_poly_t temp)
 
 void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length, ulong prec)
 {
-   ulong prec2 = PREC_SCALE*prec; // full precision computation occurs at this precision
-   ulong prec3 = PREC_SCALE2*prec + GB; // prec at which we'll do our computation (including guard bits)
-   ulong lost;
+   mpfr_prec_t prec2 = PREC_SCALE*prec; // full precision computation occurs at this precision
+   mpfr_prec_t prec3 = PREC_SCALE2*prec + GB; // prec at which we'll do our computation (including guard bits)
+   long lost;
+   long i, j, k;
+   long bits;
+   double d1;
    
    mpfr_t scale, mult;
    mpfr_poly_t a, b, c, d, temp;
@@ -122,7 +125,7 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
    *max = 0;
    *av = 0;
 
-   for (ulong i = 0; i < ITERS; i++)
+   for (i = 0; i < ITERS; i++)
    {
       mpfr_poly_set_prec(a, prec3); // compute at prec3 (includes guard bits)
 	  mpfr_poly_set_prec(b, prec3);
@@ -138,7 +141,7 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 		 mpfr_set_ui(b->coeffs + 1, 1, GMP_RNDN);
 	  }
 	  
-	  for (ulong j = 2; j < length; j++)
+	  for (j = 2; j < length; j++)
 	  {
 		  mpfr_div_ui(a->coeffs + j, a->coeffs + j - 1, j, GMP_RNDN);
 		  mpfr_div_ui(b->coeffs + j, b->coeffs + j - 1, j, GMP_RNDN);
@@ -151,7 +154,7 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 #if FATEMAN1
 	  mpfr_set_ui(scale, 10, GMP_RNDN);
 	  mpfr_set_ui(mult, 1, GMP_RNDN);
-	  for (ulong j = 0; j < length; j++)
+	  for (j = 0; j < length; j++)
 	  {
          mpfr_set(a->coeffs + length - j - 1, mult, GMP_RNDN);
 		 mpfr_mul(mult, mult, scale, GMP_RNDN);
@@ -166,12 +169,12 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 
 #if FATEMAN2
 	  mpfr_set_ui(a->coeffs, 1, GMP_RNDN);
-	  for (ulong j = 1; j < length; j++)
+	  for (j = 1; j < length; j++)
          mpfr_set_ui(a->coeffs + j, 2, GMP_RNDN);
       mpfr_set_ui(a->coeffs + length, 1, GMP_RNDN);
 
 	  mpfr_set_ui(b->coeffs, 1, GMP_RNDN);
-	  for (ulong j = 1; j < length; j++)
+	  for (j = 1; j < length; j++)
 	  {
 		  if (j & 1)
 			  mpfr_set_si(b->coeffs + j, -2, GMP_RNDN);
@@ -190,8 +193,8 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 #if RANDOM
 	  mpfr_poly_randtest(a, length);
       mpfr_poly_randtest(b, length);
-	  for (ulong j = 0; j < length; j++)
-	  {	  
+	  for (j = 0; j < length; j++)
+	  {
 #if VARY
 		  mpfr_mul_2exp(a->coeffs + j, a->coeffs + j, n_randint(prec), GMP_RNDN);
 	      mpfr_mul_2exp(b->coeffs + j, b->coeffs + j, n_randint(prec), GMP_RNDN);
@@ -211,9 +214,7 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 	  mpfr_poly_set_prec(c, prec);
 	  
 #if PRINT
-	  ulong bits;
-	  double d1;
-	  for (ulong k = 0; k < 2*length + 1; k++)
+	  for (k = 0; k < 2*length + 1; k++)
 	  {
 		  d1 = mpfr_get_d_2exp(&bits, c->coeffs + k, GMP_RNDN);
 		  printf("d = %lf, b = %ld, ", d1, bits);
@@ -250,6 +251,7 @@ void sample(mp_bitcnt_t * min, mp_bitcnt_t * av, mp_bitcnt_t * max, ulong length
 int main(void)
 {
    ulong min, av, max, length, len_old = 0, prec = PREC;
+   long i;
    
    printf("p-mul_stability:\n");
    
@@ -257,7 +259,7 @@ int main(void)
 
    length = 1;
 
-   for (ulong i = 0; i <= 100; i++)
+   for (i = 0; i <= 100; i++)
    {
 	  sample(&min, &av, &max, length, prec);
 	  printf("len = %ld, min = %ld, av = %ld, max = %ld, prec = %ld\n", length, min, av, max, prec);
