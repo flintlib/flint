@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -31,31 +31,30 @@
 
 void fmpz_mpoly_init(fmpz_mpoly_t poly, ulong vars, ulong ebits)
 {
-   poly->coeffs = NULL;
-   poly->exps = NULL;
-   
-   poly->alloc = 0;
-   poly->length = 0;
-   poly->vars = vars;
-   poly->ebits = ebits;
+    poly->coeffs = NULL;
+    poly->exps   = NULL;
+    
+    poly->alloc  = 0;
+    poly->length = 0;
+    poly->vars   = vars;
+    poly->ebits  = ebits;
 }
 
 void fmpz_mpoly_init2(fmpz_mpoly_t poly, ulong alloc, ulong vars, ulong ebits)
 {
-   if (alloc) // allocate space for alloc
-   {
-      poly->coeffs = (fmpz *) malloc(alloc*sizeof(fmpz));
-	  poly->exps = (fmpz *) malloc(alloc*sizeof(fmpz));
-	  mpn_zero(poly->coeffs, alloc);
-	  mpn_zero(poly->exps, alloc);
-   } else 
-   {
-	  poly->coeffs = NULL;
-	  poly->exps = NULL;
-   }
+    if (alloc) // allocate space for alloc
+    {
+        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
+        poly->exps   = (fmpz *) calloc(alloc, sizeof(fmpz));
+    }
+    else 
+    {
+        poly->coeffs = NULL;
+        poly->exps   = NULL;
+    }
 
-   poly->alloc = alloc;
-   poly->vars = vars;
-   poly->length = 0;
-   poly->ebits = ebits; 
+    poly->alloc  = alloc;
+    poly->vars   = vars;
+    poly->length = 0;
+    poly->ebits  = ebits; 
 }
