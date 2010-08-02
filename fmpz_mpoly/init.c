@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_init(fmpz_mpoly_t poly, ulong vars, ulong ebits)
+void fmpz_mpoly_init(fmpz_mpoly_t poly, long vars, mp_bitcnt_t ebits)
 {
     poly->coeffs = NULL;
     poly->exps   = NULL;
@@ -40,7 +40,7 @@ void fmpz_mpoly_init(fmpz_mpoly_t poly, ulong vars, ulong ebits)
     poly->ebits  = ebits;
 }
 
-void fmpz_mpoly_init2(fmpz_mpoly_t poly, ulong alloc, ulong vars, ulong ebits)
+void fmpz_mpoly_init2(fmpz_mpoly_t poly, long alloc, long vars, mp_bitcnt_t ebits)
 {
     if (alloc) // allocate space for alloc
     {

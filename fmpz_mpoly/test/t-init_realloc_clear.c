@@ -32,7 +32,7 @@
 
 int main(void)
 {
-   int i, result;
+   int i;
    printf("init/init2/realloc/clear....");
    fflush(stdout);
    

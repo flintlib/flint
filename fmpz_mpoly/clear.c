@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,29 +16,29 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
 
-#include <mpir.h>
+******************************************************************************/
+
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
 void fmpz_mpoly_clear(fmpz_mpoly_t poly)
 {
-   ulong i;
-   
-   for (i = 0; i < poly->alloc; i++) // Clean up any mpz_t's
-   {
-	  _fmpz_demote(poly->coeffs + i);
-	  _fmpz_demote(poly->exps + i);
-   }
+    long i;
 
-   if (poly->coeffs) free(poly->coeffs); // clean up coeffs
-   if (poly->exps) free(poly->exps); // and exps
+    for (i = 0; i < poly->alloc; i++) // Clean up any mpz_t's
+    {
+        _fmpz_demote(poly->coeffs + i);
+        _fmpz_demote(poly->exps + i);
+    }
+
+    if (poly->coeffs) free(poly->coeffs); // clean up coeffs
+    if (poly->exps) free(poly->exps); // and exps
 }

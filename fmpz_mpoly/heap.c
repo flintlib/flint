@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,18 +16,18 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-   This implementation was inspired by the reference implementation of
-   Roman Pearce.
-   
-*****************************************************************************/
+    This implementation was inspired by the reference implementation of
+    Roman Pearce.
 
-#include <mpir.h>
+******************************************************************************/
+
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
@@ -116,6 +116,5 @@ void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n,
 
 	  return;
    }
-
 }
 

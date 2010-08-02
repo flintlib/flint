@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_realloc(fmpz_mpoly_t poly, ulong alloc)
+void fmpz_mpoly_realloc(fmpz_mpoly_t poly, long alloc)
 {
    if (alloc == 0) // clear up
    {

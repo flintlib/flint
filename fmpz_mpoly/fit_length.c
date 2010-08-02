@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,27 +16,27 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2010 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, ulong length)
+void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, long len)
 {
-   ulong alloc = length;
-   
-   if (alloc <= poly->alloc) return;
+    long alloc = len;
 
-   // at least double number of allocated coeffs
-   if (alloc < 2*poly->alloc) alloc = 2*poly->alloc; 
-   
-   fmpz_mpoly_realloc(poly, alloc);
+    if (alloc <= poly->alloc) return;
+
+    // at least double number of allocated coeffs
+    if (alloc < 2*poly->alloc) alloc = 2 * poly->alloc; 
+
+    fmpz_mpoly_realloc(poly, alloc);
 }
