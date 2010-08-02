@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("factor_power235....");
    fflush(stdout);
  
-   for (ulong i = 0; i < 10000UL; i++) /* Test random squares */
+   for (i = 0; i < 10000; i++) /* Test random squares */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
@@ -46,16 +46,15 @@ int main(void)
       n2 = n_pow(factor, exp);
 
       result = (n1*n1 == n2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("factor = %lu, exp = %lu\n", factor, exp); 
          abort();
       }
    }
    
-   for (ulong i = 0; i < 10000UL; i++) /* Test random cubes */
+   for (i = 0; i < 10000; i++) /* Test random cubes */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
@@ -66,16 +65,15 @@ int main(void)
       n2 = n_pow(factor, exp);
 
       result = (n1*n1*n1 == n2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("factor = %lu, exp = %lu\n", factor, exp); 
          abort();
       }
    }
    
-   for (ulong i = 0; i < 10000UL; i++) /* Test random fifth powers */
+   for (i = 0; i < 10000; i++) /* Test random fifth powers */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
@@ -86,16 +84,15 @@ int main(void)
       n2 = n_pow(factor, exp);
 
       result = (n1*n1*n1*n1*n1 == n2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("factor = %lu, exp = %lu\n", factor, exp); 
          abort();
       }
    }
    
-   for (ulong i = 0; i < 10000UL; i++) /* Test non 235-powers */
+   for (i = 0; i < 10000; i++) /* Test non 235-powers */
    {
       mp_limb_t exp, n1;
       
@@ -105,10 +102,9 @@ int main(void)
       } while (n_is_perfect_power235(n1));
       
       result = (!n_factor_power235(&exp, n1));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("n1 = %lu, exp = %lu\n", n1, exp); 
          abort();
       }

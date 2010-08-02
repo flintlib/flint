@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("sqrtrem....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 100000UL; i++)
+   for (i = 0; i < 100000; i++)
    {
       mp_limb_t a, r1, r2, s1, s2;
       mpz_t a_m, r2_m, s2_m;
@@ -55,10 +55,9 @@ int main(void)
       s2 = mpz_get_ui(s2_m);
       
       result = ((r1 == r2) && (s1 == s2));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("a = %lu, r1 = %ld, r2 = %lu, s1 = %ld, s2 = %lu\n", a, r1, r2, s1, s2); 
          abort();
       }
@@ -68,7 +67,7 @@ int main(void)
       mpz_clear(s2_m);
    }
 
-   for (ulong i = 0; i < 100000UL; i++)
+   for (i = 0; i < 100000; i++)
    {
       mp_limb_t a, r1, r2, s1, s2, bits;
       mpz_t a_m, r2_m, s2_m;
@@ -93,7 +92,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL2\n");
+         printf("FAIL:\n");
          printf("a = %lu, r1 = %ld, r2 = %lu, s1 = %ld, s2 = %lu\n", a, r1, r2, s1, s2); 
          abort();
       }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("xgcd....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
       mp_limb_t a, b, c, g, bits1, bits2, bits3, ph, pl, qh, ql;
       mp_limb_signed_t s, t;
@@ -61,7 +61,7 @@ int main(void)
       result = ((g == c) && (ph == 0UL) && (pl == c));
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("a = %lu, b = %lu, c = %lu, g = %lu, s = %ld, t = %ld\n", a, b, c, g, s, t); 
          abort();
       }
