@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,33 +16,35 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a, mp_limb_t d)
+int
+n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
+                                mp_limb_t d)
 {
-   mp_limb_t t = d;
-   mp_limb_t y;
-      
-   y = n_powmod_precomp(a, t, n, npre);
+    mp_limb_t t = d;
+    mp_limb_t y;
 
-   if (y == 1UL) return 1;
-   t <<= 1;
+    y = n_powmod_precomp(a, t, n, npre);
 
-   while ((t != n - 1) && (y != n - 1))
-   {
-      y = n_mulmod_precomp(y, y, n, npre);
-      t <<= 1;
-   }
-   
-   return (y == n - 1);
+    if (y == 1UL)
+        return 1;
+    t <<= 1;
+
+    while ((t != n - 1) && (y != n - 1))
+    {
+        y = n_mulmod_precomp(y, y, n, npre);
+        t <<= 1;
+    }
+
+    return (y == n - 1);
 }
-

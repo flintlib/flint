@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,30 +16,33 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008 Peter Shrimpton
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2008 Peter Shrimpton
+    Copyright (C) 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
+int
+n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
 {
-	if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS) return (n_powmod(i, n - 1, n) == 1UL);
-   else 
-   {
-      if ((mp_limb_signed_t) (n - 1) < 0L)
-      {
-         mp_limb_t temp = n_powmod2(i, (n - 1)/2, n);
-         return (n_powmod2(temp, 2, n) == 1UL);
-      } else
-      {
-         return (n_powmod2(i, n - 1, n) == 1UL);
-      }
-   }
+    if (FLINT_BIT_COUNT(n) <= FLINT_D_BITS)
+        return (n_powmod(i, n - 1, n) == 1UL);
+    else
+    {
+        if ((mp_limb_signed_t) (n - 1) < 0L)
+        {
+            mp_limb_t temp = n_powmod2(i, (n - 1) / 2, n);
+            return (n_powmod2(temp, 2, n) == 1UL);
+        }
+        else
+        {
+            return (n_powmod2(i, n - 1, n) == 1UL);
+        }
+    }
 }

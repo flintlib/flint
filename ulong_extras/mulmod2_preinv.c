@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,22 +16,23 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
+mp_limb_t
+n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
 {
-   mp_limb_t p1, p2;
-   
-   umul_ppmm(p1, p2, a, b);
-   
-   return n_ll_mod_preinv(p1, p2, n, ninv);
+    mp_limb_t p1, p2;
+
+    umul_ppmm(p1, p2, a, b);
+
+    return n_ll_mod_preinv(p1, p2, n, ninv);
 }

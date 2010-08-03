@@ -28,24 +28,26 @@
 #include "ulong_extras.h"
 #include <stdio.h>
 
-#if 0
+/*
 
 mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 {
-   unsigned int norm;
-   mp_limb_t q, r;
+    unsigned int norm;
+    mp_limb_t q, r;
 
-   count_leading_zeros(norm, n);
-   udiv_qrnnd_preinv(q, r, r_shift(a, FLINT_BITS-norm), a<<norm, n<<norm, ninv);
-   return (r>>norm);
+    count_leading_zeros(norm, n);
+    udiv_qrnnd_preinv(q, r, r_shift(a, FLINT_BITS-norm), a<<norm, n<<norm, ninv);
+    return (r>>norm);
 }
 
-#else /* 
-         New method of Moller and Granlund
-         see paper Improved Division by Invariant Integers (Torbjorn Granlund
-		 and Niels Moller) (preprint): (pp. 4)
-		 http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
-	  */
+*/
+
+/* 
+   New method of Moller and Granlund
+   see paper Improved Division by Invariant Integers (Torbjorn Granlund
+   and Niels Moller) (preprint): (pp. 4)
+   http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
+ */
 mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 {
     unsigned int norm;
@@ -56,7 +58,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 
     {
 	    const mp_limb_t u1 = r_shift(a, FLINT_BITS-norm);
-        const mp_limb_t u0 = (a<<norm);
+        const mp_limb_t u0 = (a << norm);
 
         umul_ppmm(q1, q0, ninv, u1);
         add_ssaaaa(q1, q0, q1, q0, u1, u0);
@@ -65,9 +67,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 
         if (r >= q0) r += n;
 
-        if (r < n) return (r>>norm);
-        else return ((r - n)>>norm);
+        return (r < n) ? (r >> norm) : ((r - n) >> norm);
    }
 }
 
-#endif

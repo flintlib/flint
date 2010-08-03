@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -38,17 +38,17 @@ const ulong * revtab[5] = { revtab0, revtab1, revtab2, revtab3, revtab4 };
 // computes the reverse binary of a binary number of the given number of bits
 ulong n_revbin(ulong in, ulong bits)
 {
-   ulong out = 0, i;
-   
-   if (bits <= 4)
-      return revtab[bits][in];
+    ulong out = 0, i;
+    
+    if (bits <= 4)
+        return revtab[bits][in];
 
-   for (i = 0; i < bits; i++)
-   {   
-      out <<= 1;
-      out += (in & 1);
-      in >>= 1;
-   }
+    for (i = 0; i < bits; i++)
+    {   
+       out <<= 1;
+       out += (in & 1);
+       in >>= 1;
+    }
 
-   return out;
+    return out;
 }
