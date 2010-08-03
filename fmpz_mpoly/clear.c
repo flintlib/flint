@@ -29,16 +29,19 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_clear(fmpz_mpoly_t poly)
+void
+fmpz_mpoly_clear(fmpz_mpoly_t poly)
 {
     long i;
 
-    for (i = 0; i < poly->alloc; i++) // Clean up any mpz_t's
+    for (i = 0; i < poly->alloc; i++)   /* Clean up any mpz_t's */
     {
         _fmpz_demote(poly->coeffs + i);
         _fmpz_demote(poly->exps + i);
     }
 
-    if (poly->coeffs) free(poly->coeffs); // clean up coeffs
-    if (poly->exps) free(poly->exps); // and exps
+    if (poly->coeffs)
+        free(poly->coeffs);     /* Clean up coeffs */
+    if (poly->exps)
+        free(poly->exps);       /* and exps */
 }

@@ -29,32 +29,34 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_init(fmpz_mpoly_t poly, long vars, mp_bitcnt_t ebits)
+void
+fmpz_mpoly_init(fmpz_mpoly_t poly, long vars, mp_bitcnt_t ebits)
 {
     poly->coeffs = NULL;
-    poly->exps   = NULL;
-    
-    poly->alloc  = 0;
+    poly->exps = NULL;
+
+    poly->alloc = 0;
     poly->length = 0;
-    poly->vars   = vars;
-    poly->ebits  = ebits;
+    poly->vars = vars;
+    poly->ebits = ebits;
 }
 
-void fmpz_mpoly_init2(fmpz_mpoly_t poly, long alloc, long vars, mp_bitcnt_t ebits)
+void
+fmpz_mpoly_init2(fmpz_mpoly_t poly, long alloc, long vars, mp_bitcnt_t ebits)
 {
-    if (alloc) // allocate space for alloc
+    if (alloc)                  /* Allocate space for alloc */
     {
         poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
-        poly->exps   = (fmpz *) calloc(alloc, sizeof(fmpz));
+        poly->exps = (fmpz *) calloc(alloc, sizeof(fmpz));
     }
-    else 
+    else
     {
         poly->coeffs = NULL;
-        poly->exps   = NULL;
+        poly->exps = NULL;
     }
 
-    poly->alloc  = alloc;
-    poly->vars   = vars;
+    poly->alloc = alloc;
+    poly->vars = vars;
     poly->length = 0;
-    poly->ebits  = ebits; 
+    poly->ebits = ebits;
 }

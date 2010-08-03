@@ -29,14 +29,17 @@
 #include "fmpz.h"
 #include "fmpz_mpoly.h"
 
-void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, long len)
+void
+fmpz_mpoly_fit_length(fmpz_mpoly_t poly, long len)
 {
     long alloc = len;
 
-    if (alloc <= poly->alloc) return;
+    if (alloc <= poly->alloc)
+        return;
 
-    // at least double number of allocated coeffs
-    if (alloc < 2*poly->alloc) alloc = 2 * poly->alloc; 
+    /* At least double number of allocated coeffs */
+    if (alloc < 2 * poly->alloc)
+        alloc = 2 * poly->alloc;
 
     fmpz_mpoly_realloc(poly, alloc);
 }

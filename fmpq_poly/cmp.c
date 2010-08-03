@@ -33,10 +33,9 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden,
                    const fmpz * rpoly, const fmpz_t rden, long len)
 {
     int ans;
-    long i;
+    long i = len - 1;
     fmpz_t lcoeff, rcoeff;
     
-    i = len - 1;
     if (fmpz_equal(lden, rden))
     {
         while (i && fmpz_equal(lpoly + i, rpoly + i))

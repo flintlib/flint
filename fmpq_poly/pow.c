@@ -38,8 +38,7 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 {
-    long len = poly->length;
-    long rlen;
+    long len = poly->length, rlen;
     
     if (len == 0L)
     {
