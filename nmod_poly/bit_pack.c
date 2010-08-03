@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2007 David Howden
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-// assumes length > 0, bits > 0
+/* Assumes length > 0, bits > 0. */
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
 {  
    ulong current_limb = 0;

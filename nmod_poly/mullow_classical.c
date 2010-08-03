@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2008, 2009 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,14 +30,14 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-// Assumes poly1 and poly2 are not length 0 and 0 != trunc <= len1 + len2 - 1
+/* Assumes poly1 and poly2 are not length 0 and 0 < trunc <= len1 + len2 - 1 */
 void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1, 
 								 mp_srcptr poly2, long len2, long trunc, nmod_t mod)
 {
-   if (len1 == 1 || trunc == 1) // Special case if the length of output is 1
+   if (len1 == 1 || trunc == 1) /* Special case if the length of output is 1 */
    {
       res[0] = n_mulmod2_preinv(poly1[0], poly2[0], mod.n, mod.ninv);      
-   } else // Ordinary case
+   } else /* Ordinary case */
    {
       long i;
       
@@ -46,16 +46,16 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
       
 	  if (2*bits + log_len <= FLINT_BITS)
 	  {
-         // Set res[i] = poly1[i]*poly2[0] 
+         /* Set res[i] = poly1[i]*poly2[0] */
          mpn_mul_1(res, poly1, FLINT_MIN(len1, trunc), poly2[0]);
 	     
          if (len2 != 1)
 		 {
-			// Set res[i+len1-1] = in1[len1-1]*in2[i]
+			/* Set res[i+len1-1] = in1[len1-1]*in2[i] */
             if (trunc > len1)
 		       mpn_mul_1(res + len1, poly2 + 1, trunc - len1, poly1[len1 - 1]);
 	    
-            // out[i+j] += in1[i]*in2[j] 
+            /* out[i+j] += in1[i]*in2[j] */
             for (i = 0; i < FLINT_MIN(len1, trunc) - 1; i++)
                mpn_addmul_1(res + i + 1, poly2 + 1, FLINT_MIN(len2, trunc - i) - 1, poly1[i]);
 		 }
@@ -63,16 +63,16 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
 		 _nmod_vec_reduce(res, res, trunc, mod);
 	  } else
 	  {
-         // Set res[i] = poly1[i]*poly2[0] 
+         /* Set res[i] = poly1[i]*poly2[0] */
          _nmod_vec_scalar_mul(res, poly1, FLINT_MIN(len1, trunc), mod, poly2[0]);
 	  
          if (len2 == 1) return;
 
-		    // Set res[i+len1-1] = in1[len1-1]*in2[i]
+		    /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
          if (trunc > len1)
 		    _nmod_vec_scalar_mul(res + len1, poly2 + 1, trunc - len1, mod, poly1[len1 - 1]);
 	    
-         // out[i+j] += in1[i]*in2[j] 
+         /* out[i+j] += in1[i]*in2[j] */
          for (i = 0; i < FLINT_MIN(len1, trunc) - 1; i++)
             _nmod_vec_scalar_addmul(res + i + 1, poly2 + 1, FLINT_MIN(len2, trunc - i) - 1, mod, poly1[i]);
 	  }

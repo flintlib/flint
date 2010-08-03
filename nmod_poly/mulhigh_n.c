@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -31,6 +31,8 @@
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, long n)
 {
+    long bits, bits2;
+
    if (n <= 6)
    {
       if (n == 0)
@@ -40,8 +42,8 @@ void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, 
       return;
    }
    
-   long bits = FLINT_BITS - (long) poly1->mod.norm;
-   long bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+   bits = FLINT_BITS - (long) poly1->mod.norm;
+   bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
 
    if (2*bits + bits2 <= FLINT_BITS)
       nmod_poly_mulhigh_classical(res, poly1, poly2, n - 1);

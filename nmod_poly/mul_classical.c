@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,7 +29,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-// Assumes poly1 and poly2 are not length 0
+/* Assumes poly1 and poly2 are not length 0. */
 void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
 							              long len1, mp_srcptr poly2, long len2, nmod_t mod)
 {
@@ -39,31 +39,31 @@ void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
 
    if (2*bits + log_len <= FLINT_BITS)
    {
-	  // Set res[i] = poly1[i]*poly2[0] 
+	  /* Set res[i] = poly1[i]*poly2[0] */
       mpn_mul_1(res, poly1, len1, poly2[0]);
 	  
 	  if (len2 != 1) 
 	  {
-	     // Set res[i+len1-1] = in1[len1-1]*in2[i]
+	     /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
          mpn_mul_1(res + len1, poly2 + 1, len2 - 1, poly1[len1 - 1]);
 
-	     // out[i+j] += in1[i]*in2[j] 
+	     /* out[i+j] += in1[i]*in2[j] */
          for (i = 0; i < len1 - 1; i++)
             mpn_addmul_1(res + i + 1, poly2 + 1, len2 - 1, poly1[i]);
 	  }
 
-	  // final reduction
+	  /* final reduction */
 	  _nmod_vec_reduce(res, res, len1 + len2 - 1, mod);
    } else
    {
-	  // Set res[i] = poly1[i]*poly2[0] 
+	  /* Set res[i] = poly1[i]*poly2[0] */
       _nmod_vec_scalar_mul(res, poly1, len1, mod, poly2[0]);
 	  if (len2 == 1) return;
 
-	  // Set res[i+len1-1] = in1[len1-1]*in2[i]
+	  /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
       _nmod_vec_scalar_mul(res + len1, poly2 + 1, len2 - 1, mod, poly1[len1 - 1]);
 
-	  // out[i+j] += in1[i]*in2[j] 
+	  /* out[i+j] += in1[i]*in2[j] */
       for (i = 0; i < len1 - 1; i++)
          _nmod_vec_scalar_addmul(res + i + 1, poly2 + 1, len2 - 1, mod, poly1[i]);
    } 

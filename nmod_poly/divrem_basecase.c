@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -34,10 +34,6 @@ void _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
 		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-   mp_limb_t c;
-
-   mp_ptr R_sub;
-
    long coeff = A_len - 1;
    mp_ptr coeff_Q = Q - B_len + 1;
 
@@ -56,6 +52,8 @@ void _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
       
       if (coeff + 1 >= B_len)
       {
+        mp_limb_t c, * R_sub;
+        
          coeff_Q[coeff] = n_mulmod2_preinv(R[coeff], lead_inv, mod.n, mod.ninv); 
          
 		 c = n_negmod(coeff_Q[coeff], mod.n);
@@ -77,32 +75,30 @@ void _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
 void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, 
 		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
-   long i;
+   long coeff, i;
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-   mp_limb_t c;
-   mp_limb_t r_coeff;
-
-   mp_ptr R_sub;
+   mp_ptr coeff_Q, B2, R2;
  
-   mp_ptr B2 = nmod_vec_init(2*B_len - 2);
+   B2 = nmod_vec_init(2*B_len - 2);
    for (i = 0; i < B_len - 1; i++)
    {
       B2[2*i] = B[i];
 	  B2[2*i + 1] = 0;
    }
 
-   mp_ptr R2 = nmod_vec_init(2*A_len);
+   R2 = nmod_vec_init(2*A_len);
    for (i = 0; i < A_len; i++)
    {
       R2[2*i] = A[i];
 	  R2[2*i + 1] = 0;
    }
 
-   long coeff = A_len - 1;
-   mp_ptr coeff_Q = Q - B_len + 1;
+   coeff = A_len - 1;
+   coeff_Q = Q - B_len + 1;
   
    while (coeff + 1 >= B_len)
    {
+      mp_limb_t r_coeff;
       r_coeff = n_ll_mod_preinv(R2[2*coeff+1], R2[2*coeff], mod.n, mod.ninv);
   
       while ((coeff + 1 >= B_len) && (r_coeff == 0L))
@@ -114,6 +110,8 @@ void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
       
       if (coeff + 1 >= B_len)
       {
+        mp_limb_t c, * R_sub;
+        
          coeff_Q[coeff] = n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv); 
          
 		 c = n_negmod(coeff_Q[coeff], mod.n);
@@ -138,14 +136,12 @@ void _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
 void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, 
 		mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 {
-   long i;
+   long coeff, i;
    mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-   mp_limb_t c;
    mp_limb_t r_coeff;
+  mp_ptr B3, R3, coeff_Q;
 
-   mp_ptr R_sub;
- 
-   mp_ptr B3 = nmod_vec_init(3*B_len - 3);
+   B3 = nmod_vec_init(3*B_len - 3);
    for (i = 0; i < B_len - 1; i++)
    {
       B3[3*i] = B[i];
@@ -153,7 +149,7 @@ void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
 	  B3[3*i + 2] = 0;
    }
 
-   mp_ptr R3 = nmod_vec_init(3*A_len);
+   R3 = nmod_vec_init(3*A_len);
    for (i = 0; i < A_len; i++)
    {
       R3[3*i] = A[i];
@@ -161,8 +157,8 @@ void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
 	  R3[3*i + 2] = 0;
    }
 
-   long coeff = A_len - 1;
-   mp_ptr coeff_Q = Q - B_len + 1;
+   coeff = A_len - 1;
+   coeff_Q = Q - B_len + 1;
   
    while (coeff + 1 >= B_len)
    {
@@ -177,6 +173,8 @@ void _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
       
       if (coeff + 1 >= B_len)
       {
+        mp_limb_t c, *R_sub;
+        
          coeff_Q[coeff] = n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv); 
          
 		 c = n_negmod(coeff_Q[coeff], mod.n);
@@ -218,7 +216,7 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A, nmod
 
    if (B->length == 0)
    {
-      printf("Exception: Divide by zero in nmod_poly_divrem_basecase\n");
+      printf("Exception: division by zero in nmod_poly_divrem_basecase\n");
       abort();      
    }
    

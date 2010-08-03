@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -33,7 +33,8 @@ void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1,
 					   mp_srcptr input2, long length2, ulong bits_in, nmod_t mod)
 {   
    long len_out = length1 + length2 - 1;    
-   long bits; 
+   long bits, limbs1, limbs2;
+   mp_ptr mpn1, mpn2, res;
 
    if (!bits_in) 
    {
@@ -46,10 +47,8 @@ void _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1,
    } else
 	  bits = (long) bits_in;
    
-   mp_ptr mpn1, mpn2, res;
-
-   long limbs1 = (length1 * bits - 1) / FLINT_BITS + 1;
-   long limbs2 = (length2 * bits - 1) / FLINT_BITS + 1;
+   limbs1 = (length1 * bits - 1) / FLINT_BITS + 1;
+   limbs2 = (length2 * bits - 1) / FLINT_BITS + 1;
       
    mpn1 = (mp_ptr) malloc(sizeof(mp_limb_t)*limbs1);
    mpn2 = (input1 == input2) ? mpn1 : (mp_ptr) malloc(sizeof(mp_limb_t)*limbs2);

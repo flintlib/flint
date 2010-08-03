@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-// Assumes poly1 and poly2 are not length 0
+/* Assumes poly1 and poly2 are not length 0. */
 void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, 
 				long len1, mp_srcptr poly2, long len2, long start, nmod_t mod)
 {
@@ -38,11 +38,11 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
    
    _nmod_vec_zero(res, start);
    
-   if (len1 == 1) // Special case if the length of both inputs is 1
+   if (len1 == 1) /* Special case if the length of both inputs is 1 */
    {
       if (start == 0)
 		  res[0] = n_mulmod2_preinv(poly1[0], poly2[0], mod.n, mod.ninv);      
-   } else // Ordinary case
+   } else /* Ordinary case */
    {
       long i;
       long bits = FLINT_BITS - (long) mod.norm;
@@ -50,17 +50,17 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
       
 	  if (2*bits + log_len <= FLINT_BITS)
 	  {
-         // Set res[i] = poly1[i]*poly2[0] 
+         /* Set res[i] = poly1[i]*poly2[0] */
          if (start < len1)
 		    mpn_mul_1(res + start, poly1 + start, len1 - start, poly2[0]);
 	  
 	     if (len2 != 1)
 		 {
-			// Set res[i+len1-1] = in1[len1-1]*in2[i]
+			/* Set res[i+len1-1] = in1[len1-1]*in2[i] */
             m = FLINT_MAX(len1 - 1, start);
 	        mpn_mul_1(res + m, poly2 + m - len1 + 1, len2 - 1 + len1 - m, poly1[len1 - 1]);
 	  
-            // out[i+j] += in1[i]*in2[j] 
+            /* out[i+j] += in1[i]*in2[j] */
 	        m = FLINT_MAX(start, len2 - 1);
             for (i = m - len2 + 1; i < len1 - 1; i++)
 	        {
@@ -72,17 +72,17 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
 		 _nmod_vec_reduce(res, res, len1 + len2 - 1, mod);
 	  } else
 	  {
-         // Set res[i] = poly1[i]*poly2[0] 
+         /* Set res[i] = poly1[i]*poly2[0] */
          if (start < len1)
 		    _nmod_vec_scalar_mul(res + start, poly1 + start, len1 - start, mod, poly2[0]);
 	  
 		 if (len2 == 1) return;
 
-	     // Set res[i+len1-1] = in1[len1-1]*in2[i]
+	     /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
          m = FLINT_MAX(len1 - 1, start);
 	     _nmod_vec_scalar_mul(res + m, poly2 + m - len1 + 1, len2 - 1 + len1 - m, mod, poly1[len1 - 1]);
 	  
-         // out[i+j] += in1[i]*in2[j] 
+         /* out[i+j] += in1[i]*in2[j] */
 	     m = FLINT_MAX(start, len2 - 1);
          for (i = m - len2 + 1; i < len1 - 1; i++)
 	     {
