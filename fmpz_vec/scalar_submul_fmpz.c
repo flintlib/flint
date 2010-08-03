@@ -29,7 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, long len2, const fmpz_t x)
+void
+_fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, long len2,
+                             const fmpz_t x)
 {
     fmpz c = *x;
 
@@ -41,7 +43,7 @@ void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, long len2, con
             _fmpz_vec_sub(vec1, vec1, vec2, len2);
         else if (c == -1)
             _fmpz_vec_add(vec1, vec1, vec2, len2);
-        else 
+        else
             _fmpz_vec_scalar_submul_si(vec1, vec2, len2, c);
     }
     else
@@ -51,4 +53,3 @@ void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, long len2, con
             fmpz_submul(vec1 + i, vec2 + i, x);
     }
 }
-

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,26 +16,27 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, long len2, long c)
+void
+_fmpz_vec_scalar_addmul_si(fmpz * vec1, const fmpz * vec2, long len2, long c)
 {
-	long i;
-	
-	if (c >= 0)
-		for (i = 0; i < len2; i++)
-		    fmpz_addmul_ui(vec1 + i, vec2 + i, c);
-	else
-		for (i = 0; i < len2; i++)
-		    fmpz_submul_ui(vec1 + i, vec2 + i, -c);
+    long i;
+
+    if (c >= 0)
+        for (i = 0; i < len2; i++)
+            fmpz_addmul_ui(vec1 + i, vec2 + i, c);
+    else
+        for (i = 0; i < len2; i++)
+            fmpz_submul_ui(vec1 + i, vec2 + i, -c);
 }

@@ -29,12 +29,11 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, long len2, ulong exp)
+void
+_fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, long len2,
+                             ulong exp)
 {
     long i;
     for (i = 0; i < len2; i++)
-    {
         fmpz_fdiv_q_2exp(vec1 + i, vec2 + i, exp);
-    }
 }
-
