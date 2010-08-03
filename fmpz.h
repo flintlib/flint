@@ -75,10 +75,10 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f);
 static inline
 void _fmpz_demote(fmpz_t f)
 {
-	if (COEFF_IS_MPZ(*f)) 
-	{
-		_fmpz_clear_mpz(*f);
-		(*f) = 0L;
+    if (COEFF_IS_MPZ(*f)) 
+    {
+        _fmpz_clear_mpz(*f);
+        (*f) = 0L;
 	}
 }
 
@@ -116,9 +116,9 @@ long fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
 
-void fmpz_set_si(fmpz_t f, const long val);
+void fmpz_set_si(fmpz_t f, long val);
 
-void fmpz_set_ui(fmpz_t f, const ulong val);
+void fmpz_set_ui(fmpz_t f, ulong val);
 
 void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 
@@ -157,11 +157,12 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f);
 static inline
 void fmpz_swap(fmpz_t f, fmpz_t g)
 {
-	if (f == g) return; // swapping not required
-	
-	fmpz t = *f;
-   *f = *g;
-	*g = t;
+    if (f != g)  /* swapping required */
+    {
+        fmpz t = *f;
+        *f = *g;
+        *g = t;
+    }
 }
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
@@ -182,34 +183,35 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_mul_ui(fmpz_t f, const fmpz_t g, const ulong x);
+void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
-void fmpz_mul_si(fmpz_t f, const fmpz_t g, const long x);
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, long x);
 
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, const ulong exp);
+void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
-void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, const ulong exp);
+void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
-void fmpz_add_ui(fmpz_t f, const fmpz_t g, const ulong x);
+void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
 
-void fmpz_sub_ui(fmpz_t f, const fmpz_t g, const ulong x);
+void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);
 
-void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, const ulong x);
+void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
-void fmpz_submul_ui(fmpz_t f, const fmpz_t g, const ulong x);
+void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_pow_ui(fmpz_t f, const fmpz_t g, const ulong exp);
+void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
+
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
-ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong h);
+ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
@@ -221,7 +223,7 @@ void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h);
 
-void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, unsigned long h);
+void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
@@ -233,22 +235,14 @@ void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
-int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, 
-						      mp_bitcnt_t shift, mp_bitcnt_t bits,
-							     int negate, int borrow);
+int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
+                  const fmpz_t coeff, int negate, int borrow);
 
-int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
-					         mp_bitcnt_t bits, const fmpz_t coeff,
-							     int negate, int borrow);
+int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift, 
+                    mp_bitcnt_t bits, int negate, int borrow);
 
-void fmpz_bit_unpack_unsigned(fmpz_t coeff, 
-	  const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits);
+void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
+                              mp_bitcnt_t shift, mp_bitcnt_t bits);
 
 #endif
-
-
-
-
-
-
 

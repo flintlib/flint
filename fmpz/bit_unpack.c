@@ -27,178 +27,192 @@
 #include "flint.h"
 #include "fmpz.h"
 
-int fmpz_bit_unpack(fmpz_t coeff, const mp_limb_t * arr, mp_bitcnt_t shift, mp_bitcnt_t bits,
-							   int negate, int borrow)
+int
+fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
+                mp_bitcnt_t bits, int negate, int borrow)
 {
-   mp_limb_t sign;
-   ulong limbs = (shift + bits)/FLINT_BITS;
-   ulong rem_bits = (shift + bits)%FLINT_BITS;
-   mp_limb_t mask;
-	  
-   /* determine if field is positive or negative */
-   if (rem_bits)
-	  sign = ((((mp_limb_t) 1)<<(rem_bits - 1)) & arr[limbs]);
-   else
-      sign = ((((mp_limb_t) 1)<<(FLINT_BITS - 1)) & arr[limbs - 1]);
+    mp_limb_t mask, sign;
+    ulong limbs = (shift + bits) / FLINT_BITS;
+    ulong rem_bits = (shift + bits) % FLINT_BITS;
 
-   if (bits <= FLINT_BITS - 1) // fits into a small coeff
-   {
-      _fmpz_demote(coeff);
+    /* determine if field is positive or negative */
+    if (rem_bits)
+        sign = ((((mp_limb_t) 1) << (rem_bits - 1)) & arr[limbs]);
+    else
+        sign = ((((mp_limb_t) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
 
-	  /* mask for the given number of bits */
-	  mask = (((mp_limb_t) 1)<<bits) - (mp_limb_t) 1;
-	  
-	  if (limbs + (rem_bits != 0) > 1) // field crosses a limb boundary
-		 (*coeff) = ((arr[0]>>shift) + (arr[1]<<(FLINT_BITS - shift))) & mask;
-      else // field is in first limb only, mask it
-         (*coeff) = (arr[0]>>shift) & mask;
-	  
-	  /* sign extend */
-	  if (sign)
-	     (*coeff) += ((~(mp_limb_t) 0)<<bits);
-      
-	  /* determine whether we need to return a borrow */
-	  sign = (*coeff < (mp_limb_signed_t) 0 ? (mp_limb_t) 1 : (mp_limb_t) 0);
+    if (bits <= FLINT_BITS - 1)  /* fits into a small coeff */
+    {
+        _fmpz_demote(coeff);
 
-	  /* deal with borrow */
-	  if (borrow)
-	  {
-		 (*coeff)++;
-		 if ((*coeff) > COEFF_MAX)
-		    fmpz_set_ui(coeff, *coeff);
-	  }
+        /* mask for the given number of bits */
+        mask = (((mp_limb_t) 1) << bits) - (mp_limb_t) 1;
 
-	  /* negate the coeff if necessary */
-	  if (negate)
-	     fmpz_neg(coeff, coeff);
+        if (limbs + (rem_bits != 0) > 1)  /* field crosses a limb boundary */
+            (*coeff) =
+                ((arr[0] >> shift) + (arr[1] << (FLINT_BITS - shift))) & mask;
+        else  /* field is in first limb only, mask it */
+            (*coeff) = (arr[0] >> shift) & mask;
 
-      return (sign != (mp_limb_t) 0);
-   } else // large coefficient
-   {
-      __mpz_struct * mpz_ptr = _fmpz_promote(coeff);
+        /* sign extend */
+        if (sign)
+            (*coeff) += ((~(mp_limb_t) 0) << bits);
+
+        /* determine whether we need to return a borrow */
+        sign = (*coeff < (mp_limb_signed_t) 0 ? (mp_limb_t) 1 : (mp_limb_t) 0);
+
+        /* deal with borrow */
+        if (borrow)
+        {
+            (*coeff)++;
+            if ((*coeff) > COEFF_MAX)
+                fmpz_set_ui(coeff, *coeff);
+        }
+
+        /* negate the coeff if necessary */
+        if (negate)
+            fmpz_neg(coeff, coeff);
+
+        return (sign != (mp_limb_t) 0);
+    }
+    else  /* large coefficient */
+    {
+        __mpz_struct * mpz_ptr;
+        mp_limb_t * p;
+        ulong l, b;
         
-	  /* the number of limbs to hold the bitfield _including_ b extra bits */
-	  ulong l = (bits - 1)/FLINT_BITS + 1;
-      ulong b = bits%FLINT_BITS;
+        mpz_ptr = _fmpz_promote(coeff);
 
-      /* allocate space for l limbs only */
-	  mpz_realloc(mpz_ptr, l);
-	  mp_limb_t * p = mpz_ptr->_mp_d;
+        /* the number of limbs to hold the bitfield _including_ b extra bits */
+        l = (bits - 1) / FLINT_BITS + 1;
+        b = bits % FLINT_BITS;
 
-	  /* shift in l limbs */
-	  if (shift)
-	     mpn_rshift(p, arr, l, shift);
-	  else
-	     mpn_copyi(p, arr, l);
+        /* allocate space for l limbs only */
+        mpz_realloc(mpz_ptr, l);
+        p = mpz_ptr->_mp_d;
 
-	  /* shift in any rem_bits that weren't already shifted */
-	  if (limbs + (rem_bits != 0) > l)
-	     p[l - 1] += (arr[limbs]<<(FLINT_BITS - shift));
-	  
-	  /* mask off the last limb, if not full */
-	  if (b)
-	  {
-		 mask = (((mp_limb_t) 1)<<b) - (mp_limb_t) 1;
-		 p[l - 1] &= mask;
-	  }
+        /* shift in l limbs */
+        if (shift)
+            mpn_rshift(p, arr, l, shift);
+        else
+            mpn_copyi(p, arr, l);
 
-	  if (sign != (mp_limb_t) 0)
-	  {
-	     /* sign extend */
-		 if (b)
-			p[l - 1] += ((~(mp_limb_t) 0)<<b);
-		 
-		 /* negate */
-		 mpn_com_n(p, p, l);
-		 if (!borrow)
-		    mpn_add_1(p, p, l, 1);
+        /* shift in any rem_bits that weren't already shifted */
+        if (limbs + (rem_bits != 0) > l)
+            p[l - 1] += (arr[limbs] << (FLINT_BITS - shift));
 
-		 /* normalise */
-		 while (l && (p[l - 1] == (mp_limb_t) 0))
-		    l--;
+        /* mask off the last limb, if not full */
+        if (b)
+        {
+            mask = (((mp_limb_t) 1) << b) - (mp_limb_t) 1;
+            p[l - 1] &= mask;
+        }
 
-		 mpz_ptr->_mp_size = -l;
+        if (sign != (mp_limb_t) 0)
+        {
+            /* sign extend */
+            if (b)
+                p[l - 1] += ((~(mp_limb_t) 0) << b);
 
-		 sign = 1;
-	  } else
-	  {
-	     /* deal with borrow */
-		  if (borrow)
-		    mpn_add_1(p, p, l, 1);
+            /* negate */
+            mpn_com_n(p, p, l);
+            if (!borrow)
+                mpn_add_1(p, p, l, 1);
 
-		 /* normalise */
-		  while (l && (p[l - 1] == (mp_limb_t) 0))
-		    l--;
-        
-		 mpz_ptr->_mp_size = l;
-		 sign = 0;
-	  }
-	  
-	  /* negate if required */
-	  if (negate)
-		 mpz_neg(mpz_ptr, mpz_ptr);
+            /* normalise */
+            while (l && (p[l - 1] == (mp_limb_t) 0))
+                l--;
 
-	  /* coeff may fit in a small */
-	  _fmpz_demote_val(coeff);
-      
-	  return sign;
-   }
+            mpz_ptr->_mp_size = -l;
+
+            sign = 1;
+        }
+        else
+        {
+            /* deal with borrow */
+            if (borrow)
+                mpn_add_1(p, p, l, 1);
+
+            /* normalise */
+            while (l && (p[l - 1] == (mp_limb_t) 0))
+                l--;
+
+            mpz_ptr->_mp_size = l;
+            sign = 0;
+        }
+
+        /* negate if required */
+        if (negate)
+            mpz_neg(mpz_ptr, mpz_ptr);
+
+        /* coeff may fit in a small */
+        _fmpz_demote_val(coeff);
+
+        return sign;
+    }
 }
 
-void fmpz_bit_unpack_unsigned(fmpz_t coeff, const mp_limb_t * arr, 
-							             mp_bitcnt_t shift, mp_bitcnt_t bits)
+void
+fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
+                         mp_bitcnt_t shift, mp_bitcnt_t bits)
 {
-   ulong limbs = (shift + bits)/FLINT_BITS;
-   ulong rem_bits = (shift + bits)%FLINT_BITS;
-   mp_limb_t mask;
-	  
-   if (bits <= FLINT_BITS - 2) // fits into a small coeff
-   {
-      _fmpz_demote(coeff);
+    ulong limbs = (shift + bits) / FLINT_BITS;
+    ulong rem_bits = (shift + bits) % FLINT_BITS;
+    mp_limb_t mask;
 
-	  /* mask for the given number of bits */
-	  mask = (((mp_limb_t) 1)<<bits) - (mp_limb_t) 1;
-	  
-	  if (limbs + (rem_bits != 0) > 1) // field crosses a limb boundary
-		 (*coeff) = ((arr[0]>>shift) + (arr[1]<<(FLINT_BITS - shift))) & mask;
-      else // field is in first limb only, mask it
-         (*coeff) = (arr[0]>>shift) & mask;
-   } else // large coefficient
-   {
-      __mpz_struct * mpz_ptr = _fmpz_promote(coeff);
-        
-	  /* the number of limbs to hold the bitfield _including_ b extra bits */
-	  ulong l = (bits - 1)/FLINT_BITS + 1;
-      ulong b = bits%FLINT_BITS;
+    if (bits <= FLINT_BITS - 2)  /* fits into a small coeff */
+    {
+        _fmpz_demote(coeff);
 
-      /* allocate space for l limbs only */
-	  mpz_realloc(mpz_ptr, l);
-	  mp_limb_t * p = mpz_ptr->_mp_d;
+        /* mask for the given number of bits */
+        mask = (((mp_limb_t) 1) << bits) - (mp_limb_t) 1;
 
-	  /* shift in l limbs */
-	  if (shift)
-	     mpn_rshift(p, arr, l, shift);
-	  else
-	     mpn_copyi(p, arr, l);
+        if (limbs + (rem_bits != 0) > 1)  /* field crosses a limb boundary */
+            (*coeff) =
+                ((arr[0] >> shift) + (arr[1] << (FLINT_BITS - shift))) & mask;
+        else  /* field is in first limb only, mask it */
+            (*coeff) = (arr[0] >> shift) & mask;
+    }
+    else  /* large coefficient */
+    {
+        __mpz_struct * mpz_ptr;
+        mp_limb_t * p;
+        ulong l, b;
 
-	  /* shift in any rem_bits that weren't already shifted */
-	  if (limbs + (rem_bits != 0) > l)
-	     p[l - 1] += (arr[limbs]<<(FLINT_BITS - shift));
-	  
-	  /* mask off the last limb, if not full */
-	  if (b)
-	  {
-		 mask = (((mp_limb_t) 1)<<b) - (mp_limb_t) 1;
-		 p[l - 1] &= mask;
-	  }
+        mpz_ptr = _fmpz_promote(coeff);
 
-	  /* normalise */
-	  while (l && (p[l - 1] == (mp_limb_t) 0))
-		 l--;
-        
-	  mpz_ptr->_mp_size = l;
-		 
-	  /* coeff may fit in a small */
-	  _fmpz_demote_val(coeff);
-   }
+        /* the number of limbs to hold the bitfield _including_ b extra bits */
+        l = (bits - 1) / FLINT_BITS + 1;
+        b = bits % FLINT_BITS;
+
+        /* allocate space for l limbs only */
+        mpz_realloc(mpz_ptr, l);
+        p = mpz_ptr->_mp_d;
+
+        /* shift in l limbs */
+        if (shift)
+            mpn_rshift(p, arr, l, shift);
+        else
+            mpn_copyi(p, arr, l);
+
+        /* shift in any rem_bits that weren't already shifted */
+        if (limbs + (rem_bits != 0) > l)
+            p[l - 1] += (arr[limbs] << (FLINT_BITS - shift));
+
+        /* mask off the last limb, if not full */
+        if (b)
+        {
+            mask = (((mp_limb_t) 1) << b) - (mp_limb_t) 1;
+            p[l - 1] &= mask;
+        }
+
+        /* normalise */
+        while (l && (p[l - 1] == (mp_limb_t) 0))
+            l--;
+
+        mpz_ptr->_mp_size = l;
+
+        /* coeff may fit in a small */
+        _fmpz_demote_val(coeff);
+    }
 }

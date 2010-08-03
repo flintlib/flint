@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,32 +30,37 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, const ulong h)
+ulong
+fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 {
-	fmpz c1 = *g;
-	ulong r;
+    fmpz c1 = *g;
+    ulong r;
 
-   if (h == 0UL) 
-   {
-      printf("Exception : division by 0 in fmpz_mod_ui\n");
-      abort();
-   }
-	
-   if (!COEFF_IS_MPZ(c1)) // g is small
-	{
-		if (c1 < 0L) 
-		{
-			r = h - (-c1 % h); // C doesn't correctly handle negative mods
-			if (r == h) r = 0;
-		} else r = c1 % h;
-		
-		fmpz_set_ui(f, r);
-		return r;
-	} else // g is large
-	{		
-		r = mpz_fdiv_ui(COEFF_TO_PTR(c1), h);
-		
-		fmpz_set_ui(f, r);
-		return r;
-	}
+    if (h == 0UL)
+    {
+        printf("Exception: division by 0 in fmpz_mod_ui\n");
+        abort();
+    }
+
+    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    {
+        if (c1 < 0L)
+        {
+            r = h - (-c1 % h);  /* C doesn't correctly handle negative mods */
+            if (r == h)
+                r = 0;
+        }
+        else
+            r = c1 % h;
+
+        fmpz_set_ui(f, r);
+        return r;
+    }
+    else                        /* g is large */
+    {
+        r = mpz_fdiv_ui(COEFF_TO_PTR(c1), h);
+
+        fmpz_set_ui(f, r);
+        return r;
+    }
 }

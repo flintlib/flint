@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <mpir.h>
@@ -29,13 +29,14 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_read(fmpz_t f)
+void
+fmpz_read(fmpz_t f)
 {
-	mpz_t temp;
-	mpz_init(temp);
+    mpz_t temp;
+    mpz_init(temp);
 
-	mpz_inp_str(temp, stdin, 10);
-	fmpz_set_mpz(f, temp);
+    mpz_inp_str(temp, stdin, 10);
+    fmpz_set_mpz(f, temp);
 
-	mpz_clear(temp);
+    mpz_clear(temp);
 }
