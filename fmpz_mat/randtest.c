@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,15 +29,15 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
+void
+fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
 {
-   long r, c, i, j;
+    long r, c, i, j;
 
-   r = mat->r;
-   c = mat->c;
+    r = mat->r;
+    c = mat->c;
 
-   for (i = 0; i < r; i++)
-      for (j = 0; j < c; j++)
-	     fmpz_randtest(mat->rows[i] + j, bits_in);
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            fmpz_randtest(mat->rows[i] + j, bits_in);
 }
-
