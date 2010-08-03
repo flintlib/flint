@@ -29,7 +29,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_print(const fmpz_poly_t poly)
+void
+fmpz_poly_print(const fmpz_poly_t poly)
 {
     long i;
 

@@ -28,26 +28,28 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len)
+void
+_fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len)
 {
     long i;
-    for (i = 1L; i < len; i++)
-        fmpz_mul_ui(rpoly + (i - 1L), poly + i, i);
+    for (i = 1; i < len; i++)
+        fmpz_mul_ui(rpoly + (i - 1), poly + i, i);
 }
 
-void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
+void
+fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 {
     long len = poly->length;
-    if (len < 2L)
+    if (len < 2)
     {
         fmpz_poly_zero(res);
         return;
     }
-    
-    fmpz_poly_fit_length(res, len - 1L);
+
+    fmpz_poly_fit_length(res, len - 1);
 
     _fmpz_poly_derivative(res->coeffs, poly->coeffs, len);
-    
-    _fmpz_poly_set_length(res, len - 1L);
+
+    _fmpz_poly_set_length(res, len - 1);
     _fmpz_poly_normalise(res);
 }

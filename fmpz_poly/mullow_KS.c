@@ -82,24 +82,24 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
     if (poly1 == poly2)
     {
-        arr1 = (mp_limb_t *) calloc(limbs1, sizeof(mp_limb_t));
+        arr1 = (mp_ptr) calloc(limbs1, sizeof(mp_limb_t));
         arr2 = arr1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
     }
     else
     {
-        arr1 = (mp_limb_t *) calloc(limbs1 + limbs2, sizeof(mp_limb_t));
+        arr1 = (mp_ptr) calloc(limbs1 + limbs2, sizeof(mp_limb_t));
         arr2 = arr1 + limbs1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
         _fmpz_poly_bit_pack(arr2, poly2, len2, bits, neg2);
     }
 
-    arr3 = (mp_limb_t *) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
+    arr3 = (mp_ptr) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
     if (poly1 != poly2)
         mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
-         mpn_mul_n(arr3, arr1, arr1, limbs1);
+        mpn_mul_n(arr3, arr1, arr1, limbs1);
 
     if (sign)
         _fmpz_poly_bit_unpack(res, trunc, arr3, bits, neg1 ^ neg2);
@@ -135,7 +135,7 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     }
 
     fmpz_poly_fit_length(res, trunc);
-    
+
     if (len1 >= len2)
         _fmpz_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
                              poly2->coeffs, len2, trunc);

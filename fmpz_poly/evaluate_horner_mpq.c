@@ -28,8 +28,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
-_fmpz_poly_evaluate_horner_mpq(mpq_t res, 
+void
+_fmpz_poly_evaluate_horner_mpq(mpq_t res,
                                const fmpz * f, long len, const mpq_t a)
 {
     if (len == 0L)
@@ -42,12 +42,13 @@ _fmpz_poly_evaluate_horner_mpq(mpq_t res,
     else
     {
         mpq_t s, t;
-        const fmpz * c = f + (len - 1L);
+        const fmpz *c = f + (len - 1L);
         mpq_init(s);
         mpq_init(t);
         fmpz_get_mpz(mpq_numref(res), c);
         mpz_set_ui(mpq_denref(res), 1);
-        do {
+        do
+        {
             fmpz_get_mpz(mpq_numref(s), --c);
             mpq_mul(t, res, a);
             mpq_add(res, s, t);
@@ -57,7 +58,7 @@ _fmpz_poly_evaluate_horner_mpq(mpq_t res,
     }
 }
 
-void 
+void
 fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 {
     if (res == a)
@@ -71,4 +72,3 @@ fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
     else
         _fmpz_poly_evaluate_horner_mpq(res, f->coeffs, f->length, a);
 }
-

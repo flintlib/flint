@@ -32,31 +32,32 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-int fmpz_poly_verify_format(const char * str)
+int
+fmpz_poly_verify_format(const char *str)
 {
     long i, len;
-    const char * s = str;
-    
+    const char *s = str;
+
     if (s == NULL || !isdigit(s[0]))
         return 0;
-    
+
     if (s[0] == '0')
         return s[1] == '\0';
-    
+
     for (s++; *s != '\0' && *s != ' '; s++)
         if (!(isdigit(*s)))
             return 0;
-    
+
     if (*s++ == '\0')
         return 0;
-    
+
     /* TODO:  Technically, we should check that the number fits in a long. */
     len = atol(str);
-    
+
     /* Check that s is len times " [-]####" followed by '\0'. */
     for (i = 0; i < len; i++)
     {
-        if (*s++ != ' ') 
+        if (*s++ != ' ')
             return 0;
         if (*s == '-')
         {
@@ -73,7 +74,8 @@ int fmpz_poly_verify_format(const char * str)
                     return 0;
             }
         }
-        else return 0;
+        else
+            return 0;
         while (isdigit(*++s)) ;
     }
     if (*s != '\0')
@@ -81,54 +83,55 @@ int fmpz_poly_verify_format(const char * str)
     return 1;
 }
 
-void _fmpz_poly_from_string(fmpz * poly, const char * str)
+void
+_fmpz_poly_from_string(fmpz * poly, const char *str)
 {
-    const char * s = str;
-    char * v, * w;
+    const char *s = str;
+    char *v, *w;
     long cur, i, len, max;
-    
+
     len = atol(str);
     if (len == 0L)
         return;
-    
+
     while (s++, *str++ != ' ') ;
-    
+
     /* Find maximal gap between spaces */
-    for (max = 0; *s != '\0'; )
+    for (max = 0; *s != '\0';)
     {
         for (s++, cur = 1; *s != ' ' && *s != '\0'; s++, cur++) ;
         if (max < cur)
             max = cur;
     }
-    
+
     w = (char *) malloc((max + 1) * sizeof(char));
-    
+
     for (i = 0; i < len; i++)
     {
-        for (str++, v = w; *str != ' ' && *str != '\0'; )
+        for (str++, v = w; *str != ' ' && *str != '\0';)
             *v++ = *str++;
         *v = '\0';
         fmpz_set_str(poly++, w, 10);
     }
-    
+
     free(w);
 }
 
-int fmpz_poly_from_string(fmpz_poly_t poly, const char * str)
+int
+fmpz_poly_from_string(fmpz_poly_t poly, const char *str)
 {
     int check = fmpz_poly_verify_format(str);
     long len;
-    
+
     if (!check)
         return 0;
-    
+
     len = atol(str);
     fmpz_poly_fit_length(poly, len);
-    
+
     _fmpz_poly_from_string(poly->coeffs, str);
-    
+
     _fmpz_poly_set_length(poly, len);
     _fmpz_poly_normalise(poly);
     return 1;
 }
-

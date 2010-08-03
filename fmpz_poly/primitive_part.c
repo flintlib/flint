@@ -28,9 +28,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
+void
+_fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
 {
-    fmpz * high = res + len;
+    fmpz *high = res + len;
     fmpz_t x;
     fmpz_init(x);
     _fmpz_poly_content(x, poly, len);
@@ -45,7 +46,8 @@ void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
     fmpz_clear(x);
 }
 
-void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
+void
+fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 {
     long len = poly->length;
     if (len == 0)
@@ -53,10 +55,9 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
         fmpz_poly_zero(res);
         return;
     }
-    
+
     fmpz_poly_fit_length(res, len);
     _fmpz_poly_set_length(res, len);
-    
+
     _fmpz_poly_primitive_part(res->coeffs, poly->coeffs, len);
 }
-

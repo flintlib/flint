@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,25 +16,26 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
+void
+fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-	long i;
-	fmpz_poly_fit_length(res, poly->length);
-	
-	for (i = 0; i < poly->length; i++)
-		fmpz_neg(res->coeffs + i, poly->coeffs + i);
+    long i;
+    fmpz_poly_fit_length(res, poly->length);
 
-	_fmpz_poly_set_length(res, poly->length);
+    for (i = 0; i < poly->length; i++)
+        fmpz_neg(res->coeffs + i, poly->coeffs + i);
+
+    _fmpz_poly_set_length(res, poly->length);
 }

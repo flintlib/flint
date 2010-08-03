@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
@@ -29,19 +29,20 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
-                                const fmpz * poly2, long len2)
+void
+_fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz * poly2, long len2)
 {
     long len;
     mp_size_t limbs1, limbs2, limbsx;
-    
+
     if (len1 < 5)
     {
         _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
-	    return;
+        return;
     }
 
-    len    = len1 + len2 - 1;
+    len = len1 + len2 - 1;
     limbs1 = _fmpz_vec_max_limbs(poly1, len1);
     limbs2 = _fmpz_vec_max_limbs(poly2, len2);
     limbsx = FLINT_MAX(limbs1, limbs2);
@@ -57,12 +58,13 @@ void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1,
         _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
 }
 
-void fmpz_poly_mul(fmpz_poly_t res, 
-                   const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+void
+fmpz_poly_mul(fmpz_poly_t res,
+              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long rlen;
     long len1 = poly1->length;
     long len2 = poly2->length;
+    long rlen;
 
     if (len1 == 0 || len2 == 0)
     {
@@ -79,10 +81,10 @@ void fmpz_poly_mul(fmpz_poly_t res,
         fmpz_poly_fit_length(t, rlen);
         if (len1 >= len2)
             _fmpz_poly_mul(t->coeffs, poly1->coeffs, len1,
-                                      poly2->coeffs, len2);
+                           poly2->coeffs, len2);
         else
             _fmpz_poly_mul(t->coeffs, poly2->coeffs, len2,
-                                      poly1->coeffs, len1);
+                           poly1->coeffs, len1);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }
@@ -91,10 +93,10 @@ void fmpz_poly_mul(fmpz_poly_t res,
         fmpz_poly_fit_length(res, rlen);
         if (len1 >= len2)
             _fmpz_poly_mul(res->coeffs, poly1->coeffs, len1,
-                                        poly2->coeffs, len2);
+                           poly2->coeffs, len2);
         else
-        _fmpz_poly_mul(res->coeffs, poly2->coeffs, len2,
-                                    poly1->coeffs, len1);
+            _fmpz_poly_mul(res->coeffs, poly2->coeffs, len2,
+                           poly1->coeffs, len1);
     }
 
     _fmpz_poly_set_length(res, rlen);

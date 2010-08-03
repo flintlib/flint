@@ -28,13 +28,13 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, long len, const mpq_t a)
 {
     _fmpz_poly_evaluate_horner_mpq(res, f, len, a);
 }
 
-void 
+void
 fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 {
     if (res == a)
@@ -48,4 +48,3 @@ fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
     else
         _fmpz_poly_evaluate_mpq(res, f->coeffs, f->length, a);
 }
-

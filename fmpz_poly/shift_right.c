@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_shift_right(fmpz * res, const fmpz * poly, long len, long n)
 {
     long i;

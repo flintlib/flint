@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-// Assumes poly1 and poly2 are not length 0 and len1 >= len2
+/* Assumes poly1 and poly2 are not length 0 and len1 >= len2. */
 void
 _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
                   const fmpz * poly2, long len2)
@@ -131,7 +131,7 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
 
     fmpz_poly_fit_length(res, rlen);
     if (len1 >= len2)
-        _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1, 
+        _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1,
                           poly2->coeffs, len2);
     else
         _fmpz_poly_mul_KS(res->coeffs, poly2->coeffs, len2,

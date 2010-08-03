@@ -29,16 +29,17 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
+void
+fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
 {
-    fmpz_poly_fit_length(poly, n+1);
+    fmpz_poly_fit_length(poly, n + 1);
 
-    if (n + 1 > poly->length) // insert zeroes between end of poly and new coeff if needed
+    if (n + 1 > poly->length)   /* insert zeroes between end of poly and new coeff if needed */
     {
         mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
-        poly->length = n+1;
+        poly->length = n + 1;
     }
 
     fmpz_set(poly->coeffs + n, x);
-    _fmpz_poly_normalise(poly); // we may have set leading coefficient to zero
+    _fmpz_poly_normalise(poly); /* we may have set leading coefficient to zero */
 }

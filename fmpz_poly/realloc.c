@@ -29,27 +29,29 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
+void
+fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
 {
-    if (alloc == 0) // alloc == 0, clear up, reinitialise
+    if (alloc == 0)             /* Clear up, reinitialise */
     {
         fmpz_poly_clear(poly);
         fmpz_poly_init(poly);
         return;
-    }  
+    }
 
-    if (poly->alloc) // realloc
+    if (poly->alloc)            /* Realloc */
     {
         fmpz_poly_truncate(poly, alloc);
 
         poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
-            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc), alloc - poly->alloc);
+            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
+                     alloc - poly->alloc);
     }
-    else // nothing allocated already so do it now
+    else                        /* Nothing allocated already so do it now */
     {
         poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
     }
 
-    poly->alloc = alloc;  
+    poly->alloc = alloc;
 }

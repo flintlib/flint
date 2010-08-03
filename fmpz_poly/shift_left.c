@@ -29,15 +29,15 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void 
+void
 _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
 {
     long i = len;
-    
+
     /* Copy in reverse to avoid writing over unshifted coefficients */
     while (i--)
         fmpz_set(res + n + i, poly + i);
-    
+
     for (i = 0; i < n; i++)
         fmpz_zero(res + i);
 }
@@ -50,13 +50,13 @@ fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
         fmpz_poly_set(res, poly);
         return;
     }
-    
+
     if (poly->length == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
-    
+
     fmpz_poly_fit_length(res, poly->length + n);
     _fmpz_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
     _fmpz_poly_set_length(res, poly->length + n);
