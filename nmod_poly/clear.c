@@ -29,7 +29,9 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_clear(nmod_poly_t poly)
+void
+nmod_poly_clear(nmod_poly_t poly)
 {
-   if (poly->coeffs) free(poly->coeffs);
+    if (poly->coeffs)
+        free(poly->coeffs);
 }

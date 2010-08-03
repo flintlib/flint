@@ -29,13 +29,14 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
+void
+nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 {
-   if (alloc > poly->alloc)
-   {
-      if (alloc < 2*poly->alloc)
-         alloc = 2*poly->alloc;
+    if (alloc > poly->alloc)
+    {
+        if (alloc < 2 * poly->alloc)
+            alloc = 2 * poly->alloc;
 
-      nmod_poly_realloc(poly, alloc);
-   }
+        nmod_poly_realloc(poly, alloc);
+    }
 }

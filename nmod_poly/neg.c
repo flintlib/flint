@@ -29,11 +29,12 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
+void
+nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 {
-   nmod_poly_fit_length(res, poly1->length);
-	
-   _nmod_vec_neg(res->coeffs, poly1->coeffs, poly1->length, poly1->mod);
-    
-   res->length = poly1->length;
+    nmod_poly_fit_length(res, poly1->length);
+
+    _nmod_vec_neg(res->coeffs, poly1->coeffs, poly1->length, poly1->mod);
+
+    res->length = poly1->length;
 }

@@ -29,26 +29,27 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_realloc(nmod_poly_t poly, long alloc)
+void
+nmod_poly_realloc(nmod_poly_t poly, long alloc)
 {
-   if (alloc == 0)
-   {
-      nmod_poly_clear(poly);
-	  poly->length = 0;
-	  poly->alloc = 0;
-      poly->coeffs = NULL;
+    if (alloc == 0)
+    {
+        nmod_poly_clear(poly);
+        poly->length = 0;
+        poly->alloc = 0;
+        poly->coeffs = NULL;
 
-	  return;
-   }
+        return;
+    }
 
-   poly->coeffs = (mp_ptr) realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
-   
-   poly->alloc = alloc;
-   
-   /* truncate poly if necessary */
-   if (poly->length > alloc)
-   {
-      poly->length = alloc;
-      _nmod_poly_normalise(poly);
-   }
+    poly->coeffs = (mp_ptr) realloc(poly->coeffs, alloc * sizeof(mp_limb_t));
+
+    poly->alloc = alloc;
+
+    /* truncate poly if necessary */
+    if (poly->length > alloc)
+    {
+        poly->length = alloc;
+        _nmod_poly_normalise(poly);
+    }
 }

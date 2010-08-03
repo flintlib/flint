@@ -29,24 +29,26 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2, long trunc)
+void
+nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2,
+                   long trunc)
 {
-    long bits, bits2;    
+    long bits, bits2;
 
-   if (trunc <= 6)
-   {
-      nmod_poly_mullow_classical(res, poly1, poly2, trunc);
-      return;
-   }
-   
-   bits = FLINT_BITS - (long) poly1->mod.norm;
-   bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+    if (trunc <= 6)
+    {
+        nmod_poly_mullow_classical(res, poly1, poly2, trunc);
+        return;
+    }
 
-   if (2*bits + bits2 <= FLINT_BITS)
-      nmod_poly_mullow_classical(res, poly1, poly2, trunc);
-   else
-   {
-      nmod_poly_mul_KS(res, poly1, poly2, 0);
-	  nmod_poly_truncate(res, trunc);
-   }
+    bits = FLINT_BITS - (long) poly1->mod.norm;
+    bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+
+    if (2 * bits + bits2 <= FLINT_BITS)
+        nmod_poly_mullow_classical(res, poly1, poly2, trunc);
+    else
+    {
+        nmod_poly_mul_KS(res, poly1, poly2, 0);
+        nmod_poly_truncate(res, trunc);
+    }
 }
