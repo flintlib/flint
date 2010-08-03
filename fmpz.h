@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
  
 ******************************************************************************/
 
@@ -33,34 +33,33 @@ typedef long fmpz;
 typedef fmpz fmpz_t[1];
 
 extern __mpz_struct * fmpz_arr;
+extern gmp_randstate_t fmpz_randstate;
 
-// maximum positive value a small coefficient can have
-#define COEFF_MAX ((1L<<(FLINT_BITS-2))-1L)
+/* maximum positive value a small coefficient can have */
+#define COEFF_MAX ((1L << (FLINT_BITS - 2)) - 1L)
 
-// minimum negative value a small coefficient can have
-#define COEFF_MIN (-((1L<<(FLINT_BITS-2))-1L))
+/* minimum negative value a small coefficient can have */
+#define COEFF_MIN (-((1L << (FLINT_BITS - 2)) - 1L))
 
 #if FLINT_REENTRANT
 
-// turn a pointer to an __mpz_struct into a fmpz_t
-#define PTR_TO_COEFF(xxx) ((((ulong)xxx)>>2) | (1L<<(FLINT_BITS - 2))) 
+/* turn a pointer to an __mpz_struct into a fmpz_t */
+#define PTR_TO_COEFF(x) ((((ulong) (x) >> 2) | (1L << (FLINT_BITS - 2))) 
 
-// turns an fmpz into a pointer to an mpz
-#define COEFF_TO_PTR(xxx) ((__mpz_struct *) (xxx<<2))
+/* turns an fmpz into a pointer to an mpz */
+#define COEFF_TO_PTR(x) ((__mpz_struct *) ((x) << 2))
 
 #else
 
-// turn a pointer to an __mpz_struct into a fmpz_t
-#define PTR_TO_COEFF(xxx) ((ulong)(xxx - fmpz_arr) | (1L<<(FLINT_BITS - 2))) 
+/* turn a pointer to an __mpz_struct into a fmpz_t */
+#define PTR_TO_COEFF(x) ((ulong) ((x) - fmpz_arr) | (1L << (FLINT_BITS - 2))) 
 
-// turns an fmpz into a pointer to an mpz
-#define COEFF_TO_PTR(xxx) ((__mpz_struct *) ((xxx ^ (1L<<(FLINT_BITS - 2))) + fmpz_arr))
+/* turns an fmpz into a pointer to an mpz */
+#define COEFF_TO_PTR(x) ((__mpz_struct *) (((x) ^ (1L << (FLINT_BITS - 2))) + fmpz_arr))
 
-#endif // FLINT_REENTRANT
+#endif  /* FLINT_REENTRANT */
 
-#define COEFF_IS_MPZ(xxx) (((xxx)>>(FLINT_BITS-2)) == 1L) // is xxx a pointer not an integer
-
-extern gmp_randstate_t fmpz_randstate;
+#define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == 1L)  /* is x a pointer not an integer */
 
 __mpz_struct * _fmpz_new_mpz(void);
 
