@@ -1,8 +1,8 @@
 CC=gcc
-CFLAGS=-std=c99 -g
-LIBS=-L$(CURDIR) -L/home/suser/FLINT/flint2-seb/ -L/home/suser/MPIR/mpir-2.1.1/.libs/ -L/home/suser/MPFR/mpfr-3.0.0/.libs/ -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(CURDIR) -L/home/suser/MPIR/mpir-2.1.1/.libs/ -L/home/suser/MPFR/mpfr-3.0.0/.libs/ -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/suser/FLINT/flint2-seb/ -I/home/suser/MPIR/mpir-2.1.1/ -I/home/suser/MPFR/mpfr-3.0.0/ 
+CFLAGS=-std=c99 -O2 
+LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(CURDIR) -L/home/wbhart/lib/ -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I/home/wbhart/include
 export
 
 SOURCES = $(wildcard *.c)
@@ -62,5 +62,5 @@ library-recursive:
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 BUILD_DIRS = ulong_extras fmpz fmpz_vec fmpz_poly fmpq_poly fmpz_mpoly \
-   fmpz_mat mpfr_vec mpfr_mat mpfr_poly LLL nmod_vec nmod_poly
+   fmpz_mat mpfr_vec mpfr_mat mpfr_poly LLL nmod_vec nmod_poly nmod_mpoly
 
