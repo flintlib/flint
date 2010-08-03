@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -32,20 +32,18 @@
 void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
 				                  long len, nmod_t mod, mp_limb_t c)
 {
-   long i;
-   
-   if (mod.norm >= FLINT_BITS/2) // products will fit in a limb
+   if (mod.norm >= FLINT_BITS/2) /* products will fit in a limb */
    {
       mpn_mul_1(res, vec, len, c);
 	  _nmod_vec_reduce(res, res, len, mod);
-   } else // products may take two limbs
+   } else /* products may take two limbs */
    {
-      mp_limb_t hi, lo;
-	  
+	  long i;
 	  for (i = 0; i < len; i++)
 	  {
+         mp_limb_t hi, lo;
 	     umul_ppmm(hi, lo, vec[i], c);
-		 NMOD_RED2(res[i], hi, lo, mod); // hi already reduced mod n
+		 NMOD_RED2(res[i], hi, lo, mod); /* hi already reduced mod n */
 	  }
    }
 }
