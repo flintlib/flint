@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -31,14 +31,15 @@
 #include "mpfr_poly.h"
 #include "ulong_extras.h"
 
-void _mpfr_poly_revbin(mpfr * coeffs, long n)
+void
+_mpfr_poly_revbin(mpfr * coeffs, long n)
 {
-   long i, len = (1L << n);
-   
-   for (i = 0; i < len; i++)
-   {
-      long s = n_revbin(i, n);
-	  if (i < s)
-		  mpfr_swap(coeffs + i, coeffs + s);
-   }
+    long i, len = (1L << n);
+
+    for (i = 0; i < len; i++)
+    {
+        long s = n_revbin(i, n);
+        if (i < s)
+            mpfr_swap(coeffs + i, coeffs + s);
+    }
 }

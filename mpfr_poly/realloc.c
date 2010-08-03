@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,27 +30,29 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_realloc(mpfr_poly_t poly, long alloc)
+void
+mpfr_poly_realloc(mpfr_poly_t poly, long alloc)
 {
-   if (alloc == 0) // clear up, reinitialise
-   {
-      mpfr_poly_clear(poly);
-      mpfr_poly_init(poly, poly->prec);
-	  return;
-   }  
-   
-	if (poly->alloc) // realloc
-	{
-       long i;
-	   for (i = alloc; i < poly->alloc; i++)
-	      mpfr_clear(poly->coeffs + i);
+    if (alloc == 0)             /* Clear up, reinitialise */
+    {
+        mpfr_poly_clear(poly);
+        mpfr_poly_init(poly, poly->prec);
+        return;
+    }
 
-	   poly->coeffs = (mpfr *) realloc(poly->coeffs, alloc*sizeof(mpfr));
-		
-	   for (i = poly->alloc; i < alloc; i++)
-			mpfr_init2(poly->coeffs + i, poly->prec);
-	} else // nothing allocated already so do it now
-	   poly->coeffs = _mpfr_vec_init(alloc, poly->prec);
-   
-   poly->alloc = alloc;  
+    if (poly->alloc)            /* Realloc */
+    {
+        long i;
+        for (i = alloc; i < poly->alloc; i++)
+            mpfr_clear(poly->coeffs + i);
+
+        poly->coeffs = (mpfr *) realloc(poly->coeffs, alloc * sizeof(mpfr));
+
+        for (i = poly->alloc; i < alloc; i++)
+            mpfr_init2(poly->coeffs + i, poly->prec);
+    }
+    else                        /* Nothing allocated already so do it now */
+        poly->coeffs = _mpfr_vec_init(alloc, poly->prec);
+
+    poly->alloc = alloc;
 }

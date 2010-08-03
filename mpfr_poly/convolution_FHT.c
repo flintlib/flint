@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,14 +30,16 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_convolution_FHT(mpfr * coeffs1, mpfr * coeffs2, long n, mpfr_prec_t prec)
+void
+_mpfr_poly_convolution_FHT(mpfr * coeffs1, mpfr * coeffs2, long n,
+                           mpfr_prec_t prec)
 {
-   _mpfr_poly_FHT(coeffs1, n, prec);
-   _mpfr_poly_revbin(coeffs1, n);
-   _mpfr_poly_FHT(coeffs2, n, prec);
-   _mpfr_poly_revbin(coeffs2, n);
-   _mpfr_poly_convolution_trans(coeffs1, coeffs2, n, prec);
-   _mpfr_poly_FHT(coeffs1, n, prec);
-   _mpfr_poly_scale(coeffs1, n);
-   _mpfr_poly_revbin(coeffs1, n);
+    _mpfr_poly_FHT(coeffs1, n, prec);
+    _mpfr_poly_revbin(coeffs1, n);
+    _mpfr_poly_FHT(coeffs2, n, prec);
+    _mpfr_poly_revbin(coeffs2, n);
+    _mpfr_poly_convolution_trans(coeffs1, coeffs2, n, prec);
+    _mpfr_poly_FHT(coeffs1, n, prec);
+    _mpfr_poly_scale(coeffs1, n);
+    _mpfr_poly_revbin(coeffs1, n);
 }

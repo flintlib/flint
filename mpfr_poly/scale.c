@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,10 +29,11 @@
 #include "flint.h"
 #include "mpfr_poly.h"
 
-void _mpfr_poly_scale(mpfr * coeffs, long n)
+void
+_mpfr_poly_scale(mpfr * coeffs, long n)
 {
-   ulong i, len = (1L << n);
-   
-   for (i = 0; i < len; i++)
-      mpfr_div_2exp(coeffs + i, coeffs + i, n, GMP_RNDN);
+    long i, len = (1L << n);
+
+    for (i = 0; i < len; i++)
+        mpfr_div_2exp(coeffs + i, coeffs + i, n, GMP_RNDN);
 }

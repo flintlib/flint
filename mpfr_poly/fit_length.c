@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,26 +16,29 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_fit_length(mpfr_poly_t poly, long length)
+void
+mpfr_poly_fit_length(mpfr_poly_t poly, long length)
 {
-   long alloc = length;
-   
-   if (alloc <= poly->alloc) return;
+    long alloc = length;
 
-   // at least double number of allocated coeffs
-   if (alloc < 2*poly->alloc) alloc = 2*poly->alloc; 
-   
-   mpfr_poly_realloc(poly, alloc);
+    if (alloc <= poly->alloc)
+        return;
+
+    /* at least double number of allocated coeffs */
+    if (alloc < 2 * poly->alloc)
+        alloc = 2 * poly->alloc;
+
+    mpfr_poly_realloc(poly, alloc);
 }
