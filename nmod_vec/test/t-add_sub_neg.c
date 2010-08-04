@@ -37,7 +37,7 @@ main(void)
     printf("add/sub/neg....");
     fflush(stdout);
 
-    // check (a + b) - b == a
+    /* Check (a + b) - b == a */
     for (i = 0; i < 10000; i++)
     {
         long len = n_randint(100) + 1;
@@ -69,7 +69,7 @@ main(void)
         nmod_vec_free(vec3);
     }
 
-    // check (a + -b) == a - b
+    /* Check (a + -b) == a - b */
     for (i = 0; i < 10000; i++)
     {
         long len = n_randint(100) + 1;

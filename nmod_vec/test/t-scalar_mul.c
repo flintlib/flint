@@ -37,7 +37,7 @@ main(void)
     printf("scalar_mul....");
     fflush(stdout);
 
-    // check (a + b)*c == a*c + b*c
+    /* Check (a + b)*c == a*c + b*c */
     for (i = 0; i < 10000; i++)
     {
         long len = n_randint(100) + 1;
