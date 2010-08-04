@@ -39,8 +39,8 @@ typedef struct
     fmpz * exps;
     long alloc;
     long length;
-    long vars; // number of variables
-    mp_bitcnt_t ebits; // width of exponent bitfield (per variable)
+    long vars;  /* number of variables */
+    mp_bitcnt_t ebits;  /* width of exponent bitfield (per variable) */
 } fmpz_mpoly_struct;
 
 typedef fmpz_mpoly_struct fmpz_mpoly_t[1];
@@ -49,15 +49,15 @@ typedef struct fmpz_mpoly_entry_t fmpz_mpoly_entry_t;
 
 struct fmpz_mpoly_entry_t
 {
-   fmpz_mpoly_entry_t * next; // linked list of entries
-   unsigned int i1; // index of coefficient in first poly 
-   unsigned int i2; // index of coefficient in second poly
+    fmpz_mpoly_entry_t * next;  /* linked list of entries */
+    unsigned int i1;  /* index of coefficient in first poly */
+    unsigned int i2;  /* index of coefficient in second poly */
 };
 
 typedef struct
 {
-   fmpz exp;
-   fmpz_mpoly_entry_t * entry; 
+    fmpz exp;
+    fmpz_mpoly_entry_t * entry; 
 } fmpz_mpoly_heap_t;
 
 void fmpz_mpoly_init(fmpz_mpoly_t poly, long vars, mp_bitcnt_t ebits);
@@ -74,16 +74,14 @@ void fmpz_mpoly_clear(fmpz_mpoly_t poly);
 static inline
 void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, long len)
 {
-    long i;
-
-    if (poly->length > len) // only truncate if necessary
+    if (poly->length > len)  /* only truncate if necessary */
     {
+        long i;
         for (i = len; i < poly->length; i++)
         {
             _fmpz_demote(poly->coeffs + i);
             _fmpz_demote(poly->exps + i);
         }
-
         poly->length = len;
     }
 }

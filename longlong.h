@@ -23,7 +23,7 @@
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 
-// this will eventually be replaced by a flag set by configure
+/* This will eventually be replaced by a flag set by configure */
 #if __GMP_BITS_PER_MP_LIMB == 64 /* x86 : 64 bit */
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                 \
@@ -130,7 +130,10 @@
       udiv_qrnnd (invxl, dummy, ~(xl), ~(0L), xl);  \
    } while (0)
 
-#if 1 // branch free variant
+/*
+   Branch free variant
+ */
+#if 1
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di)               \
   do {                                                       \
     mp_limb_t _n2, _n10, _nmask, _nadj, _q1;                 \
@@ -149,7 +152,10 @@
     (q) = _xh - _q1;                                         \
   } while (0)
 
-#else // branched variant, slower on K10 for general inputs
+/*
+   Branched variant, slower on K10 for general inputs
+ */
+#else
 #define udiv_qrnnd_preinv(q, r, nh, nl, d, di)          \
   do {                                                  \
     mp_limb_t _q, _ql, _r;                              \

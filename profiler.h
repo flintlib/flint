@@ -32,31 +32,31 @@
 
 typedef struct
 {
-   long cpu;
-   long wall;
+    long cpu;
+    long wall;
 } timeit_t[1];
 
 static inline
 void timeit_start(timeit_t t)
 {
-   struct timeval tv;
-   gettimeofday(&tv, 0);
-   t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
-   t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
+    t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
 }
 
 static inline
 void timeit_stop(timeit_t t)
 {
-   struct timeval tv;
-   gettimeofday(&tv, 0);
-   t->wall += tv.tv_sec * 1000 + tv.tv_usec / 1000;
-   t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall += tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
 }
 
 /******************************************************************************
 
-   Timer based on the cycle counter
+    Timer based on the cycle counter
    
 ******************************************************************************/
 
@@ -118,8 +118,8 @@ void stop_clock(int n)
 
 /******************************************************************************
 
-   Framework for repeatedly sampling a single target
-   
+    Framework for repeatedly sampling a single target
+
 ******************************************************************************/
 
 static inline
@@ -142,4 +142,5 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
 #define DURATION_TARGET 10000.0
 
-#endif // #ifndef FLINT_PROFILER_H
+#endif
+
