@@ -41,7 +41,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Check it's zero
+    /* Check it's zero */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;

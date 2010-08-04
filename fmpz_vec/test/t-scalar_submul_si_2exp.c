@@ -40,7 +40,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Compare with alternative method of computation
+    /* Compare with alternative method of computation */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;

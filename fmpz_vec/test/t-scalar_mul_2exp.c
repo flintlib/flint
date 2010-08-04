@@ -40,7 +40,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
@@ -68,7 +68,7 @@ main(void)
         _fmpz_vec_clear(b, len);
     }
 
-    // Check aliasing of (a*2^e1)*2^e2 equals a*2^(e1+e2)
+    /* Check aliasing of (a*2^e1)*2^e2 equals a*2^(e1+e2) */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;

@@ -41,7 +41,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
@@ -73,7 +73,7 @@ main(void)
         fmpz_clear(n);
     }
 
-    // Check that n (a + b) == na + nb
+    /* Check that n (a + b) == na + nb */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *lhs, *rhs;
@@ -115,7 +115,7 @@ main(void)
         fmpz_clear(n);
     }
 
-    // Check that n2 * (n1 a) == (n1 * n2) a
+    /* Check that n2 * (n1 a) == (n1 * n2) a */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;

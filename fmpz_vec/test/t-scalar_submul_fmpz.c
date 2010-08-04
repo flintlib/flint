@@ -40,7 +40,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Compare with fmpz_vec_scalar_submul_si
+    /* Compare with fmpz_vec_scalar_submul_si */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c;
@@ -78,7 +78,7 @@ main(void)
         _fmpz_vec_clear(c, len);
     }
 
-    // Compute a different way
+    /* Compute a different way */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;

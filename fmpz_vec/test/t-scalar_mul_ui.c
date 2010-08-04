@@ -41,7 +41,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
@@ -68,7 +68,7 @@ main(void)
         _fmpz_vec_clear(b, len);
     }
 
-    // Check agreement with _fmpz
+    /* Check agreement with _fmpz */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;

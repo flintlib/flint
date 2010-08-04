@@ -41,7 +41,7 @@ main(void)
 
     _fmpz_vec_randinit();
 
-    // Check zero vector
+    /* Check zero vector */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;
@@ -62,7 +62,7 @@ main(void)
         _fmpz_vec_clear(a, len);
     }
 
-    // Check non-zero vector
+    /* Check non-zero vector */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;
