@@ -41,7 +41,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g;
@@ -66,7 +66,7 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    // Check that the result of "monic" has "is_monic" return 1
+    /* Check that the result of "monic" has "is_monic" return 1 */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f;

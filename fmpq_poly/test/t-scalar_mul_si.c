@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -68,7 +68,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Compare with fmpq_poly_scalar_mul_ui
+    /* Compare with fmpq_poly_scalar_mul_ui */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -94,7 +94,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Check n2 * (n1 a) == (n1*n2) a
+    /* Check n2 * (n1 a) == (n1*n2) a */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;

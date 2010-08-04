@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
    Copyright (C) 2009 William Hart
@@ -43,7 +41,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
@@ -60,13 +58,10 @@ main(void)
         result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf("Error:\n");
-            fmpq_poly_print(a);
-            printf("\n\n");
-            fmpq_poly_print(b);
-            printf("\n\n");
-            fmpq_poly_print(c);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
             abort();
         }
 
@@ -75,7 +70,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    // Check aliasing of b and c
+    /* Check aliasing of b and c */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
@@ -92,13 +87,10 @@ main(void)
         result = (fmpq_poly_equal(b, c));
         if (!result)
         {
-            printf("Error:\n");
-            fmpq_poly_print(a);
-            printf("\n\n");
-            fmpq_poly_print(b);
-            printf("\n\n");
-            fmpq_poly_print(c);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
             abort();
         }
 

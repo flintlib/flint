@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check that (f+g)(a) = f(a) + g(a)
+    /* Check that (f+g)(a) = f(a) + g(a) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a;
@@ -85,7 +85,7 @@ main(void)
         fmpq_poly_clear(h);
     }
 
-    // Check that (f*g)(a) = f(a) * g(a)
+    /* Check that (f*g)(a) = f(a) * g(a) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a;

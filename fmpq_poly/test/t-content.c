@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check that content(a f) = abs(a) content(f)
+    /* Check that content(a f) = abs(a) content(f) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;

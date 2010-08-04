@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -67,7 +67,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Check constants have derivative zero
+    /* Check constants have derivative zero */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -91,7 +91,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Check (f g)' = f' g + f g'
+    /* Check (f g)' = f' g + f g' */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c, d, lhs, rhs;

@@ -41,7 +41,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing of a and b for left shift
+    /* Check aliasing of a and b for left shift */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -67,7 +67,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Check aliasing of a and b for right shift
+    /* Check aliasing of a and b for right shift */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
@@ -95,7 +95,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Check shift left then right does nothing
+    /* Check shift left then right does nothing */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;

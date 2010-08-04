@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f;
@@ -54,16 +54,17 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
             abort();
         }
 
         fmpq_poly_clear(f);
     }
 
-    // Check transitivity, i.e. f <= g <= h implies f <= h, that is 
-    // NOT (f <= g <= h) OR f <= h.
+    /*
+       Check transitivity, i.e. f <= g <= h implies f <= h, that is 
+       NOT (f <= g <= h) OR f <= h
+     */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g, h;
@@ -80,12 +81,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
-            fmpq_poly_print(h);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
+            fmpq_poly_print(h), printf("\n");
             abort();
         }
 
@@ -94,7 +92,7 @@ main(void)
         fmpq_poly_clear(h);
     }
 
-    // Check that <, ==, or >
+    /* Check that <, ==, or > */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g;
@@ -110,10 +108,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
             printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
             abort();
         }

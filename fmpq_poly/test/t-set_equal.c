@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // equal polynomials
+    /* equal polynomials */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;

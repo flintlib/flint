@@ -42,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check a - b = a + neg(b)
+    /* Check a - b = a + neg(b) */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c, d;
@@ -75,7 +75,7 @@ main(void)
         fmpq_poly_clear(d);
     }
 
-    // Check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
@@ -104,7 +104,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    // Check aliasing of b and c
+    /* Check aliasing of b and c */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;

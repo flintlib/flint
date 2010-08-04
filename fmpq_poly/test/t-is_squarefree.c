@@ -41,7 +41,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check that polynomials of degree <= 1 are square-free
+    /* Check that polynomials of degree <= 1 are square-free */
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t f;
@@ -60,7 +60,7 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    // Check that a^2 f is not square-free
+    /* Check that a^2 f is not square-free */
     for (i = 0; i < 200; i++)
     {
         fmpq_poly_t a, f;

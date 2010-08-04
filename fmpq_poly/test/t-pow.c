@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -44,7 +42,7 @@ main(void)
 
     fmpq_poly_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b;
@@ -73,7 +71,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    // Compare with repeated multiplications by the base
+    /* Compare with repeated multiplications by the base */
     for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, c;
