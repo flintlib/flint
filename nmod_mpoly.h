@@ -46,20 +46,26 @@ typedef nmod_mpoly_struct nmod_mpoly_t[1];
 
 void nmod_mpoly_init(nmod_mpoly_t poly, mp_limb_t n, long vars, ulong ebits);
 
-void nmod_mpoly_init_preinv(nmod_mpoly_t poly, 
-							 mp_limb_t n, mp_limb_t ninv, long vars, ulong ebits);
+void nmod_mpoly_init_preinv(nmod_mpoly_t poly, mp_limb_t n, mp_limb_t ninv, long vars, ulong ebits);
 
-void nmod_mpoly_init2(nmod_mpoly_t poly, 
-					             mp_limb_t n, long alloc, long vars, ulong ebits);
+void nmod_mpoly_init2(nmod_mpoly_t poly,mp_limb_t n, long alloc, long vars, ulong ebits);
 
-void nmod_mpoly_init2_preinv(nmod_mpoly_t poly, 
-			    mp_limb_t n, mp_limb_t ninv, long alloc, long vars, ulong ebits);
+void nmod_mpoly_init2_preinv(nmod_mpoly_t poly, mp_limb_t n, mp_limb_t ninv, long alloc, long vars, ulong ebits);
 
 void nmod_mpoly_realloc(nmod_mpoly_t poly, long alloc);
 
 void nmod_mpoly_clear(nmod_mpoly_t poly);
 
 void nmod_mpoly_fit_length(nmod_mpoly_t poly, long alloc);
+
+static inline
+void _nmod_mpoly_normalise(nmod_mpoly_t poly)
+{
+   while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
+      poly->length--;
+}
+
+void nmod_mpoly_randtest(nmod_mpoly_t poly, long length);
 
 #endif
 
