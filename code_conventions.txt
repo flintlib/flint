@@ -1,6 +1,16 @@
 Code conventions
 ================
 
+Language dialect
+----------------
+
+For greater portability, the code should be ANSI C compatible where possible.  
+We note the following exceptions:
+
+    - Inlined functions, inlined assembly.  We define alternative keywords 
+      __asm__ and __inline__ in flint.h so that gcc allows compiling with 
+      the flags "-ansi -pendatic" nonetheless.
+
 Primitive types
 ---------------
 
@@ -26,8 +36,16 @@ The typical definitions of these in terms of primitive types are:
     | mp_ptr        | mp_limb_t *                                        |
     | mp_srcptr     | const mp_limb_t *                                  |
 
-Code style
-----------
+Type definitions
+----------------
+
+Aside from the more mathematical FLINT types, we also use the following 
+definitions:
+
+   | ulong | unsigned long |
+
+Code formatting
+---------------
 
 The C code should follow the style produced by the following call to "indent",
 
