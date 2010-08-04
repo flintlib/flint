@@ -38,7 +38,7 @@ main(void)
     printf("mullow_classical....");
     fflush(stdout);
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;
@@ -74,7 +74,7 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    // check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;
@@ -110,7 +110,7 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    // compare with mul_basecase
+    /* Compare with mul_basecase */
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c, d;

@@ -38,7 +38,7 @@ main(void)
     printf("sub....");
     fflush(stdout);
 
-    // check a - b = a + neg(b)
+    /* Check a - b = a + neg(b) */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c, d;
@@ -72,7 +72,7 @@ main(void)
         nmod_poly_clear(d);
     }
 
-    // check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c;
@@ -102,7 +102,7 @@ main(void)
         nmod_poly_clear(c);
     }
 
-    // check aliasing of b and c
+    /* Check aliasing of b and c */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c;

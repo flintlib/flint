@@ -37,7 +37,7 @@ main(void)
     printf("scalar_mul....");
     fflush(stdout);
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
@@ -64,7 +64,7 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    // check (a + b)*c = a*c + b*c
+    /* Check (a + b)*c = a*c + b*c */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, d1, d2;

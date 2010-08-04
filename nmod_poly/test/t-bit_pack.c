@@ -37,7 +37,7 @@ main(void)
     printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    // check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;

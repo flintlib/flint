@@ -38,7 +38,7 @@ main(void)
     printf("mulhigh_n....");
     fflush(stdout);
 
-    // compare with left truncated product of a and b
+    /* Compare with left truncated product of a and b */
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;

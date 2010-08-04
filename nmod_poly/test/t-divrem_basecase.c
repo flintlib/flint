@@ -37,7 +37,7 @@ main(void)
     printf("divrem_basecase....");
     fflush(stdout);
 
-    // check result of divrem
+    /* Check result of divrem */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, q, r, prod;
@@ -82,7 +82,7 @@ main(void)
         nmod_poly_clear(prod);
     }
 
-    // check aliasing of a and q
+    /* Check aliasing of a and q */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, q, r;
@@ -124,7 +124,7 @@ main(void)
         nmod_poly_clear(r);
     }
 
-    // check aliasing of b and q
+    /* Check aliasing of b and q */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, q, r;
@@ -166,7 +166,7 @@ main(void)
         nmod_poly_clear(r);
     }
 
-    // check aliasing of a and r
+    /* Check aliasing of a and r */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, q, r;
@@ -208,7 +208,7 @@ main(void)
         nmod_poly_clear(r);
     }
 
-    // check aliasing of b and r
+    /* Check aliasing of b and r */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, q, r;
