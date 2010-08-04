@@ -76,7 +76,7 @@ void n_compute_primes(ulong num)
 
     if (!flint_num_primes) flint_primes_cutoff = FLINT_PRIMES_SMALL_CUTOFF;
 
-    lg_ub = 14UL; // start with at least primes up to 16384
+    lg_ub = 14UL; /* start with at least primes up to 16384 */
     lg_ub2 = 0UL;
     while (((1UL<<lg_ub) + lg_ub2*(1UL<<(lg_ub - 1)))/(ulong)(((double)lg_ub+0.5*(double)lg_ub2)*0.7) < num) 
     {   
