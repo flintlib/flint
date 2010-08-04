@@ -32,12 +32,7 @@ mp_limb_t n_sqrt(mp_limb_t a)
 {
     mp_limb_t is;
 
-#if FLINT64
-    if (a >= 281474976710656UL)
-        is = (mp_limb_t) sqrt((double) a);
-    else
-#endif
-        is = (mp_limb_t) sqrtf((float) a);
+    is = (mp_limb_t) sqrt((double) a);
 
     is -= (is*is > a);
 #if FLINT64

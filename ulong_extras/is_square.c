@@ -48,7 +48,7 @@ int n_is_square(mp_limb_t x)
     if (!mod63[x % 63UL]) return 0;
     if (!mod65[x % 65UL]) return 0;
 
-    sq = (mp_limb_t) round(sqrt((double) x)); 
+    sq = (mp_limb_t) (sqrt((double) x) + 0.5);
     
     return (x == sq*sq);
 }
