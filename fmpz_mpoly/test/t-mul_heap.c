@@ -139,9 +139,11 @@ int main(void)
    fmpz_mpoly_clear(c30);      
 
    /*
-   // f = x*y^3*z^2 + x^2*y^2*z + x*y^3*z + x*y^2*z^2 + y^3*z^2 + y^3*z + 
-   // 2*y^2*z^2 + 2*x*y*z + y^2*z + y*z^2 + y^2 + 2*y*z + z 
+      f = x*y^3*z^2 + x^2*y^2*z + x*y^3*z + x*y^2*z^2 + y^3*z^2 + y^3*z + 
+          2*y^2*z^2 + 2*x*y*z + y^2*z + y*z^2 + y^2 + 2*y*z + z 
+   */
 
+   /*
    fmpz_mpoly_t a1, a2, a3;
    ulong i, j;
 
