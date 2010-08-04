@@ -134,14 +134,18 @@ int main(void)
    {
       info.bits = i;
 
-	  //info.type = 1;
-      //prof_repeat(&min1, &max, sample, (void *) &info);
+      /*
+	     info.type = 1;
+         prof_repeat(&min1, &max, sample, (void *) &info);
+       */
 
 	  info.type = 2;
       prof_repeat(&min2, &max, sample, (void *) &info);
 
-	  //info.type = 3;
-      //prof_repeat(&min3, &max, sample, (void *) &info);
+      /*
+	     info.type = 3;
+         prof_repeat(&min3, &max, sample, (void *) &info);
+       */
 
 	  info.type = 4;
       prof_repeat(&min4, &max, sample, (void *) &info);
@@ -153,9 +157,9 @@ int main(void)
 
          printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l, pre %.1f c/l\n", 
            i,
-		   //(min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
-           //(min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           /* (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
            (min5/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
 	     );
@@ -164,9 +168,9 @@ int main(void)
 	  {
          printf("bits %d, inv2 %.1f c/l, pre2 %.1f c/l\n", 
            i,
-		   //(min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+		   /* (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
-           //(min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000,
+           /* (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/10000, */
            (min4/(double)FLINT_CLOCK_SCALE_FACTOR)/10000
 	     );
 	  }
