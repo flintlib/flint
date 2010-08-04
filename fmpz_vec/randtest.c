@@ -31,9 +31,9 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits_in)
+_fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits)
 {
     long i;
     for (i = 0; i < len; i++)
-        fmpz_randtest(f + i, bits_in);
+        fmpz_randtest(f + i, bits);
 }
