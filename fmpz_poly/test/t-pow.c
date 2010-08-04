@@ -94,8 +94,8 @@ main(void)
         }
         else
         {
-            fmpz_poly_set(c, b);
             ulong j;
+            fmpz_poly_set(c, b);
 
             for (j = 1; j < exp; j++)
                 fmpz_poly_mul(c, c, b);

@@ -78,10 +78,10 @@ main(void)
     {
         fmpq_poly_t a, b, c;
         fmpz_t n1;
+        long n;
 
         fmpz_init(n1);
-        long n = (long) n_randtest();
-
+        n = (long) n_randtest();
         if (n == 0L)
             n = 1L;
         if (n_randint(2))
@@ -99,7 +99,7 @@ main(void)
         result = (fmpq_poly_equal(b, c));
         if (!result)
         {
-            printf("Error (comparison with _si):\n");
+            printf("FAIL (comparison with _si):\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpz_print(n1), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");

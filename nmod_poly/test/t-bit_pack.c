@@ -42,12 +42,14 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n;
+        ulong bits;
+        mp_ptr mpn;
 
         do
         {
             n = n_randtest_not_zero();
         } while (n == 1);
-        ulong bits = 2 * FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS);
+        bits = 2 * FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -56,7 +58,7 @@ main(void)
             nmod_poly_randtest(a, n_randint(100));
         } while (a->length == 0);
 
-        mp_ptr mpn =
+        mpn =
             malloc(sizeof(mp_limb_t) *
                    ((bits * a->length - 1) / FLINT_BITS + 1));
 

@@ -73,11 +73,8 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         _fmpz_vec_sub(R, A, R, A_len);
 
         _fmpz_vec_clear(d2q1, q2 + q - 1);
-
-        return;
     }
-
-    if (A_len > 2 * B_len - 1)
+    else if (A_len > 2 * B_len - 1)
     {
         const fmpz *p1;
         fmpz *d1q1, *dq1, *q1, *q2;
@@ -140,23 +137,26 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
          */
 
         _fmpz_vec_clear(dq1, A_len);
-
-        return;
     }
+    else
+    {
+        /* A_len = 2*B_len - 1 */
+        fmpz *QB = _fmpz_vec_init(A_len);
 
-    /* A_len = 2*B_len - 1 */
-    fmpz *QB = _fmpz_vec_init(A_len);
+        _fmpz_poly_divrem_divconquer_recursive(Q, QB, A, B, B_len);
+        _fmpz_vec_sub(R, A, QB, A_len);
 
-    _fmpz_poly_divrem_divconquer_recursive(Q, QB, A, B, B_len);
-    _fmpz_vec_sub(R, A, QB, A_len);
-
-    _fmpz_vec_clear(QB, A_len);
+        _fmpz_vec_clear(QB, A_len);
+    }
 }
 
 void
 fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
                             const fmpz_poly_t A, const fmpz_poly_t B)
 {
+    fmpz_poly_t t1, t2;
+    fmpz *Q_coeffs, *R_coeffs;
+
     if (B->length == 0)
     {
         printf("Exception: division by zero in fmpz_poly_divrem_divconquer\n");
@@ -169,9 +169,6 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
         fmpz_poly_set(R, A);
         return;
     }
-
-    fmpz_poly_t t1, t2;
-    fmpz *Q_coeffs, *R_coeffs;
 
     if ((Q == A) || (Q == B))
     {

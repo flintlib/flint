@@ -46,11 +46,12 @@ fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
             }
             else                /* result takes two limbs */
             {
+                __mpz_struct * mpz_ptr;
                 mpz_t temp;
                 temp->_mp_d = sum;
                 temp->_mp_size = -2;    /* result is negative number minus negative number, hence negative */
 
-                __mpz_struct *mpz_ptr = _fmpz_promote(f);   /* g has already been read */
+                mpz_ptr = _fmpz_promote(f);   /* g has already been read */
                 mpz_set(mpz_ptr, temp);
             }
         }

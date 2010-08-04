@@ -34,11 +34,11 @@ int
 main(void)
 {
     int i, result;
-    printf("set....");
-    fflush(stdout);
-
     gmp_randstate_t state;
     gmp_randinit_default(state);
+
+    printf("set....");
+    fflush(stdout);
 
     for (i = 0; i < 100000; i++)
     {

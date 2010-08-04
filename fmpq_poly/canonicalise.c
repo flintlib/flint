@@ -34,31 +34,32 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, long len)
 {
     if (*den == 1L)
         return;
+    
     if (*den == -1L)
     {
         _fmpz_vec_neg(poly, poly, len);
         fmpz_set_ui(den, 1UL);
-        return;
     }
-    if (len == 0)
+    else if (len == 0)
     {
         fmpz_set_ui(den, 1UL);
-        return;
     }
-    
-    fmpz_t gcd;
-    fmpz_init(gcd);
-    _fmpz_vec_content(gcd, poly, len);
-    if (*gcd != 1L)
-        fmpz_gcd(gcd, gcd, den);
-    if (fmpz_sgn(den) < 0)
-        fmpz_neg(gcd, gcd);
-    if (*gcd != 1L)
+    else
     {
-        _fmpz_vec_scalar_divexact_fmpz(poly, poly, len, gcd);
-        fmpz_divexact(den, den, gcd);
+        fmpz_t gcd;
+        fmpz_init(gcd);
+        _fmpz_vec_content(gcd, poly, len);
+        if (*gcd != 1L)
+            fmpz_gcd(gcd, gcd, den);
+        if (fmpz_sgn(den) < 0)
+            fmpz_neg(gcd, gcd);
+        if (*gcd != 1L)
+        {
+            _fmpz_vec_scalar_divexact_fmpz(poly, poly, len, gcd);
+            fmpz_divexact(den, den, gcd);
+        }
+        fmpz_clear(gcd);
     }
-    fmpz_clear(gcd);
 }
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly)

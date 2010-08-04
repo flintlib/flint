@@ -139,9 +139,8 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
     
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
-        multiplier = flint_primes_small[i];
-        
         mp_limb_t multn[2];
+        multiplier = flint_primes_small[i];
         umul_ppmm(multn[1], multn[0], multiplier, n);
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);
 

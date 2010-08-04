@@ -88,12 +88,10 @@ _mpfr_poly_bound_newton(double *inter, double *slope,
      */
 
     long i, max_i, min_i;
-    double slope1, slope2;
-    double max_d, min_d;
-    double k;
+    double k, *mag, max_d, min_d, slope1, slope2;
     mpfr_t t;
     mpfr_init2(t, dprec);  /* don't waste time working at a higher precision */
-    double *mag = (double *) malloc(sizeof(double) * len);
+    mag = (double *) malloc(sizeof(double) * len);
 
     for (i = 0; i < len; i++)
     {

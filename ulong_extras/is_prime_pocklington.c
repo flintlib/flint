@@ -50,9 +50,9 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 
     for (i = factors.num - 1; i >= 0; i--)
     {
+        mp_limb_t exp = n1 / factors.p[i];
         pass = 0;
         c = 1;
-        mp_limb_t exp = n1 / factors.p[i];
 
         for (j = 2; j < iterations && pass == 0; j++)
         {
@@ -68,15 +68,11 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
             }
 
             if (c == 0)
-            {
                 return 0;
-            }
         }
 
         if (j == iterations)
-        {
             return -1;
-        }
     }
 
     return (n_gcd(n, c) == 1UL);

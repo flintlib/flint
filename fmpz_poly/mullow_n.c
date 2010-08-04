@@ -59,6 +59,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
+    fmpz *copy1, *copy2;
 
     if (len1 == 0 || len2 == 0 || trunc == 0)
     {
@@ -76,7 +77,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
         return;
     }
 
-    fmpz *copy1 = poly1->coeffs;
+    copy1 = poly1->coeffs;
     if (len1 < trunc)
     {
         long i;
@@ -84,7 +85,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
         for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
     }
-    fmpz *copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
+    copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
     if (poly1 != poly2 && len2 < trunc)
     {
         long i;

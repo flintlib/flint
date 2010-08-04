@@ -86,10 +86,11 @@ _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long A_len,
             fmpz_zero(coeff_Q);
         else
         {
+            fmpz * R_sub;
             fmpz_fdiv_q(coeff_Q, R + coeff - 1, B_lead);
             _fmpz_vec_scalar_mul_fmpz(qB, B, B1, coeff_Q);
 
-            fmpz *R_sub = R + coeff - B2;
+            R_sub = R + coeff - B2;
             _fmpz_vec_sub(R_sub, R_sub, qB, B1);
         }
 
