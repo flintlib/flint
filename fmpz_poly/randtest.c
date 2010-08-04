@@ -31,41 +31,41 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_randtest(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
+fmpz_poly_randtest(fmpz_poly_t f, long len, mp_bitcnt_t bits)
 {
     long i;
-    fmpz_poly_fit_length(f, length);
+    fmpz_poly_fit_length(f, len);
 
-    for (i = 0; i < length; i++)
-        fmpz_randtest(f->coeffs + i, bits_in);
+    for (i = 0; i < len; i++)
+        fmpz_randtest(f->coeffs + i, bits);
 
-    _fmpz_poly_set_length(f, length);
+    _fmpz_poly_set_length(f, len);
     _fmpz_poly_normalise(f);
 }
 
 void
-fmpz_poly_randtest_unsigned(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
+fmpz_poly_randtest_unsigned(fmpz_poly_t f, long len, mp_bitcnt_t bits)
 {
     long i;
-    fmpz_poly_fit_length(f, length);
+    fmpz_poly_fit_length(f, len);
 
-    for (i = 0; i < length; i++)
-        fmpz_randtest_unsigned(f->coeffs + i, bits_in);
+    for (i = 0; i < len; i++)
+        fmpz_randtest_unsigned(f->coeffs + i, bits);
 
-    _fmpz_poly_set_length(f, length);
+    _fmpz_poly_set_length(f, len);
     _fmpz_poly_normalise(f);
 }
 
 void
-fmpz_poly_randtest_not_zero(fmpz_poly_t f, long length, mp_bitcnt_t bits_in)
+fmpz_poly_randtest_not_zero(fmpz_poly_t f, long len, mp_bitcnt_t bits)
 {
-    if ((bits_in == 0) || (length == 0))
+    if ((bits == 0) || (len == 0))
     {
         printf("Exception: 0 passed to fmpz_poly_randtest_not_zero\n");
         abort();
     }
 
-    fmpz_poly_randtest(f, length, bits_in);
+    fmpz_poly_randtest(f, len, bits);
     if (f->length == 0)
     {
         fmpz_set_ui(f->coeffs, 1UL);

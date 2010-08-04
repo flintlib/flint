@@ -50,22 +50,22 @@ void fmpz_poly_init2(fmpz_poly_t poly, long alloc);
 
 void fmpz_poly_realloc(fmpz_poly_t poly, long alloc);
 
-void fmpz_poly_fit_length(fmpz_poly_t poly, long length);
+void fmpz_poly_fit_length(fmpz_poly_t poly, long len);
 
 void fmpz_poly_clear(fmpz_poly_t poly);
 
 void _fmpz_poly_normalise(fmpz_poly_t poly);
 
 static __inline__
-void _fmpz_poly_set_length(fmpz_poly_t poly, long newlength)
+void _fmpz_poly_set_length(fmpz_poly_t poly, long newlen)
 {
-    if (poly->length > newlength)
+    if (poly->length > newlen)
     {
         long i;
-        for (i = newlength; i < poly->length; i++)
+        for (i = newlen; i < poly->length; i++)
             _fmpz_demote(poly->coeffs + i); 
     }
-    poly->length = newlength;
+    poly->length = newlen;
 }
 
 /*  Polynomial parameters  ***************************************************/
@@ -113,14 +113,14 @@ void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n);
 void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n);
 
 static __inline__
-void fmpz_poly_truncate(fmpz_poly_t poly, long newlength)
+void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 {
-    if (poly->length > newlength)
+    if (poly->length > newlen)
     {
         long i;
-        for (i = newlength; i < poly->length; i++)
+        for (i = newlen; i < poly->length; i++)
             _fmpz_demote(poly->coeffs + i);
-        poly->length = newlength;
+        poly->length = newlen;
         _fmpz_poly_normalise(poly);
     }  
 }
@@ -131,13 +131,11 @@ void fmpz_poly_randinit(void);
 
 void fmpz_poly_randclear(void);
 
-void fmpz_poly_randtest(fmpz_poly_t f, long length, mp_bitcnt_t bits_in);
+void fmpz_poly_randtest(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long length, 
-                                                    mp_bitcnt_t bits_in);
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, 
-                                       long length, mp_bitcnt_t bits_in);
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/
 
@@ -193,10 +191,10 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1,
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
                                 long len, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack(fmpz * poly, long length, 
+void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                            mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long length, 
+void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                        mp_srcptr arr, mp_bitcnt_t bit_size);
 
 /*  Multiplication  **********************************************************/

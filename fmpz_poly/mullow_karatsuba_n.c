@@ -30,29 +30,30 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                      const fmpz * pol2, fmpz * temp,
-                                      long length);
+void 
+_fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
+                                 const fmpz * pol2, fmpz * temp, long len);
 
-/**
-    Multiplication using truncated karatsuba. Below length 7, classical truncated multiplication
-    is always theoretically faster, so we switch to that as the basecase.
-
-    Above that we use the ordinary (left/right) karatsuba identity and recursively do one full
-    karatsuba multiplication and two truncated karatsuba multiplications.
-*/
+/*
+   Multiplication using truncated karatsuba.
+   
+   Below length 7, classical truncated multiplication is always theoretically 
+   faster, so we switch to that as the basecase.  Above that we use the 
+   ordinary (left/right) karatsuba identity and recursively do one full
+   karatsuba multiplication and two truncated karatsuba multiplications.
+ */
 
 void
 _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                 const fmpz * pol2, fmpz * temp, long length)
+                                 const fmpz * pol2, fmpz * temp, long len)
 {
-    long m1 = length / 2;
-    long m2 = length - m1;
-    int odd = (length & 1);
+    long m1 = len / 2;
+    long m2 = len - m1;
+    int odd = (len & 1);
 
-    if (length <= 6)
+    if (len <= 6)
     {
-        _fmpz_poly_mullow_classical(out, pol1, length, pol2, length, length);
+        _fmpz_poly_mullow_classical(out, pol1, len, pol2, len, len);
         return;
     }
 
@@ -87,8 +88,7 @@ _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
                               const fmpz * poly2, long len)
 {
     fmpz *temp;
-    long loglen = 0;
-    long length;
+    long length, loglen = 0;
 
     if (len == 1)
     {
@@ -108,9 +108,8 @@ _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
 }
 
 void
-fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
-                             const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                             long length)
+fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                             const fmpz_poly_t poly2, long len)
 {
     long i;
     int clear1 = 0, clear2 = 0;
@@ -122,9 +121,9 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
         return;
     }
 
-    if (poly1->length != length)
+    if (poly1->length != len)
     {
-        pol1 = (fmpz *) calloc(length, sizeof(fmpz));
+        pol1 = (fmpz *) calloc(len, sizeof(fmpz));
         for (i = 0; i < poly1->length; i++)
             pol1[i] = poly1->coeffs[i];
         clear1 = 1;
@@ -132,9 +131,9 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
     else
         pol1 = poly1->coeffs;
 
-    if (poly2->length != length)
+    if (poly2->length != len)
     {
-        pol2 = (fmpz *) calloc(length, sizeof(fmpz));
+        pol2 = (fmpz *) calloc(len, sizeof(fmpz));
         for (i = 0; i < poly2->length; i++)
             pol2[i] = poly2->coeffs[i];
         clear2 = 1;
@@ -144,20 +143,20 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res,
 
     if (res != poly1 && res != poly2)
     {
-        fmpz_poly_fit_length(res, length);
+        fmpz_poly_fit_length(res, len);
 
-        _fmpz_poly_mullow_karatsuba_n(res->coeffs, pol1, pol2, length);
-        _fmpz_poly_set_length(res, length);
+        _fmpz_poly_mullow_karatsuba_n(res->coeffs, pol1, pol2, len);
+        _fmpz_poly_set_length(res, len);
         _fmpz_poly_normalise(res);
     }
     else
     {
         fmpz_poly_t temp;
         fmpz_poly_init(temp);
-        fmpz_poly_fit_length(temp, length);
+        fmpz_poly_fit_length(temp, len);
 
-        _fmpz_poly_mullow_karatsuba_n(temp->coeffs, pol1, pol2, length);
-        _fmpz_poly_set_length(temp, length);
+        _fmpz_poly_mullow_karatsuba_n(temp->coeffs, pol1, pol2, len);
+        _fmpz_poly_set_length(temp, len);
         _fmpz_poly_normalise(temp);
 
         fmpz_poly_swap(temp, res);

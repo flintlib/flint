@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_bit_unpack(fmpz * poly, long length,
+_fmpz_poly_bit_unpack(fmpz * poly, long len,
                       mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
 {
     mp_bitcnt_t bits = 0;
@@ -39,7 +39,7 @@ _fmpz_poly_bit_unpack(fmpz * poly, long length,
     int borrow = 0;
     long i;
 
-    for (i = 0; i < length; i++)
+    for (i = 0; i < len; i++)
     {
         borrow =
             fmpz_bit_unpack(poly + i, arr + limbs, bits, bit_size, negate,
@@ -55,7 +55,7 @@ _fmpz_poly_bit_unpack(fmpz * poly, long length,
 }
 
 void
-_fmpz_poly_bit_unpack_unsigned(fmpz * poly, long length,
+_fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
                                mp_srcptr arr, mp_bitcnt_t bit_size)
 {
     mp_bitcnt_t bits = 0;
@@ -64,7 +64,7 @@ _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long length,
     mp_size_t l = bit_size / FLINT_BITS;
     long i;
 
-    for (i = 0; i < length; i++)
+    for (i = 0; i < len; i++)
     {
         fmpz_bit_unpack_unsigned(poly + i, arr + limbs, bits, bit_size);
         limbs += l;
