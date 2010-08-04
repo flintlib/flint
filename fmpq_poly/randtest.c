@@ -31,7 +31,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 {
     long i;
     fmpq_poly_fit_length(f, len);
@@ -44,7 +44,7 @@ void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits_in)
     fmpq_poly_canonicalise(f);
 }
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 {
    long i;
    fmpq_poly_fit_length(f, len);
@@ -57,7 +57,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits_in)
    fmpq_poly_canonicalise(f);
 }
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 {
     if ((bits_in == 0) | (len == 0))
     {
