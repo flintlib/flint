@@ -33,35 +33,40 @@
 #include "mpfr_mat.h"
 #include "fmpz_mat.h"
 
-void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, long a, long kappa, long zeroes)
+void
+GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, long a,
+         long kappa, long zeroes)
 {
-  long i;
-  mpfr_t tmp, rtmp;
+    long i;
+    mpfr_t tmp, rtmp;
 
-  mpfr_init2(tmp, mu->prec);
-  mpfr_init2(rtmp, mu->prec);
-  
-  mpfr_set_ui(max, 0, GMP_RNDN);
-  
-  for (i = a; i < kappa; i++)
-  {
-      if (i >= zeroes + 2)
-	  {
-	     mpfr_set_z(rtmp, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
-		 _mpfr_vec_scalar_product(tmp, mu->rows[i] + zeroes + 1, r->rows[kappa] + zeroes + 1, i - zeroes - 1);
-		 mpfr_sub(r->rows[kappa] + i, rtmp, tmp, GMP_RNDN);
-	  } else
-	     mpfr_set_z(r->rows[kappa] + i, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
-      
-      mpfr_div(mu->rows[kappa] + i, r->rows[kappa] + i, r->rows[i] + i, GMP_RNDN);
-      if (mpfr_cmpabs(mu->rows[kappa] + i, max) > 0)
-		 mpfr_set(max, mu->rows[kappa] + i, GMP_RNDN);
-   }
+    mpfr_init2(tmp, mu->prec);
+    mpfr_init2(rtmp, mu->prec);
 
-   mpfr_abs(max, max, GMP_RNDN);
+    mpfr_set_ui(max, 0, GMP_RNDN);
 
-   mpfr_clear(tmp);
-   mpfr_clear(rtmp);
+    for (i = a; i < kappa; i++)
+    {
+        if (i >= zeroes + 2)
+        {
+            mpfr_set_z(rtmp, COEFF_TO_PTR(G->rows[kappa][i]), GMP_RNDN);
+            _mpfr_vec_scalar_product(tmp, mu->rows[i] + zeroes + 1,
+                                     r->rows[kappa] + zeroes + 1,
+                                     i - zeroes - 1);
+            mpfr_sub(r->rows[kappa] + i, rtmp, tmp, GMP_RNDN);
+        }
+        else
+            mpfr_set_z(r->rows[kappa] + i, COEFF_TO_PTR(G->rows[kappa][i]),
+                       GMP_RNDN);
+
+        mpfr_div(mu->rows[kappa] + i, r->rows[kappa] + i, r->rows[i] + i,
+                 GMP_RNDN);
+        if (mpfr_cmpabs(mu->rows[kappa] + i, max) > 0)
+            mpfr_set(max, mu->rows[kappa] + i, GMP_RNDN);
+    }
+
+    mpfr_abs(max, max, GMP_RNDN);
+
+    mpfr_clear(tmp);
+    mpfr_clear(rtmp);
 }
-
-
