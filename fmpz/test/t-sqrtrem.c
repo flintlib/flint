@@ -40,7 +40,7 @@ main(void)
 
     fmpz_randinit();
 
-    // Comparison with mpz routines
+    /* Comparison with mpz routines */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t f, r, g;
@@ -83,7 +83,7 @@ main(void)
         mpz_clear(mg);
     }
 
-    // Check aliasing of r and g
+    /* Check aliasing of r and g */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, f;
@@ -121,7 +121,7 @@ main(void)
         mpz_clear(mf2);
     }
 
-    // Check aliasing of f and g
+    /* Check aliasing of f and g */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t r, f;

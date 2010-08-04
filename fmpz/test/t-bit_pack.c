@@ -43,7 +43,7 @@ main(void)
     {
         fmpz_t a, b;
         mp_bitcnt_t bits = n_randint(300) + 1;
-        ulong space = (300 - 1) / FLINT_BITS + 2;   // 2 to accomodate shift
+        ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
         mp_ptr arr = (mp_ptr) calloc(space, sizeof(mp_limb_t));
         mp_bitcnt_t shift = n_randint(FLINT_BITS);
         int negate = (int) -n_randint(2);
@@ -51,7 +51,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
 
-        fmpz_randtest(a, bits - 1); // need one bit for sign
+        fmpz_randtest(a, bits - 1); /* need one bit for sign */
 
         arr[0] = n_randbits(shift);
 
@@ -77,7 +77,7 @@ main(void)
     {
         fmpz_t a, b;
         mp_bitcnt_t bits = n_randint(300) + 1;
-        ulong space = (300 - 1) / FLINT_BITS + 2;   // 2 to accomodate shift
+        ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
         mp_ptr arr = (mp_ptr) calloc(space, sizeof(mp_limb_t));
         mp_bitcnt_t shift = n_randint(FLINT_BITS);
 

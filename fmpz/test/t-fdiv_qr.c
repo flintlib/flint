@@ -91,7 +91,7 @@ main(void)
         mpz_clear(s);
     }
 
-    // check aliasing of c and a
+    /* Check aliasing of c and a */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c, r;
@@ -144,7 +144,7 @@ main(void)
         mpz_clear(s);
     }
 
-    // check aliasing of c and b
+    /* Check aliasing of c and b */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c, r;
@@ -197,7 +197,7 @@ main(void)
         mpz_clear(s);
     }
 
-    // check aliasing of r and a
+    /* Check aliasing of r and a */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c, r;
@@ -250,7 +250,7 @@ main(void)
         mpz_clear(s);
     }
 
-    // check aliasing of r and b
+    /* Check aliasing of r and b */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c, r;

@@ -78,7 +78,7 @@ main(void)
         mpz_clear(f);
     }
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a;

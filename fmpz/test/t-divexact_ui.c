@@ -78,7 +78,7 @@ main(void)
         mpz_clear(g);
     }
 
-    // Test aliasing of a and c
+    /* Test aliasing of a and c */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, c;
