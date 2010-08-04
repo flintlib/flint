@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
@@ -69,7 +69,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // compare with fmpz_poly_scalar_mul_si
+    /* Compare with fmpz_poly_scalar_mul_si */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;

@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // equal polynomials
+    /* equal polynomials */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;

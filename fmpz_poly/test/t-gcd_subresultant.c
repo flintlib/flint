@@ -41,7 +41,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, c;
@@ -69,7 +69,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    // Check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, c;
@@ -97,7 +97,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    // Check that a divides GCD(af, ag)
+    /* Check that a divides GCD(af, ag) */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, d, f, g, q, r;

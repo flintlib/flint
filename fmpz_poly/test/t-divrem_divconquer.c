@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // check q*b + r = a, no aliasing
+    /* Check q*b + r = a, no aliasing */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, q, r, prod;

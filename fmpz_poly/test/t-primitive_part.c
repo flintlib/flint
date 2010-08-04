@@ -41,7 +41,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // Check aliasing
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t f, g;
@@ -66,7 +66,7 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    // Check that content(f) primitive_part(f) = sgn(lead(f)) f
+    /* Check that content(f) primitive_part(f) = sgn(lead(f)) f */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t f, g;

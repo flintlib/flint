@@ -42,7 +42,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // Check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b;
@@ -71,7 +71,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // Compare with repeated multiplications by the case
+    /* Compare with repeated multiplications by the case */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;

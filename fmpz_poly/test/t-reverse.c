@@ -41,7 +41,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // Aliasing
+    /* Aliasing */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b;
@@ -69,7 +69,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // Correctness (?)
+    /* Correctness (?) */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b;

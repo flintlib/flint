@@ -41,7 +41,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // Check aliasing
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;
@@ -70,7 +70,7 @@ main(void)
         fmpz_poly_clear(f);
     }
 
-    // Check that (f+g)(a) = f(a) + g(a)
+    /* Check that (f+g)(a) = f(a) + g(a) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b, c;

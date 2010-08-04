@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;
@@ -68,7 +68,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    // check aliasing of a and c
+    /* Check aliasing of a and c */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;
@@ -98,7 +98,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    // check (b*c)+(b*d) = b*(c+d)
+    /* Check (b*c)+(b*d) = b*(c+d) */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a1, a2, b, c, d;

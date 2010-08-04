@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // check aliasing of a and b
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
@@ -66,7 +66,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // compare with fmpz_poly_scalar_mul_ui
+    /* Compare with fmpz_poly_scalar_mul_ui */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
@@ -92,7 +92,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // check (a*n1)*n2 = a*(n1*n2)
+    /* Check (a*n1)*n2 = a*(n1*n2) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b, c;

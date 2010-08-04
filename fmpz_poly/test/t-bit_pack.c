@@ -56,7 +56,7 @@ main(void)
         do
         {
             fmpz_poly_randtest(a, length, bits - 1);
-        }                       // -1 bit to handle signs
+        }                       /* -1 bit to handle signs */
         while (a->length == 0);
 
         negate = fmpz_sgn(a->coeffs + a->length - 1);

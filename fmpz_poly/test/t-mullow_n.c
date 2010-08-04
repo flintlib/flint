@@ -40,7 +40,7 @@ main(void)
 
     fmpz_poly_randinit();
 
-    // compare with truncated product of a and b
+    /* Compare with truncated product of a and b */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;
