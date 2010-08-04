@@ -1,7 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -19,53 +16,61 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
 
-********************************************************************************
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Andy Novocin
 
-  Memory management
+******************************************************************************/
 
-********************************************************************************
+*******************************************************************************
 
-__mpfr_struct * _mpfr_vec_init(ulong length, mp_bitcnt_t prec)
+    Memory management
 
-   Return a vector of the given length of initialised mpfr's with the
-   given exact precision.
+*******************************************************************************
+
+__mpfr_struct * _mpfr_vec_init(long len, mp_bitcnt_t prec)
+
+    Returns a vector of the given length of initialised mpfr's with the
+    given exact precision.
  
-void _mpfr_vec_clear(__mpfr_struct * vec, ulong length)
- 
-   Clear the given vector.
+void _mpfr_vec_clear(__mpfr_struct * vec, long len)
 
-********************************************************************************
+    Clear the given vector.
 
-  Arithmetic
+*******************************************************************************
 
-********************************************************************************
+    Arithmetic
 
-void _mpfr_vec_zero(mpfr * vec, ulong length)
+*******************************************************************************
 
-   Zero the vector {vec, length}
+void _mpfr_vec_zero(mpfr * vec, long len)
 
-void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, ulong length)
+   Zeros the vector {vec, len}.
 
-   Copy the vector vec2 of the given length into vec1. No check is made to ensure
-   vec1 and vec2 are different.
+void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long len)
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, ulong length)
+    Copies the vector vec2 of the given length into vec1. No check is made 
+    to ensure vec1 and vec2 are different.
 
-   Add the given vectors of the given length together and store the result in res.
+void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long len)
 
-void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, ulong length, mpfr_t c)
-   
-   Multiply the vector with given length by the scalar c and set res to the result.
+    Adds the given vectors of the given length together and stores the 
+    result in res.
 
-void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, ulong length, mp_bitcnt_t exp)
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, long len, mpfr_t c)
 
-   Multiply the given vector of the given length by 2^exp.
+    Multiplies the vector with given length by the scalar c and sets res 
+    to the result.
+
+void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, long len, mp_bitcnt_t exp)
+
+    Multiplies the given vector of the given length by 2^exp.
 
 void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-                                             __mpfr_struct * vec2, ulong length)
+                                                __mpfr_struct * vec2, long len)
 
-   Set res to the scalar product of {vec1, length} with {vec2, length}. Assumes
-   length > 0.
+   Sets res to the scalar product of {vec1, len} with {vec2, len}. Assumes 
+   len > 0.
 

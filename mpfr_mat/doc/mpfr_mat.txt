@@ -1,7 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -19,20 +16,26 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
 
-********************************************************************************
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Andy Novocin
 
-  Memory management
+******************************************************************************/
 
-********************************************************************************
+*******************************************************************************
 
-void mpfr_mat_init(mpfr_mat_t mat, ulong rows, ulong cols, mp_bitcnt_t prec)
+    Memory management
 
-   Initialise a matrix with the given number of rows and columns and the
-   given precision for use. The precision is the exact precision of the
-   entries.
+*******************************************************************************
+
+void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec)
+
+    Initialises a matrix with the given number of rows and columns and the
+    given precision for use. The precision is the exact precision of the
+    entries.
 
 void mpfr_mat_clear(mpfr_mat_t mat)
  
-   Clear the given matrix.
+   Clears the given matrix.

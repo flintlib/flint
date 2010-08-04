@@ -27,14 +27,14 @@
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_poly.h"
-    void
-mpfr_poly_randtest(mpfr_poly_t f, long length)
+
+void mpfr_poly_randtest(mpfr_poly_t f, long len)
 {
     long i;
-    mpfr_poly_fit_length(f, length);
+    mpfr_poly_fit_length(f, len);
 
-    for (i = 0; i < length; i++)
+    for (i = 0; i < len; i++)
         mpfr_urandomb(f->coeffs + i, mpfr_poly_randstate);
 
-    _mpfr_poly_set_length(f, length);
+    _mpfr_poly_set_length(f, len);
 }

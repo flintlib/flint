@@ -29,16 +29,14 @@
 #include "mpfr_poly.h"
 
 void
-mpfr_poly_fit_length(mpfr_poly_t poly, long length)
+mpfr_poly_fit_length(mpfr_poly_t poly, long len)
 {
-    long alloc = length;
-
-    if (alloc <= poly->alloc)
+    if (len <= poly->alloc)
         return;
 
-    /* at least double number of allocated coeffs */
-    if (alloc < 2 * poly->alloc)
-        alloc = 2 * poly->alloc;
+    /* At least double number of allocated coeffs */
+    if (len < 2 * poly->alloc)
+        len = 2 * poly->alloc;
 
-    mpfr_poly_realloc(poly, alloc);
+    mpfr_poly_realloc(poly, len);
 }

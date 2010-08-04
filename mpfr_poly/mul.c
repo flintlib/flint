@@ -133,7 +133,7 @@ _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, long len1, mpfr * poly2,
     mpfr *t1, *t2;
     long len_out = len1 + len2 - 1;
     long log_len = 0;
-    long length, length2;
+    long length;
     long i;
     long w1, w2;
 
@@ -173,7 +173,7 @@ _mpfr_poly_mul_scale(mpfr * res, mpfr * poly1, long len1, mpfr * poly2,
 
     for (i = w2; i < len2; i += w2)
     {
-        long l2 = FLINT_MIN(w2, len2 - i);
+        long l2 = FLINT_MIN(w2, len2 - i), length2;
 
         log_len = FLINT_BIT_COUNT(w1 + l2 - 1);
         length2 = (1L << log_len);
