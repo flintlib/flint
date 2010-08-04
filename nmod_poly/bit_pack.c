@@ -32,16 +32,12 @@
 
 /* Assumes length > 0, bits > 0. */
 void
-_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
+_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len, mp_bitcnt_t bits)
 {
-    ulong current_limb = 0;
-    ulong current_bit = 0;
-
-    mp_limb_t temp_lower;
-    mp_limb_t temp_upper;
-
-    ulong total_limbs = (length * bits - 1) / FLINT_BITS + 1;
     long i;
+    ulong current_bit = 0, current_limb = 0;
+    ulong total_limbs = (len * bits - 1) / FLINT_BITS + 1;
+    mp_limb_t temp_lower, temp_upper;
 
     res[0] = 0L;
 
@@ -49,7 +45,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             if (current_bit > boundary_limit_bit)
             {
@@ -84,12 +80,12 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
     }
     else if (bits == FLINT_BITS)
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
             res[i] = poly[i];
     }
     else if (bits == 2 * FLINT_BITS)
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             res[current_limb++] = poly[i];
             res[current_limb++] = 0L;
@@ -97,7 +93,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
     }
     else if (bits < 2 * FLINT_BITS)
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             /* the coefficient will be added accross a limb boundary */
             temp_lower = poly[i] << current_bit;
@@ -119,7 +115,7 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long length, mp_bitcnt_t bits)
     }
     else                        /* 2*FLINT_BITS < bits < 3*FLINT_BITS */
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             temp_lower = poly[i] << current_bit;
             temp_upper = r_shift(poly[i], FLINT_BITS - current_bit);

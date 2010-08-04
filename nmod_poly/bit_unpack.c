@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2007 David Howden
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,28 +30,22 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-/* Assumes length > 0, bits > 0. */
+/* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, mp_bitcnt_t bits,
+_nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long len, mp_bitcnt_t bits,
                       nmod_t mod)
 {
     long i;
-    ulong current_limb = 0;
-    ulong current_bit = 0;
-
-    mp_limb_t temp_lower;
-    mp_limb_t temp_upper;
-    mp_limb_t temp_upper2;
-
-    mp_limb_t mask;
+    ulong current_bit = 0, current_limb = 0;
+    mp_limb_t temp_lower, temp_upper, temp_upper2;
 
     if (bits < FLINT_BITS)
     {
         ulong boundary_limit_bit = FLINT_BITS - bits;
 
-        mask = (1L << bits) - 1L;
+        mp_limb_t mask = (1L << bits) - 1L;
 
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             if (current_bit > boundary_limit_bit)
             {
@@ -84,12 +78,12 @@ _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, mp_bitcnt_t bits,
     }
     else if (bits == FLINT_BITS)
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
             NMOD_RED(res[i], mpn[i], mod);
     }
     else if (bits == 2 * FLINT_BITS)
     {
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             NMOD2_RED2(res[i], mpn[current_limb + 1], mpn[current_limb], mod);
             current_limb += 2;
@@ -99,9 +93,9 @@ _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, mp_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 2 * FLINT_BITS - bits;
 
-        mask = (1L << (bits - FLINT_BITS)) - 1L;
+        mp_limb_t mask = (1L << (bits - FLINT_BITS)) - 1L;
 
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             if (current_bit == 0)
             {
@@ -155,9 +149,9 @@ _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long length, mp_bitcnt_t bits,
     {
         ulong double_boundary_limit_bit = 3 * FLINT_BITS - bits;
 
-        mask = (1L << (bits - 2 * FLINT_BITS)) - 1L;
+        mp_limb_t mask = (1L << (bits - 2 * FLINT_BITS)) - 1L;
 
-        for (i = 0; i < length; i++)
+        for (i = 0; i < len; i++)
         {
             if (current_bit == 0)
             {

@@ -30,15 +30,15 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, long length)
+nmod_poly_randtest(nmod_poly_t poly, long len)
 {
     long i;
 
-    nmod_poly_fit_length(poly, length);
+    nmod_poly_fit_length(poly, len);
 
-    for (i = 0; i < length; i++)
+    for (i = 0; i < len; i++)
         poly->coeffs[i] = n_randint(poly->mod.n);
 
-    poly->length = length;
+    poly->length = len;
     _nmod_poly_normalise(poly);
 }

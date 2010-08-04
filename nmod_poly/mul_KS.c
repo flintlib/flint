@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -30,51 +31,44 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1,
-                  mp_srcptr input2, long length2, ulong bits_in, nmod_t mod)
+_nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, long len1,
+                  mp_srcptr in2, long len2, mp_bitcnt_t bits, nmod_t mod)
 {
-    long len_out = length1 + length2 - 1;
-    long bits, limbs1, limbs2;
+    long len_out = len1 + len2 - 1, limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
-    if (!bits_in)
+    if (bits == 0)
     {
-        long bits1 = _nmod_vec_max_bits(input1, length1);
-        long bits2 =
-            (input1 == input2) ? bits1 : _nmod_vec_max_bits(input2, length2);
-
-        long log_length = FLINT_BIT_COUNT(length2);
-
-        bits = bits1 + bits2 + log_length;
+        mp_bitcnt_t bits1, bits2, loglen;
+        bits1  = _nmod_vec_max_bits(in1, len1);
+        bits2  = (in1 == in2) ? bits1 : _nmod_vec_max_bits(in2, len2);
+        loglen = FLINT_BIT_COUNT(len2);
+        
+        bits = bits1 + bits2 + loglen;
     }
-    else
-        bits = (long) bits_in;
 
-    limbs1 = (length1 * bits - 1) / FLINT_BITS + 1;
-    limbs2 = (length2 * bits - 1) / FLINT_BITS + 1;
+    limbs1 = (len1 * bits - 1) / FLINT_BITS + 1;
+    limbs2 = (len2 * bits - 1) / FLINT_BITS + 1;
 
     mpn1 = (mp_ptr) malloc(sizeof(mp_limb_t) * limbs1);
-    mpn2 =
-        (input1 ==
-         input2) ? mpn1 : (mp_ptr) malloc(sizeof(mp_limb_t) * limbs2);
+    mpn2 = (in1 == in2) ? mpn1 : (mp_ptr) malloc(sizeof(mp_limb_t) * limbs2);
 
-    _nmod_poly_bit_pack(mpn1, input1, length1, bits);
-
-    if (input1 != input2)
-        _nmod_poly_bit_pack(mpn2, input2, length2, bits);
+    _nmod_poly_bit_pack(mpn1, in1, len1, bits);
+    if (in1 != in2)
+        _nmod_poly_bit_pack(mpn2, in2, len2, bits);
 
     res = (mp_ptr) malloc(sizeof(mp_limb_t) * (limbs1 + limbs2));
 
-    if (input1 != input2)
+    if (in1 != in2)
         mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
     else
         mpn_mul_n(res, mpn1, mpn1, limbs1);
 
+    _nmod_poly_bit_unpack(out, res, len_out, bits, mod);
+    
     free(mpn2);
-    if (input1 != input2)
+    if (in1 != in2)
         free(mpn1);
-
-    _nmod_poly_bit_unpack(output, res, len_out, bits, mod);
 
     free(res);
 }
@@ -82,7 +76,7 @@ _nmod_poly_mul_KS(mp_ptr output, mp_srcptr input1, long length1,
 void
 nmod_poly_mul_KS(nmod_poly_t res,
                  const nmod_poly_t poly1, const nmod_poly_t poly2,
-                 ulong bits_in)
+                 mp_bitcnt_t bits)
 {
     long len_out;
 
@@ -100,11 +94,11 @@ nmod_poly_mul_KS(nmod_poly_t res,
         nmod_poly_init2_preinv(temp, poly1->mod.n, poly1->mod.ninv, len_out);
         if (poly1->length >= poly2->length)
             _nmod_poly_mul_KS(temp->coeffs, poly1->coeffs, poly1->length,
-                              poly2->coeffs, poly2->length, bits_in,
+                              poly2->coeffs, poly2->length, bits,
                               poly1->mod);
         else
             _nmod_poly_mul_KS(temp->coeffs, poly2->coeffs, poly2->length,
-                              poly1->coeffs, poly1->length, bits_in,
+                              poly1->coeffs, poly1->length, bits,
                               poly1->mod);
         nmod_poly_swap(res, temp);
         nmod_poly_clear(temp);
@@ -114,11 +108,11 @@ nmod_poly_mul_KS(nmod_poly_t res,
         nmod_poly_fit_length(res, len_out);
         if (poly1->length >= poly2->length)
             _nmod_poly_mul_KS(res->coeffs, poly1->coeffs, poly1->length,
-                              poly2->coeffs, poly2->length, bits_in,
+                              poly2->coeffs, poly2->length, bits,
                               poly1->mod);
         else
             _nmod_poly_mul_KS(res->coeffs, poly2->coeffs, poly2->length,
-                              poly1->coeffs, poly1->length, bits_in,
+                              poly1->coeffs, poly1->length, bits,
                               poly1->mod);
     }
 
