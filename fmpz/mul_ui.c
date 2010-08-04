@@ -54,7 +54,11 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
         else                    /* result takes two limbs */
         {
             __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            /* two limbs, least significant first, native endian, no nails, stored in prod */
+            
+            /*
+               Two limbs, least significant first, native endian, 
+               no nails, stored in prod
+            */
             mpz_import(mpz_ptr, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
             if (c2 < 0L)
                 mpz_neg(mpz_ptr, mpz_ptr);
@@ -62,7 +66,8 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
     }
     else                        /* c2 is large */
     {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);   // promote without val as if aliased both are large
+        /* Promote without val as if aliased both are large */
+        __mpz_struct *mpz_ptr = _fmpz_promote(f);
         mpz_mul_ui(mpz_ptr, COEFF_TO_PTR(c2), x);
     }
 }
