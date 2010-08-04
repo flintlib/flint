@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,11 +16,11 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 William Hart
- 
+    Copyright (C) 2010 William Hart
+
 ******************************************************************************/
 
 #ifndef NMOD_POLY_H
@@ -57,20 +57,20 @@ void nmod_poly_clear(nmod_poly_t poly);
 
 void nmod_poly_fit_length(nmod_poly_t poly, long alloc);
 
-static inline
+static __inline__
 mp_bitcnt_t nmod_poly_max_bits(nmod_poly_t poly)
 {
    return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
 
-static inline
+static __inline__
 void _nmod_poly_normalise(nmod_poly_t poly)
 {
    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
       poly->length--;
 }
 
-static inline
+static __inline__
 void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 {
    long t;
@@ -91,7 +91,7 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 
 void nmod_poly_randtest(nmod_poly_t poly, long length);
 
-static inline
+static __inline__
 void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
 {
    if (a != b)
@@ -102,7 +102,7 @@ void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
    }
 }
 
-static inline
+static __inline__
 int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
 {
    if (a->length != b->length)
@@ -115,7 +115,7 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
    return 1;
 }
 
-static inline
+static __inline__
 void nmod_poly_print(nmod_poly_t a)
 {
    long i;
@@ -132,13 +132,13 @@ void nmod_poly_print(nmod_poly_t a)
       gmp_printf(" %Mu", a->coeffs[i]);
 }
 
-static inline
+static __inline__
 void nmod_poly_zero(nmod_poly_t res)
 {
    res->length = 0;
 }
 
-static inline 
+static __inline__
 void nmod_poly_truncate(nmod_poly_t poly, long length)
 {
    if (poly->length > length)

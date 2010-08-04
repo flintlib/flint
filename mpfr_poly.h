@@ -55,13 +55,13 @@ void mpfr_poly_fit_length(mpfr_poly_t poly, long length);
 
 void mpfr_poly_clear(mpfr_poly_t poly);
 
-static inline
+static __inline__
 void _mpfr_poly_set_length(mpfr_poly_t poly, long length)
 {
    poly->length = length;
 }
 
-static inline
+static __inline__
 void mpfr_poly_set_prec(mpfr_poly_t poly, mpfr_prec_t prec)
 {
     long i;
@@ -76,7 +76,7 @@ void mpfr_poly_randclear(void);
 
 void mpfr_poly_randtest(mpfr_poly_t poly, long length);
 
-static inline
+static __inline__
 void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
 {
     mpfr * tc;

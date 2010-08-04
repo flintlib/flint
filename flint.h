@@ -30,6 +30,15 @@
 #include <mpfr.h>
 #include "longlong.h"
 
+/*
+   We define alternative key words for "asm" and "inline", allowing 
+   the code to be compiled with the "-ansi" flag under GCC
+ */
+#ifndef __GNUC__
+    #define __asm__     asm
+    #define __inline__  inline
+#endif
+
 #define ulong unsigned long
 
 #if __GMP_BITS_PER_MP_LIMB == 64
@@ -60,7 +69,7 @@ typedef __mpfr_struct mpfr;
 #define l_shift(in, shift) \
     ((shift == FLINT_BITS) ? 0L : ((in) << (shift)))
 
-static inline 
+static __inline__
 unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 {
    unsigned int zeros = FLINT_BITS;

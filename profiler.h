@@ -36,7 +36,7 @@ typedef struct
     long wall;
 } timeit_t[1];
 
-static inline
+static __inline__
 void timeit_start(timeit_t t)
 {
     struct timeval tv;
@@ -45,7 +45,7 @@ void timeit_start(timeit_t t)
     t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
 }
 
-static inline
+static __inline__
 void timeit_stop(timeit_t t)
 {
     struct timeval tv;
@@ -67,7 +67,7 @@ void timeit_stop(timeit_t t)
 extern double clock_last[FLINT_NUM_CLOCKS];
 extern double clock_accum[FLINT_NUM_CLOCKS];
 
-static inline 
+static __inline__ 
 double get_cycle_counter()
 {
    unsigned int hi;
@@ -83,13 +83,13 @@ double get_cycle_counter()
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
-static inline 
+static __inline__ 
 void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
 
-static inline 
+static __inline__ 
 void init_all_clocks()
 {
    int i;
@@ -97,19 +97,19 @@ void init_all_clocks()
       clock_accum[i] = 0.0;
 }
 
-static inline 
+static __inline__
 double get_clock(int n)
 {
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
-static inline 
+static __inline__ 
 void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
-static inline 
+static __inline__ 
 void stop_clock(int n)
 {
    double now = get_cycle_counter();
@@ -122,13 +122,13 @@ void stop_clock(int n)
 
 ******************************************************************************/
 
-static inline
+static __inline__ 
 void prof_start()
 {
    start_clock(0);
 }
 
-static inline
+static __inline__ 
 void prof_stop()
 {
    stop_clock(0);

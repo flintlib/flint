@@ -72,13 +72,13 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
 /*  Polynomial parameters  ***************************************************/
 
-static inline 
+static __inline__
 long fmpq_poly_degree(fmpq_poly_t poly)
 {
     return poly->length - 1;
 }
 
-static inline 
+static __inline__
 long fmpq_poly_length(fmpq_poly_t poly)
 {
     return poly->length;
@@ -138,13 +138,13 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right);
 
-static inline 
+static __inline__
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 {
     return poly->length == 0L;
 }
 
-static inline 
+static __inline__
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 {
     return (poly->length == 1L) && (fmpz_equal(poly->coeffs, poly->den));

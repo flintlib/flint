@@ -76,13 +76,13 @@ mp_limb_t n_randtest_not_zero(void);
 
 mp_limb_t n_pow(mp_limb_t n, ulong exp);
 
-static inline
+static __inline__ 
 double n_precompute_inverse(mp_limb_t n)
 {
    return (double) 1 / (double) n;
 }
 
-static inline
+static __inline__
 mp_limb_t n_preinvert_limb(mp_limb_t n)
 {
    mp_limb_t norm, ninv;
@@ -117,7 +117,7 @@ mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b,
 mp_limb_t n_powmod_precomp(mp_limb_t a, 
                      mp_limb_signed_t exp, mp_limb_t n, double npre);
 
-static inline
+static __inline__
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 {
    double npre = n_precompute_inverse(n);
@@ -128,7 +128,7 @@ mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 mp_limb_t n_powmod2_preinv(mp_limb_t a, 
                   mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv);
 
-static inline
+static __inline__
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 {
    mp_limb_t ninv = n_preinvert_limb(n);
@@ -136,19 +136,19 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
    return n_powmod2_preinv(a, exp, n, ninv);
 }
 
-static inline
+static __inline__
 mp_limb_t n_addmod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
     return (n - y > x ? x + y : x + y - n);
 }
 
-static inline
+static __inline__
 mp_limb_t n_submod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
     return (y > x ? x - y + n : x - y);
 }
 
-static inline
+static __inline__
 mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 {
     return n_submod(0, x, n);
@@ -206,7 +206,7 @@ int n_remove(mp_limb_t * n, mp_limb_t p);
 
 int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre);
 
-static inline
+static __inline__
 void n_factor_init(n_factor_t * factors)
 {
     factors->num = 0UL;

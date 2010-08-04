@@ -71,7 +71,7 @@ void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, long len);
 
 void fmpz_mpoly_clear(fmpz_mpoly_t poly);
 
-static inline
+static __inline__
 void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, long len)
 {
     if (poly->length > len)  /* only truncate if necessary */

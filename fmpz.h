@@ -71,7 +71,7 @@ __mpz_struct * _fmpz_promote(fmpz_t f);
 
 __mpz_struct * _fmpz_promote_val(fmpz_t f);
 
-static inline
+static __inline__
 void _fmpz_demote(fmpz_t f)
 {
     if (COEFF_IS_MPZ(*f)) 
@@ -83,7 +83,7 @@ void _fmpz_demote(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f);
 
-static inline
+static __inline__
 void fmpz_init(fmpz_t f)
 {
 	(*f) = 0L;
@@ -91,7 +91,7 @@ void fmpz_init(fmpz_t f)
 
 void fmpz_init2(fmpz_t f, ulong limbs);
 
-static inline
+static __inline__
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
@@ -125,14 +125,14 @@ void fmpz_set_mpz(fmpz_t f, const mpz_t x);
 
 int fmpz_set_str(fmpz_t f, char * str, int b);
 
-static inline
+static __inline__
 void fmpz_zero(fmpz_t f)
 {
    _fmpz_demote(f);	
    (*f) = 0L;
 }
 
-static inline
+static __inline__
 int fmpz_is_zero(const fmpz_t f)
 {
    return (*f == 0);
@@ -142,7 +142,7 @@ void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
 
-static inline 
+static __inline__
 void fmpz_print(fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x)) printf("%ld", *x);
@@ -153,7 +153,7 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f);
 
-static inline
+static __inline__
 void fmpz_swap(fmpz_t f, fmpz_t g)
 {
     if (f != g)  /* swapping required */
