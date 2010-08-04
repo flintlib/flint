@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2006, 2007, 2008, 2009 William Hart
- Copyright (C) 2008, Peter Shrimpton
- Copyright (C) 2009, Tom Boothby
- 
+    Copyright (C) 2006, 2007, 2008, 2009 William Hart
+    Copyright (C) 2008, Peter Shrimpton
+    Copyright (C) 2009, Tom Boothby
+
 ******************************************************************************/
 
 #ifndef ULONG_EXTRAS_H
@@ -32,7 +32,7 @@
 
 typedef struct pair_s
 {
-	mp_limb_t x, y;
+    mp_limb_t x, y;
 } n_pair_t;
 
 #define FLINT_MAX_FACTORS_IN_LIMB 15
@@ -98,24 +98,24 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv);
 mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv);
 
 mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, 
-                                        mp_limb_t n, double npre);
+                                           mp_limb_t n, double npre);
 
 mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t n_ll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_lo, 
-                                     mp_limb_t n, mp_limb_t ninv);
+                                        mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, 
-				     mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv);
+                        mp_limb_t a_lo, mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, 
-                                        mp_limb_t n, double ninv);
+                                           mp_limb_t n, double ninv);
 
 mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
-                                      mp_limb_t n, mp_limb_t ninv);
+                                        mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t n_powmod_precomp(mp_limb_t a, 
-                   mp_limb_signed_t exp, mp_limb_t n, double npre);
+                     mp_limb_signed_t exp, mp_limb_t n, double npre);
 
 static inline
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
@@ -126,7 +126,7 @@ mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 }
 
 mp_limb_t n_powmod2_preinv(mp_limb_t a, 
-                 mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv);
+                  mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv);
 
 static inline
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
@@ -139,27 +139,24 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 static inline
 mp_limb_t n_addmod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
-   if (n - y > x) return x + y;
-   else return x + y - n;
+    return (n - y > x ? x + y : x + y - n);
 }
 
 static inline
 mp_limb_t n_submod(mp_limb_t x, mp_limb_t y, mp_limb_t n)
 {
-   if (y > x) return x - y + n;
-   else return x - y;
+    return (y > x ? x - y + n : x - y);
 }
 
 static inline
 mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 {
-   return n_submod(0, x, n);
+    return n_submod(0, x, n);
 }
 
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 
-mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, 
-                                            mp_limb_t x, mp_limb_t y);
+mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y);
 
 mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y);
 
@@ -212,7 +209,7 @@ int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre);
 static inline
 void n_factor_init(n_factor_t * factors)
 {
-   factors->num = 0UL;
+    factors->num = 0UL;
 }
 
 void n_factor_insert(n_factor_t * factors, mp_limb_t p, ulong exp);
@@ -221,7 +218,7 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors,
                          mp_limb_t n, ulong start, ulong num_primes);
 
 mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, 
-                 mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
+                mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
 
 mp_limb_t n_factor_trial(n_factor_t * factors, 
                                   mp_limb_t n, mp_limb_t num_primes);
@@ -238,9 +235,4 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
 
 #endif
-
-
-
-
-
 
