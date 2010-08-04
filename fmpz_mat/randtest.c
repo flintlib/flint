@@ -30,7 +30,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
+fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits)
 {
     long r, c, i, j;
 
@@ -39,5 +39,5 @@ fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
 
     for (i = 0; i < r; i++)
         for (j = 0; j < c; j++)
-            fmpz_randtest(mat->rows[i] + j, bits_in);
+            fmpz_randtest(mat->rows[i] + j, bits);
 }
