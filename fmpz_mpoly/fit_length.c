@@ -32,14 +32,12 @@
 void
 fmpz_mpoly_fit_length(fmpz_mpoly_t poly, long len)
 {
-    long alloc = len;
-
-    if (alloc <= poly->alloc)
+    if (len <= poly->alloc)
         return;
 
     /* At least double number of allocated coeffs */
-    if (alloc < 2 * poly->alloc)
-        alloc = 2 * poly->alloc;
+    if (len < 2 * poly->alloc)
+        len = 2 * poly->alloc;
 
-    fmpz_mpoly_realloc(poly, alloc);
+    fmpz_mpoly_realloc(poly, len);
 }
