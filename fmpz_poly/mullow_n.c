@@ -34,17 +34,19 @@
 void
 _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
 {
+    long limbs1, limbs2, max_limbs;
+
     if (n <= 4)
     {
         _fmpz_poly_mullow_classical(res, poly1, n, poly2, n, n);
         return;
     }
 
-    const long limbs1 = _fmpz_vec_max_limbs(poly1, n);
-    const long limbs2 = _fmpz_vec_max_limbs(poly2, n);
-    const long max_limbs = FLINT_MAX(limbs1, limbs2);
+    limbs1 = _fmpz_vec_max_limbs(poly1, n);
+    limbs2 = _fmpz_vec_max_limbs(poly2, n);
+    max_limbs = FLINT_MAX(limbs1, limbs2);
 
-    if (max_limbs > 3 & n < 20)
+    if (max_limbs > 3 && n < 20)
         _fmpz_poly_mullow_karatsuba_n(res, poly1, poly2, n);
     else
         _fmpz_poly_mullow_KS(res, poly1, n, poly2, n, n);
@@ -57,14 +59,15 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
+    fmpz *copy1, *copy2;
 
-    if (len1 == 0 | len2 == 0 | trunc == 0)
+    if (len1 == 0 || len2 == 0 || trunc == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);
@@ -74,7 +77,7 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
         return;
     }
 
-    fmpz *copy1 = poly1->coeffs;
+    copy1 = poly1->coeffs;
     if (len1 < trunc)
     {
         long i;
@@ -82,8 +85,8 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
         for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
     }
-    fmpz *copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
-    if (poly1 != poly2 & len2 < trunc)
+    copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
+    if (poly1 != poly2 && len2 < trunc)
     {
         long i;
         copy2 = (fmpz *) calloc(trunc, sizeof(fmpz));
@@ -102,6 +105,6 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
 
     if (copy1 != poly1->coeffs)
         free(copy1);
-    if (poly1 != poly2 & copy2 != poly2->coeffs)
+    if (poly1 != poly2 && copy2 != poly2->coeffs)
         free(copy2);
 }

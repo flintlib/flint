@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart, Andy Novocin
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2009 Andy Novocin
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,44 +32,42 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("get_d_2exp....");
-   fflush(stdout);
+    int i, result;
+    double output;
+    long exp;
 
-   fmpz_randinit();
+    printf("get_d_2exp....");
+    fflush(stdout);
 
-   double output;
-   long exp;
+    fmpz_randinit();
 
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      fmpz_t a;
-      
-      fmpz_init(a);
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_t a;
+        fmpz_init(a);
 
-      fmpz_randtest(a, 200);
+        fmpz_randtest(a, 200);
 
-      output = fmpz_get_d_2exp(&exp, a);
+        output = fmpz_get_d_2exp(&exp, a);
 
-      result = (fmpz_bits(a) == exp);
-      
-      if (!result)
-      {
-         printf("FAIL\n");
-         printf("a = "); fmpz_print(a); printf("\n");
-         printf("output = %f\n", output);
-         printf("exp = %ld, bits = %lu\n", exp, fmpz_bits(a));
-         abort();
-      }
+        result = (fmpz_bits(a) == exp);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a = "), fmpz_print(a), printf("\n");
+            printf("output = %f\n", output);
+            printf("exp = %ld, bits = %lu\n", exp, fmpz_bits(a));
+            abort();
+        }
 
-      fmpz_clear(a);
-   }
+        fmpz_clear(a);
+    }
 
-   fmpz_randclear();
-
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

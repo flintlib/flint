@@ -33,51 +33,53 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("to_string....");
-   fflush(stdout);
-   
-    char * str;
+    int result;
+    char *str;
     fmpz_poly_t a;
+
+    printf("to_string....");
+    fflush(stdout);
+
     fmpz_poly_init(a);
-    
+
     str = fmpz_poly_to_string_pretty(a, "t");
     result = strcmp(str, "0") == 0;
     if (!result)
     {
-        printf("FAIL.\n");
-        printf("a = "); fmpz_poly_print(a); printf("\n");
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
         printf("str(a) = {%s}\n", str);
         abort();
     }
     free(str);
-    
+
     fmpz_poly_set_si(a, -2);
     str = fmpz_poly_to_string_pretty(a, "t");
     result = strcmp(str, "-2") == 0;
     if (!result)
     {
-        printf("FAIL.\n");
-        printf("a = "); fmpz_poly_print(a); printf("\n");
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
         printf("str(a) = {%s}\n", str);
         abort();
     }
     free(str);
-    
+
     fmpz_poly_set_coeff_si(a, 3, 1);
     str = fmpz_poly_to_string_pretty(a, "t");
     result = strcmp(str, "t^3-2") == 0;
     if (!result)
     {
-        printf("FAIL.\n");
-        printf("a = "); fmpz_poly_print(a); printf("\n");
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
         printf("str(a) = {%s}\n", str);
         abort();
     }
     free(str);
-    
-   printf("PASS\n");
-   return 0;
+
+    printf("PASS\n");
+    return 0;
 }

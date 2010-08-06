@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,35 +16,39 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
+mp_limb_t
+n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
 {
-   if (n == 1UL) return 0L;
-   
-   mp_limb_t x, y;
-   mp_limb_signed_t e;
+    mp_limb_t x, y;
+    mp_limb_signed_t e;
 
-   e = (exp < 0L ? -exp : exp);
-   
-   x = 1UL;
-   y = a;
+    if (n == 1UL)
+        return 0L;
 
-   while (e) 
-   {
-      if (e & 1L) x = n_mulmod_precomp(x, y, n, npre);
-      e >>= 1;
-      if (e) y = n_mulmod_precomp(y, y, n, npre);
-   }
+    e = (exp < 0L ? -exp : exp);
 
-   return (exp < 0L ? n_invmod(x, n) : x);
+    x = 1UL;
+    y = a;
+
+    while (e)
+    {
+        if (e & 1L)
+            x = n_mulmod_precomp(x, y, n, npre);
+        e >>= 1;
+        if (e)
+            y = n_mulmod_precomp(y, y, n, npre);
+    }
+
+    return (exp < 0L ? n_invmod(x, n) : x);
 }

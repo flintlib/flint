@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -34,46 +32,44 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
-    int result;
+    int i;
 
-    printf ("init/init2/realloc/clear....");
-    fflush (stdout);
+    printf("init/init2/realloc/clear....");
+    fflush(stdout);
 
-    fmpq_poly_randinit ();
+    fmpq_poly_randinit();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
-        fmpq_poly_init2 (a, n_randint (100));
-        fmpq_poly_clear (a);
+        fmpq_poly_init2(a, n_randint(100));
+        fmpq_poly_clear(a);
     }
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
-        fmpq_poly_init2 (a, n_randint (100));
-        fmpq_poly_realloc (a, n_randint (100));
-        fmpq_poly_realloc (a, n_randint (100));
-        fmpq_poly_clear (a);
+        fmpq_poly_init2(a, n_randint(100));
+        fmpq_poly_realloc(a, n_randint(100));
+        fmpq_poly_realloc(a, n_randint(100));
+        fmpq_poly_clear(a);
     }
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
-        fmpq_poly_init (a);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
-
-        fmpq_poly_clear (a);
+        fmpq_poly_init(a);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_clear(a);
     }
 
-    fmpq_poly_randclear ();
-
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    fmpq_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

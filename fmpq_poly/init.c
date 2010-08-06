@@ -41,15 +41,8 @@ void fmpq_poly_init(fmpq_poly_t poly)
 
 void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
 {
-    if (alloc)  /* Allocate space for alloc small coeffs */
-    {
-        poly->coeffs = (fmpz *) malloc(alloc * sizeof(fmpz));
-        mpn_zero(poly->coeffs, alloc);
-    }
-    else
-    {
-        poly->coeffs = NULL;
-    }
+    /* Allocate space for alloc small coeffs */
+    poly->coeffs = (alloc ? (fmpz *) calloc(alloc, sizeof(fmpz)) : NULL);
     
     fmpz_init(poly->den);
     fmpz_set_ui(poly->den, 1UL);

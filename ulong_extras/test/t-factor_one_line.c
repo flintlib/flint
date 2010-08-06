@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,12 +31,12 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
+   ulong count = 0UL;
    printf("factor_one_line....");
    fflush(stdout);
-   ulong count = 0UL;
 
-   for (ulong i = 0; i < 5000UL; i++) /* Test random numbers */
+   for (i = 0; i < 5000; i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, bits;
       
@@ -59,7 +59,7 @@ int main(void)
 
          if (!result)
          {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             printf("n1 = %lu, n2 = %lu\n", n1, n2); 
             abort();
          }
@@ -68,7 +68,7 @@ int main(void)
    
    if (count < 4500)
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("Only %lu of 10000 numbers factored\n", count); 
       abort();
    }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/*****************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +32,10 @@
 int main(void)
 {
    int result = 1;
+   ulong i, j;
+   mp_limb_t p;
+   mpz_t i_m;
+   
    printf("compute_primes....");
    fflush(stdout);
    
@@ -39,7 +43,7 @@ int main(void)
    
    if (flint_num_primes < (500UL))
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("Not enough primes computed, flint_num_primes = %lu\n", flint_num_primes);
       abort();
    }
@@ -48,7 +52,7 @@ int main(void)
    
    if (flint_num_primes < (10000UL))
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("Not enough primes computed, flint_num_primes = %lu\n", flint_num_primes);
       abort();
    }
@@ -57,7 +61,7 @@ int main(void)
    
    if (flint_num_primes < (20000UL))
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("Not enough primes computed, flint_num_primes = %lu\n", flint_num_primes);
       abort();
    }
@@ -66,18 +70,16 @@ int main(void)
    
    if (flint_num_primes < (74000UL))
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("Not enough primes computed, flint_num_primes = %lu\n", flint_num_primes);
       abort();
    }
       
-   mp_limb_t p = flint_primes[0];
-   ulong j = 0;
-
-   mpz_t i_m;
+   p = flint_primes[0];
+   j = 0;
    mpz_init(i_m);
    
-   for (ulong i = 0; i < flint_primes_cutoff; i++) /* Test that primes pass the test */
+   for (i = 0; i < flint_primes_cutoff; i++) /* Test that primes pass the test */
    {
       mpz_set_ui(i_m, i);
       if (mpz_probab_prime_p(i_m, 20))
@@ -86,7 +88,7 @@ int main(void)
          
          if (!result)
          {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             printf("%lu, %lu\n", i, p); 
             abort();
          }
@@ -98,7 +100,6 @@ int main(void)
    }
 
    mpz_clear(i_m);
-   
    printf("PASS\n");
    return 0;
 }

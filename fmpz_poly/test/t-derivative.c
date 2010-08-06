@@ -35,14 +35,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("derivative....");
     fflush(stdout);
 
     fmpz_poly_randinit();
 
-    // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check aliasing */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
 
@@ -56,11 +56,9 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("Error:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -68,8 +66,8 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // Check constants have derivative zero
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check constants have derivative zero */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
 
@@ -82,11 +80,9 @@ main(void)
         result = (b->length == 0UL);
         if (!result)
         {
-            printf("Error:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -94,8 +90,8 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    // Check (f g)' = f' g + f g'
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check (f g)' = f' g + f g' */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b, c, d, lhs, rhs;
 
@@ -120,10 +116,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -136,7 +130,6 @@ main(void)
     }
 
     fmpz_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

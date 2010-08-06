@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,16 +29,15 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_clear(fmpz_mat_t mat)
+void
+fmpz_mat_clear(fmpz_mat_t mat)
 {
-   if (mat->entries) 
-   {
-      long i;
-      
-      for (i = 0; i < mat->r * mat->c; i++) 
-      fmpz_clear(mat->entries + i); // Clear all coefficients
-      free(mat->entries); // clean up array of entries
-      free(mat->rows); // clean up row array
-   }
+    if (mat->entries)
+    {
+        long i;
+        for (i = 0; i < mat->r * mat->c; i++)
+            fmpz_clear(mat->entries + i);   /* Clear all coefficients */
+        free(mat->entries);     /* Clean up array of entries */
+        free(mat->rows);        /* Clean up row array */
+    }
 }
-

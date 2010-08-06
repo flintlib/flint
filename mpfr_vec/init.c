@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,15 +29,16 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-__mpfr_struct * _mpfr_vec_init(long length, mp_bitcnt_t prec)
+__mpfr_struct *
+_mpfr_vec_init(long length, mp_bitcnt_t prec)
 {
-   long i;
-   
-   __mpfr_struct * vec = (__mpfr_struct *) malloc(length*sizeof(__mpfr_struct));
+    long i;
 
-   for (i = 0; i < length; i++)
-      mpfr_init2(vec + i, prec);
+    __mpfr_struct *vec =
+        (__mpfr_struct *) malloc(length * sizeof(__mpfr_struct));
 
-   return vec;
+    for (i = 0; i < length; i++)
+        mpfr_init2(vec + i, prec);
+
+    return vec;
 }
-

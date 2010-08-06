@@ -31,11 +31,12 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-char * _fmpz_poly_to_string(const fmpz * poly, long len)
+char *
+_fmpz_poly_to_string(const fmpz * poly, long len)
 {
     long i, bound;
-    char * str, * strbase;
-    
+    char *str, *strbase;
+
     if (len == 0)
     {
         str = (char *) malloc(2 * sizeof(char));
@@ -43,28 +44,29 @@ char * _fmpz_poly_to_string(const fmpz * poly, long len)
         str[1] = '\0';
         return str;
     }
-    
-    bound  = (long) (ceil(log10((double) (len + 1))));
+
+    bound = (long) (ceil(log10((double) (len + 1))));
     for (i = 0; i < len; i++)
         bound += fmpz_sizeinbase(poly + i, 10) + 1;
     bound += len + 2;
-    
+
     strbase = (char *) malloc(bound * sizeof(char));
     str = strbase;
-    
+
     str += sprintf(str, "%li ", len);
-    do {
+    do
+    {
         if (!COEFF_IS_MPZ(*poly))
             str += sprintf(str, " %li", *poly);
         else
             str += gmp_sprintf(str, " %Zd", COEFF_TO_PTR(*poly));
     } while (poly++, --len);
-    
+
     return strbase;
 }
 
-char * fmpz_poly_to_string(const fmpz_poly_t poly)
+char *
+fmpz_poly_to_string(const fmpz_poly_t poly)
 {
     return _fmpz_poly_to_string(poly->coeffs, poly->length);
 }
-

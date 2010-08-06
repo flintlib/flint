@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,59 +16,57 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("init/init2/realloc/clear....");
-   fflush(stdout);
-   
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_poly_t a;
+    int i;
+    printf("init/init2/realloc/clear....");
+    fflush(stdout);
 
-	  mp_limb_t n = n_randtest_not_zero();
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
 
-      nmod_poly_init2(a, n, n_randint(100));
-      nmod_poly_clear(a);      
-   }
+        nmod_poly_init2(a, n, n_randint(100));
+        nmod_poly_clear(a);
+    }
 
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_poly_t a;
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
 
-	  mp_limb_t n = n_randtest_not_zero();
+        nmod_poly_init2(a, n, n_randint(100));
+        nmod_poly_realloc(a, n_randint(100));
+        nmod_poly_realloc(a, n_randint(100));
+        nmod_poly_clear(a);
+    }
 
-      nmod_poly_init2(a, n, n_randint(100));
-      nmod_poly_realloc(a, n_randint(100));
-      nmod_poly_realloc(a, n_randint(100));
-      nmod_poly_clear(a);      
-   }
-   
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_poly_t a;
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
 
-	  mp_limb_t n = n_randtest_not_zero();
+        nmod_poly_init(a, n);
+        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_clear(a);
+    }
 
-      nmod_poly_init(a, n);
-      nmod_poly_randtest(a, n_randint(100));
-      
-      nmod_poly_clear(a);
-   }
-   
-   printf("PASS\n");
-   return 0;
+    printf("PASS\n");
+    return 0;
 }

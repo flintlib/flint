@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,11 +16,11 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 William Hart
- 
+    Copyright (C) 2010 William Hart
+
 ******************************************************************************/
 
 #ifndef NMOD_VEC_H
@@ -79,21 +79,21 @@ typedef struct
 	   NMOD_RED2(r, a_hi, a_lo, mod); \
 	} while (0)
 
-static inline
+static __inline__
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t sum = a + b;
    return sum - mod.n + ((((mp_limb_signed_t)(sum - mod.n))>>(FLINT_BITS - 1)) & mod.n);
 }
 
-static inline
+static __inline__
 mp_limb_t _nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t diff = a - b;
    return  ((((mp_limb_signed_t)diff)>>(FLINT_BITS - 1)) & mod.n) + diff;
 }
 
-static inline
+static __inline__
 mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t neg = mod.n - a;
@@ -103,7 +103,7 @@ mp_limb_t nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
       return b - neg;
 }
 
-static inline
+static __inline__
 mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
    const mp_limb_t diff = a - b;
@@ -114,7 +114,7 @@ mp_limb_t nmod_sub(mp_limb_t a, mp_limb_t b, nmod_t mod)
       return diff;
 }
 
-static inline
+static __inline__
 mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 {
    if (a)
@@ -123,7 +123,7 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
       return 0;
 }
 
-static inline
+static __inline__
 void nmod_init(nmod_t * mod, mp_limb_t n)
 {
    mod->n = n;
@@ -131,13 +131,13 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
    count_leading_zeros(mod->norm, n);
 }
 
-static inline
+static __inline__
 mp_ptr nmod_vec_init(long len)
 {
    return (mp_ptr) malloc(len * sizeof(mp_limb_t));
 }
 
-static inline
+static __inline__
 void nmod_vec_free(mp_ptr vec)
 {
    free(vec);
@@ -145,7 +145,7 @@ void nmod_vec_free(mp_ptr vec)
 
 void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod);
 
-static inline
+static __inline__
 void _nmod_vec_zero(mp_ptr vec, long len)
 {
    mpn_zero(vec, len);
@@ -153,13 +153,13 @@ void _nmod_vec_zero(mp_ptr vec, long len)
 
 mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len);
 
-static inline
+static __inline__
 void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
 {
    mpn_copyi(res, vec, len);
 }
 
-static inline
+static __inline__
 int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 {
    long i;

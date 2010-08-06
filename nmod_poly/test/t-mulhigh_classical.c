@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,124 +31,126 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("mulhigh_classical....");
-   fflush(stdout);
-   
-   // check aliasing of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
-   {
-      nmod_poly_t a, b, c;
-      long len;
-	  ulong start;
+    int i, result;
+    printf("mulhigh_classical....");
+    fflush(stdout);
 
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-      
-	  len = b->length + c->length - 1;
-	  if (len <= 0) start = 0;
-	  else start = n_randint(b->length + c->length);
-      
-	  nmod_poly_mulhigh_classical(a, b, c, start);
-      nmod_poly_mulhigh_classical(b, b, c, start);
-      
-      result = (nmod_poly_equal(a, b));
-      if (!result)
-      {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         abort();
-      }
+    /* Check aliasing of a and b */
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c;
+        long len, start;
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
-   
-   // check aliasing of a and c
-   for (ulong i = 0; i < 2000UL; i++) 
-   {
-      nmod_poly_t a, b, c;
-      long len;
-	  ulong start;
+        mp_limb_t n = n_randtest_not_zero();
 
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) start = 0;
-	  else start = n_randint(b->length + c->length - 1);
-	  
-	  nmod_poly_mulhigh_classical(a, b, c, start);
-      nmod_poly_mulhigh_classical(c, b, c, start);
-      
-      result = (nmod_poly_equal(a, c));
-      if (!result)
-      {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(c); printf("\n\n");
-         abort();
-      }
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
-  
-   // compare with mul_basecase
-   for (ulong i = 0; i < 2000UL; i++) 
-   {
-      nmod_poly_t a, b, c, d;
-      long len;
-	  ulong start;
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            start = 0;
+        else
+            start = n_randint(b->length + c->length);
 
-	  mp_limb_t n = n_randtest_not_zero();
-      
-      nmod_poly_init(a, n);
-      nmod_poly_init(b, n);
-      nmod_poly_init(c, n);
-      nmod_poly_init(d, n);
-      nmod_poly_randtest(b, n_randint(50));
-      nmod_poly_randtest(c, n_randint(50));
-   
-	  len = b->length + c->length - 1;
-	  if (len <= 0) start = 0;
-	  else start = n_randint(b->length + c->length - 1);
-	  
-	  nmod_poly_mul_classical(a, b, c);
-      if (a->length >= start)
-		  _nmod_vec_zero(a->coeffs, start);
-	  nmod_poly_mulhigh_classical(d, b, c, start);
-      
-      result = (nmod_poly_equal(a, d));
-      if (!result)
-      {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(d); printf("\n\n");
-         abort();
-      }
+        nmod_poly_mulhigh_classical(a, b, c, start);
+        nmod_poly_mulhigh_classical(b, b, c, start);
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-      nmod_poly_clear(d);
-   }
+        result = (nmod_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            abort();
+        }
 
-   printf("PASS\n");
-   return 0;
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    /* Check aliasing of a and c */
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c;
+        long len, start;
+        mp_limb_t n = n_randtest_not_zero();
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            start = 0;
+        else
+            start = n_randint(b->length + c->length - 1);
+
+        nmod_poly_mulhigh_classical(a, b, c, start);
+        nmod_poly_mulhigh_classical(c, b, c, start);
+
+        result = (nmod_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    /* Compare with mul_basecase */
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c, d;
+        long len, start;
+        mp_limb_t n = n_randtest_not_zero();
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(c, n);
+        nmod_poly_init(d, n);
+        nmod_poly_randtest(b, n_randint(50));
+        nmod_poly_randtest(c, n_randint(50));
+
+        len = b->length + c->length - 1;
+        if (len <= 0)
+            start = 0;
+        else
+            start = n_randint(b->length + c->length - 1);
+
+        nmod_poly_mul_classical(a, b, c);
+        if (a->length >= start)
+            _nmod_vec_zero(a->coeffs, start);
+        nmod_poly_mulhigh_classical(d, b, c, start);
+
+        result = (nmod_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(d), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+        nmod_poly_clear(d);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

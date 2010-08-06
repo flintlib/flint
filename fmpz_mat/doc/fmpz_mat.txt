@@ -1,7 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -19,94 +16,101 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
 
-********************************************************************************
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Andy Novocin
 
-  Memory management
+******************************************************************************/
 
-********************************************************************************
+*******************************************************************************
 
-void fmpz_mat_init(fmpz_mat_t mat, ulong rows, ulong cols)
+    Memory management
 
-   Initialise a matrix with the given number of rows and columns for use. 
+*******************************************************************************
+
+void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
+
+    Initialises a matrix with the given number of rows and columns for use. 
 
 void fmpz_mat_clear(fmpz_mat_t mat)
 
-   Clear the given matrix.
+    Clears the given matrix.
 
 void fmpz_mat_print(fmpz_mat_t mat) 
 
-   Print the given matrix to stdout. The format is the number of rows, a
-   space, the number of columns, two spaces, then a space separated list
-   of coefficients.
+    Prints the given matrix to stdout. The format is the number of rows, a
+    space, the number of columns, two spaces, then a space separated list
+    of coefficients.
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat) 
 
-   Print the given matrix to stdout. The format is an opening square bracket
-   then on each line a row of the matrix, followed by a closing square 
-   bracket. Each row is written as an opening square bracket followed by a
-   space separated list of coefficients followed by a closing square bracket.
+    Prints the given matrix to stdout. The format is an opening square bracket
+    then on each line a row of the matrix, followed by a closing square 
+    bracket. Each row is written as an opening square bracket followed by a
+    space separated list of coefficients followed by a closing square bracket.
 
 void fmpz_mat_randinit(void)
 
-   Initialise the fmpz_mat randstate.
+    Initialises the fmpz_mat randstate.
 
 void fmpz_mat_randclear(void)
 
-   Clear the fmpz_mat randstate.
+    Clears the fmpz_mat randstate.
 
 void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits)
 
-   Sets the entries of mat to random signed integers whose absolute values
-   have the given number of binary bits.
+    Sets the entries of mat to random signed integers whose absolute values
+    have the given number of binary bits.
 
 void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
 
-   Sets the entries of mat to random signed integers whose absolute values 
-   have a random number of bits up to the given number of bits inclusive.
+    Sets the entries of mat to random signed integers whose absolute values 
+    have a random number of bits up to the given number of bits inclusive.
 
 void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
 
-   Set mat to be a random "integer relations" matrix, with signed entries up 
-   to the given number of bits. The number of columns of mat must be equal 
-   to one more than the number of rows. The format of the matrix is a set of
-   random integers in the left hand column and an identity matrix in the 
-   remaining square submatrix.
+    Sets mat to be a random "integer relations" matrix, with signed entries up 
+    to the given number of bits. The number of columns of mat must be equal 
+    to one more than the number of rows. The format of the matrix is a set of
+    random integers in the left hand column and an identity matrix in the 
+    remaining square submatrix.
 
 void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 
-   Set mat to a random "simultaneous diophantine" matrix. The matrix must
-   be square. The top left entry is set to 2^bits2. The remainder of that
-   row is then set to signed random integers of the given number of binary 
-   bits. The remainder of the first column is zero. Running down the rest of
-   the diagonal are the values 2^bits with all remaining entries zero.
+    Sets mat to a random "simultaneous diophantine" matrix. The matrix must
+    be square. The top left entry is set to 2^bits2. The remainder of that
+    row is then set to signed random integers of the given number of binary 
+    bits. The remainder of the first column is zero. Running down the rest of
+    the diagonal are the values 2^bits with all remaining entries zero.
   
 void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
    
-   Set a square matrix mat of even dimension to a random "NTRU like" matrix.
-   The matrix is broken into four square submatrices. The top left submatrix
-   is set to the identity. The bottom left submatrix is set to the zero 
-   matrix. The bottom right submatrix is set to q times the identity matrix.
-   Finally the top right submatrix has the following format. A random vector
-   h of length r/2 is created, with random signed entries of the given number
-   of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
+    Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
+    The matrix is broken into four square submatrices. The top left submatrix
+    is set to the identity. The bottom left submatrix is set to the zero 
+    matrix. The bottom right submatrix is set to q times the identity matrix.
+    Finally the top right submatrix has the following format. A random vector
+    h of length r/2 is created, with random signed entries of the given number
+    of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
 
 void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
    
-   Set a square matrix mat of even dimension to a random "NTRU like" matrix.
-   The matrix is broken into four square submatrices. The top left submatrix
-   is set to q times the identity matrix. The top right submatrix is set to the 
-   zero matrix. The bottom right submatrix is set to the identity matrix.
-   Finally the bottom left submatrix has the following format. A random vector
-   h of length r/2 is created, with random signed entries of the given number
-   of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
+    Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
+    The matrix is broken into four square submatrices. The top left submatrix
+    is set to q times the identity matrix. The top right submatrix is set to 
+    the zero matrix. The bottom right submatrix is set to the identity matrix.
+    Finally the bottom left submatrix has the following format. A random vector
+    h of length r/2 is created, with random signed entries of the given number
+    of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
 
-  Set a square matrix mat to a random "ajtai" matrix. The diagonal entries 
-  (i, i) are set to a random entry in the range [1, 2^{b-1}] inclusive where
-  b = floor((2*r - i)^alpha) for some double parameter alpha. The entries below 
-  the diagonal in column i are set to a random entry in the range (-2^b + 1, 
-  2^b - 1) whilst the entries to the right of the diagonal in row i are set to
-  zero. 
+    Sets a square matrix mat to a random "ajtai" matrix. The diagonal entries 
+    (i, i) are set to a random entry in the range [1, 2^{b-1}] inclusive where
+    b = floor((2*r - i)^alpha) for some double parameter alpha. The entries 
+    below the diagonal in column i are set to a random entry in the range 
+    (-2^b + 1, 2^b - 1) whilst the entries to the right of the diagonal in 
+    row i are set to zero. 
+

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("is_oddprime_binary....");
    fflush(stdout);
    
    n_compute_primes(10000);
 
-   for (ulong i = 0; i < 100000UL; i++) /* Test that primes pass the test */
+   for (i = 0; i < 100000; i++) /* Test that primes pass the test */
    {
       mp_limb_t d;
       mpz_t d_m;
@@ -57,7 +57,7 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d = %lu is declared composite\n", d); 
          abort();
       }
@@ -65,7 +65,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (ulong i = 0; i < 100000UL; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 100000; i++) /* Test that not too many composites pass */
    {
       mp_limb_t d;
       mpz_t d_m;
@@ -82,7 +82,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d = %lu is declared prime\n", d); 
          abort();
       }

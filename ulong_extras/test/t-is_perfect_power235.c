@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,29 +31,29 @@
 
 int main(void)
 {
-   int result;
-   printf("is_perfect_power235....");
-   fflush(stdout);
+   int i, result;
    ulong bits;
    mp_limb_t d;
    
-   for (ulong i = 0; i < 10000UL; i++) /* Test that square pass the test */
+   printf("is_perfect_power235....");
+   fflush(stdout);
+   
+   for (i = 0; i < 10000; i++) /* Test that square pass the test */
    {
       bits = n_randint(FLINT_BITS/2) + 1;
       d = n_randbits(bits);
 
       result = n_is_perfect_power235(n_pow(d, 2));
-      
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d^2 = %lu is declared not a perfect power\n", d*d); 
          abort();
       }
 
    }
          
-   for (ulong i = 0; i < 10000UL; i++) /* Test that cubes pass the test */
+   for (i = 0; i < 10000; i++) /* Test that cubes pass the test */
    {
       bits = n_randint(FLINT_BITS/3) + 1;
       d = n_randbits(bits);
@@ -62,14 +62,14 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d); 
+         printf("FAIL:\n");
+         printf("d^3 = %lu is declared not a perfect power\n", d*d*d); 
          abort();
       }
 
    }
          
-   for (ulong i = 0; i < 10000UL; i++) /* Test that fifth powers pass the test */
+   for (i = 0; i < 10000; i++) /* Test that fifth powers pass the test */
    {
       bits = n_randint(FLINT_BITS/5) + 1;
       d = n_randbits(bits);
@@ -78,18 +78,16 @@ int main(void)
       
       if (!result)
       {
-         printf("FAIL\n");
-         printf("d^3 = %lu is declared not a perfect power\n", d*d); 
+         printf("FAIL:\n");
+         printf("d^5 = %lu is declared not a perfect power\n", d*d*d*d*d); 
          abort();
       }
 
    }
          
-   for (ulong i = 0; i < 100000UL; i++) /* Test that non prefect powers fail */
+   for (i = 0; i < 100000; i++) /* Test that non prefect powers fail */
    {
-      mp_limb_t d;
       mpz_t d_m;
-      
       mpz_init(d_m);
 
       do
@@ -99,10 +97,9 @@ int main(void)
       } while (mpz_perfect_power_p(d_m));
 
       result = !n_is_perfect_power235(d);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d = %lu is declared a perfect power\n", d); 
          abort();
       }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,50 +30,52 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("get/set_mpz....");
-   fflush(stdout);
+    int i, result;
+    gmp_randstate_t state;
+    gmp_randinit_default(state);
 
-   gmp_randstate_t state;
-   gmp_randinit_default(state);
-   
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a;
-      mpz_t b, c;
-      mp_bitcnt_t bits;
+    printf("get/set_mpz....");
+    fflush(stdout);
 
-      mpz_init(b); mpz_init(c);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        mpz_t b, c;
+        mp_bitcnt_t bits;
 
-      bits = n_randint(200) + 1;
-      
-      mpz_rrandomb(b, state, bits);
-      if (n_randint(2)) mpz_neg(b, b);
+        mpz_init(b);
+        mpz_init(c);
 
-      fmpz_init(a);
-      
-      fmpz_set_mpz(a, b);
-      fmpz_get_mpz(c, a);
+        bits = n_randint(200) + 1;
 
-      result = (mpz_cmp(b, c) == 0);
+        mpz_rrandomb(b, state, bits);
+        if (n_randint(2))
+            mpz_neg(b, b);
 
-      if (!result)
-      {
-         printf("FAIL\n");
-         gmp_printf("b = %Zd, c = %Zd\n", b, c);
-         abort();
-      }
+        fmpz_init(a);
 
-      fmpz_clear(a);
+        fmpz_set_mpz(a, b);
+        fmpz_get_mpz(c, a);
 
-      mpz_clear(b);
-      mpz_clear(c);
-   }
+        result = (mpz_cmp(b, c) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("b = %Zd, c = %Zd\n", b, c);
+            abort();
+        }
 
-   gmp_randclear(state);
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_clear(a);
+
+        mpz_clear(b);
+        mpz_clear(c);
+    }
+
+    gmp_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

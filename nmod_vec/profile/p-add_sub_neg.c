@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2010 William Hart
+    Copyright 2010 William Hart
 
 ******************************************************************************/
 
@@ -40,11 +40,11 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t n, r = 0;
    nmod_t mod;
-
    info_t * info = (info_t *) arg;
-
    mp_bitcnt_t bits = info->bits;
    int type = info->type;
+   mp_size_t j;
+   long i;
 
    n = n_randbits(bits);
    if (n == 0UL) n++;
@@ -55,17 +55,17 @@ void sample(void * arg, ulong count)
    mp_ptr vec2 = nmod_vec_init(1000);
    mp_ptr res = nmod_vec_init(1000);
      
-   for (mp_size_t j = 0; j < 1000; j++)
+   for (j = 0; j < 1000; j++)
       vec1[j] = n_randint(n);
 
-   for (mp_size_t j = 0; j < 1000; j++)
+   for (j = 0; j < 1000; j++)
       vec2[j] = n_randint(n);
 
    switch (type)
    {
    case 1:
 	  prof_start();
-      for (long i = 0; i < count; i++)
+      for (i = 0; i < count; i++)
       {
          _nmod_vec_add(res, vec1, vec2, 1000, mod);
       }
@@ -74,7 +74,7 @@ void sample(void * arg, ulong count)
 
    case 2:
 	  prof_start();
-      for (long i = 0; i < count; i++)
+      for (i = 0; i < count; i++)
       {
          _nmod_vec_sub(res, vec1, vec2, 1000, mod);
       }
@@ -83,7 +83,7 @@ void sample(void * arg, ulong count)
 
    case 3:
 	  prof_start();
-      for (long i = 0; i < count; i++)
+      for (i = 0; i < count; i++)
       {
          _nmod_vec_neg(res, vec1, 1000, mod);
       }
@@ -98,10 +98,10 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min1, min2, min3, max;
-   
    info_t info;
+   mp_bitcnt_t i;
 
-   for (mp_bitcnt_t i = 2; i <= FLINT_BITS; i++)
+   for (i = 2; i <= FLINT_BITS; i++)
    {
       info.bits = i;
 
@@ -116,8 +116,8 @@ int main(void)
 
       printf("bits %ld, add = %.1lf c/l, sub = %.1lf c/l, neg = %.1lf c/l\n", 
          i, (min1/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
-         i, (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
-         i, (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
+            (min2/(double)FLINT_CLOCK_SCALE_FACTOR)/1000,
+            (min3/(double)FLINT_CLOCK_SCALE_FACTOR)/1000
 	  );
    }
 

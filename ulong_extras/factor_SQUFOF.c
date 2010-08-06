@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -29,116 +29,118 @@
 
 mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 {
-   mp_limb_t n[2];
+    mp_limb_t n[2];
 	mp_limb_t sqrt[2];
 	mp_limb_t rem[2];
-	
+	mp_size_t num, sqroot, p, q;
+
+    mp_limb_t l, l2, iq, pnext;
+    mp_limb_t qarr[50];
+    mp_limb_t qupto, qlast, t, r;
+    ulong i, j;
+
 	n[0] = n_lo;
 	n[1] = n_hi;
-	
-	mp_size_t num;
-   if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
-   else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != 0UL);
-	
-	mp_limb_t sqroot = sqrt[0];
-   mp_limb_t p = sqroot;
-   mp_limb_t q = rem[0];
-   
-   if ((q == 0) || (num == 0))
-   {
-      return sqroot;
-   }
-   
-   mp_limb_t l = 1 + 2*n_sqrt(2*p);
-   mp_limb_t l2 = l/2;
-   mp_limb_t iq, pnext;
-   mp_limb_t qarr[50];
-   mp_limb_t qupto = 0;
-   mp_limb_t qlast = 1;
-   mp_limb_t t, r;
-   ulong i, j;
-   
-   for (i = 0; i < max_iters; i++)
-   {
-      iq = (sqroot + p)/q;
-      pnext = iq*q - p;
-      if (q <= l) 
-      {
-         if ((q & 1UL) == 0UL) 
-         {
-            qarr[qupto] = q/2;
-            qupto++;
-            if (qupto >= 50UL) return 0UL;
-         } else if (q <= l2)
-         {
-            qarr[qupto] = q;
-            qupto++;
-            if (qupto >= 50UL) return 0UL;
-         }
-      }
 
-      t = qlast + iq*(p - pnext);
-	   qlast = q;
-	   q = t;
-	   p = pnext;
-	   if ((i & 1) == 1) continue;
-	   if (!n_is_square(q)) continue;
-	   r = n_sqrt(q);
-	   if (qupto == 0UL) break;
-	   for (j = 0; j < qupto; j++)	
-         if (r == qarr[j]) goto cont;
-      break;
-      cont: ; if (r == 1UL) return 0UL;
+    if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
+    else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != 0UL);
+	
+    sqroot = sqrt[0];
+    p = sqroot;
+    q = rem[0];
+
+    if ((q == 0) || (num == 0))
+    {
+        return sqroot;
+    }
+   
+    l = 1 + 2*n_sqrt(2*p);
+    l2 = l/2;
+    qupto = 0;
+    qlast = 1;
+
+    for (i = 0; i < max_iters; i++)
+    {
+        iq = (sqroot + p)/q;
+        pnext = iq*q - p;
+        if (q <= l) 
+        {
+            if ((q & 1UL) == 0UL) 
+            {
+                qarr[qupto] = q/2;
+                qupto++;
+                if (qupto >= 50UL) return 0UL;
+            } else if (q <= l2)
+            {
+                qarr[qupto] = q;
+                qupto++;
+                if (qupto >= 50UL) return 0UL;
+            }
+        }
+
+        t = qlast + iq*(p - pnext);
+        qlast = q;
+        q = t;
+        p = pnext;
+        if ((i & 1) == 1) continue;
+        if (!n_is_square(q)) continue;
+        r = n_sqrt(q);
+        if (qupto == 0UL) break;
+        for (j = 0; j < qupto; j++)	
+            if (r == qarr[j]) goto cont;
+        break;
+      cont: ;
+        if (r == 1UL) return 0UL;
    }
    
-   if (i == max_iters) return 0UL; // taken too long, give up
-   
-   qlast = r;
-   p = p + r*((sqroot - p)/r);
+    if (i == max_iters) return 0UL;  /* taken too long, give up */
+
+    qlast = r;
+    p = p + r*((sqroot - p)/r);
 
 	umul_ppmm(rem[1], rem[0], p, p);
-   sub_ddmmss(sqrt[1], sqrt[0], n[1], n[0], rem[1], rem[0]);
+    sub_ddmmss(sqrt[1], sqrt[0], n[1], n[0], rem[1], rem[0]);
 	if (sqrt[1])
 	{
-		int norm;
-	   count_leading_zeros(norm, sqrt[1]);
-	   udiv_qrnnd(q, rem[0], sqrt[1]<<norm + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0]<<norm, qlast); 
-      q >>= norm;
-	} else
-	{
-		q = sqrt[0]/qlast;
-	}
+        int norm;
+        count_leading_zeros(norm, sqrt[1]);
+        udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast); 
+        q >>= norm;
+    }
+    else
+    {
+        q = sqrt[0]/qlast;
+    }
 
-   for (j = 0; j < max_iters; j++)
-   {	
-	  iq = (sqroot + p)/q;
-	  pnext = iq*q - p;
-	  if (p == pnext) break;
-	  t = qlast + iq*(p - pnext);
-	  qlast = q;
-	  q = t;
-	  p = pnext;
-   }
-   
-   if (j == max_iters) return 0UL; // taken too long, give up
-   
-   if ((q & 1UL) == 0UL) q /= 2UL;
-   
-   return q;
+    for (j = 0; j < max_iters; j++)
+    {	
+        iq = (sqroot + p)/q;
+        pnext = iq*q - p;
+        if (p == pnext) break;
+        t = qlast + iq*(p - pnext);
+        qlast = q;
+        q = t;
+        p = pnext;
+    }
+
+    if (j == max_iters) return 0UL;  /* taken too long, give up */
+
+    if ((q & 1UL) == 0UL) q /= 2UL;
+
+    return q;
 }
 
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 {
     mp_limb_t factor = _ll_factor_SQUFOF(0UL, n, iters);
     mp_limb_t multiplier;
-    mp_limb_t quot, rem, kn;
+    mp_limb_t quot, rem;
     ulong i;
-   
+    
     for (i = 1; (i < FLINT_NUM_PRIMES_SMALL) && !factor; i++)
     {
-        multiplier = flint_primes_small[i];
-        
         mp_limb_t multn[2];
+        multiplier = flint_primes_small[i];
         umul_ppmm(multn[1], multn[0], multiplier, n);
         factor = _ll_factor_SQUFOF(multn[1], multn[0], iters);
 
@@ -153,5 +155,5 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
     if (i == FLINT_NUM_PRIMES_SMALL) return 0UL;
 
-	 return factor; 
+    return factor; 
 }

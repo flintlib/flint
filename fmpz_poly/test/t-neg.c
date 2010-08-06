@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,44 +31,44 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("neg....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      fmpz_poly_t a, b, c;
+    int i, result;
+    printf("neg....");
+    fflush(stdout);
 
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-      fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-      
-      fmpz_poly_neg(b, a);
-      fmpz_poly_neg(c, b);
+    fmpz_poly_randinit();
 
-      result = (fmpz_poly_equal(a, c));
-      if (!result)
-      {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
-         fmpz_poly_print(c); printf("\n\n");
-         abort();
-      }
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a, b, c;
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
 
-   fmpz_poly_randclear();
-      
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_poly_neg(b, a);
+        fmpz_poly_neg(c, b);
+
+        result = (fmpz_poly_equal(a, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

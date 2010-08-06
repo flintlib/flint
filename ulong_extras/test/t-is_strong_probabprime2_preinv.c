@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,15 +31,17 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
+   ulong count = 0UL;
+   
    printf("is_strong_probabprime2_preinv....");
    fflush(stdout);
-   ulong count = 0UL;
 
-   for (ulong i = 0; i < 1000UL; i++) /* Test that primes pass the test */
+   for (i = 0; i < 1000; i++) /* Test that primes pass the test */
    {
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
+      ulong j;
       
       mpz_init(d_m);
 
@@ -52,7 +54,7 @@ int main(void)
       } while (mpz_size(d_m) > 1);
       if (d == 2UL) d++;
          
-      for (ulong j = 0; j < 100; j++)
+      for (j = 0; j < 100; j++)
       {
          do a = n_randint(d);
          while (a == 0UL);
@@ -63,7 +65,7 @@ int main(void)
 
          if (!result)
          {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             printf("a = %lu, d = %lu\n", a, d); 
             abort();
          }
@@ -72,10 +74,11 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (ulong i = 0; i < 1000UL; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 1000; i++) /* Test that not too many composites pass */
    {
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
+      ulong j;
       
       mpz_init(d_m);
 
@@ -86,7 +89,7 @@ int main(void)
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
-      for (ulong j = 0; j < 100; j++)
+      for (j = 0; j < 100; j++)
       {
          do a = n_randint(d);
          while (a == 0UL);
@@ -103,7 +106,7 @@ int main(void)
 
    if (count > 2000) 
    {
-      printf("FAIL\n");
+      printf("FAIL:\n");
       printf("count = %lu\n", count);
       abort();
    }

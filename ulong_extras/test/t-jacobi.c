@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("jacobi....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 100000UL; i++) 
+   for (i = 0; i < 100000; i++) 
    {
-      mp_limb_t u, d, g;
+      mp_limb_t u, d;
       mpz_t a_m, d_m;
       mp_limb_signed_t a;
       int r1, r2;
@@ -56,10 +56,9 @@ int main(void)
       r2 = mpz_jacobi(a_m, d_m);
       
       result = (r1 == r2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("a = %lu, d = %lu\n", a, d); 
          abort();
       }

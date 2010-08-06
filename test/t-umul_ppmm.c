@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, j, result;
    printf("umul_ppmm....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
       mp_limb_t ph1, pl1, ph2, pl2, pl2old, m1, m2, bit;
 
@@ -48,13 +48,13 @@ int main(void)
       pl2 = 0UL;
       ph2 = 0UL;
       bit = 1UL;
-      for (int i = 0; i < FLINT_BITS; i++)
+      for (j = 0; j < FLINT_BITS; j++)
       {
          if (m2 & bit)
          {
-            pl2 += (m1 << i);
+            pl2 += (m1 << j);
             ph2 += (pl2 < pl2old);
-            ph2 += r_shift(m1, FLINT_BITS - i);
+            ph2 += r_shift(m1, FLINT_BITS - j);
             pl2old = pl2;
          }
          bit <<= 1;
@@ -64,7 +64,7 @@ int main(void)
 
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("m1 = %lu, m2 = %lu\n", m1, m2); 
          printf("ph2 = %lu, ph1 = %lu, pl2 = %lu, pl1 = %lu\n", ph2, ph1, pl2, pl1);
          abort();

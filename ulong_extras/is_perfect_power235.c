@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <math.h>
@@ -53,24 +53,25 @@ int n_is_perfect_power235(mp_limb_t n)
     if (!t) return 0;
 
     t &= mod63[n%63];
-
-    mp_limb_t y;
     
     if (t & 1) 
     {
-        y = (mp_limb_t) sqrt((double) n);
+        double x = sqrt((double) n);
+        mp_limb_t y = (mp_limb_t) (x + 0.5);
         if (n == n_pow(y, 2)) return 1;
     }
 
     if (t & 2) 
     {
-        y = (mp_limb_t) round(pow((double) n, 1/3.));
+        double x = pow((double) n, 1.0 / 3.0);
+        mp_limb_t y = (mp_limb_t) (x + 0.5);
         if (n == n_pow(y, 3)) return 1;
     }
 
     if (t & 4) 
     {
-        y = (mp_limb_t) round(pow((double) n, 1/5.));
+        double x = pow((double) n, 1.0 / 5.0);
+        mp_limb_t y = (mp_limb_t) (x + 0.5);
         if (n == n_pow(y, 5)) return 1;
     }
 

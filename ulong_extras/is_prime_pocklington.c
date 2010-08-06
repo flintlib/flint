@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,69 +16,64 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
+int
+n_is_prime_pocklington(mp_limb_t n, ulong iterations)
 {
-	int i, j, k, pass, exp;
-	mp_limb_t n1, cofactor, b, c, ninv, limit;
-	n_factor_t factors;
+    int i, j, pass;
+    mp_limb_t n1, cofactor, b, c, ninv, limit;
+    n_factor_t factors;
 
-   if (n % 2 == 0)
-   {
-	   if (n == 2UL) return 1;
-	   else return 0;
-	}
+    if (n % 2 == 0)
+    {
+        return (n == 2UL);
+    }
 
-   n1 = n - 1;
-	
-   n_factor_init(&factors);
+    n1 = n - 1;
 
-   limit = n_sqrt(n1);
-   cofactor = n_factor_partial(&factors, n1, limit, 1);
+    n_factor_init(&factors);
 
-   ninv = n_preinvert_limb(n);
+    limit = n_sqrt(n1);
+    cofactor = n_factor_partial(&factors, n1, limit, 1);
 
-   for (i = factors.num - 1; i >= 0 ; i--)
-	{		
-		pass = 0;
-		c = 1;
-		mp_limb_t exp = n1/factors.p[i];
-		
-		for (j = 2; j < iterations && pass == 0; j++)
-		{
-			b = n_powmod2_preinv(j, exp, n, ninv);
-         if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL) return 0;
+    ninv = n_preinvert_limb(n);
 
-         b = n_submod(b, 1UL, n);
-		   if (b != 0UL)
-			{
-			   c = n_mulmod2_preinv(c, b, n, ninv);	
-				pass = 1;
-			}
-			
-			if (c == 0)
-			{
-				return 0;
-			}
-		}
+    for (i = factors.num - 1; i >= 0; i--)
+    {
+        mp_limb_t exp = n1 / factors.p[i];
+        pass = 0;
+        c = 1;
 
-		if (j == iterations)
-      {
-			return -1;
-		}
-	}
+        for (j = 2; j < iterations && pass == 0; j++)
+        {
+            b = n_powmod2_preinv(j, exp, n, ninv);
+            if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL)
+                return 0;
 
-	if (n_gcd(n, c) != 1UL) return 0;
+            b = n_submod(b, 1UL, n);
+            if (b != 0UL)
+            {
+                c = n_mulmod2_preinv(c, b, n, ninv);
+                pass = 1;
+            }
 
-	return 1;
+            if (c == 0)
+                return 0;
+        }
+
+        if (j == iterations)
+            return -1;
+    }
+
+    return (n_gcd(n, c) == 1UL);
 }

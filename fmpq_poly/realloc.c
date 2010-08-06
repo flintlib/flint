@@ -52,13 +52,12 @@ void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
         poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (poly->alloc < alloc)
         {
-            mpn_zero(poly->coeffs + poly->alloc, alloc - poly->alloc);
+            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc), alloc - poly->alloc);
         }
     }
     else  /* Nothing allocated, do it now */
     {
-        poly->coeffs = (fmpz *) malloc(alloc * sizeof(fmpz));
-        mpn_zero(poly->coeffs, alloc);
+        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
     }
     
     poly->alloc = alloc;

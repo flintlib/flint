@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,96 +30,95 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("mul_2exp....");
-   fflush(stdout);
+    int i, result;
+    printf("mul_2exp....");
+    fflush(stdout);
 
-   fmpz_randinit();
+    fmpz_randinit();
 
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a, b;
-      mpz_t d, e, f;
-      ulong x;
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
+        mpz_t d, e, f;
+        ulong x;
 
-      fmpz_init(a);
-      fmpz_init(b);
-      
-      mpz_init(d);
-      mpz_init(e);
-      mpz_init(f);
-      
-      fmpz_randtest(a, 200);
-      
-      fmpz_get_mpz(d, a);
-      x = n_randint(200);
+        fmpz_init(a);
+        fmpz_init(b);
 
-      fmpz_mul_2exp(b, a, x);
-      mpz_mul_2exp(e, d, x);
-      
-      fmpz_get_mpz(f, b);
-         
-      result = (mpz_cmp(e, f) == 0);
+        mpz_init(d);
+        mpz_init(e);
+        mpz_init(f);
 
-      if (!result)
-      {
-         printf("FAIL\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
-         abort();
-      }
+        fmpz_randtest(a, 200);
 
-      fmpz_clear(a);
-      fmpz_clear(b);
-      
-      mpz_clear(d);
-      mpz_clear(e);
-      mpz_clear(f);
-   }
+        fmpz_get_mpz(d, a);
+        x = n_randint(200);
 
-   // check aliasing of a and b
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a;
-      mpz_t d, e, f;
-      ulong x;
+        fmpz_mul_2exp(b, a, x);
+        mpz_mul_2exp(e, d, x);
 
-      fmpz_init(a);
-      
-      mpz_init(d);
-      mpz_init(e);
-      mpz_init(f);
-      
-      fmpz_randtest(a, 200);
-      
-      fmpz_get_mpz(d, a);
-      x = n_randint(200);
+        fmpz_get_mpz(f, b);
 
-      fmpz_mul_2exp(a, a, x);
-      mpz_mul_2exp(e, d, x);
-      
-      fmpz_get_mpz(f, a);
-         
-      result = (mpz_cmp(e, f) == 0);
+        result = (mpz_cmp(e, f) == 0);
 
-      if (!result)
-      {
-         printf("FAIL\n");
-         gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
-         abort();
-      }
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
+            abort();
+        }
 
-      fmpz_clear(a);
-      
-      mpz_clear(d);
-      mpz_clear(e);
-      mpz_clear(f);
-   }
+        fmpz_clear(a);
+        fmpz_clear(b);
 
-   fmpz_randclear();
+        mpz_clear(d);
+        mpz_clear(e);
+        mpz_clear(f);
+    }
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+    /* Check aliasing of a and b */
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        mpz_t d, e, f;
+        ulong x;
+
+        fmpz_init(a);
+
+        mpz_init(d);
+        mpz_init(e);
+        mpz_init(f);
+
+        fmpz_randtest(a, 200);
+
+        fmpz_get_mpz(d, a);
+        x = n_randint(200);
+
+        fmpz_mul_2exp(a, a, x);
+        mpz_mul_2exp(e, d, x);
+
+        fmpz_get_mpz(f, a);
+
+        result = (mpz_cmp(e, f) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, exp = %lu\n", d, e, f, x);
+            abort();
+        }
+
+        fmpz_clear(a);
+
+        mpz_clear(d);
+        mpz_clear(e);
+        mpz_clear(f);
+    }
+
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

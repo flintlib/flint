@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2007 William Hart and David Harvey
+    Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
 
@@ -32,31 +32,31 @@
 
 typedef struct
 {
-   long cpu;
-   long wall;
+    long cpu;
+    long wall;
 } timeit_t[1];
 
-static inline
+static __inline__
 void timeit_start(timeit_t t)
 {
-   struct timeval tv;
-   gettimeofday(&tv, 0);
-   t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
-   t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall = - tv.tv_sec * 1000 - tv.tv_usec / 1000;
+    t->cpu = - clock() * 1000 / CLOCKS_PER_SEC;
 }
 
-static inline
+static __inline__
 void timeit_stop(timeit_t t)
 {
-   struct timeval tv;
-   gettimeofday(&tv, 0);
-   t->wall += tv.tv_sec * 1000 + tv.tv_usec / 1000;
-   t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
+    struct timeval tv;
+    gettimeofday(&tv, 0);
+    t->wall += tv.tv_sec * 1000 + tv.tv_usec / 1000;
+    t->cpu += clock() * 1000 / CLOCKS_PER_SEC;
 }
 
 /******************************************************************************
 
-   Timer based on the cycle counter
+    Timer based on the cycle counter
    
 ******************************************************************************/
 
@@ -67,7 +67,7 @@ void timeit_stop(timeit_t t)
 extern double clock_last[FLINT_NUM_CLOCKS];
 extern double clock_accum[FLINT_NUM_CLOCKS];
 
-static inline 
+static __inline__ 
 double get_cycle_counter()
 {
    unsigned int hi;
@@ -83,33 +83,34 @@ double get_cycle_counter()
 
 #define FLINT_CLOCK_SCALE_FACTOR (1000000.0 / FLINT_CLOCKSPEED)
 
-static inline 
-void init_clock(unsigned long n)
+static __inline__ 
+void init_clock(int n)
 {
    clock_accum[n] = 0.0;
 }
 
-static inline 
+static __inline__ 
 void init_all_clocks()
 {
-   for (unsigned long i = 0; i < FLINT_NUM_CLOCKS; i++)
+   int i;
+   for (i = 0; i < FLINT_NUM_CLOCKS; i++)
       clock_accum[i] = 0.0;
 }
 
-static inline 
-double get_clock(unsigned long n)
+static __inline__
+double get_clock(int n)
 {
    return clock_accum[n] * FLINT_CLOCK_SCALE_FACTOR;
 }
 
-static inline 
-void start_clock(unsigned long n)
+static __inline__ 
+void start_clock(int n)
 {
    clock_last[n] = get_cycle_counter();
 }
 
-static inline 
-void stop_clock(unsigned long n)
+static __inline__ 
+void stop_clock(int n)
 {
    double now = get_cycle_counter();
    clock_accum[n] += (now - clock_last[n]);
@@ -117,17 +118,17 @@ void stop_clock(unsigned long n)
 
 /******************************************************************************
 
-   Framework for repeatedly sampling a single target
-   
+    Framework for repeatedly sampling a single target
+
 ******************************************************************************/
 
-static inline
+static __inline__ 
 void prof_start()
 {
    start_clock(0);
 }
 
-static inline
+static __inline__ 
 void prof_stop()
 {
    stop_clock(0);
@@ -141,4 +142,5 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 
 #define DURATION_TARGET 10000.0
 
-#endif // #ifndef FLINT_PROFILER_H
+#endif
+

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,15 +31,16 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("remove....");
    fflush(stdout);
  
-   for (ulong i = 0; i < 100000UL; i++) /* Test random numbers */
+   for (i = 0; i < 100000; i++) /* Test random numbers */
    {
-      mp_limb_t n1, n2, p, orig_n;
+      mp_limb_t n1, n2, orig_n;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2;
+      ulong j;
       
       mpz_init(d_n1);
       mpz_init(d_n2);
@@ -48,20 +49,19 @@ int main(void)
       n1 = n_randtest_not_zero();
       orig_n = n1;
 
-      for (ulong i = 0; i < FLINT_NUM_PRIMES_SMALL/10; i++)
+      for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
          mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[i]);
-         exp1 = n_remove(&n1, flint_primes_small[i]);
+         mpz_set_ui(d_p, flint_primes_small[j]);
+         exp1 = n_remove(&n1, flint_primes_small[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
          n2 = mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
-
          if (!result)
          {
-            printf("FAIL\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[i]); 
+            printf("FAIL:\n");
+            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }
@@ -71,11 +71,12 @@ int main(void)
       mpz_clear(d_p);
    }
          
-   for (ulong i = 0; i < 100000UL; i++) /* Test perfect powers */
+   for (i = 0; i < 100000; i++) /* Test perfect powers */
    {
-      mp_limb_t n1, n2, p, orig_n, base;
+      mp_limb_t n1, n2, orig_n, base;
       mpz_t d_n2, d_n1, d_p;
       int exp1, exp2, exp;
+      ulong j;
       
       mpz_init(d_n1);
       mpz_init(d_n2);
@@ -88,20 +89,19 @@ int main(void)
 
       orig_n = n1;
 
-      for (ulong i = 0; i < FLINT_NUM_PRIMES_SMALL/10; i++)
+      for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
       {
          mpz_set_ui(d_n1, n1);
-         mpz_set_ui(d_p, flint_primes_small[i]);
-         exp1 = n_remove(&n1, flint_primes_small[i]);
+         mpz_set_ui(d_p, flint_primes_small[j]);
+         exp1 = n_remove(&n1, flint_primes_small[j]);
          exp2 = mpz_remove(d_n2, d_n1, d_p);
          n2 = mpz_get_ui(d_n2);
 
          result = ((exp1 == exp2) && (n1 == n2));
-
          if (!result)
          {
             printf("FAIL\n");
-            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[i]); 
+            printf("n = %lu, exp1 = %d, exp2 = %d, n1 = %lu, n2 = %lu, p = %d\n", orig_n, exp1, exp2, n1, n2, flint_primes_small[j]);
             abort();
          }
       }

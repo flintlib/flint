@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,10 +29,10 @@
 #include "flint.h"
 #include "mpfr_vec.h"
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long length)
+void
+_mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long length)
 {
-   long i;
-   for (i = 0; i < length; i++)
-      mpfr_add(res + i, vec1 + i, vec2 + i, GMP_RNDN);
+    long i;
+    for (i = 0; i < length; i++)
+        mpfr_add(res + i, vec1 + i, vec2 + i, GMP_RNDN);
 }
-

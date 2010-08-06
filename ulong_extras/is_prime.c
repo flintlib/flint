@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -29,17 +29,18 @@
 
 int n_is_prime(mp_limb_t n)
 {
-#if FLINT64
-   if (n < 10000000000000000UL) 
-#endif
-      return n_is_probabprime(n);
-   
-#if FLINT64
-   if (!n_is_probabprime(n)) return 0;
-   
-   int isprime = n_is_prime_pocklington(n, 100);
-   if (isprime != -1) return isprime;
+#if !FLINT64
+    return n_is_probabprime(n);
+#else
+    int isprime;
+    if (n < 10000000000000000UL)
+        return n_is_probabprime(n);
 
-   return n_is_prime_pseudosquare(n);
+    if (!n_is_probabprime(n)) return 0;
+
+    isprime = n_is_prime_pocklington(n, 100);
+    if (isprime != -1) return isprime;
+
+    return n_is_prime_pseudosquare(n);
 #endif
 }

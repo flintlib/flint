@@ -1,8 +1,5 @@
 /*=============================================================================
 
-    Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2010 William Hart
-
     This file is part of FLINT.
 
     FLINT is free software; you can redistribute it and/or modify
@@ -20,6 +17,12 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 *******************************************************************************
 
@@ -31,12 +34,12 @@ void fmpq_poly_init(fmpq_poly_t poly)
 
     Initialises the polynomial for use.  The length is set to zero.
 
-void fmpq_poly_init2(fmpq_poly_t poly, const ulong alloc)
+void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
 
     Initialises the polynomial with space for at least alloc coefficients and 
     set the length to zero. The alloc coefficients are all set to zero.
 
-void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
+void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
 
     Reallocates the given polynomial to have space for alloc coefficients. 
     If alloc is set to zero then the polynomial is cleared and then 
@@ -44,7 +47,7 @@ void fmpq_poly_realloc(fmpq_poly_t poly, const ulong alloc)
     is first truncated to length alloc.  Note that this might leave the 
     rational polynomial in non-canonical form.
 
-void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong len)
+void fmpq_poly_fit_length(fmpq_poly_t poly, long len)
 
     If len is greater than the number of coefficients currently 
     allocated, then the polynomial is reallocated to have space for at
@@ -54,7 +57,7 @@ void fmpq_poly_fit_length(fmpq_poly_t poly, const ulong len)
     doubling the number of allocated coefficients when len is larger 
     than the number of coefficients currently allocated.
 
-void _fmpq_poly_set_length(fmpq_poly_t poly, const ulong len)
+void _fmpq_poly_set_length(fmpq_poly_t poly, long len)
     
     Sets the length of the numerator polynomial to len, demoting 
     coefficients beyond the new length.  Note that this method does 
@@ -72,7 +75,7 @@ void _fmpq_poly_normalise(fmpq_poly_t poly)
     this function does not guarantee the coprimality of the numerator 
     polynomial and the integer denominator.
 
-void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, ulong len)
+void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, long len)
 
     Puts {poly, den} of length len into canonical form.
     
@@ -99,7 +102,7 @@ long fmpq_poly_degree(fmpq_poly_t poly)
     Only gives the right answer for polynomials such that the length, which is 
     an unsigned long, fits into a long.
 
-ulong fmpq_poly_length(fmpq_poly_t poly)
+long fmpq_poly_length(fmpq_poly_t poly)
 
     Returns the length of poly.
 
@@ -139,20 +142,20 @@ void fmpq_poly_randclear(void)
     Clear the random state initialised with fmpq_poly_randinit.  One should 
     not call this function if fmpz_randclear has already been called.
 
-void fmpq_poly_randtest(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  The 
     coefficients are signed randomly.  One must call fmpq_poly_randinit 
     before calling this function.
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
     call fmpq_poly_randinit before calling this function.
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_in)
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits)
 
     As for fmpq_poly_randtest except that length and bits_in may not be
     zero and the polynomial generated is guaranteed not to be the 
@@ -167,40 +170,41 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, ulong length, mp_bitcnt_t bits_i
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Set poly1 to equal poly2.
+    Sets poly1 to equal poly2.
 
-void fmpq_poly_set_si(fmpq_poly_t poly, const long x)
+void fmpq_poly_set_si(fmpq_poly_t poly, long x)
 
-    Set poly to the integer x.
+    Sets poly to the integer x.
 
-void fmpq_poly_set_ui(fmpq_poly_t poly, const ulong x)
+void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x)
 
-    Set poly to the integer x.
+    Sets poly to the integer x.
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
 
-    Set poly to the integer x.
+    Sets poly to the integer x.
 
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
 
-    Set poly to the integer x.
+    Sets poly to the integer x.
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
 
-    Set poly to the rational x.
+    Sets poly to the rational x.
 
 void fmpq_poly_zero(fmpq_poly_t poly)
 
-    Set poly to zero.
+    Sets poly to zero.
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Set poly1 to the additive inverse of poly2.
+    Sets poly1 to the additive inverse of poly2.
 
 void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Set poly1 to the multiplicative inverse of poly2 if possible.  Otherwise, 
-    if poly2 is not a unit, leaves poly1 unmodified and calls abort().
+    Sets poly1 to the multiplicative inverse of poly2 if possible.  
+    Otherwise, if poly2 is not a unit, leaves poly1 unmodified and 
+    calls abort().
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
@@ -212,27 +216,27 @@ void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
 ********************************************************************************
 
-void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, const ulong n)
+void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n)
 
     Retrieves the nth coefficient of poly.
 
-void fmpq_poly_set_coeff_si(fmpq_poly_t poly, const ulong n, const long x)
+void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
 
     Sets the nth coefficient in poly to the integer x.
 
-void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, const ulong n, const ulong x)
+void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, long n, ulong x)
 
     Sets the nth coefficient in poly to the integer x.
 
-void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, const ulong n, const fmpz_t x)
+void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, long n, const fmpz_t x)
 
     Sets the nth coefficient in poly to the integer x.
 
-void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, const ulong n, const mpz_t x)
+void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, long n, const mpz_t x)
 
     Sets the nth coefficient in poly to the integer x.
 
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, const ulong n, const mpq_t x)
+void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, long n, const mpq_t x)
 
     Sets the nth coefficient in poly to the rational x.
 
@@ -247,7 +251,7 @@ int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
     Return 1 if poly1 is equal to poly2, otherwise return 0.
 
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
-                        const fmpz * rpoly, const fmpz_t rden, const ulong len)
+                        const fmpz * rpoly, const fmpz_t rden, long len)
 
     Compares two non-zero polynomials, assuming they have the same length 
     len > 0.
@@ -276,16 +280,16 @@ int fmpq_poly_is_zero(const fmpq_poly_t poly)
 *******************************************************************************
 
 void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, ulong len1,
-                    const fmpz * poly2, const fmpz_t den2, ulong len2)
+                    const fmpz * poly1, const fmpz_t den1, long len1,
+                    const fmpz * poly2, const fmpz_t den2, long len2)
 
     Forms {rpoly, rden} = {den2 poly1 + den1 poly2, den1 den2}, placing the 
     result into canonical form, that is, the denominator is a positive 
     integer, which is co-prime to the content of the numerator vector.
     
     Assumes that rpoly is initialised as a sufficiently wide vector.  The 
-    input operands are assumed to be in canonical form and are also allowed to 
-    be of length 0.
+    input operands are assumed to be in canonical form and are also allowed 
+    to be of length 0.
     
     {rpoly, rden} and {poly1, den1} may be aliased, but {rpoly, rden} and 
     {poly2, den2} may not be aliased.
@@ -295,8 +299,8 @@ void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
     Sets res to the sum of poly1 and poly2, using Henrici's algorithm.
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, ulong len1,
-                    const fmpz * poly2, const fmpz_t den2, ulong len2)
+                    const fmpz * poly1, const fmpz_t den1, long len1,
+                    const fmpz * poly2, const fmpz_t den2, long len2)
 
     Forms {rpoly, rden} = {den2 poly1 - den1 poly2, den1 den2}, placing the 
     result into canonical form, that is, the denominator is a positive 
@@ -320,7 +324,7 @@ void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 *******************************************************************************
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                        const fmpz * poly, const fmpz_t den, ulong len, long c)
+                        const fmpz * poly, const fmpz_t den, long len, long c)
 
     Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
     
@@ -329,7 +333,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     between {rpoly, den} and {poly, den}.
 
 void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
-                       const fmpz * poly, const fmpz_t den, ulong len, ulong c)
+                       const fmpz * poly, const fmpz_t den, long len, ulong c)
 
     Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
     
@@ -338,7 +342,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
     between {rpoly, den} and {poly, den}.
 
 void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
-                const fmpz * poly, const fmpz_t den, ulong len, const fmpz_t c)
+                const fmpz * poly, const fmpz_t den, long len, const fmpz_t c)
 
     Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
     
@@ -348,7 +352,7 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
     {rpoly, rden}.
 
 void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-               const fmpz_t den, ulong len, const fmpz_t r, const fmpz_t s)
+               const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
     Sets {rpoly, rden} = {r, s} * {poly, den}, in lowest terms.
     
@@ -382,7 +386,7 @@ void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop,
     Sets rop to c times op.
 
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                   const fmpz_t den, ulong len, const fmpz_t c)
+                                   const fmpz_t den, long len, const fmpz_t c)
 
     Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
     
@@ -391,7 +395,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     part of {rpoly, rden}.
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                           const fmpz_t den, ulong len, long c)
+                                           const fmpz_t den, long len, long c)
 
     Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
     
@@ -399,7 +403,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     aliasing between {rpoly, rden} and {poly, den}.
 
 void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                          const fmpz_t den, ulong len, ulong c)
+                                          const fmpz_t den, long len, ulong c)
 
     Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
     
@@ -407,7 +411,7 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     aliasing between {rpoly, rden} and {poly, den}.
 
 void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                   const fmpz_t den, ulong len, conts fmpz_t r, const fmpz_t s)
+                   const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
     Sets {rpoly, rden, len} to {poly, den, len} divided by {r, s}, 
     in lowest terms.
@@ -433,8 +437,8 @@ void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t
 *******************************************************************************
 
 void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, ulong len1, 
-                    const fmpz * poly2, const fmpz_t den2, ulong len2)
+                    const fmpz * poly1, const fmpz_t den1, long len1, 
+                    const fmpz * poly2, const fmpz_t den2, long len2)
 
     Sets {rpoly, rden} to the product of {poly1, den1} and {poly2, den2}.
     Assumes that len1 and len2 are positive and that there is no overlap 
@@ -452,7 +456,7 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
 *******************************************************************************
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly, const fmpz_t den, ulong len, ulong e)
+                    const fmpz * poly, const fmpz_t den, long len, ulong e)
 
     Sets {rpoly, rden} to {poly, den}^e, assuming e, len > 0.  Assumes that 
     rpoly is an array of length at least e * (len - 1) + 1.  Supports aliasing 
@@ -468,12 +472,12 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
 *******************************************************************************
 
-void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
     Set res to poly shifted left by n coefficients. Zero coefficients are 
     inserted.
 
-void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
+void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
     Set res to poly shifted right by n coefficients. If n is equal to or 
     greater than the current length of poly, res is set to the zero polynomial.
@@ -485,8 +489,8 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, ulong n)
 *******************************************************************************
 
 void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
-                       const fmpz * A, const fmpz_t a, ulong lenA,
-                       const fmpz * B, const fmpz_t b, ulong lenB)
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB)
 
     Finds the quotient {Q, q} and remainder {R, r} of the Euclidean 
     division of {A, a} by {B, b}.
@@ -507,7 +511,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 *******************************************************************************
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
-                           const fmpz * poly, const fmpz_t den, ulong len)
+                           const fmpz * poly, const fmpz_t den, long len)
 
     Sets {rpoly, rden, len - 1} to the derivative of {poly, den, len}.  Does 
     nothing if len <= 1.  Supports aliasing between the two polynomials.
@@ -523,7 +527,7 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 *******************************************************************************
 
 void _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, ulong len, const fmpz_t a)
+                             const fmpz_t den, long len, const fmpz_t a)
 
     Evaluates the polynomial {poly, den, len} at the integer a and sets res 
     to the result.
@@ -534,7 +538,7 @@ void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly,
     Evaluates the polynomial poly at the integer a and sets res to the result.
 
 void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, ulong len, const mpq_t a)
+                             const fmpz_t den, long len, const mpq_t a)
 
     Evaluates the polynomial {poly, den, len} at the rational a and sets 
     res to the result.  Aliasing between res and a is not supported.
@@ -550,7 +554,7 @@ void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 *******************************************************************************
 
 void _fmpq_poly_content(mpq_t res, 
-                        const fmpz * poly, const fmpz_t den, ulong len)
+                        const fmpz * poly, const fmpz_t den, long len)
 
     Sets res to the content of {poly, den, len}.  If len == 0, sets res to 
     zero.
@@ -561,7 +565,7 @@ void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly)
     is defined to be zero.
 
 void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
-                               const fmpz * poly, const fmpz_t den, ulong len)
+                               const fmpz * poly, const fmpz_t den, long len)
 
     Sets {rpoly, rden, len} to the primitive part (with non-negative leading 
     coefficient) of {poly, den, len}.  Assumes that len > 0.  Supports 
@@ -572,7 +576,7 @@ void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
     Sets res to the primitive part (with non-negative leading coefficient) 
     of poly.
 
-int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, ulong len)
+int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, long len)
 
     Returns whether the polynomial {poly, den, len} is monic.  The zero 
     polynomial is not monic by definition.
@@ -583,7 +587,7 @@ int fmpq_poly_is_monic(const fmpq_poly_t poly)
     not monic by definition.
 
 void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
-                      const fmpz * poly, const fmpz_t den, ulong len)
+                      const fmpz * poly, const fmpz_t den, long len)
 
     Sets {rpoly, rden, len} to the monic scalar multiple of {poly, den, len}. 
     Assumes that len > 0.  Supports aliasing between the two polynomials.
@@ -599,7 +603,7 @@ void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 
 ********************************************************************************
 
-int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, ulong len)
+int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
 
     Returns whether the polynomial {poly, den, len} is square-free.
 

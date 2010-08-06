@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -29,12 +29,16 @@
 
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double npre)
 {
-   mp_limb_t quot = (mp_limb_t) ((double) a * (double) b * npre);
-   mp_limb_signed_t rem = a*b - quot*n;
-   if (rem < 0) 
-   {
-      rem += n;
-      if (rem < 0) return rem + n;
-   } else if (rem >= n) return rem - n;
-   return rem;
+    mp_limb_t quot;
+    mp_limb_signed_t rem;
+
+    quot = (mp_limb_t) ((double) a * (double) b * npre);
+    rem  = a * b - quot * n;
+    if (rem < 0) 
+    {
+        rem += n;
+        if (rem < 0) return rem + n;
+    }
+    else if (rem >= n) return rem - n;
+    return rem;
 }

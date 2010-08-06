@@ -92,7 +92,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long len1 = poly1->length;
+    long len1 = poly1->length, len2, max;
     
     if (poly1 == poly2)  /* Set res = 2 * poly1 */
     {
@@ -117,8 +117,8 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         return;
     }
     
-    long len2 = poly2->length;
-    long max  = FLINT_MAX(len1, len2);
+    len2 = poly2->length;
+    max  = FLINT_MAX(len1, len2);
     fmpq_poly_fit_length(res, max);
     
     if (res != poly2)

@@ -41,7 +41,7 @@ void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, long n, const mpz_t x)
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1);
-        mpn_zero(poly->coeffs + len, n - len);
+        mpn_zero((mp_ptr) (poly->coeffs + len), n - len);
         poly->length = n + 1;
     }
     

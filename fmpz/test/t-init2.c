@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,34 +30,35 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("init/init2/clear....");
-   fflush(stdout);
-   
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a;
+    int i;
+    printf("init/init2/clear....");
+    fflush(stdout);
 
-      fmpz_init2(a, n_randint(100));
-      fmpz_clear(a);      
-   }
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
 
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a;
+        fmpz_init2(a, n_randint(100));
+        fmpz_clear(a);
+    }
 
-      fmpz_init(a);
-      fmpz_randtest(a, FLINT_BITS-2);
-      
-      _fmpz_promote_val(a);
-      _fmpz_demote_val(a);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
 
-      fmpz_clear(a);
-   }
+        fmpz_init(a);
+        fmpz_randtest(a, FLINT_BITS - 2);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        _fmpz_promote_val(a);
+        _fmpz_demote_val(a);
+
+        fmpz_clear(a);
+    }
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

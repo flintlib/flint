@@ -42,7 +42,7 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     {
         if (COEFF_IS_MPZ(*r))
             _fmpz_clear_mpz(*r);
-        fmpz_set_ui(f, n_sqrtrem(r, *g));
+        fmpz_set_ui(f, n_sqrtrem((mp_limb_t *) r, *g));
     }
     else
     {

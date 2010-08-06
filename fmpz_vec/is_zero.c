@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
    
 ******************************************************************************/
 
@@ -28,10 +28,12 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_is_zero(const fmpz * vec, long len)
+int
+_fmpz_vec_is_zero(const fmpz * vec, long len)
 {
     long i;
-    for (i = 0; (i < len) && (*(vec + i) == 0); i++) ;
-    return (i == len);
+    for (i = 0; i < len; i++)
+        if (vec[i] != 0L)
+            return 0;
+    return 1;
 }
-

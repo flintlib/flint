@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,27 +16,29 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_set_ui(fmpz_t f, const ulong val)
+void
+fmpz_set_ui(fmpz_t f, ulong val)
 {
-   if (val > COEFF_MAX) // val is large
-	{		
-		__mpz_struct * mpz_coeff = _fmpz_promote(f);
-		mpz_set_ui(mpz_coeff, val);		
-	} else 
-	{		
-		_fmpz_demote(f);		
-		*f = val; // val is small
-	}
+    if (val > COEFF_MAX)        /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_ui(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
 }

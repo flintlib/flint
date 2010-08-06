@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,11 +16,11 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 William Hart
- 
+    Copyright (C) 2010 William Hart
+
 ******************************************************************************/
 
 #ifndef FMPZ_MAT_H
@@ -31,13 +31,13 @@
 
 typedef struct
 {
-   fmpz * entries;
-   long r;
-   long c;
-   fmpz ** rows;
+    fmpz * entries;
+    long r;
+    long c;
+    fmpz ** rows;
 } fmpz_mat_struct;
 
-// fmpz_mat_t allows reference-like semantics for fmpz_mat_struct
+/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
@@ -67,9 +67,4 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
 void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha);
 
 #endif
-
-
-
-
-
 

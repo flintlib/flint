@@ -28,17 +28,16 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, const long len)
+int
+_fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, long len)
 {
     long i;
-    
     if (vec1 == vec2)
         return 1;
-    
+
     for (i = 0; i < len; i++)
         if (!fmpz_equal(vec1 + i, vec2 + i))
             return 0;
-    
+
     return 1;
 }
-

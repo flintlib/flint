@@ -35,13 +35,13 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, long n, ulong x)
     long len = poly->length;
     int replace = (n < len && *(poly->coeffs + n) != 0L);
     
-    if (!replace & x == 0UL)
+    if ((!replace) && (x == 0UL))
         return;
     
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1);
-        mpn_zero(poly->coeffs + len, n - len);
+        mpn_zero((mp_ptr) (poly->coeffs + len), n - len);
         poly->length = n + 1;
     }
     

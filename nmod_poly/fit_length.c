@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -29,13 +29,14 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
+void
+nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 {
-   if (alloc > poly->alloc)
-   {
-      if (alloc < 2*poly->alloc)
-         alloc = 2*poly->alloc;
+    if (alloc > poly->alloc)
+    {
+        if (alloc < 2 * poly->alloc)
+            alloc = 2 * poly->alloc;
 
-      nmod_poly_realloc(poly, alloc);
-   }
+        nmod_poly_realloc(poly, alloc);
+    }
 }

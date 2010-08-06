@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,14 +16,14 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2005-2009 Damien Stehle.
-   Copyright (C) 2007 David Cade.
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2005-2009 Damien Stehle
+    Copyright (C) 2007 David Cade
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -31,31 +31,32 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+void
+fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
-   long r, c, i, j;
+    long r, c, i, j;
 
-   r = mat->r;
-   c = mat->c;
+    r = mat->r;
+    c = mat->c;
 
-   if (c != r)
-   {
-	  printf("Exception: fmpz_mat_randsimdioph called on an ill-formed matrix\n");
-      abort();
-   }
-   
-   fmpz_set_ui(mat->rows[0], 1);
-   fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
-   for (j = 1; j < c; j++)
-      fmpz_randbits(mat->rows[0] + j, bits);
-   for (i = 1; i < r; i++)
-   {
-      for (j = 0; j < i; j++)
-		 fmpz_zero(mat->rows[i] + j);
-	  fmpz_set_ui(mat->rows[i] + i, 1);
-	  fmpz_mul_2exp(mat->rows[i] + i, mat->rows[i] + i, bits);
-      for (j = i + 1; j < c; j++)
-		  fmpz_zero(mat->rows[i] + j);
-   }
+    if (c != r)
+    {
+        printf
+            ("Exception: fmpz_mat_randsimdioph called on an ill-formed matrix\n");
+        abort();
+    }
+
+    fmpz_set_ui(mat->rows[0], 1);
+    fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
+    for (j = 1; j < c; j++)
+        fmpz_randbits(mat->rows[0] + j, bits);
+    for (i = 1; i < r; i++)
+    {
+        for (j = 0; j < i; j++)
+            fmpz_zero(mat->rows[i] + j);
+        fmpz_set_ui(mat->rows[i] + i, 1);
+        fmpz_mul_2exp(mat->rows[i] + i, mat->rows[i] + i, bits);
+        for (j = i + 1; j < c; j++)
+            fmpz_zero(mat->rows[i] + j);
+    }
 }
-

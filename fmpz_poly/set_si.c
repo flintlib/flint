@@ -28,7 +28,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_si(fmpz_poly_t poly, long c)
+void
+fmpz_poly_set_si(fmpz_poly_t poly, long c)
 {
     if (c == 0)
         fmpz_poly_zero(poly);
@@ -39,4 +40,3 @@ void fmpz_poly_set_si(fmpz_poly_t poly, long c)
         _fmpz_poly_set_length(poly, 1);
     }
 }
-

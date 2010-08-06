@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 Tom Boothby
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 Tom Boothby
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -71,7 +71,7 @@ mp_limb_t FLINT_ODD_PRIME_LOOKUP[] =
 
 int n_is_oddprime_small(mp_limb_t n) 
 {
-    mp_limb_t q = n/2;
-    mp_limb_t x = (q & (FLINT_BITS-1UL));
-    return (FLINT_ODD_PRIME_LOOKUP[q/FLINT_BITS] & (1UL<<x))>>x;
+    mp_limb_t q = n / 2;
+    mp_limb_t x = (q & (FLINT_BITS - 1UL));
+    return (FLINT_ODD_PRIME_LOOKUP[q / FLINT_BITS] & (1UL << x)) >> x;
 }

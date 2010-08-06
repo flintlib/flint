@@ -28,10 +28,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, long len2)
+void
+_fmpz_vec_swap(fmpz * vec1, fmpz * vec2, long len2)
 {
-	long i;
+    long i;
     for (i = 0; i < len2; i++)
         fmpz_swap(vec1 + i, vec2 + i);
 }
-

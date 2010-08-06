@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("add_ssaaaa....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
       mp_limb_t sh1, sl1, sh2, sl2, ah1, al1, ah2, al2;
 
@@ -52,10 +52,9 @@ int main(void)
       sh2 += ah2;
 
       result = ((sh2 == sh1) && (sl2 == sl1));
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("ah1 = %lu, al1 = %lu, ah2 = %lu, al1 = %lu\n", ah1, al1, ah2, al1); 
          printf("sh2 = %lu, sh1 = %lu, sl2 = %lu, sl1 = %lu\n", sh2, sh1, sl2, sl1);
          abort();

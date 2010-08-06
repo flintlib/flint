@@ -28,14 +28,16 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_content(fmpz_t res, const fmpz * poly, long len)
+void
+_fmpz_poly_content(fmpz_t res, const fmpz * poly, long len)
 {
     fmpz_zero(res);
     while (len--)
         fmpz_gcd(res, res, poly + len);
 }
 
-void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
+void
+fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
 {
     fmpz_t t;
     fmpz_init(t);
@@ -43,4 +45,3 @@ void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
     fmpz_swap(res, t);
     fmpz_clear(t);
 }
-

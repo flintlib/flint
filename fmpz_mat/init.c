@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -29,20 +29,21 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
+void
+fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
 {
-   long i;
+    if ((rows) && (cols))       /* Allocate space for r*c small entries */
+    {
+        long i;
+        mat->entries = (fmpz *) calloc(rows * cols, sizeof(fmpz));
+        mat->rows = (fmpz **) malloc(rows * sizeof(fmpz *));    /* Initialise rows */
 
-   if ((rows) && (cols)) // allocate space for r*c small entries
-   {
-      mat->entries = (fmpz *) calloc(rows*cols, sizeof(fmpz));
-      mat->rows = (fmpz **) malloc(rows*sizeof(fmpz *)); // initialise rows
-		
-      for (i = 0; i < rows; i++)
-      mat->rows[i] = mat->entries + i*cols;
-   } else mat->entries = NULL;
-   
-   mat->r = rows;
-   mat->c = cols;
+        for (i = 0; i < rows; i++)
+            mat->rows[i] = mat->entries + i * cols;
+    }
+    else
+        mat->entries = NULL;
+
+    mat->r = rows;
+    mat->c = cols;
 }
-

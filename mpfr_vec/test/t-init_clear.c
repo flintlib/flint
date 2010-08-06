@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,28 +31,27 @@
 #include "mpfr_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("init/clear....");
-   fflush(stdout);
-   
-   for (ulong i = 0; i < 10000UL; i++) 
-   {
-      __mpfr_struct * a;
-      ulong j;
-	  
-      ulong length = n_randint(100);
-      ulong prec = n_randint(200) + MPFR_PREC_MIN;
+    int i;
+    printf("init/clear....");
+    fflush(stdout);
 
-      a = _mpfr_vec_init(length, prec);
-      
-      for (j = 0; j < length; j++)
-         mpfr_set_ui(a + j, 0, GMP_RNDN);
+    for (i = 0; i < 10000; i++)
+    {
+        __mpfr_struct *a;
+        long j, length = n_randint(100);
+        mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
 
-      _mpfr_vec_clear(a, length);
-   }
+        a = _mpfr_vec_init(length, prec);
 
-   printf("PASS\n");
-   return 0;
+        for (j = 0; j < length; j++)
+            mpfr_set_ui(a + j, 0, GMP_RNDN);
+
+        _mpfr_vec_clear(a, length);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

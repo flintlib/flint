@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -29,16 +29,16 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_randtest(nmod_poly_t poly, long length)
+void
+nmod_poly_randtest(nmod_poly_t poly, long len)
 {
-   long i;
+    long i;
 
-   nmod_poly_fit_length(poly, length);
-   
-   for (i = 0; i < length; i++)
-      poly->coeffs[i] = n_randint(poly->mod.n);
+    nmod_poly_fit_length(poly, len);
 
-   poly->length = length;
-   _nmod_poly_normalise(poly);
+    for (i = 0; i < len; i++)
+        poly->coeffs[i] = n_randint(poly->mod.n);
+
+    poly->length = len;
+    _nmod_poly_normalise(poly);
 }
-

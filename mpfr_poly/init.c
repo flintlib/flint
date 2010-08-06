@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -30,22 +30,22 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec)
+void
+mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec)
 {
-   poly->coeffs = NULL;
-   poly->alloc  = 0;
-   poly->length = 0;
-   poly->prec   = prec;
+    poly->coeffs = NULL;
+    poly->alloc = 0;
+    poly->length = 0;
+    poly->prec = prec;
 }
 
-void mpfr_poly_init2(mpfr_poly_t poly, long alloc, mpfr_prec_t prec)
+void
+mpfr_poly_init2(mpfr_poly_t poly, long alloc, mpfr_prec_t prec)
 {
-   if (alloc) // allocate space for alloc coefficients
-      poly->coeffs = _mpfr_vec_init(alloc, prec);
-   else
-      poly->coeffs = NULL;
+    /* Allocate space for alloc coefficients */
+    poly->coeffs = (alloc ? _mpfr_vec_init(alloc, prec) : NULL);
 
-   poly->alloc = alloc;
-   poly->length = 0;
-   poly->prec = prec;
+    poly->alloc = alloc;
+    poly->length = 0;
+    poly->prec = prec;
 }

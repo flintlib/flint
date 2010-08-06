@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -29,16 +29,17 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
+void
+fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
 {
-   fmpz_poly_fit_length(poly, n + 1);
-   
-	if (n + 1 > poly->length) // insert zeroes between end of poly and new coeff if needed
-   {
-      mpn_zero(poly->coeffs + poly->length, n - poly->length);
-      poly->length = n+1;
-   }
-   
-	fmpz_set_si(poly->coeffs + n, x);
-   _fmpz_poly_normalise(poly); // we may have set leading coefficient to zero
+    fmpz_poly_fit_length(poly, n + 1);
+
+    if (n + 1 > poly->length)   /* insert zeroes between end of poly and new coeff if needed */
+    {
+        mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
+        poly->length = n + 1;
+    }
+
+    fmpz_set_si(poly->coeffs + n, x);
+    _fmpz_poly_normalise(poly); /* we may have set leading coefficient to zero */
 }

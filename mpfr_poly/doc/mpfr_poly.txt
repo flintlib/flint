@@ -1,6 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2010 William Hart
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -18,117 +16,123 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
 
-********************************************************************************
+    Copyright (C) 2010 William Hart
 
-  Memory management
+******************************************************************************/
 
-********************************************************************************
+*******************************************************************************
 
-void mpfr_poly_init(mpfr_poly_t poly, mp_bitcnt_t prec)
+    Memory management
 
-   Initialise a polynomial with the given precision for use. The 
-   precision is the exact precision of the entries.
+*******************************************************************************
 
-void mpfr_poly_init2(mpfr_poly_t poly, const ulong alloc, mp_bitcnt_t prec)
+void mpfr_poly_init(mpfr_poly_t poly, mpfr_prec_t prec)
 
-   Initialise a polynomial with the given precision and with space
-   for the given number of coefficients (which are initialised). 
-   The precision is the exact precision of the entries.
+    Initialises a polynomial with the given precision for use. The 
+    precision is the exact precision of the entries.
 
-void mpfr_poly_realloc(mpfr_poly_t poly, const ulong alloc)
+void mpfr_poly_init2(mpfr_poly_t poly, long alloc, mpfr_prec_t prec)
 
-   Reallocate the polynomial to have space for the given number of
-   coefficients. If alloc == 0 the polynomial is cleared and 
-   reinitialised. If the current polynomial length is less than
-   alloc, the polynomial is truncated to have length alloc.
+    Initialises a polynomial with the given precision and with space
+    for the given number of coefficients (which are initialised). 
+    The precision is the exact precision of the entries.
 
-void mpfr_poly_fit_length(mpfr_poly_t poly, const ulong length)
+void mpfr_poly_realloc(mpfr_poly_t poly, long alloc)
 
-   Reallocate the polynomial to have space for at least the given
-   number of coefficients. The polynomial will not be made smaller
-   however and thus no data can be lost.
+    Reallocates the polynomial to have space for the given number of
+    coefficients. If alloc == 0 the polynomial is cleared and 
+    reinitialised. If the current polynomial length is less than
+    alloc, the polynomial is truncated to have length alloc.
 
-void _mpfr_poly_set_length(mpfr_poly_t poly, length)
+void mpfr_poly_fit_length(mpfr_poly_t poly, long len)
 
-   Set the length of poly to the given value. No attempt is made to
-   zero extra coefficients or to reallocate the polynomial, i.e.
-   poly->alloc is assumed to be at least the given length.
+    Reallocates the polynomial to have space for at least the given
+    number of coefficients. The polynomial will not be made smaller
+    however and thus no data can be lost.
 
-void mpfr_poly_set_prec(mfpr_poly_t poly, ulong prec)
+void _mpfr_poly_set_length(mpfr_poly_t poly, long len)
+
+    Sets the length of poly to the given value. No attempt is made to
+    zero extra coefficients or to reallocate the polynomial, i.e.
+    poly->alloc is assumed to be at least the given length.
+
+void mpfr_poly_set_prec(mfpr_poly_t poly, mpfr_prec_t prec)
  
-   Sets the precision of the coefficients of poly. Assumes poly is
-   already initialised to some precision. If coefficients are at a 
-   higher precision than prec, then they are rounded down, and if
-   the new precision is higher, zeroes are added in the remaining
-   bits of the mantissa. This function will fail if prec is less
-   than MPFR_PREC_MIN (which is currently 2).
+    Sets the precision of the coefficients of poly. Assumes poly is
+    already initialised to some precision. If coefficients are at a 
+    higher precision than prec, then they are rounded down, and if
+    the new precision is higher, zeroes are added in the remaining
+    bits of the mantissa. This function will fail if prec is less
+    than MPFR_PREC_MIN (which is currently 2).
 
 void mpfr_poly_clear(mpfr_poly_t poly)
- 
-   Clear the given polynomial.
+
+   Clears the given polynomial.
 
 void mpfr_poly_randinit(void)
 
-   Initialise the global mpfr_poly randstate.
+    Initialises the global mpfr_poly randstate.
 
 void mpfr_poly_randclear(void)
 
-   Clear the global mpfr_poly randstate.
+    Clears the global mpfr_poly randstate.
 
-void mpfr_poly_randtest(mpfr_poly_t pol, ulong length)
+void mpfr_poly_randtest(mpfr_poly_t pol, long len)
 
-   Set the coefficients of pol to uniform random values in the range
-   [0, 1) and with the given length. The precision is taken to be
-   the precision pol was initialised to.
+    Sets the coefficients of pol to uniform random values in the range
+    [0, 1) and with the given length. The precision is taken to be
+    the precision pol was initialised to.
 
 void mpfr_poly_swap(mpfr_poly_t poly1, mpfr_poly_t poly2)
 
-   Efficiently swap the two polynomials.
+    Efficiently swaps the two polynomials.
 
-void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, ulong len1,
-                             mpfr * in2, ulong len2, mp_bitcnt_t prec)
+void _mpfr_poly_mul_classical(mpfr * res, mpfr * in1, long len1,
+                              mpfr * in2, long len2, mpfr_prec_t prec)
 
-   Set res to the product of the polynomials in1 of length len1 and in2
-   of length len2 and the given precision coefficients. Assumes neither
-   len1 or len2 are zero and that len1 >= len2.
+    Sets res to the product of the polynomials in1 of length len1 and in2
+    of length len2 and the given precision coefficients. Assumes neither
+    len1 or len2 are zero and that len1 >= len2.
 
 void mpfr_poly_mul_classical(mpfr_poly_t res, mpfr_poly_t poly1, 
                                                     mpfr_poly_t poly2)
 
-   Set res to the product of poly1 and poly2, using the classical
-   algorithm.
+    Sets res to the product of poly1 and poly2, using the classical
+    algorithm.
 
 void mpfr_poly_mul_FHT(mpfr_poly_t res, mpfr_poly_t poly1, 
-					                   mpfr_poly_t poly2)
+                                       mpfr_poly_t poly2)
 
-   Set res to the product of poly1 and poly2, using the Fast Hartley
-   transform algorithm.
+    Sets res to the product of poly1 and poly2, using the Fast Hartley
+    transform algorithm.
 
 int _mpfr_poly_bound_newton(double * inter, double * slope, 
-			                mpfr * poly, ulong len, ulong prec)
+                            mpfr * poly, long len, mpfr_prec_t prec)
 
-   Finds the slope and y-intercept of a line which lies above all the 
-   logarithms of the coefficients of poly and such that all points are
-   no further than prec below the line. Return 1 if this can be done,
-   otherwise return 0.
+    Finds the slope and y-intercept of a line which lies above all the 
+    logarithms of the coefficients of poly and such that all points are
+    no further than prec below the line. Return 1 if this can be done,
+    otherwise return 0.
 
 void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
-                                            mpfr_poly_t poly2, ulong fb)
+                                            mpfr_poly_t poly2, mpfr_prec_t fb)
 
-   Multiplies poly1 and poly2 together. This works well if the coefficients
-   vary in magnitude according to log(P_i) = a*i + k1(i) for some small k1(i)
-   where P_i is the ith coefficient of poly1, and if a similar thing holds
-   for the coefficients of poly2, i.e. log(Q_i) = b*i + k2(i) where Q_i are
-   the coefficients of poly2.
+    Multiplies poly1 and poly2 together. This works well if the coefficients
+    vary in magnitude according to log(P_i) = a*i + k1(i) for some small k1(i)
+    where P_i is the ith coefficient of poly1, and if a similar thing holds
+    for the coefficients of poly2, i.e. log(Q_i) = b*i + k2(i) where Q_i are
+    the coefficients of poly2.
 
-   fb should be set to some small number of bits (perhaps 0) less than the
-   precision of poly1 and poly2. It represents the number of "filter bits".
-   The output of the classical and FFT algorithms are filtered and any 
-   spurious coefficients that might arise at these steps of the algorithm
-   can be filtered out if they lie in the bottom fb bits of the Newton
-   parallelogram that is computed. This feature is useful for doing 
-   computations where a lot of cancellation may occur and spurious 
-   coefficients arise. A handful of filter bits will usually remove such
-   spurious coefficients.
+    fb should be set to some small number of bits (perhaps 0) less than the
+    precision of poly1 and poly2. It represents the number of "filter bits".
+    The output of the classical and FFT algorithms are filtered and any 
+    spurious coefficients that might arise at these steps of the algorithm
+    can be filtered out if they lie in the bottom fb bits of the Newton
+    parallelogram that is computed. This feature is useful for doing 
+    computations where a lot of cancellation may occur and spurious 
+    coefficients arise. A handful of filter bits will usually remove such
+    spurious coefficients.
+

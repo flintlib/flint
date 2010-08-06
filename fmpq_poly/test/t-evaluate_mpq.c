@@ -35,14 +35,15 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+
     printf("evaluate_mpq....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
-    // Check aliasing
-    for (ulong i = 0; i < 5000UL; i++)
+    /* Check aliasing */
+    for (i = 0; i < 5000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y;
@@ -67,12 +68,9 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpz_print(a);
-            printf("\n\n");
-            fmpz_print(b);
-            printf("\n\n");
-            fmpq_poly_print(f);
-            printf("\n\n");
+            fmpz_print(a), printf("\n\n");
+            fmpz_print(b), printf("\n\n");
+            fmpq_poly_print(f), printf("\n\n");
             abort();
         }
 
@@ -83,8 +81,8 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    // Check that (f+g)(a) = f(a) + g(a)
-    for (ulong i = 0; i < 5000UL; i++)
+    /* Check that (f+g)(a) = f(a) + g(a) */
+    for (i = 0; i < 5000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -115,10 +113,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpz_print(a);
-            printf("\n\n");
-            fmpz_print(b);
-            printf("\n\n");
+            fmpz_print(a), printf("\n\n");
+            fmpz_print(b), printf("\n\n");
             abort();
         }
 
@@ -131,8 +127,8 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    // Check that (f*g)(a) = f(a) * g(a)
-    for (ulong i = 0; i < 5000UL; i++)
+    /* Check that (f*g)(a) = f(a) * g(a) */
+    for (i = 0; i < 5000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -163,10 +159,8 @@ main(void)
         if (!result)
         {
             printf("Error:\n");
-            fmpz_print(a);
-            printf("\n\n");
-            fmpz_print(b);
-            printf("\n\n");
+            fmpz_print(a), printf("\n\n");
+            fmpz_print(b), printf("\n\n");
             abort();
         }
 

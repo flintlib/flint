@@ -34,14 +34,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("sqrt....");
     fflush(stdout);
 
     fmpz_randinit();
 
-    // Comparison with mpz routines
-    for (ulong i = 0; i < 100000UL; i++)
+    /* Comparison with mpz routines */
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t f, g;
         mpz_t mf, mf2, mg;
@@ -63,10 +63,9 @@ main(void)
         fmpz_get_mpz(mf2, f);
 
         result = (mpz_cmp(mf2, mf) == 0);
-
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd, mg = %Zd\n", mf, mf2, mg);
             abort();
         }
@@ -79,8 +78,8 @@ main(void)
         mpz_clear(mg);
     }
 
-    // Check aliasing of f and g
-    for (ulong i = 0; i < 100000UL; i++)
+    /* Check aliasing of f and g */
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t f;
         mpz_t mf, mf2;
@@ -103,7 +102,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("mf = %Zd, mf2 = %Zd\n", mf, mf2);
             abort();
         }
@@ -115,7 +114,6 @@ main(void)
     }
 
     fmpz_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

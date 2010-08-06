@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,16 +31,16 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
+   ulong count = 0;
+   mp_limb_t d;
+   mpz_t d_m;
+   
    printf("is_prime_pocklington....");
    fflush(stdout);
-   ulong count = 0;
    
-   for (ulong i = 0; i < 10000UL; i++) /* Test that primes pass the test */
+   for (i = 0; i < 10000; i++) /* Test that primes pass the test */
    {
-      mp_limb_t d;
-      mpz_t d_m;
-      
       mpz_init(d_m);
 
       do
@@ -56,7 +56,7 @@ int main(void)
 
       if (result == 0)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d = %lu is declared composite\n", d); 
          abort();
       }
@@ -64,11 +64,8 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (ulong i = 0; i < 10000UL; i++) /* Test that composites do not pass */
+   for (i = 0; i < 10000; i++) /* Test that composites do not pass */
    {
-      mp_limb_t d;
-      mpz_t d_m;
-      
       mpz_init(d_m);
 
       do
@@ -83,7 +80,7 @@ int main(void)
 
       if (result == 1)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("d = %lu is declared prime\n", d); 
          abort();
       }
@@ -93,7 +90,7 @@ int main(void)
 
    if (count > 2000)
    {
-      printf("Error: Pocklington-Lehmer failed too many times (%lu times)\n", count);
+      printf("FAIL: Pocklington-Lehmer failed too many times (%lu times)\n", count);
       abort();
    }
 

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,8 +39,8 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
 {
    ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
    ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
+   ulong factors_left;
    ulong exp;
-   ulong factors_left, k;
    mp_limb_t cofactor, factor, cutoff, prod;
 
    cofactor = n_factor_trial_partial(factors, n, &prod, FLINT_FACTOR_TRIAL_PRIMES, limit);
@@ -63,7 +63,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
 
       if (factor >= cutoff)
 		{
-	      if (cofactor = n_factor_power235(&exp, factor)) 
+	      if ((cofactor = n_factor_power235(&exp, factor)))
          {
             exp_arr[factors_left - 1] *= exp;
             factor_arr[factors_left - 1] = factor = cofactor;

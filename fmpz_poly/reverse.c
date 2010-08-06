@@ -28,18 +28,19 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
+void
+_fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 {
     if (res == poly)
     {
-        fmpz * high = res + (n - 1);
+        fmpz *high = res + (n - 1);
         while (res < high)
         {
-            fmpz t  = *res;
-            *res++  = *high;
+            fmpz t = *res;
+            *res++ = *high;
             *high-- = t;
         }
-        
+
         res = (fmpz *) poly + (n - len);
         while (res-- != poly)
             fmpz_zero(res);
@@ -49,14 +50,15 @@ void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
         long zeros = n - len;
         while (zeros--)
             fmpz_zero(res++);
-        
+
         poly = (fmpz *) poly + (len - 1);
         while (len--)
             fmpz_set(res++, poly--);
     }
 }
 
-void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+void
+fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 {
     long len = FLINT_MIN(n, poly->length);
     if (len == 0)
@@ -64,7 +66,7 @@ void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
         fmpz_poly_zero(res);
         return;
     }
-    
+
     fmpz_poly_fit_length(res, n);
 
     _fmpz_poly_reverse(res->coeffs, poly->coeffs, len, n);
@@ -72,4 +74,3 @@ void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 }
-

@@ -35,56 +35,55 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("is_zero....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
-    // Check zero vector
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check zero vector */
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        ulong length = n_randint(100);
+        long len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
-        _fmpz_vec_zero(a, length);
+        a = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_zero(a, len);
 
-        result = (_fmpz_vec_is_zero(a, length));
+        result = (_fmpz_vec_is_zero(a, len));
         if (!result)
         {
             printf("FAIL1:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
-    // Check non-zero vector
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check non-zero vector */
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        ulong length = n_randint(100) + 1UL;
+        long len = n_randint(100) + 1;
 
-        a = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
-        fmpz_set_ui(a + (length - 1UL), 1UL);
+        a = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, len, n_randint(200));
+        fmpz_set_ui(a + (len - 1), 1UL);
 
-        result = (!_fmpz_vec_is_zero(a, length));
+        result = (!_fmpz_vec_is_zero(a, len));
         if (!result)
         {
             printf("FAIL2:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

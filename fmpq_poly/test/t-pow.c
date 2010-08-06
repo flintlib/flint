@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -35,98 +33,91 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
-    int result;
+    int i, result;
 
-    printf ("pow....");
-    fflush (stdout);
+    printf("pow....");
+    fflush(stdout);
 
-    fmpq_poly_randinit ();
+    fmpq_poly_randinit();
 
-    // Check aliasing of a and b
-    for (ulong i = 0; i < 2000UL; i++)
+    /* Check aliasing of a and b */
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b;
+        ulong exp;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_randtest (b, n_randint (10), n_randint (100));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(b, n_randint(10), n_randint(100));
 
-        ulong exp = n_randtest () % 20UL;
+        exp = (ulong) n_randtest() % 20UL;
 
-        fmpq_poly_pow (a, b, exp);
-        fmpq_poly_pow (b, b, exp);
+        fmpq_poly_pow(a, b, exp);
+        fmpq_poly_pow(b, b, exp);
 
-        result = (fmpq_poly_equal (a, b));
+        result = (fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf ("Error:\n");
-            printf ("exp = %lu\n", exp);
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            abort ();
+            printf("FAIL:\n");
+            printf("exp = %lu\n", exp);
+            printf("a = "), fmpq_poly_print(a), printf("\n\n");
+            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
     }
 
-    // Compare with repeated multiplications by the case
-    for (ulong i = 0; i < 2000UL; i++)
+    /* Compare with repeated multiplications by the base */
+    for (i = 0; i < 2000; i++)
     {
         fmpq_poly_t a, b, c;
+        ulong exp;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_init (c);
-        fmpq_poly_randtest (b, n_randint (10), n_randint (100));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+        fmpq_poly_randtest(b, n_randint(10), n_randint(100));
 
-        ulong exp = n_randtest () % 20UL;
+        exp = (ulong) n_randtest() % 20UL;
 
-        fmpq_poly_pow (a, b, exp);
+        fmpq_poly_pow(a, b, exp);
 
         if (exp == 0UL && b->length > 0)
         {
-            fmpq_poly_fit_length (c, 1UL);
-            fmpz_set_ui (c->coeffs, 1UL);
-            _fmpq_poly_set_length (c, 1UL);
+            fmpq_poly_fit_length(c, 1);
+            fmpz_set_ui(c->coeffs, 1UL);
+            _fmpq_poly_set_length(c, 1);
         }
         else
         {
-            fmpq_poly_set (c, b);
             ulong j;
+            fmpq_poly_set(c, b);
 
             for (j = 1; j < exp; j++)
-                fmpq_poly_mul (c, c, b);
+                fmpq_poly_mul(c, c, b);
         }
 
-        result = (fmpq_poly_equal (a, c));
+        result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf ("Error:\n");
-            printf ("exp = %lu\n", exp);
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            printf ("c = ");
-            fmpq_poly_print (c);
-            printf ("\n\n");
-            abort ();
+            printf("Error:\n");
+            printf("exp = %lu\n", exp);
+            printf("a = "), fmpq_poly_print(a), printf("\n\n");
+            printf("c = "), fmpq_poly_print(c), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
-        fmpq_poly_clear (c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear ();
-
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    fmpq_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

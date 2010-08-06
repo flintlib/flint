@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,47 +30,47 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("size....");
-   fflush(stdout);
+    int i, result;
+    printf("size....");
+    fflush(stdout);
 
-   fmpz_randinit();
+    fmpz_randinit();
 
-   for (ulong i = 0; i < 100000UL; i++) 
-   {
-      fmpz_t a;
-      mpz_t b;
-      mp_size_t r1, r2;
-      
-      fmpz_init(a);
-      
-      mpz_init(b);
-      
-      fmpz_randtest(a, 200);
-      
-      fmpz_get_mpz(b, a);
-      
-      r1 = fmpz_size(a);
-      r2 = mpz_size(b);
-      result = (r1 == r2);
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        mpz_t b;
+        mp_size_t r1, r2;
 
-      if (!result)
-      {
-         printf("FAIL\n");
-         gmp_printf("b = %Zd\n", b);
-         abort();
-      }
+        fmpz_init(a);
 
-      fmpz_clear(a);
-      
-      mpz_clear(b);
-   }
+        mpz_init(b);
 
-   fmpz_randclear();
+        fmpz_randtest(a, 200);
 
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_get_mpz(b, a);
+
+        r1 = fmpz_size(a);
+        r2 = mpz_size(b);
+        result = (r1 == r2);
+
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("b = %Zd\n", b);
+            abort();
+        }
+
+        fmpz_clear(a);
+
+        mpz_clear(b);
+    }
+
+    fmpz_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

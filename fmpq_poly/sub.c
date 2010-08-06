@@ -98,15 +98,17 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_sub(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
+    long len1, len2, max;
+
     if (poly1 == poly2)
     {
         fmpq_poly_zero(res);
         return;
     }
     
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long max  = FLINT_MAX(poly1->length, poly2->length);
+    len1 = poly1->length;
+    len2 = poly2->length;
+    max  = FLINT_MAX(poly1->length, poly2->length);
     fmpq_poly_fit_length(res, max);
     
     if (res != poly2)

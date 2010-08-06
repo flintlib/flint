@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,11 +30,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits_in)
+void
+_fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits)
 {
-   long i;
-
-   for (i = 0; i < len; i++)
-      fmpz_randtest(f + i, bits_in);
+    long i;
+    for (i = 0; i < len; i++)
+        fmpz_randtest(f + i, bits);
 }
-

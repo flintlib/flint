@@ -35,36 +35,35 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("zero....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
-    // Check it's zero
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check it's zero */
+    for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        ulong length = n_randint(100);
+        long len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
-        _fmpz_vec_randtest(a, length, n_randint(200));
-        
-        _fmpz_vec_zero(a, length);
+        a = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, len, n_randint(200));
 
-        result = (_fmpz_vec_is_zero(a, length));
+        _fmpz_vec_zero(a, len);
+
+        result = (_fmpz_vec_is_zero(a, len));
         if (!result)
         {
             printf("FAIL:\n");
-            _fmpz_vec_print(a, length), printf("\n\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,29 +16,30 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len)
+mp_size_t
+_fmpz_vec_max_limbs(const fmpz * vec, long len)
 {
     long i;
     mp_size_t limbs, max_limbs = 0;
-    
+
     for (i = 0; i < len; i++)
     {
         limbs = fmpz_size(vec + i);
         if (limbs > max_limbs)
             max_limbs = limbs;
     }
-    
+
     return max_limbs;
 }

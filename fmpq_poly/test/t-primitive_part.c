@@ -35,14 +35,14 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("primitive_part....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
-    // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check aliasing */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;
         fmpq_poly_t f, g;
@@ -56,23 +56,21 @@ main(void)
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpz_randtest(a, n_randint(100));
         fmpz_randtest_not_zero(b, n_randint(100) + 1);
-        
+
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
         fmpq_poly_scalar_mul_mpq(f, f, x);
-        
+
         fmpq_poly_primitive_part(g, f);
         fmpq_poly_primitive_part(f, f);
-        
+
         result = (fmpq_poly_equal(f, g));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
             abort();
         }
 
@@ -83,8 +81,8 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    // Check that content(f) primitive_part(f) = +- f
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check that content(f) primitive_part(f) = +- f */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t a, b;
         fmpq_poly_t f, g;
@@ -99,27 +97,25 @@ main(void)
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpz_randtest(a, n_randint(100));
         fmpz_randtest_not_zero(b, n_randint(100) + 1);
-        
+
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
         fmpq_poly_scalar_mul_mpq(f, f, x);
-        
+
         fmpq_poly_content(y, f);
         fmpq_poly_primitive_part(g, f);
         fmpq_poly_scalar_mul_mpq(g, g, y);
-        
-        if (!fmpq_poly_is_zero(f) && fmpz_sgn(f->coeffs + (f->length-1UL)) < 0)
+
+        if (!fmpq_poly_is_zero(f) && fmpz_sgn(f->coeffs + (f->length - 1)) < 0)
             fmpq_poly_neg(g, g);
-        
+
         result = (fmpq_poly_equal(f, g));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
             abort();
         }
 
@@ -132,7 +128,6 @@ main(void)
     }
 
     fmpq_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

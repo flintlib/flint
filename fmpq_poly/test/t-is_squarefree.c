@@ -35,24 +35,24 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("is_squarefree....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
-    // Check that polynomials of degree <= 1 are square-free
-    for (ulong i = 0; i < 1000UL; i++)
+    /* Check that polynomials of degree <= 1 are square-free */
+    for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
         fmpq_poly_randtest(f, n_randint(2), n_randint(200));
-        
+
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL(1):\n");
+            printf("FAIL:\n");
             fmpq_poly_print(f), printf("\n");
             abort();
         }
@@ -60,25 +60,25 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    // Check that a^2 f is not square-free
-    for (ulong i = 0; i < 200UL; i++)
+    /* Check that a^2 f is not square-free */
+    for (i = 0; i < 200; i++)
     {
         fmpq_poly_t a, f;
 
         fmpq_poly_init(a);
         fmpq_poly_randtest_not_zero(a, n_randint(20) + 1, n_randint(40) + 1);
-        if (a->length < 2UL)
+        if (a->length < 2)
             continue;
         fmpq_poly_init(f);
         fmpq_poly_randtest_not_zero(f, n_randint(50) + 1, n_randint(100) + 1);
-        
+
         fmpq_poly_mul(a, a, a);
         fmpq_poly_mul(f, a, f);
-        
+
         result = (!fmpq_poly_is_squarefree(f));
         if (!result)
         {
-            printf("FAIL(2):\n");
+            printf("FAIL:\n");
             fmpq_poly_print(f), printf("\n");
             abort();
         }
@@ -88,7 +88,6 @@ main(void)
     }
 
     fmpq_poly_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

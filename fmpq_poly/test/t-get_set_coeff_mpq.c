@@ -35,68 +35,62 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
-    int result;
+    int i, j, result;
+    mpq_t n1, n2;
 
-    printf ("get/set_coeff_mpq....");
-    fflush (stdout);
+    printf("get/set_coeff_mpq....");
+    fflush(stdout);
 
-    ulong i, j, coeff;
+    mpq_init(n1);
+    mpq_init(n2);
 
-    mpq_t n1mpq, n2mpq;
+    fmpz_randinit();
 
-    mpq_init (n1mpq);
-    mpq_init (n2mpq);
-
-    fmpz_randinit ();
-
-    for (i = 0; i < 100UL; i++)
+    for (i = 0; i < 100; i++)
     {
         fmpq_poly_t a;
-
         fmpz_t xnum, xden;
+        long coeff, len;
 
-        ulong length;
+        fmpq_poly_init(a);
+        fmpz_init(xnum);
+        fmpz_init(xden);
+        len = (long) (n_randint(100) + 1);
 
-        fmpq_poly_init (a);
-        fmpz_init (xnum);
-        fmpz_init (xden);
-        length = n_randint (100) + 1;
-
-        for (j = 0; j < 100UL; j++)
+        for (j = 0; j < 100; j++)
         {
-            fmpz_randtest (xnum, 200);
-            fmpz_randtest_not_zero (xden, 200);
-            fmpz_get_mpz (mpq_numref (n1mpq), xnum);
-            fmpz_get_mpz (mpq_denref (n1mpq), xden);
-            mpq_canonicalize (n1mpq);
-            coeff = n_randint (length);
-            fmpq_poly_set_coeff_mpq (a, coeff, n1mpq);
-            fmpq_poly_get_coeff_mpq (n2mpq, a, coeff);
+            fmpz_randtest(xnum, 200);
+            fmpz_randtest_not_zero(xden, 200);
+            fmpz_get_mpz(mpq_numref(n1), xnum);
+            fmpz_get_mpz(mpq_denref(n1), xden);
+            mpq_canonicalize(n1);
+            coeff = (long) n_randint(len);
+            fmpq_poly_set_coeff_mpq(a, coeff, n1);
+            fmpq_poly_get_coeff_mpq(n2, a, coeff);
 
-            result = (mpq_equal (n1mpq, n2mpq));
+            result = (mpq_equal(n1, n2));
             if (!result)
             {
-                printf ("Error: n1 = %s, n2 = %s, coeff = %lu, length = %lu\n",
-                        mpq_get_str (NULL, 10, n1mpq), mpq_get_str (NULL, 10,
-                                                                    n2mpq),
-                        coeff, length);
-                abort ();
+                gmp_printf
+                    ("Error: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
+                     n1, n2, coeff, len);
+                abort();
             }
         }
 
-        fmpz_clear (xnum);
-        fmpz_clear (xden);
-        fmpq_poly_clear (a);
+        fmpz_clear(xnum);
+        fmpz_clear(xden);
+        fmpq_poly_clear(a);
     }
 
-    fmpz_randclear ();
+    fmpz_randclear();
 
-    mpq_clear (n1mpq);
-    mpq_clear (n2mpq);
+    mpq_clear(n1);
+    mpq_clear(n2);
 
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

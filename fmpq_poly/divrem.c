@@ -72,9 +72,11 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     /* 2.  lead^d != +-1.  {Q, q} = {b Q, a lead^d}, {R, r} = {R, a lead^d} */
     else
     {
-        // TODO:  Improve this.  Clearly we do not need to compute 
-        // den = a lead^d in many cases, but can determine the GCD from 
-        // lead alone already.
+        /*
+           TODO:  Improve this.  Clearly we do not need to compute 
+           den = a lead^d in many cases, but can determine the GCD from 
+           lead alone already.
+         */
         fmpz_t den;
         fmpz_init(den);
         fmpz_pow_ui(den, lead, d);
@@ -95,6 +97,8 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
+    long lenA, lenB, lenQ, lenR;
+
     if (fmpq_poly_is_zero(poly2))
     {
         printf("Exception: division by zero in fmpq_poly_divrem\n");
@@ -107,9 +111,9 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     }
     
     /* Deal with the various other cases of aliasing. */
-    if (R == poly1 | R == poly2)
+    if (R == poly1 || R == poly2)
     {
-        if (Q == poly1 | Q == poly2)
+        if (Q == poly1 || Q == poly2)
         {
             fmpq_poly_t tempQ, tempR;
             fmpq_poly_init(tempQ);
@@ -133,7 +137,7 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     }
     else
     {
-        if (Q == poly1 | Q == poly2)
+        if (Q == poly1 || Q == poly2)
         {
             fmpq_poly_t tempQ;
             fmpq_poly_init(tempQ);
@@ -151,10 +155,10 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
         return;
     }
     
-    ulong lenA = poly1->length;
-    ulong lenB = poly2->length;
-    ulong lenQ = lenA + (lenB - 1UL);
-    ulong lenR = lenB - 1UL;
+    lenA = poly1->length;
+    lenB = poly2->length;
+    lenQ = lenA + (lenB - 1L);
+    lenR = lenB - 1L;
     
     fmpq_poly_fit_length(Q, lenQ);
     fmpq_poly_fit_length(R, lenA);  /* XXX: Need at least that much space */

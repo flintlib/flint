@@ -28,12 +28,13 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_normalise(fmpz_poly_t poly)
+void
+_fmpz_poly_normalise(fmpz_poly_t poly)
 {
-    long length = poly->length;
-	
-	while (length && !poly->coeffs[length - 1])
-        length--;
+    long len = poly->length;
 
-    poly->length = length;
+    while (len && !poly->coeffs[len - 1])
+        len--;
+
+    poly->length = len;
 }

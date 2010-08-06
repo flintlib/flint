@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,14 +16,14 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2005-2009 Damien Stehle.
-   Copyright (C) 2007 David Cade.
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2005-2009 Damien Stehle
+    Copyright (C) 2007 David Cade
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <stdlib.h>
 #include <mpir.h>
@@ -31,27 +31,28 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
+void
+fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
 {
-   long r, c, i, j;
+    long r, c, i, j;
 
-   r = mat->r;
-   c = mat->c;
+    r = mat->r;
+    c = mat->c;
 
-   if (c != r + 1)
-   {
-	  printf("Exception: fmpz_mat_randintrel called on an ill-formed matrix\n");
-      abort();
-   }
-   
-   for (i = 0; i < r; i++)
-   {
-      fmpz_randbits(mat->rows[i], bits);
-	  for (j = 1; j <= i; j++)
-		 fmpz_zero(mat->rows[i] + j);
-	  fmpz_set_ui(mat->rows[i] + i + 1, 1);
-	  for (j = i + 2; j < c; j++)
-		  fmpz_zero(mat->rows[i] + j);
-   }
+    if (c != r + 1)
+    {
+        printf
+            ("Exception: fmpz_mat_randintrel called on an ill-formed matrix\n");
+        abort();
+    }
+
+    for (i = 0; i < r; i++)
+    {
+        fmpz_randbits(mat->rows[i], bits);
+        for (j = 1; j <= i; j++)
+            fmpz_zero(mat->rows[i] + j);
+        fmpz_set_ui(mat->rows[i] + i + 1, 1);
+        for (j = i + 2; j < c; j++)
+            fmpz_zero(mat->rows[i] + j);
+    }
 }
-

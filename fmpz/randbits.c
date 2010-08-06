@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,17 +30,21 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
+void
+fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
 {
-   if (bits <= FLINT_BITS - 2)
-   {
-      _fmpz_demote(f);
-      *f = n_randbits(bits);
-      if (n_randint(2)) *f = -*f;
-   } else
-   {
-      __mpz_struct * mpz_ptr = _fmpz_promote(f);
-      mpz_urandomb(mpz_ptr, fmpz_randstate, bits);
-      if (n_randint(2)) mpz_neg(mpz_ptr, mpz_ptr);
-   }
+    if (bits <= FLINT_BITS - 2)
+    {
+        _fmpz_demote(f);
+        *f = n_randbits(bits);
+        if (n_randint(2))
+            *f = -*f;
+    }
+    else
+    {
+        __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        mpz_urandomb(mpz_ptr, fmpz_randstate, bits);
+        if (n_randint(2))
+            mpz_neg(mpz_ptr, mpz_ptr);
+    }
 }

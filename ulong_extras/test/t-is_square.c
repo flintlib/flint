@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("is_square....");
    fflush(stdout);
    
-   for (ulong i = 0; i < 100000UL; i++) /* Test that non-squares pass */
+   for (i = 0; i < 100000; i++) /* Test that non-squares pass */
    {
       mp_limb_t a, s, bits;
       
@@ -44,16 +44,15 @@ int main(void)
       s = a*a + n_randint(2*a) + 1;
 
       result = !n_is_square(s);
-      
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("s = %lu is declared square\n", s); 
          abort();
       }
    }
          
-   for (ulong i = 0; i < 100000UL; i++) /* Test that squares pass */
+   for (i = 0; i < 100000; i++) /* Test that squares pass */
    {
       mp_limb_t a, s, bits;
       
@@ -62,10 +61,9 @@ int main(void)
       s = a*a;
 
       result = n_is_square(s);
-      
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("s = %lu is declared square\n", s); 
          abort();
       }

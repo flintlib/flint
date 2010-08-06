@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,47 +31,48 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("mullow_n....");
-   fflush(stdout);
-   
-   fmpz_poly_randinit();
-   
-   // compare with truncated product of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
-   {
-      fmpz_poly_t a, b, c;
-      
-      fmpz_poly_init(a);
-      fmpz_poly_init(b);
-      fmpz_poly_init(c);
-	  ulong trunc = n_randint(50);
-      fmpz_poly_randtest(b, trunc, n_randint(200));
-      fmpz_poly_randtest(c, trunc, n_randint(200));
-   
-	  fmpz_poly_mullow_n(a, b, c, trunc);
-      fmpz_poly_mul(b, b, c);
-      fmpz_poly_truncate(b, trunc);
+    int i, result;
+    printf("mullow_n....");
+    fflush(stdout);
 
-      result = (fmpz_poly_equal(a, b));
-      if (!result)
-      {
-         printf("Error:\n");
-         fmpz_poly_print(a); printf("\n\n");
-         fmpz_poly_print(b); printf("\n\n");
-         abort();
-      }
+    fmpz_poly_randinit();
 
-      fmpz_poly_clear(a);
-      fmpz_poly_clear(b);
-      fmpz_poly_clear(c);
-   }
+    /* Compare with truncated product of a and b */
+    for (i = 0; i < 2000; i++)
+    {
+        fmpz_poly_t a, b, c;
+        long trunc;
 
-   fmpz_poly_randclear();
-      
-   _fmpz_cleanup();
-   printf("PASS\n");
-   return 0;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        trunc = n_randint(50);
+        fmpz_poly_randtest(b, trunc, n_randint(200));
+        fmpz_poly_randtest(c, trunc, n_randint(200));
+
+        fmpz_poly_mullow_n(a, b, c, trunc);
+        fmpz_poly_mul(b, b, c);
+        fmpz_poly_truncate(b, trunc);
+
+        result = (fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

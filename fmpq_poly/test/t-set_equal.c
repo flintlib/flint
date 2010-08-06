@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -35,100 +33,88 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
-    int result;
+    int i, result;
 
-    printf ("set/equal....");
-    fflush (stdout);
+    printf("set/equal....");
+    fflush(stdout);
 
-    fmpq_poly_randinit ();
+    fmpq_poly_randinit();
 
-    // equal polynomials
-    for (ulong i = 0; i < 10000UL; i++)
+    /* equal polynomials */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
 
-        fmpq_poly_set (b, a);
+        fmpq_poly_set(b, a);
 
-        result = (fmpq_poly_equal (a, b));
+        result = (fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf ("Error:\n");
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n");
-            printf ("alloc = %lu\nlength = %lu\n\n", a->alloc, a->length);
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            printf ("alloc = %lu\nlength = %lu\n\n", b->alloc, b->length);
-            printf ("equal(a, b) = %i\n", result);
-            abort ();
+            printf("FAIL:\n");
+            printf("a = "), fmpq_poly_print(a), printf("\n");
+            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
+            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
+            printf("equal(a, b) = %d\n", result);
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
     }
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-
-        ulong coeff = n_randint (100);
-
+        long coeff = (long) n_randint(100);
         mpq_t x1, x2;
-
         fmpz_t x1fmpz;
 
-        mpq_init (x1);
-        mpq_init (x2);
-        fmpz_init (x1fmpz);
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
+        mpq_init(x1);
+        mpq_init(x2);
+        fmpz_init(x1fmpz);
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
 
-        fmpq_poly_set (b, a);
+        fmpq_poly_set(b, a);
 
-        fmpq_poly_get_coeff_mpq (x2, b, coeff);
+        fmpq_poly_get_coeff_mpq(x2, b, coeff);
         do
         {
-            fmpz_randtest (x1fmpz, 200);
-            fmpz_get_mpz (mpq_numref (x1), x1fmpz);
-            mpz_set_si (mpq_denref (x1), 1);
-        } while (mpq_equal (x1, x2));
-        fmpq_poly_set_coeff_mpq (b, coeff, x1);
+            fmpz_randtest(x1fmpz, 200);
+            fmpz_get_mpz(mpq_numref(x1), x1fmpz);
+            mpz_set_si(mpq_denref(x1), 1);
+        } while (mpq_equal(x1, x2));
+        fmpq_poly_set_coeff_mpq(b, coeff, x1);
 
-        result = (!fmpq_poly_equal (a, b));
+        result = (!fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf ("Error:\n");
-            printf ("a = ");
-            fmpq_poly_print (a);
-            printf ("\n");
-            printf ("alloc = %lu\nlength = %lu\n\n", a->alloc, a->length);
-            printf ("b = ");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            printf ("alloc = %lu\nlength = %lu\n\n", b->alloc, b->length);
-            printf ("!equal(a, b) = %i\n", result);
-            abort ();
+            printf("FAIL:\n");
+            printf("a = "), fmpq_poly_print(a), printf("\n");
+            printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
+            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
+            printf("!equal(a, b) = %d\n", result);
+            abort();
         }
 
-        mpq_clear (x1);
-        mpq_clear (x2);
-        fmpz_clear (x1fmpz);
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
+        mpq_clear(x1);
+        mpq_clear(x2);
+        fmpz_clear(x1fmpz);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
     }
 
-    fmpq_poly_randclear ();
-
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    fmpq_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -31,16 +31,15 @@
 
 int is_prime(mp_limb_t n, int proved)
 {
-   if (proved) return n_is_prime(n);
-   else return n_is_probabprime(n);
+    return proved ? n_is_prime(n) : n_is_probabprime(n);
 }
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 {
    ulong factor_arr[FLINT_MAX_FACTORS_IN_LIMB];
    ulong exp_arr[FLINT_MAX_FACTORS_IN_LIMB];
+   ulong factors_left;
    ulong exp;
-   ulong factors_left, k;
    mp_limb_t cofactor, factor, cutoff;
 
    cofactor = n_factor_trial(factors, n, FLINT_FACTOR_TRIAL_PRIMES);
@@ -63,7 +62,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 
       if (factor >= cutoff)
 		{
-	      if (cofactor = n_factor_power235(&exp, factor)) 
+	      if ((cofactor = n_factor_power235(&exp, factor)))
          {
             exp_arr[factors_left - 1] *= exp;
             factor_arr[factors_left - 1] = factor = cofactor;
@@ -84,7 +83,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                factors_left++;
 				} else
 				{
-               printf("Error : failed to factor %ld\n", n);
+               printf("Exception: failed to factor %ld\n", n);
                abort();
 				}
          } else

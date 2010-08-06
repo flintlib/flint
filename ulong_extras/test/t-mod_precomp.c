@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,16 +31,16 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mod_precomp....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t d, n, r1, r2, norm;
+      mp_limb_t bits, d, n, r1, r2;
       double dpre;
 
-      mp_limb_t bits = n_randint(FLINT_D_BITS) + 1;
+      bits = n_randint(FLINT_D_BITS) + 1;
       d = n_randbits(bits);
       if (bits <= (FLINT_BITS/2)) n = n_randint(d*d);
       else n = n_randtest();
@@ -51,10 +51,9 @@ int main(void)
       r2 = n%d;
 
       result = (r1 == r2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("n = %lu, d = %lu, dinv = %f\n", n, d, dpre); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();

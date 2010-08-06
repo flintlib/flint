@@ -50,33 +50,33 @@ void fmpz_poly_init2(fmpz_poly_t poly, long alloc);
 
 void fmpz_poly_realloc(fmpz_poly_t poly, long alloc);
 
-void fmpz_poly_fit_length(fmpz_poly_t poly, long length);
+void fmpz_poly_fit_length(fmpz_poly_t poly, long len);
 
 void fmpz_poly_clear(fmpz_poly_t poly);
 
 void _fmpz_poly_normalise(fmpz_poly_t poly);
 
-static inline
-void _fmpz_poly_set_length(fmpz_poly_t poly, long newlength)
+static __inline__
+void _fmpz_poly_set_length(fmpz_poly_t poly, long newlen)
 {
-    if (poly->length > newlength)
+    if (poly->length > newlen)
     {
         long i;
-        for (i = newlength; i < poly->length; i++)
+        for (i = newlen; i < poly->length; i++)
             _fmpz_demote(poly->coeffs + i); 
     }
-    poly->length = newlength;
+    poly->length = newlen;
 }
 
 /*  Polynomial parameters  ***************************************************/
 
-static inline
+static __inline__
 long fmpz_poly_length(const fmpz_poly_t poly)
 {
     return poly->length;
 }
 
-static inline
+static __inline__
 long fmpz_poly_degree(const fmpz_poly_t poly)
 {
     return poly->length - 1;
@@ -94,13 +94,13 @@ void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c);
 
 void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c);
 
-static inline
+static __inline__
 void fmpz_poly_zero(fmpz_poly_t poly)
 {
    _fmpz_poly_set_length(poly, 0);
 }
 
-static inline 
+static __inline__
 void fmpz_poly_one(fmpz_poly_t poly)
 {
     fmpz_poly_set_ui(poly, 1UL);
@@ -112,15 +112,15 @@ void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n);
 
 void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n);
 
-static inline 
-void fmpz_poly_truncate(fmpz_poly_t poly, long newlength)
+static __inline__
+void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 {
-    if (poly->length > newlength)
+    if (poly->length > newlen)
     {
         long i;
-        for (i = newlength; i < poly->length; i++)
+        for (i = newlen; i < poly->length; i++)
             _fmpz_demote(poly->coeffs + i);
-        poly->length = newlength;
+        poly->length = newlen;
         _fmpz_poly_normalise(poly);
     }  
 }
@@ -131,13 +131,11 @@ void fmpz_poly_randinit(void);
 
 void fmpz_poly_randclear(void);
 
-void fmpz_poly_randtest(fmpz_poly_t f, long length, mp_bitcnt_t bits_in);
+void fmpz_poly_randtest(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long length, 
-                                                    mp_bitcnt_t bits_in);
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, 
-                                       long length, mp_bitcnt_t bits_in);
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, long len, mp_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/
 
@@ -193,10 +191,10 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1,
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
                                 long len, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack(fmpz * poly, long length, 
+void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                            mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long length, 
+void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                        mp_srcptr arr, mp_bitcnt_t bit_size);
 
 /*  Multiplication  **********************************************************/
@@ -323,7 +321,7 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly);
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
                                     long A_len, const fmpz * B, long B_len);
 
-static inline
+static __inline__
 void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
                                                 const fmpz * B, long B_len)
 {
@@ -353,14 +351,14 @@ void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
 
-static inline 
+static __inline__
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, 
                     const fmpz * A, long A_len, const fmpz * B, long B_len)
 {
     _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, A_len, B, B_len);
 }
 
-static inline 
+static __inline__
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, 
                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 {

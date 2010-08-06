@@ -42,7 +42,7 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, long n, const mpq_t x)
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1); 
-        mpn_zero(poly->coeffs + len, n - len);
+        mpn_zero((mp_ptr) (poly->coeffs + len), n - len);
         len = n + 1;
         poly->length = len;
     }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2009 William Hart
+    Copyright 2009 William Hart
 
 ******************************************************************************/
 
@@ -33,28 +33,26 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t n, d, r, norm, bits;
    double dpre;
-   
-   mp_limb_t * array = malloc(1000*sizeof(mp_limb_t));
-   
-   mp_limb_t mask = (1UL<<63) - 1UL;
+   ulong i;
+   mp_ptr array = (mp_ptr) malloc(1000*sizeof(mp_limb_t));
 
-   for (ulong i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
+      int j;
       bits = n_randint(53) + 1;
       d = n_randbits(bits);
-      
       dpre = n_precompute_inverse(d);
 
-      for (mp_size_t i = 0; i < 1000; i++)
+      for (j = 0; j < 1000; j++)
       {
-         if (bits <= 32) array[i] = n_randint(d*d);
-         else array[i] = n_randtest();
+         if (bits <= 32) array[j] = n_randint(d*d);
+         else array[j] = n_randtest();
       }
 
       prof_start();
-      for (mp_size_t i = 0; i < 1000; i++)
+      for (j = 0; j < 1000; j++)
       {
-         r = n_mod_precomp(array[i], d, dpre);  
+         r = n_mod_precomp(array[j], d, dpre);  
       }
       prof_stop();
    }

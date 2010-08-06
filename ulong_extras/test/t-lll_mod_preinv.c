@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("lll_mod_preinv....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t d, dinv, nh, nm, nl, r1, r2, m, norm;
+      mp_limb_t d, dinv, nh, nm, nl, r1, r2, m;
 
       d = n_randtest_not_zero();
       m = n_randtest();
@@ -52,10 +52,9 @@ int main(void)
 	  r1 = n_ll_mod_preinv(nm, nl, d, dinv);
 
       result = (r1 == r2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("nh = %lu, nm = %ld, nl = %lu, d = %lu, dinv = %lu\n", nh, nm, nl, d, dinv); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();

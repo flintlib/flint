@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2009, 2010 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -33,54 +33,56 @@
    and Niels Moller) (preprint): (pp. 4)
    http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf 
 */
-mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, mp_limb_t a_lo, 
-                                             mp_limb_t n, mp_limb_t ninv)
+mp_limb_t
+n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi, mp_limb_t a_lo,
+                 mp_limb_t n, mp_limb_t ninv)
 {
-   mp_limb_t q0, q1, r, norm;
-   
-   count_leading_zeros(norm, n);
-   n <<= norm;
+    mp_limb_t q0, q1, r, norm;
 
-   /* 
-      we assume a_hi is already reduced
-      first reduce a_hi, a_mi mod n 
-   */
-   {
-	  const mp_limb_t u1 = (a_hi<<norm) + r_shift(a_mi, FLINT_BITS - norm);
-      const mp_limb_t u0 = (a_mi<<norm);
+    count_leading_zeros(norm, n);
+    n <<= norm;
 
-      umul_ppmm(q1, q0, ninv, u1);
-      add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    /* 
+       we assume a_hi is already reduced
+       first reduce a_hi, a_mi mod n 
+     */
+    {
+        const mp_limb_t u1 = (a_hi << norm) + r_shift(a_mi, FLINT_BITS - norm);
+        const mp_limb_t u0 = (a_mi << norm);
 
-      r = (u0 - (q1 + 1)*n);
+        umul_ppmm(q1, q0, ninv, u1);
+        add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-      if (r >= q0) r += n;
+        r = (u0 - (q1 + 1) * n);
 
-      if (r < n)
-         a_mi = (r>>norm);
-      else
-         a_mi = ((r - n)>>norm);
-   }
+        if (r >= q0)
+            r += n;
 
-   /* 
-      now a_mid is reduced mod n
-      so reduce a_mi, a_lo mod n 
-   */
-   {
-	  const mp_limb_t u1 = (a_mi<<norm) + r_shift(a_lo, FLINT_BITS - norm);
-      const mp_limb_t u0 = (a_lo<<norm);
+        if (r < n)
+            a_mi = (r >> norm);
+        else
+            a_mi = ((r - n) >> norm);
+    }
 
-      umul_ppmm(q1, q0, ninv, u1);
-      add_ssaaaa(q1, q0, q1, q0, u1, u0);
+    /* 
+       now a_mid is reduced mod n
+       so reduce a_mi, a_lo mod n 
+     */
+    {
+        const mp_limb_t u1 = (a_mi << norm) + r_shift(a_lo, FLINT_BITS - norm);
+        const mp_limb_t u0 = (a_lo << norm);
 
-      r = (u0 - (q1 + 1)*n);
+        umul_ppmm(q1, q0, ninv, u1);
+        add_ssaaaa(q1, q0, q1, q0, u1, u0);
 
-      if (r >= q0) r += n;
+        r = (u0 - (q1 + 1) * n);
 
-      if (r < n)
-         return (r>>norm);
-      else
-         return ((r - n)>>norm);
-   }
+        if (r >= q0)
+            r += n;
+
+        if (r < n)
+            return (r >> norm);
+        else
+            return ((r - n) >> norm);
+    }
 }
-

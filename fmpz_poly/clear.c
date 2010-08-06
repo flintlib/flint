@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
    
-*****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -29,10 +29,12 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_clear(fmpz_poly_t poly)
+void
+fmpz_poly_clear(fmpz_poly_t poly)
 {
-   long i;
-   for (i = 0; i < poly->alloc; i++) // Clean up any mpz_t's
-		_fmpz_demote(poly->coeffs + i);
-	if (poly->coeffs) free(poly->coeffs); // clean up ordinary coeffs
+    long i;
+    for (i = 0; i < poly->alloc; i++)   /* Clean up any mpz_t's */
+        _fmpz_demote(poly->coeffs + i);
+    if (poly->coeffs)
+        free(poly->coeffs);     /* clean up ordinary coeffs */
 }

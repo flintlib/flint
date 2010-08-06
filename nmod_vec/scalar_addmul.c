@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
@@ -30,19 +30,17 @@
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_addmul(mp_ptr res, mp_srcptr vec, 
-				                  long len, nmod_t mod, mp_limb_t c)
+				             long len, nmod_t mod, mp_limb_t c)
 {
-   long i;
-   
-   if (mod.norm >= FLINT_BITS/2) // addmul will fit in a limb
-   {
-      mpn_addmul_1(res, vec, len, c);
-	  _nmod_vec_reduce(res, res, len, mod);
-   } else // products may take two limbs
-   {
-      mp_limb_t hi, lo;
-	  
-	  for (i = 0; i < len; i++)
-	     NMOD_ADDMUL(res[i], vec[i], c, mod); // hi already reduced mod n
+    if (mod.norm >= FLINT_BITS/2) /* addmul will fit in a limb */
+    {
+        mpn_addmul_1(res, vec, len, c);
+	    _nmod_vec_reduce(res, res, len, mod);
+    }
+    else /* products may take two limbs */
+    {
+        long i;
+        for (i = 0; i < len; i++)
+            NMOD_ADDMUL(res[i], vec[i], c, mod); /* hi already reduced mod n */
    }
 }

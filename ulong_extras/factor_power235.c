@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,13 +16,13 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   Copyright (C) 2009 Thomas Boothby
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2009 Thomas Boothby
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <math.h>
 #include <mpir.h>
@@ -56,7 +56,8 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
 
    if (t & 1) 
    {
-      mp_limb_t y = (mp_limb_t) sqrt((double) n);
+      double x = sqrt((double) n);
+      mp_limb_t y = (mp_limb_t) (x + 0.5);
       if (n == n_pow(y, 2))
       {
          *exp = 2;
@@ -66,7 +67,8 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
     
    if (t & 2) 
    {
-      mp_limb_t y = (mp_limb_t) round(pow((double) n, 1/3.0));
+      double x = pow((double) n, 1.0 / 3.0);
+      mp_limb_t y = (mp_limb_t) (x + 0.5);
       if (n == n_pow(y, 3))
       {
          *exp = 3;
@@ -76,7 +78,8 @@ mp_limb_t n_factor_power235(ulong * exp, mp_limb_t n)
     
    if (t & 4) 
    {
-      mp_limb_t y = (mp_limb_t) round(pow((double) n, 1/5.0));
+      double x = pow((double) n, 1.0 / 5.0);
+      mp_limb_t y = (mp_limb_t) (x + 0.5);
       if (n == n_pow(y, 5))
       {
          *exp = 5;

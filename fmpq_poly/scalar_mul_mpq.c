@@ -100,6 +100,8 @@ void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
 {
+    fmpz_t r, s;
+
     if (mpz_cmp_si(mpq_denref(c), 1) == 0)
     {
         fmpq_poly_scalar_mul_mpz(rop, op, mpq_numref(c));
@@ -115,7 +117,6 @@ void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t
     fmpq_poly_fit_length(rop, op->length);
     _fmpq_poly_set_length(rop, op->length);
     
-    fmpz_t r, s;
     fmpz_init(r);
     fmpz_init(s);
     fmpz_set_mpz(r, mpq_numref(c));

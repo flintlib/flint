@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mulmod2_preinv....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t a, b, d, r1, r2, q, norm, p1, p2, dinv;
+      mp_limb_t a, b, d, r1, r2, q, p1, p2, dinv;
       
       d = n_randtest_not_zero();
       a = n_randint(d);
@@ -52,10 +52,9 @@ int main(void)
       udiv_qrnnd(q, r2, p1, p2, d); 
       
       result = (r1 == r2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("a = %lu, b = %lu, d = %lu, dinv = %lu\n", a, b, d, dinv); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();

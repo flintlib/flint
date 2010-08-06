@@ -35,35 +35,37 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
+
     printf("cmp....");
     fflush(stdout);
 
     fmpq_poly_randinit();
 
-    // Check aliasing
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check aliasing */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        
+
         result = (fmpq_poly_cmp(f, f) == 0);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
             abort();
         }
 
         fmpq_poly_clear(f);
     }
 
-    // Check transitivity, i.e. f <= g <= h implies f <= h, that is 
-    // NOT (f <= g <= h) OR f <= h.
-    for (ulong i = 0; i < 10000UL; i++)
+    /*
+       Check transitivity, i.e. f <= g <= h implies f <= h, that is 
+       NOT (f <= g <= h) OR f <= h
+     */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g, h;
 
@@ -73,18 +75,15 @@ main(void)
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpq_poly_randtest(g, n_randint(100), n_randint(200));
         fmpq_poly_randtest(h, n_randint(100), n_randint(200));
-        
-        result = !(fmpq_poly_cmp(f, g) <= 0) || !(fmpq_poly_cmp(g, h) <= 0) 
-                                             || (fmpq_poly_cmp(f, h) <= 0);
+
+        result = !(fmpq_poly_cmp(f, g) <= 0) || !(fmpq_poly_cmp(g, h) <= 0)
+            || (fmpq_poly_cmp(f, h) <= 0);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
-            fmpq_poly_print(h);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
+            fmpq_poly_print(h), printf("\n");
             abort();
         }
 
@@ -93,8 +92,8 @@ main(void)
         fmpq_poly_clear(h);
     }
 
-    // Check that <, ==, or >
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check that <, ==, or > */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t f, g;
 
@@ -102,17 +101,15 @@ main(void)
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, n_randint(100), n_randint(200));
         fmpq_poly_randtest(g, n_randint(100), n_randint(200));
-        
-        result = (fmpq_poly_cmp(f, g) < 0) || (fmpq_poly_equal(f, g)) 
-                                           || (fmpq_poly_cmp(f, g) > 0);
-        
+
+        result = (fmpq_poly_cmp(f, g) < 0) || (fmpq_poly_equal(f, g))
+            || (fmpq_poly_cmp(f, g) > 0);
+
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f);
-            printf("\n");
-            fmpq_poly_print(g);
-            printf("\n");
+            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_print(g), printf("\n");
             printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
             abort();
         }

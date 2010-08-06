@@ -41,8 +41,8 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (len1--; len1 != -1 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
-    for (len2--; len2 != -1 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    for (len1--; len1 >= 0 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
+    for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
     len1++;
     len2++;
     if (!len1 | !len2)
@@ -82,24 +82,24 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
     if (poly1 == poly2)
     {
-        arr1 = (mp_limb_t *) calloc(limbs1, sizeof(mp_limb_t));
+        arr1 = (mp_ptr) calloc(limbs1, sizeof(mp_limb_t));
         arr2 = arr1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
     }
     else
     {
-        arr1 = (mp_limb_t *) calloc(limbs1 + limbs2, sizeof(mp_limb_t));
+        arr1 = (mp_ptr) calloc(limbs1 + limbs2, sizeof(mp_limb_t));
         arr2 = arr1 + limbs1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
         _fmpz_poly_bit_pack(arr2, poly2, len2, bits, neg2);
     }
 
-    arr3 = (mp_limb_t *) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
+    arr3 = (mp_ptr) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
     if (poly1 != poly2)
         mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
-         mpn_mul_n(arr3, arr1, arr1, limbs1);
+        mpn_mul_n(arr3, arr1, arr1, limbs1);
 
     if (sign)
         _fmpz_poly_bit_unpack(res, trunc, arr3, bits, neg1 ^ neg2);
@@ -118,13 +118,13 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     const long len1 = poly1->length;
     const long len2 = poly2->length;
 
-    if (len1 == 0 | len2 == 0 | trunc == 0)
+    if (len1 == 0 || len2 == 0 || trunc == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (res == poly1 | res == poly2)
+    if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
         fmpz_poly_init(t);
@@ -135,7 +135,7 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     }
 
     fmpz_poly_fit_length(res, trunc);
-    
+
     if (len1 >= len2)
         _fmpz_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
                              poly2->coeffs, len2, trunc);

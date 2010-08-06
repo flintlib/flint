@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,13 +31,13 @@
 
 int main(void)
 {
-   int result;
+   int i, result;
    printf("mulmod_precomp....");
    fflush(stdout);
 
-   for (ulong i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t a, b, d, r1, r2, norm, p1, p2, dinv;
+      mp_limb_t a, b, d, r1, r2, p1, p2, dinv;
       double dpre;
 
       mp_limb_t bits = n_randint(FLINT_D_BITS) + 1;
@@ -54,10 +54,9 @@ int main(void)
       r2 = n_ll_mod_preinv(p1, p2, d, dinv);
 
       result = (r1 == r2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("a = %lu, b = %lu, d = %lu, dinv = %f\n", a, b, d, dpre); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();

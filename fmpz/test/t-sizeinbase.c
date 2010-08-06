@@ -35,18 +35,17 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("sizeinbase....");
     fflush(stdout);
 
     fmpz_randinit();
 
-    for (ulong i = 0; i < 100000UL; i++)
+    for (i = 0; i < 100000; i++)
     {
         fmpz_t a;
         mpz_t b;
         int base;
-        int j;
         size_t r1, r2;
 
         fmpz_init(a);
@@ -62,10 +61,10 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("b = %Zd\n", b);
             printf("base = %d\n", base);
-            printf("r1 = %zu\n, r2 = %zu\n", r1, r2);
+            printf("r1 = %lu\n, r2 = %lu\n", (ulong) r1, (ulong) r2);
             abort();
         }
 
@@ -74,7 +73,6 @@ main(void)
     }
 
     fmpz_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

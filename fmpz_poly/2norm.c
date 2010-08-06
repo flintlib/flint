@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -28,7 +28,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
+void
+fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 {
     long i;
     fmpz_zero(res);
@@ -36,4 +37,3 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
         fmpz_addmul(res, poly->coeffs + i, poly->coeffs + i);
     fmpz_sqrt(res, res);
 }
-

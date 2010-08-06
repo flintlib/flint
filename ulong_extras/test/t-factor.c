@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,11 +31,11 @@
 
 int main(void)
 {
-   int result;
+   int i, j, result;
    printf("factor....");
    fflush(stdout);
  
-   for (ulong i = 0; i < 10000UL; i++) /* Test random numbers */
+   for (i = 0; i < 10000; i++) /* Test random numbers */
    {
       mp_limb_t n1, n2;
       n_factor_t factors;
@@ -47,16 +47,15 @@ int main(void)
       
       n2 = 1UL;
 
-      for (ulong i = 0; i < factors.num; i++)
+      for (j = 0; j < factors.num; j++)
       {
-         n2 *= n_pow(factors.p[i], factors.exp[i]);
+         n2 *= n_pow(factors.p[j], factors.exp[j]);
       }
 
       result = (n1 == n2);
-
       if (!result)
       {
-         printf("FAIL\n");
+         printf("FAIL:\n");
          printf("n1 = %lu, n2 = %lu\n", n1, n2); 
          abort();
       }

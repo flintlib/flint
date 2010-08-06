@@ -34,24 +34,24 @@
 int
 main(void)
 {
-    int result;
+    int i, result;
     printf("max_bits....");
     fflush(stdout);
 
     _fmpz_vec_randinit();
 
-    for (ulong i = 0; i < 10000UL; i++)
+    for (i = 0; i < 10000; i++)
     {
-        fmpz * a;
-        ulong length, bits, bits2;
+        fmpz *a;
+        long len, bits, bits2;
 
-        length = n_randint(100);
+        len = n_randint(100);
 
-        a = _fmpz_vec_init(length);
+        a = _fmpz_vec_init(len);
         bits = n_randint(200);
-        _fmpz_vec_randtest(a, length, bits);
+        _fmpz_vec_randtest(a, len, bits);
 
-        bits2 = _fmpz_vec_max_bits(a, length);
+        bits2 = _fmpz_vec_max_bits(a, len);
 
         result = (bits >= FLINT_ABS(bits2));
         if (!result)
@@ -61,11 +61,10 @@ main(void)
             abort();
         }
 
-        _fmpz_vec_clear(a, length);
+        _fmpz_vec_clear(a, len);
     }
 
     _fmpz_vec_randclear();
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

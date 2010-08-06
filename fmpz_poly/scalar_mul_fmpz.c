@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2008, 2009 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -29,19 +29,18 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, const fmpz_t x)
+void
+fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                          const fmpz_t x)
 {
-	// either scalar or input poly is zero
-	if ((*x == 0) || (poly2->length == 0)) 
-	{
-	    fmpz_poly_zero(poly1);
-		return;
-	}
-		
-	fmpz_poly_fit_length(poly1, poly2->length);
-	
-	_fmpz_vec_scalar_mul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
+    /* Either scalar or input poly is zero */
+    if ((*x == 0) || (poly2->length == 0))
+    {
+        fmpz_poly_zero(poly1);
+        return;
+    }
 
-	_fmpz_poly_set_length(poly1, poly2->length);
+    fmpz_poly_fit_length(poly1, poly2->length);
+    _fmpz_vec_scalar_mul_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
+    _fmpz_poly_set_length(poly1, poly2->length);
 }
-

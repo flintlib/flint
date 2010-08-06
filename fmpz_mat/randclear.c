@@ -27,7 +27,8 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_mat_randclear(void)
+void
+fmpz_mat_randclear(void)
 {
-   fmpz_randclear();
+    fmpz_randclear();
 }

@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
-*****************************************************************************/
+******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,51 +31,54 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-   int result;
-   printf("mulhigh_n....");
-   fflush(stdout);
-   
-   // compare with left truncated product of a and b
-   for (ulong i = 0; i < 2000UL; i++) 
-   {
-      nmod_poly_t a, b, c;
-      ulong j;
+    int i, result;
+    printf("mulhigh_n....");
+    fflush(stdout);
 
-	  mp_limb_t m = n_randtest_not_zero();
-      
-      nmod_poly_init(a, m);
-      nmod_poly_init(b, m);
-      nmod_poly_init(c, m);
-	  ulong n = n_randint(50);
-      nmod_poly_randtest(b, n);
-      nmod_poly_randtest(c, n);
-   
-	  nmod_poly_mulhigh_n(a, b, c, n);
-      nmod_poly_mul(b, b, c);
-      for (j = 0; j + 1 < n; j++)
-	  {
-		 if (j < a->length) a->coeffs[j] = 0;
-		 if (j < b->length) b->coeffs[j] = 0;
-	  }
-      _nmod_poly_normalise(a);
-      _nmod_poly_normalise(b);
+    /* Compare with left truncated product of a and b */
+    for (i = 0; i < 2000; i++)
+    {
+        nmod_poly_t a, b, c;
+        ulong j, n;
 
-      result = (nmod_poly_equal(a, b));
-      if (!result)
-      {
-         printf("Error:\n");
-         nmod_poly_print(a); printf("\n\n");
-         nmod_poly_print(b); printf("\n\n");
-         abort();
-      }
+        mp_limb_t m = n_randtest_not_zero();
 
-      nmod_poly_clear(a);
-      nmod_poly_clear(b);
-      nmod_poly_clear(c);
-   }
+        nmod_poly_init(a, m);
+        nmod_poly_init(b, m);
+        nmod_poly_init(c, m);
+        n = n_randint(50);
+        nmod_poly_randtest(b, n);
+        nmod_poly_randtest(c, n);
 
-   printf("PASS\n");
-   return 0;
+        nmod_poly_mulhigh_n(a, b, c, n);
+        nmod_poly_mul(b, b, c);
+        for (j = 0; j + 1 < n; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < b->length)
+                b->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(b);
+
+        result = (nmod_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(c);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

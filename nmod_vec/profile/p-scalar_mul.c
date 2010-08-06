@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- (C) 2010 William Hart
+    Copyright 2010 William Hart
 
 ******************************************************************************/
 
@@ -40,27 +40,25 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t n, c;
    nmod_t mod;
-
    info_t * info = (info_t *) arg;
-
    mp_bitcnt_t bits = info->bits;
-   ulong length = info->length;
-
+   long length = info->length;
+   long i, j;
    mp_ptr vec = nmod_vec_init(length);
    mp_ptr vec2 = nmod_vec_init(length);
      
-   for (long i = 0; i < count; i++)
+   for (i = 0; i < count; i++)
    {
       n = n_randbits(bits);
       if (n == 0UL) n++;
       c = n_randint(n);
-      for (mp_size_t j = 0; j < length; j++)
+      for (j = 0; j < length; j++)
          vec[j] = n_randint(n);
       
 	  nmod_init(&mod, n);
 
       prof_start();
-      for (long j = 0; j < 30; j++)
+      for (j = 0; j < 30; j++)
 		 _nmod_vec_scalar_mul(vec2, vec, length, mod, c);
 	  prof_stop();
    }
@@ -72,10 +70,10 @@ void sample(void * arg, ulong count)
 int main(void)
 {
    double min1, min2, max;
-   
    info_t info;
+   mp_bitcnt_t i;
 
-   for (mp_bitcnt_t i = 2; i <= FLINT_BITS; i++)
+   for (i = 2; i <= FLINT_BITS; i++)
    {
       info.bits = i;
 

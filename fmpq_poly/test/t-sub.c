@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -35,119 +33,108 @@
 #include "ulong_extras.h"
 
 int
-main (void)
+main(void)
 {
-    int result;
+    int i, result;
 
-    printf ("sub....");
-    fflush (stdout);
+    printf("sub....");
+    fflush(stdout);
 
-    fmpq_poly_randinit ();
+    fmpq_poly_randinit();
 
-    // Check a - b = a + neg(b)
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check a - b = a + neg(b) */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c, d;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_init (c);
-        fmpq_poly_init (d);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
-        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+        fmpq_poly_init(d);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(b, n_randint(100), n_randint(200));
 
-        fmpq_poly_sub (c, a, b);
-        fmpq_poly_neg (b, b);
-        fmpq_poly_add (d, a, b);
+        fmpq_poly_sub(c, a, b);
+        fmpq_poly_neg(b, b);
+        fmpq_poly_add(d, a, b);
 
-        result = (fmpq_poly_equal (d, d));
+        result = (fmpq_poly_equal(d, d));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
-            fmpq_poly_print (d);
-            printf ("\n\n");
-            abort ();
+            printf("FAIL:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_print(d), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
-        fmpq_poly_clear (c);
-        fmpq_poly_clear (d);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
+        fmpq_poly_clear(d);
     }
 
-    // Check aliasing of a and c
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check aliasing of a and c */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_init (c);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
-        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(b, n_randint(100), n_randint(200));
 
-        fmpq_poly_sub (c, a, b);
-        fmpq_poly_sub (a, a, b);
+        fmpq_poly_sub(c, a, b);
+        fmpq_poly_sub(a, a, b);
 
-        result = (fmpq_poly_equal (a, c));
+        result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
-            abort ();
+            printf("FAIL:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
-        fmpq_poly_clear (c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
     }
 
-    // Check aliasing of b and c
-    for (ulong i = 0; i < 10000UL; i++)
+    /* Check aliasing of b and c */
+    for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
 
-        fmpq_poly_init (a);
-        fmpq_poly_init (b);
-        fmpq_poly_init (c);
-        fmpq_poly_randtest (a, n_randint (100), n_randint (200));
-        fmpq_poly_randtest (b, n_randint (100), n_randint (200));
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(b, n_randint(100), n_randint(200));
 
-        fmpq_poly_sub (c, a, b);
-        fmpq_poly_sub (b, a, b);
+        fmpq_poly_sub(c, a, b);
+        fmpq_poly_sub(b, a, b);
 
-        result = (fmpq_poly_equal (b, c));
+        result = (fmpq_poly_equal(b, c));
         if (!result)
         {
-            printf ("Error:\n");
-            fmpq_poly_print (a);
-            printf ("\n\n");
-            fmpq_poly_print (b);
-            printf ("\n\n");
-            fmpq_poly_print (c);
-            printf ("\n\n");
-            abort ();
+            printf("FAIL:\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            abort();
         }
 
-        fmpq_poly_clear (a);
-        fmpq_poly_clear (b);
-        fmpq_poly_clear (c);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear ();
-
-    _fmpz_cleanup ();
-    printf ("PASS\n");
+    fmpq_poly_randclear();
+    _fmpz_cleanup();
+    printf("PASS\n");
     return 0;
 }

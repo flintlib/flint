@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,12 +16,12 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
-/****************************************************************************
+=============================================================================*/
+/******************************************************************************
 
-   Copyright (C) 2010 William Hart
-   
-*****************************************************************************/
+    Copyright (C) 2010 William Hart
+
+******************************************************************************/
 
 #include <mpir.h>
 #include <mpfr.h>
@@ -29,8 +29,9 @@
 #include "mpfr_vec.h"
 #include "mpfr_poly.h"
 
-void mpfr_poly_clear(mpfr_poly_t poly)
+void
+mpfr_poly_clear(mpfr_poly_t poly)
 {
-   if (poly->coeffs)
-      _mpfr_vec_clear(poly->coeffs, poly->alloc);
+    if (poly->coeffs)
+        _mpfr_vec_clear(poly->coeffs, poly->alloc);
 }

@@ -79,7 +79,9 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    if (res == poly2 | res == poly1)
+    long len;
+    
+    if (res == poly2 || res == poly1)
     {
         fmpq_poly_t copy;
         fmpq_poly_init(copy);
@@ -89,13 +91,13 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         return;
     }
     
-    if (poly1->length == 0 | poly2->length == 0)
+    if (poly1->length == 0 || poly2->length == 0)
     {
         fmpq_poly_zero(res);
         return;
     }
     
-    long len = poly1->length + poly2->length - 1;
+    len = poly1->length + poly2->length - 1;
     fmpq_poly_fit_length(res, len);
     
     _fmpq_poly_mul(res->coeffs, res->den, 
