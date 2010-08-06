@@ -50,6 +50,13 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
         _fmpz_vec_zero(res, trunc);
         return;
     }
+
+    if (trunc > len1 + len2 - 1)
+    {
+       _fmpz_vec_zero(res + len1 + len2 - 1, trunc - len1 - len2 + 1);
+       trunc = len1 + len2 - 1;
+    }
+    
     if (neg1 >= 0)
         neg1 = 0;
     if (neg2 >= 0)
@@ -100,7 +107,7 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
         mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
         mpn_mul_n(arr3, arr1, arr1, limbs1);
-
+    
     if (sign)
         _fmpz_poly_bit_unpack(res, trunc, arr3, bits, neg1 ^ neg2);
     else
