@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -30,31 +31,70 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
 {
-    if (e < 5UL)
-        _fmpz_poly_pow_small(res, poly, len, e);
-    else
-        _fmpz_poly_pow_binexp(res, poly, len, e);
+    ulong i, f;
+    fmpz_t a, b, c;
+    
+    *a = 1L;
+    *b = 1L;
+    *c = 1L;
+    
+    fmpz_set_ui(res, 1);
+    fmpz_set_ui(res + e, 1);
+    
+    for (i = 1UL, f = e - 1UL; i <= (e - 1UL) >> 1; i++, f--)
+    {
+        fmpz_mul(a, a, poly);
+        fmpz_mul(b, b, poly + 1);
+        fmpz_mul_ui(c, c, f + 1UL);
+        fmpz_divexact_ui(c, c, i);
+        
+        fmpz_mul(res + i, b, c);
+        fmpz_mul(res + f, a, c);
+    }
+    
+    if ((e & 1UL) == 0UL)
+    {
+        fmpz_mul(a, a, poly);
+        fmpz_mul(b, b, poly + 1);
+        fmpz_mul_ui(c, c, f + 1UL);
+        fmpz_divexact_ui(c, c, i);
+        
+        fmpz_mul(res + i, b, c);
+        fmpz_mul(res + i, res + i, a);
+        i++, f--;
+    }
+    
+    for ( ; i <= e; i++, f--)
+    {
+        fmpz_mul(a, a, poly);
+        fmpz_mul(b, b, poly + 1);
+        
+        fmpz_mul(res + i, res + i, b);
+        fmpz_mul(res + f, res + f, a);
+    }
+    
+    fmpz_clear(a);
+    fmpz_clear(b);
+    fmpz_clear(c);
 }
 
 void
-fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     const long len = poly->length;
     long rlen;
 
-    if ((len < 2) | (e < 3UL))
+    if (len != 2)
     {
-        if (len == 0)
-            fmpz_poly_zero(res);
-        else if (len == 1)
-        {
-            fmpz_poly_fit_length(res, 1);
-            fmpz_pow_ui(res->coeffs, poly->coeffs, e);
-            _fmpz_poly_set_length(res, 1);
-        }
-        else if (e == 0UL)
+        printf("Exception: poly->length not equal to 2 in fmpz_poly_pow_binomial\n");
+        abort();
+    }
+
+    if (e < 3UL)
+    {
+        if (e == 0UL)
             fmpz_poly_set_ui(res, 1UL);
         else if (e == 1UL)
             fmpz_poly_set(res, poly);
@@ -62,21 +102,21 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_poly_mul(res, poly, poly);
         return;
     }
-
-    rlen = (long) e * (len - 1) + 1;
+    
+    rlen = (long) e + 1;
 
     if (res != poly)
     {
         fmpz_poly_fit_length(res, rlen);
         _fmpz_poly_set_length(res, rlen);
-        _fmpz_poly_pow(res->coeffs, poly->coeffs, len, e);
+        _fmpz_poly_pow_binomial(res->coeffs, poly->coeffs, e);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, rlen);
         _fmpz_poly_set_length(t, rlen);
-        _fmpz_poly_pow(t->coeffs, poly->coeffs, len, e);
+        _fmpz_poly_pow_binomial(t->coeffs, poly->coeffs, e);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }

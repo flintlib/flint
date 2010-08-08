@@ -492,24 +492,56 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 *******************************************************************************
 
+void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
+
+    Computes res = poly^e when poly is of length 2, using binomial expansion. 
+    Assumes e > 0.  Does not support aliasing.
+
+void fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+
+    Computes res = poly^e when poly is of length 2, using binomial expansion.
+    If the length of poly is not 2, raises an exception and aborts.
+
+void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, 
+                                                          const int * a, int n)
+
+    Given a star chain 1 = a[0] < a[1] < ... < a[n] = e computes res = poly^e.
+    
+    A start chain is an addition chain 1 = a[0] < a[1] < ... < a[n] such that 
+    a[i] = a[i-1] + a[j] with j < i for all i > 0.
+    
+    Assumes that e > 2 (equivalently n > 1) and len > 0.  Does not support 
+    aliasing.
+
+void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+    
+    Computes res = poly^e using addition chains whenever 0 <= e <= 148.  
+    If e > 148, raises an exception and aborts.
+
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets res = poly^e using binary exponentiation.
+    Sets res = poly^e using left-to-right binary exponentiation, see 
+    D. Knuth, ``The Art of Computer Programming Vol. 2'', Seminumerical 
+    algorithms, p. 461.
     
-    Assumes that len, e > 0.  Assumes that res is an array of length 
-    at least e * (len - 1) + 1.  Allows aliasing.
+    Assumes that len > 0, e > 1.  Assumes that res is an array of length 
+    at least e * (len - 1) + 1.  Does not support aliasing.
+
+void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+
+    Computes res = poly^e using the binary exponentiation algorithm.  
+    If poly is zero, returns zero, so that in particular 0^0 = 0.
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
 
     Sets res = poly^e whenever 0 <= e <= 4.
     
-    Assumes that len > 0, and that res is an array of length at least 
-    e * (len - 1) + 1.  Allows aliasing.
+    Assumes that len > 0 and that res is an array of length at least 
+    e * (len - 1) + 1.  Does not support aliasing.
 
 void _fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Sets res = poly^e, assuming that e, len > 0.  Supports aliasing of 
-    res and poly.
+    Sets res = poly^e, assuming that e, len > 0.  Does not support aliasing.
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 

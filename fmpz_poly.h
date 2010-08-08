@@ -270,7 +270,17 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /*  Powering  ****************************************************************/
 
+void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e);
+
+void fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e);
+
+void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
+void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, const int * a, int n);
+
+void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e);
 
