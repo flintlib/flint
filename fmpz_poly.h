@@ -270,6 +270,10 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /*  Powering  ****************************************************************/
 
+void _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e);
+
+void fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
 void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e);
 
 void fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);

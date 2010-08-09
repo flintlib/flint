@@ -36,24 +36,25 @@
 #define lenhi  50
 #define lenh   1
 #define bits   16
-#define elo    127
-#define ehi    136
-#define eh     1
+#define elo    10
+#define ehi    140
+#define eh     10
 #define cpumin 100
 
 int
 main(void)
 {
     int len, e;
-    fmpz_poly_t f, g[2];
+    fmpz_poly_t f, g[3];
     
     fmpz_poly_randinit();
     
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
     fmpz_poly_init2(g[1], ehi * (lenhi - 1) + 1);
+    fmpz_poly_init2(g[2], ehi * (lenhi - 1) + 1);
     
-    printf("| len | exp | binexp | addchains |\n");
+    printf("| len | exp | binexp | addchains | multinomial |\n");
     
     for (len = lenlo; len <= lenhi; len += lenh)
     {
@@ -72,9 +73,9 @@ main(void)
         
         for (e = elo; e <= ehi; e += eh)
         {
-            timeit_t t[2];
+            timeit_t t[3];
             int l, loops = 1, r = 0;
-            long s[2] = {0, 0};
+            long s[3] = {0, 0, 0};
             
           loop:
             
@@ -88,7 +89,12 @@ main(void)
                 fmpz_poly_pow_addchains(g[1], f, e);
             timeit_stop(t[1]);
             
-            if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin)
+            timeit_start(t[2]);
+            for (l = 0; l < loops; l++)
+                fmpz_poly_pow_multinomial(g[2], f, e);
+            timeit_stop(t[2]);
+            
+            if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin || t[2]->cpu <= cpumin)
             {
                 loops *= 10;
                 goto loop;
@@ -96,15 +102,17 @@ main(void)
             
             s[0] += t[0]->cpu;
             s[1] += t[1]->cpu;
+            s[2] += t[2]->cpu;
             r    += loops;
             
-            printf("%d %d %lf %lf\n", len, e, s[0] / (double) r, s[1] / (double) r);
+            printf("%d %d %lf %lf %lf\n", len, e, s[0] / (double) r, s[1] / (double) r, s[2] / (double) r);
         }
     }
     
     fmpz_poly_clear(f);
     fmpz_poly_clear(g[0]);
     fmpz_poly_clear(g[1]);
+    fmpz_poly_clear(g[2]);
 
     fmpz_poly_randclear();
 }

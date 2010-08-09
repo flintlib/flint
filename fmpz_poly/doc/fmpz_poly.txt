@@ -492,6 +492,38 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 *******************************************************************************
 
+void _fmpz_poly_pow_multinomial(fmpz * res, 
+                                          const fmpz * poly, long len, ulong e)
+
+    Comuputes res = poly^e.  This uses the J.C.P. Miller pure recurrence as 
+    follows:
+    
+    If low is the index of the lowest non-zero coefficient in poly, as a first 
+    step this method zeros out the lowest low times e coefficients of res.  
+    The recurrence above is then used to compute the remaining coefficients.
+    
+    Assumes len > 0, e > 0.  Does not support aliasing.
+
+void fmpz_poly_pow_multinomial(fmpz_poly_t res, 
+                                               const fmpz_poly_t poly, ulong e)
+
+    Computes res = poly^e using a generalisation of binomial expansion called 
+    the J.C.P. Miller pure recurrence.   If poly is zero, returns zero, so 
+    that in particular 0^0 = 0.
+    
+    The formal statement of the recurrence is as follows.  Write the input 
+    polynomial as $P(t) = p_0 + p_1 t + \dotsb + p_m t^m$ with $p_0 \neq 0$ 
+    and let $P(t)^n = a(n, 0) + a(n, 1) t + \dotsb + a(n, mn) t^{mn}$.  Then 
+    $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
+    $a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i)$.
+    
+    [1] D. Knuth, The Art of Computer Programming Vol. 2, Seminumerical 
+    Algorithm, Third Edition (Reading, Massachusetts: Addison-Wesley, 1997)
+    
+    [2] D. Zeilberger, The J.C.P. Miller Recurrence for Exponentiating a 
+    Polynomial, and its q-Analog, Journal of Difference Equations and 
+    Applications, 1995, Vol. 1, pp. 57--60
+
 void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
 
     Computes res = poly^e when poly is of length 2, using binomial expansion. 
