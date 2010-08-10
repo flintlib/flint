@@ -70,10 +70,10 @@ _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
             else
                 fmpz_submul_ui(res + k, t, - ((ulong) u));
         }
-        fmpz_mul_si(d, P, k);
+        fmpz_add(d, d, P);
         fmpz_divexact(res + k, res + k, d);
     }
- 
+    
     fmpz_clear(d);
     fmpz_clear(t);
 }
