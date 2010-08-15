@@ -34,8 +34,17 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
 {
     if (e < 5UL)
         _fmpz_poly_pow_small(res, poly, len, e);
+    else if (len == 2)
+        _fmpz_poly_pow_binomial(res, poly, e);
     else
-        _fmpz_poly_pow_binexp(res, poly, len, e);
+    {
+        ulong limbs = (ulong) _fmpz_vec_max_limbs(poly, len);
+        
+        if (limbs < (((3UL * e) >> 1) + 150UL) / (ulong) len)
+            _fmpz_poly_pow_multinomial(res, poly, len, e);
+        else
+            _fmpz_poly_pow_binexp(res, poly, len, e);
+    }
 }
 
 void

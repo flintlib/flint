@@ -47,41 +47,18 @@
 #define rows     ((bitshi + 1 - bitslo + (bitsh - 1)) / bitsh)
 #define height   ((exphi + 1 - explo + (exph - 1)) / exph)
 #define cpumin   10
-#define nalgs    3
 #define img      1
-/* #define imgname  "out" */
-
-/*
-   Write a binar 24-bit ppm image.
- */
-int write_rgb_ppm(const char* file_name, unsigned char* pixels, 
-                  unsigned int w, unsigned int h)
-{
-    FILE* file = fopen(file_name, "wb");
-    if (file == NULL)
-        return -1;
-    fprintf(file, "P6\n%d %d\n255\n", w, h);
-    fwrite(pixels, sizeof(unsigned char), w * h * 3, file);
-    fclose(file);
-    return 0;
-}
 
 int
 main(void)
 {
     int k, exp;
-    int X[rows][cols];
-    double T[rows][cols][nalgs];
-    unsigned char PIXELS[3 * rows * cols * sizeof(unsigned char)];
-    
-    fmpz_poly_t f, g[3];
+    fmpz_poly_t f, g;
     
     fmpz_poly_randinit();
     
     fmpz_poly_init2(f, lenhi);
-    fmpz_poly_init2(g[0], exphi * (lenhi - 1) + 1);
-    fmpz_poly_init2(g[1], exphi * (lenhi - 1) + 1);
-    fmpz_poly_init2(g[2], exphi * (lenhi - 1) + 1);
+    fmpz_poly_init2(g, exphi * (lenhi - 1) + 1);
     
     printf("Comparative timing for fmpz_poly_pow\n");
     printf("\n");
@@ -89,7 +66,7 @@ main(void)
     printf("Bit size:  [%d..%d] with step size %d\n", bitslo, bitshi, bitsh);
     printf("Exponents: [%d..%d] with step size %d\n", explo, exphi, exph);
     printf("\n");
-    printf("exp len bits (Binary exponentiation) (Addition chains) Multinomials\n");
+    printf("exp len bits (Binary exponentiation) Multinomials\n");
     printf("\n");
     
     for (exp = explo, k = 0; exp <= exphi; exp += exph, k++)
@@ -101,9 +78,10 @@ main(void)
             for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
             {
             
-                timeit_t t[nalgs];
+                timeit_t t[2];
                 int l, loops = 1, r = 0;
-                long s[nalgs] = {0L, 0L, 0L};
+                long s[2] = {0L, 0L};
+                double T[2];
             
                 /*
                    Construct random polynomial f of length len
@@ -125,20 +103,15 @@ main(void)
                 
                 timeit_start(t[0]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_pow_binexp(g[0], f, exp);
+                    fmpz_poly_pow_binexp(g, f, exp);
                 timeit_stop(t[0]);
 
                 timeit_start(t[1]);
                 for (l = 0; l < loops; l++)
-                    fmpz_poly_pow_addchains(g[1], f, exp);
+                    fmpz_poly_pow_multinomial(g, f, exp);
                 timeit_stop(t[1]);
                 
-                timeit_start(t[2]);
-                for (l = 0; l < loops; l++)
-                    fmpz_poly_pow_multinomial(g[2], f, exp);
-                timeit_stop(t[2]);
-                
-                if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin || t[2]->cpu <= cpumin)
+                if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin)
                 {
                     loops *= 10;
                     goto loop;
@@ -146,71 +119,19 @@ main(void)
                 
                 s[0] += t[0]->cpu;
                 s[1] += t[1]->cpu;
-                s[2] += t[2]->cpu;
                 r    += loops;
                 
-                T[i][j][0] = s[0] / (double) r;
-                T[i][j][1] = s[1] / (double) r;
-                T[i][j][2] = s[2] / (double) r;
+                T[0] = s[0] / (double) r;
+                T[1] = s[1] / (double) r;
                 
-                if (s[0] <= s[1] && s[0] <= s[2])
-                    X[i][j] = 0;
-                else if (s[1] <= s[2])
-                    X[i][j] = 1;
-                else
-                    X[i][j] = 2;
+                printf("%d %d %d %f %f\n", exp, len, bits, T[0], T[1]);
+                fflush(stdout);
             }
         }
-        
-        /*
-           Print raw data
-         */
-        for (i = 0, len = lenlo; i < rows; i++, len += lenh)
-        {
-            for (j = 0, bits = bitslo; j < cols; j++, bits += bitsh)
-            {
-                printf("%d %d %d %f %f %f\n", exp, len, bits, 
-                           T[i][j][0], T[i][j][1], T[i][j][2]);
-            }
-        }
-
-        /*
-           Print image
-         */
-        if (img)
-        {
-            int c = 0;
-            char * fname = (char *) malloc(20 * sizeof(char));
-            for (i = 0; i < rows; i++)
-            {
-                for (j = 0; j < cols; j++)
-                {
-                    double max = DBL_MIN, v[nalgs];
-                    int m;
-                    for (m = 0; m < nalgs; m++)
-                    {
-                        v[m] = T[i][j][m] - T[i][j][X[i][j]];
-                        if (v[m] > max)
-                            max = v[m];
-                    }
-                    for (m = 0; m < nalgs; m++)
-                    {
-                        v[m] = (max - v[m]) / max;
-                        PIXELS[c++] = (unsigned char) (v[m] * 255);
-                    }
-                }
-            }
-            sprintf(fname, "out_%d.ppm", exp);
-            c = write_rgb_ppm(fname, PIXELS, cols, rows);
-            free(fname);
-        }
-        
     }
     
     fmpz_poly_clear(f);
-    fmpz_poly_clear(g[0]);
-    fmpz_poly_clear(g[1]);
-    fmpz_poly_clear(g[2]);
+    fmpz_poly_clear(g);
 
     fmpz_poly_randclear();
 }
