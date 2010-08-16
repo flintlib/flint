@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -105,8 +106,10 @@ mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
 /*
     Set result to the product of the given factors, return the
     length of the result. It is assumed that no factors are zero.
+    bits must be set to some bound on the bit size of the entries
+    in factors. If no bound is known, simply use FLINT_BITS.
 */
-mp_size_t mpn_prod_limbs(mp_limb_t *result, const mp_limb_t * factors,
+mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
     mp_size_t n, ulong bits)
 {
     mp_size_t len, limbs;
