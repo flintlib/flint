@@ -32,7 +32,7 @@
 
 int main(void)
 {
-    int k;
+    ulong i, k;
     fmpz_t x;
     fmpz_t y;
 
@@ -43,19 +43,19 @@ int main(void)
     fmpz_init(y);
     fmpz_set_ui(y, 1);
 
-    for (k=0; k<2000; k++)
+    for (k = 0; k < 10000; k++)
     {
-        fmpz_primorial(x, k);
-        if (n_is_prime(k))
-            fmpz_mul_ui(y, y, k);
-        if (!fmpz_equal(x, y))
-        {
-            printf("FAIL:\n");
-            printf("primorial of %d disagrees with direct product\n", k); 
-            fmpz_print(x);
-            printf("\n");
-            abort();
-        }
+       fmpz_primorial(x, k);
+       if (n_is_prime(k))
+          fmpz_mul_ui(y, y, k);
+       if (!fmpz_equal(x, y))
+       {
+          printf("FAIL:\n");
+          printf("primorial of %lu disagrees with direct product\n", k); 
+          fmpz_print(x);
+          printf("\n");
+          abort();
+       }
     }
 
     printf("PASS\n");

@@ -51,7 +51,7 @@ const ulong ULONG_PRIMORIALS[] =
 
 #define PROD_LIMBS_DIRECT_CUTOFF 50
 
-mp_size_t mpn_prod_limbs_direct(mp_limb_t *result, const mp_limb_t *factors,
+mp_size_t mpn_prod_limbs_direct(mp_limb_t * result, const mp_limb_t * factors,
     mp_size_t n)
 {
     mp_size_t k, len;
@@ -75,53 +75,59 @@ mp_size_t mpn_prod_limbs_direct(mp_limb_t *result, const mp_limb_t *factors,
     return len;
 }
 
-mp_size_t mpn_prod_limbs_balanced(mp_limb_t *result, mp_limb_t *scratch,
-                             const mp_limb_t *factors, mp_size_t n)
+mp_size_t mpn_prod_limbs_balanced(mp_limb_t * result, mp_limb_t * scratch,
+                             const mp_limb_t * factors, mp_size_t n, ulong bits)
 {
     mp_size_t an, bn, alen, blen, len;
     mp_limb_t top;
+
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
-    {
         return mpn_prod_limbs_direct(result, factors, n);
-    }
+
     an = n/2;
-    bn = n-an;
-    alen = mpn_prod_limbs_balanced(result, scratch, factors, an);
-    blen = mpn_prod_limbs_balanced(result+an, scratch+an, factors+an, bn);
+    bn = n - an;
+    
+    alen = mpn_prod_limbs_balanced(scratch, result, factors, an, bits);
+    blen = mpn_prod_limbs_balanced(scratch + alen, result, factors + an, bn, bits);
     len = alen + blen;
+
     if (alen <= blen)
-        top = mpn_mul(scratch, result+an, blen, result, alen);
+        top = mpn_mul(result, scratch + alen, blen, scratch, alen);
     else
-        top = mpn_mul(scratch, result, alen, result+an, blen);
+        top = mpn_mul(result, scratch, alen, scratch + alen, blen);
+
     if (!top)
         len--;
-    mpn_copyi(result, scratch, len);
+    
     return len;
 }
 
 /*
     Set result to the product of the given factors, return the
-    length of the result. The result must have room for at least n limbs,
-    even if the actual product is smaller. It is assumed that no factors
-    are zero.
+    length of the result. It is assumed that no factors are zero.
 */
-mp_size_t mpn_prod_limbs(mp_limb_t *result, const mp_limb_t *factors,
-    mp_size_t n)
+mp_size_t mpn_prod_limbs(mp_limb_t *result, const mp_limb_t * factors,
+    mp_size_t n, ulong bits)
 {
-    mp_size_t len;
-    mp_limb_t *scratch;
+    mp_size_t len, limbs;
+    mp_limb_t * scratch;
+    
     if (n < PROD_LIMBS_DIRECT_CUTOFF)
         return mpn_prod_limbs_direct(result, factors, n);
-    scratch = malloc(sizeof(mp_limb_t) * n);
-    len = mpn_prod_limbs_balanced(result, scratch, factors, n);
+
+    limbs = (n * bits - 1)/FLINT_BITS + 2; 
+
+    scratch = malloc(sizeof(mp_limb_t) * limbs);
+    len = mpn_prod_limbs_balanced(result, scratch, factors, n, bits);
     free(scratch);
+    
     return len;
 }
 
 void fmpz_primorial(fmpz_t res, long n)
 {
-    mpz_t tmp;
     mp_size_t len, pi;
+    ulong bits;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {
@@ -133,12 +139,13 @@ void fmpz_primorial(fmpz_t res, long n)
     }
 
     pi = n_prime_pi(n);
-
+    
     n_compute_primes(pi);
-    mpz_init2(tmp, pi*FLINT_BITS);
-    len = mpn_prod_limbs(tmp->_mp_d, flint_primes, pi);
-    tmp->_mp_size = len;
-
-    fmpz_set_mpz(res, tmp);
-    mpz_clear(tmp);
+    bits = FLINT_BIT_COUNT(flint_primes[pi - 1]);
+    
+    __mpz_struct * mpz_ptr = _fmpz_promote(res);
+    mpz_realloc2(mpz_ptr, pi*bits);
+    
+    len = mpn_prod_limbs(mpz_ptr->_mp_d, flint_primes, pi, bits);
+    mpz_ptr->_mp_size = len;
 }
