@@ -202,6 +202,8 @@ int n_is_prime(mp_limb_t n);
 
 void n_compute_primes(ulong num_primes);
 
+ulong n_prime_pi(ulong n);
+
 int n_remove(mp_limb_t * n, mp_limb_t p);
 
 int n_remove2_precomp(mp_limb_t * n, mp_limb_t p, double ppre);

@@ -357,11 +357,11 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
 ********************************************************************************
 
-  Primality testing
+  Prime number generation and counting
 
 ********************************************************************************
 
-void n_compute_trial_factor_primes(ulong num_primes)
+void n_compute_primes(ulong num_primes)
 
    Precomputes num_primes primes and their double precomputed
    inverses and stores them in flint_primes and flint_prime_inverse
@@ -396,6 +396,22 @@ void n_compute_trial_factor_primes(ulong num_primes)
    As the small prime cutoff is currently 1030, primes can be 
    computed up to almost n = 2^20, in fact floor(n/log_2(n)*0.7) = 
    74898 primes which actually takes us to 949937.
+
+ulong n_prime_pi(ulong n)
+
+   Returns the value of the prime counting function pi(n), i.e. the
+   number of primes less than or equal to n. The invariant
+   n_prime_pi(flint_primes[n-1]) == n holds (because flint_primes is
+   indexed from zero).
+
+   Currently, this function simply extends flint_primes up to
+   an upper limit and then performs binary search.
+
+********************************************************************************
+
+  Primality testing
+
+********************************************************************************
 
 int n_is_oddprime_small(mp_limb_t n) 
    
