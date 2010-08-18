@@ -29,8 +29,13 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
 
 void fmpz_primorial(fmpz_t res, long n);
+
+void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
+
+void fmpz_ramanujan_tau(fmpz_t res, long n);
 
 #endif
 
