@@ -70,6 +70,10 @@ int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, long len);
 
 int _fmpz_vec_is_zero(const fmpz * vec, long len);
 
+/* Sorting  ******************************************************************/
+
+void _fmpz_vec_sort(fmpz * vec, long len);
+
 /*  Addition  ****************************************************************/
 
 void _fmpz_vec_add(fmpz * res, const fmpz * vec1, 
