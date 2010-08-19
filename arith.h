@@ -37,5 +37,8 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
 
 void fmpz_ramanujan_tau(fmpz_t res, long n);
 
-#endif
+void fmpz_divisors(fmpz_poly_t res, ulong n);
 
+void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k);
+
+#endif
