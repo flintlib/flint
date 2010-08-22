@@ -26,23 +26,26 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
 int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
 {
-    if (len < 3)
+    if (len < 3L)
         return 1;
-    else if (len == 3)
+    else if (len == 3L)
     {
         int ans;
         fmpz_t lhs, rhs;
         fmpz_init(lhs);
         fmpz_init(rhs);
-        fmpz_mul(lhs, poly + 2, poly);
-        fmpz_mul_ui(lhs, lhs, 4UL);
-        fmpz_mul(rhs, poly + 1, poly + 1);
-        ans = !fmpz_equal(lhs, rhs);
+        
+        fmpz_mul(lhs, poly + 1, poly + 1);
+        fmpz_mul(rhs, poly, poly + 2);
+        fmpz_mul_si(rhs, rhs, -4);
+        
+        ans = fmpz_equal(lhs, rhs);
         fmpz_clear(lhs);
         fmpz_clear(rhs);
         return ans;
@@ -50,15 +53,15 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
     else
     {
         long gdeg;
-        fmpz * der, * gcd;
-        fmpz * Z = _fmpz_vec_init(2 * (len - 1));
-        der = Z;
-        gcd = Z + len - 1;
-        _fmpz_poly_derivative(der, poly, len);
-        _fmpz_poly_gcd(gcd, poly, len, der, len - 1);
-        for (gdeg = len - 2; fmpz_is_zero(gcd + gdeg); gdeg--) ;
-        _fmpz_vec_clear(Z, 2 * (len - 1));
-        return gdeg < 1;
+        fmpz * w = _fmpz_vec_init(2L * len);
+        
+        _fmpz_poly_derivative(w, poly, len);
+        _fmpz_poly_gcd(w + len, poly, len, w, len - 1L);
+        
+        for (gdeg = len - 2L; *(w + gdeg) == 0L; gdeg--) ;
+        
+        _fmpz_vec_clear(w, 2L * len);
+        return (gdeg == 0L);
     }
 }
 
