@@ -825,6 +825,42 @@ void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 
 *******************************************************************************
 
+    Composition
+
+*******************************************************************************
+
+void _fmpz_poly_compose_horner(fmpz * res, 
+                  const fmpz * poly1, long len1, const fmpz * poly2, long len2)
+
+    Sets res to the composition of {poly1, len1} and {poly2, len2}.  
+    Assumes that res has space for (len1-1)*(len2-1) + 1 coefficients.
+    Assumes that poly1 and poly2 are non-zero polynomials.
+    Does not support aliasing between any of the inputs and the output.
+
+void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                       const fmpz_poly_t poly2)
+
+    Sets res to the composition of poly1 and poly2.  To be more precise, 
+    denoting res, poly1, and poly2 by f, g, and h, sets f(t) = g(h(t)).  
+    
+    This implementation uses Horner's method.
+
+void _fmpz_poly_compose(fmpz * res, 
+                  const fmpz * poly1, long len1, const fmpz * poly2, long len2)
+
+    Sets res to the composition of {poly1, len1} and {poly2, len2}.  
+    Assumes that res has space for (len1-1)*(len2-1) + 1 coefficients.
+    Assumes that poly1 and poly2 are non-zero polynomials.
+    Does not support aliasing between any of the inputs and the output.
+
+void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                       const fmpz_poly_t poly2)
+
+    Sets res to the composition of poly1 and poly2.  To be more precise, 
+    denoting res, poly1, and poly2 by f, g, and h, sets f(t) = g(h(t)).
+
+*******************************************************************************
+
     String conversions
 
 *******************************************************************************
