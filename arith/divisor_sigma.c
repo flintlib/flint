@@ -50,8 +50,11 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
     fmpz_init(r);
     fmpz_set_ui(res, 1UL);
 
-    /* TODO: use a balanced product in large cases,
-       speedup for small n. */
+    /*
+       TODO: use a balanced product in large cases,
+       speedup for small n.
+    */
+
     for (i = 0; i<factors.num; i++)
     {
         if (k == 0)

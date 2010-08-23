@@ -35,7 +35,7 @@ void
 _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
                      const fmpz * poly2, long len2, long trunc)
 {
-    int neg1, neg2;
+    int neg1 = 0, neg2 = 0;
     long limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
