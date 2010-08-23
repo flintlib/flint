@@ -25,6 +25,7 @@
 
 #include "profiler.h"
 #include <math.h>
+#include <float.h>
 
 /*
    clock_last[i] is the last read clock value for clock #i.
@@ -39,7 +40,7 @@ prof_repeat(double *min, double *max, profile_target_t target, void *arg)
 {
     /* Number of timings that were at least DURATION_THRESHOLD microseconds */
     unsigned long good_count = 0;
-    double max_time, min_time;
+    double max_time = DBL_MIN, min_time = DBL_MAX;
 
     /* First try one loop */
     unsigned long num_trials = 8;

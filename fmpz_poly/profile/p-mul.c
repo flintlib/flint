@@ -26,47 +26,88 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
+#include <float.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
-#define lenlo   1
-#define lenhi   60
-#define lenh    1
-#define bitslo  16
-#define bitshi  1024
-#define bitsh   16
-#define cols    ((lenhi + 1 - lenlo + (lenh - 1)) / lenh)
-#define rows    ((bitshi + 1 - bitslo + (bitsh - 1)) / bitsh)
-#define cpumin  10
-#define N       10
+/*
+   Definitions for the parameters of the timing process.
+   
+   lenlo    Minimum length
+   lenhi    Maximum length
+   lenh     Step size for the length
+   bitslo   Minimum bit size
+   bitshi   Maximum bit size
+   bitsh    Step size for the bit size
+   cols     Number of different lengths
+   rows     Number of different bit sizes
+   cpumin   Minimum number of ms spent on each test case
+   ncases   Number of test cases per point (length, bit size)
+   nalgs    Number of algorithms
+   img      Whether an RGB coloured image should be produced
+   imgname  File name for image
+ */
+
+#define lenlo    1
+#define lenhi    60
+#define lenh     1
+#define bitslo   16
+#define bitshi   2048
+#define bitsh    32
+#define cols     ((lenhi + 1 - lenlo + (lenh - 1)) / lenh)
+#define rows     ((bitshi + 1 - bitslo + (bitsh - 1)) / bitsh)
+#define cpumin   10
+#define ncases   1
+#define nalgs    3
+#define img      1
+#define imgname  "out.ppm"
+
+/*
+   Write a binar 24-bit ppm image.
+ */
+int write_rgb_ppm(const char* file_name, unsigned char* pixels, 
+                   unsigned int width, unsigned int height)
+{
+    FILE* file = fopen(file_name, "wb");
+    if (file == NULL)
+        return -1;
+    fprintf(file, "P6\n%d %d\n255\n", width, height);
+    fwrite(pixels, sizeof(unsigned char), width * height * 3, file);
+    fclose(file);
+    return 0;
+}
 
 int
 main(void)
 {
-    int len, bits;
-    int i, j, x[rows][cols];
+    int i, j, len, bits;
+    int X[rows][cols];
+    double T[rows][cols][nalgs];
+    fmpz_poly_t f, g, h;
     
     fmpz_poly_randinit();
+        
+    fmpz_poly_init2(f, lenhi);
+    fmpz_poly_init2(g, lenhi);
+    fmpz_poly_init2(h, 2*lenhi - 1);
     
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
-        fmpz_poly_t f, g, h;
-        fmpz_poly_init2(f, len);
-        fmpz_poly_init2(g, len);
-        fmpz_poly_init2(h, 2*len - 1);
+        long s[nalgs];
         
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
-            int n;
-            long s[3] = {0, 0, 0};
-            int reps = 0;
+            int c, n, reps = 0;
             
-            for (n = 0; n < N; n++)
+            for (c = 0; c < nalgs; c++)
+                s[c] = 0L;
+            
+            for (n = 0; n < ncases; n++)
             {
-                timeit_t t[3];
+                timeit_t t[nalgs];
                 int l, loops = 1;
                 
                 /*
@@ -79,14 +120,12 @@ main(void)
                         fmpz_randbits(f->coeffs + k, bits);
                         fmpz_randbits(g->coeffs + k, bits);
                     }
-                    k = len;
-                    while (k && !f->coeffs[k - 1])
-                        k--;
-                    f->length = k;
-                    k = len;
-                    while (k && !g->coeffs[k - 1])
-                        k--;
-                    g->length = k;
+                    if ((f->coeffs)[len-1] == 0L)
+                        fmpz_randtest_not_zero(f->coeffs + (len - 1), bits);
+                    if ((g->coeffs)[len-1] == 0L)
+                        fmpz_randtest_not_zero(g->coeffs + (len - 1), bits);
+                    f->length = len;
+                    g->length = len;
                 }
                 
               loop:
@@ -106,37 +145,83 @@ main(void)
                     fmpz_poly_mul_KS(h, f, g);
                 timeit_stop(t[2]);
                 
-                if (t[0]->cpu <= cpumin || t[1]->cpu <= cpumin || t[2]->cpu <= cpumin)
-                {
-                    loops *= 10;
-                    goto loop;
-                }
+                for (c = 0; c < nalgs; c++)
+                    if (t[c]->cpu <= cpumin)
+                    {
+                        loops *= 10;
+                        goto loop;
+                    }
                 
-                s[0] += t[0]->cpu;
-                s[1] += t[1]->cpu;
-                s[2] += t[2]->cpu;
+                for (c = 0; c < nalgs; c++)
+                    s[c] += t[c]->cpu;
                 reps += loops;
             }
             
-            printf("%d %d %lf %lf %lf\n", len, bits, s[0] / (double) reps, s[1] / (double) reps, s[2] / (double) reps);
+            for (c = 0; c < nalgs; c++)
+                T[i][j][c] = s[c] / (double) reps;
             
             if (s[0] <= s[1] && s[0] <= s[2])
-                x[i][j] = 0;
+                X[i][j] = 0;
             else if (s[1] <= s[2])
-                x[i][j] = 1;
+                X[i][j] = 1;
             else
-                x[i][j] = 2;
+                X[i][j] = 2;
         }
-        fmpz_poly_clear(f);
-        fmpz_poly_clear(g);
-        fmpz_poly_clear(h);
+        printf("len = %d, time = %ldms\n", len, s[0] + s[1] + s[2]), fflush(stdout);
     }
+    fmpz_poly_clear(f);
+    fmpz_poly_clear(g);
+    fmpz_poly_clear(h);
     
+    /* 
+       Print 2-D ASCII image of the winning algorithms
+     */
     for (i = 0; i < rows; i++)
     {
         for (j = 0; j < cols; j++)
-            printf("%d", x[i][j]);
+            printf("%d", X[i][j]);
         printf("\n");
+    }
+    
+    /*
+       Print 2-D coloured image to file
+     */
+    if (img)
+    {
+        unsigned char * PIXELS;
+        int k;
+        
+        PIXELS = (unsigned char *) malloc(3 * rows * cols * sizeof(unsigned char));
+        k = 0;
+        for (i = 0; i < rows; i++)
+        {
+            for (j = 0; j < cols; j++)
+            {
+                double max = DBL_MIN, v[nalgs];
+                int m;
+                
+                for (m = 0; m < nalgs; m++)
+                {
+                    v[m] = T[i][j][m] - T[i][j][X[i][j]];
+                    if (v[m] > max)
+                        max = v[m];
+                }
+                for (m = 0; m < nalgs; m++)
+                {
+                    v[m] = (max - v[m]) / max;
+                    PIXELS[k++] = (unsigned char) (v[m] * 255);
+                }
+                
+            }
+        }
+
+        k = write_rgb_ppm(imgname, PIXELS, cols, rows);
+        free(PIXELS);
+        
+        if (k)
+        {
+            printf("Exception:  writing ppm image failed\n");
+        }
     }
 
     fmpz_poly_randclear();
