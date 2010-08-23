@@ -29,7 +29,9 @@
 
 #include <stdio.h>
 #include <mpir.h>
+
 #include "nmod_vec.h"
+#include "fmpz.h"
 
 typedef struct
 {
@@ -89,6 +91,35 @@ void _nmod_mpoly_normalise(nmod_mpoly_t poly)
 }
 
 
+//Assumes that the width of the exponent bitfield is the same.
+static inline
+int nmod_mpoly_equal(nmod_mpoly_t a, nmod_mpoly_t b)
+{
+   if (a->length != b->length)
+	  return 0;
+
+   if (a != b)
+      if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
+	     return 0;
+      if (!_nmod_vec_equal(a->exps, b->exps, a->length))
+	     return 0;
+
+   return 1;
+}
+
+static inline
+void nmod_mpoly_set(nmod_mpoly_t a, nmod_mpoly_t b)
+{
+   if (a != b)
+   {
+      nmod_mpoly_fit_length(a, b->length);
+	  mpn_copyi(a->coeffs, b->coeffs, b->length);
+          mpn_copyi(a->exps, b->exps, b->length);
+	  a->length = b->length;
+          a->ebits = b->ebits;
+          a->mod = b->mod;
+   }
+}
 
 void nmod_mpoly_randtest(nmod_mpoly_t poly, long length);
 
@@ -98,6 +129,9 @@ void nmod_mpoly_heap_insert(nmod_mpoly_heap_t * heap, ulong * n, nmod_mpoly_entr
 
 void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly2);
 
+ulong nmod_mpoly_get_coeff(nmod_mpoly_t poly, ulong exp);
+
+void get_period_sequence(fmpz_t *zeroCoefficients, long *coefficients, ulong *exponents, ulong length, ulong monomial, int pow, ulong *primes, int numOfPrimes);
 
 #endif
 

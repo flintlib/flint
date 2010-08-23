@@ -59,7 +59,6 @@ void fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
    number of bits.
 
    If one requests random numbers with more than FLINT_BITS - 2 bits
-   one must first call fmpz_randinit(). When one is finished generating
    random numbers one should call fmpz_randclear() to clean up.
  
    Because this function depends on a global random state it isn't 

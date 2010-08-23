@@ -19,58 +19,67 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2010 William Hart
+   Copyright (C) 2009 William Hart
    Copyright (C) 2010 Daniel Woodhouse
 
 *****************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_mpoly.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 int main(void)
 {
    int result;
-   printf("init/init2/realloc/clear....");
+   printf("CRT....");
    fflush(stdout);
+
+   fmpz_t res;
+   fmpz_t r1;
+   fmpz_t m1;
+   fmpz_t mm2;
+   fmpz_t c;
+   fmpz_init(res);
+   fmpz_init(r1);
+   fmpz_init(m1);
+   fmpz_init(mm2);
+   fmpz_init(c);
+   fmpz_set_ui(r1,(ulong) 55953);
+   fmpz_set_ui(m1, (ulong) 104549);
+   fmpz_set_ui(mm2, (ulong) 104551);
+   ulong r2 = 55947;
+   ulong m2 = 104551;
+    
+   fmpz_invmod(c, m1, mm2);
+   double pre = n_precompute_inverse(m2);
+
+   fmpz_CRT_ui_precomp(res, r1, m1, r2, m2, fmpz_get_ui(c), pre);
    
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_mpoly_t a;
-
-	  mp_limb_t n = n_randtest_not_zero();
-
-      nmod_mpoly_init2(a, n, n_randint(100), (long) 5, (ulong) 5);
-      nmod_mpoly_clear(a);      
+   if(fmpz_get_ui(res) != (ulong)369600){
+        
+	printf("FAIL");
    }
+   fmpz_set_ui(r1,(ulong) 0);
+   fmpz_set_ui(m1, (ulong) 18446744073709551557);
+   fmpz_set_ui(mm2, (ulong) 18446744073709551533);
+   r2 = 0;
+   m2 = 18446744073709551533;
+    
+   fmpz_set_ui(c, 14603672391686728297);
+   pre = n_precompute_inverse(m2);
 
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_mpoly_t a;
-      
+   fmpz_CRT_ui2_precomp(res, r1, m1, r2, m2, fmpz_get_ui(c), pre);
 
-	  mp_limb_t n = n_randtest_not_zero();
+   fmpz_clear(r1);
+   fmpz_clear(m1);
+   fmpz_clear(mm2);
+   fmpz_clear(res);
+   fmpz_clear(c);
 
-      nmod_mpoly_init2(a, n, n_randint(100), (long) 5, (ulong) 5);
-      nmod_mpoly_realloc(a, n_randint(100));
-      nmod_mpoly_realloc(a, n_randint(100));
-      nmod_mpoly_clear(a);      
-   }
-   
-   for (long i = 0; i < 10000UL; i++) 
-   {
-      nmod_mpoly_t a;
-
-	  mp_limb_t n = n_randtest_not_zero();
-
-      nmod_mpoly_init(a, n, (long) 5, (ulong) 5);
-      nmod_mpoly_randtest(a, n_randint(100));
-      
-      nmod_mpoly_clear(a);
-   }
-   
    printf("PASS\n");
+   
    return 0;
 }

@@ -43,8 +43,6 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
    ulong len1 = poly1->length;
    ulong len2 = poly2->length;
    ulong i, j, bits1 = 0, bits2 = 0, b, b_old;
-   //int signed_c = 0;
-   //mp_limb_t temp;
 
    nmod_mpoly_heap_t * heap = (nmod_mpoly_heap_t *) malloc((len2 + 1)*sizeof(nmod_mpoly_heap_t));
    nmod_mpoly_entry_t * entries = (nmod_mpoly_entry_t *) malloc(len2*sizeof(nmod_mpoly_entry_t));
@@ -60,14 +58,12 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
    bits2 = nmod_mpoly_max_bits(poly2);
 
    b = bits1 + bits2 + FLINT_BIT_COUNT(len2); //?? is the FLINT_BIT_COUNT(len2) neccessary? -YES
-   if (b < FLINT_BITS) b = 0; // output will fit in a mp_limb_t
-   else if ( bits1 <= FLINT_BITS && bits2 <= FLINT_BITS ) b = 2; // unsigned <= 3 limbs
-   else b = 3;
-
+   if (b <= FLINT_BITS) b = 0; // output will fit in a mp_limb_t
+   else b = 2; // unsigned <= 3 limbs
+  
    b_old = b;
    
    /* place all products poly1[0]*poly2[j] into our array of entries */
-   
   
    for (j = 0; j < len2; j++)
    {
@@ -76,8 +72,7 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
       entries[j].i1 = 0;
       entries[j].i2 = j;
       
-   }
-   
+   }  
 
    /* 
       insert only the first of these entries into the heap - we inject the others later 
@@ -101,11 +96,9 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
 	  mp_limb_t c1, c2; // coefficients
           mp_limb_t accum0 = 0, accum1 = 0, accum2 = 0, cy;
 	  
-	  //This line is no doubt important, but I need to find out what to do with it.
-	  //__mpz_struct * coeff;
 	  //int sign;
 	  ulong size;
-          mp_limb_t n1, n2, n3; //removed the "signed_"
+          mp_limb_t n1, n2, n3; 
 
 	  b = b_old;
       
@@ -149,68 +142,63 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
 		 c2 = poly2->coeffs[next->i2];
                  
 		 /* addmul */
-		 if (b == 0) // fits in a small fmpz
+		 if (b == 0) // fits in a single limb
 		 {
-		    accum0 += ((mp_limb_signed_t) c1 * (mp_limb_signed_t) c2);
+		    accum0 += (c1 * c2);
 		 } else if (b == 2) // input coeffs fit in a small and are unsigned
 		 {
 		    umul_ppmm(n2, n1, c1, c2);
                     add_ssaaaa(cy, accum0, (mp_limb_t) 0, accum0, (mp_limb_t) 0, n1);
                     add_ssaaaa(cy, accum1, (mp_limb_t) 0, accum1, (mp_limb_t) 0, n2 + cy); // cannot overflow  
-		 if (cy) // has overflowed
-		 {
-			   b = 3;
-			   accum2 = cy;
-			}
+		    if (cy) // has overflowed
+		    {
+			b = 3;
+			accum2 = cy;
+		    }
 		 } else // general case
 		 {
 			
-		        umul_ppmm(n2, n1, c1, c2);
+		    umul_ppmm(n2, n1, c1, c2);
                         
-                        add_ssaaaa(cy, accum0, (mp_limb_t) 0, accum0, (mp_limb_t) 0, n1);
-                        add_ssaaaa(accum2, accum1, accum2, accum1, (mp_limb_t) 0, cy);
-                        add_ssaaaa(accum2, accum1, accum2, accum1, n3, n2);
-		 }
+                    add_ssaaaa(cy, accum0, (mp_limb_t) 0, accum0, (mp_limb_t) 0, n1);
+                    add_ssaaaa(accum2, accum1, accum2, accum1, (mp_limb_t) 0, n2 + cy); // cannot overflow
+ 		 }
              
 	     if (next->i1 == 0 && next->i2 < len2 - 1) // inject next entry poly1[0]*poly2[j+1]
-		    nmod_mpoly_heap_insert(heap, &n, next + 1, poly1->exps[0] + poly2->exps[next->i2 + 1]);
+	        nmod_mpoly_heap_insert(heap, &n, next + 1, poly1->exps[0] + poly2->exps[next->i2 + 1]);
 		
 		          
-		 next = next->next;
+             next = next->next;
 		  
              /* insert poly1[i+1]*poly2[j] */
-		 prev->i1++;
+	     prev->i1++;
 		 
-		 //prev->next=NULL; // need to unchain the chain.??
-             if (prev->i1 < len1)
-		    nmod_mpoly_heap_insert(heap, &n, prev, poly1->exps[prev->i1] + poly2->exps[prev->i2]);
-	     } while (next); 
-	    //reached the end of the chain
-          
+	     if (prev->i1 < len1)
+		 nmod_mpoly_heap_insert(heap, &n, prev, poly1->exps[prev->i1] + poly2->exps[prev->i2]);
+	  } while (next); 
+	  //reached the end of the chain
 
 
 	  /* store term */
 	  if (b == 0) // fits into a small fmpz
 	  {
 	         
-                 NMOD_RED(res->coeffs[len_out], accum0, res->mod);
+             NMOD_RED(res->coeffs[len_out], accum0, res->mod);
 		 
 	  } else if (b == 2) // fits into two limbs unsigned
 	  {		
-		 NMOD_RED2(res->coeffs[len_out], accum1, accum0, res->mod);
+             NMOD2_RED2(res->coeffs[len_out], accum1, accum0, res->mod);
 	  } else
 	  {
-		 NMOD_RED(accum2, accum2, res->mod);
-                 NMOD_RED3(res->coeffs[len_out], accum2, accum1, accum0, res->mod);
-	    
+	     NMOD_RED3(res->coeffs[len_out], accum2, accum1, accum0, res->mod);    
 	  }
 
 	  res->exps[len_out] = exp;
-	  
-	  len_out++;
-   }//End of multiplication
+	  if (res->coeffs[len_out] != 0) //So that zero terms are ignored
+	     len_out++;
+   }
+   //End of multiplication
 
-   //if (b == 3) temp= 0;
    free(heap);
    free(entries);
 

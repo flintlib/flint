@@ -43,13 +43,19 @@ int main(void)
    nmod_mpoly_t p;
    nmod_mpoly_t q;
    nmod_mpoly_t r;
+   nmod_mpoly_t copyTest;
    mp_limb_t n = n_randtest_not_zero();
 
    nmod_mpoly_init2(p, n, 3, (long) 2, (ulong) 5);
+   nmod_mpoly_init2(copyTest, n, 3, (long) 2, (ulong) 5);
    nmod_mpoly_init2(q, n, 3, (long) 2, (ulong) 5);
    nmod_mpoly_init2(r, n, 3, (long) 2, (ulong) 5);
    //nmod_mpoly_realloc(a, 3);
    
+   nmod_mpoly_set(copyTest, p);
+   if(!(nmod_mpoly_equal(copyTest,p)))
+	printf("FAIL:\n");
+
    p->coeffs[0] = (mp_limb_t) 1;
    p->exps[0] = (mp_limb_t) 0;
    p->coeffs[1] = (mp_limb_t) 1;
@@ -69,7 +75,11 @@ int main(void)
 
    nmod_mpoly_mul_heap(r, p, q);
 
+  
+   
+
    if(r->length != (mp_limb_t) 6){
+      printf("\nsquare (1 + xy + x^2)\n");
       printf("\n\nr->length = %u \n\n", r->length);
       int i;
       for(i=0; i < r->length; i++){
@@ -77,22 +87,68 @@ int main(void)
       } 
       printf("\nFAIL:\n");
    }
-  
+
+   if(nmod_mpoly_equal(copyTest,p))
+	printf("FAIL:\n");
+
+   if(nmod_mpoly_get_coeff(r, ((ulong)4 << 5)) != (ulong)1){
+      printf("\n%lu", nmod_mpoly_get_coeff(r, (4 << 5)));
+      printf("\nFAAIL:\n"); 
+   }
+
    nmod_mpoly_clear(p);     
    nmod_mpoly_clear(q);
    nmod_mpoly_clear(r);
+   nmod_mpoly_clear(copyTest);
+
+   //multiply (w + 2*x + 3*y + 4*z)^7
+  
+   nmod_mpoly_init2(p, 7, 4, (long) 4, (ulong) 6);
+   nmod_mpoly_init2(q, 7, 4, (long) 4, (ulong) 6);
+   nmod_mpoly_init2(r, 7, 4, (long) 4, (ulong) 6);
+
+   p->coeffs[0] = (mp_limb_t) 4;
+   p->exps[0] = (mp_limb_t) 1;
+   p->coeffs[1] = (mp_limb_t) 3;
+   p->exps[1] = (mp_limb_t) 1 << 6;
+   p->coeffs[2] = (mp_limb_t) 2;
+   p->exps[2] = (mp_limb_t) 1 << 12;
+   p->coeffs[3] = (mp_limb_t) 1;
+   p->exps[3] = (mp_limb_t) 1 << 18;
+
+   p->length = 4;
+
+   nmod_mpoly_mul_heap(q, p, p);
+   nmod_mpoly_mul_heap(r, p, q);
+/*   nmod_mpoly_mul_heap(r, p, r);
+   nmod_mpoly_mul_heap(r, p, r);
+   nmod_mpoly_mul_heap(r, p, r);
+   nmod_mpoly_mul_heap(r, p, r);*/
+
+   if(r->length != (mp_limb_t) 20){
+      printf("\n (w + 2*x + 3*y + 4*z)^7 ");
+      printf("\n\nr->length = %u \n\n", r->length);
+      int i;
+      for(i=0; i < r->length; i++){
+	   printf("%u %u + ", r->coeffs[i], r->exps[i]);
+      } 
+      printf("\nFAIL:\n");
+   }
+
+   nmod_mpoly_clear(p);     
    
+   nmod_mpoly_clear(r);
 
    nmod_mpoly_t a, a2, a3, a6, a12;
    nmod_mpoly_t c, c2, c3, c5, c10, c20, c30;
    ulong i;   
 
-   nmod_mpoly_init2(a, (ulong) 100000, 6,  (long) 5, (ulong) 12);
+   nmod_mpoly_init2(a, (ulong) 100003, 6,  (long) 5, (ulong) 12);
    
-   nmod_mpoly_init(a2, (ulong) 100000, 5, 12);
-   nmod_mpoly_init(a3, (ulong) 100000, 5, 12);
-   nmod_mpoly_init(a6, (ulong) 100000, 5, 12);
-   nmod_mpoly_init(a12, (ulong) 100000, 5, 12);
+   nmod_mpoly_init(a2, (ulong) 100003, 5, 12);
+   nmod_mpoly_init(a3, (ulong) 100003, 5, 12);
+   nmod_mpoly_init(a6, (ulong) 100003, 5, 12);
+   nmod_mpoly_init(a12, (ulong) 100003, 5, 12);
    
    a->coeffs[0] = 1;
    a->coeffs[1] = 5;
@@ -147,13 +203,13 @@ int main(void)
 	   printf("length = %ld\n", a12->length);
    }   
 
-   nmod_mpoly_init2(c, (ulong) 100000, 5, 4, 15);
-   nmod_mpoly_init(c2, (ulong) 100000, 4, 15);
-   nmod_mpoly_init(c3, (ulong) 100000, 4, 15);
-   nmod_mpoly_init(c5, (ulong) 100000, 4, 15);
-   nmod_mpoly_init(c10, (ulong) 100000, 4, 15);
-   nmod_mpoly_init(c20, (ulong) 100000, 4, 15);
-   nmod_mpoly_init(c30, (ulong) 100000, 4, 15);
+   nmod_mpoly_init2(c, (ulong) 100003, 5, 4, 15);
+   nmod_mpoly_init(c2, (ulong) 100003, 4, 15);
+   nmod_mpoly_init(c3, (ulong) 100003, 4, 15);
+   nmod_mpoly_init(c5, (ulong) 100003, 4, 15);
+   nmod_mpoly_init(c10, (ulong) 100003, 4, 15);
+   nmod_mpoly_init(c20, (ulong) 100003, 4, 15);
+   nmod_mpoly_init(c30, (ulong) 100003, 4, 15);
  
    for (i = 0; i < 5; i++)
 	   c->coeffs[i] = 1;
