@@ -131,6 +131,7 @@ void fmpz_primorial(fmpz_t res, long n)
 {
     mp_size_t len, pi;
     ulong bits;
+    __mpz_struct * mpz_ptr;
 
     if (n <= LARGEST_ULONG_PRIMORIAL)
     {
@@ -146,7 +147,7 @@ void fmpz_primorial(fmpz_t res, long n)
     n_compute_primes(pi);
     bits = FLINT_BIT_COUNT(flint_primes[pi - 1]);
     
-    __mpz_struct * mpz_ptr = _fmpz_promote(res);
+    mpz_ptr = _fmpz_promote(res);
     mpz_realloc2(mpz_ptr, pi*bits);
     
     len = mpn_prod_limbs(mpz_ptr->_mp_d, flint_primes, pi, bits);

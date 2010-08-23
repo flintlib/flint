@@ -38,7 +38,7 @@ const int FLINT_TINY_DIVISORS_SIZE[FLINT_NUM_TINY_DIVISORS] = {
     0,1,2,2,3,2,4,2,4,3,4,2,6,2,4,4,5,2,6,2,6,4,4,2,8,3,4,4,6,2,8,2,
 #if FLINT64
     6,4,4,4,9,2,4,4,8,2,8,2,6,6,4,2,10,3,6,4,6,2,8,4,8,4,4,2,12,2,4,6
-#endif FLINT64
+#endif 
 };
 
 const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
@@ -63,10 +63,11 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 
 void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
 {
-    long i, j;
+    long i;
 
     long *exp = malloc(sizeof(long) * factors->num);
     fmpz *powers = _fmpz_vec_init(factors->num);
+    fmpz_t d;
 
     for (i=0; i<factors->num; i++)
     {
@@ -75,7 +76,6 @@ void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
         fmpz_pow_ui(powers+i, powers+i, factors->exp[i]);
     }
 
-    fmpz_t d;
     fmpz_init(d);
     fmpz_set_ui(res, 1UL);
     fmpz_set_ui(d, 1UL);
@@ -115,7 +115,8 @@ void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
 void fmpz_divisors(fmpz_poly_t res, ulong n)
 {
     long i, k, size;
-
+    n_factor_t factors;
+    
     if (n < FLINT_NUM_TINY_DIVISORS)
     {
         size = FLINT_TINY_DIVISORS_SIZE[n];
@@ -133,7 +134,6 @@ void fmpz_divisors(fmpz_poly_t res, ulong n)
         return;
     }
 
-    n_factor_t factors;
     n_factor_init(&factors);
     n_factor(&factors, n, 0);
 

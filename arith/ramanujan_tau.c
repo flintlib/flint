@@ -64,6 +64,7 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
     fmpz_t tau_p, p_11, next, this, prev;
     n_factor_t factors;
     int k, r;
+    ulong max_prime;
 
     if (n < 1)
     {
@@ -73,7 +74,7 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
 
     n_factor_init(&factors);
     n_factor(&factors, n, 0);
-    ulong max_prime = 1;
+    max_prime = 1;
     for (k = 0; k < factors.num; k++)
         max_prime = FLINT_MAX(max_prime, factors.p[k]);
 
