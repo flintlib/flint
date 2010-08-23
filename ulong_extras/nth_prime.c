@@ -23,38 +23,19 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main(void)
+mp_limb_t n_nth_prime(ulong n)
 {
-    int n;
-
-    printf("prime_pi....");
-    fflush(stdout);
-
-    for (n=1; n<100000; n++)
+    if (n == 0)
     {
-        if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
-        {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
-        }
+        printf("exception: n_nth_prime(0) is undefined");
+        abort();
     }
 
-    for (n=1; n<50000; n++)
-    {
-        if (n_prime_pi(n_nth_prime(n)) != n)
-        {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
-        }
-    }
+    if (n > flint_num_primes)
+        n_compute_primes(n+1);
 
-    printf("PASS\n");
-    return 0;
+    return flint_primes[n-1];
 }

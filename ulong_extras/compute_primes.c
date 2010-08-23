@@ -21,6 +21,7 @@
 
     Copyright (C) 2009 Tom Boothby
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -76,14 +77,10 @@ void n_compute_primes(ulong num)
 
     if (!flint_num_primes) flint_primes_cutoff = FLINT_PRIMES_SMALL_CUTOFF;
 
-    lg_ub = 14UL; /* start with at least primes up to 16384 */
-    lg_ub2 = 0UL;
-    while (((1UL<<lg_ub) + lg_ub2*(1UL<<(lg_ub - 1)))/(ulong)(((double)lg_ub+0.5*(double)lg_ub2)*0.7) < num) 
-    {   
-        lg_ub += lg_ub2;
-        lg_ub2 = 1UL - lg_ub2;
-    }
-    primes_cutoff = (1UL<<lg_ub) + lg_ub2*(1UL<<(lg_ub - 1));
+    num = FLINT_MAX(num, 16384);
+    n_nth_prime_bounds(&primes_cutoff, &primes_cutoff, num+1);
+    /* bad things will happen if primes_cutoff equals a prime */
+    primes_cutoff += primes_cutoff & 1;
 
     if (primes_cutoff > FLINT_PRIMES_SMALL_CUTOFF*FLINT_PRIMES_SMALL_CUTOFF)
     {

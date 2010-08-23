@@ -367,18 +367,8 @@ void n_compute_primes(ulong num_primes)
    inverses and stores them in flint_primes and flint_prime_inverse
    respectively.
 
-   The algorithm is a simple sieve of erasthothenes with the 
+   The algorithm is a simple sieve of Eratosthenes with the 
    constant array flint_small_primes as a starting point.
-
-   In order to compute a sieve size, a lower bound on the size of
-   n s.t. pi(n) >= num_primes is needed. For this we use the 
-   estimate that for n > 17, pi(n) > n/log(n). 
-
-   We start with n = 16384 and consider consecutive values of
-   n/log(n) until we exceed num_primes. Actually we take an 
-   approximation to log(n) which is slightly too large (as log_2(n)
-   = log(n)/log(2), i.e. log(n) = log(2)*log_2(n) < 0.7*log_2(n),
-   then we can use the approximation 0.7*log_2(n)).
 
    The sieve works by marking all multiples of small primes in
    the sieve, but the sieve does not contain entries for numbers
@@ -397,15 +387,66 @@ void n_compute_primes(ulong num_primes)
    computed up to almost n = 2^20, in fact floor(n/log_2(n)*0.7) = 
    74898 primes which actually takes us to 949937.
 
-ulong n_prime_pi(ulong n)
+ulong n_prime_pi(mp_limb_t n)
 
    Returns the value of the prime counting function pi(n), i.e. the
    number of primes less than or equal to n. The invariant
-   n_prime_pi(flint_primes[n-1]) == n holds (because flint_primes is
+   n_prime_pi(n_nth_prime(n)) == n holds, or
+   n_prime_pi(flint_primes[n-1]) == n (because flint_primes is
    indexed from zero).
 
    Currently, this function simply extends flint_primes up to
    an upper limit and then performs binary search.
+
+void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
+
+   Calculates lower and upper bounds for the value of the prime counting
+   function lo <= pi(n) <= hi. If lo and hi point to the same location, the
+   high value will be stored.
+
+   The upper approximation is 1.25506 n / ln n, and the lower is n/ln n.
+   These bounds are due to Rosser and  Schoenfeld 1962 and valid
+   for n >= 17. 
+
+   We use the number of bits in n (or one less) to form an 
+   approximation to ln n, taking care to use a value too
+   small or too large to maintain the inequality.
+
+mp_limb_t n_nth_prime(ulong n)
+
+   Returns the nth prime number p_n, using the mathematical indexing
+   convention p_1 = 2, p_2 = 3, ...
+
+   This function simply ensures that flint_primes is large enough
+   and then looks up flint_primes[n-1].
+
+void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
+
+   Calculates lower and upper bounds for the nth prime number p_n,
+   lo <= p_n <= hi. If lo and hi point to the same location, the
+   high value will be stored. Note that this function will overflow
+   for sufficiently large n.
+
+   We use the following estimates, valid for n > 5:
+
+   p_n  >  n (ln n + ln ln n - 1)
+   p_n  <  n (ln n + ln ln n)
+   p_n  <  n (ln n + ln ln n - 0.9427)   (n >= 15985)
+
+   The first inequality was proved by Dusart [1], and the last is due
+   to Massias & Robin [2] (see http://primes.utm.edu/howmany.shtml).
+
+   We bound ln n using the number of bits in n as in n_prime_pi_bounds,
+   and estimate ln ln n to the nearest integer (this function is nearly
+   constant).
+
+   [1] P. Dusart, "The kth prime is greater than k(ln k+ln ln k-1) for k> 2,"
+       Math. Comp., 68:225 (January 1999) 411--415.
+
+   [2] J. Massias and G. Robin, "Bornes effectives pour certaines fonctions
+       concernant les nombres premiers," J. Theorie Nombres Bordeaux, 8
+       (1996) 215-242.
+
 
 ********************************************************************************
 
@@ -428,15 +469,7 @@ int n_is_oddprime_binary(mp_limb_t n)
    1, otherwise 0. For the algorithm to operate correctly 
    n should be odd and >= 17. 
 
-   The algorithm works by taking two approximations to
-   pi(n). The upper approximation is 1.25506 n / ln n, the
-   lower by n/ln n. These bounds are due to Rosser and 
-   Schoenfeld 1962 which are valid for n >= 17. 
-
-   We use the number of bits in n (or one less) to form an 
-   approximation to ln n, taking care to use a value too
-   small or too large to maintain the inequality.
-
+   Lower and upper bounds are computed with n_prime_pi_bounds.
    Once we have bounds on where to look in the table, we 
    refine our search with a simple binary algorithm, taking
    the top or bottom of the current interval as necessary.

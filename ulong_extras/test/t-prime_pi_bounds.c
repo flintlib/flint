@@ -28,32 +28,53 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+void check(mp_limb_t n, ulong ans)
+{
+    ulong lo, hi;
+    n_prime_pi_bounds(&lo, &hi, n);
+
+    int ok = lo <= ans && ans <= hi;
+    int reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
+
+    if (ok && reasonable)
+        return;
+
+    printf("FAIL:\n");
+    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    abort();
+}
+
 int main(void)
 {
     int n;
 
-    printf("prime_pi....");
+    printf("prime_pi_bounds....");
     fflush(stdout);
 
-    for (n=1; n<100000; n++)
+    for (n=17; n<100000; n++)
     {
-        if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
-        {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
-        }
+        check(n, n_prime_pi(n));
     }
 
-    for (n=1; n<50000; n++)
-    {
-        if (n_prime_pi(n_nth_prime(n)) != n)
-        {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
-        }
-    }
+    check(10UL, 4UL);
+    check(100UL, 25UL);
+    check(1000UL, 168UL);
+    check(10000UL, 1229UL);
+    check(100000UL, 9592UL);
+    check(1000000UL, 78498UL);
+    check(10000000UL, 664579UL);
+    check(100000000UL, 5761455UL);
+    check(1000000000UL, 50847534UL);
+#if FLINT64
+    check(10000000000UL, 455052511UL);
+    check(100000000000UL, 4118054813UL);
+    check(1000000000000UL, 37607912018UL);
+    check(10000000000000UL, 346065536839UL);
+    check(100000000000000UL, 3204941750802UL);
+    check(1000000000000000UL, 29844570422669UL);
+    check(10000000000000000UL, 279238341033925UL);
+    check(100000000000000000UL, 2623557157654233UL);
+#endif
 
     printf("PASS\n");
     return 0;

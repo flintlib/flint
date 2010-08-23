@@ -54,6 +54,9 @@ typedef struct factor_s
 #define FLINT_FACTOR_ONE_LINE_MAX (1UL<<39)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
 
+#define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
+
+
 extern const unsigned int flint_primes_small[];
 
 extern mp_limb_t * flint_primes;
@@ -202,7 +205,13 @@ int n_is_prime(mp_limb_t n);
 
 void n_compute_primes(ulong num_primes);
 
-ulong n_prime_pi(ulong n);
+mp_limb_t n_nth_prime(ulong n);
+
+void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n);
+
+ulong n_prime_pi(mp_limb_t n);
+
+void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n);
 
 int n_remove(mp_limb_t * n, mp_limb_t p);
 

@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,9 +31,8 @@
 int n_is_oddprime_binary(mp_limb_t n) 
 {
     ulong diff, prime_lo, prime_hi;
-    
-    prime_lo = (ulong)(((double)n)/((double)FLINT_BIT_COUNT(n)*0.6931472));
-    prime_hi = (ulong)(((double)n)/((double)(FLINT_BIT_COUNT(n)-1)*0.5522821));
+
+    n_prime_pi_bounds(&prime_lo, &prime_hi, n);
     if (prime_hi >= flint_num_primes) prime_hi = flint_num_primes - 1;
 
     if (n == flint_primes[prime_hi]) return 1;

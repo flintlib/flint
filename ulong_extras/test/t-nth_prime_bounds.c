@@ -28,32 +28,54 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
+void check(ulong n, mp_limb_t ans)
+{
+    mp_limb_t lo, hi;
+    n_nth_prime_bounds(&lo, &hi, n);
+
+    int ok = lo <= ans && ans <= hi;
+    int reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
+
+    if (ok && reasonable)
+        return;
+
+    printf("FAIL:\n");
+    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    abort();
+}
+
 int main(void)
 {
     int n;
 
-    printf("prime_pi....");
+    printf("nth_prime_bounds....");
     fflush(stdout);
 
-    for (n=1; n<100000; n++)
+    for (n=6; n<75000; n++)
     {
-        if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
-        {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
-        }
+        check(n, n_nth_prime(n));
     }
 
-    for (n=1; n<50000; n++)
-    {
-        if (n_prime_pi(n_nth_prime(n)) != n)
-        {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
-        }
-    }
+    // Some known large primes
+    check(10UL, 29UL);
+    check(100UL, 541UL);
+    check(1000UL, 7919UL);
+    check(10000UL, 104729UL);
+    check(100000UL, 1299709UL);
+    check(1000000UL, 15485863UL);
+    check(10000000UL, 179424673UL);
+    check(100000000UL, 2038074743UL);
+#if FLINT64
+    check(1000000000UL, 22801763489UL);
+    check(10000000000UL, 252097800623UL);
+    check(100000000000UL, 2760727302517UL);
+    check(1000000000000UL, 29996224275833UL);
+    check(10000000000000UL, 323780508946331UL);
+    check(100000000000000UL, 3475385758524527UL);
+    check(1000000000000000UL, 37124508045065437UL);
+    check(10000000000000000UL, 394906913903735329UL);
+    check(100000000000000000UL, 4185296581467695669UL);
+#endif
 
     printf("PASS\n");
     return 0;
