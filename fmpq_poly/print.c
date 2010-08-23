@@ -33,7 +33,7 @@ void fmpq_poly_print(const fmpq_poly_t poly)
 {
     char * str;
     
-    str = fmpq_poly_to_string(poly);
+    str = fmpq_poly_get_str(poly);
     printf("%s", str);
     free(str);
 }
@@ -42,7 +42,7 @@ void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 {
     char * str;
     
-    str = fmpq_poly_to_string_pretty(poly, var);
+    str = fmpq_poly_get_str_pretty(poly, var);
     printf("%s", str);
     free(str);
 }

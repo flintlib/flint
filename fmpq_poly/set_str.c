@@ -34,7 +34,7 @@
 #include "fmpq_poly.h"
 
 int 
-_fmpq_poly_from_string(fmpz * poly, fmpz_t den, const char * str)
+_fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 {
     char * w;
     long i, len;
@@ -102,7 +102,7 @@ _fmpq_poly_from_string(fmpz * poly, fmpz_t den, const char * str)
 }
 
 int
-fmpq_poly_from_string(fmpq_poly_t poly, const char * str)
+fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
 {
     int ans;
     long len;
@@ -118,7 +118,7 @@ fmpq_poly_from_string(fmpq_poly_t poly, const char * str)
 
     fmpq_poly_fit_length(poly, len);
     
-    ans = _fmpq_poly_from_string(poly->coeffs, poly->den, str);
+    ans = _fmpq_poly_set_str(poly->coeffs, poly->den, str);
     
     if (ans == 0)
     {

@@ -43,11 +43,11 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
     for (i = 0; i < n; i++)
     {
         mpz_divexact(t, d, mpq_denref(a[i]));
-        mpz_mul(mpq_numref(a[i]), mpq_numref(a[i]), t);
+        mpz_mul((mpz_ptr) mpq_numref(a[i]), (mpz_ptr) mpq_numref(a[i]), t);
     }
     
     for (i = 0; i < n; i++)
-        fmpz_set_mpz(poly + i, mpq_numref(a[i]));
+        fmpz_set_mpz(poly + i, (mpz_ptr) mpq_numref(a[i]));
     
     fmpz_set_mpz(den, d);
     mpz_clear(d);

@@ -202,6 +202,32 @@ void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
     Sets poly to the polynomial with coefficients as given in the array a, 
     from lowest degree to highest degree.
 
+int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
+
+    Sets {poly, den} to the polynomial specified by the null-terminated 
+    string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of {poly, den} is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+int fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
+
+    Sets poly to the polynomial specified by the null-terminated string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of poly is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+char * fmpq_poly_get_str(const fmpq_poly_t poly)
+
+    Returns the string representation of poly.
+
+char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
+
+    Returns the pretty representation of poly, using the null-terminated 
+    string var not equal to "\0" as the variable name.
+
 void fmpq_poly_zero(fmpq_poly_t poly)
 
     Sets poly to zero.
@@ -662,37 +688,11 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
     whether the greatest common divisor of poly and its derivative has 
     length 1.
 
-********************************************************************************
+*******************************************************************************
 
-    String conversions
+    Printing
 
-********************************************************************************
-
-int _fmpq_poly_from_string(fmpz * poly, fmpz_t den, const char * str)
-
-    Sets {poly, den} to the polynomial specified by the null-terminated 
-    string str.
-    
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of {poly, den} is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
-
-int fmpq_poly_from_string(fmpq_poly_t poly, const char * str)
-
-    Sets poly to the polynomial specified by the null-terminated string str.
-    
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of poly is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
-
-char * fmpq_poly_to_string(const fmpq_poly_t poly)
-
-    Returns the string representation of poly.
-
-char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
-
-    Returns the pretty representation of poly, using the null-terminated 
-    string var not equal to "\0" as the variable name.
+*******************************************************************************
 
 void fmpq_poly_print(const fmpq_poly_t poly)
 

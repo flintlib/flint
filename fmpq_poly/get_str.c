@@ -32,7 +32,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-char * fmpq_poly_to_string(const fmpq_poly_t poly)
+char * fmpq_poly_get_str(const fmpq_poly_t poly)
 {
     long i;
     size_t j;
@@ -101,7 +101,7 @@ char * fmpq_poly_to_string(const fmpq_poly_t poly)
     return str;
 }
 
-char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
+char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
 {
     long i;
     size_t j;
