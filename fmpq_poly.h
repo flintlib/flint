@@ -269,6 +269,20 @@ void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly,
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
 
+/*  Composition  *************************************************************/
+
+void _fmpq_poly_compose(fmpz * res, fmpz_t den, 
+                             const fmpz * poly1, const fmpz_t den1, long len1, 
+                             const fmpz * poly2, const fmpz_t den2, long len2);
+
+void fmpq_poly_compose(fmpq_poly_t res, 
+                             const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
+             const fmpz_t den, long len, const fmpz_t xnum, const fmpz_t xden);
+
+void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpq_poly_content(mpq_t res, 
