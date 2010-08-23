@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -30,25 +31,55 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e)
 {
-    if (e < 5UL)
-        _fmpz_poly_pow_small(res, poly, len, e);
-    else if (len == 2)
-        _fmpz_poly_pow_binomial(res, poly, e);
+    long k, low, rlen;
+    fmpz_t d, t;
+    fmpz * P;
+    
+    rlen = (long) e * (len - 1L) + 1L;
+    _fmpz_vec_zero(res, rlen);
+    
+    for (low = 0L; poly[low] == 0L; low++) ;
+    if (low == 0L)
+    {
+        P = (fmpz *) poly;
+    }
     else
     {
-        ulong limbs = (ulong) _fmpz_vec_max_limbs(poly, len);
-        
-        if (limbs < (((3UL * e) >> 1) + 150UL) / (ulong) len)
-            _fmpz_poly_pow_multinomial(res, poly, len, e);
-        else
-            _fmpz_poly_pow_binexp(res, poly, len, e);
+        P = (fmpz *) poly + low;
+        len  -= low;
+        res  += (long) e * low;
+        rlen -= (long) e * low;
     }
+    
+    fmpz_init(d);
+    fmpz_init(t);
+    
+    fmpz_pow_ui(res, P, e);
+    
+    for (k = 1; k < rlen; k++)
+    {
+        long i, u = -k;
+        for (i = 1; i <= FLINT_MIN(k, len - 1); i++)
+        {
+            fmpz_mul(t, P + i, res + (k - i));
+            u += (long) e + 1;
+            if (u >= 0)
+                fmpz_addmul_ui(res + k, t, (ulong) u);
+            else
+                fmpz_submul_ui(res + k, t, - ((ulong) u));
+        }
+        fmpz_add(d, d, P);
+        fmpz_divexact(res + k, res + k, d);
+    }
+    
+    fmpz_clear(d);
+    fmpz_clear(t);
 }
 
 void
-fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
     const long len = poly->length;
     long rlen;
@@ -71,21 +102,21 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_poly_mul(res, poly, poly);
         return;
     }
-
+    
     rlen = (long) e * (len - 1) + 1;
 
     if (res != poly)
     {
         fmpz_poly_fit_length(res, rlen);
+        _fmpz_poly_pow_multinomial(res->coeffs, poly->coeffs, len, e);
         _fmpz_poly_set_length(res, rlen);
-        _fmpz_poly_pow(res->coeffs, poly->coeffs, len, e);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, rlen);
+        _fmpz_poly_pow_multinomial(t->coeffs, poly->coeffs, len, e);
         _fmpz_poly_set_length(t, rlen);
-        _fmpz_poly_pow(t->coeffs, poly->coeffs, len, e);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }

@@ -52,9 +52,21 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
     }
     
     rlen = (long) e * (len - 1L) + 1L;
-    fmpq_poly_fit_length(res, rlen);
-    _fmpq_poly_set_length(res, rlen);
     
-    _fmpq_poly_pow(res->coeffs, res->den, poly->coeffs, poly->den, len, e);
+    if (res != poly)
+    {
+        fmpq_poly_fit_length(res, rlen);
+        _fmpq_poly_pow(res->coeffs, res->den, poly->coeffs, poly->den, len, e);
+        _fmpq_poly_set_length(res, rlen);
+    }
+    else
+    {
+        fmpq_poly_t t;
+        fmpq_poly_init2(t, rlen);
+        _fmpq_poly_pow(t->coeffs, t->den, poly->coeffs, poly->den, len, e);
+        _fmpq_poly_set_length(t, rlen);
+        fmpq_poly_swap(res, t);
+        fmpq_poly_clear(t);
+    }
 }
 

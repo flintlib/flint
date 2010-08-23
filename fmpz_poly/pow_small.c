@@ -28,45 +28,39 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
-#include "fmpq_poly.h"
 
-int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
+void
+_fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
 {
-    if (len < 3L)
-        return 1;
-    else if (len == 3L)
+    switch (e)
     {
-        int ans;
-        fmpz_t lhs, rhs;
-        fmpz_init(lhs);
-        fmpz_init(rhs);
-        
-        fmpz_mul(lhs, poly + 1, poly + 1);
-        fmpz_mul(rhs, poly, poly + 2);
-        fmpz_mul_si(rhs, rhs, -4);
-        
-        ans = fmpz_equal(lhs, rhs);
-        fmpz_clear(lhs);
-        fmpz_clear(rhs);
-        return ans;
+        case 0:
+            fmpz_set_ui(res, 1UL);
+            break;
+        case 1:
+            _fmpz_vec_copy(res, poly, len);
+            break;
+        case 2:
+            _fmpz_poly_mul(res, poly, len, poly, len);
+            break;
+        case 3:
+        {
+            long alloc = 2 * len - 1;
+            fmpz *t = _fmpz_vec_init(alloc);
+            _fmpz_poly_mul(t, poly, len, poly, len);
+            _fmpz_poly_mul(res, t, alloc, poly, len);
+            _fmpz_vec_clear(t, alloc);
+            break;
+        }
+        case 4:
+        {
+            long alloc = 2 * len - 1;
+            fmpz *t = _fmpz_vec_init(alloc);
+            _fmpz_poly_mul(t, poly, len, poly, len);
+            _fmpz_poly_mul(res, t, alloc, t, alloc);
+            _fmpz_vec_clear(t, alloc);
+            break;
+        }
     }
-    else
-    {
-        long gdeg;
-        fmpz * w = _fmpz_vec_init(2L * len);
-        
-        _fmpz_poly_derivative(w, poly, len);
-        _fmpz_poly_gcd(w + len, poly, len, w, len - 1L);
-        
-        for (gdeg = len - 2L; *(w + gdeg) == 0L; gdeg--) ;
-        
-        _fmpz_vec_clear(w, 2L * len);
-        return (gdeg == 0L);
-    }
-}
-
-int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
-{
-    return _fmpq_poly_is_squarefree(poly->coeffs, poly->den, poly->length);
 }
 

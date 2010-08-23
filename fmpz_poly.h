@@ -270,7 +270,21 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 /*  Powering  ****************************************************************/
 
+void _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e);
+
+void fmpz_poly_pow_multinomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
+void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e);
+
+void fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e);
+
+void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
+void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, const int * a, int n);
+
+void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e);
 
@@ -393,6 +407,28 @@ void _fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, long len,
                                                                 const mpq_t a);
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
+
+/*  Composition  *************************************************************/
+
+void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1, 
+                                                const fmpz * poly2, long len2);
+
+void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                      const fmpz_poly_t poly2);
+
+static __inline__
+void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1, 
+                                                const fmpz * poly2, long len2)
+{
+    _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
+}
+
+static __inline__
+void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                      const fmpz_poly_t poly2)
+{
+    fmpz_poly_compose_horner(res, poly1, poly2);
+}
 
 /*  String conversions  ******************************************************/
 
