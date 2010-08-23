@@ -316,6 +316,10 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
 /*  String conversion  *******************************************************/
 
+int _fmpq_poly_from_string(fmpz * poly, fmpz_t den, const char * str);
+
+int fmpq_poly_from_string(fmpq_poly_t poly, const char * str);
+
 char * fmpq_poly_to_string(const fmpq_poly_t poly);
 
 char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var);

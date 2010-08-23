@@ -668,6 +668,23 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
 
 ********************************************************************************
 
+int _fmpq_poly_from_string(fmpz * poly, fmpz_t den, const char * str)
+
+    Sets {poly, den} to the polynomial specified by the null-terminated 
+    string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of {poly, den} is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+int fmpq_poly_from_string(fmpq_poly_t poly, const char * str)
+
+    Sets poly to the polynomial specified by the null-terminated string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of poly is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
 char * fmpq_poly_to_string(const fmpq_poly_t poly)
 
     Returns the string representation of poly.
