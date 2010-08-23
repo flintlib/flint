@@ -26,7 +26,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -36,50 +35,41 @@
 int
 main(void)
 {
-    int result;
-    char *str;
-    fmpz_poly_t a;
-
-    printf("to_string....");
+    int i, result;
+    printf("get_set_str....");
     fflush(stdout);
 
-    fmpz_poly_init(a);
+    fmpz_poly_randinit();
 
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "0") == 0;
-    if (!result)
+    for (i = 0; i < 10000; i++)
     {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        fmpz_poly_t a, b;
+        char * str;
+        int ans;
 
-    fmpz_poly_set_si(a, -2);
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "-2") == 0;
-    if (!result)
-    {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
 
-    fmpz_poly_set_coeff_si(a, 3, 1);
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "t^3-2") == 0;
-    if (!result)
-    {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        str = fmpz_poly_get_str(a);
+        ans = fmpz_poly_set_str(b, str);
 
+        result = (ans == 0 && fmpz_poly_equal(a, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        free(str);
+    }
+
+    fmpz_poly_randclear();
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -32,7 +32,7 @@
 #include "fmpz_poly.h"
 
 char *
-_fmpz_poly_to_string(const fmpz * poly, long len)
+_fmpz_poly_get_str(const fmpz * poly, long len)
 {
     long i, bound;
     char *str, *strbase;
@@ -66,7 +66,7 @@ _fmpz_poly_to_string(const fmpz * poly, long len)
 }
 
 char *
-fmpz_poly_to_string(const fmpz_poly_t poly)
+fmpz_poly_get_str(const fmpz_poly_t poly)
 {
-    return _fmpz_poly_to_string(poly->coeffs, poly->length);
+    return _fmpz_poly_get_str(poly->coeffs, poly->length);
 }

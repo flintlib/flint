@@ -94,6 +94,18 @@ void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c);
 
 void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c);
 
+int _fmpz_poly_set_str(fmpz * poly, const char * str);
+
+int fmpz_poly_set_str(fmpz_poly_t poly, const char * str);
+
+char * _fmpz_poly_get_str(const fmpz * poly, long len);
+
+char * fmpz_poly_get_str(const fmpz_poly_t poly);
+
+char * _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char * x);
+
+char * fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char * x);
+
 static __inline__
 void fmpz_poly_zero(fmpz_poly_t poly)
 {
@@ -430,24 +442,9 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
     fmpz_poly_compose_horner(res, poly1, poly2);
 }
 
-/*  String conversions  ******************************************************/
+/*  Printing  ****************************************************************/
 
 void fmpz_poly_print(const fmpz_poly_t poly);
-
-char * _fmpz_poly_to_string(const fmpz * poly, long len);
-
-char * fmpz_poly_to_string(const fmpz_poly_t poly);
-
-char * _fmpz_poly_to_string_pretty(const fmpz * poly, 
-                                                long len, const char * x);
-
-char * fmpz_poly_to_string_pretty(const fmpz_poly_t poly, const char * x);
-
-int fmpz_poly_verify_format(const char * str);
-
-void _fmpz_poly_from_string(fmpz * poly, const char * str);
-
-int fmpz_poly_from_string(fmpz_poly_t poly, const char * str);
 
 #endif
 

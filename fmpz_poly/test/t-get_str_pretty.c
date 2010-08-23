@@ -40,12 +40,12 @@ main(void)
     char *str;
     fmpz_poly_t a;
 
-    printf("to_string....");
+    printf("get_str_pretty....");
     fflush(stdout);
 
     fmpz_poly_init(a);
 
-    str = fmpz_poly_to_string_pretty(a, "t");
+    str = fmpz_poly_get_str_pretty(a, "t");
     result = strcmp(str, "0") == 0;
     if (!result)
     {
@@ -57,7 +57,7 @@ main(void)
     free(str);
 
     fmpz_poly_set_si(a, -2);
-    str = fmpz_poly_to_string_pretty(a, "t");
+    str = fmpz_poly_get_str_pretty(a, "t");
     result = strcmp(str, "-2") == 0;
     if (!result)
     {
@@ -69,7 +69,7 @@ main(void)
     free(str);
 
     fmpz_poly_set_coeff_si(a, 3, 1);
-    str = fmpz_poly_to_string_pretty(a, "t");
+    str = fmpz_poly_get_str_pretty(a, "t");
     result = strcmp(str, "t^3-2") == 0;
     if (!result)
     {
