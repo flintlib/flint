@@ -1,0 +1,86 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Fredrik Johansson
+
+******************************************************************************/
+
+This module implements arithmetic functions, number-theoretic and combinatorial
+special number sequences and polynomials.
+
+
+*******************************************************************************
+
+    Special numbers
+
+*******************************************************************************
+
+void fmpz_primorial(fmpz_t res, long n)
+
+    Set res to "n primorial" or "n#", the product of all prime numbers less
+    than or equal to n.
+
+
+*******************************************************************************
+
+    Multiplicative functions
+
+*******************************************************************************
+
+void fmpz_divisors(fmpz_poly_t res, ulong n)
+
+    Set the coefficients of the polynomial res to the divisors of n
+    (including 1 and n itself) in ascending order.
+
+void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
+
+    Set res to sigma_k(n), the sum of kth powers of all divisors of n.
+
+void fmpz_ramanujan_tau(fmpz_t res, long n)
+
+    Set res to the Ramanujan tau function tau(n) which is the coefficient of
+    q^n in the series expansion of f(q) = q * prod_{k>=1} (1-q^k)^24.
+
+    We factor n and use the identity tau(p*q) = tau(p)*tau(q)
+    along with the recursion tau(p^(r+1)) = tau(p)*tau(p^r) - p^11*tau(p^(r-1))
+    for prime powers.
+
+    The base values tau(p) are obtained from fmpz_poly_ramanujan_tau.
+    Thus the speed of fmpz_ramanujan_tau depends on the largest
+    prime factor of n.
+
+    Future improvements: optimize for small n (could use a lookup table
+    or fmpz_poly_ramanujan_tau directly); let n be an fmpz_t instead
+    as soon as fmpz factoring is implemented.
+
+void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
+
+    Set res to the the polynomial with coefficients tau(0),tau(1)...tau(n-1)
+    giving the initial n terms in the series expansion of
+    f(q) = q * prod_{k>=1} (1-q^k)^24.
+
+    The algorithm is borrowed from the delta_qexp function in Sage (written
+    by William Stein and David Harvey), and consists of expanding the
+    series of the equivalent representation
+    f(q) = q * (sum_{k>=0} (-1)^k (2k+1) q^(k(k+1)/2))^8. The first squaring
+    is done directly since the polynomial is very sparse at this point.
+
+
