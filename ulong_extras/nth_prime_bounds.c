@@ -33,12 +33,12 @@ void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
     int bits, ll;
     double llo, lhi;
 
-    // Lower and upper bounds for ln(n)
+    /* Lower and upper bounds for ln(n) */
     bits = FLINT_BIT_COUNT(n);
     llo = (bits-1) * 0.6931471;
     lhi = bits * 0.6931472;
 
-    // Lower bound for ln(ln(n))
+    /* Lower bound for ln(ln(n)) */
     if      (n < 16)        ll = 0;
     else if (n < 1619)      ll = 1;
     else if (n < 528491312) ll = 2;

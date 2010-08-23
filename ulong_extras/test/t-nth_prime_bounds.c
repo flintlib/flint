@@ -30,11 +30,12 @@
 
 void check(ulong n, mp_limb_t ans)
 {
+    int ok, reasonable;
     mp_limb_t lo, hi;
     n_nth_prime_bounds(&lo, &hi, n);
 
-    int ok = lo <= ans && ans <= hi;
-    int reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
+    ok = lo <= ans && ans <= hi;
+    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
 
     if (ok && reasonable)
         return;
@@ -56,7 +57,7 @@ int main(void)
         check(n, n_nth_prime(n));
     }
 
-    // Some known large primes
+    /* Some known large primes */
     check(10UL, 29UL);
     check(100UL, 541UL);
     check(1000UL, 7919UL);

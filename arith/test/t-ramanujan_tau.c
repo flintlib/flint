@@ -88,8 +88,6 @@ void consistency_check(long n)
 
 int main(void)
 {
-    ulong k;
-
     printf("ramanujan_tau....");
     fflush(stdout);
 

@@ -30,11 +30,12 @@
 
 void check(mp_limb_t n, ulong ans)
 {
+    int ok, reasonable;
     ulong lo, hi;
     n_prime_pi_bounds(&lo, &hi, n);
 
-    int ok = lo <= ans && ans <= hi;
-    int reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
+    ok = lo <= ans && ans <= hi;
+    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
 
     if (ok && reasonable)
         return;

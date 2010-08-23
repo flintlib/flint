@@ -35,6 +35,7 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
 {
     int i;
     fmpz_t p, r;
+    n_factor_t factors;
 
     if (n == 0)
     {
@@ -42,7 +43,6 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
         return;
     }
 
-    n_factor_t factors;
     n_factor_init(&factors);
     n_factor(&factors, n, 0);
 
@@ -50,8 +50,8 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
     fmpz_init(r);
     fmpz_set_ui(res, 1UL);
 
-    // TODO: use a balanced product in large cases,
-    // speedup for small n.
+    /* TODO: use a balanced product in large cases,
+       speedup for small n. */
     for (i = 0; i<factors.num; i++)
     {
         if (k == 0)
