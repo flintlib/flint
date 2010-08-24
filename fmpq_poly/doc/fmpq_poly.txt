@@ -565,22 +565,24 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 
 *******************************************************************************
 
-void _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const fmpz_t a)
+void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
+                              const fmpz_t den, long len, const fmpz_t a)
 
-    Evaluates the polynomial {poly, den, len} at the integer a and sets res 
-    to the result.
+    Evaluates the polynomial {poly, den, len} at the integer a and sets 
+    {rnum, rden} to the result in lowest terms.
 
 void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
                              const fmpz_t a)
 
     Evaluates the polynomial poly at the integer a and sets res to the result.
 
-void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const mpq_t a)
+void _fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+                             const fmpz * poly, const fmpz_t den, long len, 
+                             const fmpz_t anum, const fmpz_t aden)
 
-    Evaluates the polynomial {poly, den, len} at the rational a and sets 
-    res to the result.  Aliasing between res and a is not supported.
+    Evaluates the polynomial {poly, den, len} at the rational {anum, aden} 
+    and sets {rnum, rden} to the result in lowest terms.  
+    Aliasing between {rnum, rden} and {anum, aden} is not supported.
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 

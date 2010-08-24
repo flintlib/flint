@@ -412,14 +412,16 @@ void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a);
 
 void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
-void _fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz * f, long len, 
-                                                                const mpq_t a);
+void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, long len, 
+                                    const fmpz_t anum, const fmpz_t aden);
 
 void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
                                                                 const mpq_t a);
 
-void _fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, long len, 
-                                                                const mpq_t a);
+void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
+                             const fmpz * f, long len, 
+                             const fmpz_t anum, const fmpz_t aden);
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
 

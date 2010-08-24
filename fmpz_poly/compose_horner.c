@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -78,11 +78,12 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
         fmpz_poly_zero(res);
         return;
     }
-    if (len2 == 0L)
+    if (len1 == 1L || len2 == 0L)
     {
         fmpz_poly_fit_length(res, 1);
         fmpz_set(res->coeffs, poly1->coeffs);
         _fmpz_poly_set_length(res, 1);
+        _fmpz_poly_normalise(res);
         return;
     }
     
@@ -94,6 +95,7 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
         _fmpz_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
                                                           poly2->coeffs, len2);
         _fmpz_poly_set_length(res, lenr);
+        _fmpz_poly_normalise(res);
     }
     else
     {
@@ -102,6 +104,7 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
         _fmpz_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
                                                           poly2->coeffs, len2);
         _fmpz_poly_set_length(t, lenr);
+        _fmpz_poly_normalise(t);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }

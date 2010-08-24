@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,31 +29,43 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void 
-_fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, const fmpz_t den, 
-                        long len, const mpq_t a)
+void
+_fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+                        const fmpz * poly, const fmpz_t den, long len, 
+                        const fmpz_t anum, const fmpz_t aden)
 {
-    mpq_t rden;
-    mpq_init(rden);
-    _fmpz_poly_evaluate_horner_mpq(res, poly, len, a);
-    mpz_set_ui(mpq_numref(rden), 1);
-    fmpz_get_mpz(mpq_denref(rden), den);
-    mpq_mul(res, res, rden);
-    mpq_clear(rden);
+    fmpz_t d;
+    
+    _fmpz_poly_evaluate_horner_mpq(rnum, rden, poly, len, anum, aden);
+    fmpz_mul(rden, rden, den);
+    
+    fmpz_init(d);
+    fmpz_gcd(d, rnum, rden);
+    if (*d != 1L)
+    {
+        fmpz_divexact(rnum, rnum, d);
+        fmpz_divexact(rden, rden, d);
+    }
+    fmpz_clear(d);
 }
 
 void 
 fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 {
-    if (res == a)
-    {
-        mpq_t t;
-        mpq_init(t);
-        _fmpq_poly_evaluate_mpq(t, poly->coeffs, poly->den, poly->length, a);
-        mpq_swap(res, t);
-        mpq_clear(t);
-    }
-    else
-        _fmpq_poly_evaluate_mpq(res, poly->coeffs, poly->den, poly->length, a);
-}
+    fmpz_t rnum, rden, anum, aden;
+    fmpz_init(rnum);
+    fmpz_init(rden);
+    fmpz_init(anum);
+    fmpz_init(aden);
+    fmpz_set_mpz(anum, mpq_numref(a));
+    fmpz_set_mpz(aden, mpq_denref(a));
 
+    _fmpq_poly_evaluate_mpq(rnum, rden, poly->coeffs, poly->den, poly->length, anum, aden);
+
+    fmpz_get_mpz(mpq_numref(res), rnum);
+    fmpz_get_mpz(mpq_denref(res), rden);
+    fmpz_clear(rnum);
+    fmpz_clear(rden);
+    fmpz_clear(anum);
+    fmpz_clear(aden);
+}
