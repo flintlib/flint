@@ -52,8 +52,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
         fmpq_poly_init(r);
-        fmpq_poly_randtest(a, state, n_randint(50), 500);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
+        fmpq_poly_randtest(a, state, n_randint(50), 200);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 200);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(a, b, a, b);
@@ -84,8 +84,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
         fmpq_poly_init(r);
-        fmpq_poly_randtest(a, state, n_randint(50), 500);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
+        fmpq_poly_randtest(a, state, n_randint(50), 200);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 200);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(b, a, a, b);
@@ -117,8 +117,8 @@ main(void)
         fmpq_poly_init(q);
         fmpq_poly_init(r);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(50), 500);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
+        fmpq_poly_randtest(a, state, n_randint(50), 200);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 200);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_mul(rhs, q, b);
@@ -128,8 +128,11 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("a   = "), fmpq_poly_print(a), printf("\n\n");
-            printf("rhs = "), fmpq_poly_print(rhs), printf("\n\n");
+            printf("a       = "), fmpq_poly_print(a), printf("\n\n");
+            printf("b       = "), fmpq_poly_print(b), printf("\n\n");
+            printf("q       = "), fmpq_poly_print(q), printf("\n\n");
+            printf("r       = "), fmpq_poly_print(r), printf("\n\n");
+            printf("q b + r = "), fmpq_poly_print(rhs), printf("\n\n");
             abort();
         }
 
