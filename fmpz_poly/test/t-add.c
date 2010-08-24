@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -50,8 +51,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_add(c, a, b);
         fmpz_poly_add(a, a, b);
@@ -60,12 +61,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
-            fmpz_poly_print(c);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
             abort();
         }
 
@@ -82,8 +80,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_add(c, a, b);
         fmpz_poly_add(b, a, b);
@@ -92,12 +90,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
-            fmpz_poly_print(c);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
             abort();
         }
 

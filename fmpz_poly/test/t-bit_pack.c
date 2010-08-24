@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -55,11 +55,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
 
-        do
-        {
-            fmpz_poly_randtest(a, state, length, bits - 1);
-        }                       /* -1 bit to handle signs */
-        while (a->length == 0);
+        /* -1 bit to handle signs */
+        fmpz_poly_randtest_not_zero(a, state, length, bits - 1);
 
         negate = fmpz_sgn(a->coeffs + a->length - 1);
         if (negate > 0)
@@ -97,9 +94,7 @@ main(void)
         fmpz_poly_init(b);
 
         do
-        {
             fmpz_poly_randtest_unsigned(a, state, length, bits);
-        }
         while (a->length == 0);
 
         _fmpz_poly_bit_pack(arr, a->coeffs, a->length, bits, 0);

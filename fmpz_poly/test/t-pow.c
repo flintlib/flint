@@ -38,7 +38,6 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-
     printf("pow....");
     fflush(stdout);
 
@@ -52,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(10), n_randint(100));
+        fmpz_poly_randtest(b, state, n_randint(10), 100);
 
         exp = n_randtest() % 20UL;
 
@@ -82,7 +81,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(10), n_randint(100));
+        fmpz_poly_randtest(b, state, n_randint(10), 100);
 
         exp = n_randtest() % 20UL;
 

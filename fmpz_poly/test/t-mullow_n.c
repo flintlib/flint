@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -52,8 +52,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         trunc = n_randint(50);
-        fmpz_poly_randtest(b, state, trunc, n_randint(200));
-        fmpz_poly_randtest(c, state, trunc, n_randint(200));
+        fmpz_poly_randtest(b, state, trunc, 200);
+        fmpz_poly_randtest(c, state, trunc, 200);
 
         fmpz_poly_mullow_n(a, b, c, trunc);
         fmpz_poly_mul(b, b, c);

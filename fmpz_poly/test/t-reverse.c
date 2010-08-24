@@ -51,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
         n = n_randint(150);
 
         fmpz_poly_reverse(a, b, n);
@@ -79,7 +79,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
         n = n_randint(150);
 
         len = FLINT_MIN(n, b->length);

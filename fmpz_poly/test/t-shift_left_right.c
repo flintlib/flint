@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
 
         fmpz_poly_shift_left(b, a, shift);
         fmpz_poly_shift_left(a, a, shift);
@@ -76,7 +76,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest_not_zero(a, state, n_randint(100) + 1, n_randint(200) + 1);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(100) + 1, 200);
 
         shift = n_randint(a->length);
 
@@ -105,7 +105,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
 
         fmpz_poly_shift_left(b, a, shift);
         fmpz_poly_shift_right(c, b, shift);

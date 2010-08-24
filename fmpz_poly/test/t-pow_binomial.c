@@ -38,7 +38,6 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-
     printf("pow_binomial....");
     fflush(stdout);
 

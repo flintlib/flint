@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -55,11 +55,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
         fmpz_poly_mul(prod, q, b);
@@ -86,7 +83,7 @@ main(void)
         fmpz_poly_clear(prod);
     }
 
-    /* check r and a alias */
+    /* Check r and a alias */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -96,11 +93,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
         fmpz_poly_pseudo_divrem_basecase(q, a, &d, a, b);
@@ -121,7 +115,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check r and b alias */
+    /* Check r and b alias */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -131,11 +125,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
         fmpz_poly_pseudo_divrem_basecase(q, b, &d, a, b);
@@ -156,7 +147,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check q and a alias */
+    /* Check q and a alias */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -165,11 +156,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
         fmpz_poly_pseudo_divrem_basecase(a, r, &d, a, b);
@@ -190,7 +178,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check q and b alias */
+    /* Check q and b alias */
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -200,11 +188,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
         fmpz_poly_pseudo_divrem_basecase(b, r, &d, a, b);

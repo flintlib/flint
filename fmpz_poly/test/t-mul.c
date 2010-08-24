@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -50,8 +50,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), n_randint(500));
-        fmpz_poly_randtest(c, state, n_randint(50), n_randint(500));
+        fmpz_poly_randtest(b, state, n_randint(50), 500);
+        fmpz_poly_randtest(c, state, n_randint(50), 500);
 
         fmpz_poly_mul(a, b, c);
         fmpz_poly_mul(b, b, c);
@@ -78,8 +78,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), n_randint(500));
-        fmpz_poly_randtest(c, state, n_randint(50), n_randint(500));
+        fmpz_poly_randtest(b, state, n_randint(50), 500);
+        fmpz_poly_randtest(c, state, n_randint(50), 500);
 
         fmpz_poly_mul(a, b, c);
         fmpz_poly_mul(c, b, c);
@@ -88,10 +88,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(c);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(c), printf("\n\n");
             abort();
         }
 
@@ -110,9 +108,9 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(100), n_randint(500));
-        fmpz_poly_randtest(c, state, n_randint(100), n_randint(500));
-        fmpz_poly_randtest(d, state, n_randint(100), n_randint(500));
+        fmpz_poly_randtest(b, state, n_randint(100), 500);
+        fmpz_poly_randtest(c, state, n_randint(100), 500);
+        fmpz_poly_randtest(d, state, n_randint(100), 500);
 
         fmpz_poly_mul(a1, b, c);
         fmpz_poly_mul(a2, b, d);

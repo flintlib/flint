@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -53,8 +53,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         len = n_randint(50);
-        fmpz_poly_randtest(b, state, len, n_randint(200));
-        fmpz_poly_randtest(c, state, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mulhigh_karatsuba_n(a, b, c, len);
         fmpz_poly_mulhigh_karatsuba_n(b, b, c, len);
@@ -83,8 +83,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         len = n_randint(50);
-        fmpz_poly_randtest(b, state, len, n_randint(200));
-        fmpz_poly_randtest(c, state, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mulhigh_karatsuba_n(a, b, c, len);
         fmpz_poly_mulhigh_karatsuba_n(c, b, c, len);
@@ -114,8 +114,8 @@ main(void)
         fmpz_poly_init(c);
         fmpz_poly_init(d);
         len = n_randint(50);
-        fmpz_poly_randtest(b, state, len, n_randint(200));
-        fmpz_poly_randtest(c, state, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mul_classical(a, b, c);
         if (len)

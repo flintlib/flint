@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -52,14 +52,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, state, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(b->length + c->length);
+        start = (len <= 0) ? 0 : n_randint(b->length + c->length);
 
         fmpz_poly_mulhigh_classical(a, b, c, start);
         fmpz_poly_mulhigh_classical(b, b, c, start);
@@ -87,14 +84,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, state, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(b->length + c->length - 1);
+        start = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
 
         fmpz_poly_mulhigh_classical(a, b, c, start);
         fmpz_poly_mulhigh_classical(c, b, c, start);
@@ -123,14 +117,11 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, state, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(b->length + c->length - 1);
+        start = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
 
         fmpz_poly_mul_classical(a, b, c);
         if (a->length >= start)

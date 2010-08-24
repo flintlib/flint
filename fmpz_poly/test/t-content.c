@@ -53,8 +53,8 @@ main(void)
         fmpz_init(c);
         fmpz_init(d);
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, state, n_randint(100), n_randint(200));
-        fmpz_randtest(a, state, n_randint(100));
+        fmpz_poly_randtest(f, state, n_randint(100), 200);
+        fmpz_randtest(a, state, 100);
 
         fmpz_poly_content(c, f);
         fmpz_poly_scalar_mul_fmpz(f, f, a);
@@ -78,7 +78,6 @@ main(void)
     }
 
     fmpz_poly_randclear(state);
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
