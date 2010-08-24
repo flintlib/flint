@@ -34,6 +34,7 @@ int
 main(void)
 {
     int i, result;
+
     printf("get/set_si....");
     fflush(stdout);
 

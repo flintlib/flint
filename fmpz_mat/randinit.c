@@ -28,7 +28,7 @@
 #include "fmpz.h"
 
 void
-fmpz_mat_randinit(void)
+fmpz_mat_randinit(fmpz_randstate_t state)
 {
-    fmpz_randinit();
+    fmpz_randinit(state);
 }

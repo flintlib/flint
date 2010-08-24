@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("neg....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -49,7 +50,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpq_poly_neg(b, a);
         fmpq_poly_neg(c, b);
@@ -57,7 +58,7 @@ main(void)
         result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
@@ -69,7 +70,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

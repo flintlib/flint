@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("cmpabs....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -46,7 +48,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
 
-        fmpz_randtest(a, 200);
+        fmpz_randtest(a, state, 200);
 
         fmpz_set(b, a);
         result = (fmpz_cmpabs(a, b));
@@ -54,10 +56,8 @@ main(void)
         if (result != 0)
         {
             printf("FAIL\n");
-            printf("a = ");
-            fmpz_print(a), printf("\n");
-            printf("b = ");
-            fmpz_print(b), printf("\n");
+            printf("a = "), fmpz_print(a), printf("\n");
+            printf("b = "), fmpz_print(b), printf("\n");
             abort();
         }
 
@@ -77,8 +77,8 @@ main(void)
         mpz_init(c);
         mpz_init(d);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest(b, state, 200);
 
         fmpz_get_mpz(c, a);
         fmpz_get_mpz(d, b);
@@ -90,7 +90,7 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL\n");
+            printf("FAIL:\n");
             gmp_printf("c = %Zd, d = %Zd\n", c, d);
             abort();
         }
@@ -102,7 +102,7 @@ main(void)
         mpz_clear(d);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

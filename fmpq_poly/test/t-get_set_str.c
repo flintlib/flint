@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("get_set_str....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -50,7 +51,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), n_randint(200));
         
         str = fmpq_poly_get_str(f);
         ans = fmpq_poly_set_str(g, str);
@@ -70,7 +71,7 @@ main(void)
         free(str);
     }
     
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

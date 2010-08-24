@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,7 +32,7 @@
 #include "fmpz.h"
 
 void
-fmpz_randm(fmpz_t f, fmpz_t m)
+fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m)
 {
     mp_bitcnt_t bits = fmpz_bits(m);
     int sgn = fmpz_sgn(m);
@@ -39,15 +40,12 @@ fmpz_randm(fmpz_t f, fmpz_t m)
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
-        if (sgn >= 0)
-            *f = n_randint(*m);
-        else
-            *f = -n_randint(-(*m));
+        *f =  (sgn >= 0) ? n_randint(*m) : - n_randint(-(*m));
     }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_urandomm(mpz_ptr, fmpz_randstate, COEFF_TO_PTR(*m));
+        mpz_urandomm(mpz_ptr, state, COEFF_TO_PTR(*m));
         if (sgn < 0)
             mpz_neg(mpz_ptr, mpz_ptr);
         _fmpz_demote_val(f);

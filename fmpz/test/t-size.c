@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("size....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -49,7 +51,7 @@ main(void)
 
         mpz_init(b);
 
-        fmpz_randtest(a, 200);
+        fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(b, a);
 
@@ -69,7 +71,7 @@ main(void)
         mpz_clear(b);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

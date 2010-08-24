@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("mulhigh_n....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Compare with left truncated product of a and b */
     for (i = 0; i < 2000; i++)
@@ -50,8 +52,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         n = n_randint(50);
-        fmpz_poly_randtest(b, n, n_randint(200));
-        fmpz_poly_randtest(c, n, n_randint(200));
+        fmpz_poly_randtest(b, state, n, n_randint(200));
+        fmpz_poly_randtest(c, state, n, n_randint(200));
 
         fmpz_poly_mulhigh_n(a, b, c, n);
         fmpz_poly_mul(b, b, c);
@@ -79,7 +81,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

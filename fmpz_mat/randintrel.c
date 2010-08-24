@@ -32,7 +32,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
+fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
     long r, c, i, j;
 
@@ -48,7 +48,7 @@ fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
 
     for (i = 0; i < r; i++)
     {
-        fmpz_randbits(mat->rows[i], bits);
+        fmpz_randbits(mat->rows[i], state, bits);
         for (j = 1; j <= i; j++)
             fmpz_zero(mat->rows[i] + j);
         fmpz_set_ui(mat->rows[i] + i + 1, 1);

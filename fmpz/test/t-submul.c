@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("submul....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -53,9 +55,9 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest(b, 200);
-        fmpz_randtest(c, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest(b, state, 200);
+        fmpz_randtest(c, state, 200);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
@@ -97,8 +99,8 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest(c, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest(c, state, 200);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(f, c);
@@ -138,8 +140,8 @@ main(void)
         mpz_init(e);
         mpz_init(f);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest(b, state, 200);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
@@ -178,8 +180,8 @@ main(void)
         mpz_init(e);
         mpz_init(f);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest(b, state, 200);
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(e, b);
@@ -205,7 +207,7 @@ main(void)
         mpz_clear(f);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

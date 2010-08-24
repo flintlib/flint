@@ -35,9 +35,12 @@ int
 main(void)
 {
     int i;
+    fmpz_randstate_t state;
+    
     printf("init/clear....");
     fflush(stdout);
-    _fmpz_vec_randinit();
+    
+    _fmpz_vec_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -51,7 +54,7 @@ main(void)
         _fmpz_vec_clear(a, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     for (i = 0; i < 20000; i++)
     {
@@ -55,7 +57,7 @@ main(void)
 
         do
         {
-            fmpz_poly_randtest(a, length, bits - 1);
+            fmpz_poly_randtest(a, state, length, bits - 1);
         }                       /* -1 bit to handle signs */
         while (a->length == 0);
 
@@ -72,10 +74,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -98,7 +98,7 @@ main(void)
 
         do
         {
-            fmpz_poly_randtest_unsigned(a, length, bits);
+            fmpz_poly_randtest_unsigned(a, state, length, bits);
         }
         while (a->length == 0);
 
@@ -111,10 +111,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(b);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -123,7 +121,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("set_array_mpq....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -50,7 +51,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(n), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(n), n_randint(200));
         for (j = 0; j < n; j++)
             mpq_init(a[j]);
         for (j = 0; j < f->length; j++)
@@ -73,7 +74,7 @@ main(void)
             mpq_clear(a[j]);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

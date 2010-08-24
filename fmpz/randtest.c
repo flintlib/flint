@@ -31,9 +31,9 @@
 #include "fmpz.h"
 
 void
-fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
+fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
-    mp_bitcnt_t bits = n_randint(bits_in + 1);
+    bits = n_randint(bits + 1);
 
     if (bits <= FLINT_BITS - 2)
     {
@@ -45,16 +45,16 @@ fmpz_randtest(fmpz_t f, mp_bitcnt_t bits_in)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_rrandomb(mpz_ptr, fmpz_randstate, bits);
+        mpz_rrandomb(mpz_ptr, state, bits);
         if (n_randint(2))
             mpz_neg(mpz_ptr, mpz_ptr);
     }
 }
 
 void
-fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in)
+fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
-    mp_bitcnt_t bits = n_randint(bits_in + 1);
+    bits = n_randint(bits + 1);
 
     if (bits <= FLINT_BITS - 2)
     {
@@ -64,20 +64,20 @@ fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_rrandomb(mpz_ptr, fmpz_randstate, bits);
+        mpz_rrandomb(mpz_ptr, state, bits);
     }
 }
 
 void
-fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in)
+fmpz_randtest_not_zero(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
-    if (bits_in == 0)
+    if (bits == 0)
     {
         printf("Exception: 0 passed to fmpz_randtest_not_zero\n");
         abort();
     }
 
-    fmpz_randtest(f, bits_in);
+    fmpz_randtest(f, state, bits);
     if (fmpz_is_zero(f))
-        fmpz_set_ui(f, 1UL);
+        fmpz_set_ui(f, 1);
 }

@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, j, result;
+    fmpz_randstate_t state;
+
     printf("get/set_coeff_si....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
@@ -67,7 +69,7 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

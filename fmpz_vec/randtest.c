@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,9 +32,10 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits)
+_fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state, 
+                   long len, mp_bitcnt_t bits)
 {
     long i;
     for (i = 0; i < len; i++)
-        fmpz_randtest(f + i, bits);
+        fmpz_randtest(f + i, state, bits);
 }

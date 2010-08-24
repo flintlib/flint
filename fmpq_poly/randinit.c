@@ -28,8 +28,8 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpq_poly_randinit(void)
+void fmpq_poly_randinit(fmpz_randstate_t state)
 {
-    fmpz_randinit();
+    fmpz_randinit(state);
 }
 

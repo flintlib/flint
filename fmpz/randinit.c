@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -27,9 +28,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-gmp_randstate_t fmpz_randstate;
-
-void fmpz_randinit(void)
+void fmpz_randinit(fmpz_randstate_t state)
 {
-    gmp_randinit_default(fmpz_randstate);
+    gmp_randinit_default(state);
 }

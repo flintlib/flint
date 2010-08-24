@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("set/equal....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* equal polynomials */
     for (i = 0; i < 10000; i++)
@@ -49,7 +50,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_set(b, a);
 
@@ -81,14 +82,14 @@ main(void)
         fmpz_init(x1fmpz);
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_set(b, a);
 
         fmpq_poly_get_coeff_mpq(x2, b, coeff);
         do
         {
-            fmpz_randtest(x1fmpz, 200);
+            fmpz_randtest(x1fmpz, state, 200);
             fmpz_get_mpz(mpq_numref(x1), x1fmpz);
             mpz_set_si(mpq_denref(x1), 1);
         } while (mpq_equal(x1, x2));
@@ -113,7 +114,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

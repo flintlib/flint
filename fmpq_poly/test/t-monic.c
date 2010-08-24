@@ -36,10 +36,11 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
     printf("monic/is_monic....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -48,7 +49,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), n_randint(200));
 
         fmpq_poly_monic(g, f);
         fmpq_poly_monic(f, f);
@@ -72,7 +73,7 @@ main(void)
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest_not_zero(f, n_randint(100) + 1, n_randint(200) + 1);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(100) + 1, n_randint(200) + 1);
 
         fmpq_poly_monic(f, f);
 
@@ -87,7 +88,7 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -51,25 +51,25 @@ void fmpz_mat_print_pretty(fmpz_mat_t mat)
     bracket. Each row is written as an opening square bracket followed by a
     space separated list of coefficients followed by a closing square bracket.
 
-void fmpz_mat_randinit(void)
+void fmpz_mat_randinit(fmpz_randstate_t state)
 
     Initialises the fmpz_mat randstate.
 
-void fmpz_mat_randclear(void)
+void fmpz_mat_randclear(fmpz_randstate_t state)
 
     Clears the fmpz_mat randstate.
 
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits)
+void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
 
     Sets the entries of mat to random signed integers whose absolute values
     have the given number of binary bits.
 
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits_in)
+void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
 
     Sets the entries of mat to random signed integers whose absolute values 
     have a random number of bits up to the given number of bits inclusive.
 
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
+void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
 
     Sets mat to be a random "integer relations" matrix, with signed entries up 
     to the given number of bits. The number of columns of mat must be equal 
@@ -77,7 +77,7 @@ void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits)
     random integers in the left hand column and an identity matrix in the 
     remaining square submatrix.
 
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 
     Sets mat to a random "simultaneous diophantine" matrix. The matrix must
     be square. The top left entry is set to 2^bits2. The remainder of that
@@ -85,7 +85,7 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
     bits. The remainder of the first column is zero. Running down the rest of
     the diagonal are the values 2^bits with all remaining entries zero.
   
-void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
+void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q)
    
     Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
     The matrix is broken into four square submatrices. The top left submatrix
@@ -95,7 +95,7 @@ void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
     h of length r/2 is created, with random signed entries of the given number
     of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
 
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
+void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q)
    
     Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
     The matrix is broken into four square submatrices. The top left submatrix
@@ -105,7 +105,7 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
     h of length r/2 is created, with random signed entries of the given number
     of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
 
-void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
+void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
 
     Sets a square matrix mat to a random "ajtai" matrix. The diagonal entries 
     (i, i) are set to a random entry in the range [1, 2^{b-1}] inclusive where

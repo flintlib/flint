@@ -86,15 +86,18 @@ long fmpq_poly_length(fmpq_poly_t poly)
 
 /*  Randomisation  ***********************************************************/
 
-void fmpq_poly_randinit(void);
+void fmpq_poly_randinit(fmpz_randstate_t state);
 
-void fmpq_poly_randclear(void);
+void fmpq_poly_randclear(fmpz_randstate_t state);
 
-void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits_in);
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits_in);
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state,
+                                                long len, mp_bitcnt_t bits_in);
 
 /*  Assignment and basic manipulation  ***************************************/
 

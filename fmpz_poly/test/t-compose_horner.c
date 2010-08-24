@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("compose_horner....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 100; i++)
@@ -49,8 +51,8 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, n_randint(50), n_randint(100));
-        fmpz_poly_randtest(h, n_randint(20), n_randint(50));
+        fmpz_poly_randtest(g, state, n_randint(50), n_randint(100));
+        fmpz_poly_randtest(h, state, n_randint(20), n_randint(50));
 
         fmpz_poly_compose_horner(f, g, h);
         fmpz_poly_compose_horner(g, g, h);
@@ -77,8 +79,8 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, n_randint(50), n_randint(100));
-        fmpz_poly_randtest(h, n_randint(20), n_randint(50));
+        fmpz_poly_randtest(g, state, n_randint(50), n_randint(100));
+        fmpz_poly_randtest(h, state, n_randint(20), n_randint(50));
 
         fmpz_poly_compose_horner(f, g, h);
         fmpz_poly_compose_horner(h, g, h);
@@ -108,8 +110,8 @@ main(void)
         fmpz_poly_init(h);
         fmpz_poly_init(s);
         fmpz_poly_init(t);
-        fmpz_poly_randtest(g, n_randint(50), n_randint(100));
-        fmpz_poly_randtest(h, n_randint(20), n_randint(50));
+        fmpz_poly_randtest(g, state, n_randint(50), n_randint(100));
+        fmpz_poly_randtest(h, state, n_randint(20), n_randint(50));
         
         fmpz_poly_set_ui(t, 1);
         for (k = 0; k < g->length; k++)
@@ -136,7 +138,7 @@ main(void)
         fmpz_poly_clear(t);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

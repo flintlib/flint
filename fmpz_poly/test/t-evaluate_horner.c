@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("evaluate_horner....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -50,8 +52,8 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, n_randint(100), n_randint(200));
-        fmpz_randtest(a, n_randint(100));
+        fmpz_poly_randtest(f, state, n_randint(100), n_randint(200));
+        fmpz_randtest(a, state, n_randint(100));
 
         fmpz_poly_evaluate_horner(b, f, a);
         fmpz_poly_evaluate_horner(a, f, a);
@@ -81,9 +83,9 @@ main(void)
         fmpz_init(c);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(f, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(g, n_randint(100), n_randint(200));
-        fmpz_randtest(a, n_randint(100));
+        fmpz_poly_randtest(f, state, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(g, state, n_randint(100), n_randint(200));
+        fmpz_randtest(a, state, n_randint(100));
 
         fmpz_poly_evaluate_horner(b, f, a);
         fmpz_poly_evaluate_horner(c, g, a);
@@ -107,7 +109,7 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

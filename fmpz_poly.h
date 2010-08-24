@@ -139,15 +139,18 @@ void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 
 /*  Randomisation  ***********************************************************/
 
-void fmpz_poly_randinit(void);
+void fmpz_poly_randinit(fmpz_randstate_t state);
 
-void fmpz_poly_randclear(void);
+void fmpz_poly_randclear(fmpz_randstate_t state);
 
-void fmpz_poly_randtest(fmpz_poly_t f, long len, mp_bitcnt_t bits);
+void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long len, mp_bitcnt_t bits);
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits);
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, long len, mp_bitcnt_t bits);
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state,
+                                                long len, mp_bitcnt_t bits);
 
 /*  Getting and setting coefficients  ****************************************/
 

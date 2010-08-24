@@ -48,23 +48,23 @@ void fmpz_mat_print(fmpz_mat_t mat);
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat);
 
-void fmpz_mat_randinit(void);
+void fmpz_mat_randinit(fmpz_randstate_t state);
 
-void fmpz_mat_randclear(void);
+void fmpz_mat_randclear(fmpz_randstate_t state);
 
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
+void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);
+void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits);
+void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2);
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2);
 
-void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
+void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q);
 
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
+void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q);
 
-void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha);
+void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha);
 
 #endif
 

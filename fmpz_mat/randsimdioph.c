@@ -32,7 +32,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
     long r, c, i, j;
 
@@ -49,7 +49,7 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2)
     fmpz_set_ui(mat->rows[0], 1);
     fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
     for (j = 1; j < c; j++)
-        fmpz_randbits(mat->rows[0] + j, bits);
+        fmpz_randbits(mat->rows[0] + j, state, bits);
     for (i = 1; i < r; i++)
     {
         for (j = 0; j < i; j++)

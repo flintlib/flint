@@ -36,10 +36,11 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
     printf("rescale....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 1000; i++)
@@ -50,12 +51,12 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(100));
+        fmpq_poly_randtest(f, state, n_randint(100), 100);
         
         fmpz_init(anum);
         fmpz_init(aden);
-        fmpz_randtest(anum, n_randint(100));
-        fmpz_randtest_not_zero(aden, n_randint(100) + 1);
+        fmpz_randtest(anum, state, 100);
+        fmpz_randtest_not_zero(aden, state, 100);
         
         mpq_init(a);
         fmpz_get_mpz(mpq_numref(a), anum);
@@ -90,12 +91,12 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(100));
+        fmpq_poly_randtest(f, state, n_randint(100), 100);
         
         fmpz_init(anum);
         fmpz_init(aden);
-        fmpz_randtest_not_zero(anum, n_randint(100) + 1);
-        fmpz_randtest_not_zero(aden, n_randint(100) + 1);
+        fmpz_randtest_not_zero(anum, state, 100);
+        fmpz_randtest_not_zero(aden, state, 100);
         
         mpq_init(a);
         fmpz_get_mpz(mpq_numref(a), anum);
@@ -122,7 +123,7 @@ main(void)
         mpq_clear(a);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

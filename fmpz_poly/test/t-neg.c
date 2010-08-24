@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("neg....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -47,7 +49,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpz_poly_neg(b, a);
         fmpz_poly_neg(c, b);
@@ -67,7 +69,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

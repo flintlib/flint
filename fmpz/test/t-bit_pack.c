@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 500000; i++)
     {
@@ -51,7 +53,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
 
-        fmpz_randtest(a, bits - 1); /* need one bit for sign */
+        fmpz_randtest(a, state, bits - 1); /* need one bit for sign */
 
         arr[0] = n_randbits(shift);
 
@@ -84,7 +86,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
 
-        fmpz_randtest_unsigned(a, bits);
+        fmpz_randtest_unsigned(a, state, bits);
 
         arr[0] = n_randbits(shift);
 
@@ -106,7 +108,7 @@ main(void)
         fmpz_clear(b);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

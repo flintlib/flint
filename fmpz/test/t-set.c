@@ -34,6 +34,7 @@ int
 main(void)
 {
     int i, result;
+
     gmp_randstate_t state;
     gmp_randinit_default(state);
 

@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_mul_ui....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -48,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpz_poly_scalar_mul_ui(b, a, n);
         fmpz_poly_scalar_mul_ui(a, a, n);
@@ -76,7 +78,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpz_poly_scalar_mul_ui(b, a, n1);
         fmpz_poly_scalar_mul_ui(c, b, n2);
@@ -97,7 +99,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

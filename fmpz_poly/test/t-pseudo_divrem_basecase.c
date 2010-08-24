@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("pseudo_divrem_basecase....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check q*b + r = a, no aliasing */
     for (i = 0; i < 2000; i++)
@@ -53,10 +55,10 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
         do
         {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
         } while (b->length == 0);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
@@ -94,10 +96,10 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
         do
         {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
         } while (b->length == 0);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
@@ -129,10 +131,10 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
         do
         {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
         } while (b->length == 0);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
@@ -163,10 +165,10 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
         do
         {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
         } while (b->length == 0);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
@@ -198,10 +200,10 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), n_randint(200));
         do
         {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+            fmpz_poly_randtest(b, state, n_randint(100), n_randint(200));
         } while (b->length == 0);
 
         fmpz_poly_pseudo_divrem_basecase(q, r, &d, a, b);
@@ -223,7 +225,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

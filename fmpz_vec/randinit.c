@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -28,7 +29,7 @@
 #include "fmpz.h"
 
 void
-_fmpz_vec_randinit(void)
+_fmpz_vec_randinit(fmpz_randstate_t state)
 {
-    fmpz_randinit();
+    fmpz_randinit(state);
 }
