@@ -34,66 +34,71 @@ void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden,
                                const fmpz * poly, const fmpz_t den, long len, 
                                const fmpz_t r, const fmpz_t s)
 {
-    fmpz_t gcd1;  /* GCD( poly, s ) */
-    fmpz_t gcd2;  /* GCD( r, den )  */
+    fmpz_t gcd1;  /* GCD( poly, r ) */
+    fmpz_t gcd2;  /* GCD( s, den )  */
     fmpz_init(gcd1);
     fmpz_init(gcd2);
-    fmpz_set_ui(gcd1, 1UL);
-    fmpz_set_ui(gcd2, 1UL);
-    if (*s != 1L)
+    fmpz_set_ui(gcd1, 1);
+    fmpz_set_ui(gcd2, 1);
+    if (*r != 1L)
     {
         _fmpz_vec_content(gcd1, poly, len);
         if (*gcd1 != 1L)
-            fmpz_gcd(gcd1, gcd1, s);
+            fmpz_gcd(gcd1, gcd1, r);
     }
-    if (*den != 1L && *r != 1L)
+    if (*den != 1L && *s != 1L)
         fmpz_gcd(gcd2, gcd2, den);
     
     if (*gcd1 == 1L)
     {
         if (*gcd2 == 1L)
         {
-            _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, r);
-            fmpz_mul(rden, den, s);
+            _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, s);
+            fmpz_mul(rden, den, r);
         }
         else
         {
-            fmpz_t r2;
-            fmpz_init(r2);
-            fmpz_divexact(r2, r, gcd2);
-            _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, r2);
+            fmpz_t s2;
+            fmpz_init(s2);
+            fmpz_divexact(s2, s, gcd2);
+            _fmpz_vec_scalar_mul_fmpz(rpoly, poly, len, s2);
             fmpz_divexact(rden, den, gcd2);
-            fmpz_mul(rden, rden, s);
-            fmpz_clear(r2);
+            fmpz_mul(rden, rden, r);
+            fmpz_clear(s2);
         }
     }
     else
     {
-        fmpz_t s2;
-        fmpz_init(s2);
-        fmpz_divexact(s2, s, gcd1);
+        fmpz_t r2;
+        fmpz_init(r2);
+        fmpz_divexact(r2, r, gcd1);
         if (*gcd2 == 1L)
         {
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
-            _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, r);
-            fmpz_mul(rden, den, s2);
+            _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, s);
+            fmpz_mul(rden, den, r2);
         }
         else
         {
-            fmpz_t r2;
-            fmpz_init(r2);
-            fmpz_divexact(r2, r, gcd2);
+            fmpz_t s2;
+            fmpz_init(s2);
+            fmpz_divexact(s2, s, gcd2);
             _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, gcd1);
-            _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, r2);
+            _fmpz_vec_scalar_mul_fmpz(rpoly, rpoly, len, s2);
             fmpz_divexact(rden, den, gcd2);
-            fmpz_mul(rden, rden, s2);
-            fmpz_clear(r2);
+            fmpz_mul(rden, rden, r2);
+            fmpz_clear(s2);
         }
-        fmpz_clear(s2);
+        fmpz_clear(r2);
     }
     
     if (_fmpz_vec_is_zero(rpoly, len))
-        fmpz_set_ui(rden, 1UL);
+        fmpz_set_ui(rden, 1);
+    if (fmpz_sgn(rden) < 0)
+    {
+        _fmpz_vec_neg(rpoly, rpoly, len);
+        fmpz_neg(rden, rden);
+    }
     
     fmpz_clear(gcd1);
     fmpz_clear(gcd2);
