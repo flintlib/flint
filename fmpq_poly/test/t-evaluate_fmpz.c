@@ -56,8 +56,8 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_init(h);
-        fmpq_poly_randtest(f, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(g, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
+        fmpq_poly_randtest(g, state, n_randint(100), 200);
         fmpz_randtest(a, state, n_randint(100));
 
         fmpq_poly_evaluate_fmpz(x, f, a);
@@ -98,8 +98,8 @@ main(void)
         fmpz_init(a);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(g, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
+        fmpq_poly_randtest(g, state, n_randint(100), 200);
         fmpz_randtest(a, state, n_randint(100));
 
         fmpq_poly_evaluate_fmpz(x, f, a);
@@ -124,7 +124,6 @@ main(void)
     }
 
     fmpq_poly_randclear(state);
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

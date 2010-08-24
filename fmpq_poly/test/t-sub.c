@@ -52,8 +52,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(c);
         fmpq_poly_init(d);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_sub(c, a, b);
         fmpq_poly_neg(b, b);
@@ -84,8 +84,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_sub(c, a, b);
         fmpq_poly_sub(a, a, b);
@@ -113,8 +113,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_sub(c, a, b);
         fmpq_poly_sub(b, a, b);

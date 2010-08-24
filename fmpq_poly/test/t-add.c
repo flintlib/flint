@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -50,8 +50,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_add(c, a, b);
         fmpq_poly_add(a, a, b);
@@ -79,8 +79,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_add(c, a, b);
         fmpq_poly_add(b, a, b);
@@ -101,7 +101,6 @@ main(void)
     }
 
     fmpq_poly_randclear(state);
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

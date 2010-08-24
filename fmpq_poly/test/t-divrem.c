@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -52,8 +52,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
         fmpq_poly_init(r);
-        fmpq_poly_randtest(a, state, n_randint(50), n_randint(500));
-        fmpq_poly_randtest_not_zero(b, state, n_randint(499) + 1, n_randint(499) + 1);
+        fmpq_poly_randtest(a, state, n_randint(50), 500);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(a, b, a, b);
@@ -84,8 +84,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
         fmpq_poly_init(r);
-        fmpq_poly_randtest(a, state, n_randint(50), n_randint(500));
-        fmpq_poly_randtest_not_zero(b, state, n_randint(499) + 1, n_randint(499) + 1);
+        fmpq_poly_randtest(a, state, n_randint(50), 500);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(b, a, a, b);
@@ -117,8 +117,8 @@ main(void)
         fmpq_poly_init(q);
         fmpq_poly_init(r);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(50), n_randint(500));
-        fmpq_poly_randtest_not_zero(b, state, n_randint(499) + 1, n_randint(499) + 1);
+        fmpq_poly_randtest(a, state, n_randint(50), 500);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 500);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_mul(rhs, q, b);
@@ -141,7 +141,6 @@ main(void)
     }
 
     fmpq_poly_randclear(state);
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

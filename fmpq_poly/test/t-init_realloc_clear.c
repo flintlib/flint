@@ -56,7 +56,6 @@ main(void)
 
         fmpq_poly_init2(a, n_randint(100));
         fmpq_poly_realloc(a, n_randint(100));
-        fmpq_poly_realloc(a, n_randint(100));
         fmpq_poly_clear(a);
     }
 
@@ -65,7 +64,7 @@ main(void)
         fmpq_poly_t a;
 
         fmpq_poly_init(a);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
         fmpq_poly_clear(a);
     }
 

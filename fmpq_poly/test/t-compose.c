@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     fmpz_randstate_t state;
+
     printf("compose....");
     fflush(stdout);
 
@@ -50,8 +51,8 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_init(h);
-        fmpq_poly_randtest(g, state, n_randint(50), n_randint(100));
-        fmpq_poly_randtest(h, state, n_randint(20), n_randint(50));
+        fmpq_poly_randtest(g, state, n_randint(50), 100);
+        fmpq_poly_randtest(h, state, n_randint(20), 50);
 
         fmpq_poly_compose(f, g, h);
         fmpq_poly_compose(g, g, h);
@@ -78,8 +79,8 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_init(h);
-        fmpq_poly_randtest(g, state, n_randint(50), n_randint(100));
-        fmpq_poly_randtest(h, state, n_randint(20), n_randint(50));
+        fmpq_poly_randtest(g, state, n_randint(50), 100);
+        fmpq_poly_randtest(h, state, n_randint(20), 50);
 
         fmpq_poly_compose(f, g, h);
         fmpq_poly_compose(h, g, h);
@@ -112,8 +113,8 @@ main(void)
         fmpq_poly_init(t);
         fmpq_poly_init(u);
         mpq_init(c);
-        fmpq_poly_randtest(g, state, n_randint(20), n_randint(65));
-        fmpq_poly_randtest(h, state, n_randint(20), n_randint(65));
+        fmpq_poly_randtest(g, state, n_randint(20), 65);
+        fmpq_poly_randtest(h, state, n_randint(20), 65);
         
         fmpq_poly_zero(s);
         fmpq_poly_set_ui(t, 1UL);

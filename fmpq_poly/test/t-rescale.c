@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     fmpz_randstate_t state;
+
     printf("rescale....");
     fflush(stdout);
 

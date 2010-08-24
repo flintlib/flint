@@ -51,7 +51,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(n), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(n), 200);
         for (j = 0; j < n; j++)
             mpq_init(a[j]);
         for (j = 0; j < f->length; j++)

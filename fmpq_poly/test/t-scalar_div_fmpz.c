@@ -166,14 +166,14 @@ main(void)
 
         fmpz_init(n);
 
-        fmpz_randtest_not_zero(n, state, n_randint(100) + 1);
+        fmpz_randtest_not_zero(n, state, 100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_scalar_div_fmpz(lhs, a, n);
         fmpq_poly_scalar_div_fmpz(rhs, b, n);

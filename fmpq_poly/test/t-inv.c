@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -52,7 +50,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest_not_zero(a, state, 1, n_randint(199) + 1);
+        fmpq_poly_randtest_not_zero(a, state, 1, 200);
 
         fmpq_poly_inv(b, a);
         fmpq_poly_inv(c, b);
@@ -73,7 +71,6 @@ main(void)
     }
 
     fmpq_poly_randclear(state);
-
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

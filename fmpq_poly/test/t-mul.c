@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -53,8 +51,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(b, state, n_randint(50), n_randint(500));
-        fmpq_poly_randtest(c, state, n_randint(50), n_randint(500));
+        fmpq_poly_randtest(b, state, n_randint(50), 500);
+        fmpq_poly_randtest(c, state, n_randint(50), 500);
 
         fmpq_poly_mul(a, b, c);
         fmpq_poly_mul(b, b, c);
@@ -81,8 +79,8 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(b, state, n_randint(50), n_randint(500));
-        fmpq_poly_randtest(c, state, n_randint(50), n_randint(500));
+        fmpq_poly_randtest(b, state, n_randint(50), 500);
+        fmpq_poly_randtest(c, state, n_randint(50), 500);
 
         fmpq_poly_mul(a, b, c);
         fmpq_poly_mul(c, b, c);
@@ -111,9 +109,9 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(c);
         fmpq_poly_init(d);
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(500));
-        fmpq_poly_randtest(c, state, n_randint(100), n_randint(500));
-        fmpq_poly_randtest(d, state, n_randint(100), n_randint(500));
+        fmpq_poly_randtest(b, state, n_randint(100), 500);
+        fmpq_poly_randtest(c, state, n_randint(100), 500);
+        fmpq_poly_randtest(d, state, n_randint(100), 500);
 
         fmpq_poly_mul(a1, b, c);
         fmpq_poly_mul(a2, b, d);

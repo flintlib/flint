@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     fmpz_randstate_t state;
+
     printf("shift_left/right....");
     fflush(stdout);
 
@@ -50,7 +51,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_left(a, a, shift);
@@ -76,7 +77,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest_not_zero(a, state, n_randint(100) + 1, n_randint(200) + 1);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(100) + 1, 200);
 
         shift = (long) n_randint(a->length);
 
@@ -105,7 +106,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_right(c, b, shift);
