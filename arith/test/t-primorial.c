@@ -32,7 +32,7 @@
 
 int main(void)
 {
-    ulong i, k;
+    ulong k;
     fmpz_t x;
     fmpz_t y;
 
