@@ -57,7 +57,7 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
         {
             i--;
             _fmpz_poly_mul(t, res, lenr, poly2, len2);
-            lenr = lenr + len2 - 1L;
+            lenr += len2 - 1L;
             _fmpz_poly_add(res, t, lenr, poly1 + i, 1L);
         }
         

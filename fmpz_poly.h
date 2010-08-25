@@ -433,6 +433,12 @@ void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+void _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
+                                                const fmpz * poly2, long len2);
+
+void fmpz_poly_compose_divconquer(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                      const fmpz_poly_t poly2);
+
 static __inline__
 void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1, 
                                                 const fmpz * poly2, long len2)

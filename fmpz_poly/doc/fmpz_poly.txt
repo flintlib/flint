@@ -889,6 +889,24 @@ void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1,
     
     This implementation uses Horner's method.
 
+void _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
+                                               const fmpz * poly2, long len2)
+
+   Computes the composition of {poly1, len1} and {poly2, len2} using 
+   a divide and conquer approach and places the result into res, assuming 
+   res can hold the output of length (len1 - 1) * (len2 - 1) + 1.
+   
+   Assumes len1, len2 > 0.
+   Does not support aliasing between res and any of {poly1, len1} and 
+   {poly2, len2}.
+
+void fmpz_poly_compose_divconquer(fmpz_poly_t res, const fmpz_poly_t poly1,
+                                                   const fmpz_poly_t poly2)
+
+    Sets res to the composition of poly1 and poly2.  To be precise about the 
+    order of composition, denoting res, poly1, and poly2 by f, g, and h, 
+    respectively, sets f(t) = g(h(t)).
+
 void _fmpz_poly_compose(fmpz * res, 
                   const fmpz * poly1, long len1, const fmpz * poly2, long len2)
 
@@ -900,8 +918,9 @@ void _fmpz_poly_compose(fmpz * res,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Sets res to the composition of poly1 and poly2.  To be more precise, 
-    denoting res, poly1, and poly2 by f, g, and h, sets f(t) = g(h(t)).
+    Sets res to the composition of poly1 and poly2.  To be precise about the 
+    order of composition, denoting res, poly1, and poly2 by f, g, and h, 
+    respectively, sets f(t) = g(h(t)).
 
 *******************************************************************************
 
