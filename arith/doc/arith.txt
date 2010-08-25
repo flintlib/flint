@@ -27,6 +27,43 @@ This module implements arithmetic functions, number-theoretic and combinatorial
 special number sequences and polynomials.
 
 
+
+*******************************************************************************
+
+    Factoring integers 
+
+*******************************************************************************
+
+void fmpz_factor_init(fmpz_factor_t factor)
+void fmpz_factor_clear(fmpz_factor_t factor)
+
+    An integer may be represented in factored form using the fmpz_factor_t
+    data structure. This consists of two fmpz vectors representing
+    bases and exponents respectively. Canonically, the bases will be
+    prime numbers sorted in ascending order and the exponents will be
+    positive.
+
+    A separate int field holds the sign, which may be -1, 0 or 1.
+
+
+void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
+
+    Factors n into prime numbers. If n is zero or negative, the
+    sign field of the factor object will be set accordingly.
+
+    This currently only uses trial division, falling back to n_factor
+    as soon as the number shrinks to a single limb.
+
+
+void fmpz_unfactor(fmpz_t n, fmpz_factor factor)
+
+    Evaluates an integer in factored form back to an fmpz_t.
+
+    This currently exponentiates the bases separately and multiplies
+    them together one by one, although much more efficient algorithms
+    exist. 
+
+
 *******************************************************************************
 
     Special numbers
@@ -35,7 +72,7 @@ special number sequences and polynomials.
 
 void fmpz_primorial(fmpz_t res, long n)
 
-    Set res to "n primorial" or "n#", the product of all prime numbers less
+    Sets res to "n primorial" or "n#", the product of all prime numbers less
     than or equal to n.
 
 
@@ -45,18 +82,20 @@ void fmpz_primorial(fmpz_t res, long n)
 
 *******************************************************************************
 
+void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
+
+    Sets res to sigma_k(n), the sum of kth powers of all divisors of n.
+
+
 void fmpz_divisors(fmpz_poly_t res, ulong n)
 
     Set the coefficients of the polynomial res to the divisors of n
     (including 1 and n itself) in ascending order.
 
-void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
-
-    Set res to sigma_k(n), the sum of kth powers of all divisors of n.
 
 void fmpz_ramanujan_tau(fmpz_t res, long n)
 
-    Set res to the Ramanujan tau function tau(n) which is the coefficient of
+    Sets res to the Ramanujan tau function tau(n) which is the coefficient of
     q^n in the series expansion of f(q) = q * prod_{k>=1} (1-q^k)^24.
 
     We factor n and use the identity tau(p*q) = tau(p)*tau(q)
@@ -70,6 +109,7 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
     Future improvements: optimize for small n (could use a lookup table
     or fmpz_poly_ramanujan_tau directly); let n be an fmpz_t instead
     as soon as fmpz factoring is implemented.
+
 
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
 
