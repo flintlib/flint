@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -33,9 +34,43 @@
 int
 main(void)
 {
+    fmpz_t x;
+
     int i, result;
     printf("get/set_si....");
     fflush(stdout);
+
+    fmpz_init(x);
+
+    fmpz_set_si(x, COEFF_MIN);
+    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    {
+        printf("FAIL: COEFF_MIN");
+        abort();
+    }
+
+    fmpz_set_si(x, COEFF_MAX);
+    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
+    {
+        printf("FAIL: COEFF_MIN");
+        abort();
+    }
+
+    fmpz_set_si(x, LONG_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    {
+        printf("FAIL: LONG_MIN");
+        abort();
+    }
+
+    fmpz_set_si(x, LONG_MIN);
+    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    {
+        printf("FAIL: LONG_MAX");
+        abort();
+    }
+
+    fmpz_clear(x);
 
     for (i = 0; i < 100000; i++)
     {

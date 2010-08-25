@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -31,7 +32,7 @@
 void
 fmpz_set_si(fmpz_t f, long val)
 {
-    if (FLINT_ABS(val) > COEFF_MAX) /* val is large */
+    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
         __mpz_struct *mpz_coeff = _fmpz_promote(f);
         mpz_set_si(mpz_coeff, val);
