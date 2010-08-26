@@ -58,8 +58,8 @@ void fmpz_unfactor(fmpz_t n, fmpz_factor_t factor);
 
 void fmpz_primorial(fmpz_t res, long n);
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
-void fmpz_ramanujan_tau(fmpz_t res, long n);
-void fmpz_divisors(fmpz_poly_t res, ulong n);
-void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k);
+void fmpz_ramanujan_tau(fmpz_t res, fmpz_t n);
+void fmpz_divisors(fmpz_poly_t res, fmpz_t n);
+void fmpz_divisor_sigma(fmpz_t res, fmpz_t n, ulong k);
 
 #endif

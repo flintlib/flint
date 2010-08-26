@@ -31,20 +31,10 @@
 #include "ulong_extras.h"
 
 
-void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
+void _fmpz_divisor_sigma(fmpz_t res, fmpz_factor_t factors, ulong k)
 {
-    int i;
+    long i;
     fmpz_t p, r;
-    n_factor_t factors;
-
-    if (n == 0)
-    {
-        fmpz_zero(res);
-        return;
-    }
-
-    n_factor_init(&factors);
-    n_factor(&factors, n, 0);
 
     fmpz_init(p);
     fmpz_init(r);
@@ -54,16 +44,15 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
        TODO: use a balanced product in large cases,
        speedup for small n.
     */
-
-    for (i = 0; i<factors.num; i++)
+    for (i = 0; i < factors->length; i++)
     {
         if (k == 0)
-            fmpz_mul_ui(res, res, factors.exp[i]+1);
+            fmpz_mul_ui(res, res, fmpz_get_ui(factors->exp + i) + 1);
         else
         {
-            fmpz_set_ui(p, factors.p[i]);
+            fmpz_set(p, factors->p + i);
             fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, factors.exp[i]+1);
+            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1);
             fmpz_sub_ui(r, r, 1);
             fmpz_sub_ui(p, p, 1);
             fmpz_divexact(p, r, p);
@@ -72,4 +61,20 @@ void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
     }
     fmpz_clear(p);
     fmpz_clear(r);
+}
+
+void fmpz_divisor_sigma(fmpz_t res, fmpz_t n, ulong k)
+{
+    fmpz_factor_t factors;
+
+    if (fmpz_is_zero(n))
+    {
+        fmpz_zero(res);
+        return;
+    }
+
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+    _fmpz_divisor_sigma(res, factors, k);
+    fmpz_factor_clear(factors);
 }

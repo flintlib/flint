@@ -34,7 +34,8 @@ void check_value(long n, char *ans)
     fmpz_t x, y;
     fmpz_init(x);
     fmpz_init(y);
-    fmpz_ramanujan_tau(x, n);
+    fmpz_set_si(y, n);
+    fmpz_ramanujan_tau(x, y);
     fmpz_set_str(y, ans, 10);
     if (!fmpz_equal(x,y))
     {
@@ -68,7 +69,8 @@ void consistency_check(long n)
 
     for (k=0; k<n; k++)
     {
-        fmpz_ramanujan_tau(x, k);
+        fmpz_set_si(y, k);
+        fmpz_ramanujan_tau(x, y);
         fmpz_poly_get_coeff_fmpz(y, p, k);
         if (!fmpz_equal(x,y))
         {

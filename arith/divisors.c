@@ -61,18 +61,18 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 };
 
 
-void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
+void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
-    long *exp = malloc(sizeof(long) * factors->num);
-    fmpz *powers = _fmpz_vec_init(factors->num);
+    long *exp = malloc(sizeof(long) * factors->length);
+    fmpz *powers = _fmpz_vec_init(factors->length);
     fmpz_t d;
 
-    for (i=0; i<factors->num; i++)
+    for (i = 0; i < factors->length; i++)
     {
         exp[i] = 0;
-        fmpz_set_ui(powers+i, factors->p[i]);
-        fmpz_pow_ui(powers+i, powers+i, factors->exp[i]);
+        fmpz_set(powers + i, factors->p + i);
+        fmpz_pow_ui(powers + i, powers + i, fmpz_get_ui(factors->exp + i));
     }
 
     fmpz_init(d);
@@ -85,12 +85,12 @@ void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
     {
         while (1)
         {
-            if (i == factors->num)
+            if (i == factors->length)
                 goto all_done;
-            if (exp[i] < factors->exp[i])
+            if (exp[i] < fmpz_get_ui(factors->exp + i))
             {
                 exp[i]++;
-                fmpz_mul_ui(d, d, factors->p[i]);
+                fmpz_mul(d, d, factors->p + i);
                 i = 0;
                 break;
             }
@@ -108,40 +108,58 @@ void _fmpz_divisors(fmpz *res, long size, n_factor_t *factors)
     all_done:
     fmpz_clear(d);
     free(exp);
-    _fmpz_vec_clear(powers, factors->num);
+    _fmpz_vec_clear(powers, factors->length);
 }
 
-void fmpz_divisors(fmpz_poly_t res, ulong n)
+
+void _fmpz_divisors_tiny(fmpz_poly_t res, long n)
 {
-    long i, k, size;
-    n_factor_t factors;
+    long size;
+    long i, k;
 
-    if (n < FLINT_NUM_TINY_DIVISORS)
-    {
-        size = FLINT_TINY_DIVISORS_SIZE[n];
-        fmpz_poly_fit_length(res, size);
-        i = 0;
-        for (k = 1; k <= n; k++)
-        {
-            if (FLINT_TINY_DIVISORS_LOOKUP[n] & (1UL << k))
-            {
-                fmpz_poly_set_coeff_si(res, i, k);
-                i++;
-            }
-        }
-        _fmpz_poly_set_length(res, size);
-        return;
-    }
-
-    n_factor_init(&factors);
-    n_factor(&factors, n, 0);
-
-    size = 1;
-    for (i = 0; i < factors.num; i++)
-        size *= factors.exp[i]+1;
+    size = FLINT_TINY_DIVISORS_SIZE[n];
 
     fmpz_poly_fit_length(res, size);
-    _fmpz_divisors(res->coeffs, size, &factors);
+    i = 0;
+    for (k = 1; k <= n; k++)
+    {
+        if (FLINT_TINY_DIVISORS_LOOKUP[n] & (1UL << k))
+        {
+            fmpz_poly_set_coeff_si(res, i, k);
+            i++;
+        }
+    }
+    _fmpz_poly_set_length(res, size);
+    return;
+}
+
+void fmpz_divisors(fmpz_poly_t res, fmpz_t n)
+{
+    long i, size, m;
+    fmpz_factor_t factors;
+
+    if (!COEFF_IS_MPZ(*n))
+    {
+        m = fmpz_get_si(n);
+        if (-FLINT_NUM_TINY_DIVISORS < m && m < FLINT_NUM_TINY_DIVISORS)
+        {
+            _fmpz_divisors_tiny(res, FLINT_ABS(m));
+            return;
+        }
+    }
+
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+
+    /* TODO: check for overflow for huge n */
+    size = 1;
+    for (i = 0; i < factors->length; i++)
+        size *= fmpz_get_ui(factors->exp + i) + 1;
+
+    fmpz_poly_fit_length(res, size);
+    _fmpz_divisors(res->coeffs, size, factors);
     _fmpz_poly_set_length(res, size);
     _fmpz_vec_sort(res->coeffs, size);
+
+    fmpz_factor_clear(factors);
 }

@@ -35,6 +35,8 @@ void fmpz_divisors_naive(fmpz_poly_t p, long n)
     long k;
     long i = 0;
 
+    n = FLINT_ABS(n);
+
     fmpz_poly_zero(p);
     for (k = 1; k <= n; k++)
     {
@@ -48,18 +50,21 @@ void fmpz_divisors_naive(fmpz_poly_t p, long n)
 
 int main(void)
 {
+    fmpz_t t;
     fmpz_poly_t a, b;
     long n;
 
     printf("divisors....");
     fflush(stdout);
 
+    fmpz_init(t);
     fmpz_poly_init(a);
     fmpz_poly_init(b);
 
-    for (n=0; n<1000; n++)
+    for (n = -1000; n < 1000; n++)
     {
-        fmpz_divisors(a, n);
+        fmpz_set_si(t, n);
+        fmpz_divisors(a, t);
         fmpz_divisors_naive(b, n);
         if (!fmpz_poly_equal(a, b))
         {
@@ -69,6 +74,7 @@ int main(void)
         }
     }
 
+    fmpz_clear(t);
     fmpz_poly_clear(a);
     fmpz_poly_clear(b);
 

@@ -39,7 +39,8 @@ void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
     fmpz_poly_t p;
     fmpz_init(t);
     fmpz_poly_init(p);
-    fmpz_divisors(p, n);
+    fmpz_set_ui(t, n);
+    fmpz_divisors(p, t);
 
     fmpz_zero(x);
     for (i = 0; i < p->length; i++)
@@ -55,7 +56,7 @@ void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
 
 int main(void)
 {
-    fmpz_t a, b;
+    fmpz_t m, a, b;
     long n, k;
 
     printf("divisor_sigma....");
@@ -63,12 +64,14 @@ int main(void)
 
     fmpz_init(a);
     fmpz_init(b);
+    fmpz_init(m);
 
     for (n = 0; n < 5000; n++)
     {
         for (k = 0; k < 10; k++)
         {
-            fmpz_divisor_sigma(a, n, k);
+            fmpz_set_ui(m, n);
+            fmpz_divisor_sigma(a, m, k);
             fmpz_sigma_naive(b, n, k);
             if (!fmpz_equal(a, b))
             {
@@ -81,6 +84,7 @@ int main(void)
 
     fmpz_clear(a);
     fmpz_clear(b);
+    fmpz_clear(m);
 
     printf("PASS\n");
     return 0;
