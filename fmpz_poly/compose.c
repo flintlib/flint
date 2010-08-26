@@ -30,44 +30,22 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1, 
-                                      const fmpz * poly2, long len2)
+_fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1, 
+                               const fmpz * poly2, long len2)
 {
-    if (len1 == 1L)
-    {
+    if (len1 == 1)
         fmpz_set(res, poly1);
-    }
+    else if (len2 == 1)
+        _fmpz_poly_evaluate(res, poly1, len1, poly2);
+    else if (len1 <= 4)
+        _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
     else
-    {
-        long i = len1 - 1L, lenr;
-        const long alloc = ((len1 - 1L) * (len2 - 1L) + 1L);
-        fmpz * t = _fmpz_vec_init(alloc);
-        
-        /*
-           Perform the first two steps as one, 
-             "res = a(m) * poly2 + a(m-1)".
-         */
-        {
-            lenr = len2;
-            _fmpz_vec_scalar_mul_fmpz(res, poly2, len2, poly1 + i);
-            i--;
-            fmpz_add(res, res, poly1 + i);
-        }
-        while (i > 0L)
-        {
-            i--;
-            _fmpz_poly_mul(t, res, lenr, poly2, len2);
-            lenr += len2 - 1L;
-            _fmpz_poly_add(res, t, lenr, poly1 + i, 1L);
-        }
-        
-        _fmpz_vec_clear(t, alloc);
-    }
+        _fmpz_poly_compose_divconquer(res, poly1, len1, poly2, len2);
 }
 
 void
-fmpz_poly_compose_horner(fmpz_poly_t res, 
-                         const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+fmpz_poly_compose(fmpz_poly_t res, 
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
@@ -92,8 +70,8 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
     if ((res != poly1) && (res != poly2))
     {
         fmpz_poly_fit_length(res, lenr);
-        _fmpz_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
-                                               poly2->coeffs, len2);
+        _fmpz_poly_compose(res->coeffs, poly1->coeffs, len1, 
+                                        poly2->coeffs, len2);
         _fmpz_poly_set_length(res, lenr);
         _fmpz_poly_normalise(res);
     }
@@ -101,8 +79,8 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, lenr);
-        _fmpz_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
-                                             poly2->coeffs, len2);
+        _fmpz_poly_compose(t->coeffs, poly1->coeffs, len1,
+                                      poly2->coeffs, len2);
         _fmpz_poly_set_length(t, lenr);
         _fmpz_poly_normalise(t);
         fmpz_poly_swap(res, t);

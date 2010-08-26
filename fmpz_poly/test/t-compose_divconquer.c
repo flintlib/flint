@@ -99,7 +99,7 @@ main(void)
         fmpz_poly_clear(h);
     }
 
-    /* Compare with Horner's method */
+    /* Compare with the default method */
     for (i = 0; i < 100; i++)
     {
         fmpz_poly_t f1, f2, g, h;
@@ -111,8 +111,8 @@ main(void)
         fmpz_poly_randtest(g, state, n_randint(50), 100);
         fmpz_poly_randtest(h, state, n_randint(20), 50);
         
-        fmpz_poly_compose_horner(f1, g, h);
-        fmpz_poly_compose_horner(f2, g, h);
+        fmpz_poly_compose_divconquer(f1, g, h);
+        fmpz_poly_compose(f2, g, h);
 
         result = (fmpz_poly_equal(f1, f2));
         if (!result)

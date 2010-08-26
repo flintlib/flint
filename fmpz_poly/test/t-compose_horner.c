@@ -99,43 +99,34 @@ main(void)
         fmpz_poly_clear(h);
     }
 
-    /* Compare with the naive method for g(h(t)) */
+    /* Compare with the default method */
     for (i = 0; i < 100; i++)
     {
-        fmpz_poly_t f, g, h, s, t;
-        long k;
+        fmpz_poly_t f1, f2, g, h;
 
-        fmpz_poly_init(f);
+        fmpz_poly_init(f1);
+        fmpz_poly_init(f2);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_init(s);
-        fmpz_poly_init(t);
         fmpz_poly_randtest(g, state, n_randint(50), 100);
         fmpz_poly_randtest(h, state, n_randint(20), 50);
         
-        fmpz_poly_set_ui(t, 1);
-        for (k = 0; k < g->length; k++)
-        {
-            fmpz_poly_scalar_addmul_fmpz(s, t, g->coeffs + k);
-            fmpz_poly_mul(t, t, h);
-        }
-        
-        fmpz_poly_compose_horner(f, g, h);
+        fmpz_poly_compose_horner(f1, g, h);
+        fmpz_poly_compose(f2, g, h);
 
-        result = (fmpz_poly_equal(f, s));
+        result = (fmpz_poly_equal(f1, f2));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(f), printf("\n\n");
-            fmpz_poly_print(s), printf("\n\n");
+            fmpz_poly_print(f1), printf("\n\n");
+            fmpz_poly_print(f2), printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(f);
+        fmpz_poly_clear(f1);
+        fmpz_poly_clear(f2);
         fmpz_poly_clear(g);
         fmpz_poly_clear(h);
-        fmpz_poly_clear(s);
-        fmpz_poly_clear(t);
     }
 
     fmpz_poly_randclear(state);
