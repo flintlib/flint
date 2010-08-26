@@ -78,7 +78,7 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     the first stage of trial division.
 
 
-int mpn_find_trial_factor(mp_srcptr x, mp_size_t xsize, int start, int stop)
+int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
 
     Searches for a factor of (x, xsize) among {flint_primes[start] ...
     flint_primes[stop-1]}. Returns i if flint_primes[i] is a factor,
