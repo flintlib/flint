@@ -34,13 +34,13 @@
 
 void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
 {
-    int found;
     ulong exp;
     mp_limb_t p;
     mpz_t x;
     mp_ptr xd;
     mp_size_t xsize;
-    int trial_start, trial_stop;
+    long found;
+    long trial_start, trial_stop;
 
     if (!COEFF_IS_MPZ(*n))
     {

@@ -105,7 +105,7 @@ void _fmpz_factor_si(fmpz_factor_t factor, long n)
 
 void _fmpz_factor_extend_factor_n(fmpz_factor_t factor, ulong n)
 {
-    int i, len;
+    long i, len;
     n_factor_t nfac;
 
     if (n == 0)
@@ -132,7 +132,7 @@ void _fmpz_factor_extend_factor_n(fmpz_factor_t factor, ulong n)
 
 void fmpz_factor_print(fmpz_factor_t factor)
 {
-    int i;
+    long i;
 
     if (factor->sign == 0)
     {

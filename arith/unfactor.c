@@ -31,7 +31,7 @@
 
 void fmpz_unfactor(fmpz_t n, fmpz_factor_t factor)
 {
-    int i;
+    long i;
     fmpz_t tmp;
 
     fmpz_set_si(n, factor->sign);
