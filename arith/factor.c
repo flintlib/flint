@@ -77,7 +77,7 @@ void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
     trial_stop = 1000;
     while (xsize > 1)
     {
-        found = mpn_find_trial_factor(xd, xsize, trial_start, trial_stop);
+        found = mpn_factor_trial(xd, xsize, trial_start, trial_stop);
 
         if (found)
         {

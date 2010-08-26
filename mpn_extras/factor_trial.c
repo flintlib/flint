@@ -32,9 +32,9 @@
 #include "ulong_extras.h"
 
 
-int mpn_find_trial_factor(mp_srcptr x, mp_size_t xsize, int start, int stop)
+int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
 {
-    int i;
+    long i;
     n_compute_primes(stop);
     for (i = start; i < stop; i++)
     {
