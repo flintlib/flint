@@ -64,7 +64,8 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
-    long *exp = malloc(sizeof(long) * factors->length);
+    ulong *exp = malloc(sizeof(ulong) * factors->length);
+    ulong *exp_max = malloc(sizeof(ulong) * factors->length);
     fmpz *powers = _fmpz_vec_init(factors->length);
     fmpz_t d;
 
@@ -72,7 +73,8 @@ void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
     {
         exp[i] = 0;
         fmpz_set(powers + i, factors->p + i);
-        fmpz_pow_ui(powers + i, powers + i, fmpz_get_ui(factors->exp + i));
+        exp_max[i] = fmpz_get_ui(factors->exp + i);
+        fmpz_pow_ui(powers + i, powers + i, exp_max[i]);
     }
 
     fmpz_init(d);
@@ -87,7 +89,7 @@ void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
         {
             if (i == factors->length)
                 goto all_done;
-            if (exp[i] < fmpz_get_ui(factors->exp + i))
+            if (exp[i] < exp_max[i])
             {
                 exp[i]++;
                 fmpz_mul(d, d, factors->p + i);
@@ -108,6 +110,7 @@ void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
     all_done:
     fmpz_clear(d);
     free(exp);
+    free(exp_max);
     _fmpz_vec_clear(powers, factors->length);
 }
 

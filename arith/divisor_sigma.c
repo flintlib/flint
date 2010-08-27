@@ -31,35 +31,62 @@
 #include "ulong_extras.h"
 
 
+void _fmpz_prod(fmpz *factors, long len)
+{
+    long k, mid;
+    if (len < 4)
+    {
+        for (k = 1; k < len; k++)
+        {
+            fmpz_mul(factors, factors, factors+k);
+        }
+        return;
+    }
+
+    mid = len * 0.4;
+    _fmpz_prod(factors, mid);
+    _fmpz_prod(factors+mid, len-mid);
+    fmpz_mul(factors, factors, factors+mid);
+}
+
+/* Note: destroys factors! */
 void _fmpz_divisor_sigma(fmpz_t res, fmpz_factor_t factors, ulong k)
 {
     long i;
-    fmpz_t p, r;
+    fmpz * p;
+    fmpz_t r;
 
-    fmpz_init(p);
-    fmpz_init(r);
     fmpz_set_ui(res, 1UL);
 
-    /*
-       TODO: use a balanced product in large cases,
-       speedup for small n.
-    */
-    for (i = 0; i < factors->length; i++)
+    if (factors->length == 0)
+        return;
+
+    fmpz_init(r);
+
+    if (k == 0)
     {
-        if (k == 0)
-            fmpz_mul_ui(res, res, fmpz_get_ui(factors->exp + i) + 1);
-        else
+        for (i = 0; i < factors->length; i++)
         {
+            fmpz_add_ui(r, factors->exp + i, 1UL);
+            fmpz_mul(res, res, r);
+        }
+        return;
+    }
+    else
+    {
+        for (i = 0; i < factors->length; i++)
+        {
+            p = factors->p + i;
             fmpz_set(p, factors->p + i);
             fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1);
-            fmpz_sub_ui(r, r, 1);
-            fmpz_sub_ui(p, p, 1);
+            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1UL);
+            fmpz_sub_ui(r, r, 1UL);
+            fmpz_sub_ui(p, p, 1UL);
             fmpz_divexact(p, r, p);
-            fmpz_mul(res, res, p);
         }
+        _fmpz_prod(factors->p, factors->length);
+        fmpz_set(res, factors->p);
     }
-    fmpz_clear(p);
     fmpz_clear(r);
 }
 
