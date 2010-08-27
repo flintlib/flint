@@ -35,93 +35,78 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
                                           const fmpz * poly2, long len2)
 {
     long i, j, n;
-    long *alloc, talloc;
-    long *half_len, *temp_len, pow2_len;
-    fmpz *v, **half, **temp, *pow2, *pow2t;
+    long *halloc, *hlen, alloc, powlen;
+    fmpz *v, **h, *pow, *temp;
     
-	if (len1 == 1)
-	{
+    if (len1 == 1)
+    {
         _fmpz_vec_copy(res, poly1, len1);
-		return;
-	}
+        return;
+    }
     if (len2 == 1)
     {
         _fmpz_poly_evaluate(res, poly1, len1, poly2);
         return;
     }
-	if (len1 == 2)
-	{
-		_fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
-		return;
-	}
+    if (len1 == 2)
+    {
+        _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
+        return;
+    }
+
+    /* Run through the algorithm to determine the allocation sizes */
     
-    /*
-       Run through the algorithm to figure out the allocations:
-       
-       -  alloc[i] is the maximum length of half[i] and temp[i]
-       -  talloc is the sum of these values
-     */
-    
-    alloc = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
-    
+    halloc = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
     for (i = 0; i < (len1 + 1) / 2; i++)
-        alloc[i] = len2;
-    pow2_len = 2 * len2 + 1;
+        halloc[i] = len2;
+    
+    powlen = 2 * len2 - 1;
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
     {
-        pow2_len += pow2_len - 1;
-        for (i = 0; i < n / 2; i++)
-            alloc[i] = alloc[2 * i + 1] + pow2_len - 1;
+        halloc[0] = FLINT_MAX(halloc[0], powlen + halloc[1] - 1);
+        
+        for (i = 1; i < n / 2; i++)
+        {
+            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i + 1] + powlen - 1);
+            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i]);
+        }
+
         if ((n & 1L))
-            alloc[i] = alloc[2 * i];
-        pow2_len += pow2_len - 1;
+            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i]);
+        
+        powlen += powlen - 1;
     }
-
-    talloc = 0;
+    
+    /* Complete the initialisation */
+    
+    alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
-        talloc += alloc[i];
+        alloc += halloc[i];
 
-    /*
-       Allocate
-     */
-
-    v    = _fmpz_vec_init(2 * talloc + 2 * pow2_len);
+    v = _fmpz_vec_init(alloc +  2 * powlen);
+    h = (fmpz **) malloc(((len1 + 1) / 2) * sizeof(fmpz *));
+    hlen = (long *) calloc(((len1 + 1) / 2), sizeof(long));
+    h[0] = v;
+    for (i = 0; i < (len1 - 1) / 2; i++)
+        h[i + 1] = h[i] + halloc[i];
+    pow  = v + alloc;
+    temp = pow + powlen;
     
-    half = (fmpz **) malloc(((len1 & 1L) ? len1 + 1 : len1) * sizeof(fmpz *));
-    temp = half + ((len1 + 1) / 2);
+    /* Let's start the actual work */
     
-    half[0] = v;
-    temp[0] = v + talloc;
-    
-    half_len = (long *) calloc(2 * talloc, sizeof(long));
-    temp_len = half_len + talloc;
-    
-    for (i = 1; i < (len1 + 1) / 2; i++)
-    {
-        half[i] = half[i-1] + alloc[i-1];
-        temp[i] = temp[i-1] + alloc[i-1];
-    }
-    
-    pow2  = v + 2 * talloc;
-    pow2t = pow2 + pow2_len;
-
-    /*
-       Let's start the actual work
-     */
-
     j = 0;
     for (i = 0; i < len1 / 2; i++)
     {
         if (poly1[j + 1] != 0L)
         {
-            _fmpz_vec_scalar_mul_fmpz(temp[i], poly2, len2, poly1 + j + 1);
-            fmpz_add(temp[i], temp[i], poly1 + j);
-            temp_len[i] = len2;
+            _fmpz_vec_scalar_mul_fmpz(h[i], poly2, len2, poly1 + j + 1);
+            fmpz_add(h[i], h[i], poly1 + j);
+            hlen[i] = len2;
         }
         else if (poly1[j] != 0L)
         {
-            fmpz_set(temp[i], poly1 + j);
-            temp_len[i] = 1;
+            fmpz_set(h[i], poly1 + j);
+            hlen[i] = 1;
         }
         j += 2;
     }
@@ -129,67 +114,56 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     {
         if (poly1[j] != 0L)
         {
-            fmpz_set(temp[i], poly1 + j);
-            temp_len[i] = 1;
+            fmpz_set(h[i], poly1 + j);
+            hlen[i] = 1;
         }
     }
     
-    _fmpz_poly_mul(pow2, poly2, len2, poly2, len2);
-    pow2_len = 2 * len2 - 1;
+    _fmpz_poly_mul(pow, poly2, len2, poly2, len2);
+    powlen = 2 * len2 - 1;
     
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
     {
-        for (i = 0; i < n / 2; i++)
+        if (hlen[1] > 0)
         {
-            if (temp_len[2 * i + 1] > 0)
+            long templen = powlen + hlen[1] - 1;
+            _fmpz_poly_mul(temp, pow, powlen, h[1], hlen[1]);
+            _fmpz_poly_add(h[0], temp, templen, h[0], hlen[0]);
+            hlen[0] = FLINT_MAX(hlen[0], templen);
+        }
+        
+        for (i = 1; i < n / 2; i++)
+        {
+            if (hlen[2*i + 1] > 0)
             {
-                _fmpz_poly_mul(half[i], pow2, pow2_len, temp[2 * i + 1], temp_len[2 * i + 1]);
-                half_len[i] = temp_len[2 * i + 1] + pow2_len - 1;
-                
-                _fmpz_poly_add(half[i], half[i], half_len[i], temp[2 * i], temp_len[2 * i]);
+                _fmpz_poly_mul(h[i], pow, powlen, h[2*i + 1], hlen[2*i + 1]);
+                hlen[i] = hlen[2*i + 1] + powlen - 1;
             }
-            else
-            {
-                _fmpz_vec_copy(half[i], temp[2 * i], temp_len[2 * i]);
-                half_len[i] = temp_len[2 * i];
-            }
+            _fmpz_poly_add(h[i], h[i], hlen[i], h[2*i], hlen[2*i]);
+            hlen[i] = FLINT_MAX(hlen[i], hlen[2*i]);
         }
         if ((n & 1L))
         {
-            _fmpz_vec_copy(half[i], temp[2 * i], temp_len[2 * i]);
-            half_len[i] = temp_len[2 * i];
-        }
-
-        _fmpz_poly_mul(pow2t, pow2, pow2_len, pow2, pow2_len);
-        pow2_len += pow2_len - 1;
-        {
-            fmpz * t = pow2t;
-            pow2t    = pow2;
-            pow2     = t;
+            _fmpz_vec_copy(h[i], h[2*i], hlen[2*i]);
+            hlen[i] = hlen[2*i];
         }
         
-        for (i = 0; i < n; i++)
+        _fmpz_poly_mul(temp, pow, powlen, pow, powlen);
+        powlen += powlen - 1;
         {
-            {
-                fmpz * t = half[i];
-                half[i]  = temp[i];
-                temp[i]  = t;
-            }
-            {
-                long t = half_len[i];
-                half_len[i] = temp_len[i];
-                temp_len[i] = t;
-            }
+            fmpz * t = pow;
+            pow      = temp;
+            temp     = t;
         }
     }
-    
-    _fmpz_poly_mul(res, pow2, pow2_len, temp[1], temp_len[1]);
-    _fmpz_vec_add(res, res, temp[0], temp_len[0]);
 
-    free(alloc);
-    _fmpz_vec_clear(v, 2 * talloc + 2 * pow2_len);
-    free(half);
-    free(half_len);
+    _fmpz_poly_mul(res, pow, powlen, h[1], hlen[1]);
+    _fmpz_vec_add(res, res, h[0], hlen[0]);
+    
+    free(halloc);
+    _fmpz_vec_clear(v, alloc + 2 * powlen);
+    free(h);
+    free(hlen);
 }
 
 void
