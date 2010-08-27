@@ -30,12 +30,70 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+/*
+    Assumptions.
+
+    Suppose that $len1 \geq 3$ and $len2 \geq 2$.
+
+
+    Definitions.
+
+    Define a sequence $(n_i)$ by $n_1 = \ceil{len1 / 2}$, 
+    $n_2 = \ceil{n_1 / 2}$, etc. all the way to 
+    $n_K = \ceil{n_{K-1} / 2} = 2$.  Thus, $K = \ceil{\log_2 len1} - 1$. 
+    Note that we can write $n_i = \ceil{len1 / 2^i}$.
+
+
+    Rough description (of the allocation process, or the algorithm).
+
+    Step 1.
+    For $0 \leq i < n_1$, set h[i] to something of length at most len2.
+    Set pow to $poly2^2$.
+    
+    Step n.
+    For $0 \leq i < n_n$, set h[i] to something of length at most the length 
+    of $poly2^{2^n - 1}$.
+    Set pow to $poly^{2^n}$.
+    
+    Step K.
+    For $0 \leq i < n_K$, set h[i] to something of length at most the length 
+    of $poly2^{2^K - 1}$.
+    Set pow to $poly^{2^K}$.
+
+
+    Analysis of the space requirements.
+
+    Let $S$ be the over all space we need, measured in number of coefficients.
+    Then 
+    \begin{align*}
+    S & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+        + \sum_{i=1}^{K-1} (n_i - n_{i+1}) \bigl[(2^i - 1) (len2 - 1) + 1\bigr] \\
+      & = 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+        + (len2 - 1) \sum_{i=1}^{K-1} (n_i - n_{i+1}) (2^i - 1) + n_1 - n_K.
+    \end{align*}
+
+    If $K = 1$, or equivalently $len1$ is 3 or 4, then $S = 2 \times len2$.
+    Otherwise, we can bound $n_i - n_{i+1}$ from above as follows.  For any 
+    non-negative integer $x$, 
+    \begin{equation*}
+    \ceil{x / 2^i} - \ceil{x / 2^{i+1}} \leq x/2^i - x/2^{i+1} = x / 2^{i+1}.
+    \end{equation*}
+
+    Thus, 
+    \begin{align*}
+    S & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+           + (len2 - 1) \times len1 \times \sum_{i=1}^{K-1} (1/2 - 1/2^{i+1}) \\
+      & \leq 2 \times \bigl[ (2^K - 1) (len2 - 1) + 1 \bigr] 
+           + (len2 - 1) \times len1 \times (K/2 + 1).
+    \end{align*}
+ */
+
 void
 _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
                                           const fmpz * poly2, long len2)
 {
-    long i, j, n;
-    long *halloc, *hlen, alloc, powlen;
+    long i, j, K, n;
+    long *hlen, alloc, powlen;
     fmpz *v, **h, *pow, *temp;
     
     if (len1 == 1)
@@ -54,48 +112,42 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
         return;
     }
 
-    /* Run through the algorithm to determine the allocation sizes */
+    /* Initialisation */
     
-    halloc = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
-    for (i = 0; i < (len1 + 1) / 2; i++)
-        halloc[i] = len2;
+    hlen = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
     
-    powlen = 2 * len2 - 1;
-    for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
+    K = 1;
+    while ((2 << K) < len1)
+        K++;
+    
+    hlen[0] = hlen[1] = ((1 << K) - 1) * (len2 - 1) + 1;
+    for (i = K - 1; i > 0; i--)
     {
-        halloc[0] = FLINT_MAX(halloc[0], powlen + halloc[1] - 1);
-        
-        for (i = 1; i < n / 2; i++)
-        {
-            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i + 1] + powlen - 1);
-            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i]);
-        }
-
-        if ((n & 1L))
-            halloc[i] = FLINT_MAX(halloc[i], halloc[2 * i]);
-        
-        powlen += powlen - 1;
+        long hi = (len1 + (1 << i) - 1) / (1 << i);
+        for (n = (hi + 1) / 2; n < hi; n++)
+            hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
-    
-    /* Complete the initialisation */
+    powlen = (1 << K) * (len2 - 1) + 1;
     
     alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
-        alloc += halloc[i];
+        alloc += hlen[i];
 
     v = _fmpz_vec_init(alloc +  2 * powlen);
     h = (fmpz **) malloc(((len1 + 1) / 2) * sizeof(fmpz *));
-    hlen = (long *) calloc(((len1 + 1) / 2), sizeof(long));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
-        h[i + 1] = h[i] + halloc[i];
+    {
+        h[i + 1] = h[i] + hlen[i];
+        hlen[i]  = 0;
+    }
+    hlen[(len1 - 1) / 2] = 0;
     pow  = v + alloc;
     temp = pow + powlen;
     
     /* Let's start the actual work */
     
-    j = 0;
-    for (i = 0; i < len1 / 2; i++)
+    for (i = 0, j = 0; i < len1 / 2; i++, j += 2)
     {
         if (poly1[j + 1] != 0L)
         {
@@ -108,7 +160,6 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
             fmpz_set(h[i], poly1 + j);
             hlen[i] = 1;
         }
-        j += 2;
     }
     if ((len1 & 1L))
     {
@@ -160,7 +211,6 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     _fmpz_poly_mul(res, pow, powlen, h[1], hlen[1]);
     _fmpz_vec_add(res, res, h[0], hlen[0]);
     
-    free(halloc);
     _fmpz_vec_clear(v, alloc + 2 * powlen);
     free(h);
     free(hlen);
