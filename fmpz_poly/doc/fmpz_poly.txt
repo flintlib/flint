@@ -796,6 +796,45 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     If L is the leading coefficient of B, then computes Q, R such that 
     L^d*A = QB + R. This function is used for simulating division over QQ. 
 
+void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
+                                          long lenA, const fmpz * B, long lenB)
+
+    Assumes that lenA >= lenB > 0.
+    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
+    fit lenA coefficients.
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
+    no aliasing of the inputs and outputs is supported.
+
+void fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
+                                                  fmpz_poly_t A, fmpz_poly_t B)
+
+    This is a variant of fmpz_poly_pseudo_divrem which computes polynomials 
+    Q and R such that lead(B)^d * A = B * Q + R.  However, the value of d 
+    is fixed at the maximum of 0 and A->length - B->length + 1.
+    
+    This function is faster when the remainder is not well behaved, i.e. 
+    where it is not expected to be close to zero.  Note that this function 
+    is not asymptotically fast.  It is efficient only for short polynomials, 
+    e.g. when B->length < 32.
+
+void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA, 
+                                                     const fmpz * B, long lenB)
+
+    Assumes that lenA >= lenB > 0.  Assumes that R can fit lenA coefficients. 
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, no 
+    aliasing of the inputs and outputs is supported.
+
+void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, fmpz_poly_t A, fmpz_poly_t B)
+
+    This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
+    Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
+    the value of d is fixed at the maximum of 0 and A->length - B->length + 1.
+    
+    This function is faster when the remainder is not well behaved, i.e. 
+    where it is not expected to be close to zero.  Note that this function 
+    is not asymptotically fast.  It is efficient only for short polynomials, 
+    e.g. when B->length < 32.
+
 *******************************************************************************
 
     Derivative
