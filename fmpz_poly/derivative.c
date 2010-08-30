@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -51,5 +51,4 @@ fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
     _fmpz_poly_derivative(res->coeffs, poly->coeffs, len);
 
     _fmpz_poly_set_length(res, len - 1);
-    _fmpz_poly_normalise(res);
 }
