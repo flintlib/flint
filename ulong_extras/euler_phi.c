@@ -29,7 +29,7 @@
 mp_limb_t n_euler_phi(mp_limb_t n)
 {
     int i;
-    mp_limb_t phi, p;
+    mp_limb_t phi;
     n_factor_t fac;
 
     if (n < 2)
