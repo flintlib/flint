@@ -20,7 +20,8 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
-   
+    Copyright (C) 2010 Sebastian Pancratz
+
 ******************************************************************************/
 
 #include <stdlib.h>
@@ -31,79 +32,126 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long A_len,
-                           const fmpz * B, long B_len)
+_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
+                           const fmpz * B, long lenB)
 {
-    const fmpz *B_lead = B + B_len - 1;
-    fmpz *qB, *coeff_Q;
-    long coeff, B1, B1_orig, B2;
+    const fmpz * leadB = B + lenB - 1;
+    long B1, B2, iQ = lenA - lenB;
     int want_rem;
 
-    if (B_len == 0)
+    want_rem = (R != NULL);
+    if (want_rem)
+        _fmpz_vec_copy(R, A, lenA);
+
+    while (lenA >= lenB)
     {
-        printf("Exception: division by zero in _fmpz_poly_divrem_basecase\n");
-        abort();
-    }
-
-    coeff = A_len;
-    coeff_Q = Q + A_len - B_len;
-
-    want_rem = (R == NULL) ? 0 : 1;
-
-    while (coeff >= B_len)
-    {
-        if (fmpz_cmpabs(A + coeff - 1, B_lead) >= 0)
+        if (fmpz_cmpabs(A + lenA - 1, leadB) >= 0)
             break;
         else
         {
-            fmpz_zero(coeff_Q);
-            coeff_Q--;
-            coeff--;
+            fmpz_zero(Q + iQ);
+            iQ--;
+            lenA--;
         }
     }
 
-    if (want_rem)
-        _fmpz_vec_copy(R, A, A_len);
-
-    if (coeff < B_len)
+    if (lenA < lenB)
         return;
 
     if (!want_rem)
     {
-        R = _fmpz_vec_init(coeff);
-        mpn_copyi((mp_ptr) (R + B_len - 1), (mp_srcptr) (A + B_len - 1),
-                  coeff - B_len + 1);
+        R = _fmpz_vec_init(lenA);
+        _fmpz_vec_copy(R + lenB - 1, A + lenB - 1, lenA - lenB + 1);
     }
 
-    B1 = want_rem ? B_len : B_len - 1;
-    B2 = B_len;
-    B1_orig = B1;
-    qB = _fmpz_vec_init(B1);
-
-    while (coeff >= B_len)
+    B1 = lenB - (!want_rem);
+    B2 = lenB;
+    
+    while (lenA >= lenB)
     {
-        if (fmpz_cmpabs(R + coeff - 1, B_lead) < 0)
-            fmpz_zero(coeff_Q);
+        if (fmpz_cmpabs(R + lenA - 1, leadB) < 0)
+            fmpz_zero(Q + iQ);
         else
         {
-            fmpz * R_sub;
-            fmpz_fdiv_q(coeff_Q, R + coeff - 1, B_lead);
-            _fmpz_vec_scalar_mul_fmpz(qB, B, B1, coeff_Q);
-
-            R_sub = R + coeff - B2;
-            _fmpz_vec_sub(R_sub, R_sub, qB, B1);
+            fmpz_fdiv_q(Q + iQ, R + lenA - 1, leadB);
+            _fmpz_vec_scalar_submul_fmpz(R + lenA - B2, B, B1, Q + iQ);
         }
 
-        if ((!want_rem) && (B1 >= coeff - B_len + 1))
+        if ((!want_rem) && (B1 >= lenA - lenB + 1))
         {
             B++;
             B1--;
             B2--;
         }
 
-        coeff--;
-        coeff_Q--;
+        lenA--;
+        iQ--;
+    }
+}
+
+void
+fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
+                          const fmpz_poly_t A, const fmpz_poly_t B)
+{
+    long lenq, lenr;
+    fmpz *q, *r;
+    
+    if (B->length == 0)
+    {
+        printf("Exception: division by zero in fmpz_poly_divrem_basecase\n");
+        abort();
+    }
+    if (Q == R)
+    {
+        printf("Exception: output arguments Q and R may not be aliased\n");
+        abort();
+    }
+    if (A->length < B->length)
+    {
+        fmpz_poly_zero(Q);
+        fmpz_poly_set(R, A);
+        return;
     }
 
-    _fmpz_vec_clear(qB, B1_orig);
+    lenq = A->length - B->length + 1;
+    lenr = A->length;
+    if ((Q == A) || (Q == B))
+        q = _fmpz_vec_init(lenq);
+    else
+    {
+        fmpz_poly_fit_length(Q, lenq);
+        q = Q->coeffs;
+    }
+    if ((R == A) || (R == B))
+        r = _fmpz_vec_init(lenr);
+    else
+    {
+        fmpz_poly_fit_length(R, lenr);
+        r = R->coeffs;
+    }
+
+    _fmpz_poly_divrem_basecase(q, r, A->coeffs, A->length,
+                                     B->coeffs, B->length);
+
+    if ((Q == A) || (Q == B))
+    {
+        _fmpz_vec_clear(Q->coeffs, Q->alloc);
+        Q->coeffs = q;
+        Q->alloc = lenq;
+        Q->length = lenq;
+    }
+    else
+        _fmpz_poly_set_length(Q, lenq);
+    if ((R == A) || (R == B))
+    {
+        _fmpz_vec_clear(R->coeffs, R->alloc);
+        R->coeffs = r;
+        R->alloc = lenr;
+        R->length = lenr;
+    }
+    else
+        _fmpz_poly_set_length(R, lenr);
+
+    _fmpz_poly_normalise(Q);
+    _fmpz_poly_normalise(R);
 }

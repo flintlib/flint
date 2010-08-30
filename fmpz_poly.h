@@ -348,7 +348,10 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly);
 /*  Euclidean division  ******************************************************/
 
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
-                                    long A_len, const fmpz * B, long B_len);
+                                      long lenA, const fmpz * B, long lenB);
+
+void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
+                                  const fmpz_poly_t A, const fmpz_poly_t B);
 
 static __inline__
 void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
