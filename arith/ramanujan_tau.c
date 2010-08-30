@@ -110,7 +110,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     fmpz_poly_clear(poly);
 }
 
-void fmpz_ramanujan_tau(fmpz_t res, fmpz_t n)
+void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
 {
     fmpz_factor_t factors;
 

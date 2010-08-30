@@ -130,7 +130,7 @@ void _fmpz_factor_extend_factor_n(fmpz_factor_t factor, ulong n)
     }
 }
 
-void fmpz_factor_print(fmpz_factor_t factor)
+void fmpz_factor_print(const fmpz_factor_t factor)
 {
     long i;
 
@@ -151,7 +151,7 @@ void fmpz_factor_print(fmpz_factor_t factor)
     for (i = 0; i < factor->length; i++)
     {
         fmpz_print(factor->p + i);
-        if (factor->exp[i] != 1UL)
+        if (fmpz_get_ui(factor->exp + i) != 1UL)
         {
             printf("^");
             fmpz_print(factor->exp + i);

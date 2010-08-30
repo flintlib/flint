@@ -136,7 +136,7 @@ void _fmpz_divisors_tiny(fmpz_poly_t res, long n)
     return;
 }
 
-void fmpz_divisors(fmpz_poly_t res, fmpz_t n)
+void fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
 {
     long i, size, m;
     fmpz_factor_t factors;

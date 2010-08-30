@@ -2,7 +2,7 @@
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
+fits_abs_ui    FLINT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
@@ -19,29 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "arith.h"
 
-
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
+int
+fmpz_abs_fits_ui(const fmpz_t f)
 {
-    long i;
-    fmpz_t tmp;
-
-    fmpz_set_si(n, factor->sign);
-
-    fmpz_init(tmp);
-    for (i = 0; i < factor->length; i++)
-    {
-        fmpz_pow_ui(tmp, factor->p + i, fmpz_get_ui(factor->exp + i));
-        fmpz_mul(n, n, tmp);
-    }
-
-    fmpz_clear(tmp);
+    if (!COEFF_IS_MPZ(*f))
+        return 1;
+    return FLINT_ABS(COEFF_TO_PTR(*f)->_mp_size) <= 1;
 }

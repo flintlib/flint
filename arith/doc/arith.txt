@@ -46,7 +46,7 @@ void fmpz_factor_clear(fmpz_factor_t factor)
     A separate int field holds the sign, which may be -1, 0 or 1.
 
 
-void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
+void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     Factors n into prime numbers. If n is zero or negative, the
     sign field of the factor object will be set accordingly.
@@ -55,7 +55,7 @@ void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
     as soon as the number shrinks to a single limb.
 
 
-void fmpz_unfactor(fmpz_t n, fmpz_factor factor)
+void fmpz_unfactor(fmpz_t n, const fmpz_factor factor)
 
     Evaluates an integer in factored form back to an fmpz_t.
 
@@ -82,18 +82,32 @@ void fmpz_primorial(fmpz_t res, long n)
 
 *******************************************************************************
 
-void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
+void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+
+    Sets res to the Euler totient function phi(n), counting the number of
+    positive integers less than or equal to n that are coprime to n.
+
+
+int fmpz_moebius_mu(const fmpz_t n)
+
+   Computes the Moebius function mu(n) = 0 if n has a prime factor of
+   multiplicity greater than 1, mu(n) = -1 n has an odd number of distinct
+   prime factors, mu(n) = 1 if n has an even number of distinct prime factors.
+   By convention, mu(0) = 0.
+
+
+void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     Sets res to sigma_k(n), the sum of kth powers of all divisors of n.
 
 
-void fmpz_divisors(fmpz_poly_t res, ulong n)
+void fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
 
     Set the coefficients of the polynomial res to the divisors of n
     (including 1 and n itself) in ascending order.
 
 
-void fmpz_ramanujan_tau(fmpz_t res, long n)
+void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
 
     Sets res to the Ramanujan tau function tau(n) which is the coefficient of
     q^n in the series expansion of f(q) = q * prod_{k>=1} (1-q^k)^24.
@@ -106,9 +120,8 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
     Thus the speed of fmpz_ramanujan_tau depends on the largest
     prime factor of n.
 
-    Future improvements: optimize for small n (could use a lookup table
-    or fmpz_poly_ramanujan_tau directly); let n be an fmpz_t instead
-    as soon as fmpz factoring is implemented.
+    Future improvement: optimize for small n (could use a lookup table
+    or fmpz_poly_ramanujan_tau directly).
 
 
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)

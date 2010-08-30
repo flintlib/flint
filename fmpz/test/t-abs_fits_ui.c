@@ -19,29 +19,72 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "arith.h"
 
+void check(fmpz_t x, int expected)
+{
+    if (fmpz_abs_fits_ui(x) != expected)
+    {
+        printf("FAIL:");
+        fmpz_print(x);
+        printf("\n");
+        abort();
+    }
+}
 
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
+int
+main(void)
 {
     long i;
-    fmpz_t tmp;
+    fmpz_t x;
 
-    fmpz_set_si(n, factor->sign);
+    printf("abs_fits_ui....");
+    fflush(stdout);
 
-    fmpz_init(tmp);
-    for (i = 0; i < factor->length; i++)
+    fmpz_init(x);
+
+    fmpz_set_si(x, COEFF_MIN);
+    check(x, 1);
+
+    fmpz_set_si(x, COEFF_MAX);
+    check(x, 1);
+
+    fmpz_set_ui(x, ULONG_MAX);
+    check(x, 1);
+
+    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_neg(x, x);
+    check(x, 1);
+
+    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_add_ui(x, x, 1UL);
+    check(x, 0);
+
+    fmpz_neg(x, x);
+    check(x, 0);
+
+    for (i = 0; i < 1000; i++)
     {
-        fmpz_pow_ui(tmp, factor->p + i, fmpz_get_ui(factor->exp + i));
-        fmpz_mul(n, n, tmp);
+        fmpz_set_ui(x, 1UL);
+        fmpz_mul_2exp(x, x, i);
+        check(x, i < FLINT_BITS);
+        fmpz_neg(x, x);
+        check(x, i < FLINT_BITS);
     }
 
-    fmpz_clear(tmp);
+    fmpz_clear(x);
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

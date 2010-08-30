@@ -23,25 +23,41 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "arith.h"
+#include "ulong_extras.h"
 
 
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
+int fmpz_moebius_mu(const fmpz_t n)
 {
+    fmpz_factor_t factors;
     long i;
-    fmpz_t tmp;
+    int mu;
 
-    fmpz_set_si(n, factor->sign);
+    if (fmpz_abs_fits_ui(n))
+        return n_moebius_mu(fmpz_get_ui(n));
 
-    fmpz_init(tmp);
-    for (i = 0; i < factor->length; i++)
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+
+    mu = 1;
+    for (i = 0; i < factors->length; i++)
     {
-        fmpz_pow_ui(tmp, factor->p + i, fmpz_get_ui(factor->exp + i));
-        fmpz_mul(n, n, tmp);
+        if (fmpz_get_ui(factors->exp + i) != 1UL)
+        {
+            mu = 0;
+            break;
+        }
     }
 
-    fmpz_clear(tmp);
+    if (factors->length % 2)
+        mu = -mu;
+
+    fmpz_factor_clear(factors);
+    return mu;
 }

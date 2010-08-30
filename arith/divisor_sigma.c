@@ -90,7 +90,7 @@ void _fmpz_divisor_sigma(fmpz_t res, fmpz_factor_t factors, ulong k)
     fmpz_clear(r);
 }
 
-void fmpz_divisor_sigma(fmpz_t res, fmpz_t n, ulong k)
+void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 {
     fmpz_factor_t factors;
 

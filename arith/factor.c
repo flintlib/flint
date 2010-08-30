@@ -32,7 +32,7 @@
 #include "ulong_extras.h"
 
 
-void fmpz_factor(fmpz_factor_t factor, fmpz_t n)
+void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 {
     ulong exp;
     mp_limb_t p;
