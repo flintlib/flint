@@ -456,6 +456,12 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Signature  ***************************************************************/
+
+void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len);
+
+void fmpz_poly_signature(ulong * r1, ulong * r2, fmpz_poly_t poly);
+
 /*  Printing  ****************************************************************/
 
 void fmpz_poly_print(const fmpz_poly_t poly);
