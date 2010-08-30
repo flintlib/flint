@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
    
 ******************************************************************************/
 
@@ -32,9 +33,11 @@
 void
 fmpz_poly_clear(fmpz_poly_t poly)
 {
-    long i;
-    for (i = 0; i < poly->alloc; i++)   /* Clean up any mpz_t's */
-        _fmpz_demote(poly->coeffs + i);
     if (poly->coeffs)
-        free(poly->coeffs);     /* clean up ordinary coeffs */
+    {
+        long i;
+        for (i = 0; i < poly->alloc; i++)
+            _fmpz_demote(poly->coeffs + i);
+        free(poly->coeffs);
+    }
 }
