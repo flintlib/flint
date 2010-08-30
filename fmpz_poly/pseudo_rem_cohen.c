@@ -67,7 +67,7 @@ _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA,
 }
 
 void
-fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, fmpz_poly_t A, fmpz_poly_t B)
+fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 {
     long lenr;
     fmpz *r;

@@ -88,7 +88,8 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
 }
 
 void
-fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, fmpz_poly_t A, fmpz_poly_t B)
+fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
+                              const fmpz_poly_t A, const fmpz_poly_t B)
 {
     long lenq, lenr;
     fmpz *q, *r;

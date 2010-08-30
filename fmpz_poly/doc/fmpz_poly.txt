@@ -793,12 +793,15 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 *******************************************************************************
 
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, long A_len, const fmpz * B, long B_len)
+                          const fmpz * A, long lenA, const fmpz * B, long lenB)
 
     If L is the leading coefficient of B, then computes Q, R such that 
-    L^d*A = QB + R. This function is used for simulating division over QQ. An 
-    exception is raised if B_len == 0. No aliasing of inputs and outputs is 
-    allowed.
+    L^d*A = QB + R. This function is used for simulating division over QQ. 
+    Assumes that lenA >= lenB > 0.
+    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
+    fit lenA coefficients.
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
+    no aliasing of the inputs and outputs is suppported.
 
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
@@ -816,7 +819,7 @@ void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
     no aliasing of the inputs and outputs is supported.
 
 void fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
-                                                  fmpz_poly_t A, fmpz_poly_t B)
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
 
     This is a variant of fmpz_poly_pseudo_divrem which computes polynomials 
     Q and R such that lead(B)^d * A = B * Q + R.  However, the value of d 
@@ -834,7 +837,8 @@ void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA,
     Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, no 
     aliasing of the inputs and outputs is supported.
 
-void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, fmpz_poly_t A, fmpz_poly_t B)
+void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, 
+                                                           const fmpz_poly_t B)
 
     This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
     Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
