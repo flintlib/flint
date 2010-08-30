@@ -885,4 +885,41 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
    factoring is done. 
 
    The factors are proved prime if proved is 1, otherwise
-   they are merely probably prime.   
+   they are merely probably prime.
+
+********************************************************************************
+
+  Arithmetic functions
+
+********************************************************************************
+
+int n_moebius_mu(mp_limb_t n)
+
+   Computes the Moebius function mu(n) = 0 if n has a prime factor of
+   multiplicity greater than 1, mu(n) = -1 n has an odd number of distinct
+   prime factors, mu(n) = 1 if n has an even number of distinct prime factors.
+   By convention, mu(0) = 0.
+
+   For even numbers, we use the identities mu(4n) = 0 and mu(2n) = -m(n). Odd
+   numbers up to a cutoff are then looked up from a precomputed table
+   storing mu(n) + 1 in groups of two bits.
+
+   For larger n, we first check if n is divisible by a small odd square
+   and otherwise call n_factor and count the factors.
+
+void n_moebius_mu_vec(int * mu, ulong len)
+
+   Computes mu(n) for n = 0,1,...,len-1. This is done by sieving over each
+   prime in the range, flipping the sign of mu(n) for every multiple of a
+   prime p and setting mu(n) = 0 for every multiple of p^2.
+
+int n_is_squarefree(mp_limb_t n)
+
+   Returns 0 if n is divisible by some perfect square, and 1 otherwise.
+   This simply amounts to testing whether n_moebius_mu(n) != 0. As special
+   cases, 1 is considered squarefree and 0 is not considered squarefree.
+
+mp_limb_t n_euler_phi(mp_limb_t n)
+
+   Computes the Euler totient function phi(n), counting the number of
+   positive integers less than or equal to n that are coprime to n.

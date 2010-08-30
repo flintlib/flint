@@ -245,5 +245,13 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
 
+int n_is_squarefree(mp_limb_t n);
+
+int n_moebius_mu(mp_limb_t n);
+
+void n_moebius_mu_vec(int * mu, ulong len);
+
+mp_limb_t n_euler_phi(mp_limb_t n);
+
 #endif
 
