@@ -32,9 +32,9 @@
 
 int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
 {
-    if (len < 3L)
+    if (len < 3)
         return 1;
-    else if (len == 3L)
+    else if (len == 3)
     {
         int ans;
         fmpz_t lhs, rhs;
@@ -43,9 +43,9 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
         
         fmpz_mul(lhs, poly + 1, poly + 1);
         fmpz_mul(rhs, poly, poly + 2);
-        fmpz_mul_si(rhs, rhs, -4);
-        
-        ans = fmpz_equal(lhs, rhs);
+        fmpz_mul_ui(rhs, rhs, 4);
+
+        ans = !fmpz_equal(lhs, rhs);
         fmpz_clear(lhs);
         fmpz_clear(rhs);
         return ans;
@@ -53,15 +53,15 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
     else
     {
         long gdeg;
-        fmpz * w = _fmpz_vec_init(2L * len);
+        fmpz * w = _fmpz_vec_init(2 * len);
         
         _fmpz_poly_derivative(w, poly, len);
         _fmpz_poly_gcd(w + len, poly, len, w, len - 1L);
         
-        for (gdeg = len - 2L; *(w + gdeg) == 0L; gdeg--) ;
+        for (gdeg = len - 2L; w[gdeg] == 0L; gdeg--) ;
         
-        _fmpz_vec_clear(w, 2L * len);
-        return (gdeg == 0L);
+        _fmpz_vec_clear(w, 2 * len);
+        return (gdeg == 0);
     }
 }
 
