@@ -44,7 +44,7 @@ main(void)
     fmpz_poly_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that (f+g)(a) = f(a) + g(a) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check that (f*g)(a) = f(a) * g(a) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
