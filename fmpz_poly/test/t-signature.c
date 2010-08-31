@@ -47,7 +47,7 @@ main(void)
     {
         fmpz_poly_t poly, linear, quadratic, rem;
         fmpz_t lhs, rhs;
-        ulong nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
+        long nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
         long len = n_randint(20) + 1;
         mp_bitcnt_t bits = n_randint(50) + 1;
         
@@ -77,8 +77,6 @@ main(void)
             fmpz_randtest_not_zero(c, state, bits);
             fmpz_randtest(b, state, bits);
             fmpz_randtest_unsigned(a, state, bits);
-            fmpz_init(lhs);
-            fmpz_init(rhs);
             
             if (fmpz_sgn(c) < 0)
             {
@@ -137,7 +135,7 @@ main(void)
 
     {
         fmpz_poly_t poly;
-        ulong r1, r2;
+        long r1, r2;
         fmpz_poly_init(poly);
         fmpz_poly_set_str(poly, "6  1 1 1 10 5 1");
         fmpz_poly_signature(&r1, &r2, poly);
