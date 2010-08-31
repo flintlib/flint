@@ -883,6 +883,9 @@ void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     Evaluates the polynomial f at the integer a using Horner's rule, and 
     sets res to the result.
 
+    As expected, aliasing between res and a is supported.  However, res may 
+    not be aliased with a coefficient of f.
+
 void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 
     Evaluates the polynomial {f, len} at the integer a and sets res to the 
@@ -892,6 +895,9 @@ void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial f at the integer a and sets res to the result.
+
+    As expected, aliasing between res and a is supported.  However, res may 
+    not be aliased with a coefficient of f.
 
 void _fmpz_poly_evaluate_horner_(fmpz_t rnum, fmpz_t rden, 
                                  const fmpz * f, long len, 

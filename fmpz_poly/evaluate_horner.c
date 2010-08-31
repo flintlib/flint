@@ -32,21 +32,21 @@ void
 _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len,
                            const fmpz_t a)
 {
-    if (len == 0L)
-        fmpz_set_ui(res, 0UL);
-    else if (len == 1L)
+    if (len == 0)
+        fmpz_set_ui(res, 0);
+    else if (len == 1)
         fmpz_set(res, f);
     else
     {
+        long i = len - 1;
         fmpz_t t;
-        const fmpz *c = f + (len - 1L);
         fmpz_init(t);
-        fmpz_set(res, c);
-        do
+        fmpz_set(res, f + i);
+        for (i = len - 2; i >= 0; i--)
         {
             fmpz_mul(t, res, a);
-            fmpz_add(res, --c, t);
-        } while (c != f);
+            fmpz_add(res, f + i, t);
+        }
         fmpz_clear(t);
     }
 }
