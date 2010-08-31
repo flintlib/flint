@@ -130,7 +130,7 @@ fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
     
     _fmpz_poly_pseudo_divrem_cohen(q, r, A->coeffs, A->length, B->coeffs, B->length);
     
-    for (lenr = B->length - 1; r[lenr] == 0L; lenr--) ;
+    for (lenr = B->length - 1; (lenr >= 0) && r[lenr] == 0L; lenr--) ;
     lenr++;
     
     if ((Q == A) || (Q == B))
