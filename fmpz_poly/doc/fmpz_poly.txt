@@ -981,12 +981,12 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 *******************************************************************************
 
-void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
+void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
 
     Computes the signature (r1, r2) of the polynomial {poly, len}.
     Assumes that the polynomial is squarefree over Q.
 
-void fmpz_poly_signature(ulong * r1, ulong * r2, fmpz_poly_t poly)
+void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 
     Computes the signature (r1, r2) of the polynomial poly, which is 
     assumed to be square-free over Q.  The values of r1 and 2*r2 are the 
