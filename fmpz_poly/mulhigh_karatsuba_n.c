@@ -24,6 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -109,33 +110,31 @@ _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
 void
 fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                              long length)
+                              long len)
 {
-    long i;
+    long lenr = poly1->length + poly2->length - 1;
     int clear1 = 0, clear2 = 0;
     fmpz *pol1, *pol2;
 
-    if ((poly1->length == 0) || (poly2->length == 0))
+    if (poly1->length == 0 || poly2->length == 0 || len - 1 >= lenr)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (poly1->length != length)
+    if (poly1->length != len)
     {
-        pol1 = (fmpz *) calloc(length, sizeof(fmpz));
-        for (i = 0; i < poly1->length; i++)
-            pol1[i] = poly1->coeffs[i];
+        pol1 = (fmpz *) calloc(len, sizeof(fmpz));
+        memcpy(pol1, poly1->coeffs, poly1->length * sizeof(fmpz));
         clear1 = 1;
     }
     else
         pol1 = poly1->coeffs;
 
-    if (poly2->length != length)
+    if (poly2->length != len)
     {
-        pol2 = (fmpz *) calloc(length, sizeof(fmpz));
-        for (i = 0; i < poly2->length; i++)
-            pol2[i] = poly2->coeffs[i];
+        pol2 = (fmpz *) calloc(len, sizeof(fmpz));
+        memcpy(pol2, poly2->coeffs, poly2->length * sizeof(fmpz));
         clear2 = 1;
     }
     else
@@ -143,21 +142,17 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
 
     if (res != poly1 && res != poly2)
     {
-        fmpz_poly_fit_length(res, 2 * length - 1);
-
-        _fmpz_poly_mulhigh_karatsuba_n(res->coeffs, pol1, pol2, length);
-        _fmpz_poly_set_length(res, 2 * length - 1);
-        _fmpz_poly_normalise(res);
+        fmpz_poly_fit_length(res, 2 * len - 1);
+        _fmpz_poly_mulhigh_karatsuba_n(res->coeffs, pol1, pol2, len);
+        _fmpz_poly_set_length(res, lenr);
     }
     else
     {
         fmpz_poly_t temp;
-        fmpz_poly_init(temp);
-        fmpz_poly_fit_length(temp, 2 * length - 1);
+        fmpz_poly_init2(temp, 2 * len - 1);
 
-        _fmpz_poly_mulhigh_karatsuba_n(temp->coeffs, pol1, pol2, length);
-        _fmpz_poly_set_length(temp, 2 * length - 1);
-        _fmpz_poly_normalise(temp);
+        _fmpz_poly_mulhigh_karatsuba_n(temp->coeffs, pol1, pol2, len);
+        _fmpz_poly_set_length(temp, lenr);
 
         fmpz_poly_swap(temp, res);
         fmpz_poly_clear(temp);

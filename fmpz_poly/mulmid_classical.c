@@ -76,8 +76,7 @@ fmpz_poly_mulmid_classical(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t temp;
-        fmpz_poly_init(temp);
-        fmpz_poly_fit_length(temp, len_out);
+        fmpz_poly_init2(temp, len_out);
         _fmpz_poly_mulmid_classical(temp->coeffs, poly1->coeffs, poly1->length,
                                     poly2->coeffs, poly2->length);
         fmpz_poly_swap(res, temp);

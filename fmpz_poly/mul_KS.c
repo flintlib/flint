@@ -117,17 +117,17 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
         return;
     }
 
+    rlen = len1 + len2 - 1;
+
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init(t);
+        fmpz_poly_init2(t, rlen);
         fmpz_poly_mul_KS(t, poly1, poly2);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
         return;
     }
-
-    rlen = len1 + len2 - 1;
 
     fmpz_poly_fit_length(res, rlen);
     if (len1 >= len2)
@@ -136,7 +136,5 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
     else
         _fmpz_poly_mul_KS(res->coeffs, poly2->coeffs, len2,
                           poly1->coeffs, len1);
-
     _fmpz_poly_set_length(res, rlen);
-    _fmpz_poly_normalise(res);
 }

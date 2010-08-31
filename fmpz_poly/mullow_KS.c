@@ -134,7 +134,7 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init(t);
+        fmpz_poly_init2(t, trunc);
         fmpz_poly_mullow_KS(t, poly1, poly2, trunc);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
