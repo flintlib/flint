@@ -30,12 +30,11 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
+void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
 {
-    fmpz *A, *B;
+    fmpz *A, *B, *f, *g, *h, *w;
     long lenA, lenB;
     int s, t;
-    fmpz_t g;
     
     if (len <= 2)
     {
@@ -44,17 +43,21 @@ void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
         return;
     }
     
+    w = _fmpz_vec_init(2 * len + 2);
+    A = w;
+	B = w + len;
     lenA = len;
-    A = _fmpz_vec_init(lenA);
-    _fmpz_poly_primitive_part(A, poly, lenA);
-
     lenB = lenA - 1;
-	B = _fmpz_vec_init(lenB);
+    f = w + 2 * len - 1;
+    g = w + 2 * len;
+    h = w + 2 * len + 1;
+    
+    _fmpz_poly_primitive_part(A, poly, lenA);
     _fmpz_poly_derivative(B, A, lenA);
     _fmpz_poly_primitive_part(B, B, lenB);
     
-    fmpz_init(g);
     fmpz_set_ui(g, 1);
+    fmpz_set_ui(h, 1);
     
     s = 1;
     t = (lenA & 1L) ? -s : s;
@@ -62,6 +65,7 @@ void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
     
     while (1)
 	{
+        long delta = lenA - lenB;
         int sgnA;
 
         _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
@@ -72,13 +76,11 @@ void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
 		if (lenA == 0)
 		{
 			printf("Exception: non-squarefree polynomial detected in fmpz_poly_signature\n");
-            fmpz_clear(g);
-            _fmpz_vec_clear(A, len);
-            _fmpz_vec_clear(B, len - 1);
+            _fmpz_vec_clear(w, 2 * len + 2);
 			abort();
 		}
       
-        if ((fmpz_sgn(B + (lenB - 1)) > 0) || ((lenA - lenB) & 1L))
+        if ((fmpz_sgn(B + (lenB - 1)) > 0) || (delta & 1L))
             _fmpz_vec_neg(A, A, lenA);
 
         sgnA = fmpz_sgn(A + (lenA - 1));
@@ -97,9 +99,7 @@ void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
         {
             *r2 = ((len - 1) - *r1) / 2;
             
-            fmpz_clear(g);
-            _fmpz_vec_clear(A, len);
-            _fmpz_vec_clear(B, len - 1);
+            _fmpz_vec_clear(w, 2 * len + 2);
             return;
         }
 		else
@@ -115,14 +115,28 @@ void _fmpz_poly_signature(ulong * r1, ulong * r2, fmpz * poly, long len)
                 lenB = temp;
             }
             
-            _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, g);
-            if (lenB > 2)
-                fmpz_mul(g, A + (lenA - 1), A + (lenA - 1));
+            if (delta == 1)
+            {
+                fmpz_mul(f, g, h);
+                _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, f);
+                fmpz_set(g, A + (lenA - 1));
+                fmpz_set(h, g);
+            }
+            else
+            {
+                fmpz_pow_ui(f, h, delta);
+                fmpz_mul(f, f, g);
+                _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, f);
+                fmpz_pow_ui(f, h, delta - 1);
+                fmpz_pow_ui(g, A + (lenA - 1), delta);
+                fmpz_divexact(h, g, f);
+                fmpz_set(g, A + (lenA - 1));
+            }
 		}
 	}
 }
 
-void fmpz_poly_signature(ulong * r1, ulong * r2, fmpz_poly_t poly)
+void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 {
     _fmpz_poly_signature(r1, r2, poly->coeffs, poly->length);
 }
