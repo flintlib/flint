@@ -65,7 +65,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
             _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, max - min, den11);
         
         if (_fmpz_vec_is_zero(rpoly, max))
-            fmpz_set_ui(rden, 1UL);
+            fmpz_set_ui(rden, 1);
         else
         {
             fmpz_t e;
@@ -98,7 +98,7 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
     {
         fmpz_t rem;
         fmpz_init(rem);
-        fmpz_mod_ui(rem, poly1->den, 2UL);
+        fmpz_mod_ui(rem, poly1->den, 2);
         
         fmpq_poly_fit_length(res, len1);
         _fmpq_poly_set_length(res, len1);
@@ -106,11 +106,11 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         if (*rem == 0UL)
         {
             _fmpz_vec_copy(res->coeffs, poly1->coeffs, len1);
-            fmpz_fdiv_q_2exp(res->den, poly1->den, 1UL);
+            fmpz_fdiv_q_2exp(res->den, poly1->den, 1);
         }
         else
         {
-            _fmpz_vec_scalar_mul_2exp(res->coeffs, poly1->coeffs, len1, 1UL);
+            _fmpz_vec_scalar_mul_2exp(res->coeffs, poly1->coeffs, len1, 1);
             fmpz_set(res->den, poly1->den);
         }
         fmpz_clear(rem);
