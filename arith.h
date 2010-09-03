@@ -65,4 +65,9 @@ void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 int fmpz_moebius_mu(const fmpz_t n);
 void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 
+void _mpq_harmonic_tiny(mpq_t res, long n);
+void _mpq_harmonic_balanced(mpq_t res, long a, long b);
+void _mpq_harmonic_odd_balanced(mpq_t res, long n);
+void mpq_harmonic(mpq_t res, long n);
+
 #endif

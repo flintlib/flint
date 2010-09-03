@@ -83,3 +83,24 @@ int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
     Searches for a factor of (x, xsize) among {flint_primes[start] ...
     flint_primes[stop-1]}. Returns i if flint_primes[i] is a factor,
     otherwise returns 0 if no factor is found. It is assumed that start >= 1.
+
+
+********************************************************************************
+
+  Special numbers
+
+********************************************************************************
+
+void mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
+                               mp_ptr v, mp_size_t * vsize,
+                               long a, long b, long n, int d)
+
+    Computes (t,tsize) and (v,vsize) such that t/v = H_n = 1 + 1/2 + ... + 1/n.
+    The computation is performed using recursive balanced summation
+    over the odd terms. The resulting fraction will not generally be
+    normalized. At the top level, this function should be called with
+    n > 0, a = 1, b = n, d = 1.
+
+    Enough space should be allocated for t and v to fit the entire sum
+    1 + 1/2 + ... + 1/n computed without normalization; i.e. t and v
+    should have room to fit n! plus one extra limb.
