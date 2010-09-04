@@ -245,5 +245,7 @@ int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
 void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
                               mp_bitcnt_t shift, mp_bitcnt_t bits);
 
+void fmpz_fac_ui(fmpz_t f, ulong n);
+
 #endif
 
