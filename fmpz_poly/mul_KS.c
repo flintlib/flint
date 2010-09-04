@@ -36,16 +36,19 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
                   const fmpz * poly2, long len2)
 {
     int neg1 = 0, neg2 = 0;
-    long i, limbs1, limbs2, loglen;
+    long limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (i = len1 - 1; i >= 0 && !(neg1 = fmpz_sgn(poly1 + i)); i--) ;
-    for (i = len2 - 1; i >= 0 && !(neg2 = fmpz_sgn(poly2 + i)); i--) ;
-    if (neg1 >= 0)
+    for (len1--; len1 >= 0 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
+    for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    len1++;
+    len2++;
+
+    if (neg1 > 0)
         neg1 = 0;
-    if (neg2 >= 0)
+    if (neg2 > 0)
         neg2 = 0;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
@@ -89,10 +92,12 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
 
     arr3 = (mp_limb_t *) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
-    if (poly1 != poly2)
+    if (limbs1 == limbs2)
+        mpn_mul_n(arr3, arr1, arr2, limbs1);
+    else if (limbs1 > limbs2)
         mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
-        mpn_mul_n(arr3, arr1, arr1, limbs1);
+        mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
 
     if (sign)
         _fmpz_poly_bit_unpack(res, len1 + len2 - 1, arr3, bits, neg1 ^ neg2);
