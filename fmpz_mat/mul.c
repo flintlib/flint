@@ -19,54 +19,56 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_MAT_H
-#define FMPZ_MAT_H
-
+#include <stdlib.h>
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 
-typedef struct
+void
+_fmpz_mat_mul(fmpz * C,
+              const fmpz * A, long ar, long ac,
+              const fmpz * B, long br, long bc)
 {
-    fmpz * entries;
-    long r;
-    long c;
-    fmpz ** rows;
-} fmpz_mat_struct;
+    long i, j, k;
+    fmpz * a, b, c;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
-typedef fmpz_mat_struct fmpz_mat_t[1];
+    for (i = 0; i < ar; i++)
+    {
+        for (j = 0; j < bc; j++)
+        {
+            a = A + ac*i;
+            c = C + bc*i + j;
+            fmpz_zero(c);
 
-void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
+            for (k = 0, b = B + j; k < br; k++, a++)
+            {
+                /* C[i,j] += A[i,k] * B[k,j] */
+                b = B + j + bc*k;
+                fmpz_addmul(c, a, b);
+            }
+        }
+    }
+}
 
-void fmpz_mat_clear(fmpz_mat_t mat);
+void
+fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+{
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+    {
+        printf("fmpz_mat_mul: incompatible dimensions\n");
+        abort();
+    }
 
-void fmpz_mat_print(fmpz_mat_t mat); 
+    if (C == A || C == B)
+    {
+        printf("fmpz_mat_mul: aliasing not implemented\n");
+        abort();
+    }
 
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
-
-void fmpz_mat_randinit(void);
-
-void fmpz_mat_randclear(void);
-
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2);
-
-void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
-
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
-
-void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha);
-
-void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B);
-
-#endif
-
+    _fmpz_mat_mul(C->entries, A->entries, A->r, A->c, B->entries, B->r, B->c);
+}

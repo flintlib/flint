@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2010 Andy Novocin
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -114,3 +115,14 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha)
     (-2^b + 1, 2^b - 1) whilst the entries to the right of the diagonal in 
     row i are set to zero. 
 
+
+*******************************************************************************
+
+    Arithmetic
+
+*******************************************************************************
+
+void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+
+    Sets C = A * B. A, B, and C must have compatible dimensions for matrix
+    multiplication. No aliasing is allowed.

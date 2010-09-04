@@ -19,54 +19,53 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#ifndef FMPZ_MAT_H
-#define FMPZ_MAT_H
-
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "ulong_extras.h"
 
-typedef struct
+const long test_A[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+const long test_B[] = { 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+const long test_C[] = { 84, 90, 96, 201, 216, 231, 318, 342, 366 };
+
+int main(void)
 {
-    fmpz * entries;
-    long r;
-    long c;
-    fmpz ** rows;
-} fmpz_mat_struct;
+    fmpz_mat_t A, B, C;
+    long i;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
-typedef fmpz_mat_struct fmpz_mat_t[1];
+    printf("mul....");
+    fflush(stdout);
 
-void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
+    fmpz_mat_init(A, 3, 3);
+    fmpz_mat_init(B, 3, 3);
+    fmpz_mat_init(C, 3, 3);
 
-void fmpz_mat_clear(fmpz_mat_t mat);
+    for (i = 0; i < 9; i++)
+    {
+        fmpz_set_ui(A->entries+i, test_A[i]);
+        fmpz_set_ui(B->entries+i, test_B[i]);
+    }
 
-void fmpz_mat_print(fmpz_mat_t mat); 
+    fmpz_mat_mul(C, A, B);
 
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
+    for (i = 0; i < 9; i++)
+    {
+        if (fmpz_get_ui(C->entries+i) != test_C[i])
+        {
+            _fmpz_vec_print(C->entries, 9);
+            abort();
+        }
+    }
 
-void fmpz_mat_randinit(void);
-
-void fmpz_mat_randclear(void);
-
-void fmpz_mat_randbits(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randtest(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randintrel(fmpz_mat_t mat, mp_bitcnt_t bits);
-
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, mp_bitcnt_t bits, mp_bitcnt_t bits2);
-
-void fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
-
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q);
-
-void fmpz_mat_randajtai(fmpz_mat_t mat, double alpha);
-
-void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B);
-
-#endif
-
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
+}
