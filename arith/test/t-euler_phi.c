@@ -38,6 +38,7 @@ int main(void)
     long i;
     ulong n;
     fmpz_t x, y, z;
+    fmpz_randstate_t rndstate;
 
     printf("euler_phi....");
     fflush(stdout);
@@ -45,8 +46,7 @@ int main(void)
     fmpz_init(x);
     fmpz_init(y);
     fmpz_init(z);
-
-    fmpz_randinit();
+    fmpz_randinit(rndstate);
 
     for (i = 0; i < 100; i++)
     {
@@ -64,8 +64,8 @@ int main(void)
     /* Aliasing test */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_randtest(x, FLINT_BITS);
-        fmpz_randtest(y, 5);
+        fmpz_randtest(x, rndstate, FLINT_BITS);
+        fmpz_randtest(y, rndstate, 5);
         fmpz_pow_ui(y, y, n_randtest() % 100);
         fmpz_mul(x, x, y);
         fmpz_set(z, x);
@@ -107,7 +107,7 @@ int main(void)
         abort();
     }
 
-    fmpz_randclear();
+    fmpz_randclear(rndstate);
 
     fmpz_clear(x);
     fmpz_clear(y);

@@ -43,8 +43,7 @@ int main(void)
 
     long n, k, nn;
 
-    /* const long maxn = 40; */
-    const long maxn = 20;
+    const long maxn = 40;
 
     printf("stirling....");
     fflush(stdout);
