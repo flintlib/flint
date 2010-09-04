@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_addmul_si....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Compare with alternative method of computation */
     for (i = 0; i < 10000; i++)
@@ -54,8 +56,8 @@ main(void)
         c = _fmpz_vec_init(len);
         d = _fmpz_vec_init(len);
 
-        _fmpz_vec_randtest(a, len, n_randint(200));
-        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(b, state, len, 200);
         _fmpz_vec_copy(c, b, len);
 
         x = (long) n_randtest();
@@ -82,7 +84,7 @@ main(void)
         _fmpz_vec_clear(d, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -33,27 +33,27 @@ _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 {
     if (res == poly)
     {
-        fmpz *high = res + (n - 1);
-        while (res < high)
+        long i;
+
+        for (i = 0; i < n / 2; i++)
         {
-            fmpz t = *res;
-            *res++ = *high;
-            *high-- = t;
+            fmpz t = res[i];
+            res[i] = res[n - 1 - i];
+            res[n - 1 - i] = t;
         }
 
-        res = (fmpz *) poly + (n - len);
-        while (res-- != poly)
-            fmpz_zero(res);
+        for (i = 0; i < n - len; i++)
+            fmpz_zero(res + i);
     }
     else
     {
-        long zeros = n - len;
-        while (zeros--)
-            fmpz_zero(res++);
+        long i;
 
-        poly = (fmpz *) poly + (len - 1);
-        while (len--)
-            fmpz_set(res++, poly--);
+        for (i = 0; i < n - len; i++)
+            fmpz_zero(res + i);
+
+        for (i = 0; i < len; i++)
+            fmpz_set(res + (n - len) + i, poly + (len - 1) - i);
     }
 }
 

@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("pow....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -50,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, n_randint(10), n_randint(100));
+        fmpz_poly_randtest(b, state, n_randint(10), 100);
 
         exp = n_randtest() % 20UL;
 
@@ -80,7 +81,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, n_randint(10), n_randint(100));
+        fmpz_poly_randtest(b, state, n_randint(10), 100);
 
         exp = n_randtest() % 20UL;
 
@@ -116,7 +117,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

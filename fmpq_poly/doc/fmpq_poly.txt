@@ -132,32 +132,35 @@ fmpz_t fmpq_poly_denref(fmpq_poly_t poly)
 
 ********************************************************************************
 
-void fmpq_poly_randinit(void)
+void fmpq_poly_randinit(fmpz_randstate_t state)
 
     Initialise the random state for random polynomial generation.  One should 
     not call this function if fmpz_randinit has already been called. 
 
-void fmpq_poly_randclear(void)
+void fmpq_poly_randclear(fmpz_randstate_t state)
 
     Clear the random state initialised with fmpq_poly_randinit.  One should 
     not call this function if fmpz_randclear has already been called.
 
-void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  The 
     coefficients are signed randomly.  One must call fmpq_poly_randinit 
     before calling this function.
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state,
+                                                long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
     call fmpq_poly_randinit before calling this function.
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state,
+                                                long len, mp_bitcnt_t bits)
 
-    As for fmpq_poly_randtest except that length and bits_in may not be
+    As for fmpq_poly_randtest except that length and bits may not be
     zero and the polynomial generated is guaranteed not to be the 
     zero polynomial.  One must call fmpq_poly_randinit before calling
     this function.
@@ -191,6 +194,42 @@ void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
 
     Sets poly to the rational x.
+
+void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
+
+    Sets {poly, den} to the polynomial given by the first n coefficients in 
+    the array a, from lowest degree to highest degree.
+
+void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
+
+    Sets poly to the polynomial with coefficients as given in the array a, 
+    from lowest degree to highest degree.
+
+int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
+
+    Sets {poly, den} to the polynomial specified by the null-terminated 
+    string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of {poly, den} is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+int fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
+
+    Sets poly to the polynomial specified by the null-terminated string str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of poly is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+char * fmpq_poly_get_str(const fmpq_poly_t poly)
+
+    Returns the string representation of poly.
+
+char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
+
+    Returns the pretty representation of poly, using the null-terminated 
+    string var not equal to "\0" as the variable name.
 
 void fmpq_poly_zero(fmpq_poly_t poly)
 
@@ -526,22 +565,24 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 
 *******************************************************************************
 
-void _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const fmpz_t a)
+void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
+                              const fmpz_t den, long len, const fmpz_t a)
 
-    Evaluates the polynomial {poly, den, len} at the integer a and sets res 
-    to the result.
+    Evaluates the polynomial {poly, den, len} at the integer a and sets 
+    {rnum, rden} to the result in lowest terms.
 
 void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
                              const fmpz_t a)
 
     Evaluates the polynomial poly at the integer a and sets res to the result.
 
-void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const mpq_t a)
+void _fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+                             const fmpz * poly, const fmpz_t den, long len, 
+                             const fmpz_t anum, const fmpz_t aden)
 
-    Evaluates the polynomial {poly, den, len} at the rational a and sets 
-    res to the result.  Aliasing between res and a is not supported.
+    Evaluates the polynomial {poly, den, len} at the rational {anum, aden} 
+    and sets {rnum, rden} to the result in lowest terms.  
+    Aliasing between {rnum, rden} and {anum, aden} is not supported.
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 
@@ -652,20 +693,11 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
     whether the greatest common divisor of poly and its derivative has 
     length 1.
 
-********************************************************************************
+*******************************************************************************
 
-    String conversions
+    Printing
 
-********************************************************************************
-
-char * fmpq_poly_to_string(const fmpq_poly_t poly)
-
-    Returns the string representation of poly.
-
-char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var)
-
-    Returns the pretty representation of poly, using the null-terminated 
-    string var not equal to "\0" as the variable name.
+*******************************************************************************
 
 void fmpq_poly_print(const fmpq_poly_t poly)
 

@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_mul_2exp....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -49,7 +51,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_scalar_mul_2exp(b, a, len, exp);
         _fmpz_vec_scalar_mul_2exp(a, a, len, exp);
@@ -78,7 +80,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_scalar_mul_2exp(b, a, len, e1);
         _fmpz_vec_scalar_mul_2exp(b, b, len, e2);
@@ -98,7 +100,7 @@ main(void)
         _fmpz_vec_clear(b, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

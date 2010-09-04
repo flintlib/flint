@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,11 +35,13 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
 
     printf("mullow_karatsuba_n....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -51,8 +53,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         len = n_randint(50);
-        fmpz_poly_randtest(b, len, n_randint(200));
-        fmpz_poly_randtest(c, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mullow_karatsuba_n(a, b, c, len);
         fmpz_poly_mullow_karatsuba_n(b, b, c, len);
@@ -81,8 +83,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         len = n_randint(50);
-        fmpz_poly_randtest(b, len, n_randint(200));
-        fmpz_poly_randtest(c, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mullow_karatsuba_n(a, b, c, len);
         fmpz_poly_mullow_karatsuba_n(c, b, c, len);
@@ -112,8 +114,8 @@ main(void)
         fmpz_poly_init(c);
         fmpz_poly_init(d);
         len = n_randint(50);
-        fmpz_poly_randtest(b, len, n_randint(200));
-        fmpz_poly_randtest(c, len, n_randint(200));
+        fmpz_poly_randtest(b, state, len, 200);
+        fmpz_poly_randtest(c, state, len, 200);
 
         fmpz_poly_mullow_karatsuba_n(a, b, c, len);
         fmpz_poly_mul_karatsuba(d, b, c);
@@ -134,7 +136,7 @@ main(void)
         fmpz_poly_clear(d);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

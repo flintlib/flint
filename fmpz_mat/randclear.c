@@ -28,7 +28,7 @@
 #include "fmpz.h"
 
 void
-fmpz_mat_randclear(void)
+fmpz_mat_randclear(fmpz_randstate_t state)
 {
-    fmpz_randclear();
+    fmpz_randclear(state);
 }

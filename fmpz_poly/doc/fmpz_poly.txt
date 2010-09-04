@@ -112,6 +112,44 @@ void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
 
     Sets poly to the integer c.
 
+int _fmpz_poly_set_str(fmpz * poly, const char * str)
+
+    Sets poly to the polynomial encoded in the null-terminated string str.  
+    Assumes that poly is allocated as a sufficiently large array suitable for 
+    the number of coefficients present in str.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of poly is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+int fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
+
+    Imports a polynomial from a null-terminated string.  If the string str 
+    represents a valid polynomial returns 1, otherwise returns 0.
+    
+    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
+    which case the resulting value of poly is undefined.  If str is not 
+    null-terminated, calling this method might result in a segmentation fault.
+
+char * _fmpz_poly_get_str(const fmpz * poly, long len)
+
+    Returns the plain FLINT string representation of the polynomial 
+    {poly, len}.
+
+char * fmpz_poly_get_str(const fmpz_poly_t poly)
+
+    Returns the plain FLINT string representation of the polynomial poly.
+
+char * _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char * x)
+
+    Returns a pretty representation of the polynomial {poly, len} using 
+    the null-terminated string x as the variable name.
+
+char * fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char * x)
+
+    Returns a pretty representation of the polynomial poly using the 
+    null-terminated string x as the variable name.
+
 void fmpz_poly_zero(fmpz_poly_t poly)
 
     Sets poly to the zero polynomial.
@@ -152,32 +190,35 @@ void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 
 *******************************************************************************
 
-void fmpz_poly_randinit()
+void fmpz_poly_randinit(fmpz_randstate_t state)
 
     Initialises the random state for random polynomial generation. 
     One should not call this function if fmpz_randinit has already 
     been called. 
 
-void fmpz_poly_randclear()
+void fmpz_poly_randclear(fmpz_randstate_t state)
 
     Clears the random state initialised with fmpz_poly_randinit. One 
     should not call this function if fmpz_randclear has already been
     called.
 
-void fmpz_poly_randtest(fmpz_poly_t f, long len, mp_bitcnt_t bits)
+void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. The coefficients
     are signed randomly. One must call fmpz_poly_randinit before calling
     this function.
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, long len, mp_bitcnt_t bits)
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
     fmpz_poly_randinit before calling this function.
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, long len, mp_bitcnt_t bits)
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits)
 
     As for fmpz_poly_randtest except that len and bits may not be zero and 
     the polynomial generated is guaranteed not to be the zero polynomial. 
@@ -691,13 +732,23 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 *******************************************************************************
 
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
-                                        long A_len, const fmpz * B, long B_len)
+                                          long lenA, const fmpz * B, long lenB)
 
     Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
     B->length - 1 is reduced mod the leading coefficient of B. If the leading 
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. No aliasing of input and output operands is allowed. 
-    An exception is raised if B->length == 0.
+    Assumes that lenB > 0.
+    
+    Allows R == NULL in case the remainder is not required.
+
+void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. An exception is raised if B is zero.
 
 void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
                                                     const fmpz * B, long B_len)
@@ -742,18 +793,61 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 *******************************************************************************
 
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
-                        const fmpz * A, long A_len, const fmpz * B, long B_len)
+                          const fmpz * A, long lenA, const fmpz * B, long lenB)
 
     If L is the leading coefficient of B, then computes Q, R such that 
-    L^d*A = QB + R. This function is used for simulating division over QQ. An 
-    exception is raised if B_len == 0. No aliasing of inputs and outputs is 
-    allowed.
+    L^d*A = QB + R. This function is used for simulating division over QQ. 
+    Assumes that lenA >= lenB > 0.
+    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
+    fit lenA coefficients.
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
+    no aliasing of the inputs and outputs is suppported.
 
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
     If L is the leading coefficient of B, then computes Q, R such that 
     L^d*A = QB + R. This function is used for simulating division over QQ. 
+
+void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
+                                          long lenA, const fmpz * B, long lenB)
+
+    Assumes that lenA >= lenB > 0.
+    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
+    fit lenA coefficients.
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
+    no aliasing of the inputs and outputs is supported.
+
+void fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    This is a variant of fmpz_poly_pseudo_divrem which computes polynomials 
+    Q and R such that lead(B)^d * A = B * Q + R.  However, the value of d 
+    is fixed at the maximum of 0 and A->length - B->length + 1.
+    
+    This function is faster when the remainder is not well behaved, i.e. 
+    where it is not expected to be close to zero.  Note that this function 
+    is not asymptotically fast.  It is efficient only for short polynomials, 
+    e.g. when B->length < 32.
+
+void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA, 
+                                                     const fmpz * B, long lenB)
+
+    Assumes that lenA >= lenB > 0.  Assumes that R can fit lenA coefficients. 
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, no 
+    aliasing of the inputs and outputs is supported.
+
+void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, 
+                                                           const fmpz_poly_t B)
+
+    This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
+    Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
+    the value of d is fixed at the maximum of 0 and A->length - B->length + 1.
+    
+    This function is faster when the remainder is not well behaved, i.e. 
+    where it is not expected to be close to zero.  Note that this function 
+    is not asymptotically fast.  It is efficient only for short polynomials, 
+    e.g. when B->length < 32.
 
 *******************************************************************************
 
@@ -789,6 +883,9 @@ void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     Evaluates the polynomial f at the integer a using Horner's rule, and 
     sets res to the result.
 
+    As expected, aliasing between res and a is supported.  However, res may 
+    not be aliased with a coefficient of f.
+
 void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 
     Evaluates the polynomial {f, len} at the integer a and sets res to the 
@@ -799,12 +896,17 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial f at the integer a and sets res to the result.
 
-void _fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz * f, long len, 
-                                                                 const mpq_t a)
+    As expected, aliasing between res and a is supported.  However, res may 
+    not be aliased with a coefficient of f.
 
-    Evaluates the polynomial {f, len} at the rational a using Horner's rule, 
-    and sets res to the result.  Aliasing between res and a or any of the 
-    coefficients of f is not supported.
+void _fmpz_poly_evaluate_horner_(fmpz_t rnum, fmpz_t rden, 
+                                 const fmpz * f, long len, 
+                                 const fmpz_t anum, const fmpz_t aden)
+
+    Evaluates the polynomial {f, len} at the rational {anum, aden} using 
+    Horner's rule, and sets {rnum, rden} to the result in lowest terms.  
+    Aliasing between {rnum, rden} and {anum, aden} or any of the coefficients 
+    of f is not supported.
 
 void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f, 
                                                                  const mpq_t a)
@@ -812,12 +914,13 @@ void fmpz_poly_evaluate_horner_mpq(mpq_t res, const fmpz_poly_t f,
     Evaluates the polynomial f at the rational a using Horner's rule, and 
     sets res to the result.
 
-void _fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, 
-                                                       long len, const mpq_t a)
+void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+                             const fmpz * f, long len, 
+                             const fmpz_t anum, const fmpz_t aden)
 
-    Evaluates the polynomial {f, len} at the rational a and sets res to the 
-    result.  Aliasing between res and a or any of the coefficients of f is 
-    not supported.
+    Evaluates the polynomial {f, len} at the rational {anum, aden} and sets 
+    {rnum, rden} to the result in lowest terms.  Aliasing between {rnum, rden} 
+    and {anum, aden} or any of the coefficients of f is not supported.
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 
@@ -845,6 +948,24 @@ void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1,
     
     This implementation uses Horner's method.
 
+void _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
+                                               const fmpz * poly2, long len2)
+
+   Computes the composition of {poly1, len1} and {poly2, len2} using 
+   a divide and conquer approach and places the result into res, assuming 
+   res can hold the output of length (len1 - 1) * (len2 - 1) + 1.
+   
+   Assumes len1, len2 > 0.
+   Does not support aliasing between res and any of {poly1, len1} and 
+   {poly2, len2}.
+
+void fmpz_poly_compose_divconquer(fmpz_poly_t res, const fmpz_poly_t poly1,
+                                                   const fmpz_poly_t poly2)
+
+    Sets res to the composition of poly1 and poly2.  To be precise about the 
+    order of composition, denoting res, poly1, and poly2 by f, g, and h, 
+    respectively, sets f(t) = g(h(t)).
+
 void _fmpz_poly_compose(fmpz * res, 
                   const fmpz * poly1, long len1, const fmpz * poly2, long len2)
 
@@ -856,12 +977,37 @@ void _fmpz_poly_compose(fmpz * res,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Sets res to the composition of poly1 and poly2.  To be more precise, 
-    denoting res, poly1, and poly2 by f, g, and h, sets f(t) = g(h(t)).
+    Sets res to the composition of poly1 and poly2.  To be precise about the 
+    order of composition, denoting res, poly1, and poly2 by f, g, and h, 
+    respectively, sets f(t) = g(h(t)).
 
 *******************************************************************************
 
-    String conversions
+    Signature
+
+*******************************************************************************
+
+void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
+
+    Computes the signature (r1, r2) of the polynomial {poly, len}.
+    Assumes that the polynomial is squarefree over Q.
+
+void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
+
+    Computes the signature (r1, r2) of the polynomial poly, which is 
+    assumed to be square-free over Q.  The values of r1 and 2*r2 are the 
+    number of real and complex roots of the polynomial, respectively. 
+    For convenience, the zero polynomial is allowed, in which case 
+    the output is (0, 0).
+    
+    If the polynomial is not square-free, the behaviour is undefined and an 
+    exception may be raised.
+    
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 4.1.11.
+
+*******************************************************************************
+
+    Printing
 
 *******************************************************************************
 
@@ -871,43 +1017,4 @@ void fmpz_poly_print(const fmpz_poly_t poly)
     printed. If the length is not zero two spaces are printed after the 
     length, then a space separated list of coefficients is printed, starting
     with the constant coefficient.
-
-char * _fmpz_poly_to_string(const fmpz * poly, long len)
-
-    Returns the plain FLINT string representation of the polynomial 
-    {poly, len}.
-
-char * fmpz_poly_to_string(const fmpz_poly_t poly)
-
-    Returns the plain FLINT string representation of the polynomial poly.
-
-char * _fmpz_poly_to_string_pretty(const fmpz * poly, long len, const char * x)
-
-    Returns a pretty representation of the polynomial {poly, len} using 
-    the null-terminated string x as the variable name.
-
-char * fmpz_poly_to_string_pretty(const fmpz_poly_t poly, const char * x)
-
-    Returns a pretty representation of the polynomial poly using the 
-    null-terminated string x as the variable name.
-
-int fmpz_poly_verify_format(const char * str)
-
-    Verifies that the null-terminated string str contains the representation 
-    of a polynomial in the plain FLINT format.  Returns 1 if this is the case, 
-    and 0 otherwise.
-    
-    If the string is not null-terminated, this method might execute invalid 
-    reads from memory, causing segmentation faults.
-
-void _fmpz_poly_from_string(fmpz * poly, const char * str)
-
-    Sets poly to the polynomial encoded in the null-terminated string str.  
-    Assumes that poly is allocated as a sufficiently large array suitable for 
-    the number of coefficients present in str.
-
-int fmpz_poly_from_string(fmpz_poly_t poly, const char * str)
-
-    Imports a polynomial from a null-terminated string.  If the string str 
-    represents a valid polynomial returns 1, otherwise returns 0.
 

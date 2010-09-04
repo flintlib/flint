@@ -31,33 +31,36 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
+                        long len, mp_bitcnt_t bits)
 {
     long i;
     fmpq_poly_fit_length(f, len);
     
     for (i = 0; i < len; i++)
-        fmpz_randtest(f->coeffs + i, bits);
-    fmpz_randtest_not_zero(f->den, FLINT_MAX(bits, 1));
+        fmpz_randtest(f->coeffs + i, state, bits);
+    fmpz_randtest_not_zero(f->den, state, FLINT_MAX(bits, 1));
     
     _fmpq_poly_set_length(f, len);
     fmpq_poly_canonicalise(f);
 }
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state,
+                                 long len, mp_bitcnt_t bits)
 {
    long i;
    fmpq_poly_fit_length(f, len);
 
    for (i = 0; i < len; i++)
-      fmpz_randtest_unsigned(f->coeffs + i, bits);
-    fmpz_randtest_not_zero(f->den, FLINT_MAX(bits, 1));
+      fmpz_randtest_unsigned(f->coeffs + i, state, bits);
+    fmpz_randtest_not_zero(f->den, state, FLINT_MAX(bits, 1));
    
    _fmpq_poly_set_length(f, len);
    fmpq_poly_canonicalise(f);
 }
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits)
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state, 
+                                 long len, mp_bitcnt_t bits)
 {
     if ((bits == 0) | (len == 0))
     {
@@ -65,7 +68,7 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits)
         abort();
     }
 
-    fmpq_poly_randtest(f, len, bits);
+    fmpq_poly_randtest(f, state, len, bits);
     if (f->length == 0) 
         fmpq_poly_set_ui(f, 1UL);
 }

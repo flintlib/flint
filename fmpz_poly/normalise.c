@@ -21,7 +21,7 @@
 
     Copyright (C) 2008, 2009 William Hart
 
-*(****************************************************************************/
+******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
@@ -31,10 +31,7 @@
 void
 _fmpz_poly_normalise(fmpz_poly_t poly)
 {
-    long len = poly->length;
-
-    while (len && !poly->coeffs[len - 1])
-        len--;
-
-    poly->length = len;
+    long i;
+    for (i = poly->length - 1; (i >= 0) && !poly->coeffs[i]; i--) ;
+    poly->length = i + 1;
 }

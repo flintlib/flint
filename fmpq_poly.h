@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 Sebastian Pancratz
- Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
  
 ******************************************************************************/
 
@@ -86,15 +86,18 @@ long fmpq_poly_length(fmpq_poly_t poly)
 
 /*  Randomisation  ***********************************************************/
 
-void fmpq_poly_randinit(void);
+void fmpq_poly_randinit(fmpz_randstate_t state);
 
-void fmpq_poly_randclear(void);
+void fmpq_poly_randclear(fmpz_randstate_t state);
 
-void fmpq_poly_randtest(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits_in);
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state, 
+                                                long len, mp_bitcnt_t bits_in);
 
-void fmpq_poly_randtest_not_zero(fmpq_poly_t f, long len, mp_bitcnt_t bits_in);
+void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state,
+                                                long len, mp_bitcnt_t bits_in);
 
 /*  Assignment and basic manipulation  ***************************************/
 
@@ -109,6 +112,18 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
+
+void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a);
+
+void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n);
+
+int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str);
+
+int fmpq_poly_set_str(fmpq_poly_t poly, const char * str);
+
+char * fmpq_poly_get_str(const fmpq_poly_t poly);
+
+char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var);
 
 void fmpq_poly_zero(fmpq_poly_t poly);
 
@@ -258,14 +273,15 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
 
 /*  Evaluation  **************************************************************/
 
-void _fmpq_poly_evaluate_fmpz(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const fmpz_t a);
+void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
+                              const fmpz_t den, long len, const fmpz_t a);
 
 void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
                              const fmpz_t a);
 
-void _fmpq_poly_evaluate_mpq(mpq_t res, const fmpz * poly, 
-                             const fmpz_t den, long len, const mpq_t a);
+void _fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
+                             const fmpz * poly, const fmpz_t den, long len, 
+                             const fmpz_t anum, const fmpz_t aden);
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
 
@@ -310,11 +326,7 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len);
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
-/*  String conversion  *******************************************************/
-
-char * fmpq_poly_to_string(const fmpq_poly_t poly);
-
-char * fmpq_poly_to_string_pretty(const fmpq_poly_t poly, const char * var);
+/*  Printing  ****************************************************************/
 
 void fmpq_poly_print(const fmpq_poly_t poly);
 

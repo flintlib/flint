@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, j, result;
+    fmpz_randstate_t state;
+
     printf("get/set_coeff_fmpz....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
@@ -53,7 +55,7 @@ main(void)
 
         for (j = 0; j < 1000; j++)
         {
-            fmpz_randtest(x1, 200);
+            fmpz_randtest(x1, state, 200);
             coeff = n_randint(len);
             fmpz_poly_set_coeff_fmpz(a, coeff, x1);
             fmpz_poly_get_coeff_fmpz(x2, a, coeff);
@@ -61,11 +63,10 @@ main(void)
             result = (fmpz_equal(x1, x2));
             if (!result)
             {
-                printf("FAIL: x1 = ");
-                fmpz_print(x1);
-                printf(", x2 = ");
-                fmpz_print(x2);
-                printf(", coeff = %ld, length = %ld\n", coeff, len);
+                printf("FAIL:\n");
+                printf("x1 = "), fmpz_print(x1), printf("\n");
+                printf("x2 = "), fmpz_print(x2), printf("\n");
+                printf("coeff = %ld, length = %ld\n", coeff, len);
                 abort();
             }
         }
@@ -75,7 +76,7 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

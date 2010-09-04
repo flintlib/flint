@@ -31,15 +31,12 @@
 
 void fmpq_poly_fit_length(fmpq_poly_t poly, long len)
 {
-    long alloc = len;
-    
-    if (alloc <= poly->alloc)
-        return;
-    
-    /* At least double the number of allocated coefficients */
-    if (alloc < 2 * poly->alloc)
-        alloc = 2 * poly->alloc;
-
-    fmpq_poly_realloc(poly, alloc);
+    if (len > poly->alloc)
+    {
+        /* At least double the number of allocated coefficients */
+        if (len < 2 * poly->alloc)
+            len = 2 * poly->alloc;
+        fmpq_poly_realloc(poly, len);
+    }
 }
 

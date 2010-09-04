@@ -45,9 +45,10 @@ int
 main(void)
 {
     int len, e;
+    fmpz_randstate_t state;
     fmpz_poly_t f, g[1];
     
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
     
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g[0], ehi * (lenhi - 1) + 1);
@@ -63,9 +64,9 @@ main(void)
         {
             long k;
             for (k = 0; k < len; k++)
-                fmpz_randbits(f->coeffs + k, bits);
+                fmpz_randbits(f->coeffs + k, state, bits);
             if ((f->coeffs)[len-1] == 0L)
-                fmpz_randtest_not_zero(f->coeffs + (len-1), bits);
+                fmpz_randtest_not_zero(f->coeffs + (len-1), state, bits);
             f->length = len;
         }
         
@@ -98,5 +99,5 @@ main(void)
     fmpz_poly_clear(f);
     fmpz_poly_clear(g[0]);
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
 }

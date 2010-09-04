@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("derivative....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -49,7 +50,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_derivative(b, a);
         fmpq_poly_derivative(a, a);
@@ -57,7 +58,7 @@ main(void)
         result = (fmpq_poly_equal(a, b));
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             abort();
@@ -74,14 +75,14 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(2), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(2), 200);
 
         fmpq_poly_derivative(b, a);
 
         result = (b->length == 0UL);
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             abort();
@@ -102,8 +103,8 @@ main(void)
         fmpq_poly_init(d);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(b, state, n_randint(100), 200);
 
         fmpq_poly_mul(lhs, a, b);
         fmpq_poly_derivative(lhs, lhs);
@@ -116,7 +117,7 @@ main(void)
         result = fmpq_poly_equal(lhs, rhs);
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             abort();
@@ -130,8 +131,7 @@ main(void)
         fmpq_poly_clear(rhs);
     }
 
-    fmpq_poly_randclear();
-
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

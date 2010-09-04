@@ -23,50 +23,46 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <string.h>
-#include <math.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
-char *
-_fmpz_poly_to_string(const fmpz * poly, long len)
+void
+_fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
 {
-    long i, bound;
-    char *str, *strbase;
-
-    if (len == 0)
+    long i;
+    mpz_t d, t;
+    
+    mpz_init_set_ui(d, 1);
+    mpz_init(t);
+    for (i = 0; i < n; i++)
+        mpz_lcm(d, d, mpq_denref(a[i]));
+    
+    for (i = 0; i < n; i++)
     {
-        str = (char *) malloc(2 * sizeof(char));
-        str[0] = '0';
-        str[1] = '\0';
-        return str;
+        mpz_divexact(t, d, mpq_denref(a[i]));
+        mpz_mul((mpz_ptr) mpq_numref(a[i]), (mpz_ptr) mpq_numref(a[i]), t);
     }
-
-    bound = (long) (ceil(log10((double) (len + 1))));
-    for (i = 0; i < len; i++)
-        bound += fmpz_sizeinbase(poly + i, 10) + 1;
-    bound += len + 2;
-
-    strbase = (char *) malloc(bound * sizeof(char));
-    str = strbase;
-
-    str += sprintf(str, "%li ", len);
-    do
-    {
-        if (!COEFF_IS_MPZ(*poly))
-            str += sprintf(str, " %li", *poly);
-        else
-            str += gmp_sprintf(str, " %Zd", COEFF_TO_PTR(*poly));
-    } while (poly++, --len);
-
-    return strbase;
+    
+    for (i = 0; i < n; i++)
+        fmpz_set_mpz(poly + i, (mpz_ptr) mpq_numref(a[i]));
+    
+    fmpz_set_mpz(den, d);
+    mpz_clear(d);
+    mpz_clear(t);
 }
 
-char *
-fmpz_poly_to_string(const fmpz_poly_t poly)
+void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
 {
-    return _fmpz_poly_to_string(poly->coeffs, poly->length);
+    if (n == 0L)
+        fmpq_poly_zero(poly);
+    else
+    {
+        fmpq_poly_fit_length(poly, n);
+        _fmpq_poly_set_array_mpq(poly->coeffs, poly->den, n, a);
+        _fmpq_poly_set_length(poly, n);
+        _fmpq_poly_normalise(poly);
+    }
 }

@@ -32,8 +32,9 @@
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
 
+typedef gmp_randstate_t fmpz_randstate_t;
+
 extern __mpz_struct * fmpz_arr;
-extern gmp_randstate_t fmpz_randstate;
 
 /* maximum positive value a small coefficient can have */
 #define COEFF_MAX ((1L << (FLINT_BITS - 2)) - 1L)
@@ -97,19 +98,19 @@ void fmpz_clear(fmpz_t f)
 	_fmpz_demote(f);
 }
 
-void fmpz_randinit(void);
+void fmpz_randinit(fmpz_randstate_t state);
 
-void fmpz_randclear(void);
+void fmpz_randclear(fmpz_randstate_t state);
 
-void fmpz_randbits(fmpz_t f, mp_bitcnt_t bits);
+void fmpz_randbits(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_randm(fmpz_t f, fmpz_t m);
+void fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m);
 
-void fmpz_randtest(fmpz_t f, mp_bitcnt_t bits);
+void fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_randtest_unsigned(fmpz_t f, mp_bitcnt_t bits_in);
+void fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
 
-void fmpz_randtest_not_zero(fmpz_t f, mp_bitcnt_t bits_in);
+void fmpz_randtest_not_zero(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
 
 long fmpz_get_si(const fmpz_t f);
 

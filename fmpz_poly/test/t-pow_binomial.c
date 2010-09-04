@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("pow_binomial....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -51,8 +52,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init2(b, 2);
 
-        fmpz_randtest(b->coeffs, n_randint(100));
-        fmpz_randtest_not_zero(b->coeffs + 1, n_randint(100) + 1);
+        fmpz_randtest(b->coeffs, state, 100);
+        fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
         
         exp = n_randtest() % 100UL;
@@ -83,8 +84,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init2(b, 2);
         
-        fmpz_randtest(b->coeffs, n_randint(100));
-        fmpz_randtest_not_zero(b->coeffs + 1, n_randint(100) + 1);
+        fmpz_randtest(b->coeffs, state, 100);
+        fmpz_randtest_not_zero(b->coeffs + 1, state, 100);
         _fmpz_poly_set_length(b, 2);
 
         exp = n_randtest() % 100UL;
@@ -106,7 +107,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -34,8 +34,12 @@ int
 main(void)
 {
     int i;
+    fmpz_randstate_t state;
+    
     printf("init/init2/clear....");
     fflush(stdout);
+    
+    fmpz_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -50,7 +54,7 @@ main(void)
         fmpz_t a;
 
         fmpz_init(a);
-        fmpz_randtest(a, FLINT_BITS - 2);
+        fmpz_randtest(a, state, FLINT_BITS - 2);
 
         _fmpz_promote_val(a);
         _fmpz_demote_val(a);
@@ -58,6 +62,7 @@ main(void)
         fmpz_clear(a);
     }
 
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

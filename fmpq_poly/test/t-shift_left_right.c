@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("shift_left/right....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing of a and b for left shift */
     for (i = 0; i < 10000; i++)
@@ -49,7 +51,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_left(a, a, shift);
@@ -75,7 +77,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest_not_zero(a, n_randint(100) + 1, n_randint(200) + 1);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(100) + 1, 200);
 
         shift = (long) n_randint(a->length);
 
@@ -104,7 +106,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_right(c, b, shift);
@@ -124,7 +126,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

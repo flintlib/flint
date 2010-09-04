@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,7 +32,7 @@
 #include "fmpz.h"
 
 void
-fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
+fmpz_randbits(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
     if (bits <= FLINT_BITS - 2)
     {
@@ -43,7 +44,7 @@ fmpz_randbits(fmpz_t f, mp_bitcnt_t bits)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_urandomb(mpz_ptr, fmpz_randstate, bits);
+        mpz_urandomb(mpz_ptr, state, bits);
         if (n_randint(2))
             mpz_neg(mpz_ptr, mpz_ptr);
     }

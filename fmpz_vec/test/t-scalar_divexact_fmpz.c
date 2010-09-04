@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_divexact_fmpz....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -48,13 +50,13 @@ main(void)
         fmpz_t n;
         long len = n_randint(100);
         fmpz_init(n);
-        fmpz_randtest(n, 100);
+        fmpz_randtest(n, state, 100);
         if (n_randint(2))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_scalar_mul_fmpz(b, a, len, n);
         _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
@@ -73,7 +75,7 @@ main(void)
         fmpz_clear(n);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

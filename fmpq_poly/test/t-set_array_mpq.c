@@ -19,67 +19,63 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
-    int result;
-    char *str;
-    fmpz_poly_t a;
+    int i, result;
+    fmpz_randstate_t state;
 
-    printf("to_string....");
+    printf("set_array_mpq....");
     fflush(stdout);
 
-    fmpz_poly_init(a);
+    fmpq_poly_randinit(state);
 
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "0") == 0;
-    if (!result)
+    for (i = 0; i < 10000; i++)
     {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        long j, n = 100;
+        fmpq_poly_t f, g;
+        mpq_t * a = (mpq_t *) malloc(n * sizeof(mpq_t));
 
-    fmpz_poly_set_si(a, -2);
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "-2") == 0;
-    if (!result)
-    {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        fmpq_poly_init(f);
+        fmpq_poly_init(g);
+        fmpq_poly_randtest(f, state, n_randint(n), 200);
+        for (j = 0; j < n; j++)
+            mpq_init(a[j]);
+        for (j = 0; j < f->length; j++)
+            fmpq_poly_get_coeff_mpq(a[j], f, j);
 
-    fmpz_poly_set_coeff_si(a, 3, 1);
-    str = fmpz_poly_to_string_pretty(a, "t");
-    result = strcmp(str, "t^3-2") == 0;
-    if (!result)
-    {
-        printf("FAIL:\n");
-        printf("a = "), fmpz_poly_print(a), printf("\n");
-        printf("str(a) = {%s}\n", str);
-        abort();
-    }
-    free(str);
+        fmpq_poly_set_array_mpq(g, (const mpq_t *) a, n);
 
+        result = (fmpq_poly_equal(f, g));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("f = "), fmpq_poly_print(f), printf("\n\n");
+            printf("g = "), fmpq_poly_print(g), printf("\n\n");
+            abort();
+        }
+
+        fmpq_poly_clear(f);
+        fmpq_poly_clear(g);
+        for (j = 0; j < n; j++)
+            mpq_clear(a[j]);
+    }
+
+    fmpq_poly_randclear(state);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

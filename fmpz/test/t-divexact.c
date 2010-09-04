@@ -34,10 +34,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("divexact....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -53,8 +55,8 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest_not_zero(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest_not_zero(b, state, 200);
         fmpz_mul(c, a, b);
 
         fmpz_get_mpz(d, b);
@@ -66,7 +68,6 @@ main(void)
         fmpz_get_mpz(g, a);
 
         result = (mpz_cmp(f, g) == 0);
-
         if (!result)
         {
             printf("FAIL:\n");
@@ -97,7 +98,7 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest_not_zero(a, 200);
+        fmpz_randtest_not_zero(a, state, 200);
 
         fmpz_get_mpz(d, a);
 
@@ -107,7 +108,6 @@ main(void)
         fmpz_get_mpz(g, c);
 
         result = (mpz_cmp(f, g) == 0);
-
         if (!result)
         {
             printf("FAIL:\n");
@@ -138,8 +138,8 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest_not_zero(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest_not_zero(b, state, 200);
         fmpz_mul(c, a, b);
 
         fmpz_get_mpz(d, c);
@@ -183,8 +183,8 @@ main(void)
         mpz_init(f);
         mpz_init(g);
 
-        fmpz_randtest(a, 200);
-        fmpz_randtest_not_zero(b, 200);
+        fmpz_randtest(a, state, 200);
+        fmpz_randtest_not_zero(b, state, 200);
         fmpz_mul(c, a, b);
 
         fmpz_get_mpz(d, c);
@@ -213,7 +213,7 @@ main(void)
         mpz_clear(g);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

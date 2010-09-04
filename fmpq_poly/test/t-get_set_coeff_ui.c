@@ -35,12 +35,14 @@ int
 main(void)
 {
     int i, j, result;
+    fmpz_randstate_t state;
     ulong n1;
     mpq_t n1mpq, n2mpq;
 
     printf("get/set_coeff_ui....");
     fflush(stdout);
-    fmpz_randinit();
+    
+    fmpz_randinit(state);
 
     mpq_init(n1mpq);
     mpq_init(n2mpq);
@@ -51,6 +53,7 @@ main(void)
 
         fmpq_poly_init(a);
         len = (long) (n_randint(100) + 1);
+        fmpq_poly_randtest(a, state, len, 100);
 
         for (j = 0; j < 1000; j++)
         {
@@ -65,7 +68,7 @@ main(void)
             if (!result)
             {
                 gmp_printf
-                    ("Error: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
+                    ("FAIL: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
                      n1mpq, n2mpq, coeff, len);
                 abort();
             }
@@ -76,7 +79,8 @@ main(void)
 
     mpq_clear(n1mpq);
     mpq_clear(n2mpq);
-    fmpz_randclear();
+    
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

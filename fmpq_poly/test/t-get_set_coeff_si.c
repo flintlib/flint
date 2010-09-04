@@ -63,7 +63,7 @@ main(void)
             if (!result)
             {
                 gmp_printf
-                    ("Error: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
+                    ("FAIL: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
                      n1mpq, n2mpq, coeff, len);
                 abort();
             }

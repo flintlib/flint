@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -69,13 +69,24 @@ fmpq_poly_compose(fmpq_poly_t res,
         fmpq_poly_zero(res);
         return;
     }
-    if (len2 == 0L)
+    if (len1 == 1L || len2 == 0L)
     {
         fmpq_poly_fit_length(res, 1);
         fmpz_set(res->coeffs, poly1->coeffs);
         fmpz_set(res->den, poly1->den);
+        {
+            fmpz_t d;
+            fmpz_init(d);
+            fmpz_gcd(d, res->coeffs, res->den);
+            if (*d != 1L)
+            {
+                fmpz_divexact(res->coeffs, res->coeffs, d);
+                fmpz_divexact(res->den, res->den, d);
+            }
+            fmpz_clear(d);
+        }
         _fmpq_poly_set_length(res, 1);
-        _fmpq_poly_canonicalise(res->coeffs, res->den, res->length);
+        _fmpq_poly_normalise(res);
         return;
     }
     
@@ -88,6 +99,7 @@ fmpq_poly_compose(fmpq_poly_t res,
                            poly1->coeffs, poly1->den, len1, 
                            poly2->coeffs, poly2->den, len2);
         _fmpq_poly_set_length(res, lenr);
+        _fmpq_poly_normalise(res);
     }
     else
     {
@@ -97,6 +109,7 @@ fmpq_poly_compose(fmpq_poly_t res,
                            poly1->coeffs, poly1->den, len1,
                            poly2->coeffs, poly2->den, len2);
         _fmpq_poly_set_length(t, lenr);
+        _fmpq_poly_normalise(t);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }

@@ -70,8 +70,7 @@ fmpz_poly_mul(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init(t);
-        fmpz_poly_fit_length(t, rlen);
+        fmpz_poly_init2(t, rlen);
         if (len1 >= len2)
             _fmpz_poly_mul(t->coeffs, poly1->coeffs, len1,
                            poly2->coeffs, len2);
@@ -93,5 +92,4 @@ fmpz_poly_mul(fmpz_poly_t res,
     }
 
     _fmpz_poly_set_length(res, rlen);
-    _fmpz_poly_normalise(res);
 }

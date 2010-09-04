@@ -45,6 +45,7 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
     for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
     len1++;
     len2++;
+
     if (!len1 | !len2)
     {
         _fmpz_vec_zero(res, trunc);
@@ -57,9 +58,9 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
        trunc = len1 + len2 - 1;
     }
     
-    if (neg1 >= 0)
+    if (neg1 > 0)
         neg1 = 0;
-    if (neg2 >= 0)
+    if (neg2 > 0)
         neg2 = 0;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
@@ -103,10 +104,12 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
     arr3 = (mp_ptr) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
-    if (poly1 != poly2)
+    if (limbs1 == limbs2)
+        mpn_mul_n(arr3, arr1, arr2, limbs1);
+    else if (limbs1 > limbs2)
         mpn_mul(arr3, arr1, limbs1, arr2, limbs2);
     else
-        mpn_mul_n(arr3, arr1, arr1, limbs1);
+        mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
     
     if (sign)
         _fmpz_poly_bit_unpack(res, trunc, arr3, bits, neg1 ^ neg2);
@@ -134,7 +137,7 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init(t);
+        fmpz_poly_init2(t, trunc);
         fmpz_poly_mullow_KS(t, poly1, poly2, trunc);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);

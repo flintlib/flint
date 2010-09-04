@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("content....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check that content(a f) = abs(a) content(f) */
     for (i = 0; i < 10000; i++)
@@ -52,9 +53,9 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        fmpz_randtest(a, n_randint(100));
-        fmpz_randtest_not_zero(b, n_randint(100) + 1);
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
+        fmpz_randtest(a, state, 100);
+        fmpz_randtest_not_zero(b, state, 100);
         mpq_init(x);
         mpq_init(y);
         mpq_init(z);
@@ -85,8 +86,7 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    fmpq_poly_randclear();
-
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

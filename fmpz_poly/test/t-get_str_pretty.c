@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -35,40 +36,50 @@
 int
 main(void)
 {
-    int i, result;
-    printf("from_string....");
+    int result;
+    char *str;
+    fmpz_poly_t a;
+
+    printf("get_str_pretty....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_init(a);
 
-    for (i = 0; i < 10000; i++)
+    str = fmpz_poly_get_str_pretty(a, "t");
+    result = strcmp(str, "0") == 0;
+    if (!result)
     {
-        fmpz_poly_t a, b;
-        char *str;
-
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-
-        str = fmpz_poly_to_string(a);
-        fmpz_poly_from_string(b, str);
-        free(str);
-
-        result = (fmpz_poly_equal(a, b));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            abort();
-        }
-
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
+        printf("str(a) = {%s}\n", str);
+        abort();
     }
+    free(str);
 
-    fmpz_poly_randclear();
-    _fmpz_cleanup();
+    fmpz_poly_set_si(a, -2);
+    str = fmpz_poly_get_str_pretty(a, "t");
+    result = strcmp(str, "-2") == 0;
+    if (!result)
+    {
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
+        printf("str(a) = {%s}\n", str);
+        abort();
+    }
+    free(str);
+
+    fmpz_poly_set_coeff_si(a, 3, 1);
+    str = fmpz_poly_get_str_pretty(a, "t");
+    result = strcmp(str, "t^3-2") == 0;
+    if (!result)
+    {
+        printf("FAIL:\n");
+        printf("a = "), fmpz_poly_print(a), printf("\n");
+        printf("str(a) = {%s}\n", str);
+        abort();
+    }
+    free(str);
+
     printf("PASS\n");
     return 0;
 }

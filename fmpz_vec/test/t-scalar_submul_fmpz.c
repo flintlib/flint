@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_submul_fmpz....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Compare with fmpz_vec_scalar_submul_si */
     for (i = 0; i < 10000; i++)
@@ -56,8 +58,8 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         c = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
-        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(b, state, len, 200);
         _fmpz_vec_copy(c, b, len);
 
         _fmpz_vec_scalar_submul_fmpz(b, a, len, n1);
@@ -85,14 +87,14 @@ main(void)
         long len = n_randint(100);
         fmpz_t n1;
         fmpz_init(n1);
-        fmpz_randtest(n1, 200);
+        fmpz_randtest(n1, state, 200);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         c = _fmpz_vec_init(len);
         d = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
-        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(b, state, len, 200);
         _fmpz_vec_copy(c, b, len);
 
         _fmpz_vec_scalar_submul_fmpz(b, a, len, n1);
@@ -115,7 +117,7 @@ main(void)
         _fmpz_vec_clear(d, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

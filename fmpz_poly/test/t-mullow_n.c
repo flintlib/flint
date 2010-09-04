@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("mullow_n....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Compare with truncated product of a and b */
     for (i = 0; i < 2000; i++)
@@ -50,8 +52,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         trunc = n_randint(50);
-        fmpz_poly_randtest(b, trunc, n_randint(200));
-        fmpz_poly_randtest(c, trunc, n_randint(200));
+        fmpz_poly_randtest(b, state, trunc, 200);
+        fmpz_poly_randtest(c, state, trunc, 200);
 
         fmpz_poly_mullow_n(a, b, c, trunc);
         fmpz_poly_mul(b, b, c);
@@ -71,7 +73,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

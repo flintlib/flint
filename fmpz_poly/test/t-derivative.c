@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("derivative....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -48,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
 
         fmpz_poly_derivative(b, a);
         fmpz_poly_derivative(a, a);
@@ -73,7 +75,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, n_randint(2), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(2), 200);
 
         fmpz_poly_derivative(b, a);
 
@@ -101,8 +103,8 @@ main(void)
         fmpz_poly_init(d);
         fmpz_poly_init(lhs);
         fmpz_poly_init(rhs);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_mul(lhs, a, b);
         fmpz_poly_derivative(lhs, lhs);
@@ -115,7 +117,7 @@ main(void)
         result = fmpz_poly_equal(lhs, rhs);
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(b), printf("\n\n");
             abort();
@@ -129,7 +131,7 @@ main(void)
         fmpz_poly_clear(rhs);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

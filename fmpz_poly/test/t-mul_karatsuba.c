@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("mul_karatsuba....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -48,8 +50,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         fmpz_poly_mul_karatsuba(a, b, c);
         fmpz_poly_mul_karatsuba(b, b, c);
@@ -76,8 +78,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         fmpz_poly_mul_karatsuba(a, b, c);
         fmpz_poly_mul_karatsuba(c, b, c);
@@ -105,8 +107,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, n_randint(50), n_randint(200));
-        fmpz_poly_randtest(c, n_randint(50), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
         fmpz_poly_mul_karatsuba(a, b, c);
         fmpz_poly_mul_classical(d, b, c);
@@ -126,7 +128,7 @@ main(void)
         fmpz_poly_clear(d);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

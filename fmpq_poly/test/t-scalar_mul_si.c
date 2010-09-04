@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("scalar_mul_si....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -50,7 +51,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpq_poly_scalar_mul_si(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
@@ -76,7 +77,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpq_poly_scalar_mul_ui(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
@@ -108,7 +109,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
 
         fmpq_poly_scalar_mul_si(b, a, n1);
         fmpq_poly_scalar_mul_si(c, b, n2);
@@ -130,7 +131,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear();
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

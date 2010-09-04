@@ -1,4 +1,3 @@
-
 /*=============================================================================
 
     This file is part of FLINT.
@@ -18,7 +17,6 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
@@ -38,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("inv....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -51,7 +50,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest_not_zero(a, 1, n_randint(199) + 1);
+        fmpq_poly_randtest_not_zero(a, state, 1, 200);
 
         fmpq_poly_inv(b, a);
         fmpq_poly_inv(c, b);
@@ -59,7 +58,7 @@ main(void)
         result = (fmpq_poly_equal(a, c));
         if (!result)
         {
-            printf("Error:\n");
+            printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
@@ -71,8 +70,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear();
-
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

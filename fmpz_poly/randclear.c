@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -28,7 +29,7 @@
 #include "fmpz.h"
 
 void
-fmpz_poly_randclear(void)
+fmpz_poly_randclear(fmpz_randstate_t state)
 {
-    fmpz_randclear();
+    fmpz_randclear(state);
 }

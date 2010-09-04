@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("scalar_mul_ui....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -50,7 +52,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_scalar_mul_ui(b, a, len, n);
         _fmpz_vec_scalar_mul_ui(a, a, len, n);
@@ -79,7 +81,7 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         fmpz_init(x);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         fmpz_set_ui(x, n);
         _fmpz_vec_scalar_mul_ui(b, a, len, n);
@@ -99,7 +101,7 @@ main(void)
         fmpz_clear(x);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -60,7 +60,6 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
             fmpz_neg(poly1->den, poly2->coeffs);
         }
         _fmpq_poly_set_length(poly1, 1);
-        _fmpq_poly_normalise(poly1);
     }
 }
 

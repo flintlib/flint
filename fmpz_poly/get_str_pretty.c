@@ -32,7 +32,7 @@
 #include "fmpz_poly.h"
 
 char *
-_fmpz_poly_to_string_pretty(const fmpz * poly, long len, const char *x)
+_fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
 {
     long i, bound, nz;
     fmpz *top;
@@ -109,7 +109,7 @@ _fmpz_poly_to_string_pretty(const fmpz * poly, long len, const char *x)
 }
 
 char *
-fmpz_poly_to_string_pretty(const fmpz_poly_t poly, const char *x)
+fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char *x)
 {
-    return _fmpz_poly_to_string_pretty(poly->coeffs, poly->length, x);
+    return _fmpz_poly_get_str_pretty(poly->coeffs, poly->length, x);
 }

@@ -38,11 +38,12 @@ void _fmpz_vec_clear(fmpz * vec, long len);
 
 /*  Randomisation  ***********************************************************/
 
-void _fmpz_vec_randinit(void);
+void _fmpz_vec_randinit(fmpz_randstate_t state);
 
-void _fmpz_vec_randclear(void);
+void _fmpz_vec_randclear(fmpz_randstate_t state);
 
-void _fmpz_vec_randtest(fmpz * f, long len, mp_bitcnt_t bits_in);
+void _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state, 
+                        long len, mp_bitcnt_t bits);
 
 /*  Bit sizes  ***************************************************************/
 

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -57,7 +57,7 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
         {
             i--;
             _fmpz_poly_mul(t, res, lenr, poly2, len2);
-            lenr = lenr + len2 - 1L;
+            lenr += len2 - 1L;
             _fmpz_poly_add(res, t, lenr, poly1 + i, 1L);
         }
         
@@ -67,41 +67,44 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
 
 void
 fmpz_poly_compose_horner(fmpz_poly_t res, 
-                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+                         const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
     long lenr;
     
-    if (len1 == 0L)
+    if (len1 == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
-    if (len2 == 0L)
+    if (len1 == 1 || len2 == 0)
     {
         fmpz_poly_fit_length(res, 1);
         fmpz_set(res->coeffs, poly1->coeffs);
         _fmpz_poly_set_length(res, 1);
+        _fmpz_poly_normalise(res);
         return;
     }
     
-    lenr = (len1 - 1L) * (len2 - 1L) + 1L;
+    lenr = (len1 - 1) * (len2 - 1) + 1;
     
     if ((res != poly1) && (res != poly2))
     {
         fmpz_poly_fit_length(res, lenr);
         _fmpz_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
-                                                          poly2->coeffs, len2);
+                                               poly2->coeffs, len2);
         _fmpz_poly_set_length(res, lenr);
+        _fmpz_poly_normalise(res);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, lenr);
         _fmpz_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
-                                                          poly2->coeffs, len2);
+                                             poly2->coeffs, len2);
         _fmpz_poly_set_length(t, lenr);
+        _fmpz_poly_normalise(t);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
     }

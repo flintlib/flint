@@ -81,8 +81,7 @@ fmpz_poly_mullow_classical(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t temp;
-        fmpz_poly_init(temp);
-        fmpz_poly_fit_length(temp, trunc);
+        fmpz_poly_init2(temp, trunc);
         _fmpz_poly_mullow_classical(temp->coeffs, poly1->coeffs, poly1->length,
                                     poly2->coeffs, poly2->length, trunc);
         fmpz_poly_swap(res, temp);

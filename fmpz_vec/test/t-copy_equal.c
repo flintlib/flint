@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("copy/equal....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -47,7 +49,7 @@ main(void)
         long len = n_randint(100);
 
         a = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_copy(a, a, len);
 
@@ -70,7 +72,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_copy(b, a, len);
 
@@ -96,7 +98,7 @@ main(void)
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_copy(b, a, len);
         coeff = n_randint(len);
@@ -115,7 +117,7 @@ main(void)
         _fmpz_vec_clear(b, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

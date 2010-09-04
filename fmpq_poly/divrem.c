@@ -39,27 +39,33 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
-    if (lenB == 1UL)
+    if (lenB == 1)
     {
         _fmpq_poly_scalar_div_mpq(Q, q, A, a, lenA, B, b);
         _fmpz_vec_zero(R, lenR);
-        fmpz_set_ui(r, 1UL);
+        fmpz_set_ui(r, 1);
         return;
     }
     
+    /* 
+       From pseudo division over Z we have 
+           lead^d * A = Q * B + R
+       and thus
+           {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
+     */
     _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
     
     /* Determine the actual length of R */
     for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
     
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
-    if (d == 0UL || FLINT_ABS(*lead) == 1L)
+    if (d == 0UL || *lead == 1L || *lead == -1L)
     {
-        fmpz_set_ui(q, 1UL);
+        fmpz_set_ui(q, 1);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
-        fmpz_set_ui(r, 1UL);
+        fmpz_set_ui(r, 1);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
@@ -82,11 +88,11 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         fmpz_pow_ui(den, lead, d);
         fmpz_mul(den, a, den);
         
-        fmpz_set_ui(q, 1UL);
+        fmpz_set_ui(q, 1);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, den);
         
-        fmpz_set_ui(r, 1UL);
+        fmpz_set_ui(r, 1);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, den);
         

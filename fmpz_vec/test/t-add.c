@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("add....");
     fflush(stdout);
 
-    _fmpz_vec_randinit();
+    _fmpz_vec_randinit(state);
 
     /* Check aliasing of a and c */
     for (i = 0; i < 10000; i++)
@@ -49,8 +51,8 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         c = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
-        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(b, state, len, 200);
 
         _fmpz_vec_add(c, a, b, len);
         _fmpz_vec_add(a, a, b, len);
@@ -78,8 +80,8 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         c = _fmpz_vec_init(len);
-        _fmpz_vec_randtest(a, len, n_randint(200));
-        _fmpz_vec_randtest(b, len, n_randint(200));
+        _fmpz_vec_randtest(a, state, len, 200);
+        _fmpz_vec_randtest(b, state, len, 200);
 
         _fmpz_vec_add(c, a, b, len);
         _fmpz_vec_add(b, a, b, len);
@@ -98,7 +100,7 @@ main(void)
         _fmpz_vec_clear(c, len);
     }
 
-    _fmpz_vec_randclear();
+    _fmpz_vec_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

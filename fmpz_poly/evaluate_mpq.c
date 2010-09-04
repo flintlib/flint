@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,22 +29,29 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_evaluate_mpq(mpq_t res, const fmpz * f, long len, const mpq_t a)
+_fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, const fmpz * f, long len, 
+                        const fmpz_t anum, const fmpz_t aden)
 {
-    _fmpz_poly_evaluate_horner_mpq(res, f, len, a);
+    _fmpz_poly_evaluate_horner_mpq(rnum, rden, f, len, anum, aden);
 }
 
 void
 fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
 {
-    if (res == a)
-    {
-        mpq_t t;
-        mpq_init(t);
-        _fmpz_poly_evaluate_mpq(t, f->coeffs, f->length, a);
-        mpq_swap(res, t);
-        mpq_clear(t);
-    }
-    else
-        _fmpz_poly_evaluate_mpq(res, f->coeffs, f->length, a);
+    fmpz_t rnum, rden, anum, aden;
+    fmpz_init(rnum);
+    fmpz_init(rden);
+    fmpz_init(anum);
+    fmpz_init(aden);
+    fmpz_set_mpz(anum, mpq_numref(a));
+    fmpz_set_mpz(aden, mpq_denref(a));
+
+    _fmpz_poly_evaluate_mpq(anum, aden, f->coeffs, f->length, anum, aden);
+
+    fmpz_get_mpz(mpq_numref(res), rnum);
+    fmpz_get_mpz(mpq_denref(res), rden);
+    fmpz_clear(rnum);
+    fmpz_clear(rden);
+    fmpz_clear(anum);
+    fmpz_clear(aden);
 }

@@ -36,11 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
 
     printf("cmp....");
     fflush(stdout);
 
-    fmpq_poly_randinit();
+    fmpq_poly_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -48,7 +49,7 @@ main(void)
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
 
         result = (fmpq_poly_cmp(f, f) == 0);
         if (!result)
@@ -72,9 +73,9 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_init(h);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(g, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(h, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
+        fmpq_poly_randtest(g, state, n_randint(100), 200);
+        fmpq_poly_randtest(h, state, n_randint(100), 200);
 
         result = !(fmpq_poly_cmp(f, g) <= 0) || !(fmpq_poly_cmp(g, h) <= 0)
             || (fmpq_poly_cmp(f, h) <= 0);
@@ -99,8 +100,8 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(g, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(f, state, n_randint(100), 200);
+        fmpq_poly_randtest(g, state, n_randint(100), 200);
 
         result = (fmpq_poly_cmp(f, g) < 0) || (fmpq_poly_equal(f, g))
             || (fmpq_poly_cmp(f, g) > 0);
@@ -118,8 +119,7 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    fmpq_poly_randclear();
-
+    fmpq_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

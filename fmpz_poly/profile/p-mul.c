@@ -84,11 +84,12 @@ int
 main(void)
 {
     int i, j, len, bits;
+    fmpz_randstate_t state;
     int X[rows][cols];
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
     
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
         
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, lenhi);
@@ -117,13 +118,13 @@ main(void)
                     long k;
                     for (k = 0; k < len; k++)
                     {
-                        fmpz_randbits(f->coeffs + k, bits);
-                        fmpz_randbits(g->coeffs + k, bits);
+                        fmpz_randbits(f->coeffs + k, state, bits);
+                        fmpz_randbits(g->coeffs + k, state, bits);
                     }
                     if ((f->coeffs)[len-1] == 0L)
-                        fmpz_randtest_not_zero(f->coeffs + (len - 1), bits);
+                        fmpz_randtest_not_zero(f->coeffs + (len - 1), state, bits);
                     if ((g->coeffs)[len-1] == 0L)
-                        fmpz_randtest_not_zero(g->coeffs + (len - 1), bits);
+                        fmpz_randtest_not_zero(g->coeffs + (len - 1), state, bits);
                     f->length = len;
                     g->length = len;
                 }
@@ -224,5 +225,5 @@ main(void)
         }
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
 }

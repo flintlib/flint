@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("sub....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check a - b = a + neg(b) */
     for (i = 0; i < 10000; i++)
@@ -49,8 +51,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_neg(b, b);
@@ -81,8 +83,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_sub(a, a, b);
@@ -110,8 +112,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_sub(b, a, b);
@@ -131,7 +133,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

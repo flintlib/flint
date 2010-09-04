@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -35,10 +35,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("divrem_divconquer....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Check q*b + r = a, no aliasing */
     for (i = 0; i < 2000; i++)
@@ -50,11 +52,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_divrem_divconquer(q, r, a, b);
         fmpz_poly_mul(prod, q, b);
@@ -78,7 +77,7 @@ main(void)
         fmpz_poly_clear(prod);
     }
 
-    /* check r and a alias */
+    /* Check r and a alias */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -87,11 +86,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_divrem_divconquer(q, r, a, b);
         fmpz_poly_divrem_divconquer(q, a, a, b);
@@ -100,12 +96,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a);
-            printf("\n\n");
-            fmpz_poly_print(q);
-            printf("\n\n");
-            fmpz_poly_print(r);
-            printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(q), printf("\n\n");
+            fmpz_poly_print(r), printf("\n\n");
             abort();
         }
 
@@ -115,7 +108,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check r and b alias */
+    /* Check r and b alias */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -124,11 +117,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_divrem_divconquer(q, r, a, b);
         fmpz_poly_divrem_divconquer(q, b, a, b);
@@ -149,7 +139,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check q and a alias */
+    /* Check q and a alias */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -158,11 +148,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_divrem_divconquer(q, r, a, b);
         fmpz_poly_divrem_divconquer(a, r, a, b);
@@ -183,7 +170,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    /* check q and b alias */
+    /* Check q and b alias */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q, r;
@@ -192,11 +179,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, n_randint(100), n_randint(200));
-        do
-        {
-            fmpz_poly_randtest(b, n_randint(100), n_randint(200));
-        } while (b->length == 0);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
 
         fmpz_poly_divrem_divconquer(q, r, a, b);
         fmpz_poly_divrem_divconquer(b, r, a, b);
@@ -217,7 +201,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

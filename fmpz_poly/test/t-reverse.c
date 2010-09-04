@@ -36,10 +36,12 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("reverse....");
     fflush(stdout);
 
-    fmpz_poly_randinit();
+    fmpz_poly_randinit(state);
 
     /* Aliasing */
     for (i = 0; i < 2000; i++)
@@ -49,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
         n = n_randint(150);
 
         fmpz_poly_reverse(a, b, n);
@@ -77,7 +79,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, n_randint(100), n_randint(200));
+        fmpz_poly_randtest(b, state, n_randint(100), 200);
         n = n_randint(150);
 
         len = FLINT_MIN(n, b->length);
@@ -106,7 +108,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear();
+    fmpz_poly_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

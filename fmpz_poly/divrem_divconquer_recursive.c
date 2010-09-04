@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
    
 ******************************************************************************/
 
@@ -36,13 +37,10 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
                                        long B_len)
 {
     long crossover = 16;
-    long A_len = 2 * B_len - 1;
+    long A_len = 2 * B_len - 1, n1, n2;
 
     const fmpz *d1, *d2, *d3, *d4, *p1, *p2;
-    fmpz *q1, *q2, *dq1, *dq2, *d1q1, *d2q1, *d3q2, *d4q2, *t;
-
-    long n1 = (B_len + 1) / 2;
-    long n2 = B_len - n1;
+    fmpz *q1, *q2, *dq1, *dq2, *d1q1, *d2q1, *d3q2, *d4q2, *t, *W1, *W2;
 
     if (B_len <= crossover)
     {
@@ -51,13 +49,21 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
            quotient and remainder, then use A - R to compute BQ
          */
 
-        fmpz *R = _fmpz_vec_init(A_len);
-        _fmpz_poly_divrem_basecase(Q, R, A, A_len, B, B_len);
-        _fmpz_vec_sub(BQ, A, R, A_len);
-        _fmpz_vec_clear(R, A_len);
-
+        _fmpz_poly_divrem_basecase(Q, BQ, A, A_len, B, B_len);
+        _fmpz_vec_sub(BQ, A, BQ, A_len);
         return;
     }
+
+    n1 = (B_len + 1) / 2;
+    n2 = B_len - n1;
+
+    /*
+       To avoid repeated allocations and de-allocations, 
+       we allocate all the space we need up front.
+     */
+    
+    W1 = _fmpz_vec_init((n1 + n2 - 1) + (n1 + 2 * n2 - 1));
+    W2 = W1 + (n1 + n2 - 1);
 
     /* We let B = d1*x^n2 + d2 */
 
@@ -92,7 +98,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
        which ends up being length n1+n2-1
      */
 
-    d2q1 = _fmpz_vec_init(n1 + n2 - 1);
+    d2q1 = W1;
     _fmpz_poly_mul(d2q1, q1, n1, d2, n2);
 
     /* 
@@ -102,7 +108,6 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
 
     _fmpz_vec_copy(dq1, d2q1, n2);
     _fmpz_vec_add(dq1 + n2, dq1 + n2, d2q1 + n2, n1 - 1);
-    _fmpz_vec_clear(d2q1, n1 + n2 - 1);
 
     /*
        Compute t = A/x^n2 - dq1
@@ -112,7 +117,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
        We set p2 to the top 2*n2-1 coefficients of this
      */
 
-    t = _fmpz_vec_init(n1 + n2 - 1);
+    t = W1;
     _fmpz_vec_sub(t, A + n2, dq1, n1 + n2 - 1);
     p2 = t + (n1 > n2);
 
@@ -123,18 +128,17 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
        Also compute d3q2 of length 2*n2-1
      */
 
-    dq2 = _fmpz_vec_init(n1 + 2 * n2 - 1);
+    dq2 = W2;
     d3q2 = dq2 + n1;
     q2 = Q;
     _fmpz_poly_divrem_divconquer_recursive(q2, d3q2, p2, d3, n2);
-    _fmpz_vec_clear(t, n1 + n2 - 1);
 
     /*
        Compute d4q2 = d4*q2 which is of length 
        n1+n2-1
      */
 
-    d4q2 = _fmpz_vec_init(n1 + n2 - 1);
+    d4q2 = W1;
     _fmpz_poly_mul(d4q2, d4, n1, q2, n2);
 
     /*
@@ -144,7 +148,6 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
 
     _fmpz_vec_copy(dq2, d4q2, n1);
     _fmpz_vec_add(dq2 + n1, dq2 + n1, d4q2 + n1, n2 - 1);
-    _fmpz_vec_clear(d4q2, n1 + n2 - 1);
 
     /*
        Note Q = q1*x^n2 + q2
@@ -157,5 +160,5 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
     _fmpz_vec_copy(BQ, dq2, n2);
     _fmpz_vec_add(BQ + n2, BQ + n2, dq2 + n2, n1 + n2 - 1);
 
-    _fmpz_vec_clear(dq2, n1 + 2 * n2 - 1);
+    _fmpz_vec_clear(W1, n1 + n2 - 1);
 }

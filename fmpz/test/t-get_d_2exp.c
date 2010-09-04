@@ -36,20 +36,22 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     double output;
     long exp;
 
     printf("get_d_2exp....");
     fflush(stdout);
 
-    fmpz_randinit();
+    fmpz_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
         fmpz_t a;
         fmpz_init(a);
 
-        fmpz_randtest(a, 200);
+        fmpz_randtest(a, state, 200);
 
         output = fmpz_get_d_2exp(&exp, a);
 
@@ -66,7 +68,7 @@ main(void)
         fmpz_clear(a);
     }
 
-    fmpz_randclear();
+    fmpz_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

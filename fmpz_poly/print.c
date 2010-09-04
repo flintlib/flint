@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -35,12 +36,13 @@ fmpz_poly_print(const fmpz_poly_t poly)
     long i;
 
     printf("%li", poly->length);
-    if (poly->length == 0)
-        return;
-    printf(" ");
-    for (i = 0; i < poly->length; i++)
+    if (poly->length > 0)
     {
         printf(" ");
-        fmpz_print(poly->coeffs + i);
+        for (i = 0; i < poly->length; i++)
+        {
+            printf(" ");
+            fmpz_print(poly->coeffs + i);
+        }
     }
 }

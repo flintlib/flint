@@ -37,6 +37,7 @@ main(void)
     fmpz_t x;
 
     int i, result;
+
     printf("get/set_si....");
     fflush(stdout);
 

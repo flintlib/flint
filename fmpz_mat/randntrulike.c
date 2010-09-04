@@ -33,7 +33,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
+fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q)
 {
     long r, c, d, i, j, k;
     fmpz *h;
@@ -52,7 +52,7 @@ fmpz_mat_randntrulike(fmpz_mat_t mat, mp_bitcnt_t bits, ulong q)
     h = _fmpz_vec_init(d);
 
     for (i = 0; i < d; i++)
-        fmpz_randbits(h + i, bits);
+        fmpz_randbits(h + i, state, bits);
 
     for (i = 0; i < d; i++)
     {

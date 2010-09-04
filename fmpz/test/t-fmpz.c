@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result;
+    fmpz_randstate_t state;
+
     printf("fmpz....");
     fflush(stdout);
 
@@ -43,7 +45,7 @@ main(void)
 
         *a = 0L;
 
-        fmpz_randtest(a, FLINT_BITS - 2);
+        fmpz_randtest(a, state, FLINT_BITS - 2);
 
         *b = *a;
 

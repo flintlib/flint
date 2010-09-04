@@ -24,6 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -111,7 +112,6 @@ void
 fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, 
                              const fmpz_poly_t poly2, long len)
 {
-    long i;
     int clear1 = 0, clear2 = 0;
     fmpz *pol1, *pol2;
 
@@ -124,8 +124,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
     if (poly1->length != len)
     {
         pol1 = (fmpz *) calloc(len, sizeof(fmpz));
-        for (i = 0; i < poly1->length; i++)
-            pol1[i] = poly1->coeffs[i];
+        memcpy(pol1, poly1->coeffs, poly1->length * sizeof(fmpz));
         clear1 = 1;
     }
     else
@@ -134,8 +133,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
     if (poly2->length != len)
     {
         pol2 = (fmpz *) calloc(len, sizeof(fmpz));
-        for (i = 0; i < poly2->length; i++)
-            pol2[i] = poly2->coeffs[i];
+        memcpy(pol2, poly2->coeffs, poly2->length * sizeof(fmpz));
         clear2 = 1;
     }
     else
@@ -144,24 +142,18 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
     if (res != poly1 && res != poly2)
     {
         fmpz_poly_fit_length(res, len);
-
         _fmpz_poly_mullow_karatsuba_n(res->coeffs, pol1, pol2, len);
-        _fmpz_poly_set_length(res, len);
-        _fmpz_poly_normalise(res);
     }
     else
     {
         fmpz_poly_t temp;
-        fmpz_poly_init(temp);
-        fmpz_poly_fit_length(temp, len);
-
+        fmpz_poly_init2(temp, len);
         _fmpz_poly_mullow_karatsuba_n(temp->coeffs, pol1, pol2, len);
-        _fmpz_poly_set_length(temp, len);
-        _fmpz_poly_normalise(temp);
-
         fmpz_poly_swap(temp, res);
         fmpz_poly_clear(temp);
     }
+    _fmpz_poly_set_length(res, len);
+    _fmpz_poly_normalise(res);
 
     if (clear1)
         free(pol1);
