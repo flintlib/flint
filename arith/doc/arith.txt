@@ -84,6 +84,58 @@ void mpq_harmonic(mpq_t res, long n)
     single limb. For larger n, mpn_harmonic_odd_balanced is used.
 
 
+void fmpz_stirling1u(fmpz_t s, long n, long k)
+void fmpz_stirling1(fmpz_t s, long n, long k)
+void fmpz_stirling2(fmpz_t s, long n, long k)
+
+    Sets s to S(n,k) where S(n,k) respectively denotes an unsigned Stirling
+    number of the first kind |S1(n,k)|, a signed Stirling number of the first
+    kind S1(n,k), or a Stirling number of the second kind S2(n,k).
+
+    These numbers are defined using the generating functions
+
+        x_{(n)} = \sum_{k=0}^n S1(n,k) x^k
+
+        x^{(n)} = \sum_{k=0}^n |S1(n,k)| x^k
+
+        x^n = \sum_{k=0}^n S2(n,k) x_{(k)}
+
+    where x_{(n)} = x(x-1)(x-2)...(x-n+1) is a falling factorial and
+    x^{(n)} = x(x+1)(x+2)...(x+n-1) is a rising factorial.
+
+    S(n,k) is taken to be zero if n < 0 or k < 0.
+
+
+void fmpz_stirling1u_vec(fmpz * row, long n, long klen)
+void fmpz_stirling1_vec(fmpz * row, long n, long klen)
+void fmpz_stirling2_vec(fmpz * row, long n, long klen)
+
+    Computes the row of successive Stirling numbers
+    S(n,0), S(n,1), S(n,2), ..., S(n,klen-1). It is assumed that klen <= n+1.
+
+void fmpz_stirling1u_mat(fmpz ** rows, long n)
+void fmpz_stirling1_mat(fmpz ** rows, long n)
+void fmpz_stirling2_mat(fmpz ** rows, long n)
+
+    Computes an n x n matrix of Stirling numbers:
+
+    row 0   : S(0,0)
+    row 1   : S(1,0), S(1,1)
+    row 2   : S(2,0), S(2,1), S(2,2)
+    row 3   : S(3,0), S(3,1), S(3,2), S(3,3)
+                  ...
+    row n-1 : S(n-1,0), S(n-1,1), ..., S(n-1,n-1)
+
+    In effect, if rows are the rows of an fmpz_mat_t, this stores the
+    Stirling number analog of Pascal's triangle as a lower triangular
+    matrix, with ones on the main diagonal (entries above the main
+    diagonal will not be touched, and should be zeroed by the caller
+    if necessary).
+
+    For any n, the S1 and S2 matrices thus obtained are inverses of
+    each other.
+
+
 *******************************************************************************
 
     Multiplicative functions

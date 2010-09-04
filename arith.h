@@ -70,4 +70,19 @@ void _mpq_harmonic_balanced(mpq_t res, long a, long b);
 void _mpq_harmonic_odd_balanced(mpq_t res, long n);
 void mpq_harmonic(mpq_t res, long n);
 
+void _fmpz_stirling2_powsum(fmpz_t s, long n, long k);
+void _fmpz_stirling2_powsum_odd(fmpz_t , long n, long k);
+
+void fmpz_stirling1u(fmpz_t s, long n, long k);
+void fmpz_stirling1(fmpz_t s, long n, long k);
+void fmpz_stirling2(fmpz_t s, long n, long k);
+
+void fmpz_stirling1u_vec(fmpz * row, long n, long klen);
+void fmpz_stirling1_vec(fmpz * row, long n, long klen);
+void fmpz_stirling2_vec(fmpz * row, long n, long klen);
+
+void fmpz_stirling1u_mat(fmpz ** rows, long n);
+void fmpz_stirling1_mat(fmpz ** rows, long n);
+void fmpz_stirling2_mat(fmpz ** rows, long n);
+
 #endif
