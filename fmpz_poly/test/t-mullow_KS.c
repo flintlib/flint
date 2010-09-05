@@ -19,8 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -38,7 +37,7 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-    printf("mul_classical....");
+    printf("mullow_KS....");
     fflush(stdout);
 
     fmpz_poly_randinit(state);
@@ -47,6 +46,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;
+        long len, trunc;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -54,8 +54,11 @@ main(void)
         fmpz_poly_randtest(b, state, n_randint(50), 200);
         fmpz_poly_randtest(c, state, n_randint(50), 200);
 
-        fmpz_poly_mul_classical(a, b, c);
-        fmpz_poly_mul_classical(b, b, c);
+        len = b->length + c->length - 1;
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length);
+
+        fmpz_poly_mullow_KS(a, b, c, trunc);
+        fmpz_poly_mullow_KS(b, b, c, trunc);
 
         result = (fmpz_poly_equal(a, b));
         if (!result)
@@ -75,6 +78,8 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c;
+        long len;
+        ulong trunc;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -82,8 +87,11 @@ main(void)
         fmpz_poly_randtest(b, state, n_randint(50), 200);
         fmpz_poly_randtest(c, state, n_randint(50), 200);
 
-        fmpz_poly_mul_classical(a, b, c);
-        fmpz_poly_mul_classical(c, b, c);
+        len = b->length + c->length - 1;
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
+
+        fmpz_poly_mullow_KS(a, b, c, trunc);
+        fmpz_poly_mullow_KS(c, b, c, trunc);
 
         result = (fmpz_poly_equal(a, c));
         if (!result)
@@ -99,82 +107,39 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    /* Check (b*c)+(b*d) = b*(c+d) */
+    /* Compare with mul_basecase */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_poly_t a1, a2, b, c, d;
+        fmpz_poly_t a, b, c, d;
+        long len, trunc;
 
-        fmpz_poly_init(a1);
-        fmpz_poly_init(a2);
+        fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(100), 200);
-        fmpz_poly_randtest(c, state, n_randint(100), 200);
-        fmpz_poly_randtest(d, state, n_randint(100), 200);
+        fmpz_poly_randtest(b, state, n_randint(50), 200);
+        fmpz_poly_randtest(c, state, n_randint(50), 200);
 
-        fmpz_poly_mul_classical(a1, b, c);
-        fmpz_poly_mul_classical(a2, b, d);
-        fmpz_poly_add(a1, a1, a2);
+        len = b->length + c->length - 1;
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
 
-        fmpz_poly_add(c, c, d);
-        fmpz_poly_mul_classical(a2, b, c);
+        fmpz_poly_mul_KS(a, b, c);
+        fmpz_poly_truncate(a, trunc);
+        fmpz_poly_mullow_KS(d, b, c, trunc);
 
-        result = (fmpz_poly_equal(a1, a2));
+        result = (fmpz_poly_equal(a, d));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a1), printf("\n\n");
-            fmpz_poly_print(a2), printf("\n\n");
-            abort();
-        }
-
-        fmpz_poly_clear(a1);
-        fmpz_poly_clear(a2);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
-        fmpz_poly_clear(d);
-    }
-
-    /* Check _fmpz_poly_mul_classical directly */
-    for (i = 0; i < 2000; i++)
-    {
-        long len1, len2;
-        fmpz_poly_t a, b, out1, out2;
-
-        len1 = n_randint(100) + 1;
-        len2 = n_randint(100) + 1;
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(out1);
-        fmpz_poly_init(out2);
-        fmpz_poly_randtest(a, state, len1, 200);
-        fmpz_poly_randtest(b, state, len2, 200);
-
-        fmpz_poly_mul_classical(out1, a, b);
-        fmpz_poly_fit_length(a, a->alloc + n_randint(10));
-        fmpz_poly_fit_length(b, b->alloc + n_randint(10));
-        a->length = a->alloc;
-        b->length = b->alloc;
-        fmpz_poly_fit_length(out2, a->length + b->length - 1);
-        _fmpz_poly_mul_classical(out2->coeffs, a->coeffs, a->length,
-                                               b->coeffs, b->length);
-        _fmpz_poly_set_length(out2, a->length + b->length - 1);
-        _fmpz_poly_normalise(out2);
-
-        result = (fmpz_poly_equal(out1, out2));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            fmpz_poly_print(out1), printf("\n\n");
-            fmpz_poly_print(out2), printf("\n\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(d), printf("\n\n");
             abort();
         }
 
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
-        fmpz_poly_clear(out1);
-        fmpz_poly_clear(out2);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
     }
 
     fmpz_poly_randclear(state);

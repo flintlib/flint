@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -183,6 +184,47 @@ main(void)
         fmpz_poly_clear(b);
         fmpz_poly_clear(c);
         fmpz_poly_clear(d);
+    }
+
+    /* Check _fmpz_poly_mul_KS directly */
+    for (i = 0; i < 2000; i++)
+    {
+        long len1, len2;
+        fmpz_poly_t a, b, out1, out2;
+
+        len1 = n_randint(100) + 1;
+        len2 = n_randint(100) + 1;
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(out1);
+        fmpz_poly_init(out2);
+        fmpz_poly_randtest(a, state, len1, 200);
+        fmpz_poly_randtest(b, state, len2, 200);
+
+        fmpz_poly_mul_KS(out1, a, b);
+        fmpz_poly_fit_length(a, a->alloc + n_randint(10));
+        fmpz_poly_fit_length(b, b->alloc + n_randint(10));
+        a->length = a->alloc;
+        b->length = b->alloc;
+        fmpz_poly_fit_length(out2, a->length + b->length - 1);
+        _fmpz_poly_mul_KS(out2->coeffs, a->coeffs, a->length,
+                                        b->coeffs, b->length);
+        _fmpz_poly_set_length(out2, a->length + b->length - 1);
+        _fmpz_poly_normalise(out2);
+
+        result = (fmpz_poly_equal(out1, out2));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(out1), printf("\n\n");
+            fmpz_poly_print(out2), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(out1);
+        fmpz_poly_clear(out2);
     }
 
     fmpz_poly_randclear(state);

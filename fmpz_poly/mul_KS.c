@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -30,26 +31,31 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-/* Assumes poly1 and poly2 are not length 0 and len1 >= len2. */
 void
 _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
-                  const fmpz * poly2, long len2)
+                              const fmpz * poly2, long len2)
 {
-    int neg1 = 0, neg2 = 0;
+    const long in1_len = len1, in2_len = len2;
+    int neg1, neg2;
     long limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (len1--; len1 >= 0 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
-    for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    for (len1--; len1 >= 0 && !poly1[len1]; len1--) ;
+    for (len2--; len2 >= 0 && !poly2[len2]; len2--) ;
     len1++;
     len2++;
 
-    if (neg1 > 0)
-        neg1 = 0;
-    if (neg2 > 0)
-        neg2 = 0;
+    if (!len1 | !len2)
+    {
+        if (in1_len + in2_len - 1 > 0)
+            _fmpz_vec_zero(res, in1_len + in2_len - 1);
+        return;
+    }
+
+    neg1 = (fmpz_sgn(poly1 + len1 - 1) > 0) ? 0 : -1;
+    neg2 = (fmpz_sgn(poly2 + len2 - 1) > 0) ? 0 : -1;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
     if (bits1 < 0)
@@ -70,7 +76,7 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
     else
         bits2 = bits1;
 
-    loglen = FLINT_BIT_COUNT(len2);
+    loglen = FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
     bits = bits1 + bits2 + loglen + sign;
 
     limbs1 = (bits * len1 - 1) / FLINT_BITS + 1;
@@ -103,6 +109,9 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
         _fmpz_poly_bit_unpack(res, len1 + len2 - 1, arr3, bits, neg1 ^ neg2);
     else
         _fmpz_poly_bit_unpack_unsigned(res, len1 + len2 - 1, arr3, bits);
+
+    if ((len1 < in1_len) | (len2 < in2_len))
+        _fmpz_vec_zero(res + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2));
 
     free(arr1);
     free(arr3);

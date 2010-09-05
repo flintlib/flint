@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -377,8 +378,9 @@ void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}.  Assumes len1 and len2 are positive.  Allows zero-padding 
+    of the two input polynomials. 
     No aliasing of inputs with outputs is allowed.
 
 void fmpz_poly_mul_classical(fmpz_poly_t res, 
@@ -426,17 +428,18 @@ void fmpz_poly_mulmid_classical(fmpz_poly_t res,
     poly1 * poly, i.e. the coefficient from degree len2 - 1 to len1 - 1 
     inclusive. Assumes that len1 >= len2.
 
+void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, long len1, 
+                                                 const fmpz * poly2, long len2)
+
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}. Assumes len1 >= len2 > 0.  Allows zero-padding of the two 
+    input polynomials.
+    No aliasing of inputs with outputs is allowed.
+
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets res to poly1 multiplied by poly2.
-
-void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, long len1, 
-                                                 const fmpz * poly2, long len2)
-
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                                  const fmpz * poly2, long len)
@@ -469,9 +472,10 @@ void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
 void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}. Places no assumptions on len1 and len2. Allows 
+    zero-padding of the two input polynomials. Supports aliasing of 
+    inputs and outputs.
 
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -496,9 +500,9 @@ void fmpz_poly_mullow_KS(fmpz_poly_t res,
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}.  Assumes len1 >= len2 > 0.  Allows zero-padding of 
+    the two input polynomials.
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
