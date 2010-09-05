@@ -29,39 +29,73 @@
 
 
 void
+_fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
+{
+    long k;
+    fmpz_t t, u;
+
+    if (n == 0)
+    {
+        fmpz_set_ui(new, 1UL);
+        return;
+    }
+
+    if (klen < 1)
+        return;
+
+    fmpz_init(t);
+    fmpz_init(u);
+    fmpz_set_ui(new, 0UL);
+
+    if (klen > n)
+        fmpz_set_ui(new+n, 1UL);
+
+    for (k = 1; k < FLINT_MIN(n, klen); k++)
+    {
+        fmpz_set(u, prev+k);
+        fmpz_set(new + k, t);
+        switch (kind)
+        {
+        case 0:
+            fmpz_addmul_ui(new+k, u, n-1UL);
+            break;
+        case 1:
+            fmpz_submul_ui(new+k, u, n - 1UL);
+            break;
+        case 2:
+            fmpz_addmul_ui(new+k, u, k);
+            break;
+        }
+        fmpz_set(t, u);
+    }
+    fmpz_clear(t);
+    fmpz_clear(u);
+}
+
+void
 _fmpz_stirling_mat(fmpz ** rows, long nn, int kind)
 {
-    long n, k;
+    long n;
 
-    fmpz * row;
-    fmpz * prev_row;
+    if (nn > 0)
+        fmpz_set_ui(rows[0], 1UL);
+    for (n = 1; n < nn; n++)
+        _fmpz_stirling_next_row(rows[n], rows[n-1], n, n+1, kind);
+}
 
-    for (n = 0; n < nn; n++)
-    {
-        prev_row = row;
-        row = rows[n];
+void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+{
+    _fmpz_stirling_next_row(row, prev, n, klen, 0);
+}
 
-        /* Leftmost column and diagonal */
-        fmpz_set_ui(row, n == 0);
-        fmpz_set_ui(row + n, 1UL);
+void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+{
+    _fmpz_stirling_next_row(row, prev, n, klen, 1);
+}
 
-        for (k = 1; k < n; k++)
-        {
-            fmpz_set(row+k, prev_row+(k-1));
-            switch (kind)
-            {
-            case 0:
-                fmpz_addmul_ui(row+k, prev_row+k, n - 1UL);
-                break;
-            case 1:
-                fmpz_submul_ui(row+k, prev_row+k, n - 1UL);
-                break;
-            case 2:
-                fmpz_addmul_ui(row+k, prev_row+k, k);
-                break;
-            }
-        }
-    }
+void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+{
+    _fmpz_stirling_next_row(row, prev, n, klen, 2);
 }
 
 void

@@ -32,7 +32,7 @@
 #include "ulong_extras.h"
 
 
-void fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
+void _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 {
     if (parity % 2)
         fmpz_submul(s, t, u);
@@ -40,44 +40,7 @@ void fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
         fmpz_addmul(s, t, u);
 }
 
-
 void _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
-{
-    fmpz_t t, u;
-    long j;
-
-    fmpz_init(t);
-    fmpz_init(u);
-    fmpz_set_ui(t, 1UL);
-    fmpz_set_ui(s, 0UL);
-
-    for (j = 1; j < k/2 + 1; j++)
-    {
-        fmpz_mul_ui(t, t, k+1-j);
-        fmpz_divexact_ui(t, t, j);
-        fmpz_set_ui(u, j);
-        fmpz_pow_ui(u, u, n);
-        fmpz_addmul_alt(s, t, u, k+j);
-        if (2*j != k)
-        {
-            /* C(k,j) = C(k,k-j) */
-            fmpz_set_ui(u, k-j);
-            fmpz_pow_ui(u, u, n);
-            fmpz_addmul_alt(s, t, u, j);
-        }
-    }
-
-    /* Last term not included because loop starts from 1 */
-    fmpz_set_ui(u, k);
-    fmpz_pow_ui(u, u, n);
-    fmpz_add(s, s, u);
-    fmpz_fac_ui(t, k);
-    fmpz_divexact(s, s, t);
-    fmpz_clear(t);
-    fmpz_clear(u);
-}
-
-void _fmpz_stirling2_powsum_odd(fmpz_t s, long n, long k)
 {
     fmpz_t t, u;
     fmpz * bc;
@@ -89,7 +52,7 @@ void _fmpz_stirling2_powsum_odd(fmpz_t s, long n, long k)
 
     bc = _fmpz_vec_init(max_bc + 1);
     fmpz_set_ui(bc, 1UL);
-    for (j = 1; j < max_bc + 1; j++)
+    for (j = 1; j <= max_bc; j++)
     {
         fmpz_set(bc+j, bc+j-1);
         fmpz_mul_ui(bc+j, bc+j, k+1-j);
@@ -97,7 +60,7 @@ void _fmpz_stirling2_powsum_odd(fmpz_t s, long n, long k)
     }
 
     fmpz_zero(s);
-    for (j = 1; j < k + 1; j += 2)
+    for (j = 1; j <= k; j += 2)
     {
         fmpz_set_ui(u, j);
         fmpz_pow_ui(u, u, n);
@@ -106,9 +69,9 @@ void _fmpz_stirling2_powsum_odd(fmpz_t s, long n, long k)
         while (1)
         {
             if (m > max_bc)
-                fmpz_addmul_alt(s, bc+k-m, u, k + m);
+                _fmpz_addmul_alt(s, bc+k-m, u, k + m);
             else
-                fmpz_addmul_alt(s, bc+m, u, k + m);
+                _fmpz_addmul_alt(s, bc+m, u, k + m);
             m *= 2;
             if (m > k)
                 break;
@@ -122,8 +85,6 @@ void _fmpz_stirling2_powsum_odd(fmpz_t s, long n, long k)
     fmpz_clear(t);
     fmpz_clear(u);
 }
-
-
 
 void fmpz_stirling2(fmpz_t s, long n, long k)
 {
@@ -163,17 +124,20 @@ void fmpz_stirling2(fmpz_t s, long n, long k)
         return;
     }
 
-    if (n < 200)
-        _fmpz_stirling2_powsum(s, n, k);
-    else
-        _fmpz_stirling2_powsum_odd(s, n, k);
+    _fmpz_stirling2_powsum(s, n, k);
 }
-
 
 void
 fmpz_stirling2_vec(fmpz * row, long n, long klen)
 {
-    long k;
-    for (k = 0; k < klen; k++)
-        fmpz_stirling2(row + k, n, k);
+    long m;
+
+    klen = FLINT_MIN(klen, n+1);
+
+    if (klen < 1)
+        return;
+
+    fmpz_set_ui(row, 1UL);
+    for (m = 1; m <= n; m++)
+        _fmpz_stirling_next_row(row, row, m, klen, 2);
 }

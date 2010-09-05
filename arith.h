@@ -81,6 +81,10 @@ void fmpz_stirling1u_vec(fmpz * row, long n, long klen);
 void fmpz_stirling1_vec(fmpz * row, long n, long klen);
 void fmpz_stirling2_vec(fmpz * row, long n, long klen);
 
+void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+
 void fmpz_stirling1u_mat(fmpz ** rows, long n);
 void fmpz_stirling1_mat(fmpz ** rows, long n);
 void fmpz_stirling2_mat(fmpz ** rows, long n);

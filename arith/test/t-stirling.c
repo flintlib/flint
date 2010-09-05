@@ -39,7 +39,7 @@ int main(void)
     fmpz_mat_t mat, mat2, mat3;
 
     fmpz * row;
-    fmpz_t s, t;
+    fmpz_t s;
 
     long n, k, nn;
 
@@ -172,21 +172,6 @@ int main(void)
 
         fmpz_mat_clear(mat);
     }
-
-    /* Large number test */
-    fmpz_init(t);
-    for (nn = 0; nn < 100; nn++)
-    {
-        n = n_randtest() % 1000 + 2;
-        k = n_randtest() % n;
-        _fmpz_stirling2_powsum(s, n, k);
-        _fmpz_stirling2_powsum_odd(t, n, k);
-        if (!fmpz_equal(s, t))
-        {
-            printf("powsum != powsum_odd for n,k = %ld,%ld", n, k);
-        }
-    }
-    fmpz_clear(t);
 
     /* Matrix inverse test */
     for (nn = 1; nn < 50; nn++)
