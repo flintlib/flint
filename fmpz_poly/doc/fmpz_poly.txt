@@ -166,7 +166,7 @@ void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
 void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 
-    Sets {res, n} to the reverse of {poly, len}, where poly is in fact 
+    Sets {res, n} to the reverse of {poly, n}, where poly is in fact 
     an array of length len.  Assumes that 0 < len <= n.  Supports aliasing 
     of res and poly, but the behaviour is undefined in case of partial 
     overlap.
@@ -789,6 +789,20 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     B->length - 1 is reduced mod the leading coefficient of B. If the leading 
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. An exception is raised if B->length == 0.
+
+void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n)
+
+    Computes the first n terms of the inverse power series of Q using 
+    Newton iteration.
+
+    Assumes that n >= 1, that Q has length at least n and constant term 1.
+    Requires an array temp of length at least max(2 * n, 3 * 32).
+    Does not support aliasing between the three arrays Qinv, temp, and Q.
+
+void fmpz_poly_newton_inv(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+
+    Computes the first n terms of the inverse power series of Q using 
+    Newton iteration, assuming that Q has constant term 1.
 
 *******************************************************************************
 

@@ -369,6 +369,10 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                                   const fmpz_poly_t A, const fmpz_poly_t B);
 
+void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n);
+
+void fmpz_poly_newton_inv(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
 /*  Pseudo division  *********************************************************/
 
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
