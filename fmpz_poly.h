@@ -348,26 +348,35 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly);
 /*  Euclidean division  ******************************************************/
 
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
-                                      long lenA, const fmpz * B, long lenB);
+                                       long lenA, const fmpz * B, long lenB);
 
 void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
-                                  const fmpz_poly_t A, const fmpz_poly_t B);
-
-static __inline__
-void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
-                                                const fmpz * B, long B_len)
-{
-   _fmpz_poly_divrem_basecase(Q, NULL, A, A_len, B, B_len);
-}
+                                   const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
-                                const fmpz * A, const fmpz * B, long B_len);
+                                 const fmpz * A, const fmpz * B, long B_len);
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                    const fmpz * A, long A_len, const fmpz * B, long B_len);
+                     const fmpz * A, long A_len, const fmpz * B, long B_len);
 
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
-                                  const fmpz_poly_t A, const fmpz_poly_t B);
+                                   const fmpz_poly_t A, const fmpz_poly_t B);
+
+static __inline__
+void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long lenA,
+                                       const fmpz * B, long lenB)
+{
+   _fmpz_poly_divrem_basecase(Q, NULL, A, lenA, B, lenB);
+}
+
+void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
+                                  const fmpz * A, const fmpz * B, long lenB);
+
+void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
+                                                  const fmpz * B, long lenB);
+
+void fmpz_poly_div_divconquer(fmpz_poly_t Q, 
+                                   const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n);
 

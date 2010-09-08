@@ -754,15 +754,6 @@ void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. An exception is raised if B is zero.
 
-void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
-                                                    const fmpz * B, long B_len)
-
-    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
-    B->length - 1 is reduced mod the leading coefficient of B, but discard the 
-    remainder R. If the leading coefficient of B is +/-1 or the division is 
-    exact, this is the same thing as division over Q. No aliasing of input and 
-    output operands is allowed. An exception is raised if B->length == 0.
-
 void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
                                     const fmpz * A, const fmpz * B, long B_len)
 
@@ -789,6 +780,41 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     B->length - 1 is reduced mod the leading coefficient of B. If the leading 
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. An exception is raised if B->length == 0.
+
+void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long lenA,
+                                                    const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} divided by 
+    {B, lenB}. 
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. No aliasing of input and output 
+    operands is allowed. Assumes lenB > 0.
+
+void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
+                                    const fmpz * A, const fmpz * B, long lenB)
+
+    Recursive short division in the balanced case.
+
+    Computes the quotient {Q, lenB} of {A, 2 lenB - 1} upon division 
+    by {B, lenB}.  Requires lenB > 0.  Needs a temporary array temp 
+    of length 2 lenB - 1.  Does not support any aliasing.
+
+    See Thom Mulders, On Short Multiplications and Divisions.
+
+void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
+                                         const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} divided by 
+    {B, lenB}.  Assumes that lenA >= lenB > 0.  Does not support 
+    aliasing.
+
+fmpz_poly_div_divconquer(fmpz_poly_t Q, 
+                         const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the quotient of A divided by B.  Assumes that B is non-zero.
 
 void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n)
 
