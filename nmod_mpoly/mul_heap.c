@@ -190,6 +190,7 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
              NMOD2_RED2(res->coeffs[len_out], accum1, accum0, res->mod);
 	  } else
 	  {
+             NMOD_RED(accum2, accum2, res->mod); //is this neccessary?
 	     NMOD_RED3(res->coeffs[len_out], accum2, accum1, accum0, res->mod);    
 	  }
 

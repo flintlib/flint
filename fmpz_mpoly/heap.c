@@ -62,10 +62,10 @@ void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n,
    if ((*n) != 0) // make sure the heap has something in it
    {
 
-      /* 
-         first see if the new entry can be chained at the top 
-         this happens often enough to optimise this case
-      */
+       
+         //first see if the new entry can be chained at the top 
+         //this happens often enough to optimise this case
+
       if (exp == heap[1].exp)
       {
          entry->next = heap[1].entry;
@@ -76,7 +76,7 @@ void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n,
       i = (*n) + 1;
       j = i/2;
 
-      /* find where to put the new entry */
+      // find where to put the new entry 
       do
       {
          const mp_limb_signed_t diff = exp - heap[j].exp;
@@ -94,14 +94,14 @@ void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n,
 
       const ulong s = j;
 
-      /* 
-         s is the slot we want to put our entry _below_
-         move entries down to create a space
-      */
+       
+         //s is the slot we want to put our entry _below_
+         //move entries down to create a space
+      
    
       while (i/2 > s) { heap[i] = heap[i/2]; i /= 2; }
 
-      /* place entry in spot */
+      // place entry in spot 
       entry->next = NULL;
       heap[i].exp = exp;
       heap[i].entry = entry;

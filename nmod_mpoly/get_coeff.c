@@ -30,30 +30,15 @@
 #include "ulong_extras.h"
 #include "nmod_mpoly.h"
 
-void nmod_mpoly_realloc(nmod_mpoly_t poly, long alloc)
-{
-   if (alloc == 0)
-   {
-      nmod_mpoly_clear(poly);
-	  poly->vars = 0;
-	  poly->ebits = 0;	
-	  poly->length = 0;
-	  poly->alloc = 0;
-      poly->coeffs = NULL;
-      poly->exps = NULL;
+ulong nmod_mpoly_get_coeff(nmod_mpoly_t poly, ulong exp){
 
-	  return;
-   }
-
-   poly->coeffs = (mp_ptr)realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
-   poly->exps = (mp_ptr)realloc(poly->exps, alloc*sizeof(mp_limb_t));
-
-   poly->alloc = alloc;
-   
-   // truncate poly if necessary
-   if (poly->length > alloc)
-   {
-      poly->length = alloc;
-      _nmod_mpoly_normalise(poly);
-   }
+   long i = 0;
+    
+   while(i < poly->length && poly->exps[i] <= exp){
+      
+      if(exp == poly->exps[i])
+         return poly->coeffs[i];
+      i++;
+   }  
+   return 0;
 }

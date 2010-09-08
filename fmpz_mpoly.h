@@ -20,6 +20,7 @@
 /******************************************************************************
 
    Copyright (C) 2010, William Hart
+   Copyright (C) 2010, Daniel Woodhouse
 
    We acknowledge the generous assistance of Roman Pearce in helping us 
    understand his heap multiplication algorithm, and in particular for
@@ -30,8 +31,12 @@
 #ifndef FMPZ_MPOLY_H
 #define FMPZ_MPOLY_H
 
+
+#include <stdio.h>
 #include <mpir.h>
 #include "fmpz.h"
+#include "flint.h"
+
 
 typedef struct
 {
@@ -69,7 +74,11 @@ void fmpz_mpoly_realloc(fmpz_mpoly_t poly, ulong alloc);
 
 void fmpz_mpoly_fit_length(fmpz_mpoly_t poly, ulong length);
 
+void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, ulong exponent, const fmpz_t x);
+
 void fmpz_mpoly_clear(fmpz_mpoly_t poly);
+
+int fmpz_mpoly_equal(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2);
 
 static inline
 void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, ulong length)
@@ -88,13 +97,32 @@ void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, ulong length)
    }  
 }
 
+static inline
+ulong fmpz_mpoly_get_length(fmpz_mpoly_t poly)
+{
+   return poly->length;
+}
+/*
+static inline
+fmpz_t fmpz_get_ceoff(fmpz_mpoly_t poly, int index)
+{
+   return poly->coeffs + index;
+}
+
+static inline
+fmpz_t fmpz_get_exp(fmpz_mpoly_t poly, int index)
+{
+   return poly->exps + index;
+}
+*/
 void fmpz_mpoly_reheapify(fmpz_mpoly_heap_t * heap, ulong * n);
 
 void fmpz_mpoly_heap_insert(fmpz_mpoly_heap_t * heap, ulong * n, 
 							     fmpz_mpoly_entry_t * entry, fmpz exp);
 
-void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, 
-						                           fmpz_mpoly_t poly2);
+void fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2);
+
+void fmpz_mpoly_mod_mul(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2);
 
 #endif
 

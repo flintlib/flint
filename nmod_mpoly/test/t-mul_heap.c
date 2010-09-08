@@ -60,23 +60,21 @@ int main(void)
    p->exps[0] = (mp_limb_t) 0;
    p->coeffs[1] = (mp_limb_t) 1;
    p->exps[1] = (mp_limb_t) 1 + ((mp_limb_t)1 <<5);  
-   p->coeffs[2] = (mp_limb_t) 1;
+   p->coeffs[2] = (mp_limb_t) 18446744073709551611;
    p->exps[2] = (mp_limb_t) 2 << 5;
 
    q->coeffs[0] = (mp_limb_t) 1;
    q->exps[0] = (mp_limb_t) 0;
    q->coeffs[1] = (mp_limb_t) 1;
    q->exps[1] = (mp_limb_t) 1 + ((mp_limb_t)1 <<5);  
-   q->coeffs[2] = (mp_limb_t) 1;
+   q->coeffs[2] = (mp_limb_t) 18446744073709551611;
    q->exps[2] = (mp_limb_t) 2 << 5;
 
    p->length = 3;
    q->length = 3;
 
    nmod_mpoly_mul_heap(r, p, q);
-
   
-   
 
    if(r->length != (mp_limb_t) 6){
       printf("\nsquare (1 + xy + x^2)\n");
@@ -91,11 +89,17 @@ int main(void)
    if(nmod_mpoly_equal(copyTest,p))
 	printf("FAIL:\n");
 
-   if(nmod_mpoly_get_coeff(r, ((ulong)4 << 5)) != (ulong)1){
+   if(nmod_mpoly_get_coeff(r, ((ulong)4 << 5)) != nmod_mpoly_get_coeff_of_product(p,q,((ulong)4 << 5))){
       printf("\n%lu", nmod_mpoly_get_coeff(r, (4 << 5)));
+      printf("\n%lu", nmod_mpoly_get_coeff_of_product(p,q,((ulong)4 << 5)));
       printf("\nFAAIL:\n"); 
    }
-
+/*
+   if(nmod_mpoly_get_coeff_of_product(p,q,((ulong)4 << 5)) != (ulong)1){
+      printf("\n%lu", nmod_mpoly_get_coeff_of_product(p,q,((ulong)4 << 5)));
+      printf("\nFAAAIL:\n"); 
+   }
+*/
    nmod_mpoly_clear(p);     
    nmod_mpoly_clear(q);
    nmod_mpoly_clear(r);
@@ -175,6 +179,12 @@ int main(void)
    {
 	   printf("FAIL:\n");
 	   printf("length = %ld\n", a12->length);
+   }
+
+   if(nmod_mpoly_get_coeff(a12, (ulong)5 <<36 + (ulong)3 <<48) != nmod_mpoly_get_coeff_of_product(a6,a6,(ulong)5 <<36 + (ulong)3 <<48)){
+	   printf("FAIL:\n");
+	   printf("val1 = %ld\n", nmod_mpoly_get_coeff(a12, (ulong)5 <<36 + (ulong)3 <<48));
+           printf("val2 = %ld\n", nmod_mpoly_get_coeff_of_product(a6,a6,(ulong)5 <<36 + (ulong)3 <<48));
    }
 
    for (i = 0; i < 3; i++)

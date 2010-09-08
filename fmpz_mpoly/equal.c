@@ -19,41 +19,37 @@
 ===============================================================================*/
 /****************************************************************************
 
-   Copyright (C) 2010 William Hart
-   Copyright (C) 2010 Daniel Woodhouse
+   Copyright (C) 2008, 2009 William Hart
+   Copyright (C) 2010, Daniel Woodhouse
    
 *****************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_mpoly.h"
+#include "fmpz.h"
+#include "fmpz_mpoly.h"
 
-void nmod_mpoly_realloc(nmod_mpoly_t poly, long alloc)
-{
-   if (alloc == 0)
-   {
-      nmod_mpoly_clear(poly);
-	  poly->vars = 0;
-	  poly->ebits = 0;	
-	  poly->length = 0;
-	  poly->alloc = 0;
-      poly->coeffs = NULL;
-      poly->exps = NULL;
+int fmpz_mpoly_equal(fmpz_mpoly_t poly1, fmpz_mpoly_t poly2){
 
-	  return;
-   }
+     if(poly1->length != poly2->length){
+        return 0;
+     }
+     else if(poly1->vars != poly2->vars || poly1->ebits != poly2->ebits){
+        return 0;  
+     }
 
-   poly->coeffs = (mp_ptr)realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
-   poly->exps = (mp_ptr)realloc(poly->exps, alloc*sizeof(mp_limb_t));
-
-   poly->alloc = alloc;
+    int i;
+  
+    for(i=0; i < poly1->length; i++){
+       
    
-   // truncate poly if necessary
-   if (poly->length > alloc)
-   {
-      poly->length = alloc;
-      _nmod_mpoly_normalise(poly);
-   }
+       if(fmpz_equal(poly1->exps + i, poly2->exps +i) == 0 || fmpz_equal(poly1->coeffs + i, poly2->coeffs + i) == 0)
+          return 0;
+
+    }
+
+    return 1;
 }
+
+

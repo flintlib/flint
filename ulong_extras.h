@@ -29,6 +29,7 @@
 #define ULONG_EXTRAS_H
 
 #include <mpir.h>
+#include "flint.h"
 
 typedef struct pair_s
 {

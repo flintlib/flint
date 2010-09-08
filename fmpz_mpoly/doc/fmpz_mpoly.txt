@@ -64,3 +64,20 @@ void _fmpz_mpoly_truncate(fmpz_mpoly_t poly, ulong length)
    Truncate the polynomial to the given length. If length is 
    greater than the current length of the polynomial, nothing
    happens.
+
+void fmpz_mpoly_set_coeff_fmpz(fmpz_mpoly_t poly, ulong exponent, const fmpz_t x);
+
+   Sets coefficient of exponent in poly. 
+
+
+********************************************************************************
+
+  Basic arithmatic
+
+********************************************************************************
+
+void fmpz_mpoly_mod_mul(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
+
+   Sets res = poly1 * poly2 
+
+

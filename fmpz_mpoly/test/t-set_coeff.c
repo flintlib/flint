@@ -20,40 +20,63 @@
 /****************************************************************************
 
    Copyright (C) 2010 William Hart
-   Copyright (C) 2010 Daniel Woodhouse
-   
+
 *****************************************************************************/
 
+#include <stdio.h>
 #include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mpoly.h"
 #include "ulong_extras.h"
-#include "nmod_mpoly.h"
+#include <time.h>
 
-void nmod_mpoly_realloc(nmod_mpoly_t poly, long alloc)
+int main(void)
 {
-   if (alloc == 0)
-   {
-      nmod_mpoly_clear(poly);
-	  poly->vars = 0;
-	  poly->ebits = 0;	
-	  poly->length = 0;
-	  poly->alloc = 0;
-      poly->coeffs = NULL;
-      poly->exps = NULL;
+   int result;
+   printf("set_coeff....");
+   fflush(stdout);
 
-	  return;
+   fmpz_mpoly_t poly1;
+   fmpz_mpoly_t poly2;
+
+   fmpz_t temp;
+   fmpz_init(temp);
+
+   fmpz_mpoly_init2(poly1, 10, 3, 21);
+   fmpz_mpoly_init2(poly2, 10, 3, 21);
+
+   fmpz_set_ui(poly1->coeffs + 0, 1);
+   fmpz_set_ui(poly1->coeffs + 1, 1);
+   fmpz_set_ui(poly1->coeffs + 2, 1);
+
+   fmpz_set_ui(poly1->exps + 0, 1);
+   fmpz_set_ui(poly1->exps + 1, (ulong)1 << 21);
+   fmpz_set_ui(poly1->exps + 2, (ulong)1 << 42);
+
+   poly1->length = 3;
+
+   //now set poly2
+   fmpz_set_ui(temp, 1);
+   fmpz_mpoly_set_coeff_fmpz(poly2, (ulong)1 <<42, temp);
+   fmpz_mpoly_set_coeff_fmpz(poly2, (ulong)1 <<21, temp);
+   fmpz_mpoly_set_coeff_fmpz(poly2, 1, temp);
+
+   if(fmpz_mpoly_equal(poly1, poly2) == 0){
+      printf("FAIL");
    }
 
-   poly->coeffs = (mp_ptr)realloc(poly->coeffs, alloc*sizeof(mp_limb_t));
-   poly->exps = (mp_ptr)realloc(poly->exps, alloc*sizeof(mp_limb_t));
+ 
 
-   poly->alloc = alloc;
+   fmpz_mpoly_set_coeff_fmpz(poly2, 3, temp);
+   fmpz_set_ui(temp, 0);
+   fmpz_mpoly_set_coeff_fmpz(poly2, 3, temp);
    
-   // truncate poly if necessary
-   if (poly->length > alloc)
-   {
-      poly->length = alloc;
-      _nmod_mpoly_normalise(poly);
+ 
+   if(fmpz_mpoly_equal(poly1, poly2) == 0){
+      printf("FAIL");
    }
+   
+   printf("PASS\n");
+   return 0;
 }

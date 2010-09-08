@@ -131,7 +131,11 @@ void nmod_mpoly_mul_heap(nmod_mpoly_t res, nmod_mpoly_t poly1, nmod_mpoly_t poly
 
 ulong nmod_mpoly_get_coeff(nmod_mpoly_t poly, ulong exp);
 
-void get_period_sequence(fmpz_t *zeroCoefficients, long *coefficients, ulong *exponents, ulong length, ulong monomial, int pow, ulong *primes, int numOfPrimes);
+void get_period_sequence(fmpz_t *zeroCoefficients, long *coefficients, ulong *exponents, ulong length, ulong monomial, int pow, ulong *primes, int numOfPrimes, ulong nvars);
+
+void get_period_sequence2(fmpz_t *zeroCoefficients, long *coefficients, ulong *exponents, ulong length, ulong monomial, int pow, ulong *primes, int numOfPrimes, ulong nvars);
+
+ulong nmod_mpoly_get_coeff_of_product(nmod_mpoly_t poly1, nmod_mpoly_t poly2, ulong mon);
 
 #endif
 

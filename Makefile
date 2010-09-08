@@ -1,8 +1,8 @@
 CC=gcc
 CFLAGS=-std=c99 -O2 
-LIBS=-L$(CURDIR) -L/home/wbhart/lib/ -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(CURDIR) -L/home/wbhart/lib/ -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/wbhart/include
+LIBS=-L$(CURDIR) -L/home/danielwoodhouse/flint2 -L/usr/local/sage/sage-4.5.2/local/lib -lflint -lgmp -lmpfr -lm
+LIBS2=-L$(CURDIR) -L/usr/local/sage/sage-4.5.2/local/lib -lgmp -lmpfr -lm
+INCS=-I$(CURDIR) -I/home/danielwoodhouse/flint2
 export
 
 SOURCES = $(wildcard *.c)
@@ -62,5 +62,5 @@ library-recursive:
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 BUILD_DIRS = ulong_extras fmpz fmpz_vec fmpz_poly fmpq_poly fmpz_mpoly \
-   fmpz_mat mpfr_vec mpfr_mat mpfr_poly LLL nmod_vec nmod_poly nmod_mpoly
+   fmpz_mat mpfr_vec mpfr_mat mpfr_poly LLL nmod_vec nmod_poly nmod_mpoly 
 

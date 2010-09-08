@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <mpir.h>
 #include "nmod_vec.h"
+#include "flint.h"
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];

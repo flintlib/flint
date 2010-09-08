@@ -89,7 +89,7 @@ int main(void)
    start = clock();
    */
 
-   get_period_sequence(zeroCoefficients, coefficients, exponents, 4, monomial, 100, primes3, 10);
+   get_period_sequence(zeroCoefficients, coefficients, exponents, 4, monomial, 100, primes3, 10, 3);
  
    /*
    end = clock();
@@ -101,8 +101,10 @@ int main(void)
    fmpz_init(check);
    fmpz_set_str(check, "-1612207508215775948685323966297082670959348818240567745024", 10);
 
-   if(!(fmpz_equal(zeroCoefficients[99], check)))
-      printf("FAIL\n");
+   if(!(fmpz_equal(zeroCoefficients[99], check))){
+      fmpz_print(zeroCoefficients[99]);
+      printf(" FAIL\n");
+   }
 
    int i;
    /*
@@ -115,8 +117,37 @@ int main(void)
       fmpz_clear(zeroCoefficients[i]);
    }
 
+   //check again with version2 of the function
+   get_period_sequence2(zeroCoefficients, coefficients, exponents, 4, monomial, 100, primes3, 10, 3);
+ 
+   /*
+   end = clock();
+   elapsed = ((double) (end - start)) / CLOCKS_PER_SEC;
+   */
+   
 
-   fmpz_t zeroCoefficients2[100];
+  
+   
+   fmpz_set_str(check, "-1612207508215775948685323966297082670959348818240567745024", 10);
+
+   if(!(fmpz_equal(zeroCoefficients[99], check))){
+      fmpz_print(zeroCoefficients[99]);
+      printf(" FAIL\n");
+   }
+
+   fmpz_clear(check);
+   /*
+   for(i=0; i<100; i++){
+      fmpz_print(zeroCoefficients[i]);
+      printf("\n");
+   }*/
+
+   for(i=0; i<100; i++){
+      fmpz_clear(zeroCoefficients[i]);
+   }
+
+
+   fmpz_t zeroCoefficients2[10];
    long coefficients2[9] = {1,1,1,1,2,1,1,1,1};
    ulong exponents2[9]; 
 
@@ -132,7 +163,7 @@ int main(void)
 
    ulong monomial2 = (ulong) 1 + ((ulong) 1 << 21) + ((ulong) 3 << 42);
  
-   get_period_sequence(zeroCoefficients2, coefficients2, exponents2, 9, monomial2, 10, primes3, 10);
+   get_period_sequence(zeroCoefficients2, coefficients2, exponents2, 9, monomial2, 10, primes3, 10, 3);
 
 
    fmpz_set_str(check, "1348704", 10);
@@ -142,7 +173,7 @@ int main(void)
       printf("\nFAIL\n");
    } 
 
-   for(i=0; i<100; i++){
+   for(i=0; i<10; i++){
       fmpz_clear(zeroCoefficients2[i]);
    }
     
