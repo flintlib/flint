@@ -43,16 +43,11 @@ _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
     if (want_rem)
         _fmpz_vec_copy(R, A, lenA);
 
-    while (lenA >= lenB)
+    while (lenA >= lenB && fmpz_cmpabs(A + lenA - 1, leadB) < 0)
     {
-        if (fmpz_cmpabs(A + lenA - 1, leadB) >= 0)
-            break;
-        else
-        {
-            fmpz_zero(Q + iQ);
-            iQ--;
-            lenA--;
-        }
+        fmpz_zero(Q + iQ);
+        iQ--;
+        lenA--;
     }
 
     if (lenA < lenB)
