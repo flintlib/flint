@@ -38,7 +38,7 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
 {
     if (lenB <= FLINT_DIV_DIVCONQUER_CUTOFF)
     {
-        _fmpz_poly_div_basecase(Q, A, 2 * lenB - 1, B, lenB);
+        _fmpz_poly_div_basecase(Q, temp, A, 2 * lenB - 1, B, lenB);
     }
     else
     {

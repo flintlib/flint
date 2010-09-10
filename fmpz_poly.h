@@ -362,12 +362,11 @@ void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                                    const fmpz_poly_t A, const fmpz_poly_t B);
 
-static __inline__
-void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long lenA,
-                                       const fmpz * B, long lenB)
-{
-   _fmpz_poly_divrem_basecase(Q, NULL, A, lenA, B, lenB);
-}
+void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
+                                                  const fmpz * B, long lenB);
+
+void fmpz_poly_div_basecase(fmpz_poly_t Q, 
+                                   const fmpz_poly_t A, const fmpz_poly_t B);
 
 void
 _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
