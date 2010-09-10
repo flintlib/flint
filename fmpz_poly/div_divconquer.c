@@ -66,12 +66,11 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 
         /* 
            Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
-           being of length lenB;  also set d1q1 = d1 q1 of length 2 lenB - 1
-
-           TODO:  We really only need the bottom lenB - 1 coeffs of d1q1
+           being of length lenB; also set d1q1 = d1 q1 of length 2 lenB - 1, 
+           truncated to length lenB - 1
          */
 
-        _fmpz_poly_divrem_divconquer_recursive(q1, d1q1, p1, B, lenB);
+        _fmpz_poly_divremlow_divconquer_recursive(q1, d1q1, p1, B, lenB);
 
         /* 
            We have dq1 = d1 q1 x^shift, of length lenA
