@@ -52,7 +52,8 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
     alloc = (R == NULL) ? lenA : 0;
     if (alloc)
         R = _fmpz_vec_init(alloc);
-    _fmpz_vec_copy(R + lenB - 1, A + lenB - 1, lenA - lenB + 1);
+    if (R != A)
+        _fmpz_vec_copy(R + lenB - 1, A + lenB - 1, lenA - lenB + 1);
 
     B1 = lenB - 1;
     
