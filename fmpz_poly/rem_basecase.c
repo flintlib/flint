@@ -33,30 +33,26 @@
 
 void
 _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
-                        const fmpz * B, long lenB)
+                                  const fmpz * B, long lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iR = lenA - 1;
     fmpz_t q;
 
     if (R != A)
         _fmpz_vec_copy(R, A, lenA);
 
-    while (iR >= lenB - 1 && fmpz_cmpabs(R + iR, leadB) < 0)
-    {
-        iR--;
-    }
+    for ( ; lenA >= lenB && fmpz_cmpabs(A + lenA - 1, leadB) < 0; lenA--) ;
 
     fmpz_init(q);
 
-    while (iR >= lenB - 1)
+    while (lenA >= lenB)
     {
-        if (fmpz_cmpabs(R + iR, leadB) >= 0)
+        if (fmpz_cmpabs(R + lenA - 1, leadB) >= 0)
         {
-            fmpz_fdiv_q(q, R + iR, leadB);
-            _fmpz_vec_scalar_submul_fmpz(R + iR - lenB + 1, B, lenB, q);
+            fmpz_fdiv_q(q, R + lenA - 1, leadB);
+            _fmpz_vec_scalar_submul_fmpz(R + lenA - lenB, B, lenB, q);
         }
-        iR--;
+        lenA--;
     }
 
     fmpz_clear(q);
