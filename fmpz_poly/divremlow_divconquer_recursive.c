@@ -72,7 +72,9 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
         /* 
            temp is of length lenB, but we only care about the bottom n1 - 1 
-           coeffs, which we push up by n2 + 1, to the very top
+           coeffs, which we push up by n2 + 1, to the very top; we do this 
+           manually here instead of via _fmpz_vec_swap() because the source 
+           and destination arrays overlap
          */
 
         d1q1 = temp + (n2 + 1);
