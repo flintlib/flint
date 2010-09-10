@@ -369,6 +369,10 @@ void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long lenA,
    _fmpz_poly_divrem_basecase(Q, NULL, A, lenA, B, lenB);
 }
 
+void
+_fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
+                                          const fmpz * A, const fmpz * B, long lenB);
+
 void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
                                   const fmpz * A, const fmpz * B, long lenB);
 

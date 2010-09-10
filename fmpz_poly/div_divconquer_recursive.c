@@ -65,8 +65,11 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
 
            TODO: We only need the bottom n1 - 1 coeffs of r1
          */
-
+/*
         _fmpz_poly_divrem_divconquer_recursive(q1, r1, A + 2 * n2, B + n2, n1);
+        _fmpz_vec_sub(r1, A + 2 * n2, r1, n1 - 1);
+*/
+        _fmpz_poly_divremlow_divconquer_recursive(q1, r1, A + 2 * n2, B + n2, n1);
         _fmpz_vec_sub(r1, A + 2 * n2, r1, n1 - 1);
 
         /*

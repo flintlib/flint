@@ -793,6 +793,16 @@ void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long lenA,
     is the same thing as division over Q. No aliasing of input and output 
     operands is allowed. Assumes lenB > 0.
 
+void _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
+                                    const fmpz * A, const fmpz * B, long lenB)
+
+    Divide and conquer division of {A, 2 lenB - 1} by {B, lenB}, computing 
+    only the bottom lenB - 1 coefficients of Q*B.
+
+    Assumes lenB > 0.  Requires QB to have length at least 2 lenB - 1, 
+    although only the bottom lenB - 1 will carry meaningful output.  Does 
+    not support any aliasing.  Allows zero-padding in A, but not in B.
+
 void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
                                     const fmpz * A, const fmpz * B, long lenB)
 
