@@ -793,9 +793,9 @@ void _fmpz_poly_div_basecase(fmpz * Q, fmpz * T, const fmpz * A, long lenA,
     is the same thing as division over Q.
 
     Assumes lenB > 0.  Allows zero-padding in {A, lenA}.  Requires a 
-    temporary array T of size at least the (actual) length of A.  T and A 
-    may be aliased, but apart from this no aliasing of input and output 
-    operands is allowed.
+    temporary array T of size at least the (actual) length of A.  For 
+    convenience, T may be NULL.  T and A may be aliased, but apart from this 
+    no aliasing of input and output operands is allowed.
 
 void fmpz_poly_div_basecase(fmpz_poly_t Q, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
