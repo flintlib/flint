@@ -841,6 +841,30 @@ fmpz_poly_div_divconquer(fmpz_poly_t Q,
 
     Computes the quotient of A divided by B.  Assumes that B is non-zero.
 
+void _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA, 
+                                       const fmpz * B, long lenB)
+
+    Computes the remainder {R, lenA} of {A, lenA} upon division by {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. If the 
+    leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q.
+
+    Assumes that lenB > 0.  Allows zero-padding in {A, lenA}.  R and A may be 
+    aliased, but apart from this no aliasing of input and output operands is 
+    allowed.
+
+void fmpz_poly_rem_basecase(fmpz_poly_t R, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the remaeinder R of A upon division by B.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. If 
+    the leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q. An exception is raised if B is zero.
+
 void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n)
 
     Computes the first n terms of the inverse power series of Q using 

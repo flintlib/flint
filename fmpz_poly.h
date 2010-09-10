@@ -381,6 +381,12 @@ void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 void fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                                    const fmpz_poly_t A, const fmpz_poly_t B);
 
+void _fmpz_poly_rem_basecase(fmpz * Q, const fmpz * A, long lenA,
+                                       const fmpz * B, long lenB);
+
+void fmpz_poly_rem_basecase(fmpz_poly_t R, 
+                                   const fmpz_poly_t A, const fmpz_poly_t B);
+
 void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n);
 
 void fmpz_poly_newton_inv(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
