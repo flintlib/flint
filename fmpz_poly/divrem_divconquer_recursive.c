@@ -52,15 +52,13 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
 
         /*
            To avoid repeated allocations and de-allocations, 
-           we allocate all the space we need up front.
+           we allocate all the space we need up front
          */
 
         fmpz * W1 = _fmpz_vec_init(2 * (lenB - 1));
         fmpz * W2 = W1 + (lenB - 1);
 
         /*
-           We let A = a1 x^(n1 + 2 n2 - 1) + a2 x^(n1 + n2 - 1) + a3, where 
-           a1 is length n1, a2 is length n2 and a3 is length n1 + n2 - 1; 
            We set p1 to the top 2 n1 - 1 coeffs of A
 
            We let B = d1 x^n2 + d2 = d3 x^n1 + d4
