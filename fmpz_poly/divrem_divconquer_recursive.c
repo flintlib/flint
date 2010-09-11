@@ -34,35 +34,27 @@
 #define FLINT_DIVREM_DIVCONQUER_CUTOFF  16
 
 void
-_fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
+_fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
                                        const fmpz * A, const fmpz * B,
                                        long lenB)
 {
     if (lenB <= FLINT_DIVREM_DIVCONQUER_CUTOFF)
     {
-        const long lenA = 2 * lenB - 1;
+        _fmpz_vec_zero(BQ, lenB - 1);
+        _fmpz_vec_copy(BQ + (lenB - 1), A + (lenB - 1), lenB);
 
-        _fmpz_poly_divrem_basecase(Q, BQ, A, lenA, B, lenB);
-        _fmpz_vec_sub(BQ, A, BQ, lenA);
+        _fmpz_poly_divrem_basecase(Q, BQ, BQ, 2 * lenB - 1, B, lenB);
+
+        _fmpz_vec_neg(BQ, BQ, lenB - 1);
+        _fmpz_vec_sub(BQ + (lenB - 1), A + (lenB - 1), BQ + (lenB - 1), lenB);
     }
     else
     {
         const long n2   = lenB / 2;
         const long n1   = lenB - n2;
 
-        /*
-           To avoid repeated allocations and de-allocations, 
-           we allocate all the space we need up front
-         */
-
-        fmpz * W1 = _fmpz_vec_init(2 * (lenB - 1));
-        fmpz * W2 = W1 + (lenB - 1);
-
-        /*
-           We set p1 to the top 2 n1 - 1 coeffs of A
-
-           We let B = d1 x^n2 + d2 = d3 x^n1 + d4
-         */
+        fmpz * W1 = W;
+        fmpz * W2 = W + (lenB - 1);
 
         const fmpz * p1 = A + 2 * n2;
         const fmpz * p2;
@@ -83,7 +75,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
            being of length n1;  d1q1 = d1 q1 is of length 2 n1 - 1
          */
 
-        _fmpz_poly_divrem_divconquer_recursive(q1, d1q1, p1, d1, n1);
+        _fmpz_poly_divrem_divconquer_recursive(q1, d1q1, W1, p1, d1, n1);
 
         /* 
            Compute d2q1 = d2 q1, of length lenB - 1
@@ -101,15 +93,19 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
 
         /*
            Compute t = A/x^n2 - dq1, which has length 2 n1 + n2 - 1, but we 
-           are not interested in the first n1 coeffs as they will be zero, 
-           so this has effective length n1 + n2 - 1
+           are not interested in the top n1 coeffs as they will be zero, so 
+           this has effective length n1 + n2 - 1
 
-           Set p2 to the top 2 n2 - 1 coeffs of this
+           For the following division, we want to set {p2, 2 n2 - 1} to the 
+           top 2 n2 - 1 coeffs of this
+
+           Since the bottom n2 - 1 coeffs of p2 are irrelevant for the 
+           division, we in fact set {t, n2} to the relevant coeffs
          */
 
-        t = W1;
-        _fmpz_vec_sub(t, A + n2, dq1, n1 + n2 - 1);
-        p2 = t + (lenB & 1L);
+        t = BQ;
+        _fmpz_vec_sub(t, A + n2 + (n1 - 1), dq1 + (n1 - 1), n2);
+        p2 = t - (n2 - 1);
 
         /*
            Compute q2 = t div d3, a 2 n2 - 1 by n2 division, so q2 will have 
@@ -117,7 +113,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
          */
 
         d3q2 = W2;
-        _fmpz_poly_divrem_divconquer_recursive(q2, d3q2, p2, d3, n2);
+        _fmpz_poly_divrem_divconquer_recursive(q2, d3q2, W1, p2, d3, n2);
 
         /*
            Compute d4q2 = d4 q2, of length n1 + n2 - 1 = lenB - 1
@@ -135,11 +131,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ,
         _fmpz_vec_add(BQ + n1, BQ + n1, d3q2, 2 * n2 - 1);
 
         /*
-           Note Q = q1 x^n2 + q2, so Q has length n1 + n2 = lenB
-
-           Note BQ = dq1 x^n2 + dq2, of length 2 lenB - 1
+           Note Q = q1 x^n2 + q2, and BQ = dq1 x^n2 + dq2
          */
-
-        _fmpz_vec_clear(W1, 2 * (lenB - 1));
     }
 }
