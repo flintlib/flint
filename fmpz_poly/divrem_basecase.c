@@ -36,19 +36,12 @@ _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
                            const fmpz * B, long lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iQ = lenA - lenB, iR = lenA - 1;
+    long iQ, iR;
 
     if (R != A)
         _fmpz_vec_copy(R, A, lenA);
 
-    while (iQ >= 0 && fmpz_cmpabs(R + iR, leadB) < 0)
-    {
-        fmpz_zero(Q + iQ);
-        iQ--;
-        iR--;
-    }
-
-    while (iQ >= 0)
+    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
         if (fmpz_cmpabs(R + iR, leadB) < 0)
             fmpz_zero(Q + iQ);
@@ -57,8 +50,6 @@ _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
             fmpz_fdiv_q(Q + iQ, R + iR, leadB);
             _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
         }
-        iQ--;
-        iR--;
     }
 }
 
