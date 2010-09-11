@@ -32,8 +32,8 @@
 
 void
 _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
-                             const fmpz * A, long lenA, const fmpz * B,
-                             long lenB)
+                             const fmpz * A, long lenA, 
+                             const fmpz * B, long lenB)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -48,12 +48,12 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         const fmpz * d1 = B + n2;
         const fmpz * d2 = B;
 
+        fmpz * W = _fmpz_vec_init(2 * (n1 - 1) + lenB - 1);
+
         fmpz * d1q1 = R + n2;
-        fmpz * d2q1 = _fmpz_vec_init(lenB - 1);
+        fmpz * d2q1 = W + 2 * (n1 - 1);
 
-        fmpz * XXX = _fmpz_vec_init(2 * (lenB - 1));
-
-        _fmpz_poly_divrem_divconquer_recursive(Q, d1q1, XXX, p1, d1, n1);
+        _fmpz_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1);
 
         /*
            Compute d2q1 = Q d2, of length lenB - 1
@@ -69,12 +69,11 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
            then compute R = A - BQ
          */
 
-        _fmpz_vec_copy(R, d2q1, n2);
+        _fmpz_vec_swap(R, d2q1, n2);
         _fmpz_vec_add(R + n2, R + n2, d2q1 + n2, n1 - 1);
         _fmpz_vec_sub(R, A, R, lenA);
 
-        _fmpz_vec_clear(d2q1, lenB - 1);
-        _fmpz_vec_clear(XXX, 2 * (lenB - 1));
+        _fmpz_vec_clear(W, 2 * (n1 - 1) + lenB - 1);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -85,19 +84,19 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         const long shift = lenA - 2 * lenB + 1;
         const fmpz * p1 = A + shift;
 
+        fmpz * W = _fmpz_vec_init(lenA + 2 * (lenB - 1));
+
         fmpz * q1   = Q + shift;
         fmpz * q2   = Q;
-        fmpz * dq1  = _fmpz_vec_init(lenA);
+        fmpz * dq1  = W + 2 * (lenB - 1);
         fmpz * d1q1 = dq1 + shift;
-
-        fmpz * XXX = _fmpz_vec_init(2 * (lenB - 1));
 
         /* 
            Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
            being of length lenB; set d1q1 = d1 * q1 of length 2 lenB - 1
          */
 
-        _fmpz_poly_divrem_divconquer_recursive(q1, d1q1, XXX, p1, B, lenB);
+        _fmpz_poly_divrem_divconquer_recursive(q1, d1q1, W, p1, B, lenB);
 
         /* 
            We have dq1 = d1 * q1 * x^shift, of length lenA
@@ -109,7 +108,7 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 
         _fmpz_vec_copy(dq1, A, shift);
         _fmpz_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1);
-        _fmpz_vec_sub(R + lenA - lenB, A + lenA - lenB,
+        _fmpz_vec_sub(R + lenA - lenB, A + lenA - lenB, 
                       dq1 + lenA - lenB, lenB);
 
         /*
@@ -127,16 +126,16 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
            We've also written the remainder in place
          */
 
-        _fmpz_vec_clear(dq1, lenA);
-
-        _fmpz_vec_clear(XXX,  2 * (lenB - 1));
+        _fmpz_vec_clear(W, lenA + 2 * (lenB - 1));
     }
     else  /* lenA = 2 * lenB - 1 */
     {
-        fmpz * XXX = _fmpz_vec_init(2 * (lenB - 1));
-        _fmpz_poly_divrem_divconquer_recursive(Q, R, XXX, A, B, lenB);
+        fmpz * W = _fmpz_vec_init(2 * (lenB - 1));
+
+        _fmpz_poly_divrem_divconquer_recursive(Q, R, W, A, B, lenB);
         _fmpz_vec_sub(R, A, R, lenA);
-        _fmpz_vec_clear(XXX, 2 * (lenB - 1));
+
+        _fmpz_vec_clear(W, 2 * (lenB - 1));
     }
 }
 
@@ -183,7 +182,7 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     }
 
     _fmpz_poly_divrem_divconquer(Q_coeffs, R_coeffs, A->coeffs, A->length,
-                                 B->coeffs, B->length);
+                                                     B->coeffs, B->length);
 
     if (Q == A || Q == B)
     {

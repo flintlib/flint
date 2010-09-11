@@ -112,14 +112,14 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
            length n2; let d3q2 = d3 q2, of length 2 n2 - 1
          */
 
-        d3q2 = W2;
-        _fmpz_poly_divrem_divconquer_recursive(q2, d3q2, W1, p2, d3, n2);
+        d3q2 = W1;
+        _fmpz_poly_divrem_divconquer_recursive(q2, d3q2, W2, p2, d3, n2);
 
         /*
            Compute d4q2 = d4 q2, of length n1 + n2 - 1 = lenB - 1
          */
 
-        d4q2 = W1;
+        d4q2 = W2;
         _fmpz_poly_mul(d4q2, d4, n1, q2, n2);
 
         /*
