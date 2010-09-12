@@ -143,8 +143,8 @@ void
 fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
                             const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    fmpz_poly_t t1, t2;
-    fmpz *Q_coeffs, *R_coeffs;
+    fmpz_poly_t tQ, tR;
+    fmpz *q, *r;
 
     if (B->length == 0)
     {
@@ -161,43 +161,43 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (Q == A || Q == B)
     {
-        fmpz_poly_init2(t1, A->length - B->length + 1);
-        Q_coeffs = t1->coeffs;
+        fmpz_poly_init2(tQ, A->length - B->length + 1);
+        q = tQ->coeffs;
     }
     else
     {
         fmpz_poly_fit_length(Q, A->length - B->length + 1);
-        Q_coeffs = Q->coeffs;
+        q = Q->coeffs;
     }
 
     if (R == A || R == B)
     {
-        fmpz_poly_init2(t2, A->length);
-        R_coeffs = t2->coeffs;
+        fmpz_poly_init2(tR, A->length);
+        r = tR->coeffs;
     }
     else
     {
         fmpz_poly_fit_length(R, A->length);
-        R_coeffs = R->coeffs;
+        r = R->coeffs;
     }
 
-    _fmpz_poly_divrem_divconquer(Q_coeffs, R_coeffs, A->coeffs, A->length,
-                                                     B->coeffs, B->length);
+    _fmpz_poly_divrem_divconquer(q, r, A->coeffs, A->length,
+                                       B->coeffs, B->length);
 
     if (Q == A || Q == B)
     {
-        _fmpz_poly_set_length(t1, A->length - B->length + 1);
-        fmpz_poly_swap(t1, Q);
-        fmpz_poly_clear(t1);
+        _fmpz_poly_set_length(tQ, A->length - B->length + 1);
+        fmpz_poly_swap(tQ, Q);
+        fmpz_poly_clear(tQ);
     }
     else
         _fmpz_poly_set_length(Q, A->length - B->length + 1);
 
     if (R == A || R == B)
     {
-        _fmpz_poly_set_length(t2, A->length);
-        fmpz_poly_swap(t2, R);
-        fmpz_poly_clear(t2);
+        _fmpz_poly_set_length(tR, A->length);
+        fmpz_poly_swap(tR, R);
+        fmpz_poly_clear(tR);
     }
     else
         _fmpz_poly_set_length(R, A->length);
