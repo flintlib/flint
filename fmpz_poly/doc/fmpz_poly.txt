@@ -1011,11 +1011,13 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
     Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
     the value of d is fixed at the maximum of 0 and A->length - B->length + 1.
-    
+
     This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
     is not asymptotically fast.  It is efficient only for short polynomials, 
     e.g. when B->length < 32.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.1.2.
 
 *******************************************************************************
 
