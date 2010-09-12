@@ -48,6 +48,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         const long n1 = lenB - n2;
 
         const fmpz * p1 = A + 2 * n2;
+        const fmpz * p2;
         const fmpz * d1 = B + n2;
         const fmpz * d2 = B;
 
@@ -95,19 +96,22 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         _fmpz_poly_mul(d2q1, q1, n1, d2, n2);
 
         /*
-           Compute t to be the top 2 n2 - 1 coeffs of 
+           Compute {t - (n2 - 1), 2 n2 - 1} to be the top 2 n2 - 1 coeffs of 
 
                A / x^n2 - (d1q1 x^n2 + d2q1).
 
            Note that actually the bottom n2 - 1 coeffs may be arbitrary
          */
 
-        t = temp + 1 + (lenB & 1L);
+        t = temp + n1;
 
-        _fmpz_vec_zero(t, n2 - (lenB & 1L));
-        _fmpz_vec_add(t + (n2 - 1), t + (n2 - 1), d2q1 + (n1 - 1), n2);
-        _fmpz_vec_neg(t + (n2 - 1), t + (n2 - 1), n2);
-        _fmpz_vec_add(t + (n2 - 1), t + (n2 - 1), A + (lenB - 1), n2);
+        if (n1 == n2)
+            fmpz_zero(t);
+        _fmpz_vec_add(t, t, d2q1 + (n1 - 1), n2);
+        _fmpz_vec_neg(t, t, n2);
+        _fmpz_vec_add(t, t, A + (n1 + n2 - 1), n2);
+
+        p2 = t - (n2 - 1);
 
         /*
            Move {QB, n1 - 1} into the bottom coefficients of temp, so that 
@@ -117,12 +121,12 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         _fmpz_vec_swap(QB, temp, n1 - 1);
 
         /*
-           Compute q2 = t div {B + n1}, a 2 n2 by n2 division
+           Compute q2 = t div {B + n1}, a 2 n2 - 1 by n2 division
          */
 
         d3q2 = QB;
 
-        _fmpz_poly_divremlow_divconquer_recursive(q2, d3q2, t, B + n1, n2);
+        _fmpz_poly_divremlow_divconquer_recursive(q2, d3q2, p2, B + n1, n2);
 
         _fmpz_vec_swap(QB + n1, d3q2, n2 - 1);
 
