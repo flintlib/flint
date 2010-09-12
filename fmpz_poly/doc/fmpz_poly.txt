@@ -789,6 +789,25 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. An exception is raised if B is zero.
 
+void _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA, 
+                                           const fmpz * B, long lenB)
+
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that A = B*Q + R and each 
+    coefficient of R beyond lenB - 1 is reduced mod the leading coefficient 
+    of B. If the leading coefficient of B is +/-1 or the division is exact, 
+    this is the same thing as division over Q.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
+    of input and output operands is allowed.
+
+void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B)
+
+    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. An exception is raised if B is zero.
+
 void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
                                                      const fmpz * B, long lenB)
 
@@ -845,7 +864,35 @@ void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)
 
-    Computes the quotient of A divided by B.  Assumes that B is non-zero.
+    Computes the quotient Q of A divided by Q.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_div(fmpz * Q, const fmpz * A, long lenA,
+                              const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} divided by 
+    {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. Aliasing of 
+    input and output operands is not allowed.
+
+void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the quotient Q of A divided by Q.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. An exception is raised if B is zero.
 
 void _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA, 
                                        const fmpz * B, long lenB)
@@ -863,6 +910,28 @@ void _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
 
 void fmpz_poly_rem_basecase(fmpz_poly_t R, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the remainder R of A upon division by B.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. If 
+    the leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, 
+                              const fmpz * B, long lenB)
+
+    Computes the remainder {R, lenA} of {A, lenA} upon division by {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. If the 
+    leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q.
+
+    Assumes that lenA >= lenB > 0. Allows zero-padding in {A, lenA}. Aliasing 
+    of input and output operands is not allowed.
+
+void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     Computes the remainder R of A upon division by B.
 

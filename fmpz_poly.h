@@ -354,13 +354,19 @@ void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
                                    const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
-                                 const fmpz * A, const fmpz * B, long B_len);
+                                 const fmpz * A, const fmpz * B, long lenB);
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                     const fmpz * A, long A_len, const fmpz * B, long B_len);
+                     const fmpz * A, long lenA, const fmpz * B, long lenB);
 
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                                    const fmpz_poly_t A, const fmpz_poly_t B);
+
+void _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA, 
+                                           const fmpz * B, long lenB);
+
+void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B);
 
 void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
                                                   const fmpz * B, long lenB);
@@ -381,11 +387,22 @@ void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 void fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                                    const fmpz_poly_t A, const fmpz_poly_t B);
 
+void _fmpz_poly_div(fmpz * Q, const fmpz * A, long lenA, 
+                              const fmpz * B, long lenB);
+
+void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                  const fmpz_poly_t B);
+
 void _fmpz_poly_rem_basecase(fmpz * Q, const fmpz * A, long lenA,
                                        const fmpz * B, long lenB);
 
 void fmpz_poly_rem_basecase(fmpz_poly_t R, 
                                    const fmpz_poly_t A, const fmpz_poly_t B);
+
+void _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, 
+                              const fmpz * B, long lenB);
+
+void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
 
 void _fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n);
 
