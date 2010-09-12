@@ -63,6 +63,10 @@ TODO
   fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
   functionality.  Once this has been done, also include test code for these
 
+* Improve the implementations of fmpz_poly_divrem, _div, and _rem, check that 
+  the documentations still apply, and write test code for this --- all of this 
+  makes more sense once there is a choice of algorithms
+
 Maybe
 =====
 
