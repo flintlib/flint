@@ -700,6 +700,28 @@ void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     Computes the greatest common divisor res of poly1 and poly2, normalised 
     to have non-negative leading coefficient.
 
+void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2)
+
+    Sets res to the resultant of {poly1, len1} and {poly2, len2}, assuming 
+    that len1 >= len2 > 0.
+
+void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2)
+
+    Computes the resultant of poly1 and poly2.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \[
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y)
+    \]
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.7.
+
 *******************************************************************************
 
     Gaussian content

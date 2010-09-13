@@ -335,6 +335,12 @@ void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                     const fmpz_poly_t poly2);
 
+void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2);
+
+void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, long len);
