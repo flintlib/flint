@@ -60,7 +60,7 @@ main(void)
         result = (fmpz_poly_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (aliasing a and b):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(b), printf("\n\n");
             abort();
@@ -88,7 +88,7 @@ main(void)
         result = (fmpz_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (aliasing a and c):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(c), printf("\n\n");
             abort();
@@ -123,7 +123,7 @@ main(void)
         result = (r->length == 0L);
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (check a | gcd(af, ag)):\n");
             fmpz_poly_print(f), printf("\n");
             fmpz_poly_print(g), printf("\n");
             fmpz_poly_print(d), printf("\n");

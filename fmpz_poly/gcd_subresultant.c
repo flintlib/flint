@@ -31,134 +31,112 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1,
-                            long len1, const fmpz * poly2, long len2)
+_fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
+                                        const fmpz * poly2, long len2)
 {
-    fmpz_t a, b, d;
-    fmpz *A, *B, *Q, *R, *Z;
-    long lenA, lenB, lenQ, lenR, lenZ;
-    ulong s;
-
-    fmpz *g;
-    fmpz_t h, one, r, temp;
-    long olddelta;
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(d);
-    _fmpz_poly_content(a, poly1, len1);
-    _fmpz_poly_content(b, poly2, len2);
-    fmpz_gcd(d, a, b);
-
-    if (len2 == 1L)
+    if (len2 == 1)
     {
-        fmpz_set(res, d);
+        fmpz_t c;
+        fmpz_init(c);
+        _fmpz_poly_content(c, poly1, len1);
+        fmpz_gcd(res, c, poly2);
+        fmpz_clear(c);
+    }
+    else
+    {
+        fmpz_t a, b, d, g, h;
+        fmpz *A, *B, *W;
+        long lenA, lenB;
+
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(d);
+        fmpz_init(g);
+        fmpz_init(h);
+
+        A = W = _fmpz_vec_init(len1 + len2);
+        B = W + len1;
+
+        lenA = len1;
+        lenB = len2;
+        _fmpz_poly_content(a, poly1, lenA);
+        _fmpz_poly_content(b, poly2, lenB);
+        _fmpz_vec_scalar_divexact_fmpz(A, poly1, lenA, a);
+        _fmpz_vec_scalar_divexact_fmpz(B, poly2, lenB, b);
+
+        fmpz_gcd(d, a, b);
+        fmpz_set_ui(g, 1);
+        fmpz_set_ui(h, 1);
+
+        while (1)
+        {
+            const long delta = lenA - lenB;
+
+            _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
+
+            for (lenA--; lenA >= 0 && !A[lenA]; lenA--) ;
+            lenA++;
+
+            if (lenA <= 1)
+                break;
+
+            {                       /* Swap A and B */
+                fmpz *T;
+                long len;
+                T = A, A = B, B = T, len = lenA, lenA = lenB, lenB = len;
+            }
+
+            if (delta == 1)
+            {
+                fmpz_mul(b, g, h);
+                _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
+                fmpz_set(g, A + (lenA - 1));
+                fmpz_set(h, g);
+            }
+            else
+            {
+                fmpz_pow_ui(a, h, delta);
+                fmpz_mul(b, g, a);
+                _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
+                fmpz_pow_ui(b, A + (lenA - 1), delta);
+                fmpz_mul(g, h, b);
+                fmpz_divexact(h, g, a);
+                fmpz_set(g, A + (lenA - 1));
+            }
+        }
+
+        if (lenA == 1)
+        {
+            fmpz_set(res, d);
+            _fmpz_vec_zero(res + 1, len2 - 1);
+        }
+        else
+        {
+            _fmpz_poly_content(b, B, lenB);
+            _fmpz_vec_scalar_divexact_fmpz(B, B, lenB, b);
+            if (fmpz_sgn(B + (lenB - 1)) < 0)
+                fmpz_neg(d, d);
+            _fmpz_vec_scalar_mul_fmpz(res, B, lenB, d);
+            if (len2 >= lenB)
+                _fmpz_vec_zero(res + lenB, len2 - lenB);
+        }
+
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(d);
-        return;
+        fmpz_clear(g);
+        fmpz_clear(h);
+
+        _fmpz_vec_clear(W, len1 + len2);
     }
-
-    lenA = len1;
-    lenB = len2;
-    lenQ = lenA + lenB - 1L;
-    lenR = lenA;
-    lenZ = lenA + lenB + lenQ + lenR;
-    Z = _fmpz_vec_init(lenZ);
-    A = Z;
-    B = A + lenA;
-    Q = B + lenB;
-    R = Q + lenQ;
-    _fmpz_vec_scalar_divexact_fmpz(A, poly1, len1, a);
-    _fmpz_vec_scalar_divexact_fmpz(B, poly2, len2, b);
-    s = 0UL;
-
-    fmpz_init(h);
-    fmpz_init(one);
-    fmpz_init(r);
-    fmpz_init(temp);
-    fmpz_set_ui(h, 1UL);
-    fmpz_set_ui(one, 1UL);
-    g = one;
-    olddelta = 1L;
-
-    while (1)
-    {
-        long delta = lenA - lenB;
-        _fmpz_poly_pseudo_divrem(Q, R, &s, A, lenA, B, lenB);
-        lenQ = lenA + (lenB - 1L);
-        lenR = lenB - 1L;
-        for (; lenR != 0L && fmpz_is_zero(R + (lenR - 1L)); lenR--) ;
-        if (lenR <= 1L)
-            break;
-
-        {                       /* Swap A and B */
-            fmpz *T;
-            long t;
-            T = A, A = B, B = T, t = lenA, lenA = lenB, lenB = t;
-        }
-
-        if (olddelta == 1L)
-            fmpz_pow_ui(r, g, delta + 1L);
-        else
-        {
-            fmpz_pow_ui(r, h, delta);
-            fmpz_mul(r, r, g);
-        }
-
-        g = A + (lenA - 1L);
-        fmpz_pow_ui(temp, g, (ulong) delta + 1UL - s);
-        _fmpz_vec_scalar_mul_fmpz(R, R, lenR, temp);
-
-        _fmpz_vec_scalar_divexact_fmpz(B, R, lenR, r);
-        lenB = lenR;
-
-        olddelta = delta;
-        if (delta == 0L)
-            fmpz_set_ui(h, 1UL);
-        else if (delta == 1L)
-            fmpz_set(h, g);
-        else
-        {
-            fmpz_t num, den;
-            fmpz_init(num), fmpz_init(den);
-            fmpz_pow_ui(num, g, delta);
-            fmpz_pow_ui(den, h, delta - 1UL);
-            fmpz_divexact(h, num, den);
-            fmpz_clear(num), fmpz_clear(den);
-        }
-    }
-    if (lenR == 1L)
-    {
-        fmpz_set_ui(B, 1UL);
-        lenB = 1L;
-    }
-
-    /* {res, len2} = +- (d / b) {B, lenB} */
-    _fmpz_poly_content(b, B, lenB);
-    _fmpz_vec_scalar_divexact_fmpz(res, B, lenB, b);
-    if (fmpz_sgn(res + (lenB - 1L)) < 0)
-        fmpz_neg(d, d);
-    _fmpz_vec_scalar_mul_fmpz(res, res, lenB, d);
-    for (s = lenB; s < len2; s++)
-        fmpz_zero(res + s);
-
-    _fmpz_vec_clear(Z, lenZ);
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(d);
-    fmpz_clear(h);
-    fmpz_clear(one);
-    fmpz_clear(r);
-    fmpz_clear(temp);
 }
 
 void
 fmpz_poly_gcd_subresultant(fmpz_poly_t res,
                            const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
+    const long len1 = poly1->length;
+    const long len2 = poly2->length;
     long rlen;
 
     if (len1 == 0)

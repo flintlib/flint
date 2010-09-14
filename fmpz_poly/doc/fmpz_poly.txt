@@ -674,16 +674,18 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Computes the greatest common divisor res of {poly1, len1} and 
-    {poly2, len2}, assuming len1 >= len2 > 0.  The result is normalised to 
-    have positive leading coefficient.  Assumes that res has space for 
-    len2 coefficients.  Aliasing between res, poly1 and poly2 is supported.
+    Computes the greatest common divisor {res, len2} of {poly1, len1} and 
+    {poly2, len2}, assuming len1 >= len2 > 0. The result is normalised to 
+    have positive leading coefficient. Aliasing between res, poly1 and poly2 
+    is supported.
 
 void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
     Computes the greatest common divisor res of poly1 and poly2, normalised 
     to have non-negative leading coefficient.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.1.
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
