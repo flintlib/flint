@@ -92,13 +92,13 @@ void
 _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
                                           const fmpz * poly2, long len2)
 {
-    long i, j, K, n;
+    long i, j, k, n;
     long *hlen, alloc, powlen;
     fmpz *v, **h, *pow, *temp;
     
     if (len1 == 1)
     {
-        _fmpz_vec_copy(res, poly1, len1);
+        fmpz_set(res, poly1);
         return;
     }
     if (len2 == 1)
@@ -116,18 +116,16 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     
     hlen = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
     
-    K = 1;
-    while ((2 << K) < len1)
-        K++;
+    for (k = 1; (2 << k) < len1; k++) ;
     
-    hlen[0] = hlen[1] = ((1 << K) - 1) * (len2 - 1) + 1;
-    for (i = K - 1; i > 0; i--)
+    hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
+    for (i = k - 1; i > 0; i--)
     {
         long hi = (len1 + (1 << i) - 1) / (1 << i);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
-    powlen = (1 << K) * (len2 - 1) + 1;
+    powlen = (1 << k) * (len2 - 1) + 1;
     
     alloc = 0;
     for (i = 0; i < (len1 + 1) / 2; i++)
@@ -231,16 +229,13 @@ fmpz_poly_compose_divconquer(fmpz_poly_t res,
     }
     if (len1 == 1 || len2 == 0)
     {
-        fmpz_poly_fit_length(res, 1);
-        fmpz_set(res->coeffs, poly1->coeffs);
-        _fmpz_poly_set_length(res, 1);
-        _fmpz_poly_normalise(res);
+        fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
     }
     
     lenr = (len1 - 1) * (len2 - 1) + 1;
     
-    if ((res != poly1) && (res != poly2))
+    if (res != poly1 && res != poly2)
     {
         fmpz_poly_fit_length(res, lenr);
         _fmpz_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1, 

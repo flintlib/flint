@@ -33,19 +33,19 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
                                const fmpz * f, long len, 
                                const fmpz_t anum, const fmpz_t aden)
 {
-    if (len == 0L)
+    if (len == 0)
     {
         fmpz_set_ui(rnum, 0);
         fmpz_set_ui(rden, 1);
     }
-    else if (len == 1L)
+    else if (len == 1)
     {
         fmpz_set(rnum, f);
         fmpz_set_ui(rden, 1);
     }
     else
     {
-        long i = len - 1L;
+        long i = len - 1;
         fmpz_t d;
         fmpz_init(d);
         

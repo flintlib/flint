@@ -32,8 +32,5 @@
 long
 fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
 {
-    if (n < poly->length)
-        return fmpz_get_si(poly->coeffs + n);
-    else
-        return 0L;
+    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : 0L;
 }
