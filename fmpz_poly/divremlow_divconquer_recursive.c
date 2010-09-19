@@ -57,33 +57,33 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
         /*
            Think of the top lenB coefficients of QB as temporary space; this 
-           code will not depend on {QB, lenB - 1} and temp being adjacent
+           code will not depend on {QB, lenB - 1} and W being adjacent
          */
 
-        fmpz * temp = QB + (lenB - 1);
+        fmpz * W = QB + (lenB - 1);
 
         fmpz *d1q1, *d2q1, *t, *d3q2, *d4q2;
 
         /*
            Set q1 to p1 div d1, a 2 n1 - 1 by n1 division, so q1 has length 
-           at most n1; {temp, n1 - 1} is d1 * q1 is truncated to length n1 - 1
+           at most n1; {W, n1 - 1} is d1 * q1 is truncated to length n1 - 1
          */
 
-        _fmpz_poly_divremlow_divconquer_recursive(q1, temp, p1, d1, n1);
+        _fmpz_poly_divremlow_divconquer_recursive(q1, W, p1, d1, n1);
 
         /* 
-           temp is of length lenB, but we only care about the bottom n1 - 1 
+           W is of length lenB, but we only care about the bottom n1 - 1 
            coeffs, which we push up by n2 + 1, to the very top; we do this 
            manually here instead of via _fmpz_vec_swap() because the source 
            and destination arrays overlap
          */
 
-        d1q1 = temp + (n2 + 1);
+        d1q1 = W + (n2 + 1);
 
         {
             long i;
             for (i = 0; i < n1 - 1; i++)
-                fmpz_swap(d1q1 + i, temp + i);
+                fmpz_swap(d1q1 + i, W + i);
         }
 
         /*
@@ -103,7 +103,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
            Note that actually the bottom n2 - 1 coeffs may be arbitrary
          */
 
-        t = temp + n1;
+        t = W + n1;
 
         if (n1 == n2)
             fmpz_zero(t);
@@ -114,11 +114,11 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         p2 = t - (n2 - 1);
 
         /*
-           Move {QB, n1 - 1} into the bottom coefficients of temp, so that 
+           Move {QB, n1 - 1} into the bottom coefficients of W, so that 
            we can use {QB, 2 n2 - 1} as space in the next division
          */
 
-        _fmpz_vec_swap(QB, temp, n1 - 1);
+        _fmpz_vec_swap(QB, W, n1 - 1);
 
         /*
            Compute q2 = t div {B + n1}, a 2 n2 - 1 by n2 division
@@ -132,7 +132,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
 
         if (lenB & 1L)
             fmpz_zero(QB + n2);
-        _fmpz_vec_add(QB + n2, QB + n2, temp, n1 - 1);
+        _fmpz_vec_add(QB + n2, QB + n2, W, n1 - 1);
 
         /*
            Compute {d4q2, lenB - 1} as {B, n1} * {q2, n2}; then move the 
@@ -140,7 +140,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
            coeffs to {QB + n2, n1 - 1}
          */
 
-        d4q2 = temp;
+        d4q2 = W;
 
         _fmpz_poly_mul(d4q2, B, n1, q2, n2);
 

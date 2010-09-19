@@ -789,7 +789,7 @@ void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     thing as division over Q.
 
     Assumes lenB > 0. Allows zero-padding in {A, lenA}. Requires a temporary 
-    array {W, 2 lenB - 2}. No aliasing of input and output operands is allowed.
+    array {W, 2 lenB - 1}. No aliasing of input and output operands is allowed.
 
     This function does not read the bottom lenB - 1 coefficients from A, which 
     means that they might not even need to exist in allocated memory.

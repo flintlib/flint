@@ -48,10 +48,10 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         const fmpz * d1 = B + n2;
         const fmpz * d2 = B;
 
-        fmpz * W = _fmpz_vec_init(2 * (n1 - 1) + lenB - 1);
+        fmpz * W = _fmpz_vec_init((2 * n1 - 1) + lenB - 1);
 
         fmpz * d1q1 = R + n2;
-        fmpz * d2q1 = W + 2 * (n1 - 1);
+        fmpz * d2q1 = W + (2 * n1 - 1);
 
         _fmpz_poly_divrem_divconquer_recursive(Q, d1q1, W, p1, d1, n1);
 
@@ -73,7 +73,7 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         _fmpz_vec_add(R + n2, R + n2, d2q1 + n2, n1 - 1);
         _fmpz_vec_sub(R, A, R, lenA);
 
-        _fmpz_vec_clear(W, 2 * (n1 - 1) + lenB - 1);
+        _fmpz_vec_clear(W, (2 * n1 - 1) + lenB - 1);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -84,11 +84,11 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
         const long shift = lenA - 2 * lenB + 1;
         const fmpz * p1 = A + shift;
 
-        fmpz * W = _fmpz_vec_init(lenA + 2 * (lenB - 1));
+        fmpz * W = _fmpz_vec_init(lenA + (2 * lenB - 1));
 
         fmpz * q1   = Q + shift;
         fmpz * q2   = Q;
-        fmpz * dq1  = W + 2 * (lenB - 1);
+        fmpz * dq1  = W + (2 * lenB - 1);
         fmpz * d1q1 = dq1 + shift;
 
         /* 
@@ -126,16 +126,16 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
            We've also written the remainder in place
          */
 
-        _fmpz_vec_clear(W, lenA + 2 * (lenB - 1));
+        _fmpz_vec_clear(W, lenA + (2 * lenB - 1));
     }
     else  /* lenA = 2 * lenB - 1 */
     {
-        fmpz * W = _fmpz_vec_init(2 * (lenB - 1));
+        fmpz * W = _fmpz_vec_init(lenA);
 
         _fmpz_poly_divrem_divconquer_recursive(Q, R, W, A, B, lenB);
         _fmpz_vec_sub(R, A, R, lenA);
 
-        _fmpz_vec_clear(W, 2 * (lenB - 1));
+        _fmpz_vec_clear(W, lenA);
     }
 }
 

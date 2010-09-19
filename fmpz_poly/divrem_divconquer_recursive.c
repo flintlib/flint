@@ -50,11 +50,11 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     }
     else
     {
-        const long n2   = lenB / 2;
-        const long n1   = lenB - n2;
+        const long n2 = lenB / 2;
+        const long n1 = lenB - n2;
 
         fmpz * W1 = W;
-        fmpz * W2 = W + (lenB - 1);
+        fmpz * W2 = W + lenB;
 
         const fmpz * p1 = A + 2 * n2;
         const fmpz * p2;
