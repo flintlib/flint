@@ -42,8 +42,8 @@ void
 _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
                           const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    long crossover = 16;
-    long crossover2 = 128;
+    const long crossover1 = (lenB <= 12) ? 8 : 16;
+    const long crossover2 = 128;
 
     const long n2 = lenB / 2;
     const long n1 = lenB - n2;
@@ -53,17 +53,14 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
     const fmpz * d3 = B + n1;
     const fmpz * d4 = B;
 
-    if (lenB <= 12)
-        crossover = 8;
-
-    if (lenB <= crossover || (lenA > 2 * lenB - 1 && lenA < crossover2))
+    if (lenB <= crossover1 || (lenA > 2 * lenB - 1 && lenA < crossover2))
     {
         _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, lenA, B, lenB);
     }
     else if (lenA <= n2 + lenB - 1)
     {
-        fmpz_t f;
         fmpz *p1, *r1, *d2q1;
+        fmpz_t f;
 
         /*
            Here, n1 + n2 - 1 < lenA <= n1 + 2 n2 - 1
@@ -71,9 +68,13 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
            Shift A right by n1 and zero the bottom n2 - 1 coeffs, call this p1
          */
 
-        p1 = _fmpz_vec_init(lenA - n1);
-        _fmpz_vec_copy(p1, A + n1, lenA - n1);
-        _fmpz_vec_zero(p1, n2 - 1);
+        p1 = (fmpz *) malloc((lenA - n1) * sizeof(fmpz));
+        {
+            long i;
+            mpn_zero((mp_ptr) p1, n2 - 1);
+            for (i = n2 - 1; i < lenA - n1; i++)
+                p1[i] = (A + n1)[i];
+        }
 
         /*
            Compute p1 div d3, at most a 2 n2 - 1 by n2 division, leaving 
@@ -85,7 +86,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
         _fmpz_vec_zero(r1 + (n2 - 1), lenA - n1 - n2 + 1);
 
-        _fmpz_vec_clear(p1, lenA - n1);
+        free(p1);
 
         /*
            Compute d2q1 = Q d4 of length lenA - lenB + n1, which is 
@@ -115,7 +116,6 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
         _fmpz_vec_clear(d2q1, lenA - lenB + n1);
 
         fmpz_clear(f);
-        _fmpz_vec_zero(R + lenB - 1, lenA - lenB + 1);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -124,30 +124,34 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
         fmpz * q1 = Q + shift;
         fmpz * q2 = Q;
+        fmpz * r1 = R;
 
-        fmpz *p1, *r1, *t;
+        fmpz *p1, *t;
         fmpz_t f;
+
+        fmpz_init(f);
 
         /*
            Shift A right until it is of length 2 lenB - 1, call this p1; 
            zero the bottom lenB - 1 coeffs
          */
 
-        p1 = _fmpz_vec_init(2 * lenB - 1);
-
-        _fmpz_vec_copy(p1, A + shift, 2 * lenB - 1);
-        _fmpz_vec_zero(p1, lenB - 1);
+        p1 = (fmpz *) malloc((2 * lenB - 1) * sizeof(fmpz));
+        {
+            long i;
+            mpn_zero((mp_ptr) p1, lenB - 1);
+            for (i = lenB - 1; i < lenB; i++)
+                p1[i] = (A + shift)[i];
+        }
 
         /*
            Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
            being at most length lenB; r1 is of length at most lenB - 1
          */
 
-        r1 = _fmpz_vec_init(2 * lenB - 1);
-
         _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, 2 * lenB - 1, B, lenB);
 
-        _fmpz_vec_clear(p1, 2 * lenB - 1);
+        free(p1);
 
         /*
            Compute t = L^s1 a2 + r1 x^shift, which ends up being of length at 
@@ -157,13 +161,10 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
         t = _fmpz_vec_init(lenA - lenB);
 
-        fmpz_init(f);
         fmpz_pow_ui(f, B + (lenB - 1), s1);
 
         _fmpz_vec_scalar_mul_fmpz(t, A, lenA - lenB, f);
         _fmpz_vec_add(t + shift, t + shift, r1, lenB - 1);
-
-        _fmpz_vec_clear(r1, 2 * lenB - 1);
 
         /*
            Compute q2 = t div B; it is a smaller division than the original 
@@ -188,43 +189,47 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
         *d = s1 + s2;
 
         fmpz_clear(f);
-        _fmpz_vec_zero(R + lenB - 1, lenA - lenB + 1);
     }
     else  /* n1 + 2 n2 - 1 < lenA <= 2 lenB - 1 */
     {
-        ulong s1, s2;
-        fmpz *p1, *r1, *q1, *d2q1, *t, *q2;
+        fmpz * q1   = Q + n2;
+        fmpz * q2   = Q;
+        fmpz * r1   = R;
+        fmpz * d2q1 = R + (n1 - 1);
+        fmpz *p1, *t;
         fmpz_t f;
+        ulong s1, s2;
+
+        fmpz_init(f);
 
         /*
-           Let A = a1 x^{n1 + 2 n2 - 1} + a2 x^{n1 + n2 - 1} + a3, where 
-           a1 is of length at most n1, a2 of length n2, and a3 of length 
-           n1 + n2 - 1; set p1 = a1 x^{n1 - 1}, of length at most 2 n1 - 1
+           Set p1 to the top lenA - 2 n2 coeffs of A, clearing the bottom 
+           n1 - 1 coeffs
          */
 
-        p1 = _fmpz_vec_init(lenA - 2 * n2);
-
-        _fmpz_vec_copy(p1, A + 2 * n2, lenA - 2 * n2);
-        _fmpz_vec_zero(p1, n1 - 1);
+        p1 = (fmpz *) malloc((lenA - 2 * n2) * sizeof(fmpz));
+        {
+            long i;
+            mpn_zero((mp_ptr) p1, n1 - 1);
+            for (i = n1 - 1; i < lenA - 2 * n2; i++)
+                p1[i] = (A + 2 * n2)[i];
+        }
 
         /*
            Set q1 to p1 div d1, at most a 2 n1 - 1 by n1 division, so q1 ends 
            up being of length at most n1; r1 is of length n1 - 1
          */
 
-        r1 = _fmpz_vec_init(lenA - 2 * n2);
-        q1 = _fmpz_vec_init(lenA - (n1 + 2 * n2 - 1));
-
         _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, lenA - 2 * n2, d1, n1);
 
-        _fmpz_vec_clear(p1, lenA - 2 * n2);
+        free(p1);
 
         /*
-           Compute d2q1 = d2q1, of length n1 + n2 - 1; note len(q1) is 
-           at least 1 since we are performing a pseudo division
-         */
+           Compute d2q1 = d2q1, of length lenA - lenB
 
-        d2q1 = _fmpz_vec_init(lenA - lenB);
+           Note lenA - lenB <= lenB - 1 <= 2 n2 and lenA - (n1 - 1) > 2 n2, 
+           so we can store d2q1 in the top 2 n2 coeffs of R
+         */
 
         if (n2 >= lenA - n1 - 2 * n2 + 1)
             _fmpz_poly_mul(d2q1, d2, n2, q1, lenA - (n1 + 2 * n2 - 1));
@@ -240,46 +245,33 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
         t = _fmpz_vec_init(n1 + 2 * n2 - 1);
 
-        fmpz_init(f);
-
         fmpz_pow_ui(f, B + (lenB - 1), s1);
 
         _fmpz_vec_scalar_mul_fmpz(t, A, n1 + 2 * n2 - 1, f);
         _fmpz_vec_add(t + 2 * n2, t + 2 * n2, r1, n1 - 1);
         _fmpz_vec_sub(t + n2, t + n2, d2q1, lenA - lenB);
 
-        _fmpz_vec_clear(r1, lenA - 2 * n2);
-        _fmpz_vec_clear(d2q1, lenA - lenB);
-
         /*
            Compute q2 = t div B and set R to the remainder, at most a 
            lenB + n2 - 1 by lenB division, so q2 is of length at most n2
          */
-
-        q2 = _fmpz_vec_init(n2);
 
         _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenB + n2 - 1, B, lenB);
 
         _fmpz_vec_clear(t, n1 + 2 * n2 - 1);
 
         /*
-           Write Q = L^s2 q1 x^n2 + q2, of length n1 + n2; note len(q1) is 
-           non-zero since we are performing pseudo division
+           Write Q = L^s2 q1 x^n2 + q2; note len(q1) is non-zero since 
+           we are performing pseudo division
          */
 
         fmpz_pow_ui(f, B + (lenB - 1), s2);
 
-        _fmpz_vec_zero(Q, lenA - lenB + 1);
-        _fmpz_vec_scalar_mul_fmpz(Q + n2,  q1, lenA - lenB - n2 + 1, f);
-        _fmpz_vec_add(Q, Q, q2, n2);
-
-        _fmpz_vec_clear(q1, lenA - (n1 + 2 * n2 - 1));
-        _fmpz_vec_clear(q2, n2);
+        _fmpz_vec_scalar_mul_fmpz(q1, q1, lenA - lenB + 1 - n2, f);
 
         *d = s1 + s2;
 
         fmpz_clear(f);
-        _fmpz_vec_zero(R + lenB - 1, lenA - lenB + 1);
     }
 }
 
