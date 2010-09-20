@@ -422,6 +422,12 @@ void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                         ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
 
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                       const fmpz * A, long lenA, const fmpz * B, long lenB);
+
+void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
+                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B);
+
 void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
                                        long lenA, const fmpz * B, long lenB);
 

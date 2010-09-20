@@ -1001,6 +1001,23 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     If L is the leading coefficient of B, then computes Q, R such that 
     L^d*A = QB + R. This function is used for simulating division over QQ. 
 
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                          const fmpz * A, long lenB, const fmpz * B, long lenB)
+
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that L^d A = B*Q + R, only 
+    taking the bottom lenB - 1 coefficients of R into account.  The remaining 
+    top coefficients of {R, lenA} may be arbitrary.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
+    of input and output operands is allowed.
+
+void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
+                           ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes Q, R, and d such that L^d A = B*Q + R, where R has length less 
+    than the length of B and L is the leading coefficient of B.  An exception 
+    is raised if B is zero.
+
 void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
 
