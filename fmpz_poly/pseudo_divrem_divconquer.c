@@ -31,13 +31,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-/*
-    No aliasing.
-    lenA >= lenB > 0.
-
-    Sets {Q, lenA - lenB + 1} and {R, lenB - 1} to the quotient and remainder.
-    Expects R to be of length lenA on input.
- */
 void 
 _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
                           const fmpz * A, long lenA, const fmpz * B, long lenB)
@@ -60,7 +53,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
     else if (lenA <= n2 + lenB - 1)
     {
         fmpz *p1, *r1, *d2q1;
-        fmpz_t f;
+        fmpz *f;
 
         /*
            Here, n1 + n2 - 1 < lenA <= n1 + 2 n2 - 1
@@ -84,38 +77,46 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
         r1 = R + n1;
         _fmpz_poly_pseudo_divrem_divconquer(Q, r1, d, p1, lenA - n1, d3, n2);
 
-        _fmpz_vec_zero(r1 + (n2 - 1), lenA - n1 - n2 + 1);
-
         free(p1);
 
         /*
-           Compute d2q1 = Q d4 of length lenA - lenB + n1, which is 
+           Push the relevant {n2 - 1} terms of the remainder to the 
+           top of {R, lenA}
+         */
+
+        {
+            long i;
+            for (i = n2 - 2; i >= 0; i--)
+                fmpz_swap(R + lenA - (n2 - 1) + i, r1 + i);
+            r1 = R + lenA - (n2 - 1);
+        }
+
+        /*
+           Compute d2q1 = Q d4 of length lenA - n2, which is 
            at most n1 + n2 - 1 terms
          */
 
-        d2q1 = _fmpz_vec_init(lenA - lenB + n1);
-        
+        d2q1 = R;
         _fmpz_poly_mul(d2q1, d4, n1, Q, lenA - lenB + 1);
 
         /*
            Compute R = L^d R', where R' is the terms of A we have not dealt, 
-           of which there are at most n1 + n2 - 1
-         */
+           of which there are at most n1 + n2 - 1; that is, 
 
-        fmpz_init(f);
-        fmpz_pow_ui(f, B + (lenB - 1), *d);
-
-        /*
            Set R to {A, n1 + n2 - 1} * f + r1 x^n1 - d2q1
          */
 
-        _fmpz_vec_scalar_mul_fmpz(R, A, n1, f);
-        _fmpz_vec_scalar_addmul_fmpz(R + n1, A + n1, n2 - 1, f);
-        _fmpz_vec_sub(R, R, d2q1, lenA - lenB + n1);
-
-        _fmpz_vec_clear(d2q1, lenA - lenB + n1);
-
-        fmpz_clear(f);
+        _fmpz_vec_neg(R, R, lenA - n2);
+        {
+            long i;
+            for (i = 0; i < lenA - lenB; i++)
+                fmpz_add(R + n1 + i, R + n1 + i, R + lenA - (n2 - 1) + i);
+            for ( ; i < n2 - 1; i++)
+                fmpz_swap(R + n1 + i, R + lenA - (n2 - 1) + i);
+        }
+        f = R + lenB - 1;
+        fmpz_pow_ui(f, B + (lenB - 1), *d);
+        _fmpz_vec_scalar_addmul_fmpz(R, A, n1 + n2 - 1, f);
     }
     else if (lenA > 2 * lenB - 1)
     {
