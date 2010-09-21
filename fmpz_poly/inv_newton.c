@@ -30,56 +30,59 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-#define FLINT_NEWTON_INV_CUTOFF  32
+#define FLINT_INV_NEWTON_CUTOFF  32
 
 void 
-_fmpz_poly_newton_inv(fmpz * Qinv, fmpz * temp, const fmpz * Q, long n)
+_fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
 {
-    long *a, i;
-
     if (n == 1)
     {
         fmpz_set_ui(Qinv, 1);
-        return;
     }
-
-    _fmpz_vec_zero(Qinv, n);
-
-    for (i = 1; (1L << i) < n; i++) ;
-
-    a = (long *) malloc(i * sizeof(long));
-    a[i = 0] = n;
-    while (n >= FLINT_NEWTON_INV_CUTOFF)
-        a[++i] = (n = (n + 1) / 2);
-
-    /* Base case */
+    else
     {
-        fmpz *Qrev = temp + 2 * FLINT_NEWTON_INV_CUTOFF;
+        const long alloc = FLINT_MAX(2 * n, 3 * FLINT_INV_NEWTON_CUTOFF);
+        long *a, i;
+        fmpz *W;
 
-        _fmpz_poly_reverse(Qrev, Q, n, n);
-        _fmpz_vec_zero(temp, 2*n - 2);
-        fmpz_set_ui(temp + (2*n - 2), 1);
-        _fmpz_poly_div_basecase(Qinv, temp, temp, 2*n - 1, Qrev, n);
-        _fmpz_poly_reverse(Qinv, Qinv, n, n);
+        W = _fmpz_vec_init(alloc);
+
+        for (i = 1; (1L << i) < n; i++) ;
+
+        a = (long *) malloc(i * sizeof(long));
+        a[i = 0] = n;
+        while (n >= FLINT_INV_NEWTON_CUTOFF)
+            a[++i] = (n = (n + 1) / 2);
+
+        /* Base case */
+        {
+            fmpz *Qrev = W + 2 * FLINT_INV_NEWTON_CUTOFF;
+
+            _fmpz_poly_reverse(Qrev, Q, n, n);
+            _fmpz_vec_zero(W, 2*n - 2);
+            fmpz_set_ui(W + (2*n - 2), 1);
+            _fmpz_poly_div_basecase(Qinv, W, W, 2*n - 1, Qrev, n);
+            _fmpz_poly_reverse(Qinv, Qinv, n, n);
+        }
+        
+        for (i--; i >= 0; i--)
+        {
+            n = a[i];
+
+            _fmpz_poly_mullow_n(W, Q, Qinv, n);
+            fmpz_sub_ui(W, W, 1);
+            _fmpz_poly_mullow_n(W + n, W, Qinv, n);
+            _fmpz_vec_sub(Qinv, Qinv, W + n, n);
+        }
+
+        _fmpz_vec_clear(W, alloc);
+        free(a);
     }
-    
-    for (i--; i >= 0; i--)
-    {
-        n = a[i];
-
-        _fmpz_poly_mullow_n(temp, Q, Qinv, n);
-        fmpz_sub_ui(temp, temp, 1);
-        _fmpz_poly_mullow_n(temp + n, temp, Qinv, n);
-        _fmpz_vec_sub(Qinv, Qinv, temp + n, n);
-    }
-
-    free(a);
 }
 
-void fmpz_poly_newton_inv(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 {
     fmpz *Qcopy;
-    fmpz *T = _fmpz_vec_init(FLINT_MAX(2 * n, 3 * FLINT_NEWTON_INV_CUTOFF));
     int Qalloc;
 
     if (Q->length >= n)
@@ -101,20 +104,19 @@ void fmpz_poly_newton_inv(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_newton_inv(Qinv->coeffs, T, Qcopy, n);
+        _fmpz_poly_inv_newton(Qinv->coeffs, Qcopy, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_newton_inv(t->coeffs, T, Qcopy, n);
+        _fmpz_poly_inv_newton(t->coeffs, Qcopy, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }
     
     _fmpz_poly_set_length(Qinv, n);
     _fmpz_poly_normalise(Qinv);
-    _fmpz_vec_clear(T, FLINT_MAX(2 * n, 3 * FLINT_NEWTON_INV_CUTOFF));
 
     if (Qalloc)
         free(Qcopy);
