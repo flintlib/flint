@@ -410,9 +410,23 @@ void _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA,
 
 void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
 
+/*  Power series division  ***************************************************/
+
 void _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n);
 
 void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+static __inline__ void 
+_fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, long n)
+{
+    _fmpz_poly_inv_series(Qinv, Q, n);
+}
+
+static __inline__ void 
+fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+{
+    fmpz_poly_inv_series(Qinv, Q, n);
+}
 
 /*  Pseudo division  *********************************************************/
 

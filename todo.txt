@@ -67,6 +67,9 @@ TODO
   the documentations still apply, and write test code for this --- all of this 
   makes more sense once there is a choice of algorithms
 
+* Include test code for fmpz_poly_inv_series, once this method does anything 
+  better than aliasing fmpz_poly_inv_newton
+
 Maybe
 =====
 
