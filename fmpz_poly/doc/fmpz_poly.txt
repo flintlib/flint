@@ -995,6 +995,21 @@ void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     Computes the first n terms of the inverse power series of Q, 
     assuming Q has constant term 1 and n >= 1.
 
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B)
+
+    Divides {A, n} by {B, n} as power series over Z, assuming B has 
+    constant term 1 and n >= 1.
+
+    Only supports aliasing of {Q, n} and {B, n}.
+
+void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                         const fmpz_poly_t B, long n)
+
+    Performs power series division in Z[[t]].  The function considers 
+    the polynomials A and B as power series of length n starting with 
+    the constant terms.  The function assumes that B has constant 
+    term 1 and n >= 1.
+
 *******************************************************************************
 
     Pseudo division

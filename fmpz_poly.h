@@ -419,14 +419,19 @@ void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 static __inline__ void 
 _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, long n)
 {
-    _fmpz_poly_inv_series(Qinv, Q, n);
+    _fmpz_poly_inv_newton(Qinv, Q, n);
 }
 
 static __inline__ void 
 fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 {
-    fmpz_poly_inv_series(Qinv, Q, n);
+    fmpz_poly_inv_newton(Qinv, Q, n);
 }
+
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n);
+
+void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                         const fmpz_poly_t B, long n);
 
 /*  Pseudo division  *********************************************************/
 
