@@ -473,6 +473,18 @@ void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R,
     fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, B);
 }
 
+void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, long lenA, 
+                                                const fmpz * B, long lenB);
+
+void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B);
+
+void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, long lenA, 
+                                                const fmpz * B, long lenB);
+
+void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B);
+
 /*  Derivative  **************************************************************/
 
 void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len);

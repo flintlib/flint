@@ -70,6 +70,9 @@ TODO
 * Include test code for fmpz_poly_inv_series, once this method does anything 
   better than aliasing fmpz_poly_inv_newton
 
+* Sort out the fmpz_poly_pseudo_div and _rem code.  Currently this is just 
+  a hack to call fmpz_poly_pseudo_divrem
+
 Maybe
 =====
 
