@@ -264,6 +264,20 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+void _fmpq_poly_div(fmpz * Q, fmpz_t q,
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB);
+
+void fmpq_poly_div(fmpq_poly_t Q, 
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void _fmpq_poly_rem(fmpz * R, fmpz_t r,
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB);
+
+void fmpq_poly_rem(fmpq_poly_t R,
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
 /*  Derivative  **************************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
