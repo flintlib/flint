@@ -117,7 +117,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
     
     lenA = poly1->length;
     lenB = poly2->length;
-    lenR = lenB - 1L;
+    lenR = lenB - 1;
     
     fmpq_poly_fit_length(R, lenA);  /* XXX: Need at least that much space */
     

@@ -34,7 +34,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
                     const fmpz * A, const fmpz_t a, long lenA, 
                     const fmpz * B, const fmpz_t b, long lenB)
 {
-    long lenQ = lenA + (lenB - 1);
+    long lenQ = lenA - lenB + 1;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
@@ -114,7 +114,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
     
     lenA = poly1->length;
     lenB = poly2->length;
-    lenQ = lenA + (lenB - 1L);
+    lenQ = lenA - lenB + 1;
     
     fmpq_poly_fit_length(Q, lenQ);
     

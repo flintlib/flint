@@ -34,7 +34,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
                        const fmpz * A, const fmpz_t a, long lenA, 
                        const fmpz * B, const fmpz_t b, long lenB)
 {
-    long lenQ = lenA + (lenB - 1);
+    long lenQ = lenA - lenB + 1;
     long lenR = lenB - 1;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
@@ -162,8 +162,8 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     
     lenA = poly1->length;
     lenB = poly2->length;
-    lenQ = lenA + (lenB - 1L);
-    lenR = lenB - 1L;
+    lenQ = lenA - lenB + 1;
+    lenR = lenB - 1;
     
     fmpq_poly_fit_length(Q, lenQ);
     fmpq_poly_fit_length(R, lenA);  /* XXX: Need at least that much space */
