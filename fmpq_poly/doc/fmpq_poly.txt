@@ -249,6 +249,12 @@ void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
     Efficiently swaps the polynomials poly1 and poly2.
 
+void fmpq_poly_truncate(fmpq_poly_t poly, long n)
+
+    If the current length of poly is greater than n, it is truncated 
+    to the given length.  Discarded coefficients are not necessarily 
+    set to zero.
+
 *******************************************************************************
 
     Setting and getting coefficients
@@ -573,6 +579,40 @@ void fmpq_poly_rem(fmpq_poly_t R,
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Finds the remainder R of the Euclidean division of poly1 by poly2.
+
+*******************************************************************************
+
+    Power series division
+
+*******************************************************************************
+
+void _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long n)
+
+    Computes the first n terms of the inverse power series of poly using 
+    Newton iteration.
+
+    Assumes that n >= 1, that poly has length at least n and non-zero 
+    constant term.  Does not support aliasing.
+
+void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+
+    Computes the first n terms of the inverse power series of poly using 
+    Newton iteration, assuming that poly has non-zero constant term and 
+    n >= 1.
+
+void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long n)
+
+    Computes the first n terms of the inverse power series of poly.
+
+    Assumes that n >= 1, that poly has length at least n and non-zero 
+    constant term.  Does not support aliasing.
+
+void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+
+    Computes the first n terms of the inverse power series of poly, 
+    assuming that poly has non-zero constant term and n >= 1.
 
 *******************************************************************************
 
