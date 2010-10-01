@@ -32,60 +32,48 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
-                           const fmpz * B, long lenB)
+_fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
+                                  const fmpz * B, long lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iQ, iR;
+    fmpz_t q;
+
+    fmpz_init(q);
 
     if (R != A)
         _fmpz_vec_copy(R, A, lenA);
 
-    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
+    for ( ; lenA >= lenB; lenA--)
     {
-        if (fmpz_cmpabs(R + iR, leadB) < 0)
-            fmpz_zero(Q + iQ);
-        else
+        if (fmpz_cmpabs(R + lenA - 1, leadB) >= 0)
         {
-            fmpz_fdiv_q(Q + iQ, R + iR, leadB);
-            _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
+            fmpz_fdiv_q(q, R + lenA - 1, leadB);
+            _fmpz_vec_scalar_submul_fmpz(R + lenA - lenB, B, lenB, q);
         }
     }
+
+    fmpz_clear(q);
 }
 
 void
-fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
-                          const fmpz_poly_t A, const fmpz_poly_t B)
+fmpz_poly_rem_basecase(fmpz_poly_t R,
+                       const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenq, lenr;
-    fmpz *q, *r;
+    long lenr;
+    fmpz *r;
     
     if (B->length == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_divrem_basecase\n");
-        abort();
-    }
-    if (Q == R)
-    {
-        printf("Exception: output arguments Q and R may not be aliased\n");
+        printf("Exception: division by zero in fmpz_poly_rem_basecase\n");
         abort();
     }
     if (A->length < B->length)
     {
-        fmpz_poly_zero(Q);
         fmpz_poly_set(R, A);
         return;
     }
 
-    lenq = A->length - B->length + 1;
     lenr = A->length;
-    if (Q == A || Q == B)
-        q = _fmpz_vec_init(lenq);
-    else
-    {
-        fmpz_poly_fit_length(Q, lenq);
-        q = Q->coeffs;
-    }
     if (R == B)
         r = _fmpz_vec_init(lenr);
     else
@@ -94,18 +82,9 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
         r = R->coeffs;
     }
 
-    _fmpz_poly_divrem_basecase(q, r, A->coeffs, A->length,
-                                     B->coeffs, B->length);
+    _fmpz_poly_rem_basecase(r, A->coeffs, A->length,
+                               B->coeffs, B->length);
 
-    if (Q == A || Q == B)
-    {
-        _fmpz_vec_clear(Q->coeffs, Q->alloc);
-        Q->coeffs = q;
-        Q->alloc = lenq;
-        Q->length = lenq;
-    }
-    else
-        _fmpz_poly_set_length(Q, lenq);
     if (R == B)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
@@ -116,6 +95,5 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     else
         _fmpz_poly_set_length(R, lenr);
 
-    _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
 }

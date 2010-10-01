@@ -19,18 +19,62 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-long
-fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
+void
+_fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : 0L;
+    _fmpz_poly_rem_basecase(R, A, lenA, B, lenB);
+}
+
+void
+fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
+{
+    fmpz_poly_t tR;
+    fmpz *r;
+
+    if (B->length == 0)
+    {
+        printf("Exception: division by zero in fmpz_poly_rem\n");
+        abort();
+    }
+
+    if (A->length < B->length)
+    {
+        fmpz_poly_set(R, A);
+        return;
+    }
+
+    if (R == A || R == B)
+    {
+        fmpz_poly_init2(tR, A->length);
+        r = tR->coeffs;
+    }
+    else
+    {
+        fmpz_poly_fit_length(R, A->length);
+        r = R->coeffs;
+    }
+
+    _fmpz_poly_rem(r, A->coeffs, A->length, B->coeffs, B->length);
+
+    if (R == A || R == B)
+    {
+        _fmpz_poly_set_length(tR, A->length);
+        fmpz_poly_swap(tR, R);
+        fmpz_poly_clear(tR);
+    }
+    else
+        _fmpz_poly_set_length(R, A->length);
+
+    _fmpz_poly_normalise(R);
 }

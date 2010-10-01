@@ -30,19 +30,17 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r, 
-                       const fmpz * A, const fmpz_t a, long lenA, 
-                       const fmpz * B, const fmpz_t b, long lenB)
+void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
+                    const fmpz * A, const fmpz_t a, long lenA, 
+                    const fmpz * B, const fmpz_t b, long lenB)
 {
     long lenQ = lenA - lenB + 1;
-    long lenR = lenB - 1;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
     if (lenB == 1)
     {
         _fmpq_poly_scalar_div_mpq(Q, q, A, a, lenA, B, b);
-        fmpz_set_ui(r, 1);
         return;
     }
     
@@ -52,29 +50,19 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
        and thus
            {A, a} = {b * Q, a * lead^d} * {B, b} + {R, a * lead^d}.
      */
-    _fmpz_poly_pseudo_divrem(Q, R, &d, A, lenA, B, lenB);
+    _fmpz_poly_pseudo_div(Q, &d, A, lenA, B, lenB);
     
-    /* Determine the actual length of R */
-    for ( ; lenR != 0 && fmpz_is_zero(R + (lenR - 1)); lenR--) ;
-    
-    /* 1.  lead^d == +-1.  {Q, q} = {b Q, a}, {R, r} = {R, a} up to sign */
+    /* 1.  lead^d == +-1.  {Q, q} = {b Q, a} up to sign */
     if (d == 0UL || *lead == 1L || *lead == -1L)
     {
         fmpz_set_ui(q, 1);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
-        fmpz_set_ui(r, 1);
-        if (lenR > 0)
-            _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
-        
         if (*lead == -1L && d % 2UL)
-        {
             _fmpz_vec_neg(Q, Q, lenQ);
-            _fmpz_vec_neg(R, R, lenR);
-        }
     }
-    /* 2.  lead^d != +-1.  {Q, q} = {b Q, a lead^d}, {R, r} = {R, a lead^d} */
+    /* 2.  lead^d != +-1.  {Q, q} = {b Q, a lead^d} */
     else
     {
         /*
@@ -91,89 +79,49 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, den);
         
-        fmpz_set_ui(r, 1);
-        if (lenR > 0)
-            _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, den);
-        
         fmpz_clear(den);
     }
 }
 
-void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, 
+void fmpq_poly_div(fmpq_poly_t Q, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long lenA, lenB, lenQ, lenR;
+    long lenA, lenB, lenQ;
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception: division by zero in fmpq_poly_divrem\n");
+        printf("Exception: division by zero in fmpq_poly_div\n");
         abort();
     }
-    if (Q == R)
-    {
-        printf("Exception: output arguments aliased\n");
-        abort();
-    }
-    
-    /* Deal with the various other cases of aliasing. */
-    if (R == poly1 || R == poly2)
-    {
-        if (Q == poly1 || Q == poly2)
-        {
-            fmpq_poly_t tempQ, tempR;
-            fmpq_poly_init(tempQ);
-            fmpq_poly_init(tempR);
-            fmpq_poly_divrem(tempQ, tempR, poly1, poly2);
-            fmpq_poly_swap(Q, tempQ);
-            fmpq_poly_swap(R, tempR);
-            fmpq_poly_clear(tempQ);
-            fmpq_poly_clear(tempR);
-            return;
-        }
-        else
-        {
-            fmpq_poly_t tempR;
-            fmpq_poly_init(tempR);
-            fmpq_poly_divrem(Q, tempR, poly1, poly2);
-            fmpq_poly_swap(R, tempR);
-            fmpq_poly_clear(tempR);
-            return;
-        }
-    }
-    else
-    {
-        if (Q == poly1 || Q == poly2)
-        {
-            fmpq_poly_t tempQ;
-            fmpq_poly_init(tempQ);
-            fmpq_poly_divrem(tempQ, R, poly1, poly2);
-            fmpq_poly_swap(Q, tempQ);
-            fmpq_poly_clear(tempQ);
-            return;
-        }
-    }
-    
+
     if (poly1->length < poly2->length)
     {
         fmpq_poly_zero(Q);
-        fmpq_poly_set(R, poly1);
         return;
     }
+ 
+    /* Deal with aliasing */
+    if (Q == poly1 || Q == poly2)
+    {
+        fmpq_poly_t tempQ;
+        fmpq_poly_init(tempQ);
+        fmpq_poly_div(tempQ, poly1, poly2);
+        fmpq_poly_swap(Q, tempQ);
+        fmpq_poly_clear(tempQ);
+        return;
+    }
+    
     
     lenA = poly1->length;
     lenB = poly2->length;
     lenQ = lenA - lenB + 1;
-    lenR = lenB - 1;
     
     fmpq_poly_fit_length(Q, lenQ);
-    fmpq_poly_fit_length(R, lenA);  /* XXX: Need at least that much space */
     
-    _fmpq_poly_divrem(Q->coeffs, Q->den, R->coeffs, R->den, 
-                      poly1->coeffs, poly1->den, poly1->length, 
-                      poly2->coeffs, poly2->den, poly2->length);
+    _fmpq_poly_div(Q->coeffs, Q->den, 
+                   poly1->coeffs, poly1->den, poly1->length, 
+                   poly2->coeffs, poly2->den, poly2->length);
     
     _fmpq_poly_set_length(Q, lenQ);
-    _fmpq_poly_set_length(R, lenR);
-    _fmpq_poly_normalise(R);
 }
 

@@ -249,6 +249,12 @@ void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
     Efficiently swaps the polynomials poly1 and poly2.
 
+void fmpq_poly_truncate(fmpq_poly_t poly, long n)
+
+    If the current length of poly is greater than n, it is truncated 
+    to the given length.  Discarded coefficients are not necessarily 
+    set to zero.
+
 *******************************************************************************
 
     Setting and getting coefficients
@@ -534,14 +540,79 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     Finds the quotient {Q, q} and remainder {R, r} of the Euclidean 
     division of {A, a} by {B, b}.
     
-    Assumes that lenA >= lenB > 0.  Supports no aliasing between the two 
-    outputs, or between the inputs and the outputs.
+    Assumes that lenA >= lenB > 0.  Assumes that R has space for lenA 
+    coefficients, although only the bottom lenB - 1 will carry meaningful 
+    data on exit.  Supports no aliasing between the two outputs, or 
+    between the inputs and the outputs.
 
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Finds the quotient Q and remainder R of the Euclidean division of poly1 
     by poly2.
+
+void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB)
+
+    Finds the quotient {Q, q} of the Euclidean division of {A, a} by {B, b}.
+    
+    Assumes that lenA >= lenB > 0.  Supports no aliasing between the 
+    inputs and the outputs.
+
+void fmpq_poly_div(fmpq_poly_t Q, 
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+    Finds the quotient Q and remainder R of the Euclidean division of poly1 
+    by poly2.
+
+void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB)
+
+    Finds the remainder {R, r} of the Euclidean division of {A, a} by {B, b}.
+    
+    Assumes that lenA >= lenB > 0.  Supports no aliasing between the inputs 
+    and the outputs.
+
+void fmpq_poly_rem(fmpq_poly_t R, 
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+
+    Finds the remainder R of the Euclidean division of poly1 by poly2.
+
+*******************************************************************************
+
+    Power series division
+
+*******************************************************************************
+
+void _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long n)
+
+    Computes the first n terms of the inverse power series of poly using 
+    Newton iteration.
+
+    Assumes that n >= 1, that poly has length at least n and non-zero 
+    constant term.  Does not support aliasing.
+
+void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+
+    Computes the first n terms of the inverse power series of poly using 
+    Newton iteration, assuming that poly has non-zero constant term and 
+    n >= 1.
+
+void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long n)
+
+    Computes the first n terms of the inverse power series of poly.
+
+    Assumes that n >= 1, that poly has length at least n and non-zero 
+    constant term.  Does not support aliasing.
+
+void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+
+    Computes the first n terms of the inverse power series of poly, 
+    assuming that poly has non-zero constant term and n >= 1.
 
 *******************************************************************************
 

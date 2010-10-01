@@ -63,6 +63,16 @@ TODO
   fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
   functionality.  Once this has been done, also include test code for these
 
+* Improve the implementations of fmpz_poly_divrem, _div, and _rem, check that 
+  the documentations still apply, and write test code for this --- all of this 
+  makes more sense once there is a choice of algorithms
+
+* Include test code for fmpz_poly_inv_series, once this method does anything 
+  better than aliasing fmpz_poly_inv_newton
+
+* Sort out the fmpz_poly_pseudo_div and _rem code.  Currently this is just 
+  a hack to call fmpz_poly_pseudo_divrem
+
 Maybe
 =====
 

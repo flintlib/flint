@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -165,7 +166,7 @@ void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
 void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 
-    Sets {res, n} to the reverse of {poly, len}, where poly is in fact 
+    Sets {res, n} to the reverse of {poly, n}, where poly is in fact 
     an array of length len.  Assumes that 0 < len <= n.  Supports aliasing 
     of res and poly, but the behaviour is undefined in case of partial 
     overlap.
@@ -377,8 +378,9 @@ void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}.  Assumes len1 and len2 are positive.  Allows zero-padding 
+    of the two input polynomials. 
     No aliasing of inputs with outputs is allowed.
 
 void fmpz_poly_mul_classical(fmpz_poly_t res, 
@@ -426,17 +428,18 @@ void fmpz_poly_mulmid_classical(fmpz_poly_t res,
     poly1 * poly, i.e. the coefficient from degree len2 - 1 to len1 - 1 
     inclusive. Assumes that len1 >= len2.
 
+void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, long len1, 
+                                                 const fmpz * poly2, long len2)
+
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}. Assumes len1 >= len2 > 0.  Allows zero-padding of the two 
+    input polynomials.
+    No aliasing of inputs with outputs is allowed.
+
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets res to poly1 multiplied by poly2.
-
-void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, long len1, 
-                                                 const fmpz * poly2, long len2)
-
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                                  const fmpz * poly2, long len)
@@ -469,9 +472,10 @@ void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
 void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}. Places no assumptions on len1 and len2. Allows 
+    zero-padding of the two input polynomials. Supports aliasing of 
+    inputs and outputs.
 
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -496,9 +500,9 @@ void fmpz_poly_mullow_KS(fmpz_poly_t res,
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} multiplied by {poly2, len2}. Assumes res has 
-    space for len1 + len2 - 1 coefficients and neither len1 nor len2 are zero. 
-    No aliasing of inputs with outputs is allowed. Also assumes len1 >= len2.
+    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
+    {poly2, len2}.  Assumes len1 >= len2 > 0.  Allows zero-padding of 
+    the two input polynomials.
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
@@ -670,16 +674,18 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Computes the greatest common divisor res of {poly1, len1} and 
-    {poly2, len2}, assuming len1 >= len2 > 0.  The result is normalised to 
-    have positive leading coefficient.  Assumes that res has space for 
-    len2 coefficients.  Aliasing between res, poly1 and poly2 is supported.
+    Computes the greatest common divisor {res, len2} of {poly1, len1} and 
+    {poly2, len2}, assuming len1 >= len2 > 0. The result is normalised to 
+    have positive leading coefficient. Aliasing between res, poly1 and poly2 
+    is supported.
 
 void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
     Computes the greatest common divisor res of poly1 and poly2, normalised 
     to have non-negative leading coefficient.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.1.
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
@@ -695,6 +701,28 @@ void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     Computes the greatest common divisor res of poly1 and poly2, normalised 
     to have non-negative leading coefficient.
+
+void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2)
+
+    Sets res to the resultant of {poly1, len1} and {poly2, len2}, assuming 
+    that len1 >= len2 > 0.
+
+void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
+                                     const fmpz_poly_t poly2)
+
+    Computes the resultant of poly1 and poly2.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \[
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y)
+    \]
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.7.
 
 *******************************************************************************
 
@@ -734,13 +762,14 @@ void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 void _fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
 
-    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
-    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
-    coefficient of B is +/-1 or the division is exact, this is the same thing 
-    as division over Q. No aliasing of input and output operands is allowed. 
-    Assumes that lenB > 0.
-    
-    Allows R == NULL in case the remainder is not required.
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that A = B*Q + R and each 
+    coefficient of R beyond lenB is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this is 
+    the same thing as division over Q.
+
+    Assumes that lenA, lenB > 0.  Allows zero-padding in {A, lenA}.  
+    R and A may be aliased, but apart from this no aliasing of input and 
+    output operands is allowed.
 
 void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
@@ -750,33 +779,31 @@ void fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     coefficient of B is +/-1 or the division is exact, this is the same thing 
     as division over Q. An exception is raised if B is zero.
 
-void _fmpz_poly_div_basecase(fmpz * Q, const fmpz * A, long A_len,
-                                                    const fmpz * B, long B_len)
+void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
+                                    const fmpz * A, const fmpz * B, long lenB)
 
-    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
-    B->length - 1 is reduced mod the leading coefficient of B, but discard the 
-    remainder R. If the leading coefficient of B is +/-1 or the division is 
-    exact, this is the same thing as division over Q. No aliasing of input and 
-    output operands is allowed. An exception is raised if B->length == 0.
+    Computes {Q, lenB}, {BQ, 2 lenB - 1} such that BQ = B*Q and A = BQ + R 
+    where each coefficient of R beyond lenB - 1 is reduced mod the leading 
+    coefficient of B. We assume that lenA = 2 lenB - 1. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same 
+    thing as division over Q.
 
-void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, 
-                                    const fmpz * A, const fmpz * B, long B_len)
+    Assumes lenB > 0. Allows zero-padding in {A, lenA}. Requires a temporary 
+    array {W, 2 lenB - 1}. No aliasing of input and output operands is allowed.
 
-    Computes Q, BQ such that BQ = B*Q and A = BQ + R for some R where each 
-    coefficient of R beyond B->length - 1 is reduced mod the leading 
-    coefficient of B. We assume that A->length = 2*B->length - 1. If the 
-    leading coefficient of B is +/-1 or the division is exact, this is the 
-    same thing as division over Q. No aliasing of input and output operands 
-    is allowed. An exception is raised if B_len == 0.
+    This function does not read the bottom lenB - 1 coefficients from A, which 
+    means that they might not even need to exist in allocated memory.
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                        const fmpz * A, long A_len, const fmpz * B, long B_len)
+                        const fmpz * A, long lenB, const fmpz * B, long lenB)
 
-    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
-    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
-    coefficient of B is +/-1 or the division is exact, this is the same thing 
-    as division over Q. No aliasing of input and output operands is allowed. 
-    An exception is raised if B_len == 0.
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that A = B*Q + R and each 
+    coefficient of R beyond lenB - 1 is reduced mod the leading coefficient 
+    of B. If the leading coefficient of B is +/-1 or the division is exact, 
+    this is the same thing as division over Q.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
+    of input and output operands is allowed.
 
 void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
@@ -784,7 +811,204 @@ void fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
     B->length - 1 is reduced mod the leading coefficient of B. If the leading 
     coefficient of B is +/-1 or the division is exact, this is the same thing 
-    as division over Q. An exception is raised if B->length == 0.
+    as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA, 
+                                           const fmpz * B, long lenB)
+
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that A = B*Q + R and each 
+    coefficient of R beyond lenB - 1 is reduced mod the leading coefficient 
+    of B. If the leading coefficient of B is +/-1 or the division is exact, 
+    this is the same thing as division over Q.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
+    of input and output operands is allowed.
+
+void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B)
+
+    Computes Q, R such that A = B*Q + R and each coefficient of R beyond 
+    B->length - 1 is reduced mod the leading coefficient of B. If the leading 
+    coefficient of B is +/-1 or the division is exact, this is the same thing 
+    as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
+                                                     const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} divided by 
+    {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q.
+
+    Assumes lenA, lenB > 0. Allows zero-padding in {A, lenA}. Requires a 
+    temporary array R of size at least the (actual) length of A. For 
+    convenience, R may be NULL. R and A may be aliased, but apart from this 
+    no aliasing of input and output operands is allowed.
+
+void fmpz_poly_div_basecase(fmpz_poly_t Q, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the quotient Q of A divided by Q.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
+                                    const fmpz * A, const fmpz * B, long lenB)
+
+    Divide and conquer division of {A, 2 lenB - 1} by {B, lenB}, computing 
+    only the bottom lenB - 1 coefficients of Q*B.
+
+    Assumes lenB > 0.  Requires QB to have length at least 2 lenB - 1, 
+    although only the bottom lenB - 1 will carry meaningful output.  Does 
+    not support any aliasing.  Allows zero-padding in A, but not in B.
+
+void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
+                                    const fmpz * A, const fmpz * B, long lenB)
+
+    Recursive short division in the balanced case.
+
+    Computes the quotient {Q, lenB} of {A, 2 lenB - 1} upon division 
+    by {B, lenB}.  Requires lenB > 0.  Needs a temporary array temp 
+    of length 2 lenB - 1.  Does not support any aliasing.
+
+    See Thom Mulders, On Short Multiplications and Divisions.
+
+void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
+                                         const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} upon division by 
+    {B, lenB}.  Assumes that lenA >= lenB > 0.  Does not support aliasing.
+
+fmpz_poly_div_divconquer(fmpz_poly_t Q, 
+                         const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the quotient Q of A divided by Q.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_div(fmpz * Q, const fmpz * A, long lenA,
+                              const fmpz * B, long lenB)
+
+    Computes the quotient {Q, lenA - lenB + 1} of {A, lenA} divided by 
+    {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. Aliasing of 
+    input and output operands is not allowed.
+
+void fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the quotient Q of A divided by Q.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. 
+    If the leading coefficient of B is +/-1 or the division is exact, this 
+    is the same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA, 
+                                       const fmpz * B, long lenB)
+
+    Computes the remainder {R, lenA} of {A, lenA} upon division by {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. If the 
+    leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q.
+
+    Assumes that lenA, lenB > 0.  Allows zero-padding in {A, lenA}.  R and A 
+    may be aliased, but apart from this no aliasing of input and output 
+    operands is allowed.
+
+void fmpz_poly_rem_basecase(fmpz_poly_t R, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the remainder R of A upon division by B.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. If 
+    the leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q. An exception is raised if B is zero.
+
+void _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, 
+                              const fmpz * B, long lenB)
+
+    Computes the remainder {R, lenA} of {A, lenA} upon division by {B, lenB}.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond lenB - 1 is reduced mod the leading coefficient of B. If the 
+    leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q.
+
+    Assumes that lenA >= lenB > 0. Allows zero-padding in {A, lenA}. Aliasing 
+    of input and output operands is not allowed.
+
+void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes the remainder R of A upon division by B.
+
+    Notationally, computes Q, R such that A = B*Q + R and each coefficient 
+    of R beyond B->length - 1 is reduced mod the leading coefficient of B. If 
+    the leading coefficient of B is +/-1 or the division is exact, this is the 
+    same thing as division over Q. An exception is raised if B is zero.
+
+*******************************************************************************
+
+    Power series division
+
+*******************************************************************************
+
+void _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
+
+    Computes the first n terms of the inverse power series of Q using 
+    Newton iteration.
+
+    Assumes that n >= 1, that Q has length at least n and constant term 1.
+    Does not support aliasing.
+
+void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+
+    Computes the first n terms of the inverse power series of Q using 
+    Newton iteration, assuming that Q has constant term 1 and n >= 1.
+
+void _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, long n)
+
+    Computes the first n terms of the inverse power series of Q.
+
+    Assumes that n >= 1, that Q has length at least n and constant term 1.
+    Does not support aliasing.
+
+void fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+
+    Computes the first n terms of the inverse power series of Q, 
+    assuming Q has constant term 1 and n >= 1.
+
+void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B)
+
+    Divides {A, n} by {B, n} as power series over Z, assuming B has 
+    constant term 1 and n >= 1.
+
+    Only supports aliasing of {Q, n} and {B, n}.
+
+void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
+                                         const fmpz_poly_t B, long n)
+
+    Performs power series division in Z[[t]].  The function considers 
+    the polynomials A and B as power series of length n starting with 
+    the constant terms.  The function assumes that B has constant 
+    term 1 and n >= 1.
 
 *******************************************************************************
 
@@ -808,6 +1032,23 @@ void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
 
     If L is the leading coefficient of B, then computes Q, R such that 
     L^d*A = QB + R. This function is used for simulating division over QQ. 
+
+void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                          const fmpz * A, long lenB, const fmpz * B, long lenB)
+
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that L^d A = B*Q + R, only 
+    taking the bottom lenB - 1 coefficients of R into account.  The remaining 
+    top coefficients of {R, lenA} may be arbitrary.
+
+    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
+    of input and output operands is allowed.
+
+void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
+                           ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes Q, R, and d such that L^d A = B*Q + R, where R has length less 
+    than the length of B and L is the leading coefficient of B.  An exception 
+    is raised if B is zero.
 
 void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
@@ -843,11 +1084,52 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
     Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
     the value of d is fixed at the maximum of 0 and A->length - B->length + 1.
-    
+
     This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
     is not asymptotically fast.  It is efficient only for short polynomials, 
     e.g. when B->length < 32.
+
+    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.1.2.
+
+void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
+                                          long lenA, const fmpz * B, long lenB)
+
+    If L is the leading coefficient of B, then computes {Q, lenA - lenB + 1}, 
+    {R, lenB - 1} and d such that L^d * A = QB + R. This function is used for 
+    simulating division over QQ. 
+
+    Assumes that lenA >= lenB > 0.  Assumes that Q can fit lenA - lenB + 1 
+    coefficients, and that R can fit lenA coefficients, although on exit only 
+    the bottom lenB coefficients will carry meaningful data.
+
+    Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
+    no aliasing of the inputs and outputs is suppported.
+
+void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, 
+                                      const fmpz_poly_t A, const fmpz_poly_t B)
+
+    Computes Q, R, and d such that lead(B)^d * A = B * Q + R.
+
+void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, long lenA, 
+                                                const fmpz * B, long lenB)
+
+    Pseudo-division, only returning the quotient.
+
+void fmpz_poly_pseudo_div(fmpz_poly_t Q, ulong * d, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B)
+
+    Pseudo-division, only returning the quotient.
+
+void _fmpz_poly_pseudo_rem(fmpz * R, ulong * d, const fmpz * A, long lenA, 
+                                                const fmpz * B, long lenB)
+
+    Pseudo-division, only returning the remainder.
+
+void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A, 
+                                                    const fmpz_poly_t B)
+
+    Pseudo-division, only returning the remainder.
 
 *******************************************************************************
 

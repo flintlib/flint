@@ -32,8 +32,5 @@
 ulong
 fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
 {
-    if (n < poly->length)
-        return fmpz_get_ui(poly->coeffs + n);
-    else
-        return 0UL;
+    return (n < poly->length) ? fmpz_get_ui(poly->coeffs + n) : 0UL;
 }

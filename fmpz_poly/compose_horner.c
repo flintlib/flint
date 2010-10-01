@@ -33,14 +33,14 @@ void
 _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2)
 {
-    if (len1 == 1L)
+    if (len1 == 1)
     {
         fmpz_set(res, poly1);
     }
     else
     {
-        long i = len1 - 1L, lenr;
-        const long alloc = ((len1 - 1L) * (len2 - 1L) + 1L);
+        long i = len1 - 1, lenr;
+        const long alloc = (len1 - 1) * (len2 - 1) + 1;
         fmpz * t = _fmpz_vec_init(alloc);
         
         /*
@@ -53,12 +53,12 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
             i--;
             fmpz_add(res, res, poly1 + i);
         }
-        while (i > 0L)
+        while (i > 0)
         {
             i--;
             _fmpz_poly_mul(t, res, lenr, poly2, len2);
-            lenr += len2 - 1L;
-            _fmpz_poly_add(res, t, lenr, poly1 + i, 1L);
+            lenr += len2 - 1;
+            _fmpz_poly_add(res, t, lenr, poly1 + i, 1);
         }
         
         _fmpz_vec_clear(t, alloc);
@@ -80,10 +80,7 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
     }
     if (len1 == 1 || len2 == 0)
     {
-        fmpz_poly_fit_length(res, 1);
-        fmpz_set(res->coeffs, poly1->coeffs);
-        _fmpz_poly_set_length(res, 1);
-        _fmpz_poly_normalise(res);
+        fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
     }
     

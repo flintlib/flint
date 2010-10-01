@@ -58,16 +58,13 @@ fmpz_poly_compose(fmpz_poly_t res,
     }
     if (len1 == 1 || len2 == 0)
     {
-        fmpz_poly_fit_length(res, 1);
-        fmpz_set(res->coeffs, poly1->coeffs);
-        _fmpz_poly_set_length(res, 1);
-        _fmpz_poly_normalise(res);
+        fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
     }
     
     lenr = (len1 - 1) * (len2 - 1) + 1;
     
-    if ((res != poly1) && (res != poly2))
+    if (res != poly1 && res != poly2)
     {
         fmpz_poly_fit_length(res, lenr);
         _fmpz_poly_compose(res->coeffs, poly1->coeffs, len1, 

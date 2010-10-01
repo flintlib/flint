@@ -37,32 +37,37 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-    printf("divrem_divconquer....");
+    printf("pseudo_divrem_divconquer....");
     fflush(stdout);
 
     fmpz_poly_randinit(state);
 
-    /* Check q*b + r = a, no aliasing */
+    /* Check q*b + r = l(b)^d a, no aliasing */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, q, r, prod;
+        fmpz_t p;
+        ulong d;
 
+        fmpz_init(p);
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(100), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
 
-        fmpz_poly_divrem_divconquer(q, r, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
         fmpz_poly_mul(prod, q, b);
         fmpz_poly_add(prod, prod, r);
+        fmpz_pow_ui(p, b->coeffs + b->length - 1, d);
+        fmpz_poly_scalar_mul_fmpz(a, a, p);
 
         result = (fmpz_poly_equal(a, prod));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (check qb + r = l(b)^d a):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(prod), printf("\n\n");
             fmpz_poly_print(q), printf("\n\n");
@@ -70,6 +75,7 @@ main(void)
             abort();
         }
 
+        fmpz_clear(p);
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
         fmpz_poly_clear(q);
@@ -78,24 +84,25 @@ main(void)
     }
 
     /* Check r and a alias */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
+        ulong d;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
 
-        fmpz_poly_divrem_divconquer(q, r, a, b);
-        fmpz_poly_divrem_divconquer(q, a, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, a, &d, a, b);
 
         result = (fmpz_poly_equal(a, r));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias r and a):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(q), printf("\n\n");
             fmpz_poly_print(r), printf("\n\n");
@@ -109,24 +116,25 @@ main(void)
     }
 
     /* Check r and b alias */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
+        ulong d;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
 
-        fmpz_poly_divrem_divconquer(q, r, a, b);
-        fmpz_poly_divrem_divconquer(q, b, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, b, &d, a, b);
 
         result = (fmpz_poly_equal(b, r));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias r and b):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(q), printf("\n\n");
             fmpz_poly_print(r), printf("\n\n");
@@ -140,24 +148,24 @@ main(void)
     }
 
     /* Check q and a alias */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
-
+        ulong d;
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
 
-        fmpz_poly_divrem_divconquer(q, r, a, b);
-        fmpz_poly_divrem_divconquer(a, r, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(a, r, &d, a, b);
 
         result = (fmpz_poly_equal(a, q));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias q and a):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(q), printf("\n\n");
             fmpz_poly_print(r), printf("\n\n");
@@ -171,24 +179,25 @@ main(void)
     }
 
     /* Check q and b alias */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
+        ulong d;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
 
-        fmpz_poly_divrem_divconquer(q, r, a, b);
-        fmpz_poly_divrem_divconquer(b, r, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
+        fmpz_poly_pseudo_divrem_divconquer(b, r, &d, a, b);
 
         result = (fmpz_poly_equal(b, q));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias q and b):\n");
             fmpz_poly_print(a), printf("\n\n");
             fmpz_poly_print(q), printf("\n\n");
             fmpz_poly_print(r), printf("\n\n");

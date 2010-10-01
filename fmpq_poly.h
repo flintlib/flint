@@ -133,6 +133,19 @@ void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2);
 
+static __inline__ 
+void fmpq_poly_truncate(fmpq_poly_t poly, long n)
+{
+    if (poly->length > n)
+    {
+        long i;
+        for (i = n; i < poly->length; i++)
+            _fmpz_demote(poly->coeffs + i);
+        poly->length = n;
+        fmpq_poly_canonicalise(poly);
+    }
+}
+
 /*  Getting and setting coefficients  ****************************************/
 
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n);
@@ -263,6 +276,40 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
 
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void _fmpq_poly_div(fmpz * Q, fmpz_t q,
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB);
+
+void fmpq_poly_div(fmpq_poly_t Q, 
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+void _fmpq_poly_rem(fmpz * R, fmpz_t r,
+                       const fmpz * A, const fmpz_t a, long lenA,
+                       const fmpz * B, const fmpz_t b, long lenB);
+
+void fmpq_poly_rem(fmpq_poly_t R,
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2);
+
+/*  Power series division  ***************************************************/
+
+void _fmpq_poly_inv_newton(fmpz * Qinv, fmpz_t Qinvden, 
+                           const fmpz * Q, const fmpz_t Qden, long n);
+
+void fmpq_poly_inv_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n);
+
+static __inline__ void 
+_fmpq_poly_inv_series(fmpz * Qinv, fmpz_t Qinvden, 
+                      const fmpz * Q, const fmpz_t Qden, long n)
+{
+    _fmpq_poly_inv_newton(Qinv, Qinvden, Q, Qden, n);
+}
+
+static __inline__ void 
+fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n)
+{
+    fmpq_poly_inv_newton(Qinv, Q, n);
+}
 
 /*  Derivative  **************************************************************/
 

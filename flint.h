@@ -81,7 +81,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define mpn_zero(xxx, nnn) \
     do \
     { \
-        ulong ixxx; \
+        long ixxx; \
         for (ixxx = 0; ixxx < nnn; ixxx++) \
             (xxx)[ixxx] = 0UL; \
     } while (0)
@@ -90,7 +90,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define mpn_store(xxx, nnn, yyy) \
    do \
    { \
-      ulong ixxx; \
+      long ixxx; \
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)

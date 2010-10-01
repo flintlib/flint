@@ -35,14 +35,14 @@ void
 _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
                      const fmpz * poly2, long len2, long trunc)
 {
-    int neg1 = 0, neg2 = 0;
+    int neg1, neg2;
     long limbs1, limbs2, loglen;
     long bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
     long sign = 0;
 
-    for (len1--; len1 >= 0 && !(neg1 = fmpz_sgn(poly1 + len1)); len1--) ;
-    for (len2--; len2 >= 0 && !(neg2 = fmpz_sgn(poly2 + len2)); len2--) ;
+    for (len1--; len1 >= 0 && !poly1[len1]; len1--) ;
+    for (len2--; len2 >= 0 && !poly2[len2]; len2--) ;
     len1++;
     len2++;
 
@@ -52,16 +52,14 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
         return;
     }
 
+    neg1 = (fmpz_sgn(poly1 + len1 - 1) > 0) ? 0 : -1;
+    neg2 = (fmpz_sgn(poly2 + len2 - 1) > 0) ? 0 : -1;
+
     if (trunc > len1 + len2 - 1)
     {
        _fmpz_vec_zero(res + len1 + len2 - 1, trunc - len1 - len2 + 1);
        trunc = len1 + len2 - 1;
     }
-    
-    if (neg1 > 0)
-        neg1 = 0;
-    if (neg2 > 0)
-        neg2 = 0;
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
     if (bits1 < 0)
