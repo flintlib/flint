@@ -220,11 +220,11 @@ void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_mul_classical(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
-void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
-                      long len1, const fmpz * poly2, long len2, long trunc);
+void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, long len1, 
+                                     const fmpz * poly2, long len2, long n);
 
-void fmpz_poly_mullow_classical(fmpz_poly_t res, 
-              const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc);
+void fmpz_poly_mullow_classical(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                           const fmpz_poly_t poly2, long n);
 
 void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, 
                       long len1, const fmpz * poly2, long len2, long start);
@@ -245,10 +245,10 @@ void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
                                   long len1, const fmpz * poly2, long len2);
 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
-                                              const fmpz * poly2, long len);
+                                                const fmpz * poly2, long n);
 
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
-             const fmpz_poly_t poly1, const fmpz_poly_t poly2, long length);
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
 
 void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                               const fmpz * poly2, long len);
@@ -263,10 +263,10 @@ void fmpz_poly_mul_KS(fmpz_poly_t res,
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1, 
-                                 const fmpz * poly2, long len2, long trunc);
+                                     const fmpz * poly2, long len2, long n);
 
-void fmpz_poly_mullow_KS(fmpz_poly_t res, 
-              const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc);
+void fmpz_poly_mullow_KS(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                           const fmpz_poly_t poly2, long n);
 
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
                                   long len1, const fmpz * poly2, long len2);
@@ -275,10 +275,10 @@ void fmpz_poly_mul(fmpz_poly_t res,
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, 
-                                            const fmpz * poly2, long trunc);
+                                                const fmpz * poly2, long n);
 
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
-              const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc);
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);

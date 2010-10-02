@@ -30,14 +30,13 @@
 #include "fmpz_poly.h"
 
 /*
-   Assumes poly1 and poly2 are not length 0 and 0 < trunc <= len1 + len2 - 1.
+   Assumes poly1 and poly2 are not length 0 and 0 < n <= len1 + len2 - 1.
  */
 void
-_fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
-                            long len1, const fmpz * poly2, long len2,
-                            long trunc)
+_fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, long len1, 
+                                        const fmpz * poly2, long len2, long n)
 {
-    if ((len1 == 1 && len2 == 1) || trunc == 1) /* Special case if the length of output is 1 */
+    if ((len1 == 1 && len2 == 1) || n == 1) /* Special case if the length of output is 1 */
     {
         fmpz_mul(res, poly1, poly2);
     }
@@ -46,54 +45,53 @@ _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1,
         long i;
 
         /* Set res[i] = poly1[i]*poly2[0] */
-        _fmpz_vec_scalar_mul_fmpz(res, poly1, FLINT_MIN(len1, trunc), poly2);
+        _fmpz_vec_scalar_mul_fmpz(res, poly1, FLINT_MIN(len1, n), poly2);
 
         /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        if (trunc > len1)
-            _fmpz_vec_scalar_mul_fmpz(res + len1, poly2 + 1, trunc - len1,
+        if (n > len1)
+            _fmpz_vec_scalar_mul_fmpz(res + len1, poly2 + 1, n - len1,
                                       poly1 + len1 - 1);
 
         /* out[i+j] += in1[i]*in2[j] */
-        for (i = 0; i < FLINT_MIN(len1, trunc) - 1; i++)
+        for (i = 0; i < FLINT_MIN(len1, n) - 1; i++)
             _fmpz_vec_scalar_addmul_fmpz(res + i + 1, poly2 + 1,
-                                         FLINT_MIN(len2, trunc - i) - 1,
+                                         FLINT_MIN(len2, n - i) - 1, 
                                          poly1 + i);
     }
 }
 
 void
-fmpz_poly_mullow_classical(fmpz_poly_t res,
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                           long trunc)
+fmpz_poly_mullow_classical(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                            const fmpz_poly_t poly2, long n)
 {
     long len_out;
 
-    if (poly1->length == 0 || poly2->length == 0 || trunc == 0)
+    if (poly1->length == 0 || poly2->length == 0 || n == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
     len_out = poly1->length + poly2->length - 1;
-    if (trunc > len_out)
-        trunc = len_out;
+    if (n > len_out)
+        n = len_out;
 
     if (res == poly1 || res == poly2)
     {
-        fmpz_poly_t temp;
-        fmpz_poly_init2(temp, trunc);
-        _fmpz_poly_mullow_classical(temp->coeffs, poly1->coeffs, poly1->length,
-                                    poly2->coeffs, poly2->length, trunc);
-        fmpz_poly_swap(res, temp);
-        fmpz_poly_clear(temp);
+        fmpz_poly_t t;
+        fmpz_poly_init2(t, n);
+        _fmpz_poly_mullow_classical(t->coeffs, poly1->coeffs, poly1->length,
+                                    poly2->coeffs, poly2->length, n);
+        fmpz_poly_swap(res, t);
+        fmpz_poly_clear(t);
     }
     else
     {
-        fmpz_poly_fit_length(res, trunc);
+        fmpz_poly_fit_length(res, n);
         _fmpz_poly_mullow_classical(res->coeffs, poly1->coeffs, poly1->length,
-                                    poly2->coeffs, poly2->length, trunc);
+                                    poly2->coeffs, poly2->length, n);
     }
 
-    _fmpz_poly_set_length(res, trunc);
+    _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 }

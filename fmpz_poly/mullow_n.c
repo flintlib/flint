@@ -25,7 +25,6 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -35,9 +34,9 @@
 void
 _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
 {
-    long limbs1, limbs2, max_limbs;
+    mp_size_t limbs1, limbs2;
 
-    if (n <= 4)
+    if (n < 7)
     {
         _fmpz_poly_mullow_classical(res, poly1, n, poly2, n, n);
         return;
@@ -45,9 +44,8 @@ _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
 
     limbs1 = _fmpz_vec_max_limbs(poly1, n);
     limbs2 = _fmpz_vec_max_limbs(poly2, n);
-    max_limbs = FLINT_MAX(limbs1, limbs2);
 
-    if (max_limbs > 3 && n < 20)
+    if (n < 25 && (limbs1 > 12 || limbs2 > 12))
         _fmpz_poly_mullow_karatsuba_n(res, poly1, poly2, n);
     else
         _fmpz_poly_mullow_KS(res, poly1, n, poly2, n, n);
@@ -56,13 +54,13 @@ _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, long n)
 void
 fmpz_poly_mullow_n(fmpz_poly_t res,
                    const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                   long trunc)
+                   long n)
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
     fmpz *copy1, *copy2;
 
-    if (len1 == 0 || len2 == 0 || trunc == 0)
+    if (len1 == 0 || len2 == 0 || n == 0)
     {
         fmpz_poly_zero(res);
         return;
@@ -71,32 +69,40 @@ fmpz_poly_mullow_n(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init2(t, trunc);
-        fmpz_poly_mullow_n(t, poly1, poly2, trunc);
+        fmpz_poly_init2(t, n);
+        fmpz_poly_mullow_n(t, poly1, poly2, n);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
         return;
     }
 
     copy1 = poly1->coeffs;
-    if (len1 < trunc)
+    if (len1 < n)
     {
-        copy1 = (fmpz *) calloc(trunc, sizeof(fmpz));
-        memcpy(copy1, poly1->coeffs, len1 * sizeof(fmpz));
+        long i;
+        copy1 = (fmpz *) malloc(n * sizeof(fmpz));
+        for (i = 0; i < len1; i++)
+            copy1[i] = poly1->coeffs[i];
+        for ( ; i < n; i++)
+            copy1[i] = 0;
     }
     copy2 = (poly1 == poly2) ? copy1 : poly2->coeffs;
-    if (poly1 != poly2 && len2 < trunc)
+    if (poly1 != poly2 && len2 < n)
     {
-        copy2 = (fmpz *) calloc(trunc, sizeof(fmpz));
-        memcpy(copy2, poly2->coeffs, len2 * sizeof(fmpz));
+        long i;
+        copy2 = (fmpz *) malloc(n * sizeof(fmpz));
+        for (i = 0; i < len2; i++)
+            copy2[i] = poly2->coeffs[i];
+        for ( ; i < n; i++)
+            copy2[i] = 0;
     }
 
-    fmpz_poly_fit_length(res, trunc);
+    fmpz_poly_fit_length(res, n);
     if (len1 >= len2)
-        _fmpz_poly_mullow_n(res->coeffs, copy1, copy2, trunc);
+        _fmpz_poly_mullow_n(res->coeffs, copy1, copy2, n);
     else
-        _fmpz_poly_mullow_n(res->coeffs, copy2, copy1, trunc);
-    _fmpz_poly_set_length(res, trunc);
+        _fmpz_poly_mullow_n(res->coeffs, copy2, copy1, n);
+    _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 
     if (copy1 != poly1->coeffs)

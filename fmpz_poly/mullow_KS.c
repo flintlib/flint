@@ -33,7 +33,7 @@
 
 void
 _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
-                     const fmpz * poly2, long len2, long trunc)
+                                 const fmpz * poly2, long len2, long n)
 {
     int neg1, neg2;
     long limbs1, limbs2, loglen;
@@ -48,17 +48,17 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
     if (!len1 | !len2)
     {
-        _fmpz_vec_zero(res, trunc);
+        _fmpz_vec_zero(res, n);
         return;
     }
 
     neg1 = (fmpz_sgn(poly1 + len1 - 1) > 0) ? 0 : -1;
     neg2 = (fmpz_sgn(poly2 + len2 - 1) > 0) ? 0 : -1;
 
-    if (trunc > len1 + len2 - 1)
+    if (n > len1 + len2 - 1)
     {
-       _fmpz_vec_zero(res + len1 + len2 - 1, trunc - len1 - len2 + 1);
-       trunc = len1 + len2 - 1;
+       _fmpz_vec_zero(res + len1 + len2 - 1, n - (len1 + len2 - 1));
+       n = len1 + len2 - 1;
     }
 
     bits1 = _fmpz_vec_max_bits(poly1, len1);
@@ -110,9 +110,9 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
         mpn_mul(arr3, arr2, limbs2, arr1, limbs1);
     
     if (sign)
-        _fmpz_poly_bit_unpack(res, trunc, arr3, bits, neg1 ^ neg2);
+        _fmpz_poly_bit_unpack(res, n, arr3, bits, neg1 ^ neg2);
     else
-        _fmpz_poly_bit_unpack_unsigned(res, trunc, arr3, bits);
+        _fmpz_poly_bit_unpack_unsigned(res, n, arr3, bits);
 
     free(arr1);
     free(arr3);
@@ -120,13 +120,12 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
 void
 fmpz_poly_mullow_KS(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                    long trunc)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
 
-    if (len1 == 0 || len2 == 0 || trunc == 0)
+    if (len1 == 0 || len2 == 0 || n == 0)
     {
         fmpz_poly_zero(res);
         return;
@@ -135,22 +134,22 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     if (res == poly1 || res == poly2)
     {
         fmpz_poly_t t;
-        fmpz_poly_init2(t, trunc);
-        fmpz_poly_mullow_KS(t, poly1, poly2, trunc);
+        fmpz_poly_init2(t, n);
+        fmpz_poly_mullow_KS(t, poly1, poly2, n);
         fmpz_poly_swap(res, t);
         fmpz_poly_clear(t);
         return;
     }
 
-    fmpz_poly_fit_length(res, trunc);
+    fmpz_poly_fit_length(res, n);
 
     if (len1 >= len2)
         _fmpz_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
-                             poly2->coeffs, len2, trunc);
+                                          poly2->coeffs, len2, n);
     else
         _fmpz_poly_mullow_KS(res->coeffs, poly2->coeffs, len2,
-                             poly1->coeffs, len1, trunc);
+                                          poly1->coeffs, len1, n);
 
-    _fmpz_poly_set_length(res, trunc);
+    _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
 }

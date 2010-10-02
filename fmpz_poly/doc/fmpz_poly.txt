@@ -389,16 +389,16 @@ void fmpz_poly_mul_classical(fmpz_poly_t res,
     Sets res to poly1 multiplied by poly2.
 
 void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, long len1, 
-                                     const fmpz * poly2, long len2, long trunc)
+                                         const fmpz * poly2, long len2, long n)
 
-    Sets {res, trunc} to the first trunc coefficients of {poly1, len1} 
-    multiplied by {poly2, len2}. Assumes 0 < trunc <= len1 + len2 - 1. Assumes 
+    Sets {res, n} to the first n coefficients of {poly1, len1} 
+    multiplied by {poly2, len2}. Assumes 0 < n <= len1 + len2 - 1. Assumes 
     neither len1 nor len2 is zero.
 
 void fmpz_poly_mullow_classical(fmpz_poly_t res, 
-                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc)
+                      const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the first trunc coefficients of poly1 * poly2.
+    Sets res to the first n coefficients of poly1 * poly2.
 
 void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, long len1, 
                                      const fmpz * poly2, long len2, long start)
@@ -442,17 +442,16 @@ void fmpz_poly_mul_karatsuba(fmpz_poly_t res,
     Sets res to poly1 multiplied by poly2.
 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
-                                                 const fmpz * poly2, long len)
+                                                    const fmpz * poly2, long n)
 
     Sets res to poly1 multiplied by poly2 and truncate to the given length. It 
     is assumed that poly1 and poly2 are precisely the given length (possibly 
-    zero padded). Assumes len is not zero.
+    zero padded). Assumes n is not zero.
 
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long len)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to poly1 multiplied by poly2 and truncate to the given length. It 
-    is assumed that poly1 and poly2 are at most the given length.
+    Sets res to poly1 multiplied by poly2 and truncate to the given length.
 
 void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                                   const fmpz * poly2, long len)
@@ -483,18 +482,18 @@ void fmpz_poly_mul_KS(fmpz_poly_t res,
     Sets res to poly1 multiplied by poly2.
 
 void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1, 
-                                     const fmpz * poly2, long len2, long trunc)
+                                     const fmpz * poly2, long len2, long n)
 
-    Sets {res, trunc} to the lowest trunc coefficients of the product of 
+    Sets {res, n} to the lowest n coefficients of the product of 
     {poly1, len1} and {poly2, len2}.  Assumes that len1 and len2 are 
     positive, but does allow for the polynomials to be zero-padded.  
-    The polynomials may be zero, too.  Assumes trunc is positive.  
+    The polynomials may be zero, too.  Assumes n is positive.  
     Suports aliasing between res, poly1 and poly2.
 
 void fmpz_poly_mullow_KS(fmpz_poly_t res, 
-                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc)
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the lowest trunc coefficients of the product of poly1 and 
+    Sets res to the lowest n coefficients of the product of poly1 and 
     poly2.
 
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
@@ -511,17 +510,17 @@ void fmpz_poly_mul(fmpz_poly_t res,
     the choices above.
 
 void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, 
-                                                                      long len)
+                                                                      long n)
 
-    Sets {res, len} to the lowest len coefficients of the product of poly1 
+    Sets {res, n} to the lowest n coefficients of the product of poly1 
     and poly2.  Assumes that poly1 and poly2 are non-zero, and that they are 
-    of length precisely len, possibly zero-padded.  Assumes that len > 0.
+    of length precisely n, possibly zero-padded.  Assumes that n > 0.
     Supports no aliasing.
 
 void fmpz_poly_mullow_n(fmpz_poly_t res, 
-                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long trunc)
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the low trunc coefficients of poly1 times poly2.
+    Sets res to the low n coefficients of poly1 times poly2.
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                       const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
