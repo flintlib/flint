@@ -111,36 +111,44 @@ void
 fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, 
                              const fmpz_poly_t poly2, long n)
 {
+    const long len1 = FLINT_MIN(poly1->length, n);
+    const long len2 = FLINT_MIN(poly2->length, n);
+    long lenr;
+
     int clear = 0, i;
     fmpz *copy1, *copy2;
 
-    if ((poly1->length == 0) || (poly2->length == 0))
+    if (len1 == 0 || len2 == 0)
     {
         fmpz_poly_zero(res);
         return;
     }
 
-    if (poly1->length < n)
+    lenr = len1 + len2 - 1;
+    if (n > lenr)
+        n = lenr;
+
+    if (len1 >= n)
+        copy1 = poly1->coeffs;
+    else
     {
         copy1 = (fmpz *) malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly1->length; i++)
+        for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
-        mpn_zero((mp_ptr) copy1 + poly1->length, n - poly1->length);
+        mpn_zero((mp_ptr) copy1 + len1, n - len1);
         clear |= 1;
     }
-    else
-        copy1 = poly1->coeffs;
 
-    if (poly2->length < n)
+    if (len2 >= n)
+        copy2 = poly2->coeffs;
+    else
     {
         copy2 = (fmpz *) malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly2->length; i++)
+        for (i = 0; i < len2; i++)
             copy2[i] = poly2->coeffs[i];
-        mpn_zero((mp_ptr) copy2 + poly2->length, n - poly2->length);
+        mpn_zero((mp_ptr) copy2 + len2, n - len2);
         clear |= 2;
     }
-    else
-        copy2 = poly2->coeffs;
 
     if (res != poly1 && res != poly2)
     {
