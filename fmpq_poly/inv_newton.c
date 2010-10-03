@@ -89,7 +89,7 @@ _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden,
 
             n = a[i];
 
-            _fmpz_poly_mullow_n(W0, poly, rpoly, n);
+            _fmpz_poly_mullow(W0, poly, n, rpoly, n, n);
             fmpz_mul(W0den, den, rden);
             for (len = n - 1; len >= 0 && !W0[len]; len--) ;
             len++;
@@ -97,7 +97,7 @@ _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden,
 
             fmpz_sub(W0, W0, W0den);
 
-            _fmpz_poly_mullow_n(W1, W0, rpoly, n);
+            _fmpz_poly_mullow(W1, W0, n, rpoly, n, n);
             fmpz_mul(W1den, W0den, rden);
             for (len = n - 1; len >= 0 && !W1[len]; len--) ;
             len++;

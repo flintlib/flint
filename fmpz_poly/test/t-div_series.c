@@ -122,7 +122,7 @@ main(void)
         fmpz_poly_set_coeff_ui(b, 0, 1);
 
         fmpz_poly_div_series(q, a, b, n);
-        fmpz_poly_mullow_n(p, q, b, n);
+        fmpz_poly_mullow(p, q, b, n);
 
         fmpz_poly_truncate(a, n);
 

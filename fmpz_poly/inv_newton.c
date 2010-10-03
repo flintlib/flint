@@ -69,9 +69,9 @@ _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
         {
             n = a[i];
 
-            _fmpz_poly_mullow_n(W, Q, Qinv, n);
+            _fmpz_poly_mullow(W, Q, n, Qinv, n, n);
             fmpz_sub_ui(W, W, 1);
-            _fmpz_poly_mullow_n(W + n, W, Qinv, n);
+            _fmpz_poly_mullow(W + n, W, n, Qinv, n, n);
             _fmpz_vec_sub(Qinv, Qinv, W + n, n);
         }
 

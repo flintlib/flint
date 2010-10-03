@@ -509,18 +509,20 @@ void fmpz_poly_mul(fmpz_poly_t res,
     Sets res to poly1 multiplied by poly2. Chooses an optimal algorithm from 
     the choices above.
 
-void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, const fmpz * poly2, 
-                                                                      long n)
+void _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1, 
+                                     const fmpz * poly2, long len2, long n)
 
-    Sets {res, n} to the lowest n coefficients of the product of poly1 
-    and poly2.  Assumes that poly1 and poly2 are non-zero, and that they are 
-    of length precisely n, possibly zero-padded.  Assumes that n > 0.
-    Supports no aliasing.
+    Sets {res, n} to the lowest n coefficients of the product of {poly1, len1} 
+    and {poly2, len2}.
 
-void fmpz_poly_mullow_n(fmpz_poly_t res, 
+    Assumes len1 >= len2 > 0 and 0 < n <= len1 + len2 - 1.  Allows for 
+    zero-padding in the inputs.  Does not support aliasing between the 
+    inputs and the output.
+
+void fmpz_poly_mullow(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the low n coefficients of poly1 times poly2.
+    Sets res to the lowest n coefficients of poly1 times poly2.
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                       const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)

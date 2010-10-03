@@ -37,7 +37,7 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-    printf("mullow_n....");
+    printf("mullow....");
     fflush(stdout);
 
     fmpz_poly_randinit(state);
@@ -55,7 +55,7 @@ main(void)
         fmpz_poly_randtest(b, state, trunc, 200);
         fmpz_poly_randtest(c, state, trunc, 200);
 
-        fmpz_poly_mullow_n(a, b, c, trunc);
+        fmpz_poly_mullow(a, b, c, trunc);
         fmpz_poly_mul(b, b, c);
         fmpz_poly_truncate(b, trunc);
 

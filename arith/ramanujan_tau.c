@@ -52,8 +52,8 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
                 fmpz_addmul_ui(res->coeffs + jv+kv, tmp, 2*k+1);
         }
     }
-    fmpz_poly_mullow_n(res, res, res, n-1);
-    fmpz_poly_mullow_n(res, res, res, n-1);
+    fmpz_poly_mullow(res, res, res, n-1);
+    fmpz_poly_mullow(res, res, res, n-1);
     fmpz_poly_shift_left(res, res, 1);
     fmpz_clear(tmp);
 }

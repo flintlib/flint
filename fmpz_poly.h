@@ -274,10 +274,10 @@ void _fmpz_poly_mul(fmpz * res, const fmpz * poly1,
 void fmpz_poly_mul(fmpz_poly_t res, 
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
-void _fmpz_poly_mullow_n(fmpz * res, const fmpz * poly1, 
-                                                const fmpz * poly2, long n);
+void _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1, 
+                                     const fmpz * poly2, long len2, long n);
 
-void fmpz_poly_mullow_n(fmpz_poly_t res, 
+void fmpz_poly_mullow(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 

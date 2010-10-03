@@ -59,7 +59,7 @@ main(void)
         one->length = 1;
 
         fmpz_poly_inv_newton(b, a, n);
-        fmpz_poly_mullow_n(c, a, b, n);
+        fmpz_poly_mullow(c, a, b, n);
 
         result = (fmpz_poly_equal(c, one));
         if (!result)
