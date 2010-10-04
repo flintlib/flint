@@ -485,10 +485,12 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
                     const fmpz * poly1, const fmpz_t den1, long len1, 
                     const fmpz * poly2, const fmpz_t den2, long len2)
 
-    Sets {rpoly, rden} to the product of {poly1, den1} and {poly2, den2}.
-    Assumes that len1 and len2 are positive and that there is no overlap 
-    between {rpoly, rden} and any of the input arguments.  Also assumes that 
-    rpoly has space for len1 + len2 - 1 entries.
+    Sets {rpoly, rden, len1 + len2 - 1} to the product of {poly1, den1, len1} 
+    and {poly2, den2, len2}.  If the input is provided in canonical form, 
+    then so is the output.
+
+    Assumes len1 >= len2 > 0.  Allows for zero-padding in the inputs.  Does 
+    not allow aliasing between the inputs and outputs.
 
 void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 

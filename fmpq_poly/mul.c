@@ -38,8 +38,8 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     fmpz_t gcd2;  /* GCD( poly2, den1 ) */
     fmpz_init(gcd1);
     fmpz_init(gcd2);
-    fmpz_set_si(gcd1, 1L);
-    fmpz_set_si(gcd2, 1L);
+    fmpz_set_ui(gcd1, 1);
+    fmpz_set_ui(gcd2, 1);
     
     if (*den2 != 1L)
     {
@@ -54,15 +54,15 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
             fmpz_gcd(gcd2, gcd2, den1);
     }
     
-    /* TODO:  If gcd1 and gcd2 are very large compared to the degrees of  */
-    /* poly1 and poly2, we might want to create copies of the polynomials */
-    /* and divide out the common factors *before* the multiplication.     */
+    /*
+       TODO:  If gcd1 and gcd2 are very large compared to the degrees of 
+       poly1 and poly2, we might want to create copies of the polynomials 
+       and divide out the common factors *before* the multiplication.
+     */
     
-    if (len1 >= len2)
-        _fmpz_poly_mul(rpoly, poly1, len1, poly2, len2);
-    else
-        _fmpz_poly_mul(rpoly, poly2, len2, poly1, len1);
+    _fmpz_poly_mul(rpoly, poly1, len1, poly2, len2);
     fmpz_mul(rden, den1, den2);
+
     if ((*gcd1 != 1L) | (*gcd2 != 1L))
     {
         fmpz_t g;
@@ -91,19 +91,24 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
 
     if (res == poly2 || res == poly1)
     {
-        fmpq_poly_t copy;
-        fmpq_poly_init2(copy, len);
-        fmpq_poly_mul(copy, poly1, poly2);
-        fmpq_poly_swap(res, copy);
-        fmpq_poly_clear(copy);
+        fmpq_poly_t t;
+        fmpq_poly_init2(t, len);
+        fmpq_poly_mul(t, poly1, poly2);
+        fmpq_poly_swap(res, t);
+        fmpq_poly_clear(t);
         return;
     }
     
     fmpq_poly_fit_length(res, len);
 
-    _fmpq_poly_mul(res->coeffs, res->den, 
-                   poly1->coeffs, poly1->den, poly1->length,
-                   poly2->coeffs, poly2->den, poly2->length);
+    if (poly1->length >= poly2->length)
+        _fmpq_poly_mul(res->coeffs, res->den, 
+                       poly1->coeffs, poly1->den, poly1->length,
+                       poly2->coeffs, poly2->den, poly2->length);
+    else
+        _fmpq_poly_mul(res->coeffs, res->den, 
+                       poly2->coeffs, poly2->den, poly2->length,
+                       poly1->coeffs, poly1->den, poly1->length);
 
     _fmpq_poly_set_length(res, len);
 }
