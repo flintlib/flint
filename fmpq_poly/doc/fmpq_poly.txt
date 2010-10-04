@@ -494,6 +494,22 @@ void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
 
     Sets res to the product of poly1 and poly2.
 
+void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden, 
+                       const fmpz * poly1, const fmpz_t den1, long len1, 
+                       const fmpz * poly2, const fmpz_t den2, long len2, long n)
+
+    Sets {rpoly, rden, n} to the low n coefficients of {poly1, den1} and 
+    {poly2, den2}.  The output is not guaranteed to be in canonical form.
+
+    Assumes len1 >= len2 > 0 and 0 < n <= len1 + len2 - 1.  Allows for 
+    zero-padding in the inputs.  Does not allow aliasing between the inputs 
+    and outputs.
+
+void fmpq_poly_mullow(fmpq_poly_t res, 
+                      const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n)
+
+    Sets res to the product of poly1 and poly2, truncated to length n.
+
 *******************************************************************************
 
     Powering

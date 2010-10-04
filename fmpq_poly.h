@@ -255,6 +255,13 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_mul(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
+void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden, 
+                    const fmpz * poly1, const fmpz_t den1, long len1, 
+                    const fmpz * poly2, const fmpz_t den2, long len2, long n);
+
+void fmpq_poly_mullow(fmpq_poly_t res, 
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n);
+
 /*  Powering  ****************************************************************/
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
