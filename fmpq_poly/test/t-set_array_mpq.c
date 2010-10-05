@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -47,13 +47,15 @@ main(void)
     {
         long j, n = 100;
         fmpq_poly_t f, g;
-        mpq_t * a = (mpq_t *) malloc(n * sizeof(mpq_t));
+        mpq_t * a;
+
+        a = (mpq_t *) malloc(n * sizeof(mpq_t));
+        for (j = 0; j < n; j++)
+            mpq_init(a[j]);
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_randtest(f, state, n_randint(n), 200);
-        for (j = 0; j < n; j++)
-            mpq_init(a[j]);
         for (j = 0; j < f->length; j++)
             fmpq_poly_get_coeff_mpq(a[j], f, j);
 
@@ -72,6 +74,7 @@ main(void)
         fmpq_poly_clear(g);
         for (j = 0; j < n; j++)
             mpq_clear(a[j]);
+        free(a);
     }
 
     fmpq_poly_randclear(state);

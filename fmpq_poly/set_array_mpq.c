@@ -56,7 +56,7 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
 
 void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
 {
-    if (n == 0L)
+    if (n == 0)
         fmpq_poly_zero(poly);
     else
     {
