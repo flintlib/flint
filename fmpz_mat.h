@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -66,7 +67,37 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t 
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha);
 
-void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B);
+void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
+
+
+/* Linear algebra operations */
+
+void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
+#define ROWREDUCE_DETONLY 0
+#define ROWREDUCE_ECHELON_FORM 1
+#define ROWREDUCE_REDUCED_ECHELON_FORM 2
+
+long _fmpz_mat_rowreduce(fmpz ** a, long n, long m, int variant);
+
+void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x);
+void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x);
+void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x);
+void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A);
+void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
+
+long fmpz_mat_rank(const fmpz_mat_t A);
+
+void _fmpz_mat_solve_2x2(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b);
+void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b);
+void _fmpz_mat_solve_rowreduce(fmpz * xnum, fmpz_t xden, const fmpz_mat_t A, const fmpz * b);
+void fmpz_mat_solve(fmpz * xnum, fmpz_t xden, const fmpz_mat_t A, const fmpz * b);
+
+void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, mp_bitcnt_t bits);
+void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det);
+void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count);
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * diag, long n);
+
 
 #endif
 

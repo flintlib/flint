@@ -27,48 +27,47 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_vec.h"
+#include "ulong_extras.h"
+
 
 void
-_fmpz_mat_mul(fmpz ** C, fmpz ** const A, long ar, long ac,
-                         fmpz ** const B, long br, long bc)
+fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
 {
-    long i, j, k;
+    long c, i, j, k;
+    long m = mat->r;
+    long n = mat->c;
 
-    for (i = 0; i < ar; i++)
+    if (mat->r == 0 || mat->c == 0)
+        return;
+
+    for (c = 0; c < count; c++)
     {
-        for (j = 0; j < bc; j++)
+        if (n_randint(2))
         {
-            fmpz_zero(&C[i][j]);
-            for (k = 0; k < br; k++)
-                fmpz_addmul(&C[i][j], &A[i][k], &B[k][j]);
+            if ((i = n_randint(m)) == (j = n_randint(m)))
+                continue;
+            if (n_randint(2))
+                for (k = 0; k < n; k++)
+                    fmpz_add(&mat->rows[j][k], &mat->rows[j][k],
+                        &mat->rows[i][k]);
+            else
+                for (k = 0; k < n; k++)
+                    fmpz_sub(&mat->rows[j][k], &mat->rows[j][k],
+                        &mat->rows[i][k]);
         }
-    }
-}
-
-void
-fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
-{
-    long cr, cc;
-
-    cr = A->r;
-    cc = B->c;
-
-    if (A->c != B->r || C->r != cr || C->c != cc)
-    {
-        printf("fmpz_mat_mul: incompatible dimensions\n");
-        abort();
-    }
-
-    if (C == A || C == B)
-    {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, cr, cc);
-        _fmpz_mat_mul(t->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
-        fmpz_mat_swap(C, t);
-        fmpz_mat_clear(t);
-    }
-    else
-    {
-        _fmpz_mat_mul(C->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
+        else
+        {
+            if ((i = n_randint(n)) == (j = n_randint(n)))
+                continue;
+            if (n_randint(2))
+                for (k = 0; k < m; k++)
+                    fmpz_add(&mat->rows[k][j], &mat->rows[k][j],
+                        &mat->rows[k][i]);
+            else
+                for (k = 0; k < m; k++)
+                    fmpz_sub(&mat->rows[k][j], &mat->rows[k][j],
+                        &mat->rows[k][i]);
+        }
     }
 }

@@ -29,46 +29,33 @@
 #include "fmpz_mat.h"
 
 void
-_fmpz_mat_mul(fmpz ** C, fmpz ** const A, long ar, long ac,
-                         fmpz ** const B, long br, long bc)
+fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    long i, j, k;
+    fmpz tmp;
+    long i, j;
 
-    for (i = 0; i < ar; i++)
+    if (B->r != A->c || B->c != A->r)
     {
-        for (j = 0; j < bc; j++)
-        {
-            fmpz_zero(&C[i][j]);
-            for (k = 0; k < br; k++)
-                fmpz_addmul(&C[i][j], &A[i][k], &B[k][j]);
-        }
-    }
-}
-
-void
-fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
-{
-    long cr, cc;
-
-    cr = A->r;
-    cc = B->c;
-
-    if (A->c != B->r || C->r != cr || C->c != cc)
-    {
-        printf("fmpz_mat_mul: incompatible dimensions\n");
+        printf("exception: fmpz_mat_transpose: incompatible dimensions\n");
         abort();
     }
 
-    if (C == A || C == B)
+    /* In-place, guaranteed to be square */
+    if (A == B)
     {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, cr, cc);
-        _fmpz_mat_mul(t->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
-        fmpz_mat_swap(C, t);
-        fmpz_mat_clear(t);
+        for (i = 0; i < A->r - 1; i++)
+        {
+            for (j = i + 1; j < i; j++)
+            {
+                tmp = A->rows[i][j];
+                A->rows[i][j] = A->rows[j][i];
+                A->rows[j][i] = tmp;
+            }
+        }
     }
-    else
-    {
-        _fmpz_mat_mul(C->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
-    }
+
+    /* Not aliased; general case */
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
+            fmpz_set(&A->rows[i][j], &B->rows[j][i]);
 }
