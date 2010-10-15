@@ -39,6 +39,11 @@ void fmpz_mat_clear(fmpz_mat_t mat)
 
     Clears the given matrix.
 
+void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+    Swaps two matrices. The dimensions of mat1 and mat2 are allowed to be
+    different.
+
 void fmpz_mat_print(fmpz_mat_t mat) 
 
     Prints the given matrix to stdout. The format is the number of rows, a
@@ -51,6 +56,13 @@ void fmpz_mat_print_pretty(fmpz_mat_t mat)
     then on each line a row of the matrix, followed by a closing square 
     bracket. Each row is written as an opening square bracket followed by a
     space separated list of coefficients followed by a closing square bracket.
+
+
+*******************************************************************************
+
+    Random matrix generation
+
+*******************************************************************************
 
 void fmpz_mat_randinit(fmpz_randstate_t state)
 
@@ -115,14 +127,115 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
     (-2^b + 1, 2^b - 1) whilst the entries to the right of the diagonal in 
     row i are set to zero. 
 
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * diag, long n)
+
+    Sets mat to a random permutation of the rows and columns of a
+    given diagonal matrix. The diagonal matrix is specified in the form of
+    an array of the n initial entries on the main diagonal.
+
+    The return value is 0 or 1 depending on whether the permutation is
+    even or odd.
+
+void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, mp_bitcnt_t bits)
+
+    Sets mat to a random sparse matrix with the given rank (having
+    exactly as many nonzero elements as the rank), with the nonzero
+    elements being random integers of the given bit size.
+
+    The matrix can be transformed into a dense matrix with unchanged
+    rank by subsequently calling fmpz_mat_randops.
+
+void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det)
+
+    Sets mat to a random sparse matrix with minimal number of nonzero
+    entries such that its determinant has the given value. (Note that
+    the matrix will be zero if det = 0; use fmpz_mat_randrank to generate
+    a nonzero singular matrix.)
+
+    The matrix can be transformed into a dense matrix with unchanged
+    determinant by subsequently calling fmpz_mat_randops.
+
+void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
+
+    Randomises mat by performing elementary row or column operations.
+    More precisely, at most count random additions or subtractions of
+    distinct rows and columns will be performed. This leaves the rank
+    (and for square matrices, determinant) unchanged.
+
+
 
 *******************************************************************************
 
-    Arithmetic
+    Linear algebra operations
 
 *******************************************************************************
 
-void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
-    Sets C = A * B. A, B, and C must have compatible dimensions for matrix
-    multiplication. No aliasing is allowed.
+    Sets B to A^T, the transpose of A. Dimensions must be compatible.
+    A and B are allowed to be the same object if A is a square matrix.
+
+
+void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets C to the matrix product A * B. The matrices must have
+    compatible dimensions for matrix multiplication.
+
+
+void fmpz_mat_det(fmpz_t det, fmpz_mat_t A)
+
+    Sets det to the determinant of the square matrix A.
+
+    The determinant is computed using cofactor expansion for matrices up
+    to size 4x4, and in general using row reduction.
+
+
+long fmpz_mat_rank(fmpz_mat_t A)
+
+    Returns the rank, or number of linearly independent columns
+    (equivalently, rows), of A. The rank is computed by row reducing
+    a copy of A.
+
+
+void fmpz_mat_solve(fmpz * xnum, fmpz_t xden, const fmpz_mat_t A, const fmpz * b)
+
+    Solves Ax = b, where A is assumed to be square and of full rank, by
+    computing an integer vector xnum and integer xden such that
+    x = xnum / xden. {xnum, xden} will not generally be reduced to lowest
+    terms. If A is singular, xden will be set to zero.
+
+    Direct solution formulas (Cramer's rule) are used for systems up to
+    size 3x3. For larger systems, row reduction is used.
+
+
+long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int variant)
+
+    Row reduces the matrix in-place using fraction-free Gaussian elimination.
+    The number of rows m and columns n may be arbitrary. The 'variant' can
+    be one of the following:
+
+    ROWREDUCE_ECHELON_FORM
+
+        Standard row reduction, i.e. only eliminates elements below
+        each pivot element.
+
+    ROWREDUCE_REDUCED_ECHELON_FORM
+
+        Full (Gauss-Jordan) reduction, eliminating elements both below
+        and above each pivot element.
+
+    ROWREDUCE_DETONLY
+
+        Standard row reduction, but immediately aborts and returns 0
+        if the matrix is detected to be singular. In this event,
+        the state of the matrix will be undefined.
+
+    Pivoting (to avoid division by zero entries) is performed by permuting
+    the vector of row pointers in-place. The matrix entries themselves
+    retain their original order in memory.
+
+    The return value r is the rank of the matrix, multiplied by a sign
+    indicating the parity of row interchanges. If r = 0, the matrix has rank
+    zero. Otherwise, the leading nonzero entries of a[0], a[1], ... a[abs(r)-1]
+    will point to the successive pivot elements. If |r| = m = n, the
+    determinant of the matrix is given by sign(r) * a[|r|-1][|r|-1].
