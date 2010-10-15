@@ -30,12 +30,19 @@
 #include "fmpz_mpoly.h"
 #include "ulong_extras.h"
 
+#define TRACE 0
+
 int main(void)
 {
-   int result;
-   fmpz_mpoly_t a, a2, a3, a6, a12, b, b2, b3, b6, b12;
+
+#if FLINT_BITS == 64
+   fmpz_mpoly_t a, a1, a2, a3, a6, a12;
    fmpz_mpoly_t c, c2, c3, c5, c10, c20, c30;
-   ulong i;
+   fmpz_t t;
+   fmpz exp;
+   mp_limb_t mask;
+
+   ulong i, k;
    
    printf("mul_heap....");
    fflush(stdout);
@@ -143,10 +150,6 @@ int main(void)
           2*y^2*z^2 + 2*x*y*z + y^2*z + y*z^2 + y^2 + 2*y*z + z 
    */
 
-   /*
-   fmpz_mpoly_t a1, a2, a3;
-   ulong i, j;
-
    fmpz_mpoly_init2(a1, 13, 3, 20);
    fmpz_mpoly_init(a2, 3, 20);
    fmpz_mpoly_init(a3, 3, 20);
@@ -180,39 +183,48 @@ int main(void)
    fmpz_set_ui(a1->exps + 0, 0UL+(2UL<<20)+(0UL<<40));
    
    a1->length = 13;
-   mp_limb_t mask = (1UL<<19)+(1UL<<39)+(1UL<<59);
+   mask = (1UL<<19)+(1UL<<39)+(1UL<<59);
    fmpz_mpoly_mul_heap(a2, a1, a1);
+   
+#if TRACE
    printf("j = 2, a2->length = %ld\n", a2->length);
    for (j = 0; j < 49; j++)
    {
-	  printf("j = %ld, a2->length = %ld\n", 2+2*j, a2->length);
-	  fmpz_mpoly_mul_heap(a3, a2, a1);
+	   printf("j = %ld, a2->length = %ld\n", 2+2*j, a2->length);
+	   fmpz_mpoly_mul_heap(a3, a2, a1);
       printf("j = %ld, a2->length = %ld\n", 2+2*j+1, a3->length);
-	  fmpz_mpoly_mul_heap(a2, a3, a1);
+	   fmpz_mpoly_mul_heap(a2, a3, a1);
    }
    printf("j = %ld, a2->length = %ld\n", 2+2*j, a2->length);
+#endif
 
-   fmpz_t t;
    fmpz_init(t);
-   fmpz exp;
-
-   for (ulong k = 0; k < a2->length; k++)
+   
+   for (k = 0; k < a2->length; k++)
    {
       if (fmpz_cmp(a2->coeffs + k, t) > 0)
-	  {
-		  fmpz_set(t, a2->coeffs + k);
-		  exp = a2->exps[k];
-	  }
+	   {
+		   fmpz_set(t, a2->coeffs + k);
+		   exp = a2->exps[k];
+	   }
    }
    
+#if TRACE
    fmpz_print(t); printf("\n");
    printf("%lx\n", exp);
+#endif
 
    fmpz_mpoly_clear(a1);
    fmpz_mpoly_clear(a2);
-   fmpz_mpoly_clear(a3);*/
+   fmpz_mpoly_clear(a3);
+
+   fmpz_clear(t);
 
    _fmpz_cleanup();
+
+#endif
+
    printf("PASS\n");
+   
    return 0;
 }

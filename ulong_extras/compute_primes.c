@@ -60,7 +60,6 @@ pthread_mutex_t flint_num_primes_mutex;
 void n_compute_primes(ulong num)
 {
     ulong num_primes, primes_cutoff;
-    ulong lg_ub, lg_ub2;
     ulong sieve_size;
     unsigned int i, j, p, q, oldq = 0;
 

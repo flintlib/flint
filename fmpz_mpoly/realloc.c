@@ -32,7 +32,7 @@
 void
 fmpz_mpoly_realloc(fmpz_mpoly_t poly, long alloc)
 {
-    if (alloc == 0)             /* Clear up */
+    if (alloc == 0) /* Clear up */
     {
         fmpz_mpoly_clear(poly);
         poly->alloc = 0;
@@ -45,7 +45,7 @@ fmpz_mpoly_realloc(fmpz_mpoly_t poly, long alloc)
 
     if (poly->alloc != alloc)
     {
-        if (poly->alloc)        /* Realloc */
+        if (poly->alloc) /* Realloc */
         {
             _fmpz_mpoly_truncate(poly, alloc);
 
@@ -60,7 +60,7 @@ fmpz_mpoly_realloc(fmpz_mpoly_t poly, long alloc)
                          alloc - poly->alloc);
             }
         }
-        else                    /* Nothing allocated already so do it now */
+        else /* Nothing allocated already so do it now */
         {
             poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
             poly->exps = (fmpz *) calloc(alloc, sizeof(fmpz));

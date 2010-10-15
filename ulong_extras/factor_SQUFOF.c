@@ -30,17 +30,17 @@
 mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 {
     mp_limb_t n[2];
-	mp_limb_t sqrt[2];
-	mp_limb_t rem[2];
-	mp_size_t num, sqroot, p, q;
+	 mp_limb_t sqrt[2];
+	 mp_limb_t rem[2];
+	 mp_size_t num, sqroot, p, q;
 
     mp_limb_t l, l2, iq, pnext;
     mp_limb_t qarr[50];
-    mp_limb_t qupto, qlast, t, r;
+    mp_limb_t qupto, qlast, t, r = 0;
     ulong i, j;
 
-	n[0] = n_lo;
-	n[1] = n_hi;
+	 n[0] = n_lo;
+	 n[1] = n_hi;
 
     if (n_hi) num = mpn_sqrtrem(sqrt, rem, n, 2);
     else num = ((sqrt[0] = n_sqrtrem(rem, n_lo)) != 0UL);

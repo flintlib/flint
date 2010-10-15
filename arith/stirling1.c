@@ -104,7 +104,7 @@ void _rising_factorial(fmpz * res, long a, long b, long trunc)
             right = _fmpz_vec_init(nright);
             _rising_factorial(left, a, mid, trunc);
             _rising_factorial(right, mid, b, trunc);
-            _fmpz_poly_mullow_n(res, left, right, trunc);
+            _fmpz_poly_mullow(res, left, nleft, right, nright, trunc);
             _fmpz_vec_clear(left, nleft);
             _fmpz_vec_clear(right, nright);
         }

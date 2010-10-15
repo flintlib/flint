@@ -1,4 +1,4 @@
-/*=============================================================================
+/*============================================================================
 
     This file is part of FLINT.
 
@@ -16,20 +16,22 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-=============================================================================*/
-/******************************************************************************
+===============================================================================*/
+/****************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+   Copyright (C) 2010 William Hart
+   Copyright (C) 2010 Daniel Woodhouse
+   
+*****************************************************************************/
 
-******************************************************************************/
-
+#include <mpir.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
+#include "nmod_mpoly.h"
 
-void
-fmpz_mat_zero(fmpz_mat_t mat)
+void nmod_mpoly_clear(nmod_mpoly_t poly)
 {
-   _fmpz_vec_zero(mat->entries, mat->r * mat->c);
+   if (poly->coeffs) free(poly->coeffs);
+   if (poly->exps) free(poly->exps); /*exps should be the same as coeffs */
 }

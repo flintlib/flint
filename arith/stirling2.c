@@ -31,6 +31,8 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
+extern void _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, 
+                                               long klen, int kind);
 
 void _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 {

@@ -77,7 +77,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
    return FLINT_BITS - zeros;
 }
 
-#if !defined(mpn_zero)
+#undef mpn_zero
 #define mpn_zero(xxx, nnn) \
     do \
     { \
@@ -85,8 +85,16 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
         for (ixxx = 0; ixxx < nnn; ixxx++) \
             (xxx)[ixxx] = 0UL; \
     } while (0)
-#endif
 
+#undef mpn_copyi
+#define mpn_copyi(xxx, yyy, nnn) \
+   do { \
+      ulong ixxx; \
+      for (ixxx = 0; ixxx < nnn; ixxx++) \
+         (xxx)[ixxx] = (yyy)[ixxx]; \
+   } while (0)
+
+#undef mpn_store
 #define mpn_store(xxx, nnn, yyy) \
    do \
    { \

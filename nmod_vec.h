@@ -30,6 +30,7 @@
 #include <mpir.h>
 #include "longlong.h"
 #include "ulong_extras.h"
+#include "flint.h"
 
 typedef struct
 {

@@ -38,6 +38,11 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
     ulong len1 = poly1->length;
     ulong len2 = poly2->length;
     ulong i, j, bits1 = 0, bits2 = 0, b, b_old;
+    ulong n; /* index of final entry in heap (0 means nothing in heap 
+                yet as indices start at 1) */
+    ulong len_out = 0; /* length of product polynomial */
+    ulong res_alloc = res->alloc;
+
     int signed_c = 0;
     fmpz_t temp;
 
@@ -45,10 +50,6 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
         (fmpz_mpoly_heap_t *) malloc((len2 + 1) * sizeof(fmpz_mpoly_heap_t));
     fmpz_mpoly_entry_t *entries =
         (fmpz_mpoly_entry_t *) malloc(len2 * sizeof(fmpz_mpoly_entry_t));
-
-    ulong n;                    /* index of final entry in heap (0 means nothing in heap yet as indices start at 1) */
-    ulong len_out = 0;          /* length of product polynomial */
-    ulong res_alloc = res->alloc;
 
     fmpz_init(temp);
 
@@ -110,7 +111,6 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
         fmpz exp = heap[1].exp; /* current exponents */
         fmpz c1, c2;            /* coefficients */
         mp_limb_t accum0 = 0, accum1 = 0, accum2 = 0, *ptr, cy;
-        __mpz_struct *coeff;
         int sign;
         ulong size;
         mp_limb_signed_t n1, n2, n3;
@@ -138,16 +138,15 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
             /* End of a chain */
             fmpz_mpoly_reheapify(heap, &n); /* remove from heap */
 
-            if ((n) && (exp == heap[1].exp))    /* next element the same exp? */
+            if ((n) && (exp == heap[1].exp)) /* next element the same exp? */
             {
                 prev->next = heap[1].entry;
                 next = prev->next;
-            }
-            else
-                break;          /* chain is complete */
+            } else
+               break; /* chain is complete */
         }
 
-        next = chain;           /* go back to start of chain */
+        next = chain; /* go back to start of chain */
 
         do
         {
@@ -209,9 +208,9 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
         {
             _fmpz_demote(res->coeffs + len_out);
             res->coeffs[len_out] = accum0;
-        }
-        else if (b == 2)        /* fits into two limbs unsigned */
+        } else if (b == 2)        /* fits into two limbs unsigned */
         {
+            __mpz_struct * coeff = NULL;
             if (accum1 != 0 || accum0 > COEFF_MAX)
             {
                 if (!COEFF_IS_MPZ(res->coeffs[len_out]))
@@ -272,7 +271,7 @@ fmpz_mpoly_mul_heap(fmpz_mpoly_t res, fmpz_mpoly_t poly1, fmpz_mpoly_t poly2)
             }
             else                /* general case */
             {
-                coeff = _fmpz_promote(res->coeffs + len_out);
+                __mpz_struct * coeff = _fmpz_promote(res->coeffs + len_out);
                 ptr = mpz_realloc(coeff, 3);
                 if (sign)
                     coeff->_mp_size = -size;
