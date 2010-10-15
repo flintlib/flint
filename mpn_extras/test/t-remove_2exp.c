@@ -19,84 +19,49 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
-int
-main(void)
+int main(void)
 {
-    fmpz_t x;
+    int zero, nonzero;
+    mp_bitcnt_t check;
+    mpz_t a;
+    mpz_t b;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("remove_2exp....");
     fflush(stdout);
 
-    fmpz_init(x);
+    mpz_init(a);
+    mpz_init(b);
 
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    for (zero=0; zero<300; zero++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
-    }
-
-    fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
+        for (nonzero=0; nonzero<300; nonzero++)
         {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
-            abort();
+            mpz_set_ui(a, 1);
+            mpz_setbit(a, nonzero);
+            mpz_set(b, a);
+            mpz_mul_2exp(a, a, zero);
+            a->_mp_size = mpn_remove_2exp(a->_mp_d, a->_mp_size, &check);
+            if (check != zero || mpz_cmp(a,b))
+            {
+                gmp_printf("%d %d \n", zero, nonzero);
+                abort();
+            }
         }
-
-        fmpz_clear(a);
     }
 
-    _fmpz_cleanup();
+    mpz_clear(a);
+    mpz_clear(b);
     printf("PASS\n");
     return 0;
 }

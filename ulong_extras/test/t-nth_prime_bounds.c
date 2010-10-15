@@ -26,65 +26,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+void check(ulong n, mp_limb_t ans)
 {
-    long i = 0;
+    int ok, reasonable;
+    mp_limb_t lo, hi;
+    n_nth_prime_bounds(&lo, &hi, n);
 
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
+    ok = lo <= ans && ans <= hi;
+    reasonable = (n < 1000) || (ans/2 < lo && hi < ans*2);
 
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
-    {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
+    if (ok && reasonable)
+        return;
 
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
+    printf("FAIL:\n");
+    printf("n = %lu: %lu < %lu < %lu\n", n, lo, ans, hi);
+    abort();
 }
 
 int main(void)
 {
-    fmpz_t m, a, b;
-    long n, k;
+    int n;
 
-    printf("divisor_sigma....");
+    printf("nth_prime_bounds....");
     fflush(stdout);
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
+    for (n=6; n<75000; n++)
     {
-        for (k = 0; k < 10; k++)
-        {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
-        }
+        check(n, n_nth_prime(n));
     }
 
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
+    /* Some known large primes */
+    check(10UL, 29UL);
+    check(100UL, 541UL);
+    check(1000UL, 7919UL);
+    check(10000UL, 104729UL);
+    check(100000UL, 1299709UL);
+    check(1000000UL, 15485863UL);
+    check(10000000UL, 179424673UL);
+    check(100000000UL, 2038074743UL);
+#if FLINT64
+    check(1000000000UL, 22801763489UL);
+    check(10000000000UL, 252097800623UL);
+    check(100000000000UL, 2760727302517UL);
+    check(1000000000000UL, 29996224275833UL);
+    check(10000000000000UL, 323780508946331UL);
+    check(100000000000000UL, 3475385758524527UL);
+    check(1000000000000000UL, 37124508045065437UL);
+    check(10000000000000000UL, 394906913903735329UL);
+    check(100000000000000000UL, 4185296581467695669UL);
+#endif
 
     printf("PASS\n");
     return 0;

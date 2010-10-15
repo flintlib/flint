@@ -31,70 +31,58 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+void check(fmpz_t x, int expected)
+{
+    if (fmpz_abs_fits_ui(x) != expected)
+    {
+        printf("FAIL:");
+        fmpz_print(x);
+        printf("\n");
+        abort();
+    }
+}
+
 int
 main(void)
 {
+    long i;
     fmpz_t x;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("abs_fits_ui....");
     fflush(stdout);
 
     fmpz_init(x);
 
     fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
+    check(x, 1);
 
     fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
+    check(x, 1);
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
+    fmpz_set_ui(x, ULONG_MAX);
+    check(x, 1);
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
+    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_neg(x, x);
+    check(x, 1);
+
+    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_add_ui(x, x, 1UL);
+    check(x, 0);
+
+    fmpz_neg(x, x);
+    check(x, 0);
+
+    for (i = 0; i < 1000; i++)
     {
-        printf("FAIL: LONG_MAX");
-        abort();
+        fmpz_set_ui(x, 1UL);
+        fmpz_mul_2exp(x, x, i);
+        check(x, i < FLINT_BITS);
+        fmpz_neg(x, x);
+        check(x, i < FLINT_BITS);
     }
 
     fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
-            abort();
-        }
-
-        fmpz_clear(a);
-    }
 
     _fmpz_cleanup();
     printf("PASS\n");

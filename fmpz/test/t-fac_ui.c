@@ -20,12 +20,12 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -34,66 +34,35 @@
 int
 main(void)
 {
+    long i, n;
     fmpz_t x;
+    fmpz_t y;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("fac_ui....");
     fflush(stdout);
 
     fmpz_init(x);
+    fmpz_init(y);
 
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    /* Twice to check demotion */
+    for (n = 0; n < 2; n++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
+        fmpz_set_ui(y, 1UL);
 
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
-    }
-
-    fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
+        for (i = 0; i < 100; i++)
         {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
-            abort();
+            fmpz_fac_ui(x, i);
+            fmpz_mul_ui(y, y, FLINT_MAX(1, i));
+            if (!fmpz_equal(x, y))
+            {
+                printf("%ld\n", i);
+                fmpz_print(x);
+                printf("\n");
+                fmpz_print(y);
+                printf("\n");
+                abort();
+            }
         }
-
-        fmpz_clear(a);
     }
 
     _fmpz_cleanup();

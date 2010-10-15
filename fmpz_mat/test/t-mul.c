@@ -19,81 +19,50 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
+#include "ulong_extras.h"
 
-int
-main(void)
+const long test_A[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+const long test_B[] = { 10, 11, 12, 13, 14, 15, 16, 17, 18 };
+const long test_C[] = { 84, 90, 96, 201, 216, 231, 318, 342, 366 };
+
+int main(void)
 {
-    fmpz_t x;
+    fmpz_mat_t A, B, C;
+    long i;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("mul....");
     fflush(stdout);
 
-    fmpz_init(x);
+    fmpz_mat_init(A, 3, 3);
+    fmpz_mat_init(B, 3, 3);
+    fmpz_mat_init(C, 3, 3);
 
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    for (i = 0; i < 9; i++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
+        fmpz_set_ui(A->entries+i, test_A[i]);
+        fmpz_set_ui(B->entries+i, test_B[i]);
     }
 
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
+    fmpz_mat_mul(C, A, B);
+
+    for (i = 0; i < 9; i++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
-    }
-
-    fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
+        if (fmpz_get_ui(C->entries+i) != test_C[i])
         {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
+            _fmpz_vec_print(C->entries, 9);
             abort();
         }
-
-        fmpz_clear(a);
     }
 
     _fmpz_cleanup();

@@ -19,84 +19,35 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
-int
-main(void)
+int main(void)
 {
-    fmpz_t x;
+    int n, k, t;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("euler_phi....");
     fflush(stdout);
 
-    fmpz_init(x);
-
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    for (n = 0; n < 200; n++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
-    }
-
-    fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
+        t = 0;
+        for (k = 1; k <= n; k++)
+            t += (n_gcd(n, k) == 1);
+        if (t != n_euler_phi(n))
         {
             printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
+            printf("phi(%d) = %d, got %lu\n", n, t, n_euler_phi(n)); 
             abort();
         }
-
-        fmpz_clear(a);
     }
 
-    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

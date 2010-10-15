@@ -26,65 +26,57 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+
+void check(mp_limb_t n, int s1, int s2)
 {
-    long i = 0;
-
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
+    if (s1 != s2)
     {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
+        printf("FAIL:\n");
+        printf("%lu: got %d instead of %d\n", n, s1, s2); 
+        abort();
     }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
 }
 
 int main(void)
 {
-    fmpz_t m, a, b;
-    long n, k;
+    int s, k;
 
-    printf("divisor_sigma....");
+    printf("is_squarefree....");
     fflush(stdout);
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
+    check(0, n_is_squarefree(0), 0);
+    check(1, n_is_squarefree(1), 1);
+    check(2, n_is_squarefree(2), 1);
+    check(3, n_is_squarefree(3), 1);
+    check(4, n_is_squarefree(4), 0);
+    check(5, n_is_squarefree(5), 1);
 
-    for (n = 0; n < 5000; n++)
+    check(16, n_is_squarefree(16), 0);
+    check(25, n_is_squarefree(25), 0);
+    check(49, n_is_squarefree(49), 0);
+    check(16*3, n_is_squarefree(16*3), 0);
+    check(25*3, n_is_squarefree(25*3), 0);
+    check(49*3, n_is_squarefree(49*3), 0);
+
+    check(101*103, n_is_squarefree(101*103), 1);
+    check(101*101, n_is_squarefree(101*101), 0);
+    check(101*103*4, n_is_squarefree(101*103*4), 0);
+    check(101*103*5, n_is_squarefree(101*103*5), 1);
+    check(101*103*103*5, n_is_squarefree(101*103*103*5), 0);
+    check(101*103*25, n_is_squarefree(101*103*25), 0);
+
+    s = 0;
+    for (k = 0; k <= 10000; k++)
+        s += n_is_squarefree(k);
+
+    if (s != 6083)
     {
-        for (k = 0; k < 10; k++)
-        {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
-        }
+        printf("FAIL:\n");
+        printf("expected %d squarefree numbers <= 10000 (got %d)\n", 6083, s);
+        abort();
     }
-
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
 
     printf("PASS\n");
     return 0;

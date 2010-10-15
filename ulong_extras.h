@@ -54,6 +54,9 @@ typedef struct factor_s
 #define FLINT_FACTOR_ONE_LINE_MAX (1UL<<39)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
 
+#define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
+
+
 extern const unsigned int flint_primes_small[];
 
 extern mp_limb_t * flint_primes;
@@ -202,7 +205,13 @@ int n_is_prime(mp_limb_t n);
 
 void n_compute_primes(ulong num_primes);
 
-ulong n_prime_pi(ulong n);
+mp_limb_t n_nth_prime(ulong n);
+
+void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n);
+
+ulong n_prime_pi(mp_limb_t n);
+
+void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n);
 
 int n_remove(mp_limb_t * n, mp_limb_t p);
 
@@ -235,6 +244,14 @@ mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters);
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
+
+int n_is_squarefree(mp_limb_t n);
+
+int n_moebius_mu(mp_limb_t n);
+
+void n_moebius_mu_vec(int * mu, ulong len);
+
+mp_limb_t n_euler_phi(mp_limb_t n);
 
 #endif
 

@@ -25,67 +25,32 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz.h"
-#include "arith.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+#if FLINT64
+#define FLINT_NUM_TINY_FACTORIALS 21
+#else
+#define FLINT_NUM_TINY_FACTORIALS 13
+#endif
+
+const mp_limb_t flint_tiny_factorials[] =
 {
-    long i = 0;
+  1UL, 1UL, 2UL, 6UL, 24UL, 120UL, 720UL, 5040UL, 40320UL, 362880UL,
+  3628800UL, 39916800UL, 479001600UL,
+#if FLINT64
+  6227020800UL, 87178291200UL, 1307674368000UL, 20922789888000UL,
+  355687428096000UL, 6402373705728000UL, 121645100408832000UL,
+  2432902008176640000UL,
+#endif
+};
 
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
-    {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
-
-int main(void)
+void fmpz_fac_ui(fmpz_t f, ulong n)
 {
-    fmpz_t m, a, b;
-    long n, k;
-
-    printf("divisor_sigma....");
-    fflush(stdout);
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
-    {
-        for (k = 0; k < 10; k++)
-        {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
-        }
-    }
-
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
-
-    printf("PASS\n");
-    return 0;
+    if (n < FLINT_NUM_TINY_FACTORIALS)
+        fmpz_set_ui(f, flint_tiny_factorials[n]);
+    else
+        mpz_fac_ui(_fmpz_promote(f), n);
 }

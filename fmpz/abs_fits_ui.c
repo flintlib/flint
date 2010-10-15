@@ -2,7 +2,7 @@
 
     This file is part of FLINT.
 
-    FLINT is free software; you can redistribute it and/or modify
+fits_abs_ui    FLINT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
     (at your option) any later version.
@@ -19,42 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int main(void)
+int
+fmpz_abs_fits_ui(const fmpz_t f)
 {
-    int n;
-
-    printf("prime_pi....");
-    fflush(stdout);
-
-    for (n=1; n<100000; n++)
-    {
-        if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
-        {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
-        }
-    }
-
-    for (n=1; n<50000; n++)
-    {
-        if (n_prime_pi(n_nth_prime(n)) != n)
-        {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
-        }
-    }
-
-    printf("PASS\n");
-    return 0;
+    if (!COEFF_IS_MPZ(*f))
+        return 1;
+    return FLINT_ABS(COEFF_TO_PTR(*f)->_mp_size) <= 1;
 }

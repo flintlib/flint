@@ -23,69 +23,52 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
 #include "fmpz.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz_mat.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+void
+_fmpz_mat_mul(fmpz * C,
+              const fmpz * A, long ar, long ac,
+              const fmpz * B, long br, long bc)
 {
-    long i = 0;
+    long i, j, k;
+    fmpz * a, b, c;
 
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
+    for (i = 0; i < ar; i++)
     {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
-
-int main(void)
-{
-    fmpz_t m, a, b;
-    long n, k;
-
-    printf("divisor_sigma....");
-    fflush(stdout);
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
-    {
-        for (k = 0; k < 10; k++)
+        for (j = 0; j < bc; j++)
         {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
+            a = A + ac*i;
+            c = C + bc*i + j;
+            fmpz_zero(c);
+
+            for (k = 0, b = B + j; k < br; k++, a++)
             {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
+                /* C[i,j] += A[i,k] * B[k,j] */
+                b = B + j + bc*k;
+                fmpz_addmul(c, a, b);
             }
         }
     }
+}
 
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
+void
+fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+{
+    if (A->c != B->r || C->r != A->r || C->c != B->c)
+    {
+        printf("fmpz_mat_mul: incompatible dimensions\n");
+        abort();
+    }
 
-    printf("PASS\n");
-    return 0;
+    if (C == A || C == B)
+    {
+        printf("fmpz_mat_mul: aliasing not implemented\n");
+        abort();
+    }
+
+    _fmpz_mat_mul(C->entries, A->entries, A->r, A->c, B->entries, B->r, B->c);
 }

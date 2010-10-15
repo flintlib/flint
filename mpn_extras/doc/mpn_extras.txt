@@ -1,0 +1,106 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Fredrik Johansson
+
+******************************************************************************/
+
+
+********************************************************************************
+
+  Utility functions
+
+********************************************************************************
+
+void mpn_debug(mp_srcptr x, mp_size_t xsize)
+
+    Prints debug information about (x, xsize) to stdout. In particular,
+    this will print binary representations of all the limbs.
+
+
+int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
+
+    Returns 1 if all limbs (x, xsize) are zero, otherwise 0.
+
+
+********************************************************************************
+
+  Divisibility
+
+********************************************************************************
+
+mpn_divisible_1_p(x, xsize, d) (macro)
+
+    Expression determining whether (x, xsize) is divisible by the
+    mp_limb_t d which is assumed to be odd-valued and >= 3.
+
+
+mp_size_t mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
+
+    Divides x once by a known single-limb divisor, returns the new size.
+
+
+mp_size_t mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
+
+    Divides (x, xsize) by 2^n where n is the number of trailing zero
+    bits in x. The new size of x is returned, and n is stored in the
+    bits argument. x may not be zero.
+
+
+mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
+                                    mp_ptr p, mp_size_t psize, ulong *exp)
+
+    Divides (x, xsize) by the largest power n of (p, psize) that is an
+    exact divisor of x. The new size of x is returned, and n is stored in
+    the exp argument. x may not be zero, and p must be larger than 2.
+
+    This function works by testing divisibility by ascending squares
+    p, p^2, p^4, p^8 ..., making it efficient for removing potentially
+    large powers. Because of its high overhead, it should not be used as
+    the first stage of trial division.
+
+
+int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
+
+    Searches for a factor of (x, xsize) among {flint_primes[start] ...
+    flint_primes[stop-1]}. Returns i if flint_primes[i] is a factor,
+    otherwise returns 0 if no factor is found. It is assumed that start >= 1.
+
+
+********************************************************************************
+
+  Special numbers
+
+********************************************************************************
+
+void mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
+                               mp_ptr v, mp_size_t * vsize,
+                               long a, long b, long n, int d)
+
+    Computes (t,tsize) and (v,vsize) such that t/v = H_n = 1 + 1/2 + ... + 1/n.
+    The computation is performed using recursive balanced summation
+    over the odd terms. The resulting fraction will not generally be
+    normalized. At the top level, this function should be called with
+    n > 0, a = 1, b = n, d = 1.
+
+    Enough space should be allocated for t and v to fit the entire sum
+    1 + 1/2 + ... + 1/n computed without normalization; i.e. t and v
+    should have room to fit n! plus one extra limb.

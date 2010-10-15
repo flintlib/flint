@@ -4,7 +4,7 @@
 
     FLINT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    the Free Software Foundation; either version 2 of the License,or
     (at your option) any later version.
 
     FLINT is distributed in the hope that it will be useful,
@@ -13,8 +13,8 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with FLINT; if not, write to the Free Software
-    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+    along with FLINT; if not,write to the Free Software
+    Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA  02110-1301 USA
 
 =============================================================================*/
 /******************************************************************************
@@ -23,38 +23,27 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int main(void)
+
+void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
 {
-    int n;
+    int bits, ll;
+    double llo, lhi;
 
-    printf("prime_pi....");
-    fflush(stdout);
+    /* Lower and upper bounds for ln(n) */
+    bits = FLINT_BIT_COUNT(n);
+    llo = (bits-1) * 0.6931471;
+    lhi = bits * 0.6931472;
 
-    for (n=1; n<100000; n++)
-    {
-        if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
-        {
-            printf("FAIL:\n");
-            printf("expected pi(%d) + 1 = pi(%d)\n", n-1, n); 
-            abort();
-        }
-    }
+    /* Lower bound for ln(ln(n)) */
+    if      (n < 16)        ll = 0;
+    else if (n < 1619)      ll = 1;
+    else if (n < 528491312) ll = 2;
+    else                    ll = 3;
 
-    for (n=1; n<50000; n++)
-    {
-        if (n_prime_pi(n_nth_prime(n)) != n)
-        {
-            printf("FAIL:\n");
-            printf("expected pi(prime(%d)) = %d\n", n, n); 
-            abort();
-        }
-    }
-
-    printf("PASS\n");
-    return 0;
+    *lo = (mp_limb_t) (n * (llo + ll - 1));
+    *hi = (mp_limb_t) (n * (lhi + (ll+1) - (n >= 15985 ? 0.9427 : 0.0)));
 }

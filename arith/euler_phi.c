@@ -23,69 +23,52 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_vec.h"
 #include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+
+void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
 {
-    long i = 0;
-
+    fmpz_factor_t factors;
     fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
+    ulong exp;
+    long i;
 
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
+    if (fmpz_sgn(n) <= 0)
     {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
+        fmpz_zero(res);
+        return;
     }
 
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
-
-int main(void)
-{
-    fmpz_t m, a, b;
-    long n, k;
-
-    printf("divisor_sigma....");
-    fflush(stdout);
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
+    if (fmpz_abs_fits_ui(n))
     {
-        for (k = 0; k < 10; k++)
+        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
+        return;
+    }
+
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+    fmpz_set_ui(res, 1UL);
+
+    fmpz_init(t);
+    for (i = 0; i < factors->length; i++)
+    {
+        fmpz_sub_ui(t, factors->p + i, 1UL);
+        fmpz_mul(res, res, t);
+        exp = fmpz_get_ui(factors->exp + i);
+        if (exp != 1)
         {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
+            fmpz_pow_ui(t, factors->p + i, exp - 1UL);
+            fmpz_mul(res, res, t);
         }
     }
 
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
-
-    printf("PASS\n");
-    return 0;
+    fmpz_clear(t);
+    fmpz_factor_clear(factors);
 }

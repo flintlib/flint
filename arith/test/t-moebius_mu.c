@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,75 +28,68 @@
 #include <limits.h>
 #include <mpir.h>
 #include "flint.h"
+#include "arith.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
+#include "profiler.h"
 
-int
-main(void)
+
+void check(fmpz_t n, int expected)
+{
+    int mu;
+
+    mu = fmpz_moebius_mu(n);
+    if (mu != expected)
+    {
+        printf("FAIL:");
+        fmpz_print(n);
+        printf("\n");
+    }
+}
+
+int main(void)
 {
     fmpz_t x;
+    ulong p;
+    long i, j, k, l;
 
-    int i, result;
-
-    printf("get/set_si....");
+    printf("moebius_mu....");
     fflush(stdout);
 
     fmpz_init(x);
 
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
+    for (i = -1000; i < 1000; i++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
+        fmpz_set_si(x, i);
+        check(x, n_moebius_mu(FLINT_ABS(i)));
     }
 
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
+    n_compute_primes(100);
+    for (i = 0; i < 1000; i++)
     {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
+        fmpz_set_ui(x, 1);
+        /* Product of some primes */
+        k = n_randtest() % 10;
+        l = n_randtest() % 10;
+        for (j = 0; j < k; j++)
+        {
+            l += (n_randtest() % 10) + 1;
+            fmpz_mul_ui(x, x, flint_primes[l]);
+        }
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
+        check(x, (k % 2 ? -1 : 1));
+        fmpz_neg(x, x);
 
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
+        check(x, (k % 2 ? -1 : 1));
+        fmpz_abs(x, x);
+
+        /* No longer square-free */
+        p = flint_primes[n_randtest() % 100];
+        fmpz_mul_ui(x, x, p*p);
+        check(x, 0);
     }
 
     fmpz_clear(x);
 
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
-            abort();
-        }
-
-        fmpz_clear(a);
-    }
-
-    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

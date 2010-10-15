@@ -23,61 +23,10 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_divisors_naive(fmpz_poly_t p, long n)
+int n_is_squarefree(mp_limb_t n)
 {
-    long k;
-    long i = 0;
-
-    n = FLINT_ABS(n);
-
-    fmpz_poly_zero(p);
-    for (k = 1; k <= n; k++)
-    {
-        if (n % k == 0)
-        {
-            fmpz_poly_set_coeff_si(p, i, k);
-            i++;
-        }
-    }
-}
-
-int main(void)
-{
-    fmpz_t t;
-    fmpz_poly_t a, b;
-    long n;
-
-    printf("divisors....");
-    fflush(stdout);
-
-    fmpz_init(t);
-    fmpz_poly_init(a);
-    fmpz_poly_init(b);
-
-    for (n = -1000; n < 1000; n++)
-    {
-        fmpz_set_si(t, n);
-        fmpz_divisors(a, t);
-        fmpz_divisors_naive(b, n);
-        if (!fmpz_poly_equal(a, b))
-        {
-            printf("FAIL:\n");
-            printf("wrong value for n=%ld\n", n);
-            abort();
-        }
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(a);
-    fmpz_poly_clear(b);
-
-    printf("PASS\n");
-    return 0;
+    return n_moebius_mu(n) != 0;
 }

@@ -23,61 +23,34 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#include "mpn_extras.h"
 
-void fmpz_divisors_naive(fmpz_poly_t p, long n)
+
+mp_size_t mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
 {
-    long k;
-    long i = 0;
+    mp_size_t shift_limbs, reduced_size;
+    mp_bitcnt_t shift_bits;
 
-    n = FLINT_ABS(n);
+    *bits = mpn_scan1(x, 0);
 
-    fmpz_poly_zero(p);
-    for (k = 1; k <= n; k++)
+    if (*bits == 0)
+        return xsize;
+
+    shift_limbs = *bits / FLINT_BITS;
+    shift_bits = *bits % FLINT_BITS;
+    reduced_size = xsize - shift_limbs;
+
+    if (shift_bits)
     {
-        if (n % k == 0)
-        {
-            fmpz_poly_set_coeff_si(p, i, k);
-            i++;
-        }
+        mpn_rshift(x, x + shift_limbs, reduced_size, shift_bits);
+        if (x[reduced_size - 1] == 0)
+            reduced_size -= 1;
     }
-}
-
-int main(void)
-{
-    fmpz_t t;
-    fmpz_poly_t a, b;
-    long n;
-
-    printf("divisors....");
-    fflush(stdout);
-
-    fmpz_init(t);
-    fmpz_poly_init(a);
-    fmpz_poly_init(b);
-
-    for (n = -1000; n < 1000; n++)
+    else
     {
-        fmpz_set_si(t, n);
-        fmpz_divisors(a, t);
-        fmpz_divisors_naive(b, n);
-        if (!fmpz_poly_equal(a, b))
-        {
-            printf("FAIL:\n");
-            printf("wrong value for n=%ld\n", n);
-            abort();
-        }
+        mpn_copyi(x, x + shift_limbs, reduced_size);
     }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(a);
-    fmpz_poly_clear(b);
-
-    printf("PASS\n");
-    return 0;
+    return reduced_size;
 }

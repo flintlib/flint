@@ -23,69 +23,24 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+mp_limb_t n_euler_phi(mp_limb_t n)
 {
-    long i = 0;
+    int i;
+    mp_limb_t phi;
+    n_factor_t fac;
 
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
+    if (n < 2)
+        return n;
 
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
-    {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
+    n_factor_init(&fac);
+    n_factor(&fac, n, 1);
 
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
+    phi = 1UL;
+    for (i = 0; i < fac.num; i++)
+        phi *= (fac.p[i]-1) * n_pow(fac.p[i], fac.exp[i]-1);
 
-int main(void)
-{
-    fmpz_t m, a, b;
-    long n, k;
-
-    printf("divisor_sigma....");
-    fflush(stdout);
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
-    {
-        for (k = 0; k < 10; k++)
-        {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
-        }
-    }
-
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
-
-    printf("PASS\n");
-    return 0;
+    return phi;
 }

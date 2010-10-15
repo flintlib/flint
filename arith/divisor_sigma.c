@@ -31,44 +31,77 @@
 #include "ulong_extras.h"
 
 
-void fmpz_divisor_sigma(fmpz_t res, ulong n, ulong k)
+void _fmpz_prod(fmpz *factors, long len)
 {
-    int i;
-    fmpz_t p, r;
-    n_factor_t factors;
-    
-    if (n == 0)
+    long k, mid;
+    if (len < 4)
+    {
+        for (k = 1; k < len; k++)
+        {
+            fmpz_mul(factors, factors, factors+k);
+        }
+        return;
+    }
+
+    mid = len * 0.4;
+    _fmpz_prod(factors, mid);
+    _fmpz_prod(factors+mid, len-mid);
+    fmpz_mul(factors, factors, factors+mid);
+}
+
+/* Note: destroys factors! */
+void _fmpz_divisor_sigma(fmpz_t res, fmpz_factor_t factors, ulong k)
+{
+    long i;
+    fmpz * p;
+    fmpz_t r;
+
+    fmpz_set_ui(res, 1UL);
+
+    if (factors->length == 0)
+        return;
+
+    fmpz_init(r);
+
+    if (k == 0)
+    {
+        for (i = 0; i < factors->length; i++)
+        {
+            fmpz_add_ui(r, factors->exp + i, 1UL);
+            fmpz_mul(res, res, r);
+        }
+        return;
+    }
+    else
+    {
+        for (i = 0; i < factors->length; i++)
+        {
+            p = factors->p + i;
+            fmpz_set(p, factors->p + i);
+            fmpz_pow_ui(p, p, k);
+            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1UL);
+            fmpz_sub_ui(r, r, 1UL);
+            fmpz_sub_ui(p, p, 1UL);
+            fmpz_divexact(p, r, p);
+        }
+        _fmpz_prod(factors->p, factors->length);
+        fmpz_set(res, factors->p);
+    }
+    fmpz_clear(r);
+}
+
+void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+{
+    fmpz_factor_t factors;
+
+    if (fmpz_is_zero(n))
     {
         fmpz_zero(res);
         return;
     }
 
-    n_factor_init(&factors);
-    n_factor(&factors, n, 0);
-
-    fmpz_init(p);
-    fmpz_init(r);
-    fmpz_set_ui(res, 1UL);
-
-    /* 
-       TODO: use a balanced product in large cases,
-       speedup for small n. 
-    */
-    for (i = 0; i<factors.num; i++)
-    {
-        if (k == 0)
-            fmpz_mul_ui(res, res, factors.exp[i]+1);
-        else
-        {
-            fmpz_set_ui(p, factors.p[i]);
-            fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, factors.exp[i]+1);
-            fmpz_sub_ui(r, r, 1);
-            fmpz_sub_ui(p, p, 1);
-            fmpz_divexact(p, r, p);
-            fmpz_mul(res, res, p);
-        }
-    }
-    fmpz_clear(p);
-    fmpz_clear(r);
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+    _fmpz_divisor_sigma(res, factors, k);
+    fmpz_factor_clear(factors);
 }

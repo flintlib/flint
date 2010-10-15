@@ -24,68 +24,27 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz.h"
-#include "arith.h"
-#include "ulong_extras.h"
+#include "mpn_extras.h"
 
-void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
+
+void mpn_debug(mp_srcptr x, mp_size_t xsize)
 {
-    long i = 0;
+    int i, j;
+    char byte[9];
+    byte[8] = 0;
 
-    fmpz_t t;
-    fmpz_poly_t p;
-    fmpz_init(t);
-    fmpz_poly_init(p);
-    fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
-
-    fmpz_zero(x);
-    for (i = 0; i < p->length; i++)
+    printf("\n");
+    for (i = 0; i < xsize; i++)
     {
-        fmpz_poly_get_coeff_fmpz(t, p, i);
-        fmpz_pow_ui(t, t, k);
-        fmpz_add(x, x, t);
-    }
-
-    fmpz_clear(t);
-    fmpz_poly_clear(p);
-}
-
-int main(void)
-{
-    fmpz_t m, a, b;
-    long n, k;
-
-    printf("divisor_sigma....");
-    fflush(stdout);
-
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(m);
-
-    for (n = 0; n < 5000; n++)
-    {
-        for (k = 0; k < 10; k++)
+        printf("DIGIT %3d/%ld: ", i, xsize);
+        for (j = 0; j < FLINT_BITS; j++)
         {
-            fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
-            fmpz_sigma_naive(b, n, k);
-            if (!fmpz_equal(a, b))
-            {
-                printf("FAIL:\n");
-                printf("wrong value for n=%ld, k=%ld\n", n, k);
-                abort();
-            }
+            byte[j % 8] = (x[i] & (1UL<<j)) ? '1' : '0';
+            if (j % 8 == 7)
+                printf("%s ", byte);
         }
+        printf(" (%lu)\n", x[i]);
     }
-
-    fmpz_clear(a);
-    fmpz_clear(b);
-    fmpz_clear(m);
-
-    printf("PASS\n");
-    return 0;
 }

@@ -58,28 +58,22 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
     fmpz_clear(tmp);
 }
 
-void fmpz_ramanujan_tau(fmpz_t res, long n)
+void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
 {
     fmpz_poly_t poly;
     fmpz_t tau_p, p_11, next, this, prev;
-    n_factor_t factors;
-    int k, r;
+    long k, r;
     ulong max_prime;
 
-    if (n < 1)
+    max_prime = 1UL;
+    for (k = 0; k < factors->length; k++)
     {
-        fmpz_zero(res);
-        return;
+        /* TODO: handle overflow properly */
+        max_prime = FLINT_MAX(max_prime, fmpz_get_ui(factors->p + k));
     }
 
-    n_factor_init(&factors);
-    n_factor(&factors, n, 0);
-    max_prime = 1;
-    for (k = 0; k < factors.num; k++)
-        max_prime = FLINT_MAX(max_prime, factors.p[k]);
-
     fmpz_poly_init(poly);
-    fmpz_poly_ramanujan_tau(poly, max_prime+1);
+    fmpz_poly_ramanujan_tau(poly, max_prime + 1);
 
     fmpz_set_ui(res, 1);
     fmpz_init(tau_p);
@@ -88,17 +82,17 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
     fmpz_init(this);
     fmpz_init(prev);
 
-    for (k=0; k < factors.num; k++)
+    for (k = 0; k < factors->length; k++)
     {
-        ulong p = factors.p[k];
+        ulong p = fmpz_get_ui(factors->p + k);
 
-        fmpz_set(tau_p, poly->coeffs+p);
+        fmpz_set(tau_p, poly->coeffs + p);
         fmpz_set_ui(p_11, p);
         fmpz_pow_ui(p_11, p_11, 11);
         fmpz_set_ui(prev, 1);
         fmpz_set(this, tau_p);
 
-        for (r = 1; r < factors.exp[k]; r++)
+        for (r = 1; r < fmpz_get_ui(factors->exp + k); r++)
         {
             fmpz_mul(next, tau_p, this);
             fmpz_submul(next, p_11, prev);
@@ -114,4 +108,20 @@ void fmpz_ramanujan_tau(fmpz_t res, long n)
     fmpz_clear(this);
     fmpz_clear(prev);
     fmpz_poly_clear(poly);
+}
+
+void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
+{
+    fmpz_factor_t factors;
+
+    if (fmpz_sgn(n) <= 0)
+    {
+        fmpz_zero(res);
+        return;
+    }
+
+    fmpz_factor_init(factors);
+    fmpz_factor(factors, n);
+    _fmpz_ramanujan_tau(res, factors);
+    fmpz_factor_clear(factors);
 }

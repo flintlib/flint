@@ -19,84 +19,64 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
-int
-main(void)
+void test_exact(int d)
 {
-    fmpz_t x;
+    int i, j;
+    ulong exp, exact;
+    mpz_t a, a2, b, c;
+    mpz_init(a);
+    mpz_init(a2);
+    mpz_init(b);
+    mpz_init(c);
+    for (i=0; i<100; i++)
+    {
+        for (j=1; j<100; j++)
+        {
+            exact = i / j;
+            mpz_set_ui(a, d);
+            mpz_pow_ui(a, a, i);
+            mpz_set(a2, a);
+            mpz_set_ui(b, d);
+            mpz_pow_ui(b, b, j);
+            a->_mp_size = mpn_remove_power_ascending(a->_mp_d, a->_mp_size,
+                b->_mp_d, b->_mp_size, &exp);
+            mpz_pow_ui(b, b, exact);
+            mpz_tdiv_q(c, a2, b);
+            if (exp != i/j || mpz_cmp(a, c))
+            {
+                gmp_printf("%d^%d / %d^%d\n", d, i, d, j);
+                abort();
+            }
+        }
+    }
 
-    int i, result;
+    mpz_clear(a);
+    mpz_clear(a2);
+    mpz_clear(b);
+    mpz_clear(c);
+}
 
-    printf("get/set_si....");
+
+int main(void)
+{
+    printf("remove_power....");
     fflush(stdout);
 
-    fmpz_init(x);
+    test_exact(3);
+    test_exact(10);
+    test_exact(7429);
 
-    fmpz_set_si(x, COEFF_MIN);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MIN)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, COEFF_MAX);
-    if (COEFF_IS_MPZ(*x) || fmpz_get_si(x) != COEFF_MAX)
-    {
-        printf("FAIL: COEFF_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MIN");
-        abort();
-    }
-
-    fmpz_set_si(x, LONG_MIN);
-    if (!COEFF_IS_MPZ(*x) || fmpz_get_si(x) != LONG_MIN)
-    {
-        printf("FAIL: LONG_MAX");
-        abort();
-    }
-
-    fmpz_clear(x);
-
-    for (i = 0; i < 100000; i++)
-    {
-        fmpz_t a;
-        long b, c;
-
-        b = (long) n_randtest();
-
-        fmpz_init(a);
-
-        fmpz_set_si(a, b);
-        c = fmpz_get_si(a);
-
-        result = (b == c);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("b = %ld, c = %ld\n", b, c);
-            abort();
-        }
-
-        fmpz_clear(a);
-    }
-
-    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

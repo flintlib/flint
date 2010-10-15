@@ -341,6 +341,10 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     g - f^2.  If g is negative, an exception is raised.  The behaviour is 
     undefined if f and r are aliases.
 
+void fmpz_fac_ui(fmpz_t f, ulong n)
+
+    Sets f to n factorial where n is an unsigned long.
+
 /*******************************************************************************
 
    GCD and extended GCD

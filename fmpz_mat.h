@@ -66,5 +66,7 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t 
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha);
 
+void fmpz_mat_mul(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B);
+
 #endif
 
