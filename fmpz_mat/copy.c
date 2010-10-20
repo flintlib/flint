@@ -35,11 +35,8 @@ fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {
-        if (mat1->r != mat2->r || mat1->c != mat2->c)
-        {
-            printf("exception: fmpz_mat_copy: incompatible dimensions\n");
-            abort();
-        }
+        FMPZ_MAT_ASSERT(mat1->r == mat2->r && mat1->c == mat2->c,
+            "fmpz_mat_copy: incompatible dimensions");
 
         _fmpz_vec_copy(mat1->entries, mat2->entries, mat2->r * mat2->c);
     }

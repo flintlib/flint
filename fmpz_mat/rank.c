@@ -44,7 +44,7 @@ fmpz_mat_rank(const fmpz_mat_t A)
 
     fmpz_mat_init(tmp, m, n);
     _fmpz_vec_copy(tmp->entries, A->entries, m * n);
-    rank = _fmpz_mat_rowreduce(tmp->rows, m, n, ROWREDUCE_ECHELON_FORM);
+    rank = _fmpz_mat_rowreduce(tmp->rows, m, n, 0);
     fmpz_mat_clear(tmp);
     return FLINT_ABS(rank);
 }

@@ -83,62 +83,71 @@ void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b)
 }
 
 void
-_fmpz_mat_solve_rowreduce(fmpz * xnum, fmpz_t xden, const fmpz_mat_t A,
-    const fmpz * b)
+_fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 {
-    long i;
-    long r = A->r;
-    long c = A->c;
-
+    long i, dim, rank;
     fmpz_mat_t T;
-    fmpz_mat_init(T, r, c+1);
+    fmpz * tmp;
 
-    /* Form augmented matrix */
-    for (i = 0; i < r; i++)
+    dim = A->r;
+
+    /* Compute LU decomposition in a temporary matrix */
+    fmpz_mat_init(T, dim, dim);
+    _fmpz_vec_copy(T->entries, A->entries, dim * dim);
+    rank = _fmpz_mat_rowreduce(T->rows, dim, dim, 0);
+
+    if (FLINT_ABS(rank) == dim)
     {
-        _fmpz_vec_copy(T->rows[i], A->rows[i], c);
-        fmpz_set(T->rows[i] + c, b + i);
+        long * order;
+        fmpz_set(den, &T->rows[dim-1][dim-1]);
+
+        /* Pivot order */
+        order = malloc(sizeof(long) * dim);
+        for (i = 0; i < dim; i++)
+            order[(T->rows[i] - T->entries) / dim] = i;
+
+        tmp = _fmpz_vec_init(dim);
+        for (i = 0; i < dim; i++)
+            fmpz_set(&tmp[order[i]], &b[i]);
+
+        _fmpz_mat_solve_fflu_precomp(tmp, T->rows, dim);
+
+        for (i = 0; i < dim; i++)
+            fmpz_set(&x[i], &tmp[i]);
+
+        _fmpz_vec_clear(tmp, dim);
+        free(order);
+    }
+    else
+    {
+        fmpz_zero(den);
     }
 
-    /* Solve */
-    _fmpz_mat_rowreduce(T->rows, r, c + 1, ROWREDUCE_REDUCED_ECHELON_FORM);
-
-    /* Copy solution */
-    for (i = 0; i < r; i++)
-        fmpz_set(xnum + i, T->rows[i] + c);
-
-    fmpz_set(xden, &T->rows[r-1][r-1]);
     fmpz_mat_clear(T);
 }
 
-
 void
-fmpz_mat_solve(fmpz * xnum, fmpz_t xden,
-                    const fmpz_mat_t A, const fmpz * b)
+fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 {
     long dim = A->r;
 
-    if (dim != A->c)
-    {
-        printf("fmpz_mat_solve: nonsquare matrix");
-        abort();
-    }
+    FMPZ_MAT_ASSERT(dim == A->c, "fmpz_mat_solve: matrix must be square");
 
     switch (dim)
     {
         case 0:
             break;
         case 1:
-            fmpz_set(xnum, b);
-            fmpz_set(xden, A->entries);
+            fmpz_set(den, A->entries);
+            fmpz_set(x, b);
             break;
         case 2:
-            _fmpz_mat_solve_2x2(xnum, xden, A->rows, b);
+            _fmpz_mat_solve_2x2(x, den, A->rows, b);
             break;
         case 3:
-            _fmpz_mat_solve_3x3(xnum, xden, A->rows, b);
+            _fmpz_mat_solve_3x3(x, den, A->rows, b);
             break;
         default:
-            _fmpz_mat_solve_rowreduce(xnum, xden, A, b);
+            _fmpz_mat_solve_fflu(x, den, A, b);
     }
 }

@@ -92,9 +92,10 @@ main(void)
             d = n_randint(2*m*n + 1);
             fmpz_mat_init(A, m, n);
             fmpz_mat_randrank(A, rnd, r, b);
-            rank = _fmpz_mat_rowreduce(A->rows, m, n, ROWREDUCE_ECHELON_FORM);
+            rank = _fmpz_mat_rowreduce(A->rows, m, n, ROWREDUCE_CLEAR_LOWER);
             if (r != FLINT_ABS(rank))
             {
+                printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
@@ -119,9 +120,10 @@ main(void)
 
             fmpz_mat_randops(A, rnd, d);
 
-            rank = _fmpz_mat_rowreduce(A->rows, m, n, ROWREDUCE_ECHELON_FORM);
+            rank = _fmpz_mat_rowreduce(A->rows, m, n, ROWREDUCE_CLEAR_LOWER);
             if (r != FLINT_ABS(rank))
             {
+                printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
@@ -132,6 +134,8 @@ main(void)
         }
     }
 
+    fmpz_mat_randclear(rnd);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -36,58 +36,59 @@
 int
 main(void)
 {
-    fmpz_mat_t A, x, b, Ax;
+    fmpz_mat_t A, X, B, AX;
     fmpz_t den;
     fmpz_randstate_t rnd;
-    long i, m, r;
+    long i, m, n, r;
 
-    printf("solve....");
+    printf("solve_mat....");
     fflush(stdout);
 
     fmpz_randinit(rnd);
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 10000; i++)
     {
         m = n_randint(10);
+        n = n_randint(10);
 
         fmpz_mat_init(A, m, m);
-        fmpz_mat_init(b, m, 1);
-        fmpz_mat_init(x, m, 1);
-        fmpz_mat_init(Ax, m, 1);
+        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(X, m, n);
+        fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
         fmpz_mat_randrank(A, rnd, m, 1+n_randint(2)*n_randint(100));
-        fmpz_mat_randtest(b, rnd, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randtest(B, rnd, 1+n_randint(2)*n_randint(100));
 
         /* Dense */
         if (n_randint(2))
             fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
 
-        fmpz_mat_solve(x->entries, den, A, b->entries);
+        fmpz_mat_solve_mat(X, den, A, B);
 
-        fmpz_mat_mul(Ax, A, x);
-        _fmpz_vec_scalar_divexact_fmpz(Ax->entries, Ax->entries, m, den);
+        fmpz_mat_mul(AX, A, X);
+        _fmpz_vec_scalar_divexact_fmpz(AX->entries, AX->entries, m*n, den);
 
-        if (!_fmpz_vec_equal(Ax->entries, b->entries, m))
+        if (!_fmpz_vec_equal(AX->entries, B->entries, m*n))
         {
             printf("FAIL:\n");
-            printf("Ax != b!\n");
+            printf("AX != B!\n");
             printf("A:\n");
             fmpz_mat_print_pretty(A);
-            printf("b:\n");
-            fmpz_mat_print_pretty(b);
-            printf("x: (den = "); fmpz_print(den); printf(")\n");
-            fmpz_mat_print_pretty(x);
-            printf("Ax:\n");
-            fmpz_mat_print_pretty(Ax);
+            printf("B:\n");
+            fmpz_mat_print_pretty(B);
+            printf("X: (den = "); fmpz_print(den); printf(")\n");
+            fmpz_mat_print_pretty(X);
+            printf("AX:\n");
+            fmpz_mat_print_pretty(AX);
             printf("\n");
             abort();
         }
 
         fmpz_mat_clear(A);
-        fmpz_mat_clear(b);
-        fmpz_mat_clear(x);
-        fmpz_mat_clear(Ax);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(X);
+        fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
 
@@ -98,19 +99,19 @@ main(void)
         r = n_randint(m);
 
         fmpz_mat_init(A, m, m);
-        fmpz_mat_init(b, m, 1);
-        fmpz_mat_init(x, m, 1);
-        fmpz_mat_init(Ax, m, 1);
+        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(X, m, n);
+        fmpz_mat_init(AX, m, n);
         fmpz_init(den);
 
         fmpz_mat_randrank(A, rnd, r, 1+n_randint(2)*n_randint(100));
-        fmpz_mat_randtest(b, rnd, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randtest(B, rnd, 1+n_randint(2)*n_randint(100));
 
         /* Dense */
         if (n_randint(2))
             fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
 
-        fmpz_mat_solve(x->entries, den, A, b->entries);
+        fmpz_mat_solve_mat(X, den, A, B);
 
         if (!fmpz_is_zero(den))
         {
@@ -120,9 +121,9 @@ main(void)
         }
 
         fmpz_mat_clear(A);
-        fmpz_mat_clear(b);
-        fmpz_mat_clear(x);
-        fmpz_mat_clear(Ax);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(X);
+        fmpz_mat_clear(AX);
         fmpz_clear(den);
     }
 

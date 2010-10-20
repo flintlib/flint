@@ -58,7 +58,7 @@ _pivot(fmpz ** rows, long n, long from_row, long in_column)
     return 0;
 }
 
-long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int variant)
+long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options)
 {
     long j, k, rank;
     int sign = 1;
@@ -84,7 +84,7 @@ long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int variant)
 
         if (!det_sign)
         {
-            if (variant == ROWREDUCE_DETONLY)
+            if (options & ROWREDUCE_FAST_ABORT)
             {
                 rank = 0L;
                 break;
@@ -99,8 +99,7 @@ long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int variant)
         if (prev_pivot_row >= 0)
             fmpz_set(d, &a[prev_pivot_row][prev_pivot_col]);
 
-        for (j = (variant == ROWREDUCE_REDUCED_ECHELON_FORM ? 
-            0 : pivot_row + 1); j < m; j++)
+        for (j = (options & ROWREDUCE_FULL ? 0 : pivot_row + 1); j < m; j++)
         {
             if (j == pivot_row)
                 continue;
@@ -111,7 +110,9 @@ long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int variant)
                 if (prev_pivot_row > -1)
                     fmpz_divexact(&a[j][k], &a[j][k], d);
             }
-            fmpz_zero(&a[j][pivot_col]);
+
+            if (options & ROWREDUCE_CLEAR_LOWER)
+                fmpz_zero(&a[j][pivot_col]);
         }
 
         prev_pivot_row = pivot_row;

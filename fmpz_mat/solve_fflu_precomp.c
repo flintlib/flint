@@ -26,46 +26,32 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-void
-_fmpz_mat_mul(fmpz ** C, fmpz ** const A, long ar, long ac,
-                         fmpz ** const B, long br, long bc)
-{
-    long i, j, k;
 
-    for (i = 0; i < ar; i++)
+void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const LU, long n)
+{
+    long i, j;
+
+    /* Fraction-free forward substitution */
+    for (i = 0; i < n - 1; i++)
     {
-        for (j = 0; j < bc; j++)
+        for (j = i + 1; j < n; j++)
         {
-            fmpz_zero(&C[i][j]);
-            for (k = 0; k < br; k++)
-                fmpz_addmul(&C[i][j], &A[i][k], &B[k][j]);
+            fmpz_mul(&b[j], &b[j], &LU[i][i]);
+            fmpz_submul(&b[j], &LU[j][i], &b[i]);
+            if (i > 0)
+                fmpz_divexact(&b[j], &b[j], &LU[i-1][i-1]);
         }
     }
-}
 
-void
-fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
-{
-    long cr, cc;
-
-    cr = A->r;
-    cc = B->c;
-
-    FMPZ_MAT_ASSERT((A->c == B->r && C->r == cr && C->c == cc),
-        "fmpz_mat_mul: incompatible dimensions\n");
-
-    if (C == A || C == B)
+    /* Fraction-free backward substitution */
+    for (i = n - 2; i >= 0; i--)
     {
-        fmpz_mat_t t;
-        fmpz_mat_init(t, cr, cc);
-        _fmpz_mat_mul(t->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
-        fmpz_mat_swap(C, t);
-        fmpz_mat_clear(t);
-    }
-    else
-    {
-        _fmpz_mat_mul(C->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
+        fmpz_mul(&b[i], &b[i], &LU[n-1][n-1]);
+        for (j = i + 1; j < n; j++)
+            fmpz_submul(&b[i], &b[j], &LU[i][j]);
+        fmpz_divexact(&b[i], &b[i], &LU[i][i]);
     }
 }

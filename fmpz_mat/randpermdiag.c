@@ -30,7 +30,10 @@
 #include "ulong_extras.h"
 
 
-/* Fisher-Yates shuffle */
+/*
+  Standard Fisher-Yates shuffle to randomise an array; returns whether
+  the permutation is even (0) or odd (1)
+*/
 static int shuffle(long * array, long n, fmpz_randstate_t state)
 {
     long i, j, tmp;

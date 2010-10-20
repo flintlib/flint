@@ -126,7 +126,7 @@ void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x)
 }
 
 void
-_fmpz_mat_det_row_reduction(fmpz_t det, const fmpz_mat_t A)
+_fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A)
 {
     fmpz_mat_t tmp;
     long m = A->r;
@@ -135,7 +135,7 @@ _fmpz_mat_det_row_reduction(fmpz_t det, const fmpz_mat_t A)
     fmpz_mat_init(tmp, m, m);
     _fmpz_vec_copy(tmp->entries, A->entries, m * m);
 
-    rank = _fmpz_mat_rowreduce(tmp->rows, m, m, ROWREDUCE_DETONLY);
+    rank = _fmpz_mat_rowreduce(tmp->rows, m, m, ROWREDUCE_FAST_ABORT);
 
     if (rank < 0)
     {
@@ -173,6 +173,6 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
         case 2:  _fmpz_mat_det_2x2(det, A->rows); break;
         case 3:  _fmpz_mat_det_3x3(det, A->rows); break;
         case 4:  _fmpz_mat_det_4x4(det, A->rows); break;
-        default: _fmpz_mat_det_row_reduction(det, A);
+        default: _fmpz_mat_det_rowreduce(det, A);
     }
 }
