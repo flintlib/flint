@@ -98,17 +98,14 @@ _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 
     if (FLINT_ABS(rank) == dim)
     {
-        long * order;
         fmpz_set(den, &T->rows[dim-1][dim-1]);
-
-        /* Pivot order */
-        order = malloc(sizeof(long) * dim);
-        for (i = 0; i < dim; i++)
-            order[(T->rows[i] - T->entries) / dim] = i;
 
         tmp = _fmpz_vec_init(dim);
         for (i = 0; i < dim; i++)
-            fmpz_set(&tmp[order[i]], &b[i]);
+        {
+            /* Insert in same order as the pivots */
+            fmpz_set(&tmp[i], &b[(T->rows[i] - T->entries) / dim]);
+        }
 
         _fmpz_mat_solve_fflu_precomp(tmp, T->rows, dim);
 
@@ -116,7 +113,6 @@ _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
             fmpz_set(&x[i], &tmp[i]);
 
         _fmpz_vec_clear(tmp, dim);
-        free(order);
     }
     else
     {
