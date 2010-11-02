@@ -1,0 +1,146 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Fredrik Johansson
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
+
+    Initialises mat to a (rows x cols) matrix with coefficients
+    mod n. All elements are set to zero.
+
+
+void nmod_mat_clear(nmod_mat_t mat)
+
+   Clears the matrix and releases any memory it used. The matrix 
+   cannot be used again until it is initialised.
+
+
+*******************************************************************************
+
+    Testing and debugging
+
+*******************************************************************************
+
+void nmod_mat_print_pretty(nmod_mat_t mat)
+
+    Pretty-prints mat to stdout.
+
+
+void nmod_mat_randtest(nmod_mat_t mat)
+
+    Sets the elements to random numbers between 0 and m-1 where m
+    is the modulus of mat.
+
+
+*******************************************************************************
+
+    Matrix arithmetic
+
+*******************************************************************************
+
+void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Computes C = A + B.
+
+
+void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Computes the matrix product C = A * B.
+
+
+void _nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Computes C = A * B using classical matrix multiplication, performing
+    a modular reduction on every arithmetic operation. This algorithm works
+    for arbitrary matrices and moduli but is generally slow and should
+    only be used as a reference implementation. C is not allowed to alias
+    with A or B.
+
+
+void _nmod_mat_mul_classical_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_classical_1r(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long run_length)
+void _nmod_mat_mul_classical_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_classical_2r(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long run_length)
+void _nmod_mat_mul_classical_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Computes C = A * B using classical matrix multiplication, i.e. forming
+    dot products of rows in A with the columns of B, accumulating
+    each result in a register of length 1, 2 or 3 limbs respectively.
+
+    The "r" versions perform a modular reduction every run_length terms
+    of each dot product, while the other versions only perform a single final
+    modular reduction per element in the result matrix.
+
+    The length-1 version assumes that the unreduced matrix product A*B over Z
+    has elements strictly smaller than 2^FLINT_BITS.
+
+    The length-2 version assumes that the unreduced matrix product A*B over Z
+    has elements strictly smaller than 2^(2*FLINT_BITS).
+
+    The length-1 "r" version assumes that all unreduced temporary results fit in
+    a single limb. This is true if run_length * (a*b) is smaller
+    than 2^FLINT_BITS for all a in A and all b in B.
+
+    The length-2 "r" version assumes that all unreduced temporary results fit in
+    two limbs. This is true if run_length * (a*b) is smaller
+    than 2^(2*FLINT_BITS) for all a in A and all b in B.
+
+    The length-3 version works in all cases.
+
+    C is not allowed to alias with A or B.
+
+
+void _nmod_mat_mul_blocked_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+void _nmod_mat_mul_blocked_1b(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+void _nmod_mat_mul_blocked_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+void _nmod_mat_mul_blocked_2b(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+void _nmod_mat_mul_blocked_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+void _nmod_mat_mul_blocked_3b(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B, long block_size)
+
+    Computes C = A * B using blocked classical matrix multiplication
+    using block products of size (block_size x block_size) to improve memory
+    locality for large matrices.
+
+    The "b" versions postpone modular reductions until the end
+    (the length-2 and length-3 versions need to allocate temporary matrices
+    to store the extended-precision temporary results).
+
+    Versions 1 and 2 assume that each unreduced block product has
+    elements strictly smaller than 2^(2*FLINT_BITS). This is true if
+    block_size * (a*b) is smaller than 2^FLINT_BITS and 2^(2*FLINT_BITS)
+    respectively.
+
+    Versions 1b and 2b assume that the unreduced matrix product A*B over Z
+    has elements strictly smaller than 2^FLINT_BITS and 2^(2*FLINT_BITS),
+    respectively.
+
+    Versions 3 and 3b work for all moduli and coefficients.
+
+    C is not allowed to alias with A or B.
+
