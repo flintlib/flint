@@ -68,7 +68,7 @@ main(void)
         fmpz_mat_mul(Ax, A, x);
         _fmpz_vec_scalar_divexact_fmpz(Ax->entries, Ax->entries, m, den);
 
-        if (!_fmpz_vec_equal(Ax->entries, b->entries, m))
+        if (!fmpz_mat_equal(Ax, b))
         {
             printf("FAIL:\n");
             printf("Ax != b!\n");

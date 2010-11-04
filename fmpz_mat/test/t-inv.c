@@ -71,7 +71,7 @@ main(void)
 
         _fmpz_vec_scalar_divexact_fmpz(C->entries, C->entries, m*m, den);
 
-        if (!_fmpz_vec_equal(C->entries, I->entries, m*m))
+        if (!fmpz_mat_equal(C, I))
         {
             printf("FAIL:\n");
             printf("A * A^-1 != I!\n");
@@ -91,7 +91,7 @@ main(void)
         fmpz_mat_mul(B, A, C);
         _fmpz_vec_scalar_divexact_fmpz(B->entries, B->entries, m*m, den);
 
-        if (!_fmpz_vec_equal(B->entries, I->entries, m*m))
+        if (!fmpz_mat_equal(B, I))
         {
             printf("FAIL:\n");
             printf("aliasing failed!\n");

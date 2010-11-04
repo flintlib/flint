@@ -48,6 +48,8 @@ void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
 void fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
 
+int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
+
 void fmpz_mat_print(fmpz_mat_t mat); 
 void fmpz_mat_print_pretty(fmpz_mat_t mat);
 
@@ -68,6 +70,8 @@ int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * d
 
 
 /* Linear algebra operations */
+
+void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A);
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 

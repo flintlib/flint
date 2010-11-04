@@ -26,36 +26,16 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-void
-fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
+int
+fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 {
-    fmpz tmp;
-    long i, j;
-
-    if (B->r != A->c || B->c != A->r)
+    if (mat1->r != mat2->r || mat1->c != mat2->c)
     {
-        printf("exception: fmpz_mat_transpose: incompatible dimensions\n");
-        abort();
+        return 0;
     }
 
-    /* In-place, guaranteed to be square */
-    if (A == B)
-    {
-        for (i = 0; i < A->r - 1; i++)
-        {
-            for (j = i + 1; j < i; j++)
-            {
-                tmp = A->rows[i][j];
-                A->rows[i][j] = A->rows[j][i];
-                A->rows[j][i] = tmp;
-            }
-        }
-    }
-
-    /* Not aliased; general case */
-    for (i = 0; i < B->r; i++)
-        for (j = 0; j < B->c; j++)
-            fmpz_set(&B->rows[i][j], &A->rows[j][i]);
+    return _fmpz_vec_equal(mat1->entries, mat2->entries, mat1->r * mat1->c);
 }
