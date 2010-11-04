@@ -29,13 +29,14 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
+
 void
-_nmod_mat_mul_classical_2r(nmod_mat_t C, const nmod_mat_t A,
-                            const nmod_mat_t B, long run_length)
+_nmod_mat_mul_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long i, j, k, r;
-    mp_limb_t s0, s1;
-    mp_limb_t t0, t1;
+    long i, j, k;
+
+    register mp_limb_t s0, s1;
+    register mp_limb_t t0, t1;
 
     for (i = 0; i < A->r; i++)
     {
@@ -43,20 +44,39 @@ _nmod_mat_mul_classical_2r(nmod_mat_t C, const nmod_mat_t A,
         {
             s0 = s1 = 0UL;
 
-            for (r = 0; r < A->c; r += run_length)
+            for (k = 0; k < A->c; k++)
             {
-                t0 = t1 = 0UL;
-
-                for (k = r; k < FLINT_MIN(A->c, r + run_length); k++)
-                {
-                    umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
-                    add_ssaaaa(s1, s0, s1, s0, t1, t0);
-                }
-
-                NMOD_RED2(s0, s1, s0, C->mod);
-                s1 = 0UL;
+                umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
+                add_ssaaaa(s1, s0, s1, s0, t1, t0);
             }
 
+            NMOD2_RED2(s0, s1, s0, C->mod);
+            C->rows[i][j] = s0;
+        }
+    }
+}
+
+void
+_nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    long i, j, k;
+
+    register mp_limb_t s0, s1;
+    register mp_limb_t t0, t1;
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < B->r; j++)
+        {
+            s0 = s1 = 0UL;
+
+            for (k = 0; k < A->c; k++)
+            {
+                umul_ppmm(t1, t0, A->rows[i][k], B->rows[j][k]);
+                add_ssaaaa(s1, s0, s1, s0, t1, t0);
+            }
+
+            NMOD2_RED2(s0, s1, s0, C->mod);
             C->rows[i][j] = s0;
         }
     }

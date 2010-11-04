@@ -28,35 +28,54 @@
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
-#include "longlong.h"
+
 
 void
-_nmod_mat_mul_classical_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+_nmod_mat_mul_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     long i, j, k;
 
-    mp_limb_t s0, s1, s2;
-    mp_limb_t t0, t1;
-    mp_limb_t c1, c2;
-
+    register mp_limb_t s;
 
     for (i = 0; i < A->r; i++)
     {
         for (j = 0; j < B->c; j++)
         {
-            s0 = s1 = s2 = 0UL;
+            s = 0UL;
 
             for (k = 0; k < A->c; k++)
             {
-                umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
-                add_ssaaaa(c1, s0, (mp_limb_t) 0, s0, (mp_limb_t) 0, t0);
-                add_ssaaaa(c2, s1, (mp_limb_t) 0, s1, (mp_limb_t) 0, t1);
-                add_ssaaaa(s2, s1, s2, s1, c2, c1);
+                s += A->rows[i][k] * B->rows[k][j];
             }
 
-            NMOD_RED(s2, s2, C->mod);
-            NMOD_RED3(s0, s2, s1, s0, C->mod);
-            C->rows[i][j] = s0;
+            C->rows[i][j] = s;
         }
     }
+
+    _nmod_vec_reduce(C->entries, C->entries, A->r * B->c, C->mod);
+}
+
+void
+_nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    long i, j, k;
+
+    register mp_limb_t s;
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < B->r; j++)
+        {
+            s = 0UL;
+
+            for (k = 0; k < A->c; k++)
+            {
+                s += A->rows[i][k] * B->rows[j][k];
+            }
+
+            C->rows[i][j] = s;
+        }
+    }
+
+    _nmod_vec_reduce(C->entries, C->entries, A->r * B->r, C->mod);
 }

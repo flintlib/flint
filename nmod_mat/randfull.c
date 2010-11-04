@@ -27,31 +27,14 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
-#include "longlong.h"
 
 void
-_nmod_mat_mul_classical_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_randfull(nmod_mat_t mat)
 {
-    long i, j, k;
+    long i;
 
-    mp_limb_t s0, s1;
-    mp_limb_t t0, t1;
-
-    for (i = 0; i < A->r; i++)
+    for (i = 0; i < mat->r * mat->c; i++)
     {
-        for (j = 0; j < B->c; j++)
-        {
-            s0 = s1 = 0UL;
-
-            for (k = 0; k < A->c; k++)
-            {
-                umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
-                add_ssaaaa(s1, s0, s1, s0, t1, t0);
-            }
-
-            NMOD_RED2(s0, s1, s0, C->mod);
-            C->rows[i][j] = s0;
-        }
+        mat->entries[i] = FLINT_MAX(1, n_randint(mat->mod.n));
     }
 }

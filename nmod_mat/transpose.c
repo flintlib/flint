@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
@@ -30,30 +31,37 @@
 #include "nmod_vec.h"
 
 void
-_nmod_mat_mul_classical_1r(nmod_mat_t C, const nmod_mat_t A,
-                            const nmod_mat_t B, long run_length)
+nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 {
-    long i, j, k, r;
-    mp_limb_t s, t;
+    mp_limb_t tmp;
 
-    for (i = 0; i < A->r; i++)
+    long i, j;
+
+    if (B->r != A->c || B->c != A->r)
     {
-        for (j = 0; j < B->c; j++)
+        printf("exception: nmod_mat_transpose: incompatible dimensions\n");
+        abort();
+    }
+
+    /* In-place, guaranteed to be square */
+    if (A == B)
+    {
+        for (i = 0; i < A->r - 1; i++)
         {
-            s = 0UL;
-
-            for (r = 0; r < A->c; r += run_length)
+            for (j = i + 1; j < i; j++)
             {
-                t = 0UL;
-
-                for (k = r; k < FLINT_MIN(A->c, r + run_length); k++)
-                    t += A->rows[i][k] * B->rows[k][j];
-
-                NMOD_RED(t, t, C->mod);
-                s = nmod_add(s, t, C->mod);
+                tmp = A->rows[i][j];
+                A->rows[i][j] = A->rows[j][i];
+                A->rows[j][i] = tmp;
             }
-
-            C->rows[i][j] = s;
         }
     }
+
+    /* Not aliased; general case */
+    for (i = 0; i < B->r; i++)
+        for (j = 0; j < B->c; j++)
+            B->rows[i][j] = A->rows[j][i];
+
+    if (B->mod.n != A->mod.n)
+        _nmod_vec_reduce(B->entries, B->entries, B->r * B->c, B->mod);
 }

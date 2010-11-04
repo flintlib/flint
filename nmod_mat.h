@@ -50,28 +50,29 @@ typedef nmod_mat_struct nmod_mat_t[1];
 void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
 void nmod_mat_clear(nmod_mat_t mat);
 
+/* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat);
+void nmod_mat_randfull(nmod_mat_t mat);
 
 void nmod_mat_print_pretty(nmod_mat_t mat);
 
 int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 
+
+void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
+void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
+
 /* Arithmetic */
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
-void _nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_classical_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_classical_1r(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long run_length);
-void _nmod_mat_mul_classical_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_classical_2r(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long run_length);
-void _nmod_mat_mul_classical_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
-void _nmod_mat_mul_blocked_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
-void _nmod_mat_mul_blocked_1b(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
-void _nmod_mat_mul_blocked_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
-void _nmod_mat_mul_blocked_2b(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
-void _nmod_mat_mul_blocked_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
-void _nmod_mat_mul_blocked_3b(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B, long block_size);
+void _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
 #endif

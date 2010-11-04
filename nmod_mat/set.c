@@ -30,21 +30,10 @@
 #include "nmod_vec.h"
 
 void
-_nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
 {
-    long i, j, k;
-    mp_limb_t t;
-
-    for (i = 0; i < A->r; i++)
-    {
-        for (j = 0; j < B->c; j++)
-        {
-            t = 0UL;
-
-            for (k = 0; k < A->c; k++)
-                NMOD_ADDMUL(t, A->rows[i][k], B->rows[k][j], C->mod);
-
-            C->rows[i][j] = t;
-        }
-    }
+    if (A->mod.n == B->mod.n)
+        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
+    else
+        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
 }
