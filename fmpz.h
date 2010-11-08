@@ -28,6 +28,7 @@
 
 #include <stdio.h>
 #include <mpir.h>
+#include <nmod_vec.h>
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
@@ -141,6 +142,12 @@ int fmpz_is_zero(const fmpz_t f)
    return (*f == 0);
 }
 
+static __inline__
+int fmpz_is_one(const fmpz_t f)
+{
+   return (*f == 1);
+}
+
 void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
@@ -247,6 +254,42 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
                               mp_bitcnt_t shift, mp_bitcnt_t bits);
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
+
+
+#define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
+
+typedef struct
+{
+    mp_limb_t * primes;
+    long num_primes;
+    long n;         /* we have 2^n >= num_primes > 2^(n-1) */
+    fmpz ** comb;   /* Array of arrays of products */
+    fmpz ** res;    /* successive residues r_i^-1 mod r_{i+1} for pairs r_i, r_{i+1} */
+    nmod_t * mod;
+}
+fmpz_comb_struct;
+
+typedef fmpz_comb_struct fmpz_comb_t[1];
+
+
+
+
+fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb);
+
+void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp);
+
+void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes);
+
+void fmpz_comb_clear(fmpz_comb_t comb);
+
+void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
+    fmpz ** comb_temp, fmpz_t temp);
+
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+
+void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
 
 #endif
 

@@ -415,3 +415,63 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
    starting after shift bits, and placed into coeff. 
 
    The value of shift is expected to be less than FLINT_BITS.
+
+/*******************************************************************************
+
+   Chinese remaindering
+
+*******************************************************************************/
+
+void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
+    fmpz ** comb_temp, fmpz_t temp)
+
+    Reduces the multiprecision integer in modulo each of the primes stored
+    in the comb structure. The array out will be filled with the residues
+    modulo these primes. The array temp is temporary space which must be
+    provided by fmpz_comb_temp_init and cleared by fmpz_comb_temp_clear.
+
+
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+
+    This function takes a set of residues modulo the list of primes
+    contained in the comb structure and reconstructs the unique unsigned
+    multiprecision integer modulo the product of the primes which has
+    these residues modulo the corresponding primes. The array temp is
+    temporary space which must be provided by fmpz_comb_temp_init and
+    cleared by fmpz_comb_temp_clear.
+
+
+void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+
+    This function takes a set of residues modulo the list of primes
+    contained in the comb structure and reconstructs a signed multiprecision
+    integer modulo the product of the primes which has these residues modulo
+    the corresponding primes. If N is the product of all the primes then
+    out is normalised to be in the range [-(N-1)/2, N/2]. The array temp
+    is temporary space which must be provided by fmpz_comb_temp_init
+    and cleared by fmpz_comb_temp_clear.
+
+void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
+
+    Initialise a comb structure for multimodular reduction and recombination.
+    The array \code{primes} is assumed to contain num_primes primes each of
+    FLINT_BITS - 1 bits. Modular reductions and recombinations will be
+    done modulo this list of primes. The primes array must not be free'd
+    until the comb structure is no longer required and must be cleared by
+    the user.
+
+void fmpz_comb_clear(fmpz_comb_t comb)
+
+    Clear the given comb structure, releasing any memory it uses. 
+
+fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb)
+
+    Creates temporary space to be used by multimodular and CRT functions
+    based on an initialised comb structure.
+
+void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp)
+
+    Clears temporary space \code{temp} used by multimodular and CRT functions
+    using the given comb.
