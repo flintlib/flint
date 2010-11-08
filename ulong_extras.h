@@ -256,5 +256,7 @@ mp_limb_t n_euler_phi(mp_limb_t n);
 
 int n_sizeinbase(mp_limb_t n, int base);
 
+mp_limb_t n_nextprime(mp_limb_t n, int proved);
+
 #endif
 

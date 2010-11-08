@@ -387,6 +387,12 @@ void n_compute_primes(ulong num_primes)
    computed up to almost n = 2^20, in fact floor(n/log_2(n)*0.7) = 
    74898 primes which actually takes us to 949937.
 
+mp_limb_t n_nextprime(mp_limb_t n, int proved)
+
+    Returns the next prime after n. Assumes the result will fit in an
+    mp_limb_t. If proved is 0 (false) the prime is not proven prime,
+    otherwise it is.
+
 ulong n_prime_pi(mp_limb_t n)
 
    Returns the value of the prime counting function pi(n), i.e. the
