@@ -303,10 +303,10 @@ long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options)
 
     ROWREDUCE_FULL
 
-        If set, performs Gauss-Jordan elimination (FFGJ), i.e. eliminates the
-        elements above each pivot element as well as those below.
-        If not set, regular Gaussian elimination is performed and only
-        the elements before pivots are eliminated.
+        If set, performs fraction-free Gauss-Jordan elimination (FFGJ), i.e.
+        eliminates the elements above each pivot element as well as those
+        below. If not set, regular Gaussian elimination is performed and only
+        the elements below pivots are eliminated.
 
     ROWREDUCE_CLEAR_LOWER
 
