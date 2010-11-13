@@ -24,16 +24,27 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+
+long
+nmod_mat_rank(const nmod_mat_t A)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long m, n, rank;
+    nmod_mat_t tmp;
+
+    m = A->r;
+    n = A->c;
+
+    if (m < 1 || n < 1)
+        return 0;
+
+    nmod_mat_init_set(tmp, A);
+
+    rank = _nmod_mat_rowreduce(tmp->rows, m, n, 0, tmp->mod);
+    nmod_mat_clear(tmp);
+    return FLINT_ABS(rank);
 }

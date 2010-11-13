@@ -23,17 +23,53 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+int
+main(void)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long m, n, mod, i, j, rep;
+
+    printf("init/clear....");
+    fflush(stdout);
+
+    for (rep = 0; rep < 1000; rep++)
+    {
+        nmod_mat_t A;
+
+        m = n_randint(50);
+        n = n_randint(50);
+        mod = n_randtest_not_zero();
+
+        nmod_mat_init(A, m, n, mod);
+
+        for (i = 0; i < m; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                if (A->rows[i][j] != 0UL)
+                {
+                    printf("FAIL: entries not zero!\n");
+                    abort();
+                }
+            }
+        }
+
+        if (A->mod.n != mod)
+        {
+            printf("FAIL: bad modulus\n");
+            abort();
+        }
+
+        nmod_mat_clear(A);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

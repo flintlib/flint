@@ -23,17 +23,42 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
+
+/* TODO: avoid temporary modulo reductions */
 void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+_nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n,
+    nmod_t mod)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long i, j;
+    mp_limb_t r;
+
+    for (i = 0; i < n; i++)
+    {
+        r = 0UL;
+        for (j = 0; j < i; j++)
+        {
+            NMOD_ADDMUL(r, LU[i][j], b[j], mod);
+        }
+
+        b[i] = nmod_sub(b[i], r, mod);
+    }
+
+    for (i = n - 1; i >= 0; i--)
+    {
+        r = 0UL;
+        for (j = i + 1; j < n; j++)
+        {
+            NMOD_ADDMUL(r, LU[i][j], b[j], mod);
+        }
+
+        r = nmod_sub(b[i], r, mod);
+        b[i] = n_mulmod2_preinv(r, n_invmod(LU[i][i], mod.n), mod.n, mod.ninv);
+    }
 }

@@ -23,17 +23,57 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+
+mp_limb_t
+_nmod_mat_det_rowreduce(const nmod_mat_t A)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    nmod_mat_t tmp;
+    mp_limb_t det;
+
+    long m = A->r;
+    long rank;
+    long i;
+
+    nmod_mat_init(tmp, m, m, A->mod.n);
+    nmod_mat_set(tmp, A);
+
+    rank = _nmod_mat_rowreduce(tmp->rows, m, m, ROWREDUCE_FAST_ABORT, A->mod);
+
+    det = 0UL;
+
+    if (FLINT_ABS(rank) == m)
+    {
+        det = 1UL;
+        for (i = 0; i < m; i++)
+            det = n_mulmod2_preinv(det, tmp->rows[i][i], A->mod.n, A->mod.ninv);
+        if (rank < 0)
+            det = nmod_neg(det, A->mod);
+    }
+
+    nmod_mat_clear(tmp);
+    return det;
+}
+
+mp_limb_t
+nmod_mat_det(const nmod_mat_t A)
+{
+    long dim = A->r;
+
+    if (dim != A->c)
+    {
+        printf("nmod_mat_det: nonsquare matrix");
+        abort();
+    }
+
+    if (dim == 0) return 1UL;
+    if (dim == 1) return A->entries[0];
+
+    return _nmod_mat_det_rowreduce(A);
 }

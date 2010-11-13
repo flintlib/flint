@@ -23,17 +23,47 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+
+int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    nmod_mat_t I;
+    long i, dim;
+    int result;
+
+    dim = A->r;
+
+    switch (dim)
+    {
+        case 0:
+            result = 1;
+            break;
+
+        case 1:
+            if (A->entries[0] == 0UL)
+            {
+                result = 0;
+            }
+            else
+            {
+                B->entries[0] = n_invmod(A->entries[0], B->mod.n);
+                result = 1;
+            }
+            break;
+
+        default:
+            nmod_mat_init(I, dim, dim, B->mod.n);
+            for (i = 0; i < dim; i++)
+                I->rows[i][i] = 1UL;
+            result = nmod_mat_solve_mat(B, A, I);
+            nmod_mat_clear(I);
+    }
+
+    return result;
 }

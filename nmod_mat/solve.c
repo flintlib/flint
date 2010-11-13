@@ -23,17 +23,55 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
+#include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+
+int
+_nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long dim, i, rank;
+    nmod_mat_t T;
+    mp_limb_t * tmp;
+    int result;
+
+    dim = A->r;
+
+    nmod_mat_init_set(T, A);
+    rank = _nmod_mat_rowreduce(T->rows, dim, dim, 0, T->mod);
+
+    result = 0;
+    if (FLINT_ABS(rank) == dim)
+    {
+        tmp = nmod_vec_init(dim);
+
+        for (i = 0; i < dim; i++)
+        {
+            /* Insert in same order as the pivots */
+            tmp[i] = b[(T->rows[i] - T->entries) / dim];
+        }
+
+        _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
+        mpn_copyi(x, tmp, dim);
+        nmod_vec_free(tmp);
+        result = 1;
+    }
+
+    nmod_mat_clear(T);
+    return result;
+}
+
+int
+nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
+{
+    long dim = A->r;
+
+    if (dim == 0)
+        return 1;
+
+    _nmod_mat_solve_lu(x, A, b);
 }

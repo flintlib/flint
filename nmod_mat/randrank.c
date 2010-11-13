@@ -23,17 +23,30 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
+#include <stdio.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
+
 void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+nmod_mat_randrank(nmod_mat_t mat, long rank)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long i;
+    mp_limb_t * diag;
+
+    if (rank < 0 || rank > mat->r || rank > mat->c)
+    {
+        printf("exception: nmod_mat_randrank: impossible rank\n");
+        abort();
+    }
+
+    diag = nmod_vec_init(rank);
+    for (i = 0; i < rank; i++)
+        diag[i] = 1 + n_randint(mat->mod.n - 1);
+
+    nmod_mat_randpermdiag(mat, diag, rank);
+
+    nmod_vec_free(diag);
 }

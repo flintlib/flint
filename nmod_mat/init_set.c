@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
@@ -27,13 +28,29 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
 
 void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
+    long rows = src->r;
+    long cols = src->c;
+
+    if ((rows) && (cols))
+    {
+        long i;
+        mat->entries = malloc(rows * cols * sizeof(mp_limb_t));
+        mat->rows = malloc(rows * sizeof(mp_limb_t *));
+
+        mpn_copyi(mat->entries, src->entries, rows * cols);
+
+        for (i = 0; i < rows; i++)
+            mat->rows[i] = mat->entries + i * cols;
+    }
     else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+        mat->entries = NULL;
+
+    mat->r = rows;
+    mat->c = cols;
+
+    mat->mod = src->mod;
 }

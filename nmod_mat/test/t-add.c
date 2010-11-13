@@ -23,17 +23,53 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+int
+main(void)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long m, n, mod, rep;
+
+    printf("add/sub....");
+    fflush(stdout);
+
+    for (rep = 0; rep < 10000; rep++)
+    {
+        nmod_mat_t A, B, C, D;
+
+        m = n_randint(20);
+        n = n_randint(20);
+        mod = n_randtest_not_zero();
+
+        nmod_mat_init(A, m, n, mod);
+        nmod_mat_init(B, m, n, mod);
+        nmod_mat_init(C, m, n, mod);
+        nmod_mat_init(D, m, n, mod);
+
+        nmod_mat_randtest(A);
+        nmod_mat_randtest(B);
+
+        nmod_mat_add(C, A, B);
+        nmod_mat_sub(C, C, B);
+
+        if (!nmod_mat_equal(C, A))
+        {
+            printf("FAIL\n");
+            abort();
+        }
+
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        nmod_mat_clear(D);
+    }
+
+    printf("PASS\n");
+    return 0;
 }

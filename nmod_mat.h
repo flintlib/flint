@@ -48,11 +48,15 @@ typedef nmod_mat_struct nmod_mat_t[1];
 
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
+void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_clear(nmod_mat_t mat);
 
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat);
 void nmod_mat_randfull(nmod_mat_t mat);
+int nmod_mat_randpermdiag(nmod_mat_t mat, const mp_limb_t * diag, long n);
+void nmod_mat_randrank(nmod_mat_t, long rank);
+void nmod_mat_randops(nmod_mat_t mat, long count);
 
 void nmod_mat_print_pretty(nmod_mat_t mat);
 
@@ -74,5 +78,20 @@ void _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+#define ROWREDUCE_FAST_ABORT 1
+#define ROWREDUCE_FULL 2
+#define ROWREDUCE_CLEAR_LOWER 4
+
+long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod);
+
+mp_limb_t nmod_mat_det(const nmod_mat_t A);
+long nmod_mat_rank(const nmod_mat_t A);
+
+void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
+int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
+int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
+
+int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 
 #endif

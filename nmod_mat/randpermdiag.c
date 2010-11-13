@@ -23,17 +23,57 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
-void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+
+/*
+  Standard Fisher-Yates shuffle to randomise an array; returns whether
+  the permutation is even (0) or odd (1)
+*/
+static int shuffle(long * array, long n)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long i, j, tmp;
+    int parity;
+
+    parity = 0;
+    for (i = n - 1; i > 0; i--)
+    {
+        j = n_randint(i+1);
+        parity ^= (i == j);
+        tmp = array[i];
+        array[i] = array[j];
+        array[j] = tmp;
+    }
+    return parity;
+}
+
+int
+nmod_mat_randpermdiag(nmod_mat_t mat, const mp_limb_t * diag, long n)
+{
+    int parity;
+    long i;
+    long * rows;
+    long * cols;
+
+    rows = malloc(sizeof(long) * mat->r);
+    cols = malloc(sizeof(long) * mat->c);
+
+    for (i = 0; i < mat->r; i++) rows[i] = i;
+    for (i = 0; i < mat->c; i++) cols[i] = i;
+
+    parity = shuffle(rows, mat->r);
+    parity ^= shuffle(cols, mat->c);
+
+    _nmod_vec_zero(mat->entries, mat->r * mat->c);
+
+    for (i = 0; i < n; i++)
+        mat->rows[rows[i]][cols[i]] = diag[i];
+
+    free(rows);
+    free(cols);
+
+    return parity;
 }
