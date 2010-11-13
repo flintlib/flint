@@ -96,6 +96,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         m = 1 + n_randint(10);
+        n = 1 + n_randint(10);
         r = n_randint(m);
 
         fmpz_mat_init(A, m, m);
