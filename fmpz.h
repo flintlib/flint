@@ -28,8 +28,12 @@
 
 #include <stdio.h>
 #include <mpir.h>
+<<<<<<< HEAD:fmpz.h
 #include "nmod_vec.h"
 #include "flint.h"
+=======
+#include <nmod_vec.h>
+>>>>>>> fredrik/matrix:fmpz.h
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
@@ -48,7 +52,7 @@ extern gmp_randstate_t fmpz_randstate;
 #if FLINT_REENTRANT
 
 /* turn a pointer to an __mpz_struct into a fmpz_t */
-#define PTR_TO_COEFF(x) ((((ulong) (x) >> 2) | (1L << (FLINT_BITS - 2))) 
+#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (1L << (FLINT_BITS - 2)))
 
 /* turns an fmpz into a pointer to an mpz */
 #define COEFF_TO_PTR(x) ((__mpz_struct *) ((x) << 2))
@@ -142,6 +146,12 @@ static __inline__
 int fmpz_is_zero(const fmpz_t f)
 {
    return (*f == 0);
+}
+
+static __inline__
+int fmpz_is_one(const fmpz_t f)
+{
+   return (*f == 1);
 }
 
 void fmpz_set(fmpz_t f, const fmpz_t g);
@@ -292,6 +302,42 @@ void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
 }
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
+
+
+#define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
+
+typedef struct
+{
+    mp_limb_t * primes;
+    long num_primes;
+    long n;         /* we have 2^n >= num_primes > 2^(n-1) */
+    fmpz ** comb;   /* Array of arrays of products */
+    fmpz ** res;    /* successive residues r_i^-1 mod r_{i+1} for pairs r_i, r_{i+1} */
+    nmod_t * mod;
+}
+fmpz_comb_struct;
+
+typedef fmpz_comb_struct fmpz_comb_t[1];
+
+
+
+
+fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb);
+
+void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp);
+
+void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes);
+
+void fmpz_comb_clear(fmpz_comb_t comb);
+
+void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
+    fmpz ** comb_temp, fmpz_t temp);
+
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+
+void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
 
 #endif
 

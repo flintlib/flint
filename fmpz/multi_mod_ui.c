@@ -1,0 +1,121 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2008, 2009, William Hart 
+    Copyright (C) 2010 Fredrik Johansson
+
+******************************************************************************/
+
+#include <mpir.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpz.h"
+#include "nmod_vec.h"
+
+void
+fmpz_multi_mod_ui_basecase(mp_limb_t * out, fmpz_t in, mp_limb_t * primes,
+                           long num_primes, fmpz_t temp)
+{
+    long i;
+    for (i = 0; i < num_primes; i++)
+    {
+        out[i] = fmpz_mod_ui(temp, in, primes[i]);
+    }
+}
+
+void
+fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
+                    fmpz ** comb_temp, fmpz_t temp)
+{
+    long i, j;
+    long n = comb->n;
+    long log_comb;
+    long stride;
+    long num;
+    long num_primes = comb->num_primes;
+
+    /* Reduce modulo a single prime which is assumed to be big enough */
+    if (num_primes == 1)
+    {
+        int sign = fmpz_sgn(in);
+        if (sign > 0)
+            out[0] = (*in);
+        else if (sign < 0)
+            out[0] = comb->primes[0] + (*in);
+        else
+            out[0] = 0L;
+        return;
+    }
+
+    log_comb = n - 1;
+   
+    /* Find level in comb with entries bigger than the input integer */
+    log_comb = 0;
+    if (fmpz_sgn(in) < 0)
+    {
+        while ((fmpz_bits(in) >= fmpz_bits(comb->comb[log_comb]) - 1)
+            && (log_comb < comb->n - 1)) log_comb++;
+    }
+    else
+    {
+        while (fmpz_cmpabs(in, comb->comb[log_comb]) >= 0)
+            log_comb++;
+    }
+
+    num = (1L << (n - log_comb - 1));
+
+    /* Set each entry of this level of temp to the input integer */
+    for (i = 0; i < num; i++)
+    {
+        fmpz_set(comb_temp[log_comb] + i, in);
+    }
+
+    log_comb--;
+    num *= 2;
+
+    /* Fill in other entries of temp by taking entries of temp
+        at higher level mod pairs from comb */
+
+    /* keep going until we reach the basecase */
+    while (log_comb > FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF)
+    {
+        for (i = 0, j = 0; i < num; i += 2, j++)
+        {
+            fmpz_mod(comb_temp[log_comb] + i, comb_temp[log_comb + 1] + j,
+                comb->comb[log_comb] + i);
+            fmpz_mod(comb_temp[log_comb] + i + 1, comb_temp[log_comb + 1] + j,
+                comb->comb[log_comb] + i + 1);
+        }
+        num *= 2;
+        log_comb--;
+    }
+
+    /* Do basecase */
+    num /= 2;
+    log_comb++;
+
+    stride = (1L << (log_comb + 1));
+    for (i = 0, j = 0; j < num_primes; i++, j += stride)
+    {
+        fmpz_multi_mod_ui_basecase(out + j, comb_temp[log_comb] + i,
+            comb->primes + j, FLINT_MIN(stride, num_primes - j), temp);
+    }
+}

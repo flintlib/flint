@@ -39,7 +39,7 @@ main(void)
     fmpz_mat_t A, x, b, Ax;
     fmpz_t den;
     fmpz_randstate_t rnd;
-    long i, m;
+    long i, m, r;
 
     printf("solve....");
     fflush(stdout);
@@ -68,14 +68,15 @@ main(void)
         fmpz_mat_mul(Ax, A, x);
         _fmpz_vec_scalar_divexact_fmpz(Ax->entries, Ax->entries, m, den);
 
-        if (!_fmpz_vec_equal(Ax->entries, b->entries, m))
+        if (!fmpz_mat_equal(Ax, b))
         {
+            printf("FAIL:\n");
             printf("Ax != b!\n");
-            printf("matrix:\n");
+            printf("A:\n");
             fmpz_mat_print_pretty(A);
             printf("b:\n");
             fmpz_mat_print_pretty(b);
-            printf("x:\n");
+            printf("x: (den = "); fmpz_print(den); printf(")\n");
             fmpz_mat_print_pretty(x);
             printf("Ax:\n");
             fmpz_mat_print_pretty(Ax);
@@ -90,7 +91,43 @@ main(void)
         fmpz_clear(den);
     }
 
+    /* Test singular systems */
+    for (i = 0; i < 10000; i++)
+    {
+        m = 1 + n_randint(10);
+        r = n_randint(m);
 
+        fmpz_mat_init(A, m, m);
+        fmpz_mat_init(b, m, 1);
+        fmpz_mat_init(x, m, 1);
+        fmpz_mat_init(Ax, m, 1);
+        fmpz_init(den);
+
+        fmpz_mat_randrank(A, rnd, r, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randtest(b, rnd, 1+n_randint(2)*n_randint(100));
+
+        /* Dense */
+        if (n_randint(2))
+            fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
+
+        fmpz_mat_solve(x->entries, den, A, b->entries);
+
+        if (!fmpz_is_zero(den))
+        {
+            printf("FAIL:\n");
+            printf("singular system gave nonzero determinant\n");
+            abort();
+        }
+
+        fmpz_mat_clear(A);
+        fmpz_mat_clear(b);
+        fmpz_mat_clear(x);
+        fmpz_mat_clear(Ax);
+        fmpz_clear(den);
+    }
+
+    fmpz_mat_randclear(rnd);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

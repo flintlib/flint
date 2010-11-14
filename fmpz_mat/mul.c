@@ -53,11 +53,8 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     cr = A->r;
     cc = B->c;
 
-    if (A->c != B->r || C->r != cr || C->c != cc)
-    {
-        printf("fmpz_mat_mul: incompatible dimensions\n");
-        abort();
-    }
+    FMPZ_MAT_ASSERT((A->c == B->r && C->r == cr && C->c == cc),
+        "fmpz_mat_mul: incompatible dimensions\n");
 
     if (C == A || C == B)
     {

@@ -22,6 +22,7 @@
     Copyright (C) 2006, 2007, 2008, 2009 William Hart
     Copyright (C) 2008, Peter Shrimpton
     Copyright (C) 2009, Tom Boothby
+    Copyright (C) 2010, Fredrik Johansson
 
 ******************************************************************************/
 
@@ -253,6 +254,10 @@ int n_moebius_mu(mp_limb_t n);
 void n_moebius_mu_vec(int * mu, ulong len);
 
 mp_limb_t n_euler_phi(mp_limb_t n);
+
+int n_sizeinbase(mp_limb_t n, int base);
+
+mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
 #endif
 

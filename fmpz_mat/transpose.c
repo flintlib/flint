@@ -55,7 +55,7 @@ fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
     }
 
     /* Not aliased; general case */
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            fmpz_set(&A->rows[i][j], &B->rows[j][i]);
+    for (i = 0; i < B->r; i++)
+        for (j = 0; j < B->c; j++)
+            fmpz_set(&B->rows[i][j], &A->rows[j][i]);
 }

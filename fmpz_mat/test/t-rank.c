@@ -59,6 +59,7 @@ main(void)
             fmpz_mat_randrank(A, rnd, r, b);
             if (r != fmpz_mat_rank(A))
             {
+                printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
@@ -81,6 +82,7 @@ main(void)
             fmpz_mat_randops(A, rnd, d);
             if (r != fmpz_mat_rank(A))
             {
+                printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
@@ -88,6 +90,8 @@ main(void)
         }
     }
 
+    fmpz_mat_randclear(rnd);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

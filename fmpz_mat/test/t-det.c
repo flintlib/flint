@@ -68,6 +68,7 @@ main(void)
 
         if (!fmpz_equal(det, result))
         {
+            printf("FAIL:\n");
             printf("wrong determinant!\n");
             fmpz_mat_print_pretty(A);
             printf("expected: ");
@@ -96,6 +97,7 @@ main(void)
         fmpz_mat_det(det, A);
         if (*det)
         {
+            printf("FAIL:\n");
             printf("expected zero determinant!\n");
             fmpz_mat_print_pretty(A);
             abort();
@@ -105,6 +107,8 @@ main(void)
         fmpz_clear(det);
     }
 
+    fmpz_mat_randclear(rnd);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
