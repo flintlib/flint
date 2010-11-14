@@ -28,12 +28,8 @@
 
 #include <stdio.h>
 #include <mpir.h>
-<<<<<<< HEAD:fmpz.h
 #include "nmod_vec.h"
 #include "flint.h"
-=======
-#include <nmod_vec.h>
->>>>>>> fredrik/matrix:fmpz.h
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
@@ -318,9 +314,6 @@ typedef struct
 fmpz_comb_struct;
 
 typedef fmpz_comb_struct fmpz_comb_t[1];
-
-
-
 
 fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb);
 
