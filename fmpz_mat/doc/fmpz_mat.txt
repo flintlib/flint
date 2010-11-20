@@ -193,6 +193,17 @@ void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     compatible dimensions for matrix multiplication.
 
 
+void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+
+    Sets C to the matrix product A * B computed using a multimodular
+    algorithm. C is computed modulo several small prime numbers
+    and reconstructed using the Chinese Remainder Theorem. This gets
+    more efficient for larger matrices with smaller entries.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing is allowed.
+
+
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
     Sets {B, den} to the inverse matrix of the square matrix A,

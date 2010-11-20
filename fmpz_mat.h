@@ -75,6 +75,8 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A);
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 
+void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
 #define ROWREDUCE_FAST_ABORT 1
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
