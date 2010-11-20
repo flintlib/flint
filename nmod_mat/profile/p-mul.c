@@ -72,7 +72,7 @@ int main(void)
 
    printf("nmod_mat_mul:\n");
    
-   params.modulus = n_randbits(50);
+   params.modulus = 40000;
 	  
    for (dim = 2; dim <= 512; dim = (long) ((double) dim * 1.1) + 1)
    {
