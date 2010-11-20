@@ -51,6 +51,9 @@ void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_clear(nmod_mat_t mat);
 
+void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, long r1, long c1, long r2, long c2);
+void nmod_mat_window_clear(nmod_mat_t window);
+
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat);
 void nmod_mat_randfull(nmod_mat_t mat);
@@ -78,6 +81,10 @@ void _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
 
 #define ROWREDUCE_FAST_ABORT 1
 #define ROWREDUCE_FULL 2

@@ -29,25 +29,46 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
-
-#define STRASSEN_CUTOFF 256
+/* TODO: tune for nonsquare matrices */
+#define TRANSPOSE_CUTOFF 24
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
+    mp_bitcnt_t amag;
+    mp_bitcnt_t bmag;
+    mp_bitcnt_t cmag;
+
     long m, k, n;
+
+    int limbs;
 
     m = A->r;
     k = A->c;
     n = B->c;
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    amag = FLINT_BIT_COUNT(A->mod.n - 1);
+    bmag = FLINT_BIT_COUNT(B->mod.n - 1);
+    cmag = FLINT_BIT_COUNT(k) + amag + bmag;
+
+    limbs = cmag < FLINT_BITS ? 1 : (cmag < 2*FLINT_BITS ? 2 : 3);
+
+    if (m < TRANSPOSE_CUTOFF || n < TRANSPOSE_CUTOFF || k < TRANSPOSE_CUTOFF)
     {
-        nmod_mat_mul_classical(C, A, B);
+        if      (limbs == 1) _nmod_mat_mul_1(C, A, B);
+        else if (limbs == 2) _nmod_mat_mul_2(C, A, B);
+        else                 _nmod_mat_mul_3(C, A, B);
     }
     else
     {
-        nmod_mat_mul_strassen(C, A, B);
+        nmod_mat_t T;
+        nmod_mat_init(T, B->c, B->r, B->mod.n);
+        nmod_mat_transpose(T, B);
+
+        if      (limbs == 1) _nmod_mat_mul_transpose_1(C, A, T);
+        else if (limbs == 2) _nmod_mat_mul_transpose_2(C, A, T);
+        else                 _nmod_mat_mul_transpose_3(C, A, T);
+
+        nmod_mat_clear(T);
     }
 }

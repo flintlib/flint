@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright 2009 William Hart
+    Copyright 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -32,55 +33,68 @@
 
 typedef struct
 {
-   ulong dim;
-   mp_limb_t modulus;
+    ulong dim;
+    mp_limb_t modulus;
+    int algorithm;
 } mat_mul_t;
 
 void sample(void * arg, ulong count)
 {
-   mat_mul_t * params = (mat_mul_t *) arg;
-   mp_limb_t n = params->modulus;
-   ulong i, dim = params->dim;
-   
-   nmod_mat_t A, B, C;
+    mat_mul_t * params = (mat_mul_t *) arg;
+    mp_limb_t n = params->modulus;
+    ulong i, dim = params->dim;
+    int algorithm = params->algorithm;
 
-   nmod_mat_init(A, dim, dim, n);
-   nmod_mat_init(B, dim, dim, n);
-   nmod_mat_init(C, dim, dim, n);
+    nmod_mat_t A, B, C;
 
-   prof_start();
-      
-   for (i = 0; i < count; i++)
-   {
-      nmod_mat_mul(C, A, B);
-   }
+    nmod_mat_init(A, dim, dim, n);
+    nmod_mat_init(B, dim, dim, n);
+    nmod_mat_init(C, dim, dim, n);
 
-   prof_stop();
+    prof_start();
 
-   if (C->entries[0] == 5893479483L) abort();
+    if (algorithm == 0)
+        for (i = 0; i < count; i++)
+            nmod_mat_mul(C, A, B);
+    else if (algorithm == 1)
+        for (i = 0; i < count; i++)
+            nmod_mat_mul_classical(C, A, B);
+    else
+        for (i = 0; i < count; i++)
+            nmod_mat_mul_strassen(C, A, B);
 
-   nmod_mat_clear(A);
-   nmod_mat_clear(B);
-   nmod_mat_clear(C);
+    prof_stop();
+
+    if (C->entries[0] == 5893479483L) abort();
+
+    nmod_mat_clear(A);
+    nmod_mat_clear(B);
+    nmod_mat_clear(C);
 }
 
 int main(void)
 {
-   double min, max;
-   mat_mul_t params;
-   long dim;
+    double min_classical, min_strassen, max;
+    mat_mul_t params;
+    long dim;
 
-   printf("nmod_mat_mul:\n");
-   
-   params.modulus = 40000;
-	  
-   for (dim = 2; dim <= 512; dim = (long) ((double) dim * 1.1) + 1)
-   {
-      params.dim = dim;
-	  prof_repeat(&min, &max, sample, &params);
-      printf("dim = %ld, time is %.2f us\n", 
-		  dim, min);
-   }
-   
-   return 0;
+    printf("nmod_mat_mul:\n");
+
+    params.modulus = 40000;
+
+    for (dim = 2; dim <= 512; dim = (long) ((double) dim * 1.1) + 1)
+    {
+        params.dim = dim;
+
+        params.algorithm = 1;
+        prof_repeat(&min_classical, &max, sample, &params);
+
+        params.algorithm = 2;
+        prof_repeat(&min_strassen, &max, sample, &params);
+
+        printf("dim = %ld, classical %.2f us strassen %.2f us\n", 
+            dim, min_classical, min_strassen);
+    }
+
+    return 0;
 }

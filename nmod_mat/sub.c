@@ -32,5 +32,10 @@
 void
 nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    _nmod_vec_sub(C->entries, A->entries, B->entries, A->r*A->c, C->mod);
+    long i;
+
+    for (i = 0; i < C->r; i++)
+    {
+        _nmod_vec_sub(C->rows[i], A->rows[i], B->rows[i], C->c, C->mod);
+    }
 }
