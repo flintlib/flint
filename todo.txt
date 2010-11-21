@@ -1,6 +1,13 @@
 TODO
 ====
 
+* Jeff Gilchrist has confirmed that the standard BPSW primality test returns no pseudoprimes 
+  to 2^64. http://gilchrist.ca/jeff/factoring/pseudoprimes.html We should implement this test
+  as specified and use this for primality testing up to 2^64. From private correspondence,
+  Jeff tells me the BPSW variant used is that implemented by T.R. Nicely:
+  http://www.trnicely.net/misc/bpsw.html Thus, if we want to use this algorithm, we must
+  specifically use that version of the algorithm.
+
 * in is_prime_pocklington allow the cofactor to be a perfect power not just prime
 
 * make n_gcd take arguments in either order and use throughout flint2
