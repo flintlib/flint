@@ -59,7 +59,7 @@ int main(void)
         fmpz_mat_randtest(A, rnd, n_randint(200) + 1);
         fmpz_mat_randtest(B, rnd, n_randint(200) + 1);
 
-        fmpz_mat_mul(C, A, B);
+        fmpz_mat_mul_classical(C, A, B);
         fmpz_mat_mul_multi_mod(D, A, B);
 
         if (!fmpz_mat_equal(C, D))

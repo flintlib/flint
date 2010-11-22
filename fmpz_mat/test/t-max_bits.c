@@ -28,60 +28,44 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
-    fmpz_mat_t A, B, C, D;
-    long i;
+    long m, n, rep, res1, res2;
     fmpz_randstate_t rnd;
 
-    printf("mul....");
+    printf("max_bits....");
     fflush(stdout);
 
     fmpz_randinit(rnd);
 
-    for (i = 0; i < 1000; i++)
+    for (rep = 0; rep < 1000; rep++)
     {
-        long m, n, k;
+        fmpz_mat_t A;
 
-        m = n_randint(50);
-        n = n_randint(50);
-        k = n_randint(50);
+        m = n_randint(20);
+        n = n_randint(20);
 
         fmpz_mat_init(A, m, n);
-        fmpz_mat_init(B, n, k);
-        fmpz_mat_init(C, m, k);
-        fmpz_mat_init(D, m, k);
+        fmpz_mat_randtest(A, rnd, 1 + n_randint(100));
 
-        fmpz_mat_randtest(A, rnd, n_randint(200) + 1);
-        fmpz_mat_randtest(B, rnd, n_randint(200) + 1);
+        res1 = fmpz_mat_max_bits(A);
+        res2 = _fmpz_vec_max_bits(A->entries, m*n);
 
-        fmpz_mat_mul_classical(C, A, B);
-        fmpz_mat_mul(D, A, B);
-
-        if (!fmpz_mat_equal(C, D))
+        if (res1 != res2)
         {
-            printf("FAIL: results not equal\n");
-            abort();
-        }
-
-        fmpz_mat_mul(A, A, B);
-        if (!fmpz_mat_equal(A, C))
-        {
-            printf("FAIL: aliasing failed\n");
+            printf("FAIL!\n");
             abort();
         }
 
         fmpz_mat_clear(A);
-        fmpz_mat_clear(B);
-        fmpz_mat_clear(C);
-        fmpz_mat_clear(D);
     }
 
-    fmpz_randclear(rnd);
+    fmpz_mat_randclear(rnd);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

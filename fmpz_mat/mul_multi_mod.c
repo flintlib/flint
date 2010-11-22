@@ -32,47 +32,11 @@
 #include "ulong_extras.h"
 
 
-/* Return n such that 2*max(|c|) < 2^n in C = A*B */
-long _bound_height(const fmpz_mat_t A, const fmpz_mat_t B)
-{
-    fmpz_t height, height_a, height_b;
-    long i, height_bits;
-
-    fmpz_init(height);
-    fmpz_init(height_a);
-    fmpz_init(height_b);
-
-    for (i = 0; i < A->r * A->c; i++)
-    {
-        if (fmpz_cmpabs(height_a, A->entries + i) < 0)
-            fmpz_set(height_a, A->entries + i);
-    }
-
-    for (i = 0; i < B->r * B->c; i++)
-    {
-        if (fmpz_cmpabs(height_b, B->entries + i) < 0)
-            fmpz_set(height_b, B->entries + i);
-    }
-
-    fmpz_mul(height, height_a, height_b);
-    fmpz_mul_ui(height, height, A->c);
-    fmpz_abs(height, height);
-
-    height_bits = fmpz_bits(height);
-
-    fmpz_clear(height_a);
-    fmpz_clear(height_b);
-    fmpz_clear(height);
-
-    /* Plus one bit to support signs */
-    return height_bits + 1;
-}
-
 void
-fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+_fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
+    long bits)
 {
     long i, j;
-    long C_bits;
 
     fmpz_comb_t comb;
     fmpz ** comb_temp;
@@ -87,12 +51,19 @@ fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     nmod_mat_t * mod_A;
     nmod_mat_t * mod_B;
 
-    C_bits = _bound_height(A, B);
-    /* TODO: find the best choice */
-    primes_bits = FLINT_BITS - 12;
+    /* TODO: find the best choice of primes */
+    primes_bits = FLINT_BITS - FLINT_BIT_COUNT(A->c) - 2;
 
-    /* Round up in the division */
-    num_primes = (C_bits + primes_bits - 1) / primes_bits;
+    if (bits < primes_bits)
+    {
+        primes_bits = bits;
+        num_primes = 1;
+    }
+    else
+    {
+        /* Round up in the division */
+        num_primes = (bits + primes_bits - 1) / primes_bits;
+    }
 
     /* Initialize */
     primes = malloc(sizeof(mp_limb_t) * num_primes);
@@ -167,4 +138,17 @@ fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     free(residues);
     free(primes);
+}
+
+void
+fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+{
+    long A_bits;
+    long B_bits;
+
+    A_bits = fmpz_mat_max_bits(A);
+    B_bits = fmpz_mat_max_bits(B);
+
+    _fmpz_mat_mul_multi_mod(C, A, B, FLINT_ABS(A_bits) + FLINT_ABS(B_bits) \
+        + FLINT_BIT_COUNT(A->c) + 1);
 }
