@@ -32,39 +32,56 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-const long test_A[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-const long test_B[] = { 10, 11, 12, 13, 14, 15, 16, 17, 18 };
-const long test_C[] = { 84, 90, 96, 201, 216, 231, 318, 342, 366 };
-
 int main(void)
 {
-    fmpz_mat_t A, B, C;
+    fmpz_mat_t A, B, C, D;
     long i;
+    fmpz_randstate_t rnd;
 
     printf("mul....");
     fflush(stdout);
 
-    fmpz_mat_init(A, 3, 3);
-    fmpz_mat_init(B, 3, 3);
-    fmpz_mat_init(C, 3, 3);
+    fmpz_randinit(rnd);
 
-    for (i = 0; i < 9; i++)
+    for (i = 0; i < 1000; i++)
     {
-        fmpz_set_ui(A->entries+i, test_A[i]);
-        fmpz_set_ui(B->entries+i, test_B[i]);
-    }
+        long m, n, k;
 
-    fmpz_mat_mul(C, A, B);
+        m = n_randint(50);
+        n = n_randint(50);
+        k = n_randint(50);
 
-    for (i = 0; i < 9; i++)
-    {
-        if (fmpz_get_ui(C->entries+i) != test_C[i])
+        fmpz_mat_init(A, m, n);
+        fmpz_mat_init(B, n, k);
+        fmpz_mat_init(C, m, k);
+        fmpz_mat_init(D, m, k);
+
+        fmpz_mat_randtest(A, rnd, n_randint(200) + 1);
+        fmpz_mat_randtest(B, rnd, n_randint(200) + 1);
+
+        fmpz_mat_mul_classical(C, A, B);
+        fmpz_mat_mul(D, A, B);
+
+        if (!fmpz_mat_equal(C, D))
         {
-            _fmpz_vec_print(C->entries, 9);
+            printf("FAIL: results not equal\n");
             abort();
         }
+
+        fmpz_mat_mul(A, A, B);
+        if (!fmpz_mat_equal(A, C))
+        {
+            printf("FAIL: aliasing failed\n");
+            abort();
+        }
+
+        fmpz_mat_clear(A);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(C);
+        fmpz_mat_clear(D);
     }
 
+    fmpz_randclear(rnd);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

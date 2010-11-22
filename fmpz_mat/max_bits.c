@@ -24,30 +24,29 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 
-
-#define STRASSEN_CUTOFF 256
-
-void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+long
+fmpz_mat_max_bits(const fmpz_mat_t mat)
 {
-    long m, k, n;
+    long i, bits, row_bits, sign;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    sign = 1;
+    bits = 0;
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    for (i = 0; i < mat->r; i++)
     {
-        nmod_mat_mul_classical(C, A, B);
+        row_bits = _fmpz_vec_max_bits(mat->rows[i], mat->c);
+        if (row_bits < 0)
+        {
+            row_bits = -row_bits;
+            sign = -1;
+        }
+        bits = FLINT_MAX(bits, row_bits);
     }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
-    }
+
+    return bits * sign;
 }

@@ -19,7 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2008, 2009 William Hart.
+    Copyright (C) 2008, Richard Howell-Peak
+    Copyright (C) 2008, Martin Albrecht
+    Copyright (C) 2010, Fredrik Johansson
 
 ******************************************************************************/
 
@@ -27,27 +30,20 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
-
-
-#define STRASSEN_CUTOFF 256
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
+    long r1, long c1, long r2, long c2)
 {
-    long m, k, n;
+    long i;
+    window->entries = NULL;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    window->rows = malloc((r2 - r1) * sizeof(mp_limb_t *));
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
-    {
-        nmod_mat_mul_classical(C, A, B);
-    }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
-    }
+    for (i = 0; i < r2 - r1; i++)
+        window->rows[i] = mat->rows[r1 + i] + c1;
+
+    window->r = r2 - r1;
+    window->c = c2 - c1;
+    window->mod = mat->mod;
 }

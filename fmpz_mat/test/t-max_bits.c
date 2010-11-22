@@ -23,31 +23,50 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
+#include "fmpz_vec.h"
+#include "ulong_extras.h"
 
-
-#define STRASSEN_CUTOFF 256
-
-void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+int
+main(void)
 {
-    long m, k, n;
+    long m, n, rep, res1, res2;
+    fmpz_randstate_t rnd;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    printf("max_bits....");
+    fflush(stdout);
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    fmpz_randinit(rnd);
+
+    for (rep = 0; rep < 1000; rep++)
     {
-        nmod_mat_mul_classical(C, A, B);
+        fmpz_mat_t A;
+
+        m = n_randint(20);
+        n = n_randint(20);
+
+        fmpz_mat_init(A, m, n);
+        fmpz_mat_randtest(A, rnd, 1 + n_randint(100));
+
+        res1 = fmpz_mat_max_bits(A);
+        res2 = _fmpz_vec_max_bits(A->entries, m*n);
+
+        if (res1 != res2)
+        {
+            printf("FAIL!\n");
+            abort();
+        }
+
+        fmpz_mat_clear(A);
     }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
-    }
+
+    fmpz_mat_randclear(rnd);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

@@ -24,30 +24,30 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
-
-
-#define STRASSEN_CUTOFF 256
+#include "fmpz.h"
+#include "fmpz_mat.h"
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long m, k, n;
+    long ar, bc, br;
+    long i, j, k;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    ar = A->r;
+    br = B->r;
+    bc = B->c;
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    for (i = 0; i < ar; i++)
     {
-        nmod_mat_mul_classical(C, A, B);
-    }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
+        for (j = 0; j < bc; j++)
+        {
+            fmpz_zero(&C->rows[i][j]);
+
+            for (k = 0; k < br; k++)
+            {
+                fmpz_addmul(&C->rows[i][j], &A->rows[i][k], &B->rows[k][j]);
+            }
+        }
     }
 }

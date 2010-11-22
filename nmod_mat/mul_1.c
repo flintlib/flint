@@ -48,11 +48,10 @@ _nmod_mat_mul_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
                 s += A->rows[i][k] * B->rows[k][j];
             }
 
+            NMOD_RED(s, s, C->mod);
             C->rows[i][j] = s;
         }
     }
-
-    _nmod_vec_reduce(C->entries, C->entries, A->r * B->c, C->mod);
 }
 
 void
@@ -73,9 +72,8 @@ _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
                 s += A->rows[i][k] * B->rows[j][k];
             }
 
+            NMOD_RED(s, s, C->mod);
             C->rows[i][j] = s;
         }
     }
-
-    _nmod_vec_reduce(C->entries, C->entries, A->r * B->r, C->mod);
 }

@@ -38,7 +38,8 @@
     One or both dimensions of a matrix may be zero.
 
     Except where otherwise noted, it is assumed all entries in input
-    data are already reduced in the range [0, n).
+    data are already reduced in the range [0, n). It is also assumed that
+    all arguments have the same modulus.
 
     Functions that require the modulus to be a prime number document this
     requirement explicitly.
@@ -158,7 +159,7 @@ void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
 void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Computes C = A + B. Dimensions must be identical.
-    Entries will be reduced to the modulus of B.
+    Entries will be reduced to the modulus of C.
 
 
 void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
@@ -167,14 +168,20 @@ void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
     for matrix multiplication. C is not allowed to be aliased with A or B.
     Entries will be reduced to the modulus of C.
 
+void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-_nmod_mat_mul_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-_nmod_mat_mul_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-_nmod_mat_mul_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+    Performs matrix multiplication respectively using the classical
+    algorithm (by calling _nmod_mat_mul_1 etc), and Strassen multiplication.
+    The interface is identical to nmod_mat_mul.
 
-_nmod_mat_mul_transpose_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-_nmod_mat_mul_transpose_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-_nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+void _nmod_mat_mul_transpose_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_transpose_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Computes C = A * B or C = A * B^T respectively, using classical
     matrix multiplication. That is, for each i and j, C[i][j] is set to
@@ -198,6 +205,12 @@ _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
     Dimensions must be compatible for matrix multiplication. C is not
     allowed to be aliased with A or B.
 
+
+*******************************************************************************
+
+    Row reduction, solving
+
+*******************************************************************************
 
 long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod)
 

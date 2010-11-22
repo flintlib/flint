@@ -190,7 +190,37 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     Sets C to the matrix product A * B. The matrices must have
-    compatible dimensions for matrix multiplication.
+    compatible dimensions for matrix multiplication. Aliasing
+    is allowed.
+
+    This function automatically switches between classical and
+    multimodular multiplication, based on a heuristic comparison of
+    the dimensions and entry sizes.
+
+
+void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets C to the matrix product A * B computed using the classical
+    algorithm.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing between C and A or C and B is allowed.
+
+void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B, long bits)
+void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
+
+    Sets C to the matrix product A * B computed using a multimodular
+    algorithm. C is computed modulo several small prime numbers
+    and reconstructed using the Chinese Remainder Theorem. This gets
+    more efficient for larger matrices with smaller entries.
+
+    The bits parameter is a bound for the bit size of largest element of C,
+    or twice the absolute value of the largest element if any elements of C
+    are negative. fmpz_mat_mul_multi_mod calculates a rigorous (but
+    sometimes pessimistic) bound automatically.
+
+    The matrices must have compatible dimensions for matrix multiplication.
+    No aliasing between C and A or C and B is allowed.
 
 
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)

@@ -23,31 +23,60 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 
-
-#define STRASSEN_CUTOFF 256
-
-void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+int
+main(void)
 {
-    long m, k, n;
+    long i;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    printf("mul_strassen....");
+    fflush(stdout);
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    for (i = 0; i < 200; i++)
     {
+        nmod_mat_t A, B, C, D;
+        mp_limb_t mod = n_randtest_not_zero();
+
+        long m, k, n;
+
+        m = n_randint(200);
+        k = n_randint(200);
+        n = n_randint(200);
+
+        nmod_mat_init(A, m, n, mod);
+        nmod_mat_init(B, n, k, mod);
+        nmod_mat_init(C, m, k, mod);
+        nmod_mat_init(D, m, k, mod);
+
+        nmod_mat_randtest(A);
+        nmod_mat_randtest(B);
+
         nmod_mat_mul_classical(C, A, B);
+        nmod_mat_mul_strassen(D, A, B);
+
+        if (!nmod_mat_equal(C, D))
+        {
+            printf("FAIL: results not equal\n");
+            nmod_mat_print_pretty(A);
+            nmod_mat_print_pretty(B);
+            nmod_mat_print_pretty(C);
+            nmod_mat_print_pretty(D);
+            abort();
+        }
+
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        nmod_mat_clear(D);
     }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
-    }
+
+    printf("PASS\n");
+    return 0;
 }

@@ -28,44 +28,46 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-void
-_fmpz_mat_mul(fmpz ** C, fmpz ** const A, long ar, long ac,
-                         fmpz ** const B, long br, long bc)
-{
-    long i, j, k;
-
-    for (i = 0; i < ar; i++)
-    {
-        for (j = 0; j < bc; j++)
-        {
-            fmpz_zero(&C[i][j]);
-            for (k = 0; k < br; k++)
-                fmpz_addmul(&C[i][j], &A[i][k], &B[k][j]);
-        }
-    }
-}
 
 void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long cr, cc;
+    long dim, m, n, k, ab, bb;
 
-    cr = A->r;
-    cc = B->c;
-
-    FMPZ_MAT_ASSERT((A->c == B->r && C->r == cr && C->c == cc),
-        "fmpz_mat_mul: incompatible dimensions\n");
+    m = A->r;
+    n = A->c;
+    k = B->c;
 
     if (C == A || C == B)
     {
         fmpz_mat_t t;
-        fmpz_mat_init(t, cr, cc);
-        _fmpz_mat_mul(t->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
+        fmpz_mat_init(t, m, k);
+        fmpz_mat_mul(t, A, B);
         fmpz_mat_swap(C, t);
         fmpz_mat_clear(t);
+        return;
+    }
+
+    dim = FLINT_MIN(FLINT_MIN(m, n), k);
+
+    if (dim < 10)
+    {
+        fmpz_mat_mul_classical(C, A, B);
+        return;
+    }
+
+    ab = fmpz_mat_max_bits(A);
+    bb = fmpz_mat_max_bits(B);
+
+    ab = FLINT_ABS(ab);
+    bb = FLINT_ABS(bb);
+
+    if (5*(ab + bb) > dim * dim)
+    {
+        fmpz_mat_mul_classical(C, A, B);
     }
     else
     {
-        _fmpz_mat_mul(C->rows, A->rows, A->r, A->c, B->rows, B->r, B->c);
+        _fmpz_mat_mul_multi_mod(C, A, B, ab + bb + FLINT_BIT_COUNT(n) + 1);
     }
 }
