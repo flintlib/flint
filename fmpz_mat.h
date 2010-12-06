@@ -44,8 +44,9 @@ typedef fmpz_mat_struct fmpz_mat_t[1];
 
 /* Memory management */
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
+void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
-void fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2);
+void fmpz_mat_copy(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
@@ -85,7 +86,7 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
 
-long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options);
+long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options);
 
 void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x);

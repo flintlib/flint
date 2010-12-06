@@ -48,8 +48,12 @@ static int _pivot(mp_limb_t ** rows, long n, long from_row, long in_column)
     return 0;
 }
 
-long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod)
+long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
 {
+    mp_limb_t ** a;
+    long m, n;
+    nmod_t mod;
+
     long j, rank;
     int sign = 1;
     int det_sign;
@@ -59,6 +63,11 @@ long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod
     long length;
 
     mp_limb_t d, e;
+
+    m = mat->r;
+    n = mat->c;
+    a = mat->rows;
+    mod = mat->mod;
 
     rank = 0L;
     pivot_row = 0L;

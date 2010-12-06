@@ -53,7 +53,7 @@ nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 
     /* Compute LU decomposition */
     nmod_mat_init_set(T, A);
-    rank = _nmod_mat_rowreduce(T->rows, dim, dim, ROWREDUCE_FAST_ABORT, T->mod);
+    rank = _nmod_mat_rowreduce(T, ROWREDUCE_FAST_ABORT);
 
     result = 0;
     if (FLINT_ABS(rank) == dim)
