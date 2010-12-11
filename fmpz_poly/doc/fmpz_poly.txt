@@ -1182,9 +1182,9 @@ void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     As expected, aliasing between res and a is supported.  However, res may 
     not be aliased with a coefficient of f.
 
-void _fmpz_poly_evaluate_horner_(fmpz_t rnum, fmpz_t rden, 
-                                 const fmpz * f, long len, 
-                                 const fmpz_t anum, const fmpz_t aden)
+void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
+                                    const fmpz * f, long len, 
+                                    const fmpz_t anum, const fmpz_t aden)
 
     Evaluates the polynomial {f, len} at the rational {anum, aden} using 
     Horner's rule, and sets {rnum, rden} to the result in lowest terms.  
