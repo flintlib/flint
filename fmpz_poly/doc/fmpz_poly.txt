@@ -32,25 +32,27 @@
 
 void fmpz_poly_init(fmpz_poly_t poly)
 
-    Initialises poly for use.  The length is set to zero.
+    Initialises \code{poly} for use.  The length is set to zero.
 
 void fmpz_poly_init2(fmpz_poly_t poly, long alloc)
 
-    Initialises poly with space for at least alloc coefficients and sets 
-    the length to zero.  The allocated coefficients are all set to zero.
+    Initialises \code{poly} with space for at least \code{alloc} coefficients 
+    and sets the length to zero.  The allocated coefficients are all set to 
+    zero.
 
 void fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
 
-    Reallocates the given polynomial to have space for alloc coefficients.
-    If alloc is zero then the polynomial is cleared and then reinitialised. 
-    If the current length is greater than alloc the poly is first truncated 
-    to length alloc.
+    Reallocates the given polynomial to have space for \code{alloc} 
+    coefficients.  If \code{alloc} is zero then the polynomial is cleared 
+    and then reinitialised.  If the current length is greater than 
+    \code{alloc} the polynomial is first truncated to length \code{alloc}.
 
 void fmpz_poly_fit_length(fmpz_poly_t poly, long len)
 
-    If len is greater than the number of coefficients currently allocated, 
-    then the polynomial is reallocated to have space for at least len 
-    coefficients.  No data is lost when calling this function.
+    If \code{len} is greater than the number of coefficients currently 
+    allocated, then the polynomial is reallocated to have space for at 
+    least \code{len} coefficients.  No data is lost when calling this 
+    function.
     
     The function efficiently deals with the case where \code{fit_length} is 
     called many times in small increments by at least doubling the number 
@@ -64,14 +66,14 @@ void fmpz_poly_clear(fmpz_poly_t poly)
 
 void _fmpz_poly_normalise(fmpz_poly_t poly)
 
-    Sets the length of poly so that the top coefficient is nonzero. If
-    all coefficients are zero, the length is set to zero. This function
+    Sets the length of \code{poly} so that the top coefficient is nonzero. 
+    If all coefficients are zero, the length is set to zero.  This function 
     is mainly used internally, as all functions guarantee normalisation.
 
 void _fmpz_poly_set_length(fmpz_poly_t poly, long newlen)
 
-    Demotes the coefficients of poly beyond newlen and sets the length of 
-    poly to newlen.
+    Demotes the coefficients of \code{poly} beyond \code{newlen} and sets 
+    the length of \code{poly} to \code{newlen}.
 
 *******************************************************************************
 
@@ -81,11 +83,11 @@ void _fmpz_poly_set_length(fmpz_poly_t poly, long newlen)
 
 long fmpz_poly_length(const fmpz_poly_t poly)
 
-    Returns the length of poly.  The zero polynomial has length zero.
+    Returns the length of \code{poly}.  The zero polynomial has length zero.
 
 long fmpz_poly_degree(const fmpz_poly_t poly)
 
-    Returns the degree of poly, which is one less than its length.
+    Returns the degree of \code{poly}, which is one less than its length.
 
 *******************************************************************************
 
@@ -95,95 +97,100 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets poly1 to equal poly2.
+    Sets \code{poly1} to equal \code{poly2}.
 
 void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
 
-    Sets poly to the unsigned integer c.
+    Sets \code{poly} to the unsigned integer \code{c}.
 
 void fmpz_poly_set_si(fmpz_poly_t poly, long c)
 
-    Sets poly to the signed integer c.
+    Sets \code{poly} to the signed integer \code{c}.
 
 void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c)
 
-    Sets poly to the integer c.
+    Sets \code{poly} to the integer \code{c}.
 
 void fmpz_poly_set_mpz(fmpz_poly_t poly, const mpz_t c)
 
-    Sets poly to the integer c.
+    Sets \code{poly} to the integer \code{c}.
 
 int _fmpz_poly_set_str(fmpz * poly, const char * str)
 
-    Sets poly to the polynomial encoded in the null-terminated string str.  
-    Assumes that poly is allocated as a sufficiently large array suitable for 
-    the number of coefficients present in str.
+    Sets \code{poly} to the polynomial encoded in the null-terminated 
+    string \code{str}.  Assumes that \code{poly} is allocated as a 
+    sufficiently large array suitable for the number of coefficients 
+    present in \code{str}.
     
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of poly is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
+    Returns $0$ if no error occurred.  Otherwise, returns a non-zero 
+    value, in which case the resulting value of \code{poly} is undefined.  
+    If \code{str} is not null-terminated, calling this method might result 
+    in a segmentation fault.
 
 int fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
 
-    Imports a polynomial from a null-terminated string.  If the string str 
-    represents a valid polynomial returns 1, otherwise returns 0.
+    Imports a polynomial from a null-terminated string.  If the string 
+    \code{str} represents a valid polynomial returns $1$, otherwise 
+    returns $0$.
     
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of poly is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
+    Returns $0$ if no error occurred.  Otherwise, returns a non-zero value, 
+    in which case the resulting value of \code{poly} is undefined.  If 
+    \code{str} is not null-terminated, calling this method might result in 
+    a segmentation fault.
 
 char * _fmpz_poly_get_str(const fmpz * poly, long len)
 
     Returns the plain FLINT string representation of the polynomial 
-    {poly, len}.
+    \code{(poly, len)}.
 
 char * fmpz_poly_get_str(const fmpz_poly_t poly)
 
-    Returns the plain FLINT string representation of the polynomial poly.
+    Returns the plain FLINT string representation of the polynomial 
+    \code{poly}.
 
 char * _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char * x)
 
-    Returns a pretty representation of the polynomial {poly, len} using 
-    the null-terminated string x as the variable name.
+    Returns a pretty representation of the polynomial 
+    \code{(poly, len)} using the null-terminated string \code{x} as the 
+    variable name.
 
 char * fmpz_poly_get_str_pretty(const fmpz_poly_t poly, const char * x)
 
-    Returns a pretty representation of the polynomial poly using the 
-    null-terminated string x as the variable name.
+    Returns a pretty representation of the polynomial \code{poly} using the 
+    null-terminated string \code{x} as the variable name.
 
 void fmpz_poly_zero(fmpz_poly_t poly)
 
-    Sets poly to the zero polynomial.
+    Sets \code{poly} to the zero polynomial.
 
 void fmpz_poly_one(fmpz_poly_t poly)
 
-    Sets poly to the constant polynomial one.
+    Sets \code{poly} to the constant polynomial one.
 
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
-    Swaps poly1 and poly2.  This is done efficiently without copying data
-    by swapping pointers, etc.
+    Swaps \code{poly1} and \code{poly2}.  This is done efficiently without 
+    copying data by swapping pointers, etc.
 
 void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n)
 
-    Sets {res, n} to the reverse of {poly, n}, where poly is in fact 
-    an array of length len.  Assumes that 0 < len <= n.  Supports aliasing 
-    of res and poly, but the behaviour is undefined in case of partial 
-    overlap.
+    Sets \code{(res, n)} to the reverse of \code{(poly, n)}, where 
+    \code{poly} is in fact an array of length \code{len}.  Assumes that 
+    \code{0 < len <= n}.  Supports aliasing of \code{res} and \code{poly}, 
+    but the behaviour is undefined in case of partial overlap.
 
 void fmpz_poly_reverse(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
-    This function considers the polynomial poly to be of length n, 
+    This function considers the polynomial \code{poly} to be of length $n$, 
     notionally truncating and zero padding if required, and reverses 
-    the result.  Since the function normalises its result res may be 
-    of length less than n.
+    the result.  Since the function normalises its result \code{res} may be 
+    of length less than $n$.
 
 void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 
-    If the current length of poly is greater than newlen, it is truncated
-    to have the given length.  Discarded coefficients are not necessarily 
-    set to zero.
-
+    If the current length of \code{poly} is greater than \code{newlen}, it 
+    is truncated to have the given length.  Discarded coefficients are not 
+    necessarily set to zero.
 
 *******************************************************************************
 
@@ -206,15 +213,15 @@ void fmpz_poly_randclear(fmpz_randstate_t state)
 void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
                                                 long len, mp_bitcnt_t bits)
 
-    Sets f to a random polynomial with up to the given length and where
-    each coefficient has up to the given number of bits. The coefficients
+    Sets $f$ to a random polynomial with up to the given length and where 
+    each coefficient has up to the given number of bits. The coefficients 
     are signed randomly. One must call \code{fmpz_poly_randinit} before 
     calling this function.
 
 void fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
                                                 long len, mp_bitcnt_t bits)
 
-    Sets f to a random polynomial with up to the given length and where
+    Sets $f$ to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
     \code{fmpz_poly_randinit} before calling this function.
 
@@ -233,45 +240,45 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state,
 *******************************************************************************
 
 long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
-   
-    Returns coefficient n of poly as a long. The result is undefined if the 
-    value does not fit into a long. Coefficient numbering is from zero and 
-    if n is set to a value beyond the end of the polynomial, zero is 
-    returned.
+
+    Returns coefficient $n$ of \code{poly} as a \code{long}. The result is 
+    undefined if the value does not fit into a \code{long}. Coefficient 
+    numbering is from zero and if $n$ is set to a value beyond the end of 
+    the polynomial, zero is returned.
 
 void fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
 
-    Sets coefficient n of poly to the long value x. Coefficient numbering
-    starts from zero and if n is beyond the current length of poly then
-    the polynomial is extended and zero coefficients inserted if 
-    necessary.
+    Sets coefficient $n$ of \code{poly} to the \code{long} value \code{x}. 
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
 
-long fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
-   
-    Returns coefficient n of poly as a ulong. The result is undefined if the 
-    value does not fit into a ulong. Coefficient numbering is from zero and 
-    if n is set to a value beyond the end of the polynomial, zero is 
-    returned.
+ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
+
+    Returns coefficient $n$ of \code{poly} as a \code{ulong}.  The result is 
+    undefined if the value does not fit into a \code{ulong}.  Coefficient 
+    numbering is from zero and if $n$ is set to a value beyond the end of the 
+    polynomial, zero is returned.
 
 void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, long n, ulong x)
 
-    Sets coefficient n of poly to the ulong value x. Coefficient numbering
-    starts from zero and if n is beyond the current length of poly then
-    the polynomial is extended and zero coefficients inserted if 
-    necessary.
+    Sets coefficient $n$ of \code{poly} to the \code{ulong} value \code{x}.  
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
 
 void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
 
-    Gets coefficient n of poly as an fmpz. Coefficient numbering is from zero 
-    and if n is set to a value beyond the end of the polynomial, zero is 
-    returned.
+    Gets coefficient $n$ of \code{poly} as an \code{fmpz}.  Coefficient 
+    numbering is from zero and if $n$ is set to a value beyond the end of 
+    the polynomial, zero is returned.
 
 void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
 
-    Sets coefficient n of poly to the fmpz value x. Coefficient numbering
-    starts from zero and if n is beyond the current length of poly then
-    the polynomial is extended and zero coefficients inserted if 
-    necessary.
+    Sets coefficient $n$ of \code{poly} to the \code{fmpz} value \code{x}.  
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
 
 *******************************************************************************
 
@@ -281,8 +288,8 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Returns 1 if poly1 is equal to poly2, otherwise returns 0.  The 
-    polynomials are assumed to be normalised.
+    Returns $1$ if \code{poly1} is equal to \code{poly2}, otherwise 
+    returns $0$.  The polynomials are assumed to be normalised.
 
 *******************************************************************************
 
@@ -293,28 +300,28 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} + {poly2, len2}. It is assumed that res has 
-    sufficient space for the longer of the two polynomials.
+    Sets \code{res} to \code{(poly1, len1) + (poly2, len2)}.  It is assumed 
+    that \code{res} has sufficient space for the longer of the two polynomials.
 
 void fmpz_poly_add(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Sets res to poly1 + poly2.
+    Sets \code{res} to \code{poly1 + poly2}.
 
 void _fmpz_poly_sub(fmpz * res, const fmpz * poly1, long len1, 
                                                 const fmpz * poly2, long len2)
 
-    Sets res to {poly1, len1} - {poly2, len2}. It is assumed that res has 
-    sufficient space for the longer of the two polynomials.
+    Sets \code{res} to \code{(poly1, len1) - (poly2, len2)}.  It is assumed 
+    that \code{res} has sufficient space for the longer of the two polynomials.
 
 void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Sets res to poly1 - poly2. 
+    Sets \code{res} to \code{poly1 - poly2}.
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
-    Sets res to -poly.
+    Sets \code{res} to \code{-poly}.
 
 *******************************************************************************
 
@@ -324,26 +331,26 @@ void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
 void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
-    Sets poly1 to poly2 times the unsigned long x.
+    Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
 
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 
-    Sets poly1 to poly2 times the signed long x.
+    Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
-    Sets poly1 to poly2 times the \code{fmpz_t x}.
+    Sets \code{poly1} to \code{poly2} times $x$.
 
 void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, 
                                  const fmpz * poly2, long len2, const fmpz_t x)
 
-    Sets poly1 to poly1 + {poly2, len2} times x.
+    Sets \code{poly1} to \code{poly1 + x * (poly2, len2)}.
 
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
                                                                 const fmpz_t x)
 
-    Sets poly to poly1 + poly2 times x.
+    Sets \code{poly} to \code{poly1 + x * poly2}.
 
 *******************************************************************************
 
@@ -381,159 +388,175 @@ void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
 void _fmpz_poly_mul_classical(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
-    {poly2, len2}.  Assumes len1 and len2 are positive.  Allows zero-padding 
-    of the two input polynomials. 
-    No aliasing of inputs with outputs is allowed.
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}.
+
+    Assumes \code{len1} and \code{len2} are positive.  Allows zero-padding 
+    of the two input polynomials.  No aliasing of inputs with outputs is 
+    allowed.
 
 void fmpz_poly_mul_classical(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets res to poly1 multiplied by poly2.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2}.
 
 void _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, long len1, 
                                          const fmpz * poly2, long len2, long n)
 
-    Sets {res, n} to the first n coefficients of {poly1, len1} 
-    multiplied by {poly2, len2}. Assumes 0 < n <= len1 + len2 - 1. Assumes 
-    neither len1 nor len2 is zero.
+    Sets \code{(res, n)} to the first $n$ coefficients of \code{(poly1, len1)} 
+    multiplied by \code{(poly2, len2)}.
+
+    Assumes \code{0 < n <= len1 + len2 - 1}.  Assumes neither \code{len1} nor 
+    \code{len2} is zero.
 
 void fmpz_poly_mullow_classical(fmpz_poly_t res, 
                       const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the first n coefficients of poly1 * poly2.
+    Sets \code{res} to the first $n$ coefficients of \code{poly1 * poly2}.
 
 void _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1, long len1, 
                                      const fmpz * poly2, long len2, long start)
 
-    Sets the first start coefficients of res to zero and the remainder to the
-    corresponding coefficients of {poly1, len1}*{poly2, len2}. Assumes start
-    <= len1 + len2 - 1. Assumes neither len1 nor len2 is zero.
+    Sets the first \code{start} coefficients of \code{res} to zero and the 
+    remainder to the corresponding coefficients of 
+    \code{(poly1, len1) * (poly2, len2)}.
+
+    Assumes \code{start <= len1 + len2 - 1}.  Assumes neither \code{len1} nor 
+    \code{len2} is zero.
 
 void fmpz_poly_mulhigh_classical(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long start)
 
-    Sets the first start coefficients of res to zero and the remainder to the 
-    corresponding coefficients of poly1 * poly2.
+    Sets the first \code{start} coefficients of \code{res} to zero and the 
+    remainder to the corresponding coefficients of \code{poly1 * poly2}.
 
 void _fmpz_poly_mulmid_classical(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets res to the middle len1 - len2 + 1 coefficients of 
-    {poly1, len1} * {poly2, len2}, i.e. the coefficient from degree len2 - 1 
-    to len1 - 1 inclusive. Assumes neither len1 nor len2 is zero and that 
-    len1 >= len2.
+    Sets \code{res} to the middle \code{len1 - len2 + 1} coefficients of 
+    \code{(poly1, len1) * (poly2, len2)}, i.e.\ the coefficients from degree 
+    \code{len2 - 1} to \code{len1 - 1} inclusive.  Assumes neither \code{len1} 
+    nor \code{len2} is zero and that \code{len1 >= len2}.
 
 void fmpz_poly_mulmid_classical(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets res to the middle poly1->length - poly2->length + 1 coefficients of 
-    poly1 * poly, i.e. the coefficient from degree len2 - 1 to len1 - 1 
-    inclusive. Assumes that len1 >= len2.
+    Sets \code{res} to the middle \code{len(poly1) - len(poly2) + 1} 
+    coefficients of \code{poly1 * poly2}, i.e.\ the coefficient from degree 
+    \code{len2 - 1} to \code{len1 - 1} inclusive.  Assumes that 
+    \code{len1 >= len2}.
 
 void _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
-    {poly2, len2}. Assumes len1 >= len2 > 0.  Allows zero-padding of the two 
-    input polynomials.
-    No aliasing of inputs with outputs is allowed.
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
+    zero-padding of the two input polynomials.  No aliasing of inputs with 
+    outputs is allowed.
 
 void fmpz_poly_mul_karatsuba(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets res to poly1 multiplied by poly2.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2}.
 
 void _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                                     const fmpz * poly2, long n)
 
-    Sets res to poly1 multiplied by poly2 and truncate to the given length. It 
-    is assumed that poly1 and poly2 are precisely the given length (possibly 
-    zero padded). Assumes n is not zero.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2} and truncate 
+    to the given length.  It is assumed that \code{poly1} and \code{poly2} are 
+    precisely the given length (possibly zero padded).  Assumes $n$ is not 
+    zero.
 
 void fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to poly1 multiplied by poly2 and truncate to the given length.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2} and truncate 
+    to the given length.
 
 void _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1, 
                                                   const fmpz * poly2, long len)
 
-    Sets res to poly1 multiplied by poly2 and truncate at the top to the given 
-    length. The first len - 1 coefficients are set to zero. It is assumed that 
-    poly1 and poly2 are precisely the given length (possibly zero padded). 
-    Assumes len is not zero.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2} and truncate 
+    at the top to the given length.  The first \code{len - 1} coefficients 
+    are set to zero. It is assumed that \code{poly1} and \code{poly2} are 
+    precisely the given length (possibly zero padded).   Assumes \code{len} 
+    is not zero.
 
 void fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long len)
 
-    Sets the first len - 1 coefficients of the result to zero and the 
+    Sets the first \code{len - 1} coefficients of the result to zero and the 
     remaining coefficients to the corresponding coefficients of the product of 
-    poly1 and poly2. Assumes poly1 and poly2 are at most of the given length.
+    \code{poly1} and \code{poly2}.  Assumes \code{poly1} and \code{poly2} are 
+    at most of the given length.
 
 void _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
-    {poly2, len2}. Places no assumptions on len1 and len2. Allows 
-    zero-padding of the two input polynomials. Supports aliasing of 
-    inputs and outputs.
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}.
+
+    Places no assumptions on \code{len1} and \code{len2}.  Allows zero-padding 
+    of the two input polynomials.  Supports aliasing of inputs and outputs.
 
 void fmpz_poly_mul_KS(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets res to poly1 multiplied by poly2.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2}.
 
 void _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1, 
                                      const fmpz * poly2, long len2, long n)
 
-    Sets {res, n} to the lowest n coefficients of the product of 
-    {poly1, len1} and {poly2, len2}.  Assumes that len1 and len2 are 
-    positive, but does allow for the polynomials to be zero-padded.  
-    The polynomials may be zero, too.  Assumes n is positive.  
-    Suports aliasing between res, poly1 and poly2.
+    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}.
+
+    Assumes that \code{len1} and \code{len2} are positive, but does allow 
+    for the polynomials to be zero-padded.  The polynomials may be zero, 
+    too.  Assumes $n$ is positive.  Supports aliasing between \code{res}, 
+    \code{poly1} and \code{poly2}.
 
 void fmpz_poly_mullow_KS(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the lowest n coefficients of the product of poly1 and 
-    poly2.
+    Sets \code{res} to the lowest $n$ coefficients of the product of 
+    \code{poly1} and \code{poly2}.
 
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Sets {res, len1 + len2 - 1} to the product of {poly1, len1} and 
-    {poly2, len2}.  Assumes len1 >= len2 > 0.  Allows zero-padding of 
-    the two input polynomials.
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
+    zero-padding of the two input polynomials.
 
 void fmpz_poly_mul(fmpz_poly_t res, 
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
-    Sets res to poly1 multiplied by poly2. Chooses an optimal algorithm from 
-    the choices above.
+    Sets \code{res} to \code{poly1} multiplied by \code{poly2}.  Chooses an 
+    optimal algorithm from the choices above.
 
 void _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1, 
                                      const fmpz * poly2, long len2, long n)
 
-    Sets {res, n} to the lowest n coefficients of the product of {poly1, len1} 
-    and {poly2, len2}.
+    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}.
 
-    Assumes len1 >= len2 > 0 and 0 < n <= len1 + len2 - 1.  Allows for 
-    zero-padding in the inputs.  Does not support aliasing between the 
-    inputs and the output.
+    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= len1 + len2 - 1}.  
+    Allows for zero-padding in the inputs.  Does not support aliasing between 
+    the inputs and the output.
 
 void fmpz_poly_mullow(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets res to the lowest n coefficients of poly1 times poly2.
+    Sets \code{res} to the lowest $n$ coefficients of \code{poly1} times 
+    \code{poly2}.
 
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                       const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
-    Sets the high n coefficients of res to the high n coefficients of the 
-    product of poly1 and poly2, assuming the latter are precisely n 
-    coefficients in length (zero padded if necessary). The remaining n - 1 
-    coefficients may be arbitrary.
+    Sets the high $n$ coefficients of \code{res} to the high $n$ coefficients 
+    of the product of \code{poly1} and \code{poly2}, assuming the latter are 
+    precisely $n$ coefficients in length (zero padded if necessary).  The 
+    remaining $n - 1$ coefficients may be arbitrary.
 
 *******************************************************************************
 
@@ -546,12 +569,13 @@ void _fmpz_poly_pow_multinomial(fmpz * res,
 
     Computes \code{res = poly^e}.  This uses the J.C.P.~Miller pure 
     recurrence as follows:
-    
-    If low is the index of the lowest non-zero coefficient in poly, as a first 
-    step this method zeros out the lowest low times e coefficients of res.  
-    The recurrence above is then used to compute the remaining coefficients.
-    
-    Assumes len > 0, e > 0.  Does not support aliasing.
+
+    If $l$ is the index of the lowest non-zero coefficient in \code{poly}, 
+    as a first step this method zeros out the lowest $l e$ coefficients of 
+    \code{res}.  The recurrence above is then used to compute the remaining 
+    coefficients.
+
+    Assumes \code{len > 0}, \code{e > 0}.  Does not support aliasing.
 
 void fmpz_poly_pow_multinomial(fmpz_poly_t res, 
                                                const fmpz_poly_t poly, ulong e)
@@ -593,7 +617,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
     Given a star chain $1 = a_0 < a_1 < \dotsb < a_n = e$ computes 
     \code{res = poly^e}.
     
-    A start chain is an addition chain $1 = a_0 < a_1 < \dotsb < a_n$ such 
+    A star chain is an addition chain $1 = a_0 < a_1 < \dotsb < a_n$ such 
     that $a_i = a_{i-1} + a_j$ with $j < i$ for all $i > 0$.
     
     Assumes that $e > 2$ (equivalently $n > 1$) and \code{len > 0}.  Does 
@@ -613,7 +637,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
     algorithms, p. 461.
     
     Assumes that \code{len > 0}, \code{e > 1}.  Assumes that \code{res} is 
-    an array of length at least \code{e * (len - 1) + 1}.  Does not support 
+    an array of length at least \code{e (len - 1) + 1}.  Does not support 
     aliasing.
 
 void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
@@ -626,7 +650,7 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
     Sets \code{res = poly^e} whenever $0 \leq e \leq 4$.
     
     Assumes that \code{len > 0} and that \code{res} is an array of length 
-    at least \code{e * (len - 1) + 1}.  Does not support aliasing.
+    at least \code{e (len - 1) + 1}.  Does not support aliasing.
 
 void _fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
@@ -646,26 +670,33 @@ void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
 void _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
 
-    Sets {res, len + n} to {poly, len} shifted left by n coefficients.  
-    Inserts zero coefficients at the lower end.  Assumes that len and n are 
-    positive, and that res fits len + n elements.  Supports aliasing between 
-    res and poly.
+    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by 
+    $n$ coefficients.  
+
+    Inserts zero coefficients at the lower end.  Assumes that \code{len} 
+    and $n$ are positive, and that \code{res} fits \code{len + n} elements.
+    Supports aliasing between \code{res} and \code{poly}.
 
 void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
-    Set res to poly shifted left by n coeffs. Zero coefficients are inserted.
+    Set \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero 
+    coefficients are inserted.
 
 void _fmpz_poly_shift_right(fmpz * res, const fmpz * poly, long len, long n)
 
-    Sets {res, len - n} to {poly, len} shifted right by n coefficients.  
-    Assumes that len and n are positive, that len > n, and that res fits 
-    len - n elements.  Supports aliasing between res and poly, although in 
-    this case the top coefficients of poly are not set to zero.
+    Sets \code{(res, len - n)} to \code{(poly, len_} shifted right by 
+    $n$ coefficients.  
+
+    Assumes that \code{len} and $n$ are positive, that \code{len > n}, 
+    and that \code{res} fits \code{len - n} elements.  Supports aliasing 
+    between \code{res} and \code{poly}, although in this case the top 
+    coefficients of \code{poly} are not set to zero.
 
 void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
-    Set res to poly shifted right by n coefficients. If n is equal to or 
-    greater than the current length of poly, res is set to the zero polynomial.
+    Set \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$ 
+    is equal to or greater than the current length of \code{poly}, \code{res} 
+    is set to the zero polynomial.
 
 *******************************************************************************
 
@@ -675,8 +706,9 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
 void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 
-    Sets res to the euclidean norm of poly, that is, the integer square root 
-    of the sum of the squares of the coefficients of poly.
+    Sets \code{res} to the euclidean norm of \code{poly}, that is, the 
+    integer square root of the sum of the squares of the coefficients of 
+    \code{poly}.
 
 *******************************************************************************
 
@@ -687,44 +719,47 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Computes the greatest common divisor {res, len2} of {poly1, len1} and 
-    {poly2, len2}, assuming len1 >= len2 > 0. The result is normalised to 
-    have positive leading coefficient. Aliasing between res, poly1 and poly2 
-    is supported.
+    Computes the greatest common divisor \code{(res, len2)} of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}, assuming 
+    \code{len1 >= len2 > 0}.  The result is normalised to have 
+    positive leading coefficient.  Aliasing between \code{res}, 
+    \code{poly1} and \code{poly2} is supported.
 
 void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Computes the greatest common divisor res of poly1 and poly2, normalised 
-    to have non-negative leading coefficient.
+    Computes the greatest common divisor \code{res} of \code{poly1} and 
+    \code{poly2}, normalised to have non-negative leading coefficient.
 
     See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.1.
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
-    Computes the greatest common divisor res of {poly1, len1} and 
-    {poly2, len2}, assuming len1 >= len2 > 0.  The result is normalised to 
-    have positive leading coefficient.  Assumes that res has space for 
-    len2 coefficients.  Aliasing between res, poly1 and poly2 might not be 
-    supported.
+    Computes the greatest common divisor \code{res} of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}, assuming \code{len1 >= len2 > 0}.  The result 
+    is normalised to have positive leading coefficient.
+
+    Assumes that \code{res} has space for \code{len2} coefficients.  
+    Aliasing between \code{res}, \code{poly1} and \code{poly2} might not 
+    be supported.
 
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)
 
-    Computes the greatest common divisor res of poly1 and poly2, normalised 
-    to have non-negative leading coefficient.
+    Computes the greatest common divisor \code{res} of \code{poly1} and 
+    \code{poly2}, normalised to have non-negative leading coefficient.
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2)
 
-    Sets res to the resultant of {poly1, len1} and {poly2, len2}, assuming 
-    that len1 >= len2 > 0.
+    Sets \code{res} to the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}, assuming that \code{len1 >= len2 > 0}.
 
 void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
                                      const fmpz_poly_t poly2)
 
-    Computes the resultant of poly1 and poly2.
+    Computes the resultant of \code{poly1} and \code{poly2}.
 
     For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
     $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
@@ -745,26 +780,30 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
 
 void _fmpz_poly_content(fmpz_t res, const fmpz * poly, long len)
 
-    Sets res to the non-negative content of {poly, len}.  Aliasing between 
-    res and the coefficients of poly is not supported.
+    Sets \code{res} to the non-negative content of \code{(poly, len)}.  
+    Aliasing between \code{res} and the coefficients of \code{poly} is 
+    not supported.
 
 void fmpz_poly_content(fmpz_t res, const fmpz_poly_t poly)
 
-    Sets res to the non-negative content of poly.  The content of the zero 
-    polynomial is defined to be zero.  Supports aliasing, that is, res is 
-    allowed to be one of the coefficients of poly.
+    Sets \code{res} to the non-negative content of \code{poly}.  The content 
+    of the zero polynomial is defined to be zero.  Supports aliasing, that is, 
+    \code{res} is allowed to be one of the coefficients of \code{poly}.
 
 void _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
 
-    Sets {res, len} to {poly, len} divided by the content of {poly, len}, 
-    and normalises the result to have non-negative leading coefficient. 
-    Assumes that {poly, len} is non-zero.  Supports aliasing of res and poly.
+    Sets \code{(res, len)} to \code{(poly, len)} divided by the content 
+    of \code{(poly, len)}, and normalises the result to have non-negative 
+    leading coefficient.
+
+    Assumes that \code{(poly, len)} is non-zero.  Supports aliasing of 
+    \code{res} and \code{poly}.
 
 void fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 
-    Sets res to poly divided by the content of poly, and normalises the result 
-    to have non-negative leading coefficient.  If poly is zero, sets res to 
-    zero.
+    Sets \code{res} to \code{poly} divided by the content of \code{poly}, 
+    and normalises the result to have non-negative leading coefficient.  
+    If \code{poly} is zero, sets \code{res} to zero.
 
 *******************************************************************************
 
