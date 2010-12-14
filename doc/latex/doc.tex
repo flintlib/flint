@@ -1,0 +1,420 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   This file is part of FLINT.
+%
+%   FLINT is free software; you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation; either version 2 of the License, or
+%   (at your option) any later version.
+%
+%   FLINT is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with FLINT; if not, write to the Free Software
+%   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Copyright (C) 2007 William Hart, David Harvey
+%   Copyright (C) 2010 Sebastian Pancratz
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,10pt]{book}
+
+\title{FLINT 2.0: Fast Library for Number Theory}
+\author{AUTHORS}
+
+%%%%%%%%%%%%
+% geometry %
+%%%%%%%%%%%%
+
+\usepackage[hmargin=3.8cm,vmargin=3cm,a4paper,centering,twoside]{geometry}
+\setlength{\headheight}{14pt}
+
+% Dutch style of paragraph formatting, i.e. no indents
+\setlength{\parskip}{1.3ex plus 0.2ex minus 0.2ex}
+\setlength{\parindent}{0pt}
+
+%%%%%%%%%%%%%%%%%%
+% Other packages %
+%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath,amsthm,amscd,amsfonts,amssymb}
+\usepackage{cases}
+\usepackage[all]{xy}
+
+\usepackage{ifpdf}
+\usepackage{paralist}
+\usepackage{fancyhdr}
+\usepackage{sectsty}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage{listings}
+
+%%%%%%%%%%%%
+% hyperref %
+%%%%%%%%%%%%
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,    % false: boxed links; true: colored links
+    citecolor=green,    % color of links to bibliography
+    filecolor=magenta,  % color of file links
+    linkcolor=red,      % color of internal links
+    urlcolor=blue       % color of external links
+}
+
+\makeatletter
+\newcommand\org@hypertarget{}
+\let\org@hypertarget\hypertarget
+\renewcommand\hypertarget[2]{%
+    \Hy@raisedlink{\org@hypertarget{#1}{}}#2%
+} 
+\makeatother
+
+\ifpdf
+    \hypersetup{
+        pdftitle={FLINT},
+        pdfauthor={},
+        pdfsubject={Computational mathematics},
+        bookmarks=true,
+        bookmarksnumbered=true,
+        unicode=true,
+        pdfstartview={FitH},
+        pdfpagemode={UseOutlines}
+    }
+\fi
+
+%%%%%%%%%%
+% natbib %
+%%%%%%%%%%
+
+\bibpunct{[}{]}{,}{n}{}{}
+
+\renewcommand{\bibname}{References}
+
+%%%%%%%%%%
+% secsty %
+%%%%%%%%%%
+
+\allsectionsfont{\nohang\centering}
+
+%%%%%%%%%%%%
+% fancyhdr %
+%%%%%%%%%%%%
+
+\newcommand\nouppercase[1]{{%
+    \let\uppercase\relax
+    \let\MakeUppercase\relax
+    \expandafter\let\csname MakeUppercase \endcsname\relax#1}%
+}
+
+\pagestyle{fancyplain}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\itshape\nouppercase{\rightmark}}
+\fancyhead[RE]{\itshape\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancypagestyle{plain}{%
+  \fancyhead{}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+    \hbox{}
+    \thispagestyle{plain}
+    \newpage
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother \clearpage{\pagestyle{plain}\cleardoublepage}
+
+%%%%%%%
+% url %
+%%%%%%%
+
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+\urlstyle{leostyle}
+
+%%%%%%%%%%%%%%%%
+% Enumerations %
+%%%%%%%%%%%%%%%%
+
+\setlength{\pltopsep}{0.24em}
+\setlength{\plpartopsep}{0em}
+\setlength{\plitemsep}{0.24em}
+
+% This should do what we want
+%   \setdefaultenum{(i)}{(a)}{1.}{A}
+% but it does not work for references, dropping the 
+% parentheses.  The following hack does work.
+
+\renewcommand{\theenumi}{(\roman{enumi})}
+\renewcommand{\theenumii}{(\alph{enumii})}
+\renewcommand{\theenumiii}{\arabic{enumiii}.}
+\renewcommand{\theenumiv}{\Alph{enumiv}}
+
+\renewcommand{\labelenumi}{\theenumi}
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\labelenumiii}{\theenumiii}
+\renewcommand{\labelenumiv}{\theenumiv}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Mathematical commands %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\to}{\rightarrow}%         Right arrow
+\newcommand{\into}{\hookrightarrow}%     Injection arrow
+\newcommand{\onto}{\twoheadrightarrow}%  Surjection arrow
+
+\providecommand{\abs}[1]{\lvert#1\rvert}%                  Absolute value
+\providecommand{\absbig}[1]{\bigl\lvert#1\bigr\rvert}%     Absolute value
+\providecommand{\absBig}[1]{\Bigl\lvert#1\Bigr\rvert}%     Absolute value
+\providecommand{\absbigg}[1]{\biggl\lvert#1\biggr\rvert}%  Absolute value
+
+\providecommand{\norm}[1]{\lVert#1\rVert}%               Norm
+\providecommand{\normbig}[1]{\bigl\lVert#1\bigr\rVert}%  Norm
+\providecommand{\normBig}[1]{\Bigl\lVert#1\Bigr\rVert}%  Norm
+
+\providecommand{\floor}[1]{\left\lfloor#1\right\rfloor}%    Floor
+\providecommand{\floorbig}[1]{\bigl\lfloor#1\bigr\rfloor}%  Floor
+\providecommand{\floorBig}[1]{\Bigl\lfloor#1\Bigr\rfloor}%  Floor
+
+\providecommand{\ceil}[1]{\left\lceil#1\right\rceil}%    Ceiling
+\providecommand{\ceilbig}[1]{\bigl\lceil#1\bigr\rceil}%  Ceiling
+\providecommand{\ceilBig}[1]{\Bigl\lceil#1\Bigr\rceil}%  Ceiling
+
+\newcommand{\N}{\mathbf{N}}%  Natural numbers
+\newcommand{\Z}{\mathbf{Z}}%  Integers
+\newcommand{\Q}{\mathbf{Q}}%  Rationals
+
+\allowdisplaybreaks[4]
+%\numberwithin{equation}{section}
+
+%%%%%%%%%%%%
+% listings %
+%%%%%%%%%%%%
+
+\lstset{language=c}
+\lstset{basicstyle=\ttfamily}
+\lstset{keywordstyle=}
+%\lstset{morekeywords={mpz_t,mpz_poly_t,fmpz_poly_t}}  TODO
+\lstset{escapechar=\%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FLINT specific commands %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\code}{\lstinline}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FRONTMATTER                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\frontmatter
+
+\maketitle
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAINMATTER                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+
+\chapter{Introduction}
+
+FLINT is a C library of functions for doing number theory. It is highly 
+optimised and can be compiled on numerous platforms.  FLINT also has the 
+aim of providing support for multicore and multiprocessor computer 
+architectures, though we do not yet provide this facility.
+
+FLINT is currently maintained by William Hart of Warwick University in 
+the UK.
+
+As of version 1.1.0 FLINT supports 32 and 64 bit processors including 
+x86, PPC, Alpha and Itanium processors, though in theory it compiles on any 
+machine with GCC version 3.4 or later and with GMP version 4.2.1 or 
+MPIR 0.9.0 or later.
+
+FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
+each of which can be linked to a C program making use of their functionality.
+
+All of the functions in FLINT have a corresponding test function provided 
+in an appropriately named test file.  For example, the function 
+\code{fmpz_poly_add} located in \code{fmpz_poly/add.c} has test code in the 
+file \code{fmpz_poly/test/t-add.c}.
+
+\chapter{Installing FLINT}
+
+\section{Building FLINT}
+
+The easiest way to use FLINT is to build a shared library.  Simply download 
+the FLINT tarball and untar it on your system.
+
+FLINT requires GMP version 4.2.1 or later or MPIR version 0.9.0 or 
+later (in GMP compatibility mode).  Set the environment variables 
+\code{FLINT_GMP_LIB_DIR} and \code{FLINT_GMP_INCLUDE_DIR} to point 
+to your GMP or MPIR library and include directories respectively. 
+Alternatively you can set default values for these environment variables 
+in the \code{flint_env} file.
+
+Once the environment variables are set or defaults are set in 
+\code{flint_env} simply type:
+
+\begin{lstlisting}[language=bash]
+source flint_env
+\end{lstlisting}
+
+in the main directory of the FLINT directory tree.  Finally type:
+
+\begin{lstlisting}[language=bash]
+make library
+\end{lstlisting}
+
+Move the library file \code{libflint.so}, \code{libflint.dll} or 
+\code{libflint.dylib} (depending on your platform) into your library 
+path and move all the \code{.h} files in the main directory of FLINT 
+into your include path.
+
+Now to use FLINT, simply include the appropriate header files for 
+the FLINT modules you wish to use in your C program.  Then compile 
+your program, linking against the FLINT library and GMP/MPIR with 
+the options \code{-lflint -lgmp}.
+
+\section{Test code}
+
+Each module of FLINT has an extensive associated test module.  We 
+strongly recommend running the test programs before relying on results 
+from FLINT on your system. 
+
+To make and run the test programs, simply type:
+
+\begin{lstlisting}[language=bash]
+make check
+\end{lstlisting}
+
+in the main FLINT directory.
+
+\section{Reporting bugs}
+
+The maintainer wishes to be made aware of any and all bugs.  Please send an 
+email with your bug report to \url{hart_wb@yahoo.com}.
+
+If possible please include details of your system, version of gcc, version 
+of GMP/MPIR and precise details of how to replicate the bug.
+
+Note that FLINT needs to be linked against version 4.2.1 or later of GMP 
+or version 0.9.0 or later of MPIR (in GMP compatibility mode) and must be 
+compiled with gcc version 3.4 or later.  In particular the compiler must be 
+fully C99 compatible.
+
+\section{Example programs}
+
+FLINT comes with a number of example programs to demonstrate current and 
+future FLINT features.  To build the example programs, type:
+
+\begin{lstlisting}[language=bash]
+make examples
+\end{lstlisting}
+
+The current example programs are:
+
+\code{delta_qexp}  Computes the first $n$ terms of the delta function, e.g.\ 
+\code{delta_qexp 1000000} will compute the first one million terms of the 
+$q$-expansion of delta.
+
+\code{BPTJCubes}  Implements the algorithm of Beck, Pine, Tarrant and Jensen 
+for finding solutions to the equation $x^3+y^3+z^3 = k$.  This program 
+outputs a file \code{output.log} containing parameters for reconstructing the 
+first solution it finds, and then aborts.
+
+\code{bernoulli_zmod} Compute many bernoulli numbers modulo a prime.  If no 
+command line input is supplied it merely checks that the \code{bernoulli_zmod} 
+function works for the first $2000$ primes.  If you specify an integer 
+argument \code{n} on the command line, it computes the Bernoulli numbers 
+$B_0, B_2, \dotsc, B_{p-1}$ modulo~$p$, where $p$ is the next prime from 
+\code{n}.
+
+\code{expmod}  Computes a very large modular exponentiation.  This is actually 
+a basic pseudo primality test.
+
+\code{Zmul}  Compares the output of the FLINT FFT with that of GMP for ever 
+larger operands.
+
+\code{thetaproduct}  Computes the congruent number theta function.  To run 
+this you need to have openmp on your machine, you need a recent version of 
+gcc (e.g. 4.3.x or 4.4.x) and you need to export \code{OMP_NUM_THREADS=16} 
+or some factor of 16, depending on how many cores your machine has.  The 
+code also expects a directory \code{storage} with \emph{plenty} of space 
+where temporary files will be created.  Be warned that this code multiplies 
+\emph{huge} integers which do not fit into memory and much disk space is 
+used.  You also need a significant amount of memory on your machine, which 
+must also be a 64 bit linux platform.  Parameters can be changed at the top 
+of the file \code{thetaproduct.c}.  Primitive (squarefree) zeroes of the 
+congruent number theta function curve will be computed up to 
+\code{MOD * LIMIT} in the class $K$ modulo \code{MOD}.  At present 
+\code{FILES1} and \code{FILES2} must be equal.  \code{LIMIT} must also be 
+divisible by \code{BLOCK} and by \code{BUNDLE * FILES1}.  The code is not 
+currently designed to correctly handle small problems. 
+
+\section{FLINT macros}
+
+In the file \code{flint.h} are various useful macros.
+
+The macro constant \code{FLINT_BITS} is set at compile time to be the 
+number of bits per limb on the machine.  FLINT requires it to be either 
+32 or 64 bits.  Other architectures are not currently supported.
+
+The macro constant \code{FLINT_D_BITS} is set at compile time to be the 
+number of bits per double on the machine or the number of bits per limb, 
+whichever is smaller.  This will have the value 53 or 32 on currently 
+supported architectures.  Numerous functions using precomputed inverses 
+only support operands up to \code{FLINT_D_BITS} bits, hence the macro.
+
+\code{FLINT_ABS(x)} returns the absolute value of a \code{long x}.
+
+\code{FLINT_MIN(x, y)} returns the minimum of two \code{long} or two 
+\code{unsigned long} values \code{x} and \code{y}.
+
+\code{FLINT_MAX(x, y)} returns the maximum of two \code{long} or two 
+\code{unsigned long} values \code{x} and \code{y}.
+
+\code{FLINT_BIT_COUNT(x)} returns the number of binary bits required 
+to represent an \code{unsigned long x}.
+
+\chapter{fmpz\_poly}
+
+\input{fmpz_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BACKMATTER                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\backmatter
+
+\end{document}
