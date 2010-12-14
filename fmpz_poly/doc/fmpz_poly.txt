@@ -52,9 +52,9 @@ void fmpz_poly_fit_length(fmpz_poly_t poly, long len)
     then the polynomial is reallocated to have space for at least len 
     coefficients.  No data is lost when calling this function.
     
-    The function efficiently deals with the case where fit_length is called 
-    many times in small increments by at least doubling the number of 
-    allocated coefficients when length is larger than the number of 
+    The function efficiently deals with the case where \code{fit_length} is 
+    called many times in small increments by at least doubling the number 
+    of allocated coefficients when length is larger than the number of 
     coefficients currently allocated.
 
 void fmpz_poly_clear(fmpz_poly_t poly)
@@ -194,13 +194,13 @@ void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 void fmpz_poly_randinit(fmpz_randstate_t state)
 
     Initialises the random state for random polynomial generation. 
-    One should not call this function if fmpz_randinit has already 
-    been called. 
+    One should not call this function if \code{fmpz_randinit} has 
+    already been called. 
 
 void fmpz_poly_randclear(fmpz_randstate_t state)
 
-    Clears the random state initialised with fmpz_poly_randinit. One 
-    should not call this function if fmpz_randclear has already been
+    Clears the random state initialised with \code{fmpz_poly_randinit}. One 
+    should not call this function if \code{fmpz_randclear} has already been 
     called.
 
 void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
@@ -208,22 +208,23 @@ void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state,
 
     Sets f to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. The coefficients
-    are signed randomly. One must call fmpz_poly_randinit before calling
-    this function.
+    are signed randomly. One must call \code{fmpz_poly_randinit} before 
+    calling this function.
 
 void fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
                                                 long len, mp_bitcnt_t bits)
 
     Sets f to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
-    fmpz_poly_randinit before calling this function.
+    \code{fmpz_poly_randinit} before calling this function.
 
 void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state, 
                                                 long len, mp_bitcnt_t bits)
 
-    As for fmpz_poly_randtest except that len and bits may not be zero and 
-    the polynomial generated is guaranteed not to be the zero polynomial. 
-    One must call fmpz_poly_randinit before calling this function.
+    As for \code{fmpz_poly_randtest} except that \code{len} and bits may 
+    not be zero and the polynomial generated is guaranteed not to be the 
+    zero polynomial.  One must call \code{fmpz_poly_randinit} before 
+    calling this function.
 
 *******************************************************************************
 
@@ -332,7 +333,7 @@ void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
-    Sets poly1 to poly2 times the fmpz_t x.
+    Sets poly1 to poly2 times the \code{fmpz_t x}.
 
 void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, 
                                  const fmpz * poly2, long len2, const fmpz_t x)
@@ -353,21 +354,23 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
                                     long len, mp_bitcnt_t bit_size, int negate)   
 
-    Packs the coefficients of poly into bitfields of the given bit_size, 
-    negating the coefficients before packing if negate is set to -1.
+    Packs the coefficients of poly into bitfields of the given 
+    \code{bit_size}, negating the coefficients before packing 
+    if \code{negate} is set to $-1$.
 
 void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                                mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
 
     Unpacks the polynomial of given length from the array as packed into 
-    fields of the given bitsize, finally negating the coefficients if negate 
-    is set to -1.
+    fields of the given \code{bit_size}, finally negating the coefficients 
+    if \code{negate} is set to $-1$.
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                          mp_srcptr_t arr, mp_bitcnt_t bit_size)
 
     Unpacks the polynomial of given length from the array as packed into 
-    fields of the given bitsize. The coefficients are assumed to be unsigned.
+    fields of the given \code{bit_size}.  The coefficients are assumed to 
+    be unsigned.
 
 *******************************************************************************
 
@@ -541,8 +544,8 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 void _fmpz_poly_pow_multinomial(fmpz * res, 
                                           const fmpz * poly, long len, ulong e)
 
-    Comuputes res = poly^e.  This uses the J.C.P. Miller pure recurrence as 
-    follows:
+    Computes \code{res = poly^e}.  This uses the J.C.P.~Miller pure 
+    recurrence as follows:
     
     If low is the index of the lowest non-zero coefficient in poly, as a first 
     step this method zeros out the lowest low times e coefficients of res.  
@@ -553,9 +556,9 @@ void _fmpz_poly_pow_multinomial(fmpz * res,
 void fmpz_poly_pow_multinomial(fmpz_poly_t res, 
                                                const fmpz_poly_t poly, ulong e)
 
-    Computes res = poly^e using a generalisation of binomial expansion called 
-    the J.C.P. Miller pure recurrence.   If poly is zero, returns zero, so 
-    that in particular 0^0 = 0.
+    Computes \code{res = poly^e} using a generalisation of binomial expansion 
+    called the J.C.P.~Miller pure recurrence.  If \code{poly} is zero, returns 
+    zero, so that in particular \code{0^0 = 0}.
     
     The formal statement of the recurrence is as follows.  Write the input 
     polynomial as $P(t) = p_0 + p_1 t + \dotsb + p_m t^m$ with $p_0 \neq 0$ 
@@ -572,59 +575,68 @@ void fmpz_poly_pow_multinomial(fmpz_poly_t res,
 
 void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
 
-    Computes res = poly^e when poly is of length 2, using binomial expansion. 
-    Assumes e > 0.  Does not support aliasing.
+    Computes \code{res = poly^e} when poly is of length~$2$, using binomial 
+    expansion. 
+
+    Assumes $e > 0$.  Does not support aliasing.
 
 void fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Computes res = poly^e when poly is of length 2, using binomial expansion.
-    If the length of poly is not 2, raises an exception and aborts.
+    Computes \code{res = poly^e} when poly is of length~$2$, using binomial 
+    expansion.
+
+    If the length of \code{poly} is not $2$, raises an exception and aborts.
 
 void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, 
                                                           const int * a, int n)
 
-    Given a star chain 1 = a[0] < a[1] < ... < a[n] = e computes res = poly^e.
+    Given a star chain $1 = a_0 < a_1 < \dotsb < a_n = e$ computes 
+    \code{res = poly^e}.
     
-    A start chain is an addition chain 1 = a[0] < a[1] < ... < a[n] such that 
-    a[i] = a[i-1] + a[j] with j < i for all i > 0.
+    A start chain is an addition chain $1 = a_0 < a_1 < \dotsb < a_n$ such 
+    that $a_i = a_{i-1} + a_j$ with $j < i$ for all $i > 0$.
     
-    Assumes that e > 2 (equivalently n > 1) and len > 0.  Does not support 
-    aliasing.
+    Assumes that $e > 2$ (equivalently $n > 1$) and \code{len > 0}.  Does 
+    not support aliasing.
 
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     
-    Computes res = poly^e using addition chains whenever 0 <= e <= 148.  
-    If e > 148, raises an exception and aborts.
+    Computes \code{res = poly^e} using addition chains whenever 
+    $0 \leq e \leq 148$.
+
+    If $e > 148$, raises an exception and aborts.
 
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets res = poly^e using left-to-right binary exponentiation, see 
-    D. Knuth, ``The Art of Computer Programming Vol. 2'', Seminumerical 
+    Sets \code{res = poly^e} using left-to-right binary exponentiation, see 
+    D.~Knuth, ``The Art of Computer Programming Vol. 2'', Seminumerical 
     algorithms, p. 461.
     
-    Assumes that len > 0, e > 1.  Assumes that res is an array of length 
-    at least e * (len - 1) + 1.  Does not support aliasing.
+    Assumes that \code{len > 0}, \code{e > 1}.  Assumes that \code{res} is 
+    an array of length at least \code{e * (len - 1) + 1}.  Does not support 
+    aliasing.
 
 void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Computes res = poly^e using the binary exponentiation algorithm.  
-    If poly is zero, returns zero, so that in particular 0^0 = 0.
+    Computes \code{res = poly^e} using the binary exponentiation algorithm.  
+    If \code{poly} is zero, returns zero, so that in particular \code{0^0 = 0}.
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets res = poly^e whenever 0 <= e <= 4.
+    Sets \code{res = poly^e} whenever $0 \leq e \leq 4$.
     
-    Assumes that len > 0 and that res is an array of length at least 
-    e * (len - 1) + 1.  Does not support aliasing.
+    Assumes that \code{len > 0} and that \code{res} is an array of length 
+    at least \code{e * (len - 1) + 1}.  Does not support aliasing.
 
 void _fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Sets res = poly^e, assuming that e, len > 0.  Does not support aliasing.
+    Sets \code{res = poly^e}, assuming that \code{e, len > 0}.  Does not 
+    support aliasing.
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Computes res = poly^e.  If poly is zero, returns zero, so that in 
-    particular 0^0 = 0.
+    Computes \code{res = poly^e}.  If \code{poly} is zero, returns zero, 
+    so that in particular \code{0^0 = 0}.
 
 *******************************************************************************
 
@@ -1020,57 +1032,60 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 
                           const fmpz * A, long lenA, const fmpz * B, long lenB)
 
-    If L is the leading coefficient of B, then computes Q, R such that 
-    L^d*A = QB + R. This function is used for simulating division over QQ. 
-    Assumes that lenA >= lenB > 0.
-    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
-    fit lenA coefficients.
+    If $\ell$ is the leading coefficient of B, then computes Q, R such that 
+    $\ell^d A = Q B + R$.  This function is used for simulating division 
+    over $\Q$.
+
+    Assumes that \code{lenA >= lenB > 0}.
+    Assumes that Q can fit \code{lenA - lenB + 1} coefficients, and that 
+    R can fit lenA coefficients.
     Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
     no aliasing of the inputs and outputs is suppported.
 
 void fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
-    If L is the leading coefficient of B, then computes Q, R such that 
-    L^d*A = QB + R. This function is used for simulating division over QQ. 
+    If $\ell$ is the leading coefficient of B, then computes Q, R such that 
+    $\ell^d A = Q B + R$.  This function is used for simulating division 
+    over $\Q$. 
 
 void _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
                           const fmpz * A, long lenB, const fmpz * B, long lenB)
 
-    Computes {Q, lenA - lenB + 1}, {R, lenA} such that L^d A = B*Q + R, only 
-    taking the bottom lenB - 1 coefficients of R into account.  The remaining 
-    top coefficients of {R, lenA} may be arbitrary.
+    Computes {Q, lenA - lenB + 1}, {R, lenA} such that $\ell^d A = B Q + R$, 
+    only taking the bottom \code{lenB - 1} coefficients of $R$ into account.  
+    The remaining top coefficients of {R, lenA} may be arbitrary.
 
-    Assumes lenA >= lenB > 0. Allows zero-padding in {A, lenA}. No aliasing 
-    of input and output operands is allowed.
+    Assumes \code{lenA >= lenB > 0}.  Allows zero-padding in {A, lenA}.  
+    No aliasing of input and output operands is allowed.
 
 void fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R, 
                            ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 
-    Computes Q, R, and d such that L^d A = B*Q + R, where R has length less 
-    than the length of B and L is the leading coefficient of B.  An exception 
-    is raised if B is zero.
+    Computes Q, R, and d such that $\ell^d A = B Q + R$, where R has length 
+    less than the length of B and $\ell$ is the leading coefficient of B.  
+    An exception is raised if B is zero.
 
 void _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
 
-    Assumes that lenA >= lenB > 0.
-    Assumes that Q can fit lenA - lenB + 1 coefficients, and that R can 
-    fit lenA coefficients.
+    Assumes that \code{lenA >= lenB > 0}.
+    Assumes that Q can fit \code{lenA - lenB + 1} coefficients, and that 
+    R can fit lenA coefficients.
     Supports aliasing of {R, lenA} and {A, lenA}.  But other than this, 
     no aliasing of the inputs and outputs is supported.
 
 void fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
 
-    This is a variant of fmpz_poly_pseudo_divrem which computes polynomials 
-    Q and R such that lead(B)^d * A = B * Q + R.  However, the value of d 
-    is fixed at the maximum of 0 and A->length - B->length + 1.
+    This is a variant of \code{fmpz_poly_pseudo_divrem} which computes 
+    polynomials Q and R such that $\ell^d A = B Q + R$.  However, the value 
+    of d is fixed at the maximum of 0 and \code{A->length - B->length + 1}.
     
     This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
     is not asymptotically fast.  It is efficient only for short polynomials, 
-    e.g. when B->length < 32.
+    e.g.\ when \code{B->length < 32}.
 
 void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA, 
                                                      const fmpz * B, long lenB)
@@ -1082,9 +1097,10 @@ void _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA,
 void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, 
                                                            const fmpz_poly_t B)
 
-    This is a variant of fmpz_poly_pseudo_rem which computes polynomials 
-    Q and R such that lead(B)^d * A = B * Q + R, but only returns R.  However, 
-    the value of d is fixed at the maximum of 0 and A->length - B->length + 1.
+    This is a variant of \code{fmpz_poly_pseudo_rem} which computes 
+    polynomials $Q$ and $R$ such that $\ell^d A = B Q + R$, but only 
+    returns $R$.  However, the value of $d$ is fixed at the maximum 
+    of 0 and \code{A->length - B->length + 1}.
 
     This function is faster when the remainder is not well behaved, i.e. 
     where it is not expected to be close to zero.  Note that this function 
@@ -1096,9 +1112,10 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
 
-    If L is the leading coefficient of B, then computes {Q, lenA - lenB + 1}, 
-    {R, lenB - 1} and d such that L^d * A = QB + R. This function is used for 
-    simulating division over QQ. 
+    If $\ell$ is the leading coefficient of $B$, then computes 
+    \code{Q, lenA - lenB + 1}, \code{R, lenB - 1} and $d$ such that 
+    $\ell^d * A = B Q + R$.  This function is used for simulating division 
+    over $\Q$.
 
     Assumes that lenA >= lenB > 0.  Assumes that Q can fit lenA - lenB + 1 
     coefficients, and that R can fit lenA coefficients, although on exit only 
@@ -1110,7 +1127,7 @@ void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A,
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, ulong * d, 
                                       const fmpz_poly_t A, const fmpz_poly_t B)
 
-    Computes Q, R, and d such that lead(B)^d * A = B * Q + R.
+    Computes Q, R, and d such that $\ell^d A = B Q + R$.
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, long lenA, 
                                                 const fmpz * B, long lenB)
@@ -1234,13 +1251,13 @@ void fmpz_poly_compose_horner(fmpz_poly_t res, const fmpz_poly_t poly1,
 void _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
                                                const fmpz * poly2, long len2)
 
-   Computes the composition of {poly1, len1} and {poly2, len2} using 
-   a divide and conquer approach and places the result into res, assuming 
-   res can hold the output of length (len1 - 1) * (len2 - 1) + 1.
+    Computes the composition of {poly1, len1} and {poly2, len2} using 
+    a divide and conquer approach and places the result into res, assuming 
+    res can hold the output of length (len1 - 1) * (len2 - 1) + 1.
    
-   Assumes len1, len2 > 0.
-   Does not support aliasing between res and any of {poly1, len1} and 
-   {poly2, len2}.
+    Assumes len1, len2 > 0.
+    Does not support aliasing between res and any of {poly1, len1} and 
+    {poly2, len2}.
 
 void fmpz_poly_compose_divconquer(fmpz_poly_t res, const fmpz_poly_t poly1,
                                                    const fmpz_poly_t poly2)
