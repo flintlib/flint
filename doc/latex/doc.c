@@ -27,13 +27,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ndocs  1
+#define ndocs  2
 
 static char * docsin[ndocs] = {
+    "../../fmpz/doc/fmpz.txt", 
     "../../fmpz_poly/doc/fmpz_poly.txt", 
 };
 
 static char * docsout[ndocs] = {
+    "fmpz.tex", 
     "fmpz_poly.tex", 
 };
 
@@ -110,6 +112,7 @@ static int open_group()
 {
     grp_open = 1;
 
+    fprintf(out, "\n");
     fprintf(out, "\\section{%s}\n\n", grp);
 
     return DOCS_SUCCESS;
@@ -126,6 +129,7 @@ static int open_function()
 {
     fnc_open = 1;
 
+    fprintf(out, "\n");
     fprintf(out, "\\vspace{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
     fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
@@ -209,17 +213,29 @@ static void processfile(void)
                 grp[i] = buf[i + 4];
             grp[i] = '\0';
 
-            r = r || readline(in, buf, &n);
+            r = r || open_group();
+
+            /* Read empty line */
             r = r || readline(in, buf, &n);
 
-            r = r || open_group();
+            /* Process the group description */
+            while ((r = r || readline(in, buf, &n)) == DOCS_SUCCESS)
+            {
+                /* Empty line */
+                if (n == 0)
+                    continue;
+
+                /* Line of '*' */
+                if (n == 79 && buf[0] == '*')
+                    NEXTSTATE(ST_FIND_FN);
+
+                r = r || printline(out, buf + 4);
+            }
 
             if (r == DOCS_IOE)
                 NEXTSTATE(ST_IOE);
             if (r == DOCS_EOF)
                 NEXTSTATE(ST_TERM);
-
-            NEXTSTATE(ST_FIND_FN);
         }
 
         STATE(ST_FIND_FN)
