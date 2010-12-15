@@ -92,6 +92,17 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
 
     Returns the degree of \code{poly}, which is one less than its length.
 
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+
+    Returns the maximum number of limbs required to store the absolute value 
+    of coefficients of \code{poly}.  If \code{poly} is zero, returns $0$.
+
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
+
+    Computes the maximum number of bits $b$ required to store the absolute 
+    value of coefficients of \code{poly}.  If all the coefficients of 
+    \code{poly} are non-negative, $b$ is returned, otherwise $-b$ is returned.
+
 *******************************************************************************
 
     Assignment and basic manipulation

@@ -82,6 +82,18 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
     return poly->length - 1;
 }
 
+static __inline__ 
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_limbs(poly->coeffs, poly->length);
+}
+
+static __inline__ 
+long _fmpz_vec_max_bits(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
+}
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
