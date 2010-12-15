@@ -26,9 +26,6 @@
 
 \documentclass[a4paper,10pt]{book}
 
-\title{FLINT 2.0: Fast Library for Number Theory}
-\author{AUTHORS}
-
 %%%%%%%%%%%%
 % geometry %
 %%%%%%%%%%%%
@@ -69,8 +66,8 @@
 \hypersetup{
     colorlinks=true,    % false: boxed links; true: colored links
     citecolor=green,    % color of links to bibliography
-    filecolor=magenta,  % color of file links
-    linkcolor=red,      % color of internal links
+    filecolor=red,      % color of file links
+    linkcolor=blue,     % color of internal links
     urlcolor=blue       % color of external links
 }
 
@@ -103,11 +100,13 @@
 
 \renewcommand{\bibname}{References}
 
-%%%%%%%%%%
-% secsty %
-%%%%%%%%%%
+%%%%%%%%%%%
+% sectsty %
+%%%%%%%%%%%
 
 \allsectionsfont{\nohang\centering}
+
+\sectionfont{\nohang\centering\large}
 
 %%%%%%%%%%%%
 % fancyhdr %
@@ -214,8 +213,10 @@
 
 \lstset{language=c}
 \lstset{basicstyle=\ttfamily}
+\lstset{breaklines=true}
+\lstset{breakatwhitespace=true}
 \lstset{keywordstyle=}
-%\lstset{morekeywords={mpz_t,mpz_poly_t,fmpz_poly_t}}  TODO
+\lstset{morekeywords={mpz_t, mpq_t, mpz_poly_t, fmpz, fmpz_t, fmpz_poly_t}}
 \lstset{escapechar=\%}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -223,6 +224,8 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \newcommand{\code}{\lstinline}
+
+\DeclareMathOperator{\len}{len}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % DOCUMENT                                                                    %
@@ -236,7 +239,10 @@
 
 \frontmatter
 
-\maketitle
+%\maketitle
+
+\input{title.tex}
+\clearpage
 
 \tableofcontents
 
@@ -407,7 +413,76 @@ only support operands up to \code{FLINT_D_BITS} bits, hence the macro.
 \code{FLINT_BIT_COUNT(x)} returns the number of binary bits required 
 to represent an \code{unsigned long x}.
 
-\chapter{fmpz\_poly}
+\chapter{Integer polynomials}
+
+\section{Introduction}
+
+The \code{fmpz_poly_t} data type represents elements of $\Z[x]$. The 
+\code{fmpz_poly} module provides routines for memory management, basic 
+arithmetic, and conversions from or to other types.
+
+Each coefficient of an \code{fmpz_poly_t} is an integer of the FLINT 
+\code{fmpz_t} type.
+
+Unless otherwise specified, all functions in this section permit aliasing 
+between their input arguments and between their input and output arguments.
+
+\section{Simple example}
+
+The following example computes the square of the polynomial $5x^3 - 1$.
+
+\begin{lstlisting}[language=c]
+#include "fmpz_poly.h"
+...
+fmpz_poly_t x, y;
+fmpz_poly_init(x);
+fmpz_poly_init(y);
+fmpz_poly_set_coeff_ui(x, 3, 5);
+fmpz_poly_set_coeff_si(x, 0, -1);
+fmpz_poly_mul(y, x, x);
+fmpz_poly_print(x); printf("\n");
+fmpz_poly_print(y); printf("\n");
+fmpz_poly_clear(x);
+fmpz_poly_clear(y);
+\end{lstlisting}
+
+The output is:
+
+\begin{lstlisting}
+4  -1 0 0 5
+7  1 0 0 -10 0 0 25
+\end{lstlisting}
+
+\section{Definition of the fmpz\_poly\_t type}
+
+The \code{fmpz_poly_t} type is a typedef for an array of length~1 of 
+\code{fmpz_poly_struct}'s.  This permits passing parameters of type 
+\code{fmpz_poly_t} by reference in a manner similar to the way GMP integers 
+of type \code{mpz_t} can be passed by reference. 
+
+In reality one never deals directly with the \code{struct} and simply deals 
+with objects of type \code{fmpz_poly_t}.  For simplicity we will think of an 
+\code{fmpz_poly_t} as a \code{struct}, though in practice to access fields 
+of this \code{struct}, one needs to dereference first, e.g.\ to access the 
+\code{length} field of an \code{fmpz_poly_t} called \code{poly1} one writes 
+\code{poly1->length}. 
+
+An \code{fmpz_poly_t} is said to be \emph{normalised} if either 
+\code{length} is zero, or if the leading coefficient of the polynomial is 
+non-zero.  All \code{fmpz_poly} functions expect their inputs to be 
+normalised, and unless otherwise specified they produce output that is 
+normalised. 
+
+It is recommended that users do not access the fields of an 
+\code{fmpz_poly_t} or its coefficient data directly, but make use of the 
+functions designed for this purpose, detailed below.
+
+Functions in \code{fmpz_poly} do all the memory management for the user. 
+One does not need to specify the maximum length or number of limbs per 
+coefficient in advance before using a polynomial object.  FLINT reallocates 
+space automatically as the computation proceeds, if more space is required. 
+
+We now describe the functions available in \code{fmpz_poly}.
 
 \input{fmpz_poly.tex}
 
