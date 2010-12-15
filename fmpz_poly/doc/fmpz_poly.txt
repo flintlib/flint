@@ -666,15 +666,37 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
     Assumes that \code{len > 0} and that \code{res} is an array of length 
     at least \code{e (len - 1) + 1}.  Does not support aliasing.
 
-void _fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
+void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets \code{res = poly^e}, assuming that \code{e, len > 0}.  Does not 
-    support aliasing.
+    Sets \code{res = poly^e}, assuming that \code{e, len > 0} and that 
+    \code{res} has space for \code{e (len - 1) + 1} coefficients.  Does 
+    not support aliasing.
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
     Computes \code{res = poly^e}.  If \code{poly} is zero, returns zero, 
     so that in particular \code{0^0 = 0}.
+
+void _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
+
+    Sets \code{(res, n)} to \code{(poly, n)} raised to the power $e$ and 
+    truncated to length $n$.
+
+    Assumes that $e, n > 0$.  Does not support aliasing of any inputs and 
+    outputs.
+
+void fmpz_poly_pow_trunc(fmpz_poly_t res, 
+                                       const fmpz_poly_t poly, ulong e, long n)
+
+    Notationally raises \code{poly} to the power $e$, truncates the result 
+    to length $n$ and writes the result in \code{res}.  This is computed 
+    much more efficiently then simply powering the polynomial and truncating.
+
+    Thus, if $n = 0$ the result is zero.  Otherwise, whenever $e = 0$ the 
+    result will be the constant polynomial equal to $1$.
+
+    This function can be used to raise power series to a power in an 
+    efficient way.
 
 *******************************************************************************
 
@@ -1231,6 +1253,24 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
                                                     const fmpz_poly_t B)
 
     Pseudo-division, only returning the remainder.
+
+*******************************************************************************
+
+    Modular arithmetic
+
+*******************************************************************************
+
+void fmpz_poly_invmod(fmpz_poly_t H, fmpz_t d, const fmpz_poly_t poly1, 
+                                               const fmpz_poly_t poly2)
+
+    Computes a polynomial $H$ and a denominator $d$ such that the 
+    product of \code{poly1} and \code{H} is congruent to \code{d} 
+    modulo \code{poly2}.
+
+    Assumes that \code{poly1} and \code{poly2} are coprime and that 
+    \code{poly2} is monic.
+
+    This function is useful for computing inverses in number field arithmetic.
 
 *******************************************************************************
 
