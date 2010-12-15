@@ -68,10 +68,5 @@ _nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
 int
 nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
 {
-    long dim = A->r;
-
-    if (dim == 0)
-        return 1;
-
-    _nmod_mat_solve_lu(x, A, b);
+    return (A->r) ? _nmod_mat_solve_lu(x, A, b) : 1;
 }
