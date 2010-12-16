@@ -30,6 +30,7 @@
 
 #include <mpir.h>
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
 /*  Type definitions *********************************************************/
 
@@ -318,6 +319,11 @@ void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e);
 void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e);
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
+
+void _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n);
+
+void 
+fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n);
 
 /*  Shifting  ****************************************************************/
 

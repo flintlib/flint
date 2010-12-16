@@ -682,8 +682,8 @@ void _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
     Sets \code{(res, n)} to \code{(poly, n)} raised to the power $e$ and 
     truncated to length $n$.
 
-    Assumes that $e, n > 0$.  Does not support aliasing of any inputs and 
-    outputs.
+    Assumes that $e, n > 0$.  Allows zero-padding of \code{(poly, n)}.  
+    Does not support aliasing of any inputs and outputs.
 
 void fmpz_poly_pow_trunc(fmpz_poly_t res, 
                                        const fmpz_poly_t poly, ulong e, long n)
