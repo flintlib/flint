@@ -157,8 +157,19 @@ int fmpz_equal(const fmpz_t f, const fmpz_t g);
 static __inline__
 void fmpz_print(fmpz_t x)
 {
-	if (!COEFF_IS_MPZ(*x)) printf("%ld", *x);
-	else gmp_printf("%Zd", COEFF_TO_PTR(*x));
+	if (!COEFF_IS_MPZ(*x)) 
+        printf("%ld", *x);
+	else 
+        mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
+}
+
+static __inline__
+void fmpz_printf(FILE * file, fmpz_t x)
+{
+	if (!COEFF_IS_MPZ(*x))
+        fprintf(file, "%ld", *x);
+	else 
+        mpz_out_str(file, 10, COEFF_TO_PTR(*x));
 }
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
