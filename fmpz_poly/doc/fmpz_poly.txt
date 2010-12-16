@@ -1450,12 +1450,20 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 
 *******************************************************************************
 
+void _fmpz_poly_print(const fmpz * poly, long len)
+
+    Prints the polynomial \code{(poly, len)} to \code{stdout}.
+
 void fmpz_poly_print(const fmpz_poly_t poly)
 
     Prints the polynomial to \code{stdout}.  First the length of the 
     polynomial is printed.  If the length is not zero two spaces are printed 
     after the length, then a space separated list of coefficients is printed, 
     starting with the constant coefficient.
+
+void _fmpz_poly_printf(FILE * file, const fmpz * poly, long len)
+
+    Prints the polynomial \code{(poly, len)} to the stream \code{file}.
 
 void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
 

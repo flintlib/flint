@@ -32,19 +32,24 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void
-fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
+void _fmpz_poly_printf(FILE * file, const fmpz * poly, long len)
 {
     long i;
 
-    fprintf(file, "%li", poly->length);
-    if (poly->length > 0)
+    fprintf(file, "%li", len);
+    if (len > 0)
     {
         fprintf(" ");
-        for (i = 0; i < poly->length; i++)
+        for (i = 0; i < len; i++)
         {
             fprintf(" ");
-            fmpz_printf(file, poly->coeffs + i);
+            fmpz_printf(file, poly + i);
         }
     }
 }
+
+void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
+{
+    _fmpz_poly_printf(file, poly->coeffs, poly->length);
+}
+
