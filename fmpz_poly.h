@@ -28,6 +28,7 @@
 #ifndef FMPZ_POLY_H
 #define FMPZ_POLY_H
 
+#include <stdio.h>
 #include <mpir.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -562,9 +563,13 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 /*  Printing  ****************************************************************/
 
-void fmpz_poly_print(const fmpz_poly_t poly);
+void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly);
 
-
+static __inline__
+void fmpz_poly_print(const fmpz_poly_t poly)
+{
+    fmpz_poly_printf(stdout, poly);
+}
 
 #endif
 

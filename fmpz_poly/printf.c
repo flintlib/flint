@@ -24,25 +24,27 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <mpir.h>
+
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_print(const fmpz_poly_t poly)
+fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
 {
     long i;
 
-    printf("%li", poly->length);
+    fprintf(file, "%li", poly->length);
     if (poly->length > 0)
     {
-        printf(" ");
+        fprintf(" ");
         for (i = 0; i < poly->length; i++)
         {
-            printf(" ");
-            fmpz_print(poly->coeffs + i);
+            fprintf(" ");
+            fmpz_printf(file, poly->coeffs + i);
         }
     }
 }
