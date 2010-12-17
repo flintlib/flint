@@ -90,7 +90,7 @@ void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
 
-long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod);
+long _nmod_mat_rowreduce(nmod_mat_t mat, int options);
 
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
 long nmod_mat_rank(const nmod_mat_t A);

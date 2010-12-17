@@ -58,8 +58,11 @@ _pivot(fmpz ** rows, long n, long from_row, long in_column)
     return 0;
 }
 
-long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options)
+long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options)
 {
+    fmpz ** a;
+    long m, n;
+
     long j, k, rank;
     int sign = 1;
     int det_sign;
@@ -70,6 +73,11 @@ long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options)
     long prev_pivot_col;
 
     fmpz_t d;
+
+    m = mat->r;
+    n = mat->c;
+    a = mat->rows;
+
     fmpz_init(d);
 
     rank = 0L;

@@ -212,10 +212,10 @@ void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
 *******************************************************************************
 
-long _nmod_mat_rowreduce(mp_limb_t ** a, long m, long n, int options, nmod_t mod)
+long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
 
-    Row reduces the (m, n) matrix with rows a using standard in-place
-    Gaussian elimination with pivoting. The modulus mod.n must be a prime
+    Row reduces the m x n matrix mat using standard in-place
+    Gaussian elimination with pivoting. The modulus must be a prime
     number.
 
     The options parameter is a bitfield which may be set to any combination

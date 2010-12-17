@@ -41,10 +41,8 @@ _nmod_mat_det_rowreduce(const nmod_mat_t A)
     long rank;
     long i;
 
-    nmod_mat_init(tmp, m, m, A->mod.n);
-    nmod_mat_set(tmp, A);
-
-    rank = _nmod_mat_rowreduce(tmp->rows, m, m, ROWREDUCE_FAST_ABORT, A->mod);
+    nmod_mat_init_set(tmp, A);
+    rank = _nmod_mat_rowreduce(tmp, ROWREDUCE_FAST_ABORT);
 
     det = 0UL;
 

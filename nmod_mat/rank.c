@@ -43,8 +43,7 @@ nmod_mat_rank(const nmod_mat_t A)
         return 0;
 
     nmod_mat_init_set(tmp, A);
-
-    rank = _nmod_mat_rowreduce(tmp->rows, m, n, 0, tmp->mod);
+    rank = _nmod_mat_rowreduce(tmp, 0);
     nmod_mat_clear(tmp);
     return FLINT_ABS(rank);
 }

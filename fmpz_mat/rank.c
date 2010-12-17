@@ -42,9 +42,8 @@ fmpz_mat_rank(const fmpz_mat_t A)
     if (m < 1 || n < 1)
         return 0;
 
-    fmpz_mat_init(tmp, m, n);
-    _fmpz_vec_copy(tmp->entries, A->entries, m * n);
-    rank = _fmpz_mat_rowreduce(tmp->rows, m, n, 0);
+    fmpz_mat_init_set(tmp, A);
+    rank = _fmpz_mat_rowreduce(tmp, 0);
     fmpz_mat_clear(tmp);
     return FLINT_ABS(rank);
 }

@@ -92,9 +92,8 @@ _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
     dim = A->r;
 
     /* Compute LU decomposition in a temporary matrix */
-    fmpz_mat_init(T, dim, dim);
-    _fmpz_vec_copy(T->entries, A->entries, dim * dim);
-    rank = _fmpz_mat_rowreduce(T->rows, dim, dim, 0);
+    fmpz_mat_init_set(T, A);
+    rank = _fmpz_mat_rowreduce(T, 0);
 
     if (FLINT_ABS(rank) == dim)
     {

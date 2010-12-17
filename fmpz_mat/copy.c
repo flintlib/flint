@@ -31,7 +31,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2)
+fmpz_mat_copy(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {

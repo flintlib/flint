@@ -19,59 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 
-
-int
-_nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
+void
+fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src)
 {
-    long dim, i, rank;
-    nmod_mat_t T;
-    mp_limb_t * tmp;
-    int result;
-
-    dim = A->r;
-
-    nmod_mat_init_set(T, A);
-    rank = _nmod_mat_rowreduce(T, 0);
-
-    result = 0;
-    if (FLINT_ABS(rank) == dim)
-    {
-        tmp = nmod_vec_init(dim);
-
-        for (i = 0; i < dim; i++)
-        {
-            /* Insert in same order as the pivots */
-            tmp[i] = b[(T->rows[i] - T->entries) / dim];
-        }
-
-        _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
-        mpn_copyi(x, tmp, dim);
-        nmod_vec_free(tmp);
-        result = 1;
-    }
-
-    nmod_mat_clear(T);
-    return result;
-}
-
-int
-nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
-{
-    long dim = A->r;
-
-    if (dim == 0)
-        return 1;
-
-    return _nmod_mat_solve_lu(x, A, b);
+    fmpz_mat_init(mat, src->r, src->c);
+    fmpz_mat_copy(mat, src);
 }

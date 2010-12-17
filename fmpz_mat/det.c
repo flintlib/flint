@@ -132,10 +132,8 @@ _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A)
     long m = A->r;
     long rank;
 
-    fmpz_mat_init(tmp, m, m);
-    _fmpz_vec_copy(tmp->entries, A->entries, m * m);
-
-    rank = _fmpz_mat_rowreduce(tmp->rows, m, m, ROWREDUCE_FAST_ABORT);
+    fmpz_mat_init_set(tmp, A);
+    rank = _fmpz_mat_rowreduce(tmp, ROWREDUCE_FAST_ABORT);
 
     if (rank < 0)
     {
