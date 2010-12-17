@@ -580,5 +580,13 @@ void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
     fmpz_poly_fprint_pretty(stdout, poly, x);
 }
 
+void fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
+
+static __inline__ 
+void fmpz_poly_read(fmpz_poly_t poly)
+{
+    fmpz_poly_fread(stdin, poly);
+}
+
 #endif
 
