@@ -214,6 +214,11 @@ int fmpz_cmp(const fmpz_t f, const fmpz_t g)
     Returns a negative value if $f < g$, positive value if $g < f$, 
     otherwise returns $0$.
 
+int fmpz_cmp_ui(const fmpz_t f, ulong g)
+
+    Returns a negative value if $f < g$, positive value if $g < f$, 
+    otherwise returns $0$.
+
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g)
 
     Returns a negative value if $\abs{f} < \abs{g}$, positive value if 

@@ -179,9 +179,11 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
     }
 }
 
-int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
-
 int fmpz_cmp(const fmpz_t f, const fmpz_t g);
+
+int fmpz_cmp_ui(const fmpz_t f, ulong g);
+
+int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
 mp_size_t fmpz_size(const fmpz_t f);
 
