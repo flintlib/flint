@@ -32,10 +32,13 @@
 #include "fmpz_poly.h"
 
 /* Not defined in mpir.h */
+/*
 mp_limb_t mpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                              mp_limb_t divisor);
 
 #define mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
+*/
+#define mpn_divisible_1_p(x, xsize, d) (*x % d == 0)
 
 static __inline__
 int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
