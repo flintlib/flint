@@ -160,23 +160,9 @@ void fmpz_read(fmpz_t f);
 
 void fmpz_fread(FILE * file, fmpz_t f);
 
-static __inline__
-void fmpz_print(fmpz_t x)
-{
-	if (!COEFF_IS_MPZ(*x)) 
-        printf("%ld", *x);
-	else 
-        mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
-}
+void fmpz_print(const fmpz_t x);
 
-static __inline__
-void fmpz_fprint(FILE * file, fmpz_t x)
-{
-	if (!COEFF_IS_MPZ(*x))
-        fprintf(file, "%ld", *x);
-	else 
-        mpz_out_str(file, 10, COEFF_TO_PTR(*x));
-}
+void fmpz_fprint(FILE * file, const fmpz_t x);
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
