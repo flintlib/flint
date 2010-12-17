@@ -142,6 +142,12 @@ void fmpz_read(fmpz_t f)
     an optional minus sign, followed by one or more digits.  The
     first digit should be nonzero unless it is the only digit.
 
+void fmpz_fread(FILE * file, fmpz_t f)
+
+    Reads a multiprecision integer from the stream \code{file}.  The 
+    format is an optional minus sign, followed by one or more digits.
+    The first digit should be nonzero unless it is the only digit.
+
 void fmpz_print(fmpz_t x)
 
     Prints the value $x$ to \code{stdout}, without a carriage return.
@@ -149,7 +155,7 @@ void fmpz_print(fmpz_t x)
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
-void fmpz_printf(FILE * file, fmpz_t x)
+void fmpz_fprint(FILE * file, fmpz_t x)
 
     Prints the value $x$ to \code{file}, without a carriage return.
     The value is printed as either $0$, the decimal digits of a 
