@@ -1356,6 +1356,21 @@ void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
     Evaluates the polynomial $f$ at the rational $a$ and sets \code{res} to 
     the result.
 
+mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a, 
+                                                   mp_limb_t n, mp_limb_t ninv)
+
+    Evaluates \code{(poly, len)} at the value $a$ modulo $n$ and 
+    returns the result.  The last argument \code{ninv} must be set 
+    to the precomputed inverse of $n$, which can be obtained using 
+    the function \code{n_preinvert_limb).
+
+mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
+                                                   mp_limb_t n, mp_limb_t ninv)
+
+    Evaluates \code{poly} at the value $a$ modulo $n$ and returns the result. 
+    The last argument \code{ninv} must be set to the precomputed inverse 
+    of $n$, which can be obtained using the function \code{n_preinvert_limb).
+
 *******************************************************************************
 
     Composition

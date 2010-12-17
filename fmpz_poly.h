@@ -535,6 +535,12 @@ void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
 
+mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a, 
+                                  mp_limb_t n, mp_limb_t ninv);
+
+mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
+                                 mp_limb_t n, mp_limb_t ninv);
+
 /*  Composition  *************************************************************/
 
 void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1, 
