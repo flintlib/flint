@@ -223,7 +223,10 @@ static void processfile(void)
             {
                 /* Empty line */
                 if (n == 0)
+                {
+                    r = r || printline(out, buf);
                     continue;
+                }
 
                 /* Line of '*' */
                 if (n == 79 && buf[0] == '*')
