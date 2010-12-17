@@ -1511,24 +1511,24 @@ void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
     Prints the pretty representation of \code{poly} to \code{stdout},
     using the string \code{x} to represent the indeterminate.
 
-void _fmpz_poly_printf(FILE * file, const fmpz * poly, long len)
+void _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
 
     Prints the polynomial \code{(poly, len)} to the stream \code{file}.
 
-void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
+void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
 
     Prints the polynomial to the stream \code{file}.  First the length of the 
     polynomial is printed.  If the length is not zero two spaces are printed 
     after the length, then a space separated list of coefficients is printed, 
     starting with the constant coefficient.
 
-void _fmpz_poly_printf_pretty(FILE * file, 
+void _fmpz_poly_fprint_pretty(FILE * file, 
                                          const fmpz * poly, long len, char * x)
 
     Prints the pretty representation of \code{(poly, len)} to the stream 
     \code{file}, using the string \code{x} to represent the indeterminate.
 
-void fmpz_poly_printf_pretty(FILE * file, const fmpz_poly_t poly, char * x)
+void fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
 
     Prints the pretty representation of \code{poly} to the stream \code{file}, 
     using the string \code{x} to represent the indeterminate.

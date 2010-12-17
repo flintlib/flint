@@ -170,7 +170,7 @@ void fmpz_print(fmpz_t x)
 }
 
 static __inline__
-void fmpz_printf(FILE * file, fmpz_t x)
+void fmpz_fprint(FILE * file, fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x))
         fprintf(file, "%ld", *x);
