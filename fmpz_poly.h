@@ -565,10 +565,19 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly);
 
+void fmpz_poly_printf_pretty(FILE * file, 
+                                       const fmpz_poly_t poly, const char * x);
+
 static __inline__
 void fmpz_poly_print(const fmpz_poly_t poly)
 {
     fmpz_poly_printf(stdout, poly);
+}
+
+static __inline__
+void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+{
+    fmpz_poly_printf_pretty(stdout, poly, x);
 }
 
 #endif

@@ -1448,6 +1448,46 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 
     Printing
 
+    The functions in this section are not intended to be particularly fast. 
+    They are intended mainly as a debugging aid.
+
+    For the string output functions there are two variants.  The first uses a 
+    simple string representation of polynomials which prints only the length 
+    of the polynomial and the integer coefficients, whilst the latter variant, 
+    appended with \code{_pretty}, uses a more traditional string 
+    representation of polynomials which prints a variable name as part of the 
+    representation. 
+
+    The first string representation is given by a sequence of integers, in 
+    decimal notation, separated by white space.  The first integer gives the 
+    length of the polynomial; the remaining integers are the coefficients. 
+    For example $5x^3 - x + 1$ is represented by the string 
+    \code{"4  1 -1 0 5"}, and the zero polynomial is represented by \code{"0"}.
+    The coefficients may be signed and arbitrary precision.
+
+    The string representation of the functions appended by \code{_pretty} 
+    includes only the non-zero terms of the polynomial, starting with the 
+    one of highest degree.  Each term starts with a coefficient, prepended 
+    with a sign, followed by the character \code{*}, followed by a variable 
+    name, which must be passed as a string parameter to the function, 
+    followed by a carot \code{^} followed by a non-negative exponent.
+
+    If the sign of the leading coefficient is positive, it is omitted. Also 
+    the exponents of the degree $1$ and $0$ terms are omitted, as is the 
+    variable and the \code{*} character in the case of the degree $0$ 
+    coefficient.  If the coefficient is plus or minus one, the coefficient 
+    is omitted, except for the sign.
+
+    Some examples of the \code{_pretty} representation are:
+
+    \begin{lstlisting}
+    5*x^3+7*x-4
+    x^2+3
+    -x^4+2*x-1
+    x+1
+    5
+    \end{lstlisting}
+
 *******************************************************************************
 
 void _fmpz_poly_print(const fmpz * poly, long len)
@@ -1461,6 +1501,16 @@ void fmpz_poly_print(const fmpz_poly_t poly)
     after the length, then a space separated list of coefficients is printed, 
     starting with the constant coefficient.
 
+void _fmpz_poly_print_pretty(const fmpz * poly, long len, const char * x)
+
+    Prints the pretty representation of \code{(poly, len)} to \code{stdout},
+    using the string \code{x} to represent the indeterminate.
+
+void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+
+    Prints the pretty representation of \code{poly} to \code{stdout},
+    using the string \code{x} to represent the indeterminate.
+
 void _fmpz_poly_printf(FILE * file, const fmpz * poly, long len)
 
     Prints the polynomial \code{(poly, len)} to the stream \code{file}.
@@ -1471,4 +1521,15 @@ void fmpz_poly_printf(FILE * file, const fmpz_poly_t poly)
     polynomial is printed.  If the length is not zero two spaces are printed 
     after the length, then a space separated list of coefficients is printed, 
     starting with the constant coefficient.
+
+void _fmpz_poly_printf_pretty(FILE * file, 
+                                         const fmpz * poly, long len, char * x)
+
+    Prints the pretty representation of \code{(poly, len)} to the stream 
+    \code{file}, using the string \code{x} to represent the indeterminate.
+
+void fmpz_poly_printf_pretty(FILE * file, const fmpz_poly_t poly, char * x)
+
+    Prints the pretty representation of \code{poly} to the stream \code{file}, 
+    using the string \code{x} to represent the indeterminate.
 
