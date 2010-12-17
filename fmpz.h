@@ -26,10 +26,12 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <mpir.h>
-#include "nmod_vec.h"
+
 #include "flint.h"
+#include "nmod_vec.h"
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
