@@ -41,33 +41,32 @@ void fmpz_mat_clear(fmpz_mat_t mat)
 
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
-    Swaps two matrices. The dimensions of mat1 and mat2 are allowed to be
-    different.
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
+    are allowed to be different.
 
 void fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
-    Sets mat1 to a copy of mat2. The dimensions of mat1 and mat2
-    must be the same.
+    Sets \code{mat1} to a copy of \code{mat2}. The dimensions of 
+    \code{mat1} and \code{mat2} must be the same.
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
-    Returns nonzero if mat1 and mat2 have the same dimensions and entries,
-    and zero otherwise.
-
+    Returns nonzero if \code{mat1} and \code{mat2} have the same 
+    dimensions and entries, and zero otherwise.
 
 void fmpz_mat_print(fmpz_mat_t mat) 
 
-    Prints the given matrix to stdout. The format is the number of rows, a
-    space, the number of columns, two spaces, then a space separated list
-    of coefficients.
+    Prints the given matrix to \code{stdout}. The format is the number 
+    of rows, a space, the number of columns, two spaces, then a space 
+    separated list of coefficients.
 
 void fmpz_mat_print_pretty(fmpz_mat_t mat) 
 
-    Prints the given matrix to stdout. The format is an opening square bracket
-    then on each line a row of the matrix, followed by a closing square 
-    bracket. Each row is written as an opening square bracket followed by a
-    space separated list of coefficients followed by a closing square bracket.
-
+    Prints the given matrix to \code{stdout}. The format is an opening 
+    square bracket then on each line a row of the matrix, followed by a 
+    closing square bracket. Each row is written as an opening square 
+    bracket followed by a space separated list of coefficients followed 
+    by a closing square bracket.
 
 *******************************************************************************
 
@@ -77,103 +76,122 @@ void fmpz_mat_print_pretty(fmpz_mat_t mat)
 
 void fmpz_mat_randinit(fmpz_randstate_t state)
 
-    Initialises the fmpz_mat randstate.
+    Initialises the \code{fmpz_mat} randstate.
 
 void fmpz_mat_randclear(fmpz_randstate_t state)
 
-    Clears the fmpz_mat randstate.
+    Clears the \code{fmpz_mat} randstate.
 
-void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                              mp_bitcnt_t bits)
 
-    Sets the entries of mat to random signed integers whose absolute values
-    have the given number of binary bits.
+    Sets the entries of \code{mat} to random signed integers whose absolute 
+    values have the given number of binary bits.
 
-void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                              mp_bitcnt_t bits)
 
-    Sets the entries of mat to random signed integers whose absolute values 
-    have a random number of bits up to the given number of bits inclusive.
+    Sets the entries of \code{mat} to random signed integers whose 
+    absolute values have a random number of bits up to the given number 
+    of bits inclusive.
 
-void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                              mp_bitcnt_t bits)
 
-    Sets mat to be a random "integer relations" matrix, with signed entries up 
-    to the given number of bits. The number of columns of mat must be equal 
-    to one more than the number of rows. The format of the matrix is a set of
-    random integers in the left hand column and an identity matrix in the 
-    remaining square submatrix.
+    Sets \code{mat} to be a random \emph{integer relations} matrix, with 
+    signed entries up to the given number of bits.
 
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
+    The number of columns of \code{mat} must be equal to one more than 
+    the number of rows. The format of the matrix is a set of random integers 
+    in the left hand column and an identity matrix in the remaining square 
+    submatrix.
 
-    Sets mat to a random "simultaneous diophantine" matrix. The matrix must
-    be square. The top left entry is set to 2^bits2. The remainder of that
-    row is then set to signed random integers of the given number of binary 
-    bits. The remainder of the first column is zero. Running down the rest of
-    the diagonal are the values 2^bits with all remaining entries zero.
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                           mp_bitcnt_t bits, mp_bitcnt_t bits2)
+
+    Sets \code{mat} to a random \emph{simultaneous diophantine} matrix.
+
+    The matrix must be square. The top left entry is set to \code{2^bits2}. 
+    The remainder of that row is then set to signed random integers of the 
+    given number of binary bits. The remainder of the first column is zero. 
+    Running down the rest of the diagonal are the values \code{2^bits} with 
+    all remaining entries zero.
   
-void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q)
-   
-    Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
+void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                     mp_bitcnt_t bits, ulong q)
+
+    Sets a square matrix \emph{mat} of even dimension to a random 
+    \emph{NTRU like} matrix.
+
     The matrix is broken into four square submatrices. The top left submatrix
     is set to the identity. The bottom left submatrix is set to the zero 
-    matrix. The bottom right submatrix is set to q times the identity matrix.
+    matrix. The bottom right submatrix is set to $q$ times the identity matrix.
     Finally the top right submatrix has the following format. A random vector
-    h of length r/2 is created, with random signed entries of the given number
-    of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
+    $h$ of length $r/2$ is created, with random signed entries of the given 
+    number of bits. Then entry $(i, j)$ of the submatrix is set to 
+    $h[i + j \bmod{r/2}]$. 
 
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q)
-   
-    Sets a square matrix mat of even dimension to a random "NTRU like" matrix.
+void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                     mp_bitcnt_t bits, ulong q)
+
+    Sets a square matrix mat of even dimension to a random 
+    \emph{NTRU like} matrix.
+
     The matrix is broken into four square submatrices. The top left submatrix
-    is set to q times the identity matrix. The top right submatrix is set to 
+    is set to $q$ times the identity matrix. The top right submatrix is set to 
     the zero matrix. The bottom right submatrix is set to the identity matrix.
     Finally the bottom left submatrix has the following format. A random vector
-    h of length r/2 is created, with random signed entries of the given number
-    of bits. Then entry (i, j) of the submatrix is set to h[i + j (mod r/2)]. 
+    $h$ of length $r/2$ is created, with random signed entries of the given 
+    number of bits. Then entry $(i, j)$ of the submatrix is set to 
+    $h[i + j \bmod{r/2}]$.
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
 
-    Sets a square matrix mat to a random "ajtai" matrix. The diagonal entries 
-    (i, i) are set to a random entry in the range [1, 2^{b-1}] inclusive where
-    b = floor((2*r - i)^alpha) for some double parameter alpha. The entries 
-    below the diagonal in column i are set to a random entry in the range 
-    (-2^b + 1, 2^b - 1) whilst the entries to the right of the diagonal in 
-    row i are set to zero. 
+    Sets a square matrix mat to a random \emph{ajtai} matrix. The diagonal 
+    entries $(i, i)$ are set to a random entry in the range $[1, 2^{b-1}]$ 
+    inclusive where $b = \floor{(2*r - i)^\alpha}$ for some double parameter 
+    $\alpha$. The entries below the diagonal in column $i$ are set to a 
+    random entry in the range $(-2^b + 1, 2^b - 1)$ whilst the entries to 
+    the right of the diagonal in row $i$ are set to zero. 
 
-int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * diag, long n)
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, 
+                                                     const fmpz * diag, long n)
 
-    Sets mat to a random permutation of the rows and columns of a
+    Sets \emph{mat} to a random permutation of the rows and columns of a
     given diagonal matrix. The diagonal matrix is specified in the form of
     an array of the n initial entries on the main diagonal.
 
-    The return value is 0 or 1 depending on whether the permutation is
+    The return value is $0$ or $1$ depending on whether the permutation is
     even or odd.
 
-void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, mp_bitcnt_t bits)
+void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, 
+                                                              mp_bitcnt_t bits)
 
-    Sets mat to a random sparse matrix with the given rank (having
-    exactly as many nonzero elements as the rank), with the nonzero
-    elements being random integers of the given bit size.
+    Sets \emph{mat} to a random sparse matrix with the given rank, 
+    having exactly as many nonzero elements as the rank, with the 
+    nonzero elements being random integers of the given bit size.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling fmpz_mat_randops.
+    rank by subsequently calling \code{fmpz_mat_randops}.
 
 void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det)
 
-    Sets mat to a random sparse matrix with minimal number of nonzero
-    entries such that its determinant has the given value. (Note that
-    the matrix will be zero if det = 0; use fmpz_mat_randrank to generate
-    a nonzero singular matrix.)
+    Sets \code{mat} to a random sparse matrix with minimal number of
+    nonzero entries such that its determinant has the given value.
+
+    Note that the matrix will be zero if \code{det} is zero;  one can 
+    use the function \code{fmpz_mat_randrank} to generate a nonzero 
+    singular matrix.
 
     The matrix can be transformed into a dense matrix with unchanged
-    determinant by subsequently calling fmpz_mat_randops.
+    determinant by subsequently calling \code{fmpz_mat_randops}.
 
 void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
 
-    Randomises mat by performing elementary row or column operations.
-    More precisely, at most count random additions or subtractions of
+    Randomises \code{mat} by performing elementary row or column operations.
+    More precisely, at most \code{count} random additions or subtractions of
     distinct rows and columns will be performed. This leaves the rank
     (and for square matrices, determinant) unchanged.
-
-
 
 *******************************************************************************
 
@@ -183,13 +201,12 @@ void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
 
 void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
-    Sets B to A^T, the transpose of A. Dimensions must be compatible.
-    A and B are allowed to be the same object if A is a square matrix.
-
+    Sets $B$ to $A^T$, the transpose of $A$. Dimensions must be compatible.
+    $A$ and $B$ are allowed to be the same object if $A$ is a square matrix.
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Sets C to the matrix product A * B. The matrices must have
+    Sets $C$ to the matrix product $A B$. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing
     is allowed.
 
@@ -197,165 +214,174 @@ void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     multimodular multiplication, based on a heuristic comparison of
     the dimensions and entry sizes.
 
+void fmpz_mat_mul_classical(fmpz_mat_t C, 
+                                        const fmpz_mat_t A, const fmpz_mat_t B)
 
-void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
-
-    Sets C to the matrix product A * B computed using the classical
+    Sets $C$ to the matrix product $A B$ computed using the classical
     algorithm.
 
     The matrices must have compatible dimensions for matrix multiplication.
-    No aliasing between C and A or C and B is allowed.
+    No aliasing between $C$ and $A$ or $C$ and $B$ is allowed.
 
-void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B, long bits)
+void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B, 
+                                                                     long bits)
+
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
 
-    Sets C to the matrix product A * B computed using a multimodular
-    algorithm. C is computed modulo several small prime numbers
-    and reconstructed using the Chinese Remainder Theorem. This gets
+    Sets $C$ to the matrix product $A B$ computed using a multimodular 
+    algorithm. $C$ is computed modulo several small prime numbers
+    and reconstructed using the Chinese Remainder Theorem. This becomes 
     more efficient for larger matrices with smaller entries.
 
-    The bits parameter is a bound for the bit size of largest element of C,
-    or twice the absolute value of the largest element if any elements of C
-    are negative. fmpz_mat_mul_multi_mod calculates a rigorous (but
-    sometimes pessimistic) bound automatically.
+    The \code{bits} parameter is a bound for the bit size of largest 
+    element of $C$, or twice the absolute value of the largest element 
+    if any elements of $C$ are negative.  The function 
+    \code{fmpz_mat_mul_multi_mod} calculates a rigorous but
+    sometimes pessimistic bound automatically.
 
     The matrices must have compatible dimensions for matrix multiplication.
-    No aliasing between C and A or C and B is allowed.
+    No aliasing between $C$ and $A$ or $C$ and $B$ is allowed.
 
+void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
 
-void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+    Sets \code{(B, d)} to the inverse matrix of the square matrix $A$,
+    i.e.\ computes an integer matrix $B$ and an integer $d$ such
+    that $A B = B A = d I$, the identity matrix.
 
-    Sets {B, den} to the inverse matrix of the square matrix A,
-    i.e. computes an integer matrix B and an integer den such
-    that A * (B/den) = (B/den) * A = I, the identity matrix.
+    If $A$ is singular, $d$ will be set to zero and the value of 
+    $B$ will be undefined.
 
-    If A is singular, den will be set to zero and the value of B will
-    be undefined.
+    In general, \code{(B, d)} will not be reduced to lowest terms.
 
-    In general, {B, den} will not be reduced to lowest terms.
-
-    A and B are allowed to be the same object.
-
+    $A$ and $B$ are allowed to be the same object.
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
-    Sets det to the determinant of the square matrix A. The determinant
-    is computed using _fmpz_mat_det_NxN up to N = 4, and for larger
-    matrices by calling _fmpz_mat_det_rowreduce.
+    Sets \code{det} to the determinant of the square matrix $A$.
 
-    The det object is not permitted to be aliased with the entries of A.
+    The determinant is computed using \code{_fmpz_mat_det_NxN} for 
+    $N = 2, 3, 4$, and for larger matrices by calling 
+    \code{_fmpz_mat_det_rowreduce}.
 
+    The \code{det} object is not permitted to be aliased with the 
+    entries of $A$.
 
 void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x)
+
 void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x)
+
 void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x)
 
-    Sets det to the determinant of the given fixed-size square matrix x
-    supplied as an array of row pointers. The determinants are computed
-    using direct formulas based on cofactor expansion.
+    Sets \code{det} to the determinant of the given fixed-size square 
+    matrix $x$ supplied as an array of row pointers. The determinants 
+    are computed using direct formulas based on cofactor expansion.
 
 void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A);
 
-    Sets det to the determinant of the square matrix A, computed using
-    row reduction on a temporary copy of A.
-
+    Sets \code{det} to the determinant of the square matrix $A$, 
+    computed using row reduction on a temporary copy of $A$.
 
 long fmpz_mat_rank(const fmpz_mat_t A)
 
-    Returns the rank, or number of linearly independent columns
-    (equivalently, rows), of A. The rank is computed by row reducing
-    a copy of A.
-
+    Returns the rank, that is, the number of linearly independent columns
+    (equivalently, rows), of $A$. The rank is computed by row reducing
+    a copy of $A$.
 
 void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 
-    Solves Ax = b for the rational vector x, where A is an m-by-m integer
-    matrix and b is an integer vector of length m.
+    Solves $A x = b$ for the rational vector $x$, where $A$ is an 
+    $m$-by-$m$ integer matrix and $b$ is an integer vector of length $m$.
 
-    More precisely, computes an integer vector x and an integer den such
-    that A*(x/den) = b. {x, den} will not generally be reduced to
-    lowest terms. If A is singular, den will be set to zero and x will be
-    undefined.
+    More precisely, computes an integer vector $x$ and an integer 
+    \code{den} such that \code{A * x = den b}. \code{(x, den)} will not 
+    generally be reduced to lowest terms. If $A$ is singular, \code{den} 
+    will be set to zero and $x$ will be undefined.
 
-    x and b are not permitted to be aliased.
+    $x$ and $b$ are not permitted to be aliased.
 
-void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B)
+void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, 
+                                        const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves AX = B for the rational matrix m-by-n matrix X, where A is
-    an m-by-m integer matrix and B is an m-by-n integer matrix. Equivalently,
-    solves Ax = b for every respective column vector x in X and b in B.
+    Solves $A X = B$ for the rational matrix $m$-by-$n$ matrix $X$, 
+    where $A$ is an $m$-by-$m$ integer matrix and $B$ is an $m$-by-$n$ 
+    integer matrix. Equivalently, solves $A x = b$ for every respective 
+    column vector $x$ in $X$ and $b$ in $B$.
 
-    More precisely, computes an integer matrix X and an integer den such that
-    A*(X/den) = B. {X, den} will not generally be reduced to
-    lowest terms. If A is singular, den will be set to zero and x will be
-    undefined.
+    More precisely, computes an integer matrix $X$ and an integer 
+    \code{den} such that \code{A * X = den B}. \code{(X, den)} will 
+    not generally be reduced to lowest terms. If $A$ is singular, 
+    \code{den} will be set to zero and $x$ will be undefined.
 
-    X and B are not permitted to be aliased.
-
+    $X$ and $B$ are not permitted to be aliased.
 
 void _fmpz_mat_solve_2x2(fmpz * x, fmpz_t den, fmpz ** const a, const fmpz * b)
+
 void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t den, fmpz ** const a, const fmpz * b)
 
-    Solves A*(x/den) = b using Cramer's rule.
+    Solves \code{A * x/den = b} using Cramer's rule.
 
 _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 
-    Solves A*(x/den) = b for general square matrix A by first computing the
-    fraction-free LU decomposition and then calling
-    _fmpz_mat_solve_fflu_precomp.
+    Solves \code{A * (x/den) = b} for general square matrix $A$ by first 
+    computing the fraction-free $LU$ decomposition and then calling
+    \code{_fmpz_mat_solve_fflu_precomp}.
 
 void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const a, long n)
 
-    Uses forward/back substitution to set b to the solution x of A(x/den) = b,
-    where a points to the rows of a precomputed fraction-free LU decomposition
-    of A (as generated by _fmpz_mat_rowreduce).
+    Uses forward/back substitution to set $b$ to the solution $x$ of 
+    \code{A * (x/den) = b}, where $a$ points to the rows of a precomputed 
+    fraction-free $LU$ decomposition of $A$, as generated by 
+    \code{_fmpz_mat_rowreduce}.
 
     The rows are assumed to be sorted by the order of the pivots.
-    If pivoting has occurred, the caller must ensure that the vector b
+    If pivoting has occurred, the caller must ensure that the vector $b$ 
     is in the same order.
-
 
 long _fmpz_mat_rowreduce(fmpz ** a, long m, long n, int options)
 
     Row reduces the matrix in-place using fraction-free Gaussian elimination.
-    The number of rows m and columns n may be arbitrary.
+    The number of rows $m$ and columns $n$ may be arbitrary.
 
     This function effectively implements the algorithms FFGE, FFGJ and FFLU
-    given in [1], but with pivoting. The 'options' parameter is a bitfield
-    which may be set to any combination of the following flags (use
-    options = 0 to disable all, resulting in FFLU):
+    given in [1], but with pivoting. The \code{options} parameter is a bitfield
+    which may be set to any combination of the following flags; use
+    \code{options = 0} to disable all, resulting in FFLU:
 
-    ROWREDUCE_FAST_ABORT
+    \begin{itemize}
+    \item \code{ROWREDUCE_FAST_ABORT}
 
-        If set, the function immediately aborts and returns 0 when (if) the
+        If set, the function immediately aborts and returns $0$ when (if) the
         matrix is detected to be rank-deficient (singular). In this event,
         the state of the matrix will be undefined.
 
-    ROWREDUCE_FULL
+    \item \code{ROWREDUCE_FULL}
 
-        If set, performs fraction-free Gauss-Jordan elimination (FFGJ), i.e.
-        eliminates the elements above each pivot element as well as those
-        below. If not set, regular Gaussian elimination is performed and only
-        the elements below pivots are eliminated.
+        If set, performs fraction-free Gauss-Jordan elimination (FFGJ), 
+        i.e.\ eliminates the elements above each pivot element as well as 
+        those below. If not set, regular Gaussian elimination is performed 
+        and only the elements below pivots are eliminated.
 
-    ROWREDUCE_CLEAR_LOWER
+    \item \code{ROWREDUCE_CLEAR_LOWER}
 
-        If set, clears (i.e. zeros) elements below the pivots (FFGE). If not
-        set, the output becomes the fraction-free LU decomposition of the
-        matrix with L in the lower triangular part.
+        If set, clears (i.e.\ zeros) elements below the pivots (FFGE). If not
+        set, the output becomes the fraction-free $LU$ decomposition of the
+        matrix with $L$ in the lower triangular part.
+
+    \end{itemize}
 
     Pivoting (to avoid division by zero entries) is performed by permuting
     the vector of row pointers in-place. The matrix entries themselves
     retain their original order in memory.
 
-    The return value r is the rank of the matrix, multiplied by a sign
-    indicating the parity of row interchanges. If r = 0, the matrix has rank
-    zero (unless ROWREDUCE_FAST_ABORT is set, in which case r = 0 indicates
-    any deficient rank). Otherwise, the leading nonzero entries of
-    a[0], a[1], ... a[abs(r)-1] will point to the successive pivot elements.
-    If |r| = m = n, the determinant of the matrix is given by
-    sign(r) * a[|r|-1][|r|-1].
+    The return value $r$ is the rank of the matrix, multiplied by a sign
+    indicating the parity of row interchanges. If $r = 0$, the matrix has rank
+    zero, unless \code{ROWREDUCE_FAST_ABORT} is set, in which case $r = 0$ 
+    indicates any deficient rank. Otherwise, the leading nonzero entries of
+    $a[0], a[1], \dotsc, a[\abs{r}-1]$ will point to the successive pivot 
+    elements. If $\abs{r} = m = n$, the determinant of the matrix is given 
+    by $\sgn(r) \times a\bigl[\abs{r}-1\bigr]\bigl[\abs{r}-1\bigr]$.
 
-    [1] George C. Nakos, Peter R Turner and Robert M Williams,
-        "Fraction-Free Algorithms for Linear and Polynomial Equations",
+    [1] George C.\ Nakos, Peter R.\ Turner and Robert M.\ Williams,
+        ``Fraction-Free Algorithms for Linear and Polynomial Equations'',
         ACM SIGSAM Bull. 31, 3 (Sep. 1997), 11-19
+
