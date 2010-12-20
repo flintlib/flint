@@ -932,7 +932,7 @@ int n_moebius_mu(mp_limb_t n)
     prime factors. By convention, $\mu(0) = 0$.
 
     For even numbers, we use the identities $\mu(4n) = 0$ and 
-    $\mu(2n) = -m(n)$. Odd numbers up to a cutoff are then looked up from 
+    $\mu(2n) = - \mu(n)$. Odd numbers up to a cutoff are then looked up from 
     a precomputed table storing $\mu(n) + 1$ in groups of two bits.
 
     For larger $n$, we first check if $n$ is divisible by a small odd square
