@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,10 +32,6 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
 {
    ulong i;
    mp_limb_t res;
-
-   if (n == 0L) return 0UL;
-   if (exp == 1UL) return n;
-   if (exp == 0UL) return 1UL;
 
    res = 1UL;
    for (i = 0; i < exp; i++)

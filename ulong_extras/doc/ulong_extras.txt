@@ -70,7 +70,7 @@ mp_limb_t n_randtest_not_zero()
 mp_limb_t n_pow(mp_limb_t n, ulong exp)
 
     Returns \code{n^exp}. No checking is done for overflow. The exponent
-    may be zero. We define $0^0 = 0$.
+    may be zero. We define $0^0 = 1$.
 
     The algorithm simply uses a for loop. Repeated squaring is
     unlikely to speed up this algorithm.
