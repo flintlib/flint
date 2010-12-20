@@ -5,8 +5,10 @@ doc :
 	$(CC) -c $(CFLAGS) doc.c -o doc.o
 	$(CC) doc.o -o doc
 	./doc
-	latex doc.tex
-	latex doc.tex
+	pdflatex doc.tex
+	bibtex doc
+	pdflatex doc.tex
+	pdflatex doc.tex
 
 clean :
 	rm doc.o doc
