@@ -437,6 +437,16 @@ to represent an \code{unsigned long x}.
 
 \chapter{Integer matrices}
 
+\section{Introduction}
+
+The \code{fmpz_mat_t} data type represents matrices of multiprecision integers.
+The number of rows or columns in a matrix is permitted to be zero.
+
+No automatic resizing is performed: in general, the user must provide
+matrices of correct size for both input and output variables. Output
+variables are \emph{not} allowed to be aliased with input variables unless
+otherwise noted.
+
 \input{fmpz_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

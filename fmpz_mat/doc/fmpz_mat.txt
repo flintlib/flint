@@ -49,7 +49,7 @@ void fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Sets \code{mat1} to a copy of \code{mat2}. The dimensions of 
     \code{mat1} and \code{mat2} must be the same.
 
-void fmpz_mat_init(fmpz_mat_t mat, fmpz_mat_t src)
+void fmpz_mat_init_set(fmpz_mat_t mat, fmpz_mat_t src)
 
     Initialises mat to the same size as src and sets it to a copy
     of src.
