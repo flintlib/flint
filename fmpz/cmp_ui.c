@@ -17,9 +17,8 @@
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
 =============================================================================*/
-/******************************************************************************
+/*****************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -27,15 +26,20 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+int
+fmpz_cmp_ui(const fmpz_t f, ulong g)
 {
-   ulong i;
-   mp_limb_t res;
+    fmpz c = *f;
 
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
-
-   return res;
+    if (!COEFF_IS_MPZ(c))    /* f is small */
+    {
+        if (c < 0L || g > COEFF_MAX)
+            return -1;
+        else 
+            return c < (long) g ? -1 : c > (long) g;
+    }
+    else                     /* f is large */
+        return mpz_cmp_ui(COEFF_TO_PTR(c), g);
 }

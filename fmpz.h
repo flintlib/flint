@@ -26,10 +26,12 @@
 #ifndef FMPZ_H
 #define FMPZ_H
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <mpir.h>
-#include "nmod_vec.h"
+
 #include "flint.h"
+#include "nmod_vec.h"
 
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
@@ -154,12 +156,13 @@ void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
 
-static __inline__
-void fmpz_print(fmpz_t x)
-{
-	if (!COEFF_IS_MPZ(*x)) printf("%ld", *x);
-	else gmp_printf("%Zd", COEFF_TO_PTR(*x));
-}
+void fmpz_read(fmpz_t f);
+
+void fmpz_fread(FILE * file, fmpz_t f);
+
+void fmpz_print(const fmpz_t x);
+
+void fmpz_fprint(FILE * file, const fmpz_t x);
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
@@ -176,9 +179,11 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
     }
 }
 
-int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
-
 int fmpz_cmp(const fmpz_t f, const fmpz_t g);
+
+int fmpz_cmp_ui(const fmpz_t f, ulong g);
+
+int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
 mp_size_t fmpz_size(const fmpz_t f);
 

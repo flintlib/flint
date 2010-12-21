@@ -19,23 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+#include "fmpz.h"
+
+void fmpz_print(const fmpz_t x)
 {
-   ulong i;
-   mp_limb_t res;
-
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
-
-   return res;
+	if (!COEFF_IS_MPZ(*x)) 
+        printf("%ld", *x);
+	else 
+        mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
 }
+

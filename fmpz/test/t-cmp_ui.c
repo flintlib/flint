@@ -19,23 +19,64 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+int
+main(void)
 {
-   ulong i;
-   mp_limb_t res;
+    int i, result;
+    fmpz_randstate_t state;
 
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
+    printf("cmp_ui....");
+    fflush(stdout);
 
-   return res;
+    fmpz_randinit(state);
+
+    /* Compare with fmpz_cmp */
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a, b;
+        ulong n;
+        int lhs, rhs;
+
+        fmpz_init(a);
+        fmpz_init(b);
+
+        fmpz_randtest(a, state, 200);
+
+        n = n_randtest_not_zero();
+        fmpz_set_ui(b, n);
+
+        lhs = fmpz_cmp(a, b);
+        rhs = fmpz_cmp_ui(a, n);
+
+        result = (lhs < 0) ? (rhs < 0) : ((lhs > 0) ? (rhs > 0) : (rhs == 0));
+        if (result == 0)
+        {
+            printf("FAIL:\n");
+            printf("a = "), fmpz_print(a), printf("\n");
+            printf("b = "), fmpz_print(b), printf("\n");
+            printf("n = %lu\n", n);
+            printf("cmp(a, b) = %d\n", fmpz_cmp(a, b));
+            printf("cmp_ui(a, n) = %d\n", fmpz_cmp_ui(a, n));
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+    }
+
+    fmpz_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return EXIT_SUCCESS;
 }

@@ -19,30 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 void
-fmpz_poly_print(const fmpz_poly_t poly)
+fmpz_fread(FILE * file, fmpz_t f)
 {
-    long i;
+    mpz_t temp;
+    mpz_init(temp);
 
-    printf("%li", poly->length);
-    if (poly->length > 0)
-    {
-        printf(" ");
-        for (i = 0; i < poly->length; i++)
-        {
-            printf(" ");
-            fmpz_print(poly->coeffs + i);
-        }
-    }
+    mpz_inp_str(temp, file, 10);
+    fmpz_set_mpz(f, temp);
+
+    mpz_clear(temp);
 }
+
