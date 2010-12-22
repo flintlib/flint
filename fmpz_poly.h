@@ -539,7 +539,7 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
                                   mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
-                                 mp_limb_t n, mp_limb_t ninv);
+                                 mp_limb_t n);
 
 /*  Composition  *************************************************************/
 

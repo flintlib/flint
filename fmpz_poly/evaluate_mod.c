@@ -50,7 +50,7 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
 }
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
-                                 mp_limb_t n, mp_limb_t ninv)
+                                 mp_limb_t n)
 {
     if (poly->length == 0)
         return 0;
@@ -66,7 +66,12 @@ mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
 
         return res;
     }
+    else
+    {
+        mp_limb_t ninv;
 
-    return _fmpz_poly_evaluate_mod(poly->coeffs, poly->length, a, n, ninv);
+        ninv = n_preinvert_limb(n);
+        return _fmpz_poly_evaluate_mod(poly->coeffs, poly->length, a, n, ninv);
+    }
 }
 

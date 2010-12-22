@@ -48,19 +48,18 @@ main(void)
     {
         fmpz_t b, s;
         fmpz_poly_t f;
-        mp_limb_t a, n, ninv, r;
+        mp_limb_t a, n, r;
 
         fmpz_poly_init(f);
         fmpz_poly_randtest(f, state, n_randint(10), 20);
 
         n = n_randtest_not_zero();
         a = n_randint(n);
-        ninv = n_preinvert_limb(n);
 
         fmpz_init(b);
         fmpz_set_ui(b, a);
 
-        r = fmpz_poly_evaluate_mod(f, a, n, ninv);
+        r = fmpz_poly_evaluate_mod(f, a, n);
         fmpz_poly_evaluate(s, f, b);
 
         result = (r == fmpz_mod_ui(s, s, n));
