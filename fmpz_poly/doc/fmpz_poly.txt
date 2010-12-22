@@ -767,7 +767,8 @@ void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
     Computes the greatest common divisor \code{res} of \code{poly1} and 
     \code{poly2}, normalised to have non-negative leading coefficient.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.1.
+    This function uses the subresultant algorithm as described 
+    in~\citep[Algorithm~3.3.1]{Coh1996}.
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
@@ -806,7 +807,8 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.7.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.3.7]{Coh1996}.
 
 *******************************************************************************
 
@@ -1211,7 +1213,8 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     is not asymptotically fast.  It is efficient only for short polynomials, 
     e.g.\ when $\len(B) < 32$.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.1.2.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.1.2]{Coh1996}.
 
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
@@ -1457,7 +1460,8 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
     If the polynomial is not square-free, the behaviour is undefined and an 
     exception may be raised.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 4.1.11.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~4.1.11]{Coh1996}.
 
 *******************************************************************************
 
