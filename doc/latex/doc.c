@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define ndocs  5
+#define ndocs  9
 
 static char * docsin[ndocs] = {
     "../../fmpz/doc/fmpz.txt", 
@@ -35,6 +35,10 @@ static char * docsin[ndocs] = {
     "../../fmpz_mat/doc/fmpz_mat.txt", 
     "../../fmpz_poly/doc/fmpz_poly.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
+    "../../nmod_vec/doc/nmod_vec.txt",
+    "../../nmod_mat/doc/nmod_mat.txt",
+    "../../nmod_poly/doc/nmod_poly.txt",
+    "../../arith/doc/arith.txt",
 };
 
 static char * docsout[ndocs] = {
@@ -43,6 +47,10 @@ static char * docsout[ndocs] = {
     "fmpz_mat.tex",
     "fmpz_poly.tex", 
     "ulong_extras.tex",
+    "nmod_vec.tex",
+    "nmod_mat.tex",
+    "nmod_poly.tex",
+    "arith.tex",
 };
 
 static FILE *in, *out;    /* Input and output handles           */
