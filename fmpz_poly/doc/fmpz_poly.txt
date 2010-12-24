@@ -181,6 +181,10 @@ void fmpz_poly_one(fmpz_poly_t poly)
 
     Sets \code{poly} to the constant polynomial one.
 
+void fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j)
+
+    Sets the coefficients of $x^i, \dotsc, x^{j-1}$ to zero.
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
     Swaps \code{poly1} and \code{poly2}.  This is done efficiently without 

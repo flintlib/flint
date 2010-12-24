@@ -132,6 +132,8 @@ void fmpz_poly_one(fmpz_poly_t poly)
     fmpz_poly_set_ui(poly, 1UL);
 }
 
+void fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j);
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2);
 
 void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n);
