@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -28,14 +29,16 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void
+int 
 fmpz_read(fmpz_t f)
 {
-    mpz_t temp;
-    mpz_init(temp);
+    mpz_t t;
+    size_t r;
 
-    mpz_inp_str(temp, stdin, 10);
-    fmpz_set_mpz(f, temp);
+    mpz_init(t);
+    r = mpz_inp_str(t, stdin, 10);
+    fmpz_set_mpz(f, t);
+    mpz_clear(t);
 
-    mpz_clear(temp);
+    return (r > 0) ? 1 : 0;
 }

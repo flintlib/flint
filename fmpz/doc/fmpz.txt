@@ -144,11 +144,25 @@ void fmpz_read(fmpz_t f)
     an optional minus sign, followed by one or more digits.  The
     first digit should be nonzero unless it is the only digit.
 
+    In case of success, returns a positive number.  In case of failure, 
+    returns a negative number.
+
+    This convention is adopted in light of the return values of 
+    \code{scanf} from the standard library and \code{mpz_inp_str} 
+    from MPIR.
+
 void fmpz_fread(FILE * file, fmpz_t f)
 
     Reads a multiprecision integer from the stream \code{file}.  The 
     format is an optional minus sign, followed by one or more digits.
     The first digit should be nonzero unless it is the only digit.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a negative number.
+
+    This convention is adopted in light of the return values of 
+    \code{scanf} from the standard library and \code{mpz_inp_str} 
+    from MPIR.
 
 int fmpz_print(fmpz_t x)
 

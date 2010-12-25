@@ -29,15 +29,17 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void
+int 
 fmpz_fread(FILE * file, fmpz_t f)
 {
-    mpz_t temp;
-    mpz_init(temp);
+    mpz_t t;
+    size_t r;
 
-    mpz_inp_str(temp, file, 10);
-    fmpz_set_mpz(f, temp);
+    mpz_init(t);
+    r = mpz_inp_str(t, file, 10);
+    fmpz_set_mpz(f, t);
+    mpz_clear(t);
 
-    mpz_clear(temp);
+    return (r > 0) ? 1 : 0;
 }
 
