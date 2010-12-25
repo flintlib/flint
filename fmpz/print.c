@@ -28,7 +28,7 @@
 
 #include "fmpz.h"
 
-void fmpz_print(const fmpz_t x)
+int fmpz_print(const fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x)) 
         return printf("%ld", *x);
