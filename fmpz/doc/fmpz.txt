@@ -150,19 +150,33 @@ void fmpz_fread(FILE * file, fmpz_t f)
     format is an optional minus sign, followed by one or more digits.
     The first digit should be nonzero unless it is the only digit.
 
-void fmpz_print(fmpz_t x)
+int fmpz_print(fmpz_t x)
 
     Prints the value $x$ to \code{stdout}, without a carriage return.
     The value is printed as either $0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
-void fmpz_fprint(FILE * file, fmpz_t x)
+    In case of success, returns a positive number.  In case of failure, 
+    returns a negative number.
+
+    This convention is adopted in light of the return values of 
+    \code{printf} from the standard library and \code{mpz_out_str} 
+    from MPIR.
+
+int fmpz_fprint(FILE * file, fmpz_t x)
 
     Prints the value $x$ to \code{file}, without a carriage return.
     The value is printed as either $0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-negative number.
+
+    This convention is adopted in light of the return values of 
+    \code{printf} from the standard library and \code{mpz_out_str} 
+    from MPIR.
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 

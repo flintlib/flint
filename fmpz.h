@@ -160,9 +160,9 @@ void fmpz_read(fmpz_t f);
 
 void fmpz_fread(FILE * file, fmpz_t f);
 
-void fmpz_print(const fmpz_t x);
+int fmpz_print(const fmpz_t x);
 
-void fmpz_fprint(FILE * file, const fmpz_t x);
+int fmpz_fprint(FILE * file, const fmpz_t x);
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 

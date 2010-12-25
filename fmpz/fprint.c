@@ -31,8 +31,13 @@
 void fmpz_fprint(FILE * file, const fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x))
-        fprintf(file, "%ld", *x);
+        return fprintf(file, "%ld", *x);
 	else 
-        mpz_out_str(file, 10, COEFF_TO_PTR(*x));
+    {
+        size_t r;
+
+        r = mpz_out_str(file, 10, COEFF_TO_PTR(*x));
+
+        return (r > 0) ? 1 : 0;
 }
 
