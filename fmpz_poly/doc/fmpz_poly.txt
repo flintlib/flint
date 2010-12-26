@@ -1572,12 +1572,18 @@ int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive number.
 
-void fmpz_poly_read(fmpz_poly_t poly)
+int fmpz_poly_read(fmpz_poly_t poly)
 
     Read a polynomial from \code{stdin}, storing the result in \code{poly}.
 
-void fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
     Read a polynomial from the stream \code{file}, storing the result 
     in \code{poly}.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
 

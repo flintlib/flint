@@ -29,32 +29,49 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
+int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 {
     long i, len;
     mpz_t t;
 
     mpz_init(t);
 
-    mpz_inp_str(t, file, 10);
-    if (!mpz_fits_slong_p(t))
     {
-        printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
-        abort();
+        size_t r;
+
+        r = mpz_inp_str(t, file, 10);
+        if (r == 0)
+        {
+            mpz_clear(t);
+            return 0;
+        }
+        if (!mpz_fits_slong_p(t))
+        {
+            printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
+            abort();
+        }
+        len = mpz_get_si(t);
     }
-
-    len = mpz_get_si(t);
-
-    fmpz_poly_fit_length(poly, len);
-
-    for (i = 0; i < len; i++)
     {
-        fmpz_fread(file, poly->coeffs + i);
-    }
+        int r;
 
-    _fmpz_poly_set_length(poly, len);
-    _fmpz_poly_normalise(poly);
+        fmpz_poly_fit_length(poly, len);
+
+        for (i = 0; i < len; i++)
+        {
+            r = fmpz_fread(file, poly->coeffs + i);
+            if (r <= 0)
+            {
+                mpz_clear(t);
+                return r;
+            }
+        }
+
+        _fmpz_poly_set_length(poly, len);
+        _fmpz_poly_normalise(poly);
+    }
 
     mpz_clear(t);
+    return 1;
 }
 
