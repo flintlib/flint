@@ -571,21 +571,21 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 /*  Printing  ****************************************************************/
 
-void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
+int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
-void fmpz_poly_fprint_pretty(FILE * file, 
+int fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
 
 static __inline__
-void fmpz_poly_print(const fmpz_poly_t poly)
+int fmpz_poly_print(const fmpz_poly_t poly)
 {
-    fmpz_poly_fprint(stdout, poly);
+    return fmpz_poly_fprint(stdout, poly);
 }
 
 static __inline__
-void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 {
-    fmpz_poly_fprint_pretty(stdout, poly, x);
+    return fmpz_poly_fprint_pretty(stdout, poly, x);
 }
 
 void fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
