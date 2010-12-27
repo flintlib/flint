@@ -19,23 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+void fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 {
-   ulong i;
-   mp_limb_t res;
+    long i, len;
+    mpz_t t;
 
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
+    mpz_init(t);
 
-   return res;
+    mpz_inp_str(t, file, 10);
+    if (!mpz_fits_slong_p(t))
+    {
+        printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
+        abort();
+    }
+
+    len = mpz_get_si(t);
+
+    fmpz_poly_fit_length(poly, len);
+
+    for (i = 0; i < len; i++)
+    {
+        fmpz_fread(file, poly->coeffs + i);
+    }
+
+    _fmpz_poly_set_length(poly, len);
+    _fmpz_poly_normalise(poly);
+
+    mpz_clear(t);
 }
+

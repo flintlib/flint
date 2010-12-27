@@ -19,23 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <mpir.h>
+
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+void _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
 {
-   ulong i;
-   mp_limb_t res;
+    long i;
 
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
-
-   return res;
+    fprintf(file, "%li", len);
+    if (len > 0)
+    {
+        fputc(' ', file);
+        for (i = 0; i < len; i++)
+        {
+            fputc(' ', file);
+            fmpz_fprint(file, poly + i);
+        }
+    }
 }
+
+void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
+{
+    _fmpz_poly_fprint(file, poly->coeffs, poly->length);
+}
+

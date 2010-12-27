@@ -51,7 +51,7 @@ void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp)
 void
 fmpz_comb_clear(fmpz_comb_t comb)
 {
-    long i, j, k, n;
+    long i, j, n;
 
     n = comb->n;
 

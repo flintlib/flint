@@ -28,8 +28,10 @@
 #ifndef FMPZ_POLY_H
 #define FMPZ_POLY_H
 
+#include <stdio.h>
 #include <mpir.h>
 #include "fmpz.h"
+#include "fmpz_vec.h"
 
 /*  Type definitions *********************************************************/
 
@@ -80,6 +82,18 @@ static __inline__
 long fmpz_poly_degree(const fmpz_poly_t poly)
 {
     return poly->length - 1;
+}
+
+static __inline__ 
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_limbs(poly->coeffs, poly->length);
+}
+
+static __inline__ 
+long _fmpz_poly_max_bits(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
 }
 
 /*  Assignment and basic manipulation  ***************************************/
@@ -307,6 +321,11 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e);
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e);
 
+void _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n);
+
+void 
+fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n);
+
 /*  Shifting  ****************************************************************/
 
 void _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n);
@@ -516,6 +535,12 @@ void _fmpz_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden,
 
 void fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a);
 
+mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a, 
+                                  mp_limb_t n, mp_limb_t ninv);
+
+mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
+                                 mp_limb_t n, mp_limb_t ninv);
+
 /*  Composition  *************************************************************/
 
 void _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1, 
@@ -544,9 +569,30 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 /*  Printing  ****************************************************************/
 
-void fmpz_poly_print(const fmpz_poly_t poly);
+void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
+void fmpz_poly_fprint_pretty(FILE * file, 
+                                       const fmpz_poly_t poly, const char * x);
 
+static __inline__
+void fmpz_poly_print(const fmpz_poly_t poly)
+{
+    fmpz_poly_fprint(stdout, poly);
+}
+
+static __inline__
+void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+{
+    fmpz_poly_fprint_pretty(stdout, poly, x);
+}
+
+void fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
+
+static __inline__ 
+void fmpz_poly_read(fmpz_poly_t poly)
+{
+    fmpz_poly_fread(stdin, poly);
+}
 
 #endif
 

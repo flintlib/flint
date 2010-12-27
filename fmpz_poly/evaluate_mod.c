@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -27,15 +27,46 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
-mp_limb_t n_pow(mp_limb_t n, ulong exp)
+mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a, 
+                                  mp_limb_t n, mp_limb_t ninv)
 {
-   ulong i;
-   mp_limb_t res;
+    mp_limb_t c, res = 0;
+    fmpz_t f;
 
-   res = 1UL;
-   for (i = 0; i < exp; i++)
-      res *= n;
+    fmpz_init(f);
 
-   return res;
+    while (len--)
+    {
+        c = fmpz_mod_ui(f, poly + len, n);
+        res = n_addmod(n_mulmod2_preinv(res, a, n, ninv), c, n);
+    }
+
+    fmpz_clear(f);
+
+    return res;
 }
+
+mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
+                                 mp_limb_t n, mp_limb_t ninv)
+{
+    if (poly->length == 0)
+        return 0;
+
+    if (a == 0)
+    {
+        mp_limb_t res;
+        fmpz_t f;
+
+        fmpz_init(f);
+        res = fmpz_mod_ui(f, poly->coeffs, n);
+        fmpz_clear(f);
+
+        return res;
+    }
+
+    return _fmpz_poly_evaluate_mod(poly->coeffs, poly->length, a, n, ninv);
+}
+
