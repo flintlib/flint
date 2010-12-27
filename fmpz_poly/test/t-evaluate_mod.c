@@ -57,6 +57,7 @@ main(void)
         a = n_randint(n);
 
         fmpz_init(b);
+        fmpz_init(s);
         fmpz_set_ui(b, a);
 
         r = fmpz_poly_evaluate_mod(f, a, n);
