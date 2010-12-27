@@ -46,8 +46,10 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     }
     else
     {
-        __mpz_struct * f_mpz_ptr = _fmpz_promote(f);
+        _fmpz_promote(f); /* must not hang on to pointer whilst promoting */
         __mpz_struct * r_mpz_ptr = _fmpz_promote(r);
+		__mpz_struct * f_mpz_ptr = COEFF_TO_PTR(*f);
+
         mpz_sqrtrem(f_mpz_ptr, r_mpz_ptr, COEFF_TO_PTR(*g));
         _fmpz_demote_val(f);
         _fmpz_demote_val(r);
