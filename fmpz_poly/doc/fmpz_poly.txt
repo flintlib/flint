@@ -181,6 +181,10 @@ void fmpz_poly_one(fmpz_poly_t poly)
 
     Sets \code{poly} to the constant polynomial one.
 
+void fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j)
+
+    Sets the coefficients of $x^i, \dotsc, x^{j-1}$ to zero.
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 
     Swaps \code{poly1} and \code{poly2}.  This is done efficiently without 
@@ -767,7 +771,8 @@ void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
     Computes the greatest common divisor \code{res} of \code{poly1} and 
     \code{poly2}, normalised to have non-negative leading coefficient.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.1.
+    This function uses the subresultant algorithm as described 
+    in~\citep[Algorithm~3.3.1]{Coh1996}.
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
@@ -806,7 +811,8 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.3.7.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.3.7]{Coh1996}.
 
 *******************************************************************************
 
@@ -1211,7 +1217,8 @@ void fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A,
     is not asymptotically fast.  It is efficient only for short polynomials, 
     e.g.\ when $\len(B) < 32$.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 3.1.2.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~3.1.2]{Coh1996}.
 
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, const fmpz * A, 
                                           long lenA, const fmpz * B, long lenB)
@@ -1362,14 +1369,12 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
     Evaluates \code{(poly, len)} at the value $a$ modulo $n$ and 
     returns the result.  The last argument \code{ninv} must be set 
     to the precomputed inverse of $n$, which can be obtained using 
-    the function \code{n_preinvert_limb}.
+    the function \code{n_preinvert_limb()}.
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
-                                                   mp_limb_t n, mp_limb_t ninv)
+                                                                   mp_limb_t n)
 
     Evaluates \code{poly} at the value $a$ modulo $n$ and returns the result. 
-    The last argument \code{ninv} must be set to the precomputed inverse 
-    of $n$, which can be obtained using the function \code{n_preinvert_limb}.
 
 *******************************************************************************
 
@@ -1457,7 +1462,8 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
     If the polynomial is not square-free, the behaviour is undefined and an 
     exception may be raised.
 
-    See H. Cohen, A Course in Computational Number Theory, Algorithm 4.1.11.
+    This function uses the algorithm described 
+    in~\citep[Algorithm~4.1.11]{Coh1996}.
 
 *******************************************************************************
 
@@ -1505,49 +1511,79 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_poly_print(const fmpz * poly, long len)
+int _fmpz_poly_print(const fmpz * poly, long len)
 
     Prints the polynomial \code{(poly, len)} to \code{stdout}.
 
-void fmpz_poly_print(const fmpz_poly_t poly)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_print(const fmpz_poly_t poly)
 
     Prints the polynomial to \code{stdout}.
 
-void _fmpz_poly_print_pretty(const fmpz * poly, long len, const char * x)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int _fmpz_poly_print_pretty(const fmpz * poly, long len, const char * x)
 
     Prints the pretty representation of \code{(poly, len)} to \code{stdout},
     using the string \code{x} to represent the indeterminate.
 
-void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 
     Prints the pretty representation of \code{poly} to \code{stdout},
     using the string \code{x} to represent the indeterminate.
 
-void _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
 
     Prints the polynomial \code{(poly, len)} to the stream \code{file}.
 
-void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
 
     Prints the polynomial to the stream \code{file}.
 
-void _fmpz_poly_fprint_pretty(FILE * file, 
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int _fmpz_poly_fprint_pretty(FILE * file, 
                                          const fmpz * poly, long len, char * x)
 
     Prints the pretty representation of \code{(poly, len)} to the stream 
     \code{file}, using the string \code{x} to represent the indeterminate.
 
-void fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
 
     Prints the pretty representation of \code{poly} to the stream \code{file}, 
     using the string \code{x} to represent the indeterminate.
 
-void fmpz_poly_read(fmpz_poly_t poly)
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_read(fmpz_poly_t poly)
 
     Read a polynomial from \code{stdin}, storing the result in \code{poly}.
 
-void fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
+
+int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
     Read a polynomial from the stream \code{file}, storing the result 
     in \code{poly}.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
 

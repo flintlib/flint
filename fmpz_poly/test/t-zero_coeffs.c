@@ -25,21 +25,50 @@
 ******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "ulong_extras.h"
 
-int 
-fmpz_fread(FILE * file, fmpz_t f)
+int
+main(void)
 {
-    mpz_t t;
-    size_t r;
+    int i, result;
+    fmpz_randstate_t state;
 
-    mpz_init(t);
-    r = mpz_inp_str(t, file, 10);
-    fmpz_set_mpz(f, t);
-    mpz_clear(t);
+    printf("zero_coeffs....");
+    fflush(stdout);
 
-    return (r > 0) ? 1 : 0;
+    fmpz_poly_randinit(state);
+
+    /* Check that zeroing [0,len/2) and [len/2,len) sets a to zero */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a;
+        long len;
+
+        fmpz_poly_init(a);
+        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        len = a->length;
+
+        fmpz_poly_zero_coeffs(a, -23, len/2);
+        fmpz_poly_zero_coeffs(a, len/2, len + 42);
+
+        result = (fmpz_poly_length(a) == 0);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+    }
+
+    fmpz_poly_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
-

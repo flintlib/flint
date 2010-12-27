@@ -132,6 +132,8 @@ void fmpz_poly_one(fmpz_poly_t poly)
     fmpz_poly_set_ui(poly, 1UL);
 }
 
+void fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j);
+
 void fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2);
 
 void _fmpz_poly_reverse(fmpz * res, const fmpz * poly, long len, long n);
@@ -539,7 +541,7 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
                                   mp_limb_t n, mp_limb_t ninv);
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
-                                 mp_limb_t n, mp_limb_t ninv);
+                                 mp_limb_t n);
 
 /*  Composition  *************************************************************/
 
@@ -567,31 +569,31 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len);
 
 void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
-/*  Printing  ****************************************************************/
+/*  Input and output  ********************************************************/
 
-void fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
+int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
-void fmpz_poly_fprint_pretty(FILE * file, 
+int fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
 
 static __inline__
-void fmpz_poly_print(const fmpz_poly_t poly)
+int fmpz_poly_print(const fmpz_poly_t poly)
 {
-    fmpz_poly_fprint(stdout, poly);
+    return fmpz_poly_fprint(stdout, poly);
 }
 
 static __inline__
-void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 {
-    fmpz_poly_fprint_pretty(stdout, poly, x);
+    return fmpz_poly_fprint_pretty(stdout, poly, x);
 }
 
-void fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
+int fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
 
 static __inline__ 
-void fmpz_poly_read(fmpz_poly_t poly)
+int fmpz_poly_read(fmpz_poly_t poly)
 {
-    fmpz_poly_fread(stdin, poly);
+    return fmpz_poly_fread(stdin, poly);
 }
 
 #endif

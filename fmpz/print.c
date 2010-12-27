@@ -28,11 +28,17 @@
 
 #include "fmpz.h"
 
-void fmpz_print(const fmpz_t x)
+int fmpz_print(const fmpz_t x)
 {
 	if (!COEFF_IS_MPZ(*x)) 
-        printf("%ld", *x);
+        return printf("%ld", *x);
 	else 
-        mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
+    {
+        size_t r;
+
+        r = mpz_out_str(stdout, 10, COEFF_TO_PTR(*x));
+
+        return (r > 0) ? 1 : 0;
+    }
 }
 

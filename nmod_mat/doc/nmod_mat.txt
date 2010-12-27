@@ -23,28 +23,6 @@
 
 ******************************************************************************/
 
-
-*******************************************************************************
-
-    General information
-
-*******************************************************************************
-
-    An nmod_mat_t represents a matrix of integers modulo n (Z/nZ), for any
-    nonzero n that fits in a single limb (up to 2^32-1 or 2^64-1). The
-    implementation uses functions and data types of the nmod_vec module
-    for low-level operations.
-
-    One or both dimensions of a matrix may be zero.
-
-    Except where otherwise noted, it is assumed all entries in input
-    data are already reduced in the range [0, n). It is also assumed that
-    all arguments have the same modulus.
-
-    Functions that require the modulus to be a prime number document this
-    requirement explicitly.
-
-
 *******************************************************************************
 
     Memory management
@@ -53,32 +31,32 @@
 
 void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
 
-    Initialises mat to a (rows x cols) matrix with coefficients
-    mod n, where n can be any nonzero integer that fits in a limb.
-    All elements are set to zero.
+    Initialises \code{mat} to a \code{rows}-by-\code{cols} matrix with 
+    coefficients modulo~$n$, where $n$ can be any nonzero integer that 
+    fits in a limb. All elements are set to zero.
 
 void nmod_mat_init_set(nmod_mat_t mat, nmod_mat_t src)
 
-    Initialises mat and sets its dimensions, modulus and elements to
-    those of src.
+    Initialises \code{mat} and sets its dimensions, modulus and elements 
+    to those of \code{src}.
 
 void nmod_mat_clear(nmod_mat_t mat)
 
     Clears the matrix and releases any memory it used. The matrix 
     cannot be used again until it is initialised. This function must be
-    called exactly once when finished using an nmod_mat_t object.
+    called exactly once when finished using an \code{nmod_mat_t} object.
 
 void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
 
-    Sets the elements of mat to those of src. It is assumed that mat and
-    src have identical dimensions, but the moduli need not be the same.
-    The elements will be reduced to the modulus of mat.
+    Sets the elements of \code{mat} to those of \code{src}. It is assumed 
+    that \code{mat} and \code{src} have identical dimensions, but the 
+    moduli need not be the same. The elements will be reduced to the 
+    modulus of \code{mat}.
 
 int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
 
     Returns nonzero if mat1 and mat2 have the same dimensions and elements,
     and zero otherwise. The moduli are ignored.
-
 
 *******************************************************************************
 
@@ -88,15 +66,16 @@ int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
 
 void nmod_mat_print_pretty(nmod_mat_t mat)
 
-    Pretty-prints mat to stdout. A header is printed followed by the rows
-    enclosed in brackets. Each column is right-aligned to the width of
-    the modulus written in decimal, and the columns are separated by spaces.
+    Pretty-prints \code{mat} to \code{stdout}. A header is printed followed 
+    by the rows enclosed in brackets. Each column is right-aligned to the 
+    width of the modulus written in decimal, and the columns are separated by 
+    spaces.
     For example:
-
-        <2 x 3 integer matrix mod 2903>
-        [   0    0 2607]
-        [ 622    0    0]
-
+    \begin{lstlisting}
+    <2 x 3 integer matrix mod 2903>
+    [   0    0 2607]
+    [ 622    0    0]
+    \end{lstlisting}
 
 *******************************************************************************
 
@@ -106,8 +85,8 @@ void nmod_mat_print_pretty(nmod_mat_t mat)
 
 void nmod_mat_randtest(nmod_mat_t mat)
 
-    Sets the elements to uniformly random numbers between 0 and m-1 inclusive
-    where m is the modulus of mat.
+    Sets the elements to uniformly random numbers between $0$ and $m-1$ 
+    inclusive, where $m$ is the modulus of \code{mat}.
 
 void nmod_mat_randfull(nmod_mat_t mat)
 
@@ -116,31 +95,31 @@ void nmod_mat_randfull(nmod_mat_t mat)
 
 int nmod_mat_randpermdiag(nmod_mat_t mat, mp_limb_t * diag, long n)
 
-    Sets mat to a random permutation of the diagonal matrix with n
-    leading entries given by the vector diag. It is assumed that the main
-    diagonal of mat has room for at least n entries.
+    Sets \code{mat} to a random permutation of the diagonal matrix 
+    with $n$ leading entries given by the vector \code{diag}. It is 
+    assumed that the main diagonal of \code{mat} has room for at 
+    least $n$ entries.
 
-    Returns 0 or 1, depending on whether the permutation is even or odd
-    respectively.
+    Returns $0$ or $1$, depending on whether the permutation is even 
+    or odd respectively.
 
 void nmod_mat_randrank(nmod_mat_t mat, long rank)
 
-    Sets mat to a random sparse matrix with the given rank (having
-    exactly as many nonzero elements as the rank), with the nonzero
-    elements being uniformly random integers between 0 and m-1 inclusive
-    where m is the modulus of m.
+    Sets \code{mat} to a random sparse matrix with the given rank, 
+    having exactly as many non-zero elements as the rank, with the 
+    non-zero elements being uniformly random integers between $0$ 
+    and $m-1$ inclusive, where $m$ is the modulus of \code{mat}.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling nmod_mat_randops.
+    rank by subsequently calling \code{nmod_mat_randops()}.
 
 void nmod_mat_randops(fmpz_mat_t mat, long count)
 
-    Randomises mat by performing elementary row or column operations.
-    More precisely, at most count random additions or subtractions of
-    distinct rows and columns will be performed. This leaves the rank
-    (and for square matrices, determinant) unchanged.
-
-
+    Randomises \code{mat} by performing elementary row or column 
+    operations. More precisely, at most \code{count} random additions 
+    or subtractions of distinct rows and columns will be performed. 
+    This leaves the rank (and for square matrices, determinant) 
+    unchanged.
 
 *******************************************************************************
 
@@ -148,32 +127,33 @@ void nmod_mat_randops(fmpz_mat_t mat, long count)
 
 *******************************************************************************
 
-
 void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
 
-    Sets B to the transpose of A. Dimensions must be compatible.
-    B and A may be the same object if and only if the matrix is square.
-    Entries will be reduced to the modulus of B.
-
+    Sets $B$ to the transpose of $A$. Dimensions must be compatible.
+    $B$ and $A$ may be the same object if and only if the matrix is 
+    square. Entries will be reduced to the modulus of B.
 
 void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Computes C = A + B. Dimensions must be identical.
-    Entries will be reduced to the modulus of C.
-
+    Computes $C = A + B$. Dimensions must be identical.
+    Entries will be reduced to the modulus of $C$.
 
 void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Computes the matrix product C = A * B. Dimensions must be compatible
-    for matrix multiplication. C is not allowed to be aliased with A or B.
-    Entries will be reduced to the modulus of C.
+    Computes the matrix product $C = A B$. Dimensions must be compatible
+    for matrix multiplication. $C$ is not allowed to be aliased with $A$ 
+    or $B$. Entries will be reduced to the modulus of $C$.
 
 void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Performs matrix multiplication using the classical algorithm, by 
+    calling \code{_nmod_mat_mul_1()} etc.  The interface is identical 
+    to \code{nmod_mat_mul()}.
+
 void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Performs matrix multiplication respectively using the classical
-    algorithm (by calling _nmod_mat_mul_1 etc), and Strassen multiplication.
-    The interface is identical to nmod_mat_mul.
+    Performs matrix multiplication respectively using Strassen 
+    multiplication.  The interface is identical to \code{nmod_mat_mul()}.
 
 void _nmod_mat_mul_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 void _nmod_mat_mul_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
@@ -183,28 +163,28 @@ void _nmod_mat_mul_transpose_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 void _nmod_mat_mul_transpose_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Computes C = A * B or C = A * B^T respectively, using classical
-    matrix multiplication. That is, for each i and j, C[i][j] is set to
-    the dot product of row i of A with column j of B (row j of B
-    when transposed).
+    Computes $C = A B$ or $C = A B^T$, respectively, using classical
+    matrix multiplication. That is, for each $i$ and $j$, $C_{ij}$ is 
+    set to the scalar product of row $i$ of $A$ with column $j$ of $B$ 
+    (or row $j$ of $B$ when transposed).
 
-    The "_X" version uses a register X limbs wide to accumulate the dot
-    product, and a modular reduction is performed only at the end.
+    The \code{_X} version uses a register \code{X} limbs wide to accumulate 
+    the scalar product, and a modular reduction is performed only at the end.
     The caller must ensure that elements are sufficiently small for
     overflow not to occur.
 
-    Let k be the dot product size (i.e. the number of columns of A)
-    and let a and b the largest absolute values of the elements in A and B
-    respectively. Then the following conditions are sufficient to guarantee
-    correctness:
-
-        1  :   k*a*b         < 2^FLINT_BITS
-        2  :   k*a*b         < 2^(2*FLINT_BITS)
+    Let $k$ be the scalar product size, i.e.\ the number of columns of $A$,
+    and let $a$ and $b$ the largest absolute values of the elements in $A$ 
+    and $B$, respectively. Then the following conditions are sufficient to 
+    guarantee correctness:
+    \begin{verbatim}
+        1  :   k*a*b  <  2^FLINT_BITS
+        2  :   k*a*b  <  2^(2*FLINT_BITS)
         3  :   always
+    \end{verbatim}
 
-    Dimensions must be compatible for matrix multiplication. C is not
-    allowed to be aliased with A or B.
-
+    Dimensions must be compatible for matrix multiplication. $C$ is not
+    allowed to be aliased with $A$ or $B$.
 
 *******************************************************************************
 
@@ -214,93 +194,92 @@ void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
 long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
 
-    Row reduces the m x n matrix mat using standard in-place
-    Gaussian elimination with pivoting. The modulus must be a prime
-    number.
+    Row reduces the $m$-by-$n$ matrix \code{mat} using standard in-place
+    Gaussian elimination with pivoting. The modulus \code{mat->mod.n} must 
+    be a prime number.
 
-    The options parameter is a bitfield which may be set to any combination
-    of the following flags (use options = 0 to disable all and perform
-    in-place LU decomposition)
+    The \code{options} parameter is a bitfield which may be set to any 
+    combination of the following flags, where using \code{options = 0} to 
+    disable all and perform in-place $LU$ decomposition)
+    \begin{itemize}
+    \item \code{ROWREDUCE_FAST_ABORT}.
 
-    ROWREDUCE_FAST_ABORT
+        If set, the function immediately aborts and returns $0$ if the 
+        matrix is detected to be rank-deficient, i.e.\ singular. In this 
+        event, the state of the matrix will be undefined.
 
-        If set, the function immediately aborts and returns 0 when (if) the
-        matrix is detected to be rank-deficient (singular). In this event,
-        the state of the matrix will be undefined.
+    \item \code{ROWREDUCE_FULL}.
 
-    ROWREDUCE_FULL
-
-        If set, performs Gauss-Jordan elimination, i.e. eliminates the
+        If set, performs Gauss--Jordan elimination, i.e.\ eliminates the
         elements above each pivot element as well as those below.
         If not set, regular Gaussian elimination is performed and only
         the elements below pivots are eliminated.
 
-    ROWREDUCE_CLEAR_LOWER
+    \item \code{ROWREDUCE_CLEAR_LOWER}.
 
-        If set, clears (i.e. zeros) elements below the pivots.
+        If set, clears, i.e.\ zeros, elements below the pivots.
 
-        If not set, the output becomes the LU decomposition of the input
-        matrix. That is, the input matrix A is overwritten with L, U
-        such that A = P*L*U where P is a permutation matrix. U is stored
-        in the upper triangular part (including the main diagonal), and L is
-        stored with an implicit unit main diagonal in the lower triangular
-        part.
+        If not set, the output becomes the $LU$ decomposition of the input
+        matrix. That is, the input matrix $A$ is overwritten with $L$, $U$
+        such that $A = P L U$ where $P$ is a permutation matrix. $U$ is 
+        stored in the upper triangular part (including the main diagonal), 
+        and $L$ is stored with an implicit unit main diagonal in the lower 
+        triangular part.
+    \end{itemize}
 
     Pivoting (to avoid division by zero entries) is performed by permuting
     the vector of row pointers in-place so that they point to the successive
     pivot rows. The matrix entries themselves retain their original order
     in memory.
 
-    The return value r is the rank of the matrix, multiplied by a sign
-    indicating the parity of row interchanges. If r = 0, the matrix has rank
-    zero (unless ROWREDUCE_FAST_ABORT is set, in which case r = 0 indicates
-    any deficient rank). Otherwise, the leading nonzero entries of
-    a[0], a[1], ... a[abs(r)-1] will point to the successive pivot elements.
-    If |r| = m = n, the determinant of the matrix is given by
-    sign(r) times the product of the entries on the main diagonal.
-
+    The return value $r$ is the rank of the matrix, multiplied by a sign
+    indicating the parity of row interchanges. If $r = 0$, the matrix has 
+    rank zero, unless \code{ROWREDUCE_FAST_ABORT} is set, in which case 
+    $r = 0$ indicates any deficient rank. Otherwise, the leading non-zero 
+    entries of $a[0], a[1], \dotsc, a[\abs(r)-1]$ will point to the 
+    successive pivot elements.  If $\abs{r} = m = n$, the determinant of 
+    the matrix is given by $\sgn(r)$ times the product of the entries on 
+    the main diagonal.
 
 mp_limb_t nmod_mat_det(nmod_mat_t A)
 
-    Returns the determinant of A. The modulus of A must be a prime number.
-
+    Returns the determinant of $A$. The modulus of $A$ must be a prime number.
 
 long nmod_mat_rank(nmod_mat_t A)
 
-    Returns the rank of A. The modulus of A must be a prime number.
-
+    Returns the rank of $A$. The modulus of $A$ must be a prime number.
 
 void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** LU,
     long n, nmod_t mod)
 
-    Transforms b to the solution x of L*U*x = b where LU points to the
-    rows of a precomputed LU factorisation of a nonsingular (n x n) matrix
-    with modulus mod.n. The modulus must be a prime number.
-
+    Transforms $b$ to the solution $x$ of $L U x = b$ where \code{LU} 
+    points to the rows of a precomputed $LU$~factorisation of a 
+    nonsingular $n$-by-$n$ matrix with modulus \code{mod.n}. The modulus 
+    must be a prime number.
 
 int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
-    Solves the matrix-vector equation Ax = b over Z/pZ where p is the
-    modulus of A which must be a prime number.
+    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$ 
+    is the modulus of $A$ which must be a prime number.
 
-    Returns 0 if A has full rank; otherwise returns 1 and sets the
-    elements of x to undefined values.
-
+    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
+    elements of $x$ to undefined values.
 
 int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
-    Solves the matrix-matrix equation AX = B over Z/pZ where p is the
-    modulus of X which must be a prime number. X, A, B should have
-    the same moduli.
+    Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$ 
+    is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$ 
+    should have the same moduli.
 
-    Returns 0 if A has full rank; otherwise returns 1 and sets the elements
-    of X to undefined values.
-
+    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the 
+    elements of $X$ to undefined values.
 
 int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
 
-    Sets B = A^(-1) and returns 1 if A is invertible. If A is singular,
-    returns 0 and sets the elements of B to undefined values.
+    Sets $B = A^{-1}$ and returns $1$ if $A$ is invertible. 
+    If $A$ is singular, returns $0$ and sets the elements of 
+    $B$ to undefined values.
 
-    A and B must be square matrices with the same dimensions
+    $A$ and $B$ must be square matrices with the same dimensions
     and modulus. The modulus must be prime.
+

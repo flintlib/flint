@@ -534,6 +534,59 @@ We now describe the functions available in \code{fmpz_poly}.
 
 \input{ulong_extras.tex}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Vectors over $\Z / n \Z$ for word-sized moduli}
+
+\input{nmod_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Polynomials over $\Z / n \Z$ for word-sized moduli}
+
+\input{nmod_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matrices over Z / nZ for word-sized moduli                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Matrices over $\Z / n \Z$ for word-sized moduli}
+
+\section{Introduction}
+
+An \code{nmod_mat_t} represents a matrix of integers modulo $n$, for any 
+non-zero $n$ that fits in a single limb, up to $2^{32}-1$ or $2^{64}-1$. The
+implementation uses functions and data types of the \code{nmod_vec} module
+for low-level operations.
+
+One or both dimensions of a matrix may be zero.
+
+Except where otherwise noted, it is assumed all entries in input
+data are already reduced in the range $[0, n)$. It is also assumed that
+all arguments have the same modulus.
+
+Functions that require the modulus to be a prime number document this
+requirement explicitly.
+
+\input{nmod_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Arithmetic functions                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{Arithmetic functions}
+
+\section{Introduction}
+
+This module implements arithmetic functions, number-theoretic and 
+combinatorial special number sequences and polynomials.
+
+\input{arith.tex}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
