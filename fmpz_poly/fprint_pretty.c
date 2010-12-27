@@ -31,84 +31,120 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_fprint_pretty(FILE * file, 
-                              const fmpz * poly, long len, const char * x)
+int _fmpz_poly_fprint_pretty(FILE * file, 
+                             const fmpz * poly, long len, const char * x)
 {
+    int r;
     long i;
 
     if (len == 0)
     {
-        fputc('0', file);
-        return;
+        r = fputc('0', file);
+        r = (r != EOF) ? 1 : EOF;
+        return r;
     }
     else if (len == 1)
     {
-        fmpz_fprint(file, poly);
-        return;
+        r = fmpz_fprint(file, poly);
+        return r;
     }
 
     i = len - 1;
 
     if (*(poly + i) == 1)
-        fprintf(file, "%s^%ld", x, i);
+        r = fprintf(file, "%s^%ld", x, i);
     else if (*(poly + i) == -1)
-        fprintf(file, "-%s^%ld", x, i);
+        r = fprintf(file, "-%s^%ld", x, i);
     else
     {
-        fmpz_fprint(file, poly + i);
-        fprintf(file, "*%s^%ld", x, i);
+        r = fmpz_fprint(file, poly + i);
+        if (r > 0)
+            r = fprintf(file, "*%s^%ld", x, i);
     }
 
-    for ( ; i > 1; --i)
+    for ( ; (r > 0) && (i > 1); --i)
     {
         if (*(poly + i) == 0)
             continue;
 
         if (*(poly + i) == 1)
-            fprintf(file, "+%s^%ld", x, i);
+            r = fprintf(file, "+%s^%ld", x, i);
         else if (*(poly + i) == -1)
-            fprintf(file, "-%s^%ld", x, i);
+            r = fprintf(file, "-%s^%ld", x, i);
         else
         {
             if (fmpz_sgn(poly + i) > 0)
-                fputc('+', file);
-            fmpz_fprint(file, poly + i);
-            fprintf(file, "*%s^%ld", x, i);
+            {
+                r = fputc('+', file);
+                r = (r != EOF) ? 1 : EOF;
+            }
+            if (r > 0)
+                r = fmpz_fprint(file, poly + i);
+            if (r > 0)
+                r = fprintf(file, "*%s^%ld", x, i);
         }
     }
 
-    if (*(poly + 1))
+    if ((r > 0) && *(poly + 1))
     {
         if (*(poly + 1) == 1)
         {
-            fputc('+', file);
-            fputs(x, file);
+            r = fputc('+', file);
+            r = (r != EOF) ? 1 : EOF;
+            if (r > 0)
+            {
+                r = fputs(x, file);
+                r = (r >= 0) ? 1 : -1;
+            }
         }
         else if (*(poly + 1) == -1)
         {
-            fputc('-', file);
-            fputs(x, file);
+            r = fputc('-', file);
+            r = (r != EOF) ? 1 : EOF;
+            if (r > 0)
+            {
+                r = fputs(x, file);
+                r = (r >= 0) ? 1 : -1;
+            }
         }
         else
         {
             if (fmpz_sgn(poly + 1) > 0)
-                fputc('+', file);
-            fmpz_fprint(file, poly + 1);
-            fputc('*', file);
-            fputs(x, file);
+            {
+                r = fputc('+', file);
+                r = (r != EOF) ? 1 : EOF;
+            }
+            if (r > 0)
+                r = fmpz_fprint(file, poly + 1);
+            if (r > 0)
+            {
+                r = fputc('*', file);
+                r = (r != EOF) ? 1 : EOF;
+            }
+            if (r > 0)
+            {
+                r = fputs(x, file);
+                r = (r >= 0) ? 1 : -1;
+            }
         }
     }
-    if (*(poly))
+    if ((r > 0) && *(poly))
     {
         if (fmpz_sgn(poly) > 0)
-            fputc('+', file);
-        fmpz_fprint(file, poly);
+        {
+            r = fputc('+', file);
+            r = (r != EOF) ? 1 : EOF;
+        }
+        if (r > 0)
+            r = fmpz_fprint(file, poly);
     }
+
+    return r;
 }
 
-void fmpz_poly_fprint_pretty(FILE * file, 
-                             const fmpz_poly_t poly, const char * x)
+int fmpz_poly_fprint_pretty(FILE * file, 
+                            const fmpz_poly_t poly, const char * x)
 {
-    _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
+    return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
 }
 

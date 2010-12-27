@@ -47,8 +47,8 @@
 
 int _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
 {
-    long i;
     int r;
+    long i;
 
     r = fprintf(file, "%li", len);
     if ((len > 0) && (r > 0))

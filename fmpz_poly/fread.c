@@ -31,45 +31,39 @@
 
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 {
+    int r;
     long i, len;
     mpz_t t;
 
     mpz_init(t);
 
+    r = mpz_inp_str(t, file, 10);
+    if (r == 0)
     {
-        size_t r;
+        mpz_clear(t);
+        return 0;
+    }
+    if (!mpz_fits_slong_p(t))
+    {
+        printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
+        abort();
+    }
+    len = mpz_get_si(t);
 
-        r = mpz_inp_str(t, file, 10);
-        if (r == 0)
+    fmpz_poly_fit_length(poly, len);
+
+    for (i = 0; i < len; i++)
+    {
+        r = fmpz_fread(file, poly->coeffs + i);
+        if (r <= 0)
         {
             mpz_clear(t);
-            return 0;
+            return r;
         }
-        if (!mpz_fits_slong_p(t))
-        {
-            printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
-            abort();
-        }
-        len = mpz_get_si(t);
     }
-    {
-        int r;
 
-        fmpz_poly_fit_length(poly, len);
-
-        for (i = 0; i < len; i++)
-        {
-            r = fmpz_fread(file, poly->coeffs + i);
-            if (r <= 0)
-            {
-                mpz_clear(t);
-                return r;
-            }
-        }
-
-        _fmpz_poly_set_length(poly, len);
-        _fmpz_poly_normalise(poly);
-    }
+    _fmpz_poly_set_length(poly, len);
+    _fmpz_poly_normalise(poly);
 
     mpz_clear(t);
     return 1;
