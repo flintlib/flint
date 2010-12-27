@@ -29,7 +29,7 @@ clean:
 	rm -f $(OBJS) $(LIB_OBJS) $(TESTS)	
 
 check: library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) -lflint $(LIBS);)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -lflint;)
 	$(foreach prog, $(TESTS), $(prog);)
 
 .PHONY: profile clean check all

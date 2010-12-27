@@ -573,7 +573,7 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
-int fmpz_poly_fprint_pretty(FILE * file, 
+void fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
 
 static __inline__
@@ -583,9 +583,9 @@ int fmpz_poly_print(const fmpz_poly_t poly)
 }
 
 static __inline__
-int fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
+void fmpz_poly_print_pretty(const fmpz_poly_t poly, const char * x)
 {
-    return fmpz_poly_fprint_pretty(stdout, poly, x);
+    fmpz_poly_fprint_pretty(stdout, poly, x);
 }
 
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly);
