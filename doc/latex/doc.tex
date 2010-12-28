@@ -421,6 +421,82 @@ to represent an \code{unsigned long x}.
 
 \chapter{Integers}
 
+\section{Introduction}
+
+By default, an \code{fmpz_t} is implemented as an array of \code{fmpz}'s of 
+length one to allow passing by reference as one can do with GMP/ MPIR's 
+\code{mpz_t} type.  The \code{fmpz_t} type is simply a single limb, though 
+the user does not need to be aware of this except in one specific case 
+outlined below.
+
+In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's 
+\code{mpz_t}'s, with automatic memory management, however, in the first 
+place only one limb is used to implement them.  Once an \code{fmpz_t} 
+overflows a limb then a multiprecision integer is automatically allocated 
+and instead of storing the actual integer data the \code{long} which 
+implements the type becomes an index into a FLINT wide array of 
+\code{mpz_t}'s.
+
+These internal implementation details are not important for the user to 
+understand, except for three important things.
+
+Firstly, \code{fmpz_t}'s will be more efficient than \code{mpz_t}'s for 
+single limb operations, or more precisely for signed quantities whose 
+absolute value does not exceed \code{FLINT_BITS - 2} bits.
+
+Secondly, for small integers that fit into \code{FLINT_BITS - 2} bits 
+much less memory will be used than for an \code{mpz_t}.  When very many 
+\code{fmpz_t}'s are used, there can be important cache benefits on 
+account of this.
+
+Thirdly, it is important to understand how to deal with arrays of 
+\code{fmpz_t}'s.  As for \code{mpz_t}'s, there is an underlying type, 
+an \code{fmpz}, which can be used to create the array, e.g.\ 
+\begin{lstlisting}
+fmpz myarr[100];
+\end{lstlisting}
+Now recall that an \code{fmpz_t} is an array of length one of \code{fmpz}'s.
+Thus, a pointer to an \code{fmpz} can be used in place of an \code{fmpz_t}.
+For example, to find the sign of the third integer in our arrat we would 
+write 
+\begin{lstlisting}
+int sign = fmpz_sgn(myarr + 2);
+\end{lstlisting}
+
+The \code{fmpz} module provides routines for memory management, basic 
+manipulation and basic arithmetic.
+
+Unless otherwise specified, all functions in this section permit aliasing 
+between their input arguments and between their input and output 
+arguments.
+
+\section{Simple example}
+
+The following example computes the square of the integer $7$ and prints 
+the result.
+\begin{lstlisting}[language=c]
+#include "fmpz.h"
+...
+fmpz_t x, y;
+fmpz_init(x);
+fmpz_init(y);
+fmpz_set_ui(x, 7);
+fmpz_mul(y, x, x);
+fmpz_print(x);
+printf("^2 = ");
+fmpz_print(y);
+printf("\n");
+fmpz_clear(x);
+fmpz_clear(y);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+7^2 = 49
+\end{lstlisting}
+
+We now describe the functions available in the \code{fmpz} module.
+
 \input{fmpz.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
