@@ -462,7 +462,12 @@ The \code{fmpz_poly_t} data type represents elements of $\Z[x]$. The
 arithmetic, and conversions from or to other types.
 
 Each coefficient of an \code{fmpz_poly_t} is an integer of the FLINT 
-\code{fmpz_t} type.
+\code{fmpz_t} type.  There are two advantages of this model.  Firstly, 
+the \code{fmpz_t} type is memory managed, so the user can manipulate 
+individual coefficients of a polynomial without having to deal with 
+tedious memory management.  Secondly, a coefficient of an 
+\code{fmpz_poly_t} can be changed without changing the size of any 
+of the other coefficients.
 
 Unless otherwise specified, all functions in this section permit aliasing 
 between their input arguments and between their input and output arguments.
@@ -521,6 +526,8 @@ Functions in \code{fmpz_poly} do all the memory management for the user.
 One does not need to specify the maximum length or number of limbs per 
 coefficient in advance before using a polynomial object.  FLINT reallocates 
 space automatically as the computation proceeds, if more space is required. 
+Each coefficient is also managed separately, being resized as needed, 
+independently of the other coefficients.
 
 We now describe the functions available in \code{fmpz_poly}.
 
