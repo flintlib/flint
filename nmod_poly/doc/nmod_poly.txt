@@ -296,6 +296,15 @@ void nmod_poly_scalar_mul(nmod_poly_t res,
     Sets \code{res} to \code{(poly1, len1)} multiplied by $c$, 
     where $c$ is reduced modulo the modulus of \code{poly1}.
 
+void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
+
+   Set \code{output} to be the scalar multiple of \code{input} with leading
+   coefficient one (if such a polynomial exists). If \code{input} is zero
+   an exception is raised. If the leading coefficient of \code{input} is not
+   invertible, \code{output} is set to the multiple of \code{input} whose
+   leading coefficient is the greatest common divisor of the leading 
+   coefficient and the modulus of \code{input}.
+
 void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
                     long len1, mp_srcptr poly2, long len2, nmod_t mod)
 
