@@ -159,6 +159,24 @@ int nmod_poly_read(nmod_poly_t poly)
 }
 
 static __inline__
+long nmod_poly_length(nmod_poly_t poly)
+{
+    return poly->length;
+}
+
+static __inline__
+long nmod_poly_degree(nmod_poly_t poly)
+{
+    return poly->length - 1;
+}
+
+static __inline__
+mp_limb_t nmod_poly_modulus(nmod_poly_t poly)
+{
+    return poly->mod.n;
+}
+
+static __inline__
 void nmod_poly_zero(nmod_poly_t res)
 {
     res->length = 0;

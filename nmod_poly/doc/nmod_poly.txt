@@ -98,6 +98,27 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
 
 *******************************************************************************
 
+    Polynomial properties
+
+*******************************************************************************
+
+long nmod_poly_length(nmod_poly_t poly)
+
+   Return the length of the polynomial \code{poly}. The zero polynomial
+   has length zsro.
+
+long nmod_poly_degree(nmod_poly_t poly)
+
+   Return the degree of the polynomial \code{poly}. The zero polynomial
+   is deemed to have degree \code{-1}.
+
+mp_limb_t nmod_poly_modulus(nmod_poly_t poly)
+
+   Return the modulus of the polynomial \code{poly}. This will be a 
+   positive integer.
+
+*******************************************************************************
+
     Getting/setting coefficients
 
 *******************************************************************************
