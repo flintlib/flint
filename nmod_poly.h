@@ -177,6 +177,12 @@ mp_limb_t nmod_poly_modulus(nmod_poly_t poly)
 }
 
 static __inline__
+int nmod_poly_is_zero(nmod_poly_t poly)
+{
+    return (poly->length == 0);
+}
+
+static __inline__
 void nmod_poly_zero(nmod_poly_t res)
 {
     res->length = 0;

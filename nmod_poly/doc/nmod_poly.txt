@@ -117,6 +117,11 @@ mp_limb_t nmod_poly_modulus(nmod_poly_t poly)
    Return the modulus of the polynomial \code{poly}. This will be a 
    positive integer.
 
+int nmod_poly_is_zero(nmod_poly_t poly)
+
+   Return one if the polynomial \code{poly} is the zero polynomial,
+   otherwise return zero.
+
 *******************************************************************************
 
     Getting/setting coefficients
