@@ -123,7 +123,7 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
 
 char * nmod_poly_to_string(nmod_poly_t poly);
 
-int nmod_poly_from_string(nmod_poly_t poly, char * s);
+int nmod_poly_from_string(char * s, nmod_poly_t poly);
 
 static __inline__
 void nmod_poly_print(nmod_poly_t a)
@@ -139,6 +139,23 @@ void nmod_poly_print(nmod_poly_t a)
 
     for (i = 0; i < a->length; i++)
         printf(" %lu", a->coeffs[i]);
+}
+
+int nmod_poly_fread(FILE * f, nmod_poly_t poly);
+
+static __inline__
+void nmod_poly_fprint(FILE * f, nmod_poly_t poly)
+{
+   char * s = nmod_poly_to_string(poly);
+   if (fputs(s, f) < 0) 
+       printf("Error writing to file\n");
+   free(s);
+}
+
+static __inline__
+int nmod_poly_read(nmod_poly_t poly)
+{
+    return nmod_poly_fread(stdin, poly);
 }
 
 static __inline__

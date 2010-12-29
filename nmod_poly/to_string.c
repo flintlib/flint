@@ -53,7 +53,7 @@ char * nmod_poly_to_string(nmod_poly_t poly)
     ptr = buf + sprintf(buf, "%ld %lu", poly->length, poly->mod.n);
    
     if (poly->length)
-        ptr += sprintf(ptr, "  ");
+        ptr += sprintf(ptr, " ");
 
     for (i = 0; i < poly->length; i++)
         ptr += sprintf(ptr, " %lu", poly->coeffs[i]);

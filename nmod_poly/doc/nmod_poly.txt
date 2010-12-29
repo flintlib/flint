@@ -165,6 +165,29 @@ int nmod_poly_from_string(nmod_poly_t poly, char * s)
     is read, a positive value is returned, otherwise a non-positive value 
     is returned.
 
+int nmod_poly_fread(FILE * f, nmod_poly_t poly)
+
+   Read \code{poly} from the file stream \code{f}. If this is a file
+   that has just been written, the file should be closed then opened
+   again. The format is as described for \code{nmod_poly_print}. If a 
+   polynomial in the correct format is read, a positive value is returned, 
+   otherwise a non-positive value is returned.
+
+void nmod_poly_fprint(FILE * f, nmod_poly_t poly)
+
+   Write a polynomial to the file stream \code{f}. If this is a file
+   then the file should be closed and reopened before being read.
+   The format is as described for \code{nmod_poly_print}. If a 
+   polynomial in the correct format is read, a positive value is returned, 
+   otherwise a non-positive value is returned. If an error occurs 
+   whilst writing to the file, an error message is printed.
+
+int nmod_poly_read(nmod_poly_t poly)
+
+   Read \code{poly} from \code{stdin}. The format is as described for 
+   \code{nmod_poly_print}. If a polynomial in the correct format is read, a 
+   positive value is returned, otherwise a non-positive value is returned.
+
 *******************************************************************************
 
     Bit packing and unpacking

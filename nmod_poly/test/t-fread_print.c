@@ -35,7 +35,7 @@ main(void)
 {
     int i, result, r1;
 
-    printf("to/from_string....");
+    printf("fread_print....");
     fflush(stdout);
 
     /* Check aliasing of a and b */
@@ -43,27 +43,42 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero();
-        char * str;
+        FILE * f = fopen("nmod_poly_test", "w+");
+
+        if (!f)
+        {
+            printf("Error: unable to open file for writing.\n");
+            abort();
+        }
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, n_randint(100));
         
-        str = nmod_poly_to_string(a);
-        r1 = nmod_poly_from_string(str, b);
+        nmod_poly_fprint(f, a);
+        fflush(f);
+        fclose(f);
+        f = fopen("nmod_poly_test", "r");
+        r1 = nmod_poly_fread(f, b);
         
         result = (r1 && nmod_poly_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n");
             printf("r1 = %d, n = %lu\n", r1, a->mod.n);
-            printf("%s\n", str);
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(b), printf("\n\n");
+            fclose(f);
+            remove("nmod_poly_test");
             abort();
         }
 
-        free(str);
+        fclose(f);
+        if (remove("nmod_poly_test"))
+        {
+            printf("Error, unable to delete file nmod_poly_test\n");
+            abort();
+        }
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }

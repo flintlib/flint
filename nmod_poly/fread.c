@@ -25,32 +25,23 @@
 
 #include <mpir.h>
 #include <stdio.h>
-#include <string.h>
 #include "flint.h"
 #include "nmod_poly.h"
 
-int nmod_poly_from_string(char * s, nmod_poly_t poly)
+int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
-    const char * whitespace = " \t\n\r";
     long i, length;
     mp_limb_t n;
 
-    if (sscanf(s, "%ld %lu", &length, &n) != 2)
+    if (fscanf(f, "%ld %lu", &length, &n) != 2)
         return 0;
       
-    /* jump past length (n will be skipped in first loop iter)  */
-    s += strcspn(s, whitespace);
-    s += strspn(s, whitespace);
-    
     nmod_poly_fit_length(poly, length);
     poly->length = length;
     
     for (i = 0; i < length; i++)
     {
-        s += strcspn(s, whitespace); /* jump to next whitespace */
-        s += strspn(s, whitespace); /* skip whitespace */
-      
-        if (!sscanf(s, "%lu", &poly->coeffs[i]))
+        if (!fscanf(f, "%lu", &poly->coeffs[i]))
         {
             poly->length = i;
             return 0;
