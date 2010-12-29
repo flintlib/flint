@@ -35,71 +35,65 @@ int
 main(void)
 {
     int i, j, result = 1;
-    fmpz_t t;
     
-    printf("derivative....");
+    printf("evaluate....");
     fflush(stdout);
 
-    fmpz_init(t);
-
-    /* Check derivative by hand */
+    /* Check evaluation at 1 gives sum of coeffs */
     for (i = 0; i < 10000; i++)
     {
-        nmod_poly_t a, b;
+        nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero();
-        
+        mp_limb_t sum, eval;
+
         nmod_poly_init(a, n);
-        nmod_poly_init(b, n);
         nmod_poly_randtest(a, n_randint(100));
         
-        nmod_poly_derivative(b, a);
+        eval = nmod_poly_evaluate(a, 1);
         
-        if (a->length <= 1)
-            result = (b->length == 0);
-        else
-        {
-            for (j = 1; j < a->length; j++)
-            {
-                fmpz_set_ui(t, nmod_poly_get_coeff_ui(a, j));
-                fmpz_mul_ui(t, t, j);
-                fmpz_mod_ui(t, t, n);
-                result &= (fmpz_get_ui(t) == nmod_poly_get_coeff_ui(b, j - 1));
-            }
-        }
+        sum = 0;
+        for (j = 0; j < a->length; j++)
+           sum = n_addmod(sum, nmod_poly_get_coeff_ui(a, j), n);
         
+        result = (sum == eval);
         if (!result)
         {
             printf("FAIL:\n");
             printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
+            printf("sum = %lu, eval = %lu\n", sum, eval);
             nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
             abort();
         }
 
         nmod_poly_clear(a);
-        nmod_poly_clear(b);
     }
 
-    fmpz_clear(t);
-
-    /* Check aliasing */
+    /* Check a(c) + b(c) = (a + b)(c) */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero();
-        
+        mp_limb_t eval1, eval2, c;
+
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(b, n_randint(100));
         
-        nmod_poly_derivative(b, a);
-        nmod_poly_derivative(a, a);
+        c = n_randint(n);
         
-        result = nmod_poly_equal(a, b);
+        eval1 = nmod_poly_evaluate(a, c);
+        eval1 = n_addmod(eval1, nmod_poly_evaluate(b, c), n);
+        
+        nmod_poly_add(a, a, b);
+        eval2 = nmod_poly_evaluate(a, c);
+        
+
+        result = (eval1 == eval2);
         if (!result)
         {
             printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
+            printf("eval1 = %lu, eval2 = %lu\n", eval1, eval2);
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(b), printf("\n\n");
             abort();

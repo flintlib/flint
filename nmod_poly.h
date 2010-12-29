@@ -270,6 +270,8 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R,
 
 void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x);
 
+mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c);
+
 #endif
 
 
