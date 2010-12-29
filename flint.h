@@ -89,8 +89,16 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #undef mpn_copyi
 #define mpn_copyi(xxx, yyy, nnn) \
    do { \
-      ulong ixxx; \
+      long ixxx; \
       for (ixxx = 0; ixxx < nnn; ixxx++) \
+         (xxx)[ixxx] = (yyy)[ixxx]; \
+   } while (0)
+
+#undef mpn_copyd
+#define mpn_copyd(xxx, yyy, nnn) \
+   do { \
+      long ixxx; \
+      for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
