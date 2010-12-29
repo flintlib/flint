@@ -216,6 +216,20 @@ int nmod_poly_read(nmod_poly_t poly)
 
 *******************************************************************************
 
+    Reversal
+
+*******************************************************************************
+
+void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m)
+
+   Set \code{output} to the reverse of \code{input}, thinking of it as
+   a polynomial of length \code{m} (notionally zero padded if necessary.
+   The length \code{m} must be non-nagative, but there are no other
+   restrictions. The output polynomial will be set to length \code{m}
+   and then normalised.
+
+*******************************************************************************
+
     Bit packing and unpacking
 
 *******************************************************************************
