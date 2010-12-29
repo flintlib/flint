@@ -38,7 +38,7 @@ main(void)
     printf("fread_print....");
     fflush(stdout);
 
-    /* Check aliasing of a and b */
+    /* Check reading and writing to a file */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;

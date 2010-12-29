@@ -38,7 +38,7 @@ main(void)
     printf("to/from_string....");
     fflush(stdout);
 
-    /* Check aliasing of a and b */
+    /* Check to and from string */
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
