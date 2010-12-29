@@ -98,6 +98,28 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
 
 *******************************************************************************
 
+    Getting/setting coefficients
+
+*******************************************************************************
+
+ulong nmod_poly_get_coeff_ui(nmod_poly_t poly, ulong j)
+
+   Get the coefficient of \code{poly} at index \code{j} (coefficients 
+   being numbered with zero being the constant coefficient) and return
+   it as a \code{ulong}. If \code{j} refers to a coefficient beyond the
+   end of \code{poly}, zero is returned.
+
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
+
+   Set the coefficient of \code{poly} at index \code{j} (coefficients 
+   being numbered with zero being the constant coefficient) to the value
+   \code{c} reduced modulo the modulus of \code{poly}. If \code{j} 
+   refers to a coefficient beyond the current end of \code{poly}, the
+   polynomial is first resized, with intervening coefficients being
+   set to zero.
+
+*******************************************************************************
+
     Random generation
 
 *******************************************************************************

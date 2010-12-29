@@ -90,6 +90,14 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 void nmod_poly_randtest(nmod_poly_t poly, long len);
 
 static __inline__
+ulong nmod_poly_get_coeff_ui(nmod_poly_t poly, ulong j)
+{
+    return (j >= poly->length) ? 0 : poly->coeffs[j];
+}
+
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
+
+static __inline__
 void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
 {
     if (a != b)
