@@ -97,10 +97,6 @@ ulong nmod_poly_get_coeff_ui(nmod_poly_t poly, ulong j)
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
 
-char * nmod_poly_to_string(nmod_poly_t poly);
-
-int nmod_poly_from_string(nmod_poly_t poly, char * s);
-
 static __inline__
 void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
 {
@@ -125,21 +121,24 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
    return 1;
 }
 
+char * nmod_poly_to_string(nmod_poly_t poly);
+
+int nmod_poly_from_string(nmod_poly_t poly, char * s);
+
 static __inline__
 void nmod_poly_print(nmod_poly_t a)
 {
     long i;
 
-    if (a->length == 0)
-    {
-        printf("0");
-        return;
-    }
+    printf("%ld %lu", a->length, a->mod.n);
 
-    printf("%li ", a->length);
+    if (a->length == 0)
+        return;
+    else
+        printf(" ");
 
     for (i = 0; i < a->length; i++)
-        gmp_printf(" %Mu", a->coeffs[i]);
+        printf(" %lu", a->coeffs[i]);
 }
 
 static __inline__

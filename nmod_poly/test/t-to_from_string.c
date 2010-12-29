@@ -48,7 +48,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, n_randint(100));
-
+        
         str = nmod_poly_to_string(a);
         r1 = nmod_poly_from_string(b, str);
         

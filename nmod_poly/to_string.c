@@ -32,14 +32,14 @@
 
 char * nmod_poly_to_string(nmod_poly_t poly)
 {
-    ulong i;
+    long i;
     char * buf, * ptr;
 
     /* estimate for the length, n and three spaces */
 #if FLINT64
-    ulong size = 21*2 + 1;
+    long size = 21*2 + 1;
 #else
-    ulong size = 11*2 + 1;
+    long size = 11*2 + 1;
 #endif
 
     for (i = 0; i < poly->length; i++)
@@ -50,13 +50,13 @@ char * nmod_poly_to_string(nmod_poly_t poly)
     }
 
     buf = (char *) malloc(size);  
-    ptr = buf + sprintf(buf, "%lu %lu ", poly->length, poly->mod.n);
+    ptr = buf + sprintf(buf, "%ld %lu", poly->length, poly->mod.n);
    
+    if (poly->length)
+        ptr += sprintf(ptr, "  ");
+
     for (i = 0; i < poly->length; i++)
         ptr += sprintf(ptr, " %lu", poly->coeffs[i]);
    
-    if (poly->length == 0)
-        sprintf(ptr, " ");
-
     return buf;
 }

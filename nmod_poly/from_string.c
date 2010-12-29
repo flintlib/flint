@@ -32,10 +32,10 @@
 int nmod_poly_from_string(nmod_poly_t poly, char * s)
 {
     const char * whitespace = " \t\n\r";
-    ulong i, length;
+    long i, length;
     mp_limb_t n;
 
-    if (sscanf(s, "%lu %lu  ", &length, &n) != 2)
+    if (sscanf(s, "%ld %lu", &length, &n) != 2)
         return 0;
       
     /* jump past length (n will be skipped in first loop iter)  */
