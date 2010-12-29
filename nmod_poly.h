@@ -97,6 +97,10 @@ ulong nmod_poly_get_coeff_ui(nmod_poly_t poly, ulong j)
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
 
+char * nmod_poly_to_string(nmod_poly_t poly);
+
+int nmod_poly_from_string(nmod_poly_t poly, char * s);
+
 static __inline__
 void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
 {
