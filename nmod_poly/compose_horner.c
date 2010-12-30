@@ -28,24 +28,70 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-/* helper: add constant to constant coefficient of p */
-void __nmod_poly_add_ui(nmod_poly_t p, ulong c)
+void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
+                     long len1, mp_srcptr poly2, long len2, nmod_t mod)
 {
-    if (p->length) /* add to existing coeff */
-	    p->coeffs[0] = n_addmod(p->coeffs[0], c, p->mod.n);
-	else 
-        nmod_poly_set_coeff_ui(p, 0, c);
+    mp_limb_t * val1, * val2, t;
+    long i, m, m2;
+   
+    if (len1 == 1) /* constant only */
+    {
+        res[0] = poly1[0];
 
-    _nmod_poly_normalise(p);
+        return;
+    }
+
+    if (len2 == 1) /* evaluate at constant */
+    {
+        res[0] = _nmod_poly_evaluate(poly1, len1, mod, poly2[0]);
+
+        return;
+    }
+
+    if (len1 == 2) /* linear poly not dealt with by general case */
+    {
+        t = poly1[0];
+        _nmod_vec_scalar_mul(res, poly2, len2, mod, poly1[1]);
+        res[0] = n_addmod(res[0], t, mod.n);
+       
+        return;
+    }
+
+   	/* general case */
+    m = len1 - 1;
+	m2 = len2 - 1;
+
+    val1 = nmod_vec_init(m*m2 + 1);
+    val2 = nmod_vec_init(m*m2 + 1);
+
+    /* initial c_m * poly2 + c_{m-1} */
+    _nmod_vec_scalar_mul(val1, poly2, len2, mod, poly1[m]);
+    val1[0] = n_addmod(val1[0], poly1[m - 1], mod.n);
+    
+	m -= 2;
+    i = 1;
+
+	for ( ; m > 0; m--, i++) /* all but final val * poly2 + c_{m-1} */
+	{
+       _nmod_poly_mul_KS(val2, val1, m2*i + 1, poly2, len2, 0, mod);
+       MP_PTR_SWAP(val1, val2);
+       val1[0] = n_addmod(val1[0], poly1[m], mod.n);
+	}
+
+    /* final val * poly2 + c_0 */
+    t = poly1[0];
+    _nmod_poly_mul_KS(res, val1, m2*(len1 - 2) + 1, poly2, len2, 0, mod);
+	res[0] = n_addmod(res[0], t, mod.n);
+
+    nmod_vec_free(val1);
+    nmod_vec_free(val2);
 }
 
 void nmod_poly_compose_horner(nmod_poly_t res, 
                        const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-	long m;
-    mp_limb_t t;
-    nmod_poly_t val;
-	
+	long len_out;
+    
     if (poly1->length == 0) /* nothing to evaluate */ 
 	{
 	   nmod_poly_zero(res);
@@ -53,7 +99,7 @@ void nmod_poly_compose_horner(nmod_poly_t res,
 	   return;
 	}
 
-	if (poly1->length == 1 || poly2->length == 0) /* constant only */
+    if (poly2->length == 0) /* constant only */ 
 	{
 	   nmod_poly_set_coeff_ui(res, 0, poly1->coeffs[0]);
        nmod_poly_truncate(res, 1);
@@ -61,49 +107,16 @@ void nmod_poly_compose_horner(nmod_poly_t res,
 	   return;
 	}
 
-    if (poly2->length == 1) /* evaluate at constant */
-    {
-        t = nmod_poly_evaluate(poly1, poly2->coeffs[0]);
+    len_out = (poly1->length - 1)*(poly2->length - 1) + 1;
 
-        nmod_poly_set_coeff_ui(res, 0, t);
-        nmod_poly_truncate(res, 1);
+	nmod_poly_fit_length(res, len_out);
 
-        return;
-    }
+    _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, poly1->length, 
+        poly2->coeffs, poly2->length, poly1->mod);
 
-	if (poly1->length == 2) /* linear poly not dealt with by general case */
-	{
-		t = poly1->coeffs[0];
-		
-        nmod_poly_scalar_mul(res, poly2, poly1->coeffs[1]);
-        __nmod_poly_add_ui(res, t);
+    res->length = len_out;
 
-		return;
-	}
-
-	/* general case */
-    m = poly1->length - 1;
-	
-    nmod_poly_init(val, poly1->mod.n);
-
-	/* initial c_m * poly1 + c_{m-1} */
-    nmod_poly_scalar_mul(val, poly2, poly1->coeffs[m]);
-    __nmod_poly_add_ui(val, poly1->coeffs[m - 1]);
-	
-	m -= 2;
-
-	for ( ; m > 0; m--) /* all but final val * poly1 + c_{m-1} */
-	{
-       nmod_poly_mul(val, val, poly2);
-       __nmod_poly_add_ui(val, poly1->coeffs[m]);
-	}
-
-    /* final val * poly1 + c_0 */
-    t = poly1->coeffs[0];
-    nmod_poly_mul(res, val, poly2);
-	__nmod_poly_add_ui(res, t);
-
-    nmod_poly_clear(val);
+    _nmod_poly_normalise(res);
 
 	return;
 }

@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-g -ansi -pedantic -Wall
+CFLAGS=-g -O2 -ansi -pedantic -Wall
 
 LIBS=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs -L/home/wbhart/mpfr-3.0.0/.libs -lflint -lmpir -lmpfr -lm
 LIBS2=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs -L/home/wbhart/mpfr-3.0.0/.libs -lmpir -lmpfr -lm
