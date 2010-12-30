@@ -28,35 +28,35 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x)
+void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
 {
 	long j;
-    const long length = x->length;
-	const mp_limb_t n = x->mod.n;
-	const mp_limb_t ninv = x->mod.ninv;
-	mp_limb_t k;
-    
-	if (length <= 1) 
+    mp_limb_t k = 1;
+
+	for (j = 1; j < len; j++)
+	{
+		if (k <= 1) 
+            x_prime[j - 1] = k == 0 ? 0L : x[j];     
+        else 
+            x_prime[j - 1] = n_mulmod2_preinv(x[j], k, mod.n, mod.ninv);
+		
+        if (++k == mod.n) k = 0L;
+	}
+
+}
+
+void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x)
+{
+	if (x->length <= 1) 
 	{
 	   nmod_poly_zero(x_prime);
 	   return;
     }
 
-    nmod_poly_fit_length(x_prime, length - 1);	
+    nmod_poly_fit_length(x_prime, x->length - 1);	
 	
-	k = 1;
-	for (j = 1; j < length; j++)
-	{
-		if (k <= 1) 
-        {
-            if (k == 0) x_prime->coeffs[j - 1] = 0L; 
-		    else x_prime->coeffs[j - 1] = x->coeffs[j];
-        } else 
-            x_prime->coeffs[j - 1] = n_mulmod2_preinv(x->coeffs[j], k, n, ninv);
-		
-        if (++k == n) k = 0L;
-	}
+    _nmod_poly_derivative(x_prime->coeffs, x->coeffs, x->length, x->mod);
 
-	x_prime->length = length - 1;
+	x_prime->length = x->length - 1;
 	_nmod_poly_normalise(x_prime); 
 }

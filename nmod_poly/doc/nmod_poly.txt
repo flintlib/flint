@@ -454,6 +454,12 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q,
 
 *******************************************************************************
 
+void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
+
+   Set the first \code{len - 1} coefficients of \code{x_prime} to the 
+   derivative of \code{x} which is assumed to be of length \code{len}. 
+   It is assumed that \code{len > 0}.
+
 void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x)
 
    Set \code{x_prime} to the derivative of \code{x}. 

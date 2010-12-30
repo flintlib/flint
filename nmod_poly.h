@@ -273,6 +273,8 @@ void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, 
                                                  nmod_poly_t A, nmod_poly_t B);
 
+void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
+
 void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x);
 
 mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c);
