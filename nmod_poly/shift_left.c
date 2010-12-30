@@ -34,7 +34,7 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
     mpn_zero(res, k);
 }
 
-void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k)
+void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 {
     nmod_poly_fit_length(res, poly->length + k);
    

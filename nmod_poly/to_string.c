@@ -30,7 +30,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-char * nmod_poly_to_string(nmod_poly_t poly)
+char * nmod_poly_to_string(const nmod_poly_t poly)
 {
     long i;
     char * buf, * ptr;

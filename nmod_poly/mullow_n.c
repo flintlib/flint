@@ -30,8 +30,8 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2,
-                   long trunc)
+nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
+                   const nmod_poly_t poly2, long trunc)
 {
     long bits, bits2;
 

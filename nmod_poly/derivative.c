@@ -45,7 +45,7 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
 
 }
 
-void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x)
+void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 {
 	if (x->length <= 1) 
 	{

@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2)
+nmod_poly_mul(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
     long bits, bits2;
 

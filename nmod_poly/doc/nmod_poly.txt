@@ -86,7 +86,7 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
     Efficiently swaps \code{poly1} and \code{poly2} by swapping pointers 
     internally. 
 
-mp_bitcnt_t nmod_poly_max_bits(nmod_poly_t poly)
+mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 
     Returns the maximum number of bits of any coefficient of \code{poly}.
 
@@ -102,22 +102,22 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
 
 *******************************************************************************
 
-long nmod_poly_length(nmod_poly_t poly)
+long nmod_poly_length(const nmod_poly_t poly)
 
    Return the length of the polynomial \code{poly}. The zero polynomial
    has length zsro.
 
-long nmod_poly_degree(nmod_poly_t poly)
+long nmod_poly_degree(const nmod_poly_t poly)
 
    Return the degree of the polynomial \code{poly}. The zero polynomial
    is deemed to have degree \code{-1}.
 
-mp_limb_t nmod_poly_modulus(nmod_poly_t poly)
+mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 
    Return the modulus of the polynomial \code{poly}. This will be a 
    positive integer.
 
-int nmod_poly_is_zero(nmod_poly_t poly)
+int nmod_poly_is_zero(const nmod_poly_t poly)
 
    Return one if the polynomial \code{poly} is the zero polynomial,
    otherwise return zero.
@@ -128,7 +128,7 @@ int nmod_poly_is_zero(nmod_poly_t poly)
 
 *******************************************************************************
 
-ulong nmod_poly_get_coeff_ui(nmod_poly_t poly, ulong j)
+ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
    Get the coefficient of \code{poly} at index \code{j} (coefficients 
    being numbered with zero being the constant coefficient) and return
@@ -160,7 +160,7 @@ void nmod_poly_randtest(nmod_poly_t poly, long len)
 
 *******************************************************************************
 
-int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
     Returns $1$ if the polynomials are equal, otherwise $0$.
 
@@ -170,7 +170,7 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
 
 *******************************************************************************
 
-void nmod_poly_print(nmod_poly_t a)
+void nmod_poly_print(const nmod_poly_t a)
 
     Prints the polynomial to \code{stdout}. The length is printed, 
     followed by a space, then the modulus. If the length is zero this is
@@ -178,13 +178,13 @@ void nmod_poly_print(nmod_poly_t a)
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
-char * nmod_poly_to_string(nmod_poly_t poly)
+char * nmod_poly_to_string(const nmod_poly_t poly)
 
     Writes \code{poly} to a string representation. The format is as 
     described for \code{nmod_poly_print}. The string must be freed by the 
     user when finished. For this it is sufficient to call \code{free}.
 
-int nmod_poly_from_string(nmod_poly_t poly, char * s)
+int nmod_poly_from_string(const char * s, nmod_poly_t poly)
 
     Read \code{poly} from a string \code{s}. The format is as described
     for \code{nmod_poly_print}. If a polynomial in the correct format
@@ -199,7 +199,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
    polynomial in the correct format is read, a positive value is returned, 
    otherwise a non-positive value is returned.
 
-void nmod_poly_fprint(FILE * f, nmod_poly_t poly)
+void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
    Write a polynomial to the file stream \code{f}. If this is a file
    then the file should be closed and reopened before being read.
@@ -228,7 +228,7 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
    non-negative, but there are no other restrictions. The polynomial
    \code{output} must have space for \code{m} coefficients. 
 
-void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m)
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
 
    Set \code{output} to the reverse of \code{input}, thinking of it as
    a polynomial of length \code{m} (notionally zero padded if necessary).
@@ -326,7 +326,7 @@ void _nmod_poly_make_monic(mp_ptr output,
    leading coefficient is the greatest common divisor of the leading 
    coefficient and the modulus of \code{input}.
 
-void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
+void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
    Set \code{output} to be the scalar multiple of \code{input} with leading
    coefficient one (if such a polynomial exists). If \code{input} is zero
@@ -347,7 +347,7 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
    \code{k} coefficients. Assumes that \code{res} has space for 
    \code{len + k} coefficients.
 
-void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k)
+void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 
    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
    multiplied by $x^k$. 
@@ -358,7 +358,7 @@ void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
    \code{k} coefficients. It is assumed that \code{k <= len} and that
    \code{res} has space for at least \code{len - k} coefficients.
 
-void nmod_poly_shift_right(nmod_poly_t res, nmod_poly_t poly, long k)
+void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
 
    Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
    divide by $x^k$ and throw away the remainder. If \code{k} is greater than
@@ -425,18 +425,19 @@ void nmod_poly_mul_KS(nmod_poly_t res,
     bits wide. If \code{bits} is set to $0$ an appropriate value 
     is computed automatically.
 
-void nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly, nmod_poly_t poly2)
+void nmod_poly_mul(nmod_poly_t res, 
+                               const nmod_poly_t poly, const nmod_poly_t poly2)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
-void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, 
-                                         nmod_poly_t poly2, long trunc)
+void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
+                                         const nmod_poly_t poly2, long trunc)
 
     Sets \code{res} to the first \code{trunc} coefficients of the 
     product of \code{poly1} and \code{poly2}.
 
-void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
-                                          nmod_poly_t poly2, long n)
+void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
+                                          const nmod_poly_t poly2, long n)
 
     Sets the high $n$ coefficients of \code{res} to the high $n$ 
     coefficients of the product of \code{poly1} and \code{poly2}, 
@@ -455,7 +456,7 @@ void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R,
     If $\len(B) = 0$ an exception is raised.
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, 
-                               nmod_poly_t R, nmod_poly_t A, nmod_poly_t B)
+                       nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     Finds $Q$ and $R$ such that $A = B Q + R$ with $\len(R) < \len(B)$. 
     If $\len(B) = 0$ an exception is raised.
@@ -472,7 +473,7 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
    derivative of \code{x} which is assumed to be of length \code{len}. 
    It is assumed that \code{len > 0}.
 
-void nmod_poly_derivative(nmod_poly_t x_prime, nmod_poly_t x)
+void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
    Set \code{x_prime} to the derivative of \code{x}. 
 
@@ -488,7 +489,7 @@ mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
    modulus of \code{poly}. The value \code{c} should be reduced modulo
    the modulus. The algorithm used is Horner's method.
 
-void nmod_poly_compose(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2)
+void nmod_poly_compose(nmod_poly_t res, const nmod_poly_t poly1, const nmod_poly_t poly2)
 
   Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
   i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 

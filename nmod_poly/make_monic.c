@@ -38,7 +38,7 @@ void _nmod_poly_make_monic(mp_ptr output,
     _nmod_vec_scalar_mul(output, input, len, mod, inv);
 }
 
-void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
+void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 {
     mp_limb_t inv;
     
