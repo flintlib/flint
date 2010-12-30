@@ -286,7 +286,7 @@ mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
 
 mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
 
-void nmod_poly_compose(nmod_poly_t res, 
+void nmod_poly_compose_horner(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 #endif

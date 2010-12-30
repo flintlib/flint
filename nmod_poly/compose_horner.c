@@ -39,7 +39,7 @@ void __nmod_poly_add_ui(nmod_poly_t p, ulong c)
     _nmod_poly_normalise(p);
 }
 
-void nmod_poly_compose(nmod_poly_t res, 
+void nmod_poly_compose_horner(nmod_poly_t res, 
                        const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
 	long m;
