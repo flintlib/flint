@@ -210,6 +210,8 @@ void _nmod_poly_make_monic(mp_ptr output,
 
 void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input);
 
+void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k);
+
 void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k);
 
 void nmod_poly_shift_right(nmod_poly_t res, nmod_poly_t poly, long k);

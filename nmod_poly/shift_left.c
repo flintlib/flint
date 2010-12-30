@@ -28,13 +28,18 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
+{
+    mpn_copyd(res + k, poly, len);
+    mpn_zero(res, k);
+}
+
 void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k)
 {
-   nmod_poly_fit_length(res, poly->length + k);
-
-   mpn_copyd(res->coeffs + k, poly->coeffs, poly->length);
-   mpn_zero(res->coeffs, k);
+    nmod_poly_fit_length(res, poly->length + k);
    
-   res->length = poly->length + k;
+    _nmod_poly_shift_left(res->coeffs, poly->coeffs, poly->length, k);
+   
+    res->length = poly->length + k;
 }
 
