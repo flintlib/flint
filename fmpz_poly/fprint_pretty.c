@@ -62,7 +62,7 @@ int _fmpz_poly_fprint_pretty(FILE * file,
             r = fprintf(file, "*%s^%ld", x, i);
     }
 
-    for ( ; (r > 0) && (i > 1); --i)
+    for (--i; (r > 0) && (i > 1); --i)
     {
         if (*(poly + i) == 0)
             continue;
