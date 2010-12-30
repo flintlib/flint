@@ -454,14 +454,23 @@ void nmod_poly_mul(nmod_poly_t res,
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
+void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                                mp_srcptr poly2, long len2, long n, nmod_t mod)
+
+    Sets \code{res} to the first \code{trunc} coefficients of the 
+    product of \code{poly1} of length \code{len1} and \code{poly2} of
+    length \code{len2}. It is assumed that \code{0 < n <= len1 + len2 - 1} 
+    and that \code{len1 >= len2 > 0}. No aliasing of inputs and output
+    is permitted.
+
 void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                                         const nmod_poly_t poly2, long trunc)
+                                           const nmod_poly_t poly2, long trunc)
 
     Sets \code{res} to the first \code{trunc} coefficients of the 
     product of \code{poly1} and \code{poly2}.
 
 void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
-                             mp_srcptr poly2, long len2, long n, nmod_t mod)
+                                 mp_srcptr poly2, long len2, long n, nmod_t mod)
 
     Sets the high $n$ coefficients of \code{res} to the high $n$
     coefficients of the product of \code{poly1} of length \code{len1}
