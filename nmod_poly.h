@@ -214,6 +214,8 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k);
 
 void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k);
 
+void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k);
+
 void nmod_poly_shift_right(nmod_poly_t res, nmod_poly_t poly, long k);
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
