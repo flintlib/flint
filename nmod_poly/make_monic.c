@@ -40,8 +40,6 @@ void _nmod_poly_make_monic(mp_ptr output,
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 {
-    mp_limb_t inv;
-    
     if (input->length == 0)
     {
         printf("Exception: division by zero in nmod_poly_invert\n");

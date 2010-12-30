@@ -29,7 +29,7 @@
 #include "nmod_poly.h"
 
 /* helper: add constant to constant coefficient of p */
-void _nmod_poly_add_ui(nmod_poly_t p, ulong c)
+void __nmod_poly_add_ui(nmod_poly_t p, ulong c)
 {
     if (p->length) /* add to existing coeff */
 	    p->coeffs[0] = n_addmod(p->coeffs[0], c, p->mod.n);
@@ -76,7 +76,7 @@ void nmod_poly_compose(nmod_poly_t res,
 		t = poly1->coeffs[0];
 		
         nmod_poly_scalar_mul(res, poly2, poly1->coeffs[1]);
-        _nmod_poly_add_ui(res, t);
+        __nmod_poly_add_ui(res, t);
 
 		return;
 	}
@@ -88,20 +88,20 @@ void nmod_poly_compose(nmod_poly_t res,
 
 	/* initial c_m * poly1 + c_{m-1} */
     nmod_poly_scalar_mul(val, poly2, poly1->coeffs[m]);
-    _nmod_poly_add_ui(val, poly1->coeffs[m - 1]);
+    __nmod_poly_add_ui(val, poly1->coeffs[m - 1]);
 	
 	m -= 2;
 
 	for ( ; m > 0; m--) /* all but final val * poly1 + c_{m-1} */
 	{
        nmod_poly_mul(val, val, poly2);
-       _nmod_poly_add_ui(val, poly1->coeffs[m]);
+       __nmod_poly_add_ui(val, poly1->coeffs[m]);
 	}
 
     /* final val * poly1 + c_0 */
     t = poly1->coeffs[0];
     nmod_poly_mul(res, val, poly2);
-	_nmod_poly_add_ui(res, t);
+	__nmod_poly_add_ui(res, t);
 
     nmod_poly_clear(val);
 
