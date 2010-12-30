@@ -282,6 +282,8 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
+mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c);
+
 mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
 
 void nmod_poly_compose(nmod_poly_t res, 

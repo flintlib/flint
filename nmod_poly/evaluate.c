@@ -28,28 +28,32 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c)
+mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
 {
-	long m;
-    
-    if (poly->length == 0) 
+    long m;
+    mp_limb_t val;
+
+    if (len == 0) 
         return 0;
 
-	if (poly->length == 1 || c == 0) 
-        return poly->coeffs[0];
+	if (len == 1 || c == 0) 
+        return poly[0];
 
-	m = poly->length - 1;
-	mp_limb_t n = poly->mod.n;
-	mp_limb_t ninv = poly->mod.ninv;
-
-    ulong val = poly->coeffs[m];
+	m = len - 1;
+	
+    val = poly[m];
     m--;
 
 	for ( ; m >= 0; m--)
 	{
-        val = n_mulmod2_preinv(val, c, n, ninv);
-	    val = n_addmod(val, poly->coeffs[m], n);
+        val = n_mulmod2_preinv(val, c, mod.n, mod.ninv);
+	    val = n_addmod(val, poly[m], mod.n);
 	} 
 
-	return val;
+    return val;
+}
+
+mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c)
+{
+    return _nmod_poly_evaluate(poly->coeffs, poly->length, poly->mod, c);
 }
