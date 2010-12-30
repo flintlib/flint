@@ -30,13 +30,13 @@
 
 void nmod_poly_shift_right(nmod_poly_t res, nmod_poly_t poly, long k)
 {
+   const long len = poly->length - k;
+
    if (k >= poly->length) /* shift all coeffs out */
    {
       res->length = 0;
       return;
    }
-
-   const long len = poly->length - k;
 
    nmod_poly_fit_length(res, len);
 

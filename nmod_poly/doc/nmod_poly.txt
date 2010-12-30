@@ -421,3 +421,9 @@ mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
    Evaluate \code{poly} at the value \code{c} and reduce modulo the 
    modulus of \code{poly}. The value \code{c} should be reduced modulo
    the modulus. The algorithm used is Horner's method.
+
+void nmod_poly_compose(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2)
+
+  Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+  i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+  Horner's algorithm.
