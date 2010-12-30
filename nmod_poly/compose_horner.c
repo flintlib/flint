@@ -73,14 +73,14 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
 
 	for ( ; m > 0; m--, i++) /* all but final val * poly2 + c_{m-1} */
 	{
-       _nmod_poly_mul_KS(val2, val1, m2*i + 1, poly2, len2, 0, mod);
+       _nmod_poly_mul(val2, val1, m2*i + 1, poly2, len2, mod);
        MP_PTR_SWAP(val1, val2);
        val1[0] = n_addmod(val1[0], poly1[m], mod.n);
 	}
 
     /* final val * poly2 + c_0 */
     t = poly1[0];
-    _nmod_poly_mul_KS(res, val1, m2*(len1 - 2) + 1, poly2, len2, 0, mod);
+    _nmod_poly_mul(res, val1, m2*(len1 - 2) + 1, poly2, len2, mod);
 	res[0] = n_addmod(res[0], t, mod.n);
 
     nmod_vec_free(val1);

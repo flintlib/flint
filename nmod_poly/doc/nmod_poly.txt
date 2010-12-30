@@ -425,6 +425,14 @@ void nmod_poly_mul_KS(nmod_poly_t res,
     bits wide. If \code{bits} is set to $0$ an appropriate value 
     is computed automatically.
 
+void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
+                                        mp_srcptr poly2, long len2, nmod_t mod)
+
+   Sets \code{res} to the product of \code{poly1} of length \code{len1} 
+   and \code{poly2} of length \code{len2}. Assumes \code{len1 >= len2 > 0}.
+   No aliasing is permitted between the inputs and the output.
+
+
 void nmod_poly_mul(nmod_poly_t res, 
                                const nmod_poly_t poly, const nmod_poly_t poly2)
 
