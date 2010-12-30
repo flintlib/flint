@@ -205,6 +205,9 @@ void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m);
 
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
+void _nmod_poly_make_monic(mp_ptr output, 
+                                   mp_srcptr input, long len, nmod_t mod);
+
 void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input);
 
 void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k);

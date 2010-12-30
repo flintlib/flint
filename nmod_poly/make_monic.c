@@ -29,6 +29,15 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
+void _nmod_poly_make_monic(mp_ptr output, 
+                            mp_srcptr input, long len, nmod_t mod)
+{
+    mp_limb_t inv;
+    
+    inv = n_invmod(input[len - 1], mod.n);
+    _nmod_vec_scalar_mul(output, input, len, mod, inv);
+}
+
 void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
 {
     mp_limb_t inv;
@@ -39,6 +48,8 @@ void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
         abort();
     }
 
-    inv = n_invmod(input->coeffs[input->length - 1], input->mod.n);
-    nmod_poly_scalar_mul(output, input, inv);
+    nmod_poly_fit_length(output, input->length);
+    _nmod_poly_make_monic(output->coeffs, 
+                            input->coeffs, input->length, input->mod);
+    output->length = input->length;
 }
