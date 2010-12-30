@@ -235,8 +235,8 @@ _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R,
 }
 
 void
-nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, nmod_poly_t A,
-                          nmod_poly_t B)
+nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
+                          const nmod_poly_t B)
 {
     mp_ptr Q_coeffs, R_coeffs;
     nmod_poly_t t1, t2;

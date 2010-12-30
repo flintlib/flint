@@ -29,26 +29,72 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
-nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2,
-                   long trunc)
+void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, long n, nmod_t mod)
 {
     long bits, bits2;
-
-    if (trunc <= 6)
+    
+    if (len1 + len2 <= 6 || n <= 6)
     {
-        nmod_poly_mullow_classical(res, poly1, poly2, trunc);
+        _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
         return;
     }
 
-    bits = FLINT_BITS - (long) poly1->mod.norm;
-    bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+    bits = FLINT_BITS - (long) mod.norm;
+    bits2 = FLINT_BIT_COUNT(len1);
 
     if (2 * bits + bits2 <= FLINT_BITS)
-        nmod_poly_mullow_classical(res, poly1, poly2, trunc);
+        _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
+        _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, 0, n, mod);
+}
+
+void nmod_poly_mullow_n(nmod_poly_t res, 
+              const nmod_poly_t poly1, const nmod_poly_t poly2, long trunc)
+{
+    long len1, len2, len_out;
+    
+    len1 = poly1->length;
+    len2 = poly2->length;
+
+    len_out = poly1->length + poly2->length - 1;
+    if (trunc > len_out)
+        trunc = len_out;
+    
+    if (len1 == 0 || len2 == 0 || trunc == 0)
     {
-        nmod_poly_mul_KS(res, poly1, poly2, 0);
-        nmod_poly_truncate(res, trunc);
+        nmod_poly_zero(res);
+
+        return;
     }
+
+    if (res == poly1 || res == poly2)
+    {
+        nmod_poly_t temp;
+
+        nmod_poly_init2(temp, poly1->mod.n, trunc);
+
+        if (len1 >= len2)
+            _nmod_poly_mullow_n(temp->coeffs, poly1->coeffs, len1,
+                           poly2->coeffs, len2, trunc, poly1->mod);
+        else
+            _nmod_poly_mullow_n(temp->coeffs, poly2->coeffs, len2,
+                           poly1->coeffs, len1, trunc, poly1->mod);
+        
+        nmod_poly_swap(temp, res);
+        nmod_poly_clear(temp);
+    } else
+    {
+        nmod_poly_fit_length(res, trunc);
+        
+        if (len1 >= len2)
+            _nmod_poly_mullow_n(res->coeffs, poly1->coeffs, len1,
+                           poly2->coeffs, len2, trunc, poly1->mod);
+        else
+            _nmod_poly_mullow_n(res->coeffs, poly2->coeffs, len2,
+                           poly1->coeffs, len1, trunc, poly1->mod);
+    }
+
+    res->length = trunc;
+    _nmod_poly_normalise(res);
 }

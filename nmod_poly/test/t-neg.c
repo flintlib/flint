@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -35,40 +34,28 @@ int
 main(void)
 {
     int i, result;
-    printf("mulhigh_n....");
+
+    printf("neg....");
     fflush(stdout);
 
-    /* Compare with left truncated product of a and b */
-    for (i = 0; i < 2000; i++)
+    /* Check neg neg a == a */
+    for (i = 0; i < 10000; i++)
     {
-        nmod_poly_t a, b, c;
-        long j, n;
-
-        mp_limb_t m = n_randtest_not_zero();
-
-        nmod_poly_init(a, m);
-        nmod_poly_init(b, m);
-        nmod_poly_init(c, m);
-        n = n_randint(50);
-        nmod_poly_randtest(b, n);
-        nmod_poly_randtest(c, n);
-
-        nmod_poly_mulhigh_n(a, b, c, n);
-        nmod_poly_mul(b, b, c);
-        for (j = 0; j + 1 < n; j++)
-        {
-            if (j < a->length)
-                a->coeffs[j] = 0;
-            if (j < b->length)
-                b->coeffs[j] = 0;
-        }
-        _nmod_poly_normalise(a);
-        _nmod_poly_normalise(b);
+        nmod_poly_t a, b;
+        mp_limb_t n = n_randtest_not_zero();
+        
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_randtest(a, n_randint(100));
+        
+        nmod_poly_neg(b, a);
+        nmod_poly_neg(b, b);
 
         result = (nmod_poly_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n");
+            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(b), printf("\n\n");
             abort();
@@ -76,7 +63,6 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
-        nmod_poly_clear(c);
     }
 
     printf("PASS\n");

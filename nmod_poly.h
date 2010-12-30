@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <mpir.h>
 #include "nmod_vec.h"
+#include "ulong_extras.h"
 
 typedef struct
 {
@@ -56,7 +57,7 @@ void nmod_poly_clear(nmod_poly_t poly);
 void nmod_poly_fit_length(nmod_poly_t poly, long alloc);
 
 static __inline__
-mp_bitcnt_t nmod_poly_max_bits(nmod_poly_t poly)
+mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
@@ -90,7 +91,15 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
 void nmod_poly_randtest(nmod_poly_t poly, long len);
 
 static __inline__
-void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
+ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
+{
+    return (j >= poly->length) ? 0 : poly->coeffs[j];
+}
+
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
+
+static __inline__
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 {
     if (a != b)
     {
@@ -101,7 +110,7 @@ void nmod_poly_set(nmod_poly_t a, nmod_poly_t b)
 }
 
 static __inline__
-int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 {
     if (a->length != b->length)
         return 0;
@@ -113,21 +122,65 @@ int nmod_poly_equal(nmod_poly_t a, nmod_poly_t b)
    return 1;
 }
 
+char * nmod_poly_to_string(const nmod_poly_t poly);
+
+int nmod_poly_from_string(const char * s, nmod_poly_t poly);
+
 static __inline__
-void nmod_poly_print(nmod_poly_t a)
+void nmod_poly_print(const nmod_poly_t a)
 {
     long i;
 
-    if (a->length == 0)
-    {
-        printf("0");
-        return;
-    }
+    printf("%ld %lu", a->length, a->mod.n);
 
-    printf("%li ", a->length);
+    if (a->length == 0)
+        return;
+    else
+        printf(" ");
 
     for (i = 0; i < a->length; i++)
-        gmp_printf(" %Mu", a->coeffs[i]);
+        printf(" %lu", a->coeffs[i]);
+}
+
+int nmod_poly_fread(FILE * f, nmod_poly_t poly);
+
+static __inline__
+void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+{
+   char * s = nmod_poly_to_string(poly);
+   if (fputs(s, f) < 0) 
+       printf("Error writing to file\n");
+   free(s);
+}
+
+static __inline__
+int nmod_poly_read(nmod_poly_t poly)
+{
+    return nmod_poly_fread(stdin, poly);
+}
+
+static __inline__
+long nmod_poly_length(const nmod_poly_t poly)
+{
+    return poly->length;
+}
+
+static __inline__
+long nmod_poly_degree(const nmod_poly_t poly)
+{
+    return poly->length - 1;
+}
+
+static __inline__
+mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
+{
+    return poly->mod.n;
+}
+
+static __inline__
+int nmod_poly_is_zero(const nmod_poly_t poly)
+{
+    return (poly->length == 0);
 }
 
 static __inline__
@@ -146,7 +199,24 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
     }
 }
 
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m);
+
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m);
+
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
+
+void _nmod_poly_make_monic(mp_ptr output, 
+                                   mp_srcptr input, long len, nmod_t mod);
+
+void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
+
+void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k);
+
+void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k);
+
+void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k);
+
+void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k);
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
                                        mp_srcptr poly2, long len2, nmod_t mod);
@@ -193,19 +263,46 @@ void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, long len1,
 void nmod_poly_mul_KS(nmod_poly_t res, 
            const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
 
-void nmod_poly_mul(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2);
+void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
+               mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod);
 
-void nmod_poly_mullow_n(nmod_poly_t res, nmod_poly_t poly1, 
-                                         nmod_poly_t poly2, long trunc);
+void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
+                            const nmod_poly_t poly2, mp_bitcnt_t bits, long n);
 
-void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1, 
-                                          nmod_poly_t poly2, long n);
+void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+
+void nmod_poly_mul(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                           mp_srcptr poly2, long len2, long trunc, nmod_t mod);
+
+void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
+                                         const nmod_poly_t poly2, long trunc);
+
+void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, long n, nmod_t mod);
+
+void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
+                                          const nmod_poly_t poly2, long n);
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, 
-                                                 nmod_poly_t A, nmod_poly_t B);
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
+
+void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
+
+mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c);
+
+mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
+
+void nmod_poly_compose_horner(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 #endif
 

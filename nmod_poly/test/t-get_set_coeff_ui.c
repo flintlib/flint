@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -35,48 +34,36 @@ int
 main(void)
 {
     int i, result;
-    printf("mulhigh_n....");
+    ulong j;
+
+    printf("get/set_coeff_ui....");
     fflush(stdout);
 
-    /* Compare with left truncated product of a and b */
-    for (i = 0; i < 2000; i++)
+    /* Check aliasing of a and b */
+    for (i = 0; i < 10000; i++)
     {
-        nmod_poly_t a, b, c;
-        long j, n;
+        nmod_poly_t a;
+        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t c1 = n_randtest(), c2;
+        
+        j = n_randint(100);
 
-        mp_limb_t m = n_randtest_not_zero();
+        nmod_poly_init(a, n);
+        nmod_poly_randtest(a, n_randint(100));
 
-        nmod_poly_init(a, m);
-        nmod_poly_init(b, m);
-        nmod_poly_init(c, m);
-        n = n_randint(50);
-        nmod_poly_randtest(b, n);
-        nmod_poly_randtest(c, n);
-
-        nmod_poly_mulhigh_n(a, b, c, n);
-        nmod_poly_mul(b, b, c);
-        for (j = 0; j + 1 < n; j++)
-        {
-            if (j < a->length)
-                a->coeffs[j] = 0;
-            if (j < b->length)
-                b->coeffs[j] = 0;
-        }
-        _nmod_poly_normalise(a);
-        _nmod_poly_normalise(b);
-
-        result = (nmod_poly_equal(a, b));
+        nmod_poly_set_coeff_ui(a, j, c1);
+        c2 = nmod_poly_get_coeff_ui(a, j);
+        
+        result = (c2 == c1 % n);
         if (!result)
         {
             printf("FAIL:\n");
+            printf("j = %lu, c1 = %lu, c2 = %lu, n = %lu\n", j, c1, c2, a->mod.n);
             nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
             abort();
         }
 
         nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(c);
     }
 
     printf("PASS\n");
