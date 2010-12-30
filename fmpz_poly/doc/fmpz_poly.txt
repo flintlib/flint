@@ -1579,6 +1579,13 @@ int fmpz_poly_read(fmpz_poly_t poly)
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
 
+int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
+
+    Reads a polynomial in pretty format from \code{stdin}.
+
+    For further details, see the documentation for the function 
+    \code{fmpz_poly_fread_pretty()}.
+
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
     Read a polynomial from the stream \code{file}, storing the result 
@@ -1586,4 +1593,44 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
+
+int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
+
+    Reads a polynomial from the file \code{file} and sets \code{poly} 
+    to this polynomial.  The string \code{*x} is set to the variable 
+    name that is used in the input.
+
+    The parser is implemented via a finite state machine as follows:
+    \begin{verbatim}
+        state   event     next state
+        ----------------------------
+          0      '-'          1
+                 D            2
+                 V0           3
+          1      D            2
+                 V0           3
+          2      D            2
+                 '*'          4
+                 '+', '-'     1
+          3      V            3
+                 '^'          5
+                 '+', '-'     1
+          4      V0           3
+          5      D            6
+          6      D            6
+                 '+', '-'     1
+    \end{verbatim}
+    Here, {\tt D} refers to any digit, {\tt V0} to any character which 
+    is allowed as the first character in the variable name (an alphetic 
+    character), and {\tt V} to any character which is allowed in the 
+    remaining part of the variable name (an alphanumeric character or 
+    underscore).
+
+    Once we encounter a character which does not fit into the above 
+    pattern, we stop.
+
+    Returns a positive value, equal to the number of characters read from 
+    the file, in case of success.  Returns a non-positive value in case of 
+    failure, which could either be a read error or the indicator of a 
+    malformed input.
 
