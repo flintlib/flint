@@ -263,6 +263,12 @@ void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, long len1,
 void nmod_poly_mul_KS(nmod_poly_t res, 
            const nmod_poly_t poly1, const nmod_poly_t poly2, mp_bitcnt_t bits);
 
+void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
+               mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod);
+
+void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
+                            const nmod_poly_t poly2, mp_bitcnt_t bits, long n);
+
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
                                        mp_srcptr poly2, long len2, nmod_t mod);
 
@@ -271,6 +277,9 @@ void nmod_poly_mul(nmod_poly_t res,
 
 void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
                                          const nmod_poly_t poly2, long trunc);
+
+void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, long n, nmod_t mod);
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
                                           const nmod_poly_t poly2, long n);

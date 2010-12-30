@@ -42,7 +42,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;
-        ulong j, n;
+        long j, n;
 
         mp_limb_t m = n_randtest_not_zero();
 

@@ -29,26 +29,73 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
-nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                    const nmod_poly_t poly2, long n)
+void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, long n, nmod_t mod)
 {
     long bits, bits2;
+    long len_out = len1 + len2 - 1;
 
-    if (n <= 6)
+    if (len1 + len2 <= 6)
     {
-        if (n == 0)
-            nmod_poly_mul_classical(res, poly1, poly2);
-        else
-            nmod_poly_mulhigh_classical(res, poly1, poly2, n - 1);
+        _nmod_poly_mulhigh_classical(res, poly1, len1, poly2, len2, len_out - n, mod);
         return;
     }
 
-    bits = FLINT_BITS - (long) poly1->mod.norm;
-    bits2 = FLINT_BIT_COUNT(FLINT_MAX(poly1->length, poly2->length));
+    bits = FLINT_BITS - (long) mod.norm;
+    bits2 = FLINT_BIT_COUNT(len1);
 
     if (2 * bits + bits2 <= FLINT_BITS)
-        nmod_poly_mulhigh_classical(res, poly1, poly2, n - 1);
+        _nmod_poly_mulhigh_classical(res, poly1, len1, poly2, len2, len_out - n, mod);
     else
-        nmod_poly_mul_KS(res, poly1, poly2, 0);
+        _nmod_poly_mul_KS(res, poly1, len1, poly2, len2, 0, mod);
+}
+
+void nmod_poly_mulhigh_n(nmod_poly_t res, 
+                   const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+{
+    long len1, len2, len_out;
+    
+    len1 = poly1->length;
+    len2 = poly2->length;
+
+    len_out = poly1->length + poly2->length - 1;
+    if (n > len_out)
+        n = len_out;
+    
+    if (len1 == 0 || len2 == 0 || n == 0)
+    {
+        nmod_poly_zero(res);
+
+        return;
+    }
+
+    if (res == poly1 || res == poly2)
+    {
+        nmod_poly_t temp;
+
+        nmod_poly_init2(temp, poly1->mod.n, len_out);
+
+        if (len1 >= len2)
+            _nmod_poly_mulhigh_n(temp->coeffs, poly1->coeffs, len1,
+                           poly2->coeffs, len2, n, poly1->mod);
+        else
+            _nmod_poly_mulhigh_n(temp->coeffs, poly2->coeffs, len2,
+                           poly1->coeffs, len1, n, poly1->mod);
+        
+        nmod_poly_swap(temp, res);
+        nmod_poly_clear(temp);
+    } else
+    {
+        nmod_poly_fit_length(res, len_out);
+        
+        if (len1 >= len2)
+            _nmod_poly_mulhigh_n(res->coeffs, poly1->coeffs, len1,
+                           poly2->coeffs, len2, n, poly1->mod);
+        else
+            _nmod_poly_mulhigh_n(res->coeffs, poly2->coeffs, len2,
+                           poly1->coeffs, len1, n, poly1->mod);
+    }
+
+    res->length = len_out;
+    _nmod_poly_normalise(res);
 }

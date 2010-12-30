@@ -31,7 +31,7 @@
 
 void
 nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                   const nmod_poly_t poly2, long trunc)
+                                  const nmod_poly_t poly2, long trunc)
 {
     long bits, bits2;
 

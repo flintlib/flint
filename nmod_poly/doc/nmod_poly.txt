@@ -374,7 +374,8 @@ void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
                     long len1, mp_srcptr poly2, long len2, nmod_t mod)
 
     Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)}
-    and \code{(poly2, len2)}. Assumes \code{len1 >= len2 > 0}.
+    and \code{(poly2, len2)}. Assumes \code{len1 >= len2 > 0}. Aliasing of 
+    inputs and output is not permitted.
 
 void nmod_poly_mul_classical(nmod_poly_t res, 
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
@@ -385,8 +386,9 @@ void _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
                            mp_srcptr poly2, long len2, long trunc, nmod_t mod)
 
     Sets \code{res} to the lower \code{trunc} coefficients of the product of 
-    \code{(poly1, len1)} and \code{(poly2, len2)}.
-    Assumes that \code{len1 >= len2 > 0} and \code{trunc > 0}.
+    \code{(poly1, len1)} and \code{(poly2, len2)}. Assumes that 
+    \code{len1 >= len2 > 0} and \code{trunc > 0}. Aliasing of inputs and 
+    output is not permitted.
 
 void nmod_poly_mullow_classical(nmod_poly_t res, 
                   const nmod_poly_t poly1, const nmod_poly_t poly2, long trunc)
@@ -400,7 +402,8 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
     Computes the product of \code{(poly1, len1)} and \code{(poly2, len2)} 
     and writes the coefficients from \code{start} onwards into the high 
     coefficients of \code{res}, the remaining coefficients being arbitrary 
-    but reduced.  Assumes that \code{len1 >= len2 > 0}.
+    but reduced.  Assumes that \code{len1 >= len2 > 0}. Aliasing of inputs 
+    and output is not permitted.
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
                   const nmod_poly_t poly1, const nmod_poly_t poly2, long start)
@@ -425,13 +428,26 @@ void nmod_poly_mul_KS(nmod_poly_t res,
     bits wide. If \code{bits} is set to $0$ an appropriate value 
     is computed automatically.
 
+void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
+                mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod)
+
+   Set \code{out} to the low $n$ coefficients of \code{in1} of length
+   \code{len1} time \code{in2} of length \code{len2}. The output must have
+   space for \code{n} coefficients. We assumed that \code{len1 >= len2 > 0}
+   and that \code{0 < n <= len1 + len2 - 1}. 
+
+void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
+                             const nmod_poly_t poly2, mp_bitcnt_t bits, long n)
+
+   Set \code{res} to the low $n$ coefficients of \code{in1} of length
+   \code{len1} time \code{in2} of length \code{len2}. 
+
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
                                         mp_srcptr poly2, long len2, nmod_t mod)
 
-   Sets \code{res} to the product of \code{poly1} of length \code{len1} 
-   and \code{poly2} of length \code{len2}. Assumes \code{len1 >= len2 > 0}.
-   No aliasing is permitted between the inputs and the output.
-
+    Sets \code{res} to the product of \code{poly1} of length \code{len1} 
+    and \code{poly2} of length \code{len2}. Assumes \code{len1 >= len2 > 0}.
+    No aliasing is permitted between the inputs and the output.
 
 void nmod_poly_mul(nmod_poly_t res, 
                                const nmod_poly_t poly, const nmod_poly_t poly2)
@@ -443,6 +459,16 @@ void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1,
 
     Sets \code{res} to the first \code{trunc} coefficients of the 
     product of \code{poly1} and \code{poly2}.
+
+void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, long n, nmod_t mod)
+
+    Sets the high $n$ coefficients of \code{res} to the high $n$
+    coefficients of the product of \code{poly1} of length \code{len1}
+    and \code{poly2} of length \code{len2}, the other coefficients
+    being arbitrary. It is assumed that \code{len1 >= len2 > 0} and
+    that \code{0 < n <= len1 + len2 - 1}. Aliasing of inputs and 
+    output is not permitted.
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
                                           const nmod_poly_t poly2, long n)
