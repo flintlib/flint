@@ -42,7 +42,7 @@ void _nmod_poly_add_ui(nmod_poly_t p, ulong c)
 void nmod_poly_compose(nmod_poly_t res, nmod_poly_t poly1, nmod_poly_t poly2)
 {
 	long m;
-    mp_limb_t n, t;
+    mp_limb_t t;
     nmod_poly_t val;
 	
     if (poly1->length == 0) /* nothing to evaluate */ 

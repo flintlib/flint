@@ -30,13 +30,15 @@
 
 mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
 {
-	if (poly->length == 0) 
+	long m;
+    
+    if (poly->length == 0) 
         return 0;
 
 	if (poly->length == 1 || c == 0) 
         return poly->coeffs[0];
 
-	long m = poly->length - 1;
+	m = poly->length - 1;
 	mp_limb_t n = poly->mod.n;
 	mp_limb_t ninv = poly->mod.ninv;
 

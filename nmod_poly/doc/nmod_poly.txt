@@ -220,11 +220,19 @@ int nmod_poly_read(nmod_poly_t poly)
 
 *******************************************************************************
 
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
+
+   Set \code{output} to the reverse of \code{input}, which is of length
+   \code{len}, but thinking of it as a polynomial of length \code{m} 
+   (notionally zero padded if necessary). The length \code{m} must be 
+   non-negative, but there are no other restrictions. The polynomial
+   \code{output} must have space for \code{m} coefficients. 
+
 void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m)
 
    Set \code{output} to the reverse of \code{input}, thinking of it as
-   a polynomial of length \code{m} (notionally zero padded if necessary.
-   The length \code{m} must be non-nagative, but there are no other
+   a polynomial of length \code{m} (notionally zero padded if necessary).
+   The length \code{m} must be non-negative, but there are no other
    restrictions. The output polynomial will be set to length \code{m}
    and then normalised.
 
@@ -268,6 +276,12 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
     Sets \code{res} to the negation of \code{poly1}.
 
+*******************************************************************************
+
+    Addition/subtraction
+
+*******************************************************************************
+
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
                          mp_srcptr poly2, long len2, nmod_t mod)
 
@@ -290,6 +304,12 @@ void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
 
+*******************************************************************************
+
+    Scalar multiplication
+
+*******************************************************************************
+
 void nmod_poly_scalar_mul(nmod_poly_t res, 
                           const nmod_poly_t poly1, mp_limb_t c)
 
@@ -305,6 +325,12 @@ void nmod_poly_make_monic(nmod_poly_t output, nmod_poly_t input)
    leading coefficient is the greatest common divisor of the leading 
    coefficient and the modulus of \code{input}.
 
+*******************************************************************************
+
+    Shifting
+
+*******************************************************************************
+
 void nmod_poly_shift_left(nmod_poly_t res, nmod_poly_t poly, long k)
 
    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
@@ -315,6 +341,12 @@ void nmod_poly_shift_right(nmod_poly_t res, nmod_poly_t poly, long k)
    Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
    divide by $x^k$ and throw away the remainder. If \code{k} is grearer than
    or equal to the length of poly, the result is the zero polynomial. 
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
 
 void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, 
                     long len1, mp_srcptr poly2, long len2, nmod_t mod)
@@ -387,6 +419,12 @@ void nmod_poly_mulhigh_n(nmod_poly_t res, nmod_poly_t poly1,
     Sets the high $n$ coefficients of \code{res} to the high $n$ 
     coefficients of the product of \code{poly1} and \code{poly2}, 
     the remaining coefficients being arbitrary.
+
+*******************************************************************************
+
+    Division
+
+*******************************************************************************
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
            mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)

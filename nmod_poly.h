@@ -199,6 +199,8 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
     }
 }
 
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m);
+
 void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m);
 
 void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);

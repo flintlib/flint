@@ -27,38 +27,40 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m)
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
 {
     long i, min;
     mp_limb_t temp;
       
-    nmod_poly_fit_length(output, m);
-    
     if (input != output)
     {
-        min = FLINT_MIN(m, input->length);
+        min = FLINT_MIN(m, len);
         
         for (i = 0; i < min; i++)
-            output->coeffs[m - i - 1] = input->coeffs[i];
+            output[m - i - 1] = input[i];
 
         for ( ; i < m; i++)
-            output->coeffs[m - i - 1] = 0L;
-   } else
-   {
-      for (i = 0; i < m/2; i++)
-      {
-         temp = i < input->length ? input->coeffs[i] : 0;
+            output[m - i - 1] = 0L;
+    } else
+    {
+        for (i = 0; i < m/2; i++)
+        {
+            temp = i < len ? input[i] : 0;
          
-         if (m - i - 1 < input->length)
-            input->coeffs[i] = input->coeffs[m - i - 1];
-         else
-            input->coeffs[i] = 0;
+            output[i] = m - i - 1 < len ? input[m - i - 1] : 0;
 
-         input->coeffs[m - i - 1] = temp;
-      }
-      if (m & 1 && i >= input->length) input->coeffs[i] = 0;
-   }
+            output[m - i - 1] = temp;
+        }
+        if (m & 1 && i >= len) output[i] = 0;
+    }
+}
 
-   output->length = m;
-   _nmod_poly_normalise(output);
+void nmod_poly_reverse(nmod_poly_t output, nmod_poly_t input, long m)
+{
+    nmod_poly_fit_length(output, m);
+     
+    _nmod_poly_reverse(output->coeffs, input->coeffs, input->length, m);
+
+    output->length = m;
+    _nmod_poly_normalise(output);
 }
