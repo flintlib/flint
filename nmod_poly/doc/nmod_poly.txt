@@ -193,26 +193,26 @@ int nmod_poly_from_string(const char * s, nmod_poly_t poly)
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
-   Read \code{poly} from the file stream \code{f}. If this is a file
-   that has just been written, the file should be closed then opened
-   again. The format is as described for \code{nmod_poly_print}. If a 
-   polynomial in the correct format is read, a positive value is returned, 
-   otherwise a non-positive value is returned.
+    Read \code{poly} from the file stream \code{f}. If this is a file
+    that has just been written, the file should be closed then opened
+    again. The format is as described for \code{nmod_poly_print}. If a 
+    polynomial in the correct format is read, a positive value is returned, 
+    otherwise a non-positive value is returned.
 
 void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
-   Write a polynomial to the file stream \code{f}. If this is a file
-   then the file should be closed and reopened before being read.
-   The format is as described for \code{nmod_poly_print}. If a 
-   polynomial in the correct format is read, a positive value is returned, 
-   otherwise a non-positive value is returned. If an error occurs 
-   whilst writing to the file, an error message is printed.
+    Write a polynomial to the file stream \code{f}. If this is a file
+    then the file should be closed and reopened before being read.
+    The format is as described for \code{nmod_poly_print}. If a 
+    polynomial in the correct format is read, a positive value is returned, 
+    otherwise a non-positive value is returned. If an error occurs 
+    whilst writing to the file, an error message is printed.
 
 int nmod_poly_read(nmod_poly_t poly)
 
-   Read \code{poly} from \code{stdin}. The format is as described for 
-   \code{nmod_poly_print}. If a polynomial in the correct format is read, a 
-   positive value is returned, otherwise a non-positive value is returned.
+    Read \code{poly} from \code{stdin}. The format is as described for 
+    \code{nmod_poly_print}. If a polynomial in the correct format is read, a 
+    positive value is returned, otherwise a non-positive value is returned.
 
 *******************************************************************************
 
@@ -222,19 +222,19 @@ int nmod_poly_read(nmod_poly_t poly)
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
 
-   Set \code{output} to the reverse of \code{input}, which is of length
-   \code{len}, but thinking of it as a polynomial of length \code{m} 
-   (notionally zero padded if necessary). The length \code{m} must be 
-   non-negative, but there are no other restrictions. The polynomial
-   \code{output} must have space for \code{m} coefficients. 
+    Set \code{output} to the reverse of \code{input}, which is of length
+    \code{len}, but thinking of it as a polynomial of length \code{m} 
+    (notionally zero padded if necessary). The length \code{m} must be 
+    non-negative, but there are no other restrictions. The polynomial
+    \code{output} must have space for \code{m} coefficients. 
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
 
-   Set \code{output} to the reverse of \code{input}, thinking of it as
-   a polynomial of length \code{m} (notionally zero padded if necessary).
-   The length \code{m} must be non-negative, but there are no other
-   restrictions. The output polynomial will be set to length \code{m}
-   and then normalised.
+    Set \code{output} to the reverse of \code{input}, thinking of it as
+    a polynomial of length \code{m} (notionally zero padded if necessary).
+    The length \code{m} must be non-negative, but there are no other
+    restrictions. The output polynomial will be set to length \code{m}
+    and then normalised.
 
 *******************************************************************************
 
@@ -319,21 +319,21 @@ void nmod_poly_scalar_mul(nmod_poly_t res,
 void _nmod_poly_make_monic(mp_ptr output, 
                                       mp_srcptr input, long len, nmod_t mod)
 
-   Set \code{output} to be the scalar multiple of \code{input} (of 
-   length \code{len > 0}) that has leading coefficient one (if such a 
-   polynomial exists). If the leading coefficient of \code{input} is not
-   invertible, \code{output} is set to the multiple of \code{input} whose
-   leading coefficient is the greatest common divisor of the leading 
-   coefficient and the modulus of \code{input}.
+    Set \code{output} to be the scalar multiple of \code{input} (of 
+    length \code{len > 0}) that has leading coefficient one (if such a 
+    polynomial exists). If the leading coefficient of \code{input} is not
+    invertible, \code{output} is set to the multiple of \code{input} whose
+    leading coefficient is the greatest common divisor of the leading 
+    coefficient and the modulus of \code{input}.
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
-   Set \code{output} to be the scalar multiple of \code{input} with leading
-   coefficient one (if such a polynomial exists). If \code{input} is zero
-   an exception is raised. If the leading coefficient of \code{input} is not
-   invertible, \code{output} is set to the multiple of \code{input} whose
-   leading coefficient is the greatest common divisor of the leading 
-   coefficient and the modulus of \code{input}.
+    Set \code{output} to be the scalar multiple of \code{input} with leading
+    coefficient one (if such a polynomial exists). If \code{input} is zero
+    an exception is raised. If the leading coefficient of \code{input} is not
+    invertible, \code{output} is set to the multiple of \code{input} whose
+    leading coefficient is the greatest common divisor of the leading 
+    coefficient and the modulus of \code{input}.
 
 *******************************************************************************
 
@@ -343,26 +343,26 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
 
-   Set \code{res} to \code{poly} (of length \code{len}) shifted left by
-   \code{k} coefficients. Assumes that \code{res} has space for 
-   \code{len + k} coefficients.
+    Set \code{res} to \code{poly} (of length \code{len}) shifted left by
+    \code{k} coefficients. Assumes that \code{res} has space for 
+    \code{len + k} coefficients.
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-   Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
-   multiplied by $x^k$. 
+    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
+    multiplied by $x^k$. 
  
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
 
-   Set \code{res} to \code{poly} (of length \code{len}) shifted left by 
-   \code{k} coefficients. It is assumed that \code{k <= len} and that
-   \code{res} has space for at least \code{len - k} coefficients.
+    Set \code{res} to \code{poly} (of length \code{len}) shifted left by 
+    \code{k} coefficients. It is assumed that \code{k <= len} and that
+    \code{res} has space for at least \code{len - k} coefficients.
 
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-   Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
-   divide by $x^k$ and throw away the remainder. If \code{k} is greater than
-   or equal to the length of poly, the result is the zero polynomial. 
+    Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
+    divide by $x^k$ and throw away the remainder. If \code{k} is greater than
+    or equal to the length of poly, the result is the zero polynomial. 
 
 *******************************************************************************
 
@@ -431,16 +431,16 @@ void nmod_poly_mul_KS(nmod_poly_t res,
 void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
                 mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod)
 
-   Set \code{out} to the low $n$ coefficients of \code{in1} of length
-   \code{len1} time \code{in2} of length \code{len2}. The output must have
-   space for \code{n} coefficients. We assumed that \code{len1 >= len2 > 0}
-   and that \code{0 < n <= len1 + len2 - 1}. 
+    Set \code{out} to the low $n$ coefficients of \code{in1} of length
+    \code{len1} time \code{in2} of length \code{len2}. The output must have
+    space for \code{n} coefficients. We assumed that \code{len1 >= len2 > 0}
+    and that \code{0 < n <= len1 + len2 - 1}. 
 
 void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
                              const nmod_poly_t poly2, mp_bitcnt_t bits, long n)
 
-   Set \code{res} to the low $n$ coefficients of \code{in1} of length
-   \code{len1} time \code{in2} of length \code{len2}. 
+    Set \code{res} to the low $n$ coefficients of \code{in1} of length
+    \code{len1} time \code{in2} of length \code{len2}. 
 
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
                                         mp_srcptr poly2, long len2, nmod_t mod)
@@ -512,13 +512,13 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q,
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
 
-   Set the first \code{len - 1} coefficients of \code{x_prime} to the 
-   derivative of \code{x} which is assumed to be of length \code{len}. 
-   It is assumed that \code{len > 0}.
+    Set the first \code{len - 1} coefficients of \code{x_prime} to the 
+    derivative of \code{x} which is assumed to be of length \code{len}. 
+    It is assumed that \code{len > 0}.
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
-   Set \code{x_prime} to the derivative of \code{x}. 
+    Set \code{x_prime} to the derivative of \code{x}. 
 
 *******************************************************************************
 
@@ -528,29 +528,30 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
 mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
 
-   Evaluate \code{poly} at the value \code{c} and reduce modulo the 
-   given modulus (of \code{poly}). The value \code{c} should be reduced 
-   modulo the modulus. The algorithm used is Horner's method.
+    Evaluate \code{poly} at the value \code{c} and reduce modulo the 
+    given modulus (of \code{poly}). The value \code{c} should be reduced 
+    modulo the modulus. The algorithm used is Horner's method.
 
 mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
 
-   Evaluate \code{poly} at the value \code{c} and reduce modulo the 
-   modulus of \code{poly}. The value \code{c} should be reduced modulo
-   the modulus. The algorithm used is Horner's method.
+    Evaluate \code{poly} at the value \code{c} and reduce modulo the 
+    modulus of \code{poly}. The value \code{c} should be reduced modulo
+    the modulus. The algorithm used is Horner's method.
 
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
                               long len1, mp_srcptr poly2, long len2, nmod_t mod)
 
-  Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
-  \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
-  at \code{poly2}. The algorithm used is Horner's algorithm. We require 
-  that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
-  coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
+    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    at \code{poly2}. The algorithm used is Horner's algorithm. We require 
+    that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
+    coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
 
 
 void nmod_poly_compose_horner(nmod_poly_t res, 
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-  Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-  i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
-  Horner's algorithm.
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e.\ evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    Horner's algorithm.
+
