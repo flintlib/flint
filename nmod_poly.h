@@ -279,13 +279,22 @@ void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1,
                            mp_srcptr poly2, long len2, long trunc, nmod_t mod);
 
 void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                                         const nmod_poly_t poly2, long trunc);
+                                          const nmod_poly_t poly2, long trunc);
 
 void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
-                             mp_srcptr poly2, long len2, long n, nmod_t mod);
+                               mp_srcptr poly2, long len2, long n, nmod_t mod);
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                                          const nmod_poly_t poly2, long n);
+                                              const nmod_poly_t poly2, long n);
+
+void _nmod_poly_pow_binexp(mp_ptr res, 
+                              mp_srcptr poly, long len, nmod_t mod, ulong e);
+
+void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e);
+
+void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e);
+
+void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);

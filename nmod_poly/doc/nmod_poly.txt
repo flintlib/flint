@@ -488,6 +488,39 @@ void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1,
 
 *******************************************************************************
 
+    Powering
+
+*******************************************************************************
+
+void _nmod_poly_pow_binexp(mp_ptr res, 
+                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+
+    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    \code{res} to the result. We require that \code{res} has enough space
+    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is nor permitted. Uses the binary exponentiation
+    method.
+
+void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
+
+    Raise \code{poly} to the power \code{e} and set \code{res} to the 
+    result. Uses the binary exponentiation method.
+
+void _nmod_poly_pow(mp_ptr res,
+                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+
+    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    \code{res} to the result. We require that \code{res} has enough space
+    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is nor permitted. 
+
+void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
+
+    Raise \code{poly} to the power \code{e} and set \code{res} to the 
+    result. 
+
+*******************************************************************************
+
     Division
 
 *******************************************************************************
