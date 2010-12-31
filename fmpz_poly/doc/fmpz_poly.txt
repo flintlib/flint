@@ -599,8 +599,8 @@ void fmpz_poly_pow_multinomial(fmpz_poly_t res,
                                                const fmpz_poly_t poly, ulong e)
 
     Computes \code{res = poly^e} using a generalisation of binomial expansion 
-    called the J.C.P.~Miller pure recurrence.  If \code{poly} is zero, returns 
-    zero, so that in particular \code{0^0 = 0}.
+    called the J.C.P.~Miller pure recurrence.  If $e$ is zero, returns one, 
+    so that in particular \code{0^0 = 1}.
     
     The formal statement of the recurrence is as follows.  Write the input 
     polynomial as $P(t) = p_0 + p_1 t + \dotsb + p_m t^m$ with $p_0 \neq 0$ 
@@ -661,7 +661,7 @@ void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 void fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
     Computes \code{res = poly^e} using the binary exponentiation algorithm.  
-    If \code{poly} is zero, returns zero, so that in particular \code{0^0 = 0}.
+    If $e$ is zero, returns one, so that in particular \code{0^0 = 1}.
 
 void _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
 
@@ -678,8 +678,8 @@ void _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
 
 void fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
-    Computes \code{res = poly^e}.  If \code{poly} is zero, returns zero, 
-    so that in particular \code{0^0 = 0}.
+    Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
+    so that in particular \code{0^0 = 1}.
 
 void _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
 

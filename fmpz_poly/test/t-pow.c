@@ -87,11 +87,9 @@ main(void)
 
         fmpz_poly_pow(a, b, exp);
 
-        if (exp == 0UL && b->length > 0)
+        if (exp == 0UL)
         {
-            fmpz_poly_fit_length(c, 1);
-            fmpz_set_ui(c->coeffs, 1UL);
-            _fmpz_poly_set_length(c, 1);
+            fmpz_poly_set_ui(c, 1);
         }
         else
         {
