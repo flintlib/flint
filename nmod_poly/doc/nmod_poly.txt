@@ -519,6 +519,41 @@ void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
     Raise \code{poly} to the power \code{e} and set \code{res} to the 
     result. 
 
+void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
+                                           long trunc, nmod_t mod, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to 
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that 
+    \code{e > 1}. Aliasing is not permitted. Uses the binary 
+    exponentiation method.
+
+void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
+                               const nmod_poly_t poly, long trunc, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering 
+    followed by a truncation. Uses the binary exponentiation method.
+
+void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
+                                           long trunc, nmod_t mod, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to 
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that 
+    \code{e > 1}. Aliasing is not permitted.
+
+void nmod_poly_pow_trunc(nmod_poly_t res, 
+                               const nmod_poly_t poly, long trunc, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering 
+    followed by a truncation.
+
 *******************************************************************************
 
     Division

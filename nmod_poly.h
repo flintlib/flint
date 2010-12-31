@@ -296,6 +296,18 @@ void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e);
 
 void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
+void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
+                                              long trunc, nmod_t mod, ulong e);
+
+void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
+                                  const nmod_poly_t poly, long trunc, ulong e);
+
+void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
+                                              long trunc, nmod_t mod, ulong e);
+
+void nmod_poly_pow_trunc(nmod_poly_t res, 
+                                  const nmod_poly_t poly, long trunc, ulong e);
+
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
 
