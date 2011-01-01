@@ -46,10 +46,10 @@ fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
-            fmpz q = c1 / c2;   /* compute C quotient */
+            fmpz q = c1 / c2;       /* compute C quotient */
             fmpz r = c1 - c2 * q;   /* compute remainder */
 
-            if ((c2 ^ r) < 0L)
+            if (r && (c2 ^ r) < 0L)
                 q--;
 
             fmpz_set_si(f, q);
