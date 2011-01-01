@@ -35,73 +35,90 @@ main(void)
 {
     int i, result = 1;
     
-    printf("compose_horner....");
+    printf("compose_divconquer....");
     fflush(stdout);
 
-    /* Check (f(x-1))(x+1) == f */
+    /* Compare aliasing */
     for (i = 0; i < 5000; i++)
     {
-        nmod_poly_t a, r, xp1, xm1;
-        mp_limb_t n = n_randtest_not_zero();
-        
-        nmod_poly_init(a, n);
-        nmod_poly_init(r, n);
-        nmod_poly_init(xm1, n);
-        nmod_poly_init(xp1, n);
-        nmod_poly_randtest(a, n_randint(100));
-        
-        nmod_poly_set_coeff_ui(xm1, 1, 1);
-        nmod_poly_set_coeff_ui(xm1, 0, n - 1);
-        nmod_poly_set_coeff_ui(xp1, 1, 1);
-        nmod_poly_set_coeff_ui(xp1, 0, 1);
-
-        nmod_poly_compose_horner(r, a, xm1);
-        nmod_poly_compose_horner(r, r, xp1);
-        
-        result = nmod_poly_equal(a, r);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
-            abort();
-        }
-
-        nmod_poly_clear(a);
-        nmod_poly_clear(r);
-        nmod_poly_clear(xm1);
-        nmod_poly_clear(xp1);
-    }
-
-    /* Check a(c) + b(c) = (a + b)(c) */
-    for (i = 0; i < 5000; i++)
-    {
-        nmod_poly_t a, b, c, r1, r2;
+        nmod_poly_t a, b, r1;
         mp_limb_t n = n_randtest_not_zero();
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_init(c, n);
+        nmod_poly_init(r1, n);
+        nmod_poly_randtest(a, n_randint(30));
+        nmod_poly_randtest(b, n_randint(15));
+        
+        nmod_poly_compose_divconquer(r1, a, b);
+        nmod_poly_compose_divconquer(a, a, b);
+        
+        result = nmod_poly_equal(r1, a);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
+            nmod_poly_print(r1), printf("\n\n");
+            nmod_poly_print(a), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(r1);
+    }
+    
+    /* Compare other aliasing */
+    for (i = 0; i < 5000; i++)
+    {
+        nmod_poly_t a, b, r1;
+        mp_limb_t n = n_randtest_not_zero();
+        
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(r1, n);
+        nmod_poly_randtest(a, n_randint(30));
+        nmod_poly_randtest(b, n_randint(15));
+        
+        nmod_poly_compose_divconquer(r1, a, b);
+        nmod_poly_compose_divconquer(b, a, b);
+        
+        result = nmod_poly_equal(r1, b);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
+            nmod_poly_print(r1), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(r1);
+    }
+    
+    /* Compare with compose_horner */
+    for (i = 0; i < 5000; i++)
+    {
+        nmod_poly_t a, b, r1, r2;
+        mp_limb_t n = n_randtest_not_zero();
+        
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
         nmod_poly_init(r2, n);
         nmod_poly_randtest(a, n_randint(30));
-        nmod_poly_randtest(b, n_randint(30));
-        nmod_poly_randtest(c, n_randint(10));
+        nmod_poly_randtest(b, n_randint(15));
         
-        nmod_poly_compose_horner(r1, a, c);
-        nmod_poly_compose_horner(r2, b, c);
-        nmod_poly_add(r1, r1, r2);
-
-        nmod_poly_add(a, a, b);
-        nmod_poly_compose_horner(r2, a, c);
+        nmod_poly_compose_divconquer(r1, a, b);
+        nmod_poly_compose_horner(r2, a, b);
         
         result = nmod_poly_equal(r1, r2);
         if (!result)
         {
             printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
+            printf("a->length = %ld, n = %lu\n", a->length, a->mod.n);
             nmod_poly_print(r1), printf("\n\n");
             nmod_poly_print(r2), printf("\n\n");
             abort();
@@ -109,10 +126,10 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
-        nmod_poly_clear(c);
         nmod_poly_clear(r1);
         nmod_poly_clear(r2);
     }
+    
 
     printf("PASS\n");
     return 0;

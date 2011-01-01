@@ -325,6 +325,11 @@ mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
 void nmod_poly_compose_horner(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+void nmod_poly_compose_divconquer(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
 #endif
 
 
