@@ -51,8 +51,8 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
         }
         else
         {
-            ulong q = (- (ulong) c1) / c2;
-            ulong r = (- (ulong) c1) - c2 * q;
+            ulong q = ((ulong) -c1) / c2;
+            ulong r = ((ulong) -c1) - c2 * q;
 
             if (r)
                 ++q;

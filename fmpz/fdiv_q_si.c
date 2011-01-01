@@ -47,7 +47,6 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
         fmpz q = c1 / c2;       /* compute C quotient */
         fmpz r = c1 - c2 * q;   /* compute remainder */
 
-        /* q cannot overflow as remainder implies |c2| != 1 */
         if (r && ((c1 ^ c2) < 0))
             --q;
 
