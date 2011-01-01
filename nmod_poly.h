@@ -318,9 +318,13 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c);
+mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, 
+                                            long len, nmod_t mod, mp_limb_t c);
 
 mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
+
+void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
+                            long len1, mp_srcptr poly2, long len2, nmod_t mod);
 
 void nmod_poly_compose_horner(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
@@ -328,6 +332,12 @@ void nmod_poly_compose_horner(nmod_poly_t res,
 void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
                                        mp_srcptr poly2, long len2, nmod_t mod);
 void nmod_poly_compose_divconquer(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+
+void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 #endif

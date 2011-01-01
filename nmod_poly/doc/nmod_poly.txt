@@ -606,6 +606,12 @@ mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
     modulus of \code{poly}. The value \code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
+*******************************************************************************
+
+    Composition
+
+*******************************************************************************
+
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
                               long len1, mp_srcptr poly2, long len2, nmod_t mod)
 
@@ -619,23 +625,37 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
 void nmod_poly_compose_horner(nmod_poly_t res, 
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-  Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-  i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
-  Horner's algorithm.
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    Horner's algorithm.
 
 void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
                                          mp_srcptr poly2, long len2, nmod_t mod)
 
-  Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
-  \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
-  at \code{poly2}. The algorithm used is the divide and conquer algorithm. 
-  We require that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
-  coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
+    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    at \code{poly2}. The algorithm used is the divide and conquer algorithm. 
+    We require that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
+    coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose_divconquer(nmod_poly_t res, 
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-  Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-  i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
-  the divide and conquer algorithm.
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    the divide and conquer algorithm.
 
+void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+
+    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    at \code{poly2}. We require that \code{res} have space for 
+    \code{(len1 - 1)*(len2 - 1) + 1} coefficients. It is assumed that 
+    \code{len1 > 0} and \code{len2 > 0}.
+
+void nmod_poly_compose(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e. evaluate \code{poly1} at \code{poly2}.
