@@ -118,6 +118,15 @@ void _fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1,
 void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1, const fmpz * vec2, 
                                                        long len2, ulong exp);
 
+void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1, 
+                               const fmpz * vec2, long len2, const fmpz_t c);
+
+void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1, 
+                                       const fmpz * vec2, long len2, long c);
+
+void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, 
+                                      const fmpz * vec2, long len2, ulong c);
+
 void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
                                        const fmpz * vec2, long len2, long c);
 
