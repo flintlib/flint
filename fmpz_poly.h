@@ -202,20 +202,49 @@ void fmpz_poly_sub(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly);
 
-/*  Scalar multiplication  ***************************************************/
+/*  Scalar multiplication and division  **************************************/
 
-void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x);
+void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, 
+                             const fmpz_poly_t poly2, ulong x);
 
-void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x);
+void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, 
+                             const fmpz_poly_t poly2, long x);
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
-                                   const fmpz_poly_t poly2, const fmpz_t x);
+                               const fmpz_poly_t poly2, const fmpz_t x);
 
 void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, 
                              const fmpz * poly2, long len2, const fmpz_t x);
 
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
+
+void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, 
+                              const fmpz_poly_t poly2, ulong x);
+
+void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, 
+                              const fmpz_poly_t poly2, long x);
+
+void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
+                                const fmpz_poly_t poly2, const fmpz_t x);
+
+void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, 
+                              const fmpz_poly_t poly2, ulong x);
+
+void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, 
+                              const fmpz_poly_t poly2, long x);
+
+void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
+                                const fmpz_poly_t poly2, const fmpz_t x);
+
+void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
+                                  const fmpz_poly_t poly2, ulong x);
+
+void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, 
+                                  const fmpz_poly_t poly2, long x);
+
+void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
+                                    const fmpz_poly_t poly2, const fmpz_t x);
 
 /*  Bit packing  *************************************************************/
 

@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, long x)
 {
     long i;
 

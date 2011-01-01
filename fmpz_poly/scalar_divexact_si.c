@@ -19,38 +19,33 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, const fmpz_poly_t poly2, ulong x)
+fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                             long x)
 {
-    long i;
+    if (x == 0)
+    {
+        printf("Exception: division by zero in fmpz_poly_scalar_divexact_si\n");
+        abort();
+    }
 
-    /* Either scalar or input poly is zero */
-    if ((x == 0L) || (poly2->length == 0))
+    if (poly2->length == 0)
     {
         fmpz_poly_zero(poly1);
         return;
     }
 
-    /* Special case, multiply by 1 */
-    if (x == 1L)
-    {
-        fmpz_poly_set(poly1, poly2);
-        return;
-    }
-
     fmpz_poly_fit_length(poly1, poly2->length);
-
-    for (i = 0; i < poly2->length; i++)
-        fmpz_mul_ui(poly1->coeffs + i, poly2->coeffs + i, x);
-
+    _fmpz_vec_scalar_divexact_si(poly1->coeffs, poly2->coeffs, poly2->length, x);
     _fmpz_poly_set_length(poly1, poly2->length);
 }

@@ -370,6 +370,55 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 
     Sets \code{poly} to \code{poly1 + x * poly2}.
 
+void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
+                                  fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    assuming the coefficient is exact for every coefficient.
+
 *******************************************************************************
 
     Bit packing
