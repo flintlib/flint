@@ -187,7 +187,8 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
             {
                 _fmpz_poly_mul(h[i], pow, powlen, h[2*i + 1], hlen[2*i + 1]);
                 hlen[i] = hlen[2*i + 1] + powlen - 1;
-            }
+            } else
+                hlen[i] = 0;
             _fmpz_poly_add(h[i], h[i], hlen[i], h[2*i], hlen[2*i]);
             hlen[i] = FLINT_MAX(hlen[i], hlen[2*i]);
         }
