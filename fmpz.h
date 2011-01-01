@@ -249,6 +249,8 @@ void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h);
+
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 

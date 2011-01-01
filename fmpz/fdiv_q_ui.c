@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
     
 ******************************************************************************/
 
@@ -45,14 +45,20 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (!COEFF_IS_MPZ(c1))      /* g is small */
     {
-        fmpz q = c1 / c2;       /* compute C quotient */
-        fmpz r = c1 - c2 * q;   /* compute remainder */
+        if (c1 > 0)
+        {
+            fmpz_set_ui(f, c1 / c2);
+        }
+        else
+        {
+            ulong q = (- (ulong) c1) / c2;
+            ulong r = (- (ulong) c1) - c2 * q;
 
-        /* q cannot overflow as remainder implies |c2| != 1 */
-        if (r < 0L)
-            q--;
+            if (r)
+                ++q;
 
-        fmpz_set_si(f, q);
+            fmpz_set_si(f, - (long) q);
+        }
     }
     else                        /* g is large */
     {
