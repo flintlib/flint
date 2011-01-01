@@ -340,7 +340,12 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, ulong h)
+void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+
+    Set $f$ to the quotient of $g$ by $h$, rounding down towards
+    minus infinity.  If $h$ is $0$ an exception is raised.
+
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.

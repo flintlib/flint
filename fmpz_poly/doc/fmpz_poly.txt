@@ -599,21 +599,21 @@ void fmpz_poly_pow_multinomial(fmpz_poly_t res,
                                                const fmpz_poly_t poly, ulong e)
 
     Computes \code{res = poly^e} using a generalisation of binomial expansion 
-    called the J.C.P.~Miller pure recurrence.  If $e$ is zero, returns one, 
-    so that in particular \code{0^0 = 1}.
+    called the J.C.P.~Miller pure recurrence~\citep{Knu1997, Zei1995}.  
+    If $e$ is zero, returns one, so that in particular \code{0^0 = 1}.
     
     The formal statement of the recurrence is as follows.  Write the input 
-    polynomial as $P(t) = p_0 + p_1 t + \dotsb + p_m t^m$ with $p_0 \neq 0$ 
-    and let $P(t)^n = a(n, 0) + a(n, 1) t + \dotsb + a(n, mn) t^{mn}$.  Then 
+    polynomial as $P(x) = p_0 + p_1 x + \dotsb + p_m x^m$ with $p_0 \neq 0$ 
+    and let $P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}$.  Then 
     $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
     $a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i)$.
     
-    [1] D. Knuth, The Art of Computer Programming Vol. 2, Seminumerical 
-    Algorithm, Third Edition (Reading, Massachusetts: Addison-Wesley, 1997)
-    
-    [2] D. Zeilberger, The J.C.P. Miller Recurrence for Exponentiating a 
-    Polynomial, and its q-Analog, Journal of Difference Equations and 
-    Applications, 1995, Vol. 1, pp. 57--60
+    % [1] D. Knuth, The Art of Computer Programming Vol. 2, Seminumerical 
+    % Algorithms, Third Edition (Reading, Massachusetts: Addison-Wesley, 1997)
+    %
+    % [2] D. Zeilberger, The J.C.P. Miller Recurrence for Exponentiating a 
+    % Polynomial, and its q-Analog, Journal of Difference Equations and 
+    % Applications, 1995, Vol. 1, pp. 57--60
 
 void _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
 
