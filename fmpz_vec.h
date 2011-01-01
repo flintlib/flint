@@ -106,7 +106,7 @@ void _fmpz_vec_scalar_divexact_si(fmpz * vec1,
 void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, 
                                       const fmpz * vec2, long len2, ulong c);
 
-void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, 
+void _fmpz_vec_scalar_fdiv_q_fmpz(fmpz * vec1, 
                                const fmpz * vec2, long len2, const fmpz_t c);
 
 void _fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, 

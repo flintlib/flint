@@ -197,7 +197,7 @@ void _fmpz_vec_scalar_divexact_ui(fmpz * vec1,
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $x$, where the 
     division is assumed to be exact for every entry in \code{vec2}.
 
-void _fmpz_vec_scalar_fdiv_q(fmpz * vec1, 
+void _fmpz_vec_scalar_fdiv_q_fmpz(fmpz * vec1, 
                                   const fmpz * vec2, long len2, const fmpz_t c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
