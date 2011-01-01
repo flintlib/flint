@@ -28,7 +28,6 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -51,7 +50,7 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
             fmpz r = c1 - c2 * q;  /* compute remainder  */
 
             if (r && ((c2 ^ r) > 0L))  /* r != 0, c2 and r same sign */
-                q++;
+                ++q;
 
             fmpz_set_si(f, q);
         }
