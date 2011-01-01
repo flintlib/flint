@@ -40,7 +40,7 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, long len, ulong e)
     {
         ulong limbs = (ulong) _fmpz_vec_max_limbs(poly, len);
         
-        if (limbs < (((3UL * e) >> 1) + 150UL) / (ulong) len)
+        if (limbs < ((3UL * e) / 2UL + 150UL) / (ulong) len)
             _fmpz_poly_pow_multinomial(res, poly, len, e);
         else
             _fmpz_poly_pow_binexp(res, poly, len, e);
@@ -55,7 +55,9 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
     if ((len < 2) | (e < 3UL))
     {
-        if (len == 0)
+        if (e == 0UL)
+            fmpz_poly_set_ui(res, 1);
+        else if (len == 0)
             fmpz_poly_zero(res);
         else if (len == 1)
         {
@@ -63,8 +65,6 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
             fmpz_pow_ui(res->coeffs, poly->coeffs, e);
             _fmpz_poly_set_length(res, 1);
         }
-        else if (e == 0UL)
-            fmpz_poly_set_ui(res, 1UL);
         else if (e == 1UL)
             fmpz_poly_set(res, poly);
         else  /* e == 2UL */
