@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -143,16 +144,20 @@ void
 fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
                             const fmpz_poly_t A, const fmpz_poly_t B)
 {
+    long lenA, lenB;
     fmpz_poly_t tQ, tR;
     fmpz *q, *r;
 
-    if (B->length == 0)
+    lenA = A->length;
+    lenB = B->length;
+
+    if (lenB == 0)
     {
         printf("Exception: division by zero in fmpz_poly_divrem_divconquer\n");
         abort();
     }
 
-    if (A->length < B->length)
+    if (lenA < lenB)
     {
         fmpz_poly_zero(Q);
         fmpz_poly_set(R, A);
@@ -161,46 +166,45 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (Q == A || Q == B)
     {
-        fmpz_poly_init2(tQ, A->length - B->length + 1);
+        fmpz_poly_init2(tQ, lenA - lenB + 1);
         q = tQ->coeffs;
     }
     else
     {
-        fmpz_poly_fit_length(Q, A->length - B->length + 1);
+        fmpz_poly_fit_length(Q, lenA - lenB + 1);
         q = Q->coeffs;
     }
 
     if (R == A || R == B)
     {
-        fmpz_poly_init2(tR, A->length);
+        fmpz_poly_init2(tR, lenA);
         r = tR->coeffs;
     }
     else
     {
-        fmpz_poly_fit_length(R, A->length);
+        fmpz_poly_fit_length(R, lenA);
         r = R->coeffs;
     }
 
-    _fmpz_poly_divrem_divconquer(q, r, A->coeffs, A->length,
-                                       B->coeffs, B->length);
+    _fmpz_poly_divrem_divconquer(q, r, A->coeffs, lenA, B->coeffs, lenB);
 
     if (Q == A || Q == B)
     {
-        _fmpz_poly_set_length(tQ, A->length - B->length + 1);
+        _fmpz_poly_set_length(tQ, lenA - lenB + 1);
         fmpz_poly_swap(tQ, Q);
         fmpz_poly_clear(tQ);
     }
     else
-        _fmpz_poly_set_length(Q, A->length - B->length + 1);
+        _fmpz_poly_set_length(Q, lenA - lenB + 1);
 
     if (R == A || R == B)
     {
-        _fmpz_poly_set_length(tR, A->length);
+        _fmpz_poly_set_length(tR, lenA);
         fmpz_poly_swap(tR, R);
         fmpz_poly_clear(tR);
     }
     else
-        _fmpz_poly_set_length(R, A->length);
+        _fmpz_poly_set_length(R, lenA);
 
     _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
