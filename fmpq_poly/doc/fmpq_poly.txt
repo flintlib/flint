@@ -527,7 +527,8 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
-    Sets res to pow^e, where the only special case 0^0 is defined as 0.
+    Sets \code{res} to \code{pow^e}, where the only special case $0^0$ is 
+    defined as $1$.
 
 *******************************************************************************
 

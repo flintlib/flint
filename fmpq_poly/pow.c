@@ -39,20 +39,20 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 {
     long len = poly->length, rlen;
-    
-    if (len == 0L)
+
+    if (e == 0)
+    {
+        fmpq_poly_set_ui(res, 1);
+        return;
+    }
+    if (len == 0)
     {
         fmpq_poly_zero(res);
         return;
     }
-    if (e == 0UL)
-    {
-        fmpq_poly_set_ui(res, 1UL);
-        return;
-    }
-    
+
     rlen = (long) e * (len - 1L) + 1L;
-    
+
     if (res != poly)
     {
         fmpq_poly_fit_length(res, rlen);
