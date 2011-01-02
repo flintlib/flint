@@ -318,6 +318,13 @@ fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n)
     fmpq_poly_inv_newton(Qinv, Q, n);
 }
 
+void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
+                           const fmpz * A, const fmpz_t denA, 
+                           const fmpz * B, const fmpz_t denB, long n);
+
+void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
+                                         const fmpq_poly_t B, long n);
+
 /*  Derivative  **************************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
