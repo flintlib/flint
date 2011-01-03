@@ -1,9 +1,9 @@
 CC=gcc
 CFLAGS=-g -O2 -ansi -pedantic -Wall
 
-LIBS=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs -L/home/wbhart/mpfr-3.0.0/.libs -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs -L/home/wbhart/mpfr-3.0.0/.libs -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/wbhart/mpir-2.1.1/ -I/home/wbhart/mpfr-3.0.0/ -I/home/wbhart/include
+LIBS=-L$(CURDIR) -L/home/suser/FLINT/flint2-seb/ -L/home/suser/MPIR/mpir-2.1.1/.libs/ -L/home/suser/MPFR/mpfr-3.0.0/.libs/ -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(CURDIR) -L/home/suser/MPIR/mpir-2.1.1/.libs/ -L/home/suser/MPFR/mpfr-3.0.0/.libs/ -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I/home/suser/FLINT/flint2-seb/ -I/home/suser/MPIR/mpir-2.1.1/ -I/home/suser/MPFR/mpfr-3.0.0/
 export
 
 SOURCES = $(wildcard *.c)
@@ -18,9 +18,13 @@ LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
 LIB_OBJS = $(patsubst %.c, %.lo, $(LIB_SOURCES))
 
+EXMP_SOURCES = $(wildcard exmp/*.c)
+
 TEST_SOURCES = $(wildcard test/*.c)
 
 PROF_SOURCES = $(wildcard profile/*.c)
+
+EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
 
@@ -38,6 +42,9 @@ profile: all profiler.o
 
 recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir);) 
+
+exmp: all $(LOBJS) library
+	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 
 check: all $(LOBJS) library
 ifndef MOD
