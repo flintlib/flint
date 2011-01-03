@@ -192,6 +192,9 @@ void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n);
 
 int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+#define fmpz_poly_is_zero(poly) \
+    ((poly)->length == 0)
+
 /*  Addition and subtraction  ************************************************/
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, long len1, 
@@ -223,6 +226,12 @@ void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1,
                              const fmpz * poly2, long len2, const fmpz_t x);
 
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, 
+                                   const fmpz_poly_t poly2, const fmpz_t x);
+
+void _fmpz_poly_scalar_submul_fmpz(fmpz * poly1, 
+                             const fmpz * poly2, long len2, const fmpz_t x);
+
+void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 
 void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, 
