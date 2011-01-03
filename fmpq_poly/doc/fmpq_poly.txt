@@ -36,56 +36,59 @@ void fmpq_poly_init(fmpq_poly_t poly)
 
 void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
 
-    Initialises the polynomial with space for at least alloc coefficients and 
-    set the length to zero. The alloc coefficients are all set to zero.
+    Initialises the polynomial with space for at least \code{alloc} 
+    coefficients and set the length to zero. The \code{alloc} coefficients 
+    are all set to zero.
 
 void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
 
-    Reallocates the given polynomial to have space for alloc coefficients. 
-    If alloc is set to zero then the polynomial is cleared and then 
-    reinitialised.  If the current length is greater than alloc then poly 
-    is first truncated to length alloc.  Note that this might leave the 
-    rational polynomial in non-canonical form.
+    Reallocates the given polynomial to have space for \code{alloc} 
+    coefficients. If \code{alloc} is zero then the polynomial is cleared 
+    and then reinitialised.  If the current length is greater than 
+    \code{alloc} then \code{poly} is first truncated to length 
+    \code{alloc}. Note that this might leave the rational polynomial in 
+    non-canonical form.
 
 void fmpq_poly_fit_length(fmpq_poly_t poly, long len)
 
-    If len is greater than the number of coefficients currently 
+    If \code{len} is greater than the number of coefficients currently 
     allocated, then the polynomial is reallocated to have space for at
-    least len coefficients. No data is lost when calling this 
+    least \code{len} coefficients. No data is lost when calling this 
     function. The function efficiently deals with the case where 
-    fit_length is called many times in small increments by at least 
-    doubling the number of allocated coefficients when len is larger 
-    than the number of coefficients currently allocated.
+    \code{fit_length()} is called many times in small increments by at 
+    least doubling the number of allocated coefficients when \code{len} 
+    is larger than the number of coefficients currently allocated.
 
 void _fmpq_poly_set_length(fmpq_poly_t poly, long len)
     
-    Sets the length of the numerator polynomial to len, demoting 
+    Sets the length of the numerator polynomial to \code{len}, demoting 
     coefficients beyond the new length.  Note that this method does 
     not guarantee that the rational polynomial is in canonical form.
 
 void fmpq_poly_clear(fmpq_poly_t poly)
-    
-    Clears the given poly, releasing any memory used. The poly must
-    be reinitialised in order to be used again.
+
+    Clears the given polynomial, releasing any memory used. The polynomial 
+    must be reinitialised in order to be used again.
 
 void _fmpq_poly_normalise(fmpq_poly_t poly)
 
-    Sets the length of poly so that the top coefficient is nonzero.  If 
-    all coefficients are zero, the length is set to zero.  Note that 
-    this function does not guarantee the coprimality of the numerator 
-    polynomial and the integer denominator.
+    Sets the length of \code{poly} so that the top coefficient is 
+    non-zero. If all coefficients are zero, the length is set to zero.  
+    Note that this function does not guarantee the coprimality of the 
+    numerator polynomial and the integer denominator.
 
 void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, long len)
 
-    Puts {poly, den} of length len into canonical form.
+    Puts \code{(poly, den)} of length \code{len} into canonical form.
     
-    It is assumed that the array poly contains a non-zero entry in position 
-    len - 1 whenever len > 0.  Assumes that den is non-zero.
+    It is assumed that the array \code{poly} contains a non-zero entry in 
+    position \code{len - 1} whenever \code{len > 0}.  Assumes that \code{den} 
+    is non-zero.
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
-    Puts the polynomial poly into canonical form.  Firstly, the length is set 
-    to the actual length of the numerator polynomial.  For non-zero 
+    Puts the polynomial \code{poly} into canonical form.  Firstly, the length 
+    is set to the actual length of the numerator polynomial.  For non-zero 
     polynomials, it is then ensured that the numerator and denominator are 
     coprime and that the denominator is positive.  The canonical form of the 
     zero polynomial is a zero numerator polynomial and a one denominator.
@@ -98,225 +101,234 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
 
 long fmpq_poly_degree(fmpq_poly_t poly)
 
-    Returns the degree of poly, which is one less than its length, as a long. 
-    Only gives the right answer for polynomials such that the length, which is 
-    an unsigned long, fits into a long.
+    Returns the degree of \code{poly}, which is one less than its length, as 
+    a \code{long}.
 
 long fmpq_poly_length(fmpq_poly_t poly)
 
-    Returns the length of poly.
+    Returns the length of \code{poly}.
 
 *******************************************************************************
 
     Accessing the numerator and denominator
 
-********************************************************************************
+*******************************************************************************
 
 fmpz * fmpq_poly_numref(fmpq_poly_t poly)
 
-    Returns a reference to the numerator polynomial as a vector.  Note that 
-    this might be NULL.
+    Returns a reference to the numerator polynomial as an array.  Note that, 
+    because of a delayed initialisation approach, this might be \code{NULL} 
+    for zero polynomials.
     
-    This is implemented as a macro returning (poly)->coeffs.
+    This is implemented as a macro returning \code{(poly)->coeffs}.
 
 fmpz_t fmpq_poly_denref(fmpq_poly_t poly)
-    
-    Returns a reference to the denominator as a fmpz_t.  The integer is 
-    guaranteed to be properly initialised.
-    
-    This is implemented as a macro returning (poly)->den.
 
-********************************************************************************
+    Returns a reference to the denominator as a \code{fmpz_t}.  The integer 
+    is guaranteed to be properly initialised.
+    
+    This is implemented as a macro returning \code{(poly)->den}.
+
+*******************************************************************************
 
     Random testing
 
-********************************************************************************
+*******************************************************************************
 
 void fmpq_poly_randinit(fmpz_randstate_t state)
 
-    Initialise the random state for random polynomial generation.  One should 
-    not call this function if fmpz_randinit has already been called. 
+    Initialises the random state for random polynomial generation.  One should 
+    not call this function if \code{fmpz_randinit()} has already been called. 
 
 void fmpq_poly_randclear(fmpz_randstate_t state)
 
-    Clear the random state initialised with fmpq_poly_randinit.  One should 
-    not call this function if fmpz_randclear has already been called.
+    Clears the random state initialised with \code{fmpq_poly_randinit()}.  
+    One should not call this function if \code{fmpz_randclear()} has already 
+    been called.
 
 void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
                                                 long len, mp_bitcnt_t bits)
 
-    Sets f to a random polynomial with coefficients up to the given length 
-    and where each coefficient has up to the given number of bits.  The 
-    coefficients are signed randomly.  One must call fmpq_poly_randinit 
-    before calling this function.
+    Sets $f$ to a random polynomial with coefficients up to the given 
+    length and where each coefficient has up to the given number of bits. 
+    The coefficients are signed randomly.  One must call 
+    \code{fmpq_poly_randinit()} before calling this function.
 
 void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state,
                                                 long len, mp_bitcnt_t bits)
 
-    Sets f to a random polynomial with coefficients up to the given length 
+    Sets $f$ to a random polynomial with coefficients up to the given length 
     and where each coefficient has up to the given number of bits.  One must 
-    call fmpq_poly_randinit before calling this function.
+    call \code{fmpq_poly_randinit()} before calling this function.
 
 void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state,
                                                 long len, mp_bitcnt_t bits)
 
-    As for fmpq_poly_randtest except that length and bits may not be
-    zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call fmpq_poly_randinit before calling
+    As for \code{fmpq_poly_randtest()} except that \code{len} and \code{bits} 
+    may not be zero and the polynomial generated is guaranteed not to be the 
+    zero polynomial.  One must call \code{fmpq_poly_randinit()} before calling
     this function.
 
 *******************************************************************************
 
     Assignment, swap, negation
 
-********************************************************************************
+*******************************************************************************
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Sets poly1 to equal poly2.
+    Sets \code{poly1} to equal \code{poly2}.
 
 void fmpq_poly_set_si(fmpq_poly_t poly, long x)
 
-    Sets poly to the integer x.
+    Sets \code{poly} to the integer $x$.
 
 void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x)
 
-    Sets poly to the integer x.
+    Sets \code{poly} to the integer $x$.
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
 
-    Sets poly to the integer x.
+    Sets \code{poly} to the integer $x$.
 
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
 
-    Sets poly to the integer x.
+    Sets \code{poly} to the integer $x$.
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
 
-    Sets poly to the rational x.
+    Sets \code{poly} to the rational $x$.
 
 void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
 
-    Sets {poly, den} to the polynomial given by the first n coefficients in 
-    the array a, from lowest degree to highest degree.
+    Sets \code{(poly, den)} to the polynomial given by the 
+    first $n$ coefficients in the array $a$, from lowest degree 
+    to highest degree.
 
 void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
 
-    Sets poly to the polynomial with coefficients as given in the array a, 
-    from lowest degree to highest degree.
+    Sets \code{poly} to the polynomial with coefficients as given in the 
+    array $a$, from lowest degree to highest degree.
 
 int _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 
-    Sets {poly, den} to the polynomial specified by the null-terminated 
-    string str.
+    Sets \code{(poly, den)} to the polynomial specified by the null-terminated 
+    string \code{str}.
     
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of {poly, den} is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
+    Returns $0$ if no error occurred.  Otherwise, returns a non-zero value, 
+    in which case the resulting value of \code{(poly, den)} is undefined. 
+    If \code{str} is not null-terminated, calling this method might result 
+    in a segmentation fault.
 
 int fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
 
-    Sets poly to the polynomial specified by the null-terminated string str.
+    Sets \code{poly} to the polynomial specified by the null-terminated 
+    string \code{str}.
     
-    Returns 0 if no error occurred.  Otherwise, returns a non-zero value, in 
-    which case the resulting value of poly is undefined.  If str is not 
-    null-terminated, calling this method might result in a segmentation fault.
+    Returns $0$ if no error occurred.  Otherwise, returns a non-zero 
+    value, in which case the resulting value of \code{poly} is undefined. 
+    If \code{str} is not null-terminated, calling this method might result 
+    in a segmentation fault.
 
 char * fmpq_poly_get_str(const fmpq_poly_t poly)
 
-    Returns the string representation of poly.
+    Returns the string representation of \code{poly}.
 
 char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
 
-    Returns the pretty representation of poly, using the null-terminated 
-    string var not equal to "\0" as the variable name.
+    Returns the pretty representation of \code{poly}, using the 
+    null-terminated string \code{var} not equal to \code{"\0"} as 
+    the variable name.
 
 void fmpq_poly_zero(fmpq_poly_t poly)
 
-    Sets poly to zero.
+    Sets \code{poly} to zero.
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Sets poly1 to the additive inverse of poly2.
+    Sets \code{poly1} to the additive inverse of \code{poly2}.
 
 void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Sets poly1 to the multiplicative inverse of poly2 if possible.  
-    Otherwise, if poly2 is not a unit, leaves poly1 unmodified and 
-    calls abort().
+    Sets \code{poly1} to the multiplicative inverse of \code{poly2} 
+    if possible.  Otherwise, if \code{poly2} is not a unit, leaves 
+    \code{poly1} unmodified and calls \code{abort()}.
 
 void fmpq_poly_swap(fmpq_poly_t poly1, fmpq_poly_t poly2)
 
-    Efficiently swaps the polynomials poly1 and poly2.
+    Efficiently swaps the polynomials \code{poly1} and \code{poly2}.
 
 void fmpq_poly_truncate(fmpq_poly_t poly, long n)
 
-    If the current length of poly is greater than n, it is truncated 
-    to the given length.  Discarded coefficients are not necessarily 
-    set to zero.
+    If the current length of \code{poly} is greater than $n$, it is 
+    truncated to the given length.  Discarded coefficients are not 
+    necessarily set to zero.
 
 *******************************************************************************
 
     Setting and getting coefficients
 
-********************************************************************************
+*******************************************************************************
 
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n)
 
-    Retrieves the nth coefficient of poly.
+    Retrieves the $n$th coefficient of poly.
 
 void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
 
-    Sets the nth coefficient in poly to the integer x.
+    Sets the $n$th coefficient in \code{poly} to the integer $x$.
 
 void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, long n, ulong x)
 
-    Sets the nth coefficient in poly to the integer x.
+    Sets the $n$th coefficient in \code{poly} to the integer $x$.
 
 void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, long n, const fmpz_t x)
 
-    Sets the nth coefficient in poly to the integer x.
+    Sets the $n$th coefficient in \code{poly} to the integer $x$.
 
 void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, long n, const mpz_t x)
 
-    Sets the nth coefficient in poly to the integer x.
+    Sets the $n$th coefficient in \code{poly} to the integer $x$.
 
 void fmpq_poly_set_coeff_mpq(fmpq_poly_t rop, long n, const mpq_t x)
 
-    Sets the nth coefficient in poly to the rational x.
+    Sets the $n$th coefficient in \code{poly} to the rational $x$.
 
-********************************************************************************
+*******************************************************************************
 
     Comparison
 
-********************************************************************************
+*******************************************************************************
 
 int fmpq_poly_equal(const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Return 1 if poly1 is equal to poly2, otherwise return 0.
+    Returns $1$ if \code{poly1} is equal to \code{poly2}, 
+    otherwise returns $0$.
 
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
                         const fmpz * rpoly, const fmpz_t rden, long len)
 
     Compares two non-zero polynomials, assuming they have the same length 
-    len > 0.
+    \code{len > 0}.
 
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 
-    Compares the two polynomials left and right.
+    Compares the two polynomials \code{left} and \code{right}.
     
-    Compares the two polynomials left and right, returning -1, 0, or 1 as left 
-    is less than, equal to, or greater than right.  The comparison is first 
-    done by the degree, and then, in case of a tie, by the individual 
-    coefficients from highest to lowest.
+    Compares the two polynomials \code{left} and \code{right}, returning 
+    $-1$, $0$, or $1$ as \code{left} is less than, equal to, or greater 
+    than \code{right}.  The comparison is first done by the degree, and 
+    then, in case of a tie, by the individual coefficients from highest 
+    to lowest.
 
 int fmpq_poly_is_one(const fmpq_poly_t poly)
 
-    Returns 1 if poly is the constant polynomial 1, otherwise returns 0.
+    Returns $1$ if \code{poly} is the constant polynomial~$1$, otherwise 
+    returns $0$.
 
 int fmpq_poly_is_zero(const fmpq_poly_t poly)
 
-    Returns 1 if poly is the zero polynomial, otherwise returns 0.
+    Returns $1$ if \code{poly} is the zero polynomial, otherwise returns $0$.
 
 *******************************************************************************
 
@@ -328,39 +340,45 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
                     const fmpz * poly1, const fmpz_t den1, long len1,
                     const fmpz * poly2, const fmpz_t den2, long len2)
 
-    Forms {rpoly, rden} = {den2 poly1 + den1 poly2, den1 den2}, placing the 
-    result into canonical form, that is, the denominator is a positive 
-    integer, which is co-prime to the content of the numerator vector.
+    Forms the sum \code{(rpoly, rden)} of \code{(poly1, den1, len1)} and 
+    \code{(poly2, den2, len2)}, placing the result into canonical form, 
+    that is, the denominator is a positive integer, which is co-prime to 
+    the content of the numerator vector.
     
-    Assumes that rpoly is initialised as a sufficiently wide vector.  The 
-    input operands are assumed to be in canonical form and are also allowed 
-    to be of length 0.
+    Assumes that \code{rpoly} is initialised as a sufficiently large array. 
+    The input operands are assumed to be in canonical form and are also 
+    allowed to be of length~$0$.
     
-    {rpoly, rden} and {poly1, den1} may be aliased, but {rpoly, rden} and 
-    {poly2, den2} may not be aliased.
+    \code{(rpoly, rden)} and \code{(poly1, den1)} may be aliased, 
+    but \code{(rpoly, rden)} and \code{(poly2, den2)} may \emph{not} 
+    be aliased.
 
 void fmpq_poly_add(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
-    Sets res to the sum of poly1 and poly2, using Henrici's algorithm.
+    Sets \code{res} to the sum of \code{poly1} and \code{poly2}, using 
+    Henrici's algorithm.
 
 void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly1, const fmpz_t den1, long len1,
                     const fmpz * poly2, const fmpz_t den2, long len2)
 
-    Forms {rpoly, rden} = {den2 poly1 - den1 poly2, den1 den2}, placing the 
-    result into canonical form, that is, the denominator is a positive 
-    integer, which is co-prime to the content of the numerator vector.
+    Forms the difference \code{(rpoly, rden)} of \code{(poly1, den1, len1)} 
+    and \code{(poly2, den2, len2)}, placing the result into canonical form, 
+    that is, the denominator is a positive integer, which is co-prime to the 
+    content of the numerator vector.
     
-    Assumes that rpoly is initialised as a sufficiently wide vector.  The 
-    input operands are assumed to be in canonical form and are also allowed to 
-    be of length 0.
+    Assumes that \code{rpoly} is initialised as a sufficiently large array. 
+    The input operands are assumed to be in canonical form and are also 
+    allowed to be of length~$0$.
     
-    {rpoly, rden} and {poly1, den1} may be aliased, but {rpoly, rden} and 
-    {poly2, den2} may not be aliased.
+    \code{(rpoly, rden)} and \code{(poly1, den1, len1)} may be aliased, 
+    but \code{(rpoly, rden)} and \code{(poly2, den2, len2)} may \emph{not} be 
+    aliased.
 
 void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 
-    Sets res to the difference of poly1 and poly2, using Henrici's algorithm.
+    Sets \code{res} to the difference of \code{poly1} and \code{poly2}, 
+    using Henrici's algorithm.
 
 *******************************************************************************
 
@@ -371,109 +389,122 @@ void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
                         const fmpz * poly, const fmpz_t den, long len, long c)
 
-    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    Sets \code{(rpoly, rden)} to the product of $c$ of 
+    \code{(poly, den, len)}, in lowest terms.
     
-    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
-    is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}.
+    Assumes that \code{(poly, den, len)} is provided in lowest terms.  Assumes 
+    that \code{rpoly} is allocated as a sufficiently large array.  Supports 
+    exact aliasing between \code{(rpoly, den)} and \code{(poly, den, len)}.
 
 void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
                        const fmpz * poly, const fmpz_t den, long len, ulong c)
 
-    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    Sets \code{(rpoly, rden)} to the product of $c$ and 
+    \code{(poly, den, len)}, in lowest terms.
     
-    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
-    is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}.
+    Assumes that \code{(poly, den, len)} is provided in lowest terms.  Assumes 
+    that \code{rpoly} is allocated as a sufficiently large array.  Supports 
+    exact aliasing between \code{(rpoly, den)} and \code{(poly, den, len)}.
 
 void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
                 const fmpz * poly, const fmpz_t den, long len, const fmpz_t c)
 
-    Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
+    Sets \code{(rpoly, rden)} to the product of $c$ and 
+    \code{(poly, den, len)}, in lowest terms.
     
-    Assumes that {poly, den} is provided in lowest terms.  Assumes that rpoly 
-    is allocated as a sufficiently large array.  Supports exact aliasing 
-    between {rpoly, den} and {poly, den}.  The fmpz_t c may not be part of 
-    {rpoly, rden}.
+    Assumes that \code{(poly, den, len)} is provided in lowest terms.  Assumes 
+    that \code{rpoly} is allocated as a sufficiently large array.  Supports 
+    exact aliasing between \code{(rpoly, den)} and \code{(poly, den, len)}.
+    The \code{fmpz_t c} may not be part of \code{(rpoly, rden)}.
 
 void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
-    Sets {rpoly, rden} = {r, s} * {poly, den}, in lowest terms.
+    Sets \code{(rpoly, rden)} to the product of $r/s$ and 
+    \code{(poly, den, len)}, in lowest terms.
     
-    Assumes that {poly, den} and {r, s} is provided in lowest terms.  Assumes 
-    that rpoly is allocated as a sufficiently large array.  Supports exact 
-    aliasing between {rpoly, den} and {poly, den}, however, there may be no 
-    partial overlap between rpoly and poly.  The fmpz_t's r and s may not be 
-    part of {rpoly, rden}.
+    Assumes that \code{(poly, den, len)} and $r/s$ are provided in lowest 
+    terms.  Assumes that \code{rpoly} is allocated as a sufficiently large 
+    array.  Supports exact aliasing between \code{(rpoly, den)} and 
+    \code{(poly, den, len)}, however, there may be no partial overlap 
+    between \code{rpoly} and \code{poly}.  The \code{fmpz_t}'s $r$ and $s$ 
+    may not be part of \code{(rpoly, rden)}.
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 
-    Sets rop to c times op.
+    Sets \code{rop} to $c$ times \code{op}.
 
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 
-    Sets rop to c times op.
+    Sets \code{rop} to $c$ times \code{op}.
 
 void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, 
                                           const fmpq_poly_t op, const fmpz_t c)
 
-    Sets rop to c times op.  Assumes that the fmpz_t c is not part of rop.
+    Sets \code{rop} to $c$ times \code{op}.  Assumes that the \code{fmpz_t c} 
+    is not part of \code{rop}.
 
 void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, 
                                            const fmpq_poly_t op, const mpz_t c)
 
-    Sets rop to c times op.
+    Sets \code{rop} to $c$ times \code{op}.
 
 void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, 
                                            const fmpq_poly_t op, const mpq_t c)
 
-    Sets rop to c times op.
+    Sets \code{rop} to $c$ times \code{op}.
 
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                    const fmpz_t den, long len, const fmpz_t c)
 
-    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $c$, 
+    in lowest terms.
     
-    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
-    aliasing between {rpoly, rden} and {poly, den}.  Assumes that c is not 
-    part of {rpoly, rden}.
+    Assumes that \code{len} is positive.  Assumes that $c$ is non-zero. 
+    Supports aliasing between \code{(rpoly, rden)} and \code{(poly, den)}. 
+    Assumes that $c$ is not part of \code{(rpoly, rden)}.
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                            const fmpz_t den, long len, long c)
 
-    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $c$, 
+    in lowest terms.
     
-    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
-    aliasing between {rpoly, rden} and {poly, den}.
+    Assumes that \code{len} is positive.  Assumes that $c$ is non-zero.  
+    Supports aliasing between \code{(rpoly, rden)} and \code{(poly, den)}.
 
 void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                                           const fmpz_t den, long len, ulong c)
 
-    Sets {rpoly, rden, len} to {poly, den, len} divided by c, in lowest terms.
+    Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $c$, 
+    in lowest terms.
     
-    Assumes that len is positive.  Assumes that c is non-zero.  Supports 
-    aliasing between {rpoly, rden} and {poly, den}.
+    Assumes that \code{len} is positive.  Assumes that $c$ is non-zero. 
+    Supports aliasing between \code{(rpoly, rden)} and \code{(poly, den)}.
 
 void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                    const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
-    Sets {rpoly, rden, len} to {poly, den, len} divided by {r, s}, 
+    Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $r/s$,
     in lowest terms.
     
-    Assumes that len is positive.  Assumes that {r, s} is non-zero and in 
-    lowest terms.  Supports aliasing between {rpoly, rden} and {poly, den}. 
-    The fmpz_t's r and s may not be part of {rpoly, poly}.
+    Assumes that \code{len} is positive.  Assumes that $r/s$ is non-zero and 
+    in lowest terms.  Supports aliasing between \code{(rpoly, rden)} and 
+    \code{(poly, den)}. The \code{fmpz_t}'s $r$ and $s$ may not be part of 
+    \code{(rpoly, poly)}.
 
 void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 
 void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 
-void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, const fmpq_poly_t op, const fmpz_t c);
+void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, 
+                                         const fmpq_poly_t op, const fmpz_t c);
 
-void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c);
+void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, 
+                                          const fmpq_poly_t op, const mpz_t c);
 
-void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c);
+void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, 
+                                          const fmpq_poly_t op, const mpq_t c);
 
 *******************************************************************************
 
@@ -485,32 +516,36 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
                     const fmpz * poly1, const fmpz_t den1, long len1, 
                     const fmpz * poly2, const fmpz_t den2, long len2)
 
-    Sets {rpoly, rden, len1 + len2 - 1} to the product of {poly1, den1, len1} 
-    and {poly2, den2, len2}.  If the input is provided in canonical form, 
-    then so is the output.
+    Sets \code{(rpoly, rden, len1 + len2 - 1)} to the product of 
+    \code{(poly1, den1, len1)} and \code{(poly2, den2, len2)}. If the 
+    input is provided in canonical form, then so is the output.
 
-    Assumes len1 >= len2 > 0.  Allows for zero-padding in the inputs.  Does 
-    not allow aliasing between the inputs and outputs.
+    Assumes \code{len1 >= len2 > 0}.  Allows zero-padding in the input. 
+    Does not allow aliasing between the inputs and outputs.
 
-void fmpq_poly_mul(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+void fmpq_poly_mul(fmpq_poly_t res,
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Sets res to the product of poly1 and poly2.
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
 void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden, 
                        const fmpz * poly1, const fmpz_t den1, long len1, 
-                       const fmpz * poly2, const fmpz_t den2, long len2, long n)
+                       const fmpz * poly2, const fmpz_t den2, long len2, 
+                       long n)
 
-    Sets {rpoly, rden, n} to the low n coefficients of {poly1, den1} and 
-    {poly2, den2}.  The output is not guaranteed to be in canonical form.
+    Sets \code{(rpoly, rden, n)} to the low $n$ coefficients of 
+    \code{(poly1, den1)} and \code{(poly2, den2)}.  The output is 
+    not guaranteed to be in canonical form.
 
-    Assumes len1 >= len2 > 0 and 0 < n <= len1 + len2 - 1.  Allows for 
-    zero-padding in the inputs.  Does not allow aliasing between the inputs 
-    and outputs.
+    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= len1 + len2 - 1}.  
+    Allows for zero-padding in the inputs.  Does not allow aliasing between 
+    the inputs and outputs.
 
 void fmpq_poly_mullow(fmpq_poly_t res, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n)
 
-    Sets res to the product of poly1 and poly2, truncated to length n.
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}, 
+    truncated to length~$n$.
 
 *******************************************************************************
 
@@ -521,9 +556,10 @@ void fmpq_poly_mullow(fmpq_poly_t res,
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
                     const fmpz * poly, const fmpz_t den, long len, ulong e)
 
-    Sets {rpoly, rden} to {poly, den}^e, assuming e, len > 0.  Assumes that 
-    rpoly is an array of length at least e * (len - 1) + 1.  Supports aliasing 
-    of {rpoly, den} and {poly, den}.
+    Sets \code{(rpoly, rden)} to \code{(poly, den)^e}, assuming 
+    \code{e, len > 0}.  Assumes that \code{rpoly} is an array of 
+    length at least \code{e * (len - 1) + 1}.  Supports aliasing 
+    of \code{(rpoly, den)} and \code{(poly, den)}.
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
@@ -538,13 +574,14 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 
 void fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
-    Set res to poly shifted left by n coefficients. Zero coefficients are 
-    inserted.
+    Set \code{res} to \code{poly} shifted left by $n$ coefficients. Zero 
+    coefficients are inserted.
 
 void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
-    Set res to poly shifted right by n coefficients. If n is equal to or 
-    greater than the current length of poly, res is set to the zero polynomial.
+    Set \code{res} to \code{poly} shifted right by $n$ coefficients. 
+    If $n$ is equal to or greater than the current length of \code{poly}, 
+    \code{res} is set to the zero polynomial.
 
 *******************************************************************************
 
@@ -556,48 +593,51 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
                        const fmpz * A, const fmpz_t a, long lenA,
                        const fmpz * B, const fmpz_t b, long lenB)
 
-    Finds the quotient {Q, q} and remainder {R, r} of the Euclidean 
-    division of {A, a} by {B, b}.
+    Finds the quotient \code{(Q, q)} and remainder \code{(R, r)} of the 
+    Euclidean division of \code{(A, a)} by \code{(B, b)}.
     
-    Assumes that lenA >= lenB > 0.  Assumes that R has space for lenA 
-    coefficients, although only the bottom lenB - 1 will carry meaningful 
-    data on exit.  Supports no aliasing between the two outputs, or 
-    between the inputs and the outputs.
+    Assumes that \code{lenA >= lenB > 0}.  Assumes that $R$ has space for 
+    \code{lenA} coefficients, although only the bottom \code{lenB - 1} will 
+    carry meaningful data on exit.  Supports no aliasing between the two 
+    outputs, or between the inputs and the outputs.
 
 void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Finds the quotient Q and remainder R of the Euclidean division of poly1 
-    by poly2.
+    Finds the quotient $Q$ and remainder $R$ of the Euclidean division of 
+    \code{poly1} by \code{poly2}.
 
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
-                       const fmpz * A, const fmpz_t a, long lenA,
-                       const fmpz * B, const fmpz_t b, long lenB)
+                    const fmpz * A, const fmpz_t a, long lenA,
+                    const fmpz * B, const fmpz_t b, long lenB)
 
-    Finds the quotient {Q, q} of the Euclidean division of {A, a} by {B, b}.
+    Finds the quotient \code{(Q, q)} of the Euclidean division 
+    of \code{(A, a)} by \code{(B, b)}.
     
-    Assumes that lenA >= lenB > 0.  Supports no aliasing between the 
-    inputs and the outputs.
+    Assumes that \code{lenA >= lenB > 0}.  Supports no aliasing 
+    between the inputs and the outputs.
 
 void fmpq_poly_div(fmpq_poly_t Q, 
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Finds the quotient Q and remainder R of the Euclidean division of poly1 
-    by poly2.
+    Finds the quotient $Q$ and remainder $R$ of the Euclidean division 
+    of \code{poly1} by \code{poly2}.
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
-                       const fmpz * A, const fmpz_t a, long lenA,
-                       const fmpz * B, const fmpz_t b, long lenB)
+                    const fmpz * A, const fmpz_t a, long lenA,
+                    const fmpz * B, const fmpz_t b, long lenB)
 
-    Finds the remainder {R, r} of the Euclidean division of {A, a} by {B, b}.
+    Finds the remainder \code{(R, r)} of the Euclidean division 
+    of \code{(A, a)} by \code{(B, b)}.
     
-    Assumes that lenA >= lenB > 0.  Supports no aliasing between the inputs 
-    and the outputs.
+    Assumes that \code{lenA >= lenB > 0}.  Supports no aliasing between 
+    the inputs and the outputs.
 
 void fmpq_poly_rem(fmpq_poly_t R, 
-                      const fmpq_poly_t poly1, const fmpq_poly_t poly2)
+                   const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Finds the remainder R of the Euclidean division of poly1 by poly2.
+    Finds the remainder $R$ of the Euclidean division 
+    of \code{poly1} by \code{poly2}.
 
 *******************************************************************************
 
@@ -608,30 +648,30 @@ void fmpq_poly_rem(fmpq_poly_t R,
 void _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long n)
 
-    Computes the first n terms of the inverse power series of poly using 
-    Newton iteration.
+    Computes the first $n$ terms of the inverse power series of 
+    \code{poly} using Newton iteration.
 
-    Assumes that n >= 1, that poly has length at least n and non-zero 
-    constant term.  Does not support aliasing.
+    Assumes that $n \geq 1$, that \code{poly} has length at least~$n$ 
+    and non-zero constant term.  Does not support aliasing.
 
 void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
-    Computes the first n terms of the inverse power series of poly using 
-    Newton iteration, assuming that poly has non-zero constant term and 
-    n >= 1.
+    Computes the first $n$ terms of the inverse power series 
+    of \code{poly} using Newton iteration, assuming that \code{poly} 
+    has non-zero constant term and $n \geq 1$.
 
 void _fmpq_poly_inv_series(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long n)
 
-    Computes the first n terms of the inverse power series of poly.
+    Computes the first $n$ terms of the inverse power series of \code{poly}.
 
-    Assumes that n >= 1, that poly has length at least n and non-zero 
-    constant term.  Does not support aliasing.
+    Assumes that $n \geq 1$, that \code{poly} has length at least~$n$ and 
+    non-zero constant term.  Does not support aliasing.
 
 void fmpq_poly_inv_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
-    Computes the first n terms of the inverse power series of poly, 
-    assuming that poly has non-zero constant term and n >= 1.
+    Computes the first $n$ terms of the inverse power series of \code{poly}, 
+    assuming that \code{poly} has non-zero constant term and $n \geq 1$.
 
 void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
                            const fmpz * A, const fmpz_t denA, 
@@ -663,12 +703,13 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long len)
 
-    Sets {rpoly, rden, len - 1} to the derivative of {poly, den, len}.  Does 
-    nothing if len <= 1.  Supports aliasing between the two polynomials.
+    Sets \code{(rpoly, rden, len - 1)} to the derivative of 
+    \code{(poly, den, len)}.  Does nothing if \code{len <= 1}.  
+    Supports aliasing between the two polynomials.
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 
-    Sets res to the derivative of poly.
+    Sets \code{res} to the derivative of \code{poly}.
 
 *******************************************************************************
 
@@ -679,25 +720,27 @@ void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
                               const fmpz_t den, long len, const fmpz_t a)
 
-    Evaluates the polynomial {poly, den, len} at the integer a and sets 
-    {rnum, rden} to the result in lowest terms.
+    Evaluates the polynomial \code{(poly, den, len)} at the integer $a$ and 
+    sets \code{(rnum, rden)} to the result in lowest terms.
 
-void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
-                             const fmpz_t a)
+void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, const fmpz_t a)
 
-    Evaluates the polynomial poly at the integer a and sets res to the result.
+    Evaluates the polynomial \code{poly} at the integer $a$ and sets 
+    \code{res} to the result.
 
 void _fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
                              const fmpz * poly, const fmpz_t den, long len, 
                              const fmpz_t anum, const fmpz_t aden)
 
-    Evaluates the polynomial {poly, den, len} at the rational {anum, aden} 
-    and sets {rnum, rden} to the result in lowest terms.  
-    Aliasing between {rnum, rden} and {anum, aden} is not supported.
+    Evaluates the polynomial \code{(poly, den, len)} at the rational 
+    \code{(anum, aden)} and sets \code{(rnum, rden)} to the result in 
+    lowest terms.  Aliasing between \code{(rnum, rden)} and 
+    \code{(anum, aden)} is not supported.
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 
-    Evaluates the polynomial poly at the rational a and sets res to the result.
+    Evaluates the polynomial \code{poly} at the rational $a$ and 
+    sets \code{res} to the result.
 
 *******************************************************************************
 
@@ -709,100 +752,103 @@ void _fmpq_poly_compose(fmpz * res, fmpz_t den,
                              const fmpz * poly1, const fmpz_t den1, long len1, 
                              const fmpz * poly2, const fmpz_t den2, long len2)
 
-    Sets {res, den} to the composition of {poly1, den1, len1} and 
-    {poly2, den2, len2}, assuming len1, len2 > 0.
+    Sets \code{(res, den)} to the composition of \code{(poly1, den1, len1)} 
+    and \code{(poly2, den2, len2)}, assuming \code{len1, len2 > 0}.
 
-    Assumes that res has space for (len1 - 1) * (len2 - 1) + 1 coefficients.
-    Does not support aliasing.
+    Assumes that \code{res} has space for \code{(len1 - 1) * (len2 - 1) + 1} 
+    coefficients.  Does not support aliasing.
 
 void fmpq_poly_compose(fmpq_poly_t res, 
                              const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
-    Sets res to the composition of poly1 and poly2.
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}.
 
 void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
               const fmpz_t den, long len, const fmpz_t xnum, const fmpz_t xden)
 
-    Sets {res, denr, len} to {poly, den, len} with the indeterminate 
-    rescaled by {xnum, xden}.
+    Sets \code{(res, denr, len)} to \code{(poly, den, len)} with the 
+    indeterminate rescaled by \code{(xnum, xden)}.
     
-    Assumes that len > 0 and {xnum, xden} is non-zero and in lowest terms.
-    Supports aliasing between {res, denr, len} and {poly, den, len}.
+    Assumes that \code{len > 0} and \code{(xnum, xden)} is non-zero and in 
+    lowest terms.  Supports aliasing between \code{(res, denr, len)} and 
+    \code{(poly, den, len)}.
 
 void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x)
 
-    Sets res to poly with the interminate rescaled by x.
+    Sets \code{res} to \code{poly} with the indeterminate rescaled by $x$.
 
 *******************************************************************************
 
-    Content
+    Gaussian content
 
 *******************************************************************************
 
 void _fmpq_poly_content(mpq_t res, 
                         const fmpz * poly, const fmpz_t den, long len)
 
-    Sets res to the content of {poly, den, len}.  If len == 0, sets res to 
-    zero.
+    Sets \code{res} to the content of \code{(poly, den, len)}.  
+    If \code{len == 0}, sets \code{res} to zero.
 
 void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly)
 
-    Sets res to the content of poly.  The content of the zero polynomial 
-    is defined to be zero.
+    Sets \code{res} to the content of \code{poly}.  The content of the zero 
+    polynomial is defined to be zero.
 
 void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
                                const fmpz * poly, const fmpz_t den, long len)
 
-    Sets {rpoly, rden, len} to the primitive part (with non-negative leading 
-    coefficient) of {poly, den, len}.  Assumes that len > 0.  Supports 
-    aliasing between the two polynomials.
+    Sets \code{(rpoly, rden, len)} to the primitive part, with non-negative 
+    leading coefficient, of \code{(poly, den, len)}.  Assumes that 
+    \code{len > 0}.  Supports aliasing between the two polynomials.
 
 void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
 
-    Sets res to the primitive part (with non-negative leading coefficient) 
-    of poly.
+    Sets \code{res} to the primitive part, with non-negative leading 
+    coefficient, of \code{poly}.
 
 int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, long len)
 
-    Returns whether the polynomial {poly, den, len} is monic.  The zero 
-    polynomial is not monic by definition.
+    Returns whether the polynomial \code{(poly, den, len)} is monic. 
+    The zero polynomial is not monic by definition.
 
 int fmpq_poly_is_monic(const fmpq_poly_t poly)
 
-    Returns whether the polynomial poly is monic.  The zero polynomial is 
-    not monic by definition.
+    Returns whether the polynomial \code{poly} is monic. The zero 
+    polynomial is not monic by definition.
 
 void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long len)
 
-    Sets {rpoly, rden, len} to the monic scalar multiple of {poly, den, len}. 
-    Assumes that len > 0.  Supports aliasing between the two polynomials.
+    Sets \code{(rpoly, rden, len)} to the monic scalar multiple of 
+    \code{(poly, den, len)}.  Assumes that \code{len > 0}.  Supports 
+    aliasing between the two polynomials.
 
 void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 
-    Sets res to the monic scalar multiple of poly whenever poly is non-zero. 
-    If poly is the zero polynomial, sets res to zero.
+    Sets \code{res} to the monic scalar multiple of \code{poly} whenever 
+    \code{poly} is non-zero.  If \code{poly} is the zero polynomial, sets 
+    \code{res} to zero.
 
-********************************************************************************
+*******************************************************************************
 
     Square-free
 
-********************************************************************************
+*******************************************************************************
 
 int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
 
-    Returns whether the polynomial {poly, den, len} is square-free.
+    Returns whether the polynomial \code{(poly, den, len)} is square-free.
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
 
-    Returns whether the polynomial poly is square-free.  A non-zero polynomial 
-    is defined to be square-free if it has no non-unit square factors.  We 
-    also define the zero polynomial to be square-free.
+    Returns whether the polynomial \code{poly} is square-free.  A non-zero 
+    polynomial is defined to be square-free if it has no non-unit square 
+    factors.  We also define the zero polynomial to be square-free.
     
-    Returns 1 if the length of poly is at most 2.  Returns whether the 
-    discriminant is zero for quadratic polynomials.  Otherwise, returns 
-    whether the greatest common divisor of poly and its derivative has 
-    length 1.
+    Returns~$1$ if the length of \code{poly} is at most~$2$.  Returns whether 
+    the discriminant is zero for quadratic polynomials.  Otherwise, returns 
+    whether the greatest common divisor of \code{poly} and its derivative has 
+    length~$1$.
 
 *******************************************************************************
 
@@ -812,10 +858,11 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
 
 void fmpq_poly_print(const fmpq_poly_t poly)
 
-    Prints the string representation of poly to stdout.
+    Prints the string representation of \code{poly} to \code{stdout}.
 
 void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
-    Prints the pretty representation of poly to stdout, using the 
-    null-terminated string var not equal to "\0" as the variable name.
+    Prints the pretty representation of \code{poly} to \code{stdout}, using 
+    the null-terminated string \code{var} not equal to \code{"\0"} as the 
+    variable name.
 
