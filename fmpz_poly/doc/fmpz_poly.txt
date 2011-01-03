@@ -395,6 +395,11 @@ void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 
     Sets \code{poly} to \code{poly1 + x * poly2}.
 
+void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
+                                                                const fmpz_t x)
+
+    Sets \code{poly} to \code{poly1 - x * poly2}.
+
 void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
