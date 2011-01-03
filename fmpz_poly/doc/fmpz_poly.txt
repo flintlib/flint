@@ -298,9 +298,9 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
     length of \code{poly} then the polynomial is extended and zero 
     coefficients inserted if necessary.
 
-fmpz_t fmpz_poly_lead(const fmpz_poly_t poly)
+fmpz * fmpz_poly_lead(const fmpz_poly_t poly)
 
-    Returns a reference to the leading coefficient (as an \code{fmpz_t}) 
+    Returns a reference to the leading coefficient (as an \code{fmpz *}) 
     of the polynomial.  This function is provided so that the leading 
     coefficient can be easily accessed and operated on by functions in 
     the \code{fmpz} module.  This function does not make a copy of the 
