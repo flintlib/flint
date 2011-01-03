@@ -1,7 +1,4 @@
-/*============================================================================
-
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -19,28 +16,53 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Andy Novocin
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Gram--Schmidt orthogonalisation
+
+*******************************************************************************
 
 void GSO_mpfr(mpfr_mat_t r, mpfr_t max, mpfr_mat_t mu, fmpz_mat_t G, 
-                                       long a, long kappa, long zeroes)
+                                    long a, long kappa, long zeroes)
 
-   Given a matrix B with rows b_i, the Gram-Schmidt Orthogonalisation of B is defined by
-   b_0* = b_0, b_i* = b_i - sum_{j=0}^{i-1} mu_{i,j} b_j*, where 
-   mu_{i,j} = <b_i, b_j*> / ||b_j*||^2.
+    Given a matrix $B$ with rows $b_i$, the Gram--Schmidt orthogonalisation 
+    of $B$ is defined by 
+    \begin{align*}
+    b_0* & = b_0, \\
+    b_i* & = b_i - \sum_{j=0}^{i-1} \mu_{i,j} b_j*, 
+    \end{align*}
+    where $\mu_{i,j} = \langle b_i, b_j* \rangle / \norm{b_j*}^2$.
 
-   For convenience, we denote r_{i,j} = <b_i, b_j*> and G_{i,j} = <b_i, b_j}
+    For convenience, we denote $r_{i,j} = \langle b_i, b_j* \rangle$ and 
+    $G_{i,j} = \langle b_i, b_j \rangle$.
 
-   Given the relevant values of r_{i,j}, mu_{i,j} and G_{i,j} for j < kappa this function 
-   computes r_{kappa,j} for a <= j < kappa. 
+    Given the relevant values of $r_{i,j}$, $\mu_{i,j}$ and $G_{i,j}$ 
+    for $j < \kappa$ this function computes $r_{\kappa,j}$ for 
+    $a \leq j < \kappa$.
 
-   Note r_{k,j} = <b_k, b_j*> = <b_k, b_j> - sum_{l=0}^{j-1} mu_{j,l} <b_k, b_l*>
-   = G_{k,j} - sum{l=0}^{j-1} mu_{j,l} r_{k,l}.
+    Note that 
+    \begin{align*}
+    r_{k,j} & = \langle b_k, b_j* \rangle \\
+            & = \langle b_k, b_j \rangle 
+                - \sum_{l=0}^{j-1} \mu_{j,l} \langle b_k, b_l* \rangle \\
+            & = G_{k,j} - \sum_{l=0}^{j-1} \mu_{j,l} r_{k,l}.
+    \end{align*}
 
-   As a refinement, we allow the first rows of B to be zero, the number of which is given 
-   by the parameter zeroes.
+    As a refinement, we allow the first rows of $B$ to be zero, the 
+    number of which is given by the parameter \code{zeroes}.
 
-   Upon return, max is set to the absolute value of the maximum mu[kappa][i] which is 
-   computed in the range a <= j < kappa.
+    Upon return, \code{max} is set to the absolute value of the 
+    maximum $\mu_{\kappa,i}$ which is computed in the range 
+    $a \leq j < \kappa$.
 
-   The parameters a, kappa, and zeroes are assumed to be non-negative.
+    The parameters $a$, $\kappa$, and \code{zeroes} are assumed to be 
+    non-negative.
 

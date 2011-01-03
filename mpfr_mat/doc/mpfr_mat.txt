@@ -38,4 +38,5 @@ void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec)
 
 void mpfr_mat_clear(mpfr_mat_t mat)
  
-   Clears the given matrix.
+    Clears the given matrix.
+
