@@ -53,6 +53,13 @@ int main(int argc, char* argv[])
     /* Number of terms to compute */
     N = atoi(argv[1]);
 
+    if (N < 1)
+    {
+        printf("Syntax: delta_qexp <integer>\n");
+        printf("where <integer> is the number of terms to compute\n");
+        return EXIT_FAILURE;
+    }
+
     /* Compute coefficients of F(q)^2 */
     values = calloc(N, sizeof(long));
 
