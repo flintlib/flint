@@ -182,6 +182,9 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x);
 
 void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n);
 
+#define fmpz_poly_get_coeff_ptr(poly, n) \
+    ((n) < (poly)->length ? (poly)->coeffs + (n) : NULL)
+
 #define fmpz_poly_lead(poly) \
     ((poly)->length ? (poly)->coeffs + (poly)->length - 1 : NULL)
 
