@@ -852,17 +852,58 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly)
 
 *******************************************************************************
 
-    Printing
+    Input and output
 
 *******************************************************************************
 
-void fmpq_poly_print(const fmpq_poly_t poly)
+int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, long len)
 
-    Prints the string representation of \code{poly} to \code{stdout}.
+    Prints the polynomial \code{(poly, den, len)} to \code{stdout}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpq_poly_print(const fmpq_poly_t poly)
+
+    Prints the polynomial to \code{stdout}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
 
 void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of \code{poly} to \code{stdout}, using 
     the null-terminated string \code{var} not equal to \code{"\0"} as the 
     variable name.
+
+int _fmpq_poly_fprint(FILE * file, 
+                      const fmpz * poly, const fmpz_t den, long len)
+
+    Prints the polynomial \code{(poly, den, len)} to the stream \code{file}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly)
+
+    Prints the polynomial to the stream \code{file}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int fmpq_poly_read(fmpq_poly_t poly)
+
+    Reads a polynomial from \code{stdin}, storing the result 
+    in \code{poly}.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
+
+int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
+
+    Reads a polynomial from the stream \code{file}, storing the result 
+    in \code{poly}.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive number.
 
