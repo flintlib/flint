@@ -161,6 +161,18 @@ void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
 }
 
 static __inline__
+void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
+{
+    long i;
+    for (i = 0; i < length; i++)
+    {
+        mp_limb_t t = a[i];
+        a[i] = b[i];
+        b[i] = t;
+    }
+}
+
+static __inline__
 int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 {
    long i;

@@ -31,6 +31,40 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 
+#define NMOD_DIVREM_DIVCONQUER_CUTOFF  500
+
+static __inline__
+long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
+{
+    mp_bitcnt_t bits;
+
+    bits =
+        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
+    
+    if (bits <= FLINT_BITS)
+        return lenA;
+    else if (bits <= 2 * FLINT_BITS)
+        return 2*(lenA + lenB - 1);
+    else
+        return 3*(lenA + lenB - 1);
+}
+
+static __inline__
+long NMOD_DIVREM_DC_ITCH(long lenB, nmod_t mod)
+{
+    long i = 0;
+    
+    while (lenB > NMOD_DIVREM_DIVCONQUER_CUTOFF + i)
+    {
+        lenB = (lenB + 1)/2;
+        i++;
+    }
+    if (lenB > NMOD_DIVREM_DIVCONQUER_CUTOFF)
+        lenB = NMOD_DIVREM_DIVCONQUER_CUTOFF;
+
+    return NMOD_DIVREM_BC_ITCH(2*lenB - 1, lenB, mod) + 2*lenB - 1;
+}
+
 typedef struct
 {
     mp_ptr coeffs;
@@ -308,10 +342,19 @@ void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly,
 void nmod_poly_pow_trunc(nmod_poly_t res, 
                                   const nmod_poly_t poly, long trunc, ulong e);
 
-void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
+void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, 
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
+                    mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod);
+
+void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
+                   mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);

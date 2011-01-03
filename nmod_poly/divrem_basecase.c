@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
+_nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
@@ -39,29 +39,31 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
     long coeff = A_len - 1;
     mp_ptr coeff_Q = Q - B_len + 1;
 
-    mpn_copyi(R, A, A_len);
+    mp_ptr R1 = W;
+    
+    mpn_copyi(R1, A, A_len);
 
     while (coeff + 1 >= B_len)
     {
-        R[coeff] = n_mod2_preinv(R[coeff], mod.n, mod.ninv);
+        R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
 
-        while ((coeff + 1 >= B_len) && (R[coeff] == 0L))
+        while ((coeff + 1 >= B_len) && (R1[coeff] == 0L))
         {
             coeff_Q[coeff--] = 0L;
             if (coeff + 1 >= B_len)
-                R[coeff] = n_mod2_preinv(R[coeff], mod.n, mod.ninv);
+                R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
         }
 
         if (coeff + 1 >= B_len)
         {
-            mp_limb_t c, *R_sub;
+            mp_limb_t c, * R_sub;
 
             coeff_Q[coeff] =
-                n_mulmod2_preinv(R[coeff], lead_inv, mod.n, mod.ninv);
+                n_mulmod2_preinv(R1[coeff], lead_inv, mod.n, mod.ninv);
 
             c = n_negmod(coeff_Q[coeff], mod.n);
 
-            R_sub = R + coeff - B_len + 1;
+            R_sub = R1 + coeff - B_len + 1;
             if (B_len > 1)
                 mpn_addmul_1(R_sub, B, B_len - 1, c);
 
@@ -71,13 +73,13 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R,
 
     while (coeff + 1 > 0)
     {
-        R[coeff] = n_mod2_preinv(R[coeff], mod.n, mod.ninv);
+        R[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
         coeff--;
     }
 }
 
 void
-_nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
+_nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
@@ -85,14 +87,14 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_ptr coeff_Q, B2, R2;
 
-    B2 = nmod_vec_init(2 * B_len - 2);
+    B2 = W;
     for (i = 0; i < B_len - 1; i++)
     {
         B2[2 * i] = B[i];
         B2[2 * i + 1] = 0;
     }
 
-    R2 = nmod_vec_init(2 * A_len);
+    R2 = W + 2*(B_len - 1);
     for (i = 0; i < A_len; i++)
     {
         R2[2 * i] = A[i];
@@ -140,13 +142,10 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R,
             n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n, mod.ninv);
         coeff--;
     }
-
-    nmod_vec_free(B2);
-    nmod_vec_free(R2);
 }
 
 void
-_nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
+_nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
@@ -155,7 +154,7 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
     mp_limb_t r_coeff;
     mp_ptr B3, R3, coeff_Q;
 
-    B3 = nmod_vec_init(3 * B_len - 3);
+    B3 = W;
     for (i = 0; i < B_len - 1; i++)
     {
         B3[3 * i] = B[i];
@@ -163,7 +162,7 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
         B3[3 * i + 2] = 0;
     }
 
-    R3 = nmod_vec_init(3 * A_len);
+    R3 = W + 3*(B_len - 1);
     for (i = 0; i < A_len; i++)
     {
         R3[3 * i] = A[i];
@@ -213,13 +212,10 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R,
                              R3[3 * coeff], mod.n, mod.ninv);
         coeff--;
     }
-
-    nmod_vec_free(B3);
-    nmod_vec_free(R3);
 }
 
 void
-_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R,
+_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
                            mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                            nmod_t mod)
 {
@@ -227,27 +223,32 @@ _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R,
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
 
     if (bits <= FLINT_BITS)
-        _nmod_poly_divrem_basecase_1(Q, R, A, A_len, B, B_len, mod);
+        _nmod_poly_divrem_basecase_1(Q, R, W, A, A_len, B, B_len, mod);
     else if (bits <= 2 * FLINT_BITS)
-        _nmod_poly_divrem_basecase_2(Q, R, A, A_len, B, B_len, mod);
+        _nmod_poly_divrem_basecase_2(Q, R, W, A, A_len, B, B_len, mod);
     else
-        _nmod_poly_divrem_basecase_3(Q, R, A, A_len, B, B_len, mod);
+        _nmod_poly_divrem_basecase_3(Q, R, W, A, A_len, B, B_len, mod);
 }
 
 void
 nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
                           const nmod_poly_t B)
 {
-    mp_ptr Q_coeffs, R_coeffs;
+    mp_ptr Q_coeffs, R_coeffs, W;
     nmod_poly_t t1, t2;
+    long Alen, Blen, bits;
 
-    if (B->length == 0)
+    Blen = B->length;
+
+    if (Blen == 0)
     {
         printf("Exception: division by zero in nmod_poly_divrem_basecase\n");
         abort();
     }
 
-    if (A->length < B->length)
+    Alen = A->length;
+
+    if (Alen < Blen)
     {
         nmod_poly_set(R, A);
         nmod_poly_zero(Q);
@@ -258,47 +259,50 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     if ((Q == A) || (Q == B))
     {
         nmod_poly_init2_preinv(t1, B->mod.n, B->mod.ninv,
-                               A->length - B->length + 1);
+                               Alen - Blen + 1);
         Q_coeffs = t1->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(Q, A->length - B->length + 1);
+        nmod_poly_fit_length(Q, Alen - Blen + 1);
         Q_coeffs = Q->coeffs;
     }
 
     if ((R == A) || (R == B))
     {
-        nmod_poly_init2_preinv(t2, B->mod.n, B->mod.ninv, A->length);
+        nmod_poly_init2_preinv(t2, B->mod.n, B->mod.ninv, Blen - 1);
         R_coeffs = t2->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(R, A->length);
+        nmod_poly_fit_length(R, Blen - 1);
         R_coeffs = R->coeffs;
     }
 
-    _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, A->coeffs, A->length,
-                               B->coeffs, B->length, B->mod);
+    W = nmod_vec_init(NMOD_DIVREM_BC_ITCH(Alen, Blen, A->mod));
+    
+    _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, Alen,
+                               B->coeffs, Blen, B->mod);
 
     if ((Q == A) || (Q == B))
     {
-        t1->length = A->length - B->length + 1;
+        t1->length = Alen - Blen + 1;
         nmod_poly_swap(Q, t1);
         nmod_poly_clear(t1);
     }
     else
-        Q->length = A->length - B->length + 1;
+        Q->length = Alen - Blen + 1;
 
     if ((R == A) || (R == B))
     {
-        t2->length = B->length - 1;
+        t2->length = Blen - 1;
         nmod_poly_swap(R, t2);
         nmod_poly_clear(t2);
     }
     else
-        R->length = B->length - 1;
+        R->length = Blen - 1;
 
+    nmod_vec_free(W);
     _nmod_poly_normalise(Q);
     _nmod_poly_normalise(R);
 }

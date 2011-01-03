@@ -138,6 +138,11 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
     Returns $1$ if \code{(vec, len)} is equal to \code{(vec2, len)}, 
     else return $0$.
 
+void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
+
+   Swap the vectors \code{a} and \code{b} of length $n$ by actually
+   swapping the entries.
+
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 
     Reduces the entries of \code{(vec, len)} modulo \code{mod.n} and set 
