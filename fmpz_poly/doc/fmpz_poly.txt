@@ -1342,24 +1342,6 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
 
 *******************************************************************************
 
-    Modular arithmetic
-
-*******************************************************************************
-
-void fmpz_poly_invmod(fmpz_poly_t H, fmpz_t d, const fmpz_poly_t poly1, 
-                                               const fmpz_poly_t poly2)
-
-    Computes a polynomial $H$ and a denominator $d$ such that the 
-    product of \code{poly1} and \code{H} is congruent to \code{d} 
-    modulo \code{poly2}.
-
-    Assumes that \code{poly1} and \code{poly2} are coprime and that 
-    \code{poly2} is monic.
-
-    This function is useful for computing inverses in number field arithmetic.
-
-*******************************************************************************
-
     Derivative
 
 *******************************************************************************
