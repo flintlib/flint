@@ -1073,7 +1073,7 @@ void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
     temporary array \code{temp} of length $2 \len(B) - 1$.  Does not support 
     any aliasing.
 
-    See Thom Mulders, On Short Multiplications and Divisions.
+    For further details, see~\citep{Mul2000}.
 
 void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
                                          const fmpz * B, long lenB)
