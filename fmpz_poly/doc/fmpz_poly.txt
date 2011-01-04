@@ -1079,8 +1079,8 @@ void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
                                          const fmpz * B, long lenB)
 
     Computes the quotient \code{(Q, lenA - lenB + 1)} of \code{(A, lenA)} 
-    upon division by \code{(B, lenB)}.  Assumes that $\len(A) \geq len(B) > 0$.
-    Does not support aliasing.
+    upon division by \code{(B, lenB)}.  Assumes that 
+    $\len(A) \geq \len(B) > 0$.  Does not support aliasing.
 
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)
