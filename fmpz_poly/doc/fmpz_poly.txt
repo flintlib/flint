@@ -113,13 +113,13 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets \code{poly1} to equal \code{poly2}.
 
-void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
-
-    Sets \code{poly} to the unsigned integer \code{c}.
-
 void fmpz_poly_set_si(fmpz_poly_t poly, long c)
 
     Sets \code{poly} to the signed integer \code{c}.
+
+void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
+
+    Sets \code{poly} to the unsigned integer \code{c}.
 
 void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c)
 
