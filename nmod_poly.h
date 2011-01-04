@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2011 William Hart
 
 ******************************************************************************/
 
@@ -47,6 +47,22 @@ long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
         return 2*(lenA + lenB - 1);
     else
         return 3*(lenA + lenB - 1);
+}
+
+static __inline__
+long NMOD_DIV_BC_ITCH(long lenA, long lenB, nmod_t mod)
+{
+    mp_bitcnt_t bits;
+
+    bits =
+        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
+    
+    if (bits <= FLINT_BITS)
+        return lenA - lenB + 1;
+    else if (bits <= 2 * FLINT_BITS)
+        return 2*lenA;
+    else
+        return 3*lenA;
 }
 
 static __inline__
@@ -356,6 +372,12 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, long A_len, 
+                                          mp_srcptr B, long B_len, nmod_t mod);
+
+void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
+                                                          const nmod_poly_t B);
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
