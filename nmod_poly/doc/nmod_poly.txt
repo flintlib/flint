@@ -76,6 +76,10 @@ void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 
 *******************************************************************************
 
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
+
+    Sets \code{a} to a copy of \code{b}.
+
 void _nmod_poly_normalise(nmod_poly_t poly)
 
     Internal function for normalising a polynomial so that the final 
