@@ -49,6 +49,7 @@
 \usepackage{paralist}
 \usepackage{fancyhdr}
 \usepackage{sectsty}
+\usepackage{epigraph}
 \usepackage{natbib}
 \usepackage{url}
 \usepackage[T1]{fontenc}
@@ -107,6 +108,24 @@
 \allsectionsfont{\nohang\centering}
 
 \sectionfont{\nohang\centering\large}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+\begin{center}
+\bfseries\Huge\S \thechapter.\ #1
+\end{center}
+\vspace*{40 pt}}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%
+% Table of contents %
+%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tocloft}
+
+\addtolength{\cftsecnumwidth}{0.8em}
+\addtolength{\cftbeforesecskip}{0.05em}
 
 %%%%%%%%%%%%
 % fancyhdr %
@@ -241,8 +260,6 @@
 
 \frontmatter
 
-%\maketitle
-
 \input{title.tex}
 \clearpage
 
@@ -277,9 +294,7 @@ in an appropriately named test file.  For example, the function
 \code{fmpz_poly_add} located in \code{fmpz_poly/add.c} has test code in the 
 file \code{fmpz_poly/test/t-add.c}.
 
-\chapter{Installing FLINT}
-
-\section{Building FLINT}
+\chapter{Building and using FLINT}
 
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
@@ -293,13 +308,11 @@ in the \code{flint_env} file.
 
 Once the environment variables are set or defaults are set in 
 \code{flint_env} simply type:
-
 \begin{lstlisting}[language=bash]
 source flint_env
 \end{lstlisting}
 
 in the main directory of the FLINT directory tree.  Finally type:
-
 \begin{lstlisting}[language=bash]
 make library
 \end{lstlisting}
@@ -314,21 +327,20 @@ the FLINT modules you wish to use in your C program.  Then compile
 your program, linking against the FLINT library and GMP/MPIR with 
 the options \code{-lflint -lgmp}.
 
-\section{Test code}
+\chapter{Test code}
 
 Each module of FLINT has an extensive associated test module.  We 
 strongly recommend running the test programs before relying on results 
 from FLINT on your system. 
 
 To make and run the test programs, simply type:
-
 \begin{lstlisting}[language=bash]
 make check
 \end{lstlisting}
 
 in the main FLINT directory.
 
-\section{Reporting bugs}
+\chapter{Reporting bugs}
 
 The maintainer wishes to be made aware of any and all bugs.  Please send an 
 email with your bug report to \url{hart_wb@yahoo.com}.
@@ -341,7 +353,7 @@ or version 0.9.0 or later of MPIR (in GMP compatibility mode) and must be
 compiled with gcc version 3.4 or later.  In particular the compiler must be 
 fully C99 compatible.
 
-\section{Example programs}
+\chapter{Example programs}
 
 FLINT comes with a number of example programs to demonstrate current and 
 future FLINT features.  To build the example programs, type:
@@ -390,9 +402,9 @@ congruent number theta function curve will be computed up to
 divisible by \code{BLOCK} and by \code{BUNDLE * FILES1}.  The code is not 
 currently designed to correctly handle small problems. 
 
-\section{FLINT macros}
+\chapter{FLINT macros}
 
-In the file \code{flint.h} are various useful macros.
+The file \code{flint.h} contains various useful macros.
 
 The macro constant \code{FLINT_BITS} is set at compile time to be the 
 number of bits per limb on the machine.  FLINT requires it to be either 
@@ -404,22 +416,27 @@ whichever is smaller.  This will have the value 53 or 32 on currently
 supported architectures.  Numerous functions using precomputed inverses 
 only support operands up to \code{FLINT_D_BITS} bits, hence the macro.
 
-\code{FLINT_ABS(x)} returns the absolute value of a \code{long x}.
+The macro \code{FLINT_ABS(x)} returns the absolute value of \code{x}
+for primitive signed numerical types.  It might fail for least negative 
+values such as \code{INT_MIN} and \code{LONG_MIN}.
 
-\code{FLINT_MIN(x, y)} returns the minimum of two \code{long} or two 
-\code{unsigned long} values \code{x} and \code{y}.
+The macro \code{FLINT_MIN(x, y)} returns the minimum of \code{x} and 
+\code{y} for primitive signed or unsigned numerical types.  This macro 
+is only safe to use when \code{x} and \code{y} are of the same type, 
+to avoid problems with integer promotion.
 
-\code{FLINT_MAX(x, y)} returns the maximum of two \code{long} or two 
-\code{unsigned long} values \code{x} and \code{y}.
+Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the 
+maximum of \code{x} and \code{y}.
 
-\code{FLINT_BIT_COUNT(x)} returns the number of binary bits required 
-to represent an \code{unsigned long x}.
+The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits 
+required to represent an \code{unsigned long x}.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Integers}
+\chapter{fmpz}
+\epigraph{Arbitrary precision integers}{}
 
 \section{Introduction}
 
@@ -457,7 +474,7 @@ fmpz myarr[100];
 \end{lstlisting}
 Now recall that an \code{fmpz_t} is an array of length one of \code{fmpz}'s.
 Thus, a pointer to an \code{fmpz} can be used in place of an \code{fmpz_t}.
-For example, to find the sign of the third integer in our arrat we would 
+For example, to find the sign of the third integer in our array we would 
 write 
 \begin{lstlisting}
 int sign = fmpz_sgn(myarr + 2);
@@ -503,7 +520,8 @@ We now describe the functions available in the \code{fmpz} module.
 % Integer vectors                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Integer vectors}
+\chapter{fmpz\_vec}
+\epigraph{Vectors over $\Z$}{}
 
 \input{fmpz_vec.tex}
 
@@ -511,7 +529,8 @@ We now describe the functions available in the \code{fmpz} module.
 % Integer matrices                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Integer matrices}
+\chapter{fmpz\_mat}
+\epigraph{Matrices over $\Z$}{}
 
 \section{Introduction}
 
@@ -529,7 +548,8 @@ otherwise noted.
 % Integer polynomials                                                          %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Integer polynomials}
+\chapter{fmpz\_poly}
+\epigraph{Polynomials over $\Z$}{}
 
 \section{Introduction}
 
@@ -551,7 +571,6 @@ between their input arguments and between their input and output arguments.
 \section{Simple example}
 
 The following example computes the square of the polynomial $5x^3 - 1$.
-
 \begin{lstlisting}[language=c]
 #include "fmpz_poly.h"
 ...
@@ -568,7 +587,6 @@ fmpz_poly_clear(y);
 \end{lstlisting}
 
 The output is:
-
 \begin{lstlisting}
 4  -1 0 0 5
 7  1 0 0 -10 0 0 25
@@ -613,7 +631,8 @@ We now describe the functions available in \code{fmpz_poly}.
 % Rational polynomials                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Rational polynomials}
+\chapter{fmpq\_poly}
+\epigraph{Polynomials over $\Q$}{}
 
 \input{fmpq_poly.tex}
 
@@ -621,7 +640,8 @@ We now describe the functions available in \code{fmpz_poly}.
 % Single limb arithmetic                                                       %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Single limb arithmetic}
+\chapter{ulong\_extras}
+\epigraph{Unsigned single limb arithmetic}{}
 
 \input{ulong_extras.tex}
 
@@ -629,7 +649,8 @@ We now describe the functions available in \code{fmpz_poly}.
 %                                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Vectors over $\Z / n \Z$ for word-sized moduli}
+\chapter{nmod\_vec}
+\epigraph{Vectors over $\Z / n \Z$ for word-sized moduli}{}
 
 \input{nmod_vec.tex}
 
@@ -637,7 +658,8 @@ We now describe the functions available in \code{fmpz_poly}.
 %                                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Polynomials over $\Z / n \Z$ for word-sized moduli}
+\chapter{nmod\_poly}
+\epigraph{Polynomials over $\Z / n \Z$ for word-sized moduli}{}
 
 \input{nmod_poly.tex}
 
@@ -645,7 +667,8 @@ We now describe the functions available in \code{fmpz_poly}.
 % Matrices over Z / nZ for word-sized moduli                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Matrices over $\Z / n \Z$ for word-sized moduli}
+\chapter{nmod\_mat}
+\epigraph{Matrices over $\Z / n \Z$ for word-sized moduli}{}
 
 \section{Introduction}
 
@@ -669,7 +692,8 @@ requirement explicitly.
 % Arithmetic functions                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Arithmetic functions}
+\chapter{arith}
+\epigraph{Arithmetic functions}{}
 
 \section{Introduction}
 
@@ -683,6 +707,8 @@ combinatorial special number sequences and polynomials.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{LLL}
+\epigraph{Functionality supporting the Lenstra--Lenstra--Lov\'asz algorithm 
+          for lattice reduction}{}
 
 \input{LLL.tex}
 
