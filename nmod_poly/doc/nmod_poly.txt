@@ -668,7 +668,7 @@ void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 void _nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
                                                  mp_srcptr Q, long n, nmod_t mod)
     
-    Given \code{Q} of length \code{n} whose leasing coefficient is invertible
+    Given \code{Q} of length \code{n} whose leading coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that the top \code{n} coefficients of the product \code{Q * Qinv} is
     $x^{n - 1}$. Requires that \code{n > 0}.
@@ -682,6 +682,19 @@ void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv,
     or if the length of \code{Q} is less than \code{n}. The leading 
     coefficient of \code{Q} must be invertible modulo the modulus of 
     \code{Q}.
+ 
+void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+    
+    Given \code{Q} of length \code{n} whose constant coefficient is invertible
+    modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
+    such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
+   
+void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+
+    Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
+    modulo $x^n$. The constant coefficient of \code{Q} must be invertible 
+    modulo the modulus of \code{Q}. An exception is raised if this is not
+    the case or if \code{n = 0}.
  
 *******************************************************************************
 

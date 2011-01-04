@@ -406,6 +406,10 @@ void _nmod_poly_invert_newton_basecase(mp_ptr Qinv,
 void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, long n);
 
+void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n);
+
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
