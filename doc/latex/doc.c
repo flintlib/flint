@@ -150,11 +150,11 @@ static int open_function()
     fnc_open = 1;
 
     fprintf(out, "\n");
-    fprintf(out, "\\vspace{0.5em}\n");
+    fprintf(out, "\\vspace*{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
     fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
     fprintf(out, "\\end{lstlisting}\n");
-    fprintf(out, "\\vspace{-0.5em}\n");
+    fprintf(out, "\\vspace*{-0.5em}\n");
 
     return DOCS_SUCCESS;
 }
