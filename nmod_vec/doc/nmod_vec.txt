@@ -128,18 +128,13 @@ void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod)
 
 *******************************************************************************
 
-void _nmod_vec_zero(mp_ptr vec, long len)
-
-    Zeros the given vector of the given length.
-
 void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
 
     Copies \code{len} entries from the vector \code{vec} to \code{res}.
 
-int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
+void _nmod_vec_zero(mp_ptr vec, long len)
 
-    Returns $1$ if \code{(vec, len)} is equal to \code{(vec2, len)}, 
-    else return $0$.
+    Zeros the given vector of the given length.
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 
@@ -149,6 +144,11 @@ void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len)
 
     Returns the maximum number of bits of any entry in the vector.
+
+int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
+
+    Returns $1$ if \code{(vec, len)} is equal to \code{(vec2, len)}, 
+    else return $0$.
 
 *******************************************************************************
 
