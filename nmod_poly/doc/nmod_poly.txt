@@ -323,17 +323,17 @@ void nmod_poly_scalar_mul(nmod_poly_t res,
 void _nmod_poly_make_monic(mp_ptr output, 
                                       mp_srcptr input, long len, nmod_t mod)
 
-    Set \code{output} to be the scalar multiple of \code{input} (of 
-    length \code{len > 0}) that has leading coefficient one (if such a 
-    polynomial exists). If the leading coefficient of \code{input} is not
+    Sets \code{output} to be the scalar multiple of \code{input} of 
+    length \code{len > 0} that has leading coefficient one, if such a 
+    polynomial exists. If the leading coefficient of \code{input} is not
     invertible, \code{output} is set to the multiple of \code{input} whose
     leading coefficient is the greatest common divisor of the leading 
     coefficient and the modulus of \code{input}.
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
-    Set \code{output} to be the scalar multiple of \code{input} with leading
-    coefficient one (if such a polynomial exists). If \code{input} is zero
+    Sets \code{output} to be the scalar multiple of \code{input} with leading
+    coefficient one, if such a polynomial exists. If \code{input} is zero
     an exception is raised. If the leading coefficient of \code{input} is not
     invertible, \code{output} is set to the multiple of \code{input} whose
     leading coefficient is the greatest common divisor of the leading 
