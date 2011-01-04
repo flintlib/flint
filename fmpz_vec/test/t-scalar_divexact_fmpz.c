@@ -50,7 +50,7 @@ main(void)
         fmpz_t n;
         long len = n_randint(100);
         fmpz_init(n);
-        fmpz_randtest(n, state, 100);
+        fmpz_randtest_not_zero(n, state, 100);
         if (n_randint(2))
             fmpz_neg(n, n);
 
@@ -58,8 +58,42 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
 
-        _fmpz_vec_scalar_mul_fmpz(b, a, len, n);
         _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
+        _fmpz_vec_scalar_divexact_fmpz(b, a, len, n);
+        _fmpz_vec_scalar_divexact_fmpz(a, a, len, n);
+
+        result = (_fmpz_vec_equal(a, b, len));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
+            _fmpz_vec_print(b, len), printf("\n\n");
+            abort();
+        }
+
+        _fmpz_vec_clear(a, len);
+        _fmpz_vec_clear(b, len);
+        fmpz_clear(n);
+    }
+
+    /* Check that a * n / n == a */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz *a, *b;
+        fmpz_t n;
+        long len = n_randint(100);
+        fmpz_init(n);
+        fmpz_randtest_not_zero(n, state, 100);
+        if (n_randint(2))
+            fmpz_neg(n, n);
+
+        a = _fmpz_vec_init(len);
+        b = _fmpz_vec_init(len);
+        _fmpz_vec_randtest(a, state, len, 200);
+
+        _fmpz_vec_copy(b, a, len);
+        _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
+        _fmpz_vec_scalar_divexact_fmpz(a, a, len, n);
 
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)

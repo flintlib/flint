@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -27,7 +28,6 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
 
 void
@@ -46,22 +46,20 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is also small */
         {
-            fmpz q = c1 / c2;     /* compute C quotient */
-            fmpz r = c1 - c2 * q;  /* compute remainder */
+            fmpz q = c1 / c2;      /* compute C quotient */
+            fmpz r = c1 - c2 * q;  /* compute remainder  */
 
-            if ((c2 > 0L && r > 0L) || (c2 < 0L && r < 0L))
-                q++;
+            if (r && ((c2 ^ r) > 0L))  /* r != 0, c2 and r same sign */
+                ++q;
 
             fmpz_set_si(f, q);
         }
         else  /* h is large and g is small */
         {
-            if (c1 == 0L)
-                fmpz_set_ui(f, 0L);  /* g is zero */
-            else if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
+            if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
                 fmpz_set_ui(f, 1);  /* quotient is positive, round up to one */
             else
-                fmpz_zero(f);  /* quotient is negative, round up to zero */  
+                fmpz_zero(f);  /* quotient is zero, or negative, round up to zero */  
         }
     }
     else  /* g is large */
@@ -73,19 +71,17 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
             if (c2 > 0)  /* h > 0 */
             {
                 mpz_cdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
-                _fmpz_demote_val(f);  /* division by h may result in small value */
             }
             else
             {
                 mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
-                _fmpz_demote_val(f);  /* division by h may result in small value */
-                fmpz_neg(f, f);
+                mpz_neg(mpz_ptr, mpz_ptr);
             }
         }
         else  /* both are large */
         {
             mpz_cdiv_q(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
-            _fmpz_demote_val(f);  /* division by h may result in small value */
         }
+        _fmpz_demote_val(f);  /* division by h may result in small value */
     }
 }

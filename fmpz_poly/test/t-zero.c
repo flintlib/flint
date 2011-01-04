@@ -19,31 +19,51 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpq_poly.h"
+#include "fmpz_poly.h"
+#include "ulong_extras.h"
 
-void fmpq_poly_print(const fmpq_poly_t poly)
+int
+main(void)
 {
-    char * str;
-    
-    str = fmpq_poly_get_str(poly);
-    printf("%s", str);
-    free(str);
-}
+    int i, result;
+    fmpz_randstate_t state;
 
-void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
-{
-    char * str;
-    
-    str = fmpq_poly_get_str_pretty(poly, var);
-    printf("%s", str);
-    free(str);
-}
+    printf("zero....");
+    fflush(stdout);
 
+    fmpz_poly_randinit(state);
+
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_poly_t a;
+
+        fmpz_poly_init(a);
+        fmpz_poly_randtest(a, state, n_randint(100), 100);
+        fmpz_poly_zero(a);
+
+        result = (fmpz_poly_is_zero(a));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+    }
+
+    fmpz_poly_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
+}

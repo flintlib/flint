@@ -207,8 +207,6 @@ void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
-void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
-
 void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x);
 
 void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x);
@@ -243,11 +241,25 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
+void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h);
+
+void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
+void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
 void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
+
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h);
+
+void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
+
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 

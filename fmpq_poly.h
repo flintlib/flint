@@ -318,6 +318,13 @@ fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n)
     fmpq_poly_inv_newton(Qinv, Q, n);
 }
 
+void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
+                           const fmpz * A, const fmpz_t denA, 
+                           const fmpz * B, const fmpz_t denB, long n);
+
+void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
+                                         const fmpq_poly_t B, long n);
+
 /*  Derivative  **************************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
@@ -380,11 +387,34 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len);
 
 int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
-/*  Printing  ****************************************************************/
+/*  Input and output *********************************************************/
 
-void fmpq_poly_print(const fmpq_poly_t poly);
+int _fmpq_poly_fprint(FILE * file, 
+                      const fmpz * poly, const fmpz_t den, long len);
+
+int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly);
+
+static __inline__
+int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, long len)
+{
+    return _fmpq_poly_fprint(stdout, poly, den, len);
+}
+
+static __inline__
+int fmpq_poly_print(const fmpq_poly_t poly)
+{
+    return fmpq_poly_fprint(stdout, poly);
+}
 
 void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+
+int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
+
+static __inline__
+int fmpq_poly_read(fmpq_poly_t poly)
+{
+    return fmpq_poly_fread(stdin, poly);
+}
 
 #endif
 

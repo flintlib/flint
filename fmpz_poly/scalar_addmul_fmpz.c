@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -33,12 +34,12 @@ void
 fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
                              const fmpz_t x)
 {
-    /* Both scalar and input poly are non-zero */
-    if ((*x != 0) && (poly2->length > 0))
+    if (!fmpz_is_zero(x) && !fmpz_poly_is_zero(poly2))
     {
         fmpz_poly_fit_length(poly1, poly2->length);
-        _fmpz_vec_scalar_addmul_fmpz(poly1->coeffs, poly2->coeffs,
-                                     poly2->length, x);
-        _fmpz_poly_set_length(poly1, poly2->length);
+        _fmpz_vec_scalar_addmul_fmpz(poly1->coeffs, 
+                                     poly2->coeffs, poly2->length, x);
+        _fmpz_poly_set_length(poly1, FLINT_MAX(poly1->length, poly2->length));
+        _fmpz_poly_normalise(poly1);
     }
 }

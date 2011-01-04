@@ -335,6 +335,16 @@ void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding up towards
     infinity.  If $h$ is $0$ an exception is raised.
 
+void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+
+    Sets $f$ to the quotient of $g$ by $h$, rounding up towards
+    infinity.  If $h$ is $0$ an exception is raised.
+
+void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+
+    Sets $f$ to the quotient of $g$ by $h$, rounding up towards
+    infinity.  If $h$ is $0$ an exception is raised.
+
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
@@ -359,6 +369,21 @@ void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to $g$ divided by \code{2^exp}, but rounded down.
+
+void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to the quotient of $g$ by $h$, rounding down towards
+    zero.  If $h$ is $0$ an exception is raised.
+
+void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+
+    Set $f$ to the quotient of $g$ by $h$, rounding down towards
+    zero.  If $h$ is $0$ an exception is raised.
+
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+
+    Set $f$ to the quotient of $g$ by $h$, rounding down towards
+    zero.  If $h$ is $0$ an exception is raised.
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

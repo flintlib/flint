@@ -47,8 +47,7 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
         fmpz q = c1 / c2;       /* compute C quotient */
         fmpz r = c1 - c2 * q;   /* compute remainder */
 
-        /* q cannot overflow as remainder implies |c2| != 1 */
-        if (r && (c1 < 0 && c2 > 0 || c1 > 0 && c2 < 0))
+        if (r && ((c1 ^ c2) < 0))
             --q;
 
         fmpz_set_si(f, q);
@@ -63,12 +62,8 @@ fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
         }
         else
         {
-            ulong r;
-
-            r = mpz_fdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
+            mpz_cdiv_q_ui(mpz_ptr, COEFF_TO_PTR(c1), -(ulong) c2);
             mpz_neg(mpz_ptr, mpz_ptr);
-            if (r)
-                mpz_sub_ui(mpz_ptr, mpz_ptr, 1);
         }
         _fmpz_demote_val(f);    /* division by h may result in small value */
     }

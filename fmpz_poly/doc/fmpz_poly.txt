@@ -298,6 +298,30 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
     length of \code{poly} then the polynomial is extended and zero 
     coefficients inserted if necessary.
 
+fmpz * fmpz_poly_get_coeff_ptr(const fmpz_poly_t poly, long n)
+
+    Returns a reference to the coefficient of $x^n$ in the polynomial 
+    (as an \code{fmpz *}).  This function is provided so that individual 
+    coefficients can be accessed and operated on by functions in the 
+    \code{fmpz} module.  This function does not make a copy of the 
+    data, but returns a reference to the actual coefficient.
+
+    Returns \code{NULL} when $n$ exceeds the degree of the polynomial.
+
+    This function is implemented as a macro.
+
+fmpz * fmpz_poly_lead(const fmpz_poly_t poly)
+
+    Returns a reference to the leading coefficient (as an \code{fmpz *}) 
+    of the polynomial.  This function is provided so that the leading 
+    coefficient can be easily accessed and operated on by functions in 
+    the \code{fmpz} module.  This function does not make a copy of the 
+    data, but returns a reference to the actual coefficient.
+
+    Returns \code{NULL} when the polynomial is zero.
+
+    This function is implemented as a macro.
+
 *******************************************************************************
 
     Comparison
@@ -308,6 +332,12 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Returns $1$ if \code{poly1} is equal to \code{poly2}, otherwise 
     returns $0$.  The polynomials are assumed to be normalised.
+
+int fmpz_poly_is_zero(const fmpz_poly_t poly)
+
+    Returns $1$ if the polynomial is zero and $0$ otherwise.
+
+    This function is implemented as a macro.
 
 *******************************************************************************
 
@@ -360,15 +390,64 @@ void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1,
 
     Sets \code{poly1} to \code{poly2} times $x$.
 
-void _fmpz_poly_scalar_addmul_fmpz(fmpz * poly1, 
-                                 const fmpz * poly2, long len2, const fmpz_t x)
-
-    Sets \code{poly1} to \code{poly1 + x * (poly2, len2)}.
-
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
                                                                 const fmpz_t x)
 
     Sets \code{poly} to \code{poly1 + x * poly2}.
+
+void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
+                                                                const fmpz_t x)
+
+    Sets \code{poly} to \code{poly1 - x * poly2}.
+
+void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    rounding coefficients down toward $- \infty$.
+
+void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
+                                  fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    assuming the coefficient is exact for every coefficient.
 
 *******************************************************************************
 
@@ -1263,24 +1342,6 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
 
 *******************************************************************************
 
-    Modular arithmetic
-
-*******************************************************************************
-
-void fmpz_poly_invmod(fmpz_poly_t H, fmpz_t d, const fmpz_poly_t poly1, 
-                                               const fmpz_poly_t poly2)
-
-    Computes a polynomial $H$ and a denominator $d$ such that the 
-    product of \code{poly1} and \code{H} is congruent to \code{d} 
-    modulo \code{poly2}.
-
-    Assumes that \code{poly1} and \code{poly2} are coprime and that 
-    \code{poly2} is monic.
-
-    This function is useful for computing inverses in number field arithmetic.
-
-*******************************************************************************
-
     Derivative
 
 *******************************************************************************
@@ -1574,7 +1635,7 @@ int fmpz_poly_fprint_pretty(FILE * file, const fmpz_poly_t poly, char * x)
 
 int fmpz_poly_read(fmpz_poly_t poly)
 
-    Read a polynomial from \code{stdin}, storing the result in \code{poly}.
+    Reads a polynomial from \code{stdin}, storing the result in \code{poly}.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
@@ -1588,7 +1649,7 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
 
 int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
 
-    Read a polynomial from the stream \code{file}, storing the result 
+    Reads a polynomial from the stream \code{file}, storing the result 
     in \code{poly}.
 
     In case of success, returns a positive number.  In case of failure, 
