@@ -76,15 +76,15 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a, b, c, one;
-        long n = n_randint(100) + 1;
+        long n = n_randint(80) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
         fmpq_poly_init(one);
 
-        fmpq_poly_randtest_not_zero(a, state, n_randint(100) + 1, 100);
-        fmpz_randtest_not_zero(a->coeffs, state, 100);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(80) + 1, 80);
+        fmpz_randtest_not_zero(a->coeffs, state, 80);
         fmpq_poly_canonicalise(a);
 
         fmpq_poly_fit_length(one, 1);

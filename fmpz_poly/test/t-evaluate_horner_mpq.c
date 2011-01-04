@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 1509 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -44,7 +44,7 @@ main(void)
     fmpz_poly_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 750; i++)
     {
         fmpz_t a, b;
         mpq_t x, y;
@@ -55,7 +55,7 @@ main(void)
         mpq_init(x);
         mpq_init(y);
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, state, n_randint(100), 200);
+        fmpz_poly_randtest(f, state, n_randint(100), 150);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that (f+g)(a) = f(a) + g(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 750; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -96,8 +96,8 @@ main(void)
         mpq_init(z);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(f, state, n_randint(100), 200);
-        fmpz_poly_randtest(g, state, n_randint(100), 200);
+        fmpz_poly_randtest(f, state, n_randint(100), 150);
+        fmpz_poly_randtest(g, state, n_randint(100), 150);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check that (f*g)(a) = f(a) * g(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 750; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
