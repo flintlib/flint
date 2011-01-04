@@ -34,19 +34,17 @@ int
 main(void)
 {
     int i, result;
-    printf("divrem_basecase....");
+    printf("divrem_divconquer....");
     fflush(stdout);
 
     /* Check result of divrem */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t a, b, q, r, prod;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest_not_zero();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -54,13 +52,11 @@ main(void)
         nmod_poly_init(r, n);
         nmod_poly_init(prod, n);
         
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
+        nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_mul(prod, q, b);
         nmod_poly_add(prod, prod, r);
 
@@ -75,7 +71,7 @@ main(void)
             printf("n = %ld\n", n);
             abort();
         }
-        
+ 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
@@ -84,28 +80,24 @@ main(void)
     }
 
     /* Check aliasing of a and q */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(a, r, a, b);
+        nmod_poly_divrem_divconquer(q, r, a, b);
+        nmod_poly_divrem_divconquer(a, r, a, b);
 
         result = (nmod_poly_equal(a, q));
         if (!result)
@@ -126,28 +118,24 @@ main(void)
     }
 
     /* Check aliasing of b and q */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(b, r, a, b);
+        nmod_poly_divrem_divconquer(q, r, a, b);
+        nmod_poly_divrem_divconquer(b, r, a, b);
 
         result = (nmod_poly_equal(b, q));
         if (!result)
@@ -168,28 +156,24 @@ main(void)
     }
 
     /* Check aliasing of a and r */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(q, a, a, b);
+        nmod_poly_divrem_divconquer(q, r, a, b);
+        nmod_poly_divrem_divconquer(q, a, a, b);
 
         result = (nmod_poly_equal(a, r));
         if (!result)
@@ -210,28 +194,24 @@ main(void)
     }
 
     /* Check aliasing of b and r */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(q, b, a, b);
+        nmod_poly_divrem_divconquer(q, r, a, b);
+        nmod_poly_divrem_divconquer(q, b, a, b);
 
         result = (nmod_poly_equal(b, r));
         if (!result)

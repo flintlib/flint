@@ -493,15 +493,85 @@ void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1,
 
 *******************************************************************************
 
+    Powering
+
+*******************************************************************************
+
+void _nmod_poly_pow_binexp(mp_ptr res, 
+                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+
+    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    \code{res} to the result. We require that \code{res} has enough space
+    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is nor permitted. Uses the binary exponentiation
+    method.
+
+void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
+
+    Raise \code{poly} to the power \code{e} and set \code{res} to the 
+    result. Uses the binary exponentiation method.
+
+void _nmod_poly_pow(mp_ptr res,
+                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+
+    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    \code{res} to the result. We require that \code{res} has enough space
+    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is nor permitted. 
+
+void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
+
+    Raise \code{poly} to the power \code{e} and set \code{res} to the 
+    result. 
+
+void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
+                                           long trunc, nmod_t mod, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to 
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that 
+    \code{e > 1}. Aliasing is not permitted. Uses the binary 
+    exponentiation method.
+
+void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
+                               const nmod_poly_t poly, long trunc, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering 
+    followed by a truncation. Uses the binary exponentiation method.
+
+void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
+                                           long trunc, nmod_t mod, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to 
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that 
+    \code{e > 1}. Aliasing is not permitted.
+
+void nmod_poly_pow_trunc(nmod_poly_t res, 
+                               const nmod_poly_t poly, long trunc, ulong e)
+
+    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering 
+    followed by a truncation.
+
+*******************************************************************************
+
     Division
 
 *******************************************************************************
 
-void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
+void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W, 
            mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 
     Finds $Q$ and $R$ such that $A = B Q + R$ with $\len(R) < \len(B)$.
-    If $\len(B) = 0$ an exception is raised.
+    If $\len(B) = 0$ an exception is raised. We require that \code{W}
+    is temporary space of \code{NMOD_DIVREM_BC_ITCH(A_len, B_len, mod)}
+    coefficients.
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, 
                        nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
@@ -509,6 +579,128 @@ void nmod_poly_divrem_basecase(nmod_poly_t Q,
     Finds $Q$ and $R$ such that $A = B Q + R$ with $\len(R) < \len(B)$. 
     If $\len(B) = 0$ an exception is raised.
 
+void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, long A_len, 
+                                          mp_srcptr B, long B_len, nmod_t mod);
+
+    Notionally finds polynomials $Q$ and $R$ such that $A = B Q + R$ with 
+    $\len(R) < \len(B)$, but returns only \code{Q}. If $\len(B) = 0$ an 
+    exception is raised. We require that \code{W} is temporary space of 
+    \code{NMOD_DIV_BC_ITCH(A_len, B_len, mod)} coefficients.
+
+void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
+                                                          const nmod_poly_t B);
+
+    Notionally finds polynomials $Q$ and $R$ such that $A = B Q + R$ with 
+    $\len(R) < \len(B)$, but returns only \code{Q}. If $\len(B) = 0$ an 
+    exception is raised.
+
+void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
+                      mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
+    \code{lenB}. Set \code{BQ} to the low \code{lenB - 1} coefficients of 
+    \code{B * Q}. We require that \code{Q} have space for \code{lenB}
+    coefficients and that \code{W} be temporary space of size \code{lenB - 1}
+    and \code{V} be temporary space for a number of coefficients computed by
+    \code{NMOD_DIVREM_DC_ITCH(lenB, mod)}. 
+
+void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
+                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{lenA} and \code{B} is length 
+    \code{lenB}. We require that \code{Q} have space for \code{lenA - lenB + 1}
+    coefficients. 
+
+void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
+                                       const nmod_poly_t A, const nmod_poly_t B)
+
+   Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
+   \code{length(R) < length(B)}.
+
+void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, 
+                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{lenA} and \code{B} is length 
+    \code{lenB}. We require that \code{Q} have space for \code{lenA - lenB + 1}
+    coefficients. 
+
+void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
+                                       const nmod_poly_t A, const nmod_poly_t B)
+
+   Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
+   \code{length(R) < length(B)}.
+
+void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
+                                mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
+    \code{lenB}. We require that \code{Q} have space for \code{lenB}
+    coefficients and that \code{W} be temporary space of size \code{lenB - 1}
+    and \code{V} be temporary space for a number of coefficients computed by
+    \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
+
+void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
+                                             mp_srcptr B, long lenB, nmod_t mod)
+
+    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
+    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
+    space for \code{lenA - lenB + 1} coefficients. 
+
+void nmod_poly_div_divconquer(nmod_poly_t Q,
+                                       const nmod_poly_t A, const nmod_poly_t B)
+
+    Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
+    with \code{length(R) < length(B)}, but return only \code{Q}.
+
+void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
+                                             mp_srcptr B, long lenB, nmod_t mod)
+
+    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
+    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
+    space for \code{lenA - lenB + 1} coefficients. 
+
+void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
+
+    Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
+    with \code{length(R) < length(B)}, but return only \code{Q}.
+
+void _nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
+                                                 mp_srcptr Q, long n, nmod_t mod)
+    
+    Given \code{Q} of length \code{n} whose leading coefficient is invertible
+    modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
+    such that the top \code{n} coefficients of the product \code{Q * Qinv} is
+    $x^{n - 1}$. Requires that \code{n > 0}.
+   
+void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
+                                                     const nmod_poly_t Q, long n)
+
+    Given \code{Q} of length at least \code{n} find \code{Qinv} of length
+    \code{n} such that the top \code{n} coefficients of the product 
+    \code{Q * Qinv} is $x^{n - 1}$. An exception is raised if \code{n = 0}
+    or if the length of \code{Q} is less than \code{n}. The leading 
+    coefficient of \code{Q} must be invertible modulo the modulus of 
+    \code{Q}.
+ 
+void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+    
+    Given \code{Q} of length \code{n} whose constant coefficient is invertible
+    modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
+    such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
+   
+void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+
+    Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
+    modulo $x^n$. The constant coefficient of \code{Q} must be invertible 
+    modulo the modulus of \code{Q}. An exception is raised if this is not
+    the case or if \code{n = 0}.
+ 
 *******************************************************************************
 
     Derivative
@@ -543,6 +735,12 @@ mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
     modulus of \code{poly}. The value \code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
+*******************************************************************************
+
+    Composition
+
+*******************************************************************************
+
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
                               long len1, mp_srcptr poly2, long len2, nmod_t mod)
 
@@ -557,6 +755,36 @@ void nmod_poly_compose_horner(nmod_poly_t res,
                                const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    i.e.\ evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
     Horner's algorithm.
 
+void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
+                                         mp_srcptr poly2, long len2, nmod_t mod)
+
+    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    at \code{poly2}. The algorithm used is the divide and conquer algorithm. 
+    We require that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
+    coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
+
+void nmod_poly_compose_divconquer(nmod_poly_t res, 
+                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    the divide and conquer algorithm.
+
+void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+
+    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    at \code{poly2}. We require that \code{res} have space for 
+    \code{(len1 - 1)*(len2 - 1) + 1} coefficients. It is assumed that 
+    \code{len1 > 0} and \code{len2 > 0}.
+
+void nmod_poly_compose(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
+    i.e. evaluate \code{poly1} at \code{poly2}.

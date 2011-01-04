@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2011 William Hart
 
 ******************************************************************************/
 
@@ -30,6 +30,57 @@
 #include <mpir.h>
 #include "nmod_vec.h"
 #include "ulong_extras.h"
+
+#define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
+#define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
+
+static __inline__
+long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
+{
+    mp_bitcnt_t bits;
+
+    bits =
+        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
+    
+    if (bits <= FLINT_BITS)
+        return lenA;
+    else if (bits <= 2 * FLINT_BITS)
+        return 2*(lenA + lenB - 1);
+    else
+        return 3*(lenA + lenB - 1);
+}
+
+static __inline__
+long NMOD_DIV_BC_ITCH(long lenA, long lenB, nmod_t mod)
+{
+    mp_bitcnt_t bits;
+
+    bits =
+        2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
+    
+    if (bits <= FLINT_BITS)
+        return lenA - lenB + 1;
+    else if (bits <= 2 * FLINT_BITS)
+        return 2*lenA;
+    else
+        return 3*lenA;
+}
+
+static __inline__
+long NMOD_DIVREM_DC_ITCH(long lenB, nmod_t mod)
+{
+    long i = 0;
+    
+    while (lenB > NMOD_DIVREM_DIVCONQUER_CUTOFF + i)
+    {
+        lenB = (lenB + 1)/2;
+        i++;
+    }
+    if (lenB > NMOD_DIVREM_DIVCONQUER_CUTOFF)
+        lenB = NMOD_DIVREM_DIVCONQUER_CUTOFF;
+
+    return NMOD_DIVREM_BC_ITCH(2*lenB - 1, lenB, mod) + 2*lenB - 1;
+}
 
 typedef struct
 {
@@ -279,29 +330,110 @@ void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1,
                            mp_srcptr poly2, long len2, long trunc, nmod_t mod);
 
 void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                                         const nmod_poly_t poly2, long trunc);
+                                          const nmod_poly_t poly2, long trunc);
 
 void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
-                             mp_srcptr poly2, long len2, long n, nmod_t mod);
+                               mp_srcptr poly2, long len2, long n, nmod_t mod);
 
 void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
-                                          const nmod_poly_t poly2, long n);
+                                              const nmod_poly_t poly2, long n);
 
-void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, 
+void _nmod_poly_pow_binexp(mp_ptr res, 
+                              mp_srcptr poly, long len, nmod_t mod, ulong e);
+
+void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e);
+
+void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e);
+
+void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e);
+
+void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
+                                              long trunc, nmod_t mod, ulong e);
+
+void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
+                                  const nmod_poly_t poly, long trunc, ulong e);
+
+void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
+                                              long trunc, nmod_t mod, ulong e);
+
+void nmod_poly_pow_trunc(nmod_poly_t res, 
+                                  const nmod_poly_t poly, long trunc, ulong e);
+
+void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
 
 void nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
+                    mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod);
+
+void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
+                   mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, long A_len, 
+                                          mp_srcptr B, long B_len, nmod_t mod);
+
+void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
+                                                          const nmod_poly_t B);
+
+void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
+                              mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod);
+
+void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_div_divconquer(nmod_poly_t Q,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
+                                              mp_srcptr Q, long n, nmod_t mod);
+
+void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
+                                                  const nmod_poly_t Q, long n);
+
+void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n);
+
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c);
+mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, 
+                                            long len, nmod_t mod, mp_limb_t c);
 
 mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
 
+void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
+                            long len1, mp_srcptr poly2, long len2, nmod_t mod);
+
 void nmod_poly_compose_horner(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+void nmod_poly_compose_divconquer(nmod_poly_t res, 
+                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
+                                       mp_srcptr poly2, long len2, nmod_t mod);
+
+void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 #endif

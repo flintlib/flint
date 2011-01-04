@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 William Hart
 
 ******************************************************************************/
 
@@ -34,13 +34,13 @@ int
 main(void)
 {
     int i, result;
-    printf("divrem_basecase....");
+    printf("div_basecase....");
     fflush(stdout);
 
-    /* Check result of divrem */
+    /* Check result of div against divrem */
     for (i = 0; i < 5000; i++)
     {
-        nmod_poly_t a, b, q, r, prod;
+        nmod_poly_t a, b, q, r, q2;
 
         mp_limb_t n;
         do
@@ -52,26 +52,23 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_init(prod, n);
+        nmod_poly_init(q2, n);
         
         nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(200));
+        while (b->length == 0);
 
         nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_mul(prod, q, b);
-        nmod_poly_add(prod, prod, r);
+        nmod_poly_div_basecase(q2, a, b);
 
-        result = (nmod_poly_equal(a, prod));
+        result = (nmod_poly_equal(q, q2));
         if (!result)
         {
             printf("FAIL:\n");
             nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(prod), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
             nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
+            nmod_poly_print(q2), printf("\n\n");
             printf("n = %ld\n", n);
             abort();
         }
@@ -80,13 +77,13 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(q);
         nmod_poly_clear(r);
-        nmod_poly_clear(prod);
+        nmod_poly_clear(q2);
     }
 
     /* Check aliasing of a and q */
     for (i = 0; i < 5000; i++)
     {
-        nmod_poly_t a, b, q, r;
+        nmod_poly_t a, b, q;
 
         mp_limb_t n;
         do
@@ -97,15 +94,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(200));
         do
         {
             nmod_poly_randtest(b, n_randint(200));
         } while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(a, r, a, b);
+        nmod_poly_div_basecase(q, a, b);
+        nmod_poly_div_basecase(a, a, b);
 
         result = (nmod_poly_equal(a, q));
         if (!result)
@@ -114,7 +110,6 @@ main(void)
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(b), printf("\n\n");
             nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
             printf("n = %ld\n", n);
             abort();
         }
@@ -122,13 +117,12 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
-        nmod_poly_clear(r);
     }
 
     /* Check aliasing of b and q */
     for (i = 0; i < 5000; i++)
     {
-        nmod_poly_t a, b, q, r;
+        nmod_poly_t a, b, q;
 
         mp_limb_t n;
         do
@@ -139,15 +133,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(200));
         do
         {
             nmod_poly_randtest(b, n_randint(200));
         } while (b->length == 0);
 
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(b, r, a, b);
+        nmod_poly_div_basecase(q, a, b);
+        nmod_poly_div_basecase(b, a, b);
 
         result = (nmod_poly_equal(b, q));
         if (!result)
@@ -156,7 +149,6 @@ main(void)
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(b), printf("\n\n");
             nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
             printf("n = %ld\n", n);
             abort();
         }
@@ -164,91 +156,6 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
         nmod_poly_clear(q);
-        nmod_poly_clear(r);
-    }
-
-    /* Check aliasing of a and r */
-    for (i = 0; i < 5000; i++)
-    {
-        nmod_poly_t a, b, q, r;
-
-        mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
-
-        nmod_poly_init(a, n);
-        nmod_poly_init(b, n);
-        nmod_poly_init(q, n);
-        nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
-
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(q, a, a, b);
-
-        result = (nmod_poly_equal(a, r));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
-            printf("n = %ld\n", n);
-            abort();
-        }
-
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(q);
-        nmod_poly_clear(r);
-    }
-
-    /* Check aliasing of b and r */
-    for (i = 0; i < 5000; i++)
-    {
-        nmod_poly_t a, b, q, r;
-
-        mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
-
-        nmod_poly_init(a, n);
-        nmod_poly_init(b, n);
-        nmod_poly_init(q, n);
-        nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(200));
-        } while (b->length == 0);
-
-        nmod_poly_divrem_basecase(q, r, a, b);
-        nmod_poly_divrem_basecase(q, b, a, b);
-
-        result = (nmod_poly_equal(b, r));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(r), printf("\n\n");
-            printf("n = %ld\n", n);
-            abort();
-        }
-
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
-        nmod_poly_clear(q);
-        nmod_poly_clear(r);
     }
 
     printf("PASS\n");

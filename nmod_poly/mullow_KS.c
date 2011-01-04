@@ -34,7 +34,7 @@ void
 _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
             mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod)
 {
-    long len_out = len1 + len2 - 1, limbs1, limbs2;
+    long limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
     if (bits == 0)

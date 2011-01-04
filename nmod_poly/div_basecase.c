@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 William Hart
+    Copyright (C) 2011 William Hart
 
 ******************************************************************************/
 
@@ -31,129 +31,120 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
+_nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-    long coeff = A_len - 1;
-    mp_ptr coeff_Q = Q - B_len + 1;
-
-    mp_ptr R1 = W;
+    long len, coeff = A_len - B_len;
     
-    mpn_copyi(R1, A, A_len);
+    mp_ptr R1 = W;
+    mp_srcptr Btop = B + B_len - 1;
+    
+    mpn_copyi(R1, A + B_len - 1, A_len - B_len + 1);
 
-    while (coeff + 1 >= B_len)
+    while (coeff >= 0)
     {
         R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
 
-        while ((coeff + 1 >= B_len) && (R1[coeff] == 0L))
+        while (coeff >= 0 && R1[coeff] == 0L)
         {
-            coeff_Q[coeff--] = 0L;
-            if (coeff + 1 >= B_len)
+            Q[coeff--] = 0L;
+            if (coeff >= 0)
                 R1[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
         }
 
-        if (coeff + 1 >= B_len)
+        if (coeff >= 0)
         {
             mp_limb_t c, * R_sub;
 
-            coeff_Q[coeff] =
+            Q[coeff] =
                 n_mulmod2_preinv(R1[coeff], lead_inv, mod.n, mod.ninv);
 
-            c = n_negmod(coeff_Q[coeff], mod.n);
+            c = n_negmod(Q[coeff], mod.n);
 
-            R_sub = R1 + coeff - B_len + 1;
-            if (B_len > 1)
-                mpn_addmul_1(R_sub, B, B_len - 1, c);
+            len = FLINT_MIN(B_len - 1, coeff);
+            R_sub = R1 + coeff - len;
+            if (len > 0)
+                mpn_addmul_1(R_sub, Btop - len, len, c);
 
             coeff--;
         }
     }
-
-    while (coeff + 1 > 0)
-    {
-        R[coeff] = n_mod2_preinv(R1[coeff], mod.n, mod.ninv);
-        coeff--;
-    }
 }
 
 void
-_nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
+_nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
-    long coeff, i;
+    long coeff, i, len;
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-    mp_ptr coeff_Q, B2, R2;
-
+    mp_ptr B2, R2;
+    mp_srcptr Btop;
+    
     B2 = W;
     for (i = 0; i < B_len - 1; i++)
     {
         B2[2 * i] = B[i];
         B2[2 * i + 1] = 0;
     }
+    Btop = B2 + 2*(B_len - 1);
 
     R2 = W + 2*(B_len - 1);
-    for (i = 0; i < A_len; i++)
+    for (i = 0; i < A_len - B_len + 1; i++)
     {
-        R2[2 * i] = A[i];
+        R2[2 * i] = A[B_len + i - 1];
         R2[2 * i + 1] = 0;
     }
 
-    coeff = A_len - 1;
-    coeff_Q = Q - B_len + 1;
-
-    while (coeff + 1 >= B_len)
+    coeff = A_len - B_len;
+    
+    while (coeff >= 0)
     {
         mp_limb_t r_coeff;
         r_coeff =
             n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n, mod.ninv);
 
-        while ((coeff + 1 >= B_len) && (r_coeff == 0L))
+        while (coeff >= 0 && r_coeff == 0L)
         {
-            coeff_Q[coeff--] = 0L;
-            if (coeff + 1 >= B_len)
+            Q[coeff--] = 0L;
+            if (coeff >= 0)
                 r_coeff =
                     n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n,
                                     mod.ninv);
         }
 
-        if (coeff + 1 >= B_len)
+        if (coeff >= 0)
         {
             mp_limb_t c, * R_sub;
 
-            coeff_Q[coeff] =
+            Q[coeff] =
                 n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv);
 
-            c = n_negmod(coeff_Q[coeff], mod.n);
+            c = n_negmod(Q[coeff], mod.n);
 
-            R_sub = R2 + 2 * (coeff - B_len + 1);
-            if (B_len > 1)
-                mpn_addmul_1(R_sub, B2, 2 * B_len - 2, c);
+            len = FLINT_MIN(B_len - 1, coeff);
+            R_sub = R2 + 2 * (coeff - len);
+            if (len > 0)
+                mpn_addmul_1(R_sub, Btop - 2*len, 2 * len, c);
 
             coeff--;
         }
     }
-
-    while (coeff + 1 > 0)
-    {
-        R[coeff] =
-            n_ll_mod_preinv(R2[2 * coeff + 1], R2[2 * coeff], mod.n, mod.ninv);
-        coeff--;
-    }
 }
 
 void
-_nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
+_nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
                              mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                              nmod_t mod)
 {
-    long coeff, i;
+    long coeff, i, len;
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_limb_t r_coeff;
-    mp_ptr B3, R3, coeff_Q;
-
+    mp_ptr B3, R3;
+    mp_srcptr Btop;
+    
     B3 = W;
     for (i = 0; i < B_len - 1; i++)
     {
@@ -161,61 +152,54 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
         B3[3 * i + 1] = 0;
         B3[3 * i + 2] = 0;
     }
+    Btop = B3 + 3*(B_len - 1);
 
     R3 = W + 3*(B_len - 1);
-    for (i = 0; i < A_len; i++)
+    for (i = 0; i < A_len - B_len + 1; i++)
     {
-        R3[3 * i] = A[i];
+        R3[3 * i] = A[B_len + i - 1];
         R3[3 * i + 1] = 0;
         R3[3 * i + 2] = 0;
     }
 
-    coeff = A_len - 1;
-    coeff_Q = Q - B_len + 1;
-
-    while (coeff + 1 >= B_len)
+    coeff = A_len - B_len;
+    
+    while (coeff >= 0)
     {
         r_coeff =
             n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
                              R3[3 * coeff], mod.n, mod.ninv);
 
-        while ((coeff + 1 >= B_len) && (r_coeff == 0L))
+        while (coeff >= 0 && r_coeff == 0L)
         {
-            coeff_Q[coeff--] = 0L;
-            if (coeff + 1 >= B_len)
+            Q[coeff--] = 0L;
+            if (coeff >= 0)
                 r_coeff =
                     n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
                                      R3[3 * coeff], mod.n, mod.ninv);
         }
 
-        if (coeff + 1 >= B_len)
+        if (coeff >= 0)
         {
             mp_limb_t c, * R_sub;
 
-            coeff_Q[coeff] =
+            Q[coeff] =
                 n_mulmod2_preinv(r_coeff, lead_inv, mod.n, mod.ninv);
 
-            c = n_negmod(coeff_Q[coeff], mod.n);
+            c = n_negmod(Q[coeff], mod.n);
 
-            R_sub = R3 + 3 * (coeff - B_len + 1);
-            if (B_len > 1)
-                mpn_addmul_1(R_sub, B3, 3 * B_len - 3, c);
+            len = FLINT_MIN(B_len - 1, coeff);
+            R_sub = R3 + 3 * (coeff - len);
+            if (len > 0)
+                mpn_addmul_1(R_sub, Btop - 3*len, 3 * len, c);
 
             coeff--;
         }
     }
-
-    while (coeff + 1 > 0)
-    {
-        R[coeff] =
-            n_lll_mod_preinv(R3[3 * coeff + 2], R3[3 * coeff + 1],
-                             R3[3 * coeff], mod.n, mod.ninv);
-        coeff--;
-    }
 }
 
 void
-_nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
+_nmod_poly_div_basecase(mp_ptr Q, mp_ptr W,
                            mp_srcptr A, long A_len, mp_srcptr B, long B_len,
                            nmod_t mod)
 {
@@ -223,26 +207,26 @@ _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
 
     if (bits <= FLINT_BITS)
-        _nmod_poly_divrem_basecase_1(Q, R, W, A, A_len, B, B_len, mod);
+        _nmod_poly_div_basecase_1(Q, W, A, A_len, B, B_len, mod);
     else if (bits <= 2 * FLINT_BITS)
-        _nmod_poly_divrem_basecase_2(Q, R, W, A, A_len, B, B_len, mod);
+        _nmod_poly_div_basecase_2(Q, W, A, A_len, B, B_len, mod);
     else
-        _nmod_poly_divrem_basecase_3(Q, R, W, A, A_len, B, B_len, mod);
+        _nmod_poly_div_basecase_3(Q, W, A, A_len, B, B_len, mod);
 }
 
 void
-nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
+nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
                           const nmod_poly_t B)
 {
-    mp_ptr Q_coeffs, R_coeffs, W;
-    nmod_poly_t t1, t2;
+    mp_ptr Q_coeffs, W;
+    nmod_poly_t t1;
     long Alen, Blen;
 
     Blen = B->length;
 
     if (Blen == 0)
     {
-        printf("Exception: division by zero in nmod_poly_divrem_basecase\n");
+        printf("Exception: division by zero in nmod_poly_div_basecase\n");
         abort();
     }
 
@@ -250,7 +234,6 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
 
     if (Alen < Blen)
     {
-        nmod_poly_set(R, A);
         nmod_poly_zero(Q);
 
         return;
@@ -268,20 +251,9 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         Q_coeffs = Q->coeffs;
     }
 
-    if (R == A || R == B)
-    {
-        nmod_poly_init2_preinv(t2, B->mod.n, B->mod.ninv, Blen - 1);
-        R_coeffs = t2->coeffs;
-    }
-    else
-    {
-        nmod_poly_fit_length(R, Blen - 1);
-        R_coeffs = R->coeffs;
-    }
-
-    W = nmod_vec_init(NMOD_DIVREM_BC_ITCH(Alen, Blen, A->mod));
+    W = nmod_vec_init(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod));
     
-    _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, Alen,
+    _nmod_poly_div_basecase(Q_coeffs, W, A->coeffs, Alen,
                                B->coeffs, Blen, B->mod);
 
     if (Q == A || Q == B)
@@ -289,18 +261,9 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         nmod_poly_swap(Q, t1);
         nmod_poly_clear(t1);
     }
-        
+    
     Q->length = Alen - Blen + 1;
-
-    if (R == A || R == B)
-    {
-        nmod_poly_swap(R, t2);
-        nmod_poly_clear(t2);
-    }
-        
-    R->length = Blen - 1;
 
     nmod_vec_free(W);
     _nmod_poly_normalise(Q);
-    _nmod_poly_normalise(R);
 }
