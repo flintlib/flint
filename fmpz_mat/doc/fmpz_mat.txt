@@ -59,20 +59,6 @@ int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Returns nonzero if \code{mat1} and \code{mat2} have the same 
     dimensions and entries, and zero otherwise.
 
-void fmpz_mat_print(fmpz_mat_t mat) 
-
-    Prints the given matrix to \code{stdout}. The format is the number 
-    of rows, a space, the number of columns, two spaces, then a space 
-    separated list of coefficients.
-
-void fmpz_mat_print_pretty(fmpz_mat_t mat) 
-
-    Prints the given matrix to \code{stdout}. The format is an opening 
-    square bracket then on each line a row of the matrix, followed by a 
-    closing square bracket. Each row is written as an opening square 
-    bracket followed by a space separated list of coefficients followed 
-    by a closing square bracket.
-
 *******************************************************************************
 
     Random matrix generation
@@ -197,6 +183,26 @@ void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
     More precisely, at most \code{count} random additions or subtractions of
     distinct rows and columns will be performed. This leaves the rank
     (and for square matrices, determinant) unchanged.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+void fmpz_mat_print(fmpz_mat_t mat) 
+
+    Prints the given matrix to \code{stdout}. The format is the number 
+    of rows, a space, the number of columns, two spaces, then a space 
+    separated list of coefficients.
+
+void fmpz_mat_print_pretty(fmpz_mat_t mat) 
+
+    Prints the given matrix to \code{stdout}. The format is an opening 
+    square bracket then on each line a row of the matrix, followed by a 
+    closing square bracket. Each row is written as an opening square 
+    bracket followed by a space separated list of coefficients followed 
+    by a closing square bracket.
 
 *******************************************************************************
 
