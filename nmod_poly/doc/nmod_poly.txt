@@ -282,7 +282,7 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
 *******************************************************************************
 
-    Addition/subtraction
+    Addition and subtraction
 
 *******************************************************************************
 
