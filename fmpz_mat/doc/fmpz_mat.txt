@@ -51,8 +51,8 @@ void fmpz_mat_copy(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
 void fmpz_mat_init_set(fmpz_mat_t mat, fmpz_mat_t src)
 
-    Initialises mat to the same size as src and sets it to a copy
-    of src.
+    Initialises the matrix \code{mat} to the same size as \code{src} and 
+    sets it to a copy of \code{src}.
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
