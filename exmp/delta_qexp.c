@@ -31,86 +31,38 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <mpir.h>
-#include <math.h>
 
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "arith.h"
 
 int main(int argc, char* argv[])
 {
-    fmpz_t c;
-    fmpz_poly_t F2, F4, F8;
-    long i, j, N, stop, *values;
+    fmpz_t c, n;
+    long N = 0;
 
-    if (argc != 2)
+    if (argc == 2)
+        N = atoi(argv[1]);
+
+    if (argc != 2 || N < 1)
     {
         printf("Syntax: delta_qexp <integer>\n");
-        printf("where <integer> is the number of terms to compute\n");
+        printf("where <integer> is the (positive) number of terms to compute\n");
         return EXIT_FAILURE;
     }
 
-    /* Number of terms to compute */
-    N = atoi(argv[1]);
-
-    if (N < 1)
-    {
-        printf("Syntax: delta_qexp <integer>\n");
-        printf("where <integer> is the number of terms to compute\n");
-        return EXIT_FAILURE;
-    }
-
-    /* Compute coefficients of F(q)^2 */
-    values = calloc(N, sizeof(long));
-
-    stop = (long) ceil((-1.0 + sqrt(1.0 + 8.0 * N)) / 2.0);
-
-    for (i = 0; i <= stop; i++)
-    {
-        long index1, index2, value1, value2;
-
-        index1 = i * (i + 1) / 2;
-        value1 = (i & 1) ? (-2 * i - 1) : (2 * i + 1);
-        for (j = 0; j <= stop; j++)
-        {
-            index2 = j * (j + 1) / 2;
-            if (index1 + index2 >= N)
-                break;
-            value2 = (j & 1) ? (-2 * j - 1) : (2 * j + 1);
-            values[index1 + index2] += value1 * value2;
-        }
-    }
-
-    /* Create some polynomial objects */
     fmpz_init(c);
-    fmpz_poly_init(F2);
-    fmpz_poly_init(F4);
-    fmpz_poly_init(F8);
+    fmpz_init(n);
 
-    fmpz_poly_fit_length(F2, N);
+    fmpz_set_si(n, N);
+    fmpz_ramanujan_tau(c, n);
 
-    for (i = 0; i < N; i++)
-      fmpz_poly_set_coeff_si(F2, i, values[i]);
-
-    free(values);
-
-    /* Compute F^4, truncated to length N */
-    fmpz_poly_mullow(F4, F2, F2, N);
-
-    /* Compute F^8, truncated to length N */
-    fmpz_poly_mullow(F8, F4, F4, N);
-
-    /* Print out last coefficient */
-    fmpz_poly_get_coeff_fmpz(c, F8, N - 1);
     printf("Coefficient of q^%ld is ", N);
     fmpz_print(c);
     printf("\n");
 
-    /* Clean up */
     fmpz_clear(c);
-    fmpz_poly_clear(F2);
-    fmpz_poly_clear(F4);
-    fmpz_poly_clear(F8);
+    fmpz_clear(n);
 
     return EXIT_SUCCESS;
 }
