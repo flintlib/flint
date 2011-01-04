@@ -347,26 +347,27 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
 
-    Set \code{res} to \code{poly} (of length \code{len}) shifted left by
+    Sets \code{(res, len + k)} to \code{(poly, len)} shifted left by 
     \code{k} coefficients. Assumes that \code{res} has space for 
     \code{len + k} coefficients.
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
-    multiplied by $x^k$. 
- 
+    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.\ 
+    multiplied by $x^k$.
+
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
 
-    Set \code{res} to \code{poly} (of length \code{len}) shifted left by 
+    Sets \code{(res, len - k)} to \code{(poly, len)} shifted left by 
     \code{k} coefficients. It is assumed that \code{k <= len} and that
     \code{res} has space for at least \code{len - k} coefficients.
 
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-    Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
-    divide by $x^k$ and throw away the remainder. If \code{k} is greater than
-    or equal to the length of poly, the result is the zero polynomial. 
+    Sets \code{res} to \code{poly} shifted right by \code{k} coefficients, 
+    i.e.\ divide by $x^k$ and throws away the remainder. If \code{k} is 
+    greater than or equal to the length of \code{poly}, the result is the 
+    zero polynomial. 
 
 *******************************************************************************
 
