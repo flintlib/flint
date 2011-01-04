@@ -264,9 +264,13 @@ int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
-int fmpz_is_zero(fmpz_t f)
+int fmpz_is_zero(const fmpz_t f)
 
     Returns $1$ if $f$ is $0$, otherwise returns $0$.
+
+int fmpz_is_one(const fmpz_t f)
+
+    Returns $1$ if $f$ is equal to one, otherwise returns $0$.
 
 *******************************************************************************
 
