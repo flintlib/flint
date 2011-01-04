@@ -124,7 +124,7 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
 
 *******************************************************************************
 
-    Getting/setting coefficients
+    Getting and setting coefficients
 
 *******************************************************************************
 
