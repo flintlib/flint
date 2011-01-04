@@ -18,7 +18,7 @@ LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
 LIB_OBJS = $(patsubst %.c, %.lo, $(LIB_SOURCES))
 
-EXMP_SOURCES = $(wildcard exmp/*.c)
+EXMP_SOURCES = $(wildcard examples/*.c)
 
 TEST_SOURCES = $(wildcard test/*.c)
 
@@ -43,7 +43,7 @@ profile: all profiler.o
 recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir);) 
 
-exmp: all $(LOBJS) library
+examples: all $(LOBJS) library
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 
 check: all $(LOBJS) library
