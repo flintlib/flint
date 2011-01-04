@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#define NMOD_NEWTON_INVERSE_CUTOFF 300
+#define NMOD_NEWTON_INVERSE_CUTOFF 400
 
 void
 _nmod_poly_invert_newton(mp_ptr Qinv, 
