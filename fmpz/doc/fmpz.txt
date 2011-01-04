@@ -151,7 +151,7 @@ void fmpz_read(fmpz_t f)
 
     Reads a multiprecision integer from \code{stdin}.  The format is
     an optional minus sign, followed by one or more digits.  The
-    first digit should be nonzero unless it is the only digit.
+    first digit should be non-zero unless it is the only digit.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
@@ -164,7 +164,7 @@ void fmpz_fread(FILE * file, fmpz_t f)
 
     Reads a multiprecision integer from the stream \code{file}.  The 
     format is an optional minus sign, followed by one or more digits.
-    The first digit should be nonzero unless it is the only digit.
+    The first digit should be non-zero unless it is the only digit.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
@@ -461,7 +461,7 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the inverse of $g$ modulo $h$.  The value of $h$ may 
     not be $0$ otherwise an exception results.  If the inverse exists 
-    the return value will be nonzero, otherwise the return value will
+    the return value will be non-zero, otherwise the return value will
     be $0$ and the value of $f$ undefined. 
 
 *******************************************************************************
