@@ -36,7 +36,6 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
     mpz_t t;
 
     mpz_init(t);
-
     r = mpz_inp_str(t, file, 10);
     if (r == 0)
     {
@@ -49,6 +48,7 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
         abort();
     }
     len = mpz_get_si(t);
+    mpz_clear(t);
 
     fmpz_poly_fit_length(poly, len);
 
@@ -56,16 +56,12 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
     {
         r = fmpz_fread(file, poly->coeffs + i);
         if (r <= 0)
-        {
-            mpz_clear(t);
             return r;
-        }
     }
 
     _fmpz_poly_set_length(poly, len);
     _fmpz_poly_normalise(poly);
 
-    mpz_clear(t);
     return 1;
 }
 
