@@ -683,9 +683,14 @@ void fmpz_poly_pow_multinomial(fmpz_poly_t res,
     
     The formal statement of the recurrence is as follows.  Write the input 
     polynomial as $P(x) = p_0 + p_1 x + \dotsb + p_m x^m$ with $p_0 \neq 0$ 
-    and let $P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}$.  Then 
-    $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
-    $a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i)$.
+    and let 
+    \begin{equation*}
+    P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}.
+    \end{equation*}
+    Then $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
+    \begin{equation*}
+    a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i).
+    \end{equation*}
     
     % [1] D. Knuth, The Art of Computer Programming Vol. 2, Seminumerical 
     % Algorithms, Third Edition (Reading, Massachusetts: Addison-Wesley, 1997)
@@ -717,7 +722,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
     A star chain is an addition chain $1 = a_0 < a_1 < \dotsb < a_n$ such 
     that $a_i = a_{i-1} + a_j$ with $j < i$ for all $i > 0$.
     
-    Assumes that $e > 2$ (equivalently $n > 1$) and \code{len > 0}.  Does 
+    Assumes that $e > 2$, or equivalently $n > 1$, and \code{len > 0}.  Does 
     not support aliasing.
 
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
@@ -729,9 +734,8 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets \code{res = poly^e} using left-to-right binary exponentiation, see 
-    D.~Knuth, ``The Art of Computer Programming Vol. 2'', Seminumerical 
-    algorithms, p. 461.
+    Sets \code{res = poly^e} using left-to-right binary exponentiation as 
+    described in~\citep[p.~461]{Knu1997}.
     
     Assumes that \code{len > 0}, \code{e > 1}.  Assumes that \code{res} is 
     an array of length at least \code{e (len - 1) + 1}.  Does not support 
