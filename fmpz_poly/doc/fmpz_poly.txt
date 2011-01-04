@@ -888,9 +888,9 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
     $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
     is defined to be 
-    \[
-        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y)
-    \]
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
