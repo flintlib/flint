@@ -43,10 +43,8 @@ main(void)
         nmod_poly_t a, b, q, r, prod;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -55,10 +53,8 @@ main(void)
         nmod_poly_init(prod, n);
         
         nmod_poly_randtest(a, n_randint(2000));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(2000));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
         nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_mul(prod, q, b);
@@ -89,20 +85,16 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(2000));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(2000));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
         nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_divrem_divconquer(a, r, a, b);
@@ -131,20 +123,16 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(2000));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(2000));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
         nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_divrem_divconquer(b, r, a, b);
@@ -173,20 +161,16 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(2000));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(2000));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
         nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_divrem_divconquer(q, a, a, b);
@@ -215,20 +199,16 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do
-        {
-            n = n_randtest();
-        } while (!n_is_probabprime(n));
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
         nmod_poly_randtest(a, n_randint(2000));
-        do
-        {
-            nmod_poly_randtest(b, n_randint(2000));
-        } while (b->length == 0);
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0);
 
         nmod_poly_divrem_divconquer(q, r, a, b);
         nmod_poly_divrem_divconquer(q, b, a, b);

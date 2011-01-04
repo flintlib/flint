@@ -31,7 +31,7 @@
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 
-#define NMOD_DIVREM_DIVCONQUER_CUTOFF  500
+#define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 
 static __inline__
 long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
