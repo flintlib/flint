@@ -174,7 +174,7 @@ void nmod_poly_print(const nmod_poly_t a)
 
     Prints the polynomial to \code{stdout}. The length is printed, 
     followed by a space, then the modulus. If the length is zero this is
-    all thar is printed, otherwise two spaces followed by a space 
+    all that is printed, otherwise two spaces followed by a space 
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
