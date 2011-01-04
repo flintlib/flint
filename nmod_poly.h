@@ -374,6 +374,12 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
 void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, long A_len, 
                                           mp_srcptr B, long B_len, nmod_t mod);
 
@@ -388,6 +394,11 @@ void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
 
 void nmod_poly_div_divconquer(nmod_poly_t Q,
                                      const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
