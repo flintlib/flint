@@ -54,11 +54,6 @@ void fmpz_mat_init_set(fmpz_mat_t mat, fmpz_mat_t src)
     Initialises the matrix \code{mat} to the same size as \code{src} and 
     sets it to a copy of \code{src}.
 
-int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
-
-    Returns nonzero if \code{mat1} and \code{mat2} have the same 
-    dimensions and entries, and zero otherwise.
-
 *******************************************************************************
 
     Random matrix generation
@@ -203,6 +198,17 @@ void fmpz_mat_print_pretty(fmpz_mat_t mat)
     closing square bracket. Each row is written as an opening square 
     bracket followed by a space separated list of coefficients followed 
     by a closing square bracket.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+    Returns nonzero if \code{mat1} and \code{mat2} have the same 
+    dimensions and entries, and zero otherwise.
 
 *******************************************************************************
 
