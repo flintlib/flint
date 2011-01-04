@@ -614,6 +614,30 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
    Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
    \code{length(R) < length(B)}.
 
+void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
+                                mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
+    \code{lenB}. We require that \code{Q} have space for \code{lenB}
+    coefficients and that \code{W} be temporary space of size \code{lenB - 1}
+    and \code{V} be temporary space for a number of coefficients computed by
+    \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
+
+void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
+    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
+    space for \code{lenA - lenB + 1} coefficients. 
+
+void nmod_poly_div_divconquer(nmod_poly_t Q,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
+   Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
+   with \code{length(R) < length(B)}, but return only \code{Q}.
+
 *******************************************************************************
 
     Derivative

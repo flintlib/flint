@@ -32,6 +32,7 @@
 #include "ulong_extras.h"
 
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
+#define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
 
 static __inline__
 long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
@@ -378,6 +379,15 @@ void _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W, mp_srcptr A, long A_len,
 
 void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
                                                           const nmod_poly_t B);
+
+void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
+                              mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod);
+
+void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
+                                           mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_div_divconquer(nmod_poly_t Q,
+                                     const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
