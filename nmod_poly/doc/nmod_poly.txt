@@ -104,23 +104,23 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
 
 long nmod_poly_length(const nmod_poly_t poly)
 
-   Return the length of the polynomial \code{poly}. The zero polynomial
-   has length zsro.
+    Returns the length of the polynomial \code{poly}. The zero polynomial
+    has length zero.
 
 long nmod_poly_degree(const nmod_poly_t poly)
 
-   Return the degree of the polynomial \code{poly}. The zero polynomial
-   is deemed to have degree \code{-1}.
+    Returns the degree of the polynomial \code{poly}. The zero polynomial
+    is deemed to have degree~$-1$.
 
 mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 
-   Return the modulus of the polynomial \code{poly}. This will be a 
-   positive integer.
+    Returns the modulus of the polynomial \code{poly}. This will be a 
+    positive integer.
 
 int nmod_poly_is_zero(const nmod_poly_t poly)
 
-   Return one if the polynomial \code{poly} is the zero polynomial,
-   otherwise return zero.
+    Returns one if the polynomial \code{poly} is the zero polynomial,
+    otherwise return zero.
 
 *******************************************************************************
 
@@ -130,19 +130,19 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
 
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
-   Get the coefficient of \code{poly} at index \code{j} (coefficients 
-   being numbered with zero being the constant coefficient) and return
-   it as a \code{ulong}. If \code{j} refers to a coefficient beyond the
-   end of \code{poly}, zero is returned.
+    Gets the coefficient of \code{poly} at index \code{j}, where coefficients 
+    are numbered with zero being the constant coefficient, and returns it as 
+    a \code{ulong}. If \code{j} refers to a coefficient beyond the end of 
+    \code{poly}, zero is returned.
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 
-   Set the coefficient of \code{poly} at index \code{j} (coefficients 
-   being numbered with zero being the constant coefficient) to the value
-   \code{c} reduced modulo the modulus of \code{poly}. If \code{j} 
-   refers to a coefficient beyond the current end of \code{poly}, the
-   polynomial is first resized, with intervening coefficients being
-   set to zero.
+    Sets the coefficient of \code{poly} at index \code{j}, where 
+    coefficients are numbered with zero being the constant coefficient, 
+    to the value \code{c} reduced modulo the modulus of \code{poly}. 
+    If \code{j} refers to a coefficient beyond the current end of \code{poly}, 
+    the polynomial is first resized, with intervening coefficients being
+    set to zero.
 
 *******************************************************************************
 
