@@ -114,6 +114,15 @@ void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
     Returns $f$ as an \code{mpz_t}.
 
+char * fmpz_get_str(char * str, int b, const fmpz_t f)
+
+    Returns the representation of $f$ in base~$b$, which can vary 
+    between $2$ and $62$, inclusive.
+
+    If \code{str} is \code{NULL}, the result string is allocated by the 
+    function.  Otherwise, it is up to the caller to ensure the allocated 
+    block of memory is sufficiently large.
+
 void fmpz_set_si(fmpz_t f, long val)
 
     Sets $f$ to the given \code{signed long} value.
@@ -196,15 +205,6 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b)
 
     Returns the size of $f$ in base~$b$, measured in numbers of digits. 
     The base~$b$ can be between $2$ and $62$, inclusive.
-
-char * fmpz_get_str(char * str, int b, const fmpz_t f)
-
-    Returns the representation of $f$ in base~$b$, which can vary 
-    between $2$ and $62$, inclusive.
-
-    If \code{str} is \code{NULL}, the result string is allocated by the 
-    function.  Otherwise, it is up to the caller to ensure the allocated 
-    block of memory is sufficiently large.
 
 *******************************************************************************
 
