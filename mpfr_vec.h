@@ -35,7 +35,7 @@ void _mpfr_vec_clear(__mpfr_struct * vec, long length);
 
 void _mpfr_vec_zero(mpfr * vec, long length);
 
-void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long length);
+void _mpfr_vec_set(mpfr * vec1, mpfr * vec2, long length);
 
 void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, long length);
 

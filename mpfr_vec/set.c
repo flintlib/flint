@@ -30,7 +30,7 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long length)
+_mpfr_vec_set(mpfr * vec1, mpfr * vec2, long length)
 {
     long i;
     for (i = 0; i < length; i++)
