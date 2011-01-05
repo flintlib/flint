@@ -37,7 +37,7 @@ main(void)
     printf("inv_series_basecase....");
     fflush(stdout);
 
-    /* Check result of div against divrem */
+    /* Check Q * Qinv = 1 mod x^n */
     for (i = 0; i < 1000; i++)
     {
         nmod_poly_t q, qinv, prod;

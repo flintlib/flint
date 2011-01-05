@@ -34,13 +34,13 @@ int
 main(void)
 {
     int i, result;
-    printf("inv_series_newton....");
+    printf("div_series....");
     fflush(stdout);
 
-    /* Check Q * Qinv = 1 mod x^n */
+    /* Check A/B * B = A */
     for (i = 0; i < 1000; i++)
     {
-        nmod_poly_t q, qinv, prod;
+        nmod_poly_t q, a, b, prod;
         long m;
 
         mp_limb_t n;
@@ -48,39 +48,42 @@ main(void)
         while (!n_is_probabprime(n));
 
         nmod_poly_init(prod, n);
-        nmod_poly_init(qinv, n);
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         
-        do nmod_poly_randtest(q, n_randint(2000));
-        while (q->length == 0 || q->coeffs[0] == 0);
+        nmod_poly_randtest(a, n_randint(2000));
+        do nmod_poly_randtest(b, n_randint(2000));
+        while (b->length == 0 || b->coeffs[0] == 0);
 
-        m = n_randint(q->length) + 1;
+        m = n_randint(2000) + 1;
 
-        nmod_poly_inv_series_newton(qinv, q, m);
-        
-        nmod_poly_mul(prod, q, qinv);
-        nmod_poly_truncate(prod, m);
+        nmod_poly_div_series(q, a, b, m);
+        nmod_poly_mullow_n(prod, q, b, m);
+        nmod_poly_truncate(a, m);
 
-        result = (prod->length == 1 && prod->coeffs[0] == 1);
+        result = (nmod_poly_equal(a, prod));
         if (!result)
         {
             printf("FAIL:\n");
             nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(qinv), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(prod), printf("\n\n");
             printf("n = %ld\n", n);
             abort();
         }
         
         nmod_poly_clear(q);
-        nmod_poly_clear(qinv);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
         nmod_poly_clear(prod);
     }
 
-    /* Check aliasing of q and qinv */
+    /* Check aliasing of q and a */
     for (i = 0; i < 1000; i++)
     {
-        nmod_poly_t q, qinv;
+        nmod_poly_t q, a, b;
         long m;
 
         mp_limb_t n;
@@ -88,28 +91,71 @@ main(void)
         while (!n_is_probabprime(n));
 
         nmod_poly_init(q, n);
-        nmod_poly_init(qinv, n);
-        do nmod_poly_randtest(q, n_randint(1000));
-        while (q->length == 0 || q->coeffs[0] == 0);
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
 
-        m = n_randint(q->length) + 1;
+        nmod_poly_randtest(a, n_randint(1000));
+        do nmod_poly_randtest(b, n_randint(1000));
+        while (b->length == 0 || b->coeffs[0] == 0);
 
-        nmod_poly_inv_series_newton(qinv, q, m);
-        nmod_poly_inv_series_newton(q, q, m);
+        m = n_randint(1000) + 1;
+
+        nmod_poly_div_series(q, a, b, m);
+        nmod_poly_div_series(a, a, b, m);
         
-        result = (nmod_poly_equal(q, qinv));
+        result = (nmod_poly_equal(q, a));
         if (!result)
         {
             printf("FAIL:\n");
+            nmod_poly_print(b), printf("\n\n");
             nmod_poly_print(q), printf("\n\n");
-            nmod_poly_print(qinv), printf("\n\n");
-            nmod_poly_print(q), printf("\n\n");
+            nmod_poly_print(a), printf("\n\n");
             printf("n = %ld, m = %ld\n", n, m);
             abort();
         }
 
         nmod_poly_clear(q);
-        nmod_poly_clear(qinv);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+    }
+
+    /* Check aliasing of q and b */
+    for (i = 0; i < 1000; i++)
+    {
+        nmod_poly_t q, a, b;
+        long m;
+
+        mp_limb_t n;
+        do n = n_randtest();
+        while (!n_is_probabprime(n));
+
+        nmod_poly_init(q, n);
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+
+        nmod_poly_randtest(a, n_randint(1000));
+        do nmod_poly_randtest(b, n_randint(1000));
+        while (b->length == 0 || b->coeffs[0] == 0);
+
+        m = n_randint(1000) + 1;
+
+        nmod_poly_div_series(q, a, b, m);
+        nmod_poly_div_series(b, a, b, m);
+        
+        result = (nmod_poly_equal(q, b));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(q), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            printf("n = %ld, m = %ld\n", n, m);
+            abort();
+        }
+
+        nmod_poly_clear(q);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
     }
 
     printf("PASS\n");

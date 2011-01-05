@@ -424,6 +424,12 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     nmod_poly_inv_series_newton(Qinv, Q, n);
 }
 
+void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
+                                                          long n, nmod_t mod);
+
+void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
+                                                 const nmod_poly_t B, long n);
+
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);

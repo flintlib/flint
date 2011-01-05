@@ -715,6 +715,25 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     the case or if \code{n = 0}. This function can be viewed as inverting 
     a power series.
  
+void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
+                                                             long n, nmod_t mod)
+
+    Given polynomials \code{A} and \code{B} of length \code{n}, find the
+    polynomial \code{Q} of length \code{n} such that \code{Q * B = A}
+    modulo $x^n$. We assume \code{n > 0} and that the constant coefficient 
+    of \code{B} is invertible modulo the given modulus. The polynomial 
+    \code{Q} must have space for \code{n} coefficients.
+
+void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
+                                                    const nmod_poly_t B, long n)
+
+   Given polynomials \code{A} and \code{B} considered modulo \code{n}, 
+   fing the polynomial \code{Q} of length at most \code{n} such that
+   \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
+   constant coefficient of \code{B} is invertible modulo the modulus. 
+   An exception is raised if \code{n == 0} or the constant coefficient
+   of \code{B} is zero.
+
 *******************************************************************************
 
     Derivative
