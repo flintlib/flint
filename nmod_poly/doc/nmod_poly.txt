@@ -76,6 +76,10 @@ void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 
 *******************************************************************************
 
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
+
+    Sets \code{a} to a copy of \code{b}.
+
 void _nmod_poly_normalise(nmod_poly_t poly)
 
     Internal function for normalising a polynomial so that the final 
@@ -104,45 +108,45 @@ void nmod_poly_truncate(nmod_poly_t poly, long len)
 
 long nmod_poly_length(const nmod_poly_t poly)
 
-   Return the length of the polynomial \code{poly}. The zero polynomial
-   has length zsro.
+    Returns the length of the polynomial \code{poly}. The zero polynomial
+    has length zero.
 
 long nmod_poly_degree(const nmod_poly_t poly)
 
-   Return the degree of the polynomial \code{poly}. The zero polynomial
-   is deemed to have degree \code{-1}.
+    Returns the degree of the polynomial \code{poly}. The zero polynomial
+    is deemed to have degree~$-1$.
 
 mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
 
-   Return the modulus of the polynomial \code{poly}. This will be a 
-   positive integer.
+    Returns the modulus of the polynomial \code{poly}. This will be a 
+    positive integer.
 
 int nmod_poly_is_zero(const nmod_poly_t poly)
 
-   Return one if the polynomial \code{poly} is the zero polynomial,
-   otherwise return zero.
+    Returns one if the polynomial \code{poly} is the zero polynomial,
+    otherwise return zero.
 
 *******************************************************************************
 
-    Getting/setting coefficients
+    Getting and setting coefficients
 
 *******************************************************************************
 
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
-   Get the coefficient of \code{poly} at index \code{j} (coefficients 
-   being numbered with zero being the constant coefficient) and return
-   it as a \code{ulong}. If \code{j} refers to a coefficient beyond the
-   end of \code{poly}, zero is returned.
+    Gets the coefficient of \code{poly} at index \code{j}, where coefficients 
+    are numbered with zero being the constant coefficient, and returns it as 
+    a \code{ulong}. If \code{j} refers to a coefficient beyond the end of 
+    \code{poly}, zero is returned.
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 
-   Set the coefficient of \code{poly} at index \code{j} (coefficients 
-   being numbered with zero being the constant coefficient) to the value
-   \code{c} reduced modulo the modulus of \code{poly}. If \code{j} 
-   refers to a coefficient beyond the current end of \code{poly}, the
-   polynomial is first resized, with intervening coefficients being
-   set to zero.
+    Sets the coefficient of \code{poly} at index \code{j}, where 
+    coefficients are numbered with zero being the constant coefficient, 
+    to the value \code{c} reduced modulo the modulus of \code{poly}. 
+    If \code{j} refers to a coefficient beyond the current end of \code{poly}, 
+    the polynomial is first resized, with intervening coefficients being
+    set to zero.
 
 *******************************************************************************
 
@@ -174,7 +178,7 @@ void nmod_poly_print(const nmod_poly_t a)
 
     Prints the polynomial to \code{stdout}. The length is printed, 
     followed by a space, then the modulus. If the length is zero this is
-    all thar is printed, otherwise two spaces followed by a space 
+    all that is printed, otherwise two spaces followed by a space 
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
@@ -278,7 +282,7 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
 *******************************************************************************
 
-    Addition/subtraction
+    Addition and subtraction
 
 *******************************************************************************
 
@@ -319,17 +323,17 @@ void nmod_poly_scalar_mul(nmod_poly_t res,
 void _nmod_poly_make_monic(mp_ptr output, 
                                       mp_srcptr input, long len, nmod_t mod)
 
-    Set \code{output} to be the scalar multiple of \code{input} (of 
-    length \code{len > 0}) that has leading coefficient one (if such a 
-    polynomial exists). If the leading coefficient of \code{input} is not
+    Sets \code{output} to be the scalar multiple of \code{input} of 
+    length \code{len > 0} that has leading coefficient one, if such a 
+    polynomial exists. If the leading coefficient of \code{input} is not
     invertible, \code{output} is set to the multiple of \code{input} whose
     leading coefficient is the greatest common divisor of the leading 
     coefficient and the modulus of \code{input}.
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
-    Set \code{output} to be the scalar multiple of \code{input} with leading
-    coefficient one (if such a polynomial exists). If \code{input} is zero
+    Sets \code{output} to be the scalar multiple of \code{input} with leading
+    coefficient one, if such a polynomial exists. If \code{input} is zero
     an exception is raised. If the leading coefficient of \code{input} is not
     invertible, \code{output} is set to the multiple of \code{input} whose
     leading coefficient is the greatest common divisor of the leading 
@@ -343,26 +347,27 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
 
-    Set \code{res} to \code{poly} (of length \code{len}) shifted left by
+    Sets \code{(res, len + k)} to \code{(poly, len)} shifted left by 
     \code{k} coefficients. Assumes that \code{res} has space for 
     \code{len + k} coefficients.
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.
-    multiplied by $x^k$. 
- 
+    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.\ 
+    multiplied by $x^k$.
+
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
 
-    Set \code{res} to \code{poly} (of length \code{len}) shifted left by 
+    Sets \code{(res, len - k)} to \code{(poly, len)} shifted left by 
     \code{k} coefficients. It is assumed that \code{k <= len} and that
     \code{res} has space for at least \code{len - k} coefficients.
 
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-    Set \code{res} to \code{poly} shifted right by \code{k} coefficients, i.e.
-    divide by $x^k$ and throw away the remainder. If \code{k} is greater than
-    or equal to the length of poly, the result is the zero polynomial. 
+    Sets \code{res} to \code{poly} shifted right by \code{k} coefficients, 
+    i.e.\ divide by $x^k$ and throws away the remainder. If \code{k} is 
+    greater than or equal to the length of \code{poly}, the result is the 
+    zero polynomial. 
 
 *******************************************************************************
 

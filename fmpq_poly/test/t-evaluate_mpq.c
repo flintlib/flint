@@ -44,7 +44,7 @@ main(void)
     fmpq_poly_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y;
@@ -55,9 +55,9 @@ main(void)
         mpq_init(x);
         mpq_init(y);
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(100), 200);
-        fmpz_randtest(a, state, 100);
-        fmpz_randtest_not_zero(b, state, 100);
+        fmpq_poly_randtest(f, state, n_randint(80), 100);
+        fmpz_randtest(a, state, 80);
+        fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that (f+g)(a) = f(a) + g(a) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -96,10 +96,10 @@ main(void)
         mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100), 200);
-        fmpq_poly_randtest(g, state, n_randint(100), 200);
-        fmpz_randtest(a, state, 100);
-        fmpz_randtest_not_zero(b, state, 100);
+        fmpq_poly_randtest(f, state, n_randint(80), 100);
+        fmpq_poly_randtest(g, state, n_randint(80), 100);
+        fmpz_randtest(a, state, 80);
+        fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check that (f*g)(a) = f(a) * g(a) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t a, b;
         mpq_t x, y, z;
@@ -142,10 +142,10 @@ main(void)
         mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(50), 100);
-        fmpq_poly_randtest(g, state, n_randint(50), 100);
-        fmpz_randtest(a, state, 100);
-        fmpz_randtest_not_zero(b, state, 100);
+        fmpq_poly_randtest(f, state, n_randint(50), 80);
+        fmpq_poly_randtest(g, state, n_randint(50), 80);
+        fmpz_randtest(a, state, 80);
+        fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);
         fmpz_get_mpz(mpq_denref(x), b);
         mpq_canonicalize(x);

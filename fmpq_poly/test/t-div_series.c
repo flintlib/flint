@@ -53,8 +53,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);
@@ -85,8 +85,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);
@@ -118,8 +118,8 @@ main(void)
         fmpq_poly_init(p);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);

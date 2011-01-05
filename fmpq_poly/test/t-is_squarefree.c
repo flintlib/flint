@@ -44,12 +44,12 @@ main(void)
     fmpq_poly_randinit(state);
 
     /* Check that polynomials of degree <= 1 are square-free */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(2), 200);
+        fmpq_poly_randtest(f, state, n_randint(2), 100);
 
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
@@ -72,7 +72,7 @@ main(void)
         if (a->length < 2)
             continue;
         fmpq_poly_init(f);
-        fmpq_poly_randtest_not_zero(f, state, n_randint(50) + 1, 100);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(20) + 1, 40);
 
         fmpq_poly_mul(a, a, a);
         fmpq_poly_mul(f, a, f);

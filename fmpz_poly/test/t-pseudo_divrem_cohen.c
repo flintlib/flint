@@ -43,7 +43,7 @@ main(void)
     fmpz_poly_randinit(state);
 
     /* Check q*b + r = a, no aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q, r, prod;
         long d;
@@ -55,8 +55,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(80), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(80) + 1, 100);
 
         fmpz_poly_pseudo_divrem_cohen(q, r, a, b);
         fmpz_poly_mul(prod, q, b);
@@ -95,8 +95,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(80), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(80) + 1, 100);
 
         fmpz_poly_pseudo_divrem_cohen(q, r, a, b);
         fmpz_poly_pseudo_divrem_cohen(q, a, a, b);
@@ -126,8 +126,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(80), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(80) + 1, 100);
 
         fmpz_poly_pseudo_divrem_cohen(q, r, a, b);
         fmpz_poly_pseudo_divrem_cohen(q, b, a, b);
@@ -157,8 +157,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(80), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(80) + 1, 100);
 
         fmpz_poly_pseudo_divrem_cohen(q, r, a, b);
         fmpz_poly_pseudo_divrem_cohen(a, r, a, b);
@@ -180,7 +180,7 @@ main(void)
     }
 
     /* Check q and b alias */
-    for (i = 0; i < 5; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, q, r;
 
@@ -188,8 +188,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(80), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(80) + 1, 100);
 
         fmpz_poly_pseudo_divrem_cohen(q, r, a, b);
         fmpz_poly_pseudo_divrem_cohen(b, r, a, b);
