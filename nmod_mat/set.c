@@ -33,7 +33,7 @@ void
 nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
 {
     if (A->mod.n <= B->mod.n)
-        _nmod_vec_copy(B->entries, A->entries, A->r*A->c);
+        _nmod_vec_set(B->entries, A->entries, A->r*A->c);
     else
         _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
 }

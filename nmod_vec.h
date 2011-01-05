@@ -155,7 +155,7 @@ void _nmod_vec_zero(mp_ptr vec, long len)
 mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len);
 
 static __inline__
-void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
+void _nmod_vec_set(mp_ptr res, mp_srcptr vec, long len)
 {
    mpn_copyi(res, vec, len);
 }

@@ -128,7 +128,7 @@ void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod)
 
 *******************************************************************************
 
-void _nmod_vec_copy(mp_ptr res, mp_srcptr vec, long len)
+void _nmod_vec_set(mp_ptr res, mp_srcptr vec, long len)
 
     Copies \code{len} entries from the vector \code{vec} to \code{res}.
 
