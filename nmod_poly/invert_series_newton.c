@@ -33,7 +33,7 @@
 #define NMOD_NEWTON_INVERSE_CUTOFF 400
 
 void
-_nmod_poly_invert_newton(mp_ptr Qinv, 
+_nmod_poly_invert_series_newton(mp_ptr Qinv, 
                                   mp_srcptr Q, long n, nmod_t mod)
 {
     long m;
@@ -51,9 +51,8 @@ _nmod_poly_invert_newton(mp_ptr Qinv,
     prod = nmod_vec_init(n);
     prod2 = nmod_vec_init(n);
 
-    _nmod_poly_invert_newton(g0, Q, m, mod);
+    _nmod_poly_invert_series_newton(g0, Q, m, mod);
     _nmod_poly_mullow_n(prod, Q, n, g0, m, n, mod);
-    prod[0] = n_submod(prod[0], 1, mod.n);
     _nmod_poly_mullow_n(prod2 + m, g0, m, prod + m, n - m, n - m, mod);
     mpn_zero(prod2, m);
 
@@ -66,7 +65,7 @@ _nmod_poly_invert_newton(mp_ptr Qinv,
 }
 
 void
-nmod_poly_invert_newton(nmod_poly_t Qinv, 
+nmod_poly_invert_series_newton(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -101,7 +100,7 @@ nmod_poly_invert_newton(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_invert_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_invert_series_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

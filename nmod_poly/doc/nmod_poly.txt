@@ -684,18 +684,36 @@ void nmod_poly_invert_series_basecase(nmod_poly_t Qinv,
     coefficient of \code{Q} must be invertible modulo the modulus of 
     \code{Q}. This function can be viewed as inverting a power series.
  
-void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+void _nmod_poly_invert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
+    This function can be viewed as inverting a power series via Newton 
+    iteration.
    
-void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+void nmod_poly_invert_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
     modulo $x^n$. The constant coefficient of \code{Q} must be invertible 
     modulo the modulus of \code{Q}. An exception is raised if this is not
-    the case or if \code{n = 0}.
+    the case or if \code{n = 0}. This function can be viewed as inverting 
+    a power series via Newton iteration.
+ 
+void _nmod_poly_invert_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+    
+    Given \code{Q} of length \code{n} whose constant coefficient is invertible
+    modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
+    such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
+    This function can be viewed as inverting a power series.
+   
+void nmod_poly_invert_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+
+    Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
+    modulo $x^n$. The constant coefficient of \code{Q} must be invertible 
+    modulo the modulus of \code{Q}. An exception is raised if this is not
+    the case or if \code{n = 0}. This function can be viewed as inverting 
+    a power series.
  
 *******************************************************************************
 

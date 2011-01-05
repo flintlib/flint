@@ -406,9 +406,23 @@ void _nmod_poly_invert_series_basecase(mp_ptr Qinv,
 void nmod_poly_invert_series_basecase(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, long n);
 
-void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+void _nmod_poly_invert_series_newton(mp_ptr Qinv, 
+                                              mp_srcptr Q, long n, nmod_t mod);
 
-void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n);
+void nmod_poly_invert_series_newton(nmod_poly_t Qinv, 
+                                                  const nmod_poly_t Q, long n);
+
+static __inline__
+void _nmod_poly_invert_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+{
+    _nmod_poly_invert_series_newton(Qinv, Q, n, mod);
+}
+
+static __inline__
+void nmod_poly_invert_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+{
+    nmod_poly_invert_series_newton(Qinv, Q, n);
+}
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
