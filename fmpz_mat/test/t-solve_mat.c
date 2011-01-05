@@ -73,15 +73,11 @@ main(void)
         {
             printf("FAIL:\n");
             printf("AX != B!\n");
-            printf("A:\n");
-            fmpz_mat_print_pretty(A);
-            printf("B:\n");
-            fmpz_mat_print_pretty(B);
-            printf("X: (den = "); fmpz_print(den); printf(")\n");
-            fmpz_mat_print_pretty(X);
-            printf("AX:\n");
-            fmpz_mat_print_pretty(AX);
-            printf("\n");
+            printf("A:\n"),      fmpz_mat_print_pretty(A),  printf("\n");
+            printf("B:\n"),      fmpz_mat_print_pretty(B),  printf("\n");
+            printf("X:\n"),      fmpz_mat_print_pretty(X),  printf("\n");
+            printf("den(X) = "), fmpz_print(den),           printf("\n");
+            printf("AX:\n"),     fmpz_mat_print_pretty(AX), printf("\n");
             abort();
         }
 

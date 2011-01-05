@@ -27,6 +27,7 @@
 #ifndef FMPZ_MAT_H
 #define FMPZ_MAT_H
 
+#include <stdio.h>
 #include <mpir.h>
 #include "fmpz.h"
 
@@ -51,8 +52,23 @@ void fmpz_mat_clear(fmpz_mat_t mat);
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
 
-void fmpz_mat_print(fmpz_mat_t mat); 
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
+/* Input and output  *********************************************************/
+
+int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
+
+int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat);
+
+static __inline__
+int fmpz_mat_print(const fmpz_mat_t mat)
+{
+    return fmpz_mat_fprint(stdout, mat);
+}
+
+static __inline__
+int fmpz_mat_print_pretty(const fmpz_mat_t mat)
+{
+    return fmpz_mat_fprint_pretty(stdout, mat);
+}
 
 /* Random matrix generation */
 void fmpz_mat_randinit(fmpz_randstate_t state);

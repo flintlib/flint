@@ -191,19 +191,35 @@ void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
 *******************************************************************************
 
-void fmpz_mat_print(fmpz_mat_t mat) 
+int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 
-    Prints the given matrix to \code{stdout}. The format is the number 
-    of rows, a space, the number of columns, two spaces, then a space 
-    separated list of coefficients.
+    Prints the given matrix to the stream \code{file}.  The format is 
+    the number of rows, a space, the number of columns, two spaces, then 
+    a space separated list of coefficients, one row after the other.
 
-void fmpz_mat_print_pretty(fmpz_mat_t mat) 
+    In case of success, returns a positive value;  otherwise, returns 
+    a non-positive value.
 
-    Prints the given matrix to \code{stdout}. The format is an opening 
-    square bracket then on each line a row of the matrix, followed by a 
-    closing square bracket. Each row is written as an opening square 
+int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
+
+    Prints the given matrix to the stream \code{file}.  The format is an 
+    opening square bracket then on each line a row of the matrix, followed 
+    by a closing square bracket. Each row is written as an opening square 
     bracket followed by a space separated list of coefficients followed 
     by a closing square bracket.
+
+    In case of success, returns a positive value;  otherwise, returns 
+    a non-positive value.
+
+int fmpz_mat_print(const fmpz_mat_t mat)
+
+    Prints the given matrix to the stream \code{file}.  For further 
+    details, see \code{fmpz_mat_fprint()}.
+
+int fmpz_mat_print_pretty(const fmpz_mat_t mat)
+
+    Prints the given matrix to \code{stdout}.  For further details, 
+    see \code{fmpz_mat_fprint_pretty()}.
 
 *******************************************************************************
 
