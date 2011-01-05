@@ -34,7 +34,7 @@ int
 main(void)
 {
     int i, result;
-    printf("invert_series_basecase....");
+    printf("inv_series_basecase....");
     fflush(stdout);
 
     /* Check result of div against divrem */
@@ -56,7 +56,7 @@ main(void)
 
         m = n_randint(q->length) + 1;
 
-        nmod_poly_invert_series_basecase(qinv, q, m);
+        nmod_poly_inv_series_basecase(qinv, q, m);
         
         nmod_poly_mul(prod, q, qinv);
         nmod_poly_truncate(prod, m);
@@ -94,8 +94,8 @@ main(void)
 
         m = n_randint(q->length) + 1;
 
-        nmod_poly_invert_series_basecase(qinv, q, m);
-        nmod_poly_invert_series_basecase(q, q, m);
+        nmod_poly_inv_series_basecase(qinv, q, m);
+        nmod_poly_inv_series_basecase(q, q, m);
         
         result = (nmod_poly_equal(q, qinv));
         if (!result)

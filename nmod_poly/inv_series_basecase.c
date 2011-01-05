@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_invert_series_basecase(mp_ptr Qinv, 
+_nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                   mp_srcptr Q, long n, nmod_t mod)
 {
     mp_ptr X2n, Qrev;
@@ -53,7 +53,7 @@ _nmod_poly_invert_series_basecase(mp_ptr Qinv,
 }
 
 void
-nmod_poly_invert_series_basecase(nmod_poly_t Qinv, 
+nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -88,7 +88,7 @@ nmod_poly_invert_series_basecase(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_invert_series_basecase(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_inv_series_basecase(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {
