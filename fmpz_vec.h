@@ -53,7 +53,13 @@ mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len);
 
 /*  Output  ******************************************************************/
 
-void _fmpz_vec_print(fmpz * vec, long len);
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len);
+
+static __inline__
+int _fmpz_vec_print(const fmpz * vec, long len)
+{
+    return _fmpz_vec_fprint(stdout, vec, len);
+}
 
 /*  Assignment and basic manipulation  ***************************************/
 

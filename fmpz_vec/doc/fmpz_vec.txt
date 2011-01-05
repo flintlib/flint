@@ -81,11 +81,23 @@ ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
 *******************************************************************************
 
-void _fmpz_vec_print(fmpz * vec, long len)
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
 
-    Prints the vector of given length to \code{stdout}.  The format is 
+    Prints the vector of given length to the stream \code{file}. The 
+    format is the length followed by two spaces, then a space separated 
+    list of coefficients. If the length is zero, only $0$ is printed.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int _fmpz_vec_print(const fmpz * vec, long len)
+
+    Prints the vector of given length to \code{stdout}. The format is 
     the length followed by two spaces, then a space separated list of 
     coefficients. If the length is zero, only $0$ is printed.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
 
 *******************************************************************************
 
