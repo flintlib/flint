@@ -77,9 +77,42 @@ ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
 *******************************************************************************
 
-    Output
+    Input and output
 
 *******************************************************************************
+
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
+
+    Reads a vector from the stream \code{file} and stores it at 
+    \code{*vec}.  The format is the same as the output format of 
+    \code{_fmpz_vec_fprint()}, followed by either any character 
+    or the end of the file.
+
+    The interpretation of the various input arguments depends on whether 
+    or not \code{*vec} is \code{NULL}:
+
+    If \code{*vec == NULL}, the value of \code{*len} on input is ignored.  
+    Once the length has been read from \code{file}, \code{*len} is that 
+    to that value and a vector of this length is allocated at \code{*vec}. 
+    Finally, \code{*len} coefficients are read from the input stream.  In 
+    case of a file or parsing error, clears the vector and sets \code{*vec} 
+    and \code{*len} to \code{NULL} and \code{0}, respectively.
+
+    Otherwise, if \code{*vec != NULL}, it is assumed that \code{(*vec, *len)} 
+    is a properly initialised vector.  If the length on the input stream 
+    does not match \code{*len}, a parsing error is raised.  Attempts to read 
+    the right number of coefficients from the input stream.  In case of a 
+    file or parsing error, leaves the vector \code{(*vec, *len)} in its 
+    current state.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
+int _fmpz_vec_read(fmpz ** vec, long * len)
+
+    Reads a vector from \code{stdin} and stores it at \code{*vec}.
+
+    For further details, see \code{_fmpz_vec_fread()}.
 
 int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
 
@@ -92,12 +125,9 @@ int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
 
 int _fmpz_vec_print(const fmpz * vec, long len)
 
-    Prints the vector of given length to \code{stdout}. The format is 
-    the length followed by two spaces, then a space separated list of 
-    coefficients. If the length is zero, only $0$ is printed.
+    Prints the vector of given length to \code{stdout}.
 
-    In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    For further details, see \code{_fmpz_vec_fprint()}.
 
 *******************************************************************************
 
