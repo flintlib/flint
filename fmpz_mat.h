@@ -42,6 +42,8 @@ typedef struct
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
+#define fmpz_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+
 /* Memory management */
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);

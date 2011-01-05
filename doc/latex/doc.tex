@@ -534,13 +534,62 @@ We now describe the functions available in the \code{fmpz} module.
 
 \section{Introduction}
 
-The \code{fmpz_mat_t} data type represents matrices of multiprecision integers.
-The number of rows or columns in a matrix is permitted to be zero.
+The \code{fmpz_mat_t} data type represents dense matrices of multiprecision
+integers, implemented using \code{fmpz} vectors.
 
 No automatic resizing is performed: in general, the user must provide
 matrices of correct size for both input and output variables. Output
 variables are \emph{not} allowed to be aliased with input variables unless
 otherwise noted.
+
+Matrices are indexed from zero: an $m \times n$ matrix
+has rows of index $0,1,\ldots,m-1$ and columns of
+index $0,1,\ldots,n-1$. One or both of $m$ and $n$ may be zero.
+
+Elements of a matrix can be read or written using the \code{fmpz_mat_entry}
+macro, which returns a reference to the entry at a given row and column index.
+This reference can be passed as an input or output $fmpz_t$ variable to any
+function in the \code{fmpz} module for direct manipulation.
+
+\section{Simple example}
+The following example creates the $2 \times 2$ matrix $A$ with
+value $2i+j$ at row $i$ and column $j$, computes $B = A^2$,
+and prints both matrices.
+
+\begin{lstlisting}[language=c]
+#include "fmpz.h"
+#include "fmpz_mat.h"
+...
+long i, j;
+fmpz_mat_t A;
+fmpz_mat_t B;
+fmpz_mat_init(A, 2, 2);
+fmpz_mat_init(B, 2, 2);
+for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+        fmpz_set_ui(fmpz_mat_entry(A, i, j), 2*i+j);
+fmpz_mat_mul(B, A, A);
+printf("A = \n");
+fmpz_mat_print_pretty(A);
+printf("A^2 = \n");
+fmpz_mat_print_pretty(B);
+fmpz_mat_clear(A);
+fmpz_mat_clear(B);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+A = 
+[[0 1]
+[2 3]]
+A^2 = 
+[[2 3]
+[6 11]]
+det(A) = -2
+det(A^2) = 4
+
+\end{lstlisting}
+
 
 \input{fmpz_mat.tex}
 
