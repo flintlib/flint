@@ -34,5 +34,5 @@ void
 fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src)
 {
     fmpz_mat_init(mat, src->r, src->c);
-    fmpz_mat_copy(mat, src);
+    fmpz_mat_set(mat, src);
 }

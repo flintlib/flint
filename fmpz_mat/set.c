@@ -31,12 +31,12 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_copy(fmpz_mat_t mat1, const fmpz_mat_t mat2)
+fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {
         FMPZ_MAT_ASSERT(mat1->r == mat2->r && mat1->c == mat2->c,
-            "fmpz_mat_copy: incompatible dimensions");
+            "fmpz_mat_set: incompatible dimensions");
 
         _fmpz_vec_set(mat1->entries, mat2->entries, mat2->r * mat2->c);
     }

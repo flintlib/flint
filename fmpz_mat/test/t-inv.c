@@ -86,7 +86,7 @@ main(void)
         }
 
         /* Test aliasing */
-        fmpz_mat_copy(C, A);
+        fmpz_mat_set(C, A);
         fmpz_mat_inv(A, den, A);
         fmpz_mat_mul(B, A, C);
         _fmpz_vec_scalar_divexact_fmpz(B->entries, B->entries, m*m, den);
