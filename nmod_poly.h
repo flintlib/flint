@@ -400,10 +400,10 @@ void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA,
 
 void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-void _nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
+void _nmod_poly_invert_series_basecase(mp_ptr Qinv, 
                                               mp_srcptr Q, long n, nmod_t mod);
 
-void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
+void nmod_poly_invert_series_basecase(nmod_poly_t Qinv, 
                                                   const nmod_poly_t Q, long n);
 
 void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);

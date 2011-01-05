@@ -665,15 +665,16 @@ void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
     Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
     with \code{length(R) < length(B)}, but return only \code{Q}.
 
-void _nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
+void _nmod_poly_invert_series_basecase(mp_ptr Qinv, 
                                                  mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose leading coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that the top \code{n} coefficients of the product \code{Q * Qinv} is
-    $x^{n - 1}$. Requires that \code{n > 0}.
+    $x^{n - 1}$. Requires that \code{n > 0}. This function can be viewed as 
+    inverting a power series.
    
-void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
+void nmod_poly_invert_series_basecase(nmod_poly_t Qinv, 
                                                      const nmod_poly_t Q, long n)
 
     Given \code{Q} of length at least \code{n} find \code{Qinv} of length
@@ -681,7 +682,7 @@ void nmod_poly_invert_newton_basecase(nmod_poly_t Qinv,
     \code{Q * Qinv} is $x^{n - 1}$. An exception is raised if \code{n = 0}
     or if the length of \code{Q} is less than \code{n}. The leading 
     coefficient of \code{Q} must be invertible modulo the modulus of 
-    \code{Q}.
+    \code{Q}. This function can be viewed as inverting a power series.
  
 void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     

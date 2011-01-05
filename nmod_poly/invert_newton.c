@@ -41,12 +41,8 @@ _nmod_poly_invert_newton(mp_ptr Qinv,
 
     if (n < NMOD_NEWTON_INVERSE_CUTOFF)
     {
-        mp_ptr Qrev = nmod_vec_init(n);
-        _nmod_poly_reverse(Qrev, Q, n, n);
-        _nmod_poly_invert_newton_basecase(Qinv, Qrev, n, mod);
-        _nmod_poly_reverse(Qinv, Qinv, n, n);
-        nmod_vec_free(Qrev);
-
+        _nmod_poly_invert_series_basecase(Qinv, Q, n, mod);
+        
         return;
     }
     

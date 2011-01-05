@@ -34,13 +34,13 @@ int
 main(void)
 {
     int i, result;
-    printf("invert_newton_basecase....");
+    printf("invert_series_basecase....");
     fflush(stdout);
 
     /* Check result of div against divrem */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000; i++)
     {
-        nmod_poly_t q, qinv, X2m, prod;
+        nmod_poly_t q, qinv, prod;
         long m;
 
         mp_limb_t n;
@@ -50,30 +50,24 @@ main(void)
         nmod_poly_init(prod, n);
         nmod_poly_init(qinv, n);
         nmod_poly_init(q, n);
-        nmod_poly_init(X2m, n);
         
-        do nmod_poly_randtest(q, n_randint(200));
-        while (q->length == 0);
+        do nmod_poly_randtest(q, n_randint(2000));
+        while (q->length == 0 || q->coeffs[0] == 0);
 
         m = n_randint(q->length) + 1;
 
-        nmod_poly_set_coeff_ui(X2m, m - 1, 1);
-
-        nmod_poly_invert_newton_basecase(qinv, q, m);
+        nmod_poly_invert_series_basecase(qinv, q, m);
         
-        if (q->length > m)
-            nmod_poly_shift_right(q, q, q->length - m);
         nmod_poly_mul(prod, q, qinv);
-        nmod_poly_shift_right(prod, prod, m - 1);
+        nmod_poly_truncate(prod, m);
 
-        result = (nmod_poly_equal(prod, X2m));
+        result = (prod->length == 1 && prod->coeffs[0] == 1);
         if (!result)
         {
             printf("FAIL:\n");
             nmod_poly_print(q), printf("\n\n");
             nmod_poly_print(qinv), printf("\n\n");
             nmod_poly_print(prod), printf("\n\n");
-            nmod_poly_print(X2m), printf("\n\n");
             printf("n = %ld\n", n);
             abort();
         }
@@ -81,11 +75,10 @@ main(void)
         nmod_poly_clear(q);
         nmod_poly_clear(qinv);
         nmod_poly_clear(prod);
-        nmod_poly_clear(X2m);
     }
 
     /* Check aliasing of q and qinv */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000; i++)
     {
         nmod_poly_t q, qinv;
         long m;
@@ -96,13 +89,13 @@ main(void)
 
         nmod_poly_init(q, n);
         nmod_poly_init(qinv, n);
-        do nmod_poly_randtest(q, n_randint(200));
-        while (q->length == 0);
+        do nmod_poly_randtest(q, n_randint(1000));
+        while (q->length == 0 || q->coeffs[0] == 0);
 
         m = n_randint(q->length) + 1;
 
-        nmod_poly_invert_newton_basecase(qinv, q, m);
-        nmod_poly_invert_newton_basecase(q, q, m);
+        nmod_poly_invert_series_basecase(qinv, q, m);
+        nmod_poly_invert_series_basecase(q, q, m);
         
         result = (nmod_poly_equal(q, qinv));
         if (!result)

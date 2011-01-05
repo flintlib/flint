@@ -31,22 +31,29 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_invert_newton_basecase(mp_ptr Qinv, 
+_nmod_poly_invert_series_basecase(mp_ptr Qinv, 
                                   mp_srcptr Q, long n, nmod_t mod)
 {
-    mp_ptr X2n;
+    mp_ptr X2n, Qrev;
 
-    X2n = nmod_vec_init(2*n - 1);
-    mpn_zero(X2n, 2*n - 2);
-    X2n[2*n - 2] = 1;
+    X2n = nmod_vec_init(2*n);
+    Qrev = X2n + n;
 
-    _nmod_poly_div_divconquer(Qinv, X2n, 2*n - 1, Q, n, mod);
+    _nmod_poly_reverse(Qrev, Q, n, n);
+    
+    X2n[n - 1] = 1;
+    mpn_zero(X2n, n - 1);
+    X2n -= (n - 1);
 
-    nmod_vec_free(X2n);
+    _nmod_poly_div_divconquer(Qinv, X2n, 2*n - 1, Qrev, n, mod);
+
+    _nmod_poly_reverse(Qinv, Qinv, n, n);
+    
+    nmod_vec_free(X2n + n - 1);
 }
 
 void
-nmod_poly_invert_newton_basecase(nmod_poly_t Qinv, 
+nmod_poly_invert_series_basecase(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -55,15 +62,22 @@ nmod_poly_invert_newton_basecase(nmod_poly_t Qinv,
     
     Qlen = Q->length;
 
-    if (Qlen < n || n == 0)
+    if (n == 0 || Q->length == 0 || Q->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_invert_newton_basecase\n");
+        printf("Exception: division by zero in nmod_poly_invert_newton\n");
         abort();
     }
 
-    Q_coeffs = Q->coeffs + Qlen - n;
+    if (Qlen < n)
+    {
+        Q_coeffs = nmod_vec_init(n);
+        mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
+        mpn_zero(Q_coeffs + Qlen, n - Qlen);
+    }
+    else
+        Q_coeffs = Q->coeffs;
 
-    if (Q == Qinv)
+    if (Q == Qinv && Qlen >= n)
     {
         nmod_poly_init2(t1, Q->mod.n, n);
         Qinv_coeffs = t1->coeffs;
@@ -74,15 +88,18 @@ nmod_poly_invert_newton_basecase(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_invert_newton_basecase(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_invert_series_basecase(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
-    if (Q == Qinv)
+    if (Q == Qinv && Qlen >= n)
     {
         nmod_poly_swap(Qinv, t1);
         nmod_poly_clear(t1);
     }
     
     Qinv->length = n;
+
+    if (Qlen < n)
+        nmod_vec_free(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }
