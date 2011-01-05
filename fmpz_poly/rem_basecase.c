@@ -41,7 +41,7 @@ _fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
     fmpz_init(q);
 
     if (R != A)
-        _fmpz_vec_copy(R, A, lenA);
+        _fmpz_vec_set(R, A, lenA);
 
     for ( ; lenA >= lenB; lenA--)
     {

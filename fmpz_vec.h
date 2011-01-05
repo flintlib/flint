@@ -71,7 +71,7 @@ int _fmpz_vec_read(fmpz ** vec, long * len)
 
 /*  Assignment and basic manipulation  ***************************************/
 
-void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2);
+void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2);
 
 void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, long len2);
 

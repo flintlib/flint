@@ -41,7 +41,7 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     if (lenB <= FLINT_DIVREM_DIVCONQUER_CUTOFF)
     {
         _fmpz_vec_zero(BQ, lenB - 1);
-        _fmpz_vec_copy(BQ + (lenB - 1), A + (lenB - 1), lenB);
+        _fmpz_vec_set(BQ + (lenB - 1), A + (lenB - 1), lenB);
 
         _fmpz_poly_divrem_basecase(Q, BQ, BQ, 2 * lenB - 1, B, lenB);
 

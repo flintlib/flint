@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2)
+_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2)
 {
     long i;
     for (i = 0; i < len2; i++)

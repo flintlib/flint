@@ -53,7 +53,7 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly,
     {
         if (res != poly)
         {
-            _fmpz_vec_copy(res, poly, len);
+            _fmpz_vec_set(res, poly, len);
             fmpz_set(denr, den);
         }
     }

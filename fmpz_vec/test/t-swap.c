@@ -54,7 +54,7 @@ main(void)
         _fmpz_vec_randtest(a, state, len, 200);
         _fmpz_vec_randtest(b, state, len, 200);
 
-        _fmpz_vec_copy(c, b, len);
+        _fmpz_vec_set(c, b, len);
         _fmpz_vec_swap(a, b, len);
 
         result = (_fmpz_vec_equal(a, c, len));

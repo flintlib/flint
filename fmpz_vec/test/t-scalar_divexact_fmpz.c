@@ -91,7 +91,7 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
 
-        _fmpz_vec_copy(b, a, len);
+        _fmpz_vec_set(b, a, len);
         _fmpz_vec_scalar_mul_fmpz(a, a, len, n);
         _fmpz_vec_scalar_divexact_fmpz(a, a, len, n);
 

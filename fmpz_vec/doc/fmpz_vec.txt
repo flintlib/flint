@@ -135,7 +135,7 @@ int _fmpz_vec_print(const fmpz * vec, long len)
 
 *******************************************************************************
 
-void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2)
+void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2)
 
     Makes a copy of \code{(vec2, len2)} into \code{vec1}.
 

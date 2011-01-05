@@ -37,7 +37,7 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     {
         if (rpoly != poly)
         {
-            _fmpz_vec_copy(rpoly, poly, len);
+            _fmpz_vec_set(rpoly, poly, len);
             fmpz_set(rden, den);
         }
     }

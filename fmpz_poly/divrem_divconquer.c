@@ -107,7 +107,7 @@ _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R,
            terms which we use in the division
          */
 
-        _fmpz_vec_copy(dq1, A, shift);
+        _fmpz_vec_set(dq1, A, shift);
         _fmpz_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1);
         _fmpz_vec_sub(R + lenA - lenB, A + lenA - lenB, 
                       dq1 + lenA - lenB, lenB);

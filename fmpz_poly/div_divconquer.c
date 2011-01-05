@@ -80,7 +80,7 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
            significant terms which we use in the division
          */
 
-        _fmpz_vec_copy(dq1, A, shift);
+        _fmpz_vec_set(dq1, A, shift);
         _fmpz_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1);
 
         /*

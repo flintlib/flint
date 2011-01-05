@@ -38,7 +38,7 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
     if (!COEFF_IS_MPZ(c))
     {
         if (c == 1)
-            _fmpz_vec_copy(vec1, vec2, len2);
+            _fmpz_vec_set(vec1, vec2, len2);
         else if (c == -1)
             _fmpz_vec_neg(vec1, vec2, len2);
         else
