@@ -53,6 +53,7 @@ void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
 {
     fmpz_t t, c, d;
     long j, k, m, mcase;
+    int prodsize;
 
     fmpz_init(t);
     fmpz_init(c);
@@ -87,6 +88,23 @@ void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
             fmpz_divexact_ui(b + m, b + m, 2UL);
         }
 
+        /* All factors are strictly smaller than m + 4; choose prodsize such
+           that (m + 4)^prodsize fits in a signed long. */
+        if (FLINT64)
+        {
+            if      (m < 1444L)       prodsize = 6;
+            else if (m < 2097148L)    prodsize = 3;
+            else if (m < 3037000495L) prodsize = 2;  /* not very likely... */
+            else abort();
+        }
+        else
+        {
+            if      (m < 32L)    prodsize = 6;
+            else if (m < 1286L)  prodsize = 3;
+            else if (m < 46336L) prodsize = 2;
+            else abort();
+        }
+
         /* c = t = binomial(m+3, m) */
         fmpz_set_ui(t, m + 1UL);
         fmpz_mul_ui(t, t, m + 2UL);
@@ -94,25 +112,39 @@ void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
         fmpz_divexact_ui(t, t, 6UL);
         fmpz_set(c, t);
 
-        for (j = 1; j <= m / 6; j++)
+        for (j = 6; j <= m; j += 6)
         {
-            /* c = binomial(m+3, m-6*j); */
-            fmpz_mul_ui(c, c, m + 6 - 6*j);
-            fmpz_mul_ui(c, c, m + 5 - 6*j);
-            fmpz_mul_ui(c, c, m + 4 - 6*j);
-            fmpz_mul_ui(c, c, m + 3 - 6*j);
-            fmpz_mul_ui(c, c, m + 2 - 6*j);
-            fmpz_mul_ui(c, c, m + 1 - 6*j);
-            fmpz_set_ui(d, 72*j);
-            fmpz_mul_ui(d, d, 2*j + 1);
-            fmpz_mul_ui(d, d, 3*j - 1);
-            fmpz_mul_ui(d, d, 3*j + 1);
-            fmpz_mul_ui(d, d, 6*j - 1);
-            fmpz_mul_ui(d, d, 6*j + 1);
-            fmpz_divexact(c, c, d);
-            fmpz_submul(b + m, c, b + (m - 6*j));
-        }
+            long r = m - j;
 
+            /* c = binomial(m+3, m-j); */
+            switch (prodsize)
+            {
+                case 2:
+                fmpz_mul_ui(c, c, (r+6)*(r+5));
+                fmpz_mul_ui(c, c, (r+4)*(r+3));
+                fmpz_mul_ui(c, c, (r+2)*(r+1));
+                fmpz_set_ui(d,    (j+0)*(j+3));
+                fmpz_mul_ui(d, d, (j-2)*(j+2));
+                fmpz_mul_ui(d, d, (j-1)*(j+1));
+                fmpz_divexact(c, c, d);
+                break;
+
+                case 3:
+                fmpz_mul_ui(c, c, (r+6)*(r+5)*(r+4));
+                fmpz_mul_ui(c, c, (r+3)*(r+2)*(r+1));
+                fmpz_set_ui(d,    (j+0)*(j+3)*(j-2));
+                fmpz_mul_ui(d, d, (j+2)*(j-1)*(j+1));
+                fmpz_divexact(c, c, d);
+                break;
+
+                case 6:
+                fmpz_mul_ui(c, c,      (r+6)*(r+5)*(r+4)*(r+3)*(r+2)*(r+1));
+                fmpz_divexact_ui(c, c, (j+0)*(j+3)*(j-2)*(j+2)*(j-1)*(j+1));
+                break;
+            }
+
+            fmpz_submul(b + m, c, b + (m - j));
+        }
         fmpz_divexact(b + m, b + m, t);
     }
 
