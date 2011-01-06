@@ -70,35 +70,10 @@ void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
     This function only ever grows the allocated space, so no data loss can 
     occur.
 
-*******************************************************************************
-
-    Basic manipulation
-
-*******************************************************************************
-
-void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
-
-    Sets \code{a} to a copy of \code{b}.
-
 void _nmod_poly_normalise(nmod_poly_t poly)
 
     Internal function for normalising a polynomial so that the final 
     coefficient (if there are any at all) is not zero.
-
-void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
-
-    Efficiently swaps \code{poly1} and \code{poly2} by swapping pointers 
-    internally. 
-
-mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
-
-    Returns the maximum number of bits of any coefficient of \code{poly}.
-
-void nmod_poly_truncate(nmod_poly_t poly, long len)
-
-    Truncates \code{poly} to the given length and normalises it. 
-    If \code{len} is bigger than the current length of \code{poly}, 
-    then nothing happens.
 
 *******************************************************************************
 
@@ -121,10 +96,60 @@ mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
     Returns the modulus of the polynomial \code{poly}. This will be a 
     positive integer.
 
-int nmod_poly_is_zero(const nmod_poly_t poly)
+mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 
-    Returns one if the polynomial \code{poly} is the zero polynomial,
-    otherwise return zero.
+    Returns the maximum number of bits of any coefficient of \code{poly}.
+
+*******************************************************************************
+
+    Assignment and basic manipulation
+
+*******************************************************************************
+
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
+
+    Sets \code{a} to a copy of \code{b}.
+
+void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
+
+    Efficiently swaps \code{poly1} and \code{poly2} by swapping pointers 
+    internally. 
+
+void nmod_poly_zero(nmod_poly_t res)
+
+    Sets \code{res} to the zero polynomial.
+
+void nmod_poly_truncate(nmod_poly_t poly, long len)
+
+    Truncates \code{poly} to the given length and normalises it. 
+    If \code{len} is bigger than the current length of \code{poly}, 
+    then nothing happens.
+
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
+
+    Set \code{output} to the reverse of \code{input}, which is of length
+    \code{len}, but thinking of it as a polynomial of length \code{m} 
+    (notionally zero padded if necessary). The length \code{m} must be 
+    non-negative, but there are no other restrictions. The polynomial
+    \code{output} must have space for \code{m} coefficients. 
+
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
+
+    Set \code{output} to the reverse of \code{input}, thinking of it as
+    a polynomial of length \code{m} (notionally zero padded if necessary).
+    The length \code{m} must be non-negative, but there are no other
+    restrictions. The output polynomial will be set to length \code{m}
+    and then normalised.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void nmod_poly_randtest(nmod_poly_t poly, long len)
+
+    Generates a random polynomial with up to the given length.
 
 *******************************************************************************
 
@@ -150,37 +175,9 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 
 *******************************************************************************
 
-    Random generation
-
-*******************************************************************************
-
-void nmod_poly_randtest(nmod_poly_t poly, long len)
-
-    Generates a random polynomial with up to the given length.
-
-*******************************************************************************
-
-    Comparison
-
-*******************************************************************************
-
-int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
-
-    Returns $1$ if the polynomials are equal, otherwise $0$.
-
-*******************************************************************************
-
     Input and output
 
 *******************************************************************************
-
-void nmod_poly_print(const nmod_poly_t a)
-
-    Prints the polynomial to \code{stdout}. The length is printed, 
-    followed by a space, then the modulus. If the length is zero this is
-    all that is printed, otherwise two spaces followed by a space 
-    separated list of coefficients is printed, beginning with the constant 
-    coefficient.
 
 char * nmod_poly_get_str(const nmod_poly_t poly)
 
@@ -194,6 +191,14 @@ int nmod_poly_set_str(const char * s, nmod_poly_t poly)
     for \code{nmod_poly_print}. If a polynomial in the correct format
     is read, a positive value is returned, otherwise a non-positive value 
     is returned.
+
+void nmod_poly_print(const nmod_poly_t a)
+
+    Prints the polynomial to \code{stdout}. The length is printed, 
+    followed by a space, then the modulus. If the length is zero this is
+    all that is printed, otherwise two spaces followed by a space 
+    separated list of coefficients is printed, beginning with the constant 
+    coefficient.
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
@@ -220,124 +225,18 @@ int nmod_poly_read(nmod_poly_t poly)
 
 *******************************************************************************
 
-    Reversal
+    Comparison
 
 *******************************************************************************
 
-void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
-    Set \code{output} to the reverse of \code{input}, which is of length
-    \code{len}, but thinking of it as a polynomial of length \code{m} 
-    (notionally zero padded if necessary). The length \code{m} must be 
-    non-negative, but there are no other restrictions. The polynomial
-    \code{output} must have space for \code{m} coefficients. 
+    Returns $1$ if the polynomials are equal, otherwise $0$.
 
-void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
+int nmod_poly_is_zero(const nmod_poly_t poly)
 
-    Set \code{output} to the reverse of \code{input}, thinking of it as
-    a polynomial of length \code{m} (notionally zero padded if necessary).
-    The length \code{m} must be non-negative, but there are no other
-    restrictions. The output polynomial will be set to length \code{m}
-    and then normalised.
-
-*******************************************************************************
-
-    Bit packing and unpacking
-
-*******************************************************************************
-
-void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len, 
-                                                     mp_bitcnt_t bits)
-
-    Packs \code{len} coefficients of \code{poly} into fields of the given 
-    number of bits in the large integer \code{res}, i.e.\ evaluates 
-    \code{poly} at \code{2^bits} and store the result in \code{res}. 
-    Assumes \code{len > 0} and \code{bits > 0}. Also assumes that no 
-    coefficient of \code{poly} is bigger than \code{bits/2} bits. We 
-    also assume \code{bits < 3 * FLINT_BITS}.
-
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                          long len, ulong bits, nmod_t mod)
-
-    Unpacks \code{len} coefficients stored in the big integer \code{mpn} 
-    in bit fields of the given number of bits, reduces them modulo the 
-    given modulus, then stores them in the polynomial \code{res}. 
-    We assume \code{len > 0} and \code{3 * FLINT_BITS > bits > 0}.
-    There are no restrictions on the size of the actual coefficients as 
-    stored within the bitfields. 
-
-*******************************************************************************
-
-    Basic arithmetic
-
-*******************************************************************************
-
-void nmod_poly_zero(nmod_poly_t res)
-
-    Sets \code{res} to the zero polynomial.
-
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
-
-    Sets \code{res} to the negation of \code{poly1}.
-
-*******************************************************************************
-
-    Addition and subtraction
-
-*******************************************************************************
-
-void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
-                         mp_srcptr poly2, long len2, nmod_t mod)
-
-    Sets \code{res} to the sum of \code{(poly1, len1)} and 
-    \code{(poly2, len2)}. There are no restrictions on the lengths.
-
-void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
-                                            const nmod_poly_t poly2)
-
-    Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
-
-void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1, 
-                         mp_srcptr poly2, long len2, nmod_t mod)
-
-    Sets \code{res} to the difference of \code{(poly1, len1)} and 
-    \code{(poly2, len2)}. There are no restrictions on the lengths.
-
-void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
-                                    const nmod_poly_t poly2)
-
-    Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
-
-*******************************************************************************
-
-    Scalar multiplication
-
-*******************************************************************************
-
-void nmod_poly_scalar_mul(nmod_poly_t res, 
-                          const nmod_poly_t poly1, mp_limb_t c)
-
-    Sets \code{res} to \code{(poly1, len1)} multiplied by $c$, 
-    where $c$ is reduced modulo the modulus of \code{poly1}.
-
-void _nmod_poly_make_monic(mp_ptr output, 
-                                      mp_srcptr input, long len, nmod_t mod)
-
-    Sets \code{output} to be the scalar multiple of \code{input} of 
-    length \code{len > 0} that has leading coefficient one, if such a 
-    polynomial exists. If the leading coefficient of \code{input} is not
-    invertible, \code{output} is set to the multiple of \code{input} whose
-    leading coefficient is the greatest common divisor of the leading 
-    coefficient and the modulus of \code{input}.
-
-void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
-
-    Sets \code{output} to be the scalar multiple of \code{input} with leading
-    coefficient one, if such a polynomial exists. If \code{input} is zero
-    an exception is raised. If the leading coefficient of \code{input} is not
-    invertible, \code{output} is set to the multiple of \code{input} whose
-    leading coefficient is the greatest common divisor of the leading 
-    coefficient and the modulus of \code{input}.
+    Returns one if the polynomial \code{poly} is the zero polynomial,
+    otherwise return zero.
 
 *******************************************************************************
 
@@ -368,6 +267,95 @@ void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
     i.e.\ divide by $x^k$ and throws away the remainder. If \code{k} is 
     greater than or equal to the length of \code{poly}, the result is the 
     zero polynomial. 
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
+                         mp_srcptr poly2, long len2, nmod_t mod)
+
+    Sets \code{res} to the sum of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}. There are no restrictions on the lengths.
+
+void nmod_poly_add(nmod_poly_t res, const nmod_poly_t poly1, 
+                                            const nmod_poly_t poly2)
+
+    Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
+
+void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1, 
+                         mp_srcptr poly2, long len2, nmod_t mod)
+
+    Sets \code{res} to the difference of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}. There are no restrictions on the lengths.
+
+void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
+                                    const nmod_poly_t poly2)
+
+    Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
+
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
+
+    Sets \code{res} to the negation of \code{poly1}.
+
+*******************************************************************************
+
+    Scalar multiplication and division
+
+*******************************************************************************
+
+void nmod_poly_scalar_mul(nmod_poly_t res, 
+                          const nmod_poly_t poly1, mp_limb_t c)
+
+    Sets \code{res} to \code{(poly1, len1)} multiplied by $c$, 
+    where $c$ is reduced modulo the modulus of \code{poly1}.
+
+void _nmod_poly_make_monic(mp_ptr output, 
+                                      mp_srcptr input, long len, nmod_t mod)
+
+    Sets \code{output} to be the scalar multiple of \code{input} of 
+    length \code{len > 0} that has leading coefficient one, if such a 
+    polynomial exists. If the leading coefficient of \code{input} is not
+    invertible, \code{output} is set to the multiple of \code{input} whose
+    leading coefficient is the greatest common divisor of the leading 
+    coefficient and the modulus of \code{input}.
+
+void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
+
+    Sets \code{output} to be the scalar multiple of \code{input} with leading
+    coefficient one, if such a polynomial exists. If \code{input} is zero
+    an exception is raised. If the leading coefficient of \code{input} is not
+    invertible, \code{output} is set to the multiple of \code{input} whose
+    leading coefficient is the greatest common divisor of the leading 
+    coefficient and the modulus of \code{input}.
+
+*******************************************************************************
+
+    Bit packing and unpacking
+
+*******************************************************************************
+
+void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len, 
+                                                     mp_bitcnt_t bits)
+
+    Packs \code{len} coefficients of \code{poly} into fields of the given 
+    number of bits in the large integer \code{res}, i.e.\ evaluates 
+    \code{poly} at \code{2^bits} and store the result in \code{res}. 
+    Assumes \code{len > 0} and \code{bits > 0}. Also assumes that no 
+    coefficient of \code{poly} is bigger than \code{bits/2} bits. We 
+    also assume \code{bits < 3 * FLINT_BITS}.
+
+void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
+                                          long len, ulong bits, nmod_t mod)
+
+    Unpacks \code{len} coefficients stored in the big integer \code{mpn} 
+    in bit fields of the given number of bits, reduces them modulo the 
+    given modulus, then stores them in the polynomial \code{res}. 
+    We assume \code{len > 0} and \code{3 * FLINT_BITS > bits > 0}.
+    There are no restrictions on the size of the actual coefficients as 
+    stored within the bitfields. 
 
 *******************************************************************************
 
@@ -787,4 +775,5 @@ void nmod_poly_compose(nmod_poly_t res,
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    i.e. evaluate \code{poly1} at \code{poly2}.
+    i.e.\ evaluate \code{poly1} at \code{poly2}.
+
