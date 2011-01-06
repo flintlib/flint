@@ -92,6 +92,8 @@ typedef struct
 
 typedef nmod_poly_struct nmod_poly_t[1];
 
+/* Memory management  ********************************************************/
+
 void nmod_poly_init(nmod_poly_t poly, mp_limb_t n);
 
 void nmod_poly_init_preinv(nmod_poly_t poly, mp_limb_t n, mp_limb_t ninv);
@@ -108,16 +110,49 @@ void nmod_poly_clear(nmod_poly_t poly);
 void nmod_poly_fit_length(nmod_poly_t poly, long alloc);
 
 static __inline__
+void _nmod_poly_normalise(nmod_poly_t poly)
+{
+    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
+        poly->length--;
+}
+
+/* Polynomial parameters  ****************************************************/
+
+static __inline__
+long nmod_poly_length(const nmod_poly_t poly)
+{
+    return poly->length;
+}
+
+static __inline__
+long nmod_poly_degree(const nmod_poly_t poly)
+{
+    return poly->length - 1;
+}
+
+static __inline__
+mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
+{
+    return poly->mod.n;
+}
+
+static __inline__
 mp_bitcnt_t nmod_poly_max_bits(const nmod_poly_t poly)
 {
     return _nmod_vec_max_bits(poly->coeffs, poly->length);
 }
 
+/* Assignment and basic manipulation  ****************************************/
+
 static __inline__
-void _nmod_poly_normalise(nmod_poly_t poly)
+void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
 {
-    while (poly->length && (poly->coeffs[poly->length - 1] == 0L))
-        poly->length--;
+    if (a != b)
+    {
+        nmod_poly_fit_length(a, b->length);
+        mpn_copyi(a->coeffs, b->coeffs, b->length);
+        a->length = b->length;
+   }
 }
 
 static __inline__
@@ -139,7 +174,31 @@ void nmod_poly_swap(nmod_poly_t poly1, nmod_poly_t poly2)
     poly2->coeffs = tp;
 }
 
+static __inline__
+void nmod_poly_zero(nmod_poly_t res)
+{
+    res->length = 0;
+}
+
+static __inline__
+void nmod_poly_truncate(nmod_poly_t poly, long len)
+{
+    if (poly->length > len)
+    {
+        poly->length = len;
+        _nmod_poly_normalise(poly);
+    }
+}
+
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m);
+
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m);
+
+/* Randomisation  ************************************************************/
+
 void nmod_poly_randtest(nmod_poly_t poly, long len);
+
+/* Getting and setting coefficients  *****************************************/
 
 static __inline__
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
@@ -149,29 +208,7 @@ ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
 
-static __inline__
-void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
-{
-    if (a != b)
-    {
-        nmod_poly_fit_length(a, b->length);
-        mpn_copyi(a->coeffs, b->coeffs, b->length);
-        a->length = b->length;
-   }
-}
-
-static __inline__
-int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
-{
-    if (a->length != b->length)
-        return 0;
-
-    if (a != b)
-        if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
-            return 0;
-
-   return 1;
-}
+/* Input and output  *********************************************************/
 
 char * nmod_poly_get_str(const nmod_poly_t poly);
 
@@ -210,22 +247,19 @@ int nmod_poly_read(nmod_poly_t poly)
     return nmod_poly_fread(stdin, poly);
 }
 
-static __inline__
-long nmod_poly_length(const nmod_poly_t poly)
-{
-    return poly->length;
-}
+/* Comparison  ***************************************************************/
 
 static __inline__
-long nmod_poly_degree(const nmod_poly_t poly)
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 {
-    return poly->length - 1;
-}
+    if (a->length != b->length)
+        return 0;
 
-static __inline__
-mp_limb_t nmod_poly_modulus(const nmod_poly_t poly)
-{
-    return poly->mod.n;
+    if (a != b)
+        if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
+            return 0;
+
+   return 1;
 }
 
 static __inline__
@@ -234,32 +268,7 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
     return (poly->length == 0);
 }
 
-static __inline__
-void nmod_poly_zero(nmod_poly_t res)
-{
-    res->length = 0;
-}
-
-static __inline__
-void nmod_poly_truncate(nmod_poly_t poly, long len)
-{
-    if (poly->length > len)
-    {
-        poly->length = len;
-        _nmod_poly_normalise(poly);
-    }
-}
-
-void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m);
-
-void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m);
-
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
-
-void _nmod_poly_make_monic(mp_ptr output, 
-                                   mp_srcptr input, long len, nmod_t mod);
-
-void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
+/* Shifting  *****************************************************************/
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k);
 
@@ -268,6 +277,8 @@ void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k);
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k);
 
 void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k);
+
+/* Addition and subtraction  *************************************************/
 
 void _nmod_poly_add(mp_ptr res, mp_srcptr poly1, long len1, 
                                        mp_srcptr poly2, long len2, nmod_t mod);
@@ -281,8 +292,27 @@ void _nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1, 
                                                       const nmod_poly_t poly2);
 
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
+
+/* Scalar multiplication and division  ***************************************/
+
 void nmod_poly_scalar_mul(nmod_poly_t res, 
                                          const nmod_poly_t poly1, mp_limb_t c);
+
+void _nmod_poly_make_monic(mp_ptr output, 
+                                   mp_srcptr input, long len, nmod_t mod);
+
+void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
+
+/* Bit packing and unpacking  ************************************************/
+
+void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
+                                              long len, mp_bitcnt_t bits);
+
+void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
+                                       long len, mp_bitcnt_t bits, nmod_t mod);
+
+/* Multiplication  ***********************************************************/
 
 void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1, long len1, 
                                        mp_srcptr poly2, long len2, nmod_t mod);
@@ -301,12 +331,6 @@ void _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1, long len1,
 
 void nmod_poly_mulhigh_classical(nmod_poly_t res, 
                  const nmod_poly_t poly1, const nmod_poly_t poly2, long start);
-
-void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
-                                              long len, mp_bitcnt_t bits);
-
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                       long len, mp_bitcnt_t bits, nmod_t mod);
 
 void _nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, long len1, 
                        mp_srcptr in2, long len2, mp_bitcnt_t bits, nmod_t mod);
@@ -338,6 +362,8 @@ void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
                                               const nmod_poly_t poly2, long n);
 
+/* Powering  *****************************************************************/
+
 void _nmod_poly_pow_binexp(mp_ptr res, 
                               mp_srcptr poly, long len, nmod_t mod, ulong e);
 
@@ -358,6 +384,8 @@ void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly,
 
 void nmod_poly_pow_trunc(nmod_poly_t res, 
                                   const nmod_poly_t poly, long trunc, ulong e);
+
+/* Division  *****************************************************************/
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
                  mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod);
@@ -410,14 +438,20 @@ void _nmod_poly_invert_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
 
 void nmod_poly_invert_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n);
 
+/* Derivative  ***************************************************************/
+
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
+
+/* Evaluation  ***************************************************************/
 
 mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, 
                                             long len, nmod_t mod, mp_limb_t c);
 
 mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
+
+/* Composition  **************************************************************/
 
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
                             long len1, mp_srcptr poly2, long len2, nmod_t mod);
@@ -437,9 +471,4 @@ void nmod_poly_compose(nmod_poly_t res,
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
 #endif
-
-
-
-
-
 
