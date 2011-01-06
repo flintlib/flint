@@ -34,6 +34,14 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
                               ulong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
+
+    if (c == 0)
+    {
+        _fmpz_vec_zero(rpoly, len);
+        fmpz_set_ui(rden, 1);
+        return;
+    }
+
     fmpz_init(gcd);
     fmpz_set_ui(gcd, c);
     fmpz_gcd(gcd, gcd, den);
@@ -50,9 +58,6 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
         fmpz_fdiv_q_ui(rden, den, gcd2);
     }
     fmpz_clear(gcd);
-    
-    if (_fmpz_vec_is_zero(rpoly, len))
-        fmpz_set_ui(rden, 1UL);
 }
 
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)

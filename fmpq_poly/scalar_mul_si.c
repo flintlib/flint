@@ -29,19 +29,19 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-/* 
-   Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
-
-   Assumes that {poly, den} is in lowest terms. 
-   Assumes that rpoly is allocated sufficiently as a sufficiently large array. 
-   Supports full aliasing between {rpoly, rden} and {poly, den}, but there 
-   may be no partial overlap between rpoly and poly.
-*/
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
                               const fmpz * poly, const fmpz_t den, long len, 
                               long c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
+
+    if (c == 0)
+    {
+        _fmpz_vec_zero(rpoly, len);
+        fmpz_set_ui(rden, 1);
+        return;
+    }
+
     fmpz_init(gcd);
     fmpz_set_si(gcd, c);
     fmpz_gcd(gcd, gcd, den);
@@ -58,9 +58,6 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
         fmpz_fdiv_q_ui(rden, den, gcd2);
     }
     fmpz_clear(gcd);
-    
-    if (_fmpz_vec_is_zero(rpoly, len))
-        fmpz_set_ui(rden, 1UL);
 }
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
