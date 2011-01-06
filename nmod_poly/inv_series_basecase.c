@@ -30,47 +30,30 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#define NMOD_NEWTON_INVERSE_CUTOFF 400
-
 void
-_nmod_poly_invert_newton(mp_ptr Qinv, 
+_nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                   mp_srcptr Q, long n, nmod_t mod)
 {
-    long m;
-    mp_ptr g0, prod, prod2;
+    mp_ptr X2n, Qrev;
 
-    if (n < NMOD_NEWTON_INVERSE_CUTOFF)
-    {
-        mp_ptr Qrev = nmod_vec_init(n);
-        _nmod_poly_reverse(Qrev, Q, n, n);
-        _nmod_poly_invert_newton_basecase(Qinv, Qrev, n, mod);
-        _nmod_poly_reverse(Qinv, Qinv, n, n);
-        nmod_vec_free(Qrev);
+    X2n = nmod_vec_init(2*n);
+    Qrev = X2n + n;
 
-        return;
-    }
+    _nmod_poly_reverse(Qrev, Q, n, n);
     
-    m = (n + 1)/2;
-    g0 = nmod_vec_init(m);
-    prod = nmod_vec_init(n);
-    prod2 = nmod_vec_init(n);
+    X2n[n - 1] = 1;
+    mpn_zero(X2n, n - 1);
+    X2n -= (n - 1);
 
-    _nmod_poly_invert_newton(g0, Q, m, mod);
-    _nmod_poly_mullow_n(prod, Q, n, g0, m, n, mod);
-    prod[0] = n_submod(prod[0], 1, mod.n);
-    _nmod_poly_mullow_n(prod2 + m, g0, m, prod + m, n - m, n - m, mod);
-    mpn_zero(prod2, m);
+    _nmod_poly_div_divconquer(Qinv, X2n, 2*n - 1, Qrev, n, mod);
 
-    _nmod_poly_sub(Qinv, g0, m, prod2, n, mod);
-
-    nmod_vec_free(prod2);
-    nmod_vec_free(prod);
-    nmod_vec_free(g0);
-
+    _nmod_poly_reverse(Qinv, Qinv, n, n);
+    
+    nmod_vec_free(X2n + n - 1);
 }
 
 void
-nmod_poly_invert_newton(nmod_poly_t Qinv, 
+nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -81,7 +64,7 @@ nmod_poly_invert_newton(nmod_poly_t Qinv,
 
     if (n == 0 || Q->length == 0 || Q->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_invert_newton\n");
+        printf("Exception: division by zero in nmod_poly_inv_series_basecase\n");
         abort();
     }
 
@@ -105,7 +88,7 @@ nmod_poly_invert_newton(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_invert_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_inv_series_basecase(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

@@ -1,0 +1,109 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 William Hart
+
+******************************************************************************/
+
+#include <stdlib.h>
+#include <mpir.h>
+#include "flint.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
+#include "ulong_extras.h"
+
+void
+_nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
+                                             long n, nmod_t mod)
+{
+    mp_ptr Binv = nmod_vec_init(n);
+
+    _nmod_poly_inv_series(Binv, B, n, mod);
+    _nmod_poly_mullow_n(Q, Binv, n, A, n, n, mod);
+
+    nmod_vec_free(Binv);
+}
+
+void
+nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
+                                    const nmod_poly_t B, long n)
+{
+    mp_ptr A_coeffs, B_coeffs, Q_coeffs;
+    nmod_poly_t t1;
+    long Alen, Blen;
+    
+    Blen = B->length;
+
+    if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
+    {
+        printf("Exception: division by zero in nmod_poly_div_series\n");
+        abort();
+    }
+    
+    Alen = A->length;
+
+    if (Alen < n)
+    {
+        A_coeffs = nmod_vec_init(n);
+        mpn_copyi(A_coeffs, A->coeffs, Alen);
+        mpn_zero(A_coeffs + Alen, n - Alen);
+    }
+    else
+        A_coeffs = A->coeffs;
+
+    if (Blen < n)
+    {
+        B_coeffs = nmod_vec_init(n);
+        mpn_copyi(B_coeffs, B->coeffs, Blen);
+        mpn_zero(B_coeffs + Blen, n - Blen);
+    }
+    else
+        B_coeffs = B->coeffs;
+
+    if ((Q == A || Q == B) && Q->length >= n)
+    {
+        nmod_poly_init2(t1, Q->mod.n, n);
+        Q_coeffs = t1->coeffs;
+    }
+    else
+    {
+        nmod_poly_fit_length(Q, n);
+        Q_coeffs = Q->coeffs;
+    }
+
+    _nmod_poly_div_series(Q_coeffs, A_coeffs, B_coeffs, n, Q->mod);
+
+    if ((Q == A || Q == B) && Q->length >= n)
+    {
+        nmod_poly_swap(Q, t1);
+        nmod_poly_clear(t1);
+    }
+    
+    Q->length = n;
+
+    if (Alen < n)
+        nmod_vec_free(A_coeffs);
+
+    if (Blen < n)
+        nmod_vec_free(B_coeffs);
+
+    _nmod_poly_normalise(Q);
+}
