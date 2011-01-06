@@ -23,51 +23,40 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include "flint.h"
 #include "nmod_poly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+char * nmod_poly_get_str(const nmod_poly_t poly)
 {
-    int i, result, r1;
+    long i;
+    char * buf, * ptr;
 
-    printf("to/from_string....");
-    fflush(stdout);
+    /* estimate for the length, n and three spaces */
+#if FLINT64
+    long size = 21*2 + 1;
+#else
+    long size = 11*2 + 1;
+#endif
 
-    /* Check to and from string */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < poly->length; i++)
     {
-        nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
-        char * str;
-
-        nmod_poly_init(a, n);
-        nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
-        
-        str = nmod_poly_to_string(a);
-        r1 = nmod_poly_from_string(str, b);
-        
-        result = (r1 && nmod_poly_equal(a, b));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("r1 = %d, n = %lu\n", r1, a->mod.n);
-            printf("%s\n", str);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            abort();
-        }
-
-        free(str);
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
+        if (poly->coeffs[i]) /* log(2)/log(10) < 0.30103, +1 for space/null */
+            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[i])) + 1;
+        else size += 2;
     }
 
-    printf("PASS\n");
-    return 0;
+    buf = (char *) malloc(size);  
+    ptr = buf + sprintf(buf, "%ld %lu", poly->length, poly->mod.n);
+   
+    if (poly->length)
+        ptr += sprintf(ptr, " ");
+
+    for (i = 0; i < poly->length; i++)
+        ptr += sprintf(ptr, " %lu", poly->coeffs[i]);
+   
+    return buf;
 }

@@ -182,13 +182,13 @@ void nmod_poly_print(const nmod_poly_t a)
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
-char * nmod_poly_to_string(const nmod_poly_t poly)
+char * nmod_poly_get_str(const nmod_poly_t poly)
 
     Writes \code{poly} to a string representation. The format is as 
     described for \code{nmod_poly_print}. The string must be freed by the 
     user when finished. For this it is sufficient to call \code{free}.
 
-int nmod_poly_from_string(const char * s, nmod_poly_t poly)
+int nmod_poly_set_str(const char * s, nmod_poly_t poly)
 
     Read \code{poly} from a string \code{s}. The format is as described
     for \code{nmod_poly_print}. If a polynomial in the correct format

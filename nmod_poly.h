@@ -173,9 +173,9 @@ int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
    return 1;
 }
 
-char * nmod_poly_to_string(const nmod_poly_t poly);
+char * nmod_poly_get_str(const nmod_poly_t poly);
 
-int nmod_poly_from_string(const char * s, nmod_poly_t poly);
+int nmod_poly_set_str(const char * s, nmod_poly_t poly);
 
 static __inline__
 void nmod_poly_print(const nmod_poly_t a)
@@ -198,7 +198,7 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 static __inline__
 void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 {
-   char * s = nmod_poly_to_string(poly);
+   char * s = nmod_poly_get_str(poly);
    if (fputs(s, f) < 0) 
        printf("Error writing to file\n");
    free(s);
