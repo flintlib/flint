@@ -842,7 +842,7 @@ void nmod_poly_compose_divconquer(nmod_poly_t res,
     the divide and conquer algorithm.
 
 void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
-                                       mp_srcptr poly2, long len2, nmod_t mod);
+                                         mp_srcptr poly2, long len2, nmod_t mod)
 
     Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
     \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
@@ -851,7 +851,28 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
     \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose(nmod_poly_t res, 
-                             const nmod_poly_t poly1, const nmod_poly_t poly2);
+                               const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
     i.e. evaluate \code{poly1} at \code{poly2}.
+
+*******************************************************************************
+
+    GCD
+
+*******************************************************************************
+
+long _nmod_poly_gcd_euclidean(mp_ptr G, 
+                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+
+   Compute the GCD of \code{A} of length \code{lenA} and \code{B} of length
+   \code{lenB}, where \code{lenA >= lenB > 1}. The length of the GCD \code{G}
+   is returned by the function. No attempt is made to make the GCD monic.
+
+void nmod_poly_gcd_euclidean(nmod_poly_t G, 
+                                       const nmod_poly_t A, const nmod_poly_t B)
+
+   Compute the GCD of \code{A} and \code{B}. The GCD of zero polynomials is
+   defined to be zero, whereas the GCD of the zero polynomial and some other
+   polynomial \code{P} is defined to be \code{P}. Except in the case where
+   the GCD is zero, the GCD \code{G} is made monic.

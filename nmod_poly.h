@@ -468,6 +468,12 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+long _nmod_poly_gcd_euclidean(mp_ptr G, 
+                   mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_gcd_euclidean(nmod_poly_t G, 
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
 #endif
 
 
