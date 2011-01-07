@@ -625,7 +625,7 @@ void _nmod_poly_divrem(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
                                        const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
+   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
    \code{length(R) < length(B)}.
 
 void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
@@ -751,6 +751,22 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
     with \code{length(R) < length(B)}, but return only \code{Q}. The algorithm 
     used is to reverse the polynomials and divde the resulting power series, 
     then reverse the result.
+
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, 
+                      mp_srcptr A, long Alen, mp_srcptr B, long Blen, nmod_t mod)
+
+    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
+    where \code{A} is length \code{lenA} and \code{B} is length \code{lenB}. 
+    We require that \code{Q} have space for \code{lenA - lenB + 1}
+    coefficients. The algorithm uses is to call \code{div_newton) and then
+    multiply out and compute the remainder. 
+
+void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
+                                        const nmod_poly_t A, const nmod_poly_t B)
+
+   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
+   \code{length(R) < length(B)}. The algorithm uses is to call 
+   \code{div_newton) and then multiply out and compute the remainder.
 
 *******************************************************************************
 
