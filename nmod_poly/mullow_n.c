@@ -43,7 +43,7 @@ void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1,
     bits = FLINT_BITS - (long) mod.norm;
     bits2 = FLINT_BIT_COUNT(len1);
 
-    if (2 * bits + bits2 <= FLINT_BITS)
+    if (2 * bits + bits2 <= FLINT_BITS && len1 + len2 < 16)
         _nmod_poly_mullow_classical(res, poly1, len1, poly2, len2, n, mod);
     else
         _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, 0, n, mod);

@@ -34,7 +34,7 @@ void
 _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                                   mp_srcptr B, long lenB, nmod_t mod)
 {
-    if (lenB < 200000)
+    if (lenB < 6000)
         _nmod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, mod);
     else
         _nmod_poly_divrem_newton(Q, R, A, lenA, B, lenB, mod);
