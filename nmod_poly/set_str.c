@@ -19,25 +19,45 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008-2009 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
-#include <stdlib.h>
+#include <mpir.h>
+#include <stdio.h>
+#include <string.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "nmod_poly.h"
 
-void
-fmpz_mat_copy(fmpz_mat_t mat1, const fmpz_mat_t mat2)
+int nmod_poly_set_str(const char * s, nmod_poly_t poly)
 {
-    if (mat1 != mat2)
-    {
-        FMPZ_MAT_ASSERT(mat1->r == mat2->r && mat1->c == mat2->c,
-            "fmpz_mat_copy: incompatible dimensions");
+    const char * whitespace = " \t\n\r";
+    long i, length;
+    mp_limb_t n;
 
-        _fmpz_vec_copy(mat1->entries, mat2->entries, mat2->r * mat2->c);
+    if (sscanf(s, "%ld %lu", &length, &n) != 2)
+        return 0;
+      
+    /* jump past length (n will be skipped in first loop iter)  */
+    s += strcspn(s, whitespace);
+    s += strspn(s, whitespace);
+    
+    nmod_poly_fit_length(poly, length);
+    poly->length = length;
+    
+    for (i = 0; i < length; i++)
+    {
+        s += strcspn(s, whitespace); /* jump to next whitespace */
+        s += strspn(s, whitespace); /* skip whitespace */
+      
+        if (!sscanf(s, "%lu", &poly->coeffs[i]))
+        {
+            poly->length = i;
+            return 0;
+        }
     }
+   
+    _nmod_poly_normalise(poly);
+   
+    return 1;
 }

@@ -82,7 +82,7 @@ main(void)
         fmpz_mat_init(B, m, m);
 
         fmpz_mat_randtest(A, rnd, 1+n_randint(100));
-        fmpz_mat_copy(B, A);
+        fmpz_mat_set(B, A);
 
         if (!fmpz_mat_equal(B, A))
         {

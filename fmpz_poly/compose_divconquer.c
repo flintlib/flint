@@ -194,7 +194,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
         }
         if ((n & 1L))
         {
-            _fmpz_vec_copy(h[i], h[2*i], hlen[2*i]);
+            _fmpz_vec_set(h[i], h[2*i], hlen[2*i]);
             hlen[i] = hlen[2*i];
         }
         

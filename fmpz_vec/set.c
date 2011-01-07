@@ -23,16 +23,15 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
-#include <mpfr.h>
 #include "flint.h"
-#include "mpfr_vec.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 
 void
-_mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long length)
+_fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2)
 {
     long i;
-    for (i = 0; i < length; i++)
-        mpfr_set(vec1 + i, vec2 + i, GMP_RNDN);
+    for (i = 0; i < len2; i++)
+        fmpz_set(vec1 + i, vec2 + i);
 }

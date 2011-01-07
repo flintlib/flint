@@ -19,55 +19,47 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2008, 2009, 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_poly.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 
-int
-main(void)
+/*
+    Recall the return value conventions for fputc (of type int) 
+
+    ``If there are no errors, the same character that has been written is 
+    returned.  If an error occurs, EOF is returned and the error indicator 
+    is set''
+
+    where the EOF macro expands to a negative int, and fprintf (of type int)
+
+    ``On success, the total number of characters written is returned.
+    On failure, a negative number is returned.''
+ */
+
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
 {
-    int i, result, r1;
+    int r;
+    long i;
 
-    printf("to/from_string....");
-    fflush(stdout);
-
-    /* Check to and from string */
-    for (i = 0; i < 10000; i++)
+    r = fprintf(file, "%li", len);
+    if ((len > 0) && (r > 0))
     {
-        nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
-        char * str;
-
-        nmod_poly_init(a, n);
-        nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
-        
-        str = nmod_poly_to_string(a);
-        r1 = nmod_poly_from_string(str, b);
-        
-        result = (r1 && nmod_poly_equal(a, b));
-        if (!result)
+        r = fputc(' ', file);
+        for (i = 0; (i < len) && (r > 0); i++)
         {
-            printf("FAIL:\n");
-            printf("r1 = %d, n = %lu\n", r1, a->mod.n);
-            printf("%s\n", str);
-            nmod_poly_print(a), printf("\n\n");
-            nmod_poly_print(b), printf("\n\n");
-            abort();
+            r = fputc(' ', file);
+            if (r > 0)
+                r = fmpz_fprint(file, vec + i);
         }
-
-        free(str);
-        nmod_poly_clear(a);
-        nmod_poly_clear(b);
     }
 
-    printf("PASS\n");
-    return 0;
+    return r;
 }

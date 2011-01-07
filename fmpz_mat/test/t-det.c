@@ -70,12 +70,9 @@ main(void)
         {
             printf("FAIL:\n");
             printf("wrong determinant!\n");
-            fmpz_mat_print_pretty(A);
-            printf("expected: ");
-            fmpz_print(det);
-            printf("\ncomputed: ");
-            fmpz_print(result);
-            printf("\n");
+            fmpz_mat_print_pretty(A), printf("\n");
+            printf("expected: "),  fmpz_print(det),    printf("\n");
+            printf("ncomputed: "), fmpz_print(result), printf("\n");
             abort();
         }
 
@@ -99,7 +96,7 @@ main(void)
         {
             printf("FAIL:\n");
             printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A);
+            fmpz_mat_print_pretty(A), printf("\n");
             abort();
         }
 

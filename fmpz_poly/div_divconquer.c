@@ -80,7 +80,7 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
            significant terms which we use in the division
          */
 
-        _fmpz_vec_copy(dq1, A, shift);
+        _fmpz_vec_set(dq1, A, shift);
         _fmpz_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1);
 
         /*
@@ -111,16 +111,20 @@ void
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)
 {
+    long lenA, lenB;
     fmpz_poly_t t;
     fmpz * q;
 
-    if (B->length == 0)
+    lenA = A->length;
+    lenB = B->length;
+
+    if (lenB == 0)
     {
         printf("Exception: division by zero in fmpz_poly_div_divconquer\n");
         abort();
     }
 
-    if (A->length < B->length)
+    if (lenA < lenB)
     {
         fmpz_poly_zero(Q);
         return;
@@ -128,26 +132,25 @@ fmpz_poly_div_divconquer(fmpz_poly_t Q,
 
     if (Q == A || Q == B)
     {
-        fmpz_poly_init2(t, A->length - B->length + 1);
+        fmpz_poly_init2(t, lenA - lenB + 1);
         q = t->coeffs;
     }
     else
     {
-        fmpz_poly_fit_length(Q, A->length - B->length + 1);
+        fmpz_poly_fit_length(Q, lenA - lenB + 1);
         q = Q->coeffs;
     }
 
-    _fmpz_poly_div_divconquer(q, A->coeffs, A->length,
-                                 B->coeffs, B->length);
+    _fmpz_poly_div_divconquer(q, A->coeffs, lenA, B->coeffs, lenB);
 
     if (Q == A || Q == B)
     {
-        _fmpz_poly_set_length(t, A->length - B->length + 1);
+        _fmpz_poly_set_length(t, lenA - lenB + 1);
         fmpz_poly_swap(t, Q);
         fmpz_poly_clear(t);
     }
     else
-        _fmpz_poly_set_length(Q, A->length - B->length + 1);
+        _fmpz_poly_set_length(Q, lenA - lenB + 1);
 
     _fmpz_poly_normalise(Q);
 }

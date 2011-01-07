@@ -49,7 +49,7 @@ void _mpfr_vec_zero(mpfr * vec, long len)
 
     Zeros the vector \code{(vec, len)}.
 
-void _mpfr_vec_copy(mpfr * vec1, mpfr * vec2, long len)
+void _mpfr_vec_set(mpfr * vec1, mpfr * vec2, long len)
 
     Copies the vector \code{vec2} of the given length into \code{vec1}. 
     No check is made to ensure \code{vec1} and \code{vec2} are different.

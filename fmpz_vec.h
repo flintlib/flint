@@ -51,13 +51,27 @@ long _fmpz_vec_max_bits(const fmpz * vec, long len);
 
 mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len);
 
-/*  Output  ******************************************************************/
+/*  Input and output  ********************************************************/
 
-void _fmpz_vec_print(fmpz * vec, long len);
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len);
+
+static __inline__
+int _fmpz_vec_print(const fmpz * vec, long len)
+{
+    return _fmpz_vec_fprint(stdout, vec, len);
+}
+
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len);
+
+static __inline__
+int _fmpz_vec_read(fmpz ** vec, long * len)
+{
+    return _fmpz_vec_fread(stdin, vec, len);
+}
 
 /*  Assignment and basic manipulation  ***************************************/
 
-void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2);
+void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2);
 
 void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, long len2);
 

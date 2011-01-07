@@ -45,7 +45,7 @@ _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA,
     }
 
     if (R != A)
-        _fmpz_vec_copy(R, A, lenA);
+        _fmpz_vec_set(R, A, lenA);
     e = lenA - lenB + 1;
 
     while (lenA >= lenB)

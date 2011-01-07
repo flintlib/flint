@@ -30,43 +30,16 @@
 
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
-
-/*
-    Recall the return value conventions for fputc (of type int) 
-
-    ``If there are no errors, the same character that has been written is 
-    returned.  If an error occurs, EOF is returned and the error indicator 
-    is set''
-
-    where the EOF macro expands to a negative int, and fprintf (of type int)
-
-    ``On success, the total number of characters written is returned.
-    On failure, a negative number is returned.''
- */
 
 int _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
 {
-    int r;
-    long i;
-
-    r = fprintf(file, "%li", len);
-    if ((len > 0) && (r > 0))
-    {
-        r = fputc(' ', file);
-        for (i = 0; (i < len) && (r > 0); i++)
-        {
-            r = fputc(' ', file);
-            if (r > 0)
-                r = fmpz_fprint(file, poly + i);
-        }
-    }
-
-    return r;
+    return _fmpz_vec_fprint(file, poly, len);
 }
 
 int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly)
 {
-    return _fmpz_poly_fprint(file, poly->coeffs, poly->length);
+    return _fmpz_vec_fprint(file, poly->coeffs, poly->length);
 }
 

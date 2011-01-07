@@ -113,13 +113,13 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets \code{poly1} to equal \code{poly2}.
 
-void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
-
-    Sets \code{poly} to the unsigned integer \code{c}.
-
 void fmpz_poly_set_si(fmpz_poly_t poly, long c)
 
     Sets \code{poly} to the signed integer \code{c}.
+
+void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c)
+
+    Sets \code{poly} to the unsigned integer \code{c}.
 
 void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c)
 
@@ -257,6 +257,12 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state,
 
 *******************************************************************************
 
+void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
+
+    Gets coefficient $n$ of \code{poly} as an \code{fmpz}.  Coefficient 
+    numbering is from zero and if $n$ is set to a value beyond the end of 
+    the polynomial, zero is returned.
+
 long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
 
     Returns coefficient $n$ of \code{poly} as a \code{long}. The result is 
@@ -264,39 +270,12 @@ long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
     numbering is from zero and if $n$ is set to a value beyond the end of 
     the polynomial, zero is returned.
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
-
-    Sets coefficient $n$ of \code{poly} to the \code{long} value \code{x}. 
-    Coefficient numbering starts from zero and if $n$ is beyond the current 
-    length of \code{poly} then the polynomial is extended and zero 
-    coefficients inserted if necessary.
-
 ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
 
     Returns coefficient $n$ of \code{poly} as a \code{ulong}.  The result is 
     undefined if the value does not fit into a \code{ulong}.  Coefficient 
     numbering is from zero and if $n$ is set to a value beyond the end of the 
     polynomial, zero is returned.
-
-void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, long n, ulong x)
-
-    Sets coefficient $n$ of \code{poly} to the \code{ulong} value \code{x}.  
-    Coefficient numbering starts from zero and if $n$ is beyond the current 
-    length of \code{poly} then the polynomial is extended and zero 
-    coefficients inserted if necessary.
-
-void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
-
-    Gets coefficient $n$ of \code{poly} as an \code{fmpz}.  Coefficient 
-    numbering is from zero and if $n$ is set to a value beyond the end of 
-    the polynomial, zero is returned.
-
-void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
-
-    Sets coefficient $n$ of \code{poly} to the \code{fmpz} value \code{x}.  
-    Coefficient numbering starts from zero and if $n$ is beyond the current 
-    length of \code{poly} then the polynomial is extended and zero 
-    coefficients inserted if necessary.
 
 fmpz * fmpz_poly_get_coeff_ptr(const fmpz_poly_t poly, long n)
 
@@ -321,6 +300,27 @@ fmpz * fmpz_poly_lead(const fmpz_poly_t poly)
     Returns \code{NULL} when the polynomial is zero.
 
     This function is implemented as a macro.
+
+void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
+
+    Sets coefficient $n$ of \code{poly} to the \code{fmpz} value \code{x}.  
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
+
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
+
+    Sets coefficient $n$ of \code{poly} to the \code{long} value \code{x}. 
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
+
+void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, long n, ulong x)
+
+    Sets coefficient $n$ of \code{poly} to the \code{ulong} value \code{x}.  
+    Coefficient numbering starts from zero and if $n$ is beyond the current 
+    length of \code{poly} then the polynomial is extended and zero 
+    coefficients inserted if necessary.
 
 *******************************************************************************
 
@@ -373,22 +373,22 @@ void fmpz_poly_neg(fmpz_poly_t res, const fmpz_poly_t poly)
 
 *******************************************************************************
 
-    Scalar multiplication
+    Scalar multiplication and division
 
 *******************************************************************************
-
-void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
-
-    Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
-
-void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
-
-    Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} times $x$.
+
+void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
+
+void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
 
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
                                                                 const fmpz_t x)
@@ -400,9 +400,10 @@ void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 
     Sets \code{poly} to \code{poly1 - x * poly2}.
 
-void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
 
-    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
     rounding coefficients down toward $- \infty$.
 
 void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
@@ -410,21 +411,10 @@ void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
     rounding coefficients down toward $- \infty$.
 
-void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
-                                       const fmpz_poly_t poly2, const fmpz_t x)
-
-    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
-    rounding coefficients down toward $- \infty$.
-
-void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
-    rounding coefficients down toward~$0$.
-
-void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
-
-    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
-    rounding coefficients down toward~$0$.
+    rounding coefficients down toward $- \infty$.
 
 void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
@@ -432,10 +422,20 @@ void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
     rounding coefficients down toward~$0$.
 
-void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
-                                  fmpz_poly_t poly2, ulong x)
+void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward~$0$.
+
+void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
     assuming the coefficient is exact for every coefficient.
 
 void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
@@ -443,10 +443,10 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
     assuming the coefficient is exact for every coefficient.
 
-void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
-                                       const fmpz_poly_t poly2, const fmpz_t x)
+void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
+                                  fmpz_poly_t poly2, ulong x)
 
-    Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
     assuming the coefficient is exact for every coefficient.
 
 *******************************************************************************
@@ -683,9 +683,14 @@ void fmpz_poly_pow_multinomial(fmpz_poly_t res,
     
     The formal statement of the recurrence is as follows.  Write the input 
     polynomial as $P(x) = p_0 + p_1 x + \dotsb + p_m x^m$ with $p_0 \neq 0$ 
-    and let $P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}$.  Then 
-    $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
-    $a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i)$.
+    and let 
+    \begin{equation*}
+    P(x)^n = a(n, 0) + a(n, 1) x + \dotsb + a(n, mn) x^{mn}.
+    \end{equation*}
+    Then $a(n, 0) = p_0^n$ and, for all $1 \leq k \leq mn$, 
+    \begin{equation*}
+    a(n, k) = (k p_0)^{-1} \sum_{i = 1}^m p_i ((n + 1) i - k) a(n, k-i).
+    \end{equation*}
     
     % [1] D. Knuth, The Art of Computer Programming Vol. 2, Seminumerical 
     % Algorithms, Third Edition (Reading, Massachusetts: Addison-Wesley, 1997)
@@ -717,7 +722,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
     A star chain is an addition chain $1 = a_0 < a_1 < \dotsb < a_n$ such 
     that $a_i = a_{i-1} + a_j$ with $j < i$ for all $i > 0$.
     
-    Assumes that $e > 2$ (equivalently $n > 1$) and \code{len > 0}.  Does 
+    Assumes that $e > 2$, or equivalently $n > 1$, and \code{len > 0}.  Does 
     not support aliasing.
 
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
@@ -729,9 +734,8 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
 void _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 
-    Sets \code{res = poly^e} using left-to-right binary exponentiation, see 
-    D.~Knuth, ``The Art of Computer Programming Vol. 2'', Seminumerical 
-    algorithms, p. 461.
+    Sets \code{res = poly^e} using left-to-right binary exponentiation as 
+    described in~\citep[p.~461]{Knu1997}.
     
     Assumes that \code{len > 0}, \code{e > 1}.  Assumes that \code{res} is 
     an array of length at least \code{e (len - 1) + 1}.  Does not support 
@@ -884,9 +888,9 @@ void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1,
     For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
     $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
     is defined to be 
-    \[
-        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y)
-    \]
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
     For convenience, we define the resultant to be equal to zero if either 
     of the two polynomials is zero.
 
@@ -1069,14 +1073,14 @@ void _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
     temporary array \code{temp} of length $2 \len(B) - 1$.  Does not support 
     any aliasing.
 
-    See Thom Mulders, On Short Multiplications and Divisions.
+    For further details, see~\citep{Mul2000}.
 
 void _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
                                          const fmpz * B, long lenB)
 
     Computes the quotient \code{(Q, lenA - lenB + 1)} of \code{(A, lenA)} 
-    upon division by \code{(B, lenB)}.  Assumes that $\len(A) \geq len(B) > 0$.
-    Does not support aliasing.
+    upon division by \code{(B, lenB)}.  Assumes that 
+    $\len(A) \geq \len(B) > 0$.  Does not support aliasing.
 
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)

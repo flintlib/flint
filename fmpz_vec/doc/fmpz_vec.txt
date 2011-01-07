@@ -77,15 +77,57 @@ ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
 *******************************************************************************
 
-    Output
+    Input and output
 
 *******************************************************************************
 
-void _fmpz_vec_print(fmpz * vec, long len)
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
 
-    Prints the vector of given length to \code{stdout}.  The format is 
-    the length followed by two spaces, then a space separated list of 
-    coefficients. If the length is zero, only $0$ is printed.
+    Reads a vector from the stream \code{file} and stores it at 
+    \code{*vec}.  The format is the same as the output format of 
+    \code{_fmpz_vec_fprint()}, followed by either any character 
+    or the end of the file.
+
+    The interpretation of the various input arguments depends on whether 
+    or not \code{*vec} is \code{NULL}:
+
+    If \code{*vec == NULL}, the value of \code{*len} on input is ignored.  
+    Once the length has been read from \code{file}, \code{*len} is that 
+    to that value and a vector of this length is allocated at \code{*vec}. 
+    Finally, \code{*len} coefficients are read from the input stream.  In 
+    case of a file or parsing error, clears the vector and sets \code{*vec} 
+    and \code{*len} to \code{NULL} and \code{0}, respectively.
+
+    Otherwise, if \code{*vec != NULL}, it is assumed that \code{(*vec, *len)} 
+    is a properly initialised vector.  If the length on the input stream 
+    does not match \code{*len}, a parsing error is raised.  Attempts to read 
+    the right number of coefficients from the input stream.  In case of a 
+    file or parsing error, leaves the vector \code{(*vec, *len)} in its 
+    current state.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
+int _fmpz_vec_read(fmpz ** vec, long * len)
+
+    Reads a vector from \code{stdin} and stores it at \code{*vec}.
+
+    For further details, see \code{_fmpz_vec_fread()}.
+
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
+
+    Prints the vector of given length to the stream \code{file}. The 
+    format is the length followed by two spaces, then a space separated 
+    list of coefficients. If the length is zero, only $0$ is printed.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive number.
+
+int _fmpz_vec_print(const fmpz * vec, long len)
+
+    Prints the vector of given length to \code{stdout}.
+
+    For further details, see \code{_fmpz_vec_fprint()}.
 
 *******************************************************************************
 
@@ -93,7 +135,7 @@ void _fmpz_vec_print(fmpz * vec, long len)
 
 *******************************************************************************
 
-void _fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2)
+void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2)
 
     Makes a copy of \code{(vec2, len2)} into \code{vec1}.
 
@@ -136,7 +178,7 @@ void _fmpz_vec_sort(fmpz * vec, long len)
 
 *******************************************************************************
 
-    Addition
+    Addition and subtraction
 
 *******************************************************************************
 
@@ -157,6 +199,12 @@ void _fmpz_vec_sub(fmpz * res, const fmpz * vec1,
 
 *******************************************************************************
 
+void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
+                                  const fmpz * vec2, long len2, const fmpz_t x)
+
+    Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
+    where $c$ is an \code{fmpz_t}.
+
 void _fmpz_vec_scalar_mul_si(fmpz * vec1, const fmpz * vec2, long len2, long c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
@@ -167,12 +215,6 @@ void _fmpz_vec_scalar_mul_ui(fmpz * vec1,
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
     where $c$ is an \code{unsigned long}.
-
-void _fmpz_vec_scalar_mul_fmpz(fmpz * vec1, 
-                                  const fmpz * vec2, long len2, const fmpz_t x)
-
-    Sets \code{(vec1, len2)} to \code{(vec2, len2)} multiplied by $c$, 
-    where $c$ is an \code{fmpz_t}.
 
 void _fmpz_vec_scalar_mul_2exp(fmpz * vec1, 
                                        const fmpz * vec2, long len2, ulong exp)
@@ -239,17 +281,17 @@ void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1,
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
     down towards minus infinity whenever the division is not exact.
 
-void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
-                                          const fmpz * vec2, long len2, long c)
-
-    Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where $c$ is a 
-    \code{signed long}.
-
 void _fmpz_vec_scalar_addmul_fmpz(fmpz * vec1, 
                                   const fmpz * vec2, long len2, const fmpz_t c)
 
     Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where $c$ is a 
     \code{fmpz_t}.
+
+void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
+                                          const fmpz * vec2, long len2, long c)
+
+    Adds \code{(vec2, len2)} times $c$ to \code{(vec1, len2)}, where $c$ is a 
+    \code{signed long}.
 
 void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, 
                                const fmpz * vec2, long len2, long c, ulong exp)
@@ -257,17 +299,17 @@ void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1,
     Adds \code{(vec2, len2)} times \code{c * 2^exp} to \code{(vec1, len2)}, 
     where $c$ is a \code{signed long}.
 
-void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
-                                          const fmpz * vec2, long len2, long c)
-
-    Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)}, 
-    where $c$ is a \code{signed long}.
-
 void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, 
                                   const fmpz * vec2, long len2, const fmpz_t x)
 
     Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)}, 
     where $c$ is a \code{fmpz_t}.
+
+void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
+                                          const fmpz * vec2, long len2, long c)
+
+    Subtracts \code{(vec2, len2)} times $c$ from \code{(vec1, len2)}, 
+    where $c$ is a \code{signed long}.
 
 void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, 
                                const fmpz * vec2, long len2, long c, ulong exp)

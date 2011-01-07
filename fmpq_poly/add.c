@@ -105,7 +105,7 @@ void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t p
         
         if (*rem == 0UL)
         {
-            _fmpz_vec_copy(res->coeffs, poly1->coeffs, len1);
+            _fmpz_vec_set(res->coeffs, poly1->coeffs, len1);
             fmpz_fdiv_q_2exp(res->den, poly1->den, 1);
         }
         else

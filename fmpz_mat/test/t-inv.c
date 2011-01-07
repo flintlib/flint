@@ -75,18 +75,15 @@ main(void)
         {
             printf("FAIL:\n");
             printf("A * A^-1 != I!\n");
-            printf("A:\n");
-            fmpz_mat_print_pretty(A);
-            printf("A^-1: (den = "); fmpz_print(den); printf(")\n");
-            fmpz_mat_print_pretty(B);
-            printf("A * A^-1:\n");
-            fmpz_mat_print_pretty(C);
-            printf("\n");
+            printf("A:\n"),         fmpz_mat_print_pretty(A), printf("\n");
+            printf("A^-1:\n"),      fmpz_mat_print_pretty(B), printf("\n");
+            printf("den(A^-1) = "), fmpz_print(den), printf("\n");
+            printf("A * A^-1:\n"),  fmpz_mat_print_pretty(C), printf("\n");
             abort();
         }
 
         /* Test aliasing */
-        fmpz_mat_copy(C, A);
+        fmpz_mat_set(C, A);
         fmpz_mat_inv(A, den, A);
         fmpz_mat_mul(B, A, C);
         _fmpz_vec_scalar_divexact_fmpz(B->entries, B->entries, m*m, den);
@@ -95,7 +92,7 @@ main(void)
         {
             printf("FAIL:\n");
             printf("aliasing failed!\n");
-            fmpz_mat_print(C);
+            fmpz_mat_print(C); printf("\n");
             abort();
         }
 

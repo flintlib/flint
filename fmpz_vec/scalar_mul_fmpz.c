@@ -39,7 +39,7 @@ _fmpz_vec_scalar_mul_fmpz(fmpz * poly1, const fmpz * poly2, long len2,
         if (c == 0)
             _fmpz_vec_zero(poly1, len2);
         else if (c == 1)
-            _fmpz_vec_copy(poly1, poly2, len2);
+            _fmpz_vec_set(poly1, poly2, len2);
         else if (c == -1)
             _fmpz_vec_neg(poly1, poly2, len2);
         else

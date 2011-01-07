@@ -141,7 +141,7 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
             if (res != poly)
             {
                 fmpz_poly_fit_length(res, len);
-                _fmpz_vec_copy(res->coeffs, poly->coeffs, len);
+                _fmpz_vec_set(res->coeffs, poly->coeffs, len);
                 _fmpz_poly_set_length(res, len);
             }
             else

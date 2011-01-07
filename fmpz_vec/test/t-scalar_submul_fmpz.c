@@ -60,7 +60,7 @@ main(void)
         c = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
         _fmpz_vec_randtest(b, state, len, 200);
-        _fmpz_vec_copy(c, b, len);
+        _fmpz_vec_set(c, b, len);
 
         _fmpz_vec_scalar_submul_fmpz(b, a, len, n1);
         _fmpz_vec_scalar_submul_si(c, a, len, n);
@@ -95,7 +95,7 @@ main(void)
         d = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
         _fmpz_vec_randtest(b, state, len, 200);
-        _fmpz_vec_copy(c, b, len);
+        _fmpz_vec_set(c, b, len);
 
         _fmpz_vec_scalar_submul_fmpz(b, a, len, n1);
         _fmpz_vec_scalar_mul_fmpz(d, a, len, n1);

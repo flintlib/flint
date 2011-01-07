@@ -37,7 +37,7 @@ main(void)
     int i, result;
     fmpz_randstate_t state;
 
-    printf("copy/equal....");
+    printf("set/equal....");
     fflush(stdout);
 
     _fmpz_vec_randinit(state);
@@ -51,7 +51,7 @@ main(void)
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
 
-        _fmpz_vec_copy(a, a, len);
+        _fmpz_vec_set(a, a, len);
 
         result = (_fmpz_vec_equal(a, a, len));
         if (!result)
@@ -74,7 +74,7 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
 
-        _fmpz_vec_copy(b, a, len);
+        _fmpz_vec_set(b, a, len);
 
         result = (_fmpz_vec_equal(a, b, len));
         if (!result)
@@ -100,7 +100,7 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
 
-        _fmpz_vec_copy(b, a, len);
+        _fmpz_vec_set(b, a, len);
         coeff = n_randint(len);
         fmpz_add_ui(b + coeff, b + coeff, 1);
 

@@ -35,7 +35,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n)
 {
     if (n == 1)
     {
-        _fmpz_vec_copy(Q, A, n);
+        _fmpz_vec_set(Q, A, n);
     }
     else
     {

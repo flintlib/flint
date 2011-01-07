@@ -19,45 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2008-2009 William Hart
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 
-int nmod_poly_from_string(const char * s, nmod_poly_t poly)
+void
+fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    const char * whitespace = " \t\n\r";
-    long i, length;
-    mp_limb_t n;
-
-    if (sscanf(s, "%ld %lu", &length, &n) != 2)
-        return 0;
-      
-    /* jump past length (n will be skipped in first loop iter)  */
-    s += strcspn(s, whitespace);
-    s += strspn(s, whitespace);
-    
-    nmod_poly_fit_length(poly, length);
-    poly->length = length;
-    
-    for (i = 0; i < length; i++)
+    if (mat1 != mat2)
     {
-        s += strcspn(s, whitespace); /* jump to next whitespace */
-        s += strspn(s, whitespace); /* skip whitespace */
-      
-        if (!sscanf(s, "%lu", &poly->coeffs[i]))
-        {
-            poly->length = i;
-            return 0;
-        }
+        FMPZ_MAT_ASSERT(mat1->r == mat2->r && mat1->c == mat2->c,
+            "fmpz_mat_set: incompatible dimensions");
+
+        _fmpz_vec_set(mat1->entries, mat2->entries, mat2->r * mat2->c);
     }
-   
-    _nmod_poly_normalise(poly);
-   
-    return 1;
 }

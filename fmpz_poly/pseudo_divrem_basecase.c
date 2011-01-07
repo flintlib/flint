@@ -45,7 +45,7 @@ _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
     *d = 0;
     _fmpz_vec_zero(Q, lenA - lenB + 1);
     if (R != A)
-        _fmpz_vec_copy(R, A, lenA);
+        _fmpz_vec_set(R, A, lenA);
 
     while (iR >= lenB - 1)
     {

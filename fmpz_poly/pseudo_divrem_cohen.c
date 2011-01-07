@@ -51,7 +51,7 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
     lenQ = lenA - lenB + 1;
     _fmpz_vec_zero(Q, lenQ);
     if (R != A)
-        _fmpz_vec_copy(R, A, lenA);
+        _fmpz_vec_set(R, A, lenA);
     e = lenA - lenB;
     
     /* Unroll the first run of the while loop */

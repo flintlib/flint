@@ -19,19 +19,69 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdlib.h>
+#include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void
-_fmpz_vec_copy(fmpz * vec1, const fmpz * vec2, long len2)
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
 {
+    int alloc, r;
     long i;
-    for (i = 0; i < len2; i++)
-        fmpz_set(vec1 + i, vec2 + i);
+    mpz_t t;
+
+    alloc = (*vec == NULL);
+
+    mpz_init(t);
+    r = mpz_inp_str(t, file, 10);
+    if (r == 0)
+    {
+        if (alloc)
+            *len = 0;
+        mpz_clear(t);
+        return 0;
+    }
+    if (!mpz_fits_slong_p(t))
+    {
+        printf("ERROR (_fmpz_vec_fread).  Length does not fit into a long.\n");
+        abort();
+    }
+    if (alloc)
+    {
+        *len = mpz_get_si(t);
+        *vec = _fmpz_vec_init(*len);
+    }
+    else
+    {
+        if (*len != mpz_get_si(t))
+        {
+            mpz_clear(t);
+            return 0;
+        }
+    }
+    mpz_clear(t);
+
+    for (i = 0; i < *len; i++)
+    {
+        r = fmpz_fread(file, (*vec) + i);
+        if (r <= 0)
+        {
+            if (alloc)
+            {
+                _fmpz_vec_clear(*vec, *len);
+                *vec = NULL;
+                *len = 0;
+            }
+            return r;
+        }
+    }
+
+    return 1;
 }
+

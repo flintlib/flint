@@ -19,29 +19,44 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009, 2010 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
+#include "nmod_poly.h"
 
-void
-_fmpz_vec_print(fmpz * vec, long len)
+char * nmod_poly_get_str(const nmod_poly_t poly)
 {
     long i;
-    printf("%li", len);
+    char * buf, * ptr;
 
-    if (len == 0)
-        return;
+    /* estimate for the length, n and three spaces */
+#if FLINT64
+    long size = 21*2 + 1;
+#else
+    long size = 11*2 + 1;
+#endif
 
-    printf(" ");
-    for (i = 0; i < len; i++)
+    for (i = 0; i < poly->length; i++)
     {
-        printf(" ");
-        fmpz_print(vec + i);
+        if (poly->coeffs[i]) /* log(2)/log(10) < 0.30103, +1 for space/null */
+            size += (ulong) ceil(0.30103*FLINT_BIT_COUNT(poly->coeffs[i])) + 1;
+        else size += 2;
     }
+
+    buf = (char *) malloc(size);  
+    ptr = buf + sprintf(buf, "%ld %lu", poly->length, poly->mod.n);
+   
+    if (poly->length)
+        ptr += sprintf(ptr, " ");
+
+    for (i = 0; i < poly->length; i++)
+        ptr += sprintf(ptr, " %lu", poly->coeffs[i]);
+   
+    return buf;
 }

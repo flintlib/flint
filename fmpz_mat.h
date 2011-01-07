@@ -27,9 +27,9 @@
 #ifndef FMPZ_MAT_H
 #define FMPZ_MAT_H
 
+#include <stdio.h>
 #include <mpir.h>
 #include "fmpz.h"
-
 
 typedef struct
 {
@@ -39,22 +39,38 @@ typedef struct
     fmpz ** rows;
 } fmpz_mat_struct;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef fmpz_mat_struct fmpz_mat_t[1];
 
-/* Memory management */
+/* Memory management  ********************************************************/
+
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
-void fmpz_mat_copy(fmpz_mat_t mat1, const fmpz_mat_t mat2);
+void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
 
-void fmpz_mat_print(fmpz_mat_t mat); 
-void fmpz_mat_print_pretty(fmpz_mat_t mat);
+/* Input and output  *********************************************************/
 
-/* Random matrix generation */
+int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
+
+int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat);
+
+static __inline__
+int fmpz_mat_print(const fmpz_mat_t mat)
+{
+    return fmpz_mat_fprint(stdout, mat);
+}
+
+static __inline__
+int fmpz_mat_print_pretty(const fmpz_mat_t mat)
+{
+    return fmpz_mat_fprint_pretty(stdout, mat);
+}
+
+/* Random matrix generation  *************************************************/
+
 void fmpz_mat_randinit(fmpz_randstate_t state);
 void fmpz_mat_randclear(fmpz_randstate_t state);
 void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
@@ -69,10 +85,9 @@ void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det);
 void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count);
 int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * diag, long n);
 
-
 long fmpz_mat_max_bits(const fmpz_mat_t mat);
 
-/* Linear algebra operations */
+/* Linear algebra operations  ************************************************/
 
 void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A);
 
@@ -106,7 +121,6 @@ void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
-
 
 #define FMPZ_MAT_ASSERT(expr, msg)       \
     if (1)                               \

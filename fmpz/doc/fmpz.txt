@@ -114,6 +114,15 @@ void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
     Returns $f$ as an \code{mpz_t}.
 
+char * fmpz_get_str(char * str, int b, const fmpz_t f)
+
+    Returns the representation of $f$ in base~$b$, which can vary 
+    between $2$ and $62$, inclusive.
+
+    If \code{str} is \code{NULL}, the result string is allocated by the 
+    function.  Otherwise, it is up to the caller to ensure the allocated 
+    block of memory is sufficiently large.
+
 void fmpz_set_si(fmpz_t f, long val)
 
     Sets $f$ to the given \code{signed long} value.
@@ -142,7 +151,7 @@ void fmpz_read(fmpz_t f)
 
     Reads a multiprecision integer from \code{stdin}.  The format is
     an optional minus sign, followed by one or more digits.  The
-    first digit should be nonzero unless it is the only digit.
+    first digit should be non-zero unless it is the only digit.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
@@ -155,7 +164,7 @@ void fmpz_fread(FILE * file, fmpz_t f)
 
     Reads a multiprecision integer from the stream \code{file}.  The 
     format is an optional minus sign, followed by one or more digits.
-    The first digit should be nonzero unless it is the only digit.
+    The first digit should be non-zero unless it is the only digit.
 
     In case of success, returns a positive number.  In case of failure, 
     returns a non-positive number.
@@ -196,15 +205,6 @@ size_t fmpz_sizeinbase(const fmpz_t f, int b)
 
     Returns the size of $f$ in base~$b$, measured in numbers of digits. 
     The base~$b$ can be between $2$ and $62$, inclusive.
-
-char * fmpz_get_str(char * str, int b, const fmpz_t f)
-
-    Returns the representation of $f$ in base~$b$, which can vary 
-    between $2$ and $62$, inclusive.
-
-    If \code{str} is \code{NULL}, the result string is allocated by the 
-    function.  Otherwise, it is up to the caller to ensure the allocated 
-    block of memory is sufficiently large.
 
 *******************************************************************************
 
@@ -264,9 +264,13 @@ int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
-int fmpz_is_zero(fmpz_t f)
+int fmpz_is_zero(const fmpz_t f)
 
     Returns $1$ if $f$ is $0$, otherwise returns $0$.
+
+int fmpz_is_one(const fmpz_t f)
+
+    Returns $1$ if $f$ is equal to one, otherwise returns $0$.
 
 *******************************************************************************
 
@@ -282,21 +286,25 @@ void fmpz_abs(fmpz_t f1, const fmpz_t f2)
 
     Sets $f_1$ to the absolute value of $f_2$.
 
+void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to $g + h$.
+
 void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g + x$ where $x$ is an \code{unsigned long}.
 
-void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
+void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets $f$ to $g + h$.
+    Sets $f$ to $g - h$.
 
 void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g - x$ where $x$ is an \code{unsigned long}.
 
-void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
+void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets $f$ to $g - h$.
+    Sets $f$ to $g \times h$.
 
 void fmpz_mul_si(fmpz_t f, const fmpz_t g, long x)
 
@@ -306,29 +314,25 @@ void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g \times x$ where $x$ is an \code{unsigned long}.
 
-void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
-
-    Sets $f$ to $g \times h$.
-
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to \code{g * 2^exp}.
-
-void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets $f$ to $f + g \times x$ where $x$ is an \code{unsigned long}.
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to $f + g \times h$.
 
-void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
+void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $f - g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $f + g \times x$ where $x$ is an \code{unsigned long}.
 
 void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to $f - g \times h$.
+
+void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
+
+    Sets $f$ to $f - g \times x$ where $x$ is an \code{unsigned long}.
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -350,12 +354,12 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
@@ -375,12 +379,12 @@ void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
 
-void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
 
-void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
@@ -403,15 +407,15 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
     is $0$ an exception is raised.
 
-ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
-
-    Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
-    \code{unsigned long}.  If $x$ is $0$ an exception will result.
-
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the remainder of $g$ divided by $h$.  The remainder
     is always taken to be positive.
+
+ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
+
+    Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
+    \code{unsigned long}.  If $x$ is $0$ an exception will result.
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
@@ -437,7 +441,7 @@ void fmpz_fac_ui(fmpz_t f, ulong n)
 
 *******************************************************************************
 
-    GCD and extended GCD
+    Greatest common divisor
 
 *******************************************************************************
 
@@ -457,7 +461,7 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the inverse of $g$ modulo $h$.  The value of $h$ may 
     not be $0$ otherwise an exception results.  If the inverse exists 
-    the return value will be nonzero, otherwise the return value will
+    the return value will be non-zero, otherwise the return value will
     be $0$ and the value of $f$ undefined. 
 
 *******************************************************************************

@@ -25,51 +25,14 @@
 
 #include <stdlib.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
+#include "mpfr_vec.h"
 
 void
-fmpz_mat_print(fmpz_mat_t mat)
+_mpfr_vec_set(mpfr * vec1, mpfr * vec2, long length)
 {
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
-
-    printf("%li %li  ", r, c);
-    for (i = 0; i < r; i++)
-    {
-        for (j = 0; j < c; j++)
-        {
-            fmpz_print(mat->rows[i] + j);
-            if (j < c - 1)
-                printf(" ");
-        }
-        if (i != r - 1)
-            printf(" ");
-    }
-    printf("\n");
-}
-
-void
-fmpz_mat_print_pretty(fmpz_mat_t mat)
-{
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
-
-    printf("[");
-    for (i = 0; i < r; i++)
-    {
-        printf("[");
-        for (j = 0; j < c; j++)
-        {
-            fmpz_print(mat->rows[i] + j);
-            if (j < c - 1)
-                printf(" ");
-        }
-        if (i != r - 1)
-            printf("]\n");
-    }
-    printf("]]\n");
+    long i;
+    for (i = 0; i < length; i++)
+        mpfr_set(vec1 + i, vec2 + i, GMP_RNDN);
 }
