@@ -37,7 +37,7 @@ fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
     ulong m;
 
-    fmpz_randtests_unsigned(f, state, bits);
+    fmpz_randtest_unsigned(f, state, bits);
 
     m = n_randlimb();
     if (m & 1UL)
