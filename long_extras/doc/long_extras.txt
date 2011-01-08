@@ -1,0 +1,44 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Random functions 
+
+*******************************************************************************
+
+mp_limb_signed_t z_randtest()
+
+    Returns a pseudo random number with a random number of bits, from 
+    $0$ to \code{FLINT_BITS}.  The probability of the special values $0$, 
+    $\pm 1$, \code{COEFF_MAX}, \code{COEFF_MIN}, \code{LONG_MAX} and 
+    \code{LONG_MIN} is increased.
+
+    This random function is mainly used for testing purposes.
+
+mp_limb_signed_t z_randtest_not_zero()
+
+    As for \code{z_randtest()}, but does not return $0$.
+
