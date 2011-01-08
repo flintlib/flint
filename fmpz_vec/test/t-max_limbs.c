@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -61,7 +62,10 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("limbs = %ld, limbs2 = %ld\n", limbs, limbs2);
+            printf("bits   = %ld\n", bits);
+            printf("limbs  = %ld\n", limbs);
+            printf("a      = {"), _fmpz_vec_print(a, len), printf("}\n");
+            printf("limbs2 = %ld\n", limbs2);
             abort();
         }
 

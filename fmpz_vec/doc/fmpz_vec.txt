@@ -78,8 +78,9 @@ long _fmpz_vec_max_bits(const fmpz * vec, long len)
 
 ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
-    Return the maximum number of limbs needed to store any entry in 
-    \code{(vec, len)}.
+    Return the maximum number of limbs needed to store the absolute value 
+    of any entry in \code{(vec, len)}.  If all entries are zero, returns 
+    zero.
 
 *******************************************************************************
 
