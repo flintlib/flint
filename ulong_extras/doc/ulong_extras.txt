@@ -40,7 +40,7 @@ mp_limb_t n_randlimb()
     and \code{p_0 = nextprime(2^16)} on a 32-bit machine and 
     \code{p_1 = nextprime(p_0)}.
 
-mp_limb_t n_randbits()
+mp_limb_t n_randbits(unsigned int bits)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most sifnificant bit is always set, unless zero is passed,
