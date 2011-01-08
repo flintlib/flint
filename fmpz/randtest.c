@@ -60,10 +60,12 @@ fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
         else
         {
             m >>= 2;
-            if (bits < FLINT_BITS - 2)
+            if (bits == 0)
+                *f = 0;
+            else if (bits < FLINT_BITS - 2)
                 *f = m & 1UL;
             else
-                *f = (m & 2UL) ? COEFF_MAX : (m & 1UL);
+                *f = COEFF_MAX;
         }
     }
     else
