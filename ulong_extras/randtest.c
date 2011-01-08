@@ -33,23 +33,31 @@
 
 mp_limb_t n_randtest(void)
 {
-    ulong m;
+    mp_limb_t m;
+    mp_limb_t n;
 
     m = n_randlimb();
 
     if (m & 7UL)
     {
-        return n_randbits(n_randint(FLINT_BITS + 1));
+        n = n_randbits(n_randint(FLINT_BITS + 1));
     }
     else
     {
         m >>= 3;
 
-        if      (m % 4 == 0) return 0;
-        else if (m % 4 == 1) return 1;
-        else if (m % 4 == 2) return COEFF_MAX;
-        else                 return LONG_MAX;
+        switch (m % 5UL)
+        {
+            case 0:  n = 0;         break;
+            case 1:  n = 1;         break;
+            case 2:  n = COEFF_MAX; break;
+            case 3:  n = LONG_MAX;  break;
+            case 4:  n = ULONG_MAX; break;
+            default: n = 0;
+        }
     }
+
+    return n;
 }
 
 mp_limb_t n_randtest_not_zero(void)
