@@ -39,3 +39,12 @@ _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state,
     for (i = 0; i < len; i++)
         fmpz_randtest(f + i, state, bits);
 }
+
+void
+_fmpz_vec_randtest_unsigned(fmpz * f, fmpz_randstate_t state, 
+                            long len, mp_bitcnt_t bits)
+{
+    long i;
+    for (i = 0; i < len; i++)
+        fmpz_randtest_unsigned(f + i, state, bits);
+}
