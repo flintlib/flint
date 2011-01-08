@@ -136,6 +136,14 @@ fmpz_t fmpq_poly_denref(fmpq_poly_t poly)
 
     Random testing
 
+    The functions \code{fmpq_poly_randtest_foo()} provide random 
+    polynomials suitable for testing.  On an integer level, this 
+    means that long strings of zeros and ones in the binary 
+    representation are favoured as well as the special absolute 
+    values $0$, $1$, \code{COEFF_MAX}, and \code{LONG_MAX}.  On a 
+    polynomial level, the integer numerator has a reasonable chance 
+    to have a non-trivial content.
+
 *******************************************************************************
 
 void fmpq_poly_randinit(fmpz_randstate_t state)
