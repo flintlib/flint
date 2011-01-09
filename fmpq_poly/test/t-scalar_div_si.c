@@ -57,8 +57,6 @@ main(void)
         fmpq_poly_randtest(a, state, n_randint(100), 200);
         n = z_randtest_not_zero();
 
-        printf("a: n = %ld\n", n); fflush(stdout);
-
         fmpq_poly_scalar_div_si(b, a, n);
         fmpq_poly_scalar_div_si(a, a, n);
 
@@ -80,7 +78,6 @@ main(void)
     {
         fmpq_poly_t a, b;
         ulong n;
-        printf("b\n"); fflush(stdout);
 
         n = n_randtest_not_zero();
         if (n > LONG_MAX)
@@ -112,7 +109,6 @@ main(void)
         fmpq_poly_t a, b, c;
         long n1, n2;
         ulong m;
-        printf("c\n"); fflush(stdout);
 
         while ((n1 = (long) n_randbits(FLINT_BITS / 2)) == 0) ;
         while ((n2 = (long) n_randbits(FLINT_BITS / 2 - 1)) == 0) ;

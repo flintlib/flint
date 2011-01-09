@@ -48,21 +48,31 @@ void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     }
     else
     {
-        fmpz_t d, fc;
-        long sd;
+        fmpz_t d, f;
+
         fmpz_init(d);
-        fmpz_init(fc);
+        fmpz_init(f);
         
+        fmpz_set_si(f, c);
         _fmpz_vec_content(d, poly, len);
-        fmpz_set_si(fc, c);
-        fmpz_gcd(d, d, fc);
-        sd = fmpz_get_si(d);   /* gcd of c and d fits in a long */
-        if (c < 0)  sd = -sd;  /* sd is positive before this    */
-        _fmpz_vec_scalar_divexact_si(rpoly, poly, len, sd);
-        fmpz_mul_si(rden, den, c / sd);
-        
+        fmpz_gcd(d, d, f);
+
+        if (c > 0)
+        {
+            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
+            fmpz_mul_si(rden, den, c / fmpz_get_si(d));
+        }
+        else
+        {
+            ulong q = (- (ulong) c) / fmpz_get_ui(d);
+
+            fmpz_neg(d, d);
+            _fmpz_vec_scalar_divexact_fmpz(rpoly, poly, len, d);
+            fmpz_mul_ui(rden, den, q);
+        }
+
         fmpz_clear(d);
-        fmpz_clear(fc);
+        fmpz_clear(f);
     }
 }
 
