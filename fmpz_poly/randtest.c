@@ -69,9 +69,6 @@ fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state,
     }
 
     fmpz_poly_randtest(f, state, len, bits);
-    if (f->length == 0)
-    {
-        fmpz_set_ui(f->coeffs, 1UL);
-        f->length = 1;
-    }
+    if (fmpz_poly_is_zero(f))
+        fmpz_poly_set_ui(f, 1);
 }

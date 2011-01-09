@@ -25,46 +25,54 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
+
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
 void
 fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
-    bits = n_randint(bits + 1);
+    ulong m;
 
-    if (bits <= FLINT_BITS - 2)
-    {
-        _fmpz_demote(f);
-        *f = n_randbits(bits);
-        if (n_randint(2))
-            *f = -*f;
-    }
-    else
-    {
-        __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_rrandomb(mpz_ptr, state, bits);
-        if (n_randint(2))
-            mpz_neg(mpz_ptr, mpz_ptr);
-    }
+    fmpz_randtest_unsigned(f, state, bits);
+
+    m = n_randlimb();
+    if (m & 1UL)
+        fmpz_neg(f, f);
 }
 
 void
 fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
+    ulong m;
+
+    m    = n_randlimb();
     bits = n_randint(bits + 1);
 
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
-        *f = n_randbits(bits);
+        if (m & 3UL)
+            *f = n_randbits(bits);
+        else
+        {
+            m >>= 2;
+            if (bits == 0)
+                *f = 0;
+            else if (bits < FLINT_BITS - 2)
+                *f = m & 1UL;
+            else
+                *f = COEFF_MAX;
+        }
     }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
         mpz_rrandomb(mpz_ptr, state, bits);
+        _fmpz_demote_val(f);
     }
 }
 

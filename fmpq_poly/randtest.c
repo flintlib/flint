@@ -27,36 +27,87 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
+
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
+#include "ulong_extras.h"
 
-void fmpq_poly_randtest(fmpq_poly_t f, fmpz_randstate_t state, 
+void fmpq_poly_randtest(fmpq_poly_t poly, fmpz_randstate_t state, 
                         long len, mp_bitcnt_t bits)
 {
-    long i;
-    fmpq_poly_fit_length(f, len);
-    
-    for (i = 0; i < len; i++)
-        fmpz_randtest(f->coeffs + i, state, bits);
-    fmpz_randtest_not_zero(f->den, state, FLINT_MAX(bits, 1));
-    
-    _fmpq_poly_set_length(f, len);
-    fmpq_poly_canonicalise(f);
+    ulong m;
+
+    m = n_randlimb();
+
+    fmpq_poly_fit_length(poly, len);
+    _fmpq_poly_set_length(poly, len);
+
+    if (m & 1UL)
+    {
+        _fmpz_vec_randtest(poly->coeffs, state, len, bits);
+    }
+    else
+    {
+        fmpz_t x;
+
+        fmpz_init(x);
+        fmpz_randtest(x, state, bits / 2);
+        _fmpz_vec_randtest(poly->coeffs, state, len, (bits + 1) / 2);
+        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, len, x);
+        fmpz_clear(x);
+    }
+
+    if (m & 2UL)
+    {
+        fmpz_randtest_not_zero(poly->den, state, FLINT_MAX(bits, 1));
+        fmpz_abs(poly->den, poly->den);
+        fmpq_poly_canonicalise(poly);
+    }
+    else
+    {
+        fmpz_set_ui(poly->den, 1);
+        _fmpq_poly_normalise(poly);
+    }
 }
 
-void fmpq_poly_randtest_unsigned(fmpq_poly_t f, fmpz_randstate_t state,
+void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, fmpz_randstate_t state,
                                  long len, mp_bitcnt_t bits)
 {
-   long i;
-   fmpq_poly_fit_length(f, len);
+    ulong m;
 
-   for (i = 0; i < len; i++)
-      fmpz_randtest_unsigned(f->coeffs + i, state, bits);
-    fmpz_randtest_not_zero(f->den, state, FLINT_MAX(bits, 1));
-   
-   _fmpq_poly_set_length(f, len);
-   fmpq_poly_canonicalise(f);
+    m = n_randlimb();
+
+    fmpq_poly_fit_length(poly, len);
+    _fmpq_poly_set_length(poly, len);
+
+    if (m & 1UL)
+    {
+        _fmpz_vec_randtest_unsigned(poly->coeffs, state, len, bits);
+    }
+    else
+    {
+        fmpz_t x;
+
+        fmpz_init(x);
+        fmpz_randtest_unsigned(x, state, bits / 2);
+        _fmpz_vec_randtest_unsigned(poly->coeffs, state, len, (bits + 1) / 2);
+        _fmpz_vec_scalar_mul_fmpz(poly->coeffs, poly->coeffs, len, x);
+        fmpz_clear(x);
+    }
+
+    if (m & 2UL)
+    {
+        fmpz_randtest_not_zero(poly->den, state, FLINT_MAX(bits, 1));
+        fmpz_abs(poly->den, poly->den);
+        fmpq_poly_canonicalise(poly);
+    }
+    else
+    {
+        fmpz_set_ui(poly->den, 1);
+        _fmpq_poly_normalise(poly);
+    }
 }
 
 void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state, 
@@ -70,6 +121,6 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, fmpz_randstate_t state,
 
     fmpq_poly_randtest(f, state, len, bits);
     if (f->length == 0) 
-        fmpq_poly_set_ui(f, 1UL);
+        fmpq_poly_set_ui(f, 1);
 }
 

@@ -45,6 +45,9 @@ void _fmpz_vec_randclear(fmpz_randstate_t state);
 void _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state, 
                         long len, mp_bitcnt_t bits);
 
+void _fmpz_vec_randtest_unsigned(fmpz * f, fmpz_randstate_t state, 
+                                 long len, mp_bitcnt_t bits);
+
 /*  Bit sizes  ***************************************************************/
 
 long _fmpz_vec_max_bits(const fmpz * vec, long len);

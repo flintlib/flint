@@ -30,6 +30,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
+#include "long_extras.h"
 #include "ulong_extras.h"
 
 int
@@ -47,7 +48,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        long n = (long) n_randtest();
+        long n = z_randtest();
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -99,11 +100,15 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-        long n1 = (long) n_randbits(FLINT_BITS / 2 - 1);
-        long n2 = (long) n_randbits(FLINT_BITS / 2 - 1);
-        if (n_randint(2))
+        long n1, n2;
+        ulong m;
+
+        n1 = (long) n_randbits(FLINT_BITS / 2);
+        n2 = (long) n_randbits(FLINT_BITS / 2 - 1);
+        m = n_randlimb();
+        if (m & 1UL)
             n1 = -n1;
-        if (n_randint(2))
+        if (m & 2UL)
             n2 = -n2;
 
         fmpq_poly_init(a);

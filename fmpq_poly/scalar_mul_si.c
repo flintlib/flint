@@ -23,25 +23,26 @@
 
 ******************************************************************************/
 
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-/* 
-   Sets {rpoly, rden} = c * {poly, den}, in lowest terms.
-
-   Assumes that {poly, den} is in lowest terms. 
-   Assumes that rpoly is allocated sufficiently as a sufficiently large array. 
-   Supports full aliasing between {rpoly, rden} and {poly, den}, but there 
-   may be no partial overlap between rpoly and poly.
-*/
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
                               const fmpz * poly, const fmpz_t den, long len, 
                               long c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
+
+    if (c == 0)
+    {
+        _fmpz_vec_zero(rpoly, len);
+        fmpz_set_ui(rden, 1);
+        return;
+    }
+
     fmpz_init(gcd);
     fmpz_set_si(gcd, c);
     fmpz_gcd(gcd, gcd, den);
@@ -52,15 +53,20 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     }
     else
     {
-        ulong gcd2 = fmpz_get_ui(gcd);  /* long might not be enough */
-        long c2 = c / (long) gcd2;
-        _fmpz_vec_scalar_mul_si(rpoly, poly, len, c2);
-        fmpz_fdiv_q_ui(rden, den, gcd2);
+        if (c > LONG_MIN || fmpz_cmp_ui(gcd, - (ulong) LONG_MIN))
+        {
+            long g = fmpz_get_si(gcd);
+
+            _fmpz_vec_scalar_mul_si(rpoly, poly, len, c / g);
+            fmpz_divexact_si(rden, den, g);
+        }
+        else
+        {
+            _fmpz_vec_neg(rpoly, poly, len);
+            fmpz_divexact_ui(rden, den, - (ulong) LONG_MIN);
+        }
     }
     fmpz_clear(gcd);
-    
-    if (_fmpz_vec_is_zero(rpoly, len))
-        fmpz_set_ui(rden, 1UL);
 }
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)

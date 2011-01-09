@@ -29,12 +29,13 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
+void 
+fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
 {
-    fmpz_t fc;
-    fmpz_init(fc);
-    fmpz_set_mpz(fc, c);
-    fmpq_poly_scalar_mul_fmpz(rop, op, fc);
-    fmpz_clear(fc);
+    fmpz_t f;
+    fmpz_init(f);
+    fmpz_set_mpz(f, c);
+    fmpq_poly_scalar_mul_fmpz(rop, op, f);
+    fmpz_clear(f);
 }
 

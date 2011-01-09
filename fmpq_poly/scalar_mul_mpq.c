@@ -35,10 +35,18 @@ void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden,
 {
     fmpz_t gcd1;  /* GCD( poly, s ) */
     fmpz_t gcd2;  /* GCD( r, den )  */
+
+    if (fmpz_is_zero(r))
+    {
+        _fmpz_vec_zero(rpoly, len);
+        fmpz_set_ui(rden, 1);
+        return;
+    }
+
     fmpz_init(gcd1);
     fmpz_init(gcd2);
-    fmpz_set_ui(gcd1, 1UL);
-    fmpz_set_ui(gcd2, 1UL);
+    fmpz_set_ui(gcd1, 1);
+    fmpz_set_ui(gcd2, 1);
     if (*s != 1L)
     {
         _fmpz_vec_content(gcd1, poly, len);
@@ -90,9 +98,6 @@ void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden,
         }
         fmpz_clear(s2);
     }
-    
-    if (_fmpz_vec_is_zero(rpoly, len))
-        fmpz_set_ui(rden, 1UL);
     
     fmpz_clear(gcd1);
     fmpz_clear(gcd2);

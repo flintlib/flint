@@ -634,16 +634,51 @@ We now describe the functions available in \code{fmpz_poly}.
 \chapter{fmpq\_poly}
 \epigraph{Polynomials over $\Q$}{}
 
+\section{Introduction}
+
+The \code{fmpq_poly_t} data type represents elements of $\Q[x]$. The 
+\code{fmpq_poly} module provides routines for memory management, basic 
+arithmetic, and conversions from or to other types.
+
+A rational polynomial is stored as the quotient of an integer polynomial 
+and an integer denominator.  To be more precise, the coefficient vector 
+of the numerator can be accessed with the function \code{fmpq_poly_numref()} 
+and the denominator with \code{fmpq_poly_denref()}.  Although one can 
+construct use cases in which a representation as a list of rational 
+coefficients would be beneficial, the choice made here is typically 
+more efficient.
+
+We can obtain a unique representation based on this choice by enforcing, 
+for non-zero polynomials, that the numerator and denominator are coprime 
+and that the denominator is positive.  The unique representation of the 
+zero polynomial is chosen as $0/1$.
+
+Similar to the situation in the \code{fmpz_poly_t} case, an 
+\code{fmpq_poly_t} object also has a \code{length} parameter, which 
+denotes the length of the vector of coefficients of the numerator. 
+We say a polynomial is \emph{normalised} either if this length is zero 
+or if the leading coefficient is non-zero.
+
+We say a polynomial is in \emph{canonical} form if it is given in the 
+unique representation discussed above and normalised.
+
+The functions provided in this module roughly fall into two categories:
+
+On the one hand, there are functions mainly provided for the user, whose 
+names do not begin with an underscore.  These typically operate on 
+polynomials of type \code{fmpq_poly_t} in canonical form and, unless 
+specified otherwise, permit aliasing between their input arguments and 
+between their output arguments.
+
+On the other hand, there are versions of these functions whose names are 
+prefixed with a single underscore.  These typically operate on polynomials 
+given in the form of a triple of object of types \code{fmpz *}, 
+\code{fmpz_t}, and \code{long}, containing the numerator, denominator and 
+length, respectively.  In general, these functions expect their input to 
+be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
+terms, and they do not allow their input and output arguments to be aliased.
+
 \input{fmpq_poly.tex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Single limb arithmetic                                                       %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{ulong\_extras}
-\epigraph{Unsigned single limb arithmetic}{}
-
-\input{ulong_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                              %
@@ -711,6 +746,24 @@ combinatorial special number sequences and polynomials.
           for lattice reduction}{}
 
 \input{LLL.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Unsigned single limb arithmetic                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{ulong\_extras}
+\epigraph{Unsigned single limb arithmetic}{}
+
+\input{ulong_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Signed single limb arithmetic                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{long\_extras}
+\epigraph{Signed single limb arithmetic}{}
+
+\input{long_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mpn_extras                                                                   %

@@ -19,51 +19,46 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <limits.h>
 #include <mpir.h>
-
+#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "ulong_extras.h"
+#include "fmpz_vec.h"
+#include "fmpq_poly.h"
 
-mp_limb_t n_randtest(void)
+int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, long len)
 {
-    mp_limb_t m;
-    mp_limb_t n;
-
-    m = n_randlimb();
-
-    if (m & 7UL)
+    if (len)
     {
-        n = n_randbits(n_randint(FLINT_BITS + 1));
+        int ans;
+        fmpz_t c;
+
+        if (fmpz_is_zero(poly + len - 1))
+            return 0;
+
+        if (fmpz_sgn(den) < 0)
+            return 0;
+
+        fmpz_init(c);
+        _fmpz_poly_content(c, poly, len);
+        fmpz_gcd(c, c, den);
+        ans = (*c == 1L);
+        fmpz_clear(c);
+
+        return ans;
     }
     else
     {
-        m >>= 3;
-
-        switch (m % 5UL)
-        {
-            case 0:  n = 0;         break;
-            case 1:  n = 1;         break;
-            case 2:  n = COEFF_MAX; break;
-            case 3:  n = LONG_MAX;  break;
-            case 4:  n = ULONG_MAX; break;
-            default: n = 0;
-        }
+        return (*den == 1L);
     }
-
-    return n;
 }
 
-mp_limb_t n_randtest_not_zero(void)
+int fmpq_poly_is_canonical(const fmpq_poly_t poly)
 {
-    mp_limb_t n;
-
-    while ((n = n_randtest()) == 0) ;
-    return n;
+    return _fmpq_poly_is_canonical(poly->coeffs, poly->den, poly->length);
 }
+

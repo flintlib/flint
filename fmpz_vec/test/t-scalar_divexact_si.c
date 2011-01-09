@@ -30,6 +30,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -49,9 +50,7 @@ main(void)
         long len = n_randint(100);
         long n;
 
-        do
-            n = (long) n_randtest();
-        while (n == 0);
+        n = z_randtest_not_zero();
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -81,9 +80,7 @@ main(void)
         long len = n_randint(100);
         long n;
 
-        do 
-            n = (long) n_randtest();
-        while (n == 0);
+        n = z_randtest_not_zero();
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

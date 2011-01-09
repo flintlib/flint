@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -31,39 +30,42 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randtest(void)
+mp_limb_signed_t z_randtest(void)
 {
     mp_limb_t m;
-    mp_limb_t n;
+    mp_limb_signed_t z;
 
     m = n_randlimb();
 
     if (m & 7UL)
     {
-        n = n_randbits(n_randint(FLINT_BITS + 1));
+        z = n_randbits(n_randint(FLINT_BITS));
     }
     else
     {
         m >>= 3;
 
-        switch (m % 5UL)
+        switch (m % 7UL)
         {
-            case 0:  n = 0;         break;
-            case 1:  n = 1;         break;
-            case 2:  n = COEFF_MAX; break;
-            case 3:  n = LONG_MAX;  break;
-            case 4:  n = ULONG_MAX; break;
-            default: n = 0;
+            case 0:  z = 0;         break;
+            case 1:  z = 1;         break;
+            case 2:  z = -1;        break;
+            case 3:  z = COEFF_MAX; break;
+            case 4:  z = COEFF_MIN; break;
+            case 5:  z = LONG_MAX;  break;
+            case 6:  z = LONG_MIN;  break;
+            default: z = 0;
         }
     }
 
-    return n;
+    return z;
 }
 
-mp_limb_t n_randtest_not_zero(void)
+mp_limb_signed_t z_randtest_not_zero(void)
 {
-    mp_limb_t n;
+    mp_limb_signed_t z;
 
-    while ((n = n_randtest()) == 0) ;
-    return n;
+    while ((z = z_randtest()) == 0) ;
+    return z;
 }
+

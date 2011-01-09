@@ -40,7 +40,7 @@ mp_limb_t n_randlimb()
     and \code{p_0 = nextprime(2^16)} on a 32-bit machine and 
     \code{p_1 = nextprime(p_0)}.
 
-mp_limb_t n_randbits()
+mp_limb_t n_randbits(unsigned int bits)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most sifnificant bit is always set, unless zero is passed,
@@ -54,8 +54,10 @@ mp_limb_t n_randint(mp_limb_t limit)
 
 mp_limb_t n_randtest()
 
-    Returns a uniformly pseudo random number with a random number of bits,
-    from $0$ to $64$. This random function is mainly used for testing purposes.
+    Returns a pseudo random number with a random number of bits,
+    from $0$ to \code{FLINT_BITS}.  The probability of the special 
+    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased.  
+    This random function is mainly used for testing purposes.
 
 mp_limb_t n_randtest_not_zero()
 

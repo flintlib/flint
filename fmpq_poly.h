@@ -64,6 +64,10 @@ void _fmpq_poly_canonicalise(fmpz * rpoly, fmpz_t den, long len);
 
 void fmpq_poly_canonicalise(fmpq_poly_t poly);
 
+int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, long len);
+
+int fmpq_poly_is_canonical(const fmpq_poly_t poly);
+
 /*  Accessing numerator and denominator  *************************************/
 
 #define fmpq_poly_numref(poly)  ((poly)->coeffs)

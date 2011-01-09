@@ -30,6 +30,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
+#include "long_extras.h"
 #include "ulong_extras.h"
 
 int
@@ -118,11 +119,8 @@ main(void)
         fmpz_t n1;
         long n;
 
+        n = z_randtest();
         fmpz_init(n1);
-        n = (long) n_randtest();
-
-        if (n_randint(2))
-            n = -n;
         fmpz_set_si(n1, n);
 
         fmpq_poly_init(a);

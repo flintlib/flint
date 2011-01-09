@@ -58,6 +58,12 @@ void _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state,
     Sets the entries of a vector of the given length to random integers with 
     up to the given number of bits per entry.
 
+void _fmpz_vec_randtest_unsigned(fmpz * f, fmpz_randstate_t state, 
+                                 long len, mp_bitcnt_t bits)
+
+    Sets the entries of a vector of the given length to random unsigned 
+    integers with up to the given number of bits per entry.
+
 *******************************************************************************
 
     Bit sizes
@@ -72,8 +78,9 @@ long _fmpz_vec_max_bits(const fmpz * vec, long len)
 
 ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
-    Return the maximum number of limbs needed to store any entry in 
-    \code{(vec, len)}.
+    Return the maximum number of limbs needed to store the absolute value 
+    of any entry in \code{(vec, len)}.  If all entries are zero, returns 
+    zero.
 
 *******************************************************************************
 
