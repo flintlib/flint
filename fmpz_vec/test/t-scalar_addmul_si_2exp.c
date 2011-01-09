@@ -30,6 +30,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -60,9 +61,7 @@ main(void)
         _fmpz_vec_randtest(b, state, len, 200);
         _fmpz_vec_set(c, b, len);
 
-        x = (long) n_randtest();
-        if (n_randint(2))
-            x = -x;
+        x = z_randtest();
         exp = n_randint(200);
 
         _fmpz_vec_scalar_addmul_si_2exp(b, a, len, x, exp);

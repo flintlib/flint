@@ -31,6 +31,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -48,9 +49,7 @@ main(void)
     {
         fmpz *a, *b;
         long len = n_randint(100);
-        long n = (long) n_randtest();
-        if (n_randint(2))
-            n = -n;
+        long n = z_randtest();
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -83,9 +82,7 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
-        n = (long) n_randtest();
-        if (n_randint(2))
-            n = -n;
+        n = z_randtest();
         fmpz_set_si(x, n);
 
         _fmpz_vec_scalar_mul_fmpz(b, a, len, x);

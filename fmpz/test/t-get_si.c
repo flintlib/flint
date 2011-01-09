@@ -28,8 +28,8 @@
 #include <limits.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -78,7 +78,7 @@ main(void)
         fmpz_t a;
         long b, c;
 
-        b = (long) n_randtest();
+        b = z_randtest();
 
         fmpz_init(a);
 

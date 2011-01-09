@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-Copyright (C) 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -28,6 +28,7 @@ Copyright (C) 2009 William Hart
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz_poly.h"
+#include "long_extras.h"
 #include "ulong_extras.h"
 
 int
@@ -52,7 +53,7 @@ main(void)
 
         for (j = 0; j < 1000; j++)
         {
-            n1 = (long) n_randtest();
+            n1 = z_randtest();
             coeff = n_randint(len);
             fmpz_poly_set_coeff_si(a, coeff, n1);
             n2 = fmpz_poly_get_coeff_si(a, coeff);

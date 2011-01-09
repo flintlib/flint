@@ -28,8 +28,8 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "long_extras.h"
 
 int
 main(void)
@@ -55,9 +55,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        n = (long) n_randtest_not_zero();
-        if (n == 0)
-            n = -123L;
+        n = z_randtest_not_zero();
         fmpz_mul_si(c, a, n);
 
         fmpz_get_mpz(e, c);
@@ -98,9 +96,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        n = (long) n_randtest_not_zero();
-        if (n == 0)
-            n = -123L;
+        n = z_randtest_not_zero();
         fmpz_mul_si(c, a, n);
 
         fmpz_get_mpz(d, c);
