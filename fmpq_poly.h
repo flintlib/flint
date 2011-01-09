@@ -393,6 +393,8 @@ int fmpq_poly_is_squarefree(const fmpq_poly_t poly);
 
 /*  Input and output *********************************************************/
 
+int fmpq_poly_debug(const fmpq_poly_t poly);
+
 int _fmpq_poly_fprint(FILE * file, 
                       const fmpz * poly, const fmpz_t den, long len);
 
