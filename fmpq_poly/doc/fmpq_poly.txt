@@ -93,6 +93,14 @@ void fmpq_poly_canonicalise(fmpq_poly_t poly)
     coprime and that the denominator is positive.  The canonical form of the 
     zero polynomial is a zero numerator polynomial and a one denominator.
 
+int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, long len)
+
+    Returns whether the polynomial is in canonical form.
+
+int fmpq_poly_is_canonical(const fmpq_poly_t poly)
+
+    Returns whether the polynomial is in canonical form.
+
 *******************************************************************************
 
     Polynomial parameters
