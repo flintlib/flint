@@ -43,6 +43,8 @@ typedef fmpz_mat_struct fmpz_mat_t[1];
 
 /* Memory management  ********************************************************/
 
+#define fmpz_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
 void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);

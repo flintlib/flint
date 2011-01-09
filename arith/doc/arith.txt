@@ -156,6 +156,55 @@ void fmpz_stirling2_mat(fmpz ** rows, long n)
     For any $n$, the $S_1$ and $S_2$ matrices thus obtained are 
     inverses of each other.
 
+
+void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
+
+    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$
+    using a generating function. This algorithm is fast for very
+    large $n$ (e.g. $n > 2000$).
+
+    Conceptually, the algorithm consists of calculating the scaled
+    Bernoulli numbers $c_k = B_k / k!$ using the generating function
+    $x/(e^x-1)$. The series for $(e^x-1)/x$ is expanded using a simple
+    recurrence relation. A single \code{fmpq_poly} inversion is
+    then performed, and the resulting coefficients are scaled back to
+    obtain the ordinary Bernoulli numbers.
+
+    In fact, we use a slightly different generating function corresponding
+    to the scaled coefficients $d_k = 2^{k/2} B_k / k!$ ($k$ even). This
+    series is split into four separate power series to improve performance.
+    The formula is given in \citep{BuhlerCrandallSompolski1992}.
+
+    %[1] J.P. Buhler, R.E. Crandall, R.W. Sompolski,
+    %    "Irregular Primes to One Million", Math. Comp. Vol 59,
+    %    No. 200 (Oct. 1992), pp. 717-722.
+
+void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
+
+    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$
+    using table lookup for the initial numbers with single-limb numerators,
+    and then using a recursive formula expressing $B_m$ as a sum over
+    $B_k$ for $k$ congruent to $m$ modulo 6.[1]
+
+    All operations are performed using integer arithmetic to avoid costly GCDs,
+    making this algorithm fast for small $n$ (e.g. $n < 1000$). The fully
+    reduced denominator is calculated immediately as the primorial of $n + 1$.
+
+    %[1] http://en.wikipedia.org/w/index.php?title=Bernoulli_number&oldid=405938876
+
+void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n)
+
+    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$ for $n \ge 0$
+    as a vector of integer numerators \code{num} with a common
+    denominator \code{den}. The denominator is reduced to lowest terms.
+
+void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
+
+    For $n \ge 0$, sets \code{poly} to the Bernoulli polynomial of degree $n$,
+    $B_n(x) = \sum_{k=0}^n {n \choose k} B_k x^{n-k}$ where $B_k$
+    is a Bernoulli number.
+
+
 *******************************************************************************
 
     Multiplicative functions

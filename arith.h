@@ -19,7 +19,7 @@
 ===============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010 Fredrik Johansson
+ Copyright (C) 2010-2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,6 +30,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpq_poly.h"
 
 typedef struct
 {
@@ -88,5 +89,11 @@ void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
 void fmpz_stirling1u_mat(fmpz ** rows, long n);
 void fmpz_stirling1_mat(fmpz ** rows, long n);
 void fmpz_stirling2_mat(fmpz ** rows, long n);
+
+void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n);
+void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n);
+void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n);
+
+void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
 
 #endif
