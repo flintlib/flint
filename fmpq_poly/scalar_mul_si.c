@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -52,10 +53,18 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     }
     else
     {
-        ulong gcd2 = fmpz_get_ui(gcd);  /* long might not be enough */
-        long c2 = c / (long) gcd2;
-        _fmpz_vec_scalar_mul_si(rpoly, poly, len, c2);
-        fmpz_fdiv_q_ui(rden, den, gcd2);
+        if (c > LONG_MIN || fmpz_cmp_ui(gcd, - (ulong) LONG_MIN))
+        {
+            long g = fmpz_get_si(gcd);
+
+            _fmpz_vec_scalar_mul_si(rpoly, poly, len, c / g);
+            fmpz_divexact_si(rden, den, g);
+        }
+        else
+        {
+            _fmpz_vec_neg(rpoly, poly, len);
+            fmpz_divexact_ui(rden, den, - (ulong) LONG_MIN);
+        }
     }
     fmpz_clear(gcd);
 }
