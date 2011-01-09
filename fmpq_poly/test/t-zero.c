@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
     
     printf("zero....");
@@ -53,12 +54,14 @@ main(void)
 
         fmpq_poly_zero(a);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

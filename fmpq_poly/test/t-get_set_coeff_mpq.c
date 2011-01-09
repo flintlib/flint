@@ -38,7 +38,9 @@ int
 main(void)
 {
     int i, j, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
+
     mpq_t n1, n2;
 
     printf("get/set_coeff_mpq....");
@@ -71,12 +73,17 @@ main(void)
             fmpq_poly_set_coeff_mpq(a, coeff, n1);
             fmpq_poly_get_coeff_mpq(n2, a, coeff);
 
-            result = (mpq_equal(n1, n2));
+            cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+            result = (mpq_equal(n1, n2) && !cflags);
             if (!result)
             {
-                gmp_printf
-                    ("FAIL: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
-                     n1, n2, coeff, len);
+                printf("FAIL:\n\n");
+                printf("a     = "), fmpq_poly_print(a), printf("\n\n");
+                printf("coeff = %ld\n\n", coeff);
+                printf("len   = %ld\n\n", len);
+                printf("cflags = %lu\n\n", cflags);
+                gmp_printf("n1 = %Qd\n\n", n1);
+                gmp_printf("n2 = %Qd\n\n", n2);
                 abort();
             }
         }

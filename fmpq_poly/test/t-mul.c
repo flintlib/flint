@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("mul....");
@@ -57,12 +58,15 @@ main(void)
         fmpq_poly_mul(a, b, c);
         fmpq_poly_mul(b, b, c);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -85,12 +89,15 @@ main(void)
         fmpq_poly_mul(a, b, c);
         fmpq_poly_mul(c, b, c);
 
-        result = (fmpq_poly_equal(a, c));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -120,12 +127,15 @@ main(void)
         fmpq_poly_add(c, c, d);
         fmpq_poly_mul(a2, b, c);
 
-        result = (fmpq_poly_equal(a1, a2));
+        cflags |= fmpq_poly_is_canonical(a1) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(a2) ? 0 : 2;
+        result = (fmpq_poly_equal(a1, a2) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a1), printf("\n\n");
             fmpq_poly_print(a2), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

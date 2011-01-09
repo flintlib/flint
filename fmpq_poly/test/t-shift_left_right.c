@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("shift_left/right....");
@@ -56,12 +57,15 @@ main(void)
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_left(a, a, shift);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n");
-            fmpq_poly_print(b), printf("\n");
+            printf("FAIL:\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -84,12 +88,15 @@ main(void)
         fmpq_poly_shift_right(b, a, shift);
         fmpq_poly_shift_right(a, a, shift);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n");
-            fmpq_poly_print(b), printf("\n");
+            printf("FAIL:\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -111,13 +118,16 @@ main(void)
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_right(c, b, shift);
 
-        result = (fmpq_poly_equal(c, a));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(c, a) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n");
-            fmpq_poly_print(b), printf("\n");
-            fmpq_poly_print(c), printf("\n");
+            printf("FAIL:\n\n");
+            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

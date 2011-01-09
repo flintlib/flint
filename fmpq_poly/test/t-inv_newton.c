@@ -37,6 +37,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("inv_newton....");
@@ -59,12 +60,15 @@ main(void)
         fmpq_poly_inv_newton(b, a, n);
         fmpq_poly_inv_newton(a, a, n);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -95,13 +99,16 @@ main(void)
         fmpq_poly_mul(c, a, b);
         fmpq_poly_truncate(c, n);
 
-        result = (fmpq_poly_equal(c, one));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(c, one) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("b = "), fmpq_poly_print(b), printf("\n\n");
             printf("c = "), fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

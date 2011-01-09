@@ -37,6 +37,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("scalar_div_fmpz....");
@@ -60,12 +61,15 @@ main(void)
         fmpq_poly_scalar_div_fmpz(b, a, n);
         fmpq_poly_scalar_div_fmpz(a, a, n);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL (aliasing):\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             fmpz_print(n);
             abort();
         }
@@ -94,7 +98,9 @@ main(void)
         fmpq_poly_scalar_div_fmpz(b, a, n1);
         fmpq_poly_scalar_div_si(c, a, n);
 
-        result = (fmpq_poly_equal(b, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
             printf("FAIL (comparison with _si):\n");
@@ -102,6 +108,7 @@ main(void)
             fmpz_print(n1), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -134,7 +141,9 @@ main(void)
         fmpq_poly_scalar_div_fmpz(lhs, lhs, n2);
         fmpq_poly_scalar_div_fmpz(rhs, a, n);
 
-        result = (fmpq_poly_equal(lhs, rhs));
+        cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
+        result = (fmpq_poly_equal(lhs, rhs) && !cflags);
         if (!result)
         {
             printf("FAIL (a / n1 / n2):\n");
@@ -144,6 +153,7 @@ main(void)
             fmpz_print(n), printf("\n\n");
             fmpq_poly_print(lhs), printf("\n\n");
             fmpq_poly_print(rhs), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -178,7 +188,9 @@ main(void)
         fmpq_poly_add(lhs, a, b);
         fmpq_poly_scalar_div_fmpz(lhs, lhs, n);
 
-        result = (fmpq_poly_equal(lhs, rhs));
+        cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
+        result = (fmpq_poly_equal(lhs, rhs) && !cflags);
         if (!result)
         {
             printf("FAIL ((a + b) / n):\n");
@@ -187,6 +199,7 @@ main(void)
             fmpz_print(n), printf("\n\n");
             fmpq_poly_print(lhs), printf("\n\n");
             fmpq_poly_print(rhs), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

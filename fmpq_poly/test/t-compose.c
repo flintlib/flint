@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("compose....");
@@ -57,12 +58,15 @@ main(void)
         fmpq_poly_compose(f, g, h);
         fmpq_poly_compose(g, g, h);
 
-        result = (fmpq_poly_equal(f, g));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
+        result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
             printf("FAIL (aliasing 1):\n");
             fmpq_poly_print(f), printf("\n\n");
             fmpq_poly_print(g), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -85,12 +89,15 @@ main(void)
         fmpq_poly_compose(f, g, h);
         fmpq_poly_compose(h, g, h);
 
-        result = (fmpq_poly_equal(f, h));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(h) ? 0 : 2;
+        result = (fmpq_poly_equal(f, h) && !cflags);
         if (!result)
         {
             printf("FAIL (aliasing 2):\n");
             fmpq_poly_print(f), printf("\n\n");
             fmpq_poly_print(h), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

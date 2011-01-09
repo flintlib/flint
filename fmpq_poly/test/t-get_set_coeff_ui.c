@@ -35,17 +35,18 @@ int
 main(void)
 {
     int i, j, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
-    ulong n1;
-    mpq_t n1mpq, n2mpq;
+
+    ulong n;
+    mpq_t n_mpq;
 
     printf("get/set_coeff_ui....");
     fflush(stdout);
     
     fmpz_randinit(state);
 
-    mpq_init(n1mpq);
-    mpq_init(n2mpq);
+    mpq_init(n_mpq);
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a;
@@ -57,28 +58,31 @@ main(void)
 
         for (j = 0; j < 1000; j++)
         {
-            n1 = n_randtest();
-            mpz_set_ui(mpq_numref(n1mpq), n1);
-            mpz_set_si(mpq_denref(n1mpq), 1);
-            coeff = (long) n_randint(len);
-            fmpq_poly_set_coeff_ui(a, coeff, n1);
-            fmpq_poly_get_coeff_mpq(n2mpq, a, coeff);
+            n = n_randtest();
+            coeff = n_randint(len);
+            fmpq_poly_set_coeff_ui(a, coeff, n);
+            fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
-            result = (mpq_equal(n1mpq, n2mpq));
+            cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+            result = (mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
+                   && mpz_cmp_ui(mpq_numref(n_mpq), n) == 0
+                   && !cflags);
             if (!result)
             {
-                gmp_printf
-                    ("FAIL: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
-                     n1mpq, n2mpq, coeff, len);
+                printf("FAIL:\n");
+                printf("a      = "), fmpq_poly_print(a), printf("\n");
+                printf("len    = %ld\n", len);
+                printf("coeff  = %ld\n", coeff);
+                printf("cflags = %lu\n", cflags);
+                printf("n      = %lu\n", n);
+                gmp_printf("n_mpq  = %Qd\n", n_mpq);
                 abort();
             }
         }
 
         fmpq_poly_clear(a);
     }
-
-    mpq_clear(n1mpq);
-    mpq_clear(n2mpq);
+    mpq_clear(n_mpq);
     
     fmpz_randclear(state);
     _fmpz_cleanup();

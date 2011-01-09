@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("set_array_mpq....");
@@ -61,12 +62,14 @@ main(void)
 
         fmpq_poly_set_array_mpq(g, (const mpq_t *) a, n);
 
-        result = (fmpq_poly_equal(f, g));
+        cflags |= fmpq_poly_is_canonical(g) ? 0 : 1;
+        result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("f = "), fmpq_poly_print(f), printf("\n\n");
             printf("g = "), fmpq_poly_print(g), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

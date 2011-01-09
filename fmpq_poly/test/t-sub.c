@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("sub....");
@@ -59,14 +60,17 @@ main(void)
         fmpq_poly_neg(b, b);
         fmpq_poly_add(d, a, b);
 
-        result = (fmpq_poly_equal(d, d));
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(d) ? 0 : 2;
+        result = (fmpq_poly_equal(c, d) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL:\n\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
             fmpq_poly_print(d), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -90,13 +94,16 @@ main(void)
         fmpq_poly_sub(c, a, b);
         fmpq_poly_sub(a, a, b);
 
-        result = (fmpq_poly_equal(a, c));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL:\n\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -119,13 +126,16 @@ main(void)
         fmpq_poly_sub(c, a, b);
         fmpq_poly_sub(b, a, b);
 
-        result = (fmpq_poly_equal(b, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL:\n\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

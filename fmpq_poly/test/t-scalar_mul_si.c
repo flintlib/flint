@@ -37,6 +37,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("scalar_mul_si....");
@@ -57,12 +58,15 @@ main(void)
         fmpq_poly_scalar_mul_si(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -83,12 +87,15 @@ main(void)
         fmpq_poly_scalar_mul_ui(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -120,7 +127,9 @@ main(void)
         fmpq_poly_scalar_mul_si(c, b, n2);
         fmpq_poly_scalar_mul_si(b, a, n1 * n2);
 
-        result = (fmpq_poly_equal(b, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
@@ -128,6 +137,7 @@ main(void)
             fmpq_poly_print(a), printf("\n\n");
             fmpq_poly_print(b), printf("\n\n");
             fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

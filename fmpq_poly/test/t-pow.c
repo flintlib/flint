@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("pow....");
@@ -58,13 +59,16 @@ main(void)
         fmpq_poly_pow(a, b, exp);
         fmpq_poly_pow(b, b, exp);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("exp = %lu\n", exp);
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -100,13 +104,15 @@ main(void)
                 fmpq_poly_mul(c, c, b);
         }
 
-        result = (fmpq_poly_equal(a, c));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("exp = %lu\n", exp);
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("c = "), fmpq_poly_print(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

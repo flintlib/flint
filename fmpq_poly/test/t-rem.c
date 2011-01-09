@@ -36,6 +36,7 @@ int
 main(void)
 {
     int i, result;
+    ulong cflags = 0UL;
     fmpz_randstate_t state;
 
     printf("rem....");
@@ -57,13 +58,16 @@ main(void)
         fmpq_poly_rem(r, a, b);
         fmpq_poly_rem(a, a, b);
 
-        result = (fmpq_poly_equal(r, a));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(r) ? 0 : 2;
+        result = (fmpq_poly_equal(r, a) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("r = "), fmpq_poly_print(r), printf("\n\n");
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -86,13 +90,16 @@ main(void)
         fmpq_poly_rem(r, a, b);
         fmpq_poly_rem(b, a, b);
 
-        result = (fmpq_poly_equal(r, b));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(r) ? 0 : 2;
+        result = (fmpq_poly_equal(r, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("r = "), fmpq_poly_print(r), printf("\n\n");
             printf("a = "), fmpq_poly_print(a), printf("\n\n");
             printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -117,7 +124,9 @@ main(void)
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_rem(r2, a, b);
 
-        result = fmpq_poly_equal(r, r2);
+        cflags |= fmpq_poly_is_canonical(q)  ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(r2) ? 0 : 2;
+        result = (fmpq_poly_equal(r, r2) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
@@ -126,6 +135,7 @@ main(void)
             printf("q  = "), fmpq_poly_print(q), printf("\n\n");
             printf("r  = "), fmpq_poly_print(r), printf("\n\n");
             printf("r2 = "), fmpq_poly_print(r2), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
