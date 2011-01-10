@@ -47,7 +47,7 @@ void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden,
             fmpz_gcd(gcd1, gcd1, r);
     }
     if (*den != 1L && *s != 1L)
-        fmpz_gcd(gcd2, gcd2, den);
+        fmpz_gcd(gcd2, s, den);
     
     if (*gcd1 == 1L)
     {
