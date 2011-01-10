@@ -67,8 +67,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             fmpz_print(n);
             abort();
@@ -104,10 +104,10 @@ main(void)
         if (!result)
         {
             printf("FAIL (comparison with _si):\n");
-            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
             fmpz_print(n1), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            fmpq_poly_debug(c), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -147,12 +147,12 @@ main(void)
         if (!result)
         {
             printf("FAIL (a / n1 / n2):\n");
-            fmpq_poly_print(a), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
             fmpz_print(n1), printf("\n\n");
             fmpz_print(n2), printf("\n\n");
             fmpz_print(n), printf("\n\n");
-            fmpq_poly_print(lhs), printf("\n\n");
-            fmpq_poly_print(rhs), printf("\n\n");
+            fmpq_poly_debug(lhs), printf("\n\n");
+            fmpq_poly_debug(rhs), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -194,11 +194,11 @@ main(void)
         if (!result)
         {
             printf("FAIL ((a + b) / n):\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             fmpz_print(n), printf("\n\n");
-            fmpq_poly_print(lhs), printf("\n\n");
-            fmpq_poly_print(rhs), printf("\n\n");
+            fmpq_poly_debug(lhs), printf("\n\n");
+            fmpq_poly_debug(rhs), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }

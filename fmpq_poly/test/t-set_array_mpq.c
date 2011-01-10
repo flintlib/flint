@@ -67,8 +67,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("f = "), fmpq_poly_print(f), printf("\n\n");
-            printf("g = "), fmpq_poly_print(g), printf("\n\n");
+            printf("f = "), fmpq_poly_debug(f), printf("\n\n");
+            printf("g = "), fmpq_poly_debug(g), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }

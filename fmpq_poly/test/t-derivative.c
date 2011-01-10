@@ -62,8 +62,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -88,8 +88,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -126,8 +126,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }

@@ -67,9 +67,9 @@ main(void)
         if (!result)
         {
             printf("FAIL (alias q and a):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -102,9 +102,9 @@ main(void)
         if (!result)
         {
             printf("FAIL (alias q and b):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -141,10 +141,10 @@ main(void)
         if (!result)
         {
             printf("FAIL (check Q * B = A):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("p = "), fmpq_poly_print(p), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("p = "), fmpq_poly_debug(p), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }

@@ -58,9 +58,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n");
             printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
             printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
             printf("equal(a, b) = %d\n", result);
             abort();
@@ -99,9 +99,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n");
             printf("alloc = %ld\nlength = %ld\n\n", a->alloc, a->length);
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
             printf("alloc = %ld\nlength = %ld\n\n", b->alloc, b->length);
             printf("!equal(a, b) = %d\n", result);
             abort();

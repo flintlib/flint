@@ -55,7 +55,7 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_debug(f), printf("\n");
             abort();
         }
 
@@ -82,9 +82,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
-            fmpq_poly_print(g), printf("\n");
-            fmpq_poly_print(h), printf("\n");
+            fmpq_poly_debug(f), printf("\n");
+            fmpq_poly_debug(g), printf("\n");
+            fmpq_poly_debug(h), printf("\n");
             abort();
         }
 
@@ -109,8 +109,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
-            fmpq_poly_print(g), printf("\n");
+            fmpq_poly_debug(f), printf("\n");
+            fmpq_poly_debug(g), printf("\n");
             printf("cmp(f,g) = %d\n", fmpq_poly_cmp(f, g));
             abort();
         }

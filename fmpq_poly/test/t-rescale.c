@@ -74,8 +74,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            fmpq_poly_debug(g), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
@@ -118,8 +118,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (composition of a and 1/a):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            fmpq_poly_debug(g), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }

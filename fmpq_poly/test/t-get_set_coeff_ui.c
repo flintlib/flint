@@ -70,7 +70,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL:\n");
-                printf("a      = "), fmpq_poly_print(a), printf("\n");
+                printf("a      = "), fmpq_poly_debug(a), printf("\n");
                 printf("len    = %ld\n", len);
                 printf("coeff  = %ld\n", coeff);
                 printf("cflags = %lu\n", cflags);

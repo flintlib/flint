@@ -78,7 +78,7 @@ main(void)
             if (!result)
             {
                 printf("FAIL:\n\n");
-                printf("a     = "), fmpq_poly_print(a), printf("\n\n");
+                printf("a     = "), fmpq_poly_debug(a), printf("\n\n");
                 printf("coeff = %ld\n\n", coeff);
                 printf("len   = %ld\n\n", len);
                 printf("cflags = %lu\n\n", cflags);

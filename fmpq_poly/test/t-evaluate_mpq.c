@@ -71,7 +71,7 @@ main(void)
             printf("FAIL:\n");
             fmpz_print(a), printf("\n\n");
             fmpz_print(b), printf("\n\n");
-            fmpq_poly_print(f), printf("\n\n");
+            fmpq_poly_debug(f), printf("\n\n");
             abort();
         }
 
