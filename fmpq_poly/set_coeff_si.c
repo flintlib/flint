@@ -41,7 +41,6 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1);
-        mpn_zero((mp_ptr) (poly->coeffs + len), n - len);
         poly->length = n + 1;
     }
     
