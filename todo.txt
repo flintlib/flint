@@ -33,6 +33,17 @@ fmpz
 * [maybe] figure out how to write robust test code for fmpz_read (which reads
   from stdin), perhaps using a pipe
 
+* Inline or create inline versions of core fmpz functions.
+
+* Inline _fmpz_demote_val and try to cover the cases size == -1, 0, 1
+  with a single or at most two branches.
+
+* Inline mpz_get/set_ui in core fmpz functions.
+
+* [maybe] Avoid the double allocation of both an mpz struct and limb data,
+  having an fmpz point directly to a combined structure. This would require
+  writing replacements for most mpz functions.
+
 
 ulong_extras
 ------------
