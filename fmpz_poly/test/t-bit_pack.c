@@ -35,19 +35,19 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 20000; i++)
     {
         fmpz_poly_t a, b;
 
-        long length = n_randint(100) + 1;
-        mp_bitcnt_t bits = n_randint(300) + 2;
+        long length = n_randint(100, state) + 1;
+        mp_bitcnt_t bits = n_randint(300, state) + 2;
         mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
         int negate;
@@ -85,8 +85,8 @@ main(void)
     {
         fmpz_poly_t a, b;
 
-        long length = n_randint(100) + 1;
-        mp_bitcnt_t bits = n_randint(300) + 1;
+        long length = n_randint(100, state) + 1;
+        mp_bitcnt_t bits = n_randint(300, state) + 1;
         mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
 
@@ -116,7 +116,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

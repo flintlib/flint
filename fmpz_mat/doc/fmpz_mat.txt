@@ -45,28 +45,20 @@ void fmpz_mat_clear(fmpz_mat_t mat)
 
 *******************************************************************************
 
-void fmpz_mat_randinit(fmpz_randstate_t state)
-
-    Initialises the \code{fmpz_mat} randstate.
-
-void fmpz_mat_randclear(fmpz_randstate_t state)
-
-    Clears the \code{fmpz_mat} randstate.
-
-void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, 
                                                               mp_bitcnt_t bits)
 
     Sets the entries of \code{mat} to random signed integers whose absolute 
     values have the given number of binary bits.
 
-void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, 
                                                               mp_bitcnt_t bits)
 
     Sets the entries of \code{mat} to random signed integers whose 
     absolute values have a random number of bits up to the given number 
     of bits inclusive.
 
-void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, 
                                                               mp_bitcnt_t bits)
 
     Sets \code{mat} to be a random \emph{integer relations} matrix, with 
@@ -77,7 +69,7 @@ void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state,
     in the left hand column and an identity matrix in the remaining square 
     submatrix.
 
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, 
                                            mp_bitcnt_t bits, mp_bitcnt_t bits2)
 
     Sets \code{mat} to a random \emph{simultaneous diophantine} matrix.
@@ -88,7 +80,7 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state,
     Running down the rest of the diagonal are the values \code{2^bits} with 
     all remaining entries zero.
   
-void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, 
                                                      mp_bitcnt_t bits, ulong q)
 
     Sets a square matrix \emph{mat} of even dimension to a random 
@@ -102,7 +94,7 @@ void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state,
     number of bits. Then entry $(i, j)$ of the submatrix is set to 
     $h[i + j \bmod{r/2}]$. 
 
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, 
+void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, 
                                                      mp_bitcnt_t bits, ulong q)
 
     Sets a square matrix mat of even dimension to a random 
@@ -116,7 +108,7 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state,
     number of bits. Then entry $(i, j)$ of the submatrix is set to 
     $h[i + j \bmod{r/2}]$.
 
-void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
+void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
     Sets a square matrix mat to a random \emph{ajtai} matrix. The diagonal 
     entries $(i, i)$ are set to a random entry in the range $[1, 2^{b-1}]$ 
@@ -125,7 +117,7 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
     random entry in the range $(-2^b + 1, 2^b - 1)$ whilst the entries to 
     the right of the diagonal in row $i$ are set to zero. 
 
-int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, 
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, 
                                                      const fmpz * diag, long n)
 
     Sets \emph{mat} to a random permutation of the rows and columns of a
@@ -135,7 +127,7 @@ int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state,
     The return value is $0$ or $1$ depending on whether the permutation is
     even or odd.
 
-void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, 
+void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank, 
                                                               mp_bitcnt_t bits)
 
     Sets \emph{mat} to a random sparse matrix with the given rank, 
@@ -145,7 +137,7 @@ void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank,
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{fmpz_mat_randops}.
 
-void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det)
+void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
     Sets \code{mat} to a random sparse matrix with minimal number of
     nonzero entries such that its determinant has the given value.
@@ -157,7 +149,7 @@ void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det)
     The matrix can be transformed into a dense matrix with unchanged
     determinant by subsequently calling \code{fmpz_mat_randops}.
 
-void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
+void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
 
     Randomises \code{mat} by performing elementary row or column operations.
     More precisely, at most \code{count} random additions or subtractions of

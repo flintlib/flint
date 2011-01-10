@@ -35,7 +35,7 @@ int
 main(void)
 {
     long m, n, rep;
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
 
     printf("transpose....");
     fflush(stdout);

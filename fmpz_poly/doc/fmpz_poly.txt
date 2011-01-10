@@ -216,39 +216,27 @@ void fmpz_poly_truncate(fmpz_poly_t poly, long newlen)
 
 *******************************************************************************
 
-void fmpz_poly_randinit(fmpz_randstate_t state)
-
-    Initialises the random state for random polynomial generation. 
-    One should not call this function if \code{fmpz_randinit} has 
-    already been called. 
-
-void fmpz_poly_randclear(fmpz_randstate_t state)
-
-    Clears the random state initialised with \code{fmpz_poly_randinit}. One 
-    should not call this function if \code{fmpz_randclear} has already been 
-    called.
-
-void fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
+void fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
                                                 long len, mp_bitcnt_t bits)
 
     Sets $f$ to a random polynomial with up to the given length and where 
     each coefficient has up to the given number of bits. The coefficients 
-    are signed randomly. One must call \code{fmpz_poly_randinit} before 
+    are signed randomly. One must call \code{flint_randinit} before 
     calling this function.
 
-void fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
+void fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
                                                 long len, mp_bitcnt_t bits)
 
     Sets $f$ to a random polynomial with up to the given length and where
     each coefficient has up to the given number of bits. One must call 
-    \code{fmpz_poly_randinit} before calling this function.
+    \code{flint_randinit} before calling this function.
 
-void fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state, 
+void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, 
                                                 long len, mp_bitcnt_t bits)
 
     As for \code{fmpz_poly_randtest} except that \code{len} and bits may 
     not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call \code{fmpz_poly_randinit} before 
+    zero polynomial.  One must call \code{flint_randinit} before 
     calling this function.
 
 *******************************************************************************

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_submul_fmpz....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -53,8 +53,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_randtest(x, state, n_randint(100));
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_randtest(x, state, n_randint(100, state));
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
         fmpz_poly_set(b, a);
         fmpz_poly_set(c, a);
 
@@ -88,9 +88,9 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_randtest(x, state, n_randint(100));
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
-        fmpz_poly_randtest(b, state, n_randint(100), 200);
+        fmpz_randtest(x, state, n_randint(100, state));
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(b, state, n_randint(100, state), 200);
 
         fmpz_poly_scalar_mul_fmpz(c, a, x);
         fmpz_poly_sub(c, b, c);
@@ -114,7 +114,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

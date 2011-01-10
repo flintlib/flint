@@ -36,20 +36,20 @@ int
 main(void)
 {
     int i, j, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("signature....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 500; i++)
     {
         fmpz_poly_t poly, linear, quadratic, rem;
         fmpz_t lhs, rhs;
         long nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
-        long len = n_randint(20) + 1;
-        mp_bitcnt_t bits = n_randint(50) + 1;
+        long len = n_randint(20, state) + 1;
+        mp_bitcnt_t bits = n_randint(50, state) + 1;
         
         fmpz_poly_init2(poly, len);
         fmpz_poly_init2(linear, 2);
@@ -60,7 +60,7 @@ main(void)
         fmpz_init(lhs);
         fmpz_init(rhs);
 
-        ncomplex_max = n_randint(len) / 2;
+        ncomplex_max = n_randint(len, state) / 2;
         nreal_max = len - 2 * ncomplex_max;
         ncomplex = 0;
         nreal = 0;
@@ -150,7 +150,7 @@ main(void)
         fmpz_poly_clear(poly);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

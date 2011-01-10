@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("pow_binexp....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -51,9 +51,9 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(10), 100);
+        fmpz_poly_randtest(b, state, n_randint(10, state), 100);
 
-        exp = n_randtest() % 20UL;
+        exp = n_randtest(state) % 20UL;
 
         fmpz_poly_pow_binexp(a, b, exp);
         fmpz_poly_pow_binexp(b, b, exp);
@@ -80,9 +80,9 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(10), 100);
+        fmpz_poly_randtest(b, state, n_randint(10, state), 100);
 
-        exp = n_randtest() % 20UL;
+        exp = n_randtest(state) % 20UL;
 
         fmpz_poly_pow_binexp(a, b, exp);
         fmpz_poly_pow(b, b, exp);
@@ -101,7 +101,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

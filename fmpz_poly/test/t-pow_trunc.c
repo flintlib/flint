@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("pow_trunc....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -50,12 +50,12 @@ main(void)
         long n;
         ulong exp;
 
-        n   = n_randtest() % 10;
-        exp = n_randtest() % 100;
+        n   = n_randtest(state) % 10;
+        exp = n_randtest(state) % 100;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(100), n);
+        fmpz_poly_randtest(b, state, n_randint(100, state), n);
 
         fmpz_poly_pow_trunc(a, b, exp, n);
         fmpz_poly_pow_trunc(b, b, exp, n);
@@ -82,13 +82,13 @@ main(void)
         long n;
         ulong exp;
 
-        n   = n_randtest() % 10;
-        exp = n_randtest() % 50;
+        n   = n_randtest(state) % 10;
+        exp = n_randtest(state) % 50;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), n);
+        fmpz_poly_randtest(b, state, n_randint(50, state), n);
 
         fmpz_poly_pow(a, b, exp);
         fmpz_poly_truncate(a, n);
@@ -111,7 +111,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

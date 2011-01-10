@@ -55,36 +55,35 @@ void fmpz_clear(fmpz_t f)
     Random generation
 
     For thread-safety, the randomisation methods take as one of their 
-    parameters an object of type \code{fmpz_randstate_t}.  Before calling 
-    any of the randomisation functions requesting random numbers with more 
-    than \code{FLINT_BITS - 2} bits, such an object first has to be 
-    initialised with a call to \code{fmpz_randinit()}.  When one is 
+    parameters an object of type \code{flint_rand_t}.  Before calling 
+    any of the randomisation functions such an object first has to be 
+    initialised with a call to \code{flint_randinit()}.  When one is 
     finished generating random numbers, one should call 
-    \code{fmpz_randclear()} to clean up.
+    \code{flint_randclear()} to clean up.
 
 *******************************************************************************
 
-void fmpz_randbits(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has the given
     number of bits.
 
-void fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     Generates a random signed integer whose absolute value has a number
     of bits which is random from $0$ up to \code{bits} inclusive.
 
-void fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     Generates a random unsigned integer whose value has a number
     of bits which is random from $0$ up to \code{bits} inclusive.
 
-void fmpz_randtest_not_zero(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     As per \code{fmpz_randtest}, but the result will not be $0$. 
     If \code{bits} is set to $0$, an exception will result.
 
-void fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m)
+void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
 
     Generates a random integer in the range $0$ to $m - 1$ inclusive.
 

@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, j, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("get/set_coeff_si....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
@@ -49,12 +49,12 @@ main(void)
         long n1, n2;
 
         fmpz_poly_init(a);
-        len = n_randint(100) + 1;
+        len = n_randint(100, state) + 1;
 
         for (j = 0; j < 1000; j++)
         {
             n1 = z_randtest();
-            coeff = n_randint(len);
+            coeff = n_randint(len, state);
             fmpz_poly_set_coeff_si(a, coeff, n1);
             n2 = fmpz_poly_get_coeff_si(a, coeff);
 
@@ -70,7 +70,7 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

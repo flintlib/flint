@@ -31,7 +31,7 @@
 
 
 void
-fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank,
+fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank,
                   mp_bitcnt_t bits)
 {
     long i;

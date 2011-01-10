@@ -34,7 +34,7 @@
   Standard Fisher-Yates shuffle to randomise an array; returns whether
   the permutation is even (0) or odd (1)
 */
-static int shuffle(long * array, long n, fmpz_randstate_t state)
+static int shuffle(long * array, long n, flint_rand_t state)
 {
     long i, j, tmp;
     int parity;
@@ -52,7 +52,7 @@ static int shuffle(long * array, long n, fmpz_randstate_t state)
 }
 
 int
-fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state,
+fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
                       const fmpz * diag, long n)
 {
     int parity;

@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A, x, b, Ax;
     fmpz_t den;
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
     long i, m, r;
 
     printf("solve....");

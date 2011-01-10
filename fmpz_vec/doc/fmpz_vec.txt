@@ -44,21 +44,13 @@ void _fmpz_vec_clear(fmpz * vec, long len)
 
 *******************************************************************************
 
-void _fmpz_vec_randinit(fmpz_randstate_t state)
-
-    Initialises the random state for \code{fmpz_vec} random functions.
-
-void _fmpz_vec_randclear(fmpz_randstate_t state)
-
-    Clears the random state for \code{fmpz_vec} random functions.
-
-void _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state, 
+void _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
                         long len, mp_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random integers with 
     up to the given number of bits per entry.
 
-void _fmpz_vec_randtest_unsigned(fmpz * f, fmpz_randstate_t state, 
+void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
                                  long len, mp_bitcnt_t bits)
 
     Sets the entries of a vector of the given length to random unsigned 

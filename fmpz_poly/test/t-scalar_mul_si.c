@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_mul_si....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -51,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpz_poly_scalar_mul_si(b, a, n);
         fmpz_poly_scalar_mul_si(a, a, n);
@@ -73,11 +73,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
-        ulong n = n_randbits(FLINT_BITS - 1);
+        ulong n = n_randbits(FLINT_BITS - 1, state);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpz_poly_scalar_mul_ui(b, a, n);
         fmpz_poly_scalar_mul_si(a, a, n);
@@ -99,17 +99,17 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b, c;
-        long n1 = (long) n_randbits((FLINT_BITS - 2) / 2);
-        long n2 = (long) n_randbits((FLINT_BITS - 2) / 2);
-        if (n_randint(2))
+        long n1 = (long) n_randbits((FLINT_BITS - 2) / 2, state);
+        long n2 = (long) n_randbits((FLINT_BITS - 2) / 2, state);
+        if (n_randint(2, state))
             n1 = -n1;
-        if (n_randint(2))
+        if (n_randint(2, state))
             n2 = -n2;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpz_poly_scalar_mul_si(b, a, n1);
         fmpz_poly_scalar_mul_si(c, b, n2);
@@ -130,7 +130,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

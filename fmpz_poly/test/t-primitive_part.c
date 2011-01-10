@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("primitive_part....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(g, state, n_randint(100), 200);
+        fmpz_poly_randtest(g, state, n_randint(100, state), 200);
 
         fmpz_poly_primitive_part(f, g);
         fmpz_poly_primitive_part(g, g);
@@ -77,7 +77,7 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_init(c);
-        fmpz_poly_randtest_not_zero(f, state, n_randint(100) + 1, 200);
+        fmpz_poly_randtest_not_zero(f, state, n_randint(100, state) + 1, 200);
 
         fmpz_poly_content(c, f);
         if (fmpz_sgn(f->coeffs + f->length - 1) < 0)
@@ -99,7 +99,7 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

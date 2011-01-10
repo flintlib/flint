@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("gcd_subresultant....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 500; i++)
@@ -51,8 +51,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(40), 80);
-        fmpz_poly_randtest(c, state, n_randint(40), 80);
+        fmpz_poly_randtest(b, state, n_randint(40, state), 80);
+        fmpz_poly_randtest(c, state, n_randint(40, state), 80);
 
         fmpz_poly_gcd_subresultant(a, b, c);
         fmpz_poly_gcd_subresultant(b, b, c);
@@ -79,8 +79,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(40), 80);
-        fmpz_poly_randtest(c, state, n_randint(40), 80);
+        fmpz_poly_randtest(b, state, n_randint(40, state), 80);
+        fmpz_poly_randtest(c, state, n_randint(40, state), 80);
 
         fmpz_poly_gcd_subresultant(a, b, c);
         fmpz_poly_gcd_subresultant(c, b, c);
@@ -110,9 +110,9 @@ main(void)
         fmpz_poly_init(g);
         fmpz_poly_init(q);
         fmpz_poly_init(r);
-        fmpz_poly_randtest_not_zero(a, state, n_randint(24) + 1, 24);
-        fmpz_poly_randtest(f, state, n_randint(40), 80);
-        fmpz_poly_randtest(g, state, n_randint(40), 80);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(24, state) + 1, 24);
+        fmpz_poly_randtest(f, state, n_randint(40, state), 80);
+        fmpz_poly_randtest(g, state, n_randint(40, state), 80);
 
         fmpz_poly_mul(f, a, f);
         fmpz_poly_mul(g, a, g);
@@ -138,7 +138,7 @@ main(void)
         fmpz_poly_clear(r);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

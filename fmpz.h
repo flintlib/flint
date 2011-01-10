@@ -103,10 +103,6 @@ void fmpz_clear(fmpz_t f)
 	_fmpz_demote(f);
 }
 
-void fmpz_randinit(flint_rand_t state);
-
-void fmpz_randclear(flint_rand_t state);
-
 void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m);

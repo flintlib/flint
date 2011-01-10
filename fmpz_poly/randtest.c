@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state, 
+fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
                    long len, mp_bitcnt_t bits)
 {
     long i;
@@ -45,7 +45,7 @@ fmpz_poly_randtest(fmpz_poly_t f, fmpz_randstate_t state,
 }
 
 void
-fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state, 
+fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
                             long len, mp_bitcnt_t bits)
 {
     long i;
@@ -59,7 +59,7 @@ fmpz_poly_randtest_unsigned(fmpz_poly_t f, fmpz_randstate_t state,
 }
 
 void
-fmpz_poly_randtest_not_zero(fmpz_poly_t f, fmpz_randstate_t state, 
+fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, 
                             long len, mp_bitcnt_t bits)
 {
     if ((bits == 0) || (len == 0))

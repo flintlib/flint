@@ -73,19 +73,17 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
 /* Random matrix generation  *************************************************/
 
-void fmpz_mat_randinit(fmpz_randstate_t state);
-void fmpz_mat_randclear(fmpz_randstate_t state);
-void fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
-void fmpz_mat_randtest(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
-void fmpz_mat_randintrel(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits);
-void fmpz_mat_randsimdioph(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2);
-void fmpz_mat_randntrulike(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q);
-void fmpz_mat_randntrulike2(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits, ulong q);
-void fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha);
-void fmpz_mat_randrank(fmpz_mat_t mat, fmpz_randstate_t state, long rank, mp_bitcnt_t bits);
-void fmpz_mat_randdet(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz_t det);
-void fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count);
-int fmpz_mat_randpermdiag(fmpz_mat_t mat, fmpz_randstate_t state, const fmpz * diag, long n);
+void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2);
+void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
+void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
+void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha);
+void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank, mp_bitcnt_t bits);
+void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
+void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count);
+int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, long n);
 
 long fmpz_mat_max_bits(const fmpz_mat_t mat);
 

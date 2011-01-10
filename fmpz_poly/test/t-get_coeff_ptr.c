@@ -34,21 +34,21 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("get_coeff_ptr....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t A;
         fmpz_t a;
-        long n = n_randint(100);
+        long n = n_randint(100, state);
 
         fmpz_poly_init(A);
-        fmpz_poly_randtest(A, state, n_randint(100), 100);
+        fmpz_poly_randtest(A, state, n_randint(100, state), 100);
         fmpz_init(a);
 
         fmpz_poly_get_coeff_fmpz(a, A, n);
@@ -69,7 +69,7 @@ main(void)
         fmpz_clear(a);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

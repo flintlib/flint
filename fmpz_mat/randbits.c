@@ -30,7 +30,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randbits(fmpz_mat_t mat, fmpz_randstate_t state, mp_bitcnt_t bits)
+fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
     long r, c, i, j;
 

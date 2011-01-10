@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("set_ui_equal....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* equal polynomials */
     for (i = 0; i < 10000; i++)
@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        n = n_randtest();
+        n = n_randtest(state);
 
         fmpz_poly_set_ui(a, n);
         fmpz_poly_set(b, a);
@@ -77,10 +77,10 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
 
-        m = n_randtest();
-        n = n_randtest();
+        m = n_randtest(state);
+        n = n_randtest(state);
         while (m == n)
-            n = n_randtest();
+            n = n_randtest(state);
         fmpz_poly_set_ui(a, m);
         fmpz_poly_set_ui(b, n);
 
@@ -99,7 +99,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

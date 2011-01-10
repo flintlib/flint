@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("lead....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -47,7 +47,7 @@ main(void)
         fmpz_t a;
 
         fmpz_poly_init(A);
-        fmpz_poly_randtest(A, state, n_randint(100), 100);
+        fmpz_poly_randtest(A, state, n_randint(100, state), 100);
         fmpz_init(a);
 
         if (fmpz_poly_length(A))
@@ -67,7 +67,7 @@ main(void)
         fmpz_clear(a);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

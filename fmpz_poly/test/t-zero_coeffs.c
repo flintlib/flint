@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("zero_coeffs....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check that zeroing [0,len/2) and [len/2,len) sets a to zero */
     for (i = 0; i < 10000; i++)
@@ -50,7 +50,7 @@ main(void)
         long len;
 
         fmpz_poly_init(a);
-        fmpz_poly_randtest(a, state, n_randint(100), 200);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
         len = a->length;
 
         fmpz_poly_zero_coeffs(a, -23, len/2);
@@ -67,7 +67,7 @@ main(void)
         fmpz_poly_clear(a);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

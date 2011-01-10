@@ -35,25 +35,25 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("div_series....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing q and a */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state) + 1, 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 100);
         fmpz_poly_set_coeff_ui(b, 0, 1);
 
         fmpz_poly_div_series(q, a, b, n);
@@ -78,14 +78,14 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state) + 1, 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 100);
         fmpz_poly_set_coeff_ui(b, 0, 1);
 
         fmpz_poly_div_series(q, a, b, n);
@@ -110,15 +110,15 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, p, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
         fmpz_poly_init(q);
 
-        fmpz_poly_randtest(a, state, n_randint(50) + 1, 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state) + 1, 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 100);
         fmpz_poly_set_coeff_ui(b, 0, 1);
 
         fmpz_poly_div_series(q, a, b, n);
@@ -143,7 +143,7 @@ main(void)
         fmpz_poly_clear(q);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("mul....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -51,8 +51,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), 500);
-        fmpz_poly_randtest(c, state, n_randint(50), 500);
+        fmpz_poly_randtest(b, state, n_randint(50, state), 500);
+        fmpz_poly_randtest(c, state, n_randint(50, state), 500);
 
         fmpz_poly_mul(a, b, c);
         fmpz_poly_mul(b, b, c);
@@ -79,8 +79,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), 500);
-        fmpz_poly_randtest(c, state, n_randint(50), 500);
+        fmpz_poly_randtest(b, state, n_randint(50, state), 500);
+        fmpz_poly_randtest(c, state, n_randint(50, state), 500);
 
         fmpz_poly_mul(a, b, c);
         fmpz_poly_mul(c, b, c);
@@ -109,9 +109,9 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(100), 500);
-        fmpz_poly_randtest(c, state, n_randint(100), 500);
-        fmpz_poly_randtest(d, state, n_randint(100), 500);
+        fmpz_poly_randtest(b, state, n_randint(100, state), 500);
+        fmpz_poly_randtest(c, state, n_randint(100, state), 500);
+        fmpz_poly_randtest(d, state, n_randint(100, state), 500);
 
         fmpz_poly_mul(a1, b, c);
         fmpz_poly_mul(a2, b, d);
@@ -142,8 +142,8 @@ main(void)
         long len1, len2;
         fmpz_poly_t a, b, out1, out2;
 
-        len1 = n_randint(100) + 1;
-        len2 = n_randint(100) + 1;
+        len1 = n_randint(100, state) + 1;
+        len2 = n_randint(100, state) + 1;
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(out1);
@@ -152,8 +152,8 @@ main(void)
         fmpz_poly_randtest(b, state, len2, 200);
 
         fmpz_poly_mul(out1, a, b);
-        fmpz_poly_fit_length(a, a->alloc + n_randint(10));
-        fmpz_poly_fit_length(b, b->alloc + n_randint(10));
+        fmpz_poly_fit_length(a, a->alloc + n_randint(10, state));
+        fmpz_poly_fit_length(b, b->alloc + n_randint(10, state));
         a->length = a->alloc;
         b->length = b->alloc;
         fmpz_poly_fit_length(out2, a->length + b->length - 1);
@@ -181,7 +181,7 @@ main(void)
         fmpz_poly_clear(out2);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

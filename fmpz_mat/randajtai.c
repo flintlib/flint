@@ -34,7 +34,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_mat_randajtai(fmpz_mat_t mat, fmpz_randstate_t state, double alpha)
+fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 {
     long r, c, i, j, d;
     fmpz_t tmp;

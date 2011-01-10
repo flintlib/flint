@@ -32,7 +32,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state, 
+_fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
                    long len, mp_bitcnt_t bits)
 {
     long i;
@@ -41,7 +41,7 @@ _fmpz_vec_randtest(fmpz * f, fmpz_randstate_t state,
 }
 
 void
-_fmpz_vec_randtest_unsigned(fmpz * f, fmpz_randstate_t state, 
+_fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
                             long len, mp_bitcnt_t bits)
 {
     long i;

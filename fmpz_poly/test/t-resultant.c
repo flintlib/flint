@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("resultant....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Just one specific test */
     {
@@ -86,9 +86,9 @@ main(void)
         fmpz_poly_init(g);
         fmpz_poly_init(h);
         fmpz_poly_init(p);
-        fmpz_poly_randtest(f, state, n_randint(50), 100);
-        fmpz_poly_randtest(g, state, n_randint(50), 100);
-        fmpz_poly_randtest(h, state, n_randint(10), 100);
+        fmpz_poly_randtest(f, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(g, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(h, state, n_randint(10, state), 100);
 
         fmpz_poly_resultant(a, f, h);
         fmpz_poly_resultant(b, g, h);
@@ -119,7 +119,7 @@ main(void)
         fmpz_poly_clear(p);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

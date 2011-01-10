@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("mulhigh_karatsuba_n....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -52,7 +52,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        len = n_randint(50);
+        len = n_randint(50, state);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 
@@ -82,7 +82,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        len = n_randint(50);
+        len = n_randint(50, state);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 
@@ -113,7 +113,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        len = n_randint(50);
+        len = n_randint(50, state);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 
@@ -137,7 +137,7 @@ main(void)
         fmpz_poly_clear(d);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

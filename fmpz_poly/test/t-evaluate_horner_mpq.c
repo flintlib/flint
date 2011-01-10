@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("evaluate_horner_mpq....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing */
     for (i = 0; i < 750; i++)
@@ -55,7 +55,7 @@ main(void)
         mpq_init(x);
         mpq_init(y);
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, state, n_randint(100), 150);
+        fmpz_poly_randtest(f, state, n_randint(100, state), 150);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -96,8 +96,8 @@ main(void)
         mpq_init(z);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(f, state, n_randint(100), 150);
-        fmpz_poly_randtest(g, state, n_randint(100), 150);
+        fmpz_poly_randtest(f, state, n_randint(100, state), 150);
+        fmpz_poly_randtest(g, state, n_randint(100, state), 150);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -142,8 +142,8 @@ main(void)
         mpq_init(z);
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(f, state, n_randint(50), 100);
-        fmpz_poly_randtest(g, state, n_randint(50), 100);
+        fmpz_poly_randtest(f, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(g, state, n_randint(50, state), 100);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -174,7 +174,7 @@ main(void)
         fmpz_poly_clear(g);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

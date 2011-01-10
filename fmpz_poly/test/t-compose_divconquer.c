@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("compose_divconquer....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of the first argument */
     for (i = 0; i < 100; i++)
@@ -51,8 +51,8 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, state, n_randint(50), 100);
-        fmpz_poly_randtest(h, state, n_randint(20), 50);
+        fmpz_poly_randtest(g, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(h, state, n_randint(20, state), 50);
 
         fmpz_poly_compose_divconquer(f, g, h);
         fmpz_poly_compose_divconquer(g, g, h);
@@ -79,8 +79,8 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, state, n_randint(50), 100);
-        fmpz_poly_randtest(h, state, n_randint(20), 50);
+        fmpz_poly_randtest(g, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(h, state, n_randint(20, state), 50);
 
         fmpz_poly_compose_divconquer(f, g, h);
         fmpz_poly_compose_divconquer(h, g, h);
@@ -108,8 +108,8 @@ main(void)
         fmpz_poly_init(f2);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, state, n_randint(50), 100);
-        fmpz_poly_randtest(h, state, n_randint(20), 50);
+        fmpz_poly_randtest(g, state, n_randint(50, state), 100);
+        fmpz_poly_randtest(h, state, n_randint(20, state), 50);
         
         fmpz_poly_compose_divconquer(f1, g, h);
         fmpz_poly_compose(f2, g, h);
@@ -129,7 +129,7 @@ main(void)
         fmpz_poly_clear(h);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

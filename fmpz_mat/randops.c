@@ -32,7 +32,7 @@
 
 
 void
-fmpz_mat_randops(fmpz_mat_t mat, fmpz_randstate_t state, long count)
+fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
 {
     long c, i, j, k;
     long m = mat->r;

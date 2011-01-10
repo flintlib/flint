@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("rem_basecase....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Compare with full division, no aliasing */
     for (i = 0; i < 1000; i++)
@@ -54,8 +54,8 @@ main(void)
         fmpz_poly_init(r);
         fmpz_poly_init(r2);
 
-        fmpz_poly_randtest(a, state, n_randint(50), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(a->length + 1) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(a->length + 1, state) + 1, 100);
 
         fmpz_poly_divrem_basecase(q, r, a, b);
         fmpz_poly_rem_basecase(r2, a, b);
@@ -87,8 +87,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(50), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 100);
 
         fmpz_poly_rem_basecase(r, a, b);
         fmpz_poly_rem_basecase(a, a, b);
@@ -115,8 +115,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(50), 100);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(50) + 1, 100);
+        fmpz_poly_randtest(a, state, n_randint(50, state), 100);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 100);
 
         fmpz_poly_rem_basecase(r, a, b);
         fmpz_poly_rem_basecase(b, a, b);
@@ -136,7 +136,7 @@ main(void)
     }
 
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

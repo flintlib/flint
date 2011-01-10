@@ -72,7 +72,7 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
     long i, m, n, b, d, r, rank;
 
     printf("rowreduce....");

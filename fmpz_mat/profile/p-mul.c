@@ -47,7 +47,7 @@ void sample(void * arg, ulong count)
     long bits = params->bits;
     int algorithm = params->algorithm;
 
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
     fmpz_mat_t A, B, C;
     fmpz_randinit(rnd);
 

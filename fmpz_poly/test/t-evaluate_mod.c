@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("evaluate_mod....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Compare with evaluation over the integers */
     for (i = 0; i < 10000; i++)
@@ -51,10 +51,10 @@ main(void)
         mp_limb_t a, n, r;
 
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, state, n_randint(10), 20);
+        fmpz_poly_randtest(f, state, n_randint(10, state), 20);
 
-        n = n_randtest_not_zero();
-        a = n_randint(n);
+        n = n_randtest_not_zero(state);
+        a = n_randint(n, state);
 
         fmpz_init(b);
         fmpz_init(s);
@@ -80,7 +80,7 @@ main(void)
         fmpz_clear(s);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

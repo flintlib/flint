@@ -36,7 +36,7 @@ int main(void)
 {
     fmpz_mat_t A, B, C, D;
     long i;
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
 
     printf("mul_multi_mod....");
     fflush(stdout);

@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("mullow_classical....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 2000; i++)
@@ -51,11 +51,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), 200);
-        fmpz_poly_randtest(c, state, n_randint(50), 200);
+        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
+        fmpz_poly_randtest(c, state, n_randint(50, state), 200);
 
         len = b->length + c->length - 1;
-        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length);
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length, state);
 
         fmpz_poly_mullow_classical(a, b, c, trunc);
         fmpz_poly_mullow_classical(b, b, c, trunc);
@@ -84,11 +84,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50), 200);
-        fmpz_poly_randtest(c, state, n_randint(50), 200);
+        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
+        fmpz_poly_randtest(c, state, n_randint(50, state), 200);
 
         len = b->length + c->length - 1;
-        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1, state);
 
         fmpz_poly_mullow_classical(a, b, c, trunc);
         fmpz_poly_mullow_classical(c, b, c, trunc);
@@ -117,11 +117,11 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(50), 200);
-        fmpz_poly_randtest(c, state, n_randint(50), 200);
+        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
+        fmpz_poly_randtest(c, state, n_randint(50, state), 200);
 
         len = b->length + c->length - 1;
-        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1);
+        trunc = (len <= 0) ? 0 : n_randint(b->length + c->length - 1, state);
 
         fmpz_poly_mul_classical(a, b, c);
         fmpz_poly_truncate(a, trunc);
@@ -142,7 +142,7 @@ main(void)
         fmpz_poly_clear(d);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -36,7 +36,7 @@ int
 main(void)
 {
     long m, n, rep, res1, res2;
-    fmpz_randstate_t rnd;
+    flint_rand_t rnd;
 
     printf("max_bits....");
     fflush(stdout);

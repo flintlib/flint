@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("pseudo_div....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check r = a - q * b has small degree, no aliasing */
     for (i = 0; i < 2000; i++)
@@ -55,8 +55,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(100), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_mul(prod, q, b);
@@ -91,8 +91,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
-        fmpz_poly_randtest(a, state, n_randint(100), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_pseudo_div(a, &d, a, b);
@@ -120,8 +120,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
-        fmpz_poly_randtest(a, state, n_randint(100), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_pseudo_div(b, &d, a, b);
@@ -140,7 +140,7 @@ main(void)
         fmpz_poly_clear(q);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

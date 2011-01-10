@@ -35,24 +35,24 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("inv_newton....");
     fflush(stdout);
 
-    fmpz_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, c, one;
-        long n = n_randint(80) + 1;
+        long n = n_randint(80, state) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(one);
-        fmpz_poly_randtest_not_zero(a, state, n_randint(80) + 1, 100);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(80, state) + 1, 100);
         fmpz_poly_set_coeff_ui(a, 0, 1);
         fmpz_poly_fit_length(one, 1);
         fmpz_set_ui(one->coeffs, 1);
@@ -77,7 +77,7 @@ main(void)
         fmpz_poly_clear(one);
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
