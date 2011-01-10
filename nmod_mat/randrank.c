@@ -44,7 +44,7 @@ nmod_mat_randrank(nmod_mat_t mat, long rank)
 
     diag = nmod_vec_init(rank);
     for (i = 0; i < rank; i++)
-        diag[i] = 1 + n_randint(mat->mod.n - 1);
+        diag[i] = 1 + n_randint(mat->mod.n - 1, NULL);
 
     nmod_mat_randpermdiag(mat, diag, rank);
 

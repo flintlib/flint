@@ -35,11 +35,11 @@ mp_limb_signed_t z_randtest(void)
     mp_limb_t m;
     mp_limb_signed_t z;
 
-    m = n_randlimb();
+    m = n_randlimb(NULL);
 
     if (m & 7UL)
     {
-        z = n_randbits(n_randint(FLINT_BITS));
+        z = n_randbits(n_randint(FLINT_BITS, NULL), NULL);
     }
     else
     {

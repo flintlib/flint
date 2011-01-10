@@ -32,16 +32,20 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("is_square....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    for (i = 0; i < 100000; i++) /* Test that non-squares pass */
    {
       mp_limb_t a, s, bits;
       
-      bits = n_randint(FLINT_BITS/2) + 1;
-      a = n_randbits(bits);
-      s = a*a + n_randint(2*a) + 1;
+      bits = n_randint(FLINT_BITS/2, state) + 1;
+      a = n_randbits(bits, state);
+      s = a*a + n_randint(2*a, state) + 1;
 
       result = !n_is_square(s);
       if (!result)
@@ -56,8 +60,8 @@ int main(void)
    {
       mp_limb_t a, s, bits;
       
-      bits = n_randint(FLINT_BITS/2);
-      a = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/2, state);
+      a = n_randbits(bits, state);
       s = a*a;
 
       result = n_is_square(s);
@@ -68,6 +72,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

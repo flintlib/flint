@@ -31,7 +31,7 @@
 n_pair_t
 lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 {
-    n_pair_t current, old;
+    n_pair_t current = {0, 0}, old;
     int length, i;
     mp_limb_t power, xy, xx, yy;
 
@@ -68,7 +68,7 @@ lchain_precomp(mp_limb_t m, mp_limb_t a, mp_limb_t n, double npre)
 n_pair_t
 lchain2_preinv(mp_limb_t m, mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 {
-    n_pair_t current, old;
+    n_pair_t current = {0, 0}, old;
     int length, i;
     mp_limb_t power, xy, xx, yy;
 

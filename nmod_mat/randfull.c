@@ -35,6 +35,6 @@ nmod_mat_randfull(nmod_mat_t mat)
 
     for (i = 0; i < mat->r * mat->c; i++)
     {
-        mat->entries[i] = FLINT_MAX(1, n_randint(mat->mod.n));
+        mat->entries[i] = FLINT_MAX(1, n_randint(mat->mod.n, NULL));
     }
 }

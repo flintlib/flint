@@ -33,5 +33,5 @@ void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod)
 {
    long i;
    for (i = 0 ; i < len; i++)
-      vec[i] = (n_randtest() % mod.n);
+      vec[i] = (n_randtest(NULL) % mod.n);
 }

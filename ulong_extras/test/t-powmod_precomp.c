@@ -32,8 +32,12 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("powmod_precomp....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 100000; i++)
    {
@@ -46,13 +50,13 @@ int main(void)
       mpz_init(d_m);
       mpz_init(r2_m);
       
-      bits = n_randint(FLINT_D_BITS) + 1;
-      d = n_randbits(bits);
+      bits = n_randint(FLINT_D_BITS, state) + 1;
+      d = n_randbits(bits, state);
       do
       {
-         a = n_randint(d);
+         a = n_randint(d, state);
       } while (n_gcd(d, a) != 1UL);
-      exp = n_randtest();
+      exp = n_randtest(state);
       
       dpre = n_precompute_inverse(d);
       r1 = n_powmod_precomp(a, exp, d, dpre);
@@ -80,6 +84,8 @@ int main(void)
       mpz_clear(d_m);
       mpz_clear(r2_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

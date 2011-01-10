@@ -38,9 +38,12 @@ int main(void)
     int result;
     long i, rep;
     mpz_t mpz_n;
-
+    flint_rand_t state;
+    
     printf("nextprime....");
     fflush(stdout);
+
+    flint_randinit(state);
 
     mpz_init(mpz_n);
 
@@ -48,8 +51,8 @@ int main(void)
    
     for (rep = 0; rep < 100000; rep++)
     {
-        unsigned long bits = n_randint(FLINT_D_BITS-1)+1;
-        n = n_randint((1UL<<bits) - 1UL) + 1; 
+        unsigned long bits = n_randint(FLINT_D_BITS-1, state)+1;
+        n = n_randint((1UL<<bits) - 1UL, state) + 1; 
         mpz_set_ui(mpz_n, n);
 
         for (i = 0; i < 1; i++)
@@ -71,6 +74,8 @@ int main(void)
     }
 
     mpz_clear(mpz_n); 
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

@@ -69,15 +69,15 @@ extern mp_limb_t flint_num_primes;
 
 extern mp_limb_t flint_primes_cutoff;
 
-mp_limb_t n_randlimb(void);
+mp_limb_t n_randlimb(flint_rand_t state);
 
-mp_limb_t n_randint(mp_limb_t limit);
+mp_limb_t n_randint(mp_limb_t limit, flint_rand_t state);
 
-mp_limb_t n_randbits(unsigned int bits);
+mp_limb_t n_randbits(unsigned int bits, flint_rand_t state);
 
-mp_limb_t n_randtest(void);
+mp_limb_t n_randtest(flint_rand_t state);
 
-mp_limb_t n_randtest_not_zero(void);
+mp_limb_t n_randtest_not_zero(flint_rand_t state);
 
 mp_limb_t n_pow(mp_limb_t n, ulong exp);
 

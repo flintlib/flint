@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("mod2_precomp....");
    fflush(stdout);
 
@@ -40,10 +43,10 @@ int main(void)
       mp_limb_t d, n, r1, r2;
       double dpre;
 
-      d = n_randtest();
+      d = n_randtest(state);
       if (d == 0UL) d++;
   
-      n = n_randtest();
+      n = n_randtest(state);
       
       dpre = n_precompute_inverse(d);
 
@@ -59,6 +62,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

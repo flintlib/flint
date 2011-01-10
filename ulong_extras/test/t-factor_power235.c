@@ -32,15 +32,19 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("factor_power235....");
    fflush(stdout);
  
+   flint_randinit(state);
+
    for (i = 0; i < 10000; i++) /* Test random squares */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/2) + 1;
-      n1 = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/2, state) + 1;
+      n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -58,8 +62,8 @@ int main(void)
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/3) + 1;
-      n1 = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/3, state) + 1;
+      n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -77,8 +81,8 @@ int main(void)
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/5) + 1;
-      n1 = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/5, state) + 1;
+      n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1*n1*n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -98,7 +102,7 @@ int main(void)
       
       do
       {
-         n1 = n_randtest();
+         n1 = n_randtest(state);
       } while (n_is_perfect_power235(n1));
       
       result = (!n_factor_power235(&exp, n1));
@@ -110,6 +114,8 @@ int main(void)
       }
    }
    
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

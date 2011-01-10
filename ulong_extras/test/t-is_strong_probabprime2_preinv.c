@@ -33,9 +33,12 @@ int main(void)
 {
    int i, result;
    ulong count = 0UL;
+   flint_rand_t state;
    
    printf("is_strong_probabprime2_preinv....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 1000; i++) /* Test that primes pass the test */
    {
@@ -47,7 +50,7 @@ int main(void)
 
       do
       {
-         d = n_randtest() | 1;
+         d = n_randtest(state) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -56,7 +59,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d);
+         do a = n_randint(d, state);
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -84,14 +87,14 @@ int main(void)
 
       do
       {
-         d = n_randtest() | 1;
+         d = n_randtest(state) | 1;
          if (d == 1UL) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d);
+         do a = n_randint(d, state);
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -110,6 +113,8 @@ int main(void)
       printf("count = %lu\n", count);
       abort();
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

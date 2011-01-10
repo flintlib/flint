@@ -39,7 +39,7 @@ fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 
     fmpz_randtest_unsigned(f, state, bits);
 
-    m = n_randlimb();
+    m = n_randlimb(NULL);
     if (m & 1UL)
         fmpz_neg(f, f);
 }
@@ -49,14 +49,14 @@ fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 {
     ulong m;
 
-    m    = n_randlimb();
-    bits = n_randint(bits + 1);
+    m    = n_randlimb(NULL);
+    bits = n_randint(bits + 1, NULL);
 
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
         if (m & 3UL)
-            *f = n_randbits(bits);
+            *f = n_randbits(bits, NULL);
         else
         {
             m >>= 2;

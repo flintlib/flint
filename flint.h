@@ -52,6 +52,25 @@
 
 #define mp_bitcnt_t unsigned long
 
+typedef struct
+{
+    gmp_randstate_t gmp_state;
+} flint_rand_s;
+
+typedef flint_rand_s flint_rand_t[1];
+
+static __inline__
+void flint_randinit(flint_rand_t state)
+{
+    gmp_randinit_default(state->gmp_state);
+}
+
+static __inline__
+void flint_randclear(flint_rand_t state)
+{
+    gmp_randclear(state->gmp_state);
+}
+
 /*
   We define this here as there is no mpfr.h
  */

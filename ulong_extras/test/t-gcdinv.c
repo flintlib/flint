@@ -32,24 +32,28 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("gcdinv....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    for (i = 0; i < 100000; i++) 
    {
       mp_limb_t a, b, c, g, g2, s, t2, t, bits1, bits2, bits3;
       
-      bits1 = n_randint(FLINT_BITS-2) + 2;
-      bits2 = n_randint(bits1) + 1;
-      bits3 = n_randint(FLINT_BITS - bits1) + 1;
+      bits1 = n_randint(FLINT_BITS-2, state) + 2;
+      bits2 = n_randint(bits1, state) + 1;
+      bits3 = n_randint(FLINT_BITS - bits1, state) + 1;
 
       do
       {
-         a = n_randbits(bits1);
-         b = n_randbits(bits2);
+         a = n_randbits(bits1, state);
+         b = n_randbits(bits2, state);
       } while ((n_gcd(a, b) != 1UL) || (b >= a));
 
-      c = n_randbits(bits3);
+      c = n_randbits(bits3, state);
 
       g = n_xgcd(&s, &t, a*c, b*c);
       g2 = n_gcdinv(&t2, b*c, a*c);
@@ -64,6 +68,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

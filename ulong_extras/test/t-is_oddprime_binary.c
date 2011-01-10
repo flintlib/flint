@@ -32,9 +32,13 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("is_oddprime_binary....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    n_compute_primes(10000);
 
    for (i = 0; i < 100000; i++) /* Test that primes pass the test */
@@ -46,7 +50,7 @@ int main(void)
 
       do
       {
-         d = n_randint(flint_primes_cutoff) | 1;
+         d = n_randint(flint_primes_cutoff, state) | 1;
          if (d == 1UL) d += 2;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
@@ -74,7 +78,7 @@ int main(void)
 
       do
       {
-         d = n_randint(flint_primes_cutoff) | 1;
+         d = n_randint(flint_primes_cutoff, state) | 1;
          mpz_set_ui(d_m, d);
       } while ((mpz_probab_prime_p(d_m, 12)) || (d > flint_primes_cutoff));
 
@@ -89,6 +93,8 @@ int main(void)
 
       mpz_clear(d_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

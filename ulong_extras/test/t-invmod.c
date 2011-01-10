@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("invmod....");
    fflush(stdout);
    
@@ -41,8 +44,8 @@ int main(void)
       
       do
       {
-         a = n_randtest();
-         b = n_randtest();
+         a = n_randtest(state);
+         b = n_randtest(state);
       } while ((a >= b) || (n_gcd(b, a) != 1UL));
 
       t = n_invmod(a, b);
@@ -59,6 +62,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

@@ -40,7 +40,7 @@ fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m)
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
-        *f =  (sgn >= 0) ? n_randint(*m) : - n_randint(-(*m));
+        *f =  (sgn >= 0) ? n_randint(*m, NULL) : - n_randint(-(*m), NULL);
     }
     else
     {

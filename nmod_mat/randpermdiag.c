@@ -41,7 +41,7 @@ static int shuffle(long * array, long n)
     parity = 0;
     for (i = n - 1; i > 0; i--)
     {
-        j = n_randint(i+1);
+        j = n_randint(i+1, NULL);
         parity ^= (i == j);
         tmp = array[i];
         array[i] = array[j];

@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, j, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("factor_trial_range....");
    fflush(stdout);
  
@@ -42,7 +45,7 @@ int main(void)
 
       n_factor_init(&factors);
 
-      n1 = n_randtest_not_zero();
+      n1 = n_randtest_not_zero(state);
       n2 = n_factor_trial_range(&factors, n1, 100UL, 10000UL);
       
       for (j = 0; j < factors.num; j++)
@@ -59,7 +62,9 @@ int main(void)
          abort();
       }
    }
-   
+ 
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

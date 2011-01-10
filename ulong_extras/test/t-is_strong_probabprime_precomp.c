@@ -33,22 +33,25 @@ int main(void)
 {
    int i, j, result;
    ulong count = 0UL;
+   flint_rand_t state;
    
    printf("is_strong_probabprime_precomp....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 1000; i++) /* Test that primes pass the test */
    {
       mp_limb_t a, d, norm;
       mpz_t d_m;
       double dpre;
-      mp_limb_t bits = n_randint(FLINT_D_BITS-1) + 2;
+      mp_limb_t bits = n_randint(FLINT_D_BITS-1, state) + 2;
 
       mpz_init(d_m);
 
       do
       {
-         d = n_randbits(bits) | 1;
+         d = n_randbits(bits, state) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -57,7 +60,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d);
+         do a = n_randint(d, state);
          while (a == 0UL);
       
          dpre = n_precompute_inverse(d);
@@ -80,19 +83,19 @@ int main(void)
       mp_limb_t a, d, norm;
       mpz_t d_m;
       double dpre;
-      mp_limb_t bits = n_randint(FLINT_D_BITS-3) + 4;
+      mp_limb_t bits = n_randint(FLINT_D_BITS-3, state) + 4;
 
       mpz_init(d_m);
 
       do
       {
-         d = n_randbits(bits) | 1;
+         d = n_randbits(bits, state) | 1;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d);
+         do a = n_randint(d, state);
          while (a == 0UL);
       
          dpre = n_precompute_inverse(d);
@@ -111,6 +114,8 @@ int main(void)
       printf("count = %lu\n", count);
       abort();
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

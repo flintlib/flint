@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("jacobi....");
    fflush(stdout);
 
@@ -45,8 +48,8 @@ int main(void)
       mpz_init(a_m);
       mpz_init(d_m);
       
-      a = n_randtest();
-      d = n_randtest_not_zero() | 1L;
+      a = n_randtest(state);
+      d = n_randtest_not_zero(state) | 1L;
       u = FLINT_ABS(a);
       
       r1 = n_jacobi(a, d);
@@ -66,6 +69,8 @@ int main(void)
       mpz_clear(a_m);
       mpz_clear(d_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

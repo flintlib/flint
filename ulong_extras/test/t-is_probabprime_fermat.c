@@ -35,17 +35,20 @@ int main(void)
    ulong count = 0UL;
    mp_limb_t d, j;
    mpz_t d_m;
+   flint_rand_t state;
    
    printf("is_probabprime_fermat....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    for (i = 0; i < 100000; i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
 
       do
       {
-         d = n_randtest_not_zero();
+         d = n_randtest_not_zero(state);
          if (d == 1UL) d++;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
@@ -54,7 +57,7 @@ int main(void)
 
       do
       {
-         j = n_randint(d);
+         j = n_randint(d, state);
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -75,14 +78,14 @@ int main(void)
 
       do
       {
-         d = n_randtest_not_zero();
+         d = n_randtest_not_zero(state);
          if (d == 1UL) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       do
       {
-         j = n_randint(d);
+         j = n_randint(d, state);
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -99,6 +102,8 @@ int main(void)
       abort();
    }
    
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

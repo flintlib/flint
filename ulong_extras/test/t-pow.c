@@ -32,21 +32,25 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("pow....");
    fflush(stdout);
  
+   flint_randinit(state);
+
    for (i = 0; i < 10000; i++) /* Test a^e1 * a^e2 = a^(e1 + e2) */
    {
       mp_limb_t exp1, exp2, n, bits, r1, r2;
       
-      bits = n_randint(55) + 10;
-      exp1 = n_randint(5);
-      exp2 = n_randint(5);
+      bits = n_randint(55, state) + 10;
+      exp1 = n_randint(5, state);
+      exp2 = n_randint(5, state);
       
-      if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(64) + 1;
+      if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(64, state) + 1;
       else bits /= (exp1 + exp2);
       
-      n = n_randbits(bits);
+      n = n_randbits(bits, state);
       
       r1 = n_pow(n, exp1)*n_pow(n, exp2);
       r2 = n_pow(n, exp1 + exp2);
@@ -60,6 +64,8 @@ int main(void)
       }
    }
    
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

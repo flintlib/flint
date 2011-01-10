@@ -35,7 +35,6 @@ _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen,
                       mp_srcptr B, long Blen, nmod_t mod)
 {
     long len = Alen - Blen + 1;
-    long i;
     mp_ptr Arev, Brev;
 
     Arev = nmod_vec_init(2*len);

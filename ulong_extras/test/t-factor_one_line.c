@@ -33,8 +33,12 @@ int main(void)
 {
    int i, result;
    ulong count = 0UL;
+   flint_rand_t state;
+   
    printf("factor_one_line....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 5000; i++) /* Test random numbers */
    {
@@ -43,11 +47,11 @@ int main(void)
       do
       {
 #if FLINT64
-         bits = n_randint(44);
+         bits = n_randint(44, state);
 #else
-         bits = n_randint(20);
+         bits = n_randint(20, state);
 #endif
-         n1 = n_randbits(bits + 1);
+         n1 = n_randbits(bits + 1, state);
       } while (n_is_prime(n1) || (n1 == 1UL));
       
       n2 = n_factor_one_line(n1, 50000);
@@ -72,6 +76,8 @@ int main(void)
       printf("Only %lu of 10000 numbers factored\n", count); 
       abort();
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

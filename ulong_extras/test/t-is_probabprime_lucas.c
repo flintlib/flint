@@ -35,6 +35,8 @@ int main(void)
    ulong count = 0UL;
    mp_limb_t d;
    mpz_t d_m;
+   flint_rand_t state;
+   flint_randinit(state);
    
    printf("is_probabprime_lucas....");
    fflush(stdout);
@@ -45,7 +47,7 @@ int main(void)
 
       do
       {
-         d = n_randtest_not_zero();
+         d = n_randtest_not_zero(state);
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -68,7 +70,7 @@ int main(void)
 
       do
       {
-         d = n_randtest();
+         d = n_randtest(state);
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
@@ -84,7 +86,9 @@ int main(void)
       printf("%lu composites declared prime\n", count); 
       abort();
    }
-   
+
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

@@ -31,16 +31,16 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randtest(void)
+mp_limb_t n_randtest(flint_rand_t state)
 {
     mp_limb_t m;
     mp_limb_t n;
 
-    m = n_randlimb();
+    m = n_randlimb(state);
 
     if (m & 7UL)
     {
-        n = n_randbits(n_randint(FLINT_BITS + 1));
+        n = n_randbits(n_randint(FLINT_BITS + 1, state), state);
     }
     else
     {
@@ -60,10 +60,10 @@ mp_limb_t n_randtest(void)
     return n;
 }
 
-mp_limb_t n_randtest_not_zero(void)
+mp_limb_t n_randtest_not_zero(flint_rand_t state)
 {
     mp_limb_t n;
 
-    while ((n = n_randtest()) == 0) ;
+    while ((n = n_randtest(state)) == 0) ;
     return n;
 }

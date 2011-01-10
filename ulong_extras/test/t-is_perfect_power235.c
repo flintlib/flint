@@ -34,14 +34,17 @@ int main(void)
    int i, result;
    ulong bits;
    mp_limb_t d;
+   flint_rand_t state;
    
    printf("is_perfect_power235....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    for (i = 0; i < 10000; i++) /* Test that square pass the test */
    {
-      bits = n_randint(FLINT_BITS/2) + 1;
-      d = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/2, state) + 1;
+      d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 2));
       if (!result)
@@ -55,8 +58,8 @@ int main(void)
          
    for (i = 0; i < 10000; i++) /* Test that cubes pass the test */
    {
-      bits = n_randint(FLINT_BITS/3) + 1;
-      d = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/3, state) + 1;
+      d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 3));
       
@@ -71,8 +74,8 @@ int main(void)
          
    for (i = 0; i < 10000; i++) /* Test that fifth powers pass the test */
    {
-      bits = n_randint(FLINT_BITS/5) + 1;
-      d = n_randbits(bits);
+      bits = n_randint(FLINT_BITS/5, state) + 1;
+      d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 5));
       
@@ -92,7 +95,7 @@ int main(void)
 
       do
       {
-         d = n_randtest();
+         d = n_randtest(state);
          mpz_set_ui(d_m, d);
       } while (mpz_perfect_power_p(d_m));
 
@@ -106,6 +109,8 @@ int main(void)
 
       mpz_clear(d_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

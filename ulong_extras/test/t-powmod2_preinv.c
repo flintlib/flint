@@ -32,8 +32,12 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("powmod2_preinv....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 100000; i++)
    {
@@ -45,12 +49,12 @@ int main(void)
       mpz_init(d_m);
       mpz_init(r2_m);
       
-      d = n_randtest_not_zero();
+      d = n_randtest_not_zero(state);
       do
       {
-         a = n_randint(d);
+         a = n_randint(d, state);
       } while (n_gcd(d, a) != 1UL);
-      exp = n_randtest();
+      exp = n_randtest(state);
       
       dinv = n_preinvert_limb(d);
       r1 = n_powmod2_preinv(a, exp, d, dinv);
@@ -78,6 +82,8 @@ int main(void)
       mpz_clear(d_m);
       mpz_clear(r2_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

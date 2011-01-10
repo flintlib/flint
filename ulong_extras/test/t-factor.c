@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, j, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("factor....");
    fflush(stdout);
  
@@ -42,7 +45,7 @@ int main(void)
 
       n_factor_init(&factors);
 
-      n1 = n_randtest_not_zero();
+      n1 = n_randtest_not_zero(state);
       n_factor(&factors, n1, 0);
       
       n2 = 1UL;
@@ -60,7 +63,9 @@ int main(void)
          abort();
       }
    }
-   
+
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

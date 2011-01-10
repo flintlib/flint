@@ -32,9 +32,13 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("remove....");
    fflush(stdout);
  
+   flint_randinit(state);
+
    for (i = 0; i < 100000; i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, orig_n;
@@ -46,7 +50,7 @@ int main(void)
       mpz_init(d_n2);
       mpz_init(d_p);
 
-      n1 = n_randtest_not_zero();
+      n1 = n_randtest_not_zero(state);
       orig_n = n1;
 
       for (j = 0; j < FLINT_NUM_PRIMES_SMALL/10; j++)
@@ -82,9 +86,9 @@ int main(void)
       mpz_init(d_n2);
       mpz_init(d_p);
 
-      base = n_randtest_not_zero();
+      base = n_randtest_not_zero(state);
       n1 = base;
-      exp = n_randint(FLINT_BITS/FLINT_BIT_COUNT(n1)) + 1;
+      exp = n_randint(FLINT_BITS/FLINT_BIT_COUNT(n1), state) + 1;
       n1 = n_pow(base, exp);
 
       orig_n = n1;
@@ -111,6 +115,8 @@ int main(void)
       mpz_clear(d_p);
    }
    
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

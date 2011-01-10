@@ -32,18 +32,22 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("mod_precomp....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 1000000; i++)
    {
       mp_limb_t bits, d, n, r1, r2;
       double dpre;
 
-      bits = n_randint(FLINT_D_BITS) + 1;
-      d = n_randbits(bits);
-      if (bits <= (FLINT_BITS/2)) n = n_randint(d*d);
-      else n = n_randtest();
+      bits = n_randint(FLINT_D_BITS, state) + 1;
+      d = n_randbits(bits, state);
+      if (bits <= (FLINT_BITS/2)) n = n_randint(d*d, state);
+      else n = n_randtest(state);
 
       dpre = n_precompute_inverse(d);
 
@@ -59,6 +63,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

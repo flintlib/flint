@@ -33,6 +33,9 @@ int main(void)
 {
    int i, result;
    ulong count = 0UL;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("factor_SQUFOF....");
    fflush(stdout);
 
@@ -41,7 +44,7 @@ int main(void)
       mp_limb_t n1, n2;
 
       do
-         n1 = n_randtest();
+         n1 = n_randtest(state);
       while (n_is_prime(n1) || (n1 == 1UL));
 
 #if FLINT64
@@ -69,6 +72,8 @@ int main(void)
       printf("Only %lu of 10000 numbers factored\n", count); 
       abort();
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

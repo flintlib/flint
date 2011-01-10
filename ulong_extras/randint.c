@@ -27,8 +27,8 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randint(mp_limb_t limit) 
+mp_limb_t n_randint(mp_limb_t limit, flint_rand_t state) 
 {
-   if (limit == 0UL) return n_randlimb();
-   else return n_randlimb() % limit;
+   if (limit == 0UL) return n_randlimb(state);
+   else return n_randlimb(state) % limit;
 }

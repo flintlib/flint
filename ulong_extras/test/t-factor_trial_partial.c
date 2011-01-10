@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, j, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("factor_trial_partial....");
    fflush(stdout);
  
@@ -42,7 +45,7 @@ int main(void)
 
       n_factor_init(&factors);
 
-      n1 = n_randtest_not_zero();
+      n1 = n_randtest_not_zero(state);
       limit = n_sqrt(n1);
       n2 = n_factor_trial_partial(&factors, n1, &prod, 10000UL, limit);
       
@@ -66,7 +69,9 @@ int main(void)
          abort();
       }
    }
-   
+
+   flint_randclear(state);
+
    printf("PASS\n");
    return 0;
 }

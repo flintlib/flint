@@ -51,8 +51,7 @@ _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
         mp_srcptr d1 = B + n2;
         mp_srcptr d2 = B;
         mp_srcptr d3 = B + n1;
-        mp_srcptr d4 = B;
-
+        
         mp_ptr q1   = Q + n2;
         mp_ptr q2   = Q;
         mp_ptr d1q1 = q2 + n2 - (n1 - 1);

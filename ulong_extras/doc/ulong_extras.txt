@@ -29,7 +29,21 @@
 
 *******************************************************************************
 
-mp_limb_t n_randlimb()
+void n_randinit(flint_rand_t state)
+   
+    Initialise a random state for use in random functions. 
+    Currently this function does nothing, but must be used
+    for compatibility with future versions of flint. In 
+    particular the random functions below are not implemented
+    in a threadsafe manner.
+
+void n_randinit(flint_rand_t state)
+   
+    Release any memory used by a random state. Currently this 
+    function does nothing, but must be used for compatibility 
+    with future versions of flint.
+
+mp_limb_t n_randlimb(flint_rand_t state)
 
     Returns a uniformly pseudo random limb. 
 
@@ -40,13 +54,13 @@ mp_limb_t n_randlimb()
     and \code{p_0 = nextprime(2^16)} on a 32-bit machine and 
     \code{p_1 = nextprime(p_0)}.
 
-mp_limb_t n_randbits(unsigned int bits)
+mp_limb_t n_randbits(unsigned int bits, flint_rand_t state)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most sifnificant bit is always set, unless zero is passed,
     in which case zero is returned.
 
-mp_limb_t n_randint(mp_limb_t limit)
+mp_limb_t n_randint(mp_limb_t limit, flint_rand_t state)
 
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire random
@@ -58,10 +72,15 @@ mp_limb_t n_randtest()
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
     values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased.  
     This random function is mainly used for testing purposes.
+    Warning: this function is not threadsafe and is for use in test
+    code only. It should not be used in library code.
 
 mp_limb_t n_randtest_not_zero()
 
     As for \code{n_randtest()}, but does not return $0$.
+    Warning: this function is not threadsafe and is for use in test
+    code only. It should not be used in library code.
+
 
 *******************************************************************************
 

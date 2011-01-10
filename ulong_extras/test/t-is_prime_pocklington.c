@@ -35,6 +35,8 @@ int main(void)
    ulong count = 0;
    mp_limb_t d;
    mpz_t d_m;
+   flint_rand_t state;
+   flint_randinit(state);
    
    printf("is_prime_pocklington....");
    fflush(stdout);
@@ -45,7 +47,7 @@ int main(void)
 
       do
       {
-         d = n_randtest() | 1;
+         d = n_randtest(state) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -70,7 +72,7 @@ int main(void)
 
       do
       {
-         d = n_randtest() | 1;
+         d = n_randtest(state) | 1;
          if (d == 1UL) d++;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
@@ -93,6 +95,8 @@ int main(void)
       printf("FAIL: Pocklington-Lehmer failed too many times (%lu times)\n", count);
       abort();
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

@@ -32,8 +32,12 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("sqrt....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 100000; i++)
    {
@@ -43,7 +47,7 @@ int main(void)
       mpz_init(a_m);
       mpz_init(s2_m);
       
-      a = n_randtest();
+      a = n_randtest(state);
       
       s1 = n_sqrt(a);
 
@@ -71,10 +75,10 @@ int main(void)
       mpz_init(a_m);
       mpz_init(s2_m);
       
-      bits = n_randint(33);
-      a = n_randbits(bits);
+      bits = n_randint(33, state);
+      a = n_randbits(bits, state);
       a = a*a;
-      a += (n_randint(100) - 50);
+      a += (n_randint(100, state) - 50);
       s1 = n_sqrt(a);
 
       mpz_set_ui(a_m, a);
@@ -92,6 +96,8 @@ int main(void)
       mpz_clear(a_m);
       mpz_clear(s2_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

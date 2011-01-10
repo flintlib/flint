@@ -32,9 +32,13 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("is_oddprime_small....");
    fflush(stdout);
    
+   flint_randinit(state);
+
    for (i = 0; i < 100000; i++) /* Test that primes pass the test */
    {
       mp_limb_t d;
@@ -44,7 +48,7 @@ int main(void)
 
       do
       {
-         d = n_randint(FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
+         d = n_randint(FLINT_ODDPRIME_SMALL_CUTOFF, state) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -70,7 +74,7 @@ int main(void)
 
       do
       {
-         d = n_randint(FLINT_ODDPRIME_SMALL_CUTOFF) | 1;
+         d = n_randint(FLINT_ODDPRIME_SMALL_CUTOFF, state) | 1;
          mpz_set_ui(d_m, d);
       } while ((mpz_probab_prime_p(d_m, 12)) || (d > FLINT_ODDPRIME_SMALL_CUTOFF));
 
@@ -84,6 +88,8 @@ int main(void)
 
       mpz_clear(d_m);
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

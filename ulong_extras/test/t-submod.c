@@ -32,16 +32,20 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   
    printf("submod....");
    fflush(stdout);
+
+   flint_randinit(state);
 
    for (i = 0; i < 1000000; i++)
    {
       mp_limb_t a, b, d, r1, r2, s1;
       
-      d = n_randtest();
-      a = n_randint(d);
-      b = n_randint(d);
+      d = n_randtest(state);
+      a = n_randint(d, state);
+      b = n_randint(d, state);
       
       r1 = n_submod(a, b, d);
 
@@ -58,6 +62,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

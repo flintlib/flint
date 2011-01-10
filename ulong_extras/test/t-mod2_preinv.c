@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("mod2_preinv....");
    fflush(stdout);
 
@@ -39,8 +42,8 @@ int main(void)
    {
       mp_limb_t d, dinv, n, r1, r2;
 
-      d = n_randtest_not_zero();
-      n = n_randtest();
+      d = n_randtest_not_zero(state);
+      n = n_randtest(state);
       
       dinv = n_preinvert_limb(d);
 
@@ -56,6 +59,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;
