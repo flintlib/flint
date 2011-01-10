@@ -43,7 +43,7 @@ extern FILE * fdopen(int fildes, const char *mode);
 int main(void)
 {
     int i, j, n = 10000, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     FILE *in, *out;
     int fd[2];
@@ -52,7 +52,7 @@ int main(void)
     printf("print/ read....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     /* Randomise n integers, write to and read from a pipe */
     {
@@ -245,7 +245,7 @@ int main(void)
         }
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

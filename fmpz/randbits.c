@@ -32,20 +32,20 @@
 #include "fmpz.h"
 
 void
-fmpz_randbits(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
-        *f = n_randbits(bits, NULL);
-        if (n_randint(2, NULL))
+        *f = n_randbits(bits, state);
+        if (n_randint(2, state))
             *f = -*f;
     }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_urandomb(mpz_ptr, state, bits);
-        if (n_randint(2, NULL))
+        mpz_urandomb(mpz_ptr, state->gmp_state, bits);
+        if (n_randint(2, state))
             mpz_neg(mpz_ptr, mpz_ptr);
     }
 }

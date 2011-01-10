@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("mul_2exp....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -57,7 +57,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(200);
+        x = n_randint(200, state);
 
         fmpz_mul_2exp(b, a, x);
         mpz_mul_2exp(e, d, x);
@@ -97,7 +97,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(200);
+        x = n_randint(200, state);
 
         fmpz_mul_2exp(a, a, x);
         mpz_mul_2exp(e, d, x);
@@ -119,7 +119,7 @@ main(void)
         mpz_clear(f);
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -50,19 +50,19 @@ int main()
     fmpz ** comb_temp;
     fmpz_t temp, temp1, temp2;
 
-    fmpz_randstate_t rnd;
+    flint_rand_t state;
 
     printf("multi_CRT_ui_unsigned....");
     fflush(stdout);
 
     mpz_init(num1);
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     result = 1;
 
     for (i = 0; i < 10000; i++)
     {
-        bits = n_randint(300)+1;
+        bits = n_randint(300, state)+1;
 
         if (FLINT_BITS == 32)
             primes_per_limb = 1.0325;
@@ -82,7 +82,7 @@ int main()
 
         fmpz_init(input);
 
-        fmpz_randtest(input, rnd, bits);
+        fmpz_randtest(input, state, bits);
         fmpz_abs(input, input);
         fmpz_get_mpz(num1, input);
 
@@ -130,7 +130,7 @@ int main()
         free(primes);
     }
 
-    fmpz_randclear(rnd);
+    flint_randclear(state);
     mpz_clear(num1);
     _fmpz_cleanup();
     printf("PASS\n");

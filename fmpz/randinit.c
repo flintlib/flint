@@ -28,7 +28,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_randinit(fmpz_randstate_t state)
+void fmpz_randinit(flint_rand_t state)
 {
-    gmp_randinit_default(state);
+    gmp_randinit_default(state->gmp_state);
 }

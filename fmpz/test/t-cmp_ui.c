@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("cmp_ui....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     /* Compare with fmpz_cmp */
     for (i = 0; i < 100000; i++)
@@ -53,7 +53,7 @@ main(void)
 
         fmpz_randtest(a, state, 200);
 
-        n = n_randtest_not_zero();
+        n = n_randtest_not_zero(state);
         fmpz_set_ui(b, n);
 
         lhs = fmpz_cmp(a, b);
@@ -75,7 +75,7 @@ main(void)
         fmpz_clear(b);
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return EXIT_SUCCESS;

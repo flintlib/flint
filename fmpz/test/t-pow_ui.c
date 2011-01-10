@@ -34,12 +34,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("pow_ui....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -57,7 +57,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(20);
+        x = n_randint(20, state);
 
         fmpz_pow_ui(b, a, x);
         mpz_pow_ui(e, d, x);
@@ -96,7 +96,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(20);
+        x = n_randint(20, state);
 
         fmpz_pow_ui(a, a, x);
         mpz_pow_ui(e, d, x);
@@ -118,7 +118,7 @@ main(void)
         mpz_clear(f);
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("divexact_ui....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 100000; i++)
     {
@@ -55,7 +55,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        n = n_randtest_not_zero();
+        n = n_randtest_not_zero(state);
         fmpz_mul_ui(c, a, n);
 
         fmpz_get_mpz(e, c);
@@ -94,7 +94,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        n = n_randtest_not_zero();
+        n = n_randtest_not_zero(state);
         fmpz_mul_ui(c, a, n);
 
         fmpz_get_mpz(d, c);
@@ -119,7 +119,7 @@ main(void)
         mpz_clear(g);
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -32,7 +32,7 @@
 #include "fmpz.h"
 
 void
-fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m)
+fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
 {
     mp_bitcnt_t bits = fmpz_bits(m);
     int sgn = fmpz_sgn(m);
@@ -40,7 +40,7 @@ fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m)
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
-        *f =  (sgn >= 0) ? n_randint(*m, NULL) : - n_randint(-(*m), NULL);
+        *f =  (sgn >= 0) ? n_randint(*m, state) : - n_randint(-(*m), state);
     }
     else
     {

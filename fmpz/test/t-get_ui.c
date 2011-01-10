@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("get/set_ui....");
     fflush(stdout);
@@ -43,7 +45,7 @@ main(void)
         fmpz_t a;
         ulong b, c;
 
-        b = n_randtest();
+        b = n_randtest(state);
 
         fmpz_init(a);
 
@@ -62,6 +64,7 @@ main(void)
         fmpz_clear(a);
     }
 
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

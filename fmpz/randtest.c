@@ -33,7 +33,7 @@
 #include "ulong_extras.h"
 
 void
-fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     ulong m;
 
@@ -45,18 +45,18 @@ fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
 }
 
 void
-fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     ulong m;
 
-    m    = n_randlimb(NULL);
-    bits = n_randint(bits + 1, NULL);
+    m    = n_randlimb(state);
+    bits = n_randint(bits + 1, state);
 
     if (bits <= FLINT_BITS - 2)
     {
         _fmpz_demote(f);
         if (m & 3UL)
-            *f = n_randbits(bits, NULL);
+            *f = n_randbits(bits, state);
         else
         {
             m >>= 2;
@@ -71,13 +71,13 @@ fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
-        mpz_rrandomb(mpz_ptr, state, bits);
+        mpz_rrandomb(mpz_ptr, state->gmp_state, bits);
         _fmpz_demote_val(f);
     }
 }
 
 void
-fmpz_randtest_not_zero(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits)
+fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     if (bits == 0)
     {

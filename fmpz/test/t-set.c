@@ -35,8 +35,8 @@ main(void)
 {
     int i, result;
 
-    gmp_randstate_t state;
-    gmp_randinit_default(state);
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("set....");
     fflush(stdout);
@@ -50,10 +50,10 @@ main(void)
         mpz_init(c);
         mpz_init(d);
 
-        bits = n_randint(200) + 1;
+        bits = n_randint(200, state) + 1;
 
-        mpz_rrandomb(c, state, bits);
-        if (n_randint(2))
+        mpz_rrandomb(c, state->gmp_state, bits);
+        if (n_randint(2, state))
             mpz_neg(c, c);
 
         fmpz_init(a);
@@ -78,7 +78,7 @@ main(void)
         mpz_clear(d);
     }
 
-    gmp_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

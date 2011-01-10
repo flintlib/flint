@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     double output;
     long exp;
@@ -44,7 +44,7 @@ main(void)
     printf("get_d_2exp....");
     fflush(stdout);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -68,7 +68,7 @@ main(void)
         fmpz_clear(a);
     }
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

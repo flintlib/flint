@@ -51,6 +51,8 @@ int main(void)
     fmpz_t x;
     ulong p;
     long i, j, k, l;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("moebius_mu....");
     fflush(stdout);
@@ -68,11 +70,11 @@ int main(void)
     {
         fmpz_set_ui(x, 1);
         /* Product of some primes */
-        k = n_randtest() % 10;
-        l = n_randtest() % 10;
+        k = n_randtest(state) % 10;
+        l = n_randtest(state) % 10;
         for (j = 0; j < k; j++)
         {
-            l += (n_randtest() % 10) + 1;
+            l += (n_randtest(state) % 10) + 1;
             fmpz_mul_ui(x, x, flint_primes[l]);
         }
 
@@ -83,12 +85,14 @@ int main(void)
         fmpz_abs(x, x);
 
         /* No longer square-free */
-        p = flint_primes[n_randtest() % 100];
+        p = flint_primes[n_randtest(state) % 100];
         fmpz_mul_ui(x, x, p*p);
         check(x, 0);
     }
 
     fmpz_clear(x);
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

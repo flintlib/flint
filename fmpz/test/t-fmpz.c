@@ -34,7 +34,7 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("fmpz....");
     fflush(stdout);

@@ -103,19 +103,19 @@ void fmpz_clear(fmpz_t f)
 	_fmpz_demote(f);
 }
 
-void fmpz_randinit(fmpz_randstate_t state);
+void fmpz_randinit(flint_rand_t state);
 
-void fmpz_randclear(fmpz_randstate_t state);
+void fmpz_randclear(flint_rand_t state);
 
-void fmpz_randbits(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
+void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpz_randm(fmpz_t f, fmpz_randstate_t state, fmpz_t m);
+void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m);
 
-void fmpz_randtest(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
+void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpz_randtest_unsigned(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
+void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpz_randtest_not_zero(fmpz_t f, fmpz_randstate_t state, mp_bitcnt_t bits);
+void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
 long fmpz_get_si(const fmpz_t f);
 

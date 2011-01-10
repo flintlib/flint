@@ -40,13 +40,15 @@ int main()
     mp_limb_t * primes;
     mp_limb_t p;
     fmpz_comb_t comb;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("comb_init/clear....");
     fflush(stdout);
 
     for (i = 0; i < 1000; i++)
     {
-        n = n_randint(10);
+        n = n_randint(10, state);
         num_primes = (1L << n);
         primes = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
         p = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);
@@ -62,6 +64,7 @@ int main()
         free(primes);
     }
 
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

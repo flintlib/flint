@@ -28,7 +28,7 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_randclear(fmpz_randstate_t state)
+void fmpz_randclear(flint_rand_t state)
 {
-    gmp_randclear(state);
+    gmp_randclear(state->gmp_state);
 }
