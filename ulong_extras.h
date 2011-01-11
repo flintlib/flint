@@ -58,6 +58,12 @@ typedef struct factor_s
 
 #define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
 
+#if FLINT64
+#define ULONG_MAX_PRIME 18446744073709551557UL
+#else
+#define ULONG_MAX_PRIME 4294967291UL
+#endif
+
 
 extern const unsigned int flint_primes_small[];
 

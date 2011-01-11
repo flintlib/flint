@@ -59,7 +59,13 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
         n |= 1;
         return n;  
     }
-   
+
+    if (n >= ULONG_MAX_PRIME)
+    {
+        printf("Exception in n_nextprime: no larger single-limb prime exists");
+        abort();
+    }
+
     index = n % 30;
     n += nextmod30[index];
     index = nextindex[index];

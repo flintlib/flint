@@ -31,12 +31,6 @@
 #include "ulong_extras.h"
 
 
-#if FLINT64
-#define ULONG_MAX_PRIME 18446744073709551557UL
-#else
-#define ULONG_MAX_PRIME 4294967291UL
-#endif
-
 mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
 {
     mp_limb_t rand;

@@ -45,10 +45,22 @@ int main(void)
 
     flint_randinit(state);
 
+    if (n_nextprime(0, 0) != 2)
+    {
+        printf("FAIL: expected n_nextprime(0) = 2");
+        abort();
+    }
+
+    if (n_nextprime(ULONG_MAX_PRIME - 1, 0) != ULONG_MAX_PRIME)
+    {
+        printf("FAIL: expected n_nextprime(ULONG_MAX_PRIME-1) = ULONG_MAX_PRIME");
+        abort();
+    }
+
     mpz_init(mpz_n);
 
     result = 1;
-   
+
     for (rep = 0; rep < 100000; rep++)
     {
         unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
