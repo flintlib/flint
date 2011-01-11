@@ -72,8 +72,8 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b, c;
-        ulong n1 = n_randbits(FLINT_BITS / 2, state);
-        ulong n2 = n_randbits(FLINT_BITS / 2, state);
+        ulong n1 = n_randbits(state, FLINT_BITS / 2);
+        ulong n2 = n_randbits(state, FLINT_BITS / 2);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

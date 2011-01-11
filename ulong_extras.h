@@ -73,7 +73,7 @@ mp_limb_t n_randlimb(flint_rand_t state);
 
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit);
 
-mp_limb_t n_randbits(unsigned int bits, flint_rand_t state);
+mp_limb_t n_randbits(flint_rand_t state, unsigned int bits);
 
 mp_limb_t n_randtest(flint_rand_t state);
 

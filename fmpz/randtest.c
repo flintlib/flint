@@ -56,7 +56,7 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     {
         _fmpz_demote(f);
         if (m & 3UL)
-            *f = n_randbits(bits, state);
+            *f = n_randbits(state, bits);
         else
         {
             m >>= 2;

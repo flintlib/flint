@@ -27,7 +27,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randbits(unsigned int bits, flint_rand_t state)
+mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
 {
    if (bits == 0) return 0UL;
    else return (1UL << (bits - 1)) | n_randint(state, l_shift(1UL, bits));

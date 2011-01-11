@@ -45,7 +45,7 @@ int main(void)
       double dpre;
 
       mp_limb_t bits = n_randint(state, FLINT_D_BITS) + 1;
-      d = n_randbits(bits, state);
+      d = n_randbits(state, bits);
       a = n_randint(state, d);
       b = n_randint(state, d);
       

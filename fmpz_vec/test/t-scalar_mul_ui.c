@@ -75,7 +75,7 @@ main(void)
     {
         fmpz *a, *b;
         long len = n_randint(state, 100);
-        ulong n = n_randbits(FLINT_BITS, state);
+        ulong n = n_randbits(state, FLINT_BITS);
         fmpz_t x;
 
         a = _fmpz_vec_init(len);

@@ -49,7 +49,7 @@ main(void)
         fmpz_t n1;
         long len, n;
         len = n_randint(state, 100);
-        n = (long) n_randbits(FLINT_BITS - 1, state);
+        n = (long) n_randbits(state, FLINT_BITS - 1);
         if (n_randint(state, 2))
             n = -n;
         fmpz_init(n1);

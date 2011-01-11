@@ -78,7 +78,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        ulong n = n_randbits(FLINT_BITS - 1, state);
+        ulong n = n_randbits(state, FLINT_BITS - 1);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -110,8 +110,8 @@ main(void)
         long n1, n2;
         ulong m;
 
-        n1 = (long) n_randbits(FLINT_BITS / 2, state);
-        n2 = (long) n_randbits(FLINT_BITS / 2 - 1, state);
+        n1 = (long) n_randbits(state, FLINT_BITS / 2);
+        n2 = (long) n_randbits(state, FLINT_BITS / 2 - 1);
         m = n_randlimb(state);
         if (m & 1UL)
             n1 = -n1;

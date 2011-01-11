@@ -59,10 +59,10 @@ main(void)
                 nmod_mat_init(A, m, n, n_randtest_not_zero(state));
                 break;
             case 1:
-                nmod_mat_init(A, m, n, ULONG_MAX/2 + 1 - n_randbits(4, state));
+                nmod_mat_init(A, m, n, ULONG_MAX/2 + 1 - n_randbits(state, 4));
                 break;
             case 2:
-                nmod_mat_init(A, m, n, ULONG_MAX - n_randbits(4, state));
+                nmod_mat_init(A, m, n, ULONG_MAX - n_randbits(state, 4));
                 break;
         }
 
@@ -72,10 +72,10 @@ main(void)
                 nmod_mat_init(B, n, k, n_randtest_not_zero(state));
                 break;
             case 1:
-                nmod_mat_init(B, n, k, ULONG_MAX/2 + 1 - n_randbits(4, state));
+                nmod_mat_init(B, n, k, ULONG_MAX/2 + 1 - n_randbits(state, 4));
                 break;
             case 2:
-                nmod_mat_init(B, n, k, ULONG_MAX - n_randbits(4, state));
+                nmod_mat_init(B, n, k, ULONG_MAX - n_randbits(state, 4));
                 break;
         }
 
@@ -86,7 +86,7 @@ main(void)
                 nmod_mat_init(C, m, k, n_randtest_not_zero(state));
                 break;
             case 1:
-                nmod_mat_init(C, m, k, 1+n_randbits(4, state));
+                nmod_mat_init(C, m, k, 1+n_randbits(state, 4));
                 break;
         }
 

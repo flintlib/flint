@@ -54,13 +54,13 @@ mp_limb_t n_randlimb(flint_rand_t state)
     and \code{p_0 = nextprime(2^16)} on a 32-bit machine and 
     \code{p_1 = nextprime(p_0)}.
 
-mp_limb_t n_randbits(unsigned int bits, flint_rand_t state)
+mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
 
     Returns a uniformly pseudo random number with the given number of 
     bits. The most sifnificant bit is always set, unless zero is passed,
     in which case zero is returned.
 
-mp_limb_t n_randint(mp_limb_t limit, flint_rand_t state)
+mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
 
     Returns a uniformly pseudo random number up to but not including
     the given limit. If zero is passed as a parameter, an entire random

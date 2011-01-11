@@ -117,8 +117,8 @@ main(void)
         long n1, n2;
         ulong m;
 
-        while ((n1 = (long) n_randbits(FLINT_BITS / 2, state)) == 0) ;
-        while ((n2 = (long) n_randbits(FLINT_BITS / 2 - 1, state)) == 0) ;
+        while ((n1 = (long) n_randbits(state, FLINT_BITS / 2)) == 0) ;
+        while ((n2 = (long) n_randbits(state, FLINT_BITS / 2 - 1)) == 0) ;
 
         m = n_randlimb(state);
         if (m & 1UL)

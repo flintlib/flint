@@ -50,7 +50,7 @@ int main(void)
       if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(state, 64) + 1;
       else bits /= (exp1 + exp2);
       
-      n = n_randbits(bits, state);
+      n = n_randbits(state, bits);
       
       r1 = n_pow(n, exp1)*n_pow(n, exp2);
       r2 = n_pow(n, exp1 + exp2);

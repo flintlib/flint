@@ -50,11 +50,11 @@ int main(void)
 
       do
       {
-         a = n_randbits(bits1, state);
-         b = n_randbits(bits2, state);
+         a = n_randbits(state, bits1);
+         b = n_randbits(state, bits2);
       } while ((n_gcd(a, b) != 1UL) || (b > a));
 
-      c = n_randbits(bits3, state);
+      c = n_randbits(state, bits3);
 
       g = n_xgcd(&s, &t, a*c, b*c);
 

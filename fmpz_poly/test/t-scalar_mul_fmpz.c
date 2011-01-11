@@ -78,7 +78,7 @@ main(void)
         fmpz_t n1;
         long n;
         fmpz_init(n1);
-        n = (long) n_randbits(FLINT_BITS - 1, state);
+        n = (long) n_randbits(state, FLINT_BITS - 1);
         if (n_randint(state, 2))
             n = -n;
         fmpz_set_si(n1, n);

@@ -51,7 +51,7 @@ int main(void)
 
       do
       {
-         d = n_randbits(bits, state) | 1;
+         d = n_randbits(state, bits) | 1;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
          d = mpz_get_ui(d_m);
@@ -89,7 +89,7 @@ int main(void)
 
       do
       {
-         d = n_randbits(bits, state) | 1;
+         d = n_randbits(state, bits) | 1;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 

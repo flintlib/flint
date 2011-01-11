@@ -55,7 +55,7 @@ main(void)
 
         fmpz_randtest(a, state, bits - 1); /* need one bit for sign */
 
-        arr[0] = n_randbits(shift, state);
+        arr[0] = n_randbits(state, shift);
 
         fmpz_bit_pack(arr, shift, bits, a, negate, 0);
         fmpz_bit_unpack(b, arr, shift, bits, negate, 0);
@@ -88,7 +88,7 @@ main(void)
 
         fmpz_randtest_unsigned(a, state, bits);
 
-        arr[0] = n_randbits(shift, state);
+        arr[0] = n_randbits(state, shift);
 
         fmpz_bit_pack(arr, shift, bits, a, 0, 0);
         fmpz_bit_unpack_unsigned(b, arr, shift, bits);

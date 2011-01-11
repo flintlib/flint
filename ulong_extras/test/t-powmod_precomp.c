@@ -51,7 +51,7 @@ int main(void)
       mpz_init(r2_m);
       
       bits = n_randint(state, FLINT_D_BITS) + 1;
-      d = n_randbits(bits, state);
+      d = n_randbits(state, bits);
       do
       {
          a = n_randint(state, d);
