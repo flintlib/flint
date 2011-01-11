@@ -35,17 +35,17 @@ int
 main(void)
 {
     int i;
-    fmpz_randstate_t state;
+    flint_rand_t state;
     
     printf("init/clear....");
     fflush(stdout);
     
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        long j, len = n_randint(100) + 1;
+        long j, len = n_randint(100, state) + 1;
 
         a = _fmpz_vec_init(len);
         for (j = 0; j < len; j++)
@@ -54,7 +54,7 @@ main(void)
         _fmpz_vec_clear(a, len);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

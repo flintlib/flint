@@ -36,19 +36,19 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_mul_ui....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100);
-        ulong n = n_randtest();
+        long len = n_randint(100, state);
+        ulong n = n_randtest(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -74,8 +74,8 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100);
-        ulong n = n_randbits(FLINT_BITS);
+        long len = n_randint(100, state);
+        ulong n = n_randbits(FLINT_BITS, state);
         fmpz_t x;
 
         a = _fmpz_vec_init(len);
@@ -101,7 +101,7 @@ main(void)
         fmpz_clear(x);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

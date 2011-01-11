@@ -30,16 +30,16 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-mp_limb_signed_t z_randtest(void)
+mp_limb_signed_t z_randtest(flint_rand_t state)
 {
     mp_limb_t m;
     mp_limb_signed_t z;
 
-    m = n_randlimb(NULL);
+    m = n_randlimb(state);
 
     if (m & 7UL)
     {
-        z = n_randbits(n_randint(FLINT_BITS, NULL), NULL);
+        z = n_randbits(n_randint(FLINT_BITS, state), state);
     }
     else
     {
@@ -61,11 +61,11 @@ mp_limb_signed_t z_randtest(void)
     return z;
 }
 
-mp_limb_signed_t z_randtest_not_zero(void)
+mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
 {
     mp_limb_signed_t z;
 
-    while ((z = z_randtest()) == 0) ;
+    while ((z = z_randtest(state)) == 0) ;
     return z;
 }
 

@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, j, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("umul_ppmm....");
    fflush(stdout);
 
@@ -39,8 +42,8 @@ int main(void)
    {
       mp_limb_t ph1, pl1, ph2, pl2, pl2old, m1, m2, bit;
 
-      m1 = n_randtest();
-      m2 = n_randtest();
+      m1 = n_randtest(state);
+      m2 = n_randtest(state);
       
       umul_ppmm(ph1, pl1, m1, m2);
       
@@ -70,6 +73,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

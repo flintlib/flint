@@ -35,18 +35,18 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("neg....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -72,7 +72,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -94,7 +94,7 @@ main(void)
         _fmpz_vec_clear(b, len);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

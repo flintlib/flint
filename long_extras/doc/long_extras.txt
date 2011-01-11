@@ -29,7 +29,7 @@
 
 *******************************************************************************
 
-mp_limb_signed_t z_randtest()
+mp_limb_signed_t z_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits, from 
     $0$ to \code{FLINT_BITS}.  The probability of the special values $0$, 
@@ -38,7 +38,7 @@ mp_limb_signed_t z_randtest()
 
     This random function is mainly used for testing purposes.
 
-mp_limb_signed_t z_randtest_not_zero()
+mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
 
     As for \code{z_randtest()}, but does not return $0$.
 

@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("smul_ppmm....");
    fflush(stdout);
 
@@ -40,8 +43,8 @@ int main(void)
       mp_limb_t ph1, pl1, ph2, pl2, pl2old, n1, n2, m1, m2, bit;
       int j, sign;
 
-      n1 = n_randtest();
-      n2 = n_randtest();
+      n1 = n_randtest(state);
+      n2 = n_randtest(state);
       
       smul_ppmm(ph1, pl1, n1, n2);
 
@@ -90,6 +93,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("add_ssaaaa....");
    fflush(stdout);
 
@@ -39,10 +42,10 @@ int main(void)
    {
       mp_limb_t sh1, sl1, sh2, sl2, ah1, al1, ah2, al2;
 
-      ah1 = n_randtest();
-      al1 = n_randtest();
-      ah2 = n_randtest();
-      al2 = n_randtest();
+      ah1 = n_randtest(state);
+      al1 = n_randtest(state);
+      ah2 = n_randtest(state);
+      al2 = n_randtest(state);
       
       add_ssaaaa(sh1, sl1, ah1, al1, ah2, al2);
       
@@ -60,6 +63,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

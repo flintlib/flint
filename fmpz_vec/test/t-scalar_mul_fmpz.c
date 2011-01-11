@@ -36,22 +36,22 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_mul_fmpz....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
         fmpz_t n;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
-        if (n_randint(2))
+        if (n_randint(2, state))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
@@ -80,10 +80,10 @@ main(void)
     {
         fmpz *a, *b, *lhs, *rhs;
         fmpz_t n;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
-        if (n_randint(2))
+        if (n_randint(2, state))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
@@ -122,15 +122,15 @@ main(void)
     {
         fmpz *a, *b;
         fmpz_t n1, n2, n;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
         fmpz_init(n1);
         fmpz_init(n2);
         fmpz_init(n);
         fmpz_randtest(n1, state, 100);
         fmpz_randtest(n2, state, 100);
-        if (n_randint(2))
+        if (n_randint(2, state))
             fmpz_neg(n1, n1);
-        if (n_randint(2))
+        if (n_randint(2, state))
             fmpz_neg(n2, n2);
 
         a = _fmpz_vec_init(len);
@@ -158,7 +158,7 @@ main(void)
         fmpz_clear(n);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

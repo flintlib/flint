@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("sub_ddmmss....");
    fflush(stdout);
 
@@ -39,10 +42,10 @@ int main(void)
    {
       mp_limb_t dh1, dl1, dh2, dl2, mh, ml, sh, sl;
 
-      mh = n_randtest();
-      ml = n_randtest();
-      sh = n_randtest();
-      sl = n_randtest();
+      mh = n_randtest(state);
+      ml = n_randtest(state);
+      sh = n_randtest(state);
+      sl = n_randtest(state);
       
       sub_ddmmss(dh1, dl1, mh, ml, sh, sl);
       
@@ -61,6 +64,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

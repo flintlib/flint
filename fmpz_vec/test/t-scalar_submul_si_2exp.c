@@ -36,18 +36,18 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_submul_si_2exp....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     /* Compare with alternative method of computation */
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;
-        long len = n_randint(100), x;
+        long len = n_randint(100, state), x;
         mp_bitcnt_t exp;
 
         a = _fmpz_vec_init(len);
@@ -60,7 +60,7 @@ main(void)
         _fmpz_vec_set(c, b, len);
 
         x = z_randtest();
-        exp = n_randint(200);
+        exp = n_randint(200, state);
 
         _fmpz_vec_scalar_submul_si_2exp(b, a, len, x, exp);
         _fmpz_vec_scalar_mul_2exp(d, a, len, exp);
@@ -82,7 +82,7 @@ main(void)
         _fmpz_vec_clear(d, len);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

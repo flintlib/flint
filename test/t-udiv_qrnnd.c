@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("udiv_qrnnd....");
    fflush(stdout);
 
@@ -41,10 +44,10 @@ int main(void)
 
       do 
       {
-         d = n_randtest_not_zero();
-         nh = n_randtest();
+         d = n_randtest_not_zero(state);
+         nh = n_randtest(state);
       } while (nh >= d);
-      nl = n_randtest();
+      nl = n_randtest(state);
 
       udiv_qrnnd(q, r, nh, nl, d);
       umul_ppmm(ph, pl, d, q);
@@ -60,6 +63,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

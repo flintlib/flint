@@ -31,9 +31,9 @@
 
 /* Randomisation  ************************************************************/
 
-mp_limb_signed_t z_randtest(void);
+mp_limb_signed_t z_randtest(flint_rand_t state);
 
-mp_limb_signed_t z_randtest_not_zero(void);
+mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
 
 #endif
 

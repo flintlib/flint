@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("udiv_qrnnd_preinv....");
    fflush(stdout);
 
@@ -41,12 +44,12 @@ int main(void)
 
       do 
       {
-         d = n_randtest_not_zero();
-         nh = n_randtest();
+         d = n_randtest_not_zero(state);
+         nh = n_randtest(state);
          count_leading_zeros(norm, d);
          d <<= norm;
       } while (nh >= d);
-      nl = n_randtest();
+      nl = n_randtest(state);
 
       invert_limb(dinv, d);
 
@@ -62,6 +65,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("max_limbs....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -49,10 +49,10 @@ main(void)
         long len, bits;
         mp_size_t limbs, limbs2;
 
-        len = n_randint(100);
+        len = n_randint(100, state);
 
         a = _fmpz_vec_init(len);
-        bits = n_randint(200);
+        bits = n_randint(200, state);
         limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
         _fmpz_vec_randtest(a, state, len, bits);
 
@@ -72,7 +72,7 @@ main(void)
         _fmpz_vec_clear(a, len);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

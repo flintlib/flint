@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("count_trailing_zeros....");
    fflush(stdout);
 
@@ -40,7 +43,7 @@ int main(void)
       mp_limb_t n;
       unsigned int count;
 
-      n = n_randtest();
+      n = n_randtest(state);
 
       count_trailing_zeros(count, n);
 
@@ -52,6 +55,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

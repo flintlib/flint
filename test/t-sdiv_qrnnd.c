@@ -32,6 +32,9 @@
 int main(void)
 {
    int i, result;
+   flint_rand_t state;
+   flint_randinit(state);
+
    printf("sdiv_qrnnd....");
    fflush(stdout);
 
@@ -41,10 +44,10 @@ int main(void)
 
       do 
       {
-         d = n_randtest_not_zero();
-         nh = n_randtest();
+         d = n_randtest_not_zero(state);
+         nh = n_randtest(state);
       } while (FLINT_ABS(nh) >= FLINT_ABS(d)/2);
-      nl = n_randtest();
+      nl = n_randtest(state);
 
       sdiv_qrnnd(q, r, nh, nl, d);
       smul_ppmm(ph, pl, d, q);
@@ -61,6 +64,8 @@ int main(void)
          abort();
       }
    }
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

@@ -35,12 +35,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_addmul_fmpz....");
     fflush(stdout);
 
-    _fmpz_vec_randinit(state);
+    flint_randinit(state);
 
     /* Compare with fmpz_vec_scalar_addmul_si */
     for (i = 0; i < 10000; i++)
@@ -48,9 +48,9 @@ main(void)
         fmpz *a, *b, *c;
         fmpz_t n1;
         long len, n;
-        len = n_randint(100);
-        n = (long) n_randbits(FLINT_BITS - 1);
-        if (n_randint(2))
+        len = n_randint(100, state);
+        n = (long) n_randbits(FLINT_BITS - 1, state);
+        if (n_randint(2, state))
             n = -n;
         fmpz_init(n1);
         fmpz_set_si(n1, n);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;
-        long len = n_randint(100);
+        long len = n_randint(100, state);
         fmpz_t n1;
         fmpz_init(n1);
         fmpz_randtest(n1, state, 200);
@@ -117,7 +117,7 @@ main(void)
         _fmpz_vec_clear(d, len);
     }
 
-    _fmpz_vec_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
