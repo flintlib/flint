@@ -36,6 +36,8 @@ int
 main(void)
 {
     int i, j, result;
+    ulong cflags = 0UL;
+
     long n;
     mpq_t n_mpq;
     flint_rand_t state;
@@ -56,21 +58,24 @@ main(void)
 
         for (j = 0; j < 1000; j++)
         {
-            n = z_randtest();
+            n = z_randtest(state);
             coeff = n_randint(len, state);
             fmpq_poly_set_coeff_si(a, coeff, n);
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
+            cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
             result = (mpz_cmp_ui(mpq_denref(n_mpq), 1) == 0 
-                   && mpz_cmp_si(mpq_numref(n_mpq), n) == 0);
+                   && mpz_cmp_si(mpq_numref(n_mpq), n) == 0
+                   && !cflags);
             if (!result)
             {
                 printf("FAIL:\n");
-                printf("a     = "), fmpq_poly_print(a), printf("\n");
-                printf("len   = %ld\n", len);
-                printf("coeff = %ld\n", coeff);
-                printf("n     = %ld\n", n);
-                gmp_printf("n_mpq = %Qd\n", n_mpq);
+                printf("a      = "), fmpq_poly_debug(a), printf("\n");
+                printf("len    = %ld\n", len);
+                printf("coeff  = %ld\n", coeff);
+                printf("cflags = %lu\n", cflags);
+                printf("n      = %ld\n", n);
+                gmp_printf("n_mpq  = %Qd\n", n_mpq);
                 abort();
             }
         }
@@ -79,6 +84,7 @@ main(void)
 
     flint_randclear(state);
     mpq_clear(n_mpq);
+
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

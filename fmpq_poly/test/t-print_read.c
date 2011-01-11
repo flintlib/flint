@@ -142,8 +142,8 @@ int main(void)
                 if (!result)
                 {
                     printf("FAIL:\n");
-                    printf("a[i] = "), fmpq_poly_print(a[i]), printf("\n");
-                    printf("t    = "), fmpq_poly_print(t), printf("\n");
+                    printf("a[i] = "), fmpq_poly_debug(a[i]), printf("\n");
+                    printf("t    = "), fmpq_poly_debug(t), printf("\n");
                     abort();
                 }
 

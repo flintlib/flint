@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("monic/is_monic....");
     fflush(stdout);
@@ -55,12 +56,15 @@ main(void)
         fmpq_poly_monic(g, f);
         fmpq_poly_monic(f, f);
 
-        result = (fmpq_poly_equal(f, g));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
+        result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
-            fmpq_poly_print(g), printf("\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            fmpq_poly_debug(g), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -78,11 +82,13 @@ main(void)
 
         fmpq_poly_monic(f, f);
 
-        result = (fmpq_poly_is_monic(f));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        result = (fmpq_poly_is_monic(f) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

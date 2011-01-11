@@ -70,8 +70,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            printf("f = "), fmpq_poly_print(f), printf("\n");
-            printf("g = "), fmpq_poly_print(g), printf("\n");
+            printf("f = "), fmpq_poly_debug(f), printf("\n");
+            printf("g = "), fmpq_poly_debug(g), printf("\n");
             printf("a = "), fmpz_print(a), printf("\n");
             gmp_printf("f(a) + g(a) = %Qd\n", x);
             gmp_printf("(f + g)(a)  = %Qd\n", y);

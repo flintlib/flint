@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("neg....");
     fflush(stdout);
@@ -55,13 +56,16 @@ main(void)
         fmpq_poly_neg(b, a);
         fmpq_poly_neg(c, b);
 
-        result = (fmpq_poly_equal(a, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            fmpq_poly_debug(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

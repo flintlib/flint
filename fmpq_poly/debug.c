@@ -20,62 +20,27 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
-    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq_poly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+int fmpq_poly_debug(const fmpq_poly_t poly)
 {
-    int i, result;
-    flint_rand_t state;
-    ulong cflags = 0UL;
+    long i;
 
-    printf("get_set_str....");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    for (i = 0; i < 10000; i++)
+    printf("{alloc: %ld, length: %ld, coeffs:", poly->alloc, poly->length);
+    for (i = 0; i < poly->alloc; i++)
     {
-        int ans;
-        char * str;
-        fmpq_poly_t f, g;
-
-        fmpq_poly_init(f);
-        fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100, state), 200);
-        
-        str = fmpq_poly_get_str(f);
-        ans = fmpq_poly_set_str(g, str);
-
-        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
-        result = (ans == 0 && fmpq_poly_equal(f, g) && !cflags);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("f      = "), fmpq_poly_debug(f), printf("\n\n");
-            printf("g      = "), fmpq_poly_debug(g), printf("\n\n");
-            printf("ans    = %d\n\n", ans);
-            printf("cflags = %lu\n\n", cflags);
-            abort();
-        }
-
-        fmpq_poly_clear(f);
-        fmpq_poly_clear(g);
-        free(str);
+        printf(" ");
+        fmpz_print(poly->coeffs + i);
     }
-    
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    printf(", den: ");
+    fmpz_print(poly->den);
+    printf("}");
 }
+

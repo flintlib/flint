@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("scalar_mul_ui....");
     fflush(stdout);
@@ -56,12 +57,15 @@ main(void)
         fmpq_poly_scalar_mul_ui(b, a, n);
         fmpq_poly_scalar_mul_ui(a, a, n);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -88,15 +92,18 @@ main(void)
         fmpq_poly_add(lhs, a, b);
         fmpq_poly_scalar_mul_ui(lhs, lhs, n);
 
-        result = (fmpq_poly_equal(lhs, rhs));
+        cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
+        result = (fmpq_poly_equal(lhs, rhs) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
             printf("%li\n\n", n);
-            fmpq_poly_print(lhs), printf("\n\n");
-            fmpq_poly_print(rhs), printf("\n\n");
+            fmpq_poly_debug(lhs), printf("\n\n");
+            fmpq_poly_debug(rhs), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -120,14 +127,17 @@ main(void)
         fmpq_poly_scalar_mul_ui(c, b, n2);
         fmpq_poly_scalar_mul_ui(b, a, n1 * n2);
 
-        result = (fmpq_poly_equal(b, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("n1 = %lu, n2 = %lu:\n\n", n1, n2);
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            fmpq_poly_debug(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

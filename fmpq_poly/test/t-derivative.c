@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("derivative....");
     fflush(stdout);
@@ -55,12 +56,15 @@ main(void)
         fmpq_poly_derivative(b, a);
         fmpq_poly_derivative(a, a);
 
-        result = (fmpq_poly_equal(a, b));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -79,12 +83,14 @@ main(void)
 
         fmpq_poly_derivative(b, a);
 
-        result = (b->length == 0UL);
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        result = fmpq_poly_is_zero(b) && !cflags;
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -114,12 +120,15 @@ main(void)
         fmpq_poly_mul(d, a, d);
         fmpq_poly_add(rhs, c, d);
 
-        result = fmpq_poly_equal(lhs, rhs);
+        cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
+        result = fmpq_poly_equal(lhs, rhs) && !cflags;
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

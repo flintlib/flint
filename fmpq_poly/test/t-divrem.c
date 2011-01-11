@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("divrem....");
     fflush(stdout);
@@ -46,29 +47,42 @@ main(void)
     /* Check aliasing of {q,r} and {a,b} */
     for (i = 0; i < 2000; i++)
     {
+        fmpq_poly_t A, B;
         fmpq_poly_t a, b, q, r;
 
+        fmpq_poly_init(A);
+        fmpq_poly_init(B);
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(q);
         fmpq_poly_init(r);
-        fmpq_poly_randtest(a, state, n_randint(50, state), 200);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 200);
+
+        fmpq_poly_randtest(A, state, n_randint(50, state), 200);
+        fmpq_poly_randtest_not_zero(B, state, n_randint(50, state) + 1, 200);
+        fmpq_poly_set(a, A);
+        fmpq_poly_set(b, B);
 
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(a, b, a, b);
 
-        result = (fmpq_poly_equal(q, a)) && (fmpq_poly_equal(r, b));
+        cflags |= fmpq_poly_is_canonical(q) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 2;
+        result = (fmpq_poly_equal(q, a)) && (fmpq_poly_equal(r, b)) && !cflags;
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
-            printf("r = "), fmpq_poly_print(r), printf("\n\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("FAIL (aliasing {q,r} and {a,b}):\n\n");
+            printf("A = "), fmpq_poly_debug(A), printf("\n\n");
+            printf("B = "), fmpq_poly_debug(B), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("r = "), fmpq_poly_debug(r), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
+        fmpq_poly_clear(A);
+        fmpq_poly_clear(B);
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
         fmpq_poly_clear(q);
@@ -90,14 +104,17 @@ main(void)
         fmpq_poly_divrem(q, r, a, b);
         fmpq_poly_divrem(b, a, a, b);
 
-        result = (fmpq_poly_equal(q, b)) && (fmpq_poly_equal(r, a));
+        cflags |= fmpq_poly_is_canonical(q) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(q, b)) && (fmpq_poly_equal(r, a)) && !cflags;
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
-            printf("r = "), fmpq_poly_print(r), printf("\n\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
+            printf("FAIL (aliasing of {q,r} and {b,a}):\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("r = "), fmpq_poly_debug(r), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -124,15 +141,18 @@ main(void)
         fmpq_poly_mul(rhs, q, b);
         fmpq_poly_add(rhs, rhs, r);
 
-        result = fmpq_poly_equal(a, rhs);
+        cflags |= fmpq_poly_is_canonical(q)   ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
+        result = fmpq_poly_equal(a, rhs) && !cflags;
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a       = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b       = "), fmpq_poly_print(b), printf("\n\n");
-            printf("q       = "), fmpq_poly_print(q), printf("\n\n");
-            printf("r       = "), fmpq_poly_print(r), printf("\n\n");
-            printf("q b + r = "), fmpq_poly_print(rhs), printf("\n\n");
+            printf("FAIL (a == q b + r):\n\n");
+            printf("a       = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b       = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("q       = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("r       = "), fmpq_poly_debug(r), printf("\n\n");
+            printf("q b + r = "), fmpq_poly_debug(rhs), printf("\n\n");
+            printf("cflags  = %lu\n\n", cflags);
             abort();
         }
 

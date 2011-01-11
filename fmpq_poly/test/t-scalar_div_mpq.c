@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -37,10 +36,10 @@ int
 main(void)
 {
     int i, result;
-    flint_rand_t state;
     ulong cflags = 0UL;
+    flint_rand_t state;
 
-    printf("scalar_div_fmpz....");
+    printf("scalar_div_mpq....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -49,97 +48,78 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        fmpz_t n;
+        fmpz_t r, s;
+        mpq_t z;
 
-        fmpz_init(n);
-        fmpz_randtest_not_zero(n, state, 200);
+        mpq_init(z);
+        fmpz_init(r);
+        fmpz_init(s);
+        fmpz_randtest_not_zero(r, state, 100);
+        fmpz_randtest_not_zero(s, state, 100);
+        fmpz_get_mpz(mpq_numref(z), r);
+        fmpz_get_mpz(mpq_denref(z), s);
+        mpq_canonicalize(z);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
-        fmpq_poly_scalar_div_fmpz(b, a, n);
-        fmpq_poly_scalar_div_fmpz(a, a, n);
+        fmpq_poly_scalar_div_mpq(b, a, z);
+        fmpq_poly_scalar_div_mpq(a, a, z);
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
         result = (fmpq_poly_equal(a, b) && !cflags);
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
+            printf("FAIL (aliasing):\n\n");
             fmpq_poly_debug(a), printf("\n\n");
             fmpq_poly_debug(b), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
-            fmpz_print(n);
-            abort();
-        }
-
-        fmpz_clear(n);
-        fmpq_poly_clear(a);
-        fmpq_poly_clear(b);
-    }
-
-    /* Compare with fmpq_poly_scalar_mul_si */
-    for (i = 0; i < 10000; i++)
-    {
-        fmpq_poly_t a, b, c;
-        fmpz_t n1;
-        long n;
-
-        n = z_randtest_not_zero(state);
-        fmpz_init(n1);
-        fmpz_set_si(n1, n);
-
-        fmpq_poly_init(a);
-        fmpq_poly_init(b);
-        fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
-
-        fmpq_poly_scalar_div_fmpz(b, a, n1);
-        fmpq_poly_scalar_div_si(c, a, n);
-
-        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
-        result = (fmpq_poly_equal(b, c) && !cflags);
-        if (!result)
-        {
-            printf("FAIL (comparison with _si):\n");
-            fmpq_poly_debug(a), printf("\n\n");
-            fmpz_print(n1), printf("\n\n");
-            fmpq_poly_debug(b), printf("\n\n");
-            fmpq_poly_debug(c), printf("\n\n");
+            gmp_printf("z = %Qd\n\n", z);
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
-        fmpz_clear(n1);
+        mpq_clear(z);
+        fmpz_clear(r);
+        fmpz_clear(s);
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
-        fmpq_poly_clear(c);
     }
 
     /* Check that (a / n1) / n2 == a / (n1 * n2) */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, lhs, rhs;
-        fmpz_t n1, n2, n;
+        fmpz_t r, s;
+        mpq_t z1, z2, z;
 
-        fmpz_init(n1);
-        fmpz_init(n2);
-        fmpz_init(n);
+        fmpz_init(r);
+        fmpz_init(s);
+        mpq_init(z1);
+        mpq_init(z2);
+        mpq_init(z);
 
-        fmpz_randtest_not_zero(n1, state, 100);
-        fmpz_randtest_not_zero(n2, state, 100);
-        fmpz_mul(n, n1, n2);
+        fmpz_randtest_not_zero(r, state, 100);
+        fmpz_randtest_not_zero(s, state, 100);
+        fmpz_get_mpz(mpq_numref(z1), r);
+        fmpz_get_mpz(mpq_denref(z1), s);
+        mpq_canonicalize(z1);
+        fmpz_randtest_not_zero(r, state, 100);
+        fmpz_randtest_not_zero(s, state, 100);
+        fmpz_get_mpz(mpq_numref(z2), r);
+        fmpz_get_mpz(mpq_denref(z2), s);
+        mpq_canonicalize(z2);
+        mpq_mul(z, z1, z2);
 
         fmpq_poly_init(a);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
         fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
-        fmpq_poly_scalar_div_fmpz(lhs, a, n1);
-        fmpq_poly_scalar_div_fmpz(lhs, lhs, n2);
-        fmpq_poly_scalar_div_fmpz(rhs, a, n);
+        fmpq_poly_scalar_div_mpq(lhs, a, z1);
+        fmpq_poly_scalar_div_mpq(lhs, lhs, z2);
+        fmpq_poly_scalar_div_mpq(rhs, a, z);
 
         cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
@@ -148,18 +128,20 @@ main(void)
         {
             printf("FAIL (a / n1 / n2):\n");
             fmpq_poly_debug(a), printf("\n\n");
-            fmpz_print(n1), printf("\n\n");
-            fmpz_print(n2), printf("\n\n");
-            fmpz_print(n), printf("\n\n");
+            gmp_printf("z1 = %Qd\n\n", z1);
+            gmp_printf("z2 = %Qd\n\n", z2);
+            gmp_printf("z  = %Qd\n\n", z);
             fmpq_poly_debug(lhs), printf("\n\n");
             fmpq_poly_debug(rhs), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
-        fmpz_clear(n1);
-        fmpz_clear(n2);
-        fmpz_clear(n);
+        mpq_clear(z1);
+        mpq_clear(z2);
+        mpq_clear(z);
+        fmpz_clear(r);
+        fmpz_clear(s);
         fmpq_poly_clear(a);
         fmpq_poly_clear(lhs);
         fmpq_poly_clear(rhs);
@@ -169,11 +151,18 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, lhs, rhs;
-        fmpz_t n;
+        fmpz_t r, s;
+        mpq_t z;
 
-        fmpz_init(n);
+        fmpz_init(r);
+        fmpz_init(s);
+        mpq_init(z);
 
-        fmpz_randtest_not_zero(n, state, 100);
+        fmpz_randtest_not_zero(r, state, 100);
+        fmpz_randtest_not_zero(s, state, 100);
+        fmpz_get_mpz(mpq_numref(z), r);
+        fmpz_get_mpz(mpq_denref(z), s);
+        mpq_canonicalize(z);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -182,11 +171,11 @@ main(void)
         fmpq_poly_randtest(a, state, n_randint(100, state), 200);
         fmpq_poly_randtest(b, state, n_randint(100, state), 200);
 
-        fmpq_poly_scalar_div_fmpz(lhs, a, n);
-        fmpq_poly_scalar_div_fmpz(rhs, b, n);
+        fmpq_poly_scalar_div_mpq(lhs, a, z);
+        fmpq_poly_scalar_div_mpq(rhs, b, z);
         fmpq_poly_add(rhs, lhs, rhs);
         fmpq_poly_add(lhs, a, b);
-        fmpq_poly_scalar_div_fmpz(lhs, lhs, n);
+        fmpq_poly_scalar_div_mpq(lhs, lhs, z);
 
         cflags |= fmpq_poly_is_canonical(lhs) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(rhs) ? 0 : 2;
@@ -196,14 +185,16 @@ main(void)
             printf("FAIL ((a + b) / n):\n");
             fmpq_poly_debug(a), printf("\n\n");
             fmpq_poly_debug(b), printf("\n\n");
-            fmpz_print(n), printf("\n\n");
+            gmp_printf("z = %Qd\n\n", z);
             fmpq_poly_debug(lhs), printf("\n\n");
             fmpq_poly_debug(rhs), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
-        fmpz_clear(n);
+        mpq_clear(z);
+        fmpz_clear(r);
+        fmpz_clear(s);
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
         fmpq_poly_clear(lhs);

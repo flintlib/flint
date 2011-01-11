@@ -37,6 +37,8 @@ main(void)
 {
     int i, j, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
+
     mpq_t n1, n2;
 
     printf("get/set_coeff_mpz....");
@@ -70,9 +72,13 @@ main(void)
             result = (mpq_equal(n1, n2));
             if (!result)
             {
-                gmp_printf
-                    ("FAIL: n1 = %Qd, n2 = %Qd, coeff = %ld, length = %ld\n",
-                     n1, n2, coeff, len);
+                printf("FAIL:\n\n");
+                printf("a     = "), fmpq_poly_debug(a), printf("\n\n");
+                printf("coeff = %ld\n\n", coeff);
+                printf("len   = %ld\n\n", len);
+                printf("cflags = %lu\n\n", cflags);
+                gmp_printf("n1 = %Qd\n\n", n1);
+                gmp_printf("n2 = %Qd\n\n", n2);
                 abort();
             }
         }

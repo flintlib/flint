@@ -31,41 +31,65 @@
 
 int main(void)
 {
-   int i, j, result;
-   flint_rand_t state;
-   flint_randinit(state);
+    int i, j, result;
+    flint_rand_t state;
+    flint_randinit(state);
 
-   printf("factor....");
-   fflush(stdout);
- 
-   for (i = 0; i < 10000; i++) /* Test random numbers */
-   {
-      mp_limb_t n1, n2;
-      n_factor_t factors;
+    printf("factor....");
+    fflush(stdout);
 
-      n_factor_init(&factors);
+    /* Test random numbers */
+    for (i = 0; i < 10000; i++)
+    {
+        mp_limb_t n1, n2;
+        n_factor_t factors;
 
-      n1 = n_randtest_not_zero(state);
-      n_factor(&factors, n1, 0);
-      
-      n2 = 1UL;
+        n_factor_init(&factors);
 
-      for (j = 0; j < factors.num; j++)
-      {
-         n2 *= n_pow(factors.p[j], factors.exp[j]);
-      }
+        n1 = n_randtest_not_zero(state);
+        n_factor(&factors, n1, 0);
 
-      result = (n1 == n2);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         printf("n1 = %lu, n2 = %lu\n", n1, n2); 
-         abort();
-      }
-   }
+        n2 = 1UL;
+        for (j = 0; j < factors.num; j++)
+        {
+            n2 *= n_pow(factors.p[j], factors.exp[j]);
+        }
 
-   flint_randclear(state);
+        result = (n1 == n2);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            abort();
+        }
+    }
 
-   printf("PASS\n");
-   return 0;
+    {
+        mp_limb_t n1, n2;
+        n_factor_t factors;
+
+        n_factor_init(&factors);
+
+        n1 = 4253857039UL;
+        n_factor(&factors, n1, 0);
+
+        n2 = 1UL;
+        for (j = 0; j < factors.num; j++)
+        {
+            n2 *= n_pow(factors.p[j], factors.exp[j]);
+        }
+
+        result = (n1 == n2);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("n1 = %lu, n2 = %lu\n", n1, n2); 
+            abort();
+        }
+    }
+
+    flint_randclear(state);
+
+    printf("PASS\n");
+    return 0;
 }

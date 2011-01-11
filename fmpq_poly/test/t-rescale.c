@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("rescale....");
     fflush(stdout);
@@ -67,12 +68,15 @@ main(void)
         fmpq_poly_rescale(g, f, a);
         fmpq_poly_rescale(f, f, a);
 
-        result = (fmpq_poly_equal(f, g));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
+        result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
             printf("FAIL (aliasing):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            fmpq_poly_debug(g), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -108,12 +112,15 @@ main(void)
         mpq_inv(a, a);
         fmpq_poly_rescale(g, g, a);
 
-        result = (fmpq_poly_equal(f, g));
+        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
+        result = (fmpq_poly_equal(f, g) && !cflags);
         if (!result)
         {
             printf("FAIL (composition of a and 1/a):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
+            fmpq_poly_debug(f), printf("\n\n");
+            fmpq_poly_debug(g), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

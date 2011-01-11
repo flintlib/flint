@@ -55,7 +55,7 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_debug(f), printf("\n");
             abort();
         }
 
@@ -81,7 +81,7 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n");
+            fmpq_poly_debug(f), printf("\n");
             abort();
         }
 

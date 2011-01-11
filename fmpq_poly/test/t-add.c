@@ -36,6 +36,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
     
     printf("add....");
     fflush(stdout);
@@ -56,13 +57,16 @@ main(void)
         fmpq_poly_add(c, a, b);
         fmpq_poly_add(a, a, b);
 
-        result = (fmpq_poly_equal(a, c));
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(a, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            fmpq_poly_debug(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -85,13 +89,16 @@ main(void)
         fmpq_poly_add(c, a, b);
         fmpq_poly_add(b, a, b);
 
-        result = (fmpq_poly_equal(b, c));
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(c) ? 0 : 2;
+        result = (fmpq_poly_equal(b, c) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpq_poly_print(a), printf("\n\n");
-            fmpq_poly_print(b), printf("\n\n");
-            fmpq_poly_print(c), printf("\n\n");
+            fmpq_poly_debug(a), printf("\n\n");
+            fmpq_poly_debug(b), printf("\n\n");
+            fmpq_poly_debug(c), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 

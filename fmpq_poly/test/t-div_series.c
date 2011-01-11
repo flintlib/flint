@@ -37,6 +37,7 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
+    ulong cflags = 0UL;
 
     printf("div_series....");
     fflush(stdout);
@@ -60,13 +61,16 @@ main(void)
         fmpq_poly_div_series(q, a, b, n);
         fmpq_poly_div_series(a, a, b, n);
 
-        result = (fmpq_poly_equal(q, a));
+        cflags |= fmpq_poly_is_canonical(q) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 2;
+        result = (fmpq_poly_equal(q, a)) && !cflags;
         if (!result)
         {
             printf("FAIL (alias q and a):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -92,13 +96,16 @@ main(void)
         fmpq_poly_div_series(q, a, b, n);
         fmpq_poly_div_series(b, a, b, n);
 
-        result = (fmpq_poly_equal(q, b));
+        cflags |= fmpq_poly_is_canonical(q) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
+        result = (fmpq_poly_equal(q, b)) && !cflags;
         if (!result)
         {
             printf("FAIL (alias q and b):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
@@ -127,14 +134,18 @@ main(void)
 
         fmpq_poly_truncate(a, n);
 
-        result = (fmpq_poly_equal(p, a));
+        cflags |= fmpq_poly_is_canonical(q) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(p) ? 0 : 2;
+        cflags |= fmpq_poly_is_canonical(a) ? 0 : 4;
+        result = (fmpq_poly_equal(p, a)) && !cflags;
         if (!result)
         {
             printf("FAIL (check Q * B = A):\n");
-            printf("a = "), fmpq_poly_print(a), printf("\n\n");
-            printf("b = "), fmpq_poly_print(b), printf("\n\n");
-            printf("p = "), fmpq_poly_print(p), printf("\n\n");
-            printf("q = "), fmpq_poly_print(q), printf("\n\n");
+            printf("a = "), fmpq_poly_debug(a), printf("\n\n");
+            printf("b = "), fmpq_poly_debug(b), printf("\n\n");
+            printf("p = "), fmpq_poly_debug(p), printf("\n\n");
+            printf("q = "), fmpq_poly_debug(q), printf("\n\n");
+            printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
