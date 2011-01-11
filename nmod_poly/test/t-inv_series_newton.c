@@ -54,7 +54,7 @@ main(void)
         nmod_poly_init(qinv, n);
         nmod_poly_init(q, n);
         
-        do nmod_poly_randtest(q, n_randint(state, 2000), state);
+        do nmod_poly_randtest(q, state, n_randint(state, 2000));
         while (q->length == 0 || q->coeffs[0] == 0);
 
         m = n_randint(state, q->length) + 1;
@@ -92,7 +92,7 @@ main(void)
 
         nmod_poly_init(q, n);
         nmod_poly_init(qinv, n);
-        do nmod_poly_randtest(q, n_randint(state, 1000), state);
+        do nmod_poly_randtest(q, state, n_randint(state, 1000));
         while (q->length == 0 || q->coeffs[0] == 0);
 
         m = n_randint(state, q->length) + 1;

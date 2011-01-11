@@ -54,8 +54,8 @@ main(void)
         nmod_poly_init(r, n);
         nmod_poly_init(prod, n);
         
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
 
         nmod_poly_divrem(q, r, a, b);
@@ -94,8 +94,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
 
         nmod_poly_divrem(q, r, a, b);
@@ -132,8 +132,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
 
         nmod_poly_divrem(q, r, a, b);
@@ -170,8 +170,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
 
         nmod_poly_divrem(q, r, a, b);
@@ -208,8 +208,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0);
 
         nmod_poly_divrem(q, r, a, b);

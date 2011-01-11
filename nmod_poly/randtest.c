@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, long len, flint_rand_t state)
+nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 {
     long i;
 

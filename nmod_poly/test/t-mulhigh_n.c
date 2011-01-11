@@ -53,8 +53,8 @@ main(void)
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
         n = n_randint(state, 50);
-        nmod_poly_randtest(b, n, state);
-        nmod_poly_randtest(c, n, state);
+        nmod_poly_randtest(b, state, n);
+        nmod_poly_randtest(c, state, n);
 
         nmod_poly_mulhigh_n(a, b, c, n);
         nmod_poly_mul(b, b, c);

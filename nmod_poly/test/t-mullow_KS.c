@@ -51,8 +51,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         if (b->length > 0 && c->length > 0)
             trunc = n_randint(state, b->length + c->length);
@@ -84,8 +84,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         if (b->length > 0 && c->length > 0)
             trunc = n_randint(state, b->length + c->length);
@@ -118,8 +118,8 @@ main(void)
         nmod_poly_init(a2, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         if (b->length > 0 && c->length > 0)
             trunc = n_randint(state, b->length + c->length);

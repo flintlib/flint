@@ -49,7 +49,7 @@ main(void)
   
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
         
         nmod_poly_shift_left(b, a, shift);
         nmod_poly_shift_right(b, b, shift);
@@ -79,7 +79,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(c, n_randint(state, 100), state);
+        nmod_poly_randtest(c, state, n_randint(state, 100));
         
         nmod_poly_set(a, c);
         nmod_poly_shift_left(c, c, shift);

@@ -52,8 +52,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         len = b->length + c->length - 1;
         if (len <= 0)
@@ -88,8 +88,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         len = b->length + c->length - 1;
         if (len <= 0)
@@ -125,8 +125,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
-        nmod_poly_randtest(b, n_randint(state, 50), state);
-        nmod_poly_randtest(c, n_randint(state, 50), state);
+        nmod_poly_randtest(b, state, n_randint(state, 50));
+        nmod_poly_randtest(c, state, n_randint(state, 50));
 
         len = b->length + c->length - 1;
         if (len <= 0)

@@ -49,7 +49,7 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
         
         len = nmod_poly_length(a);
 
@@ -80,7 +80,7 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, len, state);
+        nmod_poly_randtest(a, state, len);
         
         nmod_poly_reverse(b, a, m);
         nmod_poly_reverse(b, b, m);

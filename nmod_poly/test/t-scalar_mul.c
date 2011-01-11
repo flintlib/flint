@@ -49,7 +49,7 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
 
         nmod_poly_scalar_mul(b, a, c);
         nmod_poly_scalar_mul(a, a, c);
@@ -78,8 +78,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(d1, n);
         nmod_poly_init(d2, n);
-        nmod_poly_randtest(a, n_randint(state, 100), state);
-        nmod_poly_randtest(b, n_randint(state, 100), state);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
+        nmod_poly_randtest(b, state, n_randint(state, 100));
 
         nmod_poly_add(d1, a, b);
         nmod_poly_scalar_mul(d1, d1, c);

@@ -51,7 +51,7 @@ main(void)
         j = n_randint(state, 100);
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
 
         nmod_poly_set_coeff_ui(a, j, c1);
         c2 = nmod_poly_get_coeff_ui(a, j);

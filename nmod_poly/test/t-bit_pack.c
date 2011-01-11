@@ -58,7 +58,7 @@ main(void)
         nmod_poly_init(b, n);
         do
         {
-            nmod_poly_randtest(a, n_randint(state, 100), state);
+            nmod_poly_randtest(a, state, n_randint(state, 100));
         } while (a->length == 0);
 
         mpn =

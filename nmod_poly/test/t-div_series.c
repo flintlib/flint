@@ -55,8 +55,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         
-        nmod_poly_randtest(a, n_randint(state, 2000), state);
-        do nmod_poly_randtest(b, n_randint(state, 2000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 2000));
+        do nmod_poly_randtest(b, state, n_randint(state, 2000));
         while (b->length == 0 || b->coeffs[0] == 0);
 
         m = n_randint(state, 2000) + 1;
@@ -97,8 +97,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
 
-        nmod_poly_randtest(a, n_randint(state, 1000), state);
-        do nmod_poly_randtest(b, n_randint(state, 1000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 1000));
+        do nmod_poly_randtest(b, state, n_randint(state, 1000));
         while (b->length == 0 || b->coeffs[0] == 0);
 
         m = n_randint(state, 1000) + 1;
@@ -136,8 +136,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
 
-        nmod_poly_randtest(a, n_randint(state, 1000), state);
-        do nmod_poly_randtest(b, n_randint(state, 1000), state);
+        nmod_poly_randtest(a, state, n_randint(state, 1000));
+        do nmod_poly_randtest(b, state, n_randint(state, 1000));
         while (b->length == 0 || b->coeffs[0] == 0);
 
         m = n_randint(state, 1000) + 1;
