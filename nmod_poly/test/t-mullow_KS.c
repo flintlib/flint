@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("mullow_KS....");
     fflush(stdout);
 
@@ -42,17 +45,17 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         long trunc = 0;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         if (b->length > 0 && c->length > 0)
-            trunc = n_randint(b->length + c->length);
+            trunc = n_randint(b->length + c->length, state);
 
         nmod_poly_mullow_KS(a, b, c, 0, trunc);
         nmod_poly_mullow_KS(b, b, c, 0, trunc);
@@ -75,17 +78,17 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         long trunc = 0;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         if (b->length > 0 && c->length > 0)
-            trunc = n_randint(b->length + c->length);
+            trunc = n_randint(b->length + c->length, state);
 
         nmod_poly_mullow_KS(a, b, c, 0, trunc);
         nmod_poly_mullow_KS(c, b, c, 0, trunc);
@@ -108,18 +111,18 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a1, a2, b, c;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         long trunc = 0;
 
         nmod_poly_init(a1, n);
         nmod_poly_init(a2, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         if (b->length > 0 && c->length > 0)
-            trunc = n_randint(b->length + c->length);
+            trunc = n_randint(b->length + c->length, state);
 
         nmod_poly_mullow_classical(a1, b, c, trunc);
         nmod_poly_mullow_KS(a2, b, c, 0, trunc);
@@ -138,6 +141,8 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

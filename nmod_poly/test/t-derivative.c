@@ -36,6 +36,8 @@ main(void)
 {
     int i, j, result = 1;
     fmpz_t t;
+    flint_rand_t state;
+    flint_randinit(state);
     
     printf("derivative....");
     fflush(stdout);
@@ -46,11 +48,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
         
         nmod_poly_derivative(b, a);
         
@@ -86,11 +88,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
         
         nmod_poly_derivative(b, a);
         nmod_poly_derivative(a, a);
@@ -108,6 +110,8 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

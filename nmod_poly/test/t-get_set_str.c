@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result, r1;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("get/set_str....");
     fflush(stdout);
@@ -42,12 +44,12 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         char * str;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
         
         str = nmod_poly_get_str(a);
         r1 = nmod_poly_set_str(str, b);
@@ -67,6 +69,8 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

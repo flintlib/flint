@@ -35,6 +35,8 @@ main(void)
 {
     int i, result;
     ulong j;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("get/set_coeff_ui....");
     fflush(stdout);
@@ -43,13 +45,13 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a;
-        mp_limb_t n = n_randtest_not_zero();
-        mp_limb_t c1 = n_randtest(), c2;
+        mp_limb_t n = n_randtest_not_zero(state);
+        mp_limb_t c1 = n_randtest(state), c2;
         
-        j = n_randint(100);
+        j = n_randint(100, state);
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
 
         nmod_poly_set_coeff_ui(a, j, c1);
         c2 = nmod_poly_get_coeff_ui(a, j);
@@ -65,6 +67,8 @@ main(void)
 
         nmod_poly_clear(a);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

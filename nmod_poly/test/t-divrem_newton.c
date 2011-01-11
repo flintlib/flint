@@ -34,6 +34,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("divrem_newton....");
     fflush(stdout);
 
@@ -43,7 +46,7 @@ main(void)
         nmod_poly_t a, b, q, r, prod;
 
         mp_limb_t n;
-        do n = n_randtest_not_zero();
+        do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
@@ -52,8 +55,8 @@ main(void)
         nmod_poly_init(r, n);
         nmod_poly_init(prod, n);
         
-        nmod_poly_randtest(a, n_randint(200));
-        do nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        do nmod_poly_randtest(b, n_randint(200, state), state);
         while (b->length == 0);
 
         nmod_poly_divrem_newton(q, r, a, b);
@@ -85,15 +88,15 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        do nmod_poly_randtest(b, n_randint(200, state), state);
         while (b->length == 0);
 
         nmod_poly_divrem_newton(q, r, a, b);
@@ -123,15 +126,15 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        do nmod_poly_randtest(b, n_randint(200, state), state);
         while (b->length == 0);
 
         nmod_poly_divrem_newton(q, r, a, b);
@@ -161,15 +164,15 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        do nmod_poly_randtest(b, n_randint(200, state), state);
         while (b->length == 0);
 
         nmod_poly_divrem_newton(q, r, a, b);
@@ -199,15 +202,15 @@ main(void)
         nmod_poly_t a, b, q, r;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
         nmod_poly_init(r, n);
-        nmod_poly_randtest(a, n_randint(200));
-        do nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        do nmod_poly_randtest(b, n_randint(200, state), state);
         while (b->length == 0);
 
         nmod_poly_divrem_newton(q, r, a, b);
@@ -230,6 +233,8 @@ main(void)
         nmod_poly_clear(q);
         nmod_poly_clear(r);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("mul_clasical....");
     fflush(stdout);
 
@@ -43,13 +46,13 @@ main(void)
     {
         nmod_poly_t a, b, c;
 
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         nmod_poly_mul_classical(a, b, c);
         nmod_poly_mul_classical(b, b, c);
@@ -73,13 +76,13 @@ main(void)
     {
         nmod_poly_t a, b, c;
 
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         nmod_poly_mul_classical(a, b, c);
         nmod_poly_mul_classical(c, b, c);
@@ -103,16 +106,16 @@ main(void)
     {
         nmod_poly_t a1, a2, b, c, d;
 
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a1, n);
         nmod_poly_init(a2, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
-        nmod_poly_randtest(d, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(d, n_randint(50, state), state);
 
         nmod_poly_mul_classical(a1, b, c);
         nmod_poly_mul_classical(a2, b, d);
@@ -136,6 +139,8 @@ main(void)
         nmod_poly_clear(c);
         nmod_poly_clear(d);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

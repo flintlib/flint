@@ -34,6 +34,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("gcd_euclidean....");
     fflush(stdout);
 
@@ -46,7 +49,7 @@ main(void)
         nmod_poly_t a, b, c, g;
 
         mp_limb_t n;
-        do n = n_randtest_not_zero();
+        do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
@@ -55,13 +58,13 @@ main(void)
         nmod_poly_init(g, n);
         
         do {
-            nmod_poly_randtest(a, n_randint(200));
-            nmod_poly_randtest(b, n_randint(200));
+            nmod_poly_randtest(a, n_randint(200, state), state);
+            nmod_poly_randtest(b, n_randint(200, state), state);
             nmod_poly_gcd_euclidean(g, a, b);
         } while (g->length != 1);
 
         do {
-            nmod_poly_randtest(c, n_randint(200));
+            nmod_poly_randtest(c, n_randint(200, state), state);
         } while (c->length < 2);
         nmod_poly_make_monic(c, c);
         
@@ -94,14 +97,14 @@ main(void)
         nmod_poly_t a, b, g;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(g, n);
-        nmod_poly_randtest(a, n_randint(200));
-        nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        nmod_poly_randtest(b, n_randint(200, state), state);
         
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(a, a, b);
@@ -128,14 +131,14 @@ main(void)
         nmod_poly_t a, b, g;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(g, n);
-        nmod_poly_randtest(a, n_randint(200));
-        nmod_poly_randtest(b, n_randint(200));
+        nmod_poly_randtest(a, n_randint(200, state), state);
+        nmod_poly_randtest(b, n_randint(200, state), state);
        
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(b, a, b);
@@ -155,6 +158,8 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(g);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("mulhigh_classical....");
     fflush(stdout);
 
@@ -44,19 +47,19 @@ main(void)
         nmod_poly_t a, b, c;
         long len, start;
 
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length);
+            start = n_randint(b->length + c->length, state);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(b, b, c, start);
@@ -80,19 +83,19 @@ main(void)
     {
         nmod_poly_t a, b, c;
         long len, start;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length - 1);
+            start = n_randint(b->length + c->length - 1, state);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(c, b, c, start);
@@ -116,20 +119,20 @@ main(void)
     {
         nmod_poly_t a, b, c, d;
         long len, start;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
-        nmod_poly_randtest(b, n_randint(50));
-        nmod_poly_randtest(c, n_randint(50));
+        nmod_poly_randtest(b, n_randint(50, state), state);
+        nmod_poly_randtest(c, n_randint(50, state), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length - 1);
+            start = n_randint(b->length + c->length - 1, state);
 
         nmod_poly_mul_classical(a, b, c);
         if (a->length >= start)
@@ -150,6 +153,8 @@ main(void)
         nmod_poly_clear(c);
         nmod_poly_clear(d);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

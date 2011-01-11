@@ -34,6 +34,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("inv_series_newton....");
     fflush(stdout);
 
@@ -44,17 +47,17 @@ main(void)
         long m;
 
         mp_limb_t n;
-        do n = n_randtest_not_zero();
+        do n = n_randtest_not_zero(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(prod, n);
         nmod_poly_init(qinv, n);
         nmod_poly_init(q, n);
         
-        do nmod_poly_randtest(q, n_randint(2000));
+        do nmod_poly_randtest(q, n_randint(2000, state), state);
         while (q->length == 0 || q->coeffs[0] == 0);
 
-        m = n_randint(q->length) + 1;
+        m = n_randint(q->length, state) + 1;
 
         nmod_poly_inv_series_newton(qinv, q, m);
         
@@ -84,15 +87,15 @@ main(void)
         long m;
 
         mp_limb_t n;
-        do n = n_randtest();
+        do n = n_randtest(state);
         while (!n_is_probabprime(n));
 
         nmod_poly_init(q, n);
         nmod_poly_init(qinv, n);
-        do nmod_poly_randtest(q, n_randint(1000));
+        do nmod_poly_randtest(q, n_randint(1000, state), state);
         while (q->length == 0 || q->coeffs[0] == 0);
 
-        m = n_randint(q->length) + 1;
+        m = n_randint(q->length, state) + 1;
 
         nmod_poly_inv_series_newton(qinv, q, m);
         nmod_poly_inv_series_newton(q, q, m);
@@ -111,6 +114,8 @@ main(void)
         nmod_poly_clear(q);
         nmod_poly_clear(qinv);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

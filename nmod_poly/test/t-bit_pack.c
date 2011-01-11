@@ -34,6 +34,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("bit_pack/bit_unpack....");
     fflush(stdout);
 
@@ -47,15 +50,15 @@ main(void)
 
         do
         {
-            n = n_randtest_not_zero();
+            n = n_randtest_not_zero(state);
         } while (n == 1);
-        bits = 2 * FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS);
+        bits = 2 * FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS, state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         do
         {
-            nmod_poly_randtest(a, n_randint(100));
+            nmod_poly_randtest(a, n_randint(100, state), state);
         } while (a->length == 0);
 
         mpn =
@@ -79,6 +82,8 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

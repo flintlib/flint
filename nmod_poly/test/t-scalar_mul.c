@@ -34,6 +34,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("scalar_mul....");
     fflush(stdout);
 
@@ -41,12 +44,12 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
-        mp_limb_t c = n_randint(n);
+        mp_limb_t n = n_randtest_not_zero(state);
+        mp_limb_t c = n_randint(n, state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
 
         nmod_poly_scalar_mul(b, a, c);
         nmod_poly_scalar_mul(a, a, c);
@@ -68,15 +71,15 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, d1, d2;
-        mp_limb_t n = n_randtest_not_zero();
-        mp_limb_t c = n_randint(n);
+        mp_limb_t n = n_randtest_not_zero(state);
+        mp_limb_t c = n_randint(n, state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(d1, n);
         nmod_poly_init(d2, n);
-        nmod_poly_randtest(a, n_randint(100));
-        nmod_poly_randtest(b, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(b, n_randint(100, state), state);
 
         nmod_poly_add(d1, a, b);
         nmod_poly_scalar_mul(d1, d1, c);
@@ -99,6 +102,8 @@ main(void)
         nmod_poly_clear(d1);
         nmod_poly_clear(d2);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

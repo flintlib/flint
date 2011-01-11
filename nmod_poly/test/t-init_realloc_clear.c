@@ -34,38 +34,43 @@ int
 main(void)
 {
     int i;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("init/init2/realloc/clear....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
-        nmod_poly_init2(a, n, n_randint(100));
+        nmod_poly_init2(a, n, n_randint(100, state));
         nmod_poly_clear(a);
     }
 
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
-        nmod_poly_init2(a, n, n_randint(100));
-        nmod_poly_realloc(a, n_randint(100));
-        nmod_poly_realloc(a, n_randint(100));
+        nmod_poly_init2(a, n, n_randint(100, state));
+        nmod_poly_realloc(a, n_randint(100, state));
+        nmod_poly_realloc(a, n_randint(100, state));
         nmod_poly_clear(a);
     }
 
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
         nmod_poly_clear(a);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

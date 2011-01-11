@@ -196,7 +196,7 @@ void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m);
 
 /* Randomisation  ************************************************************/
 
-void nmod_poly_randtest(nmod_poly_t poly, long len);
+void nmod_poly_randtest(nmod_poly_t poly, long len, flint_rand_t state);
 
 /* Getting and setting coefficients  *****************************************/
 

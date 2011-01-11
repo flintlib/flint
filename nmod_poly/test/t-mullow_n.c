@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("mullow_n....");
     fflush(stdout);
 
@@ -43,14 +46,14 @@ main(void)
     {
         nmod_poly_t a, b, c;
         long trunc;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        trunc = n_randint(50);
-        nmod_poly_randtest(b, trunc);
-        nmod_poly_randtest(c, trunc);
+        trunc = n_randint(50, state);
+        nmod_poly_randtest(b, trunc, state);
+        nmod_poly_randtest(c, trunc, state);
 
         nmod_poly_mullow_n(a, b, c, trunc);
         nmod_poly_mul(b, b, c);
@@ -69,6 +72,8 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

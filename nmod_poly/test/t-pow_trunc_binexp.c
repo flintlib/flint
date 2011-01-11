@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("pow_trunc_binexp....");
     fflush(stdout);
@@ -42,15 +44,15 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         long e, trunc;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(a, n_randint(30));
-        e = n_randint(20);
-        trunc = n_randint(30);
+        nmod_poly_randtest(a, n_randint(30, state), state);
+        e = n_randint(20, state);
+        trunc = n_randint(30, state);
 
         nmod_poly_pow_trunc_binexp(b, a, trunc, e);
         
@@ -79,15 +81,15 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         long e, trunc;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(a, n_randint(30));
-        e = n_randint(20);
-        trunc = n_randint(30);
+        nmod_poly_randtest(a, n_randint(30, state), state);
+        e = n_randint(20, state);
+        trunc = n_randint(30, state);
 
         nmod_poly_pow_trunc_binexp(b, a, trunc, e);
         
@@ -110,6 +112,8 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

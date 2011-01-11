@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("neg....");
     fflush(stdout);
@@ -42,11 +44,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100));
+        nmod_poly_randtest(a, n_randint(100, state), state);
         
         nmod_poly_neg(b, a);
         nmod_poly_neg(b, b);
@@ -64,6 +66,8 @@ main(void)
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

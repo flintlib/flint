@@ -34,6 +34,8 @@ int
 main(void)
 {
     int i, result = 1;
+    flint_rand_t state;
+    flint_randinit(state);
     
     printf("compose_divconquer....");
     fflush(stdout);
@@ -42,13 +44,13 @@ main(void)
     for (i = 0; i < 5000; i++)
     {
         nmod_poly_t a, b, r1;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30));
-        nmod_poly_randtest(b, n_randint(15));
+        nmod_poly_randtest(a, n_randint(30, state), state);
+        nmod_poly_randtest(b, n_randint(15, state), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_divconquer(a, a, b);
@@ -72,13 +74,13 @@ main(void)
     for (i = 0; i < 5000; i++)
     {
         nmod_poly_t a, b, r1;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30));
-        nmod_poly_randtest(b, n_randint(15));
+        nmod_poly_randtest(a, n_randint(30, state), state);
+        nmod_poly_randtest(b, n_randint(15, state), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_divconquer(b, a, b);
@@ -102,14 +104,14 @@ main(void)
     for (i = 0; i < 5000; i++)
     {
         nmod_poly_t a, b, r1, r2;
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
         nmod_poly_init(r2, n);
-        nmod_poly_randtest(a, n_randint(30));
-        nmod_poly_randtest(b, n_randint(15));
+        nmod_poly_randtest(a, n_randint(30, state), state);
+        nmod_poly_randtest(b, n_randint(15, state), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_horner(r2, a, b);
@@ -130,6 +132,7 @@ main(void)
         nmod_poly_clear(r2);
     }
     
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

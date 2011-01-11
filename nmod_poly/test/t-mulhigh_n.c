@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("mulhigh_n....");
     fflush(stdout);
 
@@ -44,14 +47,14 @@ main(void)
         nmod_poly_t a, b, c;
         long j, n;
 
-        mp_limb_t m = n_randtest_not_zero();
+        mp_limb_t m = n_randtest_not_zero(state);
 
         nmod_poly_init(a, m);
         nmod_poly_init(b, m);
         nmod_poly_init(c, m);
-        n = n_randint(50);
-        nmod_poly_randtest(b, n);
-        nmod_poly_randtest(c, n);
+        n = n_randint(50, state);
+        nmod_poly_randtest(b, n, state);
+        nmod_poly_randtest(c, n, state);
 
         nmod_poly_mulhigh_n(a, b, c, n);
         nmod_poly_mul(b, b, c);
@@ -78,6 +81,8 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;
