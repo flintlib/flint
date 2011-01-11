@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
-        long n = z_randtest();
+        long n = z_randtest(state);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

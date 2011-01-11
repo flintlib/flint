@@ -40,5 +40,5 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
 
 mp_limb_signed_t z_randtest_not_zero(flint_rand_t state)
 
-    As for \code{z_randtest()}, but does not return $0$.
+    As for \code{z_randtest(state)}, but does not return $0$.
 

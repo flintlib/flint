@@ -61,7 +61,7 @@ main(void)
         _fmpz_vec_randtest(b, state, len, 200);
         _fmpz_vec_set(c, b, len);
 
-        x = z_randtest();
+        x = z_randtest(state);
         exp = n_randint(200, state);
 
         _fmpz_vec_scalar_addmul_si_2exp(b, a, len, x, exp);

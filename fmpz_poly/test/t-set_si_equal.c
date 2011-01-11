@@ -51,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        n = z_randtest();
+        n = z_randtest(state);
 
         fmpz_poly_set_si(a, n);
         fmpz_poly_set(b, a);
@@ -78,10 +78,10 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
 
-        m = z_randtest();
-        n = z_randtest();
+        m = z_randtest(state);
+        n = z_randtest(state);
         while (m == n)
-            n = z_randtest();
+            n = z_randtest(state);
         fmpz_poly_set_si(a, m);
         fmpz_poly_set_si(b, n);
 

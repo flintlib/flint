@@ -53,7 +53,7 @@ main(void)
 
         for (j = 0; j < 1000; j++)
         {
-            n1 = z_randtest();
+            n1 = z_randtest(state);
             coeff = n_randint(len, state);
             fmpz_poly_set_coeff_si(a, coeff, n1);
             n2 = fmpz_poly_get_coeff_si(a, coeff);

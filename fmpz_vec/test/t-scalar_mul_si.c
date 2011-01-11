@@ -49,7 +49,7 @@ main(void)
     {
         fmpz *a, *b;
         long len = n_randint(100, state);
-        long n = z_randtest();
+        long n = z_randtest(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -82,7 +82,7 @@ main(void)
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
-        n = z_randtest();
+        n = z_randtest(state);
         fmpz_set_si(x, n);
 
         _fmpz_vec_scalar_mul_fmpz(b, a, len, x);

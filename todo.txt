@@ -30,7 +30,7 @@ TODO
   collection needs to be run every time also costs time, though a garbage collector can do
   more).
 
-* Implement a z_randtest() function and use in fmpz_get/set_si 
+* Implement a z_randtest(state) function and use in fmpz_get/set_si 
 
 * Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and fmpz_invert, 
   respectively

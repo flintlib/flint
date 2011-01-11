@@ -56,7 +56,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        b = z_randtest_not_zero();
+        b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
         mpz_set_si(e, b);
@@ -98,7 +98,7 @@ main(void)
         mpz_init(g);
 
         fmpz_randtest(a, state, 200);
-        b = z_randtest_not_zero();
+        b = z_randtest_not_zero(state);
 
         fmpz_get_mpz(d, a);
         mpz_set_si(e, b);

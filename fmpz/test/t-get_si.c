@@ -37,6 +37,9 @@ main(void)
     fmpz_t x;
 
     int i, result;
+    flint_rand_t state;
+
+    flint_randinit(state);
 
     printf("get/set_si....");
     fflush(stdout);
@@ -78,7 +81,7 @@ main(void)
         fmpz_t a;
         long b, c;
 
-        b = z_randtest();
+        b = z_randtest(state);
 
         fmpz_init(a);
 
@@ -95,6 +98,8 @@ main(void)
 
         fmpz_clear(a);
     }
+
+    flint_randclear(state);
 
     _fmpz_cleanup();
     printf("PASS\n");

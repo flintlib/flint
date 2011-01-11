@@ -50,7 +50,7 @@ main(void)
         long len = n_randint(100, state);
         long n;
 
-        n = z_randtest_not_zero();
+        n = z_randtest_not_zero(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -80,7 +80,7 @@ main(void)
         long len = n_randint(100, state);
         long n;
 
-        n = z_randtest_not_zero();
+        n = z_randtest_not_zero(state);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
