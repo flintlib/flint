@@ -36,22 +36,22 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_mul_ui....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        ulong n = n_randtest();
+        ulong n = n_randtest(state);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_ui(b, a, n);
         fmpq_poly_scalar_mul_ui(a, a, n);
@@ -73,14 +73,14 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, lhs, rhs;
-        ulong n = n_randtest();
+        ulong n = n_randtest(state);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
-        fmpq_poly_randtest(b, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
+        fmpq_poly_randtest(b, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_ui(lhs, a, n);
         fmpq_poly_scalar_mul_ui(rhs, b, n);
@@ -108,13 +108,13 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-        ulong n1 = n_randbits(FLINT_BITS / 2);
-        ulong n2 = n_randbits(FLINT_BITS / 2);
+        ulong n1 = n_randbits(FLINT_BITS / 2, state);
+        ulong n2 = n_randbits(FLINT_BITS / 2, state);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_ui(b, a, n1);
         fmpq_poly_scalar_mul_ui(c, b, n2);
@@ -136,7 +136,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

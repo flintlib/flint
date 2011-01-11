@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("inv....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -70,7 +70,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

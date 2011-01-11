@@ -36,25 +36,25 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("div_series....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing q and a */
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a, b, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest(a, state, n_randint(50, state) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);
@@ -79,14 +79,14 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a, b, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest(a, state, n_randint(50, state) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);
@@ -111,15 +111,15 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a, b, p, q;
-        long n = n_randint(50) + 1;
+        long n = n_randint(50, state) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(p);
         fmpq_poly_init(q);
 
-        fmpq_poly_randtest(a, state, n_randint(50) + 1, 80);
-        fmpq_poly_randtest_not_zero(b, state, n_randint(50) + 1, 80);
+        fmpq_poly_randtest(a, state, n_randint(50, state) + 1, 80);
+        fmpq_poly_randtest_not_zero(b, state, n_randint(50, state) + 1, 80);
         fmpq_poly_set_coeff_ui(b, 0, 1);
 
         fmpq_poly_div_series(q, a, b, n);
@@ -144,7 +144,7 @@ main(void)
         fmpq_poly_clear(q);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

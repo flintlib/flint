@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("mullow....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Compare with truncated product of a and b */
     for (i = 0; i < 2000; i++)
@@ -52,7 +52,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        trunc = n_randint(50);
+        trunc = n_randint(50, state);
         fmpq_poly_randtest(b, state, trunc, 200);
         fmpq_poly_randtest(c, state, trunc, 200);
 
@@ -74,7 +74,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

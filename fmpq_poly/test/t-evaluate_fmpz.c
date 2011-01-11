@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("evaluate_fmpz....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check that (f+g)(a) = f(a) + g(a) */
     for (i = 0; i < 10000; i++)
@@ -56,9 +56,9 @@ main(void)
         fmpq_poly_init(f);
         fmpq_poly_init(g);
         fmpq_poly_init(h);
-        fmpq_poly_randtest(f, state, n_randint(100), 200);
-        fmpq_poly_randtest(g, state, n_randint(100), 200);
-        fmpz_randtest(a, state, n_randint(100));
+        fmpq_poly_randtest(f, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(g, state, n_randint(100, state), 200);
+        fmpz_randtest(a, state, n_randint(100, state));
 
         fmpq_poly_evaluate_fmpz(x, f, a);
         fmpq_poly_evaluate_fmpz(y, g, a);
@@ -98,9 +98,9 @@ main(void)
         fmpz_init(a);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100), 200);
-        fmpq_poly_randtest(g, state, n_randint(100), 200);
-        fmpz_randtest(a, state, n_randint(100));
+        fmpq_poly_randtest(f, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(g, state, n_randint(100, state), 200);
+        fmpz_randtest(a, state, n_randint(100, state));
 
         fmpq_poly_evaluate_fmpz(x, f, a);
         fmpq_poly_evaluate_fmpz(y, g, a);
@@ -123,7 +123,7 @@ main(void)
         fmpq_poly_clear(g);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

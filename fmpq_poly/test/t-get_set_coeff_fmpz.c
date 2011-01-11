@@ -36,7 +36,7 @@ int
 main(void)
 {
     int i, j, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
     mpq_t n1, n2;
 
     printf("get/set_coeff_fmpz....");
@@ -45,7 +45,7 @@ main(void)
     mpq_init(n1);
     mpq_init(n2);
 
-    fmpz_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
@@ -56,14 +56,14 @@ main(void)
         fmpq_poly_init(a);
         fmpz_init(x1);
         fmpz_init(x2);
-        len = (long) (n_randint(100) + 1);
+        len = (long) (n_randint(100, state) + 1);
 
         for (j = 0; j < 1000; j++)
         {
             fmpz_randtest(x1, state, 200);
             fmpz_get_mpz(mpq_numref(n1), x1);
             mpz_set_si(mpq_denref(n1), 1);
-            coeff = (long) n_randint(len);
+            coeff = (long) n_randint(len, state);
             fmpq_poly_set_coeff_fmpz(a, coeff, x1);
             fmpq_poly_get_coeff_mpq(n2, a, coeff);
 
@@ -85,7 +85,7 @@ main(void)
     mpq_clear(n1);
     mpq_clear(n2);
 
-    fmpz_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

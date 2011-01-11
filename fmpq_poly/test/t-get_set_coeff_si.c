@@ -38,6 +38,8 @@ main(void)
     int i, j, result;
     long n;
     mpq_t n_mpq;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("get/set_coeff_si....");
     fflush(stdout);
@@ -50,12 +52,12 @@ main(void)
         long coeff, len;
 
         fmpq_poly_init(a);
-        len = (long) n_randint(100) + 1;
+        len = (long) n_randint(100, state) + 1;
 
         for (j = 0; j < 1000; j++)
         {
             n = z_randtest();
-            coeff = n_randint(len);
+            coeff = n_randint(len, state);
             fmpq_poly_set_coeff_si(a, coeff, n);
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 
@@ -75,6 +77,7 @@ main(void)
         fmpq_poly_clear(a);
     }
 
+    flint_randclear(state);
     mpq_clear(n_mpq);
     _fmpz_cleanup();
     printf("PASS\n");

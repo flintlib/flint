@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_div_fmpz....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -55,7 +55,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpq_poly_scalar_div_fmpz(b, a, n);
         fmpq_poly_scalar_div_fmpz(a, a, n);
@@ -89,7 +89,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpq_poly_scalar_div_fmpz(b, a, n1);
         fmpq_poly_scalar_div_si(c, a, n);
@@ -128,7 +128,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpq_poly_scalar_div_fmpz(lhs, a, n1);
         fmpq_poly_scalar_div_fmpz(lhs, lhs, n2);
@@ -169,8 +169,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
-        fmpq_poly_randtest(b, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(b, state, n_randint(100, state), 200);
 
         fmpq_poly_scalar_div_fmpz(lhs, a, n);
         fmpq_poly_scalar_div_fmpz(rhs, b, n);
@@ -197,7 +197,7 @@ main(void)
         fmpq_poly_clear(rhs);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

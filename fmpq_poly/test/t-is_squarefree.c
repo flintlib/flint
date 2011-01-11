@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("is_squarefree....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check that polynomials of degree <= 1 are square-free */
     for (i = 0; i < 500; i++)
@@ -49,7 +49,7 @@ main(void)
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(2), 100);
+        fmpq_poly_randtest(f, state, n_randint(2, state), 100);
 
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
@@ -68,11 +68,11 @@ main(void)
         fmpq_poly_t a, f;
 
         fmpq_poly_init(a);
-        fmpq_poly_randtest_not_zero(a, state, n_randint(20) + 1, 40);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(20, state) + 1, 40);
         if (a->length < 2)
             continue;
         fmpq_poly_init(f);
-        fmpq_poly_randtest_not_zero(f, state, n_randint(20) + 1, 40);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(20, state) + 1, 40);
 
         fmpq_poly_mul(a, a, a);
         fmpq_poly_mul(f, a, f);
@@ -89,7 +89,7 @@ main(void)
         fmpq_poly_clear(f);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

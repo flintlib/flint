@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
     
     printf("zero....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -49,7 +49,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
 
         fmpq_poly_zero(a);
 
@@ -66,7 +66,7 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -36,12 +36,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("set_array_mpq....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
@@ -55,7 +55,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(n), 200);
+        fmpq_poly_randtest(f, state, n_randint(n, state), 200);
         for (j = 0; j < f->length; j++)
             fmpq_poly_get_coeff_mpq(a[j], f, j);
 
@@ -77,7 +77,7 @@ main(void)
         free(a);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

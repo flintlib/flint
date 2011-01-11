@@ -35,18 +35,18 @@ int
 main(void)
 {
     int i;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("init/init2/realloc/clear....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a;
 
-        fmpq_poly_init2(a, n_randint(100));
+        fmpq_poly_init2(a, n_randint(100, state));
         fmpq_poly_clear(a);
     }
 
@@ -54,8 +54,8 @@ main(void)
     {
         fmpq_poly_t a;
 
-        fmpq_poly_init2(a, n_randint(100));
-        fmpq_poly_realloc(a, n_randint(100));
+        fmpq_poly_init2(a, n_randint(100, state));
+        fmpq_poly_realloc(a, n_randint(100, state));
         fmpq_poly_clear(a);
     }
 
@@ -64,11 +64,11 @@ main(void)
         fmpq_poly_t a;
 
         fmpq_poly_init(a);
-        fmpq_poly_randtest(a, state, n_randint(100), 200);
+        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
         fmpq_poly_clear(a);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -37,12 +37,12 @@ int
 main(void)
 {
     int i, result;
-    fmpz_randstate_t state;
+    flint_rand_t state;
 
     printf("scalar_mul_si....");
     fflush(stdout);
 
-    fmpq_poly_randinit(state);
+    flint_randinit(state);
 
     /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
@@ -52,7 +52,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_si(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
@@ -74,11 +74,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        ulong n = n_randbits(FLINT_BITS - 1);
+        ulong n = n_randbits(FLINT_BITS - 1, state);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_ui(b, a, n);
         fmpq_poly_scalar_mul_si(a, a, n);
@@ -103,9 +103,9 @@ main(void)
         long n1, n2;
         ulong m;
 
-        n1 = (long) n_randbits(FLINT_BITS / 2);
-        n2 = (long) n_randbits(FLINT_BITS / 2 - 1);
-        m = n_randlimb();
+        n1 = (long) n_randbits(FLINT_BITS / 2, state);
+        n2 = (long) n_randbits(FLINT_BITS / 2 - 1, state);
+        m = n_randlimb(state);
         if (m & 1UL)
             n1 = -n1;
         if (m & 2UL)
@@ -114,7 +114,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100), n_randint(200));
+        fmpq_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
 
         fmpq_poly_scalar_mul_si(b, a, n1);
         fmpq_poly_scalar_mul_si(c, b, n2);
@@ -136,7 +136,7 @@ main(void)
         fmpq_poly_clear(c);
     }
 
-    fmpq_poly_randclear(state);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
