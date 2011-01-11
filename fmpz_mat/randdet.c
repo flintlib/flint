@@ -68,7 +68,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     {
         for (j = 0; j < fmpz_get_ui(&factor->exp[i]); j++)
         {
-            k = n_randint(n, NULL);
+            k = n_randint(state, n);
             fmpz_mul(&diag[k], &diag[k], &factor->p[i]);
         }
     }
@@ -76,7 +76,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     /* Reverse signs an even number of times */
     for (i = 0; i < 2*n; i++)
     {
-        k = n_randint(n, NULL);
+        k = n_randint(state, n);
         fmpz_neg(&diag[k], &diag[k]);
     }
 

@@ -35,20 +35,20 @@ int
 main(void)
 {
     int i;
-    flint_rand_t rnd;
+    flint_rand_t state;
 
     printf("equal....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
         fmpz_mat_t A, B, C, D, E;
         long m, n, j;
 
-        m = n_randint(20);
-        n = n_randint(20);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, m, n);
@@ -62,7 +62,7 @@ main(void)
             abort();
         }
 
-        fmpz_mat_randtest(A, rnd, 1 + n_randint(100));
+        fmpz_mat_randtest(A, state, 1 + n_randint(state, 100));
         fmpz_mat_set(B, A);
 
         if (!fmpz_mat_equal(A, B))
@@ -73,7 +73,7 @@ main(void)
 
         if (m && n)
         {
-            j = n_randint(m * n);
+            j = n_randint(state, m*n);
             fmpz_add_ui(A->entries + j, A->entries + j, 1);
 
             if (fmpz_mat_equal(A, B))
@@ -90,7 +90,7 @@ main(void)
         fmpz_mat_clear(E);
     }
 
-    fmpz_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

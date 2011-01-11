@@ -36,6 +36,9 @@ int
 main(void)
 {
     int i;
+    flint_rand_t state;
+    flint_randinit(state);
+    
     printf("entry....");
     fflush(stdout);
 
@@ -43,8 +46,8 @@ main(void)
     {
         fmpz_mat_t a;
         long j, k;
-        long rows = n_randint(10);
-        long cols = n_randint(10);
+        long rows = n_randint(state, 10);
+        long cols = n_randint(state, 10);
 
         fmpz_mat_init(a, rows, cols);
 
@@ -70,6 +73,8 @@ main(void)
 
         fmpz_mat_clear(a);
     }
+
+    flint_randclear(state);
 
     _fmpz_cleanup();
     printf("PASS\n");

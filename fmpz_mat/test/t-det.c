@@ -37,7 +37,7 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    flint_rand_t rnd;
+    flint_rand_t state;
     long i, m;
 
     fmpz_t det, result;
@@ -45,11 +45,11 @@ main(void)
     printf("det....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10);
+        m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
 
@@ -57,12 +57,12 @@ main(void)
         fmpz_init(result);
 
         if (m)
-            fmpz_randtest(det, rnd, 30);
+            fmpz_randtest(det, state, 30);
         else
             fmpz_set_ui(det, 1UL);
 
-        fmpz_mat_randdet(A, rnd, det);
-        fmpz_mat_randops(A, rnd, n_randint(2*m*m + 1));
+        fmpz_mat_randdet(A, state, det);
+        fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
 
         fmpz_mat_det(result, A);
 
@@ -84,12 +84,12 @@ main(void)
     /* Generate nontrivial singular matrices */
     for (i = 0; i < 10000; i++)
     {
-        m = 2 + n_randint(10);
+        m = 2 + n_randint(state, 10);
         fmpz_mat_init(A, m, m);
         fmpz_init(det);
 
-        fmpz_mat_randrank(A, rnd, 1+n_randint(m-1), 1+n_randint(10));
-        fmpz_mat_randops(A, rnd, n_randint(2*m*m + 1));
+        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1), 1+n_randint(state, 10));
+        fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
 
         fmpz_mat_det(det, A);
         if (*det)
@@ -104,7 +104,7 @@ main(void)
         fmpz_clear(det);
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

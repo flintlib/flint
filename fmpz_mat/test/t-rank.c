@@ -37,26 +37,26 @@ int
 main(void)
 {
     fmpz_mat_t A;
-    flint_rand_t rnd;
+    flint_rand_t state;
     long i, m, n, b, d, r;
 
     printf("rank....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 1000; i++)
     {
-        m = n_randint(10);
-        n = n_randint(10);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
-            b = 1 + n_randint(10) * n_randint(10);
-            d = n_randint(2*m*n + 1);
+            b = 1 + n_randint(state, 10) * n_randint(state, 10);
+            d = n_randint(state, 2*m*n + 1);
             fmpz_mat_init(A, m, n);
-            fmpz_mat_randrank(A, rnd, r, b);
+            fmpz_mat_randrank(A, state, r, b);
             if (r != fmpz_mat_rank(A))
             {
                 printf("FAIL:\n");
@@ -70,16 +70,16 @@ main(void)
     /* Dense */
     for (i = 0; i < 1000; i++)
     {
-        m = n_randint(10);
-        n = n_randint(10);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
-            b = 1 + n_randint(10) * n_randint(10);
-            d = n_randint(2*m*n + 1);
+            b = 1 + n_randint(state, 10) * n_randint(state, 10);
+            d = n_randint(state, 2*m*n + 1);
             fmpz_mat_init(A, m, n);
-            fmpz_mat_randrank(A, rnd, r, b);
-            fmpz_mat_randops(A, rnd, d);
+            fmpz_mat_randrank(A, state, r, b);
+            fmpz_mat_randops(A, state, d);
             if (r != fmpz_mat_rank(A))
             {
                 printf("FAIL:\n");
@@ -90,7 +90,7 @@ main(void)
         }
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -38,17 +38,17 @@ main(void)
 {
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
-    flint_rand_t rnd;
+    flint_rand_t state;
     long i, j, m, r;
 
     printf("inv....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10);
+        m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, m);
@@ -61,10 +61,10 @@ main(void)
 
         /* Verify that A * A^-1 = I for random matrices */
 
-        fmpz_mat_randrank(A, rnd, m, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randrank(A, state, m, 1+n_randint(state, 2)*n_randint(state, 100));
         /* Dense or sparse? */
-        if (n_randint(2))
-            fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         fmpz_mat_inv(B, den, A);
         fmpz_mat_mul(C, A, B);
@@ -107,18 +107,18 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(10);
-        r = n_randint(m);
+        m = 1 + n_randint(state, 10);
+        r = n_randint(state, m);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, m);
         fmpz_init(den);
 
-        fmpz_mat_randrank(A, rnd, r, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randrank(A, state, r, 1+n_randint(state, 2)*n_randint(state, 100));
 
         /* Dense */
-        if (n_randint(2))
-            fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         fmpz_mat_inv(B, den, A);
         if (!fmpz_is_zero(den))
@@ -142,7 +142,7 @@ main(void)
         fmpz_clear(den);
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

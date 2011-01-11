@@ -34,7 +34,7 @@
   Standard Fisher-Yates shuffle to randomise an array; returns whether
   the permutation is even (0) or odd (1)
 */
-static int shuffle(long * array, long n, flint_rand_t state)
+static int shuffle(long * array, flint_rand_t state, long n)
 {
     long i, j, tmp;
     int parity;
@@ -42,7 +42,7 @@ static int shuffle(long * array, long n, flint_rand_t state)
     parity = 0;
     for (i = n - 1; i > 0; i--)
     {
-        j = n_randint(i+1, NULL);
+        j = n_randint(state, i+1);
         parity ^= (i == j);
         tmp = array[i];
         array[i] = array[j];
@@ -66,8 +66,8 @@ fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
     for (i = 0; i < mat->r; i++) rows[i] = i;
     for (i = 0; i < mat->c; i++) cols[i] = i;
 
-    parity = shuffle(rows, mat->r, state);
-    parity ^= shuffle(cols, mat->c, state);
+    parity = shuffle(rows, state, mat->r);
+    parity ^= shuffle(cols, state, mat->c);
 
     _fmpz_vec_zero(mat->entries, mat->r * mat->c);
 

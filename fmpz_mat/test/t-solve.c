@@ -38,17 +38,17 @@ main(void)
 {
     fmpz_mat_t A, x, b, Ax;
     fmpz_t den;
-    flint_rand_t rnd;
+    flint_rand_t state;
     long i, m, r;
 
     printf("solve....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (i = 0; i < 20000; i++)
     {
-        m = n_randint(10);
+        m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(b, m, 1);
@@ -56,12 +56,12 @@ main(void)
         fmpz_mat_init(Ax, m, 1);
         fmpz_init(den);
 
-        fmpz_mat_randrank(A, rnd, m, 1+n_randint(2)*n_randint(100));
-        fmpz_mat_randtest(b, rnd, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randrank(A, state, m, 1+n_randint(state, 2)*n_randint(state, 100));
+        fmpz_mat_randtest(b, state, 1+n_randint(state, 2)*n_randint(state, 100));
 
         /* Dense */
-        if (n_randint(2))
-            fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         fmpz_mat_solve(x->entries, den, A, b->entries);
 
@@ -90,8 +90,8 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(10);
-        r = n_randint(m);
+        m = 1 + n_randint(state, 10);
+        r = n_randint(state, m);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(b, m, 1);
@@ -99,12 +99,12 @@ main(void)
         fmpz_mat_init(Ax, m, 1);
         fmpz_init(den);
 
-        fmpz_mat_randrank(A, rnd, r, 1+n_randint(2)*n_randint(100));
-        fmpz_mat_randtest(b, rnd, 1+n_randint(2)*n_randint(100));
+        fmpz_mat_randrank(A, state, r, 1+n_randint(state, 2)*n_randint(state, 100));
+        fmpz_mat_randtest(b, state, 1+n_randint(state, 2)*n_randint(state, 100));
 
         /* Dense */
-        if (n_randint(2))
-            fmpz_mat_randops(A, rnd, 1+n_randint(1+m*m));
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
         fmpz_mat_solve(x->entries, den, A, b->entries);
 
@@ -122,7 +122,7 @@ main(void)
         fmpz_clear(den);
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

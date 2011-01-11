@@ -35,27 +35,27 @@ int
 main(void)
 {
     long m, n, rep;
-    flint_rand_t rnd;
+    flint_rand_t state;
 
     printf("transpose....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     /* Rectangular transpose */
     for (rep = 0; rep < 1000; rep++)
     {
         fmpz_mat_t A, B, C;
 
-        m = n_randint(20);
-        n = n_randint(20);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, m);
         fmpz_mat_init(C, m, n);
 
-        fmpz_mat_randtest(A, rnd, 1+n_randint(100));
-        fmpz_mat_randtest(B, rnd, 1+n_randint(100));
+        fmpz_mat_randtest(A, state, 1+n_randint(state, 100));
+        fmpz_mat_randtest(B, state, 1+n_randint(state, 100));
 
         fmpz_mat_transpose(B, A);
         fmpz_mat_transpose(C, B);
@@ -76,12 +76,12 @@ main(void)
     {
         fmpz_mat_t A, B;
 
-        m = n_randint(20);
+        m = n_randint(state, 20);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, m);
 
-        fmpz_mat_randtest(A, rnd, 1+n_randint(100));
+        fmpz_mat_randtest(A, state, 1+n_randint(state, 100));
         fmpz_mat_set(B, A);
 
         if (!fmpz_mat_equal(B, A))
@@ -94,7 +94,7 @@ main(void)
         fmpz_mat_clear(B);
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

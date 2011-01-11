@@ -43,11 +43,11 @@ fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
 
     for (c = 0; c < count; c++)
     {
-        if (n_randint(2, NULL))
+        if (n_randint(state, 2))
         {
-            if ((i = n_randint(m, NULL)) == (j = n_randint(m, NULL)))
+            if ((i = n_randint(state, m)) == (j = n_randint(state, m)))
                 continue;
-            if (n_randint(2, NULL))
+            if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
                     fmpz_add(&mat->rows[j][k], &mat->rows[j][k],
                         &mat->rows[i][k]);
@@ -58,9 +58,9 @@ fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
         }
         else
         {
-            if ((i = n_randint(n, NULL)) == (j = n_randint(n, NULL)))
+            if ((i = n_randint(state, n)) == (j = n_randint(state, n)))
                 continue;
-            if (n_randint(2, NULL))
+            if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
                     fmpz_add(&mat->rows[k][j], &mat->rows[k][j],
                         &mat->rows[k][i]);

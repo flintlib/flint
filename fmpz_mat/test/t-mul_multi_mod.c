@@ -36,28 +36,28 @@ int main(void)
 {
     fmpz_mat_t A, B, C, D;
     long i;
-    flint_rand_t rnd;
+    flint_rand_t state;
 
     printf("mul_multi_mod....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
         long m, n, k;
 
-        m = n_randint(50);
-        n = n_randint(50);
-        k = n_randint(50);
+        m = n_randint(state, 50);
+        n = n_randint(state, 50);
+        k = n_randint(state, 50);
 
         fmpz_mat_init(A, m, n);
         fmpz_mat_init(B, n, k);
         fmpz_mat_init(C, m, k);
         fmpz_mat_init(D, m, k);
 
-        fmpz_mat_randtest(A, rnd, n_randint(200) + 1);
-        fmpz_mat_randtest(B, rnd, n_randint(200) + 1);
+        fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
+        fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
 
         fmpz_mat_mul_classical(C, A, B);
         fmpz_mat_mul_multi_mod(D, A, B);
@@ -74,7 +74,7 @@ int main(void)
         fmpz_mat_clear(D);
     }
 
-    fmpz_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

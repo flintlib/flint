@@ -36,22 +36,22 @@ int
 main(void)
 {
     long m, n, rep, res1, res2;
-    flint_rand_t rnd;
+    flint_rand_t state;
 
     printf("max_bits....");
     fflush(stdout);
 
-    fmpz_randinit(rnd);
+    flint_randinit(state);
 
     for (rep = 0; rep < 1000; rep++)
     {
         fmpz_mat_t A;
 
-        m = n_randint(20);
-        n = n_randint(20);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
 
         fmpz_mat_init(A, m, n);
-        fmpz_mat_randtest(A, rnd, 1 + n_randint(100));
+        fmpz_mat_randtest(A, state, 1 + n_randint(state, 100));
 
         res1 = fmpz_mat_max_bits(A);
         res2 = _fmpz_vec_max_bits(A->entries, m*n);
@@ -65,7 +65,7 @@ main(void)
         fmpz_mat_clear(A);
     }
 
-    fmpz_mat_randclear(rnd);
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
