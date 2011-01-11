@@ -35,6 +35,9 @@ int
 main(void)
 {
     int i;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("init/clear....");
     fflush(stdout);
 
@@ -42,9 +45,9 @@ main(void)
     {
         mpfr_mat_t a;
         long j, k;
-        long rows = n_randint(100);
-        long cols = n_randint(100);
-        mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
+        long rows = n_randint(100, state);
+        long cols = n_randint(100, state);
+        mp_prec_t prec = n_randint(200, state) + MPFR_PREC_MIN;
 
         mpfr_mat_init(a, rows, cols, prec);
 
@@ -54,6 +57,8 @@ main(void)
 
         mpfr_mat_clear(a);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

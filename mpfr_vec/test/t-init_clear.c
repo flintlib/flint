@@ -35,14 +35,17 @@ int
 main(void)
 {
     int i;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("init/clear....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
         __mpfr_struct *a;
-        long j, length = n_randint(100);
-        mp_prec_t prec = n_randint(200) + MPFR_PREC_MIN;
+        long j, length = n_randint(100, state);
+        mp_prec_t prec = n_randint(200, state) + MPFR_PREC_MIN;
 
         a = _mpfr_vec_init(length, prec);
 
@@ -51,6 +54,8 @@ main(void)
 
         _mpfr_vec_clear(a, length);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;
