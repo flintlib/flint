@@ -60,7 +60,7 @@ main(void)
 
         /* Verify that A * A^-1 = I for random matrices */
 
-        nmod_mat_randrank(A, m, state);
+        nmod_mat_randrank(A, state, m);
         /* Dense or sparse? */
         if (n_randint(state, 2))
             nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
@@ -110,7 +110,7 @@ main(void)
         nmod_mat_init(A, m, m, mod);
         nmod_mat_init(B, m, m, mod);
 
-        nmod_mat_randrank(A, r, state);
+        nmod_mat_randrank(A, state, r);
 
         /* Dense */
         if (n_randint(state, 2))

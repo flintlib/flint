@@ -56,7 +56,7 @@ main(void)
         nmod_mat_init(X, m, n, mod);
         nmod_mat_init(AX, m, n, mod);
 
-        nmod_mat_randrank(A, m, state);
+        nmod_mat_randrank(A, state, m);
         nmod_mat_randtest(B, state);
 
         /* Dense */
@@ -102,7 +102,7 @@ main(void)
         nmod_mat_init(X, m, n, mod);
         nmod_mat_init(AX, m, n, mod);
 
-        nmod_mat_randrank(A, r, state);
+        nmod_mat_randrank(A, state, r);
         nmod_mat_randtest(B, state);
 
         /* Dense */

@@ -54,7 +54,7 @@ main(void)
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
             nmod_mat_init(A, m, n, mod);
-            nmod_mat_randrank(A, r, state);
+            nmod_mat_randrank(A, state, r);
             /* printf("SPARSE %ld\n", r);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
@@ -78,7 +78,7 @@ main(void)
         {
             d = n_randint(state, 2*m*n + 1);
             nmod_mat_init(A, m, n, mod);
-            nmod_mat_randrank(A, r, state);
+            nmod_mat_randrank(A, state, r);
             nmod_mat_randops(A, d, state);
             /*
             printf("DENSE %ld %ld\n", r, d);
