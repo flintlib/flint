@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod, flint_rand_t state)
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod)
 {
    long i;
    for (i = 0 ; i < len; i++)

@@ -144,7 +144,7 @@ void nmod_vec_free(mp_ptr vec)
    free(vec);
 }
 
-void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod, flint_rand_t state);
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod);
 
 static __inline__
 void _nmod_vec_zero(mp_ptr vec, long len)

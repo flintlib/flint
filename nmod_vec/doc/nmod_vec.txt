@@ -117,7 +117,7 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 
 *******************************************************************************
 
-void _nmod_vec_randtest(mp_ptr vec, long len, nmod_t mod, flint_rand_t state)
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod)
 
     Sets \code{vec} to a random vector of the given length with entries 
     reduced modulo \code{mod.n}.
