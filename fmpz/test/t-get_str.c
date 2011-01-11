@@ -53,7 +53,7 @@ main(void)
         fmpz_init(a);
         mpz_init(b);
         fmpz_randtest(a, state, 200);
-        base = (int) (n_randint(61, state) + 2);
+        base = (int) (n_randint(state, 61) + 2);
 
         fmpz_get_mpz(b, a);
 

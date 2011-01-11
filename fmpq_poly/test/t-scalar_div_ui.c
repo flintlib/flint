@@ -52,7 +52,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_scalar_div_ui(b, a, n);
         fmpq_poly_scalar_div_ui(a, a, n);
@@ -87,7 +87,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_scalar_div_ui(b, a, n1);
         fmpq_poly_scalar_div_ui(c, b, n2);

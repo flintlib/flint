@@ -50,7 +50,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_zero(a);
 

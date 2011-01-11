@@ -49,8 +49,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(15, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 15), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_divconquer(a, a, b);
@@ -79,8 +79,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(15, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 15), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_divconquer(b, a, b);
@@ -110,8 +110,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
         nmod_poly_init(r2, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(15, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 15), state);
         
         nmod_poly_compose_divconquer(r1, a, b);
         nmod_poly_compose_horner(r2, a, b);

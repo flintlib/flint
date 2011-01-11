@@ -30,5 +30,5 @@
 mp_limb_t n_randbits(unsigned int bits, flint_rand_t state)
 {
    if (bits == 0) return 0UL;
-   else return (1UL << (bits - 1)) | n_randint(l_shift(1UL, bits), state);
+   else return (1UL << (bits - 1)) | n_randint(state, l_shift(1UL, bits));
 }

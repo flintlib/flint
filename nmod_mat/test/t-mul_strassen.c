@@ -48,9 +48,9 @@ main(void)
 
         long m, k, n;
 
-        m = n_randint(200, state);
-        k = n_randint(200, state);
-        n = n_randint(200, state);
+        m = n_randint(state, 200);
+        k = n_randint(state, 200);
+        n = n_randint(state, 200);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, n, k, mod);

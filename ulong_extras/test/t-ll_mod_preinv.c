@@ -45,7 +45,7 @@ int main(void)
 
       d = n_randtest_not_zero(state);
       m = n_randtest(state);
-      r1 = n_randint(d, state);
+      r1 = n_randint(state, d);
       umul_ppmm(nh, nl, m, d);
       add_ssaaaa(nh, nl, nh, nl, 0UL, r1);
 

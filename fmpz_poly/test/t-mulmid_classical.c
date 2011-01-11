@@ -50,11 +50,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
         if (b->length == 0)
             fmpz_poly_zero(c);
         else
-            fmpz_poly_randtest(c, state, n_randint(b->length, state), 200);
+            fmpz_poly_randtest(c, state, n_randint(state, b->length), 200);
 
         fmpz_poly_mulmid_classical(a, b, c);
         fmpz_poly_mulmid_classical(b, b, c);
@@ -81,11 +81,11 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
         if (b->length == 0)
             fmpz_poly_zero(c);
         else
-            fmpz_poly_randtest(c, state, n_randint(b->length, state), 200);
+            fmpz_poly_randtest(c, state, n_randint(state, b->length), 200);
 
         fmpz_poly_mulmid_classical(a, b, c);
         fmpz_poly_mulmid_classical(c, b, c);
@@ -113,8 +113,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(b, state, n_randint(50, state), 200);
-        fmpz_poly_randtest(c, state, n_randint(b->length + 1, state), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 50), 200);
+        fmpz_poly_randtest(c, state, n_randint(state, b->length + 1), 200);
 
         fmpz_poly_mulmid_classical(d, b, c);
         if (b->length == 0 || c->length == 0)

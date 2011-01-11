@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(f);
         fmpz_poly_init(g);
-        fmpz_poly_randtest(g, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(g, state, n_randint(state, 100), 200);
 
         fmpz_poly_primitive_part(f, g);
         fmpz_poly_primitive_part(g, g);
@@ -77,7 +77,7 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_init(c);
-        fmpz_poly_randtest_not_zero(f, state, n_randint(100, state) + 1, 200);
+        fmpz_poly_randtest_not_zero(f, state, n_randint(state, 100) + 1, 200);
 
         fmpz_poly_content(c, f);
         if (fmpz_sgn(f->coeffs + f->length - 1) < 0)

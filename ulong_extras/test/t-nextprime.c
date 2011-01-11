@@ -51,8 +51,8 @@ int main(void)
    
     for (rep = 0; rep < 100000; rep++)
     {
-        unsigned long bits = n_randint(FLINT_D_BITS-1, state)+1;
-        n = n_randint((1UL<<bits) - 1UL, state) + 1; 
+        unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
+        n = n_randint(state, (1UL<<bits) - 1UL) + 1; 
         mpz_set_ui(mpz_n, n);
 
         for (i = 0; i < 1; i++)

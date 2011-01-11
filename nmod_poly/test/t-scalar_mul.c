@@ -45,11 +45,11 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(n, state);
+        mp_limb_t c = n_randint(state, n);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
 
         nmod_poly_scalar_mul(b, a, c);
         nmod_poly_scalar_mul(a, a, c);
@@ -72,14 +72,14 @@ main(void)
     {
         nmod_poly_t a, b, d1, d2;
         mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(n, state);
+        mp_limb_t c = n_randint(state, n);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(d1, n);
         nmod_poly_init(d2, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
-        nmod_poly_randtest(b, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(b, n_randint(state, 100), state);
 
         nmod_poly_add(d1, a, b);
         nmod_poly_scalar_mul(d1, d1, c);

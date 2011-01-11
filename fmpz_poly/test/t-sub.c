@@ -51,8 +51,8 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest(b, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_neg(b, b);
@@ -83,8 +83,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest(b, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_sub(a, a, b);
@@ -112,8 +112,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest(b, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
 
         fmpz_poly_sub(c, a, b);
         fmpz_poly_sub(b, a, b);

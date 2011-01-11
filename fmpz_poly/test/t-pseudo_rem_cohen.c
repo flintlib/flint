@@ -52,8 +52,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r1);
         fmpz_poly_init(r2);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 200);
 
         fmpz_poly_pseudo_divrem_cohen(q, r1, a, b);
         fmpz_poly_pseudo_rem_cohen(r2, a, b);
@@ -84,8 +84,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 200);
 
         fmpz_poly_pseudo_rem_cohen(r, a, b);
         fmpz_poly_pseudo_rem_cohen(a, a, b);
@@ -112,8 +112,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(r);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 200);
 
         fmpz_poly_pseudo_rem_cohen(r, a, b);
         fmpz_poly_pseudo_rem_cohen(b, a, b);

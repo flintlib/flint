@@ -52,7 +52,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        len = n_randint(50, state);
+        len = n_randint(state, 50);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 
@@ -82,7 +82,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        len = n_randint(50, state);
+        len = n_randint(state, 50);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 
@@ -113,7 +113,7 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(d);
-        len = n_randint(50, state);
+        len = n_randint(state, 50);
         fmpz_poly_randtest(b, state, len, 200);
         fmpz_poly_randtest(c, state, len, 200);
 

@@ -45,8 +45,8 @@ main(void)
     {
         nmod_mat_t A, B, C, D;
 
-        m = n_randint(20, state);
-        n = n_randint(20, state);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
         mod = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, n, mod);

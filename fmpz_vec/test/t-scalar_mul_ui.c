@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         ulong n = n_randtest(state);
 
         a = _fmpz_vec_init(len);
@@ -74,7 +74,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         ulong n = n_randbits(FLINT_BITS, state);
         fmpz_t x;
 

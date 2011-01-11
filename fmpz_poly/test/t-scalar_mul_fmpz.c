@@ -52,7 +52,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_scalar_mul_fmpz(b, a, n);
         fmpz_poly_scalar_mul_fmpz(a, a, n);
@@ -79,13 +79,13 @@ main(void)
         long n;
         fmpz_init(n1);
         n = (long) n_randbits(FLINT_BITS - 1, state);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             n = -n;
         fmpz_set_si(n1, n);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_scalar_mul_fmpz(b, a, n1);
         fmpz_poly_scalar_mul_si(a, a, n);

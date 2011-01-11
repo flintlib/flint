@@ -48,7 +48,7 @@ main(void)
         
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
         
         nmod_poly_neg(b, a);
         nmod_poly_neg(b, b);

@@ -53,7 +53,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        trunc = n_randint(50, state);
+        trunc = n_randint(state, 50);
         fmpq_poly_randtest(b, state, trunc, 200);
         fmpq_poly_randtest(c, state, trunc, 200);
 

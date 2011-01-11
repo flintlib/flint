@@ -50,10 +50,10 @@ main(void)
         mpz_init(b);
         mpz_init(c);
 
-        bits = n_randint(200, state) + 1;
+        bits = n_randint(state, 200) + 1;
 
         mpz_rrandomb(b, state->gmp_state, bits);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             mpz_neg(b, b);
 
         fmpz_init(a);

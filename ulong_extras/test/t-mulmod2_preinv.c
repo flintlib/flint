@@ -44,8 +44,8 @@ int main(void)
       mp_limb_t a, b, d, r1, r2, q, p1, p2, dinv;
       
       d = n_randtest_not_zero(state);
-      a = n_randint(d, state);
-      b = n_randint(d, state);
+      a = n_randint(state, d);
+      b = n_randint(state, d);
       
       dinv = n_preinvert_limb(d);
 

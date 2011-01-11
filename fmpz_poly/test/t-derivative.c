@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_derivative(b, a);
         fmpz_poly_derivative(a, a);
@@ -75,7 +75,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(2, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 2), 200);
 
         fmpz_poly_derivative(b, a);
 
@@ -103,8 +103,8 @@ main(void)
         fmpz_poly_init(d);
         fmpz_poly_init(lhs);
         fmpz_poly_init(rhs);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpz_poly_randtest(b, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
 
         fmpz_poly_mul(lhs, a, b);
         fmpz_poly_derivative(lhs, lhs);

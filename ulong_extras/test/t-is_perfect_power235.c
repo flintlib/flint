@@ -43,7 +43,7 @@ int main(void)
 
    for (i = 0; i < 10000; i++) /* Test that square pass the test */
    {
-      bits = n_randint(FLINT_BITS/2, state) + 1;
+      bits = n_randint(state, FLINT_BITS/2) + 1;
       d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 2));
@@ -58,7 +58,7 @@ int main(void)
          
    for (i = 0; i < 10000; i++) /* Test that cubes pass the test */
    {
-      bits = n_randint(FLINT_BITS/3, state) + 1;
+      bits = n_randint(state, FLINT_BITS/3) + 1;
       d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 3));
@@ -74,7 +74,7 @@ int main(void)
          
    for (i = 0; i < 10000; i++) /* Test that fifth powers pass the test */
    {
-      bits = n_randint(FLINT_BITS/5, state) + 1;
+      bits = n_randint(state, FLINT_BITS/5) + 1;
       d = n_randbits(bits, state);
 
       result = n_is_perfect_power235(n_pow(d, 5));

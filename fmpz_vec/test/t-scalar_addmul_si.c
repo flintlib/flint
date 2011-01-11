@@ -50,7 +50,7 @@ main(void)
         fmpz *a, *b, *c, *d;
         long len, x;
 
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

@@ -57,8 +57,8 @@ main(void)
         nmod_poly_init(r, n);
         nmod_poly_init(q2, n);
         
-        nmod_poly_randtest(a, n_randint(200, state), state);
-        do nmod_poly_randtest(b, n_randint(200, state), state);
+        nmod_poly_randtest(a, n_randint(state, 200), state);
+        do nmod_poly_randtest(b, n_randint(state, 200), state);
         while (b->length == 0);
 
         nmod_poly_divrem_basecase(q, r, a, b);
@@ -97,10 +97,10 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        nmod_poly_randtest(a, n_randint(200, state), state);
+        nmod_poly_randtest(a, n_randint(state, 200), state);
         do
         {
-            nmod_poly_randtest(b, n_randint(200, state), state);
+            nmod_poly_randtest(b, n_randint(state, 200), state);
         } while (b->length == 0);
 
         nmod_poly_div_basecase(q, a, b);
@@ -136,10 +136,10 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(q, n);
-        nmod_poly_randtest(a, n_randint(200, state), state);
+        nmod_poly_randtest(a, n_randint(state, 200), state);
         do
         {
-            nmod_poly_randtest(b, n_randint(200, state), state);
+            nmod_poly_randtest(b, n_randint(state, 200), state);
         } while (b->length == 0);
 
         nmod_poly_div_basecase(q, a, b);

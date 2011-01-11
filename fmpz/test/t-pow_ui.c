@@ -57,7 +57,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(20, state);
+        x = n_randint(state, 20);
 
         fmpz_pow_ui(b, a, x);
         mpz_pow_ui(e, d, x);
@@ -96,7 +96,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(20, state);
+        x = n_randint(state, 20);
 
         fmpz_pow_ui(a, a, x);
         mpz_pow_ui(e, d, x);

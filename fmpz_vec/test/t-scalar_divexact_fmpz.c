@@ -48,10 +48,10 @@ main(void)
     {
         fmpz *a, *b;
         fmpz_t n;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);
@@ -81,10 +81,10 @@ main(void)
     {
         fmpz *a, *b;
         fmpz_t n;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             fmpz_neg(n, n);
 
         a = _fmpz_vec_init(len);

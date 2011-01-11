@@ -39,7 +39,7 @@ mp_limb_signed_t z_randtest(flint_rand_t state)
 
     if (m & 7UL)
     {
-        z = n_randbits(n_randint(FLINT_BITS, state), state);
+        z = n_randbits(n_randint(state, FLINT_BITS), state);
     }
     else
     {

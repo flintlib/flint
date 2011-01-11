@@ -58,13 +58,13 @@ main(void)
         nmod_poly_init(g, n);
         
         do {
-            nmod_poly_randtest(a, n_randint(200, state), state);
-            nmod_poly_randtest(b, n_randint(200, state), state);
+            nmod_poly_randtest(a, n_randint(state, 200), state);
+            nmod_poly_randtest(b, n_randint(state, 200), state);
             nmod_poly_gcd_euclidean(g, a, b);
         } while (g->length != 1);
 
         do {
-            nmod_poly_randtest(c, n_randint(200, state), state);
+            nmod_poly_randtest(c, n_randint(state, 200), state);
         } while (c->length < 2);
         nmod_poly_make_monic(c, c);
         
@@ -103,8 +103,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(g, n);
-        nmod_poly_randtest(a, n_randint(200, state), state);
-        nmod_poly_randtest(b, n_randint(200, state), state);
+        nmod_poly_randtest(a, n_randint(state, 200), state);
+        nmod_poly_randtest(b, n_randint(state, 200), state);
         
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(a, a, b);
@@ -137,8 +137,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(g, n);
-        nmod_poly_randtest(a, n_randint(200, state), state);
-        nmod_poly_randtest(b, n_randint(200, state), state);
+        nmod_poly_randtest(a, n_randint(state, 200), state);
+        nmod_poly_randtest(b, n_randint(state, 200), state);
        
         nmod_poly_gcd_euclidean(g, a, b);
         nmod_poly_gcd_euclidean(b, a, b);

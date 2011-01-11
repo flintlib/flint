@@ -52,14 +52,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length, state);
+            start = n_randint(state, b->length + c->length);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(b, b, c, start);
@@ -88,14 +88,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length - 1, state);
+            start = n_randint(state, b->length + c->length - 1);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(c, b, c, start);
@@ -125,14 +125,14 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             start = 0;
         else
-            start = n_randint(b->length + c->length - 1, state);
+            start = n_randint(state, b->length + c->length - 1);
 
         nmod_poly_mul_classical(a, b, c);
         if (a->length >= start)

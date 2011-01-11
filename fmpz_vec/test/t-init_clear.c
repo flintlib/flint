@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        long j, len = n_randint(100, state) + 1;
+        long j, len = n_randint(state, 100) + 1;
 
         a = _fmpz_vec_init(len);
         for (j = 0; j < len; j++)

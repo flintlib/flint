@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_t a;
 
-        fmpz_init2(a, n_randint(100, state));
+        fmpz_init2(a, n_randint(state, 100));
         fmpz_clear(a);
     }
 

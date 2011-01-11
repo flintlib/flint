@@ -49,10 +49,10 @@ main(void)
         long len, bits;
         mp_size_t limbs, limbs2;
 
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
-        bits = n_randint(200, state);
+        bits = n_randint(state, 200);
         limbs = (bits + FLINT_BITS - 1) / FLINT_BITS;
         _fmpz_vec_randtest(a, state, len, bits);
 

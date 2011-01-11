@@ -50,7 +50,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_scalar_mul_ui(b, a, n);
         fmpz_poly_scalar_mul_ui(a, a, n);
@@ -78,7 +78,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_scalar_mul_ui(b, a, n1);
         fmpz_poly_scalar_mul_ui(c, b, n2);

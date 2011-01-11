@@ -44,11 +44,11 @@ main(void)
     for (i = 0; i < 500000; i++)
     {
         fmpz_t a, b;
-        mp_bitcnt_t bits = n_randint(300, state) + 1;
+        mp_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
         mp_ptr arr = (mp_ptr) calloc(space, sizeof(mp_limb_t));
-        mp_bitcnt_t shift = n_randint(FLINT_BITS, state);
-        int negate = (int) -n_randint(2, state);
+        mp_bitcnt_t shift = n_randint(state, FLINT_BITS);
+        int negate = (int) -n_randint(state, 2);
 
         fmpz_init(a);
         fmpz_init(b);
@@ -78,10 +78,10 @@ main(void)
     for (i = 0; i < 500000; i++)
     {
         fmpz_t a, b;
-        mp_bitcnt_t bits = n_randint(300, state) + 1;
+        mp_bitcnt_t bits = n_randint(state, 300) + 1;
         ulong space = (300 - 1) / FLINT_BITS + 2;   /* 2 to accomodate shift */
         mp_ptr arr = (mp_ptr) calloc(space, sizeof(mp_limb_t));
-        mp_bitcnt_t shift = n_randint(FLINT_BITS, state);
+        mp_bitcnt_t shift = n_randint(state, FLINT_BITS);
 
         fmpz_init(a);
         fmpz_init(b);

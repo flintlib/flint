@@ -43,7 +43,7 @@ int main(void)
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/2, state) + 1;
+      bits = n_randint(state, FLINT_BITS/2) + 1;
       n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1);
 
@@ -62,7 +62,7 @@ int main(void)
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/3, state) + 1;
+      bits = n_randint(state, FLINT_BITS/3) + 1;
       n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1*n1);
 
@@ -81,7 +81,7 @@ int main(void)
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
-      bits = n_randint(FLINT_BITS/5, state) + 1;
+      bits = n_randint(state, FLINT_BITS/5) + 1;
       n1 = n_randbits(bits, state);
       factor = n_factor_power235(&exp, n1*n1*n1*n1*n1);
 

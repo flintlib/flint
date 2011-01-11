@@ -59,7 +59,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d, state);
+         do a = n_randint(state, d);
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -94,7 +94,7 @@ int main(void)
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d, state);
+         do a = n_randint(state, d);
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);

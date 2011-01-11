@@ -43,9 +43,9 @@ main(void)
     /* Check (a + b)*c == a*c + b*c */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(100, state) + 1;
+        long len = n_randint(state, 100) + 1;
         mp_limb_t n = n_randtest_not_zero(state);
-        mp_limb_t c = n_randint(n, state);
+        mp_limb_t c = n_randint(state, n);
         nmod_t mod;
 
         mp_ptr vec = nmod_vec_init(len);

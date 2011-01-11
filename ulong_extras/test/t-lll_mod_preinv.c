@@ -45,7 +45,7 @@ int main(void)
 
       d = n_randtest_not_zero(state);
       m = n_randtest(state);
-      nh = n_randint(d, state);
+      nh = n_randint(state, d);
       nm = n_randtest(state);
       nl = n_randtest(state);
       

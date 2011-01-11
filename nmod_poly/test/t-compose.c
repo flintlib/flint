@@ -50,7 +50,7 @@ main(void)
         nmod_poly_init(r, n);
         nmod_poly_init(xm1, n);
         nmod_poly_init(xp1, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
         
         nmod_poly_set_coeff_ui(xm1, 1, 1);
         nmod_poly_set_coeff_ui(xm1, 0, n - 1);
@@ -87,9 +87,9 @@ main(void)
         nmod_poly_init(c, n);
         nmod_poly_init(r1, n);
         nmod_poly_init(r2, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(30, state), state);
-        nmod_poly_randtest(c, n_randint(10, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 30), state);
+        nmod_poly_randtest(c, n_randint(state, 10), state);
         
         nmod_poly_compose(r1, a, c);
         nmod_poly_compose(r2, b, c);
@@ -125,8 +125,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(15, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 15), state);
         
         nmod_poly_compose(r1, a, b);
         nmod_poly_compose(a, a, b);
@@ -155,8 +155,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(r1, n);
-        nmod_poly_randtest(a, n_randint(30, state), state);
-        nmod_poly_randtest(b, n_randint(15, state), state);
+        nmod_poly_randtest(a, n_randint(state, 30), state);
+        nmod_poly_randtest(b, n_randint(state, 15), state);
         
         nmod_poly_compose(r1, a, b);
         nmod_poly_compose(b, a, b);

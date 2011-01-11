@@ -51,7 +51,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        trunc = n_randint(50, state);
+        trunc = n_randint(state, 50);
         nmod_poly_randtest(b, trunc, state);
         nmod_poly_randtest(c, trunc, state);
 

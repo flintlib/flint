@@ -44,9 +44,9 @@ int main(void)
       mp_limb_t a, b, c, g, bits1, bits2, bits3, ph, pl, qh, ql;
       mp_limb_t s, t;
       
-      bits1 = n_randint(FLINT_BITS-1, state) + 1;
-      bits2 = n_randint(bits1, state) + 1;
-      bits3 = n_randint(FLINT_BITS - bits1, state) + 1;
+      bits1 = n_randint(state, FLINT_BITS-1) + 1;
+      bits2 = n_randint(state, bits1) + 1;
+      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
 
       do
       {

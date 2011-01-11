@@ -51,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(10, state), 100);
+        fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
         exp = n_randtest(state) % 20UL;
 
@@ -80,7 +80,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(10, state), 100);
+        fmpz_poly_randtest(b, state, n_randint(state, 10), 100);
 
         exp = n_randtest(state) % 20UL;
 

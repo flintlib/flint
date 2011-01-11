@@ -45,7 +45,7 @@ int main(void)
       mp_limb_t a, d, norm;
       mpz_t d_m;
       double dpre;
-      mp_limb_t bits = n_randint(FLINT_D_BITS-1, state) + 2;
+      mp_limb_t bits = n_randint(state, FLINT_D_BITS-1) + 2;
 
       mpz_init(d_m);
 
@@ -60,7 +60,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d, state);
+         do a = n_randint(state, d);
          while (a == 0UL);
       
          dpre = n_precompute_inverse(d);
@@ -83,7 +83,7 @@ int main(void)
       mp_limb_t a, d, norm;
       mpz_t d_m;
       double dpre;
-      mp_limb_t bits = n_randint(FLINT_D_BITS-3, state) + 4;
+      mp_limb_t bits = n_randint(state, FLINT_D_BITS-3) + 4;
 
       mpz_init(d_m);
 
@@ -95,7 +95,7 @@ int main(void)
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(d, state);
+         do a = n_randint(state, d);
          while (a == 0UL);
       
          dpre = n_precompute_inverse(d);

@@ -50,7 +50,7 @@ main(void)
         long len, x;
         mp_bitcnt_t exp;
 
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -62,7 +62,7 @@ main(void)
         _fmpz_vec_set(c, b, len);
 
         x = z_randtest(state);
-        exp = n_randint(200, state);
+        exp = n_randint(state, 200);
 
         _fmpz_vec_scalar_addmul_si_2exp(b, a, len, x, exp);
         _fmpz_vec_scalar_mul_2exp(d, a, len, exp);

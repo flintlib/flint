@@ -47,13 +47,13 @@ main(void)
 
         long m, k, n;
 
-        m = n_randint(50, state);
-        k = n_randint(50, state);
-        n = n_randint(50, state);
+        m = n_randint(state, 50);
+        k = n_randint(state, 50);
+        n = n_randint(state, 50);
 
         /* We want to generate matrices with many entries close to half
            or full limbs with high probability, to stress overflow handling */
-        switch (n_randint(3, state))
+        switch (n_randint(state, 3))
         {
             case 0:
                 nmod_mat_init(A, m, n, n_randtest_not_zero(state));
@@ -66,7 +66,7 @@ main(void)
                 break;
         }
 
-        switch (n_randint(3, state))
+        switch (n_randint(state, 3))
         {
             case 0:
                 nmod_mat_init(B, n, k, n_randtest_not_zero(state));
@@ -80,7 +80,7 @@ main(void)
         }
 
         /* Small modulus with high probability, again to trigger reductions */
-        switch (n_randint(2, state))
+        switch (n_randint(state, 2))
         {
             case 0:
                 nmod_mat_init(C, m, k, n_randtest_not_zero(state));
@@ -92,12 +92,12 @@ main(void)
 
         nmod_mat_init(D, m, k, C->mod.n);
 
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             nmod_mat_randtest(A, state);
         else
             nmod_mat_randfull(A, state);
 
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             nmod_mat_randtest(B, state);
         else
             nmod_mat_randfull(B, state);

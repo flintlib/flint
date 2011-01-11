@@ -48,7 +48,7 @@ main(void)
         fmpz_poly_t a;
 
         fmpz_poly_init(a);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 100);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 100);
         fmpz_poly_zero(a);
 
         result = (fmpz_poly_is_zero(a));

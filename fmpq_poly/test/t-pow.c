@@ -52,7 +52,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(b, state, n_randint(10, state), 100);
+        fmpq_poly_randtest(b, state, n_randint(state, 10), 100);
 
         exp = (ulong) n_randtest(state) % 20UL;
 
@@ -85,7 +85,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(b, state, n_randint(10, state), 100);
+        fmpq_poly_randtest(b, state, n_randint(state, 10), 100);
 
         exp = (ulong) n_randtest(state) % 20UL;
 

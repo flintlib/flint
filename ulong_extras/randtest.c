@@ -40,7 +40,7 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     if (m & 7UL)
     {
-        n = n_randbits(n_randint(FLINT_BITS + 1, state), state);
+        n = n_randbits(n_randint(state, FLINT_BITS + 1), state);
     }
     else
     {

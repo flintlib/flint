@@ -50,7 +50,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_set(b, a);
 
@@ -73,7 +73,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        long coeff = (long) n_randint(100, state);
+        long coeff = (long) n_randint(state, 100);
         mpq_t x1, x2;
         fmpz_t x1fmpz;
 
@@ -82,7 +82,7 @@ main(void)
         fmpz_init(x1fmpz);
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_set(b, a);
 

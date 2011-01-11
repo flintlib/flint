@@ -46,8 +46,8 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
-        ulong exp = n_randint(200, state);
+        long len = n_randint(state, 100);
+        ulong exp = n_randint(state, 200);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -74,9 +74,9 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
-        ulong e1 = n_randint(200, state);
-        ulong e2 = n_randint(200, state);
+        long len = n_randint(state, 100);
+        ulong e1 = n_randint(state, 200);
+        ulong e2 = n_randint(state, 200);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

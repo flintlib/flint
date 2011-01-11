@@ -79,10 +79,10 @@ int main(void)
       mpz_init(r2_m);
       mpz_init(s2_m);
       
-      bits = n_randint(33, state);
+      bits = n_randint(state, 33);
       a = n_randbits(bits, state);
       a = a*a;
-      a += (n_randint(100, state) - 50);
+      a += (n_randint(state, 100) - 50);
       s1 = n_sqrtrem(&r1, a);
 
       mpz_set_ui(a_m, a);

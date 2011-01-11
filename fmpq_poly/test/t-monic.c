@@ -51,7 +51,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(f, state, n_randint(state, 100), 200);
 
         fmpq_poly_monic(g, f);
         fmpq_poly_monic(f, f);
@@ -78,7 +78,7 @@ main(void)
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest_not_zero(f, state, n_randint(100, state) + 1, 200);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(state, 100) + 1, 200);
 
         fmpq_poly_monic(f, f);
 

@@ -47,10 +47,10 @@ main(void)
         fmpz *a;
         long len, bits, bits2;
 
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
-        bits = n_randint(200, state);
+        bits = n_randint(state, 200);
         _fmpz_vec_randtest(a, state, len, bits);
 
         bits2 = _fmpz_vec_max_bits(a, len);

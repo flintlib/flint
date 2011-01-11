@@ -51,7 +51,7 @@ main(void)
         nmod_poly_init(b, n);
         
         if (n == 1) continue;
-        do { nmod_poly_randtest(a, n_randint(100, state) + 1, state); } while (a->length == 0);
+        do { nmod_poly_randtest(a, n_randint(state, 100) + 1, state); } while (a->length == 0);
         
         nmod_poly_make_monic(b, a);
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
@@ -81,7 +81,7 @@ main(void)
         nmod_poly_init(a, n);
         
         if (n == 1) continue;
-        do { nmod_poly_randtest(a, n_randint(100, state) + 1, state); } while (a->length == 0);
+        do { nmod_poly_randtest(a, n_randint(state, 100) + 1, state); } while (a->length == 0);
         
         l = n_gcd(a->mod.n, a->coeffs[a->length - 1]);
         nmod_poly_make_monic(a, a);

@@ -44,9 +44,9 @@ int main(void)
       mp_limb_t bits, d, n, r1, r2;
       double dpre;
 
-      bits = n_randint(FLINT_D_BITS, state) + 1;
+      bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randbits(bits, state);
-      if (bits <= (FLINT_BITS/2)) n = n_randint(d*d, state);
+      if (bits <= (FLINT_BITS/2)) n = n_randint(state, d*d);
       else n = n_randtest(state);
 
       dpre = n_precompute_inverse(d);

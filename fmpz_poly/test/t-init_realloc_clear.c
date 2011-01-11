@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_t a;
 
-        fmpz_poly_init2(a, n_randint(100, state));
+        fmpz_poly_init2(a, n_randint(state, 100));
         fmpz_poly_clear(a);
     }
 
@@ -53,8 +53,8 @@ main(void)
     {
         fmpz_poly_t a;
 
-        fmpz_poly_init2(a, n_randint(100, state));
-        fmpz_poly_realloc(a, n_randint(100, state));
+        fmpz_poly_init2(a, n_randint(state, 100));
+        fmpz_poly_realloc(a, n_randint(state, 100));
         fmpz_poly_clear(a);
     }
 
@@ -63,7 +63,7 @@ main(void)
         fmpz_poly_t a;
 
         fmpz_poly_init(a);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
         fmpz_poly_clear(a);
     }
 

@@ -48,7 +48,7 @@ int main()
 
     for (i = 0; i < 1000; i++)
     {
-        n = n_randint(10, state);
+        n = n_randint(state, 10);
         num_primes = (1L << n);
         primes = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
         p = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);

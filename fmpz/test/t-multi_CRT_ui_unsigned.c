@@ -62,7 +62,7 @@ int main()
 
     for (i = 0; i < 10000; i++)
     {
-        bits = n_randint(300, state)+1;
+        bits = n_randint(state, 300)+1;
 
         if (FLINT_BITS == 32)
             primes_per_limb = 1.0325;

@@ -38,14 +38,14 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     {
         _fmpz_demote(f);
         *f = n_randbits(bits, state);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             *f = -*f;
     }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
         mpz_urandomb(mpz_ptr, state->gmp_state, bits);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             mpz_neg(mpz_ptr, mpz_ptr);
     }
 }

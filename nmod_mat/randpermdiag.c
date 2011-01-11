@@ -41,7 +41,7 @@ static int shuffle(long * array, long n, flint_rand_t state)
     parity = 0;
     for (i = n - 1; i > 0; i--)
     {
-        j = n_randint(i+1, state);
+        j = n_randint(state, i+1);
         parity ^= (i == j);
         tmp = array[i];
         array[i] = array[j];

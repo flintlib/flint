@@ -53,13 +53,13 @@ main(void)
         long coeff, len;
 
         fmpq_poly_init(a);
-        len = (long) (n_randint(100, state) + 1);
+        len = (long) (n_randint(state, 100) + 1);
         fmpq_poly_randtest(a, state, len, 100);
 
         for (j = 0; j < 1000; j++)
         {
             n = n_randtest(state);
-            coeff = n_randint(len, state);
+            coeff = n_randint(state, len);
             fmpq_poly_set_coeff_ui(a, coeff, n);
             fmpq_poly_get_coeff_mpq(n_mpq, a, coeff);
 

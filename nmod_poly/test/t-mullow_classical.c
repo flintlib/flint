@@ -51,14 +51,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             trunc = 0;
         else
-            trunc = n_randint(b->length + c->length, state);
+            trunc = n_randint(state, b->length + c->length);
 
         nmod_poly_mullow_classical(a, b, c, trunc);
         nmod_poly_mullow_classical(b, b, c, trunc);
@@ -87,14 +87,14 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             trunc = 0;
         else
-            trunc = n_randint(b->length + c->length - 1, state);
+            trunc = n_randint(state, b->length + c->length - 1);
 
         nmod_poly_mullow_classical(a, b, c, trunc);
         nmod_poly_mullow_classical(c, b, c, trunc);
@@ -124,14 +124,14 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
         nmod_poly_init(d, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         len = b->length + c->length - 1;
         if (len <= 0)
             trunc = 0;
         else
-            trunc = n_randint(b->length + c->length - 1, state);
+            trunc = n_randint(state, b->length + c->length - 1);
 
         nmod_poly_mul_classical(a, b, c);
         nmod_poly_truncate(a, trunc);

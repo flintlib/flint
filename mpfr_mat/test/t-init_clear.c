@@ -45,9 +45,9 @@ main(void)
     {
         mpfr_mat_t a;
         long j, k;
-        long rows = n_randint(100, state);
-        long cols = n_randint(100, state);
-        mp_prec_t prec = n_randint(200, state) + MPFR_PREC_MIN;
+        long rows = n_randint(state, 100);
+        long cols = n_randint(state, 100);
+        mp_prec_t prec = n_randint(state, 200) + MPFR_PREC_MIN;
 
         mpfr_mat_init(a, rows, cols, prec);
 

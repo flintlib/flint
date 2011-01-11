@@ -50,7 +50,7 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     ulong m;
 
     m    = n_randlimb(state);
-    bits = n_randint(bits + 1, state);
+    bits = n_randint(state, bits + 1);
 
     if (bits <= FLINT_BITS - 2)
     {

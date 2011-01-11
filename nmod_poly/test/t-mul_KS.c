@@ -50,8 +50,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         nmod_poly_mul_KS(a, b, c, 0);
         nmod_poly_mul_KS(b, b, c, 0);
@@ -79,8 +79,8 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         nmod_poly_mul_KS(a, b, c, 0);
         nmod_poly_mul_KS(c, b, c, 0);
@@ -109,8 +109,8 @@ main(void)
         nmod_poly_init(a2, n);
         nmod_poly_init(b, n);
         nmod_poly_init(c, n);
-        nmod_poly_randtest(b, n_randint(50, state), state);
-        nmod_poly_randtest(c, n_randint(50, state), state);
+        nmod_poly_randtest(b, n_randint(state, 50), state);
+        nmod_poly_randtest(c, n_randint(state, 50), state);
 
         nmod_poly_mul_classical(a1, b, c);
         nmod_poly_mul_KS(a2, b, c, 0);

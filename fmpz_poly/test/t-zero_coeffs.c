@@ -50,7 +50,7 @@ main(void)
         long len;
 
         fmpz_poly_init(a);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
         len = a->length;
 
         fmpz_poly_zero_coeffs(a, -23, len/2);

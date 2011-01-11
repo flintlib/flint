@@ -57,7 +57,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(200, state);
+        x = n_randint(state, 200);
 
         fmpz_fdiv_q_2exp(b, a, x);
         mpz_fdiv_q_2exp(e, d, x);
@@ -96,7 +96,7 @@ main(void)
         fmpz_randtest(a, state, 200);
 
         fmpz_get_mpz(d, a);
-        x = n_randint(200, state);
+        x = n_randint(state, 200);
 
         fmpz_fdiv_q_2exp(a, a, x);
         mpz_fdiv_q_2exp(e, d, x);

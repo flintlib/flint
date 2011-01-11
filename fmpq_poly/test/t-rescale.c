@@ -53,7 +53,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100, state), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 100), 100);
         
         fmpz_init(anum);
         fmpz_init(aden);
@@ -96,7 +96,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(100, state), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 100), 100);
         
         fmpz_init(anum);
         fmpz_init(aden);

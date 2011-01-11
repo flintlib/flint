@@ -44,8 +44,8 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         __mpfr_struct *a;
-        long j, length = n_randint(100, state);
-        mp_prec_t prec = n_randint(200, state) + MPFR_PREC_MIN;
+        long j, length = n_randint(state, 100);
+        mp_prec_t prec = n_randint(state, 200) + MPFR_PREC_MIN;
 
         a = _mpfr_vec_init(length, prec);
 

@@ -51,7 +51,7 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), n_randint(200, state));
+        fmpz_poly_randtest(a, state, n_randint(state, 100), n_randint(state, 200));
 
         str = fmpz_poly_get_str(a);
         ans = fmpz_poly_set_str(b, str);

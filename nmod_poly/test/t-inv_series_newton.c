@@ -54,10 +54,10 @@ main(void)
         nmod_poly_init(qinv, n);
         nmod_poly_init(q, n);
         
-        do nmod_poly_randtest(q, n_randint(2000, state), state);
+        do nmod_poly_randtest(q, n_randint(state, 2000), state);
         while (q->length == 0 || q->coeffs[0] == 0);
 
-        m = n_randint(q->length, state) + 1;
+        m = n_randint(state, q->length) + 1;
 
         nmod_poly_inv_series_newton(qinv, q, m);
         
@@ -92,10 +92,10 @@ main(void)
 
         nmod_poly_init(q, n);
         nmod_poly_init(qinv, n);
-        do nmod_poly_randtest(q, n_randint(1000, state), state);
+        do nmod_poly_randtest(q, n_randint(state, 1000), state);
         while (q->length == 0 || q->coeffs[0] == 0);
 
-        m = n_randint(q->length, state) + 1;
+        m = n_randint(state, q->length) + 1;
 
         nmod_poly_inv_series_newton(qinv, q, m);
         nmod_poly_inv_series_newton(q, q, m);

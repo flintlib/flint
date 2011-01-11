@@ -49,7 +49,7 @@ main(void)
         mp_limb_t sum, eval;
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
         
         eval = nmod_poly_evaluate(a, 1);
         
@@ -79,10 +79,10 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
-        nmod_poly_randtest(b, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
+        nmod_poly_randtest(b, n_randint(state, 100), state);
         
-        c = n_randint(n, state);
+        c = n_randint(state, n);
         
         eval1 = nmod_poly_evaluate(a, c);
         eval1 = n_addmod(eval1, nmod_poly_evaluate(b, c), n);

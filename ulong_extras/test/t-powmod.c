@@ -49,11 +49,11 @@ int main(void)
       mpz_init(d_m);
       mpz_init(r2_m);
       
-      bits = n_randint(FLINT_D_BITS, state) + 1;
+      bits = n_randint(state, FLINT_D_BITS) + 1;
       d = n_randbits(bits, state);
       do
       {
-         a = n_randint(d, state);
+         a = n_randint(state, d);
       } while (n_gcd(d, a) != 1UL);
       exp = n_randtest(state);
       

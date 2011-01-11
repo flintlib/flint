@@ -38,7 +38,7 @@ void nmod_mpoly_randtest(nmod_mpoly_t poly, long length, flint_rand_t state)
    
    for (i = 0; i < length; i++)
    {
-      poly->coeffs[i] = n_randint(poly->mod.n, state);
+      poly->coeffs[i] = n_randint(state, poly->mod.n);
       poly->exps[i] = n_randint(((1L<<poly->ebits) - 1)*(poly->vars), state); 
    }
 

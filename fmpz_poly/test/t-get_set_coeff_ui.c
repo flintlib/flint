@@ -48,12 +48,12 @@ main(void)
         long coeff, len;
 
         fmpz_poly_init(a);
-        len = n_randint(100, state) + 1;
+        len = n_randint(state, 100) + 1;
 
         for (j = 0; j < 1000; j++)
         {
             n1 = n_randtest(state);
-            coeff = n_randint(len, state);
+            coeff = n_randint(state, len);
             fmpz_poly_set_coeff_ui(a, coeff, n1);
             n2 = fmpz_poly_get_coeff_ui(a, coeff);
 

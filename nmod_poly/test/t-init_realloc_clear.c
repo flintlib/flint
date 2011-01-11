@@ -45,7 +45,7 @@ main(void)
         nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero(state);
 
-        nmod_poly_init2(a, n, n_randint(100, state));
+        nmod_poly_init2(a, n, n_randint(state, 100));
         nmod_poly_clear(a);
     }
 
@@ -54,9 +54,9 @@ main(void)
         nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero(state);
 
-        nmod_poly_init2(a, n, n_randint(100, state));
-        nmod_poly_realloc(a, n_randint(100, state));
-        nmod_poly_realloc(a, n_randint(100, state));
+        nmod_poly_init2(a, n, n_randint(state, 100));
+        nmod_poly_realloc(a, n_randint(state, 100));
+        nmod_poly_realloc(a, n_randint(state, 100));
         nmod_poly_clear(a);
     }
 
@@ -66,7 +66,7 @@ main(void)
         mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
         nmod_poly_clear(a);
     }
 

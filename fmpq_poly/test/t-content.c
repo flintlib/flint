@@ -53,7 +53,7 @@ main(void)
         fmpz_init(a);
         fmpz_init(b);
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(f, state, n_randint(state, 100), 200);
         fmpz_randtest(a, state, 100);
         fmpz_randtest_not_zero(b, state, 100);
         mpq_init(x);

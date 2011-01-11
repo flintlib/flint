@@ -49,11 +49,11 @@ main(void)
     for (i = 0; i < 500; i++)
     {
         fmpq_poly_t a, b;
-        long n = n_randint(50, state) + 1;
+        long n = n_randint(state, 50) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest_not_zero(a, state, n_randint(50, state) + 1, 50);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 50) + 1, 50);
         fmpz_randtest_not_zero(a->coeffs, state, 50);
         fmpq_poly_canonicalise(a);
 
@@ -80,14 +80,14 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpq_poly_t a, b, c, one;
-        long n = n_randint(80, state) + 1;
+        long n = n_randint(state, 80) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
         fmpq_poly_init(one);
 
-        fmpq_poly_randtest_not_zero(a, state, n_randint(80, state) + 1, 80);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, 80);
         fmpz_randtest_not_zero(a->coeffs, state, 80);
         fmpq_poly_canonicalise(a);
 

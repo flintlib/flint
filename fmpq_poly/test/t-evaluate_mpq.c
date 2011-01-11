@@ -55,7 +55,7 @@ main(void)
         mpq_init(x);
         mpq_init(y);
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(80, state), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 80), 100);
         fmpz_randtest(a, state, 80);
         fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -96,8 +96,8 @@ main(void)
         mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(80, state), 100);
-        fmpq_poly_randtest(g, state, n_randint(80, state), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 80), 100);
+        fmpq_poly_randtest(g, state, n_randint(state, 80), 100);
         fmpz_randtest(a, state, 80);
         fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);
@@ -142,8 +142,8 @@ main(void)
         mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(50, state), 80);
-        fmpq_poly_randtest(g, state, n_randint(50, state), 80);
+        fmpq_poly_randtest(f, state, n_randint(state, 50), 80);
+        fmpq_poly_randtest(g, state, n_randint(state, 50), 80);
         fmpz_randtest(a, state, 80);
         fmpz_randtest_not_zero(b, state, 80);
         fmpz_get_mpz(mpq_numref(x), a);

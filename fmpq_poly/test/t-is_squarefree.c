@@ -49,7 +49,7 @@ main(void)
         fmpq_poly_t f;
 
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(2, state), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 2), 100);
 
         result = (fmpq_poly_is_squarefree(f));
         if (!result)
@@ -68,11 +68,11 @@ main(void)
         fmpq_poly_t a, f;
 
         fmpq_poly_init(a);
-        fmpq_poly_randtest_not_zero(a, state, n_randint(20, state) + 1, 40);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1, 40);
         if (a->length < 2)
             continue;
         fmpq_poly_init(f);
-        fmpq_poly_randtest_not_zero(f, state, n_randint(20, state) + 1, 40);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, 40);
 
         fmpq_poly_mul(a, a, a);
         fmpq_poly_mul(f, a, f);

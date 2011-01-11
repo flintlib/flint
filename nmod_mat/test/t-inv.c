@@ -47,7 +47,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10, state);
+        m = n_randint(state, 10);
         mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         nmod_mat_init(A, m, m, mod);
@@ -62,8 +62,8 @@ main(void)
 
         nmod_mat_randrank(A, m, state);
         /* Dense or sparse? */
-        if (n_randint(2, state))
-            nmod_mat_randops(A, 1+n_randint(1+m*m, state), state);
+        if (n_randint(state, 2))
+            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
         result = nmod_mat_inv(B, A);
         nmod_mat_mul(C, A, B);
@@ -104,8 +104,8 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(10, state);
-        r = n_randint(m, state);
+        m = 1 + n_randint(state, 10);
+        r = n_randint(state, m);
 
         nmod_mat_init(A, m, m, mod);
         nmod_mat_init(B, m, m, mod);
@@ -113,8 +113,8 @@ main(void)
         nmod_mat_randrank(A, r, state);
 
         /* Dense */
-        if (n_randint(2, state))
-            nmod_mat_randops(A, 1+n_randint(1+m*m, state), state);
+        if (n_randint(state, 2))
+            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
         result = nmod_mat_inv(B, A);
 

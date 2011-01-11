@@ -55,8 +55,8 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_mul(prod, q, b);
@@ -91,8 +91,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_pseudo_div(a, &d, a, b);
@@ -120,8 +120,8 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(q);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 50);
-        fmpz_poly_randtest_not_zero(b, state, n_randint(100, state) + 1, 50);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 50);
+        fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 50);
 
         fmpz_poly_pseudo_div(q, &d, a, b);
         fmpz_poly_pseudo_div(b, &d, a, b);

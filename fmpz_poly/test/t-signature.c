@@ -48,8 +48,8 @@ main(void)
         fmpz_poly_t poly, linear, quadratic, rem;
         fmpz_t lhs, rhs;
         long nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
-        long len = n_randint(20, state) + 1;
-        mp_bitcnt_t bits = n_randint(50, state) + 1;
+        long len = n_randint(state, 20) + 1;
+        mp_bitcnt_t bits = n_randint(state, 50) + 1;
         
         fmpz_poly_init2(poly, len);
         fmpz_poly_init2(linear, 2);
@@ -60,7 +60,7 @@ main(void)
         fmpz_init(lhs);
         fmpz_init(rhs);
 
-        ncomplex_max = n_randint(len, state) / 2;
+        ncomplex_max = n_randint(state, len) / 2;
         nreal_max = len - 2 * ncomplex_max;
         ncomplex = 0;
         nreal = 0;

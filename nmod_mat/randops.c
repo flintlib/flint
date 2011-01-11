@@ -42,12 +42,12 @@ nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
 
     for (c = 0; c < count; c++)
     {
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
         {
-            if ((i = n_randint(m, state)) == (j = n_randint(m, state)))
+            if ((i = n_randint(state, m)) == (j = n_randint(state, m)))
                 continue;
 
-            if (n_randint(2, state))
+            if (n_randint(state, 2))
                 for (k = 0; k < n; k++)
                     mat->rows[j][k] = nmod_add(mat->rows[j][k],
                         mat->rows[i][k], mat->mod);
@@ -58,9 +58,9 @@ nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
         }
         else
         {
-            if ((i = n_randint(n, state)) == (j = n_randint(n, state)))
+            if ((i = n_randint(state, n)) == (j = n_randint(state, n)))
                 continue;
-            if (n_randint(2, state))
+            if (n_randint(state, 2))
                 for (k = 0; k < m; k++)
                     mat->rows[k][j] = nmod_add(mat->rows[k][j],
                         mat->rows[k][i], mat->mod);

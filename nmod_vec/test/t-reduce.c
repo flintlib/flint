@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        long j, len = n_randint(100, state) + 1;
+        long j, len = n_randint(state, 100) + 1;
         mp_ptr vec = nmod_vec_init(len);
         mp_ptr vec2 = nmod_vec_init(len);
 

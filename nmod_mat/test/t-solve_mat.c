@@ -47,8 +47,8 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10, state);
-        n = n_randint(10, state);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
         mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         nmod_mat_init(A, m, m, mod);
@@ -60,8 +60,8 @@ main(void)
         nmod_mat_randtest(B, state);
 
         /* Dense */
-        if (n_randint(2, state))
-            nmod_mat_randops(A, 1+n_randint(1+m*m, state), state);
+        if (n_randint(state, 2))
+            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
         solved = nmod_mat_solve_mat(X, A, B);
 
@@ -92,9 +92,9 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(10, state);
-        n = 1 + n_randint(10, state);
-        r = n_randint(m, state);
+        m = 1 + n_randint(state, 10);
+        n = 1 + n_randint(state, 10);
+        r = n_randint(state, m);
         mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         nmod_mat_init(A, m, m, mod);
@@ -106,8 +106,8 @@ main(void)
         nmod_mat_randtest(B, state);
 
         /* Dense */
-        if (n_randint(2, state))
-            nmod_mat_randops(A, 1+n_randint(1+m*m, state), state);
+        if (n_randint(state, 2))
+            nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
         solved = nmod_mat_solve_mat(X, A, B);
 

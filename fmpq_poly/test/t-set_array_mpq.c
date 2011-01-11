@@ -56,7 +56,7 @@ main(void)
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(n, state), 200);
+        fmpq_poly_randtest(f, state, n_randint(state, n), 200);
         for (j = 0; j < f->length; j++)
             fmpq_poly_get_coeff_mpq(a[j], f, j);
 

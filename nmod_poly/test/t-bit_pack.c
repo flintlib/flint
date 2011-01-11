@@ -52,13 +52,13 @@ main(void)
         {
             n = n_randtest_not_zero(state);
         } while (n == 1);
-        bits = 2 * FLINT_BIT_COUNT(n) + n_randint(FLINT_BITS, state);
+        bits = 2 * FLINT_BIT_COUNT(n) + n_randint(state, FLINT_BITS);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
         do
         {
-            nmod_poly_randtest(a, n_randint(100, state), state);
+            nmod_poly_randtest(a, n_randint(state, 100), state);
         } while (a->length == 0);
 
         mpn =

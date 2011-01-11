@@ -49,7 +49,7 @@ main(void)
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
         
         str = nmod_poly_get_str(a);
         r1 = nmod_poly_set_str(str, b);

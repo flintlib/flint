@@ -45,10 +45,10 @@ main(void)
     {
         fmpz_poly_t A;
         fmpz_t a;
-        long n = n_randint(100, state);
+        long n = n_randint(state, 100);
 
         fmpz_poly_init(A);
-        fmpz_poly_randtest(A, state, n_randint(100, state), 100);
+        fmpz_poly_randtest(A, state, n_randint(state, 100), 100);
         fmpz_init(a);
 
         fmpz_poly_get_coeff_fmpz(a, A, n);

@@ -62,7 +62,7 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_scalar_mul_mpq(b, a, z);
         fmpq_poly_scalar_mul_mpq(a, a, z);
@@ -115,7 +115,7 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_scalar_mul_mpq(lhs, a, z1);
         fmpq_poly_scalar_mul_mpq(lhs, lhs, z2);
@@ -168,8 +168,8 @@ main(void)
         fmpq_poly_init(b);
         fmpq_poly_init(lhs);
         fmpq_poly_init(rhs);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
-        fmpq_poly_randtest(b, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpq_poly_randtest(b, state, n_randint(state, 100), 200);
 
         fmpq_poly_scalar_mul_mpq(lhs, a, z);
         fmpq_poly_scalar_mul_mpq(rhs, b, z);

@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         long n = z_randtest(state);
 
         a = _fmpz_vec_init(len);
@@ -78,7 +78,7 @@ main(void)
         long len, n;
         fmpz_t x;
 
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);

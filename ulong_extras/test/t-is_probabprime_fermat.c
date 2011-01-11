@@ -57,7 +57,7 @@ int main(void)
 
       do
       {
-         j = n_randint(d, state);
+         j = n_randint(state, d);
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -85,7 +85,7 @@ int main(void)
 
       do
       {
-         j = n_randint(d, state);
+         j = n_randint(state, d);
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 

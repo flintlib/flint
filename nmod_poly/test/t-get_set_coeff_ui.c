@@ -48,10 +48,10 @@ main(void)
         mp_limb_t n = n_randtest_not_zero(state);
         mp_limb_t c1 = n_randtest(state), c2;
         
-        j = n_randint(100, state);
+        j = n_randint(state, 100);
 
         nmod_poly_init(a, n);
-        nmod_poly_randtest(a, n_randint(100, state), state);
+        nmod_poly_randtest(a, n_randint(state, 100), state);
 
         nmod_poly_set_coeff_ui(a, j, c1);
         c2 = nmod_poly_get_coeff_ui(a, j);

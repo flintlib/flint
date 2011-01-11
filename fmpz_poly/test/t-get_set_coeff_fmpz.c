@@ -51,12 +51,12 @@ main(void)
         fmpz_poly_init(a);
         fmpz_init(x1);
         fmpz_init(x2);
-        len = n_randint(100, state) + 1;
+        len = n_randint(state, 100) + 1;
 
         for (j = 0; j < 1000; j++)
         {
             fmpz_randtest(x1, state, 200);
-            coeff = n_randint(len, state);
+            coeff = n_randint(state, len);
             fmpz_poly_set_coeff_fmpz(a, coeff, x1);
             fmpz_poly_get_coeff_fmpz(x2, a, coeff);
 

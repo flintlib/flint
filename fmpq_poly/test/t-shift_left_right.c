@@ -48,11 +48,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b;
-        long shift = (long) n_randint(100, state);
+        long shift = (long) n_randint(state, 100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_left(a, a, shift);
@@ -81,9 +81,9 @@ main(void)
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
-        fmpq_poly_randtest_not_zero(a, state, n_randint(100, state) + 1, 200);
+        fmpq_poly_randtest_not_zero(a, state, n_randint(state, 100) + 1, 200);
 
-        shift = (long) n_randint(a->length, state);
+        shift = (long) n_randint(state, a->length);
 
         fmpq_poly_shift_right(b, a, shift);
         fmpq_poly_shift_right(a, a, shift);
@@ -108,12 +108,12 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_poly_t a, b, c;
-        long shift = (long) n_randint(100, state);
+        long shift = (long) n_randint(state, 100);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
         fmpq_poly_init(c);
-        fmpq_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpq_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpq_poly_shift_left(b, a, shift);
         fmpq_poly_shift_right(c, b, shift);

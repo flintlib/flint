@@ -48,9 +48,9 @@ main(void)
         fmpz *a, *b, *c;
         long len, n;
         fmpz_t n1;
-        len = n_randint(100, state);
+        len = n_randint(state, 100);
         n = (long) n_randbits(FLINT_BITS - 1, state);
-        if (n_randint(2, state))
+        if (n_randint(state, 2))
             n = -n;
         fmpz_init(n1);
         fmpz_set_si(n1, n);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b, *c, *d;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         fmpz_t n1;
         fmpz_init(n1);
         fmpz_randtest(n1, state, 200);

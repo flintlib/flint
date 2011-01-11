@@ -51,10 +51,10 @@ main(void)
         mp_limb_t a, n, r;
 
         fmpz_poly_init(f);
-        fmpz_poly_randtest(f, state, n_randint(10, state), 20);
+        fmpz_poly_randtest(f, state, n_randint(state, 10), 20);
 
         n = n_randtest_not_zero(state);
-        a = n_randint(n, state);
+        a = n_randint(state, n);
 
         fmpz_init(b);
         fmpz_init(s);

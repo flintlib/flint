@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
@@ -68,7 +68,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -93,7 +93,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state) + 1;
+        long len = n_randint(state, 100) + 1;
         long coeff;
 
         a = _fmpz_vec_init(len);
@@ -101,7 +101,7 @@ main(void)
         _fmpz_vec_randtest(a, state, len, 200);
 
         _fmpz_vec_set(b, a, len);
-        coeff = n_randint(len, state);
+        coeff = n_randint(state, len);
         fmpz_add_ui(b + coeff, b + coeff, 1);
 
         result = (!_fmpz_vec_equal(a, b, len));

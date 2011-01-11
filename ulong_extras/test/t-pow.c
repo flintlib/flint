@@ -43,11 +43,11 @@ int main(void)
    {
       mp_limb_t exp1, exp2, n, bits, r1, r2;
       
-      bits = n_randint(55, state) + 10;
-      exp1 = n_randint(5, state);
-      exp2 = n_randint(5, state);
+      bits = n_randint(state, 55) + 10;
+      exp1 = n_randint(state, 5);
+      exp2 = n_randint(state, 5);
       
-      if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(64, state) + 1;
+      if ((exp1 == 0L) && (exp2 == 0L)) bits = n_randint(state, 64) + 1;
       else bits /= (exp1 + exp2);
       
       n = n_randbits(bits, state);

@@ -51,7 +51,7 @@ main(void)
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        trunc = n_randint(50, state);
+        trunc = n_randint(state, 50);
         fmpz_poly_randtest(b, state, trunc, 200);
         fmpz_poly_randtest(c, state, trunc, 200);
 

@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         long n;
 
         n = z_randtest_not_zero(state);
@@ -77,7 +77,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz *a, *b;
-        long len = n_randint(100, state);
+        long len = n_randint(state, 100);
         long n;
 
         n = z_randtest_not_zero(state);

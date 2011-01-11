@@ -46,11 +46,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b;
-        long shift = n_randint(100, state);
+        long shift = n_randint(state, 100);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_shift_left(b, a, shift);
         fmpz_poly_shift_left(a, a, shift);
@@ -76,9 +76,9 @@ main(void)
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
-        fmpz_poly_randtest_not_zero(a, state, n_randint(100, state) + 1, 200);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(state, 100) + 1, 200);
 
-        shift = n_randint(a->length, state);
+        shift = n_randint(state, a->length);
 
         fmpz_poly_shift_right(b, a, shift);
         fmpz_poly_shift_right(a, a, shift);
@@ -100,12 +100,12 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t a, b, c;
-        long shift = n_randint(100, state);
+        long shift = n_randint(state, 100);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(100, state), 200);
+        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
 
         fmpz_poly_shift_left(b, a, shift);
         fmpz_poly_shift_right(c, b, shift);

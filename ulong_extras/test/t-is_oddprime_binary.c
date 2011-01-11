@@ -50,7 +50,7 @@ int main(void)
 
       do
       {
-         d = n_randint(flint_primes_cutoff, state) | 1;
+         d = n_randint(state, flint_primes_cutoff) | 1;
          if (d == 1UL) d += 2;
          mpz_set_ui(d_m, d);
          mpz_nextprime(d_m, d_m);
@@ -78,7 +78,7 @@ int main(void)
 
       do
       {
-         d = n_randint(flint_primes_cutoff, state) | 1;
+         d = n_randint(state, flint_primes_cutoff) | 1;
          mpz_set_ui(d_m, d);
       } while ((mpz_probab_prime_p(d_m, 12)) || (d > flint_primes_cutoff));
 
