@@ -33,6 +33,8 @@
 int main(void)
 {
    long i;
+   flint_rand_t state;
+   flint_randinit(state);
    
    printf("init/init2/realloc/clear....");
    fflush(stdout);
@@ -41,9 +43,9 @@ int main(void)
    {
       nmod_mpoly_t a;
 
-	   mp_limb_t n = n_randtest_not_zero();
+	   mp_limb_t n = n_randtest_not_zero(state);
 
-      nmod_mpoly_init2(a, n, n_randint(100), (long) 5, (ulong) 5);
+      nmod_mpoly_init2(a, n, n_randint(100, state), (long) 5, (ulong) 5);
       nmod_mpoly_clear(a);      
    }
 
@@ -52,11 +54,11 @@ int main(void)
       nmod_mpoly_t a;
       
 
-	   mp_limb_t n = n_randtest_not_zero();
+	   mp_limb_t n = n_randtest_not_zero(state);
 
-      nmod_mpoly_init2(a, n, n_randint(100), (long) 5, (ulong) 5);
-      nmod_mpoly_realloc(a, n_randint(100));
-      nmod_mpoly_realloc(a, n_randint(100));
+      nmod_mpoly_init2(a, n, n_randint(100, state), (long) 5, (ulong) 5);
+      nmod_mpoly_realloc(a, n_randint(100, state));
+      nmod_mpoly_realloc(a, n_randint(100, state));
       nmod_mpoly_clear(a);      
    }
    
@@ -64,13 +66,15 @@ int main(void)
    {
       nmod_mpoly_t a;
 
-	   mp_limb_t n = n_randtest_not_zero();
+	   mp_limb_t n = n_randtest_not_zero(state);
 
       nmod_mpoly_init(a, n, (long) 5, (ulong) 5);
-      nmod_mpoly_randtest(a, n_randint(100));
+      nmod_mpoly_randtest(a, n_randint(100, state), state);
       
       nmod_mpoly_clear(a);
    }
+   
+   flint_randclear(state);
    
    printf("PASS\n");
    return 0;

@@ -36,16 +36,21 @@
 int main(void)
 {
 
+   flint_rand_t state;
+
 #if FLINT_BITS == 64
    /* square (1 + xy + x^2) */
    nmod_mpoly_t p;
    nmod_mpoly_t q;
    nmod_mpoly_t r;
    nmod_mpoly_t copyTest;
-   mp_limb_t n = n_randtest_not_zero();
+   mp_limb_t n;
    nmod_mpoly_t a, a2, a3, a6, a12;
    nmod_mpoly_t c, c2, c3, c5, c10, c20, c30;
    ulong i;   
+   flint_randinit(state);
+
+   n = n_randtest_not_zero(state);
 
    printf("mul_heap....");
    fflush(stdout);
@@ -97,15 +102,6 @@ int main(void)
    if(nmod_mpoly_equal(copyTest,p))
    {   
       printf("\nFAIL:\n");
-      abort();
-   }
-
-   if(nmod_mpoly_get_coeff(r, 4UL << 5) != 
-      nmod_mpoly_get_coeff_of_product(p, q, 4UL << 5))
-   {
-      printf("\n%lu", nmod_mpoly_get_coeff(r, 4UL << 5));
-      printf("\n%lu", nmod_mpoly_get_coeff_of_product(p,q, 4UL << 5));
-      printf("\nFAIL:\n"); 
       abort();
    }
 
@@ -185,15 +181,6 @@ int main(void)
       abort();
    }
 
-   if (nmod_mpoly_get_coeff(a12, (5UL << 36) + (3UL << 48)) != 
-      nmod_mpoly_get_coeff_of_product(a6, a6, (5UL << 36) + (3UL << 48)))
-   {
-	   printf("FAIL:\n");
-	   printf("val1 = %ld\n", nmod_mpoly_get_coeff(a12, (5UL << 36) + (3UL << 48)));
-           printf("val2 = %ld\n", nmod_mpoly_get_coeff_of_product(a6, a6, (5UL << 36) + (3UL << 48)));
-      abort();
-   }
-
    for (i = 0; i < 3; i++)
 	   a->coeffs[i] = 1;
    a->coeffs[3] = 2;
@@ -267,6 +254,8 @@ int main(void)
    nmod_mpoly_clear(a12);     
 
 #endif
+
+   flint_randclear(state);
 
    printf("PASS\n");
    return 0;

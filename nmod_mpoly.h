@@ -127,7 +127,7 @@ void nmod_mpoly_set(nmod_mpoly_t a, nmod_mpoly_t b)
    }
 }
 
-void nmod_mpoly_randtest(nmod_mpoly_t poly, long length);
+void nmod_mpoly_randtest(nmod_mpoly_t poly, long length, flint_rand_t state);
 
 void nmod_mpoly_reheapify(nmod_mpoly_heap_t * heap, ulong * n);
 
