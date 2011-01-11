@@ -31,7 +31,7 @@
 
 
 void
-nmod_mat_randrank(nmod_mat_t mat, long rank)
+nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
 {
     long i;
     mp_limb_t * diag;
@@ -44,9 +44,9 @@ nmod_mat_randrank(nmod_mat_t mat, long rank)
 
     diag = nmod_vec_init(rank);
     for (i = 0; i < rank; i++)
-        diag[i] = 1 + n_randint(mat->mod.n - 1, NULL);
+        diag[i] = 1 + n_randint(mat->mod.n - 1, state);
 
-    nmod_mat_randpermdiag(mat, diag, rank);
+    nmod_mat_randpermdiag(mat, diag, rank, state);
 
     nmod_vec_free(diag);
 }

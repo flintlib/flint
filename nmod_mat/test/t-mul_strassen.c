@@ -35,6 +35,8 @@ int
 main(void)
 {
     long i;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("mul_strassen....");
     fflush(stdout);
@@ -42,21 +44,21 @@ main(void)
     for (i = 0; i < 200; i++)
     {
         nmod_mat_t A, B, C, D;
-        mp_limb_t mod = n_randtest_not_zero();
+        mp_limb_t mod = n_randtest_not_zero(state);
 
         long m, k, n;
 
-        m = n_randint(200);
-        k = n_randint(200);
-        n = n_randint(200);
+        m = n_randint(200, state);
+        k = n_randint(200, state);
+        n = n_randint(200, state);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, n, k, mod);
         nmod_mat_init(C, m, k, mod);
         nmod_mat_init(D, m, k, mod);
 
-        nmod_mat_randtest(A);
-        nmod_mat_randtest(B);
+        nmod_mat_randtest(A, state);
+        nmod_mat_randtest(B, state);
 
         nmod_mat_mul_classical(C, A, B);
         nmod_mat_mul_strassen(D, A, B);
@@ -76,6 +78,8 @@ main(void)
         nmod_mat_clear(C);
         nmod_mat_clear(D);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

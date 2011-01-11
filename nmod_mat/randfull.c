@@ -29,12 +29,12 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_randfull(nmod_mat_t mat)
+nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 {
     long i;
 
     for (i = 0; i < mat->r * mat->c; i++)
     {
-        mat->entries[i] = FLINT_MAX(1, n_randint(mat->mod.n, NULL));
+        mat->entries[i] = FLINT_MAX(1, n_randint(mat->mod.n, state));
     }
 }

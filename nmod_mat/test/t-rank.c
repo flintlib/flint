@@ -38,6 +38,8 @@ main(void)
     nmod_mat_t A;
     long i, m, n, d, r;
     mp_limb_t mod;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("rank....");
     fflush(stdout);
@@ -45,14 +47,14 @@ main(void)
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10);
-        n = n_randint(10);
-        mod = n_nextprime(n_randtest_not_zero() - 1, 0);
+        m = n_randint(10, state);
+        n = n_randint(10, state);
+        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
             nmod_mat_init(A, m, n, mod);
-            nmod_mat_randrank(A, r);
+            nmod_mat_randrank(A, r, state);
             /* printf("SPARSE %ld\n", r);
             nmod_mat_print_pretty(A); */
             if (r != nmod_mat_rank(A))
@@ -68,16 +70,16 @@ main(void)
     /* Dense */
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(10);
-        n = n_randint(10);
-        mod = n_nextprime(n_randtest_not_zero() - 1, 0);
+        m = n_randint(10, state);
+        n = n_randint(10, state);
+        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
-            d = n_randint(2*m*n + 1);
+            d = n_randint(2*m*n + 1, state);
             nmod_mat_init(A, m, n, mod);
-            nmod_mat_randrank(A, r);
-            nmod_mat_randops(A, d);
+            nmod_mat_randrank(A, r, state);
+            nmod_mat_randops(A, d, state);
             /*
             printf("DENSE %ld %ld\n", r, d);
             nmod_mat_print_pretty(A); */
@@ -90,6 +92,8 @@ main(void)
             nmod_mat_clear(A);
         }
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

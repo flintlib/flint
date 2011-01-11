@@ -34,15 +34,18 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("scalar_addmul....");
     fflush(stdout);
 
     /* Check (a + b*c) == a + (b*c) */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(100) + 1;
-        mp_limb_t n = n_randtest_not_zero();
-        mp_limb_t c = n_randint(n);
+        long len = n_randint(100, state) + 1;
+        mp_limb_t n = n_randtest_not_zero(state);
+        mp_limb_t c = n_randint(n, state);
         nmod_t mod;
 
         mp_ptr vec = nmod_vec_init(len);
@@ -51,8 +54,8 @@ main(void)
 
         nmod_init(&mod, n);
 
-        _nmod_vec_randtest(vec, len, mod);
-        _nmod_vec_randtest(vec2, len, mod);
+        _nmod_vec_randtest(vec, len, mod, state);
+        _nmod_vec_randtest(vec2, len, mod, state);
         mpn_copyi(vec3, vec2, len);
 
         _nmod_vec_scalar_mul(vec3, vec, len, mod, c);
@@ -72,6 +75,8 @@ main(void)
         nmod_vec_free(vec2);
         nmod_vec_free(vec3);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

@@ -34,22 +34,25 @@ int
 main(void)
 {
     int i, result;
+    flint_rand_t state;
+    flint_randinit(state);
+
     printf("reduce....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
-        long j, len = n_randint(100) + 1;
+        long j, len = n_randint(100, state) + 1;
         mp_ptr vec = nmod_vec_init(len);
         mp_ptr vec2 = nmod_vec_init(len);
 
-        mp_limb_t n = n_randtest_not_zero();
+        mp_limb_t n = n_randtest_not_zero(state);
         nmod_t mod;
         nmod_init(&mod, n);
 
         for (j = 0; j < len; j++)
         {
-            vec[j] = n_randtest();
+            vec[j] = n_randtest(state);
             vec2[j] = vec[j];
         }
 
@@ -68,6 +71,8 @@ main(void)
         nmod_vec_free(vec);
         nmod_vec_free(vec2);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

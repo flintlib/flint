@@ -35,6 +35,8 @@ int
 main(void)
 {
     long m, n, mod, rep;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("add/sub....");
     fflush(stdout);
@@ -43,17 +45,17 @@ main(void)
     {
         nmod_mat_t A, B, C, D;
 
-        m = n_randint(20);
-        n = n_randint(20);
-        mod = n_randtest_not_zero();
+        m = n_randint(20, state);
+        n = n_randint(20, state);
+        mod = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, m, n, mod);
         nmod_mat_init(C, m, n, mod);
         nmod_mat_init(D, m, n, mod);
 
-        nmod_mat_randtest(A);
-        nmod_mat_randtest(B);
+        nmod_mat_randtest(A, state);
+        nmod_mat_randtest(B, state);
 
         nmod_mat_add(C, A, B);
         nmod_mat_sub(C, C, B);
@@ -69,6 +71,8 @@ main(void)
         nmod_mat_clear(C);
         nmod_mat_clear(D);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

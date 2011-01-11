@@ -35,6 +35,8 @@ int
 main(void)
 {
     long m, n, mod, i, j, rep;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("init/clear....");
     fflush(stdout);
@@ -43,9 +45,9 @@ main(void)
     {
         nmod_mat_t A;
 
-        m = n_randint(50);
-        n = n_randint(50);
-        mod = n_randtest_not_zero();
+        m = n_randint(50, state);
+        n = n_randint(50, state);
+        mod = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, n, mod);
 
@@ -69,6 +71,8 @@ main(void)
 
         nmod_mat_clear(A);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

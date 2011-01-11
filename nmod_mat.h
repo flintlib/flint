@@ -55,11 +55,12 @@ void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, long r1, long
 void nmod_mat_window_clear(nmod_mat_t window);
 
 /* Random matrix generation */
-void nmod_mat_randtest(nmod_mat_t mat);
-void nmod_mat_randfull(nmod_mat_t mat);
-int nmod_mat_randpermdiag(nmod_mat_t mat, const mp_limb_t * diag, long n);
-void nmod_mat_randrank(nmod_mat_t, long rank);
-void nmod_mat_randops(nmod_mat_t mat, long count);
+void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
+void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
+int nmod_mat_randpermdiag(nmod_mat_t mat, 
+                 const mp_limb_t * diag, long n, flint_rand_t state);
+void nmod_mat_randrank(nmod_mat_t, long rank, flint_rand_t state);
+void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
 
 void nmod_mat_print_pretty(nmod_mat_t mat);
 

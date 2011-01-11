@@ -83,17 +83,18 @@ void nmod_mat_print_pretty(nmod_mat_t mat)
 
 *******************************************************************************
 
-void nmod_mat_randtest(nmod_mat_t mat)
+void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state)
 
     Sets the elements to uniformly random numbers between $0$ and $m-1$ 
     inclusive, where $m$ is the modulus of \code{mat}.
 
-void nmod_mat_randfull(nmod_mat_t mat)
+void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 
     Sets the element to random numbers likely to be close to the modulus
     of the matrix. This is used to test potential overflow-related bugs.
 
-int nmod_mat_randpermdiag(nmod_mat_t mat, mp_limb_t * diag, long n)
+int nmod_mat_randpermdiag(nmod_mat_t mat, 
+                        mp_limb_t * diag, long n, flint_rand_t state)
 
     Sets \code{mat} to a random permutation of the diagonal matrix 
     with $n$ leading entries given by the vector \code{diag}. It is 
@@ -103,7 +104,7 @@ int nmod_mat_randpermdiag(nmod_mat_t mat, mp_limb_t * diag, long n)
     Returns $0$ or $1$, depending on whether the permutation is even 
     or odd respectively.
 
-void nmod_mat_randrank(nmod_mat_t mat, long rank)
+void nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
 
     Sets \code{mat} to a random sparse matrix with the given rank, 
     having exactly as many non-zero elements as the rank, with the 
@@ -113,7 +114,7 @@ void nmod_mat_randrank(nmod_mat_t mat, long rank)
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{nmod_mat_randops()}.
 
-void nmod_mat_randops(fmpz_mat_t mat, long count)
+void nmod_mat_randops(fmpz_mat_t mat, long count, flint_rand_t state)
 
     Randomises \code{mat} by performing elementary row or column 
     operations. More precisely, at most \code{count} random additions 

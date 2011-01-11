@@ -35,6 +35,8 @@ int
 main(void)
 {
     long m, n, mod, mod2, rep;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("transpose....");
     fflush(stdout);
@@ -44,17 +46,17 @@ main(void)
     {
         nmod_mat_t A, B, C;
 
-        m = n_randint(20);
-        n = n_randint(20);
+        m = n_randint(20, state);
+        n = n_randint(20, state);
 
-        mod = n_randtest_not_zero();
+        mod = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, n, m, mod);
         nmod_mat_init(C, m, n, mod);
 
-        nmod_mat_randtest(A);
-        nmod_mat_randtest(B);
+        nmod_mat_randtest(A, state);
+        nmod_mat_randtest(B, state);
 
         nmod_mat_transpose(B, A);
         nmod_mat_transpose(C, B);
@@ -75,11 +77,11 @@ main(void)
     {
         nmod_mat_t A, AT, B, BT, AT2;
 
-        m = n_randint(20);
-        n = n_randint(20);
+        m = n_randint(20, state);
+        n = n_randint(20, state);
 
-        mod = n_randtest_not_zero();
-        mod2 = n_randtest_not_zero();
+        mod = n_randtest_not_zero(state);
+        mod2 = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(AT, n, m, mod);
@@ -87,7 +89,7 @@ main(void)
         nmod_mat_init(BT, n, m, mod2);
         nmod_mat_init(AT2, n, m, mod2);
 
-        nmod_mat_randtest(A);
+        nmod_mat_randtest(A, state);
         nmod_mat_set(B, A);
 
         nmod_mat_transpose(AT, A);
@@ -113,13 +115,13 @@ main(void)
     {
         nmod_mat_t A, B;
 
-        m = n_randint(20);
-        mod = n_randtest_not_zero();
+        m = n_randint(20, state);
+        mod = n_randtest_not_zero(state);
 
         nmod_mat_init(A, m, m, mod);
         nmod_mat_init(B, m, m, mod);
 
-        nmod_mat_randtest(A);
+        nmod_mat_randtest(A, state);
         nmod_mat_set(B, A);
 
         if (!nmod_mat_equal(B, A))
@@ -131,6 +133,8 @@ main(void)
         nmod_mat_clear(A);
         nmod_mat_clear(B);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

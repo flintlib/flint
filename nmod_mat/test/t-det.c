@@ -38,6 +38,8 @@ main(void)
 {
     long m, mod, rep;
     long i;
+    flint_rand_t state;
+    flint_randinit(state);
 
     printf("det....");
     fflush(stdout);
@@ -49,13 +51,13 @@ main(void)
         mp_limb_t Adet;
         fmpz_t Bdet;
 
-        m = n_randint(10);
-        mod = n_nextprime(n_randtest_not_zero() - 1, 0);
+        m = n_randint(10, state);
+        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
 
         nmod_mat_init(A, m, m, mod);
         fmpz_mat_init(B, m, m);
 
-        nmod_mat_randtest(A);
+        nmod_mat_randtest(A, state);
 
         for (i = 0; i < m*m; i++)
             fmpz_set_ui(&B->entries[i], A->entries[i]);
@@ -76,6 +78,8 @@ main(void)
         fmpz_mat_clear(B);
         fmpz_clear(Bdet);
     }
+
+    flint_randclear(state);
 
     printf("PASS\n");
     return 0;

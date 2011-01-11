@@ -29,7 +29,7 @@
 #include "nmod_mat.h"
 
 void
-nmod_mat_randtest(nmod_mat_t mat)
+nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state)
 {
-    _nmod_vec_randtest(mat->entries, mat->r * mat->c, mat->mod);
+    _nmod_vec_randtest(mat->entries, mat->r * mat->c, mat->mod, state);
 }
