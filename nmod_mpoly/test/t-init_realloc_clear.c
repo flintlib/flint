@@ -69,7 +69,7 @@ int main(void)
 	   mp_limb_t n = n_randtest_not_zero(state);
 
       nmod_mpoly_init(a, n, (long) 5, (ulong) 5);
-      nmod_mpoly_randtest(a, n_randint(state, 100), state);
+      nmod_mpoly_randtest(a, state, n_randint(state, 100));
       
       nmod_mpoly_clear(a);
    }

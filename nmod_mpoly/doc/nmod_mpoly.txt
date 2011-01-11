@@ -112,7 +112,7 @@ int nmod_mpoly_equal(nmod_mpoly_t a, nmod_mpoly_t b)
 
 ********************************************************************************
 
-void nmod_mpoly_randtest(nmod_mpoly_t poly, ulong length, flint_rand_t state)
+void nmod_mpoly_randtest(nmod_mpoly_t poly, flint_rand_t state, ulong length)
 
    Generate a random polynomial with up to the given length.
 
