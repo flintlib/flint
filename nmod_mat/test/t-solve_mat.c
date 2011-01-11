@@ -95,7 +95,7 @@ main(void)
         m = 1 + n_randint(state, 10);
         n = 1 + n_randint(state, 10);
         r = n_randint(state, m);
-        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
+        mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
         nmod_mat_init(B, m, n, mod);
