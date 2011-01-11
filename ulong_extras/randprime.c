@@ -19,68 +19,58 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2007, 2008 William Hart
+    Copyright (C) 2008 Peter Shrimpton
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
-#include <mpir.h>
+#include <stdio.h>
 #include "flint.h"
-#include "nmod_mat.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
 
-int
-main(void)
+
+#if FLINT64
+#define ULONG_MAX_PRIME 18446744073709551557UL
+#else
+#define ULONG_MAX_PRIME 4294967291UL
+#endif
+
+mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
 {
-    long m, mod, rep;
-    long i;
-    flint_rand_t state;
-    flint_randinit(state);
+    mp_limb_t rand;
 
-    printf("det....");
-    fflush(stdout);
-
-    for (rep = 0; rep < 10000; rep++)
+    if (bits < 2)
     {
-        nmod_mat_t A;
-        fmpz_mat_t B;
-        mp_limb_t Adet;
-        fmpz_t Bdet;
-
-        m = n_randint(state, 10);
-        mod = n_randtest_prime(state, 0);
-
-        nmod_mat_init(A, m, m, mod);
-        fmpz_mat_init(B, m, m);
-
-        nmod_mat_randtest(A, state);
-
-        for (i = 0; i < m*m; i++)
-            fmpz_set_ui(&B->entries[i], A->entries[i]);
-
-        Adet = nmod_mat_det(A);
-
-        fmpz_init(Bdet);
-        fmpz_mat_det(Bdet, B);
-        fmpz_mod_ui(Bdet, Bdet, mod);
-
-        if (Adet != fmpz_get_ui(Bdet))
-        {
-            printf("FAIL\n");
-            abort();
-        }
-
-        nmod_mat_clear(A);
-        fmpz_mat_clear(B);
-        fmpz_clear(Bdet);
+        printf("Exception in n_randprime: attempt to generate prime < 2!\n");
+        abort();
     }
 
-    flint_randclear(state);
+    if (bits == FLINT_BITS)
+    {
+        do { rand = n_randbits(state, bits); }
+            while (rand >= ULONG_MAX_PRIME);
 
-    printf("PASS\n");
-    return 0;
+        rand = n_nextprime(rand, proved);
+    }
+    else if (bits == 2)
+    {
+        rand = 2 + n_randint(state, 2);
+    }
+    else
+    {
+        do
+        {
+            rand = n_randbits(state, bits);
+            rand = n_nextprime(rand, proved);
+        } while ((rand >> bits) > 0L);
+    }
+
+    return rand;
+}
+
+mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+{
+    return n_randprime(state, 2 + n_randint(state, FLINT_BITS - 1), proved);
 }

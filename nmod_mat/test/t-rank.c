@@ -49,7 +49,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
+        mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -72,7 +72,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        mod = n_nextprime(n_randtest_not_zero(state) - 1, 0);
+        mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {

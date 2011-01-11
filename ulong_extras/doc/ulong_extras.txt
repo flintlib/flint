@@ -66,7 +66,7 @@ mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
     the given limit. If zero is passed as a parameter, an entire random
     limb is returned.
 
-mp_limb_t n_randtest()
+mp_limb_t n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
@@ -75,12 +75,22 @@ mp_limb_t n_randtest()
     Warning: this function is not threadsafe and is for use in test
     code only. It should not be used in library code.
 
-mp_limb_t n_randtest_not_zero()
+mp_limb_t n_randtest_not_zero(flint_rand_t state)
 
     As for \code{n_randtest()}, but does not return $0$.
     Warning: this function is not threadsafe and is for use in test
     code only. It should not be used in library code.
 
+mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
+
+    Returns a random prime number (proved = 0) or probable prime (proved = 1)
+    with \code{bits} bits, where \code{bits} must be at least 2 and
+    at most \code{FLINT_BITS}.
+
+mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
+
+    Returns a random prime number (proved = 0) or probable prime (proved = 1)
+    with size randomly chosen between 2 and \code{FLINT_BITS} bits.
 
 *******************************************************************************
 
