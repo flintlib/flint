@@ -44,6 +44,21 @@ definitions:
 
    | ulong | unsigned long |
 
+Random functions
+----------------
+
+When writing functions which produce random values the order of operands should 
+follow one of the following:
+
+if the function returns its random value, the state comes first, e.g:
+
+a = n_randint(state, n)
+
+if the function sets its first argument to a random value, the state
+comes second, e.g.
+
+nmod_poly_randtest(poly, state, len, bits)
+
 Code formatting
 ---------------
 
