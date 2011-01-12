@@ -33,7 +33,7 @@
 #define FLINT_INV_NEWTON_CUTOFF  32
 
 void 
-_fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 {
     if (n == 1)
     {
@@ -80,7 +80,7 @@ _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
     }
 }
 
-void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 {
     fmpz *Qcopy;
     int Qalloc;
@@ -104,13 +104,13 @@ void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_inv_newton(Qinv->coeffs, Qcopy, n);
+        _fmpz_poly_inv_series_newton(Qinv->coeffs, Qcopy, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_inv_newton(t->coeffs, Qcopy, n);
+        _fmpz_poly_inv_series_newton(t->coeffs, Qcopy, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }

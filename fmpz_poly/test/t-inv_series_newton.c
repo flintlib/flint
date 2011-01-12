@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("inv_newton....");
+    printf("inv_series_newton....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,7 +58,7 @@ main(void)
         fmpz_set_ui(one->coeffs, 1);
         one->length = 1;
 
-        fmpz_poly_inv_newton(b, a, n);
+        fmpz_poly_inv_series_newton(b, a, n);
         fmpz_poly_mullow(c, a, b, n);
 
         result = (fmpz_poly_equal(c, one));

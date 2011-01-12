@@ -1164,7 +1164,7 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
 *******************************************************************************
 
-void _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
+void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 
     Computes the first $n$ terms of the inverse power series of $Q$ using 
     Newton iteration.
@@ -1172,7 +1172,7 @@ void _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n)
     Assumes that $n \geq 1$, that $Q$ has length at least $n$ and constant 
     term~$1$.  Does not support aliasing.
 
-void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 
     Computes the first $n$ terms of the inverse power series of $Q$ using 
     Newton iteration, assuming that $Q$ has constant term~$1$ and $n \geq 1$.

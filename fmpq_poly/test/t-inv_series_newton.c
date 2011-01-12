@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("inv_newton....");
+    printf("inv_series_newton....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -57,8 +57,8 @@ main(void)
         fmpz_randtest_not_zero(a->coeffs, state, 50);
         fmpq_poly_canonicalise(a);
 
-        fmpq_poly_inv_newton(b, a, n);
-        fmpq_poly_inv_newton(a, a, n);
+        fmpq_poly_inv_series_newton(b, a, n);
+        fmpq_poly_inv_series_newton(a, a, n);
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
@@ -95,7 +95,7 @@ main(void)
         fmpz_set_ui(one->coeffs, 1);
         one->length = 1;
 
-        fmpq_poly_inv_newton(b, a, n);
+        fmpq_poly_inv_series_newton(b, a, n);
         fmpq_poly_mul(c, a, b);
         fmpq_poly_truncate(c, n);
 

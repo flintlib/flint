@@ -674,7 +674,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
 
 *******************************************************************************
 
-void _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long n)
 
     Computes the first $n$ terms of the inverse power series of 
@@ -683,7 +683,7 @@ void _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden,
     Assumes that $n \geq 1$, that \code{poly} has length at least~$n$ 
     and non-zero constant term.  Does not support aliasing.
 
-void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
     Computes the first $n$ terms of the inverse power series 
     of \code{poly} using Newton iteration, assuming that \code{poly} 

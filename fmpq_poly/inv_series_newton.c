@@ -34,7 +34,7 @@
 #define FMPQ_POLY_INV_NEWTON_CUTOFF  32
 
 void 
-_fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden, 
+_fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long n)
 {
     if (n == 1)
@@ -111,7 +111,7 @@ _fmpq_poly_inv_newton(fmpz * rpoly, fmpz_t rden,
     }
 }
 
-void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 {
     fmpz *copy;
     int alloc;
@@ -135,13 +135,13 @@ void fmpq_poly_inv_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_inv_newton(res->coeffs, res->den, copy, poly->den, n);
+        _fmpq_poly_inv_series_newton(res->coeffs, res->den, copy, poly->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_inv_newton(t->coeffs, t->den, copy, poly->den, n);
+        _fmpq_poly_inv_series_newton(t->coeffs, t->den, copy, poly->den, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
