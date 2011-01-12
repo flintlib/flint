@@ -29,7 +29,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, long len1, 
                              mp_srcptr poly2, long len2, long n, nmod_t mod)
 {
     long bits, bits2;
@@ -49,7 +49,7 @@ void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1,
         _nmod_poly_mullow_KS(res, poly1, len1, poly2, len2, 0, n, mod);
 }
 
-void nmod_poly_mullow_n(nmod_poly_t res, 
+void nmod_poly_mullow(nmod_poly_t res, 
               const nmod_poly_t poly1, const nmod_poly_t poly2, long trunc)
 {
     long len1, len2, len_out;
@@ -75,10 +75,10 @@ void nmod_poly_mullow_n(nmod_poly_t res,
         nmod_poly_init2(temp, poly1->mod.n, trunc);
 
         if (len1 >= len2)
-            _nmod_poly_mullow_n(temp->coeffs, poly1->coeffs, len1,
+            _nmod_poly_mullow(temp->coeffs, poly1->coeffs, len1,
                            poly2->coeffs, len2, trunc, poly1->mod);
         else
-            _nmod_poly_mullow_n(temp->coeffs, poly2->coeffs, len2,
+            _nmod_poly_mullow(temp->coeffs, poly2->coeffs, len2,
                            poly1->coeffs, len1, trunc, poly1->mod);
         
         nmod_poly_swap(temp, res);
@@ -88,10 +88,10 @@ void nmod_poly_mullow_n(nmod_poly_t res,
         nmod_poly_fit_length(res, trunc);
         
         if (len1 >= len2)
-            _nmod_poly_mullow_n(res->coeffs, poly1->coeffs, len1,
+            _nmod_poly_mullow(res->coeffs, poly1->coeffs, len1,
                            poly2->coeffs, len2, trunc, poly1->mod);
         else
-            _nmod_poly_mullow_n(res->coeffs, poly2->coeffs, len2,
+            _nmod_poly_mullow(res->coeffs, poly2->coeffs, len2,
                            poly1->coeffs, len1, trunc, poly1->mod);
     }
 

@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("mullow_n....");
+    printf("mullow....");
     fflush(stdout);
 
     /* Compare with truncated product of a and b */
@@ -55,7 +55,7 @@ main(void)
         nmod_poly_randtest(b, state, trunc);
         nmod_poly_randtest(c, state, trunc);
 
-        nmod_poly_mullow_n(a, b, c, trunc);
+        nmod_poly_mullow(a, b, c, trunc);
         nmod_poly_mul(b, b, c);
         nmod_poly_truncate(b, trunc);
 

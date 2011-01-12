@@ -52,8 +52,8 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv,
     prod2 = nmod_vec_init(n);
 
     _nmod_poly_inv_series_newton(g0, Q, m, mod);
-    _nmod_poly_mullow_n(prod, Q, n, g0, m, n, mod);
-    _nmod_poly_mullow_n(prod2 + m, g0, m, prod + m, n - m, n - m, mod);
+    _nmod_poly_mullow(prod, Q, n, g0, m, n, mod);
+    _nmod_poly_mullow(prod2 + m, g0, m, prod + m, n - m, n - m, mod);
     mpn_zero(prod2, m);
 
     _nmod_poly_sub(Qinv, g0, m, prod2, n, mod);

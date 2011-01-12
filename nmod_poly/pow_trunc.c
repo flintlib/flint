@@ -67,7 +67,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
             nmod_poly_truncate(res, trunc);
         }
         else  /* e == 2UL */
-            nmod_poly_mullow_n(res, poly, poly, trunc);
+            nmod_poly_mullow(res, poly, poly, trunc);
 
         return;
     }

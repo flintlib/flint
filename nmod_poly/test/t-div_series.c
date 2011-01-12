@@ -62,7 +62,7 @@ main(void)
         m = n_randint(state, 2000) + 1;
 
         nmod_poly_div_series(q, a, b, m);
-        nmod_poly_mullow_n(prod, q, b, m);
+        nmod_poly_mullow(prod, q, b, m);
         nmod_poly_truncate(a, m);
 
         result = (nmod_poly_equal(a, prod));

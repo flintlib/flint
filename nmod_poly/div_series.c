@@ -37,7 +37,7 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B,
     mp_ptr Binv = nmod_vec_init(n);
 
     _nmod_poly_inv_series(Binv, B, n, mod);
-    _nmod_poly_mullow_n(Q, Binv, n, A, n, n, mod);
+    _nmod_poly_mullow(Q, Binv, n, A, n, n, mod);
 
     nmod_vec_free(Binv);
 }

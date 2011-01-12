@@ -77,10 +77,10 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
        We unroll the first step of the loop, referring to {poly, len}
      */
     
-    _nmod_poly_mullow_n(R, poly, trunc, poly, trunc, trunc, mod);
+    _nmod_poly_mullow(R, poly, trunc, poly, trunc, trunc, mod);
     if ((bit & e))
     {
-        _nmod_poly_mullow_n(S, R, trunc, poly, trunc, trunc, mod);
+        _nmod_poly_mullow(S, R, trunc, poly, trunc, trunc, mod);
         T = R;
         R = S;
         S = T;
@@ -90,12 +90,12 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
     {
         if ((bit & e))
         {
-            _nmod_poly_mullow_n(S, R, trunc, R, trunc, trunc, mod);
-            _nmod_poly_mullow_n(R, S, trunc, poly, trunc, trunc, mod);
+            _nmod_poly_mullow(S, R, trunc, R, trunc, trunc, mod);
+            _nmod_poly_mullow(R, S, trunc, poly, trunc, trunc, mod);
         }
         else
         {
-            _nmod_poly_mullow_n(S, R, trunc, R, trunc, trunc, mod);
+            _nmod_poly_mullow(S, R, trunc, R, trunc, trunc, mod);
             T = R;
             R = S;
             S = T;
@@ -136,7 +136,7 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
             nmod_poly_truncate(res, trunc);
         }
         else  /* e == 2UL */
-            nmod_poly_mullow_n(res, poly, poly, trunc);
+            nmod_poly_mullow(res, poly, poly, trunc);
 
         return;
     }
