@@ -365,25 +365,25 @@ void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1,
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(mp_ptr res, 
-                              mp_srcptr poly, long len, nmod_t mod, ulong e);
+                              mp_srcptr poly, long len, ulong e, nmod_t mod);
 
 void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
-void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e);
+void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod);
 
 void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
 void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
-                                              long trunc, nmod_t mod, ulong e);
+                                              ulong e, long trunc, nmod_t mod);
 
 void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
-                                  const nmod_poly_t poly, long trunc, ulong e);
+                                  const nmod_poly_t poly, ulong e, long trunc);
 
 void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
-                                              long trunc, nmod_t mod, ulong e);
+                                              ulong e, long trunc, nmod_t mod);
 
 void nmod_poly_pow_trunc(nmod_poly_t res, 
-                                  const nmod_poly_t poly, long trunc, ulong e);
+                                  const nmod_poly_t poly, ulong e, long trunc);
 
 /* Division  *****************************************************************/
 

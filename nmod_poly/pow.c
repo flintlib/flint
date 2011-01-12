@@ -30,9 +30,9 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e)
+_nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
 {
-    _nmod_poly_pow_binexp(res, poly, len, mod, e);
+    _nmod_poly_pow_binexp(res, poly, len, e, mod);
 }
 
 void
@@ -71,13 +71,13 @@ nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
     if (res != poly)
     {
         nmod_poly_fit_length(res, rlen);
-        _nmod_poly_pow(res->coeffs, poly->coeffs, len, poly->mod, e);
+        _nmod_poly_pow(res->coeffs, poly->coeffs, len, e, poly->mod);
     }
     else
     {
         nmod_poly_t t;
         nmod_poly_init2(t, poly->mod.n, rlen);
-        _nmod_poly_pow(t->coeffs, poly->coeffs, len, poly->mod, e);
+        _nmod_poly_pow(t->coeffs, poly->coeffs, len, e, poly->mod);
         nmod_poly_swap(res, t);
         nmod_poly_clear(t);
     }

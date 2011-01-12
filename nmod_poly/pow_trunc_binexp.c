@@ -32,7 +32,7 @@
 
 void
 _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
-                                long trunc, nmod_t mod, ulong e)
+                                ulong e, long trunc, nmod_t mod)
 {
     ulong bit = ~((~0UL) >> 1);
     mp_ptr v = nmod_vec_init(trunc);
@@ -107,7 +107,7 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
 
 void
 nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
-                           const nmod_poly_t poly, long trunc, ulong e)
+                           const nmod_poly_t poly, ulong e, long trunc)
 {
     const long len = poly->length;
     mp_ptr p;
@@ -153,13 +153,13 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
     if (res != poly || pcopy)
     {
         nmod_poly_fit_length(res, trunc);
-        _nmod_poly_pow_trunc_binexp(res->coeffs, p, trunc, poly->mod, e);
+        _nmod_poly_pow_trunc_binexp(res->coeffs, p, e, trunc, poly->mod);
     }
     else
     {
         nmod_poly_t t;
         nmod_poly_init2(t, poly->mod.n, trunc);
-        _nmod_poly_pow_trunc_binexp(t->coeffs, p, trunc, poly->mod, e);
+        _nmod_poly_pow_trunc_binexp(t->coeffs, p, e, trunc, poly->mod);
         nmod_poly_swap(res, t);
         nmod_poly_clear(t);
     }
