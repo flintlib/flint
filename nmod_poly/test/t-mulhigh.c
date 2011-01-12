@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("mulhigh_n....");
+    printf("mulhigh....");
     fflush(stdout);
 
     /* Compare with left truncated product of a and b */
@@ -56,9 +56,9 @@ main(void)
         nmod_poly_randtest(b, state, n);
         nmod_poly_randtest(c, state, n);
 
-        nmod_poly_mulhigh_n(a, b, c, n);
+        nmod_poly_mulhigh(a, b, c, n);
         nmod_poly_mul(b, b, c);
-        for (j = 0; j + 1 < n; j++)
+        for (j = 0; j < n; j++)
         {
             if (j < a->length)
                 a->coeffs[j] = 0;

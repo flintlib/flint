@@ -356,10 +356,10 @@ void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1, 
                                           const nmod_poly_t poly2, long trunc);
 
-void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1, 
                                mp_srcptr poly2, long len2, long n, nmod_t mod);
 
-void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
+void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1, 
                                               const nmod_poly_t poly2, long n);
 
 /* Powering  *****************************************************************/
