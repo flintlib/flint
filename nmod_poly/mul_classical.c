@@ -59,12 +59,12 @@ _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
     else
     {
         /* Set res[i] = poly1[i]*poly2[0] */
-        _nmod_vec_scalar_mul(res, poly1, len1, mod, poly2[0]);
+        _nmod_vec_scalar_mul_nmod(res, poly1, len1, mod, poly2[0]);
         if (len2 == 1)
             return;
 
         /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
-        _nmod_vec_scalar_mul(res + len1, poly2 + 1, len2 - 1, mod,
+        _nmod_vec_scalar_mul_nmod(res + len1, poly2 + 1, len2 - 1, mod,
                              poly1[len1 - 1]);
 
         /* out[i+j] += in1[i]*in2[j] */

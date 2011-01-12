@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
+void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
 				                  long len, nmod_t mod, mp_limb_t c)
 {
    if (mod.norm >= FLINT_BITS/2) /* products will fit in a limb */

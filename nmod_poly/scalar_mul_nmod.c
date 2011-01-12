@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_scalar_mul_ui(nmod_poly_t res, const nmod_poly_t poly1, ulong c)
+nmod_poly_scalar_mul_nmod(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
 {
     if ((poly1->length == 0) || (c == 0))
     {
@@ -40,7 +40,7 @@ nmod_poly_scalar_mul_ui(nmod_poly_t res, const nmod_poly_t poly1, ulong c)
 
     nmod_poly_fit_length(res, poly1->length);
 
-    _nmod_vec_scalar_mul(res->coeffs, poly1->coeffs, poly1->length, poly1->mod,
+    _nmod_vec_scalar_mul_nmod(res->coeffs, poly1->coeffs, poly1->length, poly1->mod,
                          c);
 
     res->length = poly1->length;

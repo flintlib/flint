@@ -80,7 +80,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
         {
             /* Set res[i] = poly1[i]*poly2[0] */
             if (start < len1)
-                _nmod_vec_scalar_mul(res + start, poly1 + start, len1 - start,
+                _nmod_vec_scalar_mul_nmod(res + start, poly1 + start, len1 - start,
                                      mod, poly2[0]);
 
             if (len2 == 1)
@@ -88,7 +88,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
 
             /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
             m = FLINT_MAX(len1 - 1, start);
-            _nmod_vec_scalar_mul(res + m, poly2 + m - len1 + 1,
+            _nmod_vec_scalar_mul_nmod(res + m, poly2 + m - len1 + 1,
                                  len2 - 1 + len1 - m, mod, poly1[len1 - 1]);
 
             /* out[i+j] += in1[i]*in2[j] */

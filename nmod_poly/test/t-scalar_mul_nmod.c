@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "ulong_extras.h"
 
 int
@@ -37,44 +37,70 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_mul....");
+    printf("scalar_mul_nmod....");
     fflush(stdout);
 
-    /* Check (a + b)*c == a*c + b*c */
+    /* Check aliasing of a and b */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(state, 100) + 1;
+        nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
         mp_limb_t c = n_randint(state, n);
-        nmod_t mod;
 
-        mp_ptr vec = nmod_vec_init(len);
-        mp_ptr vec2 = nmod_vec_init(len);
-        mp_ptr vec3 = nmod_vec_init(len);
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
 
-        nmod_init(&mod, n);
+        nmod_poly_scalar_mul_nmod(b, a, c);
+        nmod_poly_scalar_mul_nmod(a, a, c);
 
-        _nmod_vec_randtest(vec, state, len, mod);
-        _nmod_vec_randtest(vec2, state, len, mod);
-
-        _nmod_vec_add(vec3, vec, vec2, len, mod);
-        _nmod_vec_scalar_mul(vec3, vec3, len, mod, c);
-
-        _nmod_vec_scalar_mul(vec, vec, len, mod, c);
-        _nmod_vec_scalar_mul(vec2, vec2, len, mod, c);
-        _nmod_vec_add(vec, vec, vec2, len, mod);
-
-        result = _nmod_vec_equal(vec, vec3, len);
+        result = (nmod_poly_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n");
-            printf("len = %ld, n = %ld\n", len, n);
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
             abort();
         }
 
-        nmod_vec_free(vec);
-        nmod_vec_free(vec2);
-        nmod_vec_free(vec3);
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+    }
+
+    /* Check (a + b)*c = a*c + b*c */
+    for (i = 0; i < 10000; i++)
+    {
+        nmod_poly_t a, b, d1, d2;
+        mp_limb_t n = n_randtest_not_zero(state);
+        mp_limb_t c = n_randint(state, n);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(d1, n);
+        nmod_poly_init(d2, n);
+        nmod_poly_randtest(a, state, n_randint(state, 100));
+        nmod_poly_randtest(b, state, n_randint(state, 100));
+
+        nmod_poly_add(d1, a, b);
+        nmod_poly_scalar_mul_nmod(d1, d1, c);
+
+        nmod_poly_scalar_mul_nmod(d2, a, c);
+        nmod_poly_scalar_mul_nmod(b, b, c);
+        nmod_poly_add(d2, d2, b);
+
+        result = (nmod_poly_equal(d1, d2));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(d1), printf("\n\n");
+            nmod_poly_print(d2), printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(d1);
+        nmod_poly_clear(d2);
     }
 
     flint_randclear(state);

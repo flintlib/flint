@@ -58,7 +58,7 @@ main(void)
         _nmod_vec_randtest(vec2, state, len, mod);
         mpn_copyi(vec3, vec2, len);
 
-        _nmod_vec_scalar_mul(vec3, vec, len, mod, c);
+        _nmod_vec_scalar_mul_nmod(vec3, vec, len, mod, c);
         _nmod_vec_add(vec3, vec3, vec2, len, mod);
 
         _nmod_vec_scalar_addmul(vec2, vec, len, mod, c);
