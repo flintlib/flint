@@ -208,7 +208,7 @@ void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
     Sets \code{poly} to the rational $x$, which is assumed to be 
     given in lowest terms.
 
-void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
+void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
 
     Sets \code{(poly, den)} to the polynomial given by the 
     first $n \geq 1$ coefficients in the array $a$, from lowest 

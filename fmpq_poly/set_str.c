@@ -91,7 +91,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
         }
     }
     
-    _fmpq_poly_set_array_mpq(poly, den, len, (const mpq_t *) a);
+    _fmpq_poly_set_array_mpq(poly, den, (const mpq_t *) a, len);
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);
