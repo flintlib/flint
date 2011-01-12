@@ -24,8 +24,9 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
+#include <mpir.h>
+
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq_poly.h"
@@ -33,26 +34,29 @@
 void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
 {
     long len = poly->length;
-    int replace = (n < len && *(poly->coeffs + n) != 0L);
+    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
     
-    if ((!replace) && (x == 0L))
+    if (!replace && (x == 0L))
         return;
     
     if (n + 1 > len)
     {
         fmpq_poly_fit_length(poly, n + 1);
-        poly->length = n + 1;
+        _fmpq_poly_set_length(poly, n + 1);
+        mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
     }
     
     if (*poly->den == 1L)
     {
         fmpz_set_si(poly->coeffs + n, x);
-        _fmpq_poly_normalise(poly);
-        return;
+        if (replace)
+            _fmpq_poly_normalise(poly);
     }
-    
-    fmpz_mul_si(poly->coeffs + n, poly->den, x);
-    if (replace)
-        fmpq_poly_canonicalise(poly);
+    else
+    {
+        fmpz_mul_si(poly->coeffs + n, poly->den, x);
+        if (replace)
+            fmpq_poly_canonicalise(poly);
+    }
 }
 
