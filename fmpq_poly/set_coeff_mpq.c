@@ -34,16 +34,16 @@
 void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, long n, const mpq_t x)
 {
     long len = poly->length;
-    int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
+    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
 
     if (!replace && mpq_sgn(x) == 0)
         return;
 
     if (n + 1 > len)
     {
-        fmpq_poly_fit_length(poly, n + 1);
         len = n + 1;
-        poly->length = len;
+        fmpq_poly_fit_length(poly, len);
+        _fmpq_poly_set_length(poly, len);
     }
 
     if (replace)
@@ -74,8 +74,8 @@ void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, long n, const mpq_t x)
             _fmpz_vec_scalar_divexact_fmpz(poly->coeffs, poly->coeffs, len, c);
             fmpz_divexact(poly->den, poly->den, c);
         }
-        _fmpq_poly_normalise(poly);
 
+        _fmpq_poly_normalise(poly);
         fmpz_clear(c);
         fmpz_clear(num);
         fmpz_clear(den);
