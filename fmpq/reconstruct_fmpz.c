@@ -34,7 +34,7 @@ int
 _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
     const fmpz_t a, const fmpz_t m)
 {
-    int failure;
+    int success;
 
     fmpz_t tmp, q, T0, T1, T2, U0, U1, U2, V0, V1, V2;
 
@@ -42,7 +42,7 @@ _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
     {
         fmpz_set(num, a);
         fmpz_set_ui(den, 1UL);
-        return 0;
+        return 1;
     }
 
     fmpz_init(U0); fmpz_init(U1); fmpz_init(U2);
@@ -94,11 +94,11 @@ _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
     if (fmpz_cmp(tmp, m) <= 0)
     {
         fmpz_gcd(tmp, num, den);
-        failure = (fmpz_cmp_ui(tmp, 1UL) == 0) ? 0 : 1;
+        success = (fmpz_cmp_ui(tmp, 1UL) == 0) ? 1 : 0;
     }
     else
     {
-        failure = 1;
+        success = 0;
     }
 
     if (fmpz_sgn(V1) < 0)
@@ -109,7 +109,7 @@ _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
     fmpz_clear(T0); fmpz_clear(T1); fmpz_clear(T2);
     fmpz_clear(tmp); fmpz_clear(q);
 
-    return failure;
+    return success;
 }
 
 int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
