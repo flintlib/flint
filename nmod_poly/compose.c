@@ -36,7 +36,7 @@ _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
     if (len1 == 1)
         res[0] = poly1[0];
     else if (len2 == 1)
-        res[0] = _nmod_poly_evaluate_ui(poly1, len1, mod, poly2[0]);
+        res[0] = _nmod_poly_evaluate_nmod(poly1, len1, mod, poly2[0]);
     else if (len1 <= 7)
         _nmod_poly_compose_horner(res, poly1, len1, poly2, len2, mod);
     else

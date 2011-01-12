@@ -103,7 +103,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     }
     if (len2 == 1)
     {
-        res[0] = _nmod_poly_evaluate_ui(poly1, len1, mod, poly2[0]);
+        res[0] = _nmod_poly_evaluate_nmod(poly1, len1, mod, poly2[0]);
         return;
     }
     if (len1 == 2)

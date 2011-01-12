@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("evaluate_ui....");
+    printf("evaluate_nmod....");
     fflush(stdout);
 
     /* Check evaluation at 1 gives sum of coeffs */
@@ -51,7 +51,7 @@ main(void)
         nmod_poly_init(a, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
         
-        eval = nmod_poly_evaluate_ui(a, 1);
+        eval = nmod_poly_evaluate_nmod(a, 1);
         
         sum = 0;
         for (j = 0; j < a->length; j++)
@@ -84,11 +84,11 @@ main(void)
         
         c = n_randint(state, n);
         
-        eval1 = nmod_poly_evaluate_ui(a, c);
-        eval1 = n_addmod(eval1, nmod_poly_evaluate_ui(b, c), n);
+        eval1 = nmod_poly_evaluate_nmod(a, c);
+        eval1 = n_addmod(eval1, nmod_poly_evaluate_nmod(b, c), n);
         
         nmod_poly_add(a, a, b);
-        eval2 = nmod_poly_evaluate_ui(a, c);
+        eval2 = nmod_poly_evaluate_nmod(a, c);
         
 
         result = (eval1 == eval2);
