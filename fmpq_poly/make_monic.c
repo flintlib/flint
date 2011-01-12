@@ -29,14 +29,14 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
     fmpz_set(rden, rpoly + (len - 1));
 }
 
-void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
+void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 {
     long len = poly->length;
     if (len == 0)
@@ -48,6 +48,6 @@ void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
     fmpq_poly_fit_length(res, len);
     _fmpq_poly_set_length(res, len);
     
-    _fmpq_poly_monic(res->coeffs, res->den, poly->coeffs, poly->den, len);
+    _fmpq_poly_make_monic(res->coeffs, res->den, poly->coeffs, poly->den, len);
 }
 

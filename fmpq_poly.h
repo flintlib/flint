@@ -376,10 +376,10 @@ int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, long len);
 
 int fmpq_poly_is_monic(const fmpq_poly_t poly);
 
-void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long len);
 
-void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly);
+void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 
 /*  Square-free  *************************************************************/
 

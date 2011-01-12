@@ -845,14 +845,14 @@ int fmpq_poly_is_monic(const fmpq_poly_t poly)
     Returns whether the polynomial \code{poly} is monic. The zero 
     polynomial is not monic by definition.
 
-void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long len)
 
     Sets \code{(rpoly, rden, len)} to the monic scalar multiple of 
     \code{(poly, den, len)}.  Assumes that \code{len > 0}.  Supports 
     aliasing between the two polynomials.
 
-void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly)
+void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly)
 
     Sets \code{res} to the monic scalar multiple of \code{poly} whenever 
     \code{poly} is non-zero.  If \code{poly} is the zero polynomial, sets 
