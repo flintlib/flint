@@ -551,15 +551,15 @@ void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
 /*  Evaluation  **************************************************************/
 
-void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len, 
+void _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len, 
                                                                const fmpz_t a);
 
-void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, 
+void fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz_poly_t f, 
                                                                const fmpz_t a);
 
-void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a);
+void _fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, long len, const fmpz_t a);
 
-void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
+void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
 void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, long len, 

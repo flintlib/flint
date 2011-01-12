@@ -35,7 +35,7 @@ _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
 {
     fmpz_t d;
     
-    _fmpz_poly_evaluate_horner(rnum, poly, len, a);
+    _fmpz_poly_evaluate_horner_fmpz(rnum, poly, len, a);
     
     fmpz_init(d);
     fmpz_gcd(d, rnum, den);

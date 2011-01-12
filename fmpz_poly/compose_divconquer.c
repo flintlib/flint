@@ -103,7 +103,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     }
     if (len2 == 1)
     {
-        _fmpz_poly_evaluate(res, poly1, len1, poly2);
+        _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
         return;
     }
     if (len1 == 2)

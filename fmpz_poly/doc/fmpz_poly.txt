@@ -1354,14 +1354,14 @@ void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len, 
+void _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len, 
                                 const fmpz_t a)
 
     Evaluates the polynomial \code{(f, len)} at the integer $a$ using 
     Horner's rule, and sets \code{res} to the result.  Aliasing between 
     \code{res} and $a$ or any of the coefficients of $f$ is not supported.
 
-void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
+void fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial $f$ at the integer $a$ using Horner's rule, and 
     sets \code{res} to the result.
@@ -1369,13 +1369,13 @@ void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     As expected, aliasing between \code{res} and \code{a} is supported.  
     However, \code{res} may not be aliased with a coefficient of $f$.
 
-void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
+void _fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 
     Evaluates the polynomial \code{(f, len)} at the integer $a$ and sets 
     \code{res} to the result.  Aliasing between \code{res} and $a$ or any
     of the coefficients of $f$ is not supported.
 
-void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
+void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
 
     Evaluates the polynomial $f$ at the integer $a$ and sets \code{res} 
     to the result.
