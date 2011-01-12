@@ -478,10 +478,10 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
 /* Evaluation  ***************************************************************/
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, 
-                                            long len, nmod_t mod, mp_limb_t c);
+mp_limb_t _nmod_poly_evaluate_ui(mp_srcptr poly, 
+                                            long len, nmod_t mod, ulong c);
 
-mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
+mp_limb_t nmod_poly_evaluate_ui(const nmod_poly_t poly, ulong c);
 
 /* Composition  **************************************************************/
 

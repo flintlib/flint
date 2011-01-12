@@ -28,7 +28,7 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
+mp_limb_t _nmod_poly_evaluate_ui(mp_srcptr poly, long len, nmod_t mod, ulong c)
 {
     long m;
     mp_limb_t val;
@@ -53,7 +53,7 @@ mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
     return val;
 }
 
-mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c)
+mp_limb_t nmod_poly_evaluate_ui(const nmod_poly_t poly, ulong c)
 {
-    return _nmod_poly_evaluate(poly->coeffs, poly->length, poly->mod, c);
+    return _nmod_poly_evaluate_ui(poly->coeffs, poly->length, poly->mod, c);
 }

@@ -43,7 +43,7 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
 
     if (len2 == 1) /* evaluate at constant */
     {
-        res[0] = _nmod_poly_evaluate(poly1, len1, mod, poly2[0]);
+        res[0] = _nmod_poly_evaluate_ui(poly1, len1, mod, poly2[0]);
 
         return;
     }
