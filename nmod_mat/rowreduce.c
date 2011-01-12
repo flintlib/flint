@@ -107,7 +107,7 @@ long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
             length = n - pivot_col - 1;
             if (length > 0)
             {
-                _nmod_vec_scalar_addmul(a[j] + pivot_col + 1,
+                _nmod_vec_scalar_addmul_nmod(a[j] + pivot_col + 1,
                                         a[pivot_row] + pivot_col + 1,
                                         length, mod, e);
             }

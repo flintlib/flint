@@ -82,7 +82,7 @@ _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
 
             /* out[i+j] += in1[i]*in2[j] */
             for (i = 0; i < FLINT_MIN(len1, trunc) - 1; i++)
-                _nmod_vec_scalar_addmul(res + i + 1, poly2 + 1,
+                _nmod_vec_scalar_addmul_nmod(res + i + 1, poly2 + 1,
                                         FLINT_MIN(len2, trunc - i) - 1, mod,
                                         poly1[i]);
         }

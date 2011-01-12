@@ -96,7 +96,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
             for (i = m - len2 + 1; i < len1 - 1; i++)
             {
                 n = FLINT_MAX(i + 1, start);
-                _nmod_vec_scalar_addmul(res + n, poly2 + n - i, len2 + i - n,
+                _nmod_vec_scalar_addmul_nmod(res + n, poly2 + n - i, len2 + i - n,
                                         mod, poly1[i]);
             }
         }

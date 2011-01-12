@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_addmul....");
+    printf("scalar_addmul_nmod....");
     fflush(stdout);
 
     /* Check (a + b*c) == a + (b*c) */
@@ -61,7 +61,7 @@ main(void)
         _nmod_vec_scalar_mul_nmod(vec3, vec, len, mod, c);
         _nmod_vec_add(vec3, vec3, vec2, len, mod);
 
-        _nmod_vec_scalar_addmul(vec2, vec, len, mod, c);
+        _nmod_vec_scalar_addmul_nmod(vec2, vec, len, mod, c);
 
         result = _nmod_vec_equal(vec2, vec3, len);
         if (!_nmod_vec_equal(vec2, vec3, len))

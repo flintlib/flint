@@ -69,7 +69,7 @@ _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
 
         /* out[i+j] += in1[i]*in2[j] */
         for (i = 0; i < len1 - 1; i++)
-            _nmod_vec_scalar_addmul(res + i + 1, poly2 + 1, len2 - 1, mod,
+            _nmod_vec_scalar_addmul_nmod(res + i + 1, poly2 + 1, len2 - 1, mod,
                                     poly1[i]);
     }
 }
