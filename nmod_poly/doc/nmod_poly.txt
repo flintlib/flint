@@ -306,8 +306,8 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
 *******************************************************************************
 
-void nmod_poly_scalar_mul(nmod_poly_t res, 
-                          const nmod_poly_t poly1, mp_limb_t c)
+void nmod_poly_scalar_mul_ui(nmod_poly_t res, 
+                          const nmod_poly_t poly1, ulong c)
 
     Sets \code{res} to \code{(poly1, len1)} multiplied by $c$, 
     where $c$ is reduced modulo the modulus of \code{poly1}.

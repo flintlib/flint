@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_scalar_mul(nmod_poly_t res, const nmod_poly_t poly1, mp_limb_t c)
+nmod_poly_scalar_mul_ui(nmod_poly_t res, const nmod_poly_t poly1, ulong c)
 {
     if ((poly1->length == 0) || (c == 0))
     {

@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("scalar_mul....");
+    printf("scalar_mul_ui....");
     fflush(stdout);
 
     /* Check aliasing of a and b */
@@ -51,8 +51,8 @@ main(void)
         nmod_poly_init(b, n);
         nmod_poly_randtest(a, state, n_randint(state, 100));
 
-        nmod_poly_scalar_mul(b, a, c);
-        nmod_poly_scalar_mul(a, a, c);
+        nmod_poly_scalar_mul_ui(b, a, c);
+        nmod_poly_scalar_mul_ui(a, a, c);
 
         result = (nmod_poly_equal(a, b));
         if (!result)
@@ -82,10 +82,10 @@ main(void)
         nmod_poly_randtest(b, state, n_randint(state, 100));
 
         nmod_poly_add(d1, a, b);
-        nmod_poly_scalar_mul(d1, d1, c);
+        nmod_poly_scalar_mul_ui(d1, d1, c);
 
-        nmod_poly_scalar_mul(d2, a, c);
-        nmod_poly_scalar_mul(b, b, c);
+        nmod_poly_scalar_mul_ui(d2, a, c);
+        nmod_poly_scalar_mul_ui(b, b, c);
         nmod_poly_add(d2, d2, b);
 
         result = (nmod_poly_equal(d1, d2));
