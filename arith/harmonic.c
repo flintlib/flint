@@ -31,9 +31,9 @@
 
 
 #if FLINT64
-#define FLINT_HARMONIC_MAX_TINY 24
-#else
 #define FLINT_HARMONIC_MAX_TINY 46
+#else
+#define FLINT_HARMONIC_MAX_TINY 24
 #endif
 
 const mp_limb_t FLINT_HARMONIC_TINY_P[] = 
