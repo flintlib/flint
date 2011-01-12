@@ -91,19 +91,18 @@ void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
 
         /* All factors are strictly smaller than m + 4; choose prodsize such
            that (m + 4)^prodsize fits in a signed long. */
-        if (FLINT64)
         {
+#if FLINT64
             if      (m < 1444L)       prodsize = 6;
             else if (m < 2097148L)    prodsize = 3;
             else if (m < 3037000495L) prodsize = 2;  /* not very likely... */
             else abort();
-        }
-        else
-        {
+#else
             if      (m < 32L)    prodsize = 6;
             else if (m < 1286L)  prodsize = 3;
             else if (m < 46336L) prodsize = 2;
             else abort();
+#endif
         }
 
         /* c = t = binomial(m+3, m) */
