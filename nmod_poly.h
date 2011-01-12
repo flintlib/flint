@@ -309,8 +309,8 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
                                               long len, mp_bitcnt_t bits);
 
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                       long len, mp_bitcnt_t bits, nmod_t mod);
+void _nmod_poly_bit_unpack(mp_ptr res, long len, 
+                                  mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
 
 /* Multiplication  ***********************************************************/
 

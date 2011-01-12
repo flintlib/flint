@@ -347,8 +347,8 @@ void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len,
     coefficient of \code{poly} is bigger than \code{bits/2} bits. We 
     also assume \code{bits < 3 * FLINT_BITS}.
 
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                          long len, ulong bits, nmod_t mod)
+void _nmod_poly_bit_unpack(mp_ptr res, long len, 
+                                mp_srcptr mpn, ulong bits, nmod_t mod)
 
     Unpacks \code{len} coefficients stored in the big integer \code{mpn} 
     in bit fields of the given number of bits, reduces them modulo the 

@@ -67,7 +67,7 @@ main(void)
 
         _nmod_poly_bit_pack(mpn, a->coeffs, a->length, bits);
         nmod_poly_fit_length(b, a->length);
-        _nmod_poly_bit_unpack(b->coeffs, mpn, a->length, bits, a->mod);
+        _nmod_poly_bit_unpack(b->coeffs, a->length, mpn, bits, a->mod);
         b->length = a->length;
 
         result = (nmod_poly_equal(a, b));

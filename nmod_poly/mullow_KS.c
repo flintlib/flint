@@ -64,7 +64,7 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
     else
         mpn_mul_n(res, mpn1, mpn1, limbs1);
 
-    _nmod_poly_bit_unpack(out, res, n, bits, mod);
+    _nmod_poly_bit_unpack(out, n, res, bits, mod);
     
     free(mpn2);
     if (in1 != in2)
