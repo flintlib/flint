@@ -35,7 +35,7 @@ void _nmod_poly_make_monic(mp_ptr output,
     mp_limb_t inv;
     
     inv = n_invmod(input[len - 1], mod.n);
-    _nmod_vec_scalar_mul_nmod(output, input, len, mod, inv);
+    _nmod_vec_scalar_mul_nmod(output, input, len, inv, mod);
 }
 
 void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)

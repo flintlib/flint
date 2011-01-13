@@ -59,7 +59,7 @@ void sample(void * arg, ulong count)
 
       prof_start();
       for (j = 0; j < 30; j++)
-		 _nmod_vec_scalar_mul_nmod(vec2, vec, length, mod, c);
+		 _nmod_vec_scalar_mul_nmod(vec2, vec, length, c, mod);
 	  prof_stop();
    }
    

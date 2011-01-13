@@ -109,7 +109,7 @@ long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
             {
                 _nmod_vec_scalar_addmul_nmod(a[j] + pivot_col + 1,
                                         a[pivot_row] + pivot_col + 1,
-                                        length, mod, e);
+                                        length, e, mod);
             }
 
             if (options & ROWREDUCE_CLEAR_LOWER)

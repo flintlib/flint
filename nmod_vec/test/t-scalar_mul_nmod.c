@@ -58,10 +58,10 @@ main(void)
         _nmod_vec_randtest(vec2, state, len, mod);
 
         _nmod_vec_add(vec3, vec, vec2, len, mod);
-        _nmod_vec_scalar_mul_nmod(vec3, vec3, len, mod, c);
+        _nmod_vec_scalar_mul_nmod(vec3, vec3, len, c, mod);
 
-        _nmod_vec_scalar_mul_nmod(vec, vec, len, mod, c);
-        _nmod_vec_scalar_mul_nmod(vec2, vec2, len, mod, c);
+        _nmod_vec_scalar_mul_nmod(vec, vec, len, c, mod);
+        _nmod_vec_scalar_mul_nmod(vec2, vec2, len, c, mod);
         _nmod_vec_add(vec, vec, vec2, len, mod);
 
         result = _nmod_vec_equal(vec, vec3, len);

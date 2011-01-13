@@ -178,12 +178,12 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
     Sets \code{(res, len)} to the negation of \code{(vec, len)}.
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				        long len, nmod_t mod, mp_limb_t c)
+				        long len, mp_limb_t c, nmod_t mod)
 
     Sets \code{(res, len)} to \code{(vec, len)} multiplied by $c$.
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				        long len, nmod_t mod, mp_limb_t c)
+				        long len, mp_limb_t c, nmod_t mod)
 
     Adds \code{(vec, len)} times $c$ to the vector \code{(res, len)}.
 

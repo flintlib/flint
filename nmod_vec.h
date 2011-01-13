@@ -196,10 +196,10 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec,
 				                             long len, nmod_t mod);
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				                long len, nmod_t mod, mp_limb_t c);
+				                long len, mp_limb_t c, nmod_t mod);
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				                long len, nmod_t mod, mp_limb_t c);
+				                long len, mp_limb_t c, nmod_t mod);
 
 #endif
 

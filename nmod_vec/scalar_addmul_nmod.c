@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				             long len, nmod_t mod, mp_limb_t c)
+				             long len, mp_limb_t c, nmod_t mod)
 {
     if (mod.norm >= FLINT_BITS/2) /* addmul will fit in a limb */
     {

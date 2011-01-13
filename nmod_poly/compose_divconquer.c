@@ -149,7 +149,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     {
         if (poly1[j + 1] != 0L)
         {
-            _nmod_vec_scalar_mul_nmod(h[i], poly2, len2, mod, poly1[j + 1]);
+            _nmod_vec_scalar_mul_nmod(h[i], poly2, len2, poly1[j + 1], mod);
             h[i][0] = n_addmod(h[i][0], poly1[j], mod.n);
             hlen[i] = len2;
         }

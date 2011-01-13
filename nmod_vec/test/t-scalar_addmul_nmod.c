@@ -58,10 +58,10 @@ main(void)
         _nmod_vec_randtest(vec2, state, len, mod);
         mpn_copyi(vec3, vec2, len);
 
-        _nmod_vec_scalar_mul_nmod(vec3, vec, len, mod, c);
+        _nmod_vec_scalar_mul_nmod(vec3, vec, len, c, mod);
         _nmod_vec_add(vec3, vec3, vec2, len, mod);
 
-        _nmod_vec_scalar_addmul_nmod(vec2, vec, len, mod, c);
+        _nmod_vec_scalar_addmul_nmod(vec2, vec, len, c, mod);
 
         result = _nmod_vec_equal(vec2, vec3, len);
         if (!_nmod_vec_equal(vec2, vec3, len))
