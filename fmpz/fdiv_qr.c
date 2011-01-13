@@ -79,9 +79,11 @@ fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
     }
     else                        /* g is large */
     {
+        __mpz_struct *mpz_ptr, *mpz_ptr2;
+
         _fmpz_promote(f); /* must not hang on to ptr whilst promoting s */
-        __mpz_struct *mpz_ptr2 = _fmpz_promote(s);
-		__mpz_struct *mpz_ptr = COEFF_TO_PTR(*f);
+        mpz_ptr2 = _fmpz_promote(s);
+		mpz_ptr  = COEFF_TO_PTR(*f);
 
 		if (!COEFF_IS_MPZ(c2))  /* h is small */
         {
