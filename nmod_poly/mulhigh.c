@@ -33,7 +33,6 @@ void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1,
                              mp_srcptr poly2, long len2, long n, nmod_t mod)
 {
     long bits, bits2;
-    long len_out = len1 + len2 - 1;
 
     if (len1 + len2 <= 6)
     {
