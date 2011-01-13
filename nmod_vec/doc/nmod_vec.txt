@@ -29,12 +29,12 @@
 
 *******************************************************************************
 
-mp_ptr nmod_vec_init(long len)
+mp_ptr _nmod_vec_init(long len)
 
     Returns a vector of the given length. The entries are not necessarily
     zero.
 
-void nmod_vec_free(mp_ptr vec)
+void _nmod_vec_free(mp_ptr vec)
 
     Frees the memory used by the given vector.
 

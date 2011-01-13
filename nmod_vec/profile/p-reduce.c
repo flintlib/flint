@@ -41,8 +41,8 @@ void sample(void * arg, ulong count)
    nmod_t mod;
    info_t * info = (info_t *) arg;
    mp_bitcnt_t bits = info->bits;
-   mp_ptr vec = nmod_vec_init(1000);
-   mp_ptr vec2 = nmod_vec_init(1000);
+   mp_ptr vec = _nmod_vec_init(1000);
+   mp_ptr vec2 = _nmod_vec_init(1000);
    mp_size_t j;
    long i;
      
@@ -60,8 +60,8 @@ void sample(void * arg, ulong count)
    }
    prof_stop();
  
-   nmod_vec_free(vec);
-   nmod_vec_free(vec2);
+   _nmod_vec_free(vec);
+   _nmod_vec_free(vec2);
 }
 
 int main(void)

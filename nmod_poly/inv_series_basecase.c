@@ -36,7 +36,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv,
 {
     mp_ptr X2n, Qrev;
 
-    X2n = nmod_vec_init(2*n);
+    X2n = _nmod_vec_init(2*n);
     Qrev = X2n + n;
 
     _nmod_poly_reverse(Qrev, Q, n, n);
@@ -49,7 +49,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv,
 
     _nmod_poly_reverse(Qinv, Qinv, n, n);
     
-    nmod_vec_free(X2n + n - 1);
+    _nmod_vec_free(X2n + n - 1);
 }
 
 void
@@ -70,7 +70,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
 
     if (Qlen < n)
     {
-        Q_coeffs = nmod_vec_init(n);
+        Q_coeffs = _nmod_vec_init(n);
         mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
         mpn_zero(Q_coeffs + Qlen, n - Qlen);
     }
@@ -99,7 +99,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        nmod_vec_free(Q_coeffs);
+        _nmod_vec_free(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }

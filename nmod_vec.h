@@ -133,13 +133,13 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 }
 
 static __inline__
-mp_ptr nmod_vec_init(long len)
+mp_ptr _nmod_vec_init(long len)
 {
    return (mp_ptr) malloc(len * sizeof(mp_limb_t));
 }
 
 static __inline__
-void nmod_vec_free(mp_ptr vec)
+void _nmod_vec_free(mp_ptr vec)
 {
    free(vec);
 }

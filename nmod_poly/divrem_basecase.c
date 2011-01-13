@@ -279,7 +279,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         R_coeffs = R->coeffs;
     }
 
-    W = nmod_vec_init(NMOD_DIVREM_BC_ITCH(Alen, Blen, A->mod));
+    W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(Alen, Blen, A->mod));
     
     _nmod_poly_divrem_basecase(Q_coeffs, R_coeffs, W, A->coeffs, Alen,
                                B->coeffs, Blen, B->mod);
@@ -300,7 +300,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         
     R->length = Blen - 1;
 
-    nmod_vec_free(W);
+    _nmod_vec_free(W);
     _nmod_poly_normalise(Q);
     _nmod_poly_normalise(R);
 }

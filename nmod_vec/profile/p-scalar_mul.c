@@ -44,8 +44,8 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    long length = info->length;
    long i, j;
-   mp_ptr vec = nmod_vec_init(length);
-   mp_ptr vec2 = nmod_vec_init(length);
+   mp_ptr vec = _nmod_vec_init(length);
+   mp_ptr vec2 = _nmod_vec_init(length);
      
    for (i = 0; i < count; i++)
    {
@@ -63,8 +63,8 @@ void sample(void * arg, ulong count)
 	  prof_stop();
    }
    
-   nmod_vec_free(vec);
-   nmod_vec_free(vec2);
+   _nmod_vec_free(vec);
+   _nmod_vec_free(vec2);
 }
 
 int main(void)

@@ -48,9 +48,9 @@ main(void)
         mp_limb_t c = n_randint(state, n);
         nmod_t mod;
 
-        mp_ptr vec = nmod_vec_init(len);
-        mp_ptr vec2 = nmod_vec_init(len);
-        mp_ptr vec3 = nmod_vec_init(len);
+        mp_ptr vec = _nmod_vec_init(len);
+        mp_ptr vec2 = _nmod_vec_init(len);
+        mp_ptr vec3 = _nmod_vec_init(len);
 
         nmod_init(&mod, n);
 
@@ -72,9 +72,9 @@ main(void)
             abort();
         }
 
-        nmod_vec_free(vec);
-        nmod_vec_free(vec2);
-        nmod_vec_free(vec3);
+        _nmod_vec_free(vec);
+        _nmod_vec_free(vec2);
+        _nmod_vec_free(vec3);
     }
 
     flint_randclear(state);

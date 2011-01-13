@@ -36,7 +36,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
     ulong bit = ~((~0UL) >> 1);
     long rlen;
     long alloc = (long) e * (len - 1) + 1;
-    mp_ptr v = nmod_vec_init(alloc);
+    mp_ptr v = _nmod_vec_init(alloc);
     mp_ptr R, S, T;
 
     /*
@@ -108,7 +108,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
         }
     }
     
-    nmod_vec_free(v);
+    _nmod_vec_free(v);
 }
 
 void

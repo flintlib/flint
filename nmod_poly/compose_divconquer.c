@@ -131,7 +131,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
 
-    v = nmod_vec_init(alloc +  2 * powlen);
+    v = _nmod_vec_init(alloc +  2 * powlen);
     h = (mp_ptr *) malloc(((len1 + 1) / 2) * sizeof(mp_ptr));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
@@ -210,7 +210,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     _nmod_poly_mul(res, pow, powlen, h[1], hlen[1], mod);
     _nmod_vec_add(res, res, h[0], hlen[0], mod);
     
-    nmod_vec_free(v);
+    _nmod_vec_free(v);
     free(h);
     free(hlen);
 }

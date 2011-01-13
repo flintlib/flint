@@ -45,12 +45,12 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
         mp_srcptr p1 = A + n2;
         mp_srcptr d1 = B + n2;
         
-        mp_ptr V = nmod_vec_init(n1 - 1 + NMOD_DIVREM_DC_ITCH(n1, mod));
+        mp_ptr V = _nmod_vec_init(n1 - 1 + NMOD_DIVREM_DC_ITCH(n1, mod));
         mp_ptr W = V + NMOD_DIVREM_DC_ITCH(n1, mod);
 
         _nmod_poly_div_divconquer_recursive(Q, W, V, p1, d1, n1, mod);
 
-        nmod_vec_free(V);
+        _nmod_vec_free(V);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -61,7 +61,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
         const long shift = lenA - 2 * lenB + 1;
         mp_srcptr p1 = A + shift;
 
-        mp_ptr V = nmod_vec_init(lenA + (3 * lenB - 2) + NMOD_DIVREM_DC_ITCH(lenB, mod));
+        mp_ptr V = _nmod_vec_init(lenA + (3 * lenB - 2) + NMOD_DIVREM_DC_ITCH(lenB, mod));
         mp_ptr R = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
         mp_ptr W = R + lenB - 1;
 
@@ -101,16 +101,16 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
            lenA - lenB by lenB
          */
 
-        nmod_vec_free(V);
+        _nmod_vec_free(V);
     }
     else  /* lenA = 2 * lenB - 1 */
     {
-        mp_ptr V = nmod_vec_init(lenB - 1 + NMOD_DIVREM_DC_ITCH(lenB, mod));
+        mp_ptr V = _nmod_vec_init(lenB - 1 + NMOD_DIVREM_DC_ITCH(lenB, mod));
         mp_ptr W = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
  
         _nmod_poly_div_divconquer_recursive(Q, W, V, A, B, lenB, mod);
         
-        nmod_vec_free(V);
+        _nmod_vec_free(V);
     }
 }
 

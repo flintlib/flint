@@ -74,7 +74,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
 
     if (poly->length < trunc)
     {
-        p = nmod_vec_init(trunc);
+        p = _nmod_vec_init(trunc);
         mpn_copyi(p, poly->coeffs, poly->length);
         mpn_zero(p + poly->length, trunc - poly->length);
         pcopy = 1;
@@ -96,7 +96,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
     }
 
     if (pcopy)
-        nmod_vec_free(p);
+        _nmod_vec_free(p);
 
     res->length = trunc;
     _nmod_poly_normalise(res);

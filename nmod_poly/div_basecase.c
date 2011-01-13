@@ -251,7 +251,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
         Q_coeffs = Q->coeffs;
     }
 
-    W = nmod_vec_init(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod));
+    W = _nmod_vec_init(NMOD_DIV_BC_ITCH(Alen, Blen, A->mod));
     
     _nmod_poly_div_basecase(Q_coeffs, W, A->coeffs, Alen,
                                B->coeffs, Blen, B->mod);
@@ -264,6 +264,6 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     
     Q->length = Alen - Blen + 1;
 
-    nmod_vec_free(W);
+    _nmod_vec_free(W);
     _nmod_poly_normalise(Q);
 }

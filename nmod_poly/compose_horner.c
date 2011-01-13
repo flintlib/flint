@@ -61,8 +61,8 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
     m = len1 - 1;
 	m2 = len2 - 1;
 
-    val1 = nmod_vec_init(m*m2 + 1);
-    val2 = nmod_vec_init(m*m2 + 1);
+    val1 = _nmod_vec_init(m*m2 + 1);
+    val2 = _nmod_vec_init(m*m2 + 1);
 
     /* initial c_m * poly2 + c_{m-1} */
     _nmod_vec_scalar_mul_nmod(val1, poly2, len2, poly1[m], mod);
@@ -83,8 +83,8 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
     _nmod_poly_mul(res, val1, m2*(len1 - 2) + 1, poly2, len2, mod);
 	res[0] = n_addmod(res[0], t, mod.n);
 
-    nmod_vec_free(val1);
-    nmod_vec_free(val2);
+    _nmod_vec_free(val1);
+    _nmod_vec_free(val2);
 }
 
 void nmod_poly_compose_horner(nmod_poly_t res, 

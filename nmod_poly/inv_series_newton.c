@@ -47,9 +47,9 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv,
     }
     
     m = (n + 1)/2;
-    g0 = nmod_vec_init(m);
-    prod = nmod_vec_init(n);
-    prod2 = nmod_vec_init(n);
+    g0 = _nmod_vec_init(m);
+    prod = _nmod_vec_init(n);
+    prod2 = _nmod_vec_init(n);
 
     _nmod_poly_inv_series_newton(g0, Q, m, mod);
     _nmod_poly_mullow(prod, Q, n, g0, m, n, mod);
@@ -58,9 +58,9 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv,
 
     _nmod_poly_sub(Qinv, g0, m, prod2, n, mod);
 
-    nmod_vec_free(prod2);
-    nmod_vec_free(prod);
-    nmod_vec_free(g0);
+    _nmod_vec_free(prod2);
+    _nmod_vec_free(prod);
+    _nmod_vec_free(g0);
 
 }
 
@@ -82,7 +82,7 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv,
 
     if (Qlen < n)
     {
-        Q_coeffs = nmod_vec_init(n);
+        Q_coeffs = _nmod_vec_init(n);
         mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
         mpn_zero(Q_coeffs + Qlen, n - Qlen);
     }
@@ -111,7 +111,7 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        nmod_vec_free(Q_coeffs);
+        _nmod_vec_free(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }
