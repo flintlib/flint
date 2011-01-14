@@ -1,9 +1,12 @@
 CC=gcc
 CFLAGS=-g -O2 -ansi -pedantic -Wall
 
-LIBS=-L$(CURDIR) -L/home/wbhart/flint2/ -L/home/wbhart/mpir-2.1.1/.libs/ -L/home/wbhart/mpfr-3.0.0/.libs/ -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs/ -L/home/wbhart/mpfr-3.0.0/.libs/ -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/wbhart/flint2/ -I/home/wbhart/mpir-2.1.1/ -I/home/wbhart/mpfr-3.0.0/
+LIBS=-L$(CURDIR) -L$(FLINT_LIB_DIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I$(FLINT_INCLUDE_DIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
+
+LD_LIBRARY_PATH:=${FLINT_LIB_DIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH
 export
 
 SOURCES = $(wildcard *.c)
@@ -52,7 +55,7 @@ ifndef MOD
 	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
 else
-	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;)
+	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;) 
 endif
 
 library: library-recursive $(LIB_OBJS)
