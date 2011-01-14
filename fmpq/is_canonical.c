@@ -30,15 +30,23 @@
 #include "ulong_extras.h"
 
 
-void
-_fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
+int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den)
 {
-    fmpz_randtest(num, state, bits);
-    fmpz_randtest_not_zero(den, state, bits);
-    _fmpq_canonicalise(num, den);
+    fmpz_t u;
+    int result;
+
+    if (fmpz_is_one(den)) return 1;
+    if (fmpz_sgn(den) <= 0) return 0;
+    if (fmpz_is_zero(num)) return fmpz_is_one(den);
+
+    fmpz_init(u);
+    fmpz_gcd(u, num, den);
+    result = fmpz_is_one(u);
+    fmpz_clear(u);
+    return result;
 }
 
-void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+int fmpq_is_canonical(const fmpq_t x)
 {
-    _fmpq_randtest(&res->num, &res->den, state, bits);
+    return _fmpq_is_canonical(&x->num, &x->den);
 }

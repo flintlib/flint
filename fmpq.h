@@ -52,7 +52,7 @@ static __inline__ void fmpq_clear(fmpq_t x)
     fmpz_clear(&x->den);
 }
 
-static __inline__ void fmpq_xzero(fmpq_t res)
+static __inline__ void fmpq_zero(fmpq_t res)
 {
     fmpz_zero(&res->num);
     fmpz_set_ui(&res->den, 1UL);
@@ -62,14 +62,35 @@ void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 void fmpq_canonicalise(fmpq_t res);
 
+int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
+
+int fmpq_is_canonical(const fmpq_t x);
+
 
 void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q);
 
 void fmpq_set_si(fmpq_t res, long p, ulong q);
 
+
+static __inline__ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
+{
+    fmpz_set_mpz(&dest->num, mpq_numref(src));
+    fmpz_set_mpz(&dest->den, mpq_denref(src));
+}
+
+static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
+{
+    fmpz_get_mpz(mpq_numref(dest), &src->num);
+    fmpz_get_mpz(mpq_denref(dest), &src->den);
+}
+
 void _fmpq_print(fmpz_t num, fmpz_t den);
 
 void fmpq_print(const fmpq_t x);
+
+void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
+
+void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
 
 
