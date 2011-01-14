@@ -37,6 +37,7 @@ _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
     int success;
 
     fmpz_t tmp, q, T0, T1, T2, U0, U1, U2, V0, V1, V2;
+    fmpz s;
 
     if (fmpz_is_zero(a) || fmpz_is_one(a))
     {
@@ -77,12 +78,9 @@ _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den,
         fmpz_mul(tmp, q, V2);
         fmpz_sub(T2, U2, tmp);
 
-        *U0 = *V0;
-        *U1 = *V1;
-        *U2 = *V2;
-        *V0 = *T0;
-        *V1 = *T1;
-        *V2 = *T2;
+        s = *U0; *U0 = *V0; *V0 = *T0; *T0 = s;
+        s = *U1; *U1 = *V1; *V1 = *T1; *T1 = s;
+        s = *U2; *U2 = *V2; *V2 = *T2; *T2 = s;
     }
 
     fmpz_abs(den, V1);
