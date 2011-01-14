@@ -63,6 +63,10 @@ library-recursive:
 
 $(FLINT_LIB): library
 
+install: library
+	cp $(FLINT_LIB) $(PREFIX)/lib
+	cp *.h $(PREFIX)/include
+
 .PHONY: profile library library-recursive recursive clean check check-recursive all
 
 %.lo: %.c
