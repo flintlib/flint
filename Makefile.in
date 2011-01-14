@@ -34,7 +34,10 @@ all: $(OBJS) recursive library
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) clean;)
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(FLINT_LIB) 
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) 
+
+distclean: clean
+	rm Makefile
 
 profile: all profiler.o
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o $(prog) $(LIBS);)
