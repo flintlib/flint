@@ -103,7 +103,7 @@ mp_limb_t _ll_factor_SQUFOF(mp_limb_t n_hi, mp_limb_t n_lo, ulong max_iters)
 	if (sqrt[1])
 	{
         int norm;
-        count_leading_zeros(norm, sqrt[1]);
+        count_leading_zeros(norm, qlast);
         udiv_qrnnd(q, rem[0], (sqrt[1] << norm) + r_shift(sqrt[0], FLINT_BITS - norm), sqrt[0] << norm, qlast << norm); 
         rem[0] >>= norm;
     }
