@@ -84,13 +84,13 @@ int
 main(void)
 {
     int i, j, len, bits;
-    fmpz_randstate_t state;
     int X[rows][cols];
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
     
-    fmpz_poly_randinit(state);
-        
+    flint_rand_t state;
+    flint_randinit(state);
+       
     fmpz_poly_init2(f, lenhi);
     fmpz_poly_init2(g, lenhi);
     fmpz_poly_init2(h, 2*lenhi - 1);
@@ -225,5 +225,5 @@ main(void)
         }
     }
 
-    fmpz_poly_randclear(state);
+    flint_randclear(state);
 }

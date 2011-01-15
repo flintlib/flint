@@ -46,14 +46,16 @@ void sample(void * arg, ulong count)
    long i, j;
    mp_ptr vec = _nmod_vec_init(length);
    mp_ptr vec2 = _nmod_vec_init(length);
-     
+   flint_rand_t state;
+   flint_randinit(state);
+    
    for (i = 0; i < count; i++)
    {
-      n = n_randbits(bits);
+      n = n_randbits(state, bits);
       if (n == 0UL) n++;
-      c = n_randint(n);
+      c = n_randint(state, n);
       for (j = 0; j < length; j++)
-         vec[j] = n_randint(n);
+         vec[j] = n_randint(state, n);
       
 	  nmod_init(&mod, n);
 
@@ -63,6 +65,7 @@ void sample(void * arg, ulong count)
 	  prof_stop();
    }
    
+   flint_randclear(state);
    _nmod_vec_free(vec);
    _nmod_vec_free(vec2);
 }

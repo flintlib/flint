@@ -49,14 +49,15 @@ void sample(void * arg, ulong count)
 
     flint_rand_t rnd;
     fmpz_mat_t A, B, C;
-    fmpz_randinit(rnd);
-
+    flint_rand_t state;
+    flint_randinit(state);
+   
     fmpz_mat_init(A, dim, dim);
     fmpz_mat_init(B, dim, dim);
     fmpz_mat_init(C, dim, dim);
 
-    fmpz_mat_randtest(A, rnd, bits);
-    fmpz_mat_randtest(B, rnd, bits);
+    fmpz_mat_randtest(A, state, bits);
+    fmpz_mat_randtest(B, state, bits);
 
     prof_start();
 
@@ -75,7 +76,8 @@ void sample(void * arg, ulong count)
     fmpz_mat_clear(A);
     fmpz_mat_clear(B);
     fmpz_mat_clear(C);
-    fmpz_randclear(rnd);
+    
+    flint_randclear(state);
 }
 
 int main(void)

@@ -1,9 +1,9 @@
-CC=gcc
-CFLAGS=-g -O2 -ansi -pedantic -Wall
+LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
 
-LIBS=-L$(CURDIR) -L/home/wbhart/flint2/ -L/home/wbhart/mpir-2.1.1/.libs/ -L/home/wbhart/mpfr-3.0.0/.libs/ -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(CURDIR) -L/home/wbhart/mpir-2.1.1/.libs/ -L/home/wbhart/mpfr-3.0.0/.libs/ -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I/home/wbhart/flint2/ -I/home/wbhart/mpir-2.1.1/ -I/home/wbhart/mpfr-3.0.0/
+LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH
 export
 
 SOURCES = $(wildcard *.c)
@@ -30,11 +30,14 @@ TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
-all: $(OBJS) recursive 
+all: $(OBJS) recursive library 
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) clean;)
-	rm -f $(OBJS) $(LOBJS) $(TESTS) 
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) 
+
+distclean: clean
+	rm Makefile
 
 profile: all profiler.o
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o $(prog) $(LIBS);)
@@ -46,13 +49,13 @@ recursive:
 examples: all $(LOBJS) library
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 
-check: all $(LOBJS) library
+check: $(FLINT_LIB)
 ifndef MOD
 	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
 else
-	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;)
+	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;) 
 endif
 
 library: library-recursive $(LIB_OBJS)
@@ -60,6 +63,12 @@ library: library-recursive $(LIB_OBJS)
 
 library-recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) library;) 
+
+$(FLINT_LIB): library
+
+install: library
+	cp $(FLINT_LIB) $(PREFIX)/lib
+	cp *.h $(PREFIX)/include
 
 .PHONY: profile library library-recursive recursive clean check check-recursive all
 
@@ -70,6 +79,6 @@ library-recursive:
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 BUILD_DIRS = ulong_extras long_extras fmpz fmpz_vec fmpz_poly fmpq_poly \
-   fmpz_mat mpfr_vec mpfr_mat LLL nmod_vec nmod_poly nmod_mpoly \
+   fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
    arith mpn_extras nmod_mat
 

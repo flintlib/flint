@@ -17,7 +17,7 @@ all: $(OBJS)
 library: $(LIB_OBJS)
 
 profile:
-	$(foreach prog, $(PROFS), $(CC) -std=c99 -O2 $(INCS) $(prog).c ../profiler.o -o $(prog) $(LIBS);)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(prog) $(LIBS) -lflint;)
         
 %.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
@@ -29,7 +29,7 @@ clean:
 	rm -f $(OBJS) $(LIB_OBJS) $(TESTS)	
 
 check: library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -lflint;)
 	$(foreach prog, $(TESTS), $(prog);)
 
 .PHONY: profile clean check all
