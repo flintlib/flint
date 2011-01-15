@@ -53,6 +53,8 @@ void fmpz_mat_clear(fmpz_mat_t mat);
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
 
+void fmpz_mat_zero(fmpz_mat_t mat);
+
 /* Input and output  *********************************************************/
 
 int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);

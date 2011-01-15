@@ -19,19 +19,58 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "ulong_extras.h"
 
-void
-fmpz_mat_zero(fmpz_mat_t mat)
+int
+main(void)
 {
-    long i;
-    for (i = 0; i < mat->r; i++)
-        _fmpz_vec_zero(mat->rows[i], mat->c);
+    long m, n, i, j, rep;
+    flint_rand_t state;
+
+    printf("zero....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (rep = 0; rep < 1000; rep++)
+    {
+        fmpz_mat_t A;
+
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
+
+        fmpz_mat_init(A, m, n);
+
+        fmpz_mat_randtest(A, state, 100);
+        fmpz_mat_zero(A);
+
+        for (i = 0; i < m; i++)
+        {
+            for (j = 0; j < n; j++)
+            {
+                if (!fmpz_is_zero(fmpz_mat_entry(A,i,j)))
+                {
+                    printf("FAIL: nonzero entry\n");
+                    abort();
+                }
+            }
+        }
+
+        fmpz_mat_clear(A);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

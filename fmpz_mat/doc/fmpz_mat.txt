@@ -187,6 +187,11 @@ fmpz * fmpz_mat_entry(fmpz_mat_t mat, long i, long j)
 
     This function is implemented as a macro.
 
+void fmpz_mat_zero(fmpz_mat_t mat)
+
+    Sets all entries of \code{mat} to 0.
+
+
 *******************************************************************************
 
     Input and output
