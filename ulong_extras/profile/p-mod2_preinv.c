@@ -44,11 +44,13 @@ void sample(void * arg, ulong count)
    ulong type = info->type;
    ulong i;
    mp_ptr arr = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
+   flint_rand_t state;
+   flint_randinit(state);
       
    for (i = 0; i < count; i++)
    {
       int j;
-      d = n_randbits(bits);
+      d = n_randbits(state, bits);
       if (d == 0UL) d++;
 
       dinv = n_preinvert_limb(d);
@@ -56,7 +58,7 @@ void sample(void * arg, ulong count)
 
       for (j = 0; j < 1024; j++)
       {
-         arr[j] = n_randbits(FLINT_BITS);
+         arr[j] = n_randbits(state, FLINT_BITS);
       }
 
 	  switch (type)
@@ -121,6 +123,7 @@ void sample(void * arg, ulong count)
   
    if (r == 9879875897UL) abort();
 
+   flint_randclear(state);
    free(arr);
 }
 

@@ -34,10 +34,13 @@ void sample(void * arg, ulong count)
 {
    mp_limb_t d, q, r, dinv, norm;
    mp_ptr array = (mp_ptr) malloc(200 * sizeof(mp_limb_t));
+   flint_rand_t state;
    ulong i;
    int j;
    
-   d = n_randtest_not_zero();
+   flint_randinit(state);
+
+   d = n_randtest_not_zero(state);
    count_leading_zeros(norm, d);
    d <<= norm;
       
@@ -47,9 +50,9 @@ void sample(void * arg, ulong count)
       {
          do
          {
-            array[j] = n_randtest();
+            array[j] = n_randtest(state);
          } while (array[j] >= d);
-         array[j + 1] = n_randtest();  
+         array[j + 1] = n_randtest(state);  
       }
        
       invert_limb(dinv, d);
@@ -64,6 +67,7 @@ void sample(void * arg, ulong count)
       if (q + r == 0) printf("\r");
    }
 
+   flint_randclear(state);
    free(array);
 }
 
