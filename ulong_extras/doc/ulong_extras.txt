@@ -106,6 +106,7 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
     The algorithm simply uses a for loop. Repeated squaring is
     unlikely to speed up this algorithm.
 
+
 *******************************************************************************
 
     Miscellaneous
@@ -117,6 +118,13 @@ ulong n_revbin(ulong in, ulong bits)
     Returns the binary reverse of \code{in}, assuming it is the given 
     number of bits long, e.g.\ \code{n_revbin(10110, 6)} will return
     \code{110100}.
+
+int n_sizeinbase(mp_limb_t n, int base)
+
+    Returns the exact number of digits needed to represent $n$ as a
+    string in base \code{base} assumed to be between 2 and 36.
+    Returns 1 when $n = 0$.
+
 
 *******************************************************************************
 
