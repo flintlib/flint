@@ -1,0 +1,26 @@
+Instructions on intalling flint 2
+---------------------------------
+
+FLINT 2 follows a standard format for installation:
+
+./configure
+make
+make check
+make install
+
+However, this assumes that MPIR and MPFR are already installed on your system in
+/usr/local. If the libraries are not in this location you must specify where 
+they are by passing their location to configure. It also assumes you wish to 
+install FLINT 2 at the prefix /usr/local. If not you must pass the prefix (the
+directory containing lib and include subdirectories into which FLINT will be
+installed) to configure:
+
+./configure --with-mpir=/home/user1/mpir-2.1.1/ --with-mpfr=/usr --prefix=/usr
+
+Note that the FLINT configure system can handle MPIR/MPFR as installed (in lib
+and include dirs) at some location, or as source builds (built from source and
+not installed).
+
+For further configure and make options, please refer to the FLINT 2
+documentation.
+
