@@ -44,8 +44,9 @@ int main(void)
       mp_limb_t n1, n2;
 
       do
-         n1 = n_randtest(state);
-      while (n_is_prime(n1) || (n1 == 1UL));
+      {
+         n1 = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+      } while (n_is_prime(n1) || (n1 < 2UL));
 
 #if FLINT64
       n2 = n_factor_SQUFOF(n1, 10000);
