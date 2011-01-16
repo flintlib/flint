@@ -279,12 +279,13 @@ aim of providing support for multicore and multiprocessor computer
 architectures, though we do not yet provide this facility.
 
 FLINT is currently maintained by William Hart of Warwick University in 
-the UK.
+the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
+Johannson, Andy Novocin and David Harvey (no longer active).
 
-As of version 1.1.0 FLINT supports 32 and 64 bit processors including 
-x86, PPC, Alpha and Itanium processors, though in theory it compiles on any 
-machine with GCC version 3.4 or later and with GMP version 4.2.1 or 
-MPIR 0.9.0 or later.
+FLINT 2 and following should compile on any machine with GCC and a standard 
+GNU toolchain, however it is specially optimized for x86 (32 and 64 bit)
+machines. As of version 2.0 FLINT required GCC version 2.96 or later, 
+MPIR 2.1.1 or later and MPFR 3.0.0 or later.
 
 FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
 each of which can be linked to a C program making use of their functionality.
@@ -299,33 +300,75 @@ file \code{fmpz_poly/test/t-add.c}.
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
 
-FLINT requires GMP version 4.2.1 or later or MPIR version 0.9.0 or 
-later (in GMP compatibility mode).  Set the environment variables 
-\code{FLINT_GMP_LIB_DIR} and \code{FLINT_GMP_INCLUDE_DIR} to point 
-to your GMP or MPIR library and include directories respectively. 
-Alternatively you can set default values for these environment variables 
-in the \code{flint_env} file.
+FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later.
 
-Once the environment variables are set or defaults are set in 
-\code{flint_env} simply type:
+To configure FLINT you must specify where MPIR and MPFR are on
+your system. FLINT can work with the libraries installed as usual,
+e.g. in \code{/usr/local} or it can work with the libraries built
+from source in their standard source trees. 
+
+In the case that a library is installed in say \code{/usr/local}
+in the \code{lib} and \code{include} directories as usual, simply
+specify the top level location, e.g. \code{/usr/local} when 
+configuring FLINT. If a library is built in its source tree,
+specify the top level source directory (e.g. \code{/home/user1/mpir/}.
+
+To specify the directories where the libraries reside, you must
+pass the directories as parameters to FLINT's configure, e.g.
+\code{./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/}.
+If no directories are specified, FLINT assumes it will find the
+libraries it needs in \code{/usr/local}.
+
+If you intend to install the FLINT library and \code{.h} files, 
+you can specify where they should be placed by passing 
+\code{--prefix=path} to configure, where \code{path} is the directory
+under which the \code{lib} and \code{include} directories exist into
+which you wish to place the FLINT files when it is installed.
+
+Once FLINT is configured, in the main directory of the FLINT directory 
+tree simply type:
 \begin{lstlisting}[language=bash]
-source flint_env
+make
+make check
 \end{lstlisting}
 
-in the main directory of the FLINT directory tree.  Finally type:
+If you wish to install FLINT, simply type:
 \begin{lstlisting}[language=bash]
-make library
+make install
 \end{lstlisting}
-
-Move the library file \code{libflint.so}, \code{libflint.dll} or 
-\code{libflint.dylib} (depending on your platform) into your library 
-path and move all the \code{.h} files in the main directory of FLINT 
-into your include path.
 
 Now to use FLINT, simply include the appropriate header files for 
 the FLINT modules you wish to use in your C program.  Then compile 
-your program, linking against the FLINT library and GMP/MPIR with 
-the options \code{-lflint -lgmp}.
+your program, linking against the FLINT library and MPIR and MPFR 
+with the options \code{-lflint -lmpfr -lgmp}.
+
+Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
+for your system to let the linker know where to find these libraries.
+Please refer to your system documentation for how to do this.
+
+The FLINT make system responds to the standard commands
+\begin{lstlisting}[language=bash]
+make 
+make library
+make check
+make clean
+make distclean
+make install
+\end{lstlisting}
+
+In addition, if you wish to simply check a single module of FLINT you
+can pass the option \code{MOD=modname} to \code{make check}. You can 
+also pass a list of module names in inverted commas, e.g:
+
+\begin{lstlisting}[language=bash]
+make check MOD=ulong_extras
+\end{lstlisting}
+
+If your system supports parallel builds, FLINT will build in parallel,
+e.g:
+\begin{lstlisting}[language=bash]
+make -j4 check 
+\end{lstlisting}
 
 \chapter{Test code}
 
@@ -338,25 +381,25 @@ To make and run the test programs, simply type:
 make check
 \end{lstlisting}
 
-in the main FLINT directory.
+in the main FLINT directory after configuring FLINT.
 
 \chapter{Reporting bugs}
 
 The maintainer wishes to be made aware of any and all bugs.  Please send an 
-email with your bug report to \url{hart_wb@yahoo.com}.
+email with your bug report to \url{hart_wb@yahoo.com} or report them on the
+FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
 
-If possible please include details of your system, version of gcc, version 
-of GMP/MPIR and precise details of how to replicate the bug.
+If possible please include details of your system, version of GCC, version 
+of MPIR and MPFR and precise details of how to replicate the bug.
 
-Note that FLINT needs to be linked against version 4.2.1 or later of GMP 
-or version 0.9.0 or later of MPIR (in GMP compatibility mode) and must be 
-compiled with gcc version 3.4 or later.  In particular the compiler must be 
-fully C99 compatible.
+Note that FLINT needs to be linked against version 2.1.1 or later of MPIR,
+version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
+or later.  
 
 \chapter{Example programs}
 
-FLINT comes with a number of example programs to demonstrate current and 
-future FLINT features.  To build the example programs, type:
+FLINT comes with example programs to demonstrate current and future FLINT 
+features.  To build the example programs, type:
 
 \begin{lstlisting}[language=bash]
 make examples
@@ -368,40 +411,6 @@ The current example programs are:
 \code{delta_qexp 1000000} will compute the first one million terms of the 
 $q$-expansion of delta.
 
-\code{BPTJCubes}  Implements the algorithm of Beck, Pine, Tarrant and Jensen 
-for finding solutions to the equation $x^3+y^3+z^3 = k$.  This program 
-outputs a file \code{output.log} containing parameters for reconstructing the 
-first solution it finds, and then aborts.
-
-\code{bernoulli_zmod} Compute many bernoulli numbers modulo a prime.  If no 
-command line input is supplied it merely checks that the \code{bernoulli_zmod} 
-function works for the first $2000$ primes.  If you specify an integer 
-argument \code{n} on the command line, it computes the Bernoulli numbers 
-$B_0, B_2, \dotsc, B_{p-1}$ modulo~$p$, where $p$ is the next prime from 
-\code{n}.
-
-\code{expmod}  Computes a very large modular exponentiation.  This is actually 
-a basic pseudo primality test.
-
-\code{Zmul}  Compares the output of the FLINT FFT with that of GMP for ever 
-larger operands.
-
-\code{thetaproduct}  Computes the congruent number theta function.  To run 
-this you need to have openmp on your machine, you need a recent version of 
-gcc (e.g. 4.3.x or 4.4.x) and you need to export \code{OMP_NUM_THREADS=16} 
-or some factor of 16, depending on how many cores your machine has.  The 
-code also expects a directory \code{storage} with \emph{plenty} of space 
-where temporary files will be created.  Be warned that this code multiplies 
-\emph{huge} integers which do not fit into memory and much disk space is 
-used.  You also need a significant amount of memory on your machine, which 
-must also be a 64 bit linux platform.  Parameters can be changed at the top 
-of the file \code{thetaproduct.c}.  Primitive (squarefree) zeroes of the 
-congruent number theta function curve will be computed up to 
-\code{MOD * LIMIT} in the class $K$ modulo \code{MOD}.  At present 
-\code{FILES1} and \code{FILES2} must be equal.  \code{LIMIT} must also be 
-divisible by \code{BLOCK} and by \code{BUNDLE * FILES1}.  The code is not 
-currently designed to correctly handle small problems. 
-
 \chapter{FLINT macros}
 
 The file \code{flint.h} contains various useful macros.
@@ -412,9 +421,10 @@ number of bits per limb on the machine.  FLINT requires it to be either
 
 The macro constant \code{FLINT_D_BITS} is set at compile time to be the 
 number of bits per double on the machine or the number of bits per limb, 
-whichever is smaller.  This will have the value 53 or 32 on currently 
-supported architectures.  Numerous functions using precomputed inverses 
-only support operands up to \code{FLINT_D_BITS} bits, hence the macro.
+whichever is smaller.  This will have the value 53 or 31 on currently 
+supported architectures.  Numerous internal functions using precomputed 
+inverses only support operands up to \code{FLINT_D_BITS} bits, hence the
+macro.
 
 The macro \code{FLINT_ABS(x)} returns the absolute value of \code{x}
 for primitive signed numerical types.  It might fail for least negative 
