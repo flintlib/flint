@@ -488,7 +488,7 @@ fmpz_poly: (polys over fmpz's)
   * divrem (basecase, divide-and-conquer)
   * div (basecase, divide-and-conquer)
   * rem (basecase)
-  * invert series (basecase, ewton)
+  * invert series (basecase, Newton)
   * div series
   * pseudo divrem (basecase, divide-and-conquer, Cohen)
   * rem (Cohen)
