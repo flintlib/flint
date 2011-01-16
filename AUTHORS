@@ -1,0 +1,37 @@
+FLINT has been developed since 2007 by a large numnber of people. Initially
+the library was started by David Harvey and William Hart. Later maintenance
+of the library was taken over solely by William Hart.
+
+The main authors of FLINT to date have been William Hart, David Harvey (no
+longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
+
+Other significant contributions to FLINT have been made byi:
+
+Jason Papadopoulos : Block Lanczos code and multiprecision complex root finding
+Gonzalo Tornaria : Theta function module, Montgomery multiplication and modular
+                   multiplication code in Z[x]
+David Howden : Computing Bernoulli numbers mod many primes, fast polynomial
+               multiplication over Z/pZ
+Burcin Erocal : Primary FLINT wrapper in Sage
+Tom Boothby : Improved factoring of unsigned longs and detection of perfect 
+              powers
+Daniel Woodhouse : Multivariate multiplication over Z/nZ, Z and 
+                   getPeriodSequence 
+Tomasz Lechowski : NTL and Pari profiling code
+Richard Howell-Peak : Polynomial factorisation and irreducibility testing for
+                      polys over Z/pZ
+Peter Shrimpton : Basic prime sieve, Pocklingtom-Lehmer, Lucas, BPSW and n-1
+                  primality tests and a Weiferich prime search program
+
+Additional research was contributed by Daniel Scott and Daniel Ellam.
+
+Further patches and bug reports have been made by Michael Abshoff, Didier 
+Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
+Kedlaya, William Stein, Robert Bradshaw and many others.
+
+Some code (longlong.h and clz_tab.c) has been used from the GMP library, 
+whose main author is Torbjorn Granlund.
+
+FLINT 2 was a complete rewrite from scratch which began in about 2010.
+ 
+
