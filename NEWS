@@ -488,13 +488,13 @@ fmpz_poly: (polys over fmpz's)
   * divrem (basecase, divide-and-conquer)
   * div (basecase, divide-and-conquer)
   * rem (basecase)
-  * invert series (basecase, newton)
+  * invert series (basecase, ewton)
   * div series
-  * pseudo divrem (basecase, divide-and-conquer, cohen)
-  * rem (cohen)
+  * pseudo divrem (basecase, divide-and-conquer, Cohen)
+  * rem (Cohen)
   * div
-  * evaluate (horner) at fmpz, mpq, a mod n
-  * composition (horner, divide-and-conquer)
+  * evaluate (Horner) at fmpz, mpq, a mod n
+  * composition (Horner, divide-and-conquer)
   * signature
   * read/write to file/stdin/stdout
 
@@ -519,10 +519,10 @@ fmpq_poly: (polynomials over Q stored as poly over fmpz with fmpz denominator)
   * powering 
   * shift left/right
   * divrem, div, rem
-  * invert series (newton iteration)
+  * invert series (Newton iteration)
   * divide series
   * derivative
-  * evaluate at fmpq, mpq
+  * evaluate at fmpz, mpq
   * composition, scale by constant
   * content, primitive part
   * make-monic, is-monic
@@ -561,13 +561,13 @@ nmod_poly: (polynomials over Z/nZ for n fitting in a machine word)
   * mulhigh (classical)
   * powering (binary exponent)
   * pow-trunc (binary exponent)
-  * divrem (basecase, divide-and-conquer, newton iteration)
-  * div (basecase, divide-and-conquer, newton iteration)
-  * invert series (basecase, newton iteration)
-  * divide series (newton iteration)
+  * divrem (basecase, divide-and-conquer, Newton iteration)
+  * div (basecase, divide-and-conquer, Newton iteration)
+  * invert series (basecase, Newton iteration)
+  * divide series (Newton iteration)
   * derivative
   * evaluation at a value taken mod n
-  * composition (horner, divide-and-conquer)
+  * composition (Horner, divide-and-conquer)
   * gcd (euclidean)
 
 fmpz_mat: (matrices over fmpz's)
@@ -582,14 +582,14 @@ fmpz_mat: (matrices over fmpz's)
   * multiplication (classical, multimodular)
   * inverse
   * determinant
-  * row reduce (Gaussian and Gauss-Jordan elimination)
+  * row reduce (Gaussian and Gauss-Jordan fraction-free elimination)
   * rank
-  * solve Ax = b
+  * solve Ax = b, solve AX = B
   * fraction free LU decomposition
 
 nmod_mat: (matrices over Z/nZ for n fitting in a machine word)
   * memory management (init, clear)
-  * random matrices (uniform, full, permuations of diagonal matrix, random of 
+  * random matrices (uniform, full, permutations of diagonal matrix, random of 
     given rank, random elementary operations)
   * set, equal
   * print to stdout
@@ -603,10 +603,11 @@ nmod_mat: (matrices over Z/nZ for n fitting in a machine word)
   * invert
 
 arith: (arithmetic functions)
-  * bernoulli numbers
+  * Bernoulli numbers
+  * Bernoulli polynomials
   * primorials (product of primes up to n)
-  * hamronic numbers
-  * stirling numbers
+  * harmonic numbers
+  * Stirling numbers
   * Euler phi function
   * Moebius mu function
   * Sigma (sum of powers of divisors)
