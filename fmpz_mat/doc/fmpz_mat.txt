@@ -79,7 +79,7 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state,
     given number of binary bits. The remainder of the first column is zero. 
     Running down the rest of the diagonal are the values \code{2^bits} with 
     all remaining entries zero.
-  
+
 void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, 
                                                      mp_bitcnt_t bits, ulong q)
 
@@ -359,7 +359,8 @@ void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t den, fmpz ** const a, const fmpz * b)
 
     Solves \code{A * x/den = b} using Cramer's rule.
 
-_fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
+void _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, 
+                          const fmpz * b)
 
     Solves \code{A * x/den = b} for general square matrix $A$ by first 
     computing the fraction-free $LU$ decomposition and then calling

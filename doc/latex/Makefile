@@ -1,19 +1,14 @@
 CC    ?= gcc
 CFLAGS = -ansi -pedantic
 
-doc :
-	$(CC) -c $(CFLAGS) doc.c -o doc.o
-	$(CC) doc.o -o doc
-	./doc
-	pdflatex doc.tex
-	bibtex doc
-	pdflatex doc.tex
-	pdflatex doc.tex
-	mv doc.tex doc.tex.bak
-	mv title.tex title.tex.bak
-	rm *.tex
-	mv doc.tex.bak doc.tex
-	mv title.tex.bak title.tex
-	rm doc.o doc
-	rm doc.aux doc.log doc.out doc.toc doc.bbl doc.blg
+manual :
+	$(CC) -c $(CFLAGS) create_doc.c -o create_doc.o
+	$(CC) create_doc.o -o create_doc
+	./create_doc
+	pdflatex flint-manual.tex
+	bibtex flint-manual
+	pdflatex flint-manual.tex
+	pdflatex flint-manual.tex
+	rm create_doc.o create_doc
+	rm flint-manual.aux flint-manual.log flint-manual.out flint-manual.toc flint-manual.bbl flint-manual.blg
 

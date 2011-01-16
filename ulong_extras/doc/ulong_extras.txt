@@ -30,7 +30,7 @@
 *******************************************************************************
 
 void n_randinit(flint_rand_t state)
-   
+
     Initialise a random state for use in random functions. 
     Currently this function does nothing, but must be used
     for compatibility with future versions of flint. In 
@@ -38,7 +38,7 @@ void n_randinit(flint_rand_t state)
     in a threadsafe manner.
 
 void n_randinit(flint_rand_t state)
-   
+
     Release any memory used by a random state. Currently this 
     function does nothing, but must be used for compatibility 
     with future versions of flint.

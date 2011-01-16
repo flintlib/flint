@@ -444,7 +444,7 @@ void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1,
 *******************************************************************************
 
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
-                                    long len, mp_bitcnt_t bit_size, int negate)   
+                                    long len, mp_bitcnt_t bit_size, int negate)
 
     Packs the coefficients of poly into bitfields of the given 
     \code{bit_size}, negating the coefficients before packing 

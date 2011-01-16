@@ -260,7 +260,7 @@
 
 \frontmatter
 
-\input{title.tex}
+\input{input/title.tex}
 \clearpage
 
 \tableofcontents
@@ -524,7 +524,7 @@ The output is:
 
 We now describe the functions available in the \code{fmpz} module.
 
-\input{fmpz.tex}
+\input{input/fmpz.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integer vectors                                                              %
@@ -533,7 +533,7 @@ We now describe the functions available in the \code{fmpz} module.
 \chapter{fmpz\_vec}
 \epigraph{Vectors over $\Z$}{}
 
-\input{fmpz_vec.tex}
+\input{input/fmpz_vec.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integer matrices                                                             %
@@ -601,7 +601,7 @@ det(A^2) = 4
 \end{lstlisting}
 
 
-\input{fmpz_mat.tex}
+\input{input/fmpz_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integer polynomials                                                          %
@@ -684,7 +684,7 @@ independently of the other coefficients.
 
 We now describe the functions available in \code{fmpz_poly}.
 
-\input{fmpz_poly.tex}
+\input{input/fmpz_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Rational polynomials                                                         %
@@ -737,7 +737,7 @@ length, respectively.  In general, these functions expect their input to
 be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
 terms, and they do not allow their input and output arguments to be aliased.
 
-\input{fmpq_poly.tex}
+\input{input/fmpq_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                              %
@@ -746,7 +746,7 @@ terms, and they do not allow their input and output arguments to be aliased.
 \chapter{nmod\_vec}
 \epigraph{Vectors over $\Z / n \Z$ for word-sized moduli}{}
 
-\input{nmod_vec.tex}
+\input{input/nmod_vec.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                              %
@@ -755,7 +755,7 @@ terms, and they do not allow their input and output arguments to be aliased.
 \chapter{nmod\_poly}
 \epigraph{Polynomials over $\Z / n \Z$ for word-sized moduli}{}
 
-\input{nmod_poly.tex}
+\input{input/nmod_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Matrices over Z / nZ for word-sized moduli                                   %
@@ -780,7 +780,7 @@ all arguments have the same modulus.
 Functions that require the modulus to be a prime number document this
 requirement explicitly.
 
-\input{nmod_mat.tex}
+\input{input/nmod_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
@@ -794,17 +794,7 @@ requirement explicitly.
 This module implements arithmetic functions, number-theoretic and 
 combinatorial special number sequences and polynomials.
 
-\input{arith.tex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% LLL                                                                          %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\chapter{LLL}
-\epigraph{Functionality supporting the Lenstra--Lenstra--Lov\'asz algorithm 
-          for lattice reduction}{}
-
-\input{LLL.tex}
+\input{input/arith.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Unsigned single limb arithmetic                                              %
@@ -813,7 +803,7 @@ combinatorial special number sequences and polynomials.
 \chapter{ulong\_extras}
 \epigraph{Unsigned single limb arithmetic}{}
 
-\input{ulong_extras.tex}
+\input{input/ulong_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Signed single limb arithmetic                                                %
@@ -822,7 +812,7 @@ combinatorial special number sequences and polynomials.
 \chapter{long\_extras}
 \epigraph{Signed single limb arithmetic}{}
 
-\input{long_extras.tex}
+\input{input/long_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mpn_extras                                                                   %
@@ -830,7 +820,7 @@ combinatorial special number sequences and polynomials.
 
 \chapter{mpn\_extras}
 
-\input{mpn_extras.tex}
+\input{input/mpn_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %
@@ -841,6 +831,6 @@ combinatorial special number sequences and polynomials.
 \phantomsection
 \addcontentsline{toc}{chapter}{References}
 \bibliographystyle{amsplain}
-\bibliography{flint}
+\bibliography{flint-manual}
 
 \end{document}
