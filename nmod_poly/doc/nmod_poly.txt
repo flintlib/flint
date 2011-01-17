@@ -371,7 +371,7 @@ void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
     inputs and output is not permitted.
 
 void nmod_poly_mul_classical(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                             const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
@@ -463,7 +463,7 @@ void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1,
     product of \code{poly1} and \code{poly2}.
 
 void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1, 
-                                 mp_srcptr poly2, long len2, long n, nmod_t mod)
+                                mp_srcptr poly2, long len2, long n, nmod_t mod)
 
     Sets all but the low $n$ coefficients of \code{res} to the 
     corresponding coefficients of the product of \code{poly1} of length 
@@ -583,7 +583,7 @@ void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     exception is raised.
 
 void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
-                      mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                     mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
 
     Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
     where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
@@ -594,7 +594,7 @@ void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,
     \code{NMOD_DIVREM_DC_ITCH(lenB, mod)}. 
 
 void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
     Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
     where \code{A} is length \code{lenA} and \code{B} is length 
@@ -602,13 +602,13 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
     coefficients. 
 
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}.
+    Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
+    \code{length(R) < length(B)}.
 
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
     Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
     where \code{A} is length \code{lenA} and \code{B} is length 
@@ -616,13 +616,13 @@ void _nmod_poly_divrem(mp_ptr Q, mp_ptr R,
     coefficients. 
 
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}.
+    Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
+    \code{length(R) < length(B)}.
 
 void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
-                                mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                               mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
 
     Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
     where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
@@ -632,26 +632,26 @@ void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
     \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
 
 void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
-                                             mp_srcptr B, long lenB, nmod_t mod)
+                                            mp_srcptr B, long lenB, nmod_t mod)
 
     Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. 
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} 
+    is length \code{lenB}, but return only \code{Q}. We require that \code{Q} 
+    have space for \code{lenA - lenB + 1} coefficients.
 
 void nmod_poly_div_divconquer(nmod_poly_t Q,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
     Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
     with \code{length(R) < length(B)}, but return only \code{Q}.
 
 void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
-                                             mp_srcptr B, long lenB, nmod_t mod)
+                                            mp_srcptr B, long lenB, nmod_t mod)
 
     Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. 
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} 
+    is length \code{lenB}, but return only \code{Q}. We require that \code{Q} 
+    have space for \code{lenA - lenB + 1} coefficients. 
 
 void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
@@ -659,16 +659,16 @@ void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
     with \code{length(R) < length(B)}, but return only \code{Q}.
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
-                                                 mp_srcptr Q, long n, nmod_t mod)
+                                    mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose leading coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that the top \code{n} coefficients of the product \code{Q * Qinv} is
     $x^{n - 1}$. Requires that \code{n > 0}. This function can be viewed as 
     inverting a power series.
-   
+
 void nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
-                                                     const nmod_poly_t Q, long n)
+                                   const nmod_poly_t Q, long n)
 
     Given \code{Q} of length at least \code{n} find \code{Qinv} of length
     \code{n} such that the top \code{n} coefficients of the product 
@@ -676,7 +676,7 @@ void nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     or if the length of \code{Q} is less than \code{n}. The leading 
     coefficient of \code{Q} must be invertible modulo the modulus of 
     \code{Q}. This function can be viewed as inverting a power series.
- 
+
 void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
@@ -684,7 +684,7 @@ void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series via Newton 
     iteration.
-   
+
 void nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
@@ -692,14 +692,14 @@ void nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     modulo the modulus of \code{Q}. An exception is raised if this is not
     the case or if \code{n = 0}. This function can be viewed as inverting 
     a power series via Newton iteration.
- 
+
 void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series.
-   
+
 void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
@@ -707,59 +707,59 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     modulo the modulus of \code{Q}. An exception is raised if this is not
     the case or if \code{n = 0}. This function can be viewed as inverting 
     a power series.
- 
-void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
-                                                             long n, nmod_t mod)
 
-    Given polynomials \code{A} and \code{B} of length \code{n}, find the
+void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
+                                                  long n, nmod_t mod)
+
+    Given polynomials \code{A} and \code{B} of length \code{n}, finds the
     polynomial \code{Q} of length \code{n} such that \code{Q * B = A}
     modulo $x^n$. We assume \code{n > 0} and that the constant coefficient 
     of \code{B} is invertible modulo the given modulus. The polynomial 
     \code{Q} must have space for \code{n} coefficients.
 
 void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
-                                                    const nmod_poly_t B, long n)
+                                         const nmod_poly_t B, long n)
 
-   Given polynomials \code{A} and \code{B} considered modulo \code{n}, 
-   fing the polynomial \code{Q} of length at most \code{n} such that
-   \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
-   constant coefficient of \code{B} is invertible modulo the modulus. 
-   An exception is raised if \code{n == 0} or the constant coefficient
-   of \code{B} is zero.
+    Given polynomials \code{A} and \code{B} considered modulo \code{n}, 
+    finds the polynomial \code{Q} of length at most \code{n} such that
+    \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
+    constant coefficient of \code{B} is invertible modulo the modulus. 
+    An exception is raised if \code{n == 0} or the constant coefficient
+    of \code{B} is zero.
 
 void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen, 
-                                             mp_srcptr B, long Blen, nmod_t mod)
+                                     mp_srcptr B, long Blen, nmod_t mod)
 
     Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. The algorithm used is to 
-    reverse the polynomials and divde the resulting power series, then reverse
-    the result.
+    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} 
+    is length \code{lenB}, but return only \code{Q}. We require that \code{Q} 
+    have space for \code{lenA - lenB + 1} coefficients. The algorithm used is 
+    to reverse the polynomials and divde the resulting power series, then 
+    reverse the result.
 
 void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
-                                                            const nmod_poly_t B)
+                                         const nmod_poly_t B)
 
     Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
     with \code{length(R) < length(B)}, but return only \code{Q}. The algorithm 
     used is to reverse the polynomials and divde the resulting power series, 
     then reverse the result.
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, 
-                      mp_srcptr A, long Alen, mp_srcptr B, long Blen, nmod_t mod)
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long Alen, 
+                                        mp_srcptr B, long Blen, nmod_t mod)
 
     Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
     where \code{A} is length \code{lenA} and \code{B} is length \code{lenB}. 
     We require that \code{Q} have space for \code{lenA - lenB + 1}
-    coefficients. The algorithm uses is to call \code{div_newton) and then
+    coefficients. The algorithm used is to call \code{div_newton} and then
     multiply out and compute the remainder. 
 
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
-                                        const nmod_poly_t A, const nmod_poly_t B)
+                             const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}. The algorithm uses is to call 
-   \code{div_newton) and then multiply out and compute the remainder.
+    Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
+    $\len(R) < \len(B)$.  The algorithm used is to call \code{div_newton} 
+    and then multiply out and compute the remainder.
 
 *******************************************************************************
 
@@ -783,7 +783,8 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
 *******************************************************************************
 
-mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, nmod_t mod)
+mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, 
+                                   nmod_t mod)
 
     Evaluate \code{poly} at the value \code{c} and reduce modulo the 
     given modulus (of \code{poly}). The value \code{c} should be reduced 
@@ -801,8 +802,8 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
 
 *******************************************************************************
 
-void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
-                              long len1, mp_srcptr poly2, long len2, nmod_t mod)
+void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1, 
+                               mp_srcptr poly2, long len2, nmod_t mod)
 
     Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
     \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
@@ -810,16 +811,15 @@ void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1,
     that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
     coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
 
-
 void nmod_poly_compose_horner(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    i.e.\ evaluate \code{poly1} at \code{poly2}. The algorithm used is 
     Horner's algorithm.
 
 void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
-                                         mp_srcptr poly2, long len2, nmod_t mod)
+                                   mp_srcptr poly2, long len2, nmod_t mod)
 
     Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
     \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
@@ -828,14 +828,14 @@ void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose_divconquer(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
     i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
     the divide and conquer algorithm.
 
 void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
-                                         mp_srcptr poly2, long len2, nmod_t mod)
+                                        mp_srcptr poly2, long len2, nmod_t mod)
 
     Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
     \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
@@ -844,7 +844,7 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
     \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
     that is evaluate \code{poly1} at \code{poly2}.
@@ -856,17 +856,18 @@ void nmod_poly_compose(nmod_poly_t res,
 *******************************************************************************
 
 long _nmod_poly_gcd_euclidean(mp_ptr G, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
-   Compute the GCD of \code{A} of length \code{lenA} and \code{B} of length
-   \code{lenB}, where \code{lenA >= lenB > 1}. The length of the GCD \code{G}
-   is returned by the function. No attempt is made to make the GCD monic. It
-   is required that \code{G} have space for \code{lenB} coefficients.
+    Compute the GCD of \code{A} of length \code{lenA} and \code{B} of length
+    \code{lenB}, where \code{lenA >= lenB > 1}. The length of the GCD \code{G}
+    is returned by the function. No attempt is made to make the GCD monic. It
+    is required that \code{G} have space for \code{lenB} coefficients.
 
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                             const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute the GCD of \code{A} and \code{B}. The GCD of zero polynomials is
-   defined to be zero, whereas the GCD of the zero polynomial and some other
-   polynomial \code{P} is defined to be \code{P}. Except in the case where
-   the GCD is zero, the GCD \code{G} is made monic.
+    Compute the GCD of \code{A} and \code{B}. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial \code{P} is defined to be \code{P}. Except in the case where
+    the GCD is zero, the GCD \code{G} is made monic.
+
