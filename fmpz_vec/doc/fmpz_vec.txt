@@ -35,7 +35,7 @@ fmpz * _fmpz_vec_init(long len)
 
 void _fmpz_vec_clear(fmpz * vec, long len)
 
-    Clears the entries of \code{(vec, len)} and frees space allocated 
+    Clears the entries of \code{(vec, len)} and frees the space allocated 
     for \code{vec}.
 
 *******************************************************************************
@@ -70,7 +70,7 @@ long _fmpz_vec_max_bits(const fmpz * vec, long len)
 
 ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
-    Return the maximum number of limbs needed to store the absolute value 
+    Returns the maximum number of limbs needed to store the absolute value 
     of any entry in \code{(vec, len)}.  If all entries are zero, returns 
     zero.
 
@@ -91,7 +91,7 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
     or not \code{*vec} is \code{NULL}:
 
     If \code{*vec == NULL}, the value of \code{*len} on input is ignored.  
-    Once the length has been read from \code{file}, \code{*len} is that 
+    Once the length has been read from \code{file}, \code{*len} is set 
     to that value and a vector of this length is allocated at \code{*vec}. 
     Finally, \code{*len} coefficients are read from the input stream.  In 
     case of a file or parsing error, clears the vector and sets \code{*vec} 
@@ -120,7 +120,7 @@ int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len)
     list of coefficients. If the length is zero, only $0$ is printed.
 
     In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
 int _fmpz_vec_print(const fmpz * vec, long len)
 
@@ -266,19 +266,19 @@ void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1,
                                   const fmpz * vec2, long len2, const fmpz_t c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
-    down towards minus infinity whenever the division is not exact.
+    towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1, 
                                           const fmpz * vec2, long len2, long c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
-    down towards minus infinity whenever the division is not exact.
+    towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, 
                                          const fmpz * vec2, long len2, ulong c)
 
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by $c$, rounding 
-    down towards minus infinity whenever the division is not exact.
+    towards zero whenever the division is not exact.
 
 void _fmpz_vec_scalar_addmul_fmpz(fmpz * vec1, 
                                   const fmpz * vec2, long len2, const fmpz_t c)
@@ -311,9 +311,9 @@ void _fmpz_vec_scalar_submul_si(fmpz * vec1,
     where $c$ is a \code{signed long}.
 
 void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, 
-                               const fmpz * vec2, long len2, long c, ulong exp)
+                               const fmpz * vec2, long len2, long c, ulong e)
 
-    Subtracts \code{(vec2, len2)} times \code{c * 2^exp} 
+    Subtracts \code{(vec2, len2)} times $c \times 2^e$ 
     from \code{(vec1, len2)}, where $c$ is a \code{signed long}.
 
 *******************************************************************************
@@ -325,5 +325,6 @@ void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1,
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len)
 
     Sets \code{res} to the non-negative content of the entries in \code{vec}.  
-    The content of a length zero vector is defined to be zero.
+    The content of a zero vector, including the case when the length is zero, 
+    is defined to be zero.
 

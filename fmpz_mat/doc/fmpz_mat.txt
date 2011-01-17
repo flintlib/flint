@@ -83,7 +83,7 @@ void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state,
 void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, 
                                                      mp_bitcnt_t bits, ulong q)
 
-    Sets a square matrix \emph{mat} of even dimension to a random 
+    Sets a square matrix \code{mat} of even dimension to a random 
     \emph{NTRU like} matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
@@ -97,7 +97,7 @@ void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state,
 void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, 
                                                      mp_bitcnt_t bits, ulong q)
 
-    Sets a square matrix mat of even dimension to a random 
+    Sets a square matrix \code{mat} of even dimension to a random 
     \emph{NTRU like} matrix.
 
     The matrix is broken into four square submatrices. The top left submatrix
@@ -110,7 +110,7 @@ void fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state,
 
 void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 
-    Sets a square matrix mat to a random \emph{ajtai} matrix. The diagonal 
+    Sets a square matrix \code{mat} to a random \emph{ajtai} matrix. The diagonal 
     entries $(i, i)$ are set to a random entry in the range $[1, 2^{b-1}]$ 
     inclusive where $b = \floor{(2 r - i)^\alpha}$ for some double parameter 
     $\alpha$. The entries below the diagonal in column $i$ are set to a 
@@ -120,7 +120,7 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, 
                                                      const fmpz * diag, long n)
 
-    Sets \emph{mat} to a random permutation of the rows and columns of a
+    Sets \code{mat} to a random permutation of the rows and columns of a
     given diagonal matrix. The diagonal matrix is specified in the form of
     an array of the n initial entries on the main diagonal.
 
@@ -130,12 +130,12 @@ int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
 void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank, 
                                                               mp_bitcnt_t bits)
 
-    Sets \emph{mat} to a random sparse matrix with the given rank, 
-    having exactly as many nonzero elements as the rank, with the 
+    Sets \code{mat} to a random sparse matrix with the given rank, 
+    having exactly as many non-zero elements as the rank, with the 
     nonzero elements being random integers of the given bit size.
 
     The matrix can be transformed into a dense matrix with unchanged
-    rank by subsequently calling \code{fmpz_mat_randops}.
+    rank by subsequently calling \code{fmpz_mat_randops()}.
 
 void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
@@ -147,14 +147,14 @@ void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     \code{fmpz_mat_randrank()} can be used.
 
     The matrix can be transformed into a dense matrix with unchanged
-    determinant by subsequently calling \code{fmpz_mat_randops}.
+    determinant by subsequently calling \code{fmpz_mat_randops()}.
 
 void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
 
     Randomises \code{mat} by performing elementary row or column operations.
     More precisely, at most \code{count} random additions or subtractions of
     distinct rows and columns will be performed. This leaves the rank
-    (and for square matrices, determinant) unchanged.
+    (and for square matrices, the determinant) unchanged.
 
 *******************************************************************************
 
@@ -215,7 +215,7 @@ int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 
 int fmpz_mat_print(const fmpz_mat_t mat)
 
-    Prints the given matrix to the stream \code{file}.  For further 
+    Prints the given matrix to the stream \code{stdout}.  For further 
     details, see \code{fmpz_mat_fprint()}.
 
 int fmpz_mat_print_pretty(const fmpz_mat_t mat)
@@ -231,8 +231,8 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
-    Returns nonzero if \code{mat1} and \code{mat2} have the same 
-    dimensions and entries, and zero otherwise.
+    Returns a non-zero value if \code{mat1} and \code{mat2} have 
+    the same dimensions and entries, and zero otherwise.
 
 *******************************************************************************
 

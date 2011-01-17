@@ -238,7 +238,7 @@
 \lstset{breakatwhitespace=true}
 \lstset{keywordstyle=}
 \lstset{morekeywords={mpz_t, mpq_t, mpz_poly_t, fmpz, fmpz_t, fmpz_poly_t}}
-\lstset{escapechar=\%}
+\lstset{escapechar=}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 % FLINT specific commands %
@@ -283,8 +283,8 @@ the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
 Johannson, Andy Novocin and David Harvey (no longer active).
 
 FLINT 2 and following should compile on any machine with GCC and a standard 
-GNU toolchain, however it is specially optimized for x86 (32 and 64 bit)
-machines. As of version 2.0 FLINT required GCC version 2.96 or later, 
+GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
+machines. As of version 2.0, FLINT required GCC version 2.96 or later, 
 MPIR 2.1.1 or later and MPFR 3.0.0 or later.
 
 FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
@@ -311,15 +311,17 @@ In the case that a library is installed in say \code{/usr/local}
 in the \code{lib} and \code{include} directories as usual, simply
 specify the top level location, e.g. \code{/usr/local} when 
 configuring FLINT. If a library is built in its source tree,
-specify the top level source directory (e.g. \code{/home/user1/mpir/}.
+specify the top level source directory, e.g. \code{/home/user1/mpir/}.
 
 To specify the directories where the libraries reside, you must
-pass the directories as parameters to FLINT's configure, e.g.
-\code{./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/}.
+pass the directories as parameters to FLINT's configure, e.g.\ 
+\begin{lstlisting}[language=bash]
+./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/
+\end{lstlisting}
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr/local}.
 
-If you intend to install the FLINT library and \code{.h} files, 
+If you intend to install the FLINT library and header files, 
 you can specify where they should be placed by passing 
 \code{--prefix=path} to configure, where \code{path} is the directory
 under which the \code{lib} and \code{include} directories exist into
@@ -389,8 +391,9 @@ The maintainer wishes to be made aware of any and all bugs.  Please send an
 email with your bug report to \url{hart_wb@yahoo.com} or report them on the
 FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
 
-If possible please include details of your system, version of GCC, version 
-of MPIR and MPFR and precise details of how to replicate the bug.
+If possible please include details of your system, the version of GCC, 
+the versions of MPIR and MPFR as well as precise details of how to 
+replicate the bug.
 
 Note that FLINT needs to be linked against version 2.1.1 or later of MPIR,
 version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
@@ -444,11 +447,11 @@ number of bits per limb on the machine.  FLINT requires it to be either
 32 or 64 bits.  Other architectures are not currently supported.
 
 The macro constant \code{FLINT_D_BITS} is set at compile time to be the 
-number of bits per double on the machine or the number of bits per limb, 
-whichever is smaller.  This will have the value 53 or 31 on currently 
-supported architectures.  Numerous internal functions using precomputed 
-inverses only support operands up to \code{FLINT_D_BITS} bits, hence the
-macro.
+number of bits per double on the machine or one less than the number of 
+bits per limb, whichever is smaller.  This will have the value 53 or 31 
+on currently supported architectures.  Numerous internal functions using 
+precomputed inverses only support operands up to \code{FLINT_D_BITS} bits, 
+hence the macro.
 
 The macro \code{FLINT_ABS(x)} returns the absolute value of \code{x}
 for primitive signed numerical types.  It might fail for least negative 
@@ -463,7 +466,8 @@ Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the
 maximum of \code{x} and \code{y}.
 
 The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits 
-required to represent an \code{unsigned long x}.
+required to represent an \code{unsigned long x}.  If \code{x} is zero, 
+returns~$0$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
@@ -572,7 +576,7 @@ The \code{fmpz_mat_t} data type represents dense matrices of multiprecision
 integers, implemented using \code{fmpz} vectors.
 
 No automatic resizing is performed: in general, the user must provide
-matrices of correct size for both input and output variables. Output
+matrices of correct dimensions for both input and output variables. Output
 variables are \emph{not} allowed to be aliased with input variables unless
 otherwise noted.
 
@@ -582,12 +586,12 @@ index $0,1,\ldots,n-1$. One or both of $m$ and $n$ may be zero.
 
 Elements of a matrix can be read or written using the \code{fmpz_mat_entry}
 macro, which returns a reference to the entry at a given row and column index.
-This reference can be passed as an input or output $fmpz_t$ variable to any
-function in the \code{fmpz} module for direct manipulation.
+This reference can be passed as an input or output \code{fmpz_t} variable to 
+any function in the \code{fmpz} module for direct manipulation.
 
 \section{Simple example}
 The following example creates the $2 \times 2$ matrix $A$ with
-value $2i+j$ at row $i$ and column $j$, computes $B = A^2$,
+value $2i+j$ at row~$i$ and column~$j$, computes $B = A^2$,
 and prints both matrices.
 
 \begin{lstlisting}[language=c]
@@ -839,12 +843,33 @@ combinatorial special number sequences and polynomials.
 \input{input/long_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% longlong.h                                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{longlong.h}
+\epigraph{$64$-bit arithmetic}
+
+\input{input/longlong.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% profiler                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mpn_extras                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{mpn\_extras}
 
 \input{input/mpn_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% profiler                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{profiler}
+
+\input{input/profiler.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % BACKMATTER                                                                  %
