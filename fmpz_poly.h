@@ -551,6 +551,13 @@ void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
 /*  Evaluation  **************************************************************/
 
+void 
+_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, long len, 
+                                                const fmpz_t a);
+
+void fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly, 
+                                        const fmpz_t a);
+
 void _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len, 
                                                                const fmpz_t a);
 
@@ -579,6 +586,14 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
                                  mp_limb_t n);
+
+void 
+_fmpz_poly_evaluate_divconquer(fmpz * res, const fmpz * poly, long len, 
+                               const fmpz_t x);
+
+void 
+fmpz_poly_evaluate_divconquer(fmpz_t res, 
+                              const fmpz_poly_t poly, const fmpz_t x);
 
 /*  Composition  *************************************************************/
 

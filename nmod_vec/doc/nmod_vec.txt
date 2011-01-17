@@ -138,8 +138,8 @@ void _nmod_vec_zero(mp_ptr vec, long len)
 
 void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
 
-   Swap the vectors \code{a} and \code{b} of length $n$ by actually
-   swapping the entries.
+    Swap the vectors \code{a} and \code{b} of length $n$ by actually
+    swapping the entries.
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 

@@ -444,7 +444,7 @@ void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1,
 *******************************************************************************
 
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
-                                    long len, mp_bitcnt_t bit_size, int negate)   
+                                    long len, mp_bitcnt_t bit_size, int negate)
 
     Packs the coefficients of poly into bitfields of the given 
     \code{bit_size}, negating the coefficients before packing 
@@ -1353,6 +1353,23 @@ void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
     Evaluation
 
 *******************************************************************************
+
+void _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, 
+                                   const fmpz * poly, long len, const fmpz_t a)
+
+    Evaluates the polynomial \code{(poly, len)} at the integer~$a$ using 
+    a divide and conquer approach.  Assumes that the length of the polynomial 
+    is at least one.  Allows zero padding.  Does not allow aliasing between 
+    \code{res} and \code{x}.
+
+void fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly, 
+                                        const fmpz_t a)
+
+    Evaluates the polynomial \code{poly} at the integer $a$ using a divide 
+    and conquer approach.
+
+    Aliasing between \code{res} and \code{a} is supported, however, 
+    \code{res} may not be part of \code{poly}.
 
 void _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len, 
                                 const fmpz_t a)

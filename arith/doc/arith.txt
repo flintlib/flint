@@ -107,9 +107,7 @@ void fmpz_stirling2(fmpz_t s, long n, long k)
     matrix versions should generally be used.
 
 void fmpz_stirling1u_vec(fmpz * row, long n, long klen)
-
 void fmpz_stirling1_vec(fmpz * row, long n, long klen)
-
 void fmpz_stirling2_vec(fmpz * row, long n, long klen)
 
     Computes the row of Stirling numbers
@@ -119,9 +117,7 @@ void fmpz_stirling2_vec(fmpz * row, long n, long klen)
     \code{klen = n+1}. It is assumed that \code{klen} is at most $n + 1$.
 
 void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
-
 void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
-
 void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 
     Given the vector \code{prev} containing a row of Stirling numbers
@@ -156,12 +152,11 @@ void fmpz_stirling2_mat(fmpz ** rows, long n)
     For any $n$, the $S_1$ and $S_2$ matrices thus obtained are 
     inverses of each other.
 
-
 void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
 
-    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$
+    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
     using a generating function. This algorithm is fast for very
-    large $n$ (e.g. $n > 2000$).
+    large $n$, say $n > 2000$.
 
     Conceptually, the algorithm consists of calculating the scaled
     Bernoulli numbers $c_k = B_k / k!$ using the generating function
@@ -181,29 +176,29 @@ void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
 
 void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
 
-    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$
+    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
     using table lookup for the initial numbers with single-limb numerators,
     and then using a recursive formula expressing $B_m$ as a sum over
-    $B_k$ for $k$ congruent to $m$ modulo 6.[1]
+    $B_k$ for $k$ congruent to $m$ modulo 6.
 
     All operations are performed using integer arithmetic to avoid costly GCDs,
-    making this algorithm fast for small $n$ (e.g. $n < 1000$). The fully
+    making this algorithm fast for small $n$, say $n < 1000$. The fully
     reduced denominator is calculated immediately as the primorial of $n + 1$.
 
-    %[1] http://en.wikipedia.org/w/index.php?title=Bernoulli_number&oldid=405938876
+    %[1] http://en.wikipedia.org/w/index.php?
+    %    title=Bernoulli_number&oldid=405938876
 
 void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n)
 
-    Computes the Bernoulli numbers $B_0, B_1, \ldots, B_{n-1}$ for $n \ge 0$
+    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$ for $n \geq 0$
     as a vector of integer numerators \code{num} with a common
     denominator \code{den}. The denominator is reduced to lowest terms.
 
 void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
 
-    For $n \ge 0$, sets \code{poly} to the Bernoulli polynomial of degree $n$,
-    $B_n(x) = \sum_{k=0}^n {n \choose k} B_k x^{n-k}$ where $B_k$
+    For $n \geq 0$, sets \code{poly} to the Bernoulli polynomial of degree $n$,
+    $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
     is a Bernoulli number.
-
 
 *******************************************************************************
 
@@ -256,17 +251,18 @@ void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
 
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
 
-    Set \code{res} to the polynomial with coefficients 
+    Sets \code{res} to the polynomial with coefficients 
     $\tau(0),\tau(1), \dotsc, \tau(n-1)$, giving the initial $n$ terms 
     in the series expansion of 
     $f(q) = q \prod_{k \geq 1} \bigl(1-q^k\bigr)^{24}$.
 
     The algorithm is borrowed from the \code{delta_qexp()} function in 
     Sage, written by William Stein and David Harvey, and consists of 
-    expanding the series of the equivalent representation
-    \[
-        f(q) = q  \Biggl( \sum_{k \geq 0} (-1)^k (2k+1) q^{k(k+1)/2} \Biggr)^8.
-    \]
+    expanding the series of the equivalent representation 
+    \begin{equation*}
+    f(q) = q  \Biggl( \sum_{k \geq 0} (-1)^k (2k+1) q^{k(k+1)/2} \Biggr)^8.
+    \end{equation*}
+
     The first squaring is done directly since the polynomial is very 
     sparse at this point.
 
