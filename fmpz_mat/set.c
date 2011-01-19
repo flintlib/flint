@@ -35,9 +35,12 @@ fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {
+        long i;
+
         FMPZ_MAT_ASSERT(mat1->r == mat2->r && mat1->c == mat2->c,
             "fmpz_mat_set: incompatible dimensions");
 
-        _fmpz_vec_set(mat1->entries, mat2->entries, mat2->r * mat2->c);
+        for (i = 0; i < mat2->r; i++)
+            _fmpz_vec_set(mat1->rows[i], mat2->rows[i], mat2->c);
     }
 }
