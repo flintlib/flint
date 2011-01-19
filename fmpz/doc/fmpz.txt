@@ -416,6 +416,12 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
     \code{unsigned long}.  If $x$ is $0$ an exception will result.
 
+ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
+
+    Returns the remainder of $g$ modulo $x$ where $x$ is an 
+    \code{unsigned long}, without changing $g$.  If $x$ is $0$ an
+    exception will result.
+
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g^x$ where $x$ is an \code{unsigned long}.  If 

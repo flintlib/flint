@@ -221,6 +221,8 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
+ulong fmpz_fdiv_ui(const fmpz_t g, ulong h);
+
 ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);

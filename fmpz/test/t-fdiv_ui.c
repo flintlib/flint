@@ -30,10 +30,49 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-ulong
-fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
+int
+main(void)
 {
-    h = fmpz_fdiv_ui(g, h);
-    fmpz_set_ui(f, h);
-    return h;
+    int i, result;
+    flint_rand_t state;
+
+    printf("fdiv_ui....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        mpz_t b;
+        ulong x, r1, r2;
+
+        fmpz_init(a);
+        mpz_init(b);
+
+        fmpz_randtest(a, state, 200);
+
+        fmpz_get_mpz(b, a);
+        x = n_randtest_not_zero(state);
+
+        r1 = fmpz_fdiv_ui(a, x);
+        r2 = mpz_fdiv_ui(b, x);
+
+        result = (r1 == r2);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf
+                ("b = %Zd, x = %lu, r1 = %lu, r2 = %lu\n", b, x, r1, r2);
+            abort();
+        }
+
+        fmpz_clear(a);
+        mpz_clear(b);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
