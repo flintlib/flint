@@ -36,16 +36,30 @@ _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
     ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
 {
     mp_limb_t r1mod, s;
+    fmpz_t r1normal;
     fmpz_t tmp;
-    fmpz_t tmp2;
 
     fmpz_init(tmp);
 
-    r1mod = fmpz_fdiv_ui(r1, m2); 
+    /* FIXME: assume r1 moved to [0, m1); add tests for this */
+    if (fmpz_sgn(r1) < 0)
+    {
+        fmpz_init(r1normal);
+        fmpz_add(r1normal, r1, m1);
+    }
+    else
+    {
+        *r1normal = *r1;
+    }
+
+    r1mod = fmpz_fdiv_ui(r1normal, m2);
     s = n_submod(r2, r1mod, m2);
     s = n_mulmod2_preinv(s, c, m2, m2inv);
     fmpz_mul_ui(tmp, m1, s);
-    fmpz_add(tmp, tmp, r1);
+    fmpz_add(tmp, tmp, r1normal);
+
+    if (fmpz_sgn(r1) < 0)
+        fmpz_clear(r1normal);
 
     if (sign)
     {
