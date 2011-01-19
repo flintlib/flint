@@ -1,0 +1,860 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   This file is part of FLINT.
+%
+%   FLINT is free software; you can redistribute it and/or modify
+%   it under the terms of the GNU General Public License as published by
+%   the Free Software Foundation; either version 2 of the License, or
+%   (at your option) any later version.
+%
+%   FLINT is distributed in the hope that it will be useful,
+%   but WITHOUT ANY WARRANTY; without even the implied warranty of
+%   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+%   GNU General Public License for more details.
+%
+%   You should have received a copy of the GNU General Public License
+%   along with FLINT; if not, write to the Free Software
+%   Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Copyright (C) 2007 William Hart, David Harvey
+%   Copyright (C) 2010 Sebastian Pancratz
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[a4paper,10pt]{book}
+
+%%%%%%%%%%%%
+% geometry %
+%%%%%%%%%%%%
+
+\usepackage[hmargin=3.8cm,vmargin=3cm,a4paper,centering,twoside]{geometry}
+\setlength{\headheight}{14pt}
+
+% Dutch style of paragraph formatting, i.e. no indents
+\setlength{\parskip}{1.3ex plus 0.2ex minus 0.2ex}
+\setlength{\parindent}{0pt}
+
+%%%%%%%%%%%%%%%%%%
+% Other packages %
+%%%%%%%%%%%%%%%%%%
+
+\usepackage{amsmath,amsthm,amscd,amsfonts,amssymb}
+\usepackage{cases}
+\usepackage[all]{xy}
+
+\usepackage{ifpdf}
+\usepackage{paralist}
+\usepackage{fancyhdr}
+\usepackage{sectsty}
+\usepackage{epigraph}
+\usepackage{natbib}
+\usepackage{url}
+\usepackage[T1]{fontenc}
+\usepackage{ae,aecompl}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{verbatim}
+\usepackage{listings}
+
+%%%%%%%%%%%%
+% hyperref %
+%%%%%%%%%%%%
+
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,    % false: boxed links; true: colored links
+    citecolor=green,    % color of links to bibliography
+    filecolor=red,      % color of file links
+    linkcolor=blue,     % color of internal links
+    urlcolor=blue       % color of external links
+}
+
+\makeatletter
+\newcommand\org@hypertarget{}
+\let\org@hypertarget\hypertarget
+\renewcommand\hypertarget[2]{%
+    \Hy@raisedlink{\org@hypertarget{#1}{}}#2%
+} 
+\makeatother
+
+\ifpdf
+    \hypersetup{
+        pdftitle={FLINT},
+        pdfauthor={},
+        pdfsubject={Computational mathematics},
+        bookmarks=true,
+        bookmarksnumbered=true,
+        unicode=true,
+        pdfstartview={FitH},
+        pdfpagemode={UseOutlines}
+    }
+\fi
+
+%%%%%%%%%%
+% natbib %
+%%%%%%%%%%
+
+\bibpunct{[}{]}{,}{n}{}{}
+
+\renewcommand{\bibname}{References}
+
+%%%%%%%%%%%
+% sectsty %
+%%%%%%%%%%%
+
+\allsectionsfont{\nohang\centering}
+
+\sectionfont{\nohang\centering\large}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+\begin{center}
+\bfseries\Huge\S \thechapter.\ #1
+\end{center}
+\vspace*{40 pt}}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%
+% Table of contents %
+%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{tocloft}
+
+\addtolength{\cftsecnumwidth}{0.8em}
+\addtolength{\cftbeforesecskip}{0.05em}
+
+%%%%%%%%%%%%
+% fancyhdr %
+%%%%%%%%%%%%
+
+\newcommand\nouppercase[1]{{%
+    \let\uppercase\relax
+    \let\MakeUppercase\relax
+    \expandafter\let\csname MakeUppercase \endcsname\relax#1}%
+}
+
+\pagestyle{fancyplain}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhf{}
+\fancyhead[LE,RO]{\bfseries\thepage}
+\fancyhead[LO]{\itshape\nouppercase{\rightmark}}
+\fancyhead[RE]{\itshape\nouppercase{\leftmark}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\fancypagestyle{plain}{%
+  \fancyhead{}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+\makeatletter
+\def\cleardoublepage{\clearpage\if@twoside \ifodd\c@page\else
+    \hbox{}
+    \thispagestyle{plain}
+    \newpage
+    \if@twocolumn\hbox{}\newpage\fi\fi\fi}
+\makeatother \clearpage{\pagestyle{plain}\cleardoublepage}
+
+%%%%%%%
+% url %
+%%%%%%%
+
+\makeatletter
+\def\url@leostyle{%
+  \@ifundefined{selectfont}{\def\UrlFont{\sf}}{\def\UrlFont{\small\ttfamily}}}
+\makeatother
+\urlstyle{leostyle}
+
+%%%%%%%%%%%%%%%%
+% Enumerations %
+%%%%%%%%%%%%%%%%
+
+\setlength{\pltopsep}{0.24em}
+\setlength{\plpartopsep}{0em}
+\setlength{\plitemsep}{0.24em}
+
+% This should do what we want
+%   \setdefaultenum{(i)}{(a)}{1.}{A}
+% but it does not work for references, dropping the 
+% parentheses.  The following hack does work.
+
+\renewcommand{\theenumi}{(\roman{enumi})}
+\renewcommand{\theenumii}{(\alph{enumii})}
+\renewcommand{\theenumiii}{\arabic{enumiii}.}
+\renewcommand{\theenumiv}{\Alph{enumiv}}
+
+\renewcommand{\labelenumi}{\theenumi}
+\renewcommand{\labelenumii}{\theenumii}
+\renewcommand{\labelenumiii}{\theenumiii}
+\renewcommand{\labelenumiv}{\theenumiv}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+% Mathematical commands %
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\renewcommand{\to}{\rightarrow}%         Right arrow
+\newcommand{\into}{\hookrightarrow}%     Injection arrow
+\newcommand{\onto}{\twoheadrightarrow}%  Surjection arrow
+
+\providecommand{\abs}[1]{\lvert#1\rvert}%                  Absolute value
+\providecommand{\absbig}[1]{\bigl\lvert#1\bigr\rvert}%     Absolute value
+\providecommand{\absBig}[1]{\Bigl\lvert#1\Bigr\rvert}%     Absolute value
+\providecommand{\absbigg}[1]{\biggl\lvert#1\biggr\rvert}%  Absolute value
+
+\providecommand{\norm}[1]{\lVert#1\rVert}%               Norm
+\providecommand{\normbig}[1]{\bigl\lVert#1\bigr\rVert}%  Norm
+\providecommand{\normBig}[1]{\Bigl\lVert#1\Bigr\rVert}%  Norm
+
+\providecommand{\floor}[1]{\left\lfloor#1\right\rfloor}%    Floor
+\providecommand{\floorbig}[1]{\bigl\lfloor#1\bigr\rfloor}%  Floor
+\providecommand{\floorBig}[1]{\Bigl\lfloor#1\Bigr\rfloor}%  Floor
+
+\providecommand{\ceil}[1]{\left\lceil#1\right\rceil}%    Ceiling
+\providecommand{\ceilbig}[1]{\bigl\lceil#1\bigr\rceil}%  Ceiling
+\providecommand{\ceilBig}[1]{\Bigl\lceil#1\Bigr\rceil}%  Ceiling
+
+\newcommand{\N}{\mathbf{N}}%  Natural numbers
+\newcommand{\Z}{\mathbf{Z}}%  Integers
+\newcommand{\Q}{\mathbf{Q}}%  Rationals
+
+\DeclareMathOperator{\sgn}{sgn}
+
+\allowdisplaybreaks[4]
+%\numberwithin{equation}{section}
+
+%%%%%%%%%%%%
+% listings %
+%%%%%%%%%%%%
+
+\lstset{language=c}
+\lstset{basicstyle=\ttfamily}
+\lstset{breaklines=true}
+\lstset{breakatwhitespace=true}
+\lstset{keywordstyle=}
+\lstset{morekeywords={mpz_t, mpq_t, mpz_poly_t, fmpz, fmpz_t, fmpz_poly_t}}
+\lstset{escapechar=\%}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FLINT specific commands %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\newcommand{\code}{\lstinline}
+
+\DeclareMathOperator{\len}{len}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% DOCUMENT                                                                    %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% FRONTMATTER                                                                 %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\frontmatter
+
+\input{input/title.tex}
+\clearpage
+
+\tableofcontents
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% MAINMATTER                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\mainmatter
+
+\chapter{Introduction}
+
+FLINT is a C library of functions for doing number theory. It is highly 
+optimised and can be compiled on numerous platforms.  FLINT also has the 
+aim of providing support for multicore and multiprocessor computer 
+architectures, though we do not yet provide this facility.
+
+FLINT is currently maintained by William Hart of Warwick University in 
+the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
+Johannson, Andy Novocin and David Harvey (no longer active).
+
+FLINT 2 and following should compile on any machine with GCC and a standard 
+GNU toolchain, however it is specially optimized for x86 (32 and 64 bit)
+machines. As of version 2.0 FLINT required GCC version 2.96 or later, 
+MPIR 2.1.1 or later and MPFR 3.0.0 or later.
+
+FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
+each of which can be linked to a C program making use of their functionality.
+
+All of the functions in FLINT have a corresponding test function provided 
+in an appropriately named test file.  For example, the function 
+\code{fmpz_poly_add} located in \code{fmpz_poly/add.c} has test code in the 
+file \code{fmpz_poly/test/t-add.c}.
+
+\chapter{Building and using FLINT}
+
+The easiest way to use FLINT is to build a shared library.  Simply download 
+the FLINT tarball and untar it on your system.
+
+FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later.
+
+To configure FLINT you must specify where MPIR and MPFR are on
+your system. FLINT can work with the libraries installed as usual,
+e.g. in \code{/usr/local} or it can work with the libraries built
+from source in their standard source trees. 
+
+In the case that a library is installed in say \code{/usr/local}
+in the \code{lib} and \code{include} directories as usual, simply
+specify the top level location, e.g. \code{/usr/local} when 
+configuring FLINT. If a library is built in its source tree,
+specify the top level source directory (e.g. \code{/home/user1/mpir/}.
+
+To specify the directories where the libraries reside, you must
+pass the directories as parameters to FLINT's configure, e.g.
+\code{./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/}.
+If no directories are specified, FLINT assumes it will find the
+libraries it needs in \code{/usr/local}.
+
+If you intend to install the FLINT library and \code{.h} files, 
+you can specify where they should be placed by passing 
+\code{--prefix=path} to configure, where \code{path} is the directory
+under which the \code{lib} and \code{include} directories exist into
+which you wish to place the FLINT files when it is installed.
+
+Once FLINT is configured, in the main directory of the FLINT directory 
+tree simply type:
+\begin{lstlisting}[language=bash]
+make
+make check
+\end{lstlisting}
+
+If you wish to install FLINT, simply type:
+\begin{lstlisting}[language=bash]
+make install
+\end{lstlisting}
+
+Now to use FLINT, simply include the appropriate header files for 
+the FLINT modules you wish to use in your C program.  Then compile 
+your program, linking against the FLINT library and MPIR and MPFR 
+with the options \code{-lflint -lmpfr -lgmp}.
+
+Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
+for your system to let the linker know where to find these libraries.
+Please refer to your system documentation for how to do this.
+
+The FLINT make system responds to the standard commands
+\begin{lstlisting}[language=bash]
+make 
+make library
+make check
+make clean
+make distclean
+make install
+\end{lstlisting}
+
+In addition, if you wish to simply check a single module of FLINT you
+can pass the option \code{MOD=modname} to \code{make check}. You can 
+also pass a list of module names in inverted commas, e.g:
+
+\begin{lstlisting}[language=bash]
+make check MOD=ulong_extras
+\end{lstlisting}
+
+If your system supports parallel builds, FLINT will build in parallel,
+e.g:
+\begin{lstlisting}[language=bash]
+make -j4 check 
+\end{lstlisting}
+
+\chapter{Test code}
+
+Each module of FLINT has an extensive associated test module.  We 
+strongly recommend running the test programs before relying on results 
+from FLINT on your system. 
+
+To make and run the test programs, simply type:
+\begin{lstlisting}[language=bash]
+make check
+\end{lstlisting}
+
+in the main FLINT directory after configuring FLINT.
+
+\chapter{Reporting bugs}
+
+The maintainer wishes to be made aware of any and all bugs.  Please send an 
+email with your bug report to \url{hart_wb@yahoo.com} or report them on the
+FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
+
+If possible please include details of your system, version of GCC, version 
+of MPIR and MPFR and precise details of how to replicate the bug.
+
+Note that FLINT needs to be linked against version 2.1.1 or later of MPIR,
+version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
+or later.  
+
+\chapter{Contributors}
+
+FLINT has been developed since 2007 by a large numnber of people. Initially
+the library was started by David Harvey and William Hart. Later maintenance
+of the library was taken over solely by William Hart.
+
+The main authors of FLINT to date have been William Hart, David Harvey (no
+longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
+
+Other significant contributions to FLINT have been made by Jason Papadopoulos,
+Gonzalo Tornaria, David Howden, Burcin Erocal, Tom Boothby, Daniel Woodhouse, 
+Tomasz Lechowski, Richard Howell-Peak and Peter Shrimpton.
+
+Additional research was contributed by Daniel Scott and Daniel Ellam.
+
+Further patches and bug reports have been made by Michael Abshoff, Didier 
+Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
+Kedlaya, William Stein, Robert Bradshaw and many others.
+
+Some code (longlong.h and clz_tab.c) has been used from the GMP library, 
+whose main author is Torbjorn Granlund.
+
+FLINT 2 was a complete rewrite from scratch which began in about 2010.
+ 
+\chapter{Example programs}
+
+FLINT comes with example programs to demonstrate current and future FLINT 
+features.  To build the example programs, type:
+
+\begin{lstlisting}[language=bash]
+make examples
+\end{lstlisting}
+
+The current example programs are:
+
+\code{delta_qexp}  Computes the first $n$ terms of the delta function, e.g.\ 
+\code{delta_qexp 1000000} will compute the first one million terms of the 
+$q$-expansion of delta.
+
+\chapter{FLINT macros}
+
+The file \code{flint.h} contains various useful macros.
+
+The macro constant \code{FLINT_BITS} is set at compile time to be the 
+number of bits per limb on the machine.  FLINT requires it to be either 
+32 or 64 bits.  Other architectures are not currently supported.
+
+The macro constant \code{FLINT_D_BITS} is set at compile time to be the 
+number of bits per double on the machine or the number of bits per limb, 
+whichever is smaller.  This will have the value 53 or 31 on currently 
+supported architectures.  Numerous internal functions using precomputed 
+inverses only support operands up to \code{FLINT_D_BITS} bits, hence the
+macro.
+
+The macro \code{FLINT_ABS(x)} returns the absolute value of \code{x}
+for primitive signed numerical types.  It might fail for least negative 
+values such as \code{INT_MIN} and \code{LONG_MIN}.
+
+The macro \code{FLINT_MIN(x, y)} returns the minimum of \code{x} and 
+\code{y} for primitive signed or unsigned numerical types.  This macro 
+is only safe to use when \code{x} and \code{y} are of the same type, 
+to avoid problems with integer promotion.
+
+Similar to the previous macro, \code{FLINT_MAX(x, y)} returns the 
+maximum of \code{x} and \code{y}.
+
+The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits 
+required to represent an \code{unsigned long x}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integers                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz}
+\epigraph{Arbitrary precision integers}{}
+
+\section{Introduction}
+
+By default, an \code{fmpz_t} is implemented as an array of \code{fmpz}'s of 
+length one to allow passing by reference as one can do with GMP/ MPIR's 
+\code{mpz_t} type.  The \code{fmpz_t} type is simply a single limb, though 
+the user does not need to be aware of this except in one specific case 
+outlined below.
+
+In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's 
+\code{mpz_t}'s, with automatic memory management, however, in the first 
+place only one limb is used to implement them.  Once an \code{fmpz_t} 
+overflows a limb then a multiprecision integer is automatically allocated 
+and instead of storing the actual integer data the \code{long} which 
+implements the type becomes an index into a FLINT wide array of 
+\code{mpz_t}'s.
+
+These internal implementation details are not important for the user to 
+understand, except for three important things.
+
+Firstly, \code{fmpz_t}'s will be more efficient than \code{mpz_t}'s for 
+single limb operations, or more precisely for signed quantities whose 
+absolute value does not exceed \code{FLINT_BITS - 2} bits.
+
+Secondly, for small integers that fit into \code{FLINT_BITS - 2} bits 
+much less memory will be used than for an \code{mpz_t}.  When very many 
+\code{fmpz_t}'s are used, there can be important cache benefits on 
+account of this.
+
+Thirdly, it is important to understand how to deal with arrays of 
+\code{fmpz_t}'s.  As for \code{mpz_t}'s, there is an underlying type, 
+an \code{fmpz}, which can be used to create the array, e.g.\ 
+\begin{lstlisting}
+fmpz myarr[100];
+\end{lstlisting}
+Now recall that an \code{fmpz_t} is an array of length one of \code{fmpz}'s.
+Thus, a pointer to an \code{fmpz} can be used in place of an \code{fmpz_t}.
+For example, to find the sign of the third integer in our array we would 
+write 
+\begin{lstlisting}
+int sign = fmpz_sgn(myarr + 2);
+\end{lstlisting}
+
+The \code{fmpz} module provides routines for memory management, basic 
+manipulation and basic arithmetic.
+
+Unless otherwise specified, all functions in this section permit aliasing 
+between their input arguments and between their input and output 
+arguments.
+
+\section{Simple example}
+
+The following example computes the square of the integer $7$ and prints 
+the result.
+\begin{lstlisting}[language=c]
+#include "fmpz.h"
+...
+fmpz_t x, y;
+fmpz_init(x);
+fmpz_init(y);
+fmpz_set_ui(x, 7);
+fmpz_mul(y, x, x);
+fmpz_print(x);
+printf("^2 = ");
+fmpz_print(y);
+printf("\n");
+fmpz_clear(x);
+fmpz_clear(y);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+7^2 = 49
+\end{lstlisting}
+
+We now describe the functions available in the \code{fmpz} module.
+
+\input{input/fmpz.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integer vectors                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_vec}
+\epigraph{Vectors over $\Z$}{}
+
+\input{input/fmpz_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integer matrices                                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_mat}
+\epigraph{Matrices over $\Z$}{}
+
+\section{Introduction}
+
+The \code{fmpz_mat_t} data type represents dense matrices of multiprecision
+integers, implemented using \code{fmpz} vectors.
+
+No automatic resizing is performed: in general, the user must provide
+matrices of correct size for both input and output variables. Output
+variables are \emph{not} allowed to be aliased with input variables unless
+otherwise noted.
+
+Matrices are indexed from zero: an $m \times n$ matrix
+has rows of index $0,1,\ldots,m-1$ and columns of
+index $0,1,\ldots,n-1$. One or both of $m$ and $n$ may be zero.
+
+Elements of a matrix can be read or written using the \code{fmpz_mat_entry}
+macro, which returns a reference to the entry at a given row and column index.
+This reference can be passed as an input or output $fmpz_t$ variable to any
+function in the \code{fmpz} module for direct manipulation.
+
+\section{Simple example}
+The following example creates the $2 \times 2$ matrix $A$ with
+value $2i+j$ at row $i$ and column $j$, computes $B = A^2$,
+and prints both matrices.
+
+\begin{lstlisting}[language=c]
+#include "fmpz.h"
+#include "fmpz_mat.h"
+...
+long i, j;
+fmpz_mat_t A;
+fmpz_mat_t B;
+fmpz_mat_init(A, 2, 2);
+fmpz_mat_init(B, 2, 2);
+for (i = 0; i < 2; i++)
+    for (j = 0; j < 2; j++)
+        fmpz_set_ui(fmpz_mat_entry(A, i, j), 2*i+j);
+fmpz_mat_mul(B, A, A);
+printf("A = \n");
+fmpz_mat_print_pretty(A);
+printf("A^2 = \n");
+fmpz_mat_print_pretty(B);
+fmpz_mat_clear(A);
+fmpz_mat_clear(B);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+A = 
+[[0 1]
+[2 3]]
+A^2 = 
+[[2 3]
+[6 11]]
+det(A) = -2
+det(A^2) = 4
+
+\end{lstlisting}
+
+
+\input{input/fmpz_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integer polynomials                                                          %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_poly}
+\epigraph{Polynomials over $\Z$}{}
+
+\section{Introduction}
+
+The \code{fmpz_poly_t} data type represents elements of $\Z[x]$. The 
+\code{fmpz_poly} module provides routines for memory management, basic 
+arithmetic, and conversions from or to other types.
+
+Each coefficient of an \code{fmpz_poly_t} is an integer of the FLINT 
+\code{fmpz_t} type.  There are two advantages of this model.  Firstly, 
+the \code{fmpz_t} type is memory managed, so the user can manipulate 
+individual coefficients of a polynomial without having to deal with 
+tedious memory management.  Secondly, a coefficient of an 
+\code{fmpz_poly_t} can be changed without changing the size of any 
+of the other coefficients.
+
+Unless otherwise specified, all functions in this section permit aliasing 
+between their input arguments and between their input and output arguments.
+
+\section{Simple example}
+
+The following example computes the square of the polynomial $5x^3 - 1$.
+\begin{lstlisting}[language=c]
+#include "fmpz_poly.h"
+...
+fmpz_poly_t x, y;
+fmpz_poly_init(x);
+fmpz_poly_init(y);
+fmpz_poly_set_coeff_ui(x, 3, 5);
+fmpz_poly_set_coeff_si(x, 0, -1);
+fmpz_poly_mul(y, x, x);
+fmpz_poly_print(x); printf("\n");
+fmpz_poly_print(y); printf("\n");
+fmpz_poly_clear(x);
+fmpz_poly_clear(y);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+4  -1 0 0 5
+7  1 0 0 -10 0 0 25
+\end{lstlisting}
+
+\section{Definition of the fmpz\_poly\_t type}
+
+The \code{fmpz_poly_t} type is a typedef for an array of length~1 of 
+\code{fmpz_poly_struct}'s.  This permits passing parameters of type 
+\code{fmpz_poly_t} by reference in a manner similar to the way GMP integers 
+of type \code{mpz_t} can be passed by reference. 
+
+In reality one never deals directly with the \code{struct} and simply deals 
+with objects of type \code{fmpz_poly_t}.  For simplicity we will think of an 
+\code{fmpz_poly_t} as a \code{struct}, though in practice to access fields 
+of this \code{struct}, one needs to dereference first, e.g.\ to access the 
+\code{length} field of an \code{fmpz_poly_t} called \code{poly1} one writes 
+\code{poly1->length}. 
+
+An \code{fmpz_poly_t} is said to be \emph{normalised} if either 
+\code{length} is zero, or if the leading coefficient of the polynomial is 
+non-zero.  All \code{fmpz_poly} functions expect their inputs to be 
+normalised, and unless otherwise specified they produce output that is 
+normalised. 
+
+It is recommended that users do not access the fields of an 
+\code{fmpz_poly_t} or its coefficient data directly, but make use of the 
+functions designed for this purpose, detailed below.
+
+Functions in \code{fmpz_poly} do all the memory management for the user. 
+One does not need to specify the maximum length or number of limbs per 
+coefficient in advance before using a polynomial object.  FLINT reallocates 
+space automatically as the computation proceeds, if more space is required. 
+Each coefficient is also managed separately, being resized as needed, 
+independently of the other coefficients.
+
+We now describe the functions available in \code{fmpz_poly}.
+
+\input{input/fmpz_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rational polynomials                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpq\_poly}
+\epigraph{Polynomials over $\Q$}{}
+
+\section{Introduction}
+
+The \code{fmpq_poly_t} data type represents elements of $\Q[x]$. The 
+\code{fmpq_poly} module provides routines for memory management, basic 
+arithmetic, and conversions from or to other types.
+
+A rational polynomial is stored as the quotient of an integer polynomial 
+and an integer denominator.  To be more precise, the coefficient vector 
+of the numerator can be accessed with the function \code{fmpq_poly_numref()} 
+and the denominator with \code{fmpq_poly_denref()}.  Although one can 
+construct use cases in which a representation as a list of rational 
+coefficients would be beneficial, the choice made here is typically 
+more efficient.
+
+We can obtain a unique representation based on this choice by enforcing, 
+for non-zero polynomials, that the numerator and denominator are coprime 
+and that the denominator is positive.  The unique representation of the 
+zero polynomial is chosen as $0/1$.
+
+Similar to the situation in the \code{fmpz_poly_t} case, an 
+\code{fmpq_poly_t} object also has a \code{length} parameter, which 
+denotes the length of the vector of coefficients of the numerator. 
+We say a polynomial is \emph{normalised} either if this length is zero 
+or if the leading coefficient is non-zero.
+
+We say a polynomial is in \emph{canonical} form if it is given in the 
+unique representation discussed above and normalised.
+
+The functions provided in this module roughly fall into two categories:
+
+On the one hand, there are functions mainly provided for the user, whose 
+names do not begin with an underscore.  These typically operate on 
+polynomials of type \code{fmpq_poly_t} in canonical form and, unless 
+specified otherwise, permit aliasing between their input arguments and 
+between their output arguments.
+
+On the other hand, there are versions of these functions whose names are 
+prefixed with a single underscore.  These typically operate on polynomials 
+given in the form of a triple of object of types \code{fmpz *}, 
+\code{fmpz_t}, and \code{long}, containing the numerator, denominator and 
+length, respectively.  In general, these functions expect their input to 
+be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
+terms, and they do not allow their input and output arguments to be aliased.
+
+\input{input/fmpq_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{nmod\_vec}
+\epigraph{Vectors over $\Z / n \Z$ for word-sized moduli}{}
+
+\input{input/nmod_vec.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{nmod\_poly}
+\epigraph{Polynomials over $\Z / n \Z$ for word-sized moduli}{}
+
+\input{input/nmod_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matrices over Z / nZ for word-sized moduli                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{nmod\_mat}
+\epigraph{Matrices over $\Z / n \Z$ for word-sized moduli}{}
+
+\section{Introduction}
+
+An \code{nmod_mat_t} represents a matrix of integers modulo $n$, for any 
+non-zero $n$ that fits in a single limb, up to $2^{32}-1$ or $2^{64}-1$. The
+implementation uses functions and data types of the \code{nmod_vec} module
+for low-level operations.
+
+One or both dimensions of a matrix may be zero.
+
+Except where otherwise noted, it is assumed all entries in input
+data are already reduced in the range $[0, n)$. It is also assumed that
+all arguments have the same modulus.
+
+Functions that require the modulus to be a prime number document this
+requirement explicitly.
+
+\input{input/nmod_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Arithmetic functions                                                         %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{arith}
+\epigraph{Arithmetic functions}{}
+
+\section{Introduction}
+
+This module implements arithmetic functions, number-theoretic and 
+combinatorial special number sequences and polynomials.
+
+\input{input/arith.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Unsigned single limb arithmetic                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{ulong\_extras}
+\epigraph{Unsigned single limb arithmetic}{}
+
+\input{input/ulong_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Signed single limb arithmetic                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{long\_extras}
+\epigraph{Signed single limb arithmetic}{}
+
+\input{input/long_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% mpn_extras                                                                   %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{mpn\_extras}
+
+\input{input/mpn_extras.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% BACKMATTER                                                                  %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\backmatter
+
+\phantomsection
+\addcontentsline{toc}{chapter}{References}
+\bibliographystyle{amsplain}
+\bibliography{flint-manual}
+
+\end{document}

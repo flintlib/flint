@@ -213,16 +213,16 @@ int fmpz_fprint(FILE * file, fmpz_t x)
     \code{printf} from the standard library and \code{mpz_out_str} 
     from MPIR.
 
-size_t fmpz_sizeinbase(const fmpz_t f, int b)
-
-    Returns the size of $f$ in base~$b$, measured in numbers of digits. 
-    The base~$b$ can be between $2$ and $62$, inclusive.
-
 *******************************************************************************
 
     Basic properties and manipulation
 
 *******************************************************************************
+
+size_t fmpz_sizeinbase(const fmpz_t f, int b)
+
+    Returns the size of $f$ in base~$b$, measured in numbers of digits. 
+    The base~$b$ can be between $2$ and $62$, inclusive.
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f)
 
