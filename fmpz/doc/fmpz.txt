@@ -87,6 +87,19 @@ void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
 
     Generates a random integer in the range $0$ to $m - 1$ inclusive.
 
+void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range $0$ to $m - 1$ inclusive,
+    with an increased probability of generating values close to
+    the endpoints.
+
+void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range $[-m/2, m/2)$, with an
+    increased probability of generating values close to the
+    endpoints or close to zero.
+
+
 *******************************************************************************
 
     Conversion
@@ -523,6 +536,22 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 
 *******************************************************************************
 
+void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+
+    Uses the Chinese Remainder Theorem to compute the unique integer
+    $0 \le x < M$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
+    positive integers greater than $1$ and coprime.
+    The result $x$ is stored in $\code{out}$.
+
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+
+    Uses the Chinese Remainder Theorem to compute the unique integer
+    $-M/2 \le x < M/2$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
+    positive integers greater than $1$ and coprime.
+    The result $x$ is stored in $\code{out}$.
+
 void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     fmpz ** comb_temp, fmpz_t temp)
 
@@ -533,7 +562,7 @@ void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     \code{fmpz_comb_temp_clear}.
 
 void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2)
 
     This function takes a set of residues modulo the list of primes
     contained in the \code{comb} structure and reconstructs the unique 
@@ -543,7 +572,7 @@ void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
     \code{fmpz_comb_temp_init} and cleared by \code{fmpz_comb_temp_clear}.
 
 void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2)
 
     This function takes a set of residues modulo the list of primes
     contained in the \code{comb} structure and reconstructs a signed 

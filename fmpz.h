@@ -113,6 +113,10 @@ void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
+void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
+
+void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
+
 long fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
@@ -313,6 +317,14 @@ void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
 }
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
+
+
+void _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
+    ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
+
+void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
 
 
 #define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
