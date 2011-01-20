@@ -216,7 +216,10 @@ static int open_function()
     fprintf(out, "\n");
     fprintf(out, "\\vspace*{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
-    fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
+    if (fnc.mods[0] != '\0')
+        fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
+    else
+        fprintf(out, "%s(%s)\n", fnc.name, fnc.args);
     fprintf(out, "\\end{lstlisting}\n");
     fprintf(out, "\\vspace*{-0.5em}\n");
 
