@@ -19,34 +19,24 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "nmod_mat.h"
 
 
 void
-nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
+fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 {
-    if ((rows) && (cols))
-    {
-        long i;
-        mat->entries = calloc(rows * cols, sizeof(mp_limb_t));
-        mat->rows = malloc(rows * sizeof(mp_limb_t *));
+    long i, j;
+    mp_limb_t m = Amod->mod.n;
 
-        for (i = 0; i < rows; i++)
-            mat->rows[i] = mat->entries + i * cols;
-    }
-    else
-        mat->entries = NULL;
-
-    mat->r = rows;
-    mat->c = cols;
-
-    _nmod_mat_set_mod(mat, n);
+    for (i = 0; i < A->r; i++)
+        for (j = 0; j < A->c; j++)
+            Amod->rows[i][j] = fmpz_fdiv_ui(A->rows[i]+j, m);
 }

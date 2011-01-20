@@ -46,6 +46,15 @@ nmod_mat_struct;
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef nmod_mat_struct nmod_mat_t[1];
 
+static __inline__
+void
+_nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
+{
+    mat->mod.n = n;
+    mat->mod.ninv = n_preinvert_limb(n);
+    count_leading_zeros(mat->mod.norm, n);
+}
+
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
