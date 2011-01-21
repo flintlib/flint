@@ -72,8 +72,8 @@ void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 
 void _nmod_poly_normalise(nmod_poly_t poly)
 
-    Internal function for normalising a polynomial so that the final 
-    coefficient (if there are any at all) is not zero.
+    Internal function for normalising a polynomial so that the top 
+    coefficient, if there is one at all, is not zero.
 
 *******************************************************************************
 
@@ -122,23 +122,23 @@ void nmod_poly_zero(nmod_poly_t res)
 void nmod_poly_truncate(nmod_poly_t poly, long len)
 
     Truncates \code{poly} to the given length and normalises it. 
-    If \code{len} is bigger than the current length of \code{poly}, 
+    If \code{len} is greater than the current length of \code{poly}, 
     then nothing happens.
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
 
-    Set \code{output} to the reverse of \code{input}, which is of length
-    \code{len}, but thinking of it as a polynomial of length \code{m} 
-    (notionally zero padded if necessary). The length \code{m} must be 
+    Sets \code{output} to the reverse of \code{input}, which is of length
+    \code{len}, but thinking of it as a polynomial of length~\code{m}, 
+    notionally zero-padded if necessary. The length~\code{m} must be 
     non-negative, but there are no other restrictions. The polynomial
     \code{output} must have space for \code{m} coefficients. 
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
 
-    Set \code{output} to the reverse of \code{input}, thinking of it as
-    a polynomial of length \code{m} (notionally zero padded if necessary).
-    The length \code{m} must be non-negative, but there are no other
-    restrictions. The output polynomial will be set to length \code{m}
+    Sets \code{output} to the reverse of \code{input}, thinking of it as
+    a polynomial of length~\code{m}, notionally zero-padded if necessary).
+    The length~\code{m} must be non-negative, but there are no other
+    restrictions. The output polynomial will be set to length~\code{m}
     and then normalised.
 
 *******************************************************************************
@@ -159,10 +159,10 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
-    Gets the coefficient of \code{poly} at index \code{j}, where coefficients 
-    are numbered with zero being the constant coefficient, and returns it as 
-    a \code{ulong}. If \code{j} refers to a coefficient beyond the end of 
-    \code{poly}, zero is returned.
+    Returns the coefficient of \code{poly} at index~\code{j}, where 
+    coefficients are numbered with zero being the constant coefficient, 
+    and returns it as an \code{unsigned long}. If \code{j} refers to a 
+    coefficient beyond the end of \code{poly}, zero is returned.
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 
@@ -182,17 +182,17 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 char * nmod_poly_get_str(const nmod_poly_t poly)
 
     Writes \code{poly} to a string representation. The format is as 
-    described for \code{nmod_poly_print}. The string must be freed by the 
-    user when finished. For this it is sufficient to call \code{free}.
+    described for \code{nmod_poly_print()}. The string must be freed by the 
+    user when finished. For this it is sufficient to call \code{free()}.
 
 int nmod_poly_set_str(const char * s, nmod_poly_t poly)
 
-    Read \code{poly} from a string \code{s}. The format is as described
-    for \code{nmod_poly_print}. If a polynomial in the correct format
+    Reads \code{poly} from a string \code{s}. The format is as described
+    for \code{nmod_poly_print()}. If a polynomial in the correct format
     is read, a positive value is returned, otherwise a non-positive value 
     is returned.
 
-void nmod_poly_print(const nmod_poly_t a)
+int nmod_poly_print(const nmod_poly_t a)
 
     Prints the polynomial to \code{stdout}. The length is printed, 
     followed by a space, then the modulus. If the length is zero this is
@@ -200,27 +200,33 @@ void nmod_poly_print(const nmod_poly_t a)
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
-    Read \code{poly} from the file stream \code{f}. If this is a file
+    Reads \code{poly} from the file stream \code{f}. If this is a file
     that has just been written, the file should be closed then opened
-    again. The format is as described for \code{nmod_poly_print}. If a 
+    again. The format is as described for \code{nmod_poly_print()}. If a 
     polynomial in the correct format is read, a positive value is returned, 
     otherwise a non-positive value is returned.
 
-void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
-    Write a polynomial to the file stream \code{f}. If this is a file
+    Writes a polynomial to the file stream \code{f}. If this is a file
     then the file should be closed and reopened before being read.
-    The format is as described for \code{nmod_poly_print}. If a 
+    The format is as described for \code{nmod_poly_print()}. If a 
     polynomial in the correct format is read, a positive value is returned, 
     otherwise a non-positive value is returned. If an error occurs 
     whilst writing to the file, an error message is printed.
 
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int nmod_poly_read(nmod_poly_t poly)
 
     Read \code{poly} from \code{stdin}. The format is as described for 
-    \code{nmod_poly_print}. If a polynomial in the correct format is read, a 
+    \code{nmod_poly_print()}. If a polynomial in the correct format is read, a 
     positive value is returned, otherwise a non-positive value is returned.
 
 *******************************************************************************
@@ -231,12 +237,12 @@ int nmod_poly_read(nmod_poly_t poly)
 
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
-    Returns $1$ if the polynomials are equal, otherwise $0$.
+    Returns~$1$ if the polynomials are equal, otherwise~$0$.
 
 int nmod_poly_is_zero(const nmod_poly_t poly)
 
-    Returns one if the polynomial \code{poly} is the zero polynomial,
-    otherwise return zero.
+    Returns~$1$ if the polynomial \code{poly} is the zero polynomial,
+    otherwise returns~$0$.
 
 *******************************************************************************
 
