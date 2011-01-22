@@ -32,17 +32,15 @@
 
 
 mp_limb_t
-_nmod_mat_det_rowreduce(const nmod_mat_t A)
+_nmod_mat_det_rowreduce(nmod_mat_t A)
 {
-    nmod_mat_t tmp;
     mp_limb_t det;
 
     long m = A->r;
     long rank;
     long i;
 
-    nmod_mat_init_set(tmp, A);
-    rank = _nmod_mat_rowreduce(tmp, ROWREDUCE_FAST_ABORT);
+    rank = _nmod_mat_rowreduce(A, ROWREDUCE_FAST_ABORT);
 
     det = 0UL;
 
@@ -50,18 +48,19 @@ _nmod_mat_det_rowreduce(const nmod_mat_t A)
     {
         det = 1UL;
         for (i = 0; i < m; i++)
-            det = n_mulmod2_preinv(det, tmp->rows[i][i], A->mod.n, A->mod.ninv);
+            det = n_mulmod2_preinv(det, A->rows[i][i], A->mod.n, A->mod.ninv);
         if (rank < 0)
             det = nmod_neg(det, A->mod);
     }
 
-    nmod_mat_clear(tmp);
     return det;
 }
 
 mp_limb_t
 nmod_mat_det(const nmod_mat_t A)
 {
+    nmod_mat_t tmp;
+    mp_limb_t det;
     long dim = A->r;
 
     if (dim != A->c)
@@ -73,5 +72,8 @@ nmod_mat_det(const nmod_mat_t A)
     if (dim == 0) return 1UL;
     if (dim == 1) return A->entries[0];
 
-    return _nmod_mat_det_rowreduce(A);
+    nmod_mat_init_set(tmp, A);
+    det = _nmod_mat_det_rowreduce(tmp);
+    nmod_mat_clear(tmp);
+    return det;
 }

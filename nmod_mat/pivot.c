@@ -23,33 +23,28 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
 #include "nmod_vec.h"
+#include "nmod_mat.h"
 
-int
-nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
+int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col)
 {
-    long i, j;
+    mp_limb_t * tmp;
+    long j;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-        return 0;
+    if (rows[start_row][col] != 0)
+        return 1;
 
-    for (i = 0; i < mat1->r; i++)
+    for (j = start_row + 1; j < n; j++)
     {
-        for (j = 0; j < mat1->c; j++)
+        if (rows[j][col] != 0)
         {
-            if (mat1->rows[i][j] != mat2->rows[i][j])
-                return 0;
+            tmp = rows[j];
+            rows[j] = rows[start_row];
+            rows[start_row] = tmp;
+            return -1;
         }
-
-        /*
-        if (!_nmod_vec_equal(mat1->rows[i], mat2->rows[i], mat1->c))
-            return 0;
-        */
     }
-
-    return 1;
+    return 0;
 }

@@ -19,109 +19,34 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <mpir.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-static int _pivot(mp_limb_t ** rows, long n, long from_row, long in_column)
-{
-    mp_limb_t * tmp;
-    long j;
-
-    if (rows[from_row][in_column] != 0)
-        return 1;
-
-    for (j = from_row + 1; j < n; j++)
-    {
-        if (rows[j][in_column] != 0L)
-        {
-            tmp = rows[j];
-            rows[j] = rows[from_row];
-            rows[from_row] = tmp;
-            return -1;
-        }
-    }
-    return 0;
-}
 
 long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
 {
-    mp_limb_t ** a;
-    long m, n;
-    nmod_t mod;
+    mp_limb_t r = mat->mod.n - 1;
 
-    long j, rank;
-    int sign = 1;
-    int det_sign;
+    long n = FLINT_MIN(mat->r, mat->c);
 
-    long pivot_row;
-    long pivot_col;
-    long length;
+    if (n < 1) return 0;
 
-    mp_limb_t d, e;
-
-    m = mat->r;
-    n = mat->c;
-    a = mat->rows;
-    mod = mat->mod;
-
-    rank = 0L;
-    pivot_row = 0L;
-    pivot_col = 0L;
-
-    while (pivot_row < m && pivot_col < n)
+    /* No overflow if (mod-1) + min(m,n)*(mod-1)^2 < 2^FLINT_BITS */
+    if (r < (1UL<<(FLINT_BITS/2)) && r*r < ((-r) / n) && \
+        (!(options & ROWREDUCE_FULL)))
     {
-        det_sign = _pivot(a, m, pivot_row, pivot_col);
-
-        if (!det_sign)
-        {
-            if (options & ROWREDUCE_FAST_ABORT)
-            {
-                rank = 0L;
-                break;
-            }
-            pivot_col++;
-            continue;
-        }
-
-        sign *= det_sign;
-        rank++;
-
-        for (j = (options & ROWREDUCE_FULL ? 0 : pivot_row + 1); j < m; j++)
-        {
-            if (j == pivot_row)
-                continue;
-
-            d = a[pivot_row][pivot_col];
-            e = a[j][pivot_col];
-
-            d = n_invmod(d, mod.n);
-            d = n_mulmod2_preinv(e, d, mod.n, mod.ninv);
-            e = nmod_neg(d, mod);
-
-            /* Length argument may not be zero */
-            length = n - pivot_col - 1;
-            if (length > 0)
-            {
-                _nmod_vec_scalar_addmul_nmod(a[j] + pivot_col + 1,
-                                        a[pivot_row] + pivot_col + 1,
-                                        length, e, mod);
-            }
-
-            if (options & ROWREDUCE_CLEAR_LOWER)
-                a[j][pivot_col] = 0L;
-            else
-                a[j][pivot_col] = d; /* LU decomposition */
-
-        }
-
-        pivot_row++;
-        pivot_col++;
+        return _nmod_mat_rowreduce_1(mat, options);
     }
-
-    return rank * sign;
+    else
+    {
+        return _nmod_mat_rowreduce_r(mat, options);
+    }
 }
