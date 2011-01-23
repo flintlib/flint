@@ -49,8 +49,7 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     fmpz_init(prod);
     fmpz_init(det_new);
 
-    /* Pick moduli allowing fast single-limb Gaussian elimination */
-    prime = n_nextprime(n_sqrt((-1UL) / (dim+1)) * 0.98, proved);
+    prime = _nmod_mat_fast_rowreduce_modulus(dim, dim, proved);
 
     nmod_mat_init(Amod, A->r, A->c, prime);
     fmpz_set_ui(prod, prime);
@@ -70,6 +69,8 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
 
         if (!proved && fmpz_equal(det_new, det))
             break;
+
+        /* printf("prime,bits %lu, %ld\n", prime, fmpz_bits(prod)); */
 
         fmpz_mul_ui(prod, prod, prime);
         fmpz_set(det, det_new);

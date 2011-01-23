@@ -19,50 +19,32 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <mpir.h>
+#include <limits.h>
+#include <math.h>
 #include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_mat.h"
+#include "nmod_vec.h"
+#include "ulong_extras.h"
 
+#define ULONG_MAX_SQUARED (((double) ULONG_MAX) * ((double) ULONG_MAX))
 
-int bound_size(long d, mp_limb_t r)
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved)
 {
-    int result;
-    mpz_t t;
-    mpz_init2(t, 4*FLINT_BITS);
-    mpz_set_ui(t, r);
-    mpz_mul(t, t, t);
-    mpz_mul_ui(t, t, d);
-    mpz_add_ui(t, t, r);
-    result = t->_mp_size;
-    mpz_clear(t);
-    return result;
+    long dim = FLINT_MIN(rows, cols);
+    return n_nextprime(sqrt(ULONG_MAX/(dim+1)) * 0.98, proved);
 }
 
-long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved)
 {
-    mp_limb_t r = mat->mod.n - 1;
-    long m = mat->r;
-    long n = mat->c;
-    long d = FLINT_MIN(m,n);
+    long dim = FLINT_MIN(rows, cols);
+    return n_nextprime(sqrt(ULONG_MAX_SQUARED/(dim+1)) * 0.98, proved);
+}
 
-    if (d < 1) return 0;
-
-    if (options & ROWREDUCE_FULL)
-        return _nmod_mat_rowreduce_r(mat, options);
-
-    if (r < (1UL<<(FLINT_BITS/2)) && r*r < ((-r) / d))
-        return _nmod_mat_rowreduce_1(mat, options);
-
-    if (d > 10 &&  /* Avoid copying overhead for very small matrices */
-        bound_size(d, r) == 2)
-        return _nmod_mat_rowreduce_2(mat, options);
-
-    return _nmod_mat_rowreduce_r(mat, options);
+mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved)
+{
+    return _nmod_mat_fast_rowreduce_modulus_1(rows, cols, proved);
 }

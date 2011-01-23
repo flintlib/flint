@@ -103,8 +103,14 @@ void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
 
 long _nmod_mat_rowreduce_1(nmod_mat_t mat, int options);
+long _nmod_mat_rowreduce_2(nmod_mat_t mat, int options);
 long _nmod_mat_rowreduce_r(nmod_mat_t mat, int options);
 long _nmod_mat_rowreduce(nmod_mat_t mat, int options);
+
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved);
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved);
+mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
+
 
 mp_limb_t _nmod_mat_det_rowreduce(nmod_mat_t A);
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
