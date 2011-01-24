@@ -534,6 +534,23 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 
     Chinese remaindering
 
+    The following functions can be used to reconstruct an integer from its
+    residues modulo a set of small (word-size) prime numbers. The first two
+    functions, \code{fmpz_CRT_ui} and \code{fmpz_CRT_ui_unsigned}, are easy
+    to use and allow building the result one residue at a time, which is
+    useful when the number of needed primes is not known in advance.
+
+    The remaining functions support performing the modular reductions and
+    reconstruction using balanced subdivision. This greatly improves
+    efficiency for large integers but assumes that the basis of primes is
+    known in advance. The user must precompute an \code{fmpz_comb_t}
+    structure and temporary working space with \code{fmpz_comb_init} and
+    \code{fmpz_comb_temp_init}, and free this data afterwards.
+
+    For simple demonstration programs showing how to use the CRT functions,
+    see \code{crt.c} and \code{multi_crt.c} in the \code{examples}
+    directory.
+
 *******************************************************************************
 
 void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
@@ -541,16 +558,17 @@ void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
     Uses the Chinese Remainder Theorem to compute the unique integer
     $0 \le x < M$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
     where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
-    positive integers greater than $1$ and coprime.
-    The result $x$ is stored in $\code{out}$.
+    positive integers greater than $1$ and coprime, and that $0 \le r_1 < m_1$
+    and $0 \le r_2 < m_2$. The result $x$ is stored in \code{out}.
 
 void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
     $-M/2 \le x < M/2$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
     where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
-    positive integers greater than $1$ and coprime.
-    The result $x$ is stored in $\code{out}$.
+    positive integers greater than $1$ and coprime, and that
+    $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
+    The result $x$ is stored in \code{out}.
 
 void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     fmpz ** comb_temp, fmpz_t temp)
