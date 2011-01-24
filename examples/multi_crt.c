@@ -1,12 +1,43 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+/*
+    Demo FLINT program for balanced multimodular reduction and
+    reconstruction using the Chinese Remainder Theorem.
+*/
+
+#include <stdlib.h>
 #include <stdio.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-int main()
+int main(int argc, char* argv[])
 {
     long i;
-    fmpz_t x, y, prod;
+    fmpz_t x, y;
 
     /* Data needed by multi CRT functions */
     fmpz_comb_t comb;
@@ -17,13 +48,24 @@ int main()
 
     long num_primes;
 
+    if (argc != 3)
+    {
+        printf("Syntax: crt <integer> <num_primes>\n");
+        return EXIT_FAILURE;
+    }
+
+    num_primes = atoi(argv[2]);
+
+    if (num_primes < 1)
+    {
+        printf("Requires num_primes >= 1\n");
+        return EXIT_FAILURE;
+    }
+
     fmpz_init(x);
     fmpz_init(y);
-    fmpz_init(prod);
 
-    fmpz_set_str(x, "-12345678901234567890", 10);
-
-    num_primes = 18;   /* We assume the number of needed primes is known */
+    fmpz_set_str(x, argv[1], 10);
 
     primes = malloc(num_primes * sizeof(mp_limb_t));
     residues = malloc(num_primes * sizeof(mp_limb_t));
@@ -60,4 +102,6 @@ int main()
 
     free(residues);
     free(primes);
+
+    return EXIT_SUCCESS;
 }
