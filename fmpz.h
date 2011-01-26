@@ -340,24 +340,32 @@ typedef struct
 }
 fmpz_comb_struct;
 
+typedef struct
+{
+    long n;
+    fmpz ** comb_temp;
+    fmpz_t temp;
+    fmpz_t temp2;
+}
+fmpz_comb_temp_struct;
+
 typedef fmpz_comb_struct fmpz_comb_t[1];
+typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
 
-fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb);
-
-void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp);
+void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb);
+void fmpz_comb_temp_clear(fmpz_comb_temp_t temp);
 
 void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes);
-
 void fmpz_comb_clear(fmpz_comb_t comb);
 
-void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
-    fmpz ** comb_temp, fmpz_t temp);
+void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
 #endif
 

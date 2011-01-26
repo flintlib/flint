@@ -39,8 +39,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     long i, j;
 
     fmpz_comb_t comb;
-    fmpz ** comb_temp;
-    fmpz_t temp_fmpz, temp_fmpz2;
+    fmpz_comb_temp_t comb_temp;
 
     long num_primes;
     long primes_bits;
@@ -84,14 +83,12 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     }
 
     fmpz_comb_init(comb, primes, num_primes);
-    comb_temp = fmpz_comb_temp_init(comb);
-    fmpz_init(temp_fmpz);
-    fmpz_init(temp_fmpz2);
+    fmpz_comb_temp_init(comb_temp, comb);
 
     /* Calculate residues of A */
     for (i = 0; i < A->r * A->c; i++)
     {
-        fmpz_multi_mod_ui(residues, &A->entries[i], comb, comb_temp, temp_fmpz);
+        fmpz_multi_mod_ui(residues, &A->entries[i], comb, comb_temp);
         for (j = 0; j < num_primes; j++)
             mod_A[j]->entries[i] = residues[j];
     }
@@ -99,7 +96,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     /* Calculate residues of B */
     for (i = 0; i < B->r * B->c; i++)
     {
-        fmpz_multi_mod_ui(residues, &B->entries[i], comb, comb_temp, temp_fmpz);
+        fmpz_multi_mod_ui(residues, &B->entries[i], comb, comb_temp);
         for (j = 0; j < num_primes; j++)
             mod_B[j]->entries[i] = residues[j];
     }
@@ -115,8 +112,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     {
         for (j = 0; j < num_primes; j++)
             residues[j] = mod_C[j]->entries[i];
-        fmpz_multi_CRT_ui(&C->entries[i], residues, comb, comb_temp,
-            temp_fmpz, temp_fmpz2);
+        fmpz_multi_CRT_ui(&C->entries[i], residues, comb, comb_temp);
     }
 
     /* Cleanup */
@@ -131,10 +127,8 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     free(mod_B);
     free(mod_C);
 
-    fmpz_comb_temp_free(comb, comb_temp);
+    fmpz_comb_temp_clear(comb_temp);
     fmpz_comb_clear(comb);
-    fmpz_clear(temp_fmpz);
-    fmpz_clear(temp_fmpz2);
 
     free(residues);
     free(primes);

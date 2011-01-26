@@ -41,8 +41,8 @@ int main(int argc, char* argv[])
 
     /* Data needed by multi CRT functions */
     fmpz_comb_t comb;
-    fmpz ** comb_temp;
-    fmpz_t temp_fmpz, temp_fmpz2;
+    fmpz_comb_temp_t comb_temp;
+
     mp_limb_t * primes;
     mp_limb_t * residues;
 
@@ -75,15 +75,13 @@ int main(int argc, char* argv[])
         primes[i] = n_nextprime(primes[i-1], 0);
 
     fmpz_comb_init(comb, primes, num_primes);
-    comb_temp = fmpz_comb_temp_init(comb);
-    fmpz_init(temp_fmpz);
-    fmpz_init(temp_fmpz2);
+    fmpz_comb_temp_init(comb_temp, comb);
 
     /* Reduce modulo all primes */
-    fmpz_multi_mod_ui(residues, x, comb, comb_temp, temp_fmpz);
+    fmpz_multi_mod_ui(residues, x, comb, comb_temp);
 
     /* Reconstruct */
-    fmpz_multi_CRT_ui(y, residues, comb, comb_temp, temp_fmpz, temp_fmpz2);
+    fmpz_multi_CRT_ui(y, residues, comb, comb_temp);
 
     for (i = 0; i < num_primes; i++)
         printf("residue mod %lu = %lu\n", primes[i], residues[i]);
@@ -95,10 +93,8 @@ int main(int argc, char* argv[])
     fmpz_clear(x);
     fmpz_clear(y);
 
-    fmpz_comb_temp_free(comb, comb_temp);
+    fmpz_comb_temp_clear(comb_temp);
     fmpz_comb_clear(comb);
-    fmpz_clear(temp_fmpz);
-    fmpz_clear(temp_fmpz2);
 
     free(residues);
     free(primes);

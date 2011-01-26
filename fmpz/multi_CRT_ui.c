@@ -33,7 +33,7 @@
 
 void
 __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
-    fmpz_comb_t comb, fmpz_t temp)
+    const fmpz_comb_t comb, fmpz_t temp)
 {
     long n = comb->n;
     long p;
@@ -66,8 +66,9 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
 }
 
 void
-__fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues, fmpz_comb_t comb, 
-                    int sign, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2)
+__fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, int sign, fmpz ** comb_temp, fmpz_t temp,
+        fmpz_t temp2)
 {
     long i, j;
     long n = comb->n;
@@ -148,14 +149,16 @@ __fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues, fmpz_comb_t comb,
         fmpz_set(output, comb_temp[log_res - 1]);
 }
 
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2)
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 {
-    __fmpz_multi_CRT_ui(output, residues, comb, 0, comb_temp, temp, temp2);
+    __fmpz_multi_CRT_ui(output, residues, comb, 0, temp->comb_temp,
+        temp->temp, temp->temp2);
 }
 
-void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2)
+void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 {
-    __fmpz_multi_CRT_ui(output, residues, comb, 1, comb_temp, temp, temp2);
+    __fmpz_multi_CRT_ui(output, residues, comb, 1, temp->comb_temp,
+        temp->temp, temp->temp2);
 }
