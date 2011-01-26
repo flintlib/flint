@@ -143,6 +143,9 @@ fmpz_poly
 
 * Write test code for fmpz_poly_scalar_addmul_fmpz
 
+* Optimise fmpz_poly_shift_right/left for shifting a polynomial
+  in-place
+
 
 arith
 -----
