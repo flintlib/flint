@@ -279,9 +279,8 @@ nmod_mat
 * Add functions for computing A*B^T and A^T*B, using transpose
   multiplications directly to avoid creating a temporary copy.
 
-* Avoid modular reductions in Gaussian elimination. This requires
-  separate 2-limb and 3-limb versions where the top unreduced
-  limbs are stored in separate matrices (or a single matrix of size 2x or 3x).
+* Write cleaner versions of the bound_size functions in
+  rowreduce.c, solve_lu_precomp.c (and combine them?)
 
 * Maybe: Optimise basecase multiplication using register blocking
   and unrolling.
