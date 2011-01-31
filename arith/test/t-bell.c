@@ -66,7 +66,7 @@ int main(void)
     }
 
     /* Compare with B_n = sum of Stirling numbers of 2nd kind */
-    for (n = 0; n < 2500; n = n + 1 + n/4)
+    for (n = 0; n < 2500; n += (n < 50) ? + 1 : n/4)
     {
         b2 = _fmpz_vec_init(n+1);
 
