@@ -96,4 +96,7 @@ void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n);
 
 void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
 
+void fmpz_bell(fmpz_t b, ulong n);
+void fmpz_bell_vec(fmpz * b, long n);
+
 #endif
