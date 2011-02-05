@@ -36,8 +36,8 @@
 /*
   Recurrence data (characteristic polynomial + initial values) for
   multisectioning the series expansion of $x / (e^x - 1)$ into $2m$
-  independent series with a common denominator. Here we use $m = 9$.
-  (The odd-indexed series are trivial.)
+  independent series (half of which are trivial) with a common denominator.
+  Here we use $m = 9$.
 
   Coefficients generated using a Mathematica program
   written by Manuel Kauers.
