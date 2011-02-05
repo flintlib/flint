@@ -204,6 +204,13 @@ void fmpz_bernoulli_denom(fmpz_t den, ulong n)
     For odd $n$, the denominator is trivial (\code{den} is set to 1 whenever
     $B_n = 0$).
 
+void fmpz_bernoulli_vec_2(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of the Bernoulli numbers
+    $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive.
+
+
 void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
 
     Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
