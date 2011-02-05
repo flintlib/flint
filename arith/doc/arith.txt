@@ -195,6 +195,15 @@ void fmpz_bell_vec(fmpz * b, long n)
 
 *******************************************************************************
 
+void fmpz_bernoulli_denom(fmpz_t den, ulong n)
+
+    Sets \code{den} to the reduced denominator of the $n$-th
+    Bernoulli number $B_n$. For even $n$, the denominator is computed
+    as the product of all primes $p$ for which $p - 1$ divides $n$;
+    this property is a consequence of the von Staudt-Clausen theorem.
+    For odd $n$, the denominator is trivial (\code{den} is set to 1 whenever
+    $B_n = 0$).
+
 void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
 
     Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$

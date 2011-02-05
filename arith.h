@@ -90,6 +90,8 @@ void fmpz_stirling1u_mat(fmpz ** rows, long n);
 void fmpz_stirling1_mat(fmpz ** rows, long n);
 void fmpz_stirling2_mat(fmpz ** rows, long n);
 
+void fmpz_bernoulli_denom(fmpz_t den, ulong n);
+
 void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n);
 void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n);
 void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n);
