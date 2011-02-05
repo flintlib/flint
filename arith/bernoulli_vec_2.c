@@ -36,8 +36,8 @@
 /*
   Recurrence data (characteristic polynomial + initial values) for
   multisectioning the series expansion of $x / (e^x - 1)$ into $2m$
-  independent series (half of which are trivial) with a common denominator.
-  Here we use $m = 9$.
+  independent numerator series (half of which are trivial)
+  divided by a common denominator series. Here we use $m = 9$.
 
   Coefficients generated using a Mathematica program
   written by Manuel Kauers.
@@ -475,7 +475,7 @@ void bernoulli_vec_series_multisectioned(fmpz * num, fmpz * den, long len)
             long prec;
             long r = 2*k + 2*m*j;
 
-            if (r > len)
+            if (r >= len)
                 break;
 
             fmpz_bernoulli_denom(den + r, r);
