@@ -114,6 +114,8 @@ void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
 
+void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
+
 void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved);
 
 long fmpz_mat_rank(const fmpz_mat_t A);
