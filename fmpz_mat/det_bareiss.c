@@ -31,20 +31,42 @@
 
 
 void
-fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
+_fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    long dim = A->r;
+    long m = tmp->r;
+    long rank;
 
-    if (dim != A->c)
+    rank = _fmpz_mat_rowreduce(tmp, ROWREDUCE_FAST_ABORT);
+
+    if (rank < 0)
     {
-        printf("fmpz_mat_det: nonsquare matrix");
-        abort();
+        rank = -rank;
+        if (rank < m)
+            fmpz_zero(det);
+        else
+            fmpz_neg(det, &tmp->rows[rank-1][rank-1]);
+    }
+    else
+    {
+        if (rank < m)
+            fmpz_zero(det);
+        else
+            fmpz_set(det, &tmp->rows[rank-1][rank-1]);
+    }
+}
+
+void
+fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
+{
+    fmpz_mat_t tmp;
+
+    if (A->r < 1)
+    {
+        fmpz_set_ui(det, 1UL);
+        return;
     }
 
-    if (dim < 5)
-        fmpz_mat_det_cofactor(det, A);
-    else if (dim < 30)
-        fmpz_mat_det_bareiss(det, A);
-    else
-        fmpz_mat_det_multi_mod(det, A, 1);
+    fmpz_mat_init_set(tmp, A);
+    _fmpz_mat_det_bareiss(det, tmp);
+    fmpz_mat_clear(tmp);
 }

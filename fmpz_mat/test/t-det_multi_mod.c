@@ -59,7 +59,7 @@ main(void)
 
         fmpz_mat_randtest(A, state, 1+n_randint(state,200));
 
-        fmpz_mat_det(det1, A);
+        fmpz_mat_det_bareiss(det1, A);
         fmpz_mat_det_multi_mod(det2, A, proved);
 
         if (!fmpz_equal(det1, det2))

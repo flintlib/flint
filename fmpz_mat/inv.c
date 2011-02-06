@@ -35,7 +35,7 @@ void _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
 {
     fmpz_t tmp;
 
-    _fmpz_mat_det_2x2(den, a);
+    _fmpz_mat_det_cofactor_2x2(den, a);
 
     fmpz_neg(&b[0][1], &a[0][1]);
     fmpz_neg(&b[1][0], &a[1][0]);

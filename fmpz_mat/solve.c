@@ -36,7 +36,7 @@ void _fmpz_mat_solve_2x2(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b)
     fmpz_submul(&x[0], &a[0][1], &b[1]);
     fmpz_mul   (&x[1], &a[0][0], &b[1]);
     fmpz_submul(&x[1], &a[1][0], &b[0]);
-    _fmpz_mat_det_2x2(d, a);
+    _fmpz_mat_det_cofactor_2x2(d, a);
 }
 
 

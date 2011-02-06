@@ -108,15 +108,15 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B
 
 long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options);
 
-void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x);
-void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x);
-void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x);
-void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
-
+void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
+void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
+void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved);
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 
-void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved);
+void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x);
+void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x);
+void _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x);
 
 long fmpz_mat_rank(const fmpz_mat_t A);
 

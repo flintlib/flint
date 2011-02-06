@@ -325,43 +325,32 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     Sets \code{det} to the determinant of the square matrix $A$.
+    This function automatically chooses between \code{fmpz_mat_det_cofactor},
+    \code{fmpz_mat_det_bareiss} and \code{fmpz_mat_det_multi_mod}
+    (with \code{proved} = 1), depending on the size of the matrix.
 
-    The determinant is computed using \code{_fmpz_mat_det_NxN()} for 
-    $N = 2, 3, 4$, and for larger matrices by calling 
-    \code{_fmpz_mat_det_rowreduce()}.
+    The matrix of dimension $0 \times 0$ is defined to have determinant 1.
 
-    The \code{det} object is not permitted to be aliased with the 
-    entries of $A$.
+void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 
-void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x)
+    Sets \code{det} to the determinant of the square matrix $A$
+    computed using direct cofactor expansion. This function only
+    supports matrices up to size $4 \times 4$.
 
-void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x)
+void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
 
-void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x)
-
-    Sets \code{det} to the determinant of the given fixed-size square 
-    matrix $x$ supplied as an array of row pointers. The determinants 
-    are computed using direct formulas based on cofactor expansion.
-
-void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A)
-
-    Sets \code{det} to the determinant of the square matrix $A$, 
-    computed using row reduction on a temporary copy of $A$.
-
-void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
-
-    Sets \code{bound} to a nonnegative integer $B$ such that
-    $|\det(A)| \le B$. Assumes $A$ to be a square matrix.
-
-    The bound is computed from the Hadamard inequality
-    $|\det(A)| \le \prod \|a_i\|_2$ where the product is taken
-    over the rows $a_i$ of $A$.
+    Sets \code{det} to the determinant of the square matrix $A$
+    computed using the Bareiss algorithm. A copy of the input matrix is
+    row reduced using fraction-free Gaussian elimination, and the
+    determinant is read off from the last element on the main
+    diagonal.
 
 void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
 
     Sets \code{det} to the determinant of the square matrix $A$
     (if \code{proved} = 1), or a probabilistic value for the
-    determinant (\code{proved} = 0).
+    determinant (\code{proved} = 0), computed using a multimodular
+    algorithm.
 
     The determinant is computed modulo several small primes and
     reconstructed using the Chinese Remainder Theorem.
@@ -369,8 +358,15 @@ void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     to satisfy the bound computed by \code{fmpz_mat_det_bound}.
     With \code{proved} = 0, the determinant is considered determined
     if it remains unchanged modulo several consecutive primes
-    (currently if their products exceeds $2^{100}$).
+    (currently if their product exceeds $2^{100}$).
 
+void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
+
+    Sets \code{bound} to a nonnegative integer $B$ such that
+    $|\det(A)| \le B$. Assumes $A$ to be a square matrix.
+    The bound is computed from the Hadamard inequality
+    $|\det(A)| \le \prod \|a_i\|_2$ where the product is taken
+    over the rows $a_i$ of $A$.
 
 *******************************************************************************
 
