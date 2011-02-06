@@ -49,6 +49,7 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
+        int proved = n_randlimb(state) % 2;
         m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
@@ -59,7 +60,7 @@ main(void)
         fmpz_mat_randtest(A, state, 1+n_randint(state,200));
 
         fmpz_mat_det(det1, A);
-        fmpz_mat_det_multi_mod(det2, A, 0);
+        fmpz_mat_det_multi_mod(det2, A, proved);
 
         if (!fmpz_equal(det1, det2))
         {

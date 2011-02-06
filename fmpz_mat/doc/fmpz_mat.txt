@@ -246,7 +246,7 @@ int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 
 *******************************************************************************
 
-    Linear algebra operations
+    Transpose
 
 *******************************************************************************
 
@@ -254,6 +254,12 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets $B$ to $A^T$, the transpose of $A$. Dimensions must be compatible.
     $A$ and $B$ are allowed to be the same object if $A$ is a square matrix.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
@@ -293,6 +299,12 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing between $C$ and $A$ or $C$ and $B$ is allowed.
 
+*******************************************************************************
+
+    Inverse
+
+*******************************************************************************
+
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
 
     Sets \code{(B, d)} to the inverse matrix of the square matrix $A$,
@@ -303,6 +315,12 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
     $B$ will be undefined.
     In general, \code{(B, d)} will not be reduced to lowest terms.
     $A$ and $B$ are allowed to be the same object.
+
+*******************************************************************************
+
+    Determinant
+
+*******************************************************************************
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
@@ -339,11 +357,38 @@ void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
     $|\det(A)| \le \prod \|a_i\|_2$ where the product is taken
     over the rows $a_i$ of $A$.
 
+void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
+
+    Sets \code{det} to the determinant of the square matrix $A$
+    (if \code{proved} = 1), or a probabilistic value for the
+    determinant (\code{proved} = 0).
+
+    The determinant is computed modulo several small primes and
+    reconstructed using the Chinese Remainder Theorem.
+    With \code{proved} = 1, sufficiently many primes are chosen
+    to satisfy the bound computed by \code{fmpz_mat_det_bound}.
+    With \code{proved} = 0, the determinant is considered determined
+    if it remains unchanged modulo several consecutive primes
+    (currently if their products exceeds $2^{100}$).
+
+
+*******************************************************************************
+
+    Rank
+
+*******************************************************************************
+
 long fmpz_mat_rank(const fmpz_mat_t A)
 
     Returns the rank, that is, the number of linearly independent columns
     (equivalently, rows), of $A$. The rank is computed by row reducing
     a copy of $A$.
+
+*******************************************************************************
+
+    Solving
+
+*******************************************************************************
 
 void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 
