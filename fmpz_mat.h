@@ -55,6 +55,7 @@ void fmpz_mat_clear(fmpz_mat_t mat);
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
 
 void fmpz_mat_zero(fmpz_mat_t mat);
+void fmpz_mat_unit(fmpz_mat_t mat);
 
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 

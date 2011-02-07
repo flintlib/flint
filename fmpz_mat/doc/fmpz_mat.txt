@@ -194,6 +194,12 @@ void fmpz_mat_zero(fmpz_mat_t mat)
 
     Sets all entries of \code{mat} to 0.
 
+void fmpz_mat_unit(fmpz_mat_t mat)
+
+    Sets \code{mat} to the unit matrix, having 1:s on the main diagonal
+    and 0:s elsewhere. If \code{mat} is nonsquare, it is set to the
+    truncation of a unit matrix.
+
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, fmpz_mat_t A)
 
     Sets the entries \code{Amod} to the entries of \code{A} reduced
