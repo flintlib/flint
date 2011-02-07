@@ -92,9 +92,15 @@ int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag,
 
 long fmpz_mat_max_bits(const fmpz_mat_t mat);
 
-/* Linear algebra operations  ************************************************/
+/* Transpose */
 
 void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A);
+
+/* Addition and subtraction */
+
+void fmpz_mat_add(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void fmpz_mat_sub(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A);
 
 /* Multiplication */
 

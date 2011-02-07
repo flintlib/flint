@@ -263,6 +263,28 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
+    Addition and subtraction
+
+*******************************************************************************
+
+void fmpz_mat_add(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets \code{C} to the elementwise sum $A + B$. All inputs must
+    be of the same size. Aliasing is allowed.
+
+void fmpz_mat_sub(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets \code{C} to the elementwise difference $A - B$. All inputs must
+    be of the same size. Aliasing is allowed.
+
+void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A)
+
+    Sets \code{B} to the elementwise negation of \code{A}. Both inputs
+    must be of the same size. Aliasing is allowed.
+
+
+*******************************************************************************
+
     Multiplication
 
 *******************************************************************************
