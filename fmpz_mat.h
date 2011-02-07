@@ -96,17 +96,23 @@ long fmpz_mat_max_bits(const fmpz_mat_t mat);
 
 void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A);
 
-void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+/* Multiplication */
 
+void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, long bits);
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
+/* Gaussian elimination */
 
 #define ROWREDUCE_FAST_ABORT 1
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
 
-long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options);
+long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options);
+
+
+/* Determinant */
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
@@ -118,16 +124,20 @@ void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x);
 
+/* Rank */
+
 long fmpz_mat_rank(const fmpz_mat_t A);
 
-void _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
-void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const a, long n);
-
-void _fmpz_mat_solve_2x2(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b);
-void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t d, fmpz ** const a, const fmpz * b);
+/* Nonsingular solving */
 
 void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
+void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
+void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
+void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU);
+
 void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+
+/* Inverse */
 
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 

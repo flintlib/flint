@@ -76,7 +76,7 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
         default:
             fmpz_mat_init(I, dim, dim);
             for (i = 0; i < dim; i++)
-                fmpz_set_ui(&I->rows[i][i], 1UL);
+                fmpz_set_ui(I->rows[i] + i, 1UL);
             fmpz_mat_solve_mat(B, den, A, I);
             fmpz_mat_clear(I);
     }

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,28 +30,29 @@
 #include "fmpz_mat.h"
 
 
-void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const LU, long n)
+void
+_fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
 {
-    long i, j;
+    long i, j, n;
+    fmpz ** a = LU->rows;
+    n = LU->r;
 
-    /* Fraction-free forward substitution */
     for (i = 0; i < n - 1; i++)
     {
         for (j = i + 1; j < n; j++)
         {
-            fmpz_mul(&b[j], &b[j], &LU[i][i]);
-            fmpz_submul(&b[j], &LU[j][i], &b[i]);
+            fmpz_mul(b + j, b + j, a[i] + i);
+            fmpz_submul(b + j, a[j] + i, b + i);
             if (i > 0)
-                fmpz_divexact(&b[j], &b[j], &LU[i-1][i-1]);
+                fmpz_divexact(b + j, b + j, a[i-1] + (i-1));
         }
     }
 
-    /* Fraction-free backward substitution */
     for (i = n - 2; i >= 0; i--)
     {
-        fmpz_mul(&b[i], &b[i], &LU[n-1][n-1]);
+        fmpz_mul(b + i, b + i, a[n-1] + (n-1));
         for (j = i + 1; j < n; j++)
-            fmpz_submul(&b[i], &b[j], &LU[i][j]);
-        fmpz_divexact(&b[i], &b[i], &LU[i][i]);
+            fmpz_submul(b + i, b + j, a[i] + j);
+        fmpz_divexact(b + i, b + i, a[i] + i);
     }
 }

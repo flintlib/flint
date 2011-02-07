@@ -33,26 +33,19 @@
 void
 _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    long m = tmp->r;
     long rank;
 
-    rank = _fmpz_mat_rowreduce(tmp, ROWREDUCE_FAST_ABORT);
+    rank = _fmpz_mat_rowreduce(NULL, tmp, ROWREDUCE_FAST_ABORT);
 
-    if (rank < 0)
+    if (FLINT_ABS(rank) == tmp->r)
     {
-        rank = -rank;
-        if (rank < m)
-            fmpz_zero(det);
+        if (rank < 0)
+            fmpz_neg(det, tmp->rows[-rank-1] + (-rank-1));
         else
-            fmpz_neg(det, &tmp->rows[rank-1][rank-1]);
+            fmpz_set(det, tmp->rows[rank-1] + (rank-1));
     }
     else
-    {
-        if (rank < m)
-            fmpz_zero(det);
-        else
-            fmpz_set(det, &tmp->rows[rank-1][rank-1]);
-    }
+        fmpz_zero(det);
 }
 
 void
