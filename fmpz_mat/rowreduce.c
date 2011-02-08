@@ -123,8 +123,13 @@ long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
             if (j == pivot_row)
                 continue;
 
-            for (k = pivot_col + 1; k < n; k++)
+            for (k = (options & ROWREDUCE_FULL ? 0 : pivot_col + 1); k < n; k++)
             {
+                /* This would be unnecessary if the operations below were
+                   rewritten to use temporary variables */
+                if (k == pivot_col)
+                    continue;
+
                 fmpz_mul(a[j] + k, a[pivot_row] + pivot_col, a[j] + k);
                 fmpz_submul(a[j] + k, a[j] + pivot_col, a[pivot_row] + k);
                 fmpz_divexact(a[j] + k, a[j] + k, d);
