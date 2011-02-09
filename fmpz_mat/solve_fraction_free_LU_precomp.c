@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,21 +30,29 @@
 #include "fmpz_mat.h"
 
 
-long
-fmpz_mat_rank(const fmpz_mat_t A)
+void
+_fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
 {
-    long m, n, rank;
-    long * perm;
-    fmpz_mat_t tmp;
+    long i, j, n;
+    fmpz ** a = LU->rows;
+    n = LU->r;
 
-    m = A->r;
-    n = A->c;
+    for (i = 0; i < n - 1; i++)
+    {
+        for (j = i + 1; j < n; j++)
+        {
+            fmpz_mul(b + j, b + j, a[i] + i);
+            fmpz_submul(b + j, a[j] + i, b + i);
+            if (i > 0)
+                fmpz_divexact(b + j, b + j, a[i-1] + (i-1));
+        }
+    }
 
-    if (m < 1 || n < 1)
-        return 0;
-
-    fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
-    fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
+    for (i = n - 2; i >= 0; i--)
+    {
+        fmpz_mul(b + i, b + i, a[n-1] + (n-1));
+        for (j = i + 1; j < n; j++)
+            fmpz_submul(b + i, b + j, a[i] + j);
+        fmpz_divexact(b + i, b + i, a[i] + i);
+    }
 }

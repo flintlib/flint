@@ -19,39 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-
-void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const LU, long n)
+void
+fmpz_mat_unit(fmpz_mat_t mat)
 {
-    long i, j;
+    long i;
 
-    /* Fraction-free forward substitution */
-    for (i = 0; i < n - 1; i++)
-    {
-        for (j = i + 1; j < n; j++)
-        {
-            fmpz_mul(&b[j], &b[j], &LU[i][i]);
-            fmpz_submul(&b[j], &LU[j][i], &b[i]);
-            if (i > 0)
-                fmpz_divexact(&b[j], &b[j], &LU[i-1][i-1]);
-        }
-    }
+    fmpz_mat_zero(mat);
 
-    /* Fraction-free backward substitution */
-    for (i = n - 2; i >= 0; i--)
-    {
-        fmpz_mul(&b[i], &b[i], &LU[n-1][n-1]);
-        for (j = i + 1; j < n; j++)
-            fmpz_submul(&b[i], &b[j], &LU[i][j]);
-        fmpz_divexact(&b[i], &b[i], &LU[i][i]);
-    }
+    for (i = 0; i < FLINT_MIN(mat->r, mat->c); i++)
+        fmpz_set_ui(mat->rows[i] + i, 1UL);
 }

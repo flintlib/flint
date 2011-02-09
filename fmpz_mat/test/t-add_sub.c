@@ -28,75 +28,50 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
-
 
 int
 main(void)
 {
-    fmpz_mat_t A;
+    long m, n, rep;
     flint_rand_t state;
-    long i, m;
 
-    fmpz_t det1, det2;
-
-    printf("det_multi_mod....");
+    printf("add/sub/neg....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 0; i < 10000; i++)
+    for (rep = 0; rep < 10000; rep++)
     {
-        int proved = n_randlimb(state) % 2;
-        m = n_randint(state, 10);
+        fmpz_mat_t A;
+        fmpz_mat_t B;
+        fmpz_mat_t C;
 
-        fmpz_mat_init(A, m, m);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
 
-        fmpz_init(det1);
-        fmpz_init(det2);
+        fmpz_mat_init(A, m, n);
+        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(C, m, n);
 
-        fmpz_mat_randtest(A, state, 1+n_randint(state,200));
+        fmpz_mat_randtest(A, state, 100);
+        fmpz_mat_randtest(B, state, 100);
 
-        fmpz_mat_det_bareiss(det1, A);
-        fmpz_mat_det_multi_mod(det2, A, proved);
+        fmpz_mat_neg(C, A);
+        fmpz_mat_add(A, A, B);
+        fmpz_mat_sub(A, A, B);
+        fmpz_mat_neg(A, A);
 
-        if (!fmpz_equal(det1, det2))
+        if (!fmpz_mat_equal(A, C))
         {
-            printf("FAIL:\n");
-            printf("different determinants!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det1: "), fmpz_print(det1), printf("\n");
-            printf("det2: "), fmpz_print(det2), printf("\n");
-            abort();
-        }
-
-        fmpz_clear(det1);
-        fmpz_clear(det2);
-        fmpz_mat_clear(A);
-    }
-
-    for (i = 0; i < 10000; i++)
-    {
-        m = 2 + n_randint(state, 10);
-        fmpz_mat_init(A, m, m);
-        fmpz_init(det2);
-
-        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1), 1+n_randint(state, 10));
-        fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
-
-        fmpz_mat_det_multi_mod(det2, A, 0);
-        if (*det2)
-        {
-            printf("FAIL:\n");
-            printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
+            printf("FAIL: matrices not equal!\n");
             abort();
         }
 
         fmpz_mat_clear(A);
-        fmpz_clear(det2);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(C);
     }
 
     flint_randclear(state);

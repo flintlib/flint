@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,21 +30,47 @@
 #include "fmpz_mat.h"
 
 
-long
-fmpz_mat_rank(const fmpz_mat_t A)
+void
+fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A,
+    const fmpz * b)
 {
-    long m, n, rank;
+    long dim, rank, i;
+    fmpz_mat_t T;
+    fmpz * tmp;
     long * perm;
-    fmpz_mat_t tmp;
 
-    m = A->r;
-    n = A->c;
+    dim = A->r;
 
-    if (m < 1 || n < 1)
-        return 0;
+    if (dim < 1)
+    {
+        fmpz_set_ui(den, 1UL);
+        return;
+    }
 
-    fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
-    fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
+    /* Compute LU decomposition in a temporary matrix */
+    fmpz_mat_init_set(T, A);
+    perm = malloc(dim * sizeof(long));
+
+    rank = _fmpz_mat_rowreduce(perm, T, ROWREDUCE_FAST_ABORT);
+
+    if (FLINT_ABS(rank) == dim)
+    {
+        fmpz_set(den, T->rows[dim-1] + (dim-1));
+        tmp = _fmpz_vec_init(dim);
+        for (i = 0; i < dim; i++)
+            fmpz_set(tmp + i, b + perm[i]);
+
+        _fmpz_mat_solve_fraction_free_LU_precomp(tmp, T);
+
+        for (i = 0; i < dim; i++)
+            fmpz_set(x + i, tmp + i);
+        _fmpz_vec_clear(tmp, dim);
+    }
+    else
+    {
+        fmpz_zero(den);
+    }
+
+    free(perm);
+    fmpz_mat_clear(T);
 }

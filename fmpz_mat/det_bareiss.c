@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,21 +30,36 @@
 #include "fmpz_mat.h"
 
 
-long
-fmpz_mat_rank(const fmpz_mat_t A)
+void
+_fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    long m, n, rank;
-    long * perm;
+    long rank;
+
+    rank = _fmpz_mat_rowreduce(NULL, tmp, ROWREDUCE_FAST_ABORT);
+
+    if (FLINT_ABS(rank) == tmp->r)
+    {
+        if (rank < 0)
+            fmpz_neg(det, tmp->rows[-rank-1] + (-rank-1));
+        else
+            fmpz_set(det, tmp->rows[rank-1] + (rank-1));
+    }
+    else
+        fmpz_zero(det);
+}
+
+void
+fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
+{
     fmpz_mat_t tmp;
 
-    m = A->r;
-    n = A->c;
-
-    if (m < 1 || n < 1)
-        return 0;
+    if (A->r < 1)
+    {
+        fmpz_set_ui(det, 1UL);
+        return;
+    }
 
     fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
+    _fmpz_mat_det_bareiss(det, tmp);
     fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
 }

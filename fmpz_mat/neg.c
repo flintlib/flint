@@ -19,32 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-
-long
-fmpz_mat_rank(const fmpz_mat_t A)
+void
+fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    long m, n, rank;
-    long * perm;
-    fmpz_mat_t tmp;
+    long i;
 
-    m = A->r;
-    n = A->c;
-
-    if (m < 1 || n < 1)
-        return 0;
-
-    fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
-    fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
+    for (i = 0; i < res->r; i++)
+        _fmpz_vec_neg(res->rows[i], mat->rows[i], res->c);
 }

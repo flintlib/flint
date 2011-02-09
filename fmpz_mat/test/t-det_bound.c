@@ -40,63 +40,40 @@ main(void)
     flint_rand_t state;
     long i, m;
 
-    fmpz_t det1, det2;
+    fmpz_t det, bound;
 
-    printf("det_multi_mod....");
+    printf("det_bound....");
     fflush(stdout);
 
     flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        int proved = n_randlimb(state) % 2;
         m = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
 
-        fmpz_init(det1);
-        fmpz_init(det2);
+        fmpz_init(det);
+        fmpz_init(bound);
 
         fmpz_mat_randtest(A, state, 1+n_randint(state,200));
 
-        fmpz_mat_det_bareiss(det1, A);
-        fmpz_mat_det_multi_mod(det2, A, proved);
+        fmpz_mat_det(det, A);
+        fmpz_mat_det_bound(bound, A);
 
-        if (!fmpz_equal(det1, det2))
+        if (fmpz_cmp(det, bound) > 0)
         {
             printf("FAIL:\n");
-            printf("different determinants!\n");
+            printf("bound too small!\n");
             fmpz_mat_print_pretty(A), printf("\n");
-            printf("det1: "), fmpz_print(det1), printf("\n");
-            printf("det2: "), fmpz_print(det2), printf("\n");
+            printf("det: "), fmpz_print(det), printf("\n");
+            printf("bound: "), fmpz_print(bound), printf("\n");
             abort();
         }
 
-        fmpz_clear(det1);
-        fmpz_clear(det2);
+        fmpz_clear(det);
+        fmpz_clear(bound);
         fmpz_mat_clear(A);
-    }
-
-    for (i = 0; i < 10000; i++)
-    {
-        m = 2 + n_randint(state, 10);
-        fmpz_mat_init(A, m, m);
-        fmpz_init(det2);
-
-        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1), 1+n_randint(state, 10));
-        fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
-
-        fmpz_mat_det_multi_mod(det2, A, 0);
-        if (*det2)
-        {
-            printf("FAIL:\n");
-            printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            abort();
-        }
-
-        fmpz_mat_clear(A);
-        fmpz_clear(det2);
     }
 
     flint_randclear(state);

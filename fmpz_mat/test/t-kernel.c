@@ -36,67 +36,70 @@
 int
 main(void)
 {
-    fmpz_mat_t A;
+    fmpz_mat_t A, B, ker;
     flint_rand_t state;
-    long i, m;
+    long i, m, n, b, d, r, nullity, nulrank;
 
-    fmpz_t det1, det2;
-
-    printf("det_multi_mod....");
+    printf("kernel....");
     fflush(stdout);
 
     flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        int proved = n_randlimb(state) % 2;
         m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
-        fmpz_mat_init(A, m, m);
-
-        fmpz_init(det1);
-        fmpz_init(det2);
-
-        fmpz_mat_randtest(A, state, 1+n_randint(state,200));
-
-        fmpz_mat_det_bareiss(det1, A);
-        fmpz_mat_det_multi_mod(det2, A, proved);
-
-        if (!fmpz_equal(det1, det2))
+        for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
-            printf("FAIL:\n");
-            printf("different determinants!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            printf("det1: "), fmpz_print(det1), printf("\n");
-            printf("det2: "), fmpz_print(det2), printf("\n");
-            abort();
+            b = 1 + n_randint(state, 10) * n_randint(state, 10);
+            d = n_randint(state, 2*m*n + 1);
+
+            fmpz_mat_init(A, m, n);
+            fmpz_mat_init(ker, n, n);
+            fmpz_mat_init(B, m, n);
+
+            fmpz_mat_randrank(A, state, r, b);
+            /* Densify */
+            if (n_randlimb(state) % 2)
+                fmpz_mat_randops(A, state, d);
+
+            nullity = fmpz_mat_kernel(ker, A);
+            nulrank = fmpz_mat_rank(ker);
+
+            if (nullity != nulrank)
+            {
+                printf("FAIL:\n");
+                printf("rank(ker) != nullity!\n");
+                fmpz_mat_print_pretty(A);
+                printf("\n");
+                abort();
+            }
+
+            if (nullity + r != n)
+            {
+                printf("FAIL:\n");
+                printf("nullity + rank != n\n");
+                fmpz_mat_print_pretty(A);
+                printf("\n");
+                abort();
+            }
+
+            fmpz_mat_mul(B, A, ker);
+
+            if (fmpz_mat_rank(B) != 0)
+            {
+                printf("FAIL:\n");
+                printf("A * ker != 0\n");
+                fmpz_mat_print_pretty(A);
+                printf("\n");
+                abort();
+            }
+
+            fmpz_mat_clear(A);
+            fmpz_mat_clear(ker);
+            fmpz_mat_clear(B);
         }
-
-        fmpz_clear(det1);
-        fmpz_clear(det2);
-        fmpz_mat_clear(A);
-    }
-
-    for (i = 0; i < 10000; i++)
-    {
-        m = 2 + n_randint(state, 10);
-        fmpz_mat_init(A, m, m);
-        fmpz_init(det2);
-
-        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1), 1+n_randint(state, 10));
-        fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
-
-        fmpz_mat_det_multi_mod(det2, A, 0);
-        if (*det2)
-        {
-            printf("FAIL:\n");
-            printf("expected zero determinant!\n");
-            fmpz_mat_print_pretty(A), printf("\n");
-            abort();
-        }
-
-        fmpz_mat_clear(A);
-        fmpz_clear(det2);
     }
 
     flint_randclear(state);

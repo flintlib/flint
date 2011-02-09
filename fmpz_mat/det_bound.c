@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,23 +28,37 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "nmod_mat.h"
+#include "nmod_vec.h"
 
 
-long
-fmpz_mat_rank(const fmpz_mat_t A)
+void
+fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 {
-    long m, n, rank;
-    long * perm;
-    fmpz_mat_t tmp;
+    fmpz_t p, s, t;
+    long i, j;
 
-    m = A->r;
-    n = A->c;
+    fmpz_init(p);
+    fmpz_init(s);
+    fmpz_init(t);
+    fmpz_set_ui(p, 1UL);
 
-    if (m < 1 || n < 1)
-        return 0;
+    for (i = 0; i < A->r; i++)
+    {
+        fmpz_set_ui(s, 0UL);
 
-    fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
-    fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
+        for (j = 0; j < A->c; j++)
+            fmpz_addmul(s, A->rows[i] + j, A->rows[i] + j);
+
+        fmpz_sqrtrem(s, t, s);
+        if (!fmpz_is_zero(t))
+            fmpz_add_ui(s, s, 1UL);
+
+        fmpz_mul(p, p, s);
+    }
+
+    fmpz_set(bound, p);
+    fmpz_clear(p);
+    fmpz_clear(s);
+    fmpz_clear(t);
 }

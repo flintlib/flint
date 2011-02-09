@@ -38,6 +38,7 @@ fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A,
     long i, dim, eq, equations, rank;
     fmpz_mat_t T;
     fmpz * tmp;
+    long * perm;
 
     FMPZ_MAT_ASSERT(A->r == A->c, "fmpz_mat_solve_mat: "
         "system matrix must be square");
@@ -54,45 +55,44 @@ fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A,
     /* Potentially faster when only solving a single equation */
     if (equations <= 1 || dim < 1)
     {
+        /* XXX: should not access mat->entries! */
         if (equations == 1)
             fmpz_mat_solve(X->entries, den, A, B->entries);
+
         /* else nothing to do */
         return;
     }
 
     /* Compute fraction-free LU decomposition */
     fmpz_mat_init_set(T, A);
-    rank = _fmpz_mat_rowreduce(T, ROWREDUCE_FAST_ABORT);
+    perm = malloc(dim * sizeof(long));
+    rank = _fmpz_mat_rowreduce(perm, T, ROWREDUCE_FAST_ABORT);
 
     if (FLINT_ABS(rank) == dim)
     {
-        long * order;
-        fmpz_set(den, &T->rows[dim-1][dim-1]);
-
-        /* Pivot order */
-        order = malloc(sizeof(long) * dim);
-        for (i = 0; i < dim; i++)
-            order[(T->rows[i] - T->entries) / dim] = i;
+        fmpz_set(den, T->rows[dim-1] + (dim-1));
 
         /* Solve for each column of B using precomputed LU decomposition */
         tmp = _fmpz_vec_init(dim);
+
         for (eq = 0; eq < equations; eq++)
         {
             for (i = 0; i < dim; i++)
-                fmpz_set(&tmp[order[i]], &B->rows[i][eq]);
+                fmpz_set(tmp + i, B->rows[perm[i]] + eq);
 
-            _fmpz_mat_solve_fflu_precomp(tmp, T->rows, dim);
+            _fmpz_mat_solve_fraction_free_LU_precomp(tmp, T);
 
             for (i = 0; i < dim; i++)
-                fmpz_set(&X->rows[i][eq], &tmp[i]);
+                fmpz_set(X->rows[i] + eq, tmp + i);
         }
+
         _fmpz_vec_clear(tmp, dim);
-        free(order);
     }
     else
     {
         fmpz_zero(den);
     }
 
+    free(perm);
     fmpz_mat_clear(T);
 }
