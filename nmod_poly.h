@@ -477,6 +477,10 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod);
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
+
 /* Evaluation  ***************************************************************/
 
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, 

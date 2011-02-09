@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -763,7 +764,7 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
 
 *******************************************************************************
 
-    Derivative
+    Derivative and integral
 
 *******************************************************************************
 
@@ -776,6 +777,23 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
     Set \code{x_prime} to the derivative of \code{x}. 
+
+
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod)
+
+    Set the first \code{len} coefficients of \code{x_int} to the 
+    integral of \code{x} which is assumed to be of length \code{len - 1}.
+    The constant term of \code{x_int} is set to zero.
+    It is assumed that \code{len > 0}. The result is only well-defined
+    if the modulus is a prime number strictly larger than the degree of
+    \code{x}.
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
+
+    Set \code{x_int} to the indefinite integral of \code{x} with constant
+    term zero. The result is only well-defined if the modulus
+    is a prime number strictly larger than the degree of \code{x}.
+
 
 *******************************************************************************
 
