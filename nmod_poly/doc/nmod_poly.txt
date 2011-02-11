@@ -778,7 +778,6 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
     Set \code{x_prime} to the derivative of \code{x}. 
 
-
 void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod)
 
     Set the first \code{len} coefficients of \code{x_int} to the 
@@ -889,3 +888,46 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     polynomial \code{P} is defined to be \code{P}. Except in the case where
     the GCD is zero, the GCD \code{G} is made monic.
 
+*******************************************************************************
+
+    Logarithm series
+
+    Functions for evaluating the logarithm of a formal power series,
+    $$\log(f(x)) = \sum_{k=1}^{\infty} \frac{(-1)^{k+1}}{k} (f(x)-1)^k.$$
+    Results are undefined if some coefficients $1/k$ do not exist in the
+    given field; that is, if the computation is done to order $O(x^n)$, the
+    modulus $p$ must be a prime satisfying $p \ge n$.
+
+*******************************************************************************
+
+void _nmod_poly_log_series_monomial_ui(mp_ptr res,
+            mp_limb_t coeff, ulong power, long n, nmod_t mod)
+
+    Set the first \code{n} coefficients of \code{res} to the
+    series expansion of $\log(1+cx^r)$ with $c,r$ given by \code{coeff},
+    \code{power}. It is assumed that \code{n > 0}, \code{power > 0} and
+    that the coefficient is reduced modulo the modulus.
+
+void nmod_poly_log_series_monomial_ui(nmod_poly_t res,
+            mp_limb_t coeff, ulong power, long n)
+
+    Set \code{res} to the series expansion of $\log(1+cx^r)$ to order $O(x^n)$
+    where $c,r$ are given by \code{coeff}, \code{power}.
+
+void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod)
+
+    Set the first \code{n} coefficients of \code{res} to the series
+    expansion of \code{log(f)}. It is assumed that \code{n > 0}, that
+    \code{f} has constant term 1 and that \code{f} is zero-padded as
+    necessary to length \code{n}.
+
+    Uses the identity $\log(f(x)) = \int \frac{f'(x)}{f(x)} dx.$
+    Since differentiation and integration can be done in linear time, the
+    complexity is equivalent to that of division (multiplication).
+
+void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
+
+    Set \code{res} to the series expansion of \code{log(f)}
+    to order $O(x^n)$. It is assumed that \code{f} has constant
+    term 1. The case $f = \log(1+cx^r)$ is automatically checked and handled
+    efficiently.
