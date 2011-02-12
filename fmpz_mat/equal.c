@@ -32,10 +32,20 @@
 int
 fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
 {
+    long j;
+
     if (mat1->r != mat2->r || mat1->c != mat2->c)
     {
         return 0;
     }
 
-    return _fmpz_vec_equal(mat1->entries, mat2->entries, mat1->r * mat1->c);
+    for (j = 0; j < mat1->r; j++)
+    {
+        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        {
+            return 0;
+        }
+    }
+
+    return 1;
 }
