@@ -45,12 +45,9 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
             lo = n_ll_mod_preinv(hi, lo, p, pinv);
             prod = n_mulmod2_preinv(prod, lo, p, pinv);
             lo = 1UL;
-            n --;
         }
-        else
-        {
-            n--;
-        }
+
+        n--;
     }
 
     return n_mulmod2_preinv(prod, lo, p, pinv);
