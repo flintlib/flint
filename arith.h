@@ -99,4 +99,7 @@ void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
 void fmpz_bell(fmpz_t b, ulong n);
 void fmpz_bell_vec(fmpz * b, long n);
 
+double euler_number_size(ulong n);
+void euler_number_vec(fmpz * res, long n);
+
 #endif
