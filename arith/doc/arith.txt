@@ -314,6 +314,18 @@ void euler_number_vec(fmpz * res, long n)
     \code{euler_number_size}, and the final integer values are recovered
     using balanced CRT reconstruction.
 
+void euler_number_zeta(fmpz_t res, ulong n)
+
+    Sets \code{res} to the Euler number $E_n$. For even $n$, this function
+    uses the relation $$|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)$$
+    where $L(n+1)$ denotes the Dirichlet $L$-function with character
+    $\chi = \{ 0, 1, 0, -1 \}$.
+
+void euler_number(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{res} to the Euler number $E_n$. Currently calls
+    \code{euler_number_zeta}.
+
 *******************************************************************************
 
     Multiplicative functions

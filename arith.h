@@ -103,10 +103,27 @@ void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
 void fmpz_bell(fmpz_t b, ulong n);
 void fmpz_bell_vec(fmpz * b, long n);
 
+#if FLINT64
+#define SMALL_EULER_LIMIT 15
+#else
+#define SMALL_EULER_LIMIT 25
+#endif
+
+static const mp_limb_t euler_number_small[] = {
+    1UL, 1UL, 5UL, 61UL, 1385UL, 50521UL, 2702765UL,
+    199360981UL,
+#if FLINT64
+    19391512145UL, 2404879675441UL, 370371188237525UL,
+    69348874393137901UL, 15514534163557086905UL
+#endif
+};
+
 double euler_number_size(ulong n);
 void euler_number_vec(fmpz * res, long n);
+void euler_number_zeta(fmpz_t res, ulong n);
+void euler_number(fmpz_t res, ulong n);
 
-void _zeta_inv_euler_product(mpfr_t res, ulong s);
+void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
 
 #if FLINT64
 #define SMALL_BERNOULLI_LIMIT 35

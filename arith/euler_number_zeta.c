@@ -30,63 +30,56 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+void euler_number_zeta(fmpz_t res, ulong n)
 {
     mpz_t r;
-    mpfr_t t, u, z, pi;
+    mpfr_t t, z, pi;
     long prec, pi_prec;
 
     if (n % 2)
     {
-        fmpz_set_si(num, -(n == 1));
-        fmpz_set_ui(den, 1 + (n == 1));
+        fmpz_zero(res);
         return;
     }
 
-    if (n < SMALL_BERNOULLI_LIMIT)
+    if (n < SMALL_EULER_LIMIT)
     {
-        fmpz_set_si(num, bernoulli_numer_small[n / 2]);
-        fmpz_set_ui(den, bernoulli_denom_small[n / 2]);
+        fmpz_set_ui(res, euler_number_small[n / 2]);
+        if (n % 4 == 2)
+            fmpz_neg(res, res);
         return;
     }
 
-    fmpz_bernoulli_denom(den, n);
-
-    prec = bernoulli_number_size(n) + fmpz_bits(den) + 10;
+    prec = euler_number_size(n) + 10;
     pi_prec = prec + FLINT_BIT_COUNT(n);
 
     mpz_init(r);
     mpfr_init2(t, prec);
-    mpfr_init2(u, prec);
     mpfr_init2(z, prec);
     mpfr_init2(pi, pi_prec);
 
-    /* t = 2 * n! / (2*pi)^n */
     mpz_fac_ui(r, n);
     mpfr_set_z(t, r, GMP_RNDN);
-    mpfr_mul_2exp(t, t, 1, GMP_RNDN);
-    mpfr_const_pi(pi, GMP_RNDN);
-    mpfr_mul_2exp(pi, pi, 1, GMP_RNDN);
-    mpfr_pow_ui(pi, pi, n, GMP_RNDN);
-    mpfr_div(t, t, pi, GMP_RNDN);
+    mpfr_mul_2exp(t, t, n + 2, GMP_RNDN);
 
-    /* t = t / zeta(n) */
-    _zeta_inv_euler_product(z, n, 0);
+    /* pi^(n + 1) * L(n+1) */
+    _zeta_inv_euler_product(z, n + 1, 1);
+    mpfr_const_pi(pi, GMP_RNDN);
+    mpfr_pow_ui(pi, pi, n + 1, GMP_RNDN);
+    mpfr_mul(z, z, pi, GMP_RNDN);
+
     mpfr_div(t, t, z, GMP_RNDN);
 
-    /* round numerator */
-    fmpz_get_mpz(r, den);
-    mpfr_mul_z(t, t, r, GMP_RNDN);
+    /* round */
     mpfr_round(t, t);
     mpfr_get_z(r, t, GMP_RNDN);
-    fmpz_set_mpz(num, r);
+    fmpz_set_mpz(res, r);
 
-    if (n % 4 == 0)
-        fmpz_neg(num, num);
+    if (n % 4 == 2)
+        fmpz_neg(res, res);
 
     mpz_clear(r);
     mpfr_clear(t);
-    mpfr_clear(u);
     mpfr_clear(z);
     mpfr_clear(pi);
 }

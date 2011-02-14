@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 
 
-void _zeta_inv_euler_product(mpfr_t res, ulong s)
+void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
     mpz_t z, x, y, r;
     mp_limb_t p;
@@ -46,9 +46,13 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s)
 
     mpz_set_ui(z, 1UL);
     mpz_mul_2exp(z, z, prec);
-    mpz_set_ui(r, 1UL);
-    mpz_mul_2exp(r, r, prec - s);
-    mpz_sub(z, z, r);
+
+    if (!char_4)
+    {
+        mpz_set_ui(r, 1UL);
+        mpz_mul_2exp(r, r, prec - s);
+        mpz_sub(z, z, r);
+    }
 
     p = 3UL;
 
@@ -104,7 +108,11 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s)
             mpz_mul_2exp(r, z, -shift);
 
         mpz_tdiv_q(r, r, y);
-        mpz_sub(z, z, r);
+
+        if (char_4 && (p % 4 == 3))
+            mpz_add(z, z, r);
+        else
+            mpz_sub(z, z, r);
 
         p = n_nextprime(p, 0);
     }
