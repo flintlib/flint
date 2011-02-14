@@ -23,10 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
 #include "ulong_extras.h"
 

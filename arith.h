@@ -27,6 +27,7 @@
 #define ARITH_H
 
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -104,5 +105,30 @@ void fmpz_bell_vec(fmpz * b, long n);
 
 double euler_number_size(ulong n);
 void euler_number_vec(fmpz * res, long n);
+
+void _zeta_inv_euler_product(mpfr_t res, ulong s);
+
+#if FLINT64
+#define SMALL_BERNOULLI_LIMIT 35
+#else
+#define SMALL_BERNOULLI_LIMIT 27
+#endif
+
+static const long bernoulli_numer_small[] = {
+    1L, 1L, -1L, 1L, -1L, 5L, -691L, 7L, -3617L, 43867L, -174611L, 854513L,
+    -236364091L, 8553103L,
+#if FLINT64
+    -23749461029L, 8615841276005L, -7709321041217L, 2577687858367L
+#endif
+};
+
+static const unsigned int bernoulli_denom_small[] = {
+    1, 6, 30, 42, 30, 66, 2730, 6, 510, 798, 330, 138,
+    2730, 6, 870, 14322, 510, 6
+};
+
+double bernoulli_number_size(ulong n);
+void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
+void bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
 
 #endif

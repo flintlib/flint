@@ -24,32 +24,21 @@
 ******************************************************************************/
 
 #include <stdio.h>
+#include <math.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_bernoulli_denom(fmpz_t den, ulong n)
+double bernoulli_number_size(ulong n)
 {
-    long i;
-    mp_limb_t p;
+    double x;
 
-    if (n % 2 == 1 || n == 0)
-    {
-        fmpz_set_ui(den, (n == 1) ? 2 : 1);
-        return;
-    }
+    /* |B_n| < 2 */
+    if (n <= 14)
+        return 1.0;
 
-    n_prime_pi_bounds(&p, &p, n);
-    n_compute_primes(p);
+    x = 2 + (n + 1) * log(n + 1) * 1.44269504088897;  /* 1/log(2) */
+    x -= n * 4.0941911703612822; /* log2(2*pi*e) */
 
-    fmpz_set_ui(den, 6UL);
-    for (i = 2; i < n; i++)
-    {
-        p = flint_primes[i];
-        if (p - 1 > n)
-            break;
-        if (n % (p - 1) == 0)
-            fmpz_mul_ui(den, den, p);
-    }
+    return x + 2;
 }

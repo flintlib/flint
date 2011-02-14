@@ -259,6 +259,30 @@ void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
     $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
     is a Bernoulli number.
 
+double bernoulli_number_size(ulong n)
+
+    Returns $b$ such that $|B_n| < 2^{\lfloor b \rfloor}$, using the inequality
+    $$|B_n| < \frac{4 n!}{(2\pi)^n}$$ and $n! \le (n+1)^{n+1} e^{-n}$.
+    No special treatment is given to odd $n$.
+    Accuracy is not guaranteed if $n > 10^{14}$.
+
+void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{(num, den)} to the reduced numerator and denominator
+    of the $n$-th Bernoulli number.
+
+    For even $n$, this function computes an approximation of
+    $|B_n| = 2n! \zeta(n) / (2 \pi)^n$ as a real number,
+    computes the exact denominator, and uses this information
+    to deduce the exact numerator.
+
+void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{(num, den)} to the reduced numerator and denominator
+    of the $n$-th Bernoulli number.
+    Currently calls \code{bernoulli_number_zeta}.
+
+
 *******************************************************************************
 
     Euler numbers

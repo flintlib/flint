@@ -31,24 +31,6 @@
 #include "fmpz_vec.h"
 #include "arith.h"
 
-#if FLINT64
-#define SMALL_BERNOULLI_LIMIT 35
-#else
-#define SMALL_BERNOULLI_LIMIT 27
-#endif
-
-static const long bernoulli_numer_small[] = {
-    1L, 1L, -1L, 1L, -1L, 5L, -691L, 7L, -3617L, 43867L, -174611L, 854513L,
-    -236364091L, 8553103L,
-#if FLINT64
-    -23749461029L, 8615841276005L, -7709321041217L, 2577687858367L
-#endif
-};
-
-static const unsigned int bernoulli_denom_small[] = {
-    1, 6, 30, 42, 30, 66, 2730, 6, 510, 798, 330, 138,
-    2730, 6, 870, 14322, 510, 6
-};
 
 void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
 {
