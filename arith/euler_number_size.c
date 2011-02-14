@@ -19,33 +19,24 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "arith.h"
+#include "ulong_extras.h"
 
-int
-fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
+double euler_number_size(ulong n)
 {
-    long j;
+    double x;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-    {
-        return 0;
-    }
+    x = n + 2;
+    x += ((n + 1) * log(n + 1) - n) * 1.44269504088897;  /* 1/log(2) */
+    x -= 1.6514961294723*(n+1);  /* log2(pi) */
 
-    for (j = 0; j < mat1->r; j++)
-    {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
-        {
-            return 0;
-        }
-    }
-
-    return 1;
+    return x + 2;
 }

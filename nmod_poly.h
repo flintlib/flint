@@ -477,6 +477,10 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod);
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
+
 /* Evaluation  ***************************************************************/
 
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, 
@@ -508,6 +512,19 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
+
+/* Logarithm series  *********************************************************/
+
+void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+
+void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
+
+void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod);
+
+void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
+
 
 #endif
 

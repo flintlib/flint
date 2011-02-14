@@ -19,33 +19,61 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
 
-int
-fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+static mp_limb_t
+n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    long j;
+    mp_limb_t prod = 1UL;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
+    while (n)
     {
-        return 0;
+        prod = n_mulmod2_preinv(prod, n, p, pinv);
+        n--;
     }
 
-    for (j = 0; j < mat1->r; j++)
+    return prod;
+}
+
+int main(void)
+{
+    flint_rand_t state;
+    mp_limb_t n;
+    int j;
+    flint_randinit(state);
+
+    printf("factorial_mod2_preinv....");
+    fflush(stdout);
+
+    for (n = 0; n < 1000; n++)
     {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        mp_limb_t p, pinv, x, y;
+
+        for (j = 0; j < 10; j++)
         {
-            return 0;
+            p = n_randtest_prime(state, 0);
+            pinv = n_preinvert_limb(p);
+            x = n_factorial_mod2_preinv(n, p, pinv);
+            y = n_factorial_mod2_foolproof(n, p, pinv);
+
+            if (x != y)
+            {
+                printf("FAIL:\n");
+                printf("n = %lu\np = %lu\nx = %lu\ny = %lu\n", n, p, x, y);
+                abort();
+            }
         }
     }
 
-    return 1;
+    flint_randclear(state);
+    printf("PASS\n");
+    return 0;
 }

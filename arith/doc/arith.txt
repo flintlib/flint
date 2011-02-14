@@ -261,6 +261,37 @@ void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
 
 *******************************************************************************
 
+    Euler numbers
+
+    Euler numbers are the integers $E_n$ defined by
+    $$\frac{1}{\cosh(t)} = \sum_{n=0}^{\infty} \frac{E_n}{n!} t^n.$$
+    With this convention, the odd-indexed numbers are zero and the even
+    ones alternate signs, viz.
+    $E_0, E_1, E_2, \ldots = 1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, \ldots$.
+
+*******************************************************************************
+
+double euler_number_size(ulong n)
+
+    Returns $b$ such that $|E_n| < 2^{\lfloor b \rfloor}$, using the inequality
+    $$|E_n| < \frac{2^{n+2} n!}{\pi^{n+1}}$$ and $n! \le (n+1)^{n+1} e^{-n}$.
+    No special treatment is given to odd $n$.
+    Accuracy is not guaranteed if $n > 10^{14}$.
+
+void euler_number_vec(fmpz * res, long n)
+
+    Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
+    and stores the result in \code{res}, which must be an initialised
+    \code{fmpz} vector of sufficient size.
+
+    Algorithm: evaluates the even-index $E_k$ modulo several limb-size primes
+    using the generating function and \code{nmod_poly} arithmetic. A tight
+    bound for the number of needed primes is computed using
+    \code{euler_number_size}, and the final integer values are recovered
+    using balanced CRT reconstruction.
+
+*******************************************************************************
+
     Multiplicative functions
 
 *******************************************************************************

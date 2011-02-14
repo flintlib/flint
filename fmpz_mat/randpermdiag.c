@@ -69,7 +69,7 @@ fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
     parity = shuffle(rows, state, mat->r);
     parity ^= shuffle(cols, state, mat->c);
 
-    _fmpz_vec_zero(mat->entries, mat->r * mat->c);
+    fmpz_mat_zero(mat);
 
     for (i = 0; i < n; i++)
         fmpz_set(&mat->rows[rows[i]][cols[i]], &diag[i]);

@@ -19,33 +19,60 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
+#include "arith.h"
+#include "profiler.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_mat.h"
 
-int
-fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+int main()
 {
-    long j;
+    fmpz * r;
+    fmpz_t s, t;
+    long k, n;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-    {
-        return 0;
-    }
+    printf("euler_number_vec....");
+    fflush(stdout);
 
-    for (j = 0; j < mat1->r; j++)
+    for (n = 2; n <= 3000; n += (n<100) ? 2 : n/3)
     {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        n += n % 2;
+        r = _fmpz_vec_init(n + 1);
+        fmpz_init(s);
+        fmpz_init(t);
+
+        euler_number_vec(r, n + 1);
+
+        /* sum binomial(n,k) E_k = 0 */
+        fmpz_set_ui(t, 1UL);
+        for (k = 0; k <= n; k++)
         {
-            return 0;
+            fmpz_addmul(s, r + k, t);
+            fmpz_mul_ui(t, t, n - k);
+            fmpz_divexact_ui(t, t, k + 1);
         }
+
+        if (!fmpz_is_zero(s))
+        {
+            printf("ERROR: sum over 0,...,n = %ld\n", n);
+            _fmpz_vec_print(r, n + 1);
+            abort();
+        }
+
+        fmpz_clear(s);
+        fmpz_clear(t);
+        _fmpz_vec_clear(r, n + 1);
     }
 
-    return 1;
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

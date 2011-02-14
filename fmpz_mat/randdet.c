@@ -51,7 +51,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
         return;
 
     /* Start with the zero matrix */
-    _fmpz_vec_zero(mat->entries, n*n);
+    fmpz_mat_zero(mat);
 
     if (*det == 0L)
         return;
@@ -88,15 +88,19 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     /* Need another reversal if the permutation was odd */
     if (parity)
     {
-        for (i = 0; i < n*n; i++)
+        for (i = 0; i < mat->r; i++)
         {
-            if (mat->entries[i])
+            for (j = 0; j < mat->c; j++)
             {
-                fmpz_neg(&mat->entries[i], &mat->entries[i]);
-                break;
+                if (!fmpz_is_zero(mat->rows[i] + j))
+                {
+                    fmpz_neg(mat->rows[i] + j, mat->rows[i] + j);
+                    goto end;
+                }
             }
         }
     }
+    end:
 
     _fmpz_vec_clear(diag, n);
     fmpz_factor_clear(factor);

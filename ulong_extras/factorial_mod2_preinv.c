@@ -19,33 +19,36 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "ulong_extras.h"
 
-int
-fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    long j;
+    mp_limb_t prod, hi, lo;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
-    {
-        return 0;
-    }
+    prod = 1UL;
+    lo = 1UL;
 
-    for (j = 0; j < mat1->r; j++)
+    /* TODO: speedup for n in the range of sqrt(ULONG_MAX) */
+    while (n)
     {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        umul_ppmm(hi, lo, lo, n);
+
+        if (hi)
         {
-            return 0;
+            lo = n_ll_mod_preinv(hi, lo, p, pinv);
+            prod = n_mulmod2_preinv(prod, lo, p, pinv);
+            lo = 1UL;
         }
+
+        n--;
     }
 
-    return 1;
+    return n_mulmod2_preinv(prod, lo, p, pinv);
 }

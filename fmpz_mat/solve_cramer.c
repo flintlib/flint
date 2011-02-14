@@ -95,7 +95,7 @@ fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
             fmpz_set_ui(den, 1UL);
             break;
         case 1:
-            fmpz_set(den, A->entries);
+            fmpz_set(den, A->rows[0]);
             fmpz_set(x, b);
             break;
         case 2:
