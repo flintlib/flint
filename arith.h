@@ -148,4 +148,6 @@ double bernoulli_number_size(ulong n);
 void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
 void bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
 
+void bernoulli_number_vec_series_multi_mod(fmpz * num, fmpz * den, long n);
+
 #endif
