@@ -117,10 +117,14 @@ static const mp_limb_t euler_number_small[] = {
 };
 
 double euler_number_size(ulong n);
+
 void euler_number_vec(fmpz * res, long n);
-void euler_number_zeta(fmpz_t res, ulong n);
+
+void _euler_number_zeta(fmpz_t res, ulong n);
+
 void euler_number(fmpz_t res, ulong n);
 
+void euler_polynomial(fmpq_poly_t poly, ulong n);
 
 /* Bernoulli numbers *********************************************************/
 

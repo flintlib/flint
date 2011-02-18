@@ -24,62 +24,67 @@
 ******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
-#include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
+#include "profiler.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
+#include "fmpq_poly.h"
 
-void _euler_number_zeta(fmpz_t res, ulong n)
+
+int main()
 {
-    mpz_t r;
-    mpfr_t t, z, pi;
-    long prec, pi_prec;
+    fmpq_poly_t P, Q;
+    mpz_t t;
 
-    if (n % 2)
+    long k, n;
+
+    printf("euler_polynomial....");
+    fflush(stdout);
+
+    for (n = 0; n <= 100; n++)
     {
-        fmpz_zero(res);
-        return;
+        fmpq_poly_init(P);
+        fmpq_poly_init(Q);
+
+        mpz_init(t);
+
+        for (k = 0; k < n; k++)
+        {
+            euler_polynomial(P, k);
+            mpz_bin_uiui(t, n, k);
+            fmpq_poly_scalar_mul_mpz(P, P, t);
+            fmpq_poly_add(Q, Q, P);
+        }
+
+        fmpq_poly_scalar_div_ui(Q, Q, 2);
+
+        euler_polynomial(P, n);
+        fmpq_poly_add(Q, Q, P);
+
+        mpz_clear(t);
+
+        fmpq_poly_zero(P);
+        fmpq_poly_set_coeff_ui(P, n, 1UL);
+
+        if (!fmpq_poly_equal(P, Q))
+        {
+            printf("ERROR: sum up to n = %ld did not add to x^n\n", n);
+            printf("Sum: ");
+            fmpq_poly_print_pretty(Q, "x");
+            printf("\nExpected: ");
+            fmpq_poly_print_pretty(P, "x");
+            printf("\n");
+            abort();
+        }
+
+        fmpq_poly_clear(P);
+        fmpq_poly_clear(Q);
     }
 
-    if (n < SMALL_EULER_LIMIT)
-    {
-        fmpz_set_ui(res, euler_number_small[n / 2]);
-        if (n % 4 == 2)
-            fmpz_neg(res, res);
-        return;
-    }
-
-    prec = euler_number_size(n) + 10;
-    pi_prec = prec + FLINT_BIT_COUNT(n);
-
-    mpz_init(r);
-    mpfr_init2(t, prec);
-    mpfr_init2(z, prec);
-    mpfr_init2(pi, pi_prec);
-
-    mpz_fac_ui(r, n);
-    mpfr_set_z(t, r, GMP_RNDN);
-    mpfr_mul_2exp(t, t, n + 2, GMP_RNDN);
-
-    /* pi^(n + 1) * L(n+1) */
-    _zeta_inv_euler_product(z, n + 1, 1);
-    mpfr_const_pi(pi, GMP_RNDN);
-    mpfr_pow_ui(pi, pi, n + 1, GMP_RNDN);
-    mpfr_mul(z, z, pi, GMP_RNDN);
-
-    mpfr_div(t, t, z, GMP_RNDN);
-
-    /* round */
-    mpfr_round(t, t);
-    mpfr_get_z(r, t, GMP_RNDN);
-    fmpz_set_mpz(res, r);
-
-    if (n % 4 == 2)
-        fmpz_neg(res, res);
-
-    mpz_clear(r);
-    mpfr_clear(t);
-    mpfr_clear(z);
-    mpfr_clear(pi);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

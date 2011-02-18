@@ -25,12 +25,35 @@
 
 #include <stdio.h>
 #include <mpir.h>
-#include <mpfr.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
-void euler_number(fmpz_t res, ulong n)
+void euler_polynomial(fmpq_poly_t poly, ulong n)
 {
-    _euler_number_zeta(res, n);
+    fmpz_t t;
+    long k;
+
+    if (n == 0)
+    {
+        fmpq_poly_set_ui(poly, 1UL);
+        return;
+    }
+
+    bernoulli_polynomial(poly, n + 1);
+
+    fmpz_init(t);
+    fmpz_set_si(t, -2L);
+    for (k = n; k >= 0; k--)
+    {
+        fmpz_mul(poly->coeffs + k, poly->coeffs + k, t);
+        fmpz_mul_ui(t, t, 2UL);
+        fmpz_sub_ui(t, t, 2UL);
+    }
+    fmpz_zero(poly->coeffs + n + 1);
+    fmpz_mul_ui(poly->den, poly->den, n + 1);
+    fmpq_poly_canonicalise(poly);
+    fmpz_clear(t);
 }

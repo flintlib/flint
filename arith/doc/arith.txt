@@ -289,15 +289,34 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 
 *******************************************************************************
 
-    Euler numbers
+    Euler numbers and polynomials
 
     Euler numbers are the integers $E_n$ defined by
     $$\frac{1}{\cosh(t)} = \sum_{n=0}^{\infty} \frac{E_n}{n!} t^n.$$
     With this convention, the odd-indexed numbers are zero and the even
     ones alternate signs, viz.
     $E_0, E_1, E_2, \ldots = 1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, \ldots$.
+    The corresponding Euler polynomials are defined by
+    $$\frac{2e^{xt}}{e^t+1} = \sum_{n=0}^{\infty} \frac{E_n(x)}{n!} t^n.$$
 
 *******************************************************************************
+
+void euler_number(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{res} to the Euler number $E_n$. Currently calls
+    \code{_euler_number_zeta}.
+
+void euler_number_vec(fmpz * res, long n)
+
+    Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
+    and stores the result in \code{res}, which must be an initialised
+    \code{fmpz} vector of sufficient size.
+
+    This function valuates the even-index $E_k$ modulo several limb-size
+    primes using the generating function and \code{nmod_poly} arithmetic.
+    A tight bound for the number of needed primes is computed using
+    \code{euler_number_size}, and the final integer values are recovered
+    using balanced CRT reconstruction.
 
 double euler_number_size(ulong n)
 
@@ -306,29 +325,21 @@ double euler_number_size(ulong n)
     No special treatment is given to odd $n$.
     Accuracy is not guaranteed if $n > 10^{14}$.
 
-void euler_number_vec(fmpz * res, long n)
+void euler_polynomial(fmpq_poly_t poly, ulong n)
 
-    Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
-    and stores the result in \code{res}, which must be an initialised
-    \code{fmpz} vector of sufficient size.
+    Sets \code{poly} to the Euler polynomial $E_n(x)$. Uses the formula
+    $$E_n(x) = \frac{2}{n+1}\left(B_{n+1}(x) - 
+        2^{n+1}B_{n+1}\left(\frac{x}{2}\right)\right),$$
+    with the Bernoulli polynomial $B_{n+1}(x)$ evaluated once
+    using \code{bernoulli_polynomial} and then rescaled.
 
-    Algorithm: evaluates the even-index $E_k$ modulo several limb-size primes
-    using the generating function and \code{nmod_poly} arithmetic. A tight
-    bound for the number of needed primes is computed using
-    \code{euler_number_size}, and the final integer values are recovered
-    using balanced CRT reconstruction.
-
-void euler_number_zeta(fmpz_t res, ulong n)
+void _euler_number_zeta(fmpz_t res, ulong n)
 
     Sets \code{res} to the Euler number $E_n$. For even $n$, this function
     uses the relation $$|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)$$
     where $L(n+1)$ denotes the Dirichlet $L$-function with character
     $\chi = \{ 0, 1, 0, -1 \}$.
 
-void euler_number(fmpz_t num, fmpz_t den, ulong n)
-
-    Sets \code{res} to the Euler number $E_n$. Currently calls
-    \code{euler_number_zeta}.
 
 *******************************************************************************
 
