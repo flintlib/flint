@@ -36,41 +36,49 @@
 
 int main()
 {
-    fmpz * nums;
-    fmpz * dens;
-    fmpz_t num;
-    fmpz_t den;
-    long n, N;
+    fmpq_poly_t P, Q;
+    mpz_t t;
 
-    printf("bernoulli_number_zeta....");
+    long k, n;
+
+    printf("bernoulli_polynomial....");
     fflush(stdout);
 
-    N = 5000;
-
-    nums = _fmpz_vec_init(N);
-    dens = _fmpz_vec_init(N);
-    fmpz_bernoulli_vec_2(nums, dens, N);
-
-    for (n = 0; n < N; n++)
+    for (n = 0; n <= 100; n++)
     {
-        fmpz_init(num);
-        fmpz_init(den);
+        fmpq_poly_init(P);
+        fmpq_poly_init(Q);
 
-        bernoulli_number(num, den, n);
-        if (!fmpz_equal(num, nums + n) || !fmpz_equal(den, dens + n))
+        mpz_init(t);
+
+        for (k = 0; k <= n; k++)
         {
-            printf("FAIL: n = %ld\n", n);
-            printf("Numerator: "); fmpz_print(num); printf("\n");
-            printf("Denominator: "); fmpz_print(den); printf("\n");
+            bernoulli_polynomial(P, k);
+            mpz_bin_uiui(t, n+1, k);
+            fmpq_poly_scalar_mul_mpz(P, P, t);
+            fmpq_poly_add(Q, Q, P);
+        }
+
+        fmpq_poly_scalar_div_ui(Q, Q, n+1);
+        mpz_clear(t);
+
+        fmpq_poly_zero(P);
+        fmpq_poly_set_coeff_ui(P, n, 1UL);
+
+        if (!fmpq_poly_equal(P, Q))
+        {
+            printf("ERROR: sum up to n = %ld did not add to x^n\n", n);
+            printf("Sum: ");
+            fmpq_poly_print_pretty(Q, "x");
+            printf("\nExpected: ");
+            fmpq_poly_print_pretty(P, "x");
+            printf("\n");
             abort();
         }
 
-        fmpz_clear(num);
-        fmpz_clear(den);
+        fmpq_poly_clear(P);
+        fmpq_poly_clear(Q);
     }
-
-    _fmpz_vec_clear(nums, N);
-    _fmpz_vec_clear(dens, N);
 
     _fmpz_cleanup();
     printf("PASS\n");

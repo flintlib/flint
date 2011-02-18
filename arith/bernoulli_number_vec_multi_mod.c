@@ -67,7 +67,7 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
 
 #define CRT_MAX_RESOLUTION 16
 
-void bernoulli_number_vec_series_multi_mod(fmpz * num, fmpz * den, long n)
+void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
@@ -82,9 +82,7 @@ void bernoulli_number_vec_series_multi_mod(fmpz * num, fmpz * den, long n)
         return;
 
     for (i = 0; i < n; i++)
-    {
-        fmpz_bernoulli_denom(den + i, i);
-    }
+        bernoulli_number_denom(den + i, i);
 
     /* Number of nonzero entries (apart from B_1) */
     m = (n + 1) / 2;
@@ -100,7 +98,7 @@ void bernoulli_number_vec_series_multi_mod(fmpz * num, fmpz * den, long n)
     residues = malloc(num_primes * sizeof(mp_limb_t));
     polys = malloc(num_primes * sizeof(mp_ptr));
 
-    /* Computes mod p */
+    /* Compute Bernoulli numbers mod p */
     primes[0] = n_nextprime(1UL<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);

@@ -31,44 +31,45 @@
 #include "fmpz_vec.h"
 #include "arith.h"
 
-
-void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
+static void
+__ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
 {
-    fmpz_t t, c, d;
+    fmpz_t t, c, d, cden;
     long j, k, m, mcase;
     int prodsize;
+
+    if (start >= n)
+        return;
 
     fmpz_init(t);
     fmpz_init(c);
     fmpz_init(d);
+    fmpz_init(cden);
 
-    fmpz_primorial(den, n + 1);
+    /* Common denominator */
+    fmpz_primorial(cden, n + 1);
 
-    /* Initial values */
-    for (k = 0; k < FLINT_MIN(SMALL_BERNOULLI_LIMIT, n); k += 2)
+    start += start % 2;
+
+    /* Convert initial values to common denominator */
+    for (k = 0; k < start; k += 2)
     {
-        fmpz_mul_si(b + k, den, bernoulli_numer_small[k/2]);
-        fmpz_divexact_ui(b + k, b + k, bernoulli_denom_small[k/2]);
+        fmpz_divexact(t, cden, den + k);
+        fmpz_mul(num + k, num + k, t);
     }
 
-    /* Odd values */
-    if (n > 1)
-        fmpz_divexact_si(b + 1, den, -2L);
-    for (k = 3; k < n; k += 2)
-        fmpz_zero(b + k);
-
     /* Ramanujan's recursive formula */
-    for (m = SMALL_BERNOULLI_LIMIT + 1; m < n; m += 2)
+    for (m = start; m < n; m += 2)
     {
         mcase = m % 6;
 
-        fmpz_mul_ui(b + m, den, m + 3UL);
-        fmpz_divexact_ui(b + m, b + m, 3UL);
+        fmpz_mul_ui(num + m, cden, m + 3UL);
+        fmpz_divexact_ui(num + m, num + m, 3UL);
 
         if (mcase == 4)
         {
-            fmpz_neg(b + m, b + m);
-            fmpz_divexact_ui(b + m, b + m, 2UL);
+            fmpz_neg(num + m, num + m);
+            fmpz_divexact_ui(num + m, num + m, 2UL);
         }
 
         /* All factors are strictly smaller than m + 4; choose prodsize such
@@ -125,12 +126,45 @@ void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
                 break;
             }
 
-            fmpz_submul(b + m, c, b + (m - j));
+            fmpz_submul(num + m, c, num + (m - j));
         }
-        fmpz_divexact(b + m, b + m, t);
+        fmpz_divexact(num + m, num + m, t);
+    }
+
+    /* Convert to separate denominators */
+    for (k = 0; k < n; k += 2)
+    {
+        bernoulli_number_denom(den + k, k);
+        fmpz_divexact(t, cden, den + k);
+        fmpz_divexact(num + k, num + k, t);
     }
 
     fmpz_clear(t);
     fmpz_clear(c);
     fmpz_clear(d);
+}
+
+void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+{
+    long i, start;
+    fmpz_t t;
+    fmpz_t d;
+
+    fmpz_init(t);
+    fmpz_init(d);
+
+    start = FLINT_MIN(BERNOULLI_SMALL_NUMER_LIMIT, n);
+
+    /* Initial values */
+    for (i = 0; i < start; i += 2)
+        bernoulli_number(num + i, den + i, i);
+
+    __ramanujan_even_common_denom(num, den, start, n);
+
+    /* Odd values */
+    for (i = 1; i < n; i += 2)
+        bernoulli_number(num + i, den + i, i);
+
+    fmpz_clear(d);
+    fmpz_clear(t);
 }

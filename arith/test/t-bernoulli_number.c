@@ -32,57 +32,53 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_poly.h"
-#include "fmpz_poly.h"
 
 
 int main()
 {
-    fmpq_poly_t P;
-    fmpz_poly_t R, S;
+    fmpz * num1;
+    fmpz * den1;
+    fmpz_t num2;
+    fmpz_t den2;
+    long n, N;
 
-    long i, n;
-
-    printf("bernoulli_vec_2....");
+    printf("bernoulli_number....");
     fflush(stdout);
 
-    for (n = 0; n <= 3200; n += (n<100) ? 1 : n/3)
+    N = 4000;
+
+    num1 = _fmpz_vec_init(N);
+    den1 = _fmpz_vec_init(N);
+    fmpz_init(num2);
+    fmpz_init(den2);
+
+    _bernoulli_number_vec_multi_mod(num1, den1, N);
+
+    for (n = 0; n < N; n++)
     {
-        fmpq_poly_init2(P, n);
-        fmpz_poly_init2(R, n);
-        fmpz_poly_init2(S, n);
+        bernoulli_number(num2, den2, n);
 
-        fmpz_bernoulli_vec(P->den, P->coeffs, n);
-        _fmpq_poly_set_length(P, n);
-
-        fmpz_bernoulli_vec_2(R->coeffs, S->coeffs, n);
-        _fmpz_poly_set_length(R, n);
-        _fmpz_poly_set_length(S, n);
-
-        for (i = 0; i < n; i++)
+        if (!fmpz_equal(num1 + n, num2))
         {
-            mpq_t x, y;
-            mpq_init(x);
-            mpq_init(y);
-
-            fmpq_poly_get_coeff_mpq(x, P, i);
-            fmpz_get_mpz(mpq_numref(y), R->coeffs + i);
-            fmpz_get_mpz(mpq_denref(y), S->coeffs + i);
-
-            if (!mpq_equal(x, y))
-            {
-                printf("ERROR: different results for %ld = \n", n);
-                abort();
-            }
-
-            mpq_clear(y);
-            mpq_clear(x);
+            printf("FAIL: n = %ld, numerator\n", n);
+            printf("vec:    "); fmpz_print(num1 + n); printf("\n");
+            printf("single: "); fmpz_print(num2); printf("\n");
+            abort();
         }
 
-
-        fmpq_poly_clear(P);
-        fmpz_poly_clear(R);
-        fmpz_poly_clear(S);
+        if (!fmpz_equal(den1 + n, den2))
+        {
+            printf("FAIL: n = %ld, denominator\n", n);
+            printf("vec:    "); fmpz_print(den1 + n); printf("\n");
+            printf("single: "); fmpz_print(den2); printf("\n");
+            abort();
+        }
     }
+
+    _fmpz_vec_clear(num1, N);
+    _fmpz_vec_clear(den1, N);
+    fmpz_clear(num2);
+    fmpz_clear(den2);
 
     _fmpz_cleanup();
     printf("PASS\n");

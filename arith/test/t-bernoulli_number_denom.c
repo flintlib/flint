@@ -24,32 +24,42 @@
 ******************************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
+#include "fmpz.h"
 #include "ulong_extras.h"
 
-void fmpz_bernoulli_denom(fmpz_t den, ulong n)
+int main()
 {
-    long i;
-    mp_limb_t p;
+    fmpz_t s, t;
+    long n;
 
-    if (n % 2 == 1 || n == 0)
+    printf("bernoulli_number_denom....");
+    fflush(stdout);
+
+    fmpz_init(s);
+    fmpz_init(t);
+
+    for (n = 0; n < 1000; n++)
     {
-        fmpz_set_ui(den, (n == 1) ? 2 : 1);
-        return;
+        bernoulli_number_denom(t, n);
+        fmpz_addmul_ui(s, t, n_nth_prime(n+1));
     }
 
-    n_prime_pi_bounds(&p, &p, n);
-    n_compute_primes(p);
+    fmpz_set_str(t, "34549631155954474103407159", 10);
 
-    fmpz_set_ui(den, 6UL);
-    for (i = 2; i < n; i++)
+    if (!fmpz_equal(s, t))
     {
-        p = flint_primes[i];
-        if (p - 1 > n)
-            break;
-        if (n % (p - 1) == 0)
-            fmpz_mul_ui(den, den, p);
+        printf("FAIL: Hash disagrees with known value\n");
+        abort();
     }
+
+    fmpz_clear(s);
+    fmpz_clear(t);
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

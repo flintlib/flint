@@ -31,25 +31,29 @@
 #include "fmpq_poly.h"
 #include "arith.h"
 
-void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
+void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
+    fmpz * den;
     long k;
 
-    if (n < 1)
+    if (n == 0)
     {
         fmpq_poly_set_ui(poly, 1UL);
         return;
     }
 
     fmpq_poly_fit_length(poly, n + 1);
-    fmpz_bernoulli_vec(poly->den, poly->coeffs, n + 1);
+
+    fmpz_init(t);
+    den = _fmpz_vec_init(n + 1);
+
+    bernoulli_number_vec(poly->coeffs, den, n + 1);
 
     /* Multiply the odd term by binomial(n,1) = n */
     fmpz_mul_ui(poly->coeffs + 1, poly->coeffs + 1, n);
 
     /* Multiply even terms by binomial coefficients */
-    fmpz_init(t);
     fmpz_set_ui(t, 1UL);
     for (k = 2; k <= n; k += 2)
     {
@@ -57,9 +61,19 @@ void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
         fmpz_divexact_ui(t, t, k*(k-1));
         fmpz_mul(poly->coeffs + k, poly->coeffs + k, t);
     }
-    fmpz_clear(t);
+
+    /* Convert to common denominator */
+    fmpz_primorial(poly->den, n + 2);
+    for (k = 0; k <= n; k++)
+    {
+        fmpz_mul(poly->coeffs + k, poly->coeffs+k, poly->den);
+        fmpz_divexact(poly->coeffs + k, poly->coeffs + k, den + k);
+    }
 
     _fmpz_poly_reverse(poly->coeffs, poly->coeffs, n + 1, n + 1);
     _fmpq_poly_set_length(poly, n + 1);
     fmpq_poly_canonicalise(poly);
+
+    _fmpz_vec_clear(den, n + 1);
+    fmpz_clear(t);
 }

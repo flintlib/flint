@@ -32,5 +32,5 @@
 
 void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 {
-    bernoulli_number_zeta(num, den, n);
+    _bernoulli_number_zeta(num, den, n);
 }

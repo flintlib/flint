@@ -91,7 +91,7 @@ void __euler_number_vec_multi_mod(fmpz * res, long n)
     residues = malloc(num_primes * sizeof(mp_limb_t));
     polys = malloc(num_primes * sizeof(mp_ptr));
 
-    /* Computes mod p */
+    /* Compute Euler numbers mod p */
     primes[0] = n_nextprime(1UL<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);

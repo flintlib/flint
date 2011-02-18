@@ -91,17 +91,15 @@ void fmpz_stirling1u_mat(fmpz ** rows, long n);
 void fmpz_stirling1_mat(fmpz ** rows, long n);
 void fmpz_stirling2_mat(fmpz ** rows, long n);
 
-void fmpz_bernoulli_denom(fmpz_t den, ulong n);
-void fmpz_bernoulli_vec_2(fmpz * num, fmpz * den, long len);
-
-void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n);
-void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n);
-void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n);
-
-void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
-
 void fmpz_bell(fmpz_t b, ulong n);
 void fmpz_bell_vec(fmpz * b, long n);
+
+/* Euler product *************************************************************/
+
+void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+
+
+/* Euler numbers *************************************************************/
 
 #if FLINT64
 #define SMALL_EULER_LIMIT 15
@@ -123,15 +121,16 @@ void euler_number_vec(fmpz * res, long n);
 void euler_number_zeta(fmpz_t res, ulong n);
 void euler_number(fmpz_t res, ulong n);
 
-void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+
+/* Bernoulli numbers *********************************************************/
 
 #if FLINT64
-#define SMALL_BERNOULLI_LIMIT 35
+#define BERNOULLI_SMALL_NUMER_LIMIT 35
 #else
-#define SMALL_BERNOULLI_LIMIT 27
+#define BERNOULLI_SMALL_NUMER_LIMIT 27
 #endif
 
-static const long bernoulli_numer_small[] = {
+static const long _bernoulli_numer_small[] = {
     1L, 1L, -1L, 1L, -1L, 5L, -691L, 7L, -3617L, 43867L, -174611L, 854513L,
     -236364091L, 8553103L,
 #if FLINT64
@@ -139,15 +138,23 @@ static const long bernoulli_numer_small[] = {
 #endif
 };
 
-static const unsigned int bernoulli_denom_small[] = {
-    1, 6, 30, 42, 30, 66, 2730, 6, 510, 798, 330, 138,
-    2730, 6, 870, 14322, 510, 6
-};
-
-double bernoulli_number_size(ulong n);
-void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
 void bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
 
-void bernoulli_number_vec_series_multi_mod(fmpz * num, fmpz * den, long n);
+void bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+
+void bernoulli_number_denom(fmpz_t den, ulong n);
+
+double bernoulli_number_size(ulong n);
+
+void bernoulli_polynomial(fmpq_poly_t poly, ulong n);
+
+void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
+
+void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n);
+
+void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
+
+void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
+
 
 #endif

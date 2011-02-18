@@ -195,93 +195,97 @@ void fmpz_bell_vec(fmpz * b, long n)
 
 *******************************************************************************
 
-void fmpz_bernoulli_denom(fmpz_t den, ulong n)
+void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{(num, den)} to the reduced numerator and denominator
+    of the $n$-th Bernoulli number. As presently implemented,
+    this function simply calls \code{_bernoulli_number_zeta}.
+
+void bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of the Bernoulli numbers
+    $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive. This function automatically
+    chooses between the \code{recursive}, \code{zeta} and \code{multi_mod}
+    algorithms according to the size of $n$.
+
+void bernoulli_number_denom(fmpz_t den, ulong n)
 
     Sets \code{den} to the reduced denominator of the $n$-th
     Bernoulli number $B_n$. For even $n$, the denominator is computed
     as the product of all primes $p$ for which $p - 1$ divides $n$;
     this property is a consequence of the von Staudt-Clausen theorem.
     For odd $n$, the denominator is trivial (\code{den} is set to 1 whenever
-    $B_n = 0$).
-
-void fmpz_bernoulli_vec_2(fmpz * num, fmpz * den, long n)
-
-    Sets the elements of \code{num} and \code{den} to the reduced
-    numerators and denominators of the Bernoulli numbers
-    $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive.
-
-
-void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
-
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
-    using a generating function. This algorithm is fast for very
-    large $n$, say $n > 2000$.
-
-    Conceptually, the algorithm consists of calculating the scaled
-    Bernoulli numbers $c_k = B_k / k!$ using the generating function
-    $x/(e^x-1)$. The series for $(e^x-1)/x$ is expanded using a simple
-    recurrence relation. A single \code{fmpq_poly} inversion is
-    then performed, and the resulting coefficients are scaled back to
-    obtain the ordinary Bernoulli numbers.
-
-    In fact, we use a slightly different generating function corresponding
-    to the scaled coefficients $d_k = 2^{k/2} B_k / k!$ ($k$ even). This
-    series is split into four separate power series to improve performance.
-    The formula is given in \citep{BuhlerCrandallSompolski1992}.
-
-    %[1] J.P. Buhler, R.E. Crandall, R.W. Sompolski,
-    %    "Irregular Primes to One Million", Math. Comp. Vol 59,
-    %    No. 200 (Oct. 1992), pp. 717-722.
-
-void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
-
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
-    using table lookup for the initial numbers with single-limb numerators,
-    and then using a recursive formula expressing $B_m$ as a sum over
-    $B_k$ for $k$ congruent to $m$ modulo 6.
-
-    All operations are performed using integer arithmetic to avoid costly GCDs,
-    making this algorithm fast for small $n$, say $n < 1000$. The fully
-    reduced denominator is calculated immediately as the primorial of $n + 1$.
-
-    %[1] http://en.wikipedia.org/w/index.php?
-    %    title=Bernoulli_number&oldid=405938876
-
-void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n)
-
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$ for $n \geq 0$
-    as a vector of integer numerators \code{num} with a common
-    denominator \code{den}. The denominator is reduced to lowest terms.
-
-void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
-
-    For $n \geq 0$, sets \code{poly} to the Bernoulli polynomial of degree $n$,
-    $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
-    is a Bernoulli number.
+    $B_n = 0$). The initial sequence of values smaller than $2^{32}$ are
+    looked up directly from a table.
 
 double bernoulli_number_size(ulong n)
 
     Returns $b$ such that $|B_n| < 2^{\lfloor b \rfloor}$, using the inequality
     $$|B_n| < \frac{4 n!}{(2\pi)^n}$$ and $n! \le (n+1)^{n+1} e^{-n}$.
-    No special treatment is given to odd $n$.
-    Accuracy is not guaranteed if $n > 10^{14}$.
+    No special treatment is given to odd $n$. Accuracy is not guaranteed
+    if $n > 10^{14}$.
 
-void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 
-    Sets \code{(num, den)} to the reduced numerator and denominator
-    of the $n$-th Bernoulli number.
+    Sets \code{poly} to the Bernoulli polynomial of degree $n$,
+    $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
+    is a Bernoulli number. This function basically calls
+    \code{bernoulli_number_vec} and then rescales the coefficients
+    efficiently.
 
-    For even $n$, this function computes an approximation of
-    $|B_n| = 2n! \zeta(n) / (2 \pi)^n$ as a real number,
-    computes the exact denominator, and uses this information
-    to deduce the exact numerator.
-
-void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 
     Sets \code{(num, den)} to the reduced numerator and denominator
     of the $n$-th Bernoulli number.
-    Currently calls \code{bernoulli_number_zeta}.
 
+    This function first computes the exact denominator and a bound
+    for the size of the numerator. It then computes an approximation
+    of $|B_n| = 2n! \zeta(n) / (2 \pi)^n$ as a floating-point number
+    and multiplies by the denominator to to obtain a real number
+    that rounds to the exact numerator. For tiny $n$, the numerator
+    is looked up from a table to avoid unnecessary overhead.
+
+void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive.
+
+    The first few entries are computed using \code{bernoulli_number},
+    and then Ramanujan's recursive formula expressing $B_m$ as a sum over
+    $B_k$ for $k$ congruent to $m$ modulo 6 is applied repeatedly.
+
+    To avoid costly GCDs, the numerators are transformed internally
+    to a common denominator and all operations are performed using
+    integer arithmetic. This makes the algorithm fast for small $n$,
+    say $n < 1000$. The common denominator is calculated directly
+    as the primorial of $n + 1$.
+
+    %[1] http://en.wikipedia.org/w/index.php?
+    %    title=Bernoulli_number&oldid=405938876
+
+void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive. Uses repeated direct calls to \code{_bernoulli_number_zeta}.
+
+void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive. Uses the generating function 
+
+    $$\frac{x^2}{\cosh(x)-1} = \sum_{k=0}^{\infty}
+        \frac{(2-4k) B_{2k}}{(2k)!} x^{2k}$$
+
+    which is evaluated modulo several limb-size primes using \code{nmod_poly}
+    arithmetic to yield the numerators of the Bernoulli numbers after
+    multiplication by the denominators and CRT reconstruction. This formula,
+    given (incorrectly) in \citep{BuhlerCrandallSompolski1992}, saves about
+    half of the time compared to the usual generating function $x/(e^x-1)$
+    since the odd terms vanish.
 
 *******************************************************************************
 

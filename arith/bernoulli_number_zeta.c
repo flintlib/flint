@@ -30,27 +30,26 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+
+void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {
     mpz_t r;
     mpfr_t t, u, z, pi;
     long prec, pi_prec;
 
+    bernoulli_number_denom(den, n);
+
     if (n % 2)
     {
         fmpz_set_si(num, -(n == 1));
-        fmpz_set_ui(den, 1 + (n == 1));
         return;
     }
 
-    if (n < SMALL_BERNOULLI_LIMIT)
+    if (n < BERNOULLI_SMALL_NUMER_LIMIT)
     {
-        fmpz_set_si(num, bernoulli_numer_small[n / 2]);
-        fmpz_set_ui(den, bernoulli_denom_small[n / 2]);
+        fmpz_set_si(num, _bernoulli_numer_small[n / 2]);
         return;
     }
-
-    fmpz_bernoulli_denom(den, n);
 
     prec = bernoulli_number_size(n) + fmpz_bits(den) + 10;
     pi_prec = prec + FLINT_BIT_COUNT(n);
