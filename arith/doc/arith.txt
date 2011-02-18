@@ -301,7 +301,7 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 
 *******************************************************************************
 
-void euler_number(fmpz_t num, fmpz_t den, ulong n)
+void euler_number(fmpz_t res, ulong n)
 
     Sets \code{res} to the Euler number $E_n$. Currently calls
     \code{_euler_number_zeta}.
