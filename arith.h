@@ -160,5 +160,8 @@ void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
 
 void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
 
+/* Swinnerton-Dyer polynomials ***********************************************/
+
+void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
 
 #endif

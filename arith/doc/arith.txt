@@ -407,3 +407,19 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
     The first squaring is done directly since the polynomial is very 
     sparse at this point.
 
+
+*******************************************************************************
+
+    Swinnerton-Dyer polynomials
+
+*******************************************************************************
+
+void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Swinnerton-Dyer polynomial $S_n$, defined as
+    the integer polynomial
+    $$S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3}
+        \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})$$
+    where $p_n$ denotes the $p$-th prime number and all combinations
+    of signs are taken. This polynomial has degree $2^n$ and is
+    irreducible over the integers.
