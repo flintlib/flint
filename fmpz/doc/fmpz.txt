@@ -457,6 +457,10 @@ void fmpz_fac_ui(fmpz_t f, ulong n)
 
     Sets $f$ to $n!$ where $n$ is an \code{unsigned long}.
 
+void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
+
+    Sets $f$ to the binomial coefficient ${n \choose k}$.
+
 *******************************************************************************
 
     Greatest common divisor

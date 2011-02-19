@@ -318,6 +318,7 @@ void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
 
+void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
 
 void _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
     ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
