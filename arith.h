@@ -94,6 +94,10 @@ void fmpz_stirling2_mat(fmpz ** rows, long n);
 void fmpz_bell(fmpz_t b, ulong n);
 void fmpz_bell_vec(fmpz * b, long n);
 
+/* Legendre polynomials ******************************************************/
+
+void legendre_polynomial(fmpq_poly_t poly, ulong n);
+
 /* Euler product *************************************************************/
 
 void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);

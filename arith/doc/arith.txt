@@ -340,6 +340,22 @@ void _euler_number_zeta(fmpz_t res, ulong n)
     where $L(n+1)$ denotes the Dirichlet $L$-function with character
     $\chi = \{ 0, 1, 0, -1 \}$.
 
+*******************************************************************************
+
+    Legendre polynomials
+
+*******************************************************************************
+
+void legendre_polynomial(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the $n$-th Legendre polynomial
+    $$P_n(x) = \frac{1}{2^n n!} \frac{d^n}{dx^n} \left[
+        \left(x^2-1\right)^n \right].$$
+    The coefficients are calculated using a hypergeometric recurrence.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
 *******************************************************************************
 
