@@ -326,6 +326,11 @@ void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g \times x$ where $x$ is an \code{unsigned long}.
 
+void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
+
+    Sets $f$ to $g \times x \times y$ where $x$ and $y$ are of type
+    \code{unsigned long}.
+
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to \code{g * 2^exp}.
@@ -418,6 +423,12 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
     Sets $f$ to the quotient of $g$ and $h$, assuming that the
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
     is $0$ an exception is raised.
+
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
+
+    Sets $f$ to the quotient of $g$ and $h = x \times y$, assuming that
+    the division is exact, i.e.\ $g$ is a multiple of $h$.
+    If $x$ or $y$ is $0$ an exception is raised.
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

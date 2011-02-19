@@ -265,6 +265,40 @@ void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
 
+static __inline__ void
+fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_mul_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_mul_ui(f, g, h1);
+        fmpz_mul_ui(f, f, h2);
+    }
+}
+
+static __inline__ void
+fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_divexact_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
+
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
 
