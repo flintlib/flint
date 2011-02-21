@@ -57,8 +57,8 @@ void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     fmpz_set_ui(t, 1UL);
     for (k = 2; k <= n; k += 2)
     {
-        fmpz_mul_ui(t, t, (n-k+1)*(n-k+2));
-        fmpz_divexact_ui(t, t, k*(k-1));
+        fmpz_mul2_uiui(t, t, n-k+1, n-k+2);
+        fmpz_divexact2_uiui(t, t, k, k-1);
         fmpz_mul(poly->coeffs + k, poly->coeffs + k, t);
     }
 
