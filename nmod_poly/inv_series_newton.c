@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -37,31 +38,25 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv,
                                   mp_srcptr Q, long n, nmod_t mod)
 {
     long m;
-    mp_ptr g0, prod, prod2;
+    mp_ptr prod, prod2;
 
     if (n < NMOD_NEWTON_INVERSE_CUTOFF)
     {
         _nmod_poly_inv_series_basecase(Qinv, Q, n, mod);
-        
         return;
     }
-    
+
     m = (n + 1)/2;
-    g0 = _nmod_vec_init(m);
     prod = _nmod_vec_init(n);
     prod2 = _nmod_vec_init(n);
 
-    _nmod_poly_inv_series_newton(g0, Q, m, mod);
-    _nmod_poly_mullow(prod, Q, n, g0, m, n, mod);
-    _nmod_poly_mullow(prod2 + m, g0, m, prod + m, n - m, n - m, mod);
-    mpn_zero(prod2, m);
-
-    _nmod_poly_sub(Qinv, g0, m, prod2, n, mod);
+    _nmod_poly_inv_series_newton(Qinv, Q, m, mod);
+    _nmod_poly_mullow(prod, Q, n, Qinv, m, n, mod);
+    _nmod_poly_mullow(prod2 + m, Qinv, m, prod + m, n - m, n - m, mod);
+    _nmod_vec_neg(Qinv + m, prod2 + m, n - m, mod);
 
     _nmod_vec_free(prod2);
     _nmod_vec_free(prod);
-    _nmod_vec_free(g0);
-
 }
 
 void
