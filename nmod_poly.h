@@ -526,5 +526,12 @@ void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod);
 void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
 
 
+/* Exponential series  *******************************************************/
+
+
+void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
+
 #endif
 

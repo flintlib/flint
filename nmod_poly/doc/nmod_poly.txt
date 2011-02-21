@@ -931,3 +931,30 @@ void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
     to order $O(x^n)$. It is assumed that \code{f} has constant
     term 1. The case $f = \log(1+cx^r)$ is automatically checked and handled
     efficiently.
+
+*******************************************************************************
+
+    Exponential series
+
+    Functions for evaluating the exponential function of a formal power series,
+    $$\exp(h) = \sum_{k=0}^{\infty} \frac{h^k}{k!}.$$
+    Results are undefined if some coefficients $1/k!$ do not exist in the
+    given field; that is, if the computation is done to order $O(x^n)$, the
+    modulus $p$ must be a prime satisfying $p \ge n$.
+
+*******************************************************************************
+
+void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
+
+    Set the first \code{n} coefficients of \code{f} to the series
+    expansion of \code{exp(h)}. It is assumed that \code{n > 0}, that
+    \code{f} has constant term 0 and that \code{f} is zero-padded as
+    necessary to length \code{n}. Aliasing is not allowed.
+
+    Uses Newton iteration (the version given in \cite{HanZim2004}).
+
+void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
+
+    Set \code{f} to the series expansion of \code{exp(h)}
+    to order $O(x^n)$. It is assumed that \code{h} has constant
+    term 0.
