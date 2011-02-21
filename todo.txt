@@ -169,10 +169,6 @@ arith
   and fast factorisation algorithm (Brent-Pollard, QS, ...) in
   fmpz_factor.
 
-* Optimise _fmpz_bernoulli_vec_recursive by collecting denominators
-  in blocks instead of using a single denominator for the entire
-  vector.
-
 * Optimise memory management in mpq_harmonic.
 
 * Maybe move the helper functions in primorial.c to the mpn_extras
@@ -189,22 +185,14 @@ arith
 
 * Write a fast version of fmpz_unfactor.
 
-* Find a faster way to compute a vector of Bernoulli numbers
-  for 1500 < n < 10000.
-
-* Implement the zeta function algorithm for computing isolated
-  Bernoulli numbers.
-
 * Implement computation of Bernoulli numbers modulo a prime
   (e.g. porting the code from flint 1)
 
 * Implement multimodular computation of large Bernoulli numbers
   (e.g. porting bernmm)
 
-* Add separate functions for computing the scaled Bernoulli numbers
+* (Maybe) add separate functions for computing the scaled Bernoulli numbers
   B_2k/(2k)! directly.
-
-* Implement computation of Euler numbers and Euler polynomials.
 
 * Implement rising factorials and falling factorials (x)_n, (x)^n
   as fmpz_poly functions, and add fmpz functions for their
@@ -215,13 +203,11 @@ arith
 
 * Implement Fibonacci polynomials and fmpz Fibonacci numbers.
 
-* Implement Bell numbers and Bell polynomials.
+* Implement Bell number vectors and Bell polynomials.
 
 * Implement cyclotomic polynomials.
 
-* Implement Swinnerton-Dyer polynomials.
-
-* Implement orthogonal polynomials (Legendre, Chebyshev T/U, Jacobi,
+* Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
   Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
@@ -235,14 +221,9 @@ fmpz_mat
 
 * Add element getter and setter methods.
 
-* Implement methods for setting the zero matrix, identity matrix, etc.
-
-* Change the interface for _fmpz_mat_rowreduce to generate
-  an explicit permutation array.
-
-* Implement null space computation.
-
 * Implement fmpz_mat_pow_ui.
+
+* Implement fast null space computation.
 
 * Implement fast multimodular and/or p-adic determinant calculation.
 
