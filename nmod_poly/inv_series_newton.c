@@ -33,12 +33,12 @@
 
 #define NMOD_NEWTON_INVERSE_CUTOFF 400
 
-void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, 
-                                  mp_srcptr Q, long n, nmod_t mod)
+static void 
+__nmod_poly_inv_series_newton_prealloc(mp_ptr Qinv, 
+                                  mp_srcptr Q, mp_ptr tmp, long n, nmod_t mod)
 {
+    int alloc;
     long m;
-    mp_ptr prod, prod2;
 
     if (n < NMOD_NEWTON_INVERSE_CUTOFF)
     {
@@ -47,16 +47,27 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv,
     }
 
     m = (n + 1)/2;
-    prod = _nmod_vec_init(n);
-    prod2 = _nmod_vec_init(n);
 
-    _nmod_poly_inv_series_newton(Qinv, Q, m, mod);
-    _nmod_poly_mullow(prod, Q, n, Qinv, m, n, mod);
-    _nmod_poly_mullow(prod2 + m, Qinv, m, prod + m, n - m, n - m, mod);
-    _nmod_vec_neg(Qinv + m, prod2 + m, n - m, mod);
+    alloc = (tmp == NULL);
+    if (alloc)
+        tmp = _nmod_vec_init(n);
 
-    _nmod_vec_free(prod2);
-    _nmod_vec_free(prod);
+    __nmod_poly_inv_series_newton_prealloc(Qinv, Q, tmp, m, mod);
+
+    _nmod_poly_mullow(tmp, Q, n, Qinv, m, n, mod);
+    _nmod_poly_mullow(Qinv + m, Qinv, m, tmp + m, n - m, n - m, mod);
+    _nmod_vec_neg(Qinv + m, Qinv + m, n - m, mod);
+
+    if (alloc)
+        _nmod_vec_free(tmp);
+}
+
+
+void
+_nmod_poly_inv_series_newton(mp_ptr Qinv, 
+                                  mp_srcptr Q, long n, nmod_t mod)
+{
+    __nmod_poly_inv_series_newton_prealloc(Qinv, Q, NULL, n, mod);
 }
 
 void
