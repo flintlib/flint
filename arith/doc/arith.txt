@@ -170,7 +170,7 @@ void fmpz_stirling2_mat(fmpz ** rows, long n)
 
 *******************************************************************************
 
-void fmpz_bell(fmpz_t b, ulong n)
+void bell_number(fmpz_t b, ulong n)
 
     Sets \code{b} to the \code{n}:th Bell number $B_n$, defined as the
     number of partitions of a set with \code{n} members. Equivalently,
@@ -181,13 +181,36 @@ void fmpz_bell(fmpz_t b, ulong n)
     and otherwise evaluates a precise truncation of the series
     $B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}$ using binary splitting.
 
-void fmpz_bell_vec(fmpz * b, long n)
+void bell_number_vec(fmpz * b, long n)
+
+    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive. Automatically switches between the \code{recursive}
+    and \code{multi_mod} algorithms depending on the size of $n$.
+
+double bell_number_size(ulong n)
+
+    Returns $b$ such that $B_n < 2^{\lfloor b \rfloor}$, using the inequality
+    $$B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n$$
+    which is given in \cite{BerTas2010}.
+
+void _bell_number_vec_recursive(fmpz * b, long n)
+
+    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive. This function uses table lookup if $B_{n-1}$ fits in a
+    single word, and a simple triangular recurrence otherwise.
+
+void _bell_number_vec_multi_mod(fmpz * b, long n)
 
     Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive.
 
-    This function uses table lookup if $B_{n-1}$ fits in a single word,
-    and a simple triangular recurrence otherwise.
+    This function evaluates the Bell numbers modulo several limb-size
+    primes using the exponential generating function
+    $$e^{e^x-1} = \sum_{n=0}^{\infty} \frac{B_n}{n!} x^n$$ and
+    \code{nmod_poly} arithmetic. A tight bound for the number of needed
+    primes is computed using \code{bell_number_size}, and the final
+    integer values are recovered using balanced CRT reconstruction.
+
 
 *******************************************************************************
 
@@ -312,7 +335,7 @@ void euler_number_vec(fmpz * res, long n)
     and stores the result in \code{res}, which must be an initialised
     \code{fmpz} vector of sufficient size.
 
-    This function valuates the even-index $E_k$ modulo several limb-size
+    This function evaluates the even-index $E_k$ modulo several limb-size
     primes using the generating function and \code{nmod_poly} arithmetic.
     A tight bound for the number of needed primes is computed using
     \code{euler_number_size}, and the final integer values are recovered

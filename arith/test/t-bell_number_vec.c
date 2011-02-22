@@ -37,23 +37,20 @@ int main(void)
 {
     fmpz * b1;
     fmpz * b2;
-    long n, k;
+    long n;
 
-    const long maxn = 400;
+    const long maxn = 1000;
 
-    printf("bell....");
+    printf("bell_number_vec....");
     fflush(stdout);
 
     b1 = _fmpz_vec_init(maxn);
+    b2 = _fmpz_vec_init(maxn);
 
-    /* Consistency test */
-    for (n = 0; n < maxn; n++)
-        fmpz_bell(b1 + n, n);
-
-    for (n = 0; n < maxn; n++)
+    for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
-        b2 = _fmpz_vec_init(n);
-        fmpz_bell_vec(b2, n);
+        _bell_number_vec_recursive(b1, n);
+        _bell_number_vec_multi_mod(b2, n);
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {
@@ -61,37 +58,10 @@ int main(void)
             printf("n = %ld\n", n);
             abort();
         }
-
-        _fmpz_vec_clear(b2, n);
-    }
-
-    /* Compare with B_n = sum of Stirling numbers of 2nd kind */
-    for (n = 0; n < 2500; n += (n < 50) ? + 1 : n/4)
-    {
-        b2 = _fmpz_vec_init(n+1);
-
-        fmpz_stirling2_vec(b2, n, n+1);
-
-        for (k = 1; k <= n; k++)
-            fmpz_add(b2, b2, b2 + k);
-
-        fmpz_bell(b1, n);
-
-        if (!fmpz_equal(b1, b2))
-        {
-            printf("FAIL:\n");
-            printf("n = %ld\n", n);
-            fmpz_print(b1);
-            printf("\n");
-            fmpz_print(b2);
-            printf("\n");
-            abort();
-        }
-
-        _fmpz_vec_clear(b2, n+1);
     }
 
     _fmpz_vec_clear(b1, maxn);
+    _fmpz_vec_clear(b2, maxn);
 
     printf("PASS\n");
     return 0;
