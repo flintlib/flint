@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 
-static __inline__ void
+static void
 __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod)
 {
@@ -57,8 +57,8 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
 
     /* g := exp(-h) + O(x^m) */
     _nmod_poly_mullow(T, f, n, g, m2, m, mod);
-    _nmod_poly_mullow(U + m2, g, m2, T + m2, m - m2, m - m2, mod);
-    _nmod_vec_neg(g + m2, U + m2, m - m2, mod);
+    _nmod_poly_mullow(g + m2, g, m2, T + m2, m - m2, m - m2, mod);
+    _nmod_vec_neg(g + m2, g + m2, m - m2, mod);
 
     /* U := h' + g (f' - f h') + O(x^(n-1))
        Note: should replace h' by h' mod x^(m-1) */
@@ -72,8 +72,7 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     /* f := f + f * (h - int U) + O(x^n) = exp(h) + O(x^n) */
     _nmod_poly_integral(U, U, n, mod);  /* should skip low terms */
     _nmod_vec_sub(U + m, h + m, U + m, n - m, mod);
-    _nmod_poly_mullow(T + m, f, n - m, U + m, n - m, n - m, mod);
-    _nmod_vec_set(f + m, T + m, n - m);
+    _nmod_poly_mullow(f + m, f, n - m, U + m, n - m, n - m, mod);
 }
 
 void
