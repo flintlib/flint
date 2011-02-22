@@ -29,5 +29,8 @@
 
 double bell_number_size(ulong n)
 {
+    if (n == 0)
+        return 2;
+
     return n * log(0.792 * n/log(n+1)) * 1.44269504088896 + 2;
 }
