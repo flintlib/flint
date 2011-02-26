@@ -32,8 +32,7 @@
 #include "nmod_vec.h"
 #include "arith.h"
 
-
-static void
+void
 __bell_number_vec_mod_p(mp_ptr res, mp_ptr tmp, long n, nmod_t mod)
 {
     mp_limb_t fac, c;
