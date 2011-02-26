@@ -36,11 +36,10 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
     long j, k, rlen;
     mp_limb_t a;
 
+    _nmod_vec_zero(res, n);
+
     if (power >= n)
-    {
-        _nmod_vec_zero(res, n);
         return;
-    }
 
     rlen = (n - 1) / power;
     a = coeff;
@@ -105,5 +104,6 @@ nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
 
     nmod_poly_fit_length(res, n);
     _nmod_poly_log_series_monomial_ui(res->coeffs, coeff, power, n, res->mod);
+    res->length = n;
     _nmod_poly_normalise(res);
 }
