@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("exp_series....");
+    printf("exp_series_basecase....");
     fflush(stdout);
 
     /* Check exp(A+B) = exp(A) * exp(B) */
@@ -46,15 +46,10 @@ main(void)
     {
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
         long n;
-        long N = 100;
         mp_limb_t mod;
 
-        /* Make sure to workout the Newton code */
-        if (n_randint(state, 10) == 1)
-            N = 2000;
-
         mod = n_randtest_prime(state, 0);
-        n = n_randtest(state) % N;
+        n = n_randtest(state) % 100;
         n = FLINT_MIN(n, mod);
 
         nmod_poly_init(A, mod);
@@ -65,12 +60,11 @@ main(void)
         nmod_poly_init(expAB, mod);
         nmod_poly_init(S, mod);
 
-        nmod_poly_randtest(A, state, n_randint(state, N));
+        nmod_poly_randtest(A, state, n_randint(state, 100));
         nmod_poly_set_coeff_ui(A, 0, 0UL);
-        nmod_poly_randtest(B, state, n_randint(state, N));
+        nmod_poly_randtest(B, state, n_randint(state, 100));
         nmod_poly_set_coeff_ui(B, 0, 0UL);
 
-        /* Randomly generate a monomial */
         if (n_randlimb(state) % 100 == 0)
         {
             nmod_poly_zero(A);
@@ -79,8 +73,8 @@ main(void)
             nmod_poly_set_coeff_ui(A, 0, 0UL);
         }
 
-        nmod_poly_exp_series(expA, A, n);
-        nmod_poly_exp_series(expB, B, n);
+        nmod_poly_exp_series_basecase(expA, A, n);
+        nmod_poly_exp_series_basecase(expB, B, n);
         nmod_poly_add(AB, A, B);
         nmod_poly_exp_series(expAB, AB, n);
         nmod_poly_mullow(S, expA, expB, n);
@@ -124,8 +118,8 @@ main(void)
         nmod_poly_randtest(A, state, n_randint(state, 50));
         nmod_poly_set_coeff_ui(A, 0, 0UL);
 
-        nmod_poly_exp_series(B, A, n);
-        nmod_poly_exp_series(A, A, n);
+        nmod_poly_exp_series_basecase(B, A, n);
+        nmod_poly_exp_series_basecase(A, A, n);
 
         result = nmod_poly_equal(A, B);
         if (!result)

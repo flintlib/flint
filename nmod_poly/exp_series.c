@@ -30,21 +30,20 @@
 #include "nmod_poly.h"
 
 
+#define NMOD_NEWTON_EXP_CUTOFF 200
+#define NMOD_NEWTON_EXP_CUTOFF2 250
+
+
 static void
 __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod)
 {
     long m, m2, l;
 
-    if (n <= 2)
+    if (n < NMOD_NEWTON_EXP_CUTOFF)
     {
-        if (n >= 1)
-            f[0] = g[0] = 1UL;
-        if (n == 2)
-        {
-            f[1] = h[1];
-            g[1] = n_negmod(h[1], mod.n);
-        }
+        _nmod_poly_exp_series_basecase(f, h, n, n, mod);
+        _nmod_poly_inv_series_basecase(g, f, (n + 1) / 2, mod);
         return;
     }
 
@@ -79,6 +78,12 @@ void
 _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 {
     mp_ptr g, T, U, hprime;
+
+    if (n < NMOD_NEWTON_EXP_CUTOFF2)
+    {
+        _nmod_poly_exp_series_basecase(f, h, n, n, mod);
+        return;
+    }
 
     g = _nmod_vec_init((n + 1) / 2);
     T = _nmod_vec_init(n);
@@ -131,6 +136,14 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
         hlen = FLINT_MIN(hlen, n);
         _nmod_poly_exp_series_monomial_ui(f->coeffs,
             h->coeffs[hlen-1], hlen - 1, n, f->mod);
+        f->length = n;
+        _nmod_poly_normalise(f);
+        return;
+    }
+
+    if (n < NMOD_NEWTON_EXP_CUTOFF2)
+    {
+        _nmod_poly_exp_series_basecase(f->coeffs, h->coeffs, hlen, n, f->mod);
         f->length = n;
         _nmod_poly_normalise(f);
         return;
