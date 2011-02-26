@@ -99,7 +99,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
 {
     mp_ptr f_coeffs, h_coeffs;
     nmod_poly_t t1;
-    long hlen;
+    long hlen, k;
 
     nmod_poly_fit_length(f, n);
     hlen = h->length;
@@ -121,6 +121,18 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
             f->coeffs[0] = 1UL;
             f->length = 1;
         }
+        return;
+    }
+
+    /* Handle monomials */
+    for (k = 0; h->coeffs[k] == 0UL && k < n - 1; k++);
+    if (k == hlen - 1 || k == n - 1)
+    {
+        hlen = FLINT_MIN(hlen, n);
+        _nmod_poly_exp_series_monomial_ui(f->coeffs,
+            h->coeffs[hlen-1], hlen - 1, n, f->mod);
+        f->length = n;
+        _nmod_poly_normalise(f);
         return;
     }
 

@@ -38,12 +38,12 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("log_series_monomial_ui....");
+    printf("exp_series_monomial_ui....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
-        nmod_poly_t A, logA, res;
+        nmod_poly_t A, expA, res;
         long n;
         mp_limb_t mod;
         ulong power;
@@ -54,19 +54,18 @@ main(void)
         n = FLINT_MIN(n, mod);
 
         nmod_poly_init(A, mod);
-        nmod_poly_init(logA, mod);
+        nmod_poly_init(expA, mod);
         nmod_poly_init(res, mod);
 
         coeff = n_randlimb(state) % mod;
         power = 1 + n_randint(state, 2*n + 1);
 
-        nmod_poly_set_coeff_ui(A, 0, 1UL);
         nmod_poly_set_coeff_ui(A, power, coeff);
 
-        nmod_poly_log_series(logA, A, n);
-        nmod_poly_log_series_monomial_ui(res, coeff, power, n);
+        nmod_poly_exp_series(expA, A, n);
+        nmod_poly_exp_series_monomial_ui(res, coeff, power, n);
 
-        result = nmod_poly_equal(logA, res);
+        result = nmod_poly_equal(expA, res);
 
         if (!result)
         {
@@ -74,13 +73,13 @@ main(void)
             printf("n = %ld, mod = %lu\n", n, mod);
             printf("power = %lu, coeff = %lu\n", power, coeff);
             printf("A: "); nmod_poly_print(A), printf("\n\n");
-            printf("log(A): "); nmod_poly_print(logA), printf("\n\n");
+            printf("exp(A): "); nmod_poly_print(expA), printf("\n\n");
             printf("res: "); nmod_poly_print(res), printf("\n\n");
             abort();
         }
 
         nmod_poly_clear(A);
-        nmod_poly_clear(logA);
+        nmod_poly_clear(expA);
         nmod_poly_clear(res);
     }
 

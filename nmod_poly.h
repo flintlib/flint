@@ -528,6 +528,11 @@ void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
 
 /* Exponential series  *******************************************************/
 
+void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+
+void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
 
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
 
