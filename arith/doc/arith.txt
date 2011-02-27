@@ -462,3 +462,39 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     where $p_n$ denotes the $n$-th prime number and all combinations
     of signs are taken. This polynomial has degree $2^n$ and is
     irreducible over the integers.
+
+
+*******************************************************************************
+
+    Partition function
+
+*******************************************************************************
+
+void partition_function_vec(fmpz * res, long len)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$. Uses inversion of Euler's pentagonal series.
+
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$, modulo the modulus defined by \code{mod}.
+    Uses inversion of Euler's pentagonal series.
+
+
+*******************************************************************************
+
+    Landau's function
+
+*******************************************************************************
+
+void landau_function_vec(fmpz * res, long len)
+
+    Computes the first \code{len} values of Landau's function $g(n)$
+    starting with $g(0)$. Landau's function gives the largest order
+    of an element of the symmetric group $S_n$.
+
+    Implements the ``basic algorithm'' given in
+    \cite{DelegliseNicolasZimmermann2009}. The running time is
+    $O(n^{3/2} / \sqrt{\log n})$.

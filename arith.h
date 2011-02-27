@@ -196,4 +196,14 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n);
 
 void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
 
+/* Partition function ********************************************************/
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
+
+void partition_function_vec(fmpz * res, long len);
+
+/* Landau function ***********************************************************/
+
+void landau_function_vec(fmpz * res, long len);
+
 #endif
