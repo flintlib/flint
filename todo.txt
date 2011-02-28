@@ -122,6 +122,12 @@ nmod_poly
 
 * Make some assembly optimisations to nmod_poly module.
 
+* Add basecase versions of log, sqrt, invsqrt series
+
+* Add O(M(n)) powering mod x^n based on exp and log
+
+* Implement fast mulmid and use to improve Newton iteration
+
 
 fmpz_poly
 ---------
@@ -145,6 +151,12 @@ fmpz_poly
 
 * Optimise fmpz_poly_shift_right/left for shifting a polynomial
   in-place
+
+
+fmpq_poly
+---------
+
+* Implement series sqrt, invsqrt, log, exp
 
 
 arith
@@ -203,7 +215,7 @@ arith
 
 * Implement Fibonacci polynomials and fmpz Fibonacci numbers.
 
-* Implement Bell number vectors and Bell polynomials.
+* Implement Bell polynomials.
 
 * Implement cyclotomic polynomials.
 
