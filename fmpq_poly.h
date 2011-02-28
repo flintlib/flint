@@ -338,6 +338,13 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
 
+/* Logarithm series **********************************************************/
+
+void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
+                           const fmpz * f, const fmpz_t fden, long n);
+
+void fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n);
+
 /*  Evaluation  **************************************************************/
 
 void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
