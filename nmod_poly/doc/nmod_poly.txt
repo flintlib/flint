@@ -890,6 +890,34 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
 
 *******************************************************************************
 
+    Square root series
+
+*******************************************************************************
+
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set the first $n$ terms of $g$ to the series expansion of $1/\sqrt{h}$.
+    It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
+    is zero-padded as necessary to length $n$. Aliasing is not permitted.
+
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g$ to the series expansion of $1/\sqrt{h}$ to order $O(x^n)$.
+    It is assumed that $h$ has constant term 1.
+
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set the first $n$ terms of $g$ to the series expansion of $\sqrt{h}$.
+    It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
+    is zero-padded as necessary to length $n$. Aliasing is not permitted.
+
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
+    It is assumed that $h$ has constant term 1.
+
+*******************************************************************************
+
     Logarithm series
 
     Functions for evaluating the logarithm of a formal power series,

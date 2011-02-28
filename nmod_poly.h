@@ -513,6 +513,16 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+/* Square root series ********************************************************/
+
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
 /* Logarithm series  *********************************************************/
 
 void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
