@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -725,7 +726,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
 
 *******************************************************************************
 
-    Derivative
+    Derivative and integral
 
 *******************************************************************************
 
@@ -739,6 +740,19 @@ void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden,
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly)
 
     Sets \code{res} to the derivative of \code{poly}.
+
+void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long len)
+
+    Sets \code{(rpoly, rden, len)} to the integral of 
+    \code{(poly, den, len - 1)}.  Assumes \code{len >= 0}.  
+    Supports aliasing between the two polynomials.
+
+void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
+
+    Sets \code{res} to the integral of \code{poly}. The constant
+    term is set to zero. In particular, the integral of the zero
+    polynomial is the zero polynomial.
 
 *******************************************************************************
 

@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
  
 ******************************************************************************/
 
@@ -325,12 +326,17 @@ void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, long n);
 
-/*  Derivative  **************************************************************/
+/*  Derivative and integral **************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long len);
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
+
+void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long len);
+
+void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
 
 /*  Evaluation  **************************************************************/
 
