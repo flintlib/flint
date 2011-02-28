@@ -892,6 +892,13 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
 
     Square root series
 
+    The series expansions for $\sqrt{h}$ and $1/\sqrt{h}$ are defined
+    by means of the generalised binomial theorem
+    $$h^r = (1+y)^r =
+        \sum_{k=0}^{\infty} {r \choose k} y^k.$$
+    It is assumed that $h$ has constant term $1$ and that the coefficients
+    $2^{-k}$ exist in the coefficient ring (i.e. $2$ must be invertible).
+
 *******************************************************************************
 
 void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
@@ -920,11 +927,11 @@ void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     Logarithm series
 
-    Functions for evaluating the logarithm of a formal power series,
-    $$\log(f(x)) = \sum_{k=1}^{\infty} \frac{(-1)^{k+1}}{k} (f(x)-1)^k.$$
-    Results are undefined if some coefficients $1/k$ do not exist in the
-    given field; that is, if the computation is done to order $O(x^n)$, the
-    modulus $p$ must be a prime satisfying $p \ge n$.
+    The logarithm of a formal power series is defined by
+    $$\log(h) = \log(1+y) = \sum_{k=1}^{\infty} \frac{(-1)^{k+1}}{k} y^k.$$
+    It is assumed that $h$ has constant term $1$ and that the $1/k$
+    coefficients exist in the given field (when computing to order $O(x^n)$,
+    the modulus $p$ must be a prime satisfying $p \ge n$).
 
 *******************************************************************************
 
@@ -964,11 +971,11 @@ void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
 
     Exponential series
 
-    Functions for evaluating the exponential function of a formal power series,
+    The exponential function of a formal power series is defined by
     $$\exp(h) = \sum_{k=0}^{\infty} \frac{h^k}{k!}.$$
-    Results are undefined if some coefficients $1/k!$ do not exist in the
-    given field; that is, if the computation is done to order $O(x^n)$, the
-    modulus $p$ must be a prime satisfying $p \ge n$.
+    It is assumed that $h$ has constant term $0$ and that the coefficients
+    $1/k!$ exist in the given field (when computing to order $O(x^n)$, the
+    modulus $p$ must be a prime satisfying $p \ge n$).
 
 *******************************************************************************
 
