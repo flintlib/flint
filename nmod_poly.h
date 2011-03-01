@@ -513,7 +513,7 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
-/* Square root series ********************************************************/
+/* Square roots **************************************************************/
 
 void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
 
@@ -523,7 +523,19 @@ void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
 
 void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
 
-/* Logarithm series  *********************************************************/
+/* Transcendental functions **************************************************/
+
+void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
 
 void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
                 ulong power, long n, nmod_t mod);
@@ -534,9 +546,6 @@ void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
 void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod);
 
 void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
-
-
-/* Exponential series  *******************************************************/
 
 void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
                 ulong power, long n, nmod_t mod);
@@ -555,4 +564,3 @@ void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
 
 #endif
-
