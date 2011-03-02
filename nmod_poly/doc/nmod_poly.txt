@@ -1094,3 +1094,33 @@ void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     Set $g = \operatorname{tan}(h) + O(x^n)$.
+
+void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{sinh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses the identity $\sinh(x) = (e^x - e^{-x})/2$.
+
+void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{sinh}(h) + O(x^n)$.
+
+void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses the identity $\cosh(x) = (e^x + e^{-x})/2$.
+
+void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{cosh}(h) + O(x^n)$.
+
+void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{tanh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Uses the identity
+    $\tanh(x) = (e^{2x}-1)/(e^{2x}+1)$.
+
+void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{tanh}(h) + O(x^n)$.

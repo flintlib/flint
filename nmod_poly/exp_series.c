@@ -34,16 +34,16 @@
 #define NMOD_NEWTON_EXP_CUTOFF2 250
 
 
-static void
+void
 __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
-    mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod)
+    mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod, int extend)
 {
     long m, m2, l;
 
     if (n < NMOD_NEWTON_EXP_CUTOFF)
     {
         _nmod_poly_exp_series_basecase(f, h, n, n, mod);
-        _nmod_poly_inv_series_basecase(g, f, (n + 1) / 2, mod);
+        _nmod_poly_inv_series_basecase(g, f, extend ? n : (n + 1) / 2, mod);
         return;
     }
 
@@ -52,7 +52,7 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     l = m - 1;  /* shifted for derivative */
 
     /* f := exp(h) + O(x^m),  g := exp(-h) + O(x^m2) */
-    __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, m, mod);
+    __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, m, mod, 0);
 
     /* g := exp(-h) + O(x^m) */
     _nmod_poly_mullow(T, f, n, g, m2, m, mod);
@@ -72,6 +72,14 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     _nmod_poly_integral(U, U, n, mod);  /* should skip low terms */
     _nmod_vec_sub(U + m, h + m, U + m, n - m, mod);
     _nmod_poly_mullow(f + m, f, n - m, U + m, n - m, n - m, mod);
+
+    /* g := exp(-h) + O(x^n) */
+    if (extend)
+    {
+        _nmod_poly_mullow(T, f, n, g, m, n, mod);
+        _nmod_poly_mullow(g + m, g, m, T + m, n - m, n - m, mod);
+        _nmod_vec_neg(g + m, g + m, n - m, mod);
+    }
 }
 
 void
@@ -91,7 +99,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
     hprime = _nmod_vec_init(n);
 
     _nmod_poly_derivative(hprime, h, n, mod);
-    __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod);
+    __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod, 0);
 
     _nmod_vec_free(hprime);
     _nmod_vec_free(g);

@@ -546,6 +546,15 @@ void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
 void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
 void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
 
+void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
 void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
                 ulong power, long n, nmod_t mod);
 void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
@@ -558,6 +567,10 @@ void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
                 ulong power, long n, nmod_t mod);
 void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
                 ulong power, long n);
+
+void
+__nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
+    mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod, int extend);
 
 void
 _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
