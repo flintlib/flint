@@ -943,12 +943,19 @@ void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     $$\operatorname{asinh}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1+(h(t))^2}} dt$$
 
-    The logarithm function assumes that $h$ has constant term $1$.
-    All other functions assume that $h$ has constant term $0$.
-    For all functions, it is assumed that the coefficient $1/k$ exists in
-    the given field. When computing to order $O(x^n)$, the modulus $p$ must
-    therefore be a prime satisfying $p \ge n$. If the input does not satisfy
-    all these conditions, results are undefined.
+    The functions sin, cos, tan, etc. are defined using standard inverse
+    or functional relations.
+
+    The logarithm function assumes that $h$ has constant term $1$. All
+    other functions assume that $h$ has constant term $0$.
+
+    All functions assume that the coefficient $1/k$ or $1/k!$ exists
+    for all indices $k$. When computing to order $O(x^n)$, the modulus $p$
+    must therefore be a prime satisfying $p \ge n$. Further, we always
+    require that $p > 2$ in order to be able to multiply by $1/2$ for
+    internal purposes.
+
+    If the input does not satisfy all these conditions, results are undefined.
 
     Except where otherwise noted, functions are implemented with optimal
     (up to constants) complexity $O(M(n))$, where $M(n)$ is the cost
@@ -1055,3 +1062,35 @@ void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     Set $g = \operatorname{asinh}(h) + O(x^n)$.
+
+void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{sin}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed. The value is computed using the identity
+    $\sin(x) = 2 \tan(x/2)) / (1 + \tan^2(x/2)).$
+
+void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{sin}(h) + O(x^n)$.
+
+void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed. The value is computed using the identity
+    $\cos(x) = (1-\tan^2(x/2)) / (1 + \tan^2(x/2)).$
+
+void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$.
+
+void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{tan}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses Newton iteration to invert the atan function.
+
+void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{tan}(h) + O(x^n)$.
