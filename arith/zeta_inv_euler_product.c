@@ -35,7 +35,7 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
     mpz_t z, x, y, r;
     mp_limb_t p;
-    long prec, n, powprec, xexp, yexp, shift;
+    long prec, powprec, xexp, yexp, shift;
 
     mpz_init(x);
     mpz_init(y);
@@ -58,6 +58,7 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 
     while (1)
     {
+        long i;
         powprec = prec - s*log(p)*1.4426950408889634 + 1;
 
         /* printf("prime %lu, powprec %ld\n", p, powprec); */
@@ -71,34 +72,20 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
         xexp = 0;
 
         /* Slow equivalent: mpz_pow_ui(y, x, s) */
-        n = s;
-        while (n)
+        mpz_set_ui(y, p);
+        for (i = FLINT_BIT_COUNT(s) - 2; i >= 0; i--)
         {
-            if (n & 1)
+            mpz_mul(y, y, y);
+            yexp += yexp;
+            shift = mpz_sizeinbase(y, 2) - powprec - 4;
+            if (shift >= 0)
             {
-                mpz_mul(y, y, x);
-                yexp += xexp;
-                shift = mpz_sizeinbase(y, 2) - powprec - 4;
-                if (shift >= 0)
-                {
-                    mpz_tdiv_q_2exp(y, y, shift);
-                    yexp += shift;
-                }
-                n--;
+                mpz_tdiv_q_2exp(y, y, shift);
+                yexp += shift;
             }
 
-            if (n > 1)
-            {
-                mpz_mul(x, x, x);
-                xexp += xexp;
-                shift = mpz_sizeinbase(x, 2) - powprec - 4;
-                if (shift >= 0)
-                {
-                    mpz_tdiv_q_2exp(x, x, shift);
-                    xexp += shift;
-                }
-                n /= 2;
-            }
+            if (s & (1UL<<i))
+                mpz_mul_ui(y, y, p);
         }
 
         shift = yexp;
