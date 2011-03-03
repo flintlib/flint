@@ -338,7 +338,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
 
-/* Logarithm series **********************************************************/
+/* Transcendental functions **************************************************/
 
 void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
                            const fmpz * f, const fmpz_t fden, long n);
@@ -349,6 +349,11 @@ void _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
                             const fmpz * h, const fmpz_t hden, long n);
 
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
 
 /*  Evaluation  **************************************************************/
