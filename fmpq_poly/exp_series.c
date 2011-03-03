@@ -57,11 +57,14 @@ _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
 
     _fmpq_poly_log_series(t, tden, g, gden, n);
     _fmpq_poly_sub(t, tden, t, tden, n, h, hden, n);
+    /* TODO: half of product is redundant! */
     _fmpq_poly_mullow(u, uden, g, gden, n, t, tden, n, n);
     _fmpq_poly_sub(g, gden, g, gden, n, u, uden, n);
 
     fmpz_clear(tden);
     fmpz_clear(uden);
+    _fmpz_vec_clear(t, n);
+    _fmpz_vec_clear(u, n);
 }
 
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
