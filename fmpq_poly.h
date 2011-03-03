@@ -388,6 +388,17 @@ void _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
 
 void fmpq_poly_tan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
+void _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_sin_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+
 /*  Evaluation  **************************************************************/
 
 void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 

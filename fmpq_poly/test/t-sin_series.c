@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("tan_series....");
+    printf("sin_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,8 +60,8 @@ main(void)
 
         fmpq_poly_canonicalise(a);
 
-        fmpq_poly_tan_series(b, a, n);
-        fmpq_poly_tan_series(a, a, n);
+        fmpq_poly_sin_series(b, a, n);
+        fmpq_poly_sin_series(a, a, n);
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
@@ -79,39 +79,39 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    /* Check atan(tan(a)) = a */
-    for (i = 0; i < 500; i++)
+    /* Check asin(sin(a)) = a */
+    for (i = 0; i < 200; i++)
     {
-        fmpq_poly_t a, tana, atantana;  /* but what is an atantana? */
+        fmpq_poly_t a, sina, asinsina;
         long n = n_randint(state, 80) + 1;
 
         fmpq_poly_init(a);
-        fmpq_poly_init(tana);
-        fmpq_poly_init(atantana);
+        fmpq_poly_init(sina);
+        fmpq_poly_init(asinsina);
 
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 60) + 1, 80);
         fmpq_poly_set_coeff_ui(a, 0, 0UL);
 
-        fmpq_poly_tan_series(tana, a, n);
-        fmpq_poly_atan_series(atantana, tana, n);
+        fmpq_poly_sin_series(sina, a, n);
+        fmpq_poly_asin_series(asinsina, sina, n);
         fmpq_poly_truncate(a, n);
 
-        cflags |= fmpq_poly_is_canonical(tana) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(atantana) ? 0 : 2;
-        result = (fmpq_poly_equal(atantana, a) && !cflags);
+        cflags |= fmpq_poly_is_canonical(sina) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(asinsina) ? 0 : 2;
+        result = (fmpq_poly_equal(asinsina, a) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("a = "), fmpq_poly_debug(a), printf("\n\n");
-            printf("tan(a) = "), fmpq_poly_debug(tana), printf("\n\n");
-            printf("atan(tan(a)) = "), fmpq_poly_debug(atantana), printf("\n\n");
+            printf("sin(a) = "), fmpq_poly_debug(sina), printf("\n\n");
+            printf("asin(sin(a)) = "), fmpq_poly_debug(asinsina), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
         }
 
         fmpq_poly_clear(a);
-        fmpq_poly_clear(tana);
-        fmpq_poly_clear(atantana);
+        fmpq_poly_clear(sina);
+        fmpq_poly_clear(asinsina);
     }
 
     flint_randclear(state);

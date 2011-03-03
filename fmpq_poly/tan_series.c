@@ -69,6 +69,7 @@ _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_sub(t, tden, t, tden, n, h, hden, n);
     _fmpq_poly_mullow(v + m, vden, u, uden, n, t + m, tden, n - m, n - m);
     _fmpq_poly_sub(g, gden, g, gden, m, v, vden, n);
+    _fmpq_poly_canonicalise(g, gden, n);
 
     fmpz_clear(tden);
     fmpz_clear(uden);
@@ -132,7 +133,7 @@ void fmpq_poly_tan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     }
 
     _fmpq_poly_set_length(res, n);
-    fmpq_poly_canonicalise(res);
+    _fmpq_poly_normalise(res);
 
     if (alloc)
         free(copy);
