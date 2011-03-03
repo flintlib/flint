@@ -46,7 +46,6 @@ void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
     _fmpq_poly_inv_series(f_inv, f_inv_den, f, fden, n);
     _fmpq_poly_mullow(g, gden, f_diff, f_diff_den, n - 1, f_inv, f_inv_den, n - 1, n - 1);
     _fmpq_poly_integral(g, gden, g, gden, n);
-    _fmpq_poly_canonicalise(g, gden, n);
 
     _fmpz_vec_clear(f_diff, n);
     _fmpz_vec_clear(f_inv, n);
@@ -63,7 +62,7 @@ fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
 
     if (flen < 1 || !fmpz_equal(f->coeffs, f->den))
     {
-        printf("Exception: nmod_poly_log_series: constant term != 1\n");
+        printf("Exception: fmpq_poly_log_series: constant term != 1\n");
         abort();
     }
 

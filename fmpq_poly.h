@@ -326,7 +326,7 @@ void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, long n);
 
-/*  Derivative and integral **************************************************/
+/*  Derivative and integral  *************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long len);
@@ -338,7 +338,20 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
 
-/* Transcendental functions **************************************************/
+/*  Square roots  ************************************************************/
+
+void  _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, long n);
+
+void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void  _fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, long n);
+
+void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+
+/*  Transcendental functions  ************************************************/
 
 void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
                            const fmpz * f, const fmpz_t fden, long n);

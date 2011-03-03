@@ -19,81 +19,84 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void
-_fmpq_poly_atan_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, long n)
+
+void 
+_fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, long n)
 {
     fmpz * t;
-    fmpz * u;
     fmpz_t tden;
-    fmpz_t uden;
-
     t = _fmpz_vec_init(n);
-    u = _fmpz_vec_init(n);
     fmpz_init(tden);
-    fmpz_init(uden);
-
-    /* atan(h(x)) = integral(h'(x)/(1+h(x)^2)) */
-    _fmpq_poly_mullow(u, uden, h, hden, n, h, hden, n, n);
-    fmpz_set(u, uden);  /* u += 1 */
-    _fmpq_poly_derivative(t, tden, h, hden, n);
-    _fmpq_poly_div_series(g, gden, t, tden, u, uden, n);
-    _fmpq_poly_integral(g, gden, g, gden, n);
-
+    _fmpq_poly_invsqrt_series(t, tden, poly, den, n);
+    _fmpq_poly_mullow(rpoly, rden, t, tden, n, poly, den, n, n);
     _fmpz_vec_clear(t, n);
-    _fmpz_vec_clear(u, n);
     fmpz_clear(tden);
-    fmpz_clear(uden);
 }
 
-
-void
-fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 {
-    fmpz * f_coeffs;
-    long flen = f->length;
+    fmpz *copy;
+    int alloc;
 
-    if (flen && !fmpz_is_zero(f->coeffs))
+    if (poly->length < 1 || !fmpz_equal(poly->coeffs, poly->den))
     {
-        printf("Exception: fmpq_poly_atan_series: constant term != 0\n");
+        printf("Exception: fmpq_poly_sqrt_series: constant term != 1\n");
         abort();
     }
 
-    if (flen == 0 || n < 2)
+    if (n < 1)
     {
         fmpq_poly_zero(res);
         return;
     }
 
-    fmpq_poly_fit_length(res, n);
-
-    if (flen < n)
+    if (poly->length >= n)
     {
-        f_coeffs = _fmpz_vec_init(n);
-        _fmpz_vec_set(f_coeffs, f->coeffs, flen);
+        copy = poly->coeffs;
+        alloc = 0;
     }
     else
     {
-        f_coeffs = f->coeffs;
+        long i;
+        copy = (fmpz *) malloc(n * sizeof(fmpz));
+        for (i = 0; i < poly->length; i++)
+            copy[i] = poly->coeffs[i];
+        for ( ; i < n; i++)
+            copy[i] = 0;
+        alloc = 1;
     }
 
-    _fmpq_poly_atan_series(res->coeffs, res->den, f_coeffs, f->den, n);
-
-    if (flen < n)
+    if (res != poly)
     {
-        _fmpz_vec_clear(f_coeffs, n);
+        fmpq_poly_fit_length(res, n);
+        _fmpq_poly_sqrt_series(res->coeffs, res->den, copy, poly->den, n);
+    }
+    else
+    {
+        fmpq_poly_t t;
+        fmpq_poly_init2(t, n);
+        _fmpq_poly_sqrt_series(t->coeffs, t->den, copy, poly->den, n);
+        fmpq_poly_swap(res, t);
+        fmpq_poly_clear(t);
     }
 
     _fmpq_poly_set_length(res, n);
-    _fmpq_poly_normalise(res);
+    fmpq_poly_canonicalise(res);
+
+    if (alloc)
+        free(copy);
 }

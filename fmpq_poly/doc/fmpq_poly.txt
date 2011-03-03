@@ -756,6 +756,38 @@ void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
 
 *******************************************************************************
 
+    Square roots
+
+*******************************************************************************
+
+void _fmpq_poly_sqrt_series(fmpz * g, fmpz_t gden, 
+                           const fmpz * f, const fmpz_t fden, long n)
+
+    Sets \code{(g, gden, n)} to the series expansion of the
+    square root of \code{(f, fden, n)}.  Assumes \code{n > 0} and
+    that \code{(f, fden, n)} has constant term 1.
+    Does not support aliasing between the input and output polynomials.
+
+void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+
+    Sets \code{res} to the series expansion of the square root of \code{f}
+    to order \code{n > 1}. Requires \code{f} to have constant term 1.
+
+void _fmpq_poly_invsqrt_series(fmpz * g, fmpz_t gden, 
+                           const fmpz * f, const fmpz_t fden, long n)
+
+    Sets \code{(g, gden, n)} to the series expansion of the inverse
+    square root of \code{(f, fden, n)}.  Assumes \code{n > 0} and
+    that \code{(f, fden, n)} has constant term 1.
+    Does not support aliasing between the input and output polynomials.
+
+void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+
+    Sets \code{res} to the series expansion of the inverse square root of
+    \code{f} to order \code{n > 0}. Requires \code{f} to have constant term 1.
+
+*******************************************************************************
+
     Transcendental functions
 
 *******************************************************************************
@@ -771,7 +803,7 @@ void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
 void fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
 
     Sets \code{res} to the series expansion of the logarithm of \code{f}
-    to order \code{n > 1}. Requires \code{f} to have constant term 1.
+    to order \code{n > 0}. Requires \code{f} to have constant term 1.
 
 void _fmpq_poly_exp_series(fmpz * g, fmpz_t gden, 
                            const fmpz * h, const fmpz_t hden, long n)
@@ -784,7 +816,7 @@ void _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
 void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t h, long n)
 
     Sets \code{res} to the series expansion of the exponential function
-    of \code{f} to order \code{n > 1}. Requires \code{f} to have
+    of \code{f} to order \code{n > 0}. Requires \code{f} to have
     constant term 0.
 
 
