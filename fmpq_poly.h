@@ -398,6 +398,20 @@ void _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
 
 void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
+void _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_cosh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
 /*  Evaluation  **************************************************************/
 

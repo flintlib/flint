@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -30,65 +29,47 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-
 void
-_fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
-                        const fmpz * h, const fmpz_t hden, long n)
+_fmpq_poly_sinh_series(fmpz * g, fmpz_t gden, 
+                           const fmpz * h, const fmpz_t hden, long n)
 {
-    long m;
-    fmpz * t, * u;
-    fmpz_t tden, uden;
-
-    if (n < 2)
-    {
-        fmpz_set_ui(g, 1UL);
-        fmpz_set_ui(gden, 1UL);
-        return;
-    }
-
-    m = (n + 1) / 2;
-    _fmpq_poly_exp_series(g, gden, h, hden, m);
-    _fmpz_vec_zero(g + m, n - m);
+    fmpz * t;
+    fmpz_t tden;
 
     t = _fmpz_vec_init(n);
-    u = _fmpz_vec_init(n);
     fmpz_init(tden);
-    fmpz_init(uden);
 
-    _fmpq_poly_log_series(t, tden, g, gden, n);
-    _fmpq_poly_sub(t, tden, t, tden, n, h, hden, n);
-    /* TODO: half of product is redundant! */
-    _fmpq_poly_mullow(u, uden, g, gden, n, t, tden, n, n);
-    _fmpq_poly_sub(g, gden, g, gden, n, u, uden, n);
+    /* sinh(x) = (exp(x)-exp(-x))/2 */
+    _fmpq_poly_exp_series(g, gden, h, hden, n);
+    _fmpq_poly_inv_series(t, tden, g, gden, n);
+    _fmpq_poly_sub(g, gden, g, gden, n, t, tden, n);
+    _fmpq_poly_scalar_div_ui(g, gden, g, gden, n, 2UL);
     _fmpq_poly_canonicalise(g, gden, n);
 
-    fmpz_clear(tden);
-    fmpz_clear(uden);
     _fmpz_vec_clear(t, n);
-    _fmpz_vec_clear(u, n);
+    fmpz_clear(tden);
 }
 
-void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 {
     fmpz *copy;
     int alloc;
 
     if (poly->length == 0)
     {
-        fmpq_poly_set_ui(res, 1UL);
+        fmpq_poly_zero(res);
         return;
     }
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        printf("Exception: fmpq_poly_exp_series: constant term != 0");
+        printf("Exception: fmpq_poly_sinh_series: constant term != 0");
         abort();
     }
 
     if (n < 2)
     {
-        if (n == 0) fmpq_poly_zero(res);
-        if (n == 1) fmpq_poly_set_ui(res, 1UL);
+        fmpq_poly_zero(res);
         return;
     }
 
@@ -111,13 +92,13 @@ void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_exp_series(res->coeffs, res->den, copy, poly->den, n);
+        _fmpq_poly_sinh_series(res->coeffs, res->den, copy, poly->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_exp_series(t->coeffs, t->den, copy, poly->den, n);
+        _fmpq_poly_sinh_series(t->coeffs, t->den, copy, poly->den, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
     }
