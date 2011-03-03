@@ -368,6 +368,21 @@ void _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
 
 void fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
+void _fmpq_poly_atanh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_atanh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_asin_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_asinh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_asinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
 
 /*  Evaluation  **************************************************************/
 

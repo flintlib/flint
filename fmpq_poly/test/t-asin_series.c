@@ -41,7 +41,7 @@ main(void)
     flint_rand_t state;
     ulong cflags = 0UL;
 
-    printf("atan_series....");
+    printf("asin_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,8 +60,8 @@ main(void)
 
         fmpq_poly_canonicalise(a);
 
-        fmpq_poly_atan_series(b, a, n);
-        fmpq_poly_atan_series(a, a, n);
+        fmpq_poly_asin_series(b, a, n);
+        fmpq_poly_asin_series(a, a, n);
 
         cflags |= fmpq_poly_is_canonical(a) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(b) ? 0 : 2;
@@ -79,42 +79,38 @@ main(void)
         fmpq_poly_clear(b);
     }
 
-    /* Check 2*atan(A) = atan(2*A/(1-A^2)) */
-    for (i = 0; i < 400; i++)
+    /* Check asin(A) = atan(A/sqrt(1-A^2)) */
+    for (i = 0; i < 200; i++)
     {
-        fmpq_poly_t A, B, atanA, atanB;
+        fmpq_poly_t A, B, asinA, atanB;
         long n = n_randint(state, 80) + 1;
 
         fmpq_poly_init(A);
         fmpq_poly_init(B);
-        fmpq_poly_init(atanA);
+        fmpq_poly_init(asinA);
         fmpq_poly_init(atanB);
 
         fmpq_poly_randtest_not_zero(A, state, n_randint(state, 80) + 1, 80);
         fmpq_poly_set_coeff_ui(A, 0, 0UL);
 
-        fmpq_poly_randtest_not_zero(B, state, n_randint(state, 80) + 1, 80);
-        fmpq_poly_set_coeff_ui(B, 0, 0UL);
-
         fmpq_poly_mullow(B, A, A, n);
         fmpq_poly_neg(B, B);
         fmpq_poly_set_coeff_ui(B, 0, 1UL);
-        fmpq_poly_div_series(B, A, B, n);
-        fmpq_poly_add(B, B, B);
+        fmpq_poly_invsqrt_series(B, B, n);
+        fmpq_poly_mullow(B, A, B, n);
 
-        fmpq_poly_atan_series(atanA, A, n);
+        fmpq_poly_asin_series(asinA, A, n);
         fmpq_poly_atan_series(atanB, B, n);
-        fmpq_poly_add(atanA, atanA, atanA);
 
-        cflags |= fmpq_poly_is_canonical(atanA) ? 0 : 1;
+        cflags |= fmpq_poly_is_canonical(asinA) ? 0 : 1;
         cflags |= fmpq_poly_is_canonical(atanB) ? 0 : 2;
-        result = (fmpq_poly_equal(atanA, atanB) && !cflags);
+        result = (fmpq_poly_equal(asinA, atanB) && !cflags);
         if (!result)
         {
             printf("FAIL:\n");
             printf("A = "), fmpq_poly_debug(A), printf("\n\n");
             printf("B = "), fmpq_poly_debug(B), printf("\n\n");
-            printf("2*atan(A) = "), fmpq_poly_debug(atanA), printf("\n\n");
+            printf("asin(A) = "), fmpq_poly_debug(asinA), printf("\n\n");
             printf("atan(B) = "), fmpq_poly_debug(atanB), printf("\n\n");
             printf("cflags = %lu\n\n", cflags);
             abort();
@@ -122,7 +118,7 @@ main(void)
 
         fmpq_poly_clear(A);
         fmpq_poly_clear(B);
-        fmpq_poly_clear(atanA);
+        fmpq_poly_clear(asinA);
         fmpq_poly_clear(atanB);
     }
 
