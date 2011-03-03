@@ -59,7 +59,11 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
     __nmod_poly_invsqrt_series_prealloc(g, h, t, u, m, mod);
 
     _nmod_vec_zero(g + m, n - m);
-    _nmod_poly_mullow(t, g, n, g, n, n, mod);
+
+    _nmod_poly_mul(t, g, m, g, m, mod);
+    if (2*m - 1 < n)
+        t[n-1] = 0UL;
+
     _nmod_poly_mullow(u, t, n, g, n, n, mod);
     _nmod_poly_mullow(t, u, n, h, n, n, mod);
 

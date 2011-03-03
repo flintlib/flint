@@ -52,7 +52,10 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     t = _nmod_vec_init(n);
     u = _nmod_vec_init(n);
 
-    _nmod_poly_mullow(u, g, n, g, n, n, mod); u[0] = 1UL;
+    _nmod_poly_mul(u, g, m, g, m, mod);
+    u[0] = 1UL;
+    if (2*m - 1 < n) u[n-1] = 0UL;
+
     _nmod_poly_atan_series(t, g, n, mod);
     _nmod_vec_sub(t + m, h + m, t + m, n - m, mod);
     _nmod_poly_mullow(g + m, u, n, t + m, n - m, n - m, mod);
