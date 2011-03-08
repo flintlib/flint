@@ -39,11 +39,11 @@
 
 void fmpz_factor_init(fmpz_factor_t factor)
 
-    Initialises a \code{fmpz_factor_t} structure.
+    Initialises an \code{fmpz_factor_t} structure.
 
 void fmpz_factor_clear(fmpz_factor_t factor)
 
-    Clears a \code{fmpz_factor_t} structure.
+    Clears an \code{fmpz_factor_t} structure.
 
 void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
@@ -139,7 +139,7 @@ void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
     It is assumed that \code{klen} is at most $n + 1$.
 
     The \code{row} and \code{prev} arguments are permitted to be the 
-    same, meaning that the row will be update in-place.
+    same, meaning that the row will be updated in-place.
 
 void fmpz_stirling1u_mat(fmpz ** rows, long n)
 void fmpz_stirling1_mat(fmpz ** rows, long n)
