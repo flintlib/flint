@@ -1,6 +1,7 @@
 LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lflint -lmpir -lmpfr -lm
 LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lmpir -lmpfr -lm
 INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
+LINKLIBS=$(FLINT_MPIR_LIB_DIR)/libmpir.a $(FLINT_MPFR_LIB_DIR)/libmpfr.a
 
 LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -34,7 +35,7 @@ all: $(OBJS) recursive library
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) clean;)
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) 
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 
 distclean: clean
 	rm Makefile
@@ -58,8 +59,13 @@ else
 	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;) 
 endif
 
-library: library-recursive $(LIB_OBJS)
-	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o libflint.so
+library: library-recursive $(OBJS) $(LIB_OBJS)
+ifdef FLINT_SHARED
+	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB) 
+endif
+ifdef FLINT_STATIC
+	$(AR) rcs libflint.a $(OBJS) $(LINKLIBS)
+endif
 
 library-recursive:
 	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) library;) 

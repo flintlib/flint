@@ -321,6 +321,12 @@ pass the directories as parameters to FLINT's configure, e.g.\
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr/local}.
 
+Note that FLINT builds static and shared libraries by default. If
+you do not require one of these then you may pass 
+\code{--disable-static} or \code{--disable-shared} to 
+\code{configure}. When running \code{make check} a shared library
+is required.
+
 If you intend to install the FLINT library and header files, 
 you can specify where they should be placed by passing 
 \code{--prefix=path} to configure, where \code{path} is the directory
