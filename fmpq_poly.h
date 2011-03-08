@@ -489,7 +489,7 @@ int fmpq_poly_print(const fmpq_poly_t poly)
     return fmpq_poly_fprint(stdout, poly);
 }
 
-void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
 

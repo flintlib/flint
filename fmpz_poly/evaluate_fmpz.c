@@ -31,7 +31,10 @@
 void
 _fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
 {
-    _fmpz_poly_evaluate_horner_fmpz(res, f, len, a);
+    if (len <= 50)
+        _fmpz_poly_evaluate_horner_fmpz(res, f, len, a);
+    else
+        _fmpz_poly_evaluate_divconquer_fmpz(res, f, len, a);
 }
 
 void
@@ -40,6 +43,7 @@ fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
     if (res == a)
     {
         fmpz_t t;
+
         fmpz_init(t);
         _fmpz_poly_evaluate_fmpz(t, f->coeffs, f->length, a);
         fmpz_swap(res, t);

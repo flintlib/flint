@@ -159,6 +159,11 @@ fmpq_poly
 * Implement series sqrt, invsqrt, log, exp
 
 
+fmpq_poly
+---------
+
+* add fmpq_poly_fprint_pretty
+
 arith
 -----
 

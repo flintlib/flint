@@ -39,6 +39,8 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
     char * w;
     long i, len;
 
+    if (!isdigit(str[0]))
+        return -1;
     len = atol(str);
     if (len < 0)
         return -1;
@@ -59,7 +61,7 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
                 max = cur;
         }
 
-        w = (char *) malloc((max + 1) * sizeof(char));
+        w = malloc(max + 1);
     }
 
     for (i = 0; i < len; i++)
@@ -89,6 +91,8 @@ fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
     int ans;
     long len;
 
+    if (!isdigit(str[0]))
+        return -1;
     len = atol(str);
     if (len < 0)
         return -1;

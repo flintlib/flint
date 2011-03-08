@@ -44,12 +44,24 @@ _fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, long len,
     for (i = 1; i < h; i++)
         fmpz_mul(y + i, y + (i - 1), y + (i - 1));
 
-    for (i = 0; i < len; )
+    for (i = 0; i < len - 1; )
     {
-        fmpz_set(t, poly + i);
-        ++i;
+        fmpz_mul(u, y + 0, poly + i + 1);
+        fmpz_add(t, poly + i, u);
+        i += 2;
         count_trailing_zeros(c, i);
-        for (k = 0; k < c; k++)
+        for (k = 1; k < c; k++)
+        {
+            fmpz_mul(u, y + k, t);
+            fmpz_add(t, T + k, u);
+        }
+        fmpz_swap(T + k, t);
+    }
+    if (len & 1L)
+    {
+        fmpz_set(t, poly + (len - 1));
+        count_trailing_zeros(c, len + 1);
+        for (k = 1; k < c; k++)
         {
             fmpz_mul(u, y + k, t);
             fmpz_add(t, T + k, u);

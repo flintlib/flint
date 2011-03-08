@@ -46,7 +46,7 @@ fmpz_poly_evaluate_mpq(mpq_t res, const fmpz_poly_t f, const mpq_t a)
     fmpz_set_mpz(anum, mpq_numref(a));
     fmpz_set_mpz(aden, mpq_denref(a));
 
-    _fmpz_poly_evaluate_mpq(anum, aden, f->coeffs, f->length, anum, aden);
+    _fmpz_poly_evaluate_mpq(rnum, rden, f->coeffs, f->length, anum, aden);
 
     fmpz_get_mpz(mpq_numref(res), rnum);
     fmpz_get_mpz(mpq_denref(res), rden);

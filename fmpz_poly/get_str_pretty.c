@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -34,13 +34,13 @@
 char *
 _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
 {
+    char *str;
+    size_t off;
     long i, bound, nz;
-    fmpz *top;
-    char *str, *strbase;
 
     if (len == 0)
     {
-        str = (char *) malloc(2 * sizeof(char));
+        str = malloc(2);
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -60,52 +60,58 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
             bound += fmpz_sizeinbase(poly + i, 10) + 1;
             nz++;
         }
-    bound += nz * (3 + strlen(x) + (long) (ceil(log10((double) len))));
+    bound += nz * (3 + strlen(x) + (long) (ceil(log10(len))));
 
-    strbase = (char *) malloc(bound * sizeof(char));
-    str = strbase;
-    top = (fmpz *) poly + (--len);
+    str = malloc(bound);
+    off = 0;
+    i = len - 1;
 
-    if (*top == 1L)
+    if (poly[i] == 1L)
     {
     }
-    else if (*top == -1L)
-        *str++ = '-';
-    else if (!COEFF_IS_MPZ(*top))
-        str += sprintf(str, "%li*", *top);
+    else if (poly[i] == -1L)
+        str[off++] = '-';
+    else if (!COEFF_IS_MPZ(poly[i]))
+        off += sprintf(str + off, "%ld*", poly[i]);
     else
-        str += gmp_sprintf(str, "%Zd*", COEFF_TO_PTR(*top));
-    str += sprintf(str, "%s^%li", x, len);
+        off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
+    if (i > 1)
+        off += sprintf(str + off, "%s^%ld", x, i);
+    else
+        off += sprintf(str + off, "%s", x);
 
-    while (--len, --top != poly)
+    for (--i; i > 0; --i)
     {
-        if (*top == 0L)
+        if (poly[i] == 0L)
             continue;
-        if (fmpz_sgn(top) > 0)
-            *str++ = '+';
-        if (*top == -1L)
-            *str++ = '-';
-        if (*top != 1L && *top != -1L)
+        if (fmpz_sgn(poly + i) > 0)
+            str[off++] = '+';
+        if (poly[i] == -1L)
+            str[off++] = '-';
+        if (poly[i] != 1L && poly[i] != -1L)
         {
-            if (!COEFF_IS_MPZ(*top))
-                str += sprintf(str, "%li*", *top);
+            if (!COEFF_IS_MPZ(poly[i]))
+                off += sprintf(str + off, "%ld*", poly[i]);
             else
-                str += gmp_sprintf(str, "%Zd*", COEFF_TO_PTR(*top));
+                off += gmp_sprintf(str + off, "%Zd*", COEFF_TO_PTR(poly[i]));
         }
-        str += sprintf(str, "%s^%li", x, len);
-    }
-
-    if (*top != 0L)
-    {
-        if (fmpz_sgn(top) > 0)
-            *str++ = '+';
-        if (!COEFF_IS_MPZ(*top))
-            str += sprintf(str, "%li", *top);
+        if (i > 1)
+            off += sprintf(str + off, "%s^%ld", x, i);
         else
-            str += gmp_sprintf(str, "%Zd", COEFF_TO_PTR(*top));
+            off += sprintf(str + off, "%s", x);
     }
 
-    return strbase;
+    if (poly[i] != 0L)
+    {
+        if (fmpz_sgn(poly + i) > 0)
+            str[off++] = '+';
+        if (!COEFF_IS_MPZ(poly[i]))
+            off += sprintf(str + off, "%ld", poly[i]);
+        else
+            off += gmp_sprintf(str + off, "%Zd", COEFF_TO_PTR(poly[i]));
+    }
+
+    return str;
 }
 
 char *

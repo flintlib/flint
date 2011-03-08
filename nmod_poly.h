@@ -216,30 +216,38 @@ char * nmod_poly_get_str(const nmod_poly_t poly);
 int nmod_poly_set_str(const char * s, nmod_poly_t poly);
 
 static __inline__
-void nmod_poly_print(const nmod_poly_t a)
+int nmod_poly_print(const nmod_poly_t a)
 {
+    int r;
     long i;
 
-    printf("%ld %lu", a->length, a->mod.n);
+    r = printf("%ld %lu", a->length, a->mod.n);
 
     if (a->length == 0)
-        return;
+        return r;
     else
-        printf(" ");
+        if (r > 0)
+            r = printf(" ");
 
-    for (i = 0; i < a->length; i++)
-        printf(" %lu", a->coeffs[i]);
+    for (i = 0; (r > 0) && (i < a->length); i++)
+        r = printf(" %lu", a->coeffs[i]);
+
+    return r;
 }
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
 static __inline__
-void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 {
-   char * s = nmod_poly_get_str(poly);
-   if (fputs(s, f) < 0) 
-       printf("Error writing to file\n");
-   free(s);
+    char *s;
+    int r;
+
+    s = nmod_poly_get_str(poly);
+    r = fputs(s, f);
+    free(s);
+
+    return (r < 0) ? r : 1;
 }
 
 static __inline__

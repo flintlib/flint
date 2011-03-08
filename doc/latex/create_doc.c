@@ -40,7 +40,9 @@ static char * docsin[] = {
     "../../arith/doc/arith.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
     "../../long_extras/doc/long_extras.txt",
+    "../../doc/longlong.txt",
     "../../mpn_extras/doc/mpn_extras.txt",
+    "../../doc/profiler.txt", 
 };
 
 static char * docsout[] = {
@@ -55,7 +57,9 @@ static char * docsout[] = {
     "input/arith.tex", 
     "input/ulong_extras.tex",
     "input/long_extras.tex",
+    "input/longlong.tex", 
     "input/mpn_extras.tex",
+    "input/profiler.tex", 
 };
 
 static const int ndocs = sizeof(docsin) / sizeof(char *);
@@ -212,7 +216,10 @@ static int open_function()
     fprintf(out, "\n");
     fprintf(out, "\\vspace*{0.5em}\n");
     fprintf(out, "\\begin{lstlisting}\n");
-    fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
+    if (fnc.mods[0] != '\0')
+        fprintf(out, "%s %s(%s)\n", fnc.mods, fnc.name, fnc.args);
+    else
+        fprintf(out, "%s(%s)\n", fnc.name, fnc.args);
     fprintf(out, "\\end{lstlisting}\n");
     fprintf(out, "\\vspace*{-0.5em}\n");
 

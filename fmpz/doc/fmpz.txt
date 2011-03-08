@@ -124,16 +124,16 @@ double fmpz_get_d_2exp(long * exp, const fmpz_t f)
 
 void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
-    Returns $f$ as an \code{mpz_t}.
+    Sets the \code{mpz_t} $x$ to the same value as $f$.
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
     Returns the representation of $f$ in base~$b$, which can vary 
     between $2$ and $62$, inclusive.
 
-    If \code{str} is \code{NULL}, the result string is allocated by the 
-    function.  Otherwise, it is up to the caller to ensure the allocated 
-    block of memory is sufficiently large.
+    If \code{str} is \code{NULL}, the result string is allocated by 
+    the function.  Otherwise, it is up to the caller to ensure that 
+    the allocated block of memory is sufficiently large.
 
 void fmpz_set_si(fmpz_t f, long val)
 
@@ -159,7 +159,7 @@ int fmpz_set_str(fmpz_t f, char * str, int b)
 
 *******************************************************************************
 
-void fmpz_read(fmpz_t f)
+int fmpz_read(fmpz_t f)
 
     Reads a multiprecision integer from \code{stdin}.  The format is
     an optional minus sign, followed by one or more digits.  The
@@ -172,7 +172,7 @@ void fmpz_read(fmpz_t f)
     \code{scanf} from the standard library and \code{mpz_inp_str} 
     from MPIR.
 
-void fmpz_fread(FILE * file, fmpz_t f)
+int fmpz_fread(FILE * file, fmpz_t f)
 
     Reads a multiprecision integer from the stream \code{file}.  The 
     format is an optional minus sign, followed by one or more digits.
@@ -188,7 +188,7 @@ void fmpz_fread(FILE * file, fmpz_t f)
 int fmpz_print(fmpz_t x)
 
     Prints the value $x$ to \code{stdout}, without a carriage return.
-    The value is printed as either $0$, the decimal digits of a 
+    The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
@@ -202,7 +202,7 @@ int fmpz_print(fmpz_t x)
 int fmpz_fprint(FILE * file, fmpz_t x)
 
     Prints the value $x$ to \code{file}, without a carriage return.
-    The value is printed as either $0$, the decimal digits of a 
+    The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
@@ -232,7 +232,7 @@ mp_bitcnt_t fmpz_bits(const fmpz_t f)
 mp_size_t fmpz_size(const fmpz_t f)
 
     Returns the number of limbs required to store the absolute
-    value of $f$.  If $f$ is zero, then $0$ is returned.
+    value of $f$.  If $f$ is zero then $0$ is returned.
 
 int fmpz_sgn(const fmpz_t f)
 
@@ -245,7 +245,7 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
 
 void fmpz_set(fmpz_t f, const fmpz_t g)
 
-    Sets $f$ to equal $g$.
+    Sets $f$ to the same value as $g$.
 
 void fmpz_zero(fmpz_t f)
 
@@ -331,9 +331,9 @@ void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
     Sets $f$ to $g \times x \times y$ where $x$ and $y$ are of type
     \code{unsigned long}.
 
-void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong e)
 
-    Sets $f$ to \code{g * 2^exp}.
+    Sets $f$ to $g \times 2^e$.
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -506,8 +506,8 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
     mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
 
-    Shifts left the given coefficient by \code{shift} bits and add it to 
-    the integer in \code{arr} in a field of the given number of bits.
+    Shifts the given coefficient to the left by \code{shift} bits and adds 
+    it to the integer in \code{arr} in a field of the given number of bits.
 
     \begin{lstlisting}
     shift  bits  --------------
@@ -516,7 +516,7 @@ int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift,
     \end{lstlisting}
 
     An optional borrow of~$1$ can be subtracted from \code{coeff} before 
-    it is packed.  If \code{coeff} is negative (after the borrow), then a 
+    it is packed.  If \code{coeff} is negative after the borrow, then a 
     borrow will be returned by the function.
 
     The value of \code{shift} is assumed to be less than \code{FLINT_BITS}. 
@@ -636,5 +636,5 @@ void fmpz_comb_clear(fmpz_comb_t comb)
 
 void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
-    Clears the given \code{comb} temporary data, releasing any memory it uses.
-
+    Clears temporary space \code{temp} used by multimodular and CRT functions
+    using the given \code{comb} structure.

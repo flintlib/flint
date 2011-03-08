@@ -175,7 +175,7 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
 
     As for \code{fmpq_poly_randtest()} except that \code{len} and \code{bits} 
     may not be zero and the polynomial generated is guaranteed not to be the 
-    zero polynomial.  One must call \code{flint_randinit} before calling
+    zero polynomial.  One must call \code{flint_randinit()} before calling
     this function.
 
 *******************************************************************************
@@ -719,7 +719,7 @@ void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, long n)
 
-    Performs power series division in $\Q[[t]]$.  The function considers 
+    Performs power series division in $\Q[[x]] / (x^n)$.  The function considers 
     the polynomials $A$ and $B$ as power series of length~$n$ starting with 
     the constant terms.  The function assumes that $B$ has non-zero constant 
     term and $n \geq 1$.
@@ -1005,18 +1005,18 @@ void fmpq_poly_compose(fmpq_poly_t res,
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}.
 
 void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
-              const fmpz_t den, long len, const fmpz_t xnum, const fmpz_t xden)
+              const fmpz_t den, long len, const fmpz_t anum, const fmpz_t aden)
 
     Sets \code{(res, denr, len)} to \code{(poly, den, len)} with the 
-    indeterminate rescaled by \code{(xnum, xden)}.
+    indeterminate rescaled by \code{(anum, aden)}.
     
-    Assumes that \code{len > 0} and \code{(xnum, xden)} is non-zero and in 
-    lowest terms.  Supports aliasing between \code{(res, denr, len)} and 
+    Assumes that \code{len > 0} and that \code{(anum, aden)} is non-zero and 
+    in lowest terms.  Supports aliasing between \code{(res, denr, len)} and 
     \code{(poly, den, len)}.
 
-void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x)
+void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t a)
 
-    Sets \code{res} to \code{poly} with the indeterminate rescaled by $x$.
+    Sets \code{res} to \code{poly} with the indeterminate rescaled by $a$.
 
 *******************************************************************************
 
@@ -1102,20 +1102,23 @@ int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, long len)
     Prints the polynomial \code{(poly, den, len)} to \code{stdout}.
 
     In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
 int fmpq_poly_print(const fmpq_poly_t poly)
 
     Prints the polynomial to \code{stdout}.
 
     In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
-void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of \code{poly} to \code{stdout}, using 
     the null-terminated string \code{var} not equal to \code{"\0"} as the 
     variable name.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
 
 int _fmpq_poly_fprint(FILE * file, 
                       const fmpz * poly, const fmpz_t den, long len)
@@ -1123,14 +1126,14 @@ int _fmpq_poly_fprint(FILE * file,
     Prints the polynomial \code{(poly, den, len)} to the stream \code{file}.
 
     In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
 int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly)
 
     Prints the polynomial to the stream \code{file}.
 
     In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
 int fmpq_poly_read(fmpq_poly_t poly)
 
@@ -1138,7 +1141,7 @@ int fmpq_poly_read(fmpq_poly_t poly)
     in \code{poly}.
 
     In case of success, returns a positive number.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 
@@ -1146,5 +1149,5 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
     in \code{poly}.
 
     In case of success, returns a positive number.  In case of failure, 
-    returns a non-positive number.
+    returns a non-positive value.
 
