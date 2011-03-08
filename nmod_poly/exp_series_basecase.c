@@ -34,7 +34,7 @@ void
 _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
                                     long hlen, long n, nmod_t mod)
 {
-    long j, k, m;
+    long j, k;
     mp_ptr a;
     mp_limb_t s;
 

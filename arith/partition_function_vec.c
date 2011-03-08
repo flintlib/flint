@@ -37,7 +37,7 @@
 
 void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
 {
-    mp_ptr * tmp;
+    mp_ptr tmp;
     mp_limb_t r;
     long k, n;
 
