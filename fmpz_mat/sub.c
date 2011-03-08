@@ -27,6 +27,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpz_vec.h"
 
 void
 fmpz_mat_sub(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)

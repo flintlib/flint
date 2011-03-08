@@ -34,7 +34,6 @@ long
 fmpz_mat_rank(const fmpz_mat_t A)
 {
     long m, n, rank;
-    long * perm;
     fmpz_mat_t tmp;
 
     m = A->r;
