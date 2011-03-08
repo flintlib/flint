@@ -31,13 +31,24 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-/* Not defined in mpir.h */
+/* Not defined in mpir.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
-
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd
+ */
 
+#ifdef mpn_modexact_1_odd
 #define mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
+#else
+static __inline__ int
+mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+{
+    __mpz_struct s;
+    s._mp_size = xsize;
+    s._mp_d = (mp_ptr) x;
+    return mpz_divisible_ui_p(&s, d);
+}
+#endif
 
 static __inline__
 int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
