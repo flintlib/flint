@@ -29,7 +29,6 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-
 #define NMOD_NEWTON_EXP_CUTOFF 200
 #define NMOD_NEWTON_EXP_CUTOFF2 250
 
@@ -55,18 +54,18 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, m, mod, 0);
 
     /* g := exp(-h) + O(x^m) */
-    _nmod_poly_mullow(T, f, n, g, m2, m, mod);
+    _nmod_poly_mullow(T, f, m, g, m2, m, mod);
     _nmod_poly_mullow(g + m2, g, m2, T + m2, m - m2, m - m2, mod);
     _nmod_vec_neg(g + m2, g + m2, m - m2, mod);
 
     /* U := h' + g (f' - f h') + O(x^(n-1))
        Note: should replace h' by h' mod x^(m-1) */
     _nmod_vec_zero(f + m, n - m);
-    _nmod_poly_mullow(T, f, n, hprime, n, n, mod);  /* should be mulmid */
+    _nmod_poly_mullow_classical(T, f, n, hprime, n, n, mod);  /* should be mulmid */
     _nmod_poly_derivative(U, f, n, mod);            /* should skip low terms */
     _nmod_vec_sub(U + l, U + l, T + l, n - l, mod);
-    _nmod_poly_mullow(T + l, g, n, U + l, n - l, n - l, mod);
-    _nmod_vec_add(U + l, hprime + l, T + l, n - l, mod);
+    _nmod_poly_mullow(T + l, g, n - m, U + l, n - m, n - m, mod);
+    _nmod_vec_add(U + l, hprime + l, T + l, n - m, mod);
 
     /* f := f + f * (h - int U) + O(x^n) = exp(h) + O(x^n) */
     _nmod_poly_integral(U, U, n, mod);  /* should skip low terms */
@@ -99,6 +98,8 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
     hprime = _nmod_vec_init(n);
 
     _nmod_poly_derivative(hprime, h, n, mod);
+    hprime[n-1] = 0UL;
+
     __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod, 0);
 
     _nmod_vec_free(hprime);

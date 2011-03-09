@@ -78,6 +78,7 @@ int main(void)
     fmpz_poly_clear(a);
     fmpz_poly_clear(b);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

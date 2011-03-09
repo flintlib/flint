@@ -58,6 +58,7 @@ int main(void)
        }
     }
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

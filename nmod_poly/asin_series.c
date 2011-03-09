@@ -41,7 +41,7 @@ _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     _nmod_poly_mullow(u, h, n, h, n, n, mod);
     _nmod_vec_neg(u, u, n, mod); u[0] = 1UL;
     _nmod_poly_invsqrt_series(t, u, n, mod);
-    _nmod_poly_derivative(u, h, n, mod);
+    _nmod_poly_derivative(u, h, n, mod); u[n-1] = 0UL;
     _nmod_poly_mullow(g, t, n, u, n, n, mod);
     _nmod_poly_integral(g, g, n, mod);
 

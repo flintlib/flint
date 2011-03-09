@@ -113,6 +113,7 @@ int main(void)
     fmpz_clear(y);
     fmpz_clear(z);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

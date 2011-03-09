@@ -114,6 +114,7 @@ int main(void)
     _nmod_vec_free(pmod);
 
     flint_randclear(state);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

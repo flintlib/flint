@@ -66,6 +66,7 @@ int main(void)
 
     _fmpz_vec_clear(res, n);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

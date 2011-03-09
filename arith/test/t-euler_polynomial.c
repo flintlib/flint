@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
 #include "profiler.h"
@@ -84,6 +85,7 @@ int main()
         fmpq_poly_clear(Q);
     }
 
+    mpfr_free_cache();
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
