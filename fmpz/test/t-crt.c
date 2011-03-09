@@ -93,6 +93,8 @@ int main(void)
    fmpz_clear(res);
    fmpz_clear(c);
 
+   _fmpz_cleanup();
+
    printf("PASS\n");
    
    return 0;
