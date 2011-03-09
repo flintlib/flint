@@ -17,19 +17,19 @@ all: $(OBJS)
 library: $(LIB_OBJS)
 
 profile:
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
         
 %.o: %.c
-	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
+	$(CC) $(CFLAGS) -c $(INCS) $< -o $(BUILD_DIR)/$@
 
 %.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $(BUILD_DIR)/$@
 
 clean:
-	rm -f $(OBJS) $(LIB_OBJS) $(TESTS)	
+	rm -rf $(BUILD_DIR)	
 
 check: library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS) -lflint;)
-	$(foreach prog, $(TESTS), $(prog);)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(TESTS), $(BUILD_DIR)/$(prog);)
 
 .PHONY: profile clean check all

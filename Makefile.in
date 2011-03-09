@@ -11,13 +11,13 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, %.o, $(SOURCES))
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
-LOBJS = $(patsubst %.c, %.lo, $(SOURCES))
+LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
 LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
-LIB_OBJS = $(patsubst %.c, %.lo, $(LIB_SOURCES))
+LIB_OBJS = $(patsubst %.c, build/%.lo, $(LIB_SOURCES))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -25,41 +25,49 @@ TEST_SOURCES = $(wildcard test/*.c)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
-EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
+EXMPS = $(patsubst %.c, build/%, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
-all: $(OBJS) recursive library 
+all: all-dirs $(OBJS) recursive library 
+
+all-dirs:
+	rm -rf build
+	mkdir -p build
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir);)
 
 clean:
-	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) clean;)
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 
 distclean: clean
 	rm Makefile
 
 profile: all profiler.o
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o $(prog) $(LIBS);)
-	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) profile;)
+	mkdir -p build/profile
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS);)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile;)
 
 recursive:
-	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir);) 
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 
 
 examples: all $(LOBJS) library
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
 
 check: $(FLINT_LIB)
 ifndef MOD
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
-	$(foreach prog, $(TESTS), $(prog);)
-	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) check;)
+	mkdir -p build/test
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
+	$(foreach prog, $(TESTS), build/$(prog);)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
 else
-	$(foreach dir, $(MOD), $(MAKE) -C $(dir) check;) 
+	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
 endif
 
 library: library-recursive $(OBJS) $(LIB_OBJS)
+	mkdir -p build
 ifdef FLINT_SHARED
 	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB) 
 endif
@@ -68,7 +76,7 @@ ifdef FLINT_STATIC
 endif
 
 library-recursive:
-	$(foreach dir, $(BUILD_DIRS), $(MAKE) -C $(dir) library;) 
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) 
 
 $(FLINT_LIB): library
 
@@ -78,10 +86,10 @@ install: library
 
 .PHONY: profile library library-recursive recursive clean check check-recursive all
 
-%.lo: %.c
+build/%.lo: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
-%.o: %.c
+build/%.o: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 BUILD_DIRS = ulong_extras long_extras fmpz fmpz_vec fmpz_poly fmpq_poly \
