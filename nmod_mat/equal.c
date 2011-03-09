@@ -37,6 +37,9 @@ nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
     if (mat1->r != mat2->r || mat1->c != mat2->c)
         return 0;
 
+    if (mat1->r == 0 || mat1->c == 0)
+        return 1;
+
     for (i = 0; i < mat1->r; i++)
     {
         for (j = 0; j < mat1->c; j++)

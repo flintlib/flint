@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
 #include "profiler.h"
@@ -72,6 +73,7 @@ int main()
         _fmpz_vec_clear(r, n + 1);
     }
 
+    mpfr_free_cache();
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

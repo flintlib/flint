@@ -40,7 +40,7 @@ _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     /* asinh(h(x)) = integral(h'(x)/sqrt(1+h(x)^2)) */
     _nmod_poly_mullow(u, h, n, h, n, n, mod); u[0] = 1UL;
     _nmod_poly_invsqrt_series(t, u, n, mod);
-    _nmod_poly_derivative(u, h, n, mod);
+    _nmod_poly_derivative(u, h, n, mod); u[n-1] = 0UL;
     _nmod_poly_mullow(g, t, n, u, n, n, mod);
     _nmod_poly_integral(g, g, n, mod);
 

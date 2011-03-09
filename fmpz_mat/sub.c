@@ -34,6 +34,9 @@ fmpz_mat_sub(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     long i;
 
+    if (res->c < 1)
+        return;
+
     for (i = 0; i < res->r; i++)
         _fmpz_vec_sub(res->rows[i], mat1->rows[i], mat2->rows[i], res->c);
 }

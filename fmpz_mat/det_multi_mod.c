@@ -104,4 +104,5 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     fmpz_clear(prod);
     fmpz_clear(stable_prod);
     fmpz_clear(det_new);
+    fmpz_clear(bound);
 }

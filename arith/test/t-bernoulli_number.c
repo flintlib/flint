@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
 #include "profiler.h"
@@ -80,6 +81,7 @@ int main()
     fmpz_clear(num2);
     fmpz_clear(den2);
 
+    mpfr_free_cache();
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

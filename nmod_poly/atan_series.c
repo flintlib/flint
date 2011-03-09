@@ -39,7 +39,7 @@ _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 
     /* atan(h(x)) = integral(h'(x)/(1+h(x)^2)) */
     _nmod_poly_mullow(u, h, n, h, n, n, mod); u[0] = 1UL;
-    _nmod_poly_derivative(t, h, n, mod);
+    _nmod_poly_derivative(t, h, n, mod); t[n-1] = 0UL;
     _nmod_poly_div_series(g, t, u, n, mod);
     _nmod_poly_integral(g, g, n, mod);
 

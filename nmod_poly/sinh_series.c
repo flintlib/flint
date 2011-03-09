@@ -39,7 +39,7 @@ _nmod_poly_sinh_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
     U = _nmod_vec_init(n);
     hprime = _nmod_vec_init(n);
 
-    _nmod_poly_derivative(hprime, h, n, mod);
+    _nmod_poly_derivative(hprime, h, n, mod); hprime[n-1] = 0UL;
     __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod, 1);
     _nmod_vec_sub(f, f, g, n, mod);
     _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(2UL, mod.n), mod);

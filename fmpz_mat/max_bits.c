@@ -37,6 +37,9 @@ fmpz_mat_max_bits(const fmpz_mat_t mat)
     sign = 1;
     bits = 0;
 
+    if (mat->r == 0 || mat->c == 0)
+        return 0;
+
     for (i = 0; i < mat->r; i++)
     {
         row_bits = _fmpz_vec_max_bits(mat->rows[i], mat->c);

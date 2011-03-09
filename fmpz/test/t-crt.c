@@ -79,7 +79,7 @@ int main(void)
    pre = n_precompute_inverse(m2);
 
    fmpz_CRT_ui2_precomp(res, r1, m1, r2, m2, fmpz_get_ui(c), pre);
-   if(fmpz_get_ui(res) != 0)   
+   if(fmpz_get_ui(res) != 0)
    {
       printf("FAIL");
       fmpz_print(res); printf("\n");

@@ -86,6 +86,7 @@ int main(void)
     fmpz_clear(b);
     fmpz_clear(m);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

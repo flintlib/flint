@@ -34,6 +34,9 @@ nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     long i;
 
+    if (C->c < 1)
+        return;
+
     for (i = 0; i < C->r; i++)
     {
         _nmod_vec_sub(C->rows[i], A->rows[i], B->rows[i], C->c, C->mod);

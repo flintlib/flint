@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <limits.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
@@ -94,6 +95,8 @@ int main(void)
 
     _fmpz_vec_clear(b1, maxn);
 
+    mpfr_free_cache();
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
