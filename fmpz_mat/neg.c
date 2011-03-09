@@ -34,6 +34,9 @@ fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
 {
     long i;
 
+    if (res->c < 1)
+        return;
+
     for (i = 0; i < res->r; i++)
         _fmpz_vec_neg(res->rows[i], mat->rows[i], res->c);
 }
