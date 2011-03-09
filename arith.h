@@ -130,9 +130,9 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
 /* Euler numbers *************************************************************/
 
 #if FLINT64
-#define SMALL_EULER_LIMIT 15
-#else
 #define SMALL_EULER_LIMIT 25
+#else
+#define SMALL_EULER_LIMIT 15
 #endif
 
 static const mp_limb_t euler_number_small[] = {
