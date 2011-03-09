@@ -39,3 +39,7 @@ unsigned char __flint_clz_tab[128] =
 
 #endif
 
+int dummy_fn_to_prevent_ISOC_warning(void)
+{
+   return 0;
+}
