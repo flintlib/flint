@@ -25,7 +25,7 @@ TEST_SOURCES = $(wildcard test/*.c)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
-EXMPS = $(patsubst %.c, build/%, $(EXMP_SOURCES))
+EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
 
@@ -55,7 +55,8 @@ recursive:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 
 
 examples: all $(LOBJS) library
-	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
+	mkdir -p build/examples
+	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/examples/$(prog) $(LIBS);)
 
 check: $(FLINT_LIB)
 ifndef MOD
@@ -82,7 +83,12 @@ library-recursive:
 $(FLINT_LIB): library
 
 install: library
+ifdef FLINT_SHARED
 	cp $(FLINT_LIB) $(PREFIX)/lib
+endif
+ifdef FLINT_STATIC
+	cp libflint.a $(PREFIX)/lib
+endif
 	cp *.h $(PREFIX)/include
 
 .PHONY: profile library library-recursive recursive clean check check-recursive all
