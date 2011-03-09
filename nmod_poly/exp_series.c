@@ -61,7 +61,7 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
     /* U := h' + g (f' - f h') + O(x^(n-1))
        Note: should replace h' by h' mod x^(m-1) */
     _nmod_vec_zero(f + m, n - m);
-    _nmod_poly_mullow_classical(T, f, n, hprime, n, n, mod);  /* should be mulmid */
+    _nmod_poly_mullow(T, f, n, hprime, n, n, mod);  /* should be mulmid */
     _nmod_poly_derivative(U, f, n, mod);            /* should skip low terms */
     _nmod_vec_sub(U + l, U + l, T + l, n - l, mod);
     _nmod_poly_mullow(T + l, g, n - m, U + l, n - m, n - m, mod);
