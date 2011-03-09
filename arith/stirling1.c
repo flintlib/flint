@@ -146,6 +146,8 @@ fmpz_stirling1(fmpz_t s, long n, long k)
 void
 fmpz_stirling1u_vec(fmpz * row, long n, long klen)
 {
+    if (klen < 1)
+        return;
     _rising_factorial(row, 0, n, klen);
 }
 

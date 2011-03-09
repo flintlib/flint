@@ -142,6 +142,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
     fmpz_clear(t);
     fmpz_clear(c);
     fmpz_clear(d);
+    fmpz_clear(cden);
 }
 
 void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
