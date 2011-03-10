@@ -34,8 +34,6 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 all: all-dirs $(OBJS) recursive library 
 
 all-dirs:
-	rm -rf build
-	mkdir -p build
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir);)
 
 clean:
