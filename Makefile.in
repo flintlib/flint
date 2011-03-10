@@ -44,6 +44,9 @@ clean:
 distclean: clean
 	rm -f Makefile
 
+dist:
+	git archive --format tar --prefix flint-2.1/ master > ../flint-2.1.tar; gzip ../flint-2.1.tar
+
 profile: all profiler.o
 	mkdir -p build/profile
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS);)
