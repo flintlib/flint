@@ -54,7 +54,7 @@ recursive:
 
 examples: all $(LOBJS) library
 	mkdir -p build/examples
-	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/examples/$(prog) $(LIBS);)
+	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 
 check: $(FLINT_LIB)
 ifndef MOD
