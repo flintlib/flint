@@ -44,7 +44,7 @@ clean:
 	rm -rf build
 
 distclean: clean
-	rm Makefile
+	rm -f Makefile
 
 profile: all profiler.o
 	mkdir -p build/profile

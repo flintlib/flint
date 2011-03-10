@@ -1,8 +1,8 @@
 SOURCES = $(wildcard *.c)
 
-OBJS = $(patsubst %.c, %.o, $(SOURCES))
+OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, %.lo, $(SOURCES))
+LIB_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 
 TEST_SOURCES = $(wildcard test/*.c)
 
@@ -19,11 +19,11 @@ library: $(LIB_OBJS)
 profile:
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
         
-%.o: %.c
-	$(CC) $(CFLAGS) -c $(INCS) $< -o $(BUILD_DIR)/$@
+$(BUILD_DIR)/%.o: %.c
+	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
-%.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $(BUILD_DIR)/$@
+$(BUILD_DIR)/%.lo: %.c
+	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)	
