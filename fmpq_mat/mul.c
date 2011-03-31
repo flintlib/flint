@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -27,25 +28,11 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
 
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
 {
-    if (fmpz_is_one(den))
-    {
-        fmpz_print(num);
-    }
-    else
-    {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
-
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+    /* This is faster except maybe for 1x1 or 2x2 matrices */
+    fmpq_mat_mul_cleared(C, A, B);
 }

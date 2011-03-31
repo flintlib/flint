@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -27,25 +28,26 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
-
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols)
 {
-    if (fmpz_is_one(den))
+    if ((rows) && (cols))
     {
-        fmpz_print(num);
+        long i;
+        mat->entries = (fmpq *) calloc(rows * cols, sizeof(fmpq));
+        mat->rows = (fmpq **) malloc(rows * sizeof(fmpq *));
+
+        /* Set denominators */
+        for (i = 0; i < rows * cols; i++)
+            mat->entries[i].den = 1L;
+
+        for (i = 0; i < rows; i++)
+            mat->rows[i] = mat->entries + i * cols;
     }
     else
-    {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
+        mat->entries = NULL;
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+    mat->r = rows;
+    mat->c = cols;
 }

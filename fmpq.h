@@ -58,9 +58,15 @@ static __inline__ void fmpq_zero(fmpq_t res)
     fmpz_set_ui(&res->den, 1UL);
 }
 
-static __inline__ int fmpq_equal(fmpq_t x, fmpq_t y)
+static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)
 {
     return fmpz_equal(&x->num, &y->num) && fmpz_equal(&x->den, &y->den);
+}
+
+static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
+{
+    fmpz_set(&dest->num, &src->num);
+    fmpz_set(&dest->den, &src->den);
 }
 
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);

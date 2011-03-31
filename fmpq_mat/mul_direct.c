@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -27,25 +28,36 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
 
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
 {
-    if (fmpz_is_one(den))
-    {
-        fmpz_print(num);
-    }
-    else
-    {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
+    long i, j, k;
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+    if (A == C || B == C)
+    {
+        printf("fmpq_mat_mul_direct: aliasing not implemented\n");
+        abort();
+    }
+
+    if (!(A->c))
+        return;
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < B->c; j++)
+        {
+            fmpq_mul(fmpq_mat_entry(C, i, j),
+                     fmpq_mat_entry(A, i, 0),
+                     fmpq_mat_entry(B, 0, j));
+
+            for (k = 1; k < A->c; k++)
+            {
+                fmpq_addmul(fmpq_mat_entry(C, i, j),
+                            fmpq_mat_entry(A, i, k),
+                            fmpq_mat_entry(B, k, j));
+            }
+        }
+    }
 }

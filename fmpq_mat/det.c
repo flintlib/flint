@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -26,26 +27,55 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
 
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat)
 {
-    if (fmpz_is_one(den))
+    long n = mat->r;
+
+    if (n == 0)
     {
-        fmpz_print(num);
+        fmpq_set_si(det, 1L, 1L);
+        return;
+    }
+    else if (n == 1)
+    {
+        fmpq_set(det, fmpq_mat_entry(mat, 0, 0));
+    }
+    else if (n == 2)
+    {
+        fmpq_t t;
+        fmpq_init(t);
+
+        fmpq_mul(t, fmpq_mat_entry(mat, 0, 0), fmpq_mat_entry(mat, 1, 1));
+        fmpq_submul(t, fmpq_mat_entry(mat, 0, 1), fmpq_mat_entry(mat, 1, 0));
+
+        fmpq_set(det, t);
+        fmpq_clear(t);
     }
     else
     {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
+        fmpz_mat_t num;
+        fmpz * den;
+        long i;
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+        fmpz_mat_init(num, mat->r, mat->c);
+        den = _fmpz_vec_init(mat->r);
+
+        fmpq_mat_get_fmpz_mat_rowwise(num, den, mat);
+        fmpz_mat_det(&det->num, num);
+
+        fmpz_set_ui(&det->den, 1UL);
+        for (i = 0; i < mat->r; i++)
+            fmpz_mul(&det->den, &det->den, den + i);
+
+        fmpq_canonicalise(det);
+
+        fmpz_mat_clear(num);
+        _fmpz_vec_clear(den, mat->r);
+    }
 }

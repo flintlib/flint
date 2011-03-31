@@ -26,26 +26,20 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
 
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_clear(fmpq_mat_t mat)
 {
-    if (fmpz_is_one(den))
+    if (mat->entries)
     {
-        fmpz_print(num);
-    }
-    else
-    {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
+        long i;
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+        for (i = 0; i < mat->r * mat->c; i++)
+            fmpq_clear(mat->entries + i);
+
+        free(mat->entries);
+    }
 }

@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -27,25 +28,14 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
+#include "fmpq_mat.h"
 
 
-void
-_fmpq_print(fmpz_t num, fmpz_t den)
+void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    if (fmpz_is_one(den))
-    {
-        fmpz_print(num);
-    }
-    else
-    {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
-    }
-}
+    long i, j;
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
+            fmpq_randtest(fmpq_mat_entry(mat,i,j), state, bits);
 }
