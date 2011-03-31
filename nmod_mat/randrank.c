@@ -42,11 +42,11 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, long rank)
         abort();
     }
 
-    diag = nmod_vec_init(rank);
+    diag = _nmod_vec_init(rank);
     for (i = 0; i < rank; i++)
         diag[i] = 1 + n_randint(state, mat->mod.n - 1);
 
     nmod_mat_randpermdiag(mat, state, diag, rank);
 
-    nmod_vec_free(diag);
+    _nmod_vec_free(diag);
 }

@@ -110,7 +110,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
     mpz_init(z_coeff);
     mpz_init(z_exp);
 
-  s_0 :
+    /* s_0 : */
 
     next_event();
 

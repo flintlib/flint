@@ -44,27 +44,30 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    long length = info->length;
    long i, j;
-   mp_ptr vec = nmod_vec_init(length);
-   mp_ptr vec2 = nmod_vec_init(length);
-     
+   mp_ptr vec = _nmod_vec_init(length);
+   mp_ptr vec2 = _nmod_vec_init(length);
+   flint_rand_t state;
+   flint_randinit(state);
+    
    for (i = 0; i < count; i++)
    {
-      n = n_randbits(bits);
+      n = n_randbits(state, bits);
       if (n == 0UL) n++;
-      c = n_randint(n);
+      c = n_randint(state, n);
       for (j = 0; j < length; j++)
-         vec[j] = n_randint(n);
+         vec[j] = n_randint(state, n);
       
 	  nmod_init(&mod, n);
 
       prof_start();
       for (j = 0; j < 30; j++)
-		 _nmod_vec_scalar_mul(vec2, vec, length, mod, c);
+		 _nmod_vec_scalar_mul_nmod(vec2, vec, length, c, mod);
 	  prof_stop();
    }
    
-   nmod_vec_free(vec);
-   nmod_vec_free(vec2);
+   flint_randclear(state);
+   _nmod_vec_free(vec);
+   _nmod_vec_free(vec2);
 }
 
 int main(void)

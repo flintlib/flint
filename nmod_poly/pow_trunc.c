@@ -31,14 +31,14 @@
 
 void
 _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
-                                       long trunc, nmod_t mod, ulong e)
+                                       ulong e, long trunc, nmod_t mod)
 {
-    _nmod_poly_pow_trunc_binexp(res, poly, trunc, mod, e);
+    _nmod_poly_pow_trunc_binexp(res, poly, e, trunc, mod);
 }
 
 void
 nmod_poly_pow_trunc(nmod_poly_t res, 
-                           const nmod_poly_t poly, long trunc, ulong e)
+                           const nmod_poly_t poly, ulong e, long trunc)
 {
     const long len = poly->length;
     mp_ptr p;
@@ -67,14 +67,14 @@ nmod_poly_pow_trunc(nmod_poly_t res,
             nmod_poly_truncate(res, trunc);
         }
         else  /* e == 2UL */
-            nmod_poly_mullow_n(res, poly, poly, trunc);
+            nmod_poly_mullow(res, poly, poly, trunc);
 
         return;
     }
 
     if (poly->length < trunc)
     {
-        p = nmod_vec_init(trunc);
+        p = _nmod_vec_init(trunc);
         mpn_copyi(p, poly->coeffs, poly->length);
         mpn_zero(p + poly->length, trunc - poly->length);
         pcopy = 1;
@@ -84,19 +84,19 @@ nmod_poly_pow_trunc(nmod_poly_t res,
     if (res != poly || pcopy)
     {
         nmod_poly_fit_length(res, trunc);
-        _nmod_poly_pow_trunc(res->coeffs, p, trunc, poly->mod, e);
+        _nmod_poly_pow_trunc(res->coeffs, p, e, trunc, poly->mod);
     }
     else
     {
         nmod_poly_t t;
         nmod_poly_init2(t, poly->mod.n, trunc);
-        _nmod_poly_pow_trunc(t->coeffs, p, trunc, poly->mod, e);
+        _nmod_poly_pow_trunc(t->coeffs, p, e, trunc, poly->mod);
         nmod_poly_swap(res, t);
         nmod_poly_clear(t);
     }
 
     if (pcopy)
-        nmod_vec_free(p);
+        _nmod_vec_free(p);
 
     res->length = trunc;
     _nmod_poly_normalise(res);

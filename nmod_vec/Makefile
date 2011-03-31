@@ -1,8 +1,8 @@
 SOURCES = $(wildcard *.c)
 
-OBJS = $(patsubst %.c, %.o, $(SOURCES))
+OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, %.lo, $(SOURCES))
+LIB_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 
 TEST_SOURCES = $(wildcard test/*.c)
 
@@ -17,19 +17,19 @@ all: $(OBJS)
 library: $(LIB_OBJS)
 
 profile:
-	$(foreach prog, $(PROFS), $(CC) -std=c99 -O2 $(INCS) $(prog).c ../profiler.o -o $(prog) $(LIBS);)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
         
-%.o: %.c
+$(BUILD_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
-%.lo: %.c
+$(BUILD_DIR)/%.lo: %.c
 	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(LIB_OBJS) $(TESTS)	
+	rm -rf $(BUILD_DIR)	
 
 check: library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(prog) $(LIBS);)
-	$(foreach prog, $(TESTS), $(prog);)
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(TESTS), $(BUILD_DIR)/$(prog);)
 
 .PHONY: profile clean check all

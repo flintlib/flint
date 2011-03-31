@@ -37,7 +37,7 @@ _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen,
     long len = Alen - Blen + 1;
     mp_ptr Arev, Brev;
 
-    Arev = nmod_vec_init(2*len);
+    Arev = _nmod_vec_init(2*len);
     Brev = Arev + len;
 
     if (Alen >= len)
@@ -59,7 +59,7 @@ _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen,
     _nmod_poly_div_series(Q, Arev, Brev, len, mod);
     
     _nmod_poly_reverse(Q, Q, len, len);
-    nmod_vec_free(Arev);
+    _nmod_vec_free(Arev);
 }
 
 void

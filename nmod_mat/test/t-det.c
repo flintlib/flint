@@ -51,7 +51,7 @@ main(void)
         mp_limb_t Adet;
         fmpz_t Bdet;
 
-        m = n_randint(state, 10);
+        m = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
@@ -81,6 +81,7 @@ main(void)
 
     flint_randclear(state);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

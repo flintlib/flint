@@ -35,7 +35,7 @@ void _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
 {
     fmpz_t tmp;
 
-    _fmpz_mat_det_2x2(den, a);
+    _fmpz_mat_det_cofactor_2x2(den, a);
 
     fmpz_neg(&b[0][1], &a[0][1]);
     fmpz_neg(&b[1][0], &a[1][0]);
@@ -76,7 +76,7 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
         default:
             fmpz_mat_init(I, dim, dim);
             for (i = 0; i < dim; i++)
-                fmpz_set_ui(&I->rows[i][i], 1UL);
+                fmpz_set_ui(I->rows[i] + i, 1UL);
             fmpz_mat_solve_mat(B, den, A, I);
             fmpz_mat_clear(I);
     }

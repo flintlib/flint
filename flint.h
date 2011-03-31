@@ -96,6 +96,10 @@ typedef __mpfr_struct mpfr;
 #define l_shift(in, shift) \
     ((shift == FLINT_BITS) ? 0L : ((in) << (shift)))
 
+#ifdef NEED_CLZ_TAB
+extern unsigned char __flint_clz_tab[128];
+#endif
+
 static __inline__
 unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 {

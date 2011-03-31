@@ -66,7 +66,7 @@ nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
             order[(T->rows[i] - T->entries) / dim] = i;
 
         /* Solve for each column of B using precomputed LU decomposition */
-        tmp = nmod_vec_init(dim);
+        tmp = _nmod_vec_init(dim);
         for (eq = 0; eq < equations; eq++)
         {
             for (i = 0; i < dim; i++)
@@ -77,7 +77,7 @@ nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
             for (i = 0; i < dim; i++)
                 X->rows[i][eq] = tmp[i];
         }
-        nmod_vec_free(tmp);
+        _nmod_vec_free(tmp);
         free(order);
         result = 1;
     }

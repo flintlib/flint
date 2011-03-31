@@ -42,5 +42,7 @@ int fmpq_poly_debug(const fmpq_poly_t poly)
     printf(", den: ");
     fmpz_print(poly->den);
     printf("}");
+
+    return 1;
 }
 

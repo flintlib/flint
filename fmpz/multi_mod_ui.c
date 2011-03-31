@@ -32,18 +32,18 @@
 
 void
 fmpz_multi_mod_ui_basecase(mp_limb_t * out, fmpz_t in, mp_limb_t * primes,
-                           long num_primes, fmpz_t temp)
+                           long num_primes)
 {
     long i;
     for (i = 0; i < num_primes; i++)
     {
-        out[i] = fmpz_mod_ui(temp, in, primes[i]);
+        out[i] = fmpz_fdiv_ui(in, primes[i]);
     }
 }
 
 void
-fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
-                    fmpz ** comb_temp, fmpz_t temp)
+fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
+    fmpz_comb_temp_t temp)
 {
     long i, j;
     long n = comb->n;
@@ -51,17 +51,11 @@ fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     long stride;
     long num;
     long num_primes = comb->num_primes;
+    fmpz ** comb_temp = temp->comb_temp;
 
-    /* Reduce modulo a single prime which is assumed to be big enough */
     if (num_primes == 1)
     {
-        int sign = fmpz_sgn(in);
-        if (sign > 0)
-            out[0] = (*in);
-        else if (sign < 0)
-            out[0] = comb->primes[0] + (*in);
-        else
-            out[0] = 0L;
+        out[0] = fmpz_fdiv_ui(in, comb->primes[0]);
         return;
     }
 
@@ -76,7 +70,8 @@ fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     }
     else
     {
-        while (fmpz_cmpabs(in, comb->comb[log_comb]) >= 0)
+        while (fmpz_cmpabs(in, comb->comb[log_comb]) >= 0 &&
+            (log_comb < comb->n - 1))
             log_comb++;
     }
 
@@ -116,6 +111,6 @@ fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
     for (i = 0, j = 0; j < num_primes; i++, j += stride)
     {
         fmpz_multi_mod_ui_basecase(out + j, comb_temp[log_comb] + i,
-            comb->primes + j, FLINT_MIN(stride, num_primes - j), temp);
+            comb->primes + j, FLINT_MIN(stride, num_primes - j));
     }
 }

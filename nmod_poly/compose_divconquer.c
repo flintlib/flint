@@ -103,7 +103,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     }
     if (len2 == 1)
     {
-        res[0] = _nmod_poly_evaluate(poly1, len1, mod, poly2[0]);
+        res[0] = _nmod_poly_evaluate_nmod(poly1, len1, poly2[0], mod);
         return;
     }
     if (len1 == 2)
@@ -131,7 +131,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     for (i = 0; i < (len1 + 1) / 2; i++)
         alloc += hlen[i];
 
-    v = nmod_vec_init(alloc +  2 * powlen);
+    v = _nmod_vec_init(alloc +  2 * powlen);
     h = (mp_ptr *) malloc(((len1 + 1) / 2) * sizeof(mp_ptr));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
@@ -149,7 +149,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     {
         if (poly1[j + 1] != 0L)
         {
-            _nmod_vec_scalar_mul(h[i], poly2, len2, mod, poly1[j + 1]);
+            _nmod_vec_scalar_mul_nmod(h[i], poly2, len2, poly1[j + 1], mod);
             h[i][0] = n_addmod(h[i][0], poly1[j], mod.n);
             hlen[i] = len2;
         }
@@ -210,7 +210,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     _nmod_poly_mul(res, pow, powlen, h[1], hlen[1], mod);
     _nmod_vec_add(res, res, h[0], hlen[0], mod);
     
-    nmod_vec_free(v);
+    _nmod_vec_free(v);
     free(h);
     free(hlen);
 }

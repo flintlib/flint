@@ -32,7 +32,7 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, long len, mp_bitcnt_t bits,
+_nmod_poly_bit_unpack(mp_ptr res, long len, mp_srcptr mpn, mp_bitcnt_t bits,
                       nmod_t mod)
 {
     long i;

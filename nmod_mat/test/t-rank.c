@@ -47,8 +47,8 @@ main(void)
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
@@ -70,8 +70,8 @@ main(void)
     /* Dense */
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(state, 10);
-        n = n_randint(state, 10);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)

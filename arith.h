@@ -27,6 +27,7 @@
 #define ARITH_H
 
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -90,10 +91,119 @@ void fmpz_stirling1u_mat(fmpz ** rows, long n);
 void fmpz_stirling1_mat(fmpz ** rows, long n);
 void fmpz_stirling2_mat(fmpz ** rows, long n);
 
-void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n);
-void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n);
-void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n);
+/* Bell numbers **************************************************************/
 
-void fmpq_poly_bernoulli(fmpq_poly_t poly, long n);
+#if FLINT64
+#define SMALL_BELL_LIMIT 25
+#else
+#define SMALL_BELL_LIMIT 15
+#endif
+
+static const mp_limb_t bell_number_small[] = 
+{
+    1UL, 1UL, 2UL, 5UL, 15UL, 52UL, 203UL, 877UL, 4140UL, 21147UL, 115975UL,
+    678570UL, 4213597UL, 27644437UL, 190899322UL, 1382958545UL,
+#if FLINT64
+    10480142147UL, 82864869804UL, 682076806159UL, 5832742205057UL,
+    51724158235372UL, 474869816156751UL, 4506715738447323UL,
+    44152005855084346UL, 445958869294805289UL,
+    4638590332229999353UL,
+#endif
+};
+
+void bell_number(fmpz_t b, ulong n);
+
+void bell_number_vec(fmpz * b, long n);
+
+double bell_number_size(ulong n);
+
+void _bell_number_vec_recursive(fmpz * b, long n);
+
+void _bell_number_vec_multi_mod(fmpz * b, long n);
+
+
+/* Zeta Euler product ********************************************************/
+
+void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+
+
+/* Euler numbers *************************************************************/
+
+#if FLINT64
+#define SMALL_EULER_LIMIT 25
+#else
+#define SMALL_EULER_LIMIT 15
+#endif
+
+static const mp_limb_t euler_number_small[] = {
+    1UL, 1UL, 5UL, 61UL, 1385UL, 50521UL, 2702765UL,
+    199360981UL,
+#if FLINT64
+    19391512145UL, 2404879675441UL, 370371188237525UL,
+    69348874393137901UL, 15514534163557086905UL
+#endif
+};
+
+double euler_number_size(ulong n);
+
+void euler_number_vec(fmpz * res, long n);
+
+void _euler_number_zeta(fmpz_t res, ulong n);
+
+void euler_number(fmpz_t res, ulong n);
+
+void euler_polynomial(fmpq_poly_t poly, ulong n);
+
+/* Bernoulli numbers *********************************************************/
+
+#if FLINT64
+#define BERNOULLI_SMALL_NUMER_LIMIT 35
+#else
+#define BERNOULLI_SMALL_NUMER_LIMIT 27
+#endif
+
+static const long _bernoulli_numer_small[] = {
+    1L, 1L, -1L, 1L, -1L, 5L, -691L, 7L, -3617L, 43867L, -174611L, 854513L,
+    -236364091L, 8553103L,
+#if FLINT64
+    -23749461029L, 8615841276005L, -7709321041217L, 2577687858367L
+#endif
+};
+
+void bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
+
+void bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+
+void bernoulli_number_denom(fmpz_t den, ulong n);
+
+double bernoulli_number_size(ulong n);
+
+void bernoulli_polynomial(fmpq_poly_t poly, ulong n);
+
+void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
+
+void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n);
+
+void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
+
+void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
+
+/* Legendre polynomials ******************************************************/
+
+void legendre_polynomial(fmpq_poly_t poly, ulong n);
+
+/* Swinnerton-Dyer polynomials ***********************************************/
+
+void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
+
+/* Partition function ********************************************************/
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
+
+void partition_function_vec(fmpz * res, long len);
+
+/* Landau function ***********************************************************/
+
+void landau_function_vec(fmpz * res, long len);
 
 #endif

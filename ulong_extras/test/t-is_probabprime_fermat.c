@@ -78,8 +78,8 @@ int main(void)
 
       do
       {
-         d = n_randtest_not_zero(state);
-         if (d == 1UL) d++;
+         d = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         if (d < 2UL) d = 2;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 

@@ -43,8 +43,8 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         long j, len = n_randint(state, 100) + 1;
-        mp_ptr vec = nmod_vec_init(len);
-        mp_ptr vec2 = nmod_vec_init(len);
+        mp_ptr vec = _nmod_vec_init(len);
+        mp_ptr vec2 = _nmod_vec_init(len);
 
         mp_limb_t n = n_randtest_not_zero(state);
         nmod_t mod;
@@ -68,8 +68,8 @@ main(void)
             abort();
         }
 
-        nmod_vec_free(vec);
-        nmod_vec_free(vec2);
+        _nmod_vec_free(vec);
+        _nmod_vec_free(vec2);
     }
 
     flint_randclear(state);

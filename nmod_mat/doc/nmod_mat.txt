@@ -201,7 +201,7 @@ long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
 
     The \code{options} parameter is a bitfield which may be set to any 
     combination of the following flags, where using \code{options = 0} to 
-    disable all and perform in-place $LU$ decomposition)
+    disable all and perform in-place $LU$ decomposition.
     \begin{itemize}
     \item \code{ROWREDUCE_FAST_ABORT}.
 

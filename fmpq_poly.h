@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
  
 ******************************************************************************/
 
@@ -113,7 +114,7 @@ void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
-void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a);
+void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n);
 
 void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n);
 
@@ -300,22 +301,22 @@ void fmpq_poly_rem(fmpq_poly_t R,
 
 /*  Power series division  ***************************************************/
 
-void _fmpq_poly_inv_newton(fmpz * Qinv, fmpz_t Qinvden, 
+void _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
                            const fmpz * Q, const fmpz_t Qden, long n);
 
-void fmpq_poly_inv_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n);
+void fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n);
 
 static __inline__ void 
 _fmpq_poly_inv_series(fmpz * Qinv, fmpz_t Qinvden, 
                       const fmpz * Q, const fmpz_t Qden, long n)
 {
-    _fmpq_poly_inv_newton(Qinv, Qinvden, Q, Qden, n);
+    _fmpq_poly_inv_series_newton(Qinv, Qinvden, Q, Qden, n);
 }
 
 static __inline__ void 
 fmpq_poly_inv_series(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n)
 {
-    fmpq_poly_inv_newton(Qinv, Q, n);
+    fmpq_poly_inv_series_newton(Qinv, Q, n);
 }
 
 void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ, 
@@ -325,12 +326,92 @@ void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, long n);
 
-/*  Derivative  **************************************************************/
+/*  Derivative and integral  *************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
                            const fmpz * poly, const fmpz_t den, long len);
 
 void fmpq_poly_derivative(fmpq_poly_t res, const fmpq_poly_t poly);
+
+void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
+                           const fmpz * poly, const fmpz_t den, long len);
+
+void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly);
+
+/*  Square roots  ************************************************************/
+
+void  _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, long n);
+
+void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void  _fmpq_poly_sqrt_series(fmpz * rpoly, fmpz_t rden, 
+                      const fmpz * poly, const fmpz_t den, long n);
+
+void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+
+/*  Transcendental functions  ************************************************/
+
+void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
+                           const fmpz * f, const fmpz_t fden, long n);
+
+void fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n);
+
+void _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_exp_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_atanh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_atanh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_asin_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_asin_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_asinh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_asinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_tan_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_tan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_sin_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_cos_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_cos_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_cosh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_cosh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
+
+void _fmpq_poly_tanh_series(fmpz * g, fmpz_t gden,
+                            const fmpz * h, const fmpz_t hden, long n);
+
+void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
 /*  Evaluation  **************************************************************/
 
@@ -376,10 +457,10 @@ int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, long len);
 
 int fmpq_poly_is_monic(const fmpq_poly_t poly);
 
-void _fmpq_poly_monic(fmpz * rpoly, fmpz_t rden, 
+void _fmpq_poly_make_monic(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, long len);
 
-void fmpq_poly_monic(fmpq_poly_t res, const fmpq_poly_t poly);
+void fmpq_poly_make_monic(fmpq_poly_t res, const fmpq_poly_t poly);
 
 /*  Square-free  *************************************************************/
 
@@ -408,7 +489,7 @@ int fmpq_poly_print(const fmpq_poly_t poly)
     return fmpq_poly_fprint(stdout, poly);
 }
 
-void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
 

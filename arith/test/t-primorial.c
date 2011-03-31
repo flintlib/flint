@@ -58,6 +58,10 @@ int main(void)
        }
     }
 
+    fmpz_clear(x);
+    fmpz_clear(y);
+
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

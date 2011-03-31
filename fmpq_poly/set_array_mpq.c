@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, long n, const mpq_t * a)
+_fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
 {
     long i;
     mpz_t d, t;
@@ -61,7 +61,7 @@ void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
     else
     {
         fmpq_poly_fit_length(poly, n);
-        _fmpq_poly_set_array_mpq(poly->coeffs, poly->den, n, a);
+        _fmpq_poly_set_array_mpq(poly->coeffs, poly->den, a, n);
         _fmpq_poly_set_length(poly, n);
         _fmpq_poly_normalise(poly);
     }

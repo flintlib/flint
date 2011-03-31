@@ -29,12 +29,12 @@
 
 *******************************************************************************
 
-mp_ptr nmod_vec_init(long len)
+mp_ptr _nmod_vec_init(long len)
 
     Returns a vector of the given length. The entries are not necessarily
     zero.
 
-void nmod_vec_free(mp_ptr vec)
+void _nmod_vec_free(mp_ptr vec)
 
     Frees the memory used by the given vector.
 
@@ -51,35 +51,35 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 
 NMOD_RED2(r, a_hi, a_lo, mod)
 
-    Macro to set $r$ to \code{a % mod.n}, where $a$ consists of two 
-    limbs \code{(a_hi, a_lo)}. The \code{mod} parameter must be a 
-    valid \code{nmod_t} structure. It is assumed that \code{a_hi} 
+    Macro to set $r$ to $a$ reduced modulo \code{mod.n}, where $a$ 
+    consists of two limbs \code{(a_hi, a_lo)}. The \code{mod} parameter 
+    must be a valid \code{nmod_t} structure. It is assumed that \code{a_hi} 
     is already reduced modulo \code{mod.n}.
 
 NMOD_RED(r, a, mod)
 
-    Macro to set $r$ to \code{a % mod.n}. The \code{mod} parameter 
-    must be a valid \code{nmod_t} structure.
+    Macro to set $r$ to $a$ reduced modulo \code{mod.n}. The \code{mod} 
+    parameter must be a valid \code{nmod_t} structure.
 
 NMOD2_RED2(r, a_hi, a_lo, mod) 
 
-    Macro to set $r$ to \code{a % mod.n}, where $a$ consists of two 
-    limbs \code{(a_hi, a_lo)}. The \code{mod} parameter must be
-    a valid \code{nmod_t} structure. No assumptions are made about 
-    \code{a_hi}.
+    Macro to set $r$ to $a$ reduced modulo \code{mod.n}, where $a$ 
+    consists of two limbs \code{(a_hi, a_lo)}. The \code{mod} parameter 
+    must be a valid \code{nmod_t} structure. No assumptions are made 
+    about \code{a_hi}.
 
 NMOD_RED3(r, a_hi, a_me, a_lo, mod)
 
-    Macro to set $r$ to \code{a % mod.n}, where $a$ consists of three 
-    limbs \code{(a_hi, a_me, a_lo)}. The \code{mod} parameter must 
-    be a valid \code{nmod_t} structure. It is assumed that \code{a_hi} 
-    is already reduced modulo \code{mod.n}.
+    Macro to set $r$ to $a$ reduced modulo \code{mod.n}, where $a$ 
+    consists of three limbs \code{(a_hi, a_me, a_lo)}. The \code{mod} 
+    parameter must be a valid \code{nmod_t} structure. It is assumed 
+    that \code{a_hi} is already reduced modulo \code{mod.n}.
 
 NMOD_ADDMUL(r, a, b, mod)
 
-    Macro to set $r$ to \code{(r + a*b) % mod.n}. The \code{mod} parameter 
-    must be a valid \code{nmod_t} structure. It is assumed that $r$, $a$, $b$ 
-    are already reduced modulo \code{mod.n}.
+    Macro to set $r$ to $r + ab$ reduced modulo \code{mod.n}. The 
+    \code{mod} parameter must be a valid \code{nmod_t} structure. It is 
+    assumed that $r$, $a$, $b$ are already reduced modulo \code{mod.n}.
 
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
 
@@ -138,8 +138,8 @@ void _nmod_vec_zero(mp_ptr vec, long len)
 
 void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
 
-   Swap the vectors \code{a} and \code{b} of length $n$ by actually
-   swapping the entries.
+    Swaps the vectors \code{a} and \code{b} of length $n$ by actually
+    swapping the entries.
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 
@@ -152,8 +152,8 @@ mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len)
 
 int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 
-    Returns $1$ if \code{(vec, len)} is equal to \code{(vec2, len)}, 
-    else return $0$.
+    Returns~$1$ if \code{(vec, len)} is equal to \code{(vec2, len)}, 
+    otherwise returns~$0$.
 
 *******************************************************************************
 
@@ -177,13 +177,13 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
 
     Sets \code{(res, len)} to the negation of \code{(vec, len)}.
 
-void _nmod_vec_scalar_mul(mp_ptr res, mp_srcptr vec, 
-				        long len, nmod_t mod, mp_limb_t c)
+void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
+				        long len, mp_limb_t c, nmod_t mod)
 
     Sets \code{(res, len)} to \code{(vec, len)} multiplied by $c$.
 
-void _nmod_vec_scalar_addmul(mp_ptr res, mp_srcptr vec, 
-				        long len, nmod_t mod, mp_limb_t c)
+void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
+				        long len, mp_limb_t c, nmod_t mod)
 
     Adds \code{(vec, len)} times $c$ to the vector \code{(res, len)}.
 

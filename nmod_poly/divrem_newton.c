@@ -41,9 +41,9 @@ _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long Alen,
     if (Blen > 1)
     {
         if (len >= Blen - 1)
-            _nmod_poly_mullow_n(R, Q, len, B, Blen - 1, Blen - 1, mod);
+            _nmod_poly_mullow(R, Q, len, B, Blen - 1, Blen - 1, mod);
         else
-            _nmod_poly_mullow_n(R, B, Blen - 1, Q, len, Blen - 1, mod);
+            _nmod_poly_mullow(R, B, Blen - 1, Q, len, Blen - 1, mod);
 
         _nmod_vec_sub(R, A, R, Blen - 1, mod);
     }

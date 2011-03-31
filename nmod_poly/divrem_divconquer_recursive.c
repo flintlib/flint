@@ -81,7 +81,7 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
          */
 
         d2q1 = W1;
-        _nmod_poly_mullow_n(d2q1, q1, n1, d2, n2, n1 + n2 - 1, mod);
+        _nmod_poly_mullow(d2q1, q1, n1, d2, n2, n1 + n2 - 1, mod);
 
         /* 
            Compute dq1 = d1 q1 x^n2 + d2 q1, of length n1 + n2 - 1
@@ -124,7 +124,7 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
          */
 
         d4q2 = W1;
-        _nmod_poly_mullow_n(d4q2, d4, n1, q2, n2, n1 + n2 - 1, mod);
+        _nmod_poly_mullow(d4q2, d4, n1, q2, n2, n1 + n2 - 1, mod);
 
         /*
            Compute dq2 = d3q2 x^n1 + d4q2, of length n1 + n2 - 1

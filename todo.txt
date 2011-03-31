@@ -1,49 +1,102 @@
 TODO
 ====
 
-* Jeff Gilchrist has confirmed that the standard BPSW primality test returns no pseudoprimes 
-  to 2^64. http://gilchrist.ca/jeff/factoring/pseudoprimes.html We should implement this test
-  as specified and use this for primality testing up to 2^64. From private correspondence,
-  Jeff tells me the BPSW variant used is that implemented by T.R. Nicely:
-  http://www.trnicely.net/misc/bpsw.html Thus, if we want to use this algorithm, we must
-  specifically use that version of the algorithm.
+general
+-------
 
-* in is_prime_pocklington allow the cofactor to be a perfect power not just prime
+* get rid of global random states
+
+* Write a flint2 memory manager, both reentrant and non-reentrant stack based
+  versions
+
+* Write a configure script for flint2 which has an option for
+  reentrant/non-reentrant
+
+* [maybe] a type mpfr which is an alias for __mpfr_struct and using throughout
+
+
+fmpz
+----
+
+* fmpz_single currently hangs on to all mpz's. It might be better to release
+  ones that are over a certain size (careful, checking every single one might
+  be expensive. It might be better to have some kind of garbage collection;
+  then again checking whether the garbage collection needs to be run every time
+  also costs time, though a garbage collector can do more).
+
+* Use fmpz_init and fmpz_clear in the t-fmpz test
+
+* Check and improve the functions fmpz_sizeinbase, fmpz_get_str and 
+  fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
+  functionality.  Once this has been done, also include test code for these
+
+* [maybe] figure out how to write robust test code for fmpz_read (which reads
+  from stdin), perhaps using a pipe
+
+* Inline or create inline versions of core fmpz functions.
+
+* Inline _fmpz_demote_val and try to cover the cases size == -1, 0, 1
+  with a single or at most two branches.
+
+* Inline mpz_get/set_ui in core fmpz functions.
+
+* [maybe] Avoid the double allocation of both an mpz struct and limb data,
+  having an fmpz point directly to a combined structure. This would require
+  writing replacements for most mpz functions.
+
+
+ulong_extras
+------------
+
+* Jeff Gilchrist has confirmed that the standard BPSW primality test returns
+  no pseudoprimes to 2^64. http://gilchrist.ca/jeff/factoring/pseudoprimes.html
+  We should implement this test as specified and use this for primality testing
+  up to 2^64. From private correspondence, Jeff tells me the BPSW variant used
+  is that implemented by T.R. Nicely: http://www.trnicely.net/misc/bpsw.html
+  Thus, if we want to use this algorithm, we must specifically use that version
+  of the algorithm.
+
+* in is_prime_pocklington allow the cofactor to be a perfect power not just
+  prime
 
 * make n_gcd take arguments in either order and use throughout flint2
 
 * have make check bomb out if one of the tests aborts
 
-* factor out some common code between n_is_perfect_power235 and n_factor_power235
+* factor out some common code between n_is_perfect_power235 and
+  n_factor_power235
 
 * add profile code for factor_trial, factor_one_line, factor_SQUFOF
 
-* Use fmpz_init and fmpz_clear in the t-fmpz test
+* [maybe] make n_factor_t an array of length 1 so it can be passed by reference
+  automatically, as per mpz_t's, etc
 
-* Write a flint2 memory manager, both reentrant and non-reentrant stack based versions
+* [enhancement] Implement a primality test which only requires factoring of
+  n-1 up to n^1/3 or n^1/4
 
-* Write a configure script for flint2 which has an option for reentrant/non-reentrant
+* [enhancement] Implement a combined p-1 and p+1 primality test as per
+  http://primes.utm.edu/prove/prove3_3.html
 
-* fmpz_single currently hangs on to all mpz's. It might be better to release ones that are 
-  over a certain size (careful, checking every single one might be expensive. It might be
-  better to have some kind of garbage collection; then again checking whether the garbage
-  collection needs to be run every time also costs time, though a garbage collector can do
-  more).
+* [enhancement] Implement a quadratic sieve and use it in n_factor once things
+  get too large for SQUFOF
 
-* Implement a z_randtest(state) function and use in fmpz_get/set_si 
 
-* Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and fmpz_invert, 
-  respectively
+long_extras
+-----------
 
-* Write test code for fmpz_poly_scalar_addmul_fmpz
+* Implement a z_randtest() function and use in fmpz_get/set_si 
+
+* Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and
+  fmpz_invert, respectively
+
+
+fmpz_vec
+--------
 
 * Write test code for fmpz_vec functions
 
-* get rid of global random states
-
-* add fmpz_mat/randajtai2.c based on Stehle's matrix.cpp in fpLLL (requires mpfr_t's).
-
-* add a cache of mpfr's which can be used as temporaries for functions like _mpfr_vec_scalar_product
+* add a cache of mpfr's which can be used as temporaries for functions like
+  _mpfr_vec_scalar_product
 
 * test code for ulong_extras/revbin.c
 
@@ -51,24 +104,38 @@ TODO
 
 * make use of mpfr type througout LLL, mpfr_vec and mpfr_mat modules
 
+
+fmpz_mpoly / nmod_mpoly
+-----------------------
+
 * Write fmpz_mpoly_max_bits, use in t-mul_heap test code and mul_heap
 
 * Write ACCUM2 and ACCUM3 assembly functions and use in mul_heap
 
 * Make mul_heap take arrays of fmpz's as arguments and document function
 
+
+nmod_poly
+---------
+
 * Write some macros for modular reduction in the nmod_poly module.
 
 * Make some assembly optimisations to nmod_poly module.
+
+* Add basecase versions of log, sqrt, invsqrt series
+
+* Add O(M(n)) powering mod x^n based on exp and log
+
+* Implement fast mulmid and use to improve Newton iteration
+
+
+fmpz_poly
+---------
 
 * add test code for fmpz_poly_max_limbs
 
 * Fix a bug in mul_KS and mullow_KS, to do with the assumption len1 >= len2 
   and zero padding
-
-* Check and improve the functions fmpz_sizeinbase, fmpz_get_str and 
-  fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
-  functionality.  Once this has been done, also include test code for these
 
 * Improve the implementations of fmpz_poly_divrem, _div, and _rem, check that 
   the documentations still apply, and write test code for this --- all of this 
@@ -80,20 +147,143 @@ TODO
 * Sort out the fmpz_poly_pseudo_div and _rem code.  Currently this is just 
   a hack to call fmpz_poly_pseudo_divrem
 
-Maybe
-=====
+* Write test code for fmpz_poly_scalar_addmul_fmpz
 
-* make n_factor_t an array of length 1 so it can be passed by reference automatically, as per mpz_t's, etc
+* Optimise fmpz_poly_shift_right/left for shifting a polynomial
+  in-place
 
-* figure out how to write robust test code for fmpz_read (which reads from stdin), perhaps using a pipe
 
-* a type mpfr which is an alias for __mpfr_struct and using throughout
+fmpq_poly
+---------
 
-Enhancements
-============
+* Implement series sqrt, invsqrt, log, exp
 
-* Implement a primality test which only requires factoring of n-1 up to n^1/3 or n^1/4
 
-* Implement a combined p-1 and p+1 primality test as per http://primes.utm.edu/prove/prove3_3.html
+fmpq_poly
+---------
 
-* Implement a quadratic sieve and use it in n_factor once things get too large for SQUFOF
+* add fmpq_poly_fprint_pretty
+
+arith
+-----
+
+* Think of a better name for this module and/or move parts of it
+  to other modules.
+
+* Write profiling code.
+
+* Improve the _fmpz_prod function in divisor_sigma.c and move it
+  to the fmpz_vec module.
+
+* Write a faster fmpz_divisors using the merge sort algorithm
+  (see Sage's implementation). Alternatively (or as a complement)
+  write a supernaturally fast _fmpz_vec_sort.
+
+* Improve fmpz_divisors by using long and longlong arithmetic
+  for divisors that fit in 1 or 2 limbs.
+
+* Implement primality testing, perfect power testing,
+  and fast factorisation algorithm (Brent-Pollard, QS, ...) in
+  fmpz_factor.
+
+* Optimise memory management in mpq_harmonic.
+
+* Maybe move the helper functions in primorial.c to the mpn_extras
+  module.
+
+* Turn mpq_harmonic into an fmpz (or future fmpq type?) function.
+
+* Implement computation of generalised harmonic numbers.
+
+* Consider renaming fmpz_poly_ramanujan_tau to fmpz_poly_delta_qexp
+  or something similar.
+
+* Maybe: move Stirling number matrix functions to the fmpz_mat module.
+
+* Write a fast version of fmpz_unfactor.
+
+* Implement computation of Bernoulli numbers modulo a prime
+  (e.g. porting the code from flint 1)
+
+* Implement multimodular computation of large Bernoulli numbers
+  (e.g. porting bernmm)
+
+* (Maybe) add separate functions for computing the scaled Bernoulli numbers
+  B_2k/(2k)! directly.
+
+* Implement rising factorials and falling factorials (x)_n, (x)^n
+  as fmpz_poly functions, and add fmpz functions for their
+  direct evaluation.
+
+* Implement the binomial coefficient binomial(x,n) as an fmpq_poly
+  function.
+
+* Implement Fibonacci polynomials and fmpz Fibonacci numbers.
+
+* Implement Bell polynomials.
+
+* Implement cyclotomic polynomials.
+
+* Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
+  Hermite, Laguerre, Gegenbauer).
+
+* Implement hypergeometric polynomials and series.
+
+
+fmpz_mat
+--------
+
+* Add fmpz_mat/randajtai2.c based on Stehle's matrix.cpp in fpLLL
+  (requires mpfr_t's).
+
+* Add element getter and setter methods.
+
+* Implement fmpz_mat_pow_ui.
+
+* Implement fast null space computation.
+
+* Implement fast multimodular and/or p-adic determinant calculation.
+
+* Implement fast multimodular and/or p-adic solving.
+
+* fmpz_mat_mul: If the product bound is less than COEFF_MAX, treat the fmpzs
+  as longs and perform direct arithmetic.
+
+* Maybe optimise multimodular multiplication by pre-transposing
+  so that nmod_mat_mul_transpose can be used directly instead of
+  creating a transposed copy in nmod_mat_mul. However, this doesn't help
+  in the Strassen range unless there also is a transpose version of
+  nmod_mat_mul_strassen.
+
+* Use _fmpz_vec functions instead of for loops in some more places.
+
+
+nmod_mat
+--------
+
+* Add element getter and setter methods.
+
+* Implement methods for setting the zero matrix, identity matrix, etc.
+
+* Change the interface for _nmod_mat_rowreduce to generate
+  an explicit permutation array.
+
+* Add a user-friendly function for LUP decomposition.
+
+* Implement null space computation.
+
+* Implement nmod_mat_pow_ui.
+
+* Add functions for computing A*B^T and A^T*B, using transpose
+  multiplications directly to avoid creating a temporary copy.
+
+* Write cleaner versions of the bound_size functions in
+  rowreduce.c, solve_lu_precomp.c (and combine them?)
+
+* Maybe: Optimise basecase multiplication using register blocking
+  and unrolling.
+
+* Maybe: add asserts to check that the modulus is a prime
+  where this is assumed.
+
+* Implement Strassen inverse.

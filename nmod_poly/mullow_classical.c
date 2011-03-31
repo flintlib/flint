@@ -69,22 +69,22 @@ _nmod_poly_mullow_classical(mp_ptr res, mp_srcptr poly1, long len1,
         else
         {
             /* Set res[i] = poly1[i]*poly2[0] */
-            _nmod_vec_scalar_mul(res, poly1, FLINT_MIN(len1, trunc), mod,
-                                 poly2[0]);
+            _nmod_vec_scalar_mul_nmod(res, poly1, FLINT_MIN(len1, trunc),
+                                 poly2[0], mod);
 
             if (len2 == 1)
                 return;
 
             /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
             if (trunc > len1)
-                _nmod_vec_scalar_mul(res + len1, poly2 + 1, trunc - len1, mod,
-                                     poly1[len1 - 1]);
+                _nmod_vec_scalar_mul_nmod(res + len1, poly2 + 1, trunc - len1,
+                                     poly1[len1 - 1], mod);
 
             /* out[i+j] += in1[i]*in2[j] */
             for (i = 0; i < FLINT_MIN(len1, trunc) - 1; i++)
-                _nmod_vec_scalar_addmul(res + i + 1, poly2 + 1,
-                                        FLINT_MIN(len2, trunc - i) - 1, mod,
-                                        poly1[i]);
+                _nmod_vec_scalar_addmul_nmod(res + i + 1, poly2 + 1,
+                                        FLINT_MIN(len2, trunc - i) - 1, 
+                                        poly1[i], mod);
         }
     }
 }

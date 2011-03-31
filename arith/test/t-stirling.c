@@ -202,6 +202,7 @@ int main(void)
 
     fmpz_clear(s);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -87,6 +87,19 @@ void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
 
     Generates a random integer in the range $0$ to $m - 1$ inclusive.
 
+void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range $0$ to $m - 1$ inclusive,
+    with an increased probability of generating values close to
+    the endpoints.
+
+void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
+
+    Generates a random integer in the range $[-m/2, m/2)$, with an
+    increased probability of generating values close to the
+    endpoints or close to zero.
+
+
 *******************************************************************************
 
     Conversion
@@ -111,16 +124,16 @@ double fmpz_get_d_2exp(long * exp, const fmpz_t f)
 
 void fmpz_get_mpz(mpz_t x, const fmpz_t f)
 
-    Returns $f$ as an \code{mpz_t}.
+    Sets the \code{mpz_t} $x$ to the same value as $f$.
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
     Returns the representation of $f$ in base~$b$, which can vary 
     between $2$ and $62$, inclusive.
 
-    If \code{str} is \code{NULL}, the result string is allocated by the 
-    function.  Otherwise, it is up to the caller to ensure the allocated 
-    block of memory is sufficiently large.
+    If \code{str} is \code{NULL}, the result string is allocated by 
+    the function.  Otherwise, it is up to the caller to ensure that 
+    the allocated block of memory is sufficiently large.
 
 void fmpz_set_si(fmpz_t f, long val)
 
@@ -146,7 +159,7 @@ int fmpz_set_str(fmpz_t f, char * str, int b)
 
 *******************************************************************************
 
-void fmpz_read(fmpz_t f)
+int fmpz_read(fmpz_t f)
 
     Reads a multiprecision integer from \code{stdin}.  The format is
     an optional minus sign, followed by one or more digits.  The
@@ -159,7 +172,7 @@ void fmpz_read(fmpz_t f)
     \code{scanf} from the standard library and \code{mpz_inp_str} 
     from MPIR.
 
-void fmpz_fread(FILE * file, fmpz_t f)
+int fmpz_fread(FILE * file, fmpz_t f)
 
     Reads a multiprecision integer from the stream \code{file}.  The 
     format is an optional minus sign, followed by one or more digits.
@@ -175,7 +188,7 @@ void fmpz_fread(FILE * file, fmpz_t f)
 int fmpz_print(fmpz_t x)
 
     Prints the value $x$ to \code{stdout}, without a carriage return.
-    The value is printed as either $0$, the decimal digits of a 
+    The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
@@ -189,7 +202,7 @@ int fmpz_print(fmpz_t x)
 int fmpz_fprint(FILE * file, fmpz_t x)
 
     Prints the value $x$ to \code{file}, without a carriage return.
-    The value is printed as either $0$, the decimal digits of a 
+    The value is printed as either~$0$, the decimal digits of a 
     positive integer, or a minus sign followed by the digits of 
     a negative integer.
 
@@ -200,16 +213,16 @@ int fmpz_fprint(FILE * file, fmpz_t x)
     \code{printf} from the standard library and \code{mpz_out_str} 
     from MPIR.
 
-size_t fmpz_sizeinbase(const fmpz_t f, int b)
-
-    Returns the size of $f$ in base~$b$, measured in numbers of digits. 
-    The base~$b$ can be between $2$ and $62$, inclusive.
-
 *******************************************************************************
 
     Basic properties and manipulation
 
 *******************************************************************************
+
+size_t fmpz_sizeinbase(const fmpz_t f, int b)
+
+    Returns the size of $f$ in base~$b$, measured in numbers of digits. 
+    The base~$b$ can be between $2$ and $62$, inclusive.
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f)
 
@@ -219,7 +232,7 @@ mp_bitcnt_t fmpz_bits(const fmpz_t f)
 mp_size_t fmpz_size(const fmpz_t f)
 
     Returns the number of limbs required to store the absolute
-    value of $f$.  If $f$ is zero, then $0$ is returned.
+    value of $f$.  If $f$ is zero then $0$ is returned.
 
 int fmpz_sgn(const fmpz_t f)
 
@@ -232,7 +245,7 @@ void fmpz_swap(fmpz_t f, fmpz_t g)
 
 void fmpz_set(fmpz_t f, const fmpz_t g)
 
-    Sets $f$ to equal $g$.
+    Sets $f$ to the same value as $g$.
 
 void fmpz_zero(fmpz_t f)
 
@@ -313,9 +326,14 @@ void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g \times x$ where $x$ is an \code{unsigned long}.
 
-void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
-    Sets $f$ to \code{g * 2^exp}.
+    Sets $f$ to $g \times x \times y$ where $x$ and $y$ are of type
+    \code{unsigned long}.
+
+void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong e)
+
+    Sets $f$ to $g \times 2^e$.
 
 void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -406,6 +424,12 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
     is $0$ an exception is raised.
 
+void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
+
+    Sets $f$ to the quotient of $g$ and $h = x \times y$, assuming that
+    the division is exact, i.e.\ $g$ is a multiple of $h$.
+    If $x$ or $y$ is $0$ an exception is raised.
+
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the remainder of $g$ divided by $h$.  The remainder
@@ -415,6 +439,12 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
     \code{unsigned long}.  If $x$ is $0$ an exception will result.
+
+ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
+
+    Returns the remainder of $g$ modulo $x$ where $x$ is an 
+    \code{unsigned long}, without changing $g$.  If $x$ is $0$ an
+    exception will result.
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
@@ -437,6 +467,10 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
     Sets $f$ to $n!$ where $n$ is an \code{unsigned long}.
+
+void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
+
+    Sets $f$ to the binomial coefficient ${n \choose k}$.
 
 *******************************************************************************
 
@@ -472,8 +506,8 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift, 
     mp_bitcnt_t bits, fmpz_t coeff, int negate, int borrow)
 
-    Shifts left the given coefficient by \code{shift} bits and add it to 
-    the integer in \code{arr} in a field of the given number of bits.
+    Shifts the given coefficient to the left by \code{shift} bits and adds 
+    it to the integer in \code{arr} in a field of the given number of bits.
 
     \begin{lstlisting}
     shift  bits  --------------
@@ -482,7 +516,7 @@ int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift,
     \end{lstlisting}
 
     An optional borrow of~$1$ can be subtracted from \code{coeff} before 
-    it is packed.  If \code{coeff} is negative (after the borrow), then a 
+    it is packed.  If \code{coeff} is negative after the borrow, then a 
     borrow will be returned by the function.
 
     The value of \code{shift} is assumed to be less than \code{FLINT_BITS}. 
@@ -515,29 +549,63 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 
     Chinese remaindering
 
+    The following functions can be used to reconstruct an integer from its
+    residues modulo a set of small (word-size) prime numbers. The first two
+    functions, \code{fmpz_CRT_ui} and \code{fmpz_CRT_ui_unsigned}, are easy
+    to use and allow building the result one residue at a time, which is
+    useful when the number of needed primes is not known in advance.
+
+    The remaining functions support performing the modular reductions and
+    reconstruction using balanced subdivision. This greatly improves
+    efficiency for large integers but assumes that the basis of primes is
+    known in advance. The user must precompute a \code{comb}
+    structure and temporary working space with \code{fmpz_comb_init} and
+    \code{fmpz_comb_temp_init}, and free this data afterwards.
+
+    For simple demonstration programs showing how to use the CRT functions,
+    see \code{crt.c} and \code{multi_crt.c} in the \code{examples}
+    directory.
+
 *******************************************************************************
 
-void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
-    fmpz ** comb_temp, fmpz_t temp)
+void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+
+    Uses the Chinese Remainder Theorem to compute the unique integer
+    $0 \le x < M$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
+    positive integers greater than $1$ and coprime, and that $0 \le r_1 < m_1$
+    and $0 \le r_2 < m_2$. The result $x$ is stored in \code{out}.
+
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+
+    Uses the Chinese Remainder Theorem to compute the unique integer
+    $-M/2 \le x < M/2$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
+    positive integers greater than $1$ and coprime, and that
+    $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
+    The result $x$ is stored in \code{out}.
+
+void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     Reduces the multiprecision integer \code{in} modulo each of the primes 
     stored in the \code{comb} structure. The array \code{out} will be filled 
-    with the residues modulo these primes. The array \code{temp} is temporary 
-    space which must be provided by \code{fmpz_comb_temp_init} and cleared by 
-    \code{fmpz_comb_temp_clear}.
+    with the residues modulo these primes. The structure \code{temp} is
+    temporary space which must be provided by \code{fmpz_comb_temp_init} and
+    cleared by \code{fmpz_comb_temp_clear}.
 
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     This function takes a set of residues modulo the list of primes
     contained in the \code{comb} structure and reconstructs the unique 
     unsigned multiprecision integer modulo the product of the primes 
-    which has these residues modulo the corresponding primes. The array 
+    which has these residues modulo the corresponding primes. The structure 
     \code{temp} is temporary space which must be provided by 
     \code{fmpz_comb_temp_init} and cleared by \code{fmpz_comb_temp_clear}.
 
-void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     This function takes a set of residues modulo the list of primes
     contained in the \code{comb} structure and reconstructs a signed 
@@ -557,17 +625,16 @@ void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
     The \code{primes} array must not be \code{free}'d until the \code{comb} 
     structure is no longer required and must be cleared by the user.
 
-void fmpz_comb_clear(fmpz_comb_t comb)
-
-    Clears the given \code{comb} structure, releasing any memory it uses.
-
-fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb)
+void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 
     Creates temporary space to be used by multimodular and CRT functions
     based on an initialised \code{comb} structure.
 
-void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp)
+void fmpz_comb_clear(fmpz_comb_t comb)
+
+    Clears the given \code{comb} structure, releasing any memory it uses.
+
+void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
     Clears temporary space \code{temp} used by multimodular and CRT functions
-    using the given \code{comb}.
-
+    using the given \code{comb} structure.

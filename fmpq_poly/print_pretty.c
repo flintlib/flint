@@ -29,12 +29,15 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 {
-    char * str;
+    char *str;
+    int r;
     
     str = fmpq_poly_get_str_pretty(poly, var);
-    printf("%s", str);
+    r = printf("%s", str);
     free(str);
+
+    return r;
 }
 

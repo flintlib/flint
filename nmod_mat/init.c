@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,6 +28,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
+
 
 void
 nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
@@ -47,7 +48,5 @@ nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
     mat->r = rows;
     mat->c = cols;
 
-    mat->mod.n = n;
-    mat->mod.ninv = n_preinvert_limb(n);
-    count_leading_zeros(mat->mod.norm, n);
+    _nmod_mat_set_mod(mat, n);
 }

@@ -42,7 +42,6 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
     fmpz c1 = *g;
     fmpz c2 = *h;
-    fmpz temp = 0;
 
     if (fmpz_is_zero(g))
     {
@@ -64,7 +63,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
         }
         else                    /* h is large, but g is small */
         {
-            fmpz c2d = fmpz_mod_ui(&temp, h, FLINT_ABS(c1));
+            fmpz c2d = fmpz_fdiv_ui(h, FLINT_ABS(c1));
             fmpz_set_si(f, z_gcd(c1, c2d));
         }
     }
@@ -72,7 +71,7 @@ fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
     {
         if (!COEFF_IS_MPZ(c2))  /* h is small, but g is large */
         {
-            fmpz c1d = fmpz_mod_ui(&temp, g, FLINT_ABS(c2));
+            fmpz c1d = fmpz_fdiv_ui(g, FLINT_ABS(c2));
             fmpz_set_si(f, z_gcd(c2, c1d));
         }
         else                    /* g and h are both large */

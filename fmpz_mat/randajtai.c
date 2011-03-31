@@ -65,7 +65,7 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
         for (j = i + 1; j <= d; j++)
         {
             fmpz_randm(mat->rows[j] + i, state, tmp);
-            if (n_randint(2, NULL))
+            if (n_randint(state, 2))
                 fmpz_neg(mat->rows[j] + i, mat->rows[j] + i);
             fmpz_zero(mat->rows[i] + j);
         }

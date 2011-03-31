@@ -54,7 +54,7 @@ main(void)
         e = n_randint(state, 20);
         trunc = n_randint(state, 30);
 
-        nmod_poly_pow_trunc(b, a, trunc, e);
+        nmod_poly_pow_trunc(b, a, e, trunc);
         
         nmod_poly_pow(c, a, e);
         nmod_poly_truncate(c, trunc);
@@ -91,10 +91,10 @@ main(void)
         e = n_randint(state, 20);
         trunc = n_randint(state, 30);
 
-        nmod_poly_pow_trunc(b, a, trunc, e);
+        nmod_poly_pow_trunc(b, a, e, trunc);
         
         nmod_poly_set(c, a);
-        nmod_poly_pow_trunc(c, c, trunc, e);
+        nmod_poly_pow_trunc(c, c, e, trunc);
         
         result = (nmod_poly_equal(b, c));
         if (!result)

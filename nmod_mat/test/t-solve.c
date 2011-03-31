@@ -47,7 +47,7 @@ main(void)
 
     for (i = 0; i < 20000; i++)
     {
-        m = n_randint(state, 10);
+        m = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
@@ -90,7 +90,7 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(state, 10);
+        m = 1 + n_randint(state, 20);
         r = n_randint(state, m);
         mod = n_randtest_prime(state, 0);
 

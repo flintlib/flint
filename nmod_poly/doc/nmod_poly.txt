@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -72,8 +73,8 @@ void nmod_poly_fit_length(nmod_poly_t poly, long alloc)
 
 void _nmod_poly_normalise(nmod_poly_t poly)
 
-    Internal function for normalising a polynomial so that the final 
-    coefficient (if there are any at all) is not zero.
+    Internal function for normalising a polynomial so that the top 
+    coefficient, if there is one at all, is not zero.
 
 *******************************************************************************
 
@@ -122,23 +123,23 @@ void nmod_poly_zero(nmod_poly_t res)
 void nmod_poly_truncate(nmod_poly_t poly, long len)
 
     Truncates \code{poly} to the given length and normalises it. 
-    If \code{len} is bigger than the current length of \code{poly}, 
+    If \code{len} is greater than the current length of \code{poly}, 
     then nothing happens.
 
 void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
 
-    Set \code{output} to the reverse of \code{input}, which is of length
-    \code{len}, but thinking of it as a polynomial of length \code{m} 
-    (notionally zero padded if necessary). The length \code{m} must be 
+    Sets \code{output} to the reverse of \code{input}, which is of length
+    \code{len}, but thinking of it as a polynomial of length~\code{m}, 
+    notionally zero-padded if necessary. The length~\code{m} must be 
     non-negative, but there are no other restrictions. The polynomial
     \code{output} must have space for \code{m} coefficients. 
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
 
-    Set \code{output} to the reverse of \code{input}, thinking of it as
-    a polynomial of length \code{m} (notionally zero padded if necessary).
-    The length \code{m} must be non-negative, but there are no other
-    restrictions. The output polynomial will be set to length \code{m}
+    Sets \code{output} to the reverse of \code{input}, thinking of it as
+    a polynomial of length~\code{m}, notionally zero-padded if necessary).
+    The length~\code{m} must be non-negative, but there are no other
+    restrictions. The output polynomial will be set to length~\code{m}
     and then normalised.
 
 *******************************************************************************
@@ -159,10 +160,10 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 
 ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
 
-    Gets the coefficient of \code{poly} at index \code{j}, where coefficients 
-    are numbered with zero being the constant coefficient, and returns it as 
-    a \code{ulong}. If \code{j} refers to a coefficient beyond the end of 
-    \code{poly}, zero is returned.
+    Returns the coefficient of \code{poly} at index~\code{j}, where 
+    coefficients are numbered with zero being the constant coefficient, 
+    and returns it as an \code{unsigned long}. If \code{j} refers to a 
+    coefficient beyond the end of \code{poly}, zero is returned.
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 
@@ -182,17 +183,17 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
 char * nmod_poly_get_str(const nmod_poly_t poly)
 
     Writes \code{poly} to a string representation. The format is as 
-    described for \code{nmod_poly_print}. The string must be freed by the 
-    user when finished. For this it is sufficient to call \code{free}.
+    described for \code{nmod_poly_print()}. The string must be freed by the 
+    user when finished. For this it is sufficient to call \code{free()}.
 
 int nmod_poly_set_str(const char * s, nmod_poly_t poly)
 
-    Read \code{poly} from a string \code{s}. The format is as described
-    for \code{nmod_poly_print}. If a polynomial in the correct format
+    Reads \code{poly} from a string \code{s}. The format is as described
+    for \code{nmod_poly_print()}. If a polynomial in the correct format
     is read, a positive value is returned, otherwise a non-positive value 
     is returned.
 
-void nmod_poly_print(const nmod_poly_t a)
+int nmod_poly_print(const nmod_poly_t a)
 
     Prints the polynomial to \code{stdout}. The length is printed, 
     followed by a space, then the modulus. If the length is zero this is
@@ -200,27 +201,33 @@ void nmod_poly_print(const nmod_poly_t a)
     separated list of coefficients is printed, beginning with the constant 
     coefficient.
 
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
-    Read \code{poly} from the file stream \code{f}. If this is a file
+    Reads \code{poly} from the file stream \code{f}. If this is a file
     that has just been written, the file should be closed then opened
-    again. The format is as described for \code{nmod_poly_print}. If a 
+    again. The format is as described for \code{nmod_poly_print()}. If a 
     polynomial in the correct format is read, a positive value is returned, 
     otherwise a non-positive value is returned.
 
-void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
-    Write a polynomial to the file stream \code{f}. If this is a file
+    Writes a polynomial to the file stream \code{f}. If this is a file
     then the file should be closed and reopened before being read.
-    The format is as described for \code{nmod_poly_print}. If a 
+    The format is as described for \code{nmod_poly_print()}. If a 
     polynomial in the correct format is read, a positive value is returned, 
     otherwise a non-positive value is returned. If an error occurs 
     whilst writing to the file, an error message is printed.
 
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int nmod_poly_read(nmod_poly_t poly)
 
     Read \code{poly} from \code{stdin}. The format is as described for 
-    \code{nmod_poly_print}. If a polynomial in the correct format is read, a 
+    \code{nmod_poly_print()}. If a polynomial in the correct format is read, a 
     positive value is returned, otherwise a non-positive value is returned.
 
 *******************************************************************************
@@ -231,12 +238,12 @@ int nmod_poly_read(nmod_poly_t poly)
 
 int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
 
-    Returns $1$ if the polynomials are equal, otherwise $0$.
+    Returns~$1$ if the polynomials are equal, otherwise~$0$.
 
 int nmod_poly_is_zero(const nmod_poly_t poly)
 
-    Returns one if the polynomial \code{poly} is the zero polynomial,
-    otherwise return zero.
+    Returns~$1$ if the polynomial \code{poly} is the zero polynomial,
+    otherwise returns~$0$.
 
 *******************************************************************************
 
@@ -252,8 +259,8 @@ void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k)
 
 void nmod_poly_shift_left(nmod_poly_t res, const nmod_poly_t poly, long k)
 
-    Set \code{res} to \code{poly} shifted left by \code{k} coefficients, i.e.\ 
-    multiplied by $x^k$.
+    Sets \code{res} to \code{poly} shifted left by \code{k} coefficients, 
+    i.e.\ multiplied by $x^k$.
 
 void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
 
@@ -296,9 +303,9 @@ void nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
 
     Sets \code{res} to the difference of \code{poly1} and \code{poly2}.
 
-void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
+void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly)
 
-    Sets \code{res} to the negation of \code{poly1}.
+    Sets \code{res} to the negation of \code{poly}.
 
 *******************************************************************************
 
@@ -306,11 +313,11 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1)
 
 *******************************************************************************
 
-void nmod_poly_scalar_mul(nmod_poly_t res, 
-                          const nmod_poly_t poly1, mp_limb_t c)
+void nmod_poly_scalar_mul_nmod(nmod_poly_t res, 
+                          const nmod_poly_t poly, ulong c)
 
-    Sets \code{res} to \code{(poly1, len1)} multiplied by $c$, 
-    where $c$ is reduced modulo the modulus of \code{poly1}.
+    Sets \code{res} to \code{(poly, len)} multiplied by~$c$, 
+    where~$c$ is reduced modulo the modulus of \code{poly}.
 
 void _nmod_poly_make_monic(mp_ptr output, 
                                       mp_srcptr input, long len, nmod_t mod)
@@ -347,8 +354,8 @@ void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len,
     coefficient of \code{poly} is bigger than \code{bits/2} bits. We 
     also assume \code{bits < 3 * FLINT_BITS}.
 
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                          long len, ulong bits, nmod_t mod)
+void _nmod_poly_bit_unpack(mp_ptr res, long len, 
+                                mp_srcptr mpn, ulong bits, nmod_t mod)
 
     Unpacks \code{len} coefficients stored in the big integer \code{mpn} 
     in bit fields of the given number of bits, reduces them modulo the 
@@ -371,7 +378,7 @@ void _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
     inputs and output is not permitted.
 
 void nmod_poly_mul_classical(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                             const nmod_poly_t poly1, const nmod_poly_t poly2)
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
@@ -424,16 +431,16 @@ void nmod_poly_mul_KS(nmod_poly_t res,
 void _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
                 mp_srcptr in2, long len2, mp_bitcnt_t bits, long n, nmod_t mod)
 
-    Set \code{out} to the low $n$ coefficients of \code{in1} of length
-    \code{len1} time \code{in2} of length \code{len2}. The output must have
-    space for \code{n} coefficients. We assumed that \code{len1 >= len2 > 0}
+    Sets \code{out} to the low $n$ coefficients of \code{in1} of length
+    \code{len1} times \code{in2} of length \code{len2}. The output must have
+    space for \code{n} coefficients. We assume that \code{len1 >= len2 > 0}
     and that \code{0 < n <= len1 + len2 - 1}. 
 
 void nmod_poly_mullow_KS(nmod_poly_t res, const nmod_poly_t poly1, 
                              const nmod_poly_t poly2, mp_bitcnt_t bits, long n)
 
     Set \code{res} to the low $n$ coefficients of \code{in1} of length
-    \code{len1} time \code{in2} of length \code{len2}. 
+    \code{len1} times \code{in2} of length \code{len2}. 
 
 void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1, 
                                         mp_srcptr poly2, long len2, nmod_t mod)
@@ -447,37 +454,37 @@ void nmod_poly_mul(nmod_poly_t res,
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
-void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, long len1, 
                                 mp_srcptr poly2, long len2, long n, nmod_t mod)
 
-    Sets \code{res} to the first \code{trunc} coefficients of the 
+    Sets \code{res} to the first \code{n} coefficients of the 
     product of \code{poly1} of length \code{len1} and \code{poly2} of
     length \code{len2}. It is assumed that \code{0 < n <= len1 + len2 - 1} 
     and that \code{len1 >= len2 > 0}. No aliasing of inputs and output
     is permitted.
 
-void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
+void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1, 
                                            const nmod_poly_t poly2, long trunc)
 
     Sets \code{res} to the first \code{trunc} coefficients of the 
     product of \code{poly1} and \code{poly2}.
 
-void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
-                                 mp_srcptr poly2, long len2, long n, nmod_t mod)
+void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1, 
+                                mp_srcptr poly2, long len2, long n, nmod_t mod)
 
-    Sets the high $n$ coefficients of \code{res} to the high $n$
-    coefficients of the product of \code{poly1} of length \code{len1}
-    and \code{poly2} of length \code{len2}, the other coefficients
-    being arbitrary. It is assumed that \code{len1 >= len2 > 0} and
-    that \code{0 < n <= len1 + len2 - 1}. Aliasing of inputs and 
-    output is not permitted.
+    Sets all but the low $n$ coefficients of \code{res} to the 
+    corresponding coefficients of the product of \code{poly1} of length 
+    \code{len1} and \code{poly2} of length \code{len2}, the other 
+    coefficients being arbitrary. It is assumed that 
+    \code{len1 >= len2 > 0} and that \code{0 < n <= len1 + len2 - 1}. 
+    Aliasing of inputs and output is not permitted.
 
-void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
+void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1, 
                                           const nmod_poly_t poly2, long n)
 
-    Sets the high $n$ coefficients of \code{res} to the high $n$ 
-    coefficients of the product of \code{poly1} and \code{poly2}, 
-    the remaining coefficients being arbitrary.
+    Sets all but the low $n$ coefficients of \code{res} to the 
+    corresponding coefficients of the product of \code{poly1} and 
+    \code{poly2}, the remaining coefficients being arbitrary.
 
 *******************************************************************************
 
@@ -486,36 +493,36 @@ void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1,
 *******************************************************************************
 
 void _nmod_poly_pow_binexp(mp_ptr res, 
-                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+                             mp_srcptr poly, long len, ulong e, nmod_t mod)
 
-    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    Raises \code{poly} of length \code{len} to the power \code{e} and sets 
     \code{res} to the result. We require that \code{res} has enough space
-    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
-    \code{e > 1}. Aliasing is nor permitted. Uses the binary exponentiation
+    for \code{(len - 1)*e + 1} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is not permitted. Uses the binary exponentiation
     method.
 
 void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
 
-    Raise \code{poly} to the power \code{e} and set \code{res} to the 
+    Raises \code{poly} to the power \code{e} and sets \code{res} to the 
     result. Uses the binary exponentiation method.
 
 void _nmod_poly_pow(mp_ptr res,
-                             mp_srcptr poly, long len, nmod_t mod, ulong e)
+                             mp_srcptr poly, long len, ulong e, nmod_t mod)
 
-    Raise \code{poly} of length \code{len} to the power \code{e} and set 
+    Raises \code{poly} of length \code{len} to the power \code{e} and sets 
     \code{res} to the result. We require that \code{res} has enough space
-    for \code{(len - 1)*e + 1)} coefficients. Assumes that \code{len > 0}, 
-    \code{e > 1}. Aliasing is nor permitted. 
+    for \code{(len - 1)*e + 1} coefficients. Assumes that \code{len > 0}, 
+    \code{e > 1}. Aliasing is not permitted. 
 
 void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e)
 
-    Raise \code{poly} to the power \code{e} and set \code{res} to the 
-    result. 
+    Raises \code{poly} to the power \code{e} and sets \code{res} to the 
+    result.
 
 void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
-                                           long trunc, nmod_t mod, ulong e)
+                                           ulong e, long trunc, nmod_t mod)
 
-    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     (assumed to be zero padded if necessary to length \code{trunc}) to 
     the power \code{e}. This is equivalent to doing a powering followed
     by a truncation. We require that \code{res} has enough space for
@@ -524,16 +531,16 @@ void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
     exponentiation method.
 
 void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
-                               const nmod_poly_t poly, long trunc, ulong e)
+                               const nmod_poly_t poly, ulong e, long trunc)
 
-    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     to the power \code{e}. This is equivalent to doing a powering 
     followed by a truncation. Uses the binary exponentiation method.
 
 void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
-                                           long trunc, nmod_t mod, ulong e)
+                                           ulong e, long trunc, nmod_t mod)
 
-    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     (assumed to be zero padded if necessary to length \code{trunc}) to 
     the power \code{e}. This is equivalent to doing a powering followed
     by a truncation. We require that \code{res} has enough space for
@@ -541,9 +548,9 @@ void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly,
     \code{e > 1}. Aliasing is not permitted.
 
 void nmod_poly_pow_trunc(nmod_poly_t res, 
-                               const nmod_poly_t poly, long trunc, ulong e)
+                               const nmod_poly_t poly, ulong e, long trunc)
 
-    Set \code{res} to the low \code{trunc} coefficients of \code{poly}
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     to the power \code{e}. This is equivalent to doing a powering 
     followed by a truncation.
 
@@ -583,92 +590,90 @@ void nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     exception is raised.
 
 void _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W,  
-                      mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                     mp_ptr V, mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
 
-    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
-    where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
-    \code{lenB}. Set \code{BQ} to the low \code{lenB - 1} coefficients of 
-    \code{B * Q}. We require that \code{Q} have space for \code{lenB}
-    coefficients and that \code{W} be temporary space of size \code{lenB - 1}
-    and \code{V} be temporary space for a number of coefficients computed by
-    \code{NMOD_DIVREM_DC_ITCH(lenB, mod)}. 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where \code{A} is of length \code{2 * lenB - 1} and \code{B} 
+    is of length \code{lenB}. Sets \code{BQ} to the low \code{lenB - 1} 
+    coefficients of \code{B * Q}. We require that \code{Q} have space for 
+    \code{lenB} coefficients, that \code{W} be temporary space of size 
+    \code{lenB - 1} and \code{V} be temporary space for a number of 
+    coefficients computed by \code{NMOD_DIVREM_DC_ITCH(lenB, mod)}.
 
 void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
-    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
-    where \code{A} is length \code{lenA} and \code{B} is length 
-    \code{lenB}. We require that \code{Q} have space for \code{lenA - lenB + 1}
-    coefficients. 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where \code{A} is of length \code{lenA} and \code{B} is of 
+    length \code{lenB}. We require that \code{Q} have space for 
+    \code{lenA - lenB + 1} coefficients.
 
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{R} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}.
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
 
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
-    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
-    where \code{A} is length \code{lenA} and \code{B} is length 
-    \code{lenB}. We require that \code{Q} have space for \code{lenA - lenB + 1}
-    coefficients. 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where \code{A} is of length \code{lenA} and \code{B} is of 
+    length \code{lenB}. We require that \code{Q} have space for 
+    \code{lenA - lenB + 1} coefficients.
 
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}.
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
 
 void _nmod_poly_div_divconquer_recursive(mp_ptr Q, mp_ptr W, mp_ptr V,
-                                mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                               mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
 
-    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
-    where \code{A} is length \code{2 * lenB - 1} and \code{B} is length 
-    \code{lenB}. We require that \code{Q} have space for \code{lenB}
-    coefficients and that \code{W} be temporary space of size \code{lenB - 1}
-    and \code{V} be temporary space for a number of coefficients computed by
-    \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where \code{A} is of length \code{2 * lenB - 1} and \code{B} 
+    is of length \code{lenB}. We require that \code{Q} have space for 
+    \code{lenB} coefficients and that \code{W} be temporary space of size 
+    \code{lenB - 1} and \code{V} be temporary space for a number of 
+    coefficients computed by \code{NMOD_DIV_DC_ITCH(lenB, mod)}. 
 
 void _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
-                                             mp_srcptr B, long lenB, nmod_t mod)
+                                            mp_srcptr B, long lenB, nmod_t mod)
 
-    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. 
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
+    and \code{B} is of length \code{lenB}, but returns only \code{Q}. We 
+    require that \code{Q} have space for \code{lenA - lenB + 1} coefficients.
 
 void nmod_poly_div_divconquer(nmod_poly_t Q,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                      const nmod_poly_t A, const nmod_poly_t B)
 
-    Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
-    with \code{length(R) < length(B)}, but return only \code{Q}.
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
+    $\len(R) < \len(B)$, but returns only $Q$.
 
 void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
-                                             mp_srcptr B, long lenB, nmod_t mod)
+                                            mp_srcptr B, long lenB, nmod_t mod)
 
-    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. 
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
+    and \code{B} is of length \code{lenB}, but returns only \code{Q}. We 
+    require that \code{Q} have space for \code{lenA - lenB + 1} coefficients.
 
 void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
-    Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
-    with \code{length(R) < length(B)}, but return only \code{Q}.
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
+    $\len(R) < \len(B)$, but returns only $Q$.
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
-                                                 mp_srcptr Q, long n, nmod_t mod)
+                                    mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose leading coefficient is invertible
-    modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
+    modulo the given modulus, finds a polynomial \code{Qinv} of length \code{n}
     such that the top \code{n} coefficients of the product \code{Q * Qinv} is
     $x^{n - 1}$. Requires that \code{n > 0}. This function can be viewed as 
     inverting a power series.
-   
+
 void nmod_poly_inv_series_basecase(nmod_poly_t Qinv, 
-                                                     const nmod_poly_t Q, long n)
+                                   const nmod_poly_t Q, long n)
 
     Given \code{Q} of length at least \code{n} find \code{Qinv} of length
     \code{n} such that the top \code{n} coefficients of the product 
@@ -676,7 +681,7 @@ void nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     or if the length of \code{Q} is less than \code{n}. The leading 
     coefficient of \code{Q} must be invertible modulo the modulus of 
     \code{Q}. This function can be viewed as inverting a power series.
- 
+
 void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
@@ -684,7 +689,7 @@ void _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series via Newton 
     iteration.
-   
+
 void nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
@@ -692,14 +697,14 @@ void nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     modulo the modulus of \code{Q}. An exception is raised if this is not
     the case or if \code{n = 0}. This function can be viewed as inverting 
     a power series via Newton iteration.
- 
+
 void _nmod_poly_inv_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     
     Given \code{Q} of length \code{n} whose constant coefficient is invertible
     modulo the given modulus, find a polynomial \code{Qinv} of length \code{n}
     such that \code{Q * Qinv} is \code{1} modulo $x^n$. Requires \code{n > 0}.
     This function can be viewed as inverting a power series.
-   
+
 void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Given \code{Q} find \code{Qinv} such that \code{Q * Qinv} is \code{1}
@@ -707,75 +712,91 @@ void nmod_poly_inv_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     modulo the modulus of \code{Q}. An exception is raised if this is not
     the case or if \code{n = 0}. This function can be viewed as inverting 
     a power series.
- 
-void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
-                                                             long n, nmod_t mod)
 
-    Given polynomials \code{A} and \code{B} of length \code{n}, find the
+void _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
+                                                  long n, nmod_t mod)
+
+    Given polynomials \code{A} and \code{B} of length \code{n}, finds the
     polynomial \code{Q} of length \code{n} such that \code{Q * B = A}
     modulo $x^n$. We assume \code{n > 0} and that the constant coefficient 
     of \code{B} is invertible modulo the given modulus. The polynomial 
     \code{Q} must have space for \code{n} coefficients.
 
 void nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
-                                                    const nmod_poly_t B, long n)
+                                         const nmod_poly_t B, long n)
 
-   Given polynomials \code{A} and \code{B} considered modulo \code{n}, 
-   fing the polynomial \code{Q} of length at most \code{n} such that
-   \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
-   constant coefficient of \code{B} is invertible modulo the modulus. 
-   An exception is raised if \code{n == 0} or the constant coefficient
-   of \code{B} is zero.
+    Given polynomials \code{A} and \code{B} considered modulo \code{n}, 
+    finds the polynomial \code{Q} of length at most \code{n} such that
+    \code{Q * B = A} modulo $x^n$. We assume \code{n > 0} and that the
+    constant coefficient of \code{B} is invertible modulo the modulus. 
+    An exception is raised if \code{n == 0} or the constant coefficient
+    of \code{B} is zero.
 
 void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen, 
-                                             mp_srcptr B, long Blen, nmod_t mod)
+                                     mp_srcptr B, long Blen, nmod_t mod)
 
-    Notionally compute polynomials $Q$ and $R$ such that $A = BQ + R$ with
-    \code{length(R) < lenB}, where \code{A} is length \code{lenA} and \code{B} is 
-    length \code{lenB}, but return only \code{Q}. We require that \code{Q} have 
-    space for \code{lenA - lenB + 1} coefficients. The algorithm used is to 
-    reverse the polynomials and divde the resulting power series, then reverse
-    the result.
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
+    and \code{B} is of length \code{lenB}, but return only $Q$. We require 
+    that $Q$ have space for \code{lenA - lenB + 1} coefficients. The 
+    algorithm used is to reverse the polynomials and divde the resulting 
+    power series, then reverse the result.
 
 void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
-                                                            const nmod_poly_t B)
+                                         const nmod_poly_t B)
 
-    Notionally compute \code{R} and \code{R} such that \code{A = BQ + R} 
-    with \code{length(R) < length(B)}, but return only \code{Q}. The algorithm 
-    used is to reverse the polynomials and divde the resulting power series, 
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
+    $\len(R) < \len(B)$, but returns only $Q$. The algorithm used is to 
+    reverse the polynomials and divide the resulting power series, 
     then reverse the result.
 
-void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, 
-                      mp_srcptr A, long Alen, mp_srcptr B, long Blen, nmod_t mod)
+void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long Alen, 
+                                        mp_srcptr B, long Blen, nmod_t mod)
 
-    Compute $Q$ and $R$ such that $A = BQ + R$ with \code{length(R) < lenB},
-    where \code{A} is length \code{lenA} and \code{B} is length \code{lenB}. 
-    We require that \code{Q} have space for \code{lenA - lenB + 1}
-    coefficients. The algorithm uses is to call \code{div_newton) and then
-    multiply out and compute the remainder. 
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length 
+    \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
+    coefficients. The algorithm used is to call \code{div_newton()} and then
+    multiply out and compute the remainder.
 
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
-                                        const nmod_poly_t A, const nmod_poly_t B)
+                             const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute \code{Q} and \code{R} such that \code{A = BQ + R} with 
-   \code{length(R) < length(B)}. The algorithm uses is to call 
-   \code{div_newton) and then multiply out and compute the remainder.
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
+    The algorithm used is to call \code{div_newton()} and then multiply out 
+    and compute the remainder.
 
 *******************************************************************************
 
-    Derivative
+    Derivative and integral
 
 *******************************************************************************
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
 
-    Set the first \code{len - 1} coefficients of \code{x_prime} to the 
+    Sets the first \code{len - 1} coefficients of \code{x_prime} to the 
     derivative of \code{x} which is assumed to be of length \code{len}. 
     It is assumed that \code{len > 0}.
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
-    Set \code{x_prime} to the derivative of \code{x}. 
+    Sets \code{x_prime} to the derivative of \code{x}. 
+
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod)
+
+    Set the first \code{len} coefficients of \code{x_int} to the 
+    integral of \code{x} which is assumed to be of length \code{len - 1}.
+    The constant term of \code{x_int} is set to zero.
+    It is assumed that \code{len > 0}. The result is only well-defined
+    if the modulus is a prime number strictly larger than the degree of
+    \code{x}.
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x)
+
+    Set \code{x_int} to the indefinite integral of \code{x} with constant
+    term zero. The result is only well-defined if the modulus
+    is a prime number strictly larger than the degree of \code{x}.
+
 
 *******************************************************************************
 
@@ -783,16 +804,17 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 
 *******************************************************************************
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, long len, nmod_t mod, mp_limb_t c)
+mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, 
+                                   nmod_t mod)
 
-    Evaluate \code{poly} at the value \code{c} and reduce modulo the 
-    given modulus (of \code{poly}). The value \code{c} should be reduced 
+    Evaluates \code{poly} at the value~\code{c} and reduces modulo the 
+    given modulus of \code{poly}. The value~\code{c} should be reduced 
     modulo the modulus. The algorithm used is Horner's method.
 
-mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
+mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
 
-    Evaluate \code{poly} at the value \code{c} and reduce modulo the 
-    modulus of \code{poly}. The value \code{c} should be reduced modulo
+    Evaluates \code{poly} at the value~\code{c} and reduces modulo the 
+    modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
 *******************************************************************************
@@ -801,53 +823,53 @@ mp_limb_t nmod_poly_evaluate(nmod_poly_t poly, mp_limb_t c)
 
 *******************************************************************************
 
-void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
-                              long len1, mp_srcptr poly2, long len2, nmod_t mod)
+void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1, 
+                               mp_srcptr poly2, long len2, nmod_t mod)
 
-    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
-    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
-    at \code{poly2}. The algorithm used is Horner's algorithm. We require 
-    that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
+    Composes \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and sets \code{res} to the result, i.e.\ evaluates 
+    \code{poly1} at \code{poly2}. The algorithm used is Horner's algorithm. 
+    We require that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1}
     coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
 
-
 void nmod_poly_compose_horner(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
+    i.e.\ evaluates \code{poly1} at \code{poly2}. The algorithm used is 
     Horner's algorithm.
 
 void _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
-                                         mp_srcptr poly2, long len2, nmod_t mod)
+                                   mp_srcptr poly2, long len2, nmod_t mod)
 
-    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
-    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
-    at \code{poly2}. The algorithm used is the divide and conquer algorithm. 
-    We require that \code{res} have space for \code{(len1 - 1)*(len2 - 1) + 1} 
-    coefficients. It is assumed that \code{len1 > 0} and \code{len2 > 0}.
+    Composes \code{poly1} of length \code{len1} with \code{poly2} of length 
+    \code{len2} and sets \code{res} to the result, i.e.\ evaluates 
+    \code{poly1} at \code{poly2}. The algorithm used is the divide and 
+    conquer algorithm. We require that \code{res} have space for 
+    \code{(len1 - 1)*(len2 - 1) + 1} coefficients. It is assumed that 
+    \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose_divconquer(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    i.e. evaluate \code{poly1} at \code{poly2}. The algorithm used is 
+    Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
+    i.e.\ evaluates \code{poly1} at \code{poly2}. The algorithm used is 
     the divide and conquer algorithm.
 
 void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1, 
-                                         mp_srcptr poly2, long len2, nmod_t mod)
+                                        mp_srcptr poly2, long len2, nmod_t mod)
 
-    Compose \code{poly1} of length \code{len1} with \code{poly2} of length 
-    \code{len2} and set \code{res} to the result, i.e. evaluate \code{poly1} 
+    Composes \code{poly1} of length \code{len1} with \code{poly2} of length
+    \code{len2} and sets \code{res} to the result, i.e.\ evaluates \code{poly1}
     at \code{poly2}. We require that \code{res} have space for 
     \code{(len1 - 1)*(len2 - 1) + 1} coefficients. It is assumed that 
     \code{len1 > 0} and \code{len2 > 0}.
 
 void nmod_poly_compose(nmod_poly_t res, 
-                               const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 
-    Compose \code{poly1} with \code{poly2} and set \code{res} to the result,
-    that is evaluate \code{poly1} at \code{poly2}.
+    Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
+    that is, evaluates \code{poly1} at \code{poly2}.
 
 *******************************************************************************
 
@@ -856,17 +878,254 @@ void nmod_poly_compose(nmod_poly_t res,
 *******************************************************************************
 
 long _nmod_poly_gcd_euclidean(mp_ptr G, 
-                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
-   Compute the GCD of \code{A} of length \code{lenA} and \code{B} of length
-   \code{lenB}, where \code{lenA >= lenB > 1}. The length of the GCD \code{G}
-   is returned by the function. No attempt is made to make the GCD monic. It
-   is required that \code{G} have space for \code{lenB} coefficients.
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 1}. The length of the GCD $G$
+    is returned by the function. No attempt is made to make the GCD monic. It
+    is required that $G$ have space for \code{lenB} coefficients.
 
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                             const nmod_poly_t A, const nmod_poly_t B)
 
-   Compute the GCD of \code{A} and \code{B}. The GCD of zero polynomials is
-   defined to be zero, whereas the GCD of the zero polynomial and some other
-   polynomial \code{P} is defined to be \code{P}. Except in the case where
-   the GCD is zero, the GCD \code{G} is made monic.
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+*******************************************************************************
+
+    Square roots
+
+    The series expansions for $\sqrt{h}$ and $1/\sqrt{h}$ are defined
+    by means of the generalised binomial theorem
+    $$h^r = (1+y)^r =
+        \sum_{k=0}^{\infty} {r \choose k} y^k.$$
+    It is assumed that $h$ has constant term $1$ and that the coefficients
+    $2^{-k}$ exist in the coefficient ring (i.e. $2$ must be invertible).
+
+
+*******************************************************************************
+
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set the first $n$ terms of $g$ to the series expansion of $1/\sqrt{h}$.
+    It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
+    is zero-padded as necessary to length $n$. Aliasing is not permitted.
+
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g$ to the series expansion of $1/\sqrt{h}$ to order $O(x^n)$.
+    It is assumed that $h$ has constant term 1.
+
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set the first $n$ terms of $g$ to the series expansion of $\sqrt{h}$.
+    It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
+    is zero-padded as necessary to length $n$. Aliasing is not permitted.
+
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
+    It is assumed that $h$ has constant term 1.
+
+*******************************************************************************
+
+    Transcendental functions
+
+    The elementary transcendental functions of a formal power series $h$
+    are defined as
+
+    $$\exp(h(x)) = \sum_{k=0}^{\infty} \frac{(h(x))^k}{k!}$$
+
+    $$\log(h(x)) = \int_0^x \frac{h'(t)}{h(t)} dt$$
+
+    $$\operatorname{atan}(h(x)) = \int_0^x\frac{h'(t)}{1+(h(t))^2} dt$$
+
+    $$\operatorname{atanh}(h(x)) = \int_0^x\frac{h'(t)}{1-(h(t))^2} dt$$
+
+    $$\operatorname{asin}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1-(h(t))^2}} dt$$
+
+    $$\operatorname{asinh}(h(x)) = \int_0^x\frac{h'(t)}{\sqrt{1+(h(t))^2}} dt$$
+
+    The functions sin, cos, tan, etc. are defined using standard inverse
+    or functional relations.
+
+    The logarithm function assumes that $h$ has constant term $1$. All
+    other functions assume that $h$ has constant term $0$.
+
+    All functions assume that the coefficient $1/k$ or $1/k!$ exists
+    for all indices $k$. When computing to order $O(x^n)$, the modulus $p$
+    must therefore be a prime satisfying $p \ge n$. Further, we always
+    require that $p > 2$ in order to be able to multiply by $1/2$ for
+    internal purposes.
+
+    If the input does not satisfy all these conditions, results are undefined.
+
+    Except where otherwise noted, functions are implemented with optimal
+    (up to constants) complexity $O(M(n))$, where $M(n)$ is the cost
+    of polynomial multiplication.
+
+*******************************************************************************
+
+void _nmod_poly_log_series_monomial_ui(mp_ptr g,
+            mp_limb_t c, ulong r, long n, nmod_t mod)
+
+    Set $g = \log(1+cx^r) + O(x^n)$. Assumes $n > 0$, $r > 0$, and that
+    the coefficient is reduced by the modulus. Works efficiently in linear
+    time.
+
+void nmod_poly_log_series_monomial_ui(nmod_poly_t g,
+            mp_limb_t c, ulong r, long n)
+
+    Set $g = \log(1+cx^r) + O(x^n)$. Works efficiently in linear time.
+
+void _nmod_poly_log_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \log(h) + O(x^n)$. Assumes $n > 0$ and that $h$ is zero-padded
+    as necessary to length $n$. Aliasing of $g$ and $h$ is allowed.
+
+void nmod_poly_log_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \log(h) + O(x^n)$. The case $h = 1+cx^r$ is automatically
+    detected and handled efficiently.
+
+void _nmod_poly_exp_series_monomial_ui(mp_ptr g,
+            mp_limb_t c, ulong r, long n, nmod_t mod)
+
+    Set $g = \exp(cx^r) + O(x^n)$. Assumes $n > 0$, $r > 0$, and that
+    the coefficient is reduced by the modulus. Works efficiently
+    in linear time.
+
+void nmod_poly_exp_series_monomial_ui(nmod_poly_t g,
+            mp_limb_t c, ulong r, long n)
+
+    Set $g = \exp(cx^r) + O(x^n)$. Works efficiently in linear time.
+
+void _nmod_poly_exp_series_basecase(mp_ptr g, mp_srcptr h, long hlen,
+                                        long n, nmod_t mod)
+
+    Set $g = \exp(h) + O(x^n)$ using a simple $O(n^2)$ algorithm.
+    Assumes $n > 0$ and $\operatorname{hlen} > 0$. Only the first
+    $\operatorname{hlen}$ coefficients of $h$ will be read.
+    Aliasing of $f$ and $h$ is allowed.
+
+void nmod_poly_exp_series_basecase(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \exp(h) + O(x^n)$ using a simple $O(n^2)$ algorithm.
+
+void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \exp(h) + O(x^n)$. Assumes $n > 0$ and that $h$ is zero-padded
+    as necessary to length $n$. Aliasing of $g$ and $h$ is not allowed.
+
+    Uses Newton iteration (the version given in \cite{HanZim2004}).
+    For small $n$, falls back to the basecase algorithm.
+
+void nmod_poly_exp_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \exp(h) + O(x^n)$. The case $h = cx^r$ is automatically
+    detected and handled efficiently. Otherwise this function automatically
+    uses the basecase algorithm for small $n$ and Newton iteration otherwise.
+
+void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{atan}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed.
+
+void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{atan}(h) + O(x^n)$.
+
+void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{atanh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed.
+
+void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{atanh}(h) + O(x^n)$.
+
+void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{asin}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed.
+
+void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{asin}(h) + O(x^n)$.
+
+void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{asinh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed.
+
+void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{asinh}(h) + O(x^n)$.
+
+void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{sin}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed. The value is computed using the identity
+    $\sin(x) = 2 \tan(x/2)) / (1 + \tan^2(x/2)).$
+
+void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{sin}(h) + O(x^n)$.
+
+void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    allowed. The value is computed using the identity
+    $\cos(x) = (1-\tan^2(x/2)) / (1 + \tan^2(x/2)).$
+
+void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$.
+
+void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{tan}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses Newton iteration to invert the atan function.
+
+void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{tan}(h) + O(x^n)$.
+
+void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{sinh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses the identity $\sinh(x) = (e^x - e^{-x})/2$.
+
+void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{sinh}(h) + O(x^n)$.
+
+void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{cos}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Aliasing of $g$ and $h$ is
+    not allowed. Uses the identity $\cosh(x) = (e^x + e^{-x})/2$.
+
+void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{cosh}(h) + O(x^n)$.
+
+void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+
+    Set $g = \operatorname{tanh}(h) + O(x^n)$. Assumes $n > 0$ and that $h$
+    is zero-padded as necessary to length $n$. Uses the identity
+    $\tanh(x) = (e^{2x}-1)/(e^{2x}+1)$.
+
+void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
+
+    Set $g = \operatorname{tanh}(h) + O(x^n)$.

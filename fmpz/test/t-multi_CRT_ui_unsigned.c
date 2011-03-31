@@ -35,7 +35,7 @@
 int main()
 {
     int result;
-    fmpz_t input;
+    fmpz_t input, temp;
     mpz_t num1;
     mp_limb_t * output, * output2;
     double primes_per_limb;
@@ -47,8 +47,7 @@ int main()
     mp_limb_t prime;
 
     fmpz_comb_t comb;
-    fmpz ** comb_temp;
-    fmpz_t temp, temp1, temp2;
+    fmpz_comb_temp_t comb_temp;
 
     flint_rand_t state;
 
@@ -90,21 +89,16 @@ int main()
         output2 = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
 
         fmpz_comb_init(comb, primes, num_primes);
+        fmpz_comb_temp_init(comb_temp, comb);
 
-        comb_temp = fmpz_comb_temp_init(comb);
-        fmpz_init(temp1);
-        fmpz_init(temp2);
-
-        fmpz_multi_mod_ui(output, input, comb, comb_temp, temp1);
+        fmpz_multi_mod_ui(output, input, comb, comb_temp);
      
         fmpz_init(temp);
 
-        fmpz_multi_CRT_ui_unsigned(temp, output, comb, comb_temp, temp1, temp2);
+        fmpz_multi_CRT_ui_unsigned(temp, output, comb, comb_temp);
         result &= fmpz_equal(temp, input);
 
-        fmpz_comb_temp_free(comb, comb_temp);
-        fmpz_clear(temp1);
-        fmpz_clear(temp2);
+        fmpz_comb_temp_clear(comb_temp);
 
         for (k = 0; k < num_primes; k++)
         {

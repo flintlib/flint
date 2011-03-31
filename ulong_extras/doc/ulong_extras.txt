@@ -20,6 +20,8 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,7 +32,7 @@
 *******************************************************************************
 
 void n_randinit(flint_rand_t state)
-   
+
     Initialise a random state for use in random functions. 
     Currently this function does nothing, but must be used
     for compatibility with future versions of flint. In 
@@ -38,7 +40,7 @@ void n_randinit(flint_rand_t state)
     in a threadsafe manner.
 
 void n_randinit(flint_rand_t state)
-   
+
     Release any memory used by a random state. Currently this 
     function does nothing, but must be used for compatibility 
     with future versions of flint.
@@ -57,7 +59,7 @@ mp_limb_t n_randlimb(flint_rand_t state)
 mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
 
     Returns a uniformly pseudo random number with the given number of 
-    bits. The most sifnificant bit is always set, unless zero is passed,
+    bits. The most significant bit is always set, unless zero is passed,
     in which case zero is returned.
 
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
@@ -83,13 +85,13 @@ mp_limb_t n_randtest_not_zero(flint_rand_t state)
 
 mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
 
-    Returns a random prime number (proved = 0) or probable prime (proved = 1)
+    Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with \code{bits} bits, where \code{bits} must be at least 2 and
     at most \code{FLINT_BITS}.
 
 mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
 
-    Returns a random prime number (proved = 0) or probable prime (proved = 1)
+    Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with size randomly chosen between 2 and \code{FLINT_BITS} bits.
 
 *******************************************************************************
@@ -106,6 +108,7 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
     The algorithm simply uses a for loop. Repeated squaring is
     unlikely to speed up this algorithm.
 
+
 *******************************************************************************
 
     Miscellaneous
@@ -117,6 +120,13 @@ ulong n_revbin(ulong in, ulong bits)
     Returns the binary reverse of \code{in}, assuming it is the given 
     number of bits long, e.g.\ \code{n_revbin(10110, 6)} will return
     \code{110100}.
+
+int n_sizeinbase(mp_limb_t n, int base)
+
+    Returns the exact number of digits needed to represent $n$ as a
+    string in base \code{base} assumed to be between 2 and 36.
+    Returns 1 when $n = 0$.
+
 
 *******************************************************************************
 
@@ -400,7 +410,7 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
     Returns \code{(a^exp) % n}. We require $0 \leq a < n$, but there are 
     no restrictions on $n$ or on \code{exp}, i.e.\ it can be negative.
 
-    This is implemented by precomputing and inverse limb and calling the 
+    This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
 
 *******************************************************************************
@@ -542,7 +552,7 @@ int n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     The most time consuming part of the algorithm is factoring 
     $n - 1$. For this reason \code{n_factor_partial()} is used, 
     which uses a combination of trial factoring and Hart's one 
-    line factor algorithm~\citep{Har2009} try to quickly factor $n - 1$. 
+    line factor algorithm~\citep{Har2009} to try to quickly factor $n - 1$. 
     Additionally if the cofactor is less than the square root of 
     $n - 1$ the algorithm can still proceed.
 
@@ -646,7 +656,7 @@ int n_is_probabprime_fermat(mp_limb_t n, mp_limb_t i)
 
 int n_is_probabprime_fibonacci(mp_limb_t n)
 
-    Letting $F_j$ be the $j$th element of the Fibonacci sequence 
+    Let $F_j$ be the $j$th element of the Fibonacci sequence 
     $0, 1, 1, 2, 3, 5, \dotsc$, starting at $j = 0$. Then if $n$ is prime
     we have $F_{n - (n/5)} = 0 \pmod n$, where $(n/5)$ is the Jacobi
     symbol.
@@ -693,26 +703,27 @@ int n_is_probabprime(mp_limb_t n)
 mp_limb_t n_sqrt(mp_limb_t a)
 
     Computes the integer truncation of the square root of $a$. The integer
-    itself can be represented exactly and its square root is computed
-    to the nearest place. If $a$ is one below a square, the rounding may be
-    up, whereas if it is one above a square, the rounding will be down.
-    Thus the square root may be one too large in some instances. We also 
-    have to be careful when the square of this too large value causes an
-    overflow. The same assumptions hold for a single precision float so
-    long as the square root itself can be represented in a single float, 
-    i.e.\ for $a < 281474976710656 = 2^{46}$.
+    itself can be represented exactly as a double and its square root is 
+    computed to the nearest place. If $a$ is one below a square, the 
+    rounding may be up, whereas if it is one above a square, the rounding 
+    will be down. Thus the square root may be one too large in some 
+    instances. We also have to be careful when the square of this too large 
+    value causes an overflow. The same assumptions hold for a single 
+    precision float so long as the square root itself can be represented 
+    in a single float, i.e.\ for $a < 281474976710656 = 2^{46}$.
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
 
     Computes the integer truncation of the square root of $a$. The integer
-    itself can be represented exactly and its square root is computed
-    to the nearest place. If $a$ is one below a square, the rounding may be
-    up, whereas if it is one above a square, the rounding will be down.
-    Thus the square root may be one too large in some instances. We also 
-    have to be careful when the square of this too large value causes an
-    overflow. The same assumptions hold for a single precision float so
-    long as the square root itself can be represented in a single float, 
-    i.e.\ for $a < 281474976710656 = 2^{46}$. The remainder is computed by 
+    itself can be represented exactly as a double and its square root is 
+    computed to the nearest place. If $a$ is one below a square, the 
+    rounding may be up, whereas if it is one above a square, the rounding 
+    will be down. Thus the square root may be one too large in some 
+    instances. We also have to be careful when the square of this too 
+    large value causes an overflow. The same assumptions hold for a 
+    single precision float so long as the square root itself can be 
+    represented in a single float, i.e. for \
+    $a < 281474976710656 = 2^{46}$. The remainder is computed by 
     subtracting the square of the computed square root from $a$.
 
 int n_is_square(mp_limb_t x)
@@ -868,11 +879,12 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
     single limb arithmetic internally.
 
     If SQUFOF fails to factor $n$ we return $0$, however with 
+    \code{iters} large enough this should never happen.
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
 
     Factors $n$ with no restrictions on $n$. If the prime factors are 
-    required to be certified prime, one may set proved to $1$, 
+    required to be certified prime, one may set \code{proved} to $1$, 
     otherwise set it to $0$, and they will only be probable primes
     (with no known counterexamples to the conjecture that they are
     in fact all prime).
@@ -901,7 +913,7 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n,
                   mp_limb_t * prod, ulong num_primes, mp_limb_t limit)
 
     Attempts trial factoring of $n$ with the first \code{num_primes primes}, 
-    but stops when the product of prime factors so far exceeds limit.
+    but stops when the product of prime factors so far exceeds \code{limit}.
 
     One requires an initialised \code{n_factor_t} structure, but factors
     will be added by default to an already used \code{n_factor_t}. Use 
@@ -987,4 +999,15 @@ mp_limb_t n_euler_phi(mp_limb_t n)
 
     Computes the Euler totient function $\phi(n)$, counting the number of
     positive integers less than or equal to $n$ that are coprime to $n$.
+
+*******************************************************************************
+
+    Factorials
+
+*******************************************************************************
+
+mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+
+    Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
+    by \code{n_preinvert_limb()}.
 

@@ -470,20 +470,20 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
 
 /*  Power series division  ***************************************************/
 
-void _fmpz_poly_inv_newton(fmpz * Qinv, const fmpz * Q, long n);
+void _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n);
 
-void fmpz_poly_inv_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 
 static __inline__ void 
 _fmpz_poly_inv_series(fmpz * Qinv, const fmpz * Q, long n)
 {
-    _fmpz_poly_inv_newton(Qinv, Q, n);
+    _fmpz_poly_inv_series_newton(Qinv, Q, n);
 }
 
 static __inline__ void 
 fmpz_poly_inv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 {
-    fmpz_poly_inv_newton(Qinv, Q, n);
+    fmpz_poly_inv_series_newton(Qinv, Q, n);
 }
 
 void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n);
@@ -551,15 +551,22 @@ void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly);
 
 /*  Evaluation  **************************************************************/
 
-void _fmpz_poly_evaluate_horner(fmpz_t res, const fmpz * f, long len, 
+void 
+_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, long len, 
+                                                const fmpz_t a);
+
+void fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz_poly_t poly, 
+                                        const fmpz_t a);
+
+void _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len, 
                                                                const fmpz_t a);
 
-void fmpz_poly_evaluate_horner(fmpz_t res, const fmpz_poly_t f, 
+void fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz_poly_t f, 
                                                                const fmpz_t a);
 
-void _fmpz_poly_evaluate(fmpz_t res, const fmpz * f, long len, const fmpz_t a);
+void _fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, long len, const fmpz_t a);
 
-void fmpz_poly_evaluate(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
+void fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a);
 
 void _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden, 
                                     const fmpz * f, long len, 
@@ -579,6 +586,14 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
 
 mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a, 
                                  mp_limb_t n);
+
+void 
+_fmpz_poly_evaluate_divconquer(fmpz * res, const fmpz * poly, long len, 
+                               const fmpz_t x);
+
+void 
+fmpz_poly_evaluate_divconquer(fmpz_t res, 
+                              const fmpz_poly_t poly, const fmpz_t x);
 
 /*  Composition  *************************************************************/
 

@@ -58,7 +58,7 @@ void sample(void * arg, ulong count)
    }
 }
 
-void fill_array(ulong * ret, mp_bitcnt_t bits)
+void fill_array(ulong * ret, mp_bitcnt_t bits, flint_rand_t state)
 {
    ulong n;
    n_factor_t factors;
@@ -69,7 +69,7 @@ void fill_array(ulong * ret, mp_bitcnt_t bits)
 	  do 
 	  {
 		 n_factor_init(&factors);
-	     n = n_randbits(bits);
+	     n = n_randbits(state, bits);
 	  } while (n_is_probabprime(n) || (n_factor_trial(&factors, n, primes) != n));
 	  ret[i] = n;
    }
@@ -80,21 +80,24 @@ int main(void)
 {
    double min, max;
    fac_one_line_t params;
+   flint_rand_t state;
    int i;
-   
+   flint_randinit(state);
+
    params.composites = malloc(1024*sizeof(ulong));
 
    printf("factor_one_line:\n");
    
    for (i = 4; i <= 64; i++)
    {
-      fill_array(params.composites, i);
+      fill_array(params.composites, i, state);
       params.bits = i;
 	  prof_repeat(&min, &max, sample, &params);
       printf("bits = %d, time is %.3f us\n", 
 		  i, max/(double)ITERS);
    }
 
+   flint_randclear(state);
    free(params.composites);
    return 0;
 }

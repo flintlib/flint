@@ -34,17 +34,12 @@ mp_limb_t _fmpz_poly_evaluate_mod(const fmpz * poly, long len, mp_limb_t a,
                                   mp_limb_t n, mp_limb_t ninv)
 {
     mp_limb_t c, res = 0;
-    fmpz_t f;
-
-    fmpz_init(f);
 
     while (len--)
     {
-        c = fmpz_mod_ui(f, poly + len, n);
+        c = fmpz_fdiv_ui(poly + len, n);
         res = n_addmod(n_mulmod2_preinv(res, a, n, ninv), c, n);
     }
-
-    fmpz_clear(f);
 
     return res;
 }
@@ -58,12 +53,7 @@ mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
     if (a == 0)
     {
         mp_limb_t res;
-        fmpz_t f;
-
-        fmpz_init(f);
-        res = fmpz_mod_ui(f, poly->coeffs, n);
-        fmpz_clear(f);
-
+        res = fmpz_fdiv_ui(poly->coeffs, n);
         return res;
     }
     else

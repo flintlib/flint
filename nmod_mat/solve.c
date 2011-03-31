@@ -47,7 +47,7 @@ _nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
     result = 0;
     if (FLINT_ABS(rank) == dim)
     {
-        tmp = nmod_vec_init(dim);
+        tmp = _nmod_vec_init(dim);
 
         for (i = 0; i < dim; i++)
         {
@@ -57,7 +57,7 @@ _nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
 
         _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
         mpn_copyi(x, tmp, dim);
-        nmod_vec_free(tmp);
+        _nmod_vec_free(tmp);
         result = 1;
     }
 

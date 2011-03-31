@@ -61,7 +61,7 @@ main(void)
         fmpz_set_ui(b, a);
 
         r = fmpz_poly_evaluate_mod(f, a, n);
-        fmpz_poly_evaluate(s, f, b);
+        fmpz_poly_evaluate_fmpz(s, f, b);
 
         result = (r == fmpz_mod_ui(s, s, n));
         if (!result)

@@ -41,11 +41,13 @@ void sample(void * arg, ulong count)
    ulong i;
    mp_limb_t n, d, r, norm;
    double dpre;
-   
+   flint_rand_t state;
+   flint_randinit(state);
+
    for (i = 0; i < count; i++)
    {
       int j, res = 1;
-      d = n_randbits(bits);
+      d = n_randbits(state, bits);
       while (!n_is_prime(d)) d++;
 
       prof_start();
@@ -55,6 +57,8 @@ void sample(void * arg, ulong count)
       
       if (!res) printf("Error\n");
    }
+
+   flint_randclear(state);
 }
 
 int main(void)

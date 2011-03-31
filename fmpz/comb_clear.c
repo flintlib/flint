@@ -31,21 +31,24 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp)
+
+void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 {
     long n, i, j;
 
-	/* Free comb_temp */
-    n = comb->n;
+    n = temp->n;
     j = (1L << (n - 1));
 
 	for (i = 0; i < n; i++)
     {
-        _fmpz_vec_clear(comb_temp[i], j);
+        _fmpz_vec_clear(temp->comb_temp[i], j);
         j /= 2;
     }
 
-	free(comb_temp);
+	free(temp->comb_temp);
+
+    fmpz_clear(temp->temp);
+    fmpz_clear(temp->temp2);
 }
 
 void

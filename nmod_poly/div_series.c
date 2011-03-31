@@ -34,12 +34,12 @@ void
 _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
                                              long n, nmod_t mod)
 {
-    mp_ptr Binv = nmod_vec_init(n);
+    mp_ptr Binv = _nmod_vec_init(n);
 
     _nmod_poly_inv_series(Binv, B, n, mod);
-    _nmod_poly_mullow_n(Q, Binv, n, A, n, n, mod);
+    _nmod_poly_mullow(Q, Binv, n, A, n, n, mod);
 
-    nmod_vec_free(Binv);
+    _nmod_vec_free(Binv);
 }
 
 void
@@ -62,7 +62,7 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Alen < n)
     {
-        A_coeffs = nmod_vec_init(n);
+        A_coeffs = _nmod_vec_init(n);
         mpn_copyi(A_coeffs, A->coeffs, Alen);
         mpn_zero(A_coeffs + Alen, n - Alen);
     }
@@ -71,7 +71,7 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Blen < n)
     {
-        B_coeffs = nmod_vec_init(n);
+        B_coeffs = _nmod_vec_init(n);
         mpn_copyi(B_coeffs, B->coeffs, Blen);
         mpn_zero(B_coeffs + Blen, n - Blen);
     }
@@ -100,10 +100,10 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
     Q->length = n;
 
     if (Alen < n)
-        nmod_vec_free(A_coeffs);
+        _nmod_vec_free(A_coeffs);
 
     if (Blen < n)
-        nmod_vec_free(B_coeffs);
+        _nmod_vec_free(B_coeffs);
 
     _nmod_poly_normalise(Q);
 }

@@ -35,18 +35,20 @@ void sample(void * arg, ulong count)
    double dpre;
    ulong i;
    mp_ptr array = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
+   flint_rand_t state;
+   flint_randinit(state);
    
    for (i = 0; i < count; i++)
    {
       int j;
-      d = n_randtest();
+      d = n_randtest(state);
       if (d == 0UL) d++;
 
       dpre = n_precompute_inverse(d);
 
       for (j = 0; j < 1024; j++)
       {
-         array[j] = n_randtest();
+         array[j] = n_randtest(state);
       }
 
       prof_start();
@@ -59,6 +61,7 @@ void sample(void * arg, ulong count)
 
    if (r == 0) abort();
 
+   flint_randclear(state);
    free(array);
 }
 

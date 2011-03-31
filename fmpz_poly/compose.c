@@ -36,7 +36,7 @@ _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
     if (len1 == 1)
         fmpz_set(res, poly1);
     else if (len2 == 1)
-        _fmpz_poly_evaluate(res, poly1, len1, poly2);
+        _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
     else if (len1 <= 4)
         _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
     else

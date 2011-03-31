@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2007, David Howden.
     Copyright (C) 2010, 2011 William Hart
 
 ******************************************************************************/
@@ -215,30 +216,38 @@ char * nmod_poly_get_str(const nmod_poly_t poly);
 int nmod_poly_set_str(const char * s, nmod_poly_t poly);
 
 static __inline__
-void nmod_poly_print(const nmod_poly_t a)
+int nmod_poly_print(const nmod_poly_t a)
 {
+    int r;
     long i;
 
-    printf("%ld %lu", a->length, a->mod.n);
+    r = printf("%ld %lu", a->length, a->mod.n);
 
     if (a->length == 0)
-        return;
+        return r;
     else
-        printf(" ");
+        if (r > 0)
+            r = printf(" ");
 
-    for (i = 0; i < a->length; i++)
-        printf(" %lu", a->coeffs[i]);
+    for (i = 0; (r > 0) && (i < a->length); i++)
+        r = printf(" %lu", a->coeffs[i]);
+
+    return r;
 }
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly);
 
 static __inline__
-void nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
+int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 {
-   char * s = nmod_poly_get_str(poly);
-   if (fputs(s, f) < 0) 
-       printf("Error writing to file\n");
-   free(s);
+    char *s;
+    int r;
+
+    s = nmod_poly_get_str(poly);
+    r = fputs(s, f);
+    free(s);
+
+    return (r < 0) ? r : 1;
 }
 
 static __inline__
@@ -296,7 +305,7 @@ void nmod_poly_neg(nmod_poly_t res, const nmod_poly_t poly1);
 
 /* Scalar multiplication and division  ***************************************/
 
-void nmod_poly_scalar_mul(nmod_poly_t res, 
+void nmod_poly_scalar_mul_nmod(nmod_poly_t res, 
                                          const nmod_poly_t poly1, mp_limb_t c);
 
 void _nmod_poly_make_monic(mp_ptr output, 
@@ -309,8 +318,8 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input);
 void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, 
                                               long len, mp_bitcnt_t bits);
 
-void _nmod_poly_bit_unpack(mp_ptr res, mp_srcptr mpn, 
-                                       long len, mp_bitcnt_t bits, nmod_t mod);
+void _nmod_poly_bit_unpack(mp_ptr res, long len, 
+                                  mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
 
 /* Multiplication  ***********************************************************/
 
@@ -350,40 +359,40 @@ void _nmod_poly_mul(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_mul(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
-void _nmod_poly_mullow_n(mp_ptr res, mp_srcptr poly1, long len1, 
+void _nmod_poly_mullow(mp_ptr res, mp_srcptr poly1, long len1, 
                            mp_srcptr poly2, long len2, long trunc, nmod_t mod);
 
-void nmod_poly_mullow_n(nmod_poly_t res, const nmod_poly_t poly1, 
+void nmod_poly_mullow(nmod_poly_t res, const nmod_poly_t poly1, 
                                           const nmod_poly_t poly2, long trunc);
 
-void _nmod_poly_mulhigh_n(mp_ptr res, mp_srcptr poly1, long len1, 
+void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1, 
                                mp_srcptr poly2, long len2, long n, nmod_t mod);
 
-void nmod_poly_mulhigh_n(nmod_poly_t res, const nmod_poly_t poly1, 
+void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1, 
                                               const nmod_poly_t poly2, long n);
 
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(mp_ptr res, 
-                              mp_srcptr poly, long len, nmod_t mod, ulong e);
+                              mp_srcptr poly, long len, ulong e, nmod_t mod);
 
 void nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
-void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, nmod_t mod, ulong e);
+void _nmod_poly_pow(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod);
 
 void nmod_poly_pow(nmod_poly_t res, const nmod_poly_t poly, ulong e);
 
 void _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly, 
-                                              long trunc, nmod_t mod, ulong e);
+                                              ulong e, long trunc, nmod_t mod);
 
 void nmod_poly_pow_trunc_binexp(nmod_poly_t res, 
-                                  const nmod_poly_t poly, long trunc, ulong e);
+                                  const nmod_poly_t poly, ulong e, long trunc);
 
 void _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
-                                              long trunc, nmod_t mod, ulong e);
+                                              ulong e, long trunc, nmod_t mod);
 
 void nmod_poly_pow_trunc(nmod_poly_t res, 
-                                  const nmod_poly_t poly, long trunc, ulong e);
+                                  const nmod_poly_t poly, ulong e, long trunc);
 
 /* Division  *****************************************************************/
 
@@ -476,12 +485,16 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod);
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
+
 /* Evaluation  ***************************************************************/
 
-mp_limb_t _nmod_poly_evaluate(mp_srcptr poly, 
-                                            long len, nmod_t mod, mp_limb_t c);
+mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, 
+                                           long len, mp_limb_t c, nmod_t mod);
 
-mp_limb_t nmod_poly_evaluate(const nmod_poly_t poly, mp_limb_t c);
+mp_limb_t nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c);
 
 /* Composition  **************************************************************/
 
@@ -508,5 +521,71 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
-#endif
+/* Square roots **************************************************************/
 
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+/* Transcendental functions **************************************************/
+
+void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
+
+void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod);
+void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
+
+void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
+
+void
+__nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
+    mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod, int extend);
+
+void
+_nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
+                                    long hlen, long n, nmod_t mod);
+void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, long n);
+
+void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
+
+#endif

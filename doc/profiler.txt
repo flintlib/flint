@@ -1,97 +1,115 @@
+*******************************************************************************
 
-timeit_start() and timeit_stop()
+    Timer based on the cycle counter
 
-   Gives wall and user time - useful for parallel programming
+*******************************************************************************
 
-   Example usage:
+void timeit_start(timeit_t t)
+void timeit_stop(timeit_t t)
 
-   timeit_t t0;
+    Gives wall and user time - useful for parallel programming.
 
-   ///....
+    Example usage:
+    \begin{lstlisting}[language=c]
+    timeit_t t0;
+    
+    // ...
+    
+    timeit_start(t0);
+    
+    // do stuff, take some time
+    
+    timeit_stop(t0);
+    
+    printf("cpu = %ld ms  wall = %ld ms\n", t0->cpu, t0->wall);
+    \end{lstlisting}
 
-   timeit_start(t0);
+void start_clock(int n)
+void stop_clock(int n)
+double get_clock(int n)
 
-   /// do stuff, take some time
+    Gives time based on cycle counter.
 
-   timeit_stop(t0);
+    First one must ensure the processor speed in cycles per second
+    is set correctly in \code{profiler.h}, in the macro definition 
+    \code{#define FLINT_CLOCKSPEED}.
 
-   printf("cpu = %ld ms  wall = %ld ms\n", t0->cpu, t0->wall);
+    One can access the cycle counter directly by \code{get_cycle_counter()}
+    which returns the current cycle counter as a \code{double}.
 
-start_clock() stop_clock() get_clock()
+    A sample usage of clocks is:
+    \begin{lstlisting}[language=c]
+    init_all_clocks();
+    
+    start_clock(n);
+    
+    // do something
+    
+    stop_clock(n);
+    
+    printf("Time in seconds is %f.3\n", get_clock(n));
+    \end{lstlisting}
+    where \code{n} is a clock number (from 0-19 by default). The number of 
+    clocks can be changed by altering \code{FLINT_NUM_CLOCKS}. One can also 
+    initialise an individual clock with \code{init_clock(n)}.
 
-   Gives time based on cycle counter
+*******************************************************************************
 
-   First one must ensure the processor speed in cycles per second
-   is set correctly in profiler.h, in the #define FLINT_CLOCKSPEED.
+    Framework for repeatedly sampling a single target
 
-   One can access the cycle counter directly by get_cycle_counter()
-   which returns the current cycle counter as a double.
+*******************************************************************************
 
-   A sample usage of clocks is:
+void prof_repeat(double *min, double *max, profile_target_t target, 
+                 ulong count)
 
-   init_all_clocks();
-   
-   start_clock(n);
+    Allows one to automatically time a given function. Here is a sample usage:
 
-   // do something
+    Suppose one has a function one wishes to profile:
+    \begin{lstlisting}[language=c]
+    void myfunc(ulong a, ulong b);
+    \end{lstlisting}
+    One creates a struct for passing arguments to our function:
+    \begin{lstlisting}[language=c]
+    typedef struct 
+    {
+        ulong a, b;
+    } myfunc_t;
+    \end{lstlisting}
+    a sample function:
+    \begin{lstlisting}[language=c]
+    void sample_myfunc(void * arg, ulong count)
+    {
+        myfunc_t * params = (myfunc_t *) arg;
 
-   stop_clock(n);
+        ulong a = params->a;
+        ulong b = params->b;
 
-   printf("Time in seconds is %f.3\n", get_clock(n));  
+        for (ulong i = 0; i < count; i++)
+        {
+            prof_start();
+            myfunc(a, b);
+            prof_stop();
+        }
+    }
+    \end{lstlisting}
+    Then we do the profile
+    \begin{lstlisting}[language=c]
+    double min, max;
 
-   where n is a clock number (from 0-19 by default). The number of clocks
-   can be changed by altering FLINT_NUM_CLOCKS. One can also initialise
-   an individual clock with init_clock(n).
+    myfunc_t params;
 
-prof_repeat()
-  
-   Allows one to automatically time a given function. Here is a sample usage:
+    params.a = 3;
+    params.b = 4;
 
-   Suppose one has a function one wishes to profile:
+    prof_repeat(&min, &max, sample_myfunc, &params);
+    
+    printf("Min time is %lf.3s, max time is %lf.3s\n", min, max);
+    \end{lstlisting}
 
-   void myfunc(ulong a, ulong b);
+    If either of the first two parameters to \code{prof_repeat} are 
+    \code{NULL}, that value is not stored.
 
-   One creates a struct for passing arguments to our function:
+    One may set the minimum time in microseconds for a timing run by 
+    adjusting \code{DURATION_THRESHOLD} and one may set a target duration 
+    in microseconds by adjusting \code{DURATION_TARGET} in \code{profiler.h}.
 
-   typedef struct 
-   {
-      ulong a, b;
-   } myfunc_t;
-
-   ... a sample function:
-
-   void sample_myfunc(void * arg, ulong count)
-   {
-      myfunc_t * params = (myfunc_t *) arg;
-
-      ulong a = params->a;
-      ulong b = params->b;
-
-      for (ulong i = 0; i < count; i++)
-      {
-         prof_start();
-         myfunc(a, b);
-         prof_stop();
-      }
-   }
-
-   ... then we do the profile
-
-   double min, max;
-
-   myfunc_t params;
-
-   params.a = 3;
-   params.b = 4;
-
-   prof_repeat(&min, &max, sample_myfunc, &params);
-   
-   printf("Min time is %lf.3s, max time is %lf.3s\n", min, max);
-
-   If either of the first two parameters to prof_repeat are NULL, that
-   value is not stored.
-
-   One may set the minimum time in microseconds for a timing run by 
-   adjusting DURATION_THRESHOLD and one may set a target duration in
-   microseconds by adjusting DURATION_TARGET in profiler.h.
-   

@@ -269,5 +269,6 @@ int n_sizeinbase(mp_limb_t n, int base);
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
-#endif
+mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
+#endif
