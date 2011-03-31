@@ -103,6 +103,9 @@ void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits
 
 void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
+void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
+
+void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
 
 
