@@ -44,6 +44,8 @@ fmpz
   having an fmpz point directly to a combined structure. This would require
   writing replacements for most mpz functions.
 
+* fmpz_remove needs to be re-written.
+
 
 ulong_extras
 ------------

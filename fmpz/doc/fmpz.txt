@@ -456,6 +456,12 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 *******************************************************************************
 
+long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
+
+    Remove all occurrences of the factor $f > 1$ from the 
+    non-zero integer \code{op} and sets \code{rop} to the 
+    resulting integer.
+
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the inverse of $g$ modulo $h$.  The value of $h$ may 
