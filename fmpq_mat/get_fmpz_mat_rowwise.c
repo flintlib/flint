@@ -30,53 +30,60 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void
-fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
-{
-    long i, j;
 
+void
+_fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
+                        const fmpq_mat_struct ** mat, long n)
+{
+    long i, j, k;
     fmpz_t t, u, lcm;
 
     fmpz_init(t);
     fmpz_init(u);
     fmpz_init(lcm);
 
-    if (mat->r <= 0 || mat->c <= 0)
+    if (mat[0]->r <= 0 || mat[0]->c <= 0)
         return;
 
-    for (i = 0; i < mat->r; i++)
+    for (i = 0; i < mat[0]->r; i++)
     {
         /* Compute common denominator of row */
-        fmpz_set(lcm, fmpq_mat_entry_den(mat, i, 0));
+        fmpz_set(lcm, fmpq_mat_entry_den(mat[0], i, 0));
 
-        for (j = 1; j < mat->c; j++)
+        for (k = 0; k < n; k++)
         {
-            fmpz * d = fmpq_mat_entry_den(mat, i, j);
-
-            if (!fmpz_is_one(d))
+            for (j = (k == 0); j < mat[k]->c; j++)
             {
-                fmpz_mul(t, lcm, d);
-                fmpz_gcd(u, lcm, d);
-                fmpz_divexact(lcm, t, u);
+                fmpz * d = fmpq_mat_entry_den(mat[k], i, j);
+
+                if (!fmpz_is_one(d))
+                {
+                    fmpz_mul(t, lcm, d);
+                    fmpz_gcd(u, lcm, d);
+                    fmpz_divexact(lcm, t, u);
+                }
             }
         }
 
         fmpz_set(den + i, lcm);
 
-        /* Rescale numerators in row */
-        if (fmpz_is_one(lcm))
+        for (k = 0; k < n; k++)
         {
-            for (j = 0; j < mat->c; j++)
-                fmpz_set(fmpz_mat_entry(num, i, j),
-                         fmpq_mat_entry_num(mat, i, j));
-        }
-        else
-        {
-            for (j = 0; j < mat->c; j++)
+            /* Rescale numerators in row */
+            if (fmpz_is_one(lcm))
             {
-                fmpz_divexact(t, lcm, fmpq_mat_entry_den(mat, i, j));
-                fmpz_mul(fmpz_mat_entry(num, i, j),
-                         fmpq_mat_entry_num(mat, i, j), t);
+                for (j = 0; j < mat[k]->c; j++)
+                    fmpz_set(fmpz_mat_entry(num[k], i, j),
+                             fmpq_mat_entry_num(mat[k], i, j));
+            }
+            else
+            {
+                for (j = 0; j < mat[k]->c; j++)
+                {
+                    fmpz_divexact(t, lcm, fmpq_mat_entry_den(mat[k], i, j));
+                    fmpz_mul(fmpz_mat_entry(num[k], i, j),
+                             fmpq_mat_entry_num(mat[k], i, j), t);
+                }
             }
         }
     }
@@ -84,4 +91,25 @@ fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
     fmpz_clear(t);
     fmpz_clear(u);
     fmpz_clear(lcm);
+}
+
+void
+fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den, const fmpq_mat_t mat)
+{
+    _fmpq_mat_get_fmpz_mat_rowwise(&num, den, &mat, 1);
+}
+
+void
+fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2, fmpz * den,
+                                   const fmpq_mat_t mat, const fmpq_mat_t mat2)
+{
+    fmpz_mat_struct * nums[2];
+    fmpq_mat_struct * mats[2];
+
+    nums[0] = num;
+    nums[1] = num2;
+    mats[0] = (fmpq_mat_struct *) mat;
+    mats[1] = (fmpq_mat_struct *) mat2;
+
+    _fmpq_mat_get_fmpz_mat_rowwise(nums, den, (const fmpq_mat_struct **) mats, 2);
 }

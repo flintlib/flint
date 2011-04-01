@@ -63,6 +63,11 @@ static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)
     return fmpz_equal(&x->num, &y->num) && fmpz_equal(&x->den, &y->den);
 }
 
+static __inline__ int fmpq_is_zero(const fmpq_t x)
+{
+    return fmpz_is_zero(&x->num);
+}
+
 static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
     fmpz_set(&dest->num, &src->num);

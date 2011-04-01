@@ -50,20 +50,30 @@ void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols);
 
 void fmpq_mat_clear(fmpq_mat_t mat);
 
+int fmpq_mat_equal(fmpq_mat_t mat1, fmpq_mat_t mat2);
+
 void fmpq_mat_print(fmpq_mat_t mat);
 
 void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+
 void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_t num, fmpz * den,
     const fmpq_mat_t mat);
+
 void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den,
     const fmpq_mat_t mat);
+
+void fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2,
+        fmpz * den, const fmpq_mat_t mat, const fmpq_mat_t mat2);
+
 
 void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 void fmpq_mat_mul_cleared(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 
 void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat);
+void fmpq_mat_solve_mat(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 #endif
