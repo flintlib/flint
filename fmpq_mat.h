@@ -75,5 +75,6 @@ void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
 void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat);
 void fmpq_mat_solve_mat(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
+void fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 #endif
