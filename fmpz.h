@@ -217,6 +217,8 @@ void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
+void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
+
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);

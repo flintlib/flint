@@ -46,6 +46,8 @@ fmpz
 
 * fmpz_remove needs to be re-written.
 
+* fmpz_powm_ui needs to be re-written.
+
 
 ulong_extras
 ------------
