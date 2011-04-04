@@ -53,10 +53,25 @@ void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
 
 int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
+int fmpz_mat_is_zero(const fmpz_mat_t mat);
+
+static __inline__ int
+fmpz_mat_is_empty(const fmpz_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+
+static __inline__ int
+fmpz_mat_is_square(const fmpz_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
 
 void fmpz_mat_zero(fmpz_mat_t mat);
 void fmpz_mat_unit(fmpz_mat_t mat);
 
+
+void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
 /* Input and output  *********************************************************/
@@ -91,6 +106,8 @@ void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det);
 void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count);
 int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, const fmpz * diag, long n);
 
+/* Norms */
+
 long fmpz_mat_max_bits(const fmpz_mat_t mat);
 
 /* Transpose */
@@ -103,12 +120,33 @@ void fmpz_mat_add(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_sub(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A);
 
+/* Scalar operations */
+void fmpz_mat_scalar_mul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
+void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_mul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
+
+void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
+void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
+
+void fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
+void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_submul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
+
+void fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B, const nmod_mat_t A, const fmpz_t c);
+void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t A, ulong c);
+
+void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
+void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, long c);
+void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
+
 /* Multiplication */
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, long bits);
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
 
 /* Gaussian elimination */
 

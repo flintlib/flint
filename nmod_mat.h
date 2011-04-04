@@ -46,6 +46,8 @@ nmod_mat_struct;
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef nmod_mat_struct nmod_mat_t[1];
 
+#define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
+
 static __inline__
 void
 _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)

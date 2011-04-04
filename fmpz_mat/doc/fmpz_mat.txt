@@ -254,6 +254,21 @@ int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Returns a non-zero value if \code{mat1} and \code{mat2} have 
     the same dimensions and entries, and zero otherwise.
 
+int fmpz_mat_is_zero(fmpz_mat_t mat)
+
+    Returns a non-zero value if all entries \code{mat} are zero, and
+    otherwise returns zero.
+
+int fmpz_mat_is_empty(fmpz_mat_t mat)
+
+    Returns a non-zero value if the number of rows or the number of
+    columns in \code{mat} is zero, and otherwise returns
+    zero.
+
+int fmpz_mat_is_square(fmpz_mat_t mat)
+
+    Returns a non-zero value if the number of rows is equal to the
+    number of columns in \code{mat}, and otherwise returns zero.
 
 *******************************************************************************
 
@@ -288,10 +303,72 @@ void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A)
     Sets \code{B} to the elementwise negation of \code{A}. Both inputs
     must be of the same size. Aliasing is allowed.
 
+*******************************************************************************
+
+    Matrix-scalar arithmetic
 
 *******************************************************************************
 
-    Multiplication
+void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+
+void fmpz_mat_scalar_mul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
+
+void fmpz_mat_scalar_mul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
+
+    Set \code{A = B*c} where \code{B} is an \code{fmpz_mat_t} and \code{c}
+    is a scalar respectively of type \code{long}, \code{unsigned long},
+    or \code{fmpz_t}. The dimensions of \code{A} and \code{B} must
+    be compatible.
+
+void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+
+void fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
+
+void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
+                                    const fmpz_t c)
+
+    Set \code{A = A + B*c} where \code{B} is an \code{fmpz_mat_t} and \code{c}
+    is a scalar respectively of type \code{long}, \code{unsigned long},
+    or \code{fmpz_t}. The dimensions of \code{A} and \code{B} must
+    be compatible.
+
+void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+
+void fmpz_mat_scalar_submul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
+
+void fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
+                                    const fmpz_t c)
+
+    Set \code{A = A - B*c} where \code{B} is an \code{fmpz_mat_t} and \code{c}
+    is a scalar respectively of type \code{long}, \code{unsigned long},
+    or \code{fmpz_t}. The dimensions of \code{A} and \code{B} must
+    be compatible.
+
+void fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B, const nmod_mat_t A,
+                                    const fmpz_t c);
+void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t A,
+                                    ulong c)
+
+    Set \code{A = A + B*c} where \code{B} is an \code{nmod_mat_t} and \code{c}
+    is a scalar respectively of type \code{unsigned long} or \code{fmpz_t}.
+    The dimensions of \code{A} and \code{B} must be compatible.
+
+void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+
+void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c)
+
+void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
+                                    const fmpz_t c)
+
+    Set \code{A = B / c}, where \code{B} is an \code{fmpz_mat_t} and \code{c}
+    is a scalar respectively of type \code{long}, \code{unsigned long},
+    or \code{fmpz_t}, which is assumed to divide all elements of
+    \code{B} exactly.
+
+
+*******************************************************************************
+
+    Matrix multiplication
 
 *******************************************************************************
 
