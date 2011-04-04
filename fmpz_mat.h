@@ -175,6 +175,8 @@ long fmpz_mat_rank(const fmpz_mat_t A);
 
 /* Nonsingular solving */
 
+void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A, const fmpz_mat_t B);
+
 void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);

@@ -556,6 +556,12 @@ void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
     system matrix were permuted during the LU decomposition, replace
     \code{b[i]} with \code{b[perm[i]]} in the input.
 
+void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A,
+    const fmpz_mat_t B)
+
+    Assuming that $A$ is nonsingular, computes integers $N$ and $D$
+    such that the numerators and denominators in $A^{-1} B$ are bounded
+    by $N$ and $D$ respectively.
 
 *******************************************************************************
 
