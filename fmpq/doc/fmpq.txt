@@ -24,6 +24,147 @@
 ******************************************************************************/
 
 
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpq_init(fmpq_t x)
+
+    Initialises the \code{fmpq_t} variable \code{x} for use. Its value
+    is set to 0.
+
+void fmpq_clear(fmpq_t x)
+
+    Clears the \code{fmpq_t} variable \code{x}. To use the variable again,
+    it must be re-initialised with \code{fmpq_init}.
+
+
+*******************************************************************************
+
+    Basic assignment and manipulation
+
+*******************************************************************************
+
+void fmpq_canonicalise(fmpq_t res)
+
+    Puts \code{res} in canonical form: the numerator and denominator are
+    reduced to lowest terms, and the denominator is made positive.
+    If the numerator is zero, the denominator is set to zero.
+
+    If the denominator is zero, the outcome of calling this function is
+    undefined, regardless of the value of the numerator.
+
+void _fmpq_canonicalise(fmpz_t num, fmpz_t den)
+
+    Does the same thing as \code{fmpq_canonicalise}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables. Aliasing
+    of \code{num} and \code{den} is not allowed.
+
+int fmpq_is_canonical(const fmpq_t x)
+
+    Returns nonzero if \code{fmpq_t} x is in canonical form
+    (as produced by \code{fmpq_canonicalise}), and zero otherwise.
+
+int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den)
+
+    Does the same thing as \code{fmpq_is_canonical}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables.
+
+void fmpq_set(fmpq_t dest, const fmpq_t src)
+
+    Sets \code{dest} to a copy of \code{src}. No canonicalisation
+    is performed.
+
+void fmpq_zero(fmpq_t res)
+
+    Sets the value of \code{res} to 0.
+
+int fmpq_is_zero(fmpq_t res)
+
+    Returns nonzero if \code{res} has value 0, and returns zero otherwise.
+
+int fmpq_equal(const fmpq_t x, const fmpq_t y)
+
+    Returns nonzero if \code{x} and \code{y} are equal, and zero otherwise.
+    Assumes that \code{x} and \code{y} are both in canonical form.
+
+*******************************************************************************
+
+    Conversion
+
+*******************************************************************************
+
+void fmpq_set_si(fmpq_t res, long p, ulong q);
+
+    Sets \code{res} to the canonical form of the fraction \code{p / q}.
+
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q);
+
+    Sets \code{(rnum, rden)} to the canonical form of the fraction
+    \code{p / q}. \code{rnum} and \code{rden} may not be aliased.
+
+void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
+
+    Sets the value of \code{dest} to that of the \code{mpq_t} variable
+    \code{src}.
+
+void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
+
+    Sets the value of \code{dest}
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+void fmpq_print(const fmpq_t x)
+
+    Prints \code{x} as a fraction. The numerator and denominator are
+    printed verbatim as integers, with a forward slash (/) printed in
+    between.
+
+void _fmpq_print(fmpz_t num, fmpz_t den)
+
+    Does the same thing as \code{fmpq_print}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables. 
+
+*******************************************************************************
+
+    Random number generation
+
+*******************************************************************************
+
+void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+
+    Sets \code{res} to a random value, with numerator and denominator
+    having up to \code{bits} bits. The fraction will be in canonical
+    form. This function has an increased probability of generating
+    special values which are likely to trigger corner cases.
+
+void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state,
+    mp_bitcnt_t bits)
+
+    Does the same thing as \code{fmpq_randtest}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables. Aliasing
+    of \code{num} and \code{den} is not allowed.
+
+void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+
+    Sets \code{res} to a random value, with numerator and denominator
+    both having exactly \code{bits} bits before canonicalisation,
+    and then puts \code{res} in canonical form. Note that as a result
+    of the canonicalisation, the resulting numerator and denominator can
+    be slightly slightly smaller than \code{bits} bits.
+
+void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state,
+        mp_bitcnt_t bits)
+
+    Does the same thing as \code{fmpq_randbits}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables. Aliasing
+    of \code{num} and \code{den} is not allowed.
 
 
 *******************************************************************************
@@ -33,11 +174,59 @@
 *******************************************************************************
 
 
+void fmpq_add(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
+void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+    Sets \code{res} respectively to \code{op1 + op2}, \code{op1 - op2}
+    or \code{op1 * op2}, placing the result in canonical form. Aliasing
+    between any combination of the variables is allowed.
+
+void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
+void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
+void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
+    Sets \code{(rnum, rden)} to the canonical form of the sum,
+    difference or product respectively of the fractions represented by
+    \code{(op1num, op1den)} and \code{(op1num, op1den)}.
+    Aliasing between any combination of the variables is allowed,
+    as long as no numerator is aliased with a denominator.
+
+void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+    Sets \code{res} to \code{res + op1 * op2} or \code{res - op1 * op2}
+    respectively, placing the result in canonical form. Aliasing
+    between any combination of the variables is allowed.
+
+void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
+void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
+    Sets \code{(rnum, rden)} to the canonical form of the fraction
+    \code{(rnum, rden)} + \code{(op1num, op1den)} * \code{(op1num, op1den)} or
+    \code{(rnum, rden)} - \code{(op1num, op1den)} * \code{(op1num, op1den)}
+    respectively. Aliasing between any combination of the variables is allowed,
+    as long as no numerator is aliased with a denominator.
+
+void fmpq_inv(fmpq_t dest, const fmpq_t src)
+
+    Sets \code{dest} to \code{1 / src}. The result is placed in canonical
+    form, assuming that \code{src} is already in reduced to lowest terms.
 
 *******************************************************************************
 
-    Rational reconstruction
+    Modular evaluation and rational reconstruction
 
 *******************************************************************************
 
@@ -50,7 +239,6 @@ int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
     defined as the $0 \ge a < m$ satisfying $n \equiv a d \pmod m$.
     If such an $a$ exists, 1 will be returned, otherwise 0 will
     be returned.
-
 
 int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a,
     const fmpz_t m)

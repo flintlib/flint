@@ -42,4 +42,10 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
     tmp = dest->num;
     dest->num = dest->den;
     dest->den = tmp;
+
+    if (fmpz_sgn(&dest->den) < 0)
+    {
+        fmpz_neg(&dest->den, &dest->den);
+        fmpz_neg(&dest->num, &dest->num);
+    }
 }
