@@ -65,7 +65,8 @@ _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
             }
         }
 
-        fmpz_set(den + i, lcm);
+        if (den != NULL)
+            fmpz_set(den + i, lcm);
 
         for (k = 0; k < n; k++)
         {
