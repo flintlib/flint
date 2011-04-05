@@ -1,0 +1,182 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Context
+
+*******************************************************************************
+
+    Assumes that $N \geq 1$.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void padic_init(padic_t rop, const padic_ctx_t ctx)
+
+    Initialises the $p$-adic number \code{rop}.
+
+void padic_clear(padic_t rop, const padic_ctx_t ctx)
+
+    Clears all memory used by the $p$-adic number \code{rop}.
+
+void padic_normalise(padic_t rop, const padic_ctx_t ctx)
+
+    Ensures that $v < N$, and that $0 \leq u < p^{N - v}$, 
+    and that $u$, if non-zero, is not divisible by $p$.
+
+    If $v \geq N$, sets $u = 0$, $v = 0$.  If $u = 0$, sets 
+    $v = 0$.  Thus, the unique value of zero is $(u, v) = (0, 0)$.
+
+void _padic_reduce_unit(padic_t rop, const padic_ctx_t ctx)
+
+    Given a padic number $x = u p^v$ modulo $p^N$, where $u$ is a $p$-adic 
+    unit not necessarily contained in the range $[1, p^{N - v})$, sets $u$ 
+    to the unique representative in this range.
+
+    Asserts that $v < N$.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
+
+    Sets \code{rop} to a random $p$-adic integer reduced modulo $p^N$.
+
+void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
+                             const padic_ctx_t ctx);
+
+    Sets \code{rop} to a random non-zero $p$-adic integer reduced
+    modulo $p^N$.
+
+*******************************************************************************
+
+    Assignment
+
+*******************************************************************************
+
+void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets \code{rop} to a copy of \code{op}.
+
+void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to the \code{long} integer \code{op}.
+
+void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to the \code{unsigned long} 
+    integer \code{op}.
+
+void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to the integer \code{op}.
+
+void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
+
+    Swaps the two $p$-adic numbers \code{op1} and \code{op2}.
+
+void padic_zero(padic_t rop, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to zero.
+
+void padic_one(padic_t rop, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to one.
+
+*******************************************************************************
+
+    Arithmetic operations
+
+*******************************************************************************
+
+void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
+               const padic_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
+               const padic_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the additive inverse of \code{op} 
+    modulo $p^N$.
+
+void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
+               const padic_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and 
+    \code{op2} modulo $p^N$.
+
+void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
+               const padic_ctx_t ctx)
+
+    Sets \code{rop} to the quotient of \code{op1} and \code{op2}.
+
+void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the inverse of \code{op}.
+
+    We compute the inverse of $x = u p^{v}$ modulo $p^N$ as 
+    $x^{-1} = u^{-1} p^{-v}$ with $u^{-1}$ reduced modulo 
+    $p^{v + N}$, where for units $u$ we compute the 
+    inverse as follows:
+
+    If $v \geq 0$ then invert $u$ modulo $p^{N + v}$. 
+    Otherwise, if $v < 0$, first reduce $u$ modulo $p^{N + v}$ 
+    and then invert this.
+
+void padic_pow_si(padic_t rop, const padic_t op, long e, 
+                  const padic_ctx_t ctx)
+
+    Sets \code{rop} to \code{op} raised to the power $e$.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int padic_is_zero(const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether \code{op} is zero modulo $p^N$.
+
+int padic_is_one(const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether \code{op} is one modulo $p^N$.
+
+int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
+
+    Returns whether \code{op1} and \code{op2} are equal modulo $p^N$.
+
