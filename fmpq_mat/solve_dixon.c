@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -32,39 +31,25 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_solve_mat(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+void
+fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 {
-    long i, j;
+    fmpz_mat_t Anum;
+    fmpz_mat_t Bnum;
+    fmpz_mat_t Xnum;
+    fmpz_t mod;
 
-    fmpz_mat_t Aclear;
-    fmpz_mat_t Bclear;
-    fmpz_mat_t Xclear;
+    fmpz_mat_init(Anum, A->r, A->c);
+    fmpz_mat_init(Bnum, B->r, B->c);
+    fmpz_mat_init(Xnum, B->r, B->c);
+    fmpz_init(mod);
 
-    fmpz * den;
+    fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
+    fmpz_mat_solve_dixon(Xnum, mod, Anum, Bnum);
+    fmpq_mat_set_fmpz_mat_mod_fmpz(X, Xnum, mod);
 
-    fmpz_mat_init(Aclear, A->r, A->c);
-    fmpz_mat_init(Bclear, B->r, B->c);
-    fmpz_mat_init(Xclear, B->r, B->c);
-
-    den = _fmpz_vec_init(A->r);
-
-    fmpq_mat_get_fmpz_mat_rowwise_2(Aclear, Bclear, den, A, B);
-
-    fmpz_mat_solve_mat(Xclear, den, Aclear, Bclear);
-
-    for (i = 0; i < B->r; i++)
-    {
-        for (j = 0; j < B->c; j++)
-        {
-            fmpz_set(fmpq_mat_entry_num(X, i, j), fmpz_mat_entry(Xclear, i, j));
-            fmpz_set(fmpq_mat_entry_den(X, i, j), den);
-            fmpq_canonicalise(fmpq_mat_entry(X, i, j));
-        }
-    }
-
-    fmpz_mat_clear(Aclear);
-    fmpz_mat_clear(Bclear);
-    fmpz_mat_clear(Xclear);
-
-    _fmpz_vec_clear(den, A->r);
+    fmpz_mat_clear(Anum);
+    fmpz_mat_clear(Bnum);
+    fmpz_mat_clear(Xnum);
+    fmpz_clear(mod);
 }

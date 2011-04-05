@@ -75,8 +75,12 @@ void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A, const fmpz_mat_t B)
 void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A, const fmpq_mat_t B);
 
 void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat);
-void fmpq_mat_solve_mat(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
+void fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+void fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+
+void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src);
+void fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod, const fmpz_t div);
 int fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X, const fmpz_mat_t Xmod, const fmpz_t mod);
 
 void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);

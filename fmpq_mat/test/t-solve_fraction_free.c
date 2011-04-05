@@ -37,7 +37,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("solve_mat....");
+    printf("solve_fraction_free....");
     fflush(stdout);
 
     for (i = 0; i < 1000; i++)
@@ -57,19 +57,19 @@ main(void)
         fmpq_mat_init(AX, n, m);
 
         fmpq_init(d);
-
         /* XXX: replace with a randtest function */
         do {
             fmpq_mat_randtest(A, state, bits);
             fmpq_mat_det(d, A);
         } while (fmpq_is_zero(d));
-
         fmpq_clear(d);
 
-        fmpq_mat_solve_mat(X, A, B);
+        fmpq_mat_randtest(B, state, bits);
+
+        fmpq_mat_solve_fraction_free(X, A, B);
         fmpq_mat_mul(AX, A, X);
 
-        if (!fmpq_mat_equal(AX, X))
+        if (!fmpq_mat_equal(AX, B))
         {
             printf("FAIL!\n");
             printf("A:\n");
