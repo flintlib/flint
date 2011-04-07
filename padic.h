@@ -158,7 +158,19 @@ char * padic_get_str(const padic_t op, const padic_ctx_t ctx);
 
 int padic_set_str(padic_t rop, const char *str, const padic_ctx_t ctx);
 
-int padic_print(const padic_t op, const padic_ctx_t ctx);
+int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
+
+static __inline__
+int padic_print(const padic_t op, const padic_ctx_t ctx)
+{
+    return padic_fprint(stdout, op, ctx);
+}
+
+static __inline__
+void padic_debug(const padic_t op, const padic_ctx_t ctx)
+{
+    printf("[u = "), fmpz_print(op), printf(", v = %ld]", op[1]);
+}
 
 #endif
 

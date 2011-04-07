@@ -2,7 +2,9 @@
 
 void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 {
-    rop[1] = n_randint(state, ctx->N);
+    long min = - (ctx->N / 10), max = ctx->N - 1;
+
+    rop[1] = n_randint(state, max - min + 1) + min;
 
     /* TODO:  Faster powering */
     {

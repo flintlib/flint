@@ -29,7 +29,18 @@
 
 *******************************************************************************
 
-    Assumes that $N \geq 1$.
+void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N, 
+                    enum padic_print_mode mode)
+
+    Initialises the context \code{ctx} with prime $p$, precision $N$, and 
+    printing mode.
+
+    Assumes that $p$ is a prime, that $N \geq 1$, and that printing mode is 
+    one of \code{PADIC_TERSE}, \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
+
+void padic_ctx_clear(padic_ctx_t ctx);
+
+    Clears all memory that has been allocated as part of the context.
 
 *******************************************************************************
 
@@ -69,13 +80,13 @@ void _padic_reduce_unit(padic_t rop, const padic_ctx_t ctx)
 
 void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
-    Sets \code{rop} to a random $p$-adic integer reduced modulo $p^N$.
+    Sets \code{rop} to a random $p$-adic number modulo $p^N$ with valuation 
+    in the range $[- N / 10, N)$, or zero.
 
 void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
-                             const padic_ctx_t ctx);
+                             const padic_ctx_t ctx)
 
-    Sets \code{rop} to a random non-zero $p$-adic integer reduced
-    modulo $p^N$.
+    Sets \code{rop} to a random non-zero $p$-adic number modulo $p^N$.
 
 *******************************************************************************
 
@@ -123,15 +134,21 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
 
     Sets \code{rop} to the sum of \code{op1} and \code{op2}.
 
+    This operation is exact modulo $p^N$.
+
 void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
     Sets \code{rop} to the difference of \code{op1} and \code{op2}.
 
+    This operation is exact modulo $p^N$.
+
 void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to the additive inverse of \code{op} 
     modulo $p^N$.
+
+    This operation is exact modulo $p^N$.
 
 void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
@@ -179,4 +196,37 @@ int padic_is_one(const padic_t op, const padic_ctx_t ctx)
 int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal modulo $p^N$.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+char * padic_get_str(const padic_t op, const padic_ctx_t ctx)
+
+    Returns the string representation of the $p$-adic number \code{op}, 
+    according to the printing mode set in the context.
+
+int padic_set_str(padic_t rop, const char *str, const padic_ctx_t ctx)
+
+    TODO.
+
+int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
+
+    Prints the string representation of the $p$-adic number \code{op} 
+    to the stream \code{file}.
+
+    In the current implementation, always returns $1$.
+
+int padic_print(const padic_t op, const padic_ctx_t ctx)
+
+    Prints the string representation of the $p$-adic number \code{op} 
+    to the stream \code{stdout}.
+
+    In the current implementation, always returns $1$.
+
+void padic_debug(const padic_t op, const padic_ctx_t ctx)
+
+    Prints debug information about \code{op} to the stream \code{stdout}.
 
