@@ -15,7 +15,7 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
         return;
     }
 
-    /* TODO:  Deal with aliasing */
+    /* Aliasing */
     if (rop == op1 || rop == op2)
     {
         padic_t t;
@@ -27,12 +27,13 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
         return;
     }
 
-    if (op1[1] > op2[1])  /* u1 p^v1 - u2 p^v2 = p^{v2} (u1 p^{v1 - v2} - u2) */
+    if (op1[1] > op2[1])
     {
+        /* u1 p^v1 - u2 p^v2 = p^v2 (u1 p^{v1-v2} - u2) */
         fmpz_t pow;
 
         fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, op1[1] - op2[2]);
+        fmpz_pow_ui(pow, ctx->p, op1[1] - op2[1]);
         fmpz_neg(rop, op2);
         fmpz_addmul(rop, op1, pow);
         fmpz_clear(pow);
@@ -41,8 +42,9 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
 
         _padic_reduce_unit(rop, ctx);
     }
-    else if (op1[1] < op2[1])  /* u1 p^v1 - u2 p^v2 = p^{v1} (u1 - u2 p^{v2 - v1}) */
+    else if (op1[1] < op2[1])
     {
+        /* u1 p^v1 - u2 p^v2 = p^v1 (u1 - u2 p^{v2-v1}) */
         fmpz_t pow;
 
         fmpz_init(pow);
