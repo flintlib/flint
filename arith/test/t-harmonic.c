@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -29,84 +29,122 @@
 #include <mpir.h>
 #include "flint.h"
 #include "arith.h"
+#include "fmpz.h"
+#include "fmpq.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 
 
-void numerical_test(mpq_t res, long n, double ans)
+void numerical_test(fmpq_t res, long n, double ans)
 {
     const double tol = 1e-13;
     double err;
 
-    mpq_harmonic(res, n);
-    err = mpq_get_d(res) - ans;
+    mpq_t tmp;
+    mpq_init(tmp);
+
+    harmonic_number(res, n);
+    fmpq_get_mpq(tmp, res);
+    err = mpq_get_d(tmp) - ans;
     err = FLINT_ABS(err);
 
     if (err > tol)
     {
-        printf("FAIL: %ld %.16f %.16f\n", n, mpq_get_d(res), ans);
+        printf("FAIL: %ld %.16f %.16f\n", n, mpq_get_d(tmp), ans);
         abort();
     }
+
+    mpq_clear(tmp);
 }
+
+void
+mpq_harmonic_balanced(mpq_t res, long a, long b)
+{
+    long k;
+    mpq_t t;
+
+    mpq_init(t);
+
+    if (b - a < 50)
+    {
+        mpq_set_ui(res, 0, 1UL);
+        for (k = a; k <= b; k++)
+        {
+            mpq_set_ui(t, 1UL, k);
+            mpq_add(res, res, t);
+        }
+    }
+    else
+    {
+        mpq_harmonic_balanced(res, a, (a+b)/2);
+        mpq_harmonic_balanced(t, (a+b)/2+1, b);
+        mpq_add(res, res, t);
+    }
+
+    mpq_clear(t);
+}
+
 
 int main(void)
 {
     long i;
-    mpq_t x, y, z;
+    mpq_t x, y;
+    fmpq_t t;
 
-    printf("harmonic....");
+    printf("harmonic_number....");
     fflush(stdout);
 
+    fmpq_init(t);
     mpq_init(x);
     mpq_init(y);
-    mpq_init(z);
 
     for (i = -2; i < 1000; i++)
     {
-        _mpq_harmonic_odd_balanced(x, i);
-        _mpq_harmonic_balanced(y, 1, i);
-        mpq_harmonic(z, i);
-        if (!mpq_equal(x, y) || !mpq_equal(x, z))
+        mpq_harmonic_balanced(x, 1, i);
+        harmonic_number(t, i);
+        fmpq_get_mpq(y, t);
+
+        if (!mpq_equal(x, y))
         {
             printf("FAIL: %ld\n", i);
             abort();
         }
     }
 
-    numerical_test(x, 1000, 7.4854708605503449127);
-    numerical_test(x, 1001, 7.4864698615493459117);
-    numerical_test(x, 1002, 7.4874678655413618797);
-    numerical_test(x, 1003, 7.4884648745144426375);
+    numerical_test(t, 1000, 7.4854708605503449127);
+    numerical_test(t, 1001, 7.4864698615493459117);
+    numerical_test(t, 1002, 7.4874678655413618797);
+    numerical_test(t, 1003, 7.4884648745144426375);
 
-    numerical_test(x, 10000, 9.7876060360443822642);
-    numerical_test(x, 10001, 9.7877060260453821642);
-    numerical_test(x, 10002, 9.7878060060493813643);
-    numerical_test(x, 10003, 9.7879059760583786652);
-    numerical_test(x, 10004, 9.7880059360743722677);
+    numerical_test(t, 10000, 9.7876060360443822642);
+    numerical_test(t, 10001, 9.7877060260453821642);
+    numerical_test(t, 10002, 9.7878060060493813643);
+    numerical_test(t, 10003, 9.7879059760583786652);
+    numerical_test(t, 10004, 9.7880059360743722677);
 
-    numerical_test(x, 20000, 10.480728217229327573);
-    numerical_test(x, 30000, 10.886184992119899362);
-    numerical_test(x, 40000, 11.173862897945522882);
-    numerical_test(x, 50000, 11.397003949278482638);
-    numerical_test(x, 60000, 11.579323839415955783);
-    numerical_test(x, 70000, 11.733473328773164956);
-    numerical_test(x, 80000, 11.867003828544530692);
-    numerical_test(x, 90000, 11.984786169759202469);
+    numerical_test(t, 20000, 10.480728217229327573);
+    numerical_test(t, 30000, 10.886184992119899362);
+    numerical_test(t, 40000, 11.173862897945522882);
+    numerical_test(t, 50000, 11.397003949278482638);
+    numerical_test(t, 60000, 11.579323839415955783);
+    numerical_test(t, 70000, 11.733473328773164956);
+    numerical_test(t, 80000, 11.867003828544530692);
+    numerical_test(t, 90000, 11.984786169759202469);
 
-    numerical_test(x, 100000, 12.090146129863427947);
-    numerical_test(x, 100001, 12.090156129763428947);
-    numerical_test(x, 100002, 12.090166129563432947);
-    numerical_test(x, 100003, 12.090176129263441947);
-    numerical_test(x, 100004, 12.090186128863457946);
+    numerical_test(t, 100000, 12.090146129863427947);
+    numerical_test(t, 100001, 12.090156129763428947);
+    numerical_test(t, 100002, 12.090166129563432947);
+    numerical_test(t, 100003, 12.090176129263441947);
+    numerical_test(t, 100004, 12.090186128863457946);
 
-    numerical_test(x, 300000, 13.188755085205611713);
-    numerical_test(x, 500000, 13.699580042305528322);
-    numerical_test(x, 700000, 14.036051993212618803);
-    numerical_test(x, 900000, 14.287366262763433338);
+    numerical_test(t, 300000, 13.188755085205611713);
+    numerical_test(t, 500000, 13.699580042305528322);
+    numerical_test(t, 700000, 14.036051993212618803);
+    numerical_test(t, 900000, 14.287366262763433338);
 
     mpq_clear(x);
     mpq_clear(y);
-    mpq_clear(z);
+    fmpq_clear(t);
 
     printf("PASS\n");
     return 0;

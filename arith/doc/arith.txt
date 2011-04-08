@@ -78,15 +78,21 @@ void fmpz_primorial(fmpz_t res, long n)
 
 *******************************************************************************
 
-void mpq_harmonic(mpq_t res, long n)
+void _harmonic_number(fmpz_t num, fmpz_t den, long n)
 
-    Sets $res$ to the $n$th harmonic number 
-    $H_n = 1 + 1/2 + 1/3 + \dotsb + 1/n$.
-    The result is zero if $n \leq 0$.
+    Sets \code{(num, den)} to the reduced numerator and denominator of
+    the $n$-th harmonic number $H_n = 1 + 1/2 + 1/3 + \dotsb + 1/n$. The
+    result is zero if $n \leq 0$.
 
-    Table lookup is used for $H_n$ whose numerator and denomator 
-    fit in single limb. For larger $n$, the function 
+    Table lookup is used for $H_n$ whose numerator and denominator 
+    fit in single limb. For larger $n$, the function
     \code{mpn_harmonic_odd_balanced()} is used.
+
+void harmonic_number(fmpq_t x, long n)
+
+    Sets \code{x} to the $n$-th harmonic number. This function is
+    equivalent to \code{_harmonic_number} apart from the output
+    being a single \code{fmpq_t} variable.
 
 *******************************************************************************
 
@@ -218,19 +224,32 @@ void _bell_number_vec_multi_mod(fmpz * b, long n)
 
 *******************************************************************************
 
-void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+void _bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 
     Sets \code{(num, den)} to the reduced numerator and denominator
     of the $n$-th Bernoulli number. As presently implemented,
     this function simply calls \code{_bernoulli_number_zeta}.
 
-void bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+void bernoulli_number(fmpq_t x, ulong n)
+
+    Sets \code{x} to the $n$-th Bernoulli number. This function is
+    equivalent to \code{_bernoulli_number} apart from the output
+    being a single \code{fmpq_t} variable.
+
+void _bernoulli_number_vec(fmpz * num, fmpz * den, long n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of the Bernoulli numbers
     $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive. This function automatically
     chooses between the \code{recursive}, \code{zeta} and \code{multi_mod}
     algorithms according to the size of $n$.
+
+void bernoulli_number_vec(fmpq * x, long n)
+
+    Sets the \code{x} to the vector of Bernoulli numbers
+    $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive. This function is
+    equivalent to \code{_bernoulli_number_vec} apart
+    from the output being a single \code{fmpq} vector.
 
 void bernoulli_number_denom(fmpz_t den, ulong n)
 

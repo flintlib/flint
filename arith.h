@@ -32,6 +32,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
+#include "fmpq.h"
 
 typedef struct
 {
@@ -67,10 +68,8 @@ void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 int fmpz_moebius_mu(const fmpz_t n);
 void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 
-void _mpq_harmonic_tiny(mpq_t res, long n);
-void _mpq_harmonic_balanced(mpq_t res, long a, long b);
-void _mpq_harmonic_odd_balanced(mpq_t res, long n);
-void mpq_harmonic(mpq_t res, long n);
+void _harmonic_number(fmpz_t num, fmpz_t den, long n);
+void harmonic_number(fmpq_t x, long n);
 
 void _fmpz_stirling2_powsum(fmpz_t s, long n, long k);
 void _fmpz_stirling2_powsum_odd(fmpz_t , long n, long k);
@@ -170,9 +169,13 @@ static const long _bernoulli_numer_small[] = {
 #endif
 };
 
-void bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
+void _bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
 
-void bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+void bernoulli_number(fmpq_t x, ulong n);
+
+void _bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+
+void bernoulli_number_vec(fmpq * num, long n);
 
 void bernoulli_number_denom(fmpz_t den, ulong n);
 

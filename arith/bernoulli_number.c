@@ -28,9 +28,14 @@
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
+#include "fmpq.h"
 
-void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+void _bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 {
     _bernoulli_number_zeta(num, den, n);
+}
+
+void bernoulli_number(fmpq_t x, ulong n)
+{
+    _bernoulli_number(fmpq_numref(x), fmpq_denref(x), n);
 }

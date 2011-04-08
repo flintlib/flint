@@ -33,7 +33,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpq_poly.h"
-
+#include "fmpq.h"
 
 int main()
 {
@@ -57,7 +57,7 @@ int main()
 
     for (n = 0; n < N; n++)
     {
-        bernoulli_number(num2, den2, n);
+        _bernoulli_number(num2, den2, n);
 
         if (!fmpz_equal(num1 + n, num2))
         {
@@ -75,6 +75,37 @@ int main()
             abort();
         }
     }
+
+    /* Check non underscore versions */
+    do
+    {
+        long N = 100;
+        fmpq * x;
+        fmpq_t t;
+
+        fmpq_init(t);
+        x = malloc(sizeof(fmpq) * N);
+
+        for (n = 0; n < N; n++)
+            fmpq_init(x + n);
+
+        bernoulli_number_vec(x, N);
+        for (n = 0; n < N; n++)
+        {
+            bernoulli_number(t, n);
+            if (!fmpq_equal(x + n, t))
+            {
+                printf("FAIL!: n = %ld\n", n);
+                abort();
+            }
+        }
+
+        for (n = 0; n < N; n++)
+            fmpq_clear(x + n);
+        free(x);
+        fmpq_clear(t);
+
+    } while (0);
 
     _fmpz_vec_clear(num1, N);
     _fmpz_vec_clear(den1, N);

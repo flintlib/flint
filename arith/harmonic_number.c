@@ -69,39 +69,8 @@ const mp_limb_t FLINT_HARMONIC_TINY_Q[] =
 #endif
 };
 
-void _mpq_harmonic_tiny(mpq_t res, long n)
-{
-    n = FLINT_MAX(n, 0);
-    mpq_set_ui(res, FLINT_HARMONIC_TINY_P[n], FLINT_HARMONIC_TINY_Q[n]);
-}
-
-void _mpq_harmonic_balanced(mpq_t res, long a, long b)
-{
-    long k;
-    mpq_t t;
-
-    mpq_init(t);
-
-    if (b - a < 50)
-    {
-        mpq_set_ui(res, 0, 1UL);
-        for (k = a; k <= b; k++)
-        {
-            mpq_set_ui(t, 1UL, k);
-            mpq_add(res, res, t);
-        }
-    }
-    else
-    {
-        _mpq_harmonic_balanced(res, a, (a+b)/2);
-        _mpq_harmonic_balanced(t, (a+b)/2+1, b);
-        mpq_add(res, res, t);
-    }
-
-    mpq_clear(t);
-}
-
-void _mpq_harmonic_odd_balanced(mpq_t res, long n)
+static void
+_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
 {
     mpz_t p, q;
 
@@ -111,7 +80,8 @@ void _mpq_harmonic_odd_balanced(mpq_t res, long n)
 
     if (n <= 0)
     {
-        mpq_set_ui(res, 0UL, 1UL);
+        fmpz_zero(num);
+        fmpz_set_ui(den, 1UL);
         return;
     }
 
@@ -128,19 +98,31 @@ void _mpq_harmonic_odd_balanced(mpq_t res, long n)
     p->_mp_size = ts;
     q->_mp_size = vs;
 
-    mpq_set_num(res, p);
-    mpq_set_den(res, q);
+    fmpz_set_mpz(num, p);
+    fmpz_set_mpz(den, q);
 
     mpz_clear(p);
     mpz_clear(q);
 
-    mpq_canonicalize(res);
+    _fmpq_canonicalise(num, den);
 }
 
-void mpq_harmonic(mpq_t res, long n)
+void _harmonic_number(fmpz_t num, fmpz_t den, long n)
 {
+    n = FLINT_MAX(n, 0);
+
     if (n <= FLINT_HARMONIC_MAX_TINY)
-        _mpq_harmonic_tiny(res, n);
+    {
+        fmpz_set_ui(num, FLINT_HARMONIC_TINY_P[n]);
+        fmpz_set_ui(den, FLINT_HARMONIC_TINY_Q[n]);
+    }
     else
-        _mpq_harmonic_odd_balanced(res, n);
+    {
+        _mpq_harmonic_odd_balanced(num, den, n);
+    }
+}
+
+void harmonic_number(fmpq_t x, long n)
+{
+    _harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
 }

@@ -39,6 +39,9 @@ fmpq;
 
 typedef fmpq fmpq_t[1];
 
+#define fmpq_numref(__x) (&(__x)->num)
+#define fmpq_denref(__y) (&(__y)->den)
+
 
 static __inline__ void fmpq_init(fmpq_t x)
 {
@@ -48,30 +51,31 @@ static __inline__ void fmpq_init(fmpq_t x)
 
 static __inline__ void fmpq_clear(fmpq_t x)
 {
-    fmpz_clear(&x->num);
-    fmpz_clear(&x->den);
+    fmpz_clear(fmpq_numref(x));
+    fmpz_clear(fmpq_denref(x));
 }
 
 static __inline__ void fmpq_zero(fmpq_t res)
 {
-    fmpz_zero(&res->num);
-    fmpz_set_ui(&res->den, 1UL);
+    fmpz_zero(fmpq_numref(res));
+    fmpz_set_ui(fmpq_denref(res), 1UL);
 }
 
 static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)
 {
-    return fmpz_equal(&x->num, &y->num) && fmpz_equal(&x->den, &y->den);
+    return fmpz_equal(fmpq_numref(x), fmpq_numref(y)) &&
+           fmpz_equal(fmpq_denref(x), fmpq_denref(y));
 }
 
 static __inline__ int fmpq_is_zero(const fmpq_t x)
 {
-    return fmpz_is_zero(&x->num);
+    return fmpz_is_zero(fmpq_numref(x));
 }
 
 static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
-    fmpz_set(&dest->num, &src->num);
-    fmpz_set(&dest->den, &src->den);
+    fmpz_set(fmpq_numref(dest), fmpq_numref(src));
+    fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
@@ -90,14 +94,14 @@ void fmpq_set_si(fmpq_t res, long p, ulong q);
 
 static __inline__ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 {
-    fmpz_set_mpz(&dest->num, mpq_numref(src));
-    fmpz_set_mpz(&dest->den, mpq_denref(src));
+    fmpz_set_mpz(fmpq_numref(dest), mpq_numref(src));
+    fmpz_set_mpz(fmpq_denref(dest), mpq_denref(src));
 }
 
 static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 {
-    fmpz_get_mpz(mpq_numref(dest), &src->num);
-    fmpz_get_mpz(mpq_denref(dest), &src->den);
+    fmpz_get_mpz(mpq_numref(dest), fmpq_numref(src));
+    fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
 void _fmpq_print(fmpz_t num, fmpz_t den);

@@ -29,8 +29,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "arith.h"
+#include "fmpq.h"
 
-void bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+void _bernoulli_number_vec(fmpz * num, fmpz * den, long n)
 {
     if (n < 700)
         _bernoulli_number_vec_recursive(num, den, n);
@@ -39,3 +40,26 @@ void bernoulli_number_vec(fmpz * num, fmpz * den, long n)
     else
         _bernoulli_number_vec_multi_mod(num, den, n);
 }
+
+void bernoulli_number_vec(fmpq * x, long n)
+{
+    fmpz * num, * den;
+    long i;
+
+    if (n <= 0)
+        return;
+
+    num = _fmpz_vec_init(n * 2);
+    den = num + n;
+
+    _bernoulli_number_vec(num, den, n);
+
+    for (i = 0; i < n; i++)
+    {
+        fmpz_swap(num + i, fmpq_numref(x + i));
+        fmpz_swap(den + i, fmpq_denref(x + i));
+    }
+
+    _fmpz_vec_clear(num, n * 2);
+}
+

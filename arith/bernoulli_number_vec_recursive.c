@@ -158,13 +158,13 @@ void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
 
     /* Initial values */
     for (i = 0; i < start; i += 2)
-        bernoulli_number(num + i, den + i, i);
+        _bernoulli_number(num + i, den + i, i);
 
     __ramanujan_even_common_denom(num, den, start, n);
 
     /* Odd values */
     for (i = 1; i < n; i += 2)
-        bernoulli_number(num + i, den + i, i);
+        _bernoulli_number(num + i, den + i, i);
 
     fmpz_clear(d);
     fmpz_clear(t);

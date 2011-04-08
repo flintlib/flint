@@ -48,7 +48,7 @@ void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     fmpz_init(t);
     den = _fmpz_vec_init(n + 1);
 
-    bernoulli_number_vec(poly->coeffs, den, n + 1);
+    _bernoulli_number_vec(poly->coeffs, den, n + 1);
 
     /* Multiply the odd term by binomial(n,1) = n */
     fmpz_mul_ui(poly->coeffs + 1, poly->coeffs + 1, n);
