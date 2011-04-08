@@ -23,6 +23,7 @@
     Copyright (C) 1991, 1992, 1993, 1994, 1996, 1997, 1999, 2000, 2001, 
                   2002, 2003, 2004, 2005 Free Software Foundation, Inc.
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -76,6 +77,11 @@ add_ssaaaa(high_sum, low_sum, high_addend_1, low_addend_1,
     respectively.  The result is placed in \code{HIGH_SUM} and 
     \code{LOW_SUM}.  Overflow, i.e.\ carry out, is not stored anywhere, 
     and is lost.
+
+add_sssaaaaaa(high_sum, mid_sum, low_sum, high_addend_1, mid_addend_1,
+            low_addend_1, high_addend_2, mid_addend_2, low_addend_2)
+
+    Adds two three limb integers. Carry out is lost.
 
 sub_ddmmss(high_difference, low_difference, high_minuend, low_minuend,
                                             high_subtrahend, low_subtrahend) 

@@ -53,7 +53,6 @@ _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n,
     int size;
     long i, j;
     register mp_limb_t s0, s1, s2;
-    register mp_limb_t c1, c2;
     register mp_limb_t t0, t1;
 
     size = bound_size(n, mod.n - 1);
@@ -83,9 +82,7 @@ _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n,
                 for (j = 0; j < i; j++)
                 {
                     umul_ppmm(t1, t0, LU[i][j], b[j]);
-                    add_ssaaaa(c1, s0, (mp_limb_t) 0, s0, (mp_limb_t) 0, t0);
-                    add_ssaaaa(c2, s1, (mp_limb_t) 0, s1, (mp_limb_t) 0, t1);
-                    add_ssaaaa(s2, s1, s2, s1, c2, c1);
+                    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
                 }
                 NMOD_RED(s2, s2, mod);
                 NMOD_RED3(s0, s2, s1, s0, mod);
@@ -120,9 +117,7 @@ _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n,
                 for (j = i + 1; j < n; j++)
                 {
                     umul_ppmm(t1, t0, LU[i][j], b[j]);
-                    add_ssaaaa(c1, s0, (mp_limb_t) 0, s0, (mp_limb_t) 0, t0);
-                    add_ssaaaa(c2, s1, (mp_limb_t) 0, s1, (mp_limb_t) 0, t1);
-                    add_ssaaaa(s2, s1, s2, s1, c2, c1);
+                    add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
                 }
                 NMOD_RED(s2, s2, mod);
                 NMOD_RED3(s0, s2, s1, s0, mod);

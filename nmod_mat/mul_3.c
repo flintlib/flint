@@ -28,6 +28,7 @@
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
+#include "longlong.h"
 
 
 void
@@ -37,7 +38,6 @@ _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     register mp_limb_t s0, s1, s2;
     register mp_limb_t t0, t1;
-    register mp_limb_t c1, c2;
 
     for (i = 0; i < A->r; i++)
     {
@@ -48,9 +48,7 @@ _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             for (k = 0; k < A->c; k++)
             {
                 umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
-                add_ssaaaa(c1, s0, (mp_limb_t) 0, s0, (mp_limb_t) 0, t0);
-                add_ssaaaa(c2, s1, (mp_limb_t) 0, s1, (mp_limb_t) 0, t1);
-                add_ssaaaa(s2, s1, s2, s1, c2, c1);
+                add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
             }
 
             NMOD_RED(s2, s2, C->mod);
@@ -67,7 +65,6 @@ _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     register mp_limb_t s0, s1, s2;
     register mp_limb_t t0, t1;
-    register mp_limb_t c1, c2;
 
     for (i = 0; i < A->r; i++)
     {
@@ -78,9 +75,7 @@ _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
             for (k = 0; k < A->c; k++)
             {
                 umul_ppmm(t1, t0, A->rows[i][k], B->rows[j][k]);
-                add_ssaaaa(c1, s0, (mp_limb_t) 0, s0, (mp_limb_t) 0, t0);
-                add_ssaaaa(c2, s1, (mp_limb_t) 0, s1, (mp_limb_t) 0, t1);
-                add_ssaaaa(s2, s1, s2, s1, c2, c1);
+                add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
             }
 
             NMOD_RED(s2, s2, C->mod);

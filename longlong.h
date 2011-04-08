@@ -3,6 +3,7 @@
    2004, 2005 Free Software Foundation, Inc.
 
    Copyright 2009 William Hart
+   Copyright 2011 Fredrik Johansson
 
    This file is free software; you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -29,6 +30,13 @@
 
 /* x86 : 64 bit */
 #if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__amd64__)) 
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
+  __asm__ ("addq %8,%q2\n\tadcq %6,%q1\n\tadcq %4,%q0"     \
+       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
+       : "0"  ((mp_limb_t)(ah)), "rme" ((mp_limb_t)(bh)),  \
+         "1"  ((mp_limb_t)(am)), "rme" ((mp_limb_t)(bm)),  \
+         "2"  ((mp_limb_t)(al)), "rme" ((mp_limb_t)(bl)))  \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)                 \
   __asm__ ("addq %5,%q1\n\tadcq %3,%q0"                    \
@@ -78,6 +86,13 @@
 
 /* x86 : 32 bit */
 #if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) || defined (__i486__) || defined(__amd64__)))
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
+  __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
+       : "=r" (sh), "=r" (sm), "=&r" (sl)                  \
+       : "0"  ((mp_limb_t)(ah)), "g" ((mp_limb_t)(bh)),    \
+         "1"  ((mp_limb_t)(am)), "g" ((mp_limb_t)(bm)),    \
+         "2"  ((mp_limb_t)(al)), "g" ((mp_limb_t)(bl)))    \
 
 #define add_ssaaaa(sh, sl, ah, al, bh, bl)               \
   __asm__ ("addl %5,%k1\n\tadcl %3,%k0"                  \
@@ -139,6 +154,14 @@
     __x = (al) + (bl);							\
     (sh) = (ah) + (bh) + (__x < (al));					\
     (sl) = __x;								\
+  } while (0)
+
+#define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
+  do {                                                              \
+    mp_limb_t __x, __y;                                             \
+    add_ssaaaa(__x, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
+    add_ssaaaa(__y, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
+    add_ssaaaa(sh, sm, sh, sm, __y, __x);                           \
   } while (0)
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
