@@ -31,10 +31,11 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-extern void _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, 
+void _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, 
                                                long klen, int kind);
 
-void _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
+static __inline__ void
+_fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 {
     if (parity % 2)
         fmpz_submul(s, t, u);
@@ -42,7 +43,8 @@ void _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
         fmpz_addmul(s, t, u);
 }
 
-void _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
+static void
+_fmpz_stirling2_powsum(fmpz_t s, long n, long k)
 {
     fmpz_t t, u;
     fmpz * bc;
@@ -88,7 +90,8 @@ void _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
     fmpz_clear(u);
 }
 
-void fmpz_stirling2(fmpz_t s, long n, long k)
+void
+stirling_number_2(fmpz_t s, long n, long k)
 {
     if (n < 0 || k < 0 || k > n)
     {
@@ -130,7 +133,7 @@ void fmpz_stirling2(fmpz_t s, long n, long k)
 }
 
 void
-fmpz_stirling2_vec(fmpz * row, long n, long klen)
+stirling_number_2_vec(fmpz * row, long n, long klen)
 {
     long m;
 

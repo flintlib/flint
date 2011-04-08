@@ -100,11 +100,11 @@ void harmonic_number(fmpq_t x, long n)
 
 *******************************************************************************
 
-void fmpz_stirling1u(fmpz_t s, long n, long k)
+void stirling_number_1u(fmpz_t s, long n, long k)
 
-void fmpz_stirling1(fmpz_t s, long n, long k)
+void stirling_number_1(fmpz_t s, long n, long k)
 
-void fmpz_stirling2(fmpz_t s, long n, long k)
+void stirling_number_2(fmpz_t s, long n, long k)
 
     Sets $s$ to $S(n,k)$ where $S(n,k)$ denotes an unsigned Stirling
     number of the first kind $\abs{S_1(n, k)}$, a signed Stirling number 
@@ -124,9 +124,9 @@ void fmpz_stirling2(fmpz_t s, long n, long k)
     numbers efficiently. To compute a range of numbers, the vector or 
     matrix versions should generally be used.
 
-void fmpz_stirling1u_vec(fmpz * row, long n, long klen)
-void fmpz_stirling1_vec(fmpz * row, long n, long klen)
-void fmpz_stirling2_vec(fmpz * row, long n, long klen)
+void stirling_number_1u(fmpz * row, long n, long klen)
+void stirling_number_1(fmpz * row, long n, long klen)
+void stirling_number_2(fmpz * row, long n, long klen)
 
     Computes the row of Stirling numbers
     \code{S(n,0), S(n,1), S(n,2), ..., S(n,klen-1)}.
@@ -134,9 +134,9 @@ void fmpz_stirling2_vec(fmpz * row, long n, long klen)
     To compute a full row, this function can be called with 
     \code{klen = n+1}. It is assumed that \code{klen} is at most $n + 1$.
 
-void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
-void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
-void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 
     Given the vector \code{prev} containing a row of Stirling numbers
     \code{S(n-1,0), S(n-1,1), S(n-1,2), ..., S(n-1,klen-2)}, computes
@@ -147,25 +147,22 @@ void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
     The \code{row} and \code{prev} arguments are permitted to be the 
     same, meaning that the row will be updated in-place.
 
-void fmpz_stirling1u_mat(fmpz ** rows, long n)
-void fmpz_stirling1_mat(fmpz ** rows, long n)
-void fmpz_stirling2_mat(fmpz ** rows, long n)
+void stirling_number_1u_mat(fmpz_mat_t mat)
+void stirling_number_1_mat(fmpz_mat_t mat)
+void stirling_number_2_mat(fmpz_mat_t mat)
 
-    Computes an $n$-by-$n$ matrix of Stirling numbers:
+    For an arbitrary $m$-by-$n$ matrix, writes the truncation of the
+    infinite Stirling number matrix 
+
     \begin{lstlisting}
     row 0   : S(0,0)
     row 1   : S(1,0), S(1,1)
     row 2   : S(2,0), S(2,1), S(2,2)
     row 3   : S(3,0), S(3,1), S(3,2), S(3,3)
-                  ...
-    row n-1 : S(n-1,0), S(n-1,1), ..., S(n-1,n-1)
     \end{lstlisting}
 
-    In effect, if \code{rows} are the rows of an \code{fmpz_mat_t}, 
-    this stores the Stirling number analogue of Pascal's triangle 
-    as a lower triangular matrix, with ones on the main diagonal; 
-    entries above the main diagonal will not be touched, and should 
-    be zeroed by the caller if necessary.
+    up to row $m-1$ and column $n-1$ inclusive. The upper triangular
+    part of the matrix is zeroed.
 
     For any $n$, the $S_1$ and $S_2$ matrices thus obtained are 
     inverses of each other.

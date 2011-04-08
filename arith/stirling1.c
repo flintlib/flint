@@ -32,7 +32,8 @@
 #include "ulong_extras.h"
 
 
-void _rising_factorial(fmpz * res, long a, long b, long trunc)
+static void
+_rising_factorial(fmpz * res, long a, long b, long trunc)
 {
     long span, mid, nleft, nright, nprod;
     fmpz * left;
@@ -112,7 +113,7 @@ void _rising_factorial(fmpz * res, long a, long b, long trunc)
 }
 
 void
-fmpz_stirling1u(fmpz_t s, long n, long k)
+stirling_number_1u(fmpz_t s, long n, long k)
 {
     fmpz * tmp;
 
@@ -136,15 +137,15 @@ fmpz_stirling1u(fmpz_t s, long n, long k)
 }
 
 void
-fmpz_stirling1(fmpz_t s, long n, long k)
+stirling_number_1(fmpz_t s, long n, long k)
 {
-    fmpz_stirling1u(s, n, k);
+    stirling_number_1u(s, n, k);
     if ((n + k) % 2)
         fmpz_neg(s, s);
 }
 
 void
-fmpz_stirling1u_vec(fmpz * row, long n, long klen)
+stirling_number_1u_vec(fmpz * row, long n, long klen)
 {
     if (klen < 1)
         return;
@@ -152,11 +153,11 @@ fmpz_stirling1u_vec(fmpz * row, long n, long klen)
 }
 
 void
-fmpz_stirling1_vec(fmpz * row, long n, long klen)
+stirling_number_1_vec(fmpz * row, long n, long klen)
 {
     long k;
 
-    fmpz_stirling1u_vec(row, n, klen);
+    stirling_number_1u_vec(row, n, klen);
 
     for (k = (n + 1) % 2; k < klen; k += 2)
         fmpz_neg(row + k, row + k);

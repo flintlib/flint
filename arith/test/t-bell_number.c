@@ -72,7 +72,7 @@ int main(void)
     {
         b2 = _fmpz_vec_init(n+1);
 
-        fmpz_stirling2_vec(b2, n, n+1);
+        stirling_number_2_vec(b2, n, n+1);
 
         for (k = 1; k <= n; k++)
             fmpz_add(b2, b2, b2 + k);

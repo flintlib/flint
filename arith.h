@@ -30,6 +30,7 @@
 #include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 #include "fmpq.h"
@@ -71,24 +72,23 @@ void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 void _harmonic_number(fmpz_t num, fmpz_t den, long n);
 void harmonic_number(fmpq_t x, long n);
 
-void _fmpz_stirling2_powsum(fmpz_t s, long n, long k);
-void _fmpz_stirling2_powsum_odd(fmpz_t , long n, long k);
+/* Stirling numbers **********************************************************/
 
-void fmpz_stirling1u(fmpz_t s, long n, long k);
-void fmpz_stirling1(fmpz_t s, long n, long k);
-void fmpz_stirling2(fmpz_t s, long n, long k);
+void stirling_number_1u(fmpz_t s, long n, long k);
+void stirling_number_1(fmpz_t s, long n, long k);
+void stirling_number_2(fmpz_t s, long n, long k);
 
-void fmpz_stirling1u_vec(fmpz * row, long n, long klen);
-void fmpz_stirling1_vec(fmpz * row, long n, long klen);
-void fmpz_stirling2_vec(fmpz * row, long n, long klen);
+void stirling_number_1u_vec(fmpz * row, long n, long klen);
+void stirling_number_1_vec(fmpz * row, long n, long klen);
+void stirling_number_2_vec(fmpz * row, long n, long klen);
 
-void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen);
-void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen);
-void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
 
-void fmpz_stirling1u_mat(fmpz ** rows, long n);
-void fmpz_stirling1_mat(fmpz ** rows, long n);
-void fmpz_stirling2_mat(fmpz ** rows, long n);
+void stirling_number_1u_mat(fmpz_mat_t mat);
+void stirling_number_1_mat(fmpz_mat_t mat);
+void stirling_number_2_mat(fmpz_mat_t mat);
 
 /* Bell numbers **************************************************************/
 

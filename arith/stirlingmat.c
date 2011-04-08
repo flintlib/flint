@@ -40,7 +40,7 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
         return;
     }
 
-    if (klen < 1)
+    if (klen <= 0)
         return;
 
     fmpz_init(t);
@@ -48,22 +48,22 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
     fmpz_set_ui(new, 0UL);
 
     if (klen > n)
-        fmpz_set_ui(new+n, 1UL);
+        fmpz_set_ui(new + n, 1UL);
 
     for (k = 1; k < FLINT_MIN(n, klen); k++)
     {
-        fmpz_set(u, prev+k);
+        fmpz_set(u, prev + k);
         fmpz_set(new + k, t);
         switch (kind)
         {
         case 0:
-            fmpz_addmul_ui(new+k, u, n-1UL);
+            fmpz_addmul_ui(new + k, u, n - 1UL);
             break;
         case 1:
-            fmpz_submul_ui(new+k, u, n - 1UL);
+            fmpz_submul_ui(new + k, u, n - 1UL);
             break;
         case 2:
-            fmpz_addmul_ui(new+k, u, k);
+            fmpz_addmul_ui(new + k, u, k);
             break;
         }
         fmpz_set(t, u);
@@ -72,46 +72,56 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
     fmpz_clear(u);
 }
 
-void
-_fmpz_stirling_mat(fmpz ** rows, long nn, int kind)
+static void
+_fmpz_stirling_mat(fmpz ** rows, long r, long c, int kind)
 {
-    long n;
+    long i, j;
 
-    if (nn > 0)
-        fmpz_set_ui(rows[0], 1UL);
-    for (n = 1; n < nn; n++)
-        _fmpz_stirling_next_row(rows[n], rows[n-1], n, n+1, kind);
+    if (r == 0 || c == 0)
+        return;
+
+    fmpz_set_ui(rows[0], 1UL);
+    for (i = 1; i < c; i++)
+        fmpz_zero(rows[0] + i);
+
+    for (i = 1; i < r; i++)
+    {
+        _fmpz_stirling_next_row(rows[i], rows[i-1], i, FLINT_MIN(c,i+1), kind);
+
+        for (j = i + 1; j < c; j++)
+            fmpz_zero(rows[i] + j);
+    }
 }
 
-void fmpz_stirling1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
     _fmpz_stirling_next_row(row, prev, n, klen, 0);
 }
 
-void fmpz_stirling1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
     _fmpz_stirling_next_row(row, prev, n, klen, 1);
 }
 
-void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
     _fmpz_stirling_next_row(row, prev, n, klen, 2);
 }
 
 void
-fmpz_stirling1u_mat(fmpz ** rows, long n)
+stirling_number_1u_mat(fmpz_mat_t mat)
 {
-    _fmpz_stirling_mat(rows, n, 0);
+    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 0);
 }
 
 void
-fmpz_stirling1_mat(fmpz ** rows, long n)
+stirling_number_1_mat(fmpz_mat_t mat)
 {
-    _fmpz_stirling_mat(rows, n, 1);
+    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 1);
 }
 
 void
-fmpz_stirling2_mat(fmpz ** rows, long n)
+stirling_number_2_mat(fmpz_mat_t mat)
 {
-    _fmpz_stirling_mat(rows, n, 2);
+    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 2);
 }
