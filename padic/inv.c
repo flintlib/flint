@@ -10,23 +10,26 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         abort();
     }
 
-    /* op has no meaningful inverse to the given precision.. */
-    /* TODO:  Decide what to do in this case */
+    /*
+        If x = u p^v has negative valuation with N <= -v 
+        then there is no inverse of x defined modulo p^N.
+     */
     if (ctx->N + op[1] <= 0)
     {
         padic_zero(rop, ctx);
         return;
     }
-    
+
     /* Unit part */
     fmpz_init(pow);
-    fmpz_pow_ui(pow, ctx->p, ctx->N + op[1]);
-    if (op[1] >= 0)
+    if (op[1] <= 0)
     {
+        fmpz_pow_ui(pow, ctx->p, ctx->N + op[1]);
         fmpz_invmod(rop, op, pow);
     }
     else
     {
+        fmpz_pow_ui(pow, ctx->p, ctx->N - op[1]);
         fmpz_mod(rop, op, pow);
         fmpz_invmod(rop, rop, pow);
     }

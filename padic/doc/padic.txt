@@ -156,6 +156,10 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
     Sets \code{rop} to the product of \code{op1} and 
     \code{op2} modulo $p^N$.
 
+    Let $v$ denote the minimum of the valuations of the two operands. 
+    This operation is exact modulo $p^N$ whenever $v \geq 0$.  Otherwise, 
+    the operation is only guaranteed to be correct modulo $p^{N - v}$.
+
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
@@ -163,16 +167,16 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Computes the inverse of \code{op}.
+    Computes the inverse of \code{op} modulo $p^N$.
 
-    We compute the inverse of $x = u p^{v}$ modulo $p^N$ as 
-    $x^{-1} = u^{-1} p^{-v}$ with $u^{-1}$ reduced modulo 
-    $p^{v + N}$, where for units $u$ we compute the 
-    inverse as follows:
+    Suppose that \code{op} is given as $x = u p^v$ modulo $p^N$.  
+    If $v \leq 0$ then we can find the exact inverse of $x$ modulo $p^N$ 
+    by inverting $u$ modulo $p^{N + v}$.  Otherwise, if $v > 0$ then 
+    this operation is only correct modulo $p^{N - v}$.
 
-    If $v \geq 0$ then invert $u$ modulo $p^{N + v}$. 
-    Otherwise, if $v < 0$, first reduce $u$ modulo $p^{N + v}$ 
-    and then invert this.
+    If $v < 0$ and $N \leq -v$ then $x$ has no inverse defined 
+    modulo $p^N$.  In this case, this function sets \code{rop} 
+    to zero.
 
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx)
