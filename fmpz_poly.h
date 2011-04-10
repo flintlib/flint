@@ -91,7 +91,7 @@ ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
 }
 
 static __inline__ 
-long _fmpz_poly_max_bits(const fmpz_poly_t poly)
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
 {
     return _fmpz_vec_max_bits(poly->coeffs, poly->length);
 }
