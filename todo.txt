@@ -296,3 +296,9 @@ nmod_mat
   where this is assumed.
 
 * Implement Strassen inverse.
+
+padic
+-----
+
+* Implement "padic_get_str"
+

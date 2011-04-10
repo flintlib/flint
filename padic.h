@@ -156,8 +156,6 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
 char * padic_get_str(const padic_t op, const padic_ctx_t ctx);
 
-int padic_set_str(padic_t rop, const char *str, const padic_ctx_t ctx);
-
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
 static __inline__
