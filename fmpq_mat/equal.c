@@ -32,7 +32,7 @@
 
 
 int
-fmpq_mat_equal(fmpq_mat_t mat1, fmpq_mat_t mat2)
+fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 {
     long i, j;
 

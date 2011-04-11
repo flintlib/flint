@@ -226,7 +226,7 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
 *******************************************************************************
 
-    Modular evaluation and rational reconstruction
+    Modular reduction and rational reconstruction
 
 *******************************************************************************
 
@@ -255,4 +255,4 @@ int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
     number exists.
 
     Reference: Algorithm 7.4 in
-    http://modular.math.washington.edu/books/modform/modform/linear_algebra.html
+    %% http://modular.math.washington.edu/books/modform/modform/linear_algebra.html

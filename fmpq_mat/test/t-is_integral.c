@@ -23,63 +23,67 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
+int
+main(void)
 {
-    long n, i, j;
+    int i;
+    flint_rand_t state;
+    flint_randinit(state);
 
-    fmpz_mat_t Aclear;
-    fmpz_mat_t Bclear;
-    fmpz_mat_t I;
+    printf("is_integral....");
+    fflush(stdout);
 
-    fmpz * den;
-
-    n = A->r;
-
-    if (n == 0)
+    for (i = 0; i < 1000; i++)
     {
-        return;
-    }
-    else if (n == 1)
-    {
-        fmpq_inv(fmpq_mat_entry(B, 0, 0), fmpq_mat_entry(A, 0, 0));
-        return;
-    }
+        fmpq_mat_t A;
+        fmpz_mat_t B;
+        long n, m;
 
-    fmpz_mat_init(Aclear, n, n);
-    fmpz_mat_init(Bclear, n, n);
-    fmpz_mat_init(I, n, n);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
 
-    den = _fmpz_vec_init(n);
+        fmpq_mat_init(A, m, n);
+        fmpz_mat_init(B, m, n);
 
-    fmpq_mat_get_fmpz_mat_rowwise(Aclear, den, A);
+        fmpz_mat_randtest(B, state, 10);
+        fmpq_mat_set_fmpz_mat(A, B);
 
-    for (i = 0; i < n; i++)
-        fmpz_set(fmpz_mat_entry(I, i, i), den + i);
-
-    /* TODO: use other algorithm? */
-    fmpz_mat_solve_mat(Bclear, den, Aclear, I);
-
-    for (i = 0; i < B->r; i++)
-    {
-        for (j = 0; j < B->c; j++)
+        if (!fmpq_mat_is_integral(A))
         {
-            fmpz_set(fmpq_mat_entry_num(B, i, j), fmpz_mat_entry(Bclear, i, j));
-            fmpz_set(fmpq_mat_entry_den(B, i, j), den);
-            fmpq_canonicalise(fmpq_mat_entry(B, i, j));
+            printf("FAIL\n");
+            abort();
         }
+
+        if (m && n)
+        {
+            long i, j;
+            i = n_randint(state, m);
+            j = n_randint(state, n);
+
+            fmpq_set_si(fmpq_mat_entry(A, i, j), 1, 2);
+
+            if (fmpq_mat_is_integral(A))
+            {
+                printf("FAIL\n");
+                abort();
+            }
+        }
+
+
+        fmpq_mat_clear(A);
+        fmpz_mat_clear(B);
     }
 
-    fmpz_mat_clear(Aclear);
-    fmpz_mat_clear(Bclear);
-    fmpz_mat_clear(I);
+    flint_randclear(state);
 
-    _fmpz_vec_clear(den, A->r);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
