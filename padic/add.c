@@ -49,7 +49,6 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
         padic_set(rop, op2, ctx);
         return;
     }
-
     if (padic_is_zero(op2, ctx))
     {
         padic_set(rop, op1, ctx);

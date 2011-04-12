@@ -32,6 +32,7 @@
 
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "ulong_extras.h"
 
 typedef long padic_t[2];
@@ -47,6 +48,9 @@ typedef struct {
     fmpz_t p;
     long N;
     double pinv;
+    fmpz *pow;
+    long min;
+    long max;
     enum padic_print_mode mode;
 } padic_ctx_struct;
 

@@ -5,15 +5,22 @@
 
 void _padic_reduce_unit(padic_t rop, const padic_ctx_t ctx)
 {
-    fmpz_t pow;
+    long e = ctx->N - rop[1];
 
-    assert(rop[1] < ctx->N);
+    assert(e > 0);
 
-    /* TODO:  Re-write this using the powers in the context */
+    if (ctx->min <= e && e < ctx->max)
+    {
+        fmpz_mod(rop, rop, ctx->pow + (e - ctx->min));
+    }
+    else
+    {
+        fmpz_t pow;
 
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, ctx->p, ctx->N - rop[1]);
-    fmpz_mod(rop, rop, pow);
-    fmpz_clear(pow);
+        fmpz_init(pow);
+        fmpz_pow_ui(pow, ctx->p, e);
+        fmpz_mod(rop, rop, pow);
+        fmpz_clear(pow);
+    }
 }
 
