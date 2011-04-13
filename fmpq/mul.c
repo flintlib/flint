@@ -29,18 +29,81 @@
 #include "fmpq.h"
 #include "ulong_extras.h"
 
-
 void
 _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
             const fmpz_t op2num, const fmpz_t op2den)
 {
-    fmpz_mul(rnum, op1num, op2num);
-    fmpz_mul(rden, op1den, op2den);
-    _fmpq_canonicalise(rnum, rden);
+    /* Common special cases: squaring, same denominator (e.g. both integers) */
+    if (((op1num == op2num) && (op1den == op2den)) ||
+         fmpz_equal(op1den, op2den))
+    {
+        fmpz_mul(rnum, op1num, op2num);
+        fmpz_mul(rden, op1den, op2den);
+    }
+    /* Exactly one argument is an integer */
+    else if (fmpz_is_one(op1den))
+    {
+        fmpz_t t, x;
+        fmpz_init(t);
+        fmpz_init(x);
+
+        fmpz_gcd(t, op1num, op2den);
+        fmpz_divexact(x, op1num, t);
+        fmpz_mul(rnum, x, op2num);
+        fmpz_divexact(t, op2den, t);
+        fmpz_mul(rden, op1den, t);
+
+        fmpz_clear(t);
+        fmpz_clear(x);
+    }
+    else if (fmpz_is_one(op2den))
+    {
+        fmpz_t t, x;
+        fmpz_init(t);
+        fmpz_init(x);
+
+        fmpz_gcd(t, op2num, op1den);
+        fmpz_divexact(x, op2num, t);
+        fmpz_mul(rnum, x, op1num);
+        fmpz_divexact(t, op1den, t);
+        fmpz_mul(rden, op2den, t);
+
+        fmpz_clear(t);
+        fmpz_clear(x);
+    }
+    else
+    {
+        fmpz_t t, u, x, y;
+
+        fmpz_init(t);
+        fmpz_init(u);
+        fmpz_init(x);
+        fmpz_init(y);
+
+        fmpz_gcd(t, op1num, op2den);
+        fmpz_gcd(u, op1den, op2num);
+
+        fmpz_divexact(x, op1num, t);
+        fmpz_divexact(y, op2num, u);
+
+        fmpz_mul(rnum, x, y);
+
+        fmpz_divexact(x, op1den, u);
+        fmpz_divexact(y, op2den, t);
+
+        fmpz_mul(rden, x, y);
+
+        fmpz_clear(t);
+        fmpz_clear(u);
+        fmpz_clear(x);
+        fmpz_clear(y);
+    }
 }
+
 
 void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
-    _fmpq_mul(&res->num, &res->den, &op1->num, &op1->den,
-            &op2->num, &op2->den);
+    _fmpq_mul(fmpq_numref(res), fmpq_denref(res),
+              fmpq_numref(op1), fmpq_denref(op1),
+              fmpq_numref(op2), fmpq_denref(op2));
 }
