@@ -39,21 +39,16 @@ _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
     fmpz_init(u);
     fmpz_init(v);
 
-    fmpz_mul(u, op1den, op2den);
-    fmpz_mul(v, op2num, rden);
-    fmpz_mul(rden, u, rden);
-    fmpz_mul(u, u, rnum);
-    fmpz_mul(v, v, op1num);
-    fmpz_sub(rnum, u, v);
+    _fmpq_mul(u, v, op1num, op1den, op2num, op2den);
+    _fmpq_sub(rnum, rden, rnum, rden, u, v);
 
     fmpz_clear(u);
     fmpz_clear(v);
-
-    _fmpq_canonicalise(rnum, rden);
 }
 
 void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
-    _fmpq_submul(&res->num, &res->den, &op1->num, &op1->den,
-            &op2->num, &op2->den);
+    _fmpq_submul(fmpq_numref(res), fmpq_denref(res),
+                 fmpq_numref(op1), fmpq_denref(op1),
+                 fmpq_numref(op2), fmpq_denref(op2));
 }

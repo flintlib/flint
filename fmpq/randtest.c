@@ -33,8 +33,37 @@
 void
 _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
 {
+    ulong x = n_randlimb(state);
+
     fmpz_randtest(num, state, bits);
     fmpz_randtest_not_zero(den, state, bits);
+
+    switch (x % 16)
+    {
+        case 0:
+            fmpz_set_si(num, 1);
+            break;
+        case 1:
+            fmpz_set_si(num, -1);
+            break;
+        case 2:
+            fmpz_set_si(num, 2);
+            break;
+        case 3:
+            fmpz_set_si(num, -2);
+            break;
+    }
+
+    switch ((x / 16) % 16)
+    {
+        case 0:
+            fmpz_set_si(den, 1);
+            break;
+        case 2:
+            fmpz_set_si(den, 2);
+            break;
+    }
+
     _fmpq_canonicalise(num, den);
 }
 
