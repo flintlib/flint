@@ -52,6 +52,37 @@ void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
         fmpq_inv(fmpq_mat_entry(B, 0, 0), fmpq_mat_entry(A, 0, 0));
         return;
     }
+    else if (n == 2)
+    {
+        fmpq_t d, t00, t01, t10, t11;
+
+        fmpq_init(d);
+        fmpq_init(t00);
+        fmpq_init(t01);
+        fmpq_init(t10);
+        fmpq_init(t11);
+
+        fmpq_mul(d, fmpq_mat_entry(A, 0, 0), fmpq_mat_entry(A, 1, 1));
+        fmpq_submul(d, fmpq_mat_entry(A, 0, 1), fmpq_mat_entry(A, 1, 0));
+        fmpq_inv(d, d);
+
+        fmpq_mul(t00, fmpq_mat_entry(A, 1, 1), d);
+        fmpq_mul(t01, fmpq_mat_entry(A, 0, 1), d);
+        fmpq_mul(t10, fmpq_mat_entry(A, 1, 0), d);
+        fmpq_mul(t11, fmpq_mat_entry(A, 0, 0), d);
+
+        fmpq_set(fmpq_mat_entry(B, 0, 0), t00);
+        fmpq_neg(fmpq_mat_entry(B, 0, 1), t01);
+        fmpq_neg(fmpq_mat_entry(B, 1, 0), t10);
+        fmpq_set(fmpq_mat_entry(B, 1, 1), t11);
+
+        fmpq_clear(d);
+        fmpq_clear(t00);
+        fmpq_clear(t01);
+        fmpq_clear(t10);
+        fmpq_clear(t11);
+        return;
+    }
 
     fmpz_mat_init(Aclear, n, n);
     fmpz_mat_init(Bclear, n, n);

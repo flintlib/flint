@@ -78,6 +78,12 @@ static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
+static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
+{
+    fmpz_neg(fmpq_numref(dest), fmpq_numref(src));
+    fmpz_set(fmpq_denref(dest), fmpq_denref(src));
+}
+
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 void fmpq_canonicalise(fmpq_t res);
