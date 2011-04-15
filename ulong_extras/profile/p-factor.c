@@ -43,16 +43,20 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = params->bits;
    ulong i, j, res, primes = (1L<<(bits/3))/10 + 1;
    n_factor_t factors;
+   mp_limb_t n2;
    
    for (i = 0; i < count; i++)
    {
       prof_start();
       for (j = 0; j < ITERS; j++)
 	  {
-		  n_factor_init(&factors);
+		  /*n_factor_init(&factors);
 	      n_factor(&factors, params->composites[j & 1023], 0);
 		  if ((factors.num == 0) || (factors.num == 1 && factors.exp[0] < 2))
-			  printf("Error %ld\n", params->composites[j & 1023]);
+			  printf("Error %ld\n", params->composites[j & 1023]);*/
+        n2 = n_factor_lehman(params->composites[j & 1023]);
+        if (n2 == params->composites[j & 1023])
+           printf("Error n = %ld\n", params->composites[j & 1023]);
 	  }
 	  prof_stop();
    }
