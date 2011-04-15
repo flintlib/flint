@@ -563,6 +563,28 @@ void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A,
     such that the numerators and denominators in $A^{-1} B$ are bounded
     by $N$ and $D$ respectively.
 
+int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
+        const fmpz_mat_t B)
+
+    Solves $AX = B$ given a nonsingular square matrix $A$ and a matrix $B$ of
+    compatible dimensions, using a modular algorithm. In particular,
+    Dixon's p-adic lifting algorithm is used (currently a non-adaptive version).
+    This is generally the preferred method for large dimensions.
+
+    More precisely, this function computes an integer $M$ and an integer
+    matrix $X$ such that $AX = B \bmod M$ and such that all the reduced
+    numerators and denominators of the elements $x = p/q$ in the full
+    solution satisfy $2|p|q < B$. As such, the explicit rational solution
+    matrix can be recovered uniquely by passing the output of this
+    function to \code{fmpq_mat_set_fmpz_mat_mod}.
+
+    A nonzero value is returned if $A$ is nonsingular. If $A$ is singular,
+    zero is returned and the values of the output variables will be
+    undefined.
+
+    Aliasing between input and output matrices is allowed.
+
+
 *******************************************************************************
 
     Kernel

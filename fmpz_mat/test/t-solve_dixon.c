@@ -35,10 +35,11 @@
 int
 main(void)
 {
-    fmpz_mat_t A, X, B, AX, Bm;
+    fmpz_mat_t A, X, B, AX, AXm, Bm;
     fmpz_t mod;
     flint_rand_t state;
-    long i, m, n;
+    long i, m, n, r;
+    int success;
 
     printf("solve_dixon....");
     fflush(stdout);
@@ -47,14 +48,15 @@ main(void)
 
     for (i = 0; i < 1000; i++)
     {
-        m = n_randint(state, 30);
-        n = n_randint(state, 30);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
 
         fmpz_mat_init(A, m, m);
         fmpz_mat_init(B, m, n);
         fmpz_mat_init(Bm, m, n);
         fmpz_mat_init(X, m, n);
         fmpz_mat_init(AX, m, n);
+        fmpz_mat_init(AXm, m, n);
         fmpz_init(mod);
 
         fmpz_mat_randrank(A, state, m, 1+n_randint(state, 2)*n_randint(state, 100));
@@ -64,13 +66,16 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
-        fmpz_mat_solve_dixon(X, mod, A, B);
-        fmpz_mat_mul(AX, A, X);
+        success = fmpz_mat_solve_dixon(X, mod, A, B);
 
-        fmpz_mat_scalar_mod_fmpz(AX, AX, mod);
+        fmpz_mat_set(AXm, X);
+
+        fmpz_mat_mul(AX, A, AXm);
+
+        fmpz_mat_scalar_mod_fmpz(AXm, AX, mod);
         fmpz_mat_scalar_mod_fmpz(Bm, B, mod);
 
-        if (!fmpz_mat_equal(AX, Bm))
+        if (!fmpz_mat_equal(AXm, Bm))
         {
             printf("FAIL:\n");
             printf("AX != B!\n");
@@ -87,6 +92,39 @@ main(void)
         fmpz_mat_clear(Bm);
         fmpz_mat_clear(X);
         fmpz_mat_clear(AX);
+        fmpz_mat_clear(AXm);
+        fmpz_clear(mod);
+    }
+
+    /* Test singular systems */
+    for (i = 0; i < 1000; i++)
+    {
+        m = 1 + n_randint(state, 10);
+        n = 1 + n_randint(state, 10);
+        r = n_randint(state, m);
+
+        fmpz_mat_init(A, m, m);
+        fmpz_mat_init(B, m, n);
+        fmpz_mat_init(X, m, n);
+        fmpz_init(mod);
+
+        fmpz_mat_randrank(A, state, r, 1+n_randint(state, 2)*n_randint(state, 100));
+        fmpz_mat_randtest(B, state, 1+n_randint(state, 2)*n_randint(state, 100));
+
+        /* Dense */
+        if (n_randint(state, 2))
+            fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
+
+        if (fmpz_mat_solve_dixon(X, mod, A, B) != 0)
+        {
+            printf("FAIL:\n");
+            printf("singular system, returned nonzero\n");
+            abort();
+        }
+
+        fmpz_mat_clear(A);
+        fmpz_mat_clear(B);
+        fmpz_mat_clear(X);
         fmpz_clear(mod);
     }
 
