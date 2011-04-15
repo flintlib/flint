@@ -23,22 +23,62 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "nmod_mat.h"
+#include "ulong_extras.h"
+#include "long_extras.h"
 
-void
-fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m)
+int
+main(void)
 {
-    long i, j;
-    fmpz_t t;
-    fmpz_init(t);
+    int i;
+    flint_rand_t state;
+    flint_randinit(state);
 
-    for (i = 0; i < A->r; i++)
-        for (j = 0; j < A->c; j++)
-            fmpz_fdiv_qr(t, fmpz_mat_entry(B,i,j), fmpz_mat_entry(A,i,j), m);
+    printf("scalar_mod_fmpz....");
+    fflush(stdout);
 
-    fmpz_clear(t);
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_mat_t A, Amod;
+        fmpz_t mod;
+
+        long rows, cols;
+
+        rows = n_randint(state, 20);
+        cols = n_randint(state, 20);
+
+        fmpz_mat_init(A, rows, cols);
+        fmpz_mat_init(Amod, rows, cols);
+        fmpz_init(mod);
+
+        fmpz_randtest_not_zero(mod, state, 100);
+
+        fmpz_mat_randtest(A, state, 100);
+        fmpz_mat_randtest(Amod, state, 100);
+
+        fmpz_mat_scalar_mod_fmpz(Amod, A, mod);
+        fmpz_mat_scalar_mod_fmpz(A, A, mod);
+
+        if (!fmpz_mat_equal(A, Amod))
+        {
+            printf("FAIL: aliasing!\n");
+            abort();
+        }
+
+        fmpz_mat_clear(A);
+        fmpz_mat_clear(Amod);
+        fmpz_clear(mod);
+    }
+
+    flint_randclear(state);
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
