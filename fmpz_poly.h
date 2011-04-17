@@ -387,6 +387,15 @@ void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                     const fmpz_poly_t poly2);
 
+int
+_fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2);
+
+int
+fmpz_poly_gcd_heuristic(fmpz_poly_t res,
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                               const fmpz * poly2, long len2);
 
