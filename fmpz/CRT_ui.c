@@ -32,8 +32,8 @@
 #include "fmpz.h"
 
 void
-_fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
-    ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
+_fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
+    ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c, int sign)
 {
     mp_limb_t r1mod, s;
     fmpz_t r1normal;
@@ -75,18 +75,16 @@ _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
     fmpz_clear(tmp);
 }
 
-void _fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1,
+void _fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign)
 {
-    fmpz_t c;
-    fmpz_t fm2;
+    mp_limb_t c;
     fmpz_t m1m2;
 
-    fmpz_init(c);
-    fmpz_init(fm2);
-    fmpz_set_ui(fm2, m2);
+    c = fmpz_fdiv_ui(m1, m2);
+    c = n_invmod(c, m2);
 
-    if (!fmpz_invmod(c, m1, fm2))
+    if (c == 0)
     {
         printf("Exception in fmpz_CRT_ui: m1 not invertible modulo m2!\n");
         abort();
@@ -96,19 +94,20 @@ void _fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1,
     fmpz_mul_ui(m1m2, m1, m2);
 
     _fmpz_CRT_ui_precomp(out, r1, m1, r2, m2, n_preinvert_limb(m2),
-        m1m2, fmpz_get_ui(c), sign);
+        m1m2, c, sign);
 
-    fmpz_clear(c);
-    fmpz_clear(fm2);
     fmpz_clear(m1m2);
 }
 
-void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+void
+fmpz_CRT_ui_unsigned(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+    ulong r2, ulong m2)
 {
     _fmpz_CRT_ui(out, r1, m1, r2, m2, 0);
 }
 
-void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+void
+fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2)
 {
     _fmpz_CRT_ui(out, r1, m1, r2, m2, 1);
 }

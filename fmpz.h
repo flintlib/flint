@@ -354,12 +354,15 @@ void fmpz_fac_ui(fmpz_t f, ulong n);
 
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
 
-void _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
-    ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+    ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
+        int sign);
 
-void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
+void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+    ulong r2, ulong m2);
 
-void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
+void fmpz_CRT_ui_unsigned(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+    ulong r2, ulong m2);
 
 
 #define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
