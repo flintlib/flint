@@ -22,6 +22,7 @@
     Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
     Copyright (C) 2009 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -32,6 +33,7 @@
 #include <mpir.h>
 #include "fmpz.h"
 #include "fmpz_vec.h"
+#include "nmod_poly.h"
 
 /*  Type definitions *********************************************************/
 
@@ -656,5 +658,21 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
     return fmpz_poly_fread_pretty(stdin, poly, x);
 }
 
-#endif
+/*  CRT  ********************************************************************/
 
+void fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly);
+
+void fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly);
+
+void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t res, const nmod_poly_t poly);
+
+void
+fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m1, const nmod_poly_t poly2);
+
+void
+fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m1, const nmod_poly_t poly2);
+
+
+#endif
