@@ -48,25 +48,37 @@ long _padic_remove(fmpz_t x, const fmpz_t p, double pinv)
     {
         if (!COEFF_IS_MPZ(q))  /* p is small */
         {
-            mpz_t prime;
+            if (!mpz_divisible_ui_p(COEFF_TO_PTR(y), q))
+            {
+                return 0;
+            }
+            else
+            {
+                mpz_t prime;
 
-            mpz_init_set_ui(prime, q);
-            e = mpz_remove(COEFF_TO_PTR(y), COEFF_TO_PTR(y), prime);
-            _fmpz_demote_val(x);
-            mpz_clear(prime);
+                mpz_init_set_ui(prime, q);
+                e = mpz_remove(COEFF_TO_PTR(y), COEFF_TO_PTR(y), prime);
+                _fmpz_demote_val(x);
+                mpz_clear(prime);
 
-            return e;
+                return e;
+            }
         }
         else  /* p is large */
         {
             __mpz_struct *a = COEFF_TO_PTR(y);
             __mpz_struct *b = COEFF_TO_PTR(q);
 
-            e = mpz_remove(a, a, b);
-
-            _fmpz_demote_val(x);
-
-            return e;
+            if (!mpz_divisible_p(a, b))
+            {
+                return 0;
+            }
+            else
+            {
+                e = mpz_remove(a, a, b);
+                _fmpz_demote_val(x);
+                return e;
+            }
         }
     }
 }
