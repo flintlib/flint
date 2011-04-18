@@ -200,12 +200,6 @@ void fmpz_mat_unit(fmpz_mat_t mat)
     and 0:s elsewhere. If \code{mat} is nonsquare, it is set to the
     truncation of a unit matrix.
 
-void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, fmpz_mat_t A)
-
-    Sets the entries \code{Amod} to the entries of \code{A} reduced
-    by the modulus of \code{Amod}.
-
-
 *******************************************************************************
 
     Input and output
@@ -280,6 +274,28 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     Sets $B$ to $A^T$, the transpose of $A$. Dimensions must be compatible.
     $A$ and $B$ are allowed to be the same object if $A$ is a square matrix.
+
+
+*******************************************************************************
+
+    Modular reduction and reconstruction
+
+*******************************************************************************
+
+void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, fmpz_mat_t A)
+
+    Sets the entries of \code{Amod} to the entries of \code{A} reduced
+    by the modulus of \code{Amod}.
+
+void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod)
+
+    Sets the entries of \code{Amod} to the residues in \code{Amod},
+    normalised to the interval $-m/2 <= r < m/2$ where $m$ is the modulus.
+
+void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
+
+    Sets the entries of \code{Amod} to the residues in \code{Amod},
+    normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
 
 *******************************************************************************
