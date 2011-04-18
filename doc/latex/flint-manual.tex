@@ -280,7 +280,7 @@ architectures, though we do not yet provide this facility.
 
 FLINT is currently maintained by William Hart of Warwick University in 
 the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
-Johannson, Andy Novocin and David Harvey (no longer active).
+Johansson, Andy Novocin and David Harvey (no longer active).
 
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
@@ -320,6 +320,12 @@ pass the directories as parameters to FLINT's configure, e.g.\
 \end{lstlisting}
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr/local}.
+
+Note that FLINT builds static and shared libraries by default. If
+you do not require one of these then you may pass 
+\code{--disable-static} or \code{--disable-shared} to 
+\code{configure}. When running \code{make check} a shared library
+is required.
 
 If you intend to install the FLINT library and header files, 
 you can specify where they should be placed by passing 
@@ -418,8 +424,9 @@ Further patches and bug reports have been made by Michael Abshoff, Didier
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
 Kedlaya, William Stein, Robert Bradshaw and many others.
 
-Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from 
-the MPIR library, whose main author is Torbjorn Granlund.
+Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from
+an LGPL v2+ version of the GMP library. The main author of the GMP 
+library is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
  
@@ -432,11 +439,25 @@ features.  To build the example programs, type:
 make examples
 \end{lstlisting}
 
+The example programs are built in the \code{build/examples} directory.
+You must set your \code{LD_LIBRARY_PATH} or equivalent for the flint, mpir
+and mpfr libraries. See your operating system documentation to see how to
+set this.
+
 The current example programs are:
 
 \code{delta_qexp}  Computes the first $n$ terms of the delta function, e.g.\ 
-\code{delta_qexp 1000000} will compute the first one million terms of the 
+\code{build/examples/delta_qexp 1000000} will compute the first one million terms of the 
 $q$-expansion of delta.
+
+\code{crt}  Demonstrates the integer Chinese Remainder code, e.g.\ 
+\code{build/examples/crt 10382788} will build up the given integer from its value mod various
+primes.
+
+\code{multi_crt}  Demonstrates the fast tree version of the integer Chinese Remainder 
+code, e.g.\ 
+\code{build/examples/multi_crt 100493287498239 13} will build up the given integer from 
+its value mod the given number of primes.
 
 \chapter{FLINT macros}
 
@@ -623,9 +644,6 @@ A =
 A^2 = 
 [[2 3]
 [6 11]]
-det(A) = -2
-det(A^2) = 4
-
 \end{lstlisting}
 
 

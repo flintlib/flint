@@ -627,3 +627,67 @@ mpfr_vec: (vectors over mpfr reals)
 mpfr_mat: (matrices over mpfr reals)
   * memory management (init, clear)
 
+2.1 -- 9 Mar 2011
+
+fmpz
+----
+  * Simplified interface for fast multimodular reduction and CRT reconstruction
+  * Fixed segmentation fault in fmpz_multi_mod_ui when the input exceeds the product of the moduli
+  * Added simple incremental CRT functions (fmpz_CRT_ui, fmpz_CRT_ui_unsigned) to complement the existing fast ones
+  * Added example programs for CRT
+  * Added random number generators designed for testing modular code (fmpz_randtest_mod, fmpz_randtest_mod_signed)
+  * Added fmpz_fdiv_ui for remainder on division by an unsigned long
+  * Added fmpz_bin_uiui for computing binomial coefficients
+  * Added fmpz_mul2_uiui and fmpz_divexact2_uiui for multiplying or dividing an fmpz by a pair of ulongs (efficiently when their product fits in a single limb)
+
+fmpz_mat
+--------
+  * Added utility functions for basic arithmetic and creating unit matrices
+  * Added multimodular determinant computation (certified or heuristic)
+  * Added support for computing right nullspaces (fmpz_mat_kernel). Fast only for small matrices.
+  * Some internal code cleanup and various small fixes
+
+nmod_mat
+--------
+  * Faster Gaussian elimination for small moduli
+  * Faster determinants
+  * Faster matrix inversion and nonsingular solving
+
+nmod_poly
+---------
+  * Added nmod_poly_integral for computing integrals
+  * Added fast square root and inverse square root of power series
+  * Added fast transcendental functions of power series (log, exp, sin, cos, tan, sinh, cosh, tanh, asin, atan, asinh, atanh)
+  * Made nmod_poly_inv_series_newton more memory efficient
+
+fmpq_poly
+---------
+  * Added fmpq_poly_integral for computing integrals
+  * Added fast transcendental functions of power series (log, exp, sin, cos, tan, sinh, cosh, tanh, asin, atan, asinh, atanh)
+
+arith
+-----
+  * Made computation of vectors of Bernoulli numbers faster
+  * Added fast computation of single Bernoulli numbers
+  * Added a separate function for computing denominators of Bernoulli numbers
+  * Added fast computation of Bell numbers (vector and single)
+  * Added fast computation of Euler numbers (vector and single)
+  * Added fast computation of Euler polynomials
+  * Added fast computation of Swinnerton-Dyer polynomials
+  * Added fast computation of Legendre polynomials
+  * Added fast vector computation of the partition function
+  * Added fast vector computation of Landau's function
+
+ulong_extras
+------------
+  * Added a function for computing factorials mod n
+
+build system
+------------
+  * Added support for building static and shared libraries
+  * All object files and test/profile/example binaries now build in separate build directory
+
+documentation
+-------------
+  * Large number of corrections
+

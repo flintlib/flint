@@ -253,6 +253,8 @@ mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n);
 
 mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters);
 
+mp_limb_t n_factor_lehman(mp_limb_t n);
+
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
@@ -269,5 +271,6 @@ int n_sizeinbase(mp_limb_t n, int base);
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
-#endif
+mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
+#endif

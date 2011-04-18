@@ -32,24 +32,23 @@
 #include "fmpz_vec.h"
 
 
-fmpz **
-fmpz_comb_temp_init(fmpz_comb_t comb)
+void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 {
     long n, i, j;
-    fmpz ** comb_temp;
 
     /* Allocate space for comb_temp */
-    n = comb->n;
-    comb_temp = (fmpz **) malloc(n * sizeof(fmpz *));
+    temp->n = n = comb->n;
+    temp->comb_temp = (fmpz **) malloc(n * sizeof(fmpz *));
 
     j = (1L << (n - 1));
     for (i = 0; i < n; i++)
     {
-        comb_temp[i] = _fmpz_vec_init(j);
+        temp->comb_temp[i] = _fmpz_vec_init(j);
         j /= 2;
     }
 
-	return comb_temp;
+    fmpz_init(temp->temp);
+    fmpz_init(temp->temp2);
 }
 
 void

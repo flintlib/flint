@@ -21,9 +21,10 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2010 Andy Novocin
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
+
 
 *******************************************************************************
 
@@ -38,6 +39,7 @@ void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
 void fmpz_mat_clear(fmpz_mat_t mat)
 
     Clears the given matrix.
+
 
 *******************************************************************************
 
@@ -156,6 +158,7 @@ void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
     distinct rows and columns will be performed. This leaves the rank
     (and for square matrices, the determinant) unchanged.
 
+
 *******************************************************************************
 
     Basic assignment and manipulation
@@ -186,6 +189,22 @@ fmpz * fmpz_mat_entry(fmpz_mat_t mat, long i, long j)
     Both $i$ and $j$ must not exceed the dimensions of the matrix.
 
     This function is implemented as a macro.
+
+void fmpz_mat_zero(fmpz_mat_t mat)
+
+    Sets all entries of \code{mat} to 0.
+
+void fmpz_mat_unit(fmpz_mat_t mat)
+
+    Sets \code{mat} to the unit matrix, having 1:s on the main diagonal
+    and 0:s elsewhere. If \code{mat} is nonsquare, it is set to the
+    truncation of a unit matrix.
+
+void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, fmpz_mat_t A)
+
+    Sets the entries \code{Amod} to the entries of \code{A} reduced
+    by the modulus of \code{Amod}.
+
 
 *******************************************************************************
 
@@ -223,6 +242,7 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
     Prints the given matrix to \code{stdout}.  For further details, 
     see \code{fmpz_mat_fprint_pretty()}.
 
+
 *******************************************************************************
 
     Comparison
@@ -234,9 +254,10 @@ int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Returns a non-zero value if \code{mat1} and \code{mat2} have 
     the same dimensions and entries, and zero otherwise.
 
+
 *******************************************************************************
 
-    Linear algebra operations
+    Transpose
 
 *******************************************************************************
 
@@ -245,9 +266,38 @@ void fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
     Sets $B$ to $A^T$, the transpose of $A$. Dimensions must be compatible.
     $A$ and $B$ are allowed to be the same object if $A$ is a square matrix.
 
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void fmpz_mat_add(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets \code{C} to the elementwise sum $A + B$. All inputs must
+    be of the same size. Aliasing is allowed.
+
+void fmpz_mat_sub(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
+
+    Sets \code{C} to the elementwise difference $A - B$. All inputs must
+    be of the same size. Aliasing is allowed.
+
+void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A)
+
+    Sets \code{B} to the elementwise negation of \code{A}. Both inputs
+    must be of the same size. Aliasing is allowed.
+
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Sets $C$ to the matrix product $A B$. The matrices must have
+    Sets \code{C} to the matrix product $C = A B$. The matrices must have
     compatible dimensions for matrix multiplication. Aliasing
     is allowed.
 
@@ -258,30 +308,38 @@ void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 void fmpz_mat_mul_classical(fmpz_mat_t C, 
                                         const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Sets $C$ to the matrix product $A B$ computed using the classical
-    algorithm.
+    Sets \code{C} to the matrix product $C = A B$ computed using
+    classical matrix algorithm.
 
     The matrices must have compatible dimensions for matrix multiplication.
-    No aliasing between $C$ and $A$ or $C$ and $B$ is allowed.
+    No aliasing is allowed.
 
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B, 
                                                                      long bits)
 
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
 
-    Sets $C$ to the matrix product $A B$ computed using a multimodular 
+    Sets \code{C} to the matrix product $C = AB$ computed using a multimodular 
     algorithm. $C$ is computed modulo several small prime numbers
-    and reconstructed using the Chinese Remainder Theorem. This becomes 
-    more efficient for larger matrices with smaller entries.
+    and reconstructed using the Chinese Remainder Theorem. This generally
+    becomes more efficient than classical multiplication for large matrices.
 
     The \code{bits} parameter is a bound for the bit size of largest 
     element of $C$, or twice the absolute value of the largest element 
-    if any elements of $C$ are negative.  The function 
-    \code{fmpz_mat_mul_multi_mod} calculates a rigorous but
-    sometimes pessimistic bound automatically.
+    if any elements of $C$ are negative. The function
+    \code{fmpz_mat_mul_multi_mod} calculates a rigorous bound automatically.
+    If the default bound is too pessimistic, \code{_fmpz_mat_mul_multi_mod}
+    can be used with a custom bound.
 
     The matrices must have compatible dimensions for matrix multiplication.
-    No aliasing between $C$ and $A$ or $C$ and $B$ is allowed.
+    No aliasing is allowed.
+
+
+*******************************************************************************
+
+    Inverse
+
+*******************************************************************************
 
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
 
@@ -294,31 +352,65 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
     In general, \code{(B, d)} will not be reduced to lowest terms.
     $A$ and $B$ are allowed to be the same object.
 
+
+*******************************************************************************
+
+    Determinant
+
+*******************************************************************************
+
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     Sets \code{det} to the determinant of the square matrix $A$.
+    This function automatically chooses between \code{fmpz_mat_det_cofactor},
+    \code{fmpz_mat_det_bareiss} and \code{fmpz_mat_det_multi_mod}
+    (with \code{proved} = 1), depending on the size of the matrix.
 
-    The determinant is computed using \code{_fmpz_mat_det_NxN()} for 
-    $N = 2, 3, 4$, and for larger matrices by calling 
-    \code{_fmpz_mat_det_rowreduce()}.
+    The matrix of dimension $0 \times 0$ is defined to have determinant 1.
 
-    The \code{det} object is not permitted to be aliased with the 
-    entries of $A$.
+void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 
-void _fmpz_mat_det_2x2(fmpz_t det, fmpz ** const x)
+    Sets \code{det} to the determinant of the square matrix $A$
+    computed using direct cofactor expansion. This function only
+    supports matrices up to size $4 \times 4$.
 
-void _fmpz_mat_det_3x3(fmpz_t det, fmpz ** const x)
+void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
 
-void _fmpz_mat_det_4x4(fmpz_t det, fmpz ** const x)
+    Sets \code{det} to the determinant of the square matrix $A$
+    computed using the Bareiss algorithm. A copy of the input matrix is
+    row reduced using fraction-free Gaussian elimination, and the
+    determinant is read off from the last element on the main
+    diagonal.
 
-    Sets \code{det} to the determinant of the given fixed-size square 
-    matrix $x$ supplied as an array of row pointers. The determinants 
-    are computed using direct formulas based on cofactor expansion.
+void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
 
-void _fmpz_mat_det_rowreduce(fmpz_t det, const fmpz_mat_t A);
+    Sets \code{det} to the determinant of the square matrix $A$
+    (if \code{proved} = 1), or a probabilistic value for the
+    determinant (\code{proved} = 0), computed using a multimodular
+    algorithm.
 
-    Sets \code{det} to the determinant of the square matrix $A$, 
-    computed using row reduction on a temporary copy of $A$.
+    The determinant is computed modulo several small primes and
+    reconstructed using the Chinese Remainder Theorem.
+    With \code{proved} = 1, sufficiently many primes are chosen
+    to satisfy the bound computed by \code{fmpz_mat_det_bound}.
+    With \code{proved} = 0, the determinant is considered determined
+    if it remains unchanged modulo several consecutive primes
+    (currently if their product exceeds $2^{100}$).
+
+void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
+
+    Sets \code{bound} to a nonnegative integer $B$ such that
+    $|\det(A)| \le B$. Assumes $A$ to be a square matrix.
+    The bound is computed from the Hadamard inequality
+    $|\det(A)| \le \prod \|a_i\|_2$ where the product is taken
+    over the rows $a_i$ of $A$.
+
+
+*******************************************************************************
+
+    Rank
+
+*******************************************************************************
 
 long fmpz_mat_rank(const fmpz_mat_t A)
 
@@ -326,58 +418,95 @@ long fmpz_mat_rank(const fmpz_mat_t A)
     (equivalently, rows), of $A$. The rank is computed by row reducing
     a copy of $A$.
 
+
+*******************************************************************************
+
+    Nonsingular solving
+
+    The following functions allow solving matrix-vector equations
+    $Ax = b$ or matrix-matrix equations $AX = B$ where the system
+    matrix $A$ is square and has full rank. The solving is implicitly
+    done over the field of rational numbers: all functions compute an
+    integer vector or matrix $\hat x$ and a separate denominator
+    $d$ (\code{den}) such that $A(\hat x/d) = b$, or equivalently
+    such that $A\hat x = bd$ holds over the integers.
+
+    No guarantee is made that the numerators and denominator
+    are reduced to lowest terms. If $A$ is singular, \code{den} will be
+    set to zero and the elements of the solution vector or matrix will
+    have undefined values. No aliasing is allowed between arguments.
+
+*******************************************************************************
+
 void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
 
-    Solves $A x = b$ for the rational vector $x$, where $A$ is an 
-    $m$-by-$m$ integer matrix and $b$ is an integer vector of length $m$.
+    Solves the matrix-vector equation $Ax = b$ where $A$ is a nonsingular
+    square matrix of size $m$ and $b$ is an integer vector of length $m$.
+    This function calls \code{fmpz_mat_solve_cramer} for small
+    matrices and \code{fmpz_mat_solve_fraction_free_LU} otherwise.
 
-    More precisely, computes an integer vector $x$ and an integer 
-    \code{den} such that \code{A * x = den b}. \code{(x, den)} will not 
-    generally be reduced to lowest terms. If $A$ is singular, \code{den} 
-    will be set to zero and $x$ will be undefined.
+void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A,
+    const fmpz * b)
 
-    $x$ and $b$ are not permitted to be aliased.
+    Solves the matrix-vector equation $Ax = b$ using Cramer's rule.
+    Only systems of size up to $3 \times 3$ are allowed.
+
+void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A,
+    const fmpz * b)
+
+    Solves the matrix-vector equation $Ax = b$ by computing a fraction-free
+    LU decomposition of $A$ and then solving the triangular systems
+    $Ly = b$, $Ux = y$ using fraction-free forward and backward
+    substitution.
 
 void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, 
-                                        const fmpz_mat_t A, const fmpz_mat_t B)
+    const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves $A X = B$ for the rational matrix $m$-by-$n$ matrix $X$, 
-    where $A$ is an $m$-by-$m$ integer matrix and $B$ is an $m$-by-$n$ 
-    integer matrix. Equivalently, solves $A x = b$ for every respective 
-    column vector $x$ in $X$ and $b$ in $B$.
+    Solves $AX = B$ for the $m$-by-$n$ matrix $X$, where $A$ is an
+    $m$-by-$m$ integer matrix and $B$ is an $m$-by-$n$ integer matrix.
+    Equivalently, solves $Ax = b$ for each respective column vector
+    $x$ in $X$ and $b$ in $B$.
 
-    More precisely, computes an integer matrix $X$ and an integer 
-    \code{den} such that \code{A * X = den B}. \code{(X, den)} will 
-    not generally be reduced to lowest terms. If $A$ is singular, 
-    \code{den} will be set to zero and $x$ will be undefined.
+    This function computes a fraction-free LU decomposition of $A$
+    and reuses the LU decomposition to solve the column equations
+    one by one.
 
-    $X$ and $B$ are not permitted to be aliased.
+void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
 
-void _fmpz_mat_solve_2x2(fmpz * x, fmpz_t den, fmpz ** const a, const fmpz * b)
+    Solves the numerator part of the matrix-vector equation $Ax = b$, given
+    a precomputed fraction-free LU decomposition of $A$. \code{b} is
+    overwritten with the solution vector in-place. If the rows of the
+    system matrix were permuted during the LU decomposition, replace
+    \code{b[i]} with \code{b[perm[i]]} in the input.
 
-void _fmpz_mat_solve_3x3(fmpz * x, fmpz_t den, fmpz ** const a, const fmpz * b)
 
-    Solves \code{A * x/den = b} using Cramer's rule.
+*******************************************************************************
 
-void _fmpz_mat_solve_fflu(fmpz * x, fmpz_t den, const fmpz_mat_t A, 
-                          const fmpz * b)
+    Kernel
 
-    Solves \code{A * x/den = b} for general square matrix $A$ by first 
-    computing the fraction-free $LU$ decomposition and then calling
-    \code{_fmpz_mat_solve_fflu_precomp()}.
+*******************************************************************************
 
-void _fmpz_mat_solve_fflu_precomp(fmpz * b, fmpz ** const a, long n)
+long fmpz_mat_kernel(fmpz_mat_t B, const fmpz_mat_t A)
 
-    Uses forward/back substitution to set $b$ to the solution $x$ of 
-    \code{A * x/den = b}, where $a$ points to the rows of a precomputed 
-    fraction-free $LU$ decomposition of $A$, as generated by 
-    \code{_fmpz_mat_rowreduce}.
+    Computes a basis for the right kernel (or null space) of $A$ and returns
+    the dimension of the kernel. $B$ is set to matrix with linearly
+    independent columns and maximal rank such that $AB = 0$ (i.e. $Ab = 0$
+    for each column $b$ in $B$), and the rank of $B$ is returned.
 
-    The rows are assumed to be sorted by the order of the pivots.
-    If pivoting has occurred, the caller must ensure that the vector $b$ 
-    is in the same order.
+    In general, the entries in $B$ will not be minimal: in particular,
+    the pivot entries in $B$ will generally differ from unity.
+    $B$ must be allocated with sufficient space to represent the result
+    (at most $n \times n$ where $n$ is the number of column of $A$).
 
-long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options)
+
+*******************************************************************************
+
+    Fraction-free row reduction
+
+*******************************************************************************
+
+
+long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
 
     Row reduces the matrix in-place using fraction-free Gaussian
     elimination. The number of rows $m$ and columns $n$ may be arbitrary.
@@ -412,6 +541,10 @@ long _fmpz_mat_rowreduce(fmpz_mat_t mat, int options)
     Pivoting (to avoid division by zero entries) is performed by permuting
     the vector of row pointers in-place. The matrix entries themselves
     retain their original order in memory.
+
+    The permutation order will also be written to \code{perm} unless this
+    argument is \code{NULL}. That is, row \code{i} of the output matrix will
+    correspond to row \code{perm[i]} of the input matrix.
 
     The return value $r$ is the rank of the matrix, multiplied by a sign
     indicating the parity of row interchanges. If $r = 0$, the matrix has rank

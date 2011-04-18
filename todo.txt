@@ -126,6 +126,12 @@ nmod_poly
 
 * Make some assembly optimisations to nmod_poly module.
 
+* Add basecase versions of log, sqrt, invsqrt series
+
+* Add O(M(n)) powering mod x^n based on exp and log
+
+* Implement fast mulmid and use to improve Newton iteration
+
 
 fmpz_poly
 ---------
@@ -146,6 +152,15 @@ fmpz_poly
   a hack to call fmpz_poly_pseudo_divrem
 
 * Write test code for fmpz_poly_scalar_addmul_fmpz
+
+* Optimise fmpz_poly_shift_right/left for shifting a polynomial
+  in-place
+
+
+fmpq_poly
+---------
+
+* Implement series sqrt, invsqrt, log, exp
 
 
 fmpq_poly
@@ -175,10 +190,6 @@ arith
   and fast factorisation algorithm (Brent-Pollard, QS, ...) in
   fmpz_factor.
 
-* Optimise _fmpz_bernoulli_vec_recursive by collecting denominators
-  in blocks instead of using a single denominator for the entire
-  vector.
-
 * Optimise memory management in mpq_harmonic.
 
 * Maybe move the helper functions in primorial.c to the mpn_extras
@@ -195,22 +206,14 @@ arith
 
 * Write a fast version of fmpz_unfactor.
 
-* Find a faster way to compute a vector of Bernoulli numbers
-  for 1500 < n < 10000.
-
-* Implement the zeta function algorithm for computing isolated
-  Bernoulli numbers.
-
 * Implement computation of Bernoulli numbers modulo a prime
   (e.g. porting the code from flint 1)
 
 * Implement multimodular computation of large Bernoulli numbers
   (e.g. porting bernmm)
 
-* Add separate functions for computing the scaled Bernoulli numbers
+* (Maybe) add separate functions for computing the scaled Bernoulli numbers
   B_2k/(2k)! directly.
-
-* Implement computation of Euler numbers and Euler polynomials.
 
 * Implement rising factorials and falling factorials (x)_n, (x)^n
   as fmpz_poly functions, and add fmpz functions for their
@@ -221,13 +224,11 @@ arith
 
 * Implement Fibonacci polynomials and fmpz Fibonacci numbers.
 
-* Implement Bell numbers and Bell polynomials.
+* Implement Bell polynomials.
 
 * Implement cyclotomic polynomials.
 
-* Implement Swinnerton-Dyer polynomials.
-
-* Implement orthogonal polynomials (Legendre, Chebyshev T/U, Jacobi,
+* Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
   Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
@@ -241,14 +242,9 @@ fmpz_mat
 
 * Add element getter and setter methods.
 
-* Implement methods for setting the zero matrix, identity matrix, etc.
-
-* Change the interface for _fmpz_mat_rowreduce to generate
-  an explicit permutation array.
-
-* Implement null space computation.
-
 * Implement fmpz_mat_pow_ui.
+
+* Implement fast null space computation.
 
 * Implement fast multimodular and/or p-adic determinant calculation.
 
@@ -285,9 +281,8 @@ nmod_mat
 * Add functions for computing A*B^T and A^T*B, using transpose
   multiplications directly to avoid creating a temporary copy.
 
-* Avoid modular reductions in Gaussian elimination. This requires
-  separate 2-limb and 3-limb versions where the top unreduced
-  limbs are stored in separate matrices (or a single matrix of size 2x or 3x).
+* Write cleaner versions of the bound_size functions in
+  rowreduce.c, solve_lu_precomp.c (and combine them?)
 
 * Maybe: Optimise basecase multiplication using register blocking
   and unrolling.

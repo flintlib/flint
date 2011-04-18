@@ -113,6 +113,10 @@ void fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
+void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
+
+void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
+
 long fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
@@ -223,6 +227,8 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
+ulong fmpz_fdiv_ui(const fmpz_t g, ulong h);
+
 ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
@@ -262,6 +268,40 @@ void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);
+
+static __inline__ void
+fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_mul_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_mul_ui(f, g, h1);
+        fmpz_mul_ui(f, f, h2);
+    }
+}
+
+static __inline__ void
+fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
+{
+    mp_limb_t hi, lo;
+
+    umul_ppmm(hi, lo, h1, h2);
+    if (!hi)
+    {
+        fmpz_divexact_ui(f, g, lo);
+    }
+    else
+    {
+        fmpz_divexact_ui(f, g, h1);
+        fmpz_divexact_ui(f, f, h2);
+    }
+}
 
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
@@ -316,6 +356,15 @@ void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
 
+void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
+
+void _fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2,
+    ulong m2, mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
+
+void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2);
+
 
 #define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
 
@@ -330,24 +379,32 @@ typedef struct
 }
 fmpz_comb_struct;
 
+typedef struct
+{
+    long n;
+    fmpz ** comb_temp;
+    fmpz_t temp;
+    fmpz_t temp2;
+}
+fmpz_comb_temp_struct;
+
 typedef fmpz_comb_struct fmpz_comb_t[1];
+typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
 
-fmpz ** fmpz_comb_temp_init(fmpz_comb_t comb);
-
-void fmpz_comb_temp_free(fmpz_comb_t comb, fmpz ** comb_temp);
+void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb);
+void fmpz_comb_temp_clear(fmpz_comb_temp_t temp);
 
 void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes);
-
 void fmpz_comb_clear(fmpz_comb_t comb);
 
-void fmpz_multi_mod_ui(mp_limb_t * out, fmpz_t in, fmpz_comb_t comb,
-    fmpz ** comb_temp, fmpz_t temp);
+void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui(fmpz_t output, mp_limb_t * residues,
-    fmpz_comb_t comb, fmpz ** comb_temp, fmpz_t temp, fmpz_t temp2);
+void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
 #endif
 

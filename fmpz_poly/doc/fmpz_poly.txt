@@ -850,6 +850,32 @@ void fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
     This function uses the subresultant algorithm as described 
     in~\citep[Algorithm~3.3.1]{Coh1996}.
 
+int _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1, 
+                                                 const fmpz * poly2, long len2)
+
+    Computes the greatest common divisor \code{(res, len2)} of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}, assuming 
+    \code{len1 >= len2 > 0}.  The result is normalised to have 
+    positive leading coefficient.  Aliasing between \code{res}, 
+    \code{poly1} and \code{poly2} is not supported. The function
+    may not always succeed in finding the GCD. If it fails, the
+    function returns 0, otherwise it returns 1.
+
+int fmpz_poly_gcd_heuristic(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                       const fmpz_poly_t poly2)
+
+    Computes the greatest common divisor \code{res} of \code{poly1} and 
+    \code{poly2}, normalised to have non-negative leading coefficient.
+    
+    The function may not always succeed in finding the GCD. If it fails, 
+    the function returns 0, otherwise it returns 1.
+
+    This function uses the heuristic GCD algorithm (GCDHEU). The basic
+    strategy is to remove the content of the polynomials, pack them 
+    using Kronecker segmentation (given a bound on the size of the
+    coefficients of the GCD) and take the integer GCD. Unpack the 
+    result and test divisibility.
+
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 
@@ -858,8 +884,8 @@ void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
     is normalised to have positive leading coefficient.
 
     Assumes that \code{res} has space for \code{len2} coefficients.  
-    Aliasing between \code{res}, \code{poly1} and \code{poly2} might not 
-    be supported.
+    Aliasing between \code{res}, \code{poly1} and \code{poly2} is not 
+    supported.
 
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                        const fmpz_poly_t poly2)

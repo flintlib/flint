@@ -164,6 +164,7 @@ int main(void)
     consistency_check(11);
     consistency_check(100);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

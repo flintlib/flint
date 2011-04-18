@@ -33,34 +33,7 @@
 ulong
 fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h)
 {
-    fmpz c1 = *g;
-    ulong r;
-
-    if (h == 0UL)
-    {
-        printf("Exception: division by 0 in fmpz_mod_ui\n");
-        abort();
-    }
-
-    if (!COEFF_IS_MPZ(c1))      /* g is small */
-    {
-        if (c1 < 0L)
-        {
-            r = h - (-c1 % h);  /* C doesn't correctly handle negative mods */
-            if (r == h)
-                r = 0;
-        }
-        else
-            r = c1 % h;
-
-        fmpz_set_ui(f, r);
-        return r;
-    }
-    else                        /* g is large */
-    {
-        r = mpz_fdiv_ui(COEFF_TO_PTR(c1), h);
-
-        fmpz_set_ui(f, r);
-        return r;
-    }
+    h = fmpz_fdiv_ui(g, h);
+    fmpz_set_ui(f, h);
+    return h;
 }

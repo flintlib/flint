@@ -31,5 +31,11 @@
 void
 fmpz_mat_zero(fmpz_mat_t mat)
 {
-   _fmpz_vec_zero(mat->entries, mat->r * mat->c);
+    long i;
+
+    if (mat->c < 1)
+        return;
+
+    for (i = 0; i < mat->r; i++)
+        _fmpz_vec_zero(mat->rows[i], mat->c);
 }

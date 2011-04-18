@@ -39,11 +39,11 @@
 
 void fmpz_factor_init(fmpz_factor_t factor)
 
-    Initialises a \code{fmpz_factor_t} structure.
+    Initialises an \code{fmpz_factor_t} structure.
 
 void fmpz_factor_clear(fmpz_factor_t factor)
 
-    Clears a \code{fmpz_factor_t} structure.
+    Clears an \code{fmpz_factor_t} structure.
 
 void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
@@ -63,7 +63,7 @@ void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
 
 *******************************************************************************
 
-    Special numbers
+    Primorials
 
 *******************************************************************************
 
@@ -71,6 +71,12 @@ void fmpz_primorial(fmpz_t res, long n)
 
     Sets \code{res} to ``$n$ primorial'' or $n \#$, the product of all prime 
     numbers less than or equal to $n$.
+
+*******************************************************************************
+
+    Harmonic numbers
+
+*******************************************************************************
 
 void mpq_harmonic(mpq_t res, long n)
 
@@ -81,6 +87,12 @@ void mpq_harmonic(mpq_t res, long n)
     Table lookup is used for $H_n$ whose numerator and denomator 
     fit in single limb. For larger $n$, the function 
     \code{mpn_harmonic_odd_balanced()} is used.
+
+*******************************************************************************
+
+    Stirling numbers
+
+*******************************************************************************
 
 void fmpz_stirling1u(fmpz_t s, long n, long k)
 
@@ -127,7 +139,7 @@ void fmpz_stirling2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
     It is assumed that \code{klen} is at most $n + 1$.
 
     The \code{row} and \code{prev} arguments are permitted to be the 
-    same, meaning that the row will be update in-place.
+    same, meaning that the row will be updated in-place.
 
 void fmpz_stirling1u_mat(fmpz ** rows, long n)
 void fmpz_stirling1_mat(fmpz ** rows, long n)
@@ -152,53 +164,221 @@ void fmpz_stirling2_mat(fmpz ** rows, long n)
     For any $n$, the $S_1$ and $S_2$ matrices thus obtained are 
     inverses of each other.
 
-void _fmpz_bernoulli_vec_series(fmpz_t den, fmpz * b, long n)
+*******************************************************************************
 
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
-    using a generating function. This algorithm is fast for very
-    large $n$, say $n > 2000$.
+    Bell numbers
 
-    Conceptually, the algorithm consists of calculating the scaled
-    Bernoulli numbers $c_k = B_k / k!$ using the generating function
-    $x/(e^x-1)$. The series for $(e^x-1)/x$ is expanded using a simple
-    recurrence relation. A single \code{fmpq_poly} inversion is
-    then performed, and the resulting coefficients are scaled back to
-    obtain the ordinary Bernoulli numbers.
+*******************************************************************************
 
-    In fact, we use a slightly different generating function corresponding
-    to the scaled coefficients $d_k = 2^{k/2} B_k / k!$ ($k$ even). This
-    series is split into four separate power series to improve performance.
-    The formula is given in \citep{BuhlerCrandallSompolski1992}.
+void bell_number(fmpz_t b, ulong n)
 
-    %[1] J.P. Buhler, R.E. Crandall, R.W. Sompolski,
-    %    "Irregular Primes to One Million", Math. Comp. Vol 59,
-    %    No. 200 (Oct. 1992), pp. 717-722.
+    Sets \code{b} to the \code{n}:th Bell number $B_n$, defined as the
+    number of partitions of a set with \code{n} members. Equivalently,
+    $B_n = \sum_{k=0}^n S_2(n,k)$ where $S_2(n,k)$ denotes a Stirling number
+    of the second kind.
 
-void _fmpz_bernoulli_vec_recursive(fmpz_t den, fmpz * b, long n)
+    This function uses a table lookup if $B_n$ fits in a single word,
+    and otherwise evaluates a precise truncation of the series
+    $B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}$ using binary splitting.
 
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$
-    using table lookup for the initial numbers with single-limb numerators,
-    and then using a recursive formula expressing $B_m$ as a sum over
-    $B_k$ for $k$ congruent to $m$ modulo 6.
+void bell_number_vec(fmpz * b, long n)
 
-    All operations are performed using integer arithmetic to avoid costly GCDs,
-    making this algorithm fast for small $n$, say $n < 1000$. The fully
-    reduced denominator is calculated immediately as the primorial of $n + 1$.
+    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive. Automatically switches between the \code{recursive}
+    and \code{multi_mod} algorithms depending on the size of $n$.
+
+double bell_number_size(ulong n)
+
+    Returns $b$ such that $B_n < 2^{\lfloor b \rfloor}$, using the inequality
+    $$B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n$$
+    which is given in \cite{BerTas2010}.
+
+void _bell_number_vec_recursive(fmpz * b, long n)
+
+    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive. This function uses table lookup if $B_{n-1}$ fits in a
+    single word, and a simple triangular recurrence otherwise.
+
+void _bell_number_vec_multi_mod(fmpz * b, long n)
+
+    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive.
+
+    This function evaluates the Bell numbers modulo several limb-size
+    primes using the exponential generating function
+    $$e^{e^x-1} = \sum_{n=0}^{\infty} \frac{B_n}{n!} x^n$$ and
+    \code{nmod_poly} arithmetic. A tight bound for the number of needed
+    primes is computed using \code{bell_number_size}, and the final
+    integer values are recovered using balanced CRT reconstruction.
+
+
+*******************************************************************************
+
+    Bernoulli numbers and polynomials
+
+*******************************************************************************
+
+void bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{(num, den)} to the reduced numerator and denominator
+    of the $n$-th Bernoulli number. As presently implemented,
+    this function simply calls \code{_bernoulli_number_zeta}.
+
+void bernoulli_number_vec(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of the Bernoulli numbers
+    $B_0, B_1, B_2, \ldots, B_{n-1}$ inclusive. This function automatically
+    chooses between the \code{recursive}, \code{zeta} and \code{multi_mod}
+    algorithms according to the size of $n$.
+
+void bernoulli_number_denom(fmpz_t den, ulong n)
+
+    Sets \code{den} to the reduced denominator of the $n$-th
+    Bernoulli number $B_n$. For even $n$, the denominator is computed
+    as the product of all primes $p$ for which $p - 1$ divides $n$;
+    this property is a consequence of the von Staudt-Clausen theorem.
+    For odd $n$, the denominator is trivial (\code{den} is set to 1 whenever
+    $B_n = 0$). The initial sequence of values smaller than $2^{32}$ are
+    looked up directly from a table.
+
+double bernoulli_number_size(ulong n)
+
+    Returns $b$ such that $|B_n| < 2^{\lfloor b \rfloor}$, using the inequality
+    $$|B_n| < \frac{4 n!}{(2\pi)^n}$$ and $n! \le (n+1)^{n+1} e^{-n}$.
+    No special treatment is given to odd $n$. Accuracy is not guaranteed
+    if $n > 10^{14}$.
+
+void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Bernoulli polynomial of degree $n$,
+    $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
+    is a Bernoulli number. This function basically calls
+    \code{bernoulli_number_vec} and then rescales the coefficients
+    efficiently.
+
+void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+
+    Sets \code{(num, den)} to the reduced numerator and denominator
+    of the $n$-th Bernoulli number.
+
+    This function first computes the exact denominator and a bound
+    for the size of the numerator. It then computes an approximation
+    of $|B_n| = 2n! \zeta(n) / (2 \pi)^n$ as a floating-point number
+    and multiplies by the denominator to to obtain a real number
+    that rounds to the exact numerator. For tiny $n$, the numerator
+    is looked up from a table to avoid unnecessary overhead.
+
+void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive.
+
+    The first few entries are computed using \code{bernoulli_number},
+    and then Ramanujan's recursive formula expressing $B_m$ as a sum over
+    $B_k$ for $k$ congruent to $m$ modulo 6 is applied repeatedly.
+
+    To avoid costly GCDs, the numerators are transformed internally
+    to a common denominator and all operations are performed using
+    integer arithmetic. This makes the algorithm fast for small $n$,
+    say $n < 1000$. The common denominator is calculated directly
+    as the primorial of $n + 1$.
 
     %[1] http://en.wikipedia.org/w/index.php?
     %    title=Bernoulli_number&oldid=405938876
 
-void fmpz_bernoulli_vec(fmpz_t den, fmpz * num, long n)
+void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n)
 
-    Computes the Bernoulli numbers $B_0, B_1, \dotsc, B_{n-1}$ for $n \geq 0$
-    as a vector of integer numerators \code{num} with a common
-    denominator \code{den}. The denominator is reduced to lowest terms.
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive. Uses repeated direct calls to \code{_bernoulli_number_zeta}.
 
-void fmpq_poly_bernoulli(fmpq_poly_t poly, long n)
+void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 
-    For $n \geq 0$, sets \code{poly} to the Bernoulli polynomial of degree $n$,
-    $B_n(x) = \sum_{k=0}^n \binom{n}{k} B_k x^{n-k}$ where $B_k$
-    is a Bernoulli number.
+    Sets the elements of \code{num} and \code{den} to the reduced
+    numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
+    inclusive. Uses the generating function 
+
+    $$\frac{x^2}{\cosh(x)-1} = \sum_{k=0}^{\infty}
+        \frac{(2-4k) B_{2k}}{(2k)!} x^{2k}$$
+
+    which is evaluated modulo several limb-size primes using \code{nmod_poly}
+    arithmetic to yield the numerators of the Bernoulli numbers after
+    multiplication by the denominators and CRT reconstruction. This formula,
+    given (incorrectly) in \citep{BuhlerCrandallSompolski1992}, saves about
+    half of the time compared to the usual generating function $x/(e^x-1)$
+    since the odd terms vanish.
+
+*******************************************************************************
+
+    Euler numbers and polynomials
+
+    Euler numbers are the integers $E_n$ defined by
+    $$\frac{1}{\cosh(t)} = \sum_{n=0}^{\infty} \frac{E_n}{n!} t^n.$$
+    With this convention, the odd-indexed numbers are zero and the even
+    ones alternate signs, viz.
+    $E_0, E_1, E_2, \ldots = 1, 0, -1, 0, 5, 0, -61, 0, 1385, 0, \ldots$.
+    The corresponding Euler polynomials are defined by
+    $$\frac{2e^{xt}}{e^t+1} = \sum_{n=0}^{\infty} \frac{E_n(x)}{n!} t^n.$$
+
+*******************************************************************************
+
+void euler_number(fmpz_t res, ulong n)
+
+    Sets \code{res} to the Euler number $E_n$. Currently calls
+    \code{_euler_number_zeta}.
+
+void euler_number_vec(fmpz * res, long n)
+
+    Computes the Euler numbers $E_0, E_1, \dotsc, E_{n-1}$ for $n \geq 0$
+    and stores the result in \code{res}, which must be an initialised
+    \code{fmpz} vector of sufficient size.
+
+    This function evaluates the even-index $E_k$ modulo several limb-size
+    primes using the generating function and \code{nmod_poly} arithmetic.
+    A tight bound for the number of needed primes is computed using
+    \code{euler_number_size}, and the final integer values are recovered
+    using balanced CRT reconstruction.
+
+double euler_number_size(ulong n)
+
+    Returns $b$ such that $|E_n| < 2^{\lfloor b \rfloor}$, using the inequality
+    $$|E_n| < \frac{2^{n+2} n!}{\pi^{n+1}}$$ and $n! \le (n+1)^{n+1} e^{-n}$.
+    No special treatment is given to odd $n$.
+    Accuracy is not guaranteed if $n > 10^{14}$.
+
+void euler_polynomial(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Euler polynomial $E_n(x)$. Uses the formula
+    $$E_n(x) = \frac{2}{n+1}\left(B_{n+1}(x) - 
+        2^{n+1}B_{n+1}\left(\frac{x}{2}\right)\right),$$
+    with the Bernoulli polynomial $B_{n+1}(x)$ evaluated once
+    using \code{bernoulli_polynomial} and then rescaled.
+
+void _euler_number_zeta(fmpz_t res, ulong n)
+
+    Sets \code{res} to the Euler number $E_n$. For even $n$, this function
+    uses the relation $$|E_n| = \frac{2^{n+2} n!}{\pi^{n+1}} L(n+1)$$
+    where $L(n+1)$ denotes the Dirichlet $L$-function with character
+    $\chi = \{ 0, 1, 0, -1 \}$.
+
+*******************************************************************************
+
+    Legendre polynomials
+
+*******************************************************************************
+
+void legendre_polynomial(fmpq_poly_t poly, ulong n)
+
+    Sets \code{poly} to the $n$-th Legendre polynomial
+    $$P_n(x) = \frac{1}{2^n n!} \frac{d^n}{dx^n} \left[
+        \left(x^2-1\right)^n \right].$$
+    The coefficients are calculated using a hypergeometric recurrence.
+    To improve performance, the common denominator is computed in one step
+    and the coefficients are evaluated using integer arithmetic. The
+    denominator is given by
+    $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
 *******************************************************************************
 
@@ -266,3 +446,55 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
     The first squaring is done directly since the polynomial is very 
     sparse at this point.
 
+
+*******************************************************************************
+
+    Swinnerton-Dyer polynomials
+
+*******************************************************************************
+
+void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Swinnerton-Dyer polynomial $S_n$, defined as
+    the integer polynomial
+    $$S_n = \prod (x \pm \sqrt{2} \pm \sqrt{3}
+        \pm \sqrt{5} \pm \ldots \pm \sqrt{p_n})$$
+    where $p_n$ denotes the $n$-th prime number and all combinations
+    of signs are taken. This polynomial has degree $2^n$ and is
+    irreducible over the integers.
+
+
+*******************************************************************************
+
+    Partition function
+
+*******************************************************************************
+
+void partition_function_vec(fmpz * res, long len)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$. Uses inversion of Euler's pentagonal series.
+
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$, modulo the modulus defined by \code{mod}.
+    Uses inversion of Euler's pentagonal series.
+
+
+*******************************************************************************
+
+    Landau's function
+
+*******************************************************************************
+
+void landau_function_vec(fmpz * res, long len)
+
+    Computes the first \code{len} values of Landau's function $g(n)$
+    starting with $g(0)$. Landau's function gives the largest order
+    of an element of the symmetric group $S_n$.
+
+    Implements the ``basic algorithm'' given in
+    \cite{DelegliseNicolasZimmermann2009}. The running time is
+    $O(n^{3/2} / \sqrt{\log n})$.

@@ -32,7 +32,7 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-void check_row_echelon_form(fmpz_mat_t A)
+void check_row_echelon_form(long * perm, fmpz_mat_t A)
 {
     long i, j, prev_pivot, prev_row_zero;
 
@@ -74,6 +74,7 @@ main(void)
     fmpz_mat_t A;
     flint_rand_t state;
     long i, m, n, b, d, r, rank;
+    long * perm;
 
     printf("rowreduce....");
     fflush(stdout);
@@ -85,6 +86,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
+        perm = malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -92,16 +94,18 @@ main(void)
             d = n_randint(state, 2*m*n + 1);
             fmpz_mat_init(A, m, n);
             fmpz_mat_randrank(A, state, r, b);
-            rank = _fmpz_mat_rowreduce(A, ROWREDUCE_CLEAR_LOWER);
+            rank = _fmpz_mat_rowreduce(perm, A, ROWREDUCE_CLEAR_LOWER);
             if (r != FLINT_ABS(rank))
             {
                 printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
-            check_row_echelon_form(A);
+            check_row_echelon_form(perm, A);
             fmpz_mat_clear(A);
         }
+
+        free(perm);
     }
 
     /* Dense */
@@ -109,6 +113,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
+        perm = malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -120,7 +125,7 @@ main(void)
 
             fmpz_mat_randops(A, state, d);
 
-            rank = _fmpz_mat_rowreduce(A, ROWREDUCE_CLEAR_LOWER);
+            rank = _fmpz_mat_rowreduce(perm, A, ROWREDUCE_CLEAR_LOWER);
             if (r != FLINT_ABS(rank))
             {
                 printf("FAIL:\n");
@@ -128,10 +133,12 @@ main(void)
                 abort();
             }
 
-            check_row_echelon_form(A);
+            check_row_echelon_form(perm, A);
 
             fmpz_mat_clear(A);
         }
+
+        free(perm);
     }
 
     flint_randclear(state);

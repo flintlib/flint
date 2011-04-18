@@ -46,6 +46,15 @@ nmod_mat_struct;
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef nmod_mat_struct nmod_mat_t[1];
 
+static __inline__
+void
+_nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
+{
+    mat->mod.n = n;
+    mat->mod.ninv = n_preinvert_limb(n);
+    count_leading_zeros(mat->mod.norm, n);
+}
+
 /* Memory management */
 void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
@@ -91,9 +100,21 @@ void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
 
+int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
+
+long _nmod_mat_rowreduce_1(nmod_mat_t mat, int options);
+long _nmod_mat_rowreduce_2(nmod_mat_t mat, int options);
+long _nmod_mat_rowreduce_r(nmod_mat_t mat, int options);
 long _nmod_mat_rowreduce(nmod_mat_t mat, int options);
 
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved);
+mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved);
+mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
+
+
+mp_limb_t _nmod_mat_det_rowreduce(nmod_mat_t A);
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
+
 long nmod_mat_rank(const nmod_mat_t A);
 
 void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);

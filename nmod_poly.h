@@ -485,6 +485,10 @@ void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
 
 void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x);
 
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, long len, nmod_t mod);
+
+void nmod_poly_integral(nmod_poly_t x_int, const nmod_poly_t x);
+
 /* Evaluation  ***************************************************************/
 
 mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly, 
@@ -517,5 +521,71 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
-#endif
+/* Square roots **************************************************************/
 
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+/* Transcendental functions **************************************************/
+
+void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atan_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_asin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sin_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_sin_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_asinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_asinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_sinh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_sinh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_cosh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+void _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+void nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
+
+void _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod);
+void nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n);
+
+void _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff,
+                ulong power, long n, nmod_t mod);
+void nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
+                ulong power, long n);
+
+void
+__nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
+    mp_srcptr hprime, mp_ptr T, mp_ptr U, long n, nmod_t mod, int extend);
+
+void
+_nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
+                                    long hlen, long n, nmod_t mod);
+void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, long n);
+
+void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
+void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
+
+#endif
