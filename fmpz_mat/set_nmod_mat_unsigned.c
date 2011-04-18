@@ -23,66 +23,19 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "nmod_mat.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+void
+fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
 {
-    int i;
-    flint_rand_t state;
-    flint_randinit(state);
+    long i, j;
 
-    printf("get/set_nmod_mat....");
-    fflush(stdout);
-
-    for (i = 0; i < 10000; i++)
-    {
-        fmpz_mat_t A;
-        nmod_mat_t M, M2;
-        long rows, cols;
-        mp_limb_t mod;
-
-        rows = n_randint(state, 50);
-        cols = n_randint(state, 50);
-
-        mod = n_randtest_prime(state, 0);
-
-        nmod_mat_init(M, rows, cols, mod);
-        nmod_mat_init(M2, rows, cols, mod);
-        fmpz_mat_init(A, rows, cols);
-
-        nmod_mat_randtest(M, state);
-
-        if (i % 2 == 0)
-            fmpz_mat_set_nmod_mat(A, M);
-        else
-            fmpz_mat_set_nmod_mat_unsigned(A, M);
-
-        fmpz_mat_scalar_mul_ui(A, A, 2UL);
-        nmod_mat_add(M, M, M);
-        fmpz_mat_get_nmod_mat(M2, A);
-
-        if (!nmod_mat_equal(M, M2))
-        {
-            printf("FAIL!\n");
-            abort();
-        }
-
-        fmpz_mat_clear(A);
-        nmod_mat_clear(M);
-        nmod_mat_clear(M2);
-    }
-
-    flint_randclear(state);
-
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    for (i = 0; i < Amod->r; i++)
+        for (j = 0; j < Amod->c; j++)
+            fmpz_set_ui(fmpz_mat_entry(A, i, j), nmod_mat_entry(Amod, i, j));
 }

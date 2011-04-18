@@ -72,6 +72,8 @@ void fmpz_mat_unit(fmpz_mat_t mat);
 
 
 void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
+void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod);
+
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
 /* Input and output  *********************************************************/

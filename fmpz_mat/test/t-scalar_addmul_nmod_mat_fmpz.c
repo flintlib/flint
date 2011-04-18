@@ -63,7 +63,7 @@ main(void)
 
         fmpz_randtest(c, state, 100);
         nmod_mat_randtest(M, state);
-        fmpz_mat_set_nmod_mat(A, M);
+        fmpz_mat_set_nmod_mat_unsigned(A, M);
 
         fmpz_mat_randtest(B, state, 100);
         fmpz_mat_set(C, B);

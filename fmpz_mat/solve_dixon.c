@@ -130,7 +130,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
 
             /* d = (d - Ay) / p */
             /* TODO: implement fmpz_mat_mul_nmod_mat to avoid y? */
-            fmpz_mat_set_nmod_mat(y, ymod);
+            fmpz_mat_set_nmod_mat_unsigned(y, ymod);
             fmpz_mat_mul(Ay, A, y);
             fmpz_mat_sub(d, d, Ay);
             fmpz_mat_scalar_divexact_ui(d, d, p);
