@@ -121,9 +121,35 @@ long fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
 
-void fmpz_set_si(fmpz_t f, long val);
+static __inline__ void
+fmpz_set_si(fmpz_t f, long val)
+{
+    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_si(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
+}
 
-void fmpz_set_ui(fmpz_t f, ulong val);
+static __inline__ void
+fmpz_set_ui(fmpz_t f, ulong val)
+{
+    if (val > COEFF_MAX)        /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_ui(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
+}
 
 void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 
@@ -191,7 +217,22 @@ int fmpz_sgn(const fmpz_t f);
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f);
 
-void fmpz_neg(fmpz_t f1, const fmpz_t f2);
+static __inline__ void
+fmpz_neg(fmpz_t f1, const fmpz_t f2)
+{
+    if (!COEFF_IS_MPZ(*f2))     /* coeff is small */
+    {
+        fmpz t = -*f2;          /* Need to save value in case of aliasing */
+        _fmpz_demote(f1);
+        *f1 = t;
+    }
+    else                        /* coeff is large */
+    {
+        /* No need to retain value in promotion, as if aliased, both already large */
+        __mpz_struct *mpz_ptr = _fmpz_promote(f1);
+        mpz_neg(mpz_ptr, COEFF_TO_PTR(*f2));
+    }
+}
 
 void fmpz_abs(fmpz_t f1, const fmpz_t f2);
 

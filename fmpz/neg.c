@@ -28,21 +28,4 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void
-fmpz_neg(fmpz_t f1, const fmpz_t f2)
-{
-    if (!COEFF_IS_MPZ(*f2))     /* coeff is small */
-    {
-        fmpz t = -*f2;          /* Need to save value in case of aliasing */
 
-        _fmpz_demote(f1);
-
-        *f1 = t;
-    }
-    else                        /* coeff is large */
-    {
-        /* No need to retain value in promotion, as if aliased, both already large */
-        __mpz_struct *mpz_ptr = _fmpz_promote(f1);
-        mpz_neg(mpz_ptr, COEFF_TO_PTR(*f2));
-    }
-}
