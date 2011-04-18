@@ -4,6 +4,10 @@
     Computes $u_1 p^{v_1} + u_2 p^{v_2} = p^{v_2} (u_1 p^{v_1 - v_2} + u_2)$.
 
     Assumes that \code{op1} , \code{op2} are non-zero and $v_1 > v_2$. 
+
+    Does not reduce the unit part.
+
+    Supports aliasing.
  */
 
 void _padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
