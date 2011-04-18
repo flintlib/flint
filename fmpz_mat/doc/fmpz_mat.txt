@@ -297,6 +297,19 @@ void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
     Sets the entries of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
+void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m, const nmod_poly_t poly2)
+
+    Given \code{mat1} with entries modulo \code{m} and \code{mat2}
+    with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
+    with signed entries satisfying $-mn/2 <= c < mn/2$.
+
+void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m1, const nmod_poly_t poly2)
+
+    Given \code{mat1} with entries modulo \code{m} and \code{mat2}
+    with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
+    with signed entries satisfying $0 <= c < mn$.
 
 *******************************************************************************
 

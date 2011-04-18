@@ -71,11 +71,6 @@ void fmpz_mat_zero(fmpz_mat_t mat);
 void fmpz_mat_unit(fmpz_mat_t mat);
 
 
-void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
-void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod);
-
-void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
-
 /* Input and output  *********************************************************/
 
 int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat);
@@ -98,6 +93,7 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
 
 void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 void fmpz_mat_randtest(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
+void fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 void fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 void fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2);
 void fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q);
@@ -196,6 +192,22 @@ long fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat);
 /* Inverse */
 
 void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+
+/* Modular reduction and reconstruction  ************************************/
+
+void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
+void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod);
+
+void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
+
+void
+fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
+                        const fmpz_t m1, const nmod_mat_t mat2);
+
+void
+fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
+                            const fmpz_t m1, const nmod_mat_t mat2);
+
 
 #define FMPZ_MAT_ASSERT(expr, msg)       \
     if (1)                               \
