@@ -1732,3 +1732,17 @@ void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
 
     Sets the coefficients of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
+
+void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m, const nmod_poly_t poly2)
+
+    Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
+    with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
+    with signed coefficients satisfying $-mn/2 <= c < mn/2$.
+
+void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
+                        const fmpz_t m1, const nmod_poly_t poly2)
+
+    Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
+    with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
+    with unsigned coefficients satisfying $0 <= c < mn$.
