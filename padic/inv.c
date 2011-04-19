@@ -22,17 +22,8 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     /* Unit part */
     fmpz_init(pow);
-    if (op[1] <= 0)
-    {
-        fmpz_pow_ui(pow, ctx->p, ctx->N + op[1]);
-        fmpz_invmod(rop, op, pow);
-    }
-    else
-    {
-        fmpz_pow_ui(pow, ctx->p, ctx->N - op[1]);
-        fmpz_mod(rop, op, pow);
-        fmpz_invmod(rop, rop, pow);
-    }
+    fmpz_pow_ui(pow, ctx->p, ctx->N + op[1]);
+    fmpz_invmod(rop, op, pow);
     fmpz_clear(pow);
     
     /* Valuation part */

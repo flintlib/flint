@@ -169,14 +169,9 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Computes the inverse of \code{op} modulo $p^N$.
 
-    Suppose that \code{op} is given as $x = u p^v$ modulo $p^N$.  
-    If $v \leq 0$ then we can find the exact inverse of $x$ modulo $p^N$ 
-    by inverting $u$ modulo $p^{N + v}$.  Otherwise, if $v > 0$ then 
-    this operation is only correct modulo $p^{N - v}$.
-
-    If $v < 0$ and $N \leq -v$ then $x$ has no inverse defined 
-    modulo $p^N$.  In this case, this function sets \code{rop} 
-    to zero.
+    Suppose that \code{op} is given as $x = u p^v$. 
+    Raises an \code{abort} signal if $v < -N$.  Otherwise, computes 
+    the inverse of $u$ modulo $p^{N+v}$.
 
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx)
