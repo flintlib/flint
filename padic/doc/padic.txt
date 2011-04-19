@@ -153,12 +153,8 @@ void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
-    Sets \code{rop} to the product of \code{op1} and 
-    \code{op2} modulo $p^N$.
-
-    Let $v$ denote the minimum of the valuations of the two operands. 
-    This operation is exact modulo $p^N$ whenever $v \geq 0$.  Otherwise, 
-    the operation is only guaranteed to be correct modulo $p^{N - v}$.
+    Sets \code{rop} to the product of \code{op1} and \code{op2} 
+    modulo $p^N$.
 
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
