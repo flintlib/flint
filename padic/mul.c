@@ -14,10 +14,11 @@ void _padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
     if (rop[1] >= ctx->N)
     {
         padic_zero(rop, ctx);
-        return;
     }
-
-    fmpz_mul(rop, op1, op2);
+    else
+    {
+        fmpz_mul(rop, op1, op2);
+    }
 }
 
 void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
