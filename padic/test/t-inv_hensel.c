@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("inv... ");
+    printf("inv_hensel... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,8 +60,8 @@ main(void)
 
         padic_randtest_not_zero(a, state, ctx);
 
-        padic_inv(d, a, ctx);
-        padic_inv(a, a, ctx);
+        padic_inv_hensel(d, a, ctx);
+        padic_inv_hensel(a, a, ctx);
 
         result = (padic_equal(a, d, ctx));
         if (!result)
@@ -79,7 +79,7 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Check that correct only mod p^{N-v} */
+    /* Check that correct only mod p^{N} */
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
@@ -107,7 +107,7 @@ main(void)
 
             padic_ctx_init(ctx2, p, N - FLINT_ABS(v), PADIC_SERIES);
 
-            padic_inv(b, a, ctx);
+            padic_inv_hensel(b, a, ctx);
             padic_mul(d, a, b, ctx);
 
             padic_normalise(d, ctx2);
@@ -121,6 +121,8 @@ main(void)
                 printf("d = "), padic_print(d, ctx2), printf("\n");
                 abort();
             }
+
+            padic_ctx_clear(ctx2);
         }
 
         padic_clear(a, ctx);

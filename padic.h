@@ -133,6 +133,8 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx);
 
