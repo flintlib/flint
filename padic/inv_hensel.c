@@ -45,8 +45,8 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
     else
     {
-        long *a, i;
-        fmpz *W, *pow;
+        long *a, i, len;
+        fmpz *W, *pow, *u;
 
         for (i = 1; (1L << i) < N; i++) ;
 
@@ -54,36 +54,38 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         a[i = 0] = N;
         while (N > 1)
             a[++i] = (N = (N + 1) / 2);
+        len = i + 1;
 
-        W   = _fmpz_vec_init(3);
-        pow = W + 2;
+        W   = _fmpz_vec_init(2);
+        pow = _fmpz_vec_init(len);
+        u   = _fmpz_vec_init(len);
 
-        /* Base case */
         {
-            fmpz_set(pow, p);
-            fmpz_invmod(rop, op, pow);
+            fmpz_pow_ui(pow, p, a[0]);
+            fmpz_mod(u, op, pow);
+        }
+        for (i = 1; i < len; i++)
+        {
+            fmpz_pow_ui(pow + i, p, a[i]);
+            fmpz_mod(u + i, u + (i - 1), pow + i);
         }
 
+        i = len - 1;
+        {
+            fmpz_invmod(rop, u + i, pow + i);
+        }
         for (i--; i >= 0; i--)
         {
-            N = a[i];
-
-            fmpz_mul(W, pow, pow);
-            if (N & 1L)
-                fmpz_divexact(pow, W, p);
-            else
-                fmpz_swap(pow, W);
-
-            fmpz_mul(W, op, rop);
+            fmpz_mul(W, u + i, rop);
             fmpz_sub_ui(W, W, 1);
-            fmpz_mod(W, W, pow);
             fmpz_mul(W + 1, W, rop);
             fmpz_sub(rop, rop, W + 1);
-            fmpz_mod(rop, rop, pow);
+            fmpz_mod(rop, rop, pow + i);
         }
 
-        _fmpz_vec_clear(W, 3);
         free(a);
+        _fmpz_vec_clear(W, 2);
+        _fmpz_vec_clear(pow, len);
     }
 
     /* Valuation part */
