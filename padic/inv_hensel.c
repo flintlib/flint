@@ -27,7 +27,8 @@
 #include "padic.h"
 
 /*
-    Assumes that op is non-zero and that op has valuation v s.t. 
+    Assumes that op is non-zero, that the unit part is 
+    not divisible by p and that the valuation v is s.t. 
     v > -N.
 
     Does not support aliasing.
@@ -45,7 +46,6 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     else
     {
         long *a, i;
-        long K = 1;  /* TODO:  Choice of cutoff */
         fmpz *W, *pow;
 
         for (i = 1; (1L << i) < N; i++) ;
@@ -60,8 +60,7 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         /* Base case */
         {
-            fmpz_pow_ui(pow, p, K);
-
+            fmpz_set(pow, p);
             fmpz_invmod(rop, op, pow);
         }
 
