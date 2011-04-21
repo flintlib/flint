@@ -50,6 +50,7 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         for (i = 1; (1L << i) < N; i++) ;
 
+        /* Compute sequence of exponents */
         a = malloc((i + 1) * sizeof(long));
         a[i = 0] = N;
         while (N > 1)
@@ -60,16 +61,42 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         pow = _fmpz_vec_init(len);
         u   = _fmpz_vec_init(len);
 
+        /* Compute powers of p */
+        i = len - 1;
         {
-            fmpz_pow_ui(pow, p, a[0]);
+            fmpz_set_ui(W, 1);
+            fmpz_set(pow + i, p);
+        }
+        for (i--; i >= 1; i--)
+        {
+            if (a[i] & 1L)
+            {
+                fmpz_mul(pow + i, W, pow + (i + 1));
+                fmpz_mul(W, W, W);
+            }
+            else
+            {
+                fmpz_mul(W, W, pow + (i + 1));
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+            }
+        }
+        {
+            if (a[i] & 1L)
+                fmpz_mul(pow + i, W, pow + (i + 1));
+            else
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+        }
+
+        /* Compute reduced units */
+        {
             fmpz_mod(u, op, pow);
         }
         for (i = 1; i < len; i++)
         {
-            fmpz_pow_ui(pow + i, p, a[i]);
             fmpz_mod(u + i, u + (i - 1), pow + i);
         }
 
+        /* Run Newton iteration */
         i = len - 1;
         {
             fmpz_invmod(rop, u + i, pow + i);
@@ -86,6 +113,7 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         free(a);
         _fmpz_vec_clear(W, 2);
         _fmpz_vec_clear(pow, len);
+        _fmpz_vec_clear(u, len);
     }
 
     /* Valuation part */
