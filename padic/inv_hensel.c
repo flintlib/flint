@@ -57,12 +57,11 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             a[++i] = (N = (N + 1) / 2);
         len = i + 1;
 
-        W   = _fmpz_vec_init(2);
-        pow = _fmpz_vec_init(len);
-        u   = _fmpz_vec_init(len);
+        W   = _fmpz_vec_init(2 + 2 * len);
+        pow = W + 2;
+        u   = W + 2 + len;
 
         /* Compute powers of p */
-        i = len - 1;
         {
             fmpz_set_ui(W, 1);
             fmpz_set(pow + i, p);
@@ -111,9 +110,7 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         }
 
         free(a);
-        _fmpz_vec_clear(W, 2);
-        _fmpz_vec_clear(pow, len);
-        _fmpz_vec_clear(u, len);
+        _fmpz_vec_clear(W, 2 + 2 * len);
     }
 
     /* Valuation part */
