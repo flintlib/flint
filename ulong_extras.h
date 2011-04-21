@@ -169,6 +169,8 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
     return n_submod(0, x, n);
 }
 
+mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
+
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 
 mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y);

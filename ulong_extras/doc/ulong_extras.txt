@@ -413,6 +413,13 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
     This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
 
+mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
+
+    Computes a square root of $a$ modulo $p$.
+
+    Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
+    Returns 0 if $a$ is a quadratic non-residue modulo $p$.
+
 *******************************************************************************
 
     Prime number generation and counting
