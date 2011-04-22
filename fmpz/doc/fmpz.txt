@@ -457,6 +457,11 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 
     Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
 
+int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
+
+    Returns whether $a$ is a quadratic residue or zero modulo $p$ 
+    and sets $b$ to a square root of $a$ if this is the case.
+
 void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
     Sets $f$ to the integer part of the square root of $g$, where 
