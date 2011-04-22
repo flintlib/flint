@@ -110,7 +110,7 @@ static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
-void _fmpq_print(fmpz_t num, fmpz_t den);
+void _fmpq_print(const fmpz_t num, const fmpz_t den);
 
 void fmpq_print(const fmpq_t x);
 

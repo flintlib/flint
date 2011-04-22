@@ -31,7 +31,7 @@
 
 
 void
-_fmpq_print(fmpz_t num, fmpz_t den)
+_fmpq_print(const fmpz_t num, const fmpz_t den)
 {
     if (fmpz_is_one(den))
     {
