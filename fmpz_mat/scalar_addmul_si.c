@@ -32,8 +32,6 @@
 void
 fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
 {
-    long i, j;
-
     if (c > 0)
         fmpz_mat_scalar_addmul_ui(B, A, c);
     else
