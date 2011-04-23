@@ -298,3 +298,6 @@ padic
 
 * Implement "padic_get_str"
 
+* Add test code and documentation for padic_sqrt
+
+* Rename inv to inv_naive and have a method inv as alias for inv_hensel
