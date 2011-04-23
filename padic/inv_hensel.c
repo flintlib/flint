@@ -27,18 +27,13 @@
 #include "padic.h"
 
 /*
-    Assumes that op is non-zero, that the unit part is 
-    not divisible by p and that the valuation v is s.t. 
-    v > -N.
+    Assumes that op is a unit modulo $p^N$.
 
-    Does not support aliasing.
+    In the current implementation, supports aliasing, but this 
+    might change.
  */
-void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
-    long N = ctx->N + op[1];
-    const fmpz *p = ctx->p;
-
-    /* Unit part */
     if (N == 1)
     {
         fmpz_invmod(rop, op, p);
@@ -112,9 +107,6 @@ void _padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         free(a);
         _fmpz_vec_clear(W, 2 + 2 * len);
     }
-
-    /* Valuation part */
-    rop[1] = -op[1];
 }
 
 void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -135,18 +127,8 @@ void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return;
     }
 
-    if (rop != op)
-    {
-        _padic_inv_hensel(rop, op, ctx);
-    }
-    else
-    {
-        padic_t t;
+    _padic_inv_hensel(rop, op, ctx->p, ctx->N + op[1]);
 
-        padic_init(t, ctx);
-        _padic_inv_hensel(t, op, ctx);
-        padic_swap(rop, t, ctx);
-        padic_clear(t, ctx);
-    }
+    rop[1] = -op[1];
 }
 
