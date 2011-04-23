@@ -185,6 +185,32 @@ int fmpz_cmp_ui(const fmpz_t f, ulong g);
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
+static __inline__
+int fmpz_is_even(const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        return !((*f) & 1L);
+    }
+    else
+    {
+        return mpz_even_p(COEFF_TO_PTR(*f));
+    }
+}
+
+static __inline__
+int fmpz_is_odd(const fmpz_t f)
+{
+    if (!COEFF_IS_MPZ(*f))
+    {
+        return ((*f) & 1L);
+    }
+    else
+    {
+        return mpz_odd_p(COEFF_TO_PTR(*f));
+    }
+}
+
 mp_size_t fmpz_size(const fmpz_t f);
 
 int fmpz_sgn(const fmpz_t f);
