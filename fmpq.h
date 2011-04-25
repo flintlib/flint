@@ -153,7 +153,10 @@ void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 
 void fmpq_submul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
+
 void fmpq_inv(fmpq_t dest, const fmpq_t src);
+
+void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 
 int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod);

@@ -29,28 +29,16 @@
 #include "fmpq.h"
 #include "ulong_extras.h"
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
+
+void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
-    if (q == 1 || p == 0)
+    if (fmpz_is_zero(fmpq_denref(op2)))
     {
-        fmpz_set_si(rnum, p);
-        fmpz_set_ui(rden, 1);
+        printf("exception: fmpq_div: division by zero");
+        abort();
     }
-    else
-    {
-        ulong r = FLINT_ABS(p);
 
-        if (r >= q)
-            r = n_gcd(r, q);
-        else
-            r = n_gcd(q, r);
-
-        fmpz_set_si(rnum, p / r);
-        fmpz_set_ui(rden, q / r);
-    }
-}
-
-void fmpq_set_si(fmpq_t res, long p, ulong q)
-{
-    _fmpq_set_si(&res->num, &res->den, p, q);
+    _fmpq_mul(fmpq_numref(res), fmpq_denref(res),
+              fmpq_numref(op1), fmpq_denref(op1),
+              fmpq_denref(op2), fmpq_numref(op2));
 }
