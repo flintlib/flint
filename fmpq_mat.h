@@ -142,6 +142,8 @@ void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Echelon form **************************************************************/
 
+int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c);
+
 long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
 long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A);

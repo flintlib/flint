@@ -94,6 +94,17 @@ void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 
 *******************************************************************************
 
+    Special matrices
+
+*******************************************************************************
+
+void fmpq_mat_hilbert_matrix(fmpq_mat_t mat)
+
+    Sets \code{mat} to a Hilbert matrix of the given size. That is,
+    the entry at row $i$ and column $j$ is set to $1/(i+j+1)$.
+
+*******************************************************************************
+
     Basic comparison and properties
 
 *******************************************************************************
@@ -101,7 +112,7 @@ void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 int fmpq_mat_equal(const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 
     Returns nonzero if \code{mat1} and \code{mat2} have the same shape and
-    all their entries agree, and returns zero otherwise. Assumes that the
+    all their entries agree, and returns zero otherwise. Assumes the
     entries in both \code{mat1} and \code{mat2} to be in canonical form.
 
 int fmpq_mat_is_integral(const fmpq_mat_t mat)
@@ -174,12 +185,12 @@ void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den,
 
 void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src)
 
-    Set \code{dest} to \code{src}.
+    Sets \code{dest} to \code{src}.
 
 void fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t mat, const fmpz_mat_t num,
     const fmpz_t den)
 
-    Set \code{mat} to the integer matrix \code{num} divided by the
+    Sets \code{mat} to the integer matrix \code{num} divided by the
     common denominator \code{den}.
 
 *******************************************************************************
@@ -248,9 +259,10 @@ void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
 
 void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat)
 
-    Sets \code{det} to the determinant of \code{mat}. Apart from matrices
-    of trivial dimension, the determinant is computed by clearing
-    denominators and computing a determinant over the integers.
+    Sets \code{det} to the determinant of \code{mat}. In the general case,
+    the determinant is computed by clearing denominators and computing a
+    determinant over the integers. Matrices of size 0, 1 or 2 are handled
+    directly.
 
 *******************************************************************************
 
@@ -282,13 +294,36 @@ void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the inverse matrix of \code{A}.
 
+
 *******************************************************************************
 
     Echelon form
 
 *******************************************************************************
 
+int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
+
+    Helper function for row reduction. Returns 1 if the entry of \code{mat}
+    at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero
+    entry in the same column among rows $r+1, r+2, \ldots$. If a nonzero
+    entry is found at row $s$, swaps rows $r$ and $s$ and the corresponding
+    entries in \code{perm} (unless \code{NULL}) and returns -1. If no
+    nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
+
+void fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
+
+    Sets \code{B} to the reduced row echelon form of \code{A}. Performs
+    Gauss-Jordan elimination directly over the rational numbers.
+    This algorithm is usually very inefficient and is mainly intended
+    to be used for testing purposes.
+
+void fmpq_mat_rref_cleared(fmpq_mat_t B, const fmpq_mat_t A)
+
+    Sets \code{B} to the reduced row echelon form of \code{A}. Clears
+    denominators and performs fraction-free Gauss-Jordan elimination
+    using \code{fmpz_mat} functions.
+
 void fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A}.
-
+    This function simply calls \code{fmpq_mat_rref_cleared}

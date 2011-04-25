@@ -31,35 +31,6 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-static int
-_pivot(long * perm, fmpq_mat_t mat, long from_row, long in_column)
-{
-    long t, j;
-    fmpq * u;
-
-    if (!fmpq_is_zero(fmpq_mat_entry(mat, from_row, in_column)))
-        return 1;
-
-    for (j = from_row + 1; j < mat->r; j++)
-    {
-        if (!fmpq_is_zero(fmpq_mat_entry(mat, j, in_column)))
-        {
-            if (perm)
-            {
-                t = perm[j];
-                perm[j] = perm[from_row];
-                perm[from_row] = t;
-            }
-
-            u = mat->rows[j];
-            mat->rows[j] = mat->rows[from_row];
-            mat->rows[from_row] = u; 
-            return -1;
-        }
-    }
-    return 0;
-}
-
 
 long
 fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
@@ -85,7 +56,7 @@ fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 
     while (pivot_row < m && pivot_col < n)
     {
-        if (!_pivot(perm, B, pivot_row, pivot_col))
+        if (!fmpq_mat_pivot(perm, B, pivot_row, pivot_col))
         {
             pivot_col++;
             continue;
@@ -104,7 +75,8 @@ fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
         /* Eliminate rows above and below */
         for (i = 0; i < m; i++)
         {
-            if (i == pivot_row)
+            if (i == pivot_row ||
+                fmpq_is_zero(fmpq_mat_entry(B, i, pivot_col)))
                 continue;
 
             for (j = pivot_col + 1; j < n; j++)
