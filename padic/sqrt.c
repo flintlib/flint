@@ -43,8 +43,6 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
     if (N == 1)
     {
         ans = fmpz_sqrtmod(rop, op, p);
-        if (ans)
-            fmpz_invmod(rop, rop, p);
         return ans;
     }
     else
@@ -89,8 +87,6 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
             else
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
         }
-
-        fmpz_set_ui(W, 2);
 
         /* Compute reduced units */
         {
