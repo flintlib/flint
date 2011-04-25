@@ -30,6 +30,6 @@ clean:
 
 check: library
 	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
-	$(foreach prog, $(TESTS), ~/memtime-1.3/memtime $(BUILD_DIR)/$(prog);)
+	$(foreach prog, $(TESTS), $(BUILD_DIR)/$(prog);)
 
 .PHONY: profile clean check all
