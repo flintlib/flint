@@ -30,6 +30,31 @@
 #include "ulong_extras.h"
 
 
+
+void
+_fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
+            const fmpz_t op2num, const fmpz_t op2den)
+{
+    fmpz_t t, u;
+
+    fmpz_init(t);
+    fmpz_init(u);
+    fmpz_set(t, op2den);
+    fmpz_set(u, op2num);
+
+    _fmpq_mul(rnum, rden, op1num, op1den, t, u);
+
+    fmpz_clear(t);
+    fmpz_clear(u);
+
+    if (fmpz_sgn(rden) < 0)
+    {
+        fmpz_neg(rnum, rnum);
+        fmpz_neg(rden, rden);
+    }
+}
+
+
 void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
     if (fmpz_is_zero(fmpq_denref(op2)))
@@ -38,7 +63,7 @@ void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
         abort();
     }
 
-    _fmpq_mul(fmpq_numref(res), fmpq_denref(res),
+    _fmpq_div(fmpq_numref(res), fmpq_denref(res),
               fmpq_numref(op1), fmpq_denref(op1),
-              fmpq_denref(op2), fmpq_numref(op2));
+              fmpq_numref(op2), fmpq_denref(op2));
 }
