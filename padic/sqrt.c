@@ -54,9 +54,8 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
         /* Compute sequence of exponents */
         a = malloc((i + 1) * sizeof(long));
-        a[i = 0] = N;
-        while (N > 1)
-            a[++i] = (N = (N + 1) / 2);
+        for (a[i = 0] = N; a[i] > 1; i++)
+            a[i + 1] = (a[i] + 1) / 2;
         len = i + 1;
 
         W      = _fmpz_vec_init(2 + 2 * len);

@@ -301,3 +301,6 @@ padic
 * Add test code and documentation for padic_sqrt
 
 * Rename inv to inv_naive and have a method inv as alias for inv_hensel
+
+* Add aliasing cases to the test code for all functions where this 
+  is currently not the case

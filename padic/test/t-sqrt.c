@@ -36,7 +36,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sqrt....");
+    printf("sqrt... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,15 +65,51 @@ int main(void)
 
         padic_mul(d, b, b, ctx);
 
-        result = (!ans || padic_equal(a, d, ctx));
-        if (!result)
+        if (ans && a[1] < 0)
         {
-            printf("FAIL (random elements):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
-            printf("p = "), fmpz_print(p), printf("\n");
-            abort();
+            padic_ctx_t ctx2;
+            padic_t a2, d2;
+
+            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+
+            padic_init(a2, ctx2);
+            padic_init(d2, ctx2);
+            padic_set(a2, a, ctx2);
+            padic_set(d2, d, ctx2);
+            padic_normalise(a2, ctx2);
+            padic_normalise(d2, ctx2);
+
+            result = (padic_equal(a2, d2, ctx2));
+            if (!result)
+            {
+                printf("FAIL (random elements):\n\n");
+                printf("a = "), padic_print(a, ctx), printf("\n");
+                printf("b = "), padic_print(b, ctx), printf("\n");
+                printf("d = "), padic_print(d, ctx), printf("\n");
+                printf("a2 = "), padic_print(a2, ctx2), printf("\n");
+                printf("d2 = "), padic_print(d2, ctx2), printf("\n");
+                printf("p = "), fmpz_print(p), printf("\n");
+                printf("ans = %d\n", ans);
+                abort();
+            }
+
+            padic_clear(a2, ctx2);
+            padic_clear(d2, ctx2);
+            padic_ctx_clear(ctx2);
+        }
+        else
+        {
+            result = (!ans || padic_equal(a, d, ctx));
+            if (!result)
+            {
+                printf("FAIL (random elements):\n\n");
+                printf("a = "), padic_print(a, ctx), printf("\n");
+                printf("b = "), padic_print(b, ctx), printf("\n");
+                printf("d = "), padic_print(d, ctx), printf("\n");
+                printf("p = "), fmpz_print(p), printf("\n");
+                printf("ans = %d\n", ans);
+                abort();
+            }
         }
 
         padic_clear(a, ctx);
@@ -110,16 +146,53 @@ int main(void)
 
         padic_mul(d, c, c, ctx);
 
-        result = (ans && padic_equal(a, d, ctx));
-        if (!result)
+        if (ans && a[1] < 0)
         {
-            printf("FAIL (random squares):\n\n");
-            printf("a = "), padic_print(a, ctx), printf("\n");
-            printf("b = "), padic_print(b, ctx), printf("\n");
-            printf("c = "), padic_print(c, ctx), printf("\n");
-            printf("d = "), padic_print(d, ctx), printf("\n");
-            printf("p = "), fmpz_print(p), printf("\n");
-            abort();
+            padic_ctx_t ctx2;
+            padic_t a2, d2;
+
+            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+
+            padic_init(a2, ctx2);
+            padic_init(d2, ctx2);
+            padic_set(a2, a, ctx2);
+            padic_set(d2, d, ctx2);
+            padic_normalise(a2, ctx2);
+            padic_normalise(d2, ctx2);
+
+            result = (padic_equal(a2, d2, ctx2));
+            if (!result)
+            {
+                printf("FAIL (random elements):\n\n");
+                printf("a = "), padic_print(a, ctx), printf("\n");
+                printf("b = "), padic_print(b, ctx), printf("\n");
+                printf("c = "), padic_print(c, ctx), printf("\n");
+                printf("d = "), padic_print(d, ctx), printf("\n");
+                printf("a2 = "), padic_print(a2, ctx2), printf("\n");
+                printf("d2 = "), padic_print(d2, ctx2), printf("\n");
+                printf("p = "), fmpz_print(p), printf("\n");
+                printf("ans = %d\n", ans);
+                abort();
+            }
+
+            padic_clear(a2, ctx2);
+            padic_clear(d2, ctx2);
+            padic_ctx_clear(ctx2);
+        }
+        else
+        {
+            result = (ans && padic_equal(a, d, ctx));
+            if (!result)
+            {
+                printf("FAIL (random squares):\n\n");
+                printf("a = "), padic_print(a, ctx), printf("\n");
+                printf("b = "), padic_print(b, ctx), printf("\n");
+                printf("c = "), padic_print(c, ctx), printf("\n");
+                printf("d = "), padic_print(d, ctx), printf("\n");
+                printf("p = "), fmpz_print(p), printf("\n");
+                printf("ans = %d\n", ans);
+                abort();
+            }
         }
 
         padic_clear(a, ctx);
