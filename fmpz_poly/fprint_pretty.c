@@ -51,15 +51,19 @@ int _fmpz_poly_fprint_pretty(FILE * file,
 
     i = len - 1;
 
-    if (*(poly + i) == 1)
-        r = fprintf(file, "%s^%ld", x, i);
-    else if (*(poly + i) == -1)
-        r = fprintf(file, "-%s^%ld", x, i);
-    else
+    r = 1;
+    if (i > 1)
     {
-        r = fmpz_fprint(file, poly + i);
-        if (r > 0)
-            r = fprintf(file, "*%s^%ld", x, i);
+        if (*(poly + i) == 1)
+           r = fprintf(file, "%s^%ld", x, i);
+        else if (*(poly + i) == -1)
+           r = fprintf(file, "-%s^%ld", x, i);
+        else
+        {
+           r = fmpz_fprint(file, poly + i);
+           if (r > 0)
+              r = fprintf(file, "*%s^%ld", x, i);
+        }
     }
 
     for (--i; (r > 0) && (i > 1); --i)

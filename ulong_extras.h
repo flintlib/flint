@@ -253,6 +253,8 @@ mp_limb_t n_factor_power235(ulong *exp, mp_limb_t n);
 
 mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters);
 
+mp_limb_t n_factor_lehman(mp_limb_t n);
+
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
