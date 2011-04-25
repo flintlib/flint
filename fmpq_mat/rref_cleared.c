@@ -31,7 +31,8 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+long
+fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
     long m, n, rank;
     fmpz_mat_t Aclear;
@@ -55,8 +56,21 @@ long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
     }
     else
     {
-        fmpz_set(den, fmpz_mat_entry(Aclear, 0, 0));
+        long i;
+        fmpz_t d;
+        fmpz_init(d);
+
+        for (i = 0; i < Aclear->c; i++)
+        {
+            if (!fmpz_is_zero(fmpz_mat_entry(Aclear, 0, i)))
+            {
+                fmpz_set(den, fmpz_mat_entry(Aclear, 0, i));
+                break;
+            }
+        }
+
         fmpq_mat_set_fmpz_mat_div_fmpz(B, Aclear, den);
+        fmpz_clear(d);
     }
 
     fmpz_mat_clear(Aclear);

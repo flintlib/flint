@@ -31,7 +31,8 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+long
+fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
     return fmpq_mat_rref_cleared(perm, B, A);
 }

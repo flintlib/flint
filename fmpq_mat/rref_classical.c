@@ -32,7 +32,7 @@
 #include "fmpq_mat.h"
 
 static int
-_pivot(long * perm, fmpq_mat_t mat, long n, long from_row, long in_column)
+_pivot(long * perm, fmpq_mat_t mat, long from_row, long in_column)
 {
     long t, j;
     fmpq * u;
@@ -40,9 +40,9 @@ _pivot(long * perm, fmpq_mat_t mat, long n, long from_row, long in_column)
     if (!fmpq_is_zero(fmpq_mat_entry(mat, from_row, in_column)))
         return 1;
 
-    for (j = from_row + 1; j < n; j++)
+    for (j = from_row + 1; j < mat->r; j++)
     {
-        if (fmpq_is_zero(fmpq_mat_entry(mat, j, in_column)))
+        if (!fmpq_is_zero(fmpq_mat_entry(mat, j, in_column)))
         {
             if (perm)
             {
@@ -61,10 +61,10 @@ _pivot(long * perm, fmpq_mat_t mat, long n, long from_row, long in_column)
 }
 
 
-long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+long
+fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
     long m, n, i, j, pivot_row, pivot_col, rank;
-    fmpq_t t;
 
     m = A->r;
     n = A->c;
@@ -83,11 +83,9 @@ long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
     pivot_row = 0;
     pivot_col = 0;
 
-    fmpq_init(t);
-
     while (pivot_row < m && pivot_col < n)
     {
-        if (!_pivot(perm, B, m, pivot_row, pivot_col))
+        if (!_pivot(perm, B, pivot_row, pivot_col))
         {
             pivot_col++;
             continue;
@@ -95,29 +93,33 @@ long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 
         rank++;
 
+        /* Scale row to have 1 as leading entry */
+        for (j = pivot_col + 1; j < n; j++)
+        {
+            fmpq_div(fmpq_mat_entry(B, pivot_row, j),
+                     fmpq_mat_entry(B, pivot_row, j),
+                     fmpq_mat_entry(B, pivot_row, pivot_col));
+        }
+
+        /* Eliminate rows above and below */
         for (i = 0; i < m; i++)
         {
             if (i == pivot_row)
                 continue;
 
-            fmpq_div(t, fmpq_mat_entry(B, i, pivot_col),
-                        fmpq_mat_entry(B, pivot_row, pivot_col));
-
             for (j = pivot_col + 1; j < n; j++)
-            {
                 fmpq_submul(fmpq_mat_entry(B, i, j),
-                            fmpq_mat_entry(B, pivot_row, j), t);
-            }
+                            fmpq_mat_entry(B, pivot_row, j),
+                            fmpq_mat_entry(B, i, pivot_col));
         }
 
+        /* Clear pivot column */
         for (i = 0; i < m; i++)
             fmpq_set_si(fmpq_mat_entry(B, i, pivot_col), i == pivot_row, 1);
 
         pivot_row++;
         pivot_col++;
     }
-
-    fmpq_clear(t);
 
     return rank;
 }
