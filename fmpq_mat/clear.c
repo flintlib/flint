@@ -41,5 +41,6 @@ void fmpq_mat_clear(fmpq_mat_t mat)
             fmpq_clear(mat->entries + i);
 
         free(mat->entries);
+        free(mat->rows);
     }
 }
