@@ -31,7 +31,36 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
-    return fmpq_mat_rref_cleared(perm, B, A);
+    long m, n, rank;
+    fmpz_mat_t Aclear;
+    fmpz * den;
+
+    m = A->r;
+    n = A->c;
+
+    if (m == 0 || n == 0)
+        return 0;
+
+    /* Fraction-free Gauss-Jordan elimination */
+    fmpz_mat_init(Aclear, m, n);
+    den = _fmpz_vec_init(m);
+    fmpq_mat_get_fmpz_mat_rowwise(Aclear, den, A);
+    rank = _fmpz_mat_rowreduce(perm, Aclear, ROWREDUCE_FULL);
+
+    if (rank == 0)
+    {
+        fmpq_mat_zero(B);
+    }
+    else
+    {
+        fmpz_set(den, fmpz_mat_entry(Aclear, 0, 0));
+        fmpq_mat_set_fmpz_mat_div_fmpz(B, Aclear, den);
+    }
+
+    fmpz_mat_clear(Aclear);
+    _fmpz_vec_clear(den, m);
+
+    return FLINT_ABS(rank);
 }

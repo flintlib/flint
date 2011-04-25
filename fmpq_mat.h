@@ -60,6 +60,16 @@ void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
 
+/* Special matrices **********************************************************/
+
+void fmpq_mat_hilbert_matrix(fmpq_mat_t mat);
+
+/* Basic assignment **********************************************************/
+
+void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src);
+
+void fmpq_mat_zero(fmpq_mat_t mat);
+
 
 /* Basic comparison and properties *******************************************/
 
@@ -132,6 +142,10 @@ void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Echelon form **************************************************************/
 
-void fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
+long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+
+long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+
+long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
 #endif
