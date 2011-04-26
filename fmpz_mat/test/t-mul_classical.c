@@ -38,7 +38,7 @@ int main(void)
     long i;
     flint_rand_t state;
 
-    printf("mul....");
+    printf("mul_classical....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,14 +65,6 @@ int main(void)
         if (!fmpz_mat_equal(C, D))
         {
             printf("FAIL: results not equal\n");
-            abort();
-        }
-
-        fmpz_mat_mul(A, A, B);
-
-        if (!fmpz_mat_equal(A, C))
-        {
-            printf("FAIL: aliasing failed\n");
             abort();
         }
 

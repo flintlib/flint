@@ -38,15 +38,22 @@ fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     br = B->r;
     bc = B->c;
 
+    if (br == 0)
+        return;
+
     for (i = 0; i < ar; i++)
     {
         for (j = 0; j < bc; j++)
         {
-            fmpz_zero(&C->rows[i][j]);
+            fmpz_mul(fmpz_mat_entry(C, i, j),
+                     fmpz_mat_entry(A, i, 0),
+                     fmpz_mat_entry(B, 0, j));
 
-            for (k = 0; k < br; k++)
+            for (k = 1; k < br; k++)
             {
-                fmpz_addmul(&C->rows[i][j], &A->rows[i][k], &B->rows[k][j]);
+                fmpz_addmul(fmpz_mat_entry(C, i, j),
+                            fmpz_mat_entry(A, i, k),
+                            fmpz_mat_entry(B, k, j));
             }
         }
     }

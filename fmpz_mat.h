@@ -143,9 +143,18 @@ void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);
 /* Multiplication */
 
 void fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
-void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B, long bits);
-void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B);
+
+void fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A,
+    const fmpz_mat_t B);
+
+void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
+    const fmpz_mat_t B);
+
+void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
+    const fmpz_mat_t B, long bits);
+
+void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
+    const fmpz_mat_t B);
 
 
 /* Gaussian elimination */
@@ -181,6 +190,7 @@ void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
 void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU);
+
 void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
 
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_mat_t A, const fmpz_mat_t B);
