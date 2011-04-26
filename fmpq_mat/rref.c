@@ -34,5 +34,8 @@
 long
 fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
-    return fmpq_mat_rref_cleared(perm, B, A);
+    if (A->r <= 2 || A->c <= 2)
+        return fmpq_mat_rref_classical(perm, B, A);
+    else
+        return fmpq_mat_rref_cleared(perm, B, A);
 }
