@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -32,7 +32,7 @@
 void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long dim, m, n, k, ab, bb;
+    long dim, m, n, k;
 
     m = A->r;
     n = A->c;
@@ -50,24 +50,33 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 
     dim = FLINT_MIN(FLINT_MIN(m, n), k);
 
-    if (dim < 10)
+    if (dim < 12)
     {
-        fmpz_mat_mul_classical(C, A, B);
-        return;
-    }
-
-    ab = fmpz_mat_max_bits(A);
-    bb = fmpz_mat_max_bits(B);
-
-    ab = FLINT_ABS(ab);
-    bb = FLINT_ABS(bb);
-
-    if (5*(ab + bb) > dim * dim)
-    {
-        fmpz_mat_mul_classical(C, A, B);
+        /* The inline version only benefits from large n */
+        if (n <= 2)
+            fmpz_mat_mul_classical(C, A, B);
+        else
+            fmpz_mat_mul_classical_inline(C, A, B);
     }
     else
     {
-        _fmpz_mat_mul_multi_mod(C, A, B, ab + bb + FLINT_BIT_COUNT(n) + 1);
+        long ab, bb, bits;
+
+        ab = fmpz_mat_max_bits(A);
+        bb = fmpz_mat_max_bits(B);
+
+        ab = FLINT_ABS(ab);
+        bb = FLINT_ABS(bb);
+
+        bits = ab + bb + FLINT_BIT_COUNT(n) + 1;
+
+        if (5*(ab + bb) > dim * dim || (bits > FLINT_BITS - 3 && dim < 60))
+        {
+            fmpz_mat_mul_classical_inline(C, A, B);
+        }
+        else
+        {
+            _fmpz_mat_mul_multi_mod(C, A, B, bits);
+        }
     }
 }
