@@ -41,7 +41,47 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++) /* Test random elements */
+    /* Check aliasing: a = sqrt(a) */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_t p;
+        long N;
+        padic_ctx_t ctx;
+
+        int ans1, ans2;
+        padic_t a, d;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = n_randint(state, 50) + 1;
+        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+
+        padic_init(a, ctx);
+        padic_init(d, ctx);
+
+        padic_randtest(a, state, ctx);
+
+        ans1 = padic_sqrt(d, a, ctx);
+        ans2 = padic_sqrt(a, a, ctx);
+
+        result = ((ans1 == ans2) && (!ans1 || padic_equal(a, d, ctx)));
+        if (!result)
+        {
+            printf("FAIL (aliasing):\n\n");
+            printf("a = "), padic_debug(a, ctx), printf("\n");
+            printf("d = "), padic_debug(d, ctx), printf("\n");
+            abort();
+        }
+
+        padic_clear(a, ctx);
+        padic_clear(d, ctx);
+
+        fmpz_clear(p);
+        padic_ctx_clear(ctx);
+    }
+
+    /* Test random elements */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         long N;
@@ -120,7 +160,8 @@ int main(void)
         padic_ctx_clear(ctx);
     }
 
-    for (i = 0; i < 1000; i++) /* Test random squares */
+    /* Test random squares */
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         long N;

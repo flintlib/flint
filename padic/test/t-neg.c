@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing: a = - a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         long N;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check that - (- a) == a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         long N;
@@ -118,7 +118,7 @@ main(void)
     }
 
     /* Check that a + (-a) == 0 */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
         long N;
