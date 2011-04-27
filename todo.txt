@@ -284,5 +284,3 @@ padic
 
 * Implement "padic_get_str"
 
-* Rename inv to inv_naive and have a method inv as alias for inv_hensel
-

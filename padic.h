@@ -131,9 +131,25 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
-void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
+
+void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
+void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
 void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
+static __inline__ 
+void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+{
+    _padic_inv_hensel(rop, op, p, N);
+}
+
+static __inline__ 
+void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+{
+    padic_inv_hensel(rop, op, ctx);
+}
 
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 

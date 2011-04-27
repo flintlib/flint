@@ -121,7 +121,7 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         }
 
         /* Invert modulo p^N */
-        _padic_inv_hensel(rop, rop, p, N);
+        _padic_inv(rop, rop, p, N);
 
       exit:
 
