@@ -32,49 +32,28 @@
 #include "fmpq_mat.h"
 
 long
-fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 {
-    long m, n, rank;
     fmpz_mat_t Aclear;
-    fmpz * den;
+    fmpz_t den;
+    long rank;
 
-    m = A->r;
-    n = A->c;
-
-    if (m == 0 || n == 0)
+    if (fmpq_mat_is_empty(A))
         return 0;
 
-    /* Fraction-free Gauss-Jordan elimination */
-    fmpz_mat_init(Aclear, m, n);
-    den = _fmpz_vec_init(m);
-    fmpq_mat_get_fmpz_mat_rowwise(Aclear, den, A);
-    rank = _fmpz_mat_rowreduce(perm, Aclear, ROWREDUCE_FULL);
+    fmpz_mat_init(Aclear, A->r, A->c);
+    fmpq_mat_get_fmpz_mat_rowwise(Aclear, NULL, A);
+    fmpz_init(den);
+
+    rank = fmpz_mat_rref_fraction_free(perm, Aclear, den, Aclear);
 
     if (rank == 0)
-    {
         fmpq_mat_zero(B);
-    }
     else
-    {
-        long i;
-        fmpz_t d;
-        fmpz_init(d);
-
-        for (i = 0; i < Aclear->c; i++)
-        {
-            if (!fmpz_is_zero(fmpz_mat_entry(Aclear, 0, i)))
-            {
-                fmpz_set(den, fmpz_mat_entry(Aclear, 0, i));
-                break;
-            }
-        }
-
         fmpq_mat_set_fmpz_mat_div_fmpz(B, Aclear, den);
-        fmpz_clear(d);
-    }
 
     fmpz_mat_clear(Aclear);
-    _fmpz_vec_clear(den, m);
+    fmpz_clear(den);
 
-    return FLINT_ABS(rank);
+    return rank;
 }

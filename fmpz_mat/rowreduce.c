@@ -29,38 +29,9 @@
 #include "fmpz_mat.h"
 
 
-static int
-_pivot(long * perm, fmpz ** rows, long n, long from_row, long in_column)
-{
-    long t;
-    fmpz * u;
 
-    long j;
-
-    if (rows[from_row][in_column] != 0L)
-        return 1;
-
-    for (j = from_row + 1; j < n; j++)
-    {
-        if (rows[j][in_column] != 0L)
-        {
-            if (perm)
-            {
-                t = perm[j];
-                perm[j] = perm[from_row];
-                perm[from_row] = t;
-            }
-
-            u = rows[j];
-            rows[j] = rows[from_row];
-            rows[from_row] = u; 
-            return -1;
-        }
-    }
-    return 0;
-}
-
-long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
+long
+_fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
 {
     fmpz ** a;
     long m, n;
@@ -80,7 +51,7 @@ long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
     n = mat->c;
     a = mat->rows;
 
-    if (m < 1 || n < 1)
+    if (m == 0 || n == 0)
         return 0;
 
     if (perm)
@@ -97,7 +68,7 @@ long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
 
     while (pivot_row < m && pivot_col < n)
     {
-        det_sign = _pivot(perm, a, m, pivot_row, pivot_col);
+        det_sign = fmpz_mat_pivot(perm, mat, pivot_row, pivot_col);
 
         if (!det_sign)
         {

@@ -19,23 +19,40 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
 
-long
-fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+int
+fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c)
 {
-    if (A->r <= 2 || A->c <= 2)
-        return fmpq_mat_rref_classical(perm, B, A);
-    else
-        return fmpq_mat_rref_fraction_free(perm, B, A);
+    long t, j;
+    fmpz * u;
+
+    if (!fmpz_is_zero(fmpz_mat_entry(mat, r, c)))
+        return 1;
+
+    for (j = r + 1; j < mat->r; j++)
+    {
+        if (!fmpz_is_zero(fmpz_mat_entry(mat, j, c)))
+        {
+            if (perm)
+            {
+                t = perm[j];
+                perm[j] = perm[r];
+                perm[r] = t;
+            }
+
+            u = mat->rows[j];
+            mat->rows[j] = mat->rows[r];
+            mat->rows[r] = u; 
+            return -1;
+        }
+    }
+    return 0;
 }

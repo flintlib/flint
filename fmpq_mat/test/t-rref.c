@@ -48,8 +48,8 @@ main(void)
         fmpz_mat_t M;
         fmpz_t den;
 
-        m = n_randint(state, 4);
-        n = n_randint(state, 4);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
         perm = malloc(FLINT_MAX(1,m) * sizeof(long));
 
         fmpz_init(den);
@@ -82,11 +82,11 @@ main(void)
                 abort();
             }
 
-            rank = fmpq_mat_rref_cleared(perm, C, A);
+            rank = fmpq_mat_rref_fraction_free(perm, C, A);
             if (r != rank)
             {
                 printf("FAIL:\n");
-                printf("fmpq_mat_rref_cleared: wrong rank!\n");
+                printf("fmpq_mat_rref_fraction_free: wrong rank!\n");
                 abort();
             }
 

@@ -19,23 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
 
 long
-fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B, fmpz_t den,
+    const fmpz_mat_t A)
 {
-    if (A->r <= 2 || A->c <= 2)
-        return fmpq_mat_rref_classical(perm, B, A);
+    long i, rank;
+
+    if (B != A)
+        fmpz_mat_set(B, A);
+
+    rank = _fmpz_mat_rowreduce(perm, B, ROWREDUCE_FULL);
+    rank = FLINT_ABS(rank);
+
+    if (rank == 0)
+    {
+        fmpz_set_ui(den, 1UL);
+    }
     else
-        return fmpq_mat_rref_fraction_free(perm, B, A);
+    {
+        for (i = 0; i < B->c; i++)
+        {
+            if (!fmpz_is_zero(fmpz_mat_entry(B, 0, i)))
+            {
+                fmpz_set(den, fmpz_mat_entry(B, 0, i));
+                break;
+            }
+        }
+    }
+
+    return rank;
 }

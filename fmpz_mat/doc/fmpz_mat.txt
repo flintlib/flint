@@ -635,10 +635,43 @@ long fmpz_mat_kernel(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-    Fraction-free row reduction
+    Echelon form
 
 *******************************************************************************
 
+long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B, fmpz_t den,
+        const fmpz_mat_t A)
+
+    Computes an integer matrix \code{B} and an integer \code{den} such that
+    \code{B / den} is the unique row reduced echelon form (RREF) of \code{A}
+    and returns the rank, i.e. the number of nonzero rows in \code{B}.
+
+    Aliasing of \code{B} and \code{A} is allowed, with an in-place
+    computation being more efficient. The size of \code{B} must be
+    the same as that of \code{A}.
+
+    The permutation order will be written to \code{perm} unless this
+    argument is \code{NULL}. That is, row \code{i} of the output matrix will
+    correspond to row \code{perm[i]} of the input matrix.
+
+    The denominator will always be a divisor of the determinant of $A$,
+    but is not guaranteed to be minimal or canonical in any other sense.
+
+
+*******************************************************************************
+
+    Internal functions for row reduction
+
+*******************************************************************************
+
+int fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c)
+
+    Helper function for row reduction. Returns 1 if the entry of \code{mat}
+    at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero
+    entry in the same column among rows $r+1, r+2, \ldots$. If a nonzero
+    entry is found at row $s$, swaps rows $r$ and $s$ and the corresponding
+    entries in \code{perm} (unless \code{NULL}) and returns -1. If no
+    nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
 
 long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
 

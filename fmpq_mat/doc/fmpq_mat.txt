@@ -126,6 +126,18 @@ int fmpq_mat_is_zero(const fmpq_mat_t mat)
     Returns nonzero if all entries in \code{mat} are zero, and returns
     zero otherwise.
 
+int fmpq_mat_is_empty(fmpq_mat_t mat)
+
+    Returns a non-zero value if the number of rows or the number of
+    columns in \code{mat} is zero, and otherwise returns
+    zero.
+
+int fmpq_mat_is_square(fmpq_mat_t mat)
+
+    Returns a non-zero value if the number of rows is equal to the
+    number of columns in \code{mat}, and otherwise returns zero.
+
+
 *******************************************************************************
 
     Integer matrix conversion
@@ -317,7 +329,7 @@ void fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
     This algorithm is usually very inefficient and is mainly intended
     to be used for testing purposes.
 
-void fmpq_mat_rref_cleared(fmpq_mat_t B, const fmpq_mat_t A)
+void fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A}. Clears
     denominators and performs fraction-free Gauss-Jordan elimination
@@ -326,4 +338,5 @@ void fmpq_mat_rref_cleared(fmpq_mat_t B, const fmpq_mat_t A)
 void fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A}.
-    This function simply calls \code{fmpq_mat_rref_cleared}
+    This function automatically chooses between the classical and
+    fraction-free algorithms depending on the size of the matrix.

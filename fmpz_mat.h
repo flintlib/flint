@@ -163,8 +163,12 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
 #define ROWREDUCE_FULL 2
 #define ROWREDUCE_CLEAR_LOWER 4
 
+int fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c);
+
 long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options);
 
+long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B,
+    fmpz_t den, const fmpz_mat_t A);
 
 /* Determinant */
 

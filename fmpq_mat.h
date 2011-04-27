@@ -79,6 +79,17 @@ int fmpq_mat_is_integral(const fmpq_mat_t mat);
 
 int fmpq_mat_is_zero(const fmpq_mat_t mat);
 
+static __inline__ int
+fmpq_mat_is_empty(const fmpq_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+
+static __inline__ int
+fmpq_mat_is_square(const fmpq_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
 
 /* Integer matrix conversion *************************************************/
 
@@ -146,7 +157,7 @@ int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c);
 
 long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
-long fmpq_mat_rref_cleared(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+long fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
 long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
