@@ -133,9 +133,6 @@ fmpz_poly
 
 * add test code for fmpz_poly_max_limbs
 
-* Fix a bug in mul_KS and mullow_KS, to do with the assumption len1 >= len2 
-  and zero padding
-
 * Improve the implementations of fmpz_poly_divrem, _div, and _rem, check that 
   the documentations still apply, and write test code for this --- all of this 
   makes more sense once there is a choice of algorithms
@@ -145,11 +142,6 @@ fmpz_poly
 
 * Sort out the fmpz_poly_pseudo_div and _rem code.  Currently this is just 
   a hack to call fmpz_poly_pseudo_divrem
-
-* Write test code for fmpz_poly_scalar_addmul_fmpz
-
-* Optimise fmpz_poly_shift_right/left for shifting a polynomial
-  in-place
 
 
 fmpq_poly
