@@ -284,6 +284,14 @@ int fmpz_is_one(const fmpz_t f)
 
     Returns $1$ if $f$ is equal to one, otherwise returns $0$.
 
+int fmpz_is_even(const fmpz_t f)
+
+    Returns whether the integer $f$ is even.
+
+int fmpz_is_odd(const fmpz_t f)
+
+    Returns whether the integer $f$ is odd.
+
 *******************************************************************************
 
     Basic arithmetic
