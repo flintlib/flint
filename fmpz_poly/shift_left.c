@@ -32,11 +32,19 @@
 void
 _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
 {
-    long i = len;
+    long i;
 
     /* Copy in reverse to avoid writing over unshifted coefficients */
-    while (i--)
-        fmpz_set(res + n + i, poly + i);
+    if (res != poly)
+    {
+        for (i = len; i--; )
+            fmpz_set(res + n + i, poly + i);
+    }
+    else
+    {
+        for (i = len; i--; )
+            fmpz_swap(res + n + i, poly + i);
+    }
 
     for (i = 0; i < n; i++)
         fmpz_zero(res + i);
