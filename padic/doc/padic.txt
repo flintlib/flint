@@ -161,13 +161,56 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 
     Sets \code{rop} to the quotient of \code{op1} and \code{op2}.
 
+void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+
+    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
+    assuming that \code{op} is a unit and $N \geq 1$.
+
+    In the current implementation, allows aliasing, but this might 
+    change in future versions.
+
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Computes the inverse of \code{op} modulo $p^N$.
 
     Suppose that \code{op} is given as $x = u p^v$. 
-    Raises an \code{abort} signal if $v < -N$.  Otherwise, computes 
-    the inverse of $u$ modulo $p^{N+v}$.
+    Raises an \code{abort} signal if $v < -N$.  Otherwise, 
+    computes the inverse of $u$ modulo $p^{N+v}$.
+
+void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+
+    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
+    assuming that \code{op} is a unit and $N \geq 1$.
+
+    In the current implementation, allows aliasing, but this might 
+    change in future versions.
+
+void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the inverse of \code{op} modulo $p^N$.
+
+    This function naively refers to the function \code{fmpz_invmod},
+    which works for any ring $\mathbf{Z} / m \code{Z}$.
+
+void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+
+    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
+    assuming that \code{op} is a unit and $N \geq 1$.
+
+    In the current implementation, allows aliasing, but this might 
+    change in future versions.
+
+void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the inverse of \code{op} modulo $p^N$.
+
+    This function employs Hensel lifting of an inverse modulo $p$.
+
+int padic_sqrt(padic_rop, const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether \code{op} is a $p$-adic square.  If this is 
+    the case, sets \code{rop} to one of the square roots;  otherwise, 
+    the value of \code{rop} is undefined.
 
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx)
@@ -202,10 +245,6 @@ char * padic_get_str(const padic_t op, const padic_ctx_t ctx)
 
     Returns the string representation of the $p$-adic number \code{op}, 
     according to the printing mode set in the context.
-
-int padic_set_str(padic_t rop, const char *str, const padic_ctx_t ctx)
-
-    TODO.
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 

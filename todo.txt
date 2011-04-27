@@ -282,5 +282,3 @@ nmod_mat
 padic
 -----
 
-* Implement "padic_get_str"
-
