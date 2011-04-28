@@ -41,7 +41,7 @@ _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
 
     if (!COEFF_IS_MPZ(n) && !COEFF_IS_MPZ(d))
     {
-        /* This does not overflow, as the denominator at most doubles */
+        /* This does not overflow, as the larger part at most doubles */
         fmpz_set_ui(rnum, d);
         fmpz_set_ui(rden, d*(n / d) + d - (n % d));
     }
@@ -54,11 +54,10 @@ _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
         fmpz_init(t);
 
         fmpz_fdiv_qr(q, r, num, den);
-        fmpz_mul(t, q, den);
-        fmpz_add(t, t, den);
-        fmpz_sub(t, t, r);
         fmpz_set(rnum, den);
-        fmpz_set(rden, t);
+        fmpz_mul(t, q, den);
+        fmpz_add(rden, t, den);
+        fmpz_sub(rden, rden, r);
 
         fmpz_clear(q);
         fmpz_clear(r);

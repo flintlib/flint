@@ -254,9 +254,6 @@ int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
     $n \equiv ad \pmod m$ and returns 0, or returns 1 if no such rational
     number exists.
 
-    Reference: Algorithm 7.4 in
-    %% http://modular.math.washington.edu/books/modform/modform/linear_algebra.html
-
 
 *******************************************************************************
 
@@ -281,7 +278,7 @@ void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
     appear late in the sequence.
 
 void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
-    const fmpz_t num, const fmpz_t den);
+    const fmpz_t num, const fmpz_t den)
 
 void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
 
