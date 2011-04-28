@@ -167,4 +167,19 @@ int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t 
 
 int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
 
+
+void
+_fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den);
+
+void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x);
+
+void
+_fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den);
+
+void
+fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x);
+
+
 #endif

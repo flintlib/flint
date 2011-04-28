@@ -256,3 +256,40 @@ int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
 
     Reference: Algorithm 7.4 in
     %% http://modular.math.washington.edu/books/modform/modform/linear_algebra.html
+
+
+*******************************************************************************
+
+    Rational enumeration
+
+*******************************************************************************
+
+void _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den)
+
+void fmpq_next_calkin_wilf(fmpq_t res, const fmpq_t x)
+
+    Given $x$ which is assumed to be nonnegative and in canonical form, sets
+    \code{res} to the next number in the breadth-first traversal of the
+    Calkin-Wilf tree. Starting with zero, this generates every nonnegative
+    rational number once and only once. The resulting sequence begins:
+
+    $$0, 1, 1/2, 2, 1/3, 3/2, 2/3, 3, 1/4, 4/3, 3/5, 5/2, 2/5, \ldots.$$
+
+    It should be noted that the Calkin-Wilf enumeration does not produce
+    the rational numbers in order of height: some small fractions will
+    appear late in the sequence.
+
+void _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den);
+
+void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
+
+    Given a signed rational number $x$ assumed to be in canonical form, sets
+    \code{res} to the next element in the alternating version of the
+    Calkin-Wilf sequence
+
+    $$0, 1, -1, 1/2, -1/2, 2, -2, 1/3, -1/3, \ldots.$$
+
+    Starting with zero, this generates every rational number once
+    and only once.
