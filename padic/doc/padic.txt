@@ -212,6 +212,14 @@ int padic_sqrt(padic_rop, const padic_t op, const padic_ctx_t ctx)
     the case, sets \code{rop} to one of the square roots;  otherwise, 
     the value of \code{rop} is undefined.
 
+    We have the following theorem:
+
+    Let $u \in \mathbf{Z}^{\times}$.  Then $u$ is a 
+    square if and only if $u \bmod p$ is a square in 
+    $\mathbf{Z} / p \mathbf{Z}$, for $p > 2$, or if 
+    $u \bmod 8$ is a square in $\mathbf{Z} / 8 \mathbf{Z}$, 
+    for $p = 2$.
+
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx)
 
