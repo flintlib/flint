@@ -52,7 +52,7 @@ void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols);
 void fmpq_mat_clear(fmpq_mat_t mat);
 
 
-void fmpq_mat_print(fmpq_mat_t mat);
+void fmpq_mat_print(const fmpq_mat_t mat);
 
 /* Random matrix generation **************************************************/
 
@@ -142,10 +142,10 @@ void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat);
 
 /* Nonsingular solving *******************************************************/
 
-void fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
+int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     const fmpq_mat_t B);
 
-void fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
+int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B);
 
 /* Inverse *******************************************************************/
 

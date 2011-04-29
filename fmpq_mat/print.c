@@ -30,7 +30,7 @@
 #include "fmpq_mat.h"
 
 
-void fmpq_mat_print(fmpq_mat_t mat)
+void fmpq_mat_print(const fmpq_mat_t mat)
 {
     long i, j;
 

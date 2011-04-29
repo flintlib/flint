@@ -282,19 +282,23 @@ void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat)
 
 *******************************************************************************
 
-void fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
+int fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     const fmpq_mat_t B)
 
     Solves \code{AX = B} for nonsingular \code{A} by clearing denominators
     and solving the rescaled system over the integers using a fraction-free
     algorithm. This is usually the fastest algorithm for small systems.
+    Returns nonzero if \code{X} is nonsingular or if the right hand side
+    is empty, and zero otherwise.
 
-void fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
+int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
     Solves \code{AX = B} for nonsingular \code{A} by clearing denominators
     and solving the rescaled system over the integers using Dixon's algorithm.
     The rational solution matrix is generated using rational reconstruction.
     This is usually the fastest algorithm for large systems.
+    Returns nonzero if \code{X} is nonsingular or if the right hand side
+    is empty, and zero otherwise.
 
 *******************************************************************************
 

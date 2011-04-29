@@ -31,13 +31,14 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void
+int
 fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 {
     fmpz_mat_t Anum;
     fmpz_mat_t Bnum;
     fmpz_mat_t Xnum;
     fmpz_t mod;
+    int success;
 
     fmpz_mat_init(Anum, A->r, A->c);
     fmpz_mat_init(Bnum, B->r, B->c);
@@ -45,11 +46,14 @@ fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
     fmpz_init(mod);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    fmpz_mat_solve_dixon(Xnum, mod, Anum, Bnum);
-    fmpq_mat_set_fmpz_mat_mod_fmpz(X, Xnum, mod);
+    success = fmpz_mat_solve_dixon(Xnum, mod, Anum, Bnum);
+    if (success)
+        success = fmpq_mat_set_fmpz_mat_mod_fmpz(X, Xnum, mod);
 
     fmpz_mat_clear(Anum);
     fmpz_mat_clear(Bnum);
     fmpz_mat_clear(Xnum);
     fmpz_clear(mod);
+
+    return success;
 }

@@ -32,7 +32,7 @@
 #include "ulong_extras.h"
 
 void
-nmod_mat_print_pretty(nmod_mat_t mat)
+nmod_mat_print_pretty(const nmod_mat_t mat)
 {
     long i, j;
     int width;

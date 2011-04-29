@@ -31,7 +31,7 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void
+int
 fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
                                                     const fmpq_mat_t B)
 {
@@ -39,6 +39,7 @@ fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     fmpz_mat_t Bnum;
     fmpz_mat_t Xnum;
     fmpz_t den;
+    int success;
 
     fmpz_mat_init(Anum, A->r, A->c);
     fmpz_mat_init(Bnum, B->r, B->c);
@@ -47,10 +48,19 @@ fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
     fmpz_mat_solve_mat(Xnum, den, Anum, Bnum);
-    fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, den);
+
+    /* TODO: improve interface of fmpz_mat_solve_mat to allow just catching
+            the return value*/
+    success = !fmpz_is_zero(den);
+    if (success)
+        fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, den);
+    else if ((A->r == 0) || (B->c == 0))
+        success = 1;
 
     fmpz_mat_clear(Anum);
     fmpz_mat_clear(Bnum);
     fmpz_mat_clear(Xnum);
     fmpz_clear(den);
+
+    return success;
 }
