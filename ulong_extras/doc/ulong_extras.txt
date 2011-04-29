@@ -859,9 +859,9 @@ mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
 
 mp_limb_t n_factor_lehman(mp_limb_t n)
 
-   Lehman's factoring algorithm. Currently works up to $10^{16}$, but is
-   not particularly efficient and so is not used in the general factor
-   function. Always returns a factor of $n$.
+    Lehman's factoring algorithm. Currently works up to $10^{16}$, but is
+    not particularly efficient and so is not used in the general factor
+    function. Always returns a factor of $n$.
 
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters)
 
