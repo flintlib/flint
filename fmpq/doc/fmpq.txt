@@ -201,9 +201,13 @@ void fmpq_sub(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
 void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
-    Sets \code{res} respectively to \code{op1 + op2}, \code{op1 - op2}
-    or \code{op1 * op2}, placing the result in canonical form. Aliasing
-    between any combination of the variables is allowed.
+void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
+
+    Sets \code{res} respectively to \code{op1 + op2}, \code{op1 - op2},
+    \code{op1 * op2}, or \code{op1 / op2}. Assumes that the inputs
+    are in canonical form, and produces output in canonical form.
+    Division by zero results in an error.
+    Aliasing between any combination of the variables is allowed.
 
 void _fmpq_add(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
@@ -214,9 +218,12 @@ void _fmpq_sub(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 void _fmpq_mul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
 
+void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
+    const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
+
     Sets \code{(rnum, rden)} to the canonical form of the sum,
-    difference or product respectively of the fractions represented by
-    \code{(op1num, op1den)} and \code{(op1num, op1den)}.
+    difference, product or quotient respectively of the fractions
+    represented by \code{(op1num, op1den)} and \code{(op1num, op1den)}.
     Aliasing between any combination of the variables is allowed,
     as long as no numerator is aliased with a denominator.
 
@@ -243,7 +250,8 @@ void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
     Sets \code{dest} to \code{1 / src}. The result is placed in canonical
-    form, assuming that \code{src} is already in reduced to lowest terms.
+    form, assuming that \code{src} is already in canonical form.
+
 
 *******************************************************************************
 
