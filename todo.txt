@@ -44,6 +44,8 @@ fmpz
   having an fmpz point directly to a combined structure. This would require
   writing replacements for most mpz functions.
 
+* Consider using mpz's instead of fmpz's in the multi CRT code
+
 
 ulong_extras
 ------------
@@ -152,17 +154,15 @@ fmpz_poly
 * Optimise fmpz_poly_shift_right/left for shifting a polynomial
   in-place
 
-
-fmpq_poly
----------
-
-* Implement series sqrt, invsqrt, log, exp
+* Fix the inefficient cases in CRT_ui, and move the relevant parts of this
+  function to the fmpz_vec module
 
 
 fmpq_poly
 ---------
 
 * add fmpq_poly_fprint_pretty
+
 
 arith
 -----
@@ -190,8 +190,6 @@ arith
 
 * Maybe move the helper functions in primorial.c to the mpn_extras
   module.
-
-* Turn mpq_harmonic into an fmpz (or future fmpq type?) function.
 
 * Implement computation of generalised harmonic numbers.
 
@@ -238,11 +236,21 @@ fmpz_mat
 
 * Add element getter and setter methods.
 
+* Implement Strassen multiplication.
+
+* Implement fast multiplication when when results are smaller than
+  2^(FLINT_BITS-1) by using fmpz arithmetic directly. Also use 2^FLINT_BITS
+  as one of the "primes" for multimodular multiplication, along with
+  fast CRT code for this purpose.
+
+* Write multiplication functions optimised for sparse matrices by changing
+  the loop order and discarding zero multipliers.
+
 * Implement fmpz_mat_pow_ui.
 
 * Implement fast null space computation.
 
-* Implement fast multimodular and/or p-adic determinant calculation.
+* Implement p-adic determinant calculation.
 
 * Implement fast multimodular and/or p-adic solving.
 
@@ -256,6 +264,10 @@ fmpz_mat
   nmod_mat_mul_strassen.
 
 * Use _fmpz_vec functions instead of for loops in some more places.
+
+* Add CRT functions
+
+* Add transpose versions of common functions, in-place addmul etc.
 
 
 nmod_mat
@@ -287,3 +299,26 @@ nmod_mat
   where this is assumed.
 
 * Implement Strassen inverse.
+
+* Add transpose versions of common functions, in-place addmul etc.
+
+
+fmpq
+----
+
+* Write a more general version of fmpq_reconstruct_fmpz that accepts
+  separate bounds for the numerator and denominator.
+  Also optimise detection of integers: 
+
+* Add a user-friendly function for LUP decomposition.
+
+* Add CRT functions.
+
+* Add more random functions.
+
+
+fmpq_mat
+--------
+
+* Add more random functions.
+
