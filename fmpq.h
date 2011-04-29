@@ -168,6 +168,10 @@ int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a, const fmpz_t 
 int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m);
 
 
+mp_bitcnt_t fmpq_height_bits(const fmpq_t x);
+
+void fmpq_height(fmpz_t height, const fmpq_t x);
+
 void
 _fmpq_next_calkin_wilf(fmpz_t rnum, fmpz_t rden,
     const fmpz_t num, const fmpz_t den);
@@ -180,6 +184,20 @@ _fmpq_next_signed_calkin_wilf(fmpz_t rnum, fmpz_t rden,
 
 void
 fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x);
+
+void
+_fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den);
+
+void fmpq_next_minimal(fmpq_t res, const fmpq_t x);
+
+void
+_fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
+    const fmpz_t num, const fmpz_t den);
+
+void
+fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
+
 
 
 #endif
