@@ -156,6 +156,8 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx);
 
+int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
 /* Comparison ****************************************************************/
 
 static __inline__
