@@ -30,12 +30,18 @@
 #include "fmpz.h"
 
 void
-fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
+fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
     {
-        printf("Exception (fmpz_powm_ui).  Modulus is less than 1.\n");
+        printf("Exception (fmpz_powm).  Modulus is less than 1.\n");
         abort();
+    }
+
+    if (!COEFF_IS_MPZ(*e))
+    {
+        fmpz_powm_ui(f, g, *e, m);
+        return;
     }
 
     if (fmpz_is_one(m))
@@ -44,30 +50,27 @@ fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         return;
     }
 
-    if (e == 0)
-    {
-        fmpz_set_ui(f, 1);
-        return;
-    }
-
     /* TODO:  Implement this properly! */
     {
-        mpz_t f2, g2, m2;
+        mpz_t f2, g2, e2, m2;
 
         mpz_init(f2);
         mpz_init(g2);
+        mpz_init(e2);
         mpz_init(m2);
 
         fmpz_get_mpz(f2, f);
         fmpz_get_mpz(g2, g);
+        fmpz_get_mpz(e2, e);
         fmpz_get_mpz(m2, m);
 
-        mpz_powm_ui(f2, g2, e, m2);
+        mpz_powm(f2, g2, e2, m2);
 
         fmpz_set_mpz(f, f2);
 
         mpz_clear(f2);
         mpz_clear(g2);
+        mpz_clear(e2);
         mpz_clear(m2);
     }
 }

@@ -44,7 +44,8 @@ fmpz
   having an fmpz point directly to a combined structure. This would require
   writing replacements for most mpz functions.
 
-* fmpz_powm_ui needs to be re-written.
+* fmpz_powm_ui and fmpz_powm are currently very naive wrappers of 
+  the MPIR functionality;  they need to be re-written.
 
 ulong_extras
 ------------

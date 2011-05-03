@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("powm_ui....");
+    printf("powm....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -47,16 +47,19 @@ main(void)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, m;
-        ulong x;
+        fmpz_t x;
+        mpz_t y;
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);
+        fmpz_init(x);
 
         mpz_init(d);
         mpz_init(e);
         mpz_init(f);
         mpz_init(m);
+        mpz_init(y);
 
         fmpz_randtest(a, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
@@ -64,10 +67,11 @@ main(void)
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(m, c);
-        x = n_randint(state, 20);
+        fmpz_randtest_unsigned(x, state, 20);
+        fmpz_get_mpz(y, x);
 
-        fmpz_powm_ui(b, a, x, c);
-        mpz_powm_ui(e, d, x, m);
+        fmpz_powm(b, a, x, c);
+        mpz_powm(e, d, y, m);
 
         fmpz_get_mpz(f, b);
 
@@ -75,37 +79,40 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %lu, m = %Zd\n", d, e, f, x, m);
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %Zd, m = %Zd\n", d, e, f, y, m);
             abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
+        fmpz_clear(x);
 
         mpz_clear(d);
         mpz_clear(e);
         mpz_clear(f);
         mpz_clear(m);
+        mpz_clear(y);
     }
 
     /* Check aliasing of a and b */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c;
-        ulong n;
+        fmpz_t n;
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);
+        fmpz_init(n);
 
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        fmpz_randtest_unsigned(n, state, 20);
 
-        fmpz_powm_ui(a, b, n, c);
-        fmpz_powm_ui(b, b, n, c);
+        fmpz_powm(a, b, n, c);
+        fmpz_powm(b, b, n, c);
 
         result = (fmpz_equal(a, b));
         if (!result)
@@ -114,32 +121,34 @@ main(void)
             printf("a = "), fmpz_print(a), printf("\n");
             printf("b = "), fmpz_print(b), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            printf("n = "), fmpz_print(n), printf("\n");
             abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
+        fmpz_clear(n);
     }
 
     /* Check aliasing of a and c */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b, c;
-        ulong n;
+        fmpz_t n;
 
         fmpz_init(a);
         fmpz_init(b);
         fmpz_init(c);
+        fmpz_init(n);
 
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        fmpz_randtest_unsigned(n, state, 20);
 
-        fmpz_powm_ui(a, b, n, c);
-        fmpz_powm_ui(c, b, n, c);
+        fmpz_powm(a, b, n, c);
+        fmpz_powm(c, b, n, c);
 
         result = (fmpz_equal(a, c));
         if (!result)
@@ -148,30 +157,32 @@ main(void)
             printf("a = "), fmpz_print(a), printf("\n");
             printf("b = "), fmpz_print(b), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            printf("n = "), fmpz_print(n), printf("\n");
             abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(b);
         fmpz_clear(c);
+        fmpz_clear(n);
     }
 
     /* Check aliasing of a and {b, c} */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, c;
-        ulong n;
+        fmpz_t n;
 
         fmpz_init(a);
         fmpz_init(c);
+        fmpz_init(n);
 
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        fmpz_randtest_unsigned(n, state, 20);
 
-        fmpz_powm_ui(a, c, n, c);
-        fmpz_powm_ui(c, c, n, c);
+        fmpz_powm(a, c, n, c);
+        fmpz_powm(c, c, n, c);
 
         result = (fmpz_equal(a, c));
         if (!result)
@@ -179,12 +190,13 @@ main(void)
             printf("FAIL:\n");
             printf("a = "), fmpz_print(a), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
-            printf("n = %lu\n", n);
+            printf("n = "), fmpz_print(n), printf("\n");
             abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(c);
+        fmpz_clear(n);
     }
 
     flint_randclear(state);
