@@ -4,14 +4,17 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
 {
     fmpz_t cont, fx, gcd;
     
-    if (x == 0)
+    if (FLINT_ABS(x) <= 1)
     {
-        printf("ERROR (fmpz_poly_q_scalar_div_si).  Division by zero.\n");
-        abort();
-    }
-    if (x == 1)
-    {
-        fmpz_poly_q_set(rop, op);
+        if (x == 0)
+        {
+            printf("ERROR (fmpz_poly_q_scalar_div_si).  Division by zero.\n");
+            abort();
+        }
+        if (x == 1)
+            fmpz_poly_q_set(rop, op);
+        else
+            fmpz_poly_q_neg(rop, op);
         return;
     }
     if (fmpz_poly_q_is_zero(op))
@@ -33,7 +36,7 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
         else
         {
             fmpz_poly_neg(rop->num, op->num);
-            fmpz_poly_scalar_mul_si(rop->den, op->den, -x);
+            fmpz_poly_scalar_mul_ui(rop->den, op->den, - ((ulong) x));
         }
         fmpz_clear(cont);
         return;
@@ -55,7 +58,7 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
         else
         {
             fmpz_poly_neg(rop->num, op->num);
-            fmpz_poly_scalar_mul_si(rop->den, op->den, -x);
+            fmpz_poly_scalar_mul_ui(rop->den, op->den, - ((ulong) x));
         }
     }
     else
