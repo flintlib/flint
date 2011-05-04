@@ -56,14 +56,14 @@ MACRO fmpq_mat_entry_num(mat,i,j)
 
     Gives a reference to the numerator of the entry at row \code{i} and
     column \code{j}. The reference can be passed as an input or output
-    variable to any \code{fmpz} function for direct manipulation of the
+    variable to any \code{fmpq} function for direct manipulation of the
     matrix element. No bounds checking is performed.
 
 MACRO fmpq_mat_entry_den(mat,i,j)
 
     Gives a reference to the denominator of the entry at row \code{i} and
     column \code{j}. The reference can be passed as an input or output
-    variable to any \code{fmpz} function for direct manipulation of the
+    variable to any \code{fmpq} function for direct manipulation of the
     matrix element. No bounds checking is performed.
 
 *******************************************************************************
