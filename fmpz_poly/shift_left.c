@@ -43,7 +43,7 @@ _fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
     else
     {
         for (i = len; i--; )
-            fmpz_swap(res + n + i, poly + i);
+            fmpz_swap(res + n + i, res + i);
     }
 
     for (i = 0; i < n; i++)
