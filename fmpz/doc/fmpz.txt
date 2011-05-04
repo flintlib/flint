@@ -291,6 +291,14 @@ int fmpz_is_one(const fmpz_t f)
 
     Returns $1$ if $f$ is equal to one, otherwise returns $0$.
 
+int fmpz_is_even(const fmpz_t f)
+
+    Returns whether the integer $f$ is even.
+
+int fmpz_is_odd(const fmpz_t f)
+
+    Returns whether the integer $f$ is odd.
+
 *******************************************************************************
 
     Basic arithmetic
@@ -458,6 +466,17 @@ void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
     Sets $f$ to $g^x$ where $x$ is an \code{unsigned long}.  If 
     $x$ is $0$ and $g$ is $0$, then $f$ will be set to $1$.
 
+void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
+
+    Sets $f$ to $g^e \bmod{m}$.  If $e = 0$, sets $f$ to $1$.
+
+    Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
+
+int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
+
+    Returns whether $a$ is a quadratic residue or zero modulo $p$ 
+    and sets $b$ to a square root of $a$ if this is the case.
+
 void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 
     Sets $f$ to the integer part of the square root of $g$, where 
@@ -496,6 +515,12 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Modular arithmetic
 
 *******************************************************************************
+
+long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
+
+    Remove all occurrences of the factor $f > 1$ from the 
+    non-zero integer \code{op} and sets \code{rop} to the 
+    resulting integer.
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

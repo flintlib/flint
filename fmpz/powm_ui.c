@@ -19,53 +19,48 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 void
-_fmpz_poly_shift_left(fmpz * res, const fmpz * poly, long len, long n)
+fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m)
 {
-    long i;
-
-    /* Copy in reverse to avoid writing over unshifted coefficients */
-    if (res != poly)
+    if (fmpz_sgn(m) <= 0)
     {
-        for (i = len; i--; )
-            fmpz_set(res + n + i, poly + i);
-    }
-    else
-    {
-        for (i = len; i--; )
-            fmpz_swap(res + n + i, poly + i);
+        printf("Exception (fmpz_powm_ui).  Modulus is less than 1.\n");
+        abort();
     }
 
-    for (i = 0; i < n; i++)
-        fmpz_zero(res + i);
-}
-
-void
-fmpz_poly_shift_left(fmpz_poly_t res, const fmpz_poly_t poly, long n)
-{
-    if (n == 0)
+    if (fmpz_is_one(m))
     {
-        fmpz_poly_set(res, poly);
+        fmpz_zero(f);
         return;
     }
 
-    if (poly->length == 0)
+    if (exp == 0)
     {
-        fmpz_poly_zero(res);
+        fmpz_set_ui(f, 1);
         return;
     }
 
-    fmpz_poly_fit_length(res, poly->length + n);
-    _fmpz_poly_shift_left(res->coeffs, poly->coeffs, poly->length, n);
-    _fmpz_poly_set_length(res, poly->length + n);
+    /* TODO:  Implement this properly! */
+    {
+        fmpz_t copy;
+
+        fmpz_init(copy);
+        fmpz_set(copy, m);
+
+        fmpz_pow_ui(f, g, exp);
+        fmpz_mod(f, f, copy);
+
+        fmpz_clear(copy);
+    }
 }
+

@@ -46,6 +46,8 @@ fmpz
 
 * Consider using mpz's instead of fmpz's in the multi CRT code
 
+* fmpz_powm_ui needs to be re-written.
+
 
 ulong_extras
 ------------
@@ -85,8 +87,6 @@ ulong_extras
 
 long_extras
 -----------
-
-* Implement a z_randtest() function and use in fmpz_get/set_si 
 
 * Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and
   fmpz_invert, respectively
@@ -136,9 +136,6 @@ fmpz_poly
 
 * add test code for fmpz_poly_max_limbs
 
-* Fix a bug in mul_KS and mullow_KS, to do with the assumption len1 >= len2 
-  and zero padding
-
 * Improve the implementations of fmpz_poly_divrem, _div, and _rem, check that 
   the documentations still apply, and write test code for this --- all of this 
   makes more sense once there is a choice of algorithms
@@ -148,11 +145,6 @@ fmpz_poly
 
 * Sort out the fmpz_poly_pseudo_div and _rem code.  Currently this is just 
   a hack to call fmpz_poly_pseudo_divrem
-
-* Write test code for fmpz_poly_scalar_addmul_fmpz
-
-* Optimise fmpz_poly_shift_right/left for shifting a polynomial
-  in-place
 
 * Fix the inefficient cases in CRT_ui, and move the relevant parts of this
   function to the fmpz_vec module
@@ -322,3 +314,6 @@ fmpq_mat
 
 * Add more random functions.
 
+
+padic
+-----

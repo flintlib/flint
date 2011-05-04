@@ -102,5 +102,5 @@ build/%.o: %.c
 
 BUILD_DIRS = ulong_extras long_extras fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
-   arith mpn_extras nmod_mat fmpq fmpq_mat
+   arith mpn_extras nmod_mat fmpq fmpq_mat padic
 
