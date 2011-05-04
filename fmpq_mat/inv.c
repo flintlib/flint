@@ -31,86 +31,89 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
+int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 {
-    long n, i, j;
-
-    fmpz_mat_t Aclear;
-    fmpz_mat_t Bclear;
-    fmpz_mat_t I;
-
-    fmpz * den;
-
-    n = A->r;
+    long n = A->r;
 
     if (n == 0)
     {
-        return;
+        return 1;
     }
     else if (n == 1)
     {
+        if (fmpq_is_zero(fmpq_mat_entry(A, 0, 0)))
+            return 0;
         fmpq_inv(fmpq_mat_entry(B, 0, 0), fmpq_mat_entry(A, 0, 0));
-        return;
+        return 1;
     }
     else if (n == 2)
     {
-        fmpq_t d, t00, t01, t10, t11;
+        fmpq_t d;
+        int success;
 
         fmpq_init(d);
-        fmpq_init(t00);
-        fmpq_init(t01);
-        fmpq_init(t10);
-        fmpq_init(t11);
 
         fmpq_mul(d, fmpq_mat_entry(A, 0, 0), fmpq_mat_entry(A, 1, 1));
         fmpq_submul(d, fmpq_mat_entry(A, 0, 1), fmpq_mat_entry(A, 1, 0));
-        fmpq_inv(d, d);
+        success = !fmpq_is_zero(d);
 
-        fmpq_mul(t00, fmpq_mat_entry(A, 1, 1), d);
-        fmpq_mul(t01, fmpq_mat_entry(A, 0, 1), d);
-        fmpq_mul(t10, fmpq_mat_entry(A, 1, 0), d);
-        fmpq_mul(t11, fmpq_mat_entry(A, 0, 0), d);
+        if (success)
+        {
+            fmpq_t t00, t01, t10, t11;
+            fmpq_inv(d, d);
 
-        fmpq_set(fmpq_mat_entry(B, 0, 0), t00);
-        fmpq_neg(fmpq_mat_entry(B, 0, 1), t01);
-        fmpq_neg(fmpq_mat_entry(B, 1, 0), t10);
-        fmpq_set(fmpq_mat_entry(B, 1, 1), t11);
+            fmpq_init(t00);
+            fmpq_init(t01);
+            fmpq_init(t10);
+            fmpq_init(t11);
+
+            fmpq_mul(t00, fmpq_mat_entry(A, 1, 1), d);
+            fmpq_mul(t01, fmpq_mat_entry(A, 0, 1), d);
+            fmpq_mul(t10, fmpq_mat_entry(A, 1, 0), d);
+            fmpq_mul(t11, fmpq_mat_entry(A, 0, 0), d);
+
+            fmpq_set(fmpq_mat_entry(B, 0, 0), t00);
+            fmpq_neg(fmpq_mat_entry(B, 0, 1), t01);
+            fmpq_neg(fmpq_mat_entry(B, 1, 0), t10);
+            fmpq_set(fmpq_mat_entry(B, 1, 1), t11);
+
+            fmpq_clear(t00);
+            fmpq_clear(t01);
+            fmpq_clear(t10);
+            fmpq_clear(t11);
+        }
 
         fmpq_clear(d);
-        fmpq_clear(t00);
-        fmpq_clear(t01);
-        fmpq_clear(t10);
-        fmpq_clear(t11);
-        return;
+        return success;
     }
-
-    fmpz_mat_init(Aclear, n, n);
-    fmpz_mat_init(Bclear, n, n);
-    fmpz_mat_init(I, n, n);
-
-    den = _fmpz_vec_init(n);
-
-    fmpq_mat_get_fmpz_mat_rowwise(Aclear, den, A);
-
-    for (i = 0; i < n; i++)
-        fmpz_set(fmpz_mat_entry(I, i, i), den + i);
-
-    /* TODO: use other algorithm? */
-    fmpz_mat_solve_mat(Bclear, den, Aclear, I);
-
-    for (i = 0; i < B->r; i++)
+    else
     {
-        for (j = 0; j < B->c; j++)
-        {
-            fmpz_set(fmpq_mat_entry_num(B, i, j), fmpz_mat_entry(Bclear, i, j));
-            fmpz_set(fmpq_mat_entry_den(B, i, j), den);
-            fmpq_canonicalise(fmpq_mat_entry(B, i, j));
-        }
+        fmpz_mat_t Aclear, Bclear, I;
+        fmpz * den;
+        long i;
+        int success;
+
+        fmpz_mat_init(Aclear, n, n);
+        fmpz_mat_init(Bclear, n, n);
+        fmpz_mat_init(I, n, n);
+        den = _fmpz_vec_init(n);
+
+        fmpq_mat_get_fmpz_mat_rowwise(Aclear, den, A);
+        for (i = 0; i < n; i++)
+            fmpz_set(fmpz_mat_entry(I, i, i), den + i);
+
+        /* TODO: use other solve algorithm or fmpz_mat_inv? */
+        fmpz_mat_solve_mat(Bclear, den, Aclear, I);
+        success = !fmpz_is_zero(den);
+
+        if (success)
+            fmpq_mat_set_fmpz_mat_div_fmpz(B, Bclear, den);
+
+        fmpz_mat_clear(Aclear);
+        fmpz_mat_clear(Bclear);
+        fmpz_mat_clear(I);
+        _fmpz_vec_clear(den, A->r);
+
+        return success;
     }
-
-    fmpz_mat_clear(Aclear);
-    fmpz_mat_clear(Bclear);
-    fmpz_mat_clear(I);
-
-    _fmpz_vec_clear(den, A->r);
 }

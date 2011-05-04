@@ -306,9 +306,10 @@ int fmpq_mat_solve_dixon(fmpq_mat_t X, const fmpq_mat_t A, const fmpq_mat_t B)
 
 *******************************************************************************
 
-void fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
+int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Sets \code{B} to the inverse matrix of \code{A}.
+    Sets \code{B} to the inverse matrix of \code{A} and returns nonzero.
+    Returns zero if \code{A} is singular. \code{A} must be a square matrix.
 
 
 *******************************************************************************
@@ -326,21 +327,21 @@ int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
     entries in \code{perm} (unless \code{NULL}) and returns -1. If no
     nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
 
-void fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
+long fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Sets \code{B} to the reduced row echelon form of \code{A}. Performs
-    Gauss-Jordan elimination directly over the rational numbers.
-    This algorithm is usually very inefficient and is mainly intended
+    Sets \code{B} to the reduced row echelon form of \code{A} and returns
+    the rank. Performs Gauss-Jordan elimination directly over the rational
+    numbers. This algorithm is usually inefficient and is mainly intended
     to be used for testing purposes.
 
-void fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
+long fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Sets \code{B} to the reduced row echelon form of \code{A}. Clears
-    denominators and performs fraction-free Gauss-Jordan elimination
-    using \code{fmpz_mat} functions.
+    Sets \code{B} to the reduced row echelon form of \code{A} and returns
+    the rank. Clears denominators and performs fraction-free Gauss-Jordan
+    elimination using \code{fmpz_mat} functions.
 
-void fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
+long fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
-    Sets \code{B} to the reduced row echelon form of \code{A}.
-    This function automatically chooses between the classical and
+    Sets \code{B} to the reduced row echelon form of \code{A} and returns
+    the rank. This function automatically chooses between the classical and
     fraction-free algorithms depending on the size of the matrix.

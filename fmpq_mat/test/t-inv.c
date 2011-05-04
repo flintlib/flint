@@ -45,6 +45,7 @@ main(void)
         fmpq_mat_t A, B, C;
         fmpq_t d;
 
+        int success1, success2;
         long n, bits;
 
         n = n_randint(state, 10);
@@ -64,10 +65,10 @@ main(void)
 
         fmpq_clear(d);
 
-        fmpq_mat_inv(B, A);
-        fmpq_mat_inv(C, B);
+        success1 = fmpq_mat_inv(B, A);
+        success2 = fmpq_mat_inv(C, B);
 
-        if (!fmpq_mat_equal(A, C))
+        if (!fmpq_mat_equal(A, C) || !success1 || !success2)
         {
             printf("FAIL!\n");
             printf("A:\n");
@@ -90,6 +91,7 @@ main(void)
         fmpq_mat_t A, B;
         fmpq_t d;
 
+        int success1, success2;
         long n, bits;
 
         n = n_randint(state, 10);
@@ -108,10 +110,10 @@ main(void)
 
         fmpq_clear(d);
 
-        fmpq_mat_inv(B, A);
-        fmpq_mat_inv(A, A);
+        success1 = fmpq_mat_inv(B, A);
+        success2 = fmpq_mat_inv(A, A);
 
-        if (!fmpq_mat_equal(A, B))
+        if (!fmpq_mat_equal(A, B) || !success1 || !success2)
         {
             printf("FAIL!\n");
             printf("A:\n");
@@ -125,6 +127,53 @@ main(void)
         fmpq_mat_clear(B);
     }
 
+    /* Test singular matrices */
+    for (i = 0; i < 1000; i++)
+    {
+        long n, r, b, d;
+        fmpq_mat_t A, B;
+        fmpz_mat_t M;
+        fmpz_t den;
+        int success;
+
+        n = n_randint(state, 10);
+
+        fmpz_init(den);
+
+        for (r = 0; r < n; r++)
+        {
+            b = 1 + n_randint(state, 10) * n_randint(state, 10);
+            d = n_randint(state, 2*n*n + 1);
+
+            fmpz_mat_init(M, n, n);
+            fmpq_mat_init(A, n, n);
+            fmpq_mat_init(B, n, n);
+
+            fmpz_mat_randrank(M, state, r, b);
+
+            if (i % 2 == 0)
+                fmpz_mat_randops(M, state, d);
+
+            fmpz_randtest_not_zero(den, state, b);
+            fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
+
+            success = fmpq_mat_inv(B, A);
+
+            if (success)
+            {
+                printf("FAIL:\n");
+                printf("matrix reported as invertible:\n");
+                fmpq_mat_print(A);
+                abort();
+            }
+
+            fmpz_mat_clear(M);
+            fmpq_mat_clear(A);
+            fmpq_mat_clear(B);
+        }
+
+        fmpz_clear(den);
+    }
 
     flint_randclear(state);
 
