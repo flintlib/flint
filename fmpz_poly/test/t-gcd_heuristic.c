@@ -32,6 +32,17 @@
 #include "fmpz_poly.h"
 #include "ulong_extras.h"
 
+/*
+    Tests whether the polynomial is suitably normalised for the 
+    result of a GCD operation, that is, whether it's leading 
+    coefficient is non-negative.
+ */
+static 
+int _t_gcd_is_canonical(const fmpz_poly_t poly)
+{
+    return fmpz_poly_is_zero(poly) || (fmpz_sgn(fmpz_poly_lead(poly)) > 0);
+}
+
 int
 main(void)
 {
@@ -44,7 +55,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -57,12 +68,13 @@ main(void)
         d1 = fmpz_poly_gcd_heuristic(a, b, c);
         d2 = fmpz_poly_gcd_heuristic(b, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || fmpz_poly_equal(a, b));
+        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, b) 
+                                           && _t_gcd_is_canonical(a)));
         if (!result)
         {
             printf("FAIL (aliasing a and b):\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_poly_print(b), printf("\n\n");
             abort();
         }
 
@@ -72,7 +84,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -85,12 +97,13 @@ main(void)
         d1 = fmpz_poly_gcd_heuristic(a, b, c);
         d2 = fmpz_poly_gcd_heuristic(c, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || fmpz_poly_equal(a, c));
+        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, c) 
+                                           && _t_gcd_is_canonical(a)));
         if (!result)
         {
             printf("FAIL (aliasing a and c):\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("c = "), fmpz_poly_print(c), printf("\n\n");
             abort();
         }
 
@@ -122,14 +135,14 @@ main(void)
         {
            fmpz_poly_divrem_divconquer(q, r, d, a);
 
-           result = (r->length == 0L);
+           result = fmpz_poly_is_zero(r) && _t_gcd_is_canonical(d);
            if (!result)
            {
               printf("FAIL (check a | gcd(af, ag)):\n");
-              fmpz_poly_print(f), printf("\n");
-              fmpz_poly_print(g), printf("\n");
-              fmpz_poly_print(a), printf("\n");
-              fmpz_poly_print(d), printf("\n");
+              printf("f = "), fmpz_poly_print(f), printf("\n");
+              printf("g = "), fmpz_poly_print(g), printf("\n");
+              printf("a = "), fmpz_poly_print(a), printf("\n");
+              printf("d = "), fmpz_poly_print(d), printf("\n");
               abort();
            }
         } 
