@@ -290,6 +290,8 @@ void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp);
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
+void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
+
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
@@ -305,6 +307,8 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

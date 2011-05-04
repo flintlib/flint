@@ -19,51 +19,59 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
 
 void
-_fmpz_poly_shift_right(fmpz * res, const fmpz * poly, long len, long n)
+fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 {
-    long i;
-
-    /* Copy in forward order to avoid writing over unshifted coefficients */
-    if (res != poly)
+    if (fmpz_sgn(m) <= 0)
     {
-        for (i = 0; i < len - n; i++)
-            fmpz_set(res + i, poly + n + i);
-    }
-    else
-    {
-        for (i = 0; i < len - n; i++)
-            fmpz_swap(res + i, res + n + i);
+        printf("Exception (fmpz_powm).  Modulus is less than 1.\n");
+        abort();
     }
 
-}
-
-void
-fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
-{
-    if (n == 0)
+    if (!COEFF_IS_MPZ(*e))
     {
-        fmpz_poly_set(res, poly);
+        fmpz_powm_ui(f, g, *e, m);
         return;
     }
 
-    if (poly->length <= n)
+    if (fmpz_is_one(m))
     {
-        fmpz_poly_zero(res);
+        fmpz_zero(f);
         return;
     }
 
-    fmpz_poly_fit_length(res, poly->length - n);
-    _fmpz_poly_shift_right(res->coeffs, poly->coeffs, poly->length, n);
-    _fmpz_poly_set_length(res, poly->length - n);
+    /* TODO:  Implement this properly! */
+    {
+        mpz_t f2, g2, e2, m2;
+
+        mpz_init(f2);
+        mpz_init(g2);
+        mpz_init(e2);
+        mpz_init(m2);
+
+        fmpz_get_mpz(f2, f);
+        fmpz_get_mpz(g2, g);
+        fmpz_get_mpz(e2, e);
+        fmpz_get_mpz(m2, m);
+
+        mpz_powm(f2, g2, e2, m2);
+
+        fmpz_set_mpz(f, f2);
+
+        mpz_clear(f2);
+        mpz_clear(g2);
+        mpz_clear(e2);
+        mpz_clear(m2);
+    }
 }
+

@@ -193,6 +193,18 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 #define fmpz_poly_is_zero(poly) \
     ((poly)->length == 0)
 
+static __inline__
+int fmpz_poly_is_one(const fmpz_poly_t op)
+{
+    return (op->length) == 1 && (*(op->coeffs) == 1L);
+}
+
+static __inline__
+int fmpz_poly_is_unit(const fmpz_poly_t op)
+{
+    return (op->length == 1) && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
+}
+
 /*  Addition and subtraction  ************************************************/
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, long len1, 

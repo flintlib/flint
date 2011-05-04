@@ -30,7 +30,7 @@
 #include "fmpz.h"
 
 void
-fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m)
+fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
     {
@@ -44,7 +44,7 @@ fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m)
         return;
     }
 
-    if (exp == 0)
+    if (e == 0)
     {
         fmpz_set_ui(f, 1);
         return;
@@ -52,15 +52,23 @@ fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m)
 
     /* TODO:  Implement this properly! */
     {
-        fmpz_t copy;
+        mpz_t f2, g2, m2;
 
-        fmpz_init(copy);
-        fmpz_set(copy, m);
+        mpz_init(f2);
+        mpz_init(g2);
+        mpz_init(m2);
 
-        fmpz_pow_ui(f, g, exp);
-        fmpz_mod(f, f, copy);
+        fmpz_get_mpz(f2, f);
+        fmpz_get_mpz(g2, g);
+        fmpz_get_mpz(m2, m);
 
-        fmpz_clear(copy);
+        mpz_powm_ui(f2, g2, e, m2);
+
+        fmpz_set_mpz(f, f2);
+
+        mpz_clear(f2);
+        mpz_clear(g2);
+        mpz_clear(m2);
     }
 }
 

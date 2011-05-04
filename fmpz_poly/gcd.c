@@ -33,8 +33,8 @@ void
 _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
                const fmpz * poly2, long len2)
 {
-    if (!_fmpz_poly_gcd_heuristic(res, poly1, len1, poly2, len2))
-       _fmpz_poly_gcd_subresultant(res, poly1, len1, poly2, len2);
+    /* if (!_fmpz_poly_gcd_heuristic(res, poly1, len1, poly2, len2)) */
+    _fmpz_poly_gcd_subresultant(res, poly1, len1, poly2, len2);
 }
 
 void

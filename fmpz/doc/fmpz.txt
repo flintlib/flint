@@ -472,6 +472,12 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 
     Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
 
+void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
+
+    Sets $f$ to $g^e \bmod{m}$.  If $e = 0$, sets $f$ to $1$.
+
+    Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
+
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
     Returns whether $a$ is a quadratic residue or zero modulo $p$ 
@@ -516,11 +522,24 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 *******************************************************************************
 
+long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
+
+    Removes all factors $f$ from $x$ and returns the number of such.
+
+    Assumes that $x$ is non-zero, that $f > 1$ and that \code{finv} 
+    is the precomputed \code{double} inverse of $f$ whenever $f$ is 
+    a small integer.
+
+    Does not support aliasing.
+
 long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     Remove all occurrences of the factor $f > 1$ from the 
     non-zero integer \code{op} and sets \code{rop} to the 
     resulting integer.
+
+    Returns an \code{abort} signal if any of the assumptions 
+    are violated.
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 

@@ -328,6 +328,15 @@ int fmpz_poly_is_zero(const fmpz_poly_t poly)
 
     This function is implemented as a macro.
 
+int fmpz_poly_is_one(const fmpz_poly_t poly)
+
+    Returns $1$ if the polynomial is one and $0$ otherwise.
+
+int fmpz_poly_is_unit(const fmpz_poly_t poly)
+
+    Returns $1$ is the polynomial is the constant polynomial $\pm 1$, 
+    and $0$ otherwise.
+
 *******************************************************************************
 
     Addition and subtraction
