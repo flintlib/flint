@@ -54,8 +54,12 @@ main(void)
         fmpz_poly_q_init(b);
         fmpz_poly_q_init(c);
         fmpz_poly_q_init(d);
-        fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
-        fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, n_randint(state, 50), 50);
+
+        fmpz_poly_q_randtest(a, state, n_randint(state, 50), 50, 
+                                       n_randint(state, 50), 50);
+        fmpz_poly_q_randtest(b, state, n_randint(state, 50), 50, 
+                                       n_randint(state, 50), 50);
+
         x = z_randtest_not_zero(state);
 
         fmpz_poly_q_scalar_div_si(c, a, x);
