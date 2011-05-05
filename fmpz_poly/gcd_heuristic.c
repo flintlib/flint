@@ -143,9 +143,19 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 	{
 		Q = _fmpz_vec_init(len1 - len2 + 1);
 		if (_fmpz_poly_divides(Q, A, len1, B, len2))
+        {
 		   _fmpz_vec_scalar_mul_fmpz(res, B, len2, d);
+            if (fmpz_sgn(res + 1) < 0)
+            {
+                fmpz_neg(res, res);
+                fmpz_neg(res + 1, res + 1);
+            }
+        }
 		else  
+        {
 			fmpz_set(res, d);
+            fmpz_zero(res + 1);
+        }
 
 		fmpz_clear(d);
 		_fmpz_vec_clear(A, len1);
