@@ -102,7 +102,7 @@ void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 static __inline__ 
 int fmpz_poly_q_is_zero(const fmpz_poly_q_t op)
 {
-    return fmpz_poly_length(op->num) < 1;
+    return fmpz_poly_is_zero(op->num);
 }
 
 static __inline__ 
