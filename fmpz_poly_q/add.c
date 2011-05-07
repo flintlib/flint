@@ -38,21 +38,13 @@ void fmpz_poly_q_add_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
         return;
     }
     
-    /* Is one or are both denominators equal to one? */
+    /* Denominators equal to one? */
     if (fmpz_poly_is_one(rop->den))
     {
-        if (fmpz_poly_is_one(op->den))
-        {
-            fmpz_poly_add(rop->num, rop->num, op->num);
-            return;
-        }
-        else
-        {
-            fmpz_poly_mul(rop->num, rop->num, op->den);
-            fmpz_poly_add(rop->num, rop->num, op->num);
-            fmpz_poly_set(rop->den, op->den);
-            return;
-        }
+        fmpz_poly_mul(rop->num, rop->num, op->den);
+        fmpz_poly_add(rop->num, rop->num, op->num);
+        fmpz_poly_set(rop->den, op->den);
+        return;
     }
     if (fmpz_poly_is_one(op->den))
     {
@@ -163,23 +155,13 @@ fmpz_poly_q_add(fmpz_poly_q_t rop,
         return;
     }
     
-    /* Is one or are even both denominators equal to one? */
+    /* Denominators equal to one? */
     if (fmpz_poly_is_one(op1->den))
     {
-        if (fmpz_poly_is_one(op2->den))
-        {
-            fmpz_poly_add(rop->num, op1->num, op2->num);
-            fmpz_poly_zero(rop->den);
-            fmpz_poly_set_coeff_si(rop->den, 0, 1);
-            return;
-        }
-        else
-        {
-            fmpz_poly_mul(rop->num, op1->num, op2->den);
-            fmpz_poly_add(rop->num, rop->num, op2->num);
-            fmpz_poly_set(rop->den, op2->den);
-            return;
-        }
+        fmpz_poly_mul(rop->num, op1->num, op2->den);
+        fmpz_poly_add(rop->num, rop->num, op2->num);
+        fmpz_poly_set(rop->den, op2->den);
+        return;
     }
     if (fmpz_poly_is_one(op2->den))
     {
