@@ -140,8 +140,6 @@ void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const
 
 /* Multiplication and division ***********************************************/
 
-void fmpz_poly_q_mul_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
-
 void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);
 
