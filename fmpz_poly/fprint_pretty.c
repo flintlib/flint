@@ -45,14 +45,44 @@ int _fmpz_poly_fprint_pretty(FILE * file,
     }
     else if (len == 1)
     {
-        r = fmpz_fprint(file, poly);
+        r = fmpz_fprint(file, poly + 0);
+        return r;
+    }
+    else if (len == 2)
+    {
+        if (*(poly + 1) == 1L)
+        {
+            r = fprintf(file, "%s", x);
+        }
+        else if (*(poly + 1) == -1L)
+        {
+            r = fprintf(file, "-%s", x);
+        }
+        else
+        {
+            r = fmpz_fprint(file, poly + 1);
+            if (r > 0)
+                r = fprintf(file, "*%s", x);
+        }
+        
+        if (r > 0)
+        {
+            if (fmpz_sgn(poly + 0) > 0)
+            {
+                r = fprintf(file, "+");
+                if (r > 0)
+                    r = fmpz_fprint(file, poly + 0);
+            }
+            else if (fmpz_sgn(poly + 0) < 0)
+            {
+                r = fmpz_fprint(file, poly + 0);
+            }
+        }
         return r;
     }
 
-    i = len - 1;
-
+    i = len - 1;  /* i >= 2 */
     r = 1;
-    if (i > 1)
     {
         if (*(poly + i) == 1)
            r = fprintf(file, "%s^%ld", x, i);
@@ -64,9 +94,10 @@ int _fmpz_poly_fprint_pretty(FILE * file,
            if (r > 0)
               r = fprintf(file, "*%s^%ld", x, i);
         }
+        --i;
     }
 
-    for (--i; (r > 0) && (i > 1); --i)
+    for (; (r > 0) && (i > 1); --i)
     {
         if (*(poly + i) == 0)
             continue;
