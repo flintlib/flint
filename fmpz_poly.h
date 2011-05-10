@@ -679,6 +679,24 @@ int fmpz_poly_read_pretty(fmpz_poly_t poly, char **x)
     return fmpz_poly_fread_pretty(stdin, poly, x);
 }
 
+static __inline__
+void fmpz_poly_debug(const fmpz_poly_t poly)
+{
+    printf("(alloc = %ld, length = %ld, vec = ", poly->alloc, poly->length);
+    if (poly->coeffs)
+    {
+        printf("{");
+        _fmpz_vec_print(poly->coeffs, poly->alloc);
+        printf("}");
+    }
+    else
+    {
+        printf("NULL");
+    }
+    printf(")");
+    fflush(stdout);
+}
+
 /*  CRT  ********************************************************************/
 
 void fmpz_poly_get_nmod_poly(nmod_poly_t res, const fmpz_poly_t poly);
