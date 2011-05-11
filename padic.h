@@ -178,6 +178,38 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
     return (op1[1] == op2[1]) && fmpz_equal(op1, op2);
 }
 
+/* Special functions *********************************************************/
+
+static 
+void padic_val_factorial(fmpz_t rop, const fmpz_t op, const fmpz_t p)
+{
+    fmpz_t t, q, pow;
+
+    if (fmpz_sgn(op) <= 0)
+    {
+        printf("Exception (padic_val_factorial).  op is non-positive.\n");
+        abort();
+    }
+
+    fmpz_init(t);
+    fmpz_init(q);
+    fmpz_init(pow);
+    fmpz_set_ui(pow, 1);
+
+    do 
+    {
+        fmpz_mul(pow, pow, p);
+        fmpz_fdiv_q(q, op, pow);
+        fmpz_add(t, t, q);
+    }
+    while (!fmpz_is_zero(q));
+
+    fmpz_swap(rop, t);
+    fmpz_clear(t);
+    fmpz_clear(q);
+    fmpz_clear(pow);
+}
+
 /* Input and output **********************************************************/
 
 char * padic_get_str(const padic_t op, const padic_ctx_t ctx);
