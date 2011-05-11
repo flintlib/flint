@@ -90,6 +90,10 @@ void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
 
+void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
+
+void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
+
 static __inline__
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 {

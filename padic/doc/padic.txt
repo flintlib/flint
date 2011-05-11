@@ -111,6 +111,16 @@ void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the integer \code{op}.
 
+void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the rational number \code{op}, reduced 
+    modulo $p^N$.
+
+void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets the rational \code{rop} to the value of \code{op}.  
+    No reduction takes place.
+
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 
     Swaps the two $p$-adic numbers \code{op1} and \code{op2}.
