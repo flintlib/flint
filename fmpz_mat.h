@@ -31,6 +31,7 @@
 #include <mpir.h>
 #include "fmpz.h"
 #include "nmod_mat.h"
+#include "mat_common.h"
 
 typedef struct
 {
@@ -158,10 +159,6 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
 
 
 /* Gaussian elimination */
-
-#define ROWREDUCE_FAST_ABORT 1
-#define ROWREDUCE_FULL 2
-#define ROWREDUCE_CLEAR_LOWER 4
 
 int fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c);
 
