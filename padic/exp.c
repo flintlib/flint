@@ -49,7 +49,7 @@
 
     Assumes that $p$ is an odd prime.
  */
-void _padic_exp_p(fmpz_t rop, const fmpz_t p, long N)
+void _padic_exp_p_bak(fmpz_t rop, const fmpz_t p, long N)
 {
     fmpz_t i, hi;
 
@@ -124,6 +124,87 @@ void _padic_exp_p(fmpz_t rop, const fmpz_t p, long N)
     fmpz_clear(hi);
 }
 
+void _padic_exp_p(fmpz_t rop, const fmpz_t p, long N)
+{
+    fmpz_t hi, t, f, pow;
+    fmpz *j;
+    long i, M, n;
+
+    if (N <= 2)
+    {
+        if (N == 1) fmpz_set_ui(rop, 1);
+        if (N == 2) fmpz_add_ui(rop, p, 1);
+        return;
+    }
+
+    fmpz_init(hi);
+    fmpz_init(t);
+    fmpz_init(f);
+    fmpz_init(pow);
+
+    /* Compute hi */
+    {
+        fmpz_t num, den;
+
+        fmpz_init(num);
+        fmpz_init(den);
+        fmpz_mul_si(num, p, N + 1);
+        fmpz_sub_ui(num, num, N + 4);
+        fmpz_sub_ui(den, p, 2);
+        fmpz_fdiv_q(hi, num, den);
+        fmpz_sub_ui(hi, hi, 1);
+        fmpz_clear(num);
+        fmpz_clear(den);
+    }
+
+    if (COEFF_IS_MPZ(*hi))
+    {
+        printf("Exception (_padic_exp_p).\n");
+        printf("Computing the p-adic exponential requires too many terms.\n");
+        abort();
+    }
+
+    M = *hi;
+
+    padic_val_factorial(t, hi, p);
+    n = *t;
+
+    fmpz_pow_ui(pow, p, N + n);
+
+    j = _fmpz_vec_init(M + 1);
+
+    fmpz_set_ui(j + M, 1);
+    for (i = M; i > 0; i--)
+    {
+        fmpz_mul_ui(j + (i - 1), j + i, i);
+        fmpz_mod(j + (i - 1), j + (i - 1), pow);
+    }
+
+    fmpz_add_ui(rop, p, 1);
+    fmpz_mul(rop, rop, j + 0);
+
+    fmpz_set(f, p);
+    for (i = 2; i <= M; i++)
+    {
+        fmpz_mul(f, f, p);
+        fmpz_mul(t, f, j + i);
+        fmpz_add(rop, rop, t);
+        if (i & 1L)
+            fmpz_mod(rop, rop, pow);
+    }
+
+    _padic_inv(t, j + 0, p, N + n);
+
+    fmpz_mul(rop, rop, t);
+    fmpz_mod(rop, rop, pow);
+
+    fmpz_clear(hi);
+    fmpz_clear(t);
+    fmpz_clear(f);
+    fmpz_clear(pow);
+    _fmpz_vec_clear(j, M + 1);
+}
+
 /*
     Returns whether the $p$-adic exponential function converges at 
     the point \code{op}, and if so sets \code{rop} to its value.
@@ -138,23 +219,25 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     if (fmpz_cmp_ui(ctx->p, 2) && (op[1] >= 1))
     {
-        fmpz_t e, pow;
+        fmpz_t e, m;
 
         fmpz_init(e);
-        fmpz_init(pow);
+        fmpz_init(m);
 
         fmpz_pow_ui(e, ctx->p, op[1] - 1);
         fmpz_mul(e, op, e);
-        fmpz_pow_ui(pow, ctx->p, ctx->N);
+        fmpz_sub_ui(m, ctx->p, 1);
+        fmpz_mul(m, m, ctx->pow + (ctx->N - 1 - ctx->min));
+        fmpz_mod(e, e, m);
 
         _padic_exp_p(rop, ctx->p, ctx->N);
 
-        fmpz_powm(rop, rop, e, pow);
+        fmpz_powm(rop, rop, e, ctx->pow + (ctx->N - ctx->min));
 
         rop[1] = 0;
 
         fmpz_clear(e);
-        fmpz_clear(pow);
+        fmpz_clear(m);
 
         return 1;
     }
