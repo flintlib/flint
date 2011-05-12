@@ -113,7 +113,7 @@ main(void)
     }
 
     /* Check that a divides GCD(af, ag) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 3000; i++)
     {
         fmpz_poly_t a, d, f, g, q, r;
 
@@ -139,6 +139,50 @@ main(void)
            if (!result)
            {
               printf("FAIL (check a | gcd(af, ag)):\n");
+              printf("f = "), fmpz_poly_print(f), printf("\n");
+              printf("g = "), fmpz_poly_print(g), printf("\n");
+              printf("a = "), fmpz_poly_print(a), printf("\n");
+              printf("d = "), fmpz_poly_print(d), printf("\n");
+              abort();
+           }
+        } 
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(d);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(q);
+        fmpz_poly_clear(r);
+    }
+
+    /* Check that a == GCD(af, ag) when GCD(f, g) = 1 */
+    for (i = 0; i < 3000; i++)
+    {
+        fmpz_poly_t a, d, f, g, q, r;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(d);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(q);
+        fmpz_poly_init(r);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(state, 100) + 1, 40);
+        do {
+           fmpz_poly_randtest(f, state, n_randint(state, 100), 40);
+           fmpz_poly_randtest(g, state, n_randint(state, 100), 40);
+           fmpz_poly_gcd_heuristic(d, f, g);
+        } while (!(d->length == 1 || fmpz_is_one(d->coeffs)));
+
+        fmpz_poly_mul(f, a, f);
+        fmpz_poly_mul(g, a, g);
+        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+
+        if (d1)
+        {
+           result = fmpz_poly_equal(d, a) && _t_gcd_is_canonical(d);
+           if (!result)
+           {
+              printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
               printf("f = "), fmpz_poly_print(f), printf("\n");
               printf("g = "), fmpz_poly_print(g), printf("\n");
               printf("a = "), fmpz_poly_print(a), printf("\n");
