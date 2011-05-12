@@ -184,6 +184,8 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
 /* Special functions *********************************************************/
 
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
 static 
 void padic_val_factorial(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 {

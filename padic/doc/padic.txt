@@ -255,6 +255,24 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
 *******************************************************************************
 
+    Special functions
+
+*******************************************************************************
+
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the Teichmuller lift of the p-adic unit \code{op}.
+
+    If \code{op} is a $p$-adic integer divisible by $p$, sets \code{rop} 
+    to zero, which satisfies $t^p - t = 0$, although it is clearly not 
+    a $(p-1)$st root of unity.
+
+    If \code{op} has negative valuation, raises an abort signal.
+
+    Supports aliasing, of course.
+
+*******************************************************************************
+
     Input and output
 
 *******************************************************************************

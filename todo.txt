@@ -318,3 +318,6 @@ fmpq_mat
 
 padic
 -----
+
+* Improve the implementation of "padic_teichmuller"
+
