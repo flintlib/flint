@@ -90,7 +90,11 @@ void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
 
+void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
+
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
+
+void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 

@@ -111,10 +111,21 @@ void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the integer \code{op}.
 
+void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op}.
+
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to the rational number \code{op}, reduced 
     modulo $p^N$.
+
+void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets the MPIR integer \code{rop} to the $p$-adic integer \code{op}.
+    No reduction takes place.
+
+    If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
 
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
