@@ -323,3 +323,5 @@ padic
 
 * Add more solid test code for "padic_shift"
 
+* Add macros "PADIC_U" and "PADIC_V" and use these throughout(!)
+
