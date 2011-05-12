@@ -321,3 +321,5 @@ padic
 
 * Improve the implementation of "padic_teichmuller"
 
+* Add more solid test code for "padic_shift"
+

@@ -139,6 +139,8 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
+void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx);
+
 void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
 void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx);

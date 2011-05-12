@@ -177,6 +177,11 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
     Sets \code{rop} to the product of \code{op1} and \code{op2} 
     modulo $p^N$.
 
+void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $p^v$, 
+    reduced modulo $p^N$.
+
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
