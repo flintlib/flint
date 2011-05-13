@@ -35,11 +35,11 @@ int _fmpz_poly_divides(fmpz * q, const fmpz * a,
    fmpz * r = _fmpz_vec_init(len1);
    
    _fmpz_poly_divrem(q, r, a, len1, b, len2);
-   while ((len2) && r[len2 - 1] == 0) len2--;
+   while ((len1) && r[len1 - 1] == 0) len1--;
    
    _fmpz_vec_clear(r, len1);
 
-   return (len2 == 0);
+   return (len1 == 0);
 }
 
 mp_size_t mpn_gcd_adjusted(mp_ptr arrayg, 

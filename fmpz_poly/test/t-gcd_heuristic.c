@@ -113,7 +113,7 @@ main(void)
     }
 
     /* Check that a divides GCD(af, ag) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 3000; i++)
     {
         fmpz_poly_t a, d, f, g, q, r;
 
@@ -153,6 +153,75 @@ main(void)
         fmpz_poly_clear(g);
         fmpz_poly_clear(q);
         fmpz_poly_clear(r);
+    }
+
+    /* Check that a == GCD(af, ag) when GCD(f, g) = 1 */
+    for (i = 0; i < 3000; i++)
+    {
+        fmpz_poly_t a, d, f, g, q, r;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(d);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(q);
+        fmpz_poly_init(r);
+        fmpz_poly_randtest_not_zero(a, state, n_randint(state, 10) + 1, 10);
+        do {
+           fmpz_poly_randtest(f, state, n_randint(state, 10), 10);
+           fmpz_poly_randtest(g, state, n_randint(state, 10), 10);
+           fmpz_poly_gcd_heuristic(d, f, g);
+        } while (!(d->length == 1 && fmpz_is_one(d->coeffs)));
+
+        fmpz_poly_mul(f, a, f);
+        fmpz_poly_mul(g, a, g);
+        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+
+        if (d1)
+        {
+           if (!_t_gcd_is_canonical(a)) fmpz_poly_neg(a, a);
+
+           result = fmpz_poly_equal(d, a) && _t_gcd_is_canonical(d);
+           if (!result)
+           {
+              printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
+              printf("f = "), fmpz_poly_print(f), printf("\n");
+              printf("g = "), fmpz_poly_print(g), printf("\n");
+              printf("a = "), fmpz_poly_print(a), printf("\n");
+              printf("d = "), fmpz_poly_print(d), printf("\n");
+              abort();
+           }
+        } 
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(d);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(q);
+        fmpz_poly_clear(r);
+    }
+
+    /* Sebastian's test case */
+    {
+       fmpz_poly_t a, b, d;
+
+       fmpz_poly_init(a);
+       fmpz_poly_init(b);
+       fmpz_poly_init(d);
+
+       fmpz_poly_set_coeff_ui(b, 2, 1);
+       fmpz_poly_set_coeff_si(a, 0, -32);
+       fmpz_poly_set_coeff_si(a, 1, 24);
+
+       fmpz_poly_gcd_heuristic(d, a, b);
+
+       result = (d->length == 1 && fmpz_is_one(d->coeffs));
+       if (!result)
+       {
+          printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
+          fmpz_poly_print(d); printf("\n"); 
+          abort();
+       }
     }
 
     flint_randclear(state);
