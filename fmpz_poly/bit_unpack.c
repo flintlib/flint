@@ -76,3 +76,71 @@ _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
         }
     }
 }
+
+
+void
+fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+{
+    long len;
+    mpz_t tmp;
+    __mpz_struct * mpz;
+    int negate;
+
+    if (COEFF_IS_MPZ(*f))
+    {
+        mpz = COEFF_TO_PTR(*f);
+    }
+    else
+    {
+        mpz_init(tmp);
+        fmpz_get_mpz(tmp, f);
+        mpz = tmp;
+    }
+
+    negate = (mpz->_mp_size < 0);
+
+    len = fmpz_bits(f) / bit_size + 1;
+
+    fmpz_poly_fit_length(poly, len);
+
+    _fmpz_poly_bit_unpack(poly->coeffs, len, mpz->_mp_d, bit_size, negate);
+    _fmpz_poly_set_length(poly, len);
+    _fmpz_poly_normalise(poly);
+
+    if (!COEFF_IS_MPZ(*f))
+        mpz_clear(tmp);
+}
+
+void
+fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+{
+    long len;
+    mpz_t tmp;
+    __mpz_struct * mpz;
+    int negate;
+
+    if (COEFF_IS_MPZ(*f))
+    {
+        mpz = COEFF_TO_PTR(*f);
+    }
+    else
+    {
+        mpz_init(tmp);
+        fmpz_get_mpz(tmp, f);
+        mpz = tmp;
+    }
+
+    if (mpz->_mp_size < 0)
+        abort();
+
+    len = fmpz_bits(f) / bit_size + 1;
+
+    fmpz_poly_fit_length(poly, len);
+
+    _fmpz_poly_bit_unpack_unsigned(poly->coeffs, len, mpz->_mp_d, bit_size);
+    _fmpz_poly_set_length(poly, len);
+    _fmpz_poly_normalise(poly);
+
+    if (!COEFF_IS_MPZ(*f))
+        mpz_clear(tmp);
+}

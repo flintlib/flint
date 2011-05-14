@@ -53,3 +53,46 @@ _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly, long len,
         }
     }
 }
+
+void
+fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
+                   mp_bitcnt_t bit_size)
+{
+    long len;
+    __mpz_struct * mpz;
+    long i, d;
+
+    len = fmpz_poly_length(poly);
+
+    if (len == 0)
+    {
+        fmpz_zero(f);
+        return;
+    }
+
+    mpz = _fmpz_promote(f);
+    mpz_realloc2(mpz, len * bit_size);
+    d = mpz->_mp_alloc;
+
+    mpn_zero(mpz->_mp_d, d);
+
+    if (fmpz_sgn(fmpz_poly_lead(poly)) < 0)
+        negate = 1;
+    else
+        negate = 0;
+
+    _fmpz_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size, negate);
+
+    for (i = d - 1; i >= 0; i--)
+    {
+        if (mpz->_mp_d[i] != 0)
+            break;
+    }
+    d = i + 1;
+
+    mpz->_mp_size = d;
+    _fmpz_demote_val(f);
+
+    if (negate)
+        fmpz_neg(f, f);
+}
