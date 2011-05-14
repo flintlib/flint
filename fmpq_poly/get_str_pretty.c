@@ -32,21 +32,22 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
+char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len, 
+                                 const char *var)
 {
     long i;
     size_t j;
-    size_t len;     /* Upper bound on the length          */
-    size_t denlen;  /* Size of the denominator in base 10 */
-    size_t varlen;  /* Length of the variable name        */
-    mpz_t z;        /* op->den (if this is not 1)         */
+    size_t size;     /* Upper bound on the length          */
+    size_t densize;  /* Size of the denominator in base 10 */
+    size_t varsize;  /* Length of the variable name        */
+    mpz_t z;         /* op->den (if this is not 1)         */
     mpq_t q;
-    char * str;
+    char *str;
     
-    if (poly->length == 0)  /* Zero polynomial */
+    if (len == 0)  /* Zero polynomial */
     {
-        str = (char *) malloc(2 * sizeof(char));
-        if (str == NULL)
+        str = malloc(2);
+        if (!str)
         {
             printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
             abort();
@@ -55,54 +56,69 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
         str[1] = '\0';
         return str;
     }
-    if (poly->length == 1)  /* Constant polynomials */
+    if (len == 1)  /* Constant polynomials */
     {
         mpq_init(q);
-        fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1));
-        fmpz_get_mpz(mpq_denref(q), poly->den);
+        fmpz_get_mpz(mpq_numref(q), poly);
+        fmpz_get_mpz(mpq_denref(q), den);
         mpq_canonicalize(q);
         str = mpq_get_str(NULL, 10, q);
         mpq_clear(q);
         return str;
     }
-    if (poly->length == 2)  /* Degree 1 polynomials */
+    if (len == 2)  /* Linear polynomials */
     {
         mpq_t a0, a1;
-        size_t len0, len1;
+        size_t size0, size1;
 
         mpq_init(a0);
         mpq_init(a1);
 
-        fmpz_get_mpz(mpq_numref(a0), poly->coeffs);
-        fmpz_get_mpz(mpq_denref(a0), poly->den);
+        fmpz_get_mpz(mpq_numref(a0), poly);
+        fmpz_get_mpz(mpq_denref(a0), den);
         mpq_canonicalize(a0);
-        fmpz_get_mpz(mpq_numref(a1), poly->coeffs + 1);
-        fmpz_get_mpz(mpq_denref(a1), poly->den);
+        fmpz_get_mpz(mpq_numref(a1), poly + 1);
+        fmpz_get_mpz(mpq_denref(a1), den);
         mpq_canonicalize(a1);
 
-        len0 = mpz_sizeinbase(mpq_numref(a0), 10) 
-             + mpz_sizeinbase(mpq_denref(a0), 10) + 1;
-        len1 = mpz_sizeinbase(mpq_numref(a1), 10) 
-             + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
-        len  = len0 + 1 + strlen(var) + 1 + len1 + 1;
-        str  = malloc(len);
+        size0 = mpz_sizeinbase(mpq_numref(a0), 10) 
+              + mpz_sizeinbase(mpq_denref(a0), 10) + 1;
+        size1 = mpz_sizeinbase(mpq_numref(a1), 10) 
+              + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
+        size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
+        str   = malloc(size);
         if (!str)
         {
             printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
             abort();
         }
 
-        if (mpq_sgn(a0) == 0)
+        if (mpq_cmp_si(a1, 1, 1) == 0)
         {
-            gmp_sprintf(str, "%Qd*%s", a1, var);
+            if (mpq_sgn(a0) == 0)
+                gmp_sprintf(str, "%s", var);
+            else if (mpq_sgn(a0) > 0)
+                gmp_sprintf(str, "%s+%Qd", var, a0);
+            else  /* mpq_sgn(a0) < 0 */
+                gmp_sprintf(str, "%s%Qd", var, a0);
         }
-        else if (mpq_sgn(a0) > 0)
+        else if (mpq_cmp_si(a1, -1, 1) == 0)
         {
-            gmp_sprintf(str, "%Qd*%s+%Qd", a1, var, a0);
+            if (mpq_sgn(a0) == 0)
+                gmp_sprintf(str, "-%s", var);
+            else if (mpq_sgn(a0) > 0)
+                gmp_sprintf(str, "-%s+%Qd", var, a0);
+            else  /* mpq_sgn(a0) < 0 */
+                gmp_sprintf(str, "-%s%Qd", var, a0);
         }
-        else  /* mpq_sgn(a0) < 0 */
+        else
         {
-            gmp_sprintf(str, "%Qd*%s%Qd", a1, var, a0);
+            if (mpq_sgn(a0) == 0)
+                gmp_sprintf(str, "%Qd*%s", a1, var);
+            else if (mpq_sgn(a0) > 0)
+                gmp_sprintf(str, "%Qd*%s+%Qd", a1, var, a0);
+            else  /* mpq_sgn(a0) < 0 */
+                gmp_sprintf(str, "%Qd*%s%Qd", a1, var, a0);
         }
 
         mpq_clear(a0);
@@ -111,35 +127,35 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
         return str;
     }
     
-    varlen = strlen(var);
+    varsize = strlen(var);
     
     /* Copy the denominator into an mpz_t */
     mpz_init(z);
-    if (*poly->den == 1L)
+    if (*den == 1L)
     {
-        denlen = 0;
+        densize = 0;
     }
     else
     {
-        fmpz_get_mpz(z, poly->den);
-        denlen = mpz_sizeinbase(z, 10);
+        fmpz_get_mpz(z, den);
+        densize = mpz_sizeinbase(z, 10);
     }
     
     /* Estimate the length */
-    len = 0;
-    for (i = 0; i < poly->length; i++)
+    size = 0;
+    for (i = 0; i < len; i++)
     {
-        fmpz_get_mpz(z, poly->coeffs + i);
-        len += mpz_sizeinbase(z, 10);                   /* Numerator         */
-        if (mpz_sgn(z) != 0) len += 1 + denlen;         /* Denominator and / */
-        len += 3;                                       /* Operator and ws   */
-        len += 1 + varlen + 1;                          /* *, x and ^        */
-        len += (size_t) ceil(log10((double) (i + 1)));  /* Exponent          */
+        fmpz_get_mpz(z, poly + i);
+        size += mpz_sizeinbase(z, 10);                   /* Numerator         */
+        if (mpz_sgn(z) != 0) size += 1 + densize;        /* Denominator and / */
+        size += 3;                                       /* Operator and ws   */
+        size += 1 + varsize + 1;                         /* *, x and ^        */
+        size += (size_t) ceil(log10((double) (i + 1)));  /* Exponent          */
     }
     
     mpq_init(q);
-    str = (char *) malloc(len * sizeof(char));
-    if (str == NULL)
+    str = malloc(size);
+    if (!str)
     {
         printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
         mpz_clear(z);
@@ -149,8 +165,8 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
     j = 0;
     
     /* Print the leading term */
-    fmpz_get_mpz(mpq_numref(q), poly->coeffs + (poly->length - 1));
-    fmpz_get_mpz(mpq_denref(q), poly->den);
+    fmpz_get_mpz(mpq_numref(q), poly + (len - 1));
+    fmpz_get_mpz(mpq_denref(q), den);
     mpq_canonicalize(q);
     
     if (mpq_cmp_si(q, 1, 1) != 0)
@@ -166,18 +182,18 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
     }
     j += sprintf(str + j, "%s", var);
     str[j++] = '^';
-    j += sprintf(str + j, "%li", poly->length - 1);
+    j += sprintf(str + j, "%li", len - 1);
     
-    i = poly->length - 1;
+    i = len - 1;
     while (i)
     {
         i--;
         
-        if (fmpz_is_zero(poly->coeffs + i))
+        if (fmpz_is_zero(poly + i))
             continue;
         
-        fmpz_get_mpz(mpq_numref(q), poly->coeffs + i);
-        fmpz_get_mpz(mpq_denref(q), poly->den);
+        fmpz_get_mpz(mpq_numref(q), poly + i);
+        fmpz_get_mpz(mpq_denref(q), den);
         mpq_canonicalize(q);
         
         str[j++] = ' ';
@@ -208,5 +224,11 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
     mpq_clear(q);
     mpz_clear(z);
     return str;
+}
+
+char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
+{
+    return _fmpq_poly_get_str_pretty(poly->coeffs, poly->den, poly->length, 
+                                     var);
 }
 
