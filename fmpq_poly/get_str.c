@@ -134,6 +134,51 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var)
         mpq_clear(q);
         return str;
     }
+    if (poly->length == 2)  /* Degree 1 polynomials */
+    {
+        mpq_t a0, a1;
+        size_t len0, len1;
+
+        mpq_init(a0);
+        mpq_init(a1);
+
+        fmpz_get_mpz(mpq_numref(a0), poly->coeffs);
+        fmpz_get_mpz(mpq_denref(a0), poly->den);
+        mpq_canonicalize(a0);
+        fmpz_get_mpz(mpq_numref(a1), poly->coeffs + 1);
+        fmpz_get_mpz(mpq_denref(a1), poly->den);
+        mpq_canonicalize(a1);
+
+        len0 = mpz_sizeinbase(mpq_numref(a0), 10) 
+             + mpz_sizeinbase(mpq_denref(a0), 10) + 1;
+        len1 = mpz_sizeinbase(mpq_numref(a1), 10) 
+             + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
+        len  = len0 + 1 + strlen(var) + 1 + len1 + 1;
+        str  = malloc(len);
+        if (!str)
+        {
+            printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+            abort();
+        }
+
+        if (mpq_sgn(a0) == 0)
+        {
+            gmp_sprintf(str, "%Qd*%s", a1, var);
+        }
+        else if (mpq_sgn(a0) > 0)
+        {
+            gmp_sprintf(str, "%Qd*%s+%Qd", a1, var, a0);
+        }
+        else  /* mpq_sgn(a0) < 0 */
+        {
+            gmp_sprintf(str, "%Qd*%s%Qd", a1, var, a0);
+        }
+
+        mpq_clear(a0);
+        mpq_clear(a1);
+
+        return str;
+    }
     
     varlen = strlen(var);
     
