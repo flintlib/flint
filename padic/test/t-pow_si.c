@@ -88,6 +88,53 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
+    /* Compare with multiplication for e > 0 */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_t p;
+        long N;
+        padic_ctx_t ctx;
+
+        padic_t a, b, c;
+        long j, e;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = n_randint(state, 50) + 1;
+        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+
+        padic_init(a, ctx);
+        padic_init(b, ctx);
+        padic_init(c, ctx);
+
+        padic_randtest(a, state, ctx);
+
+        e = n_randint(state, 50) + 1;
+
+        padic_pow_si(b, a, e, ctx);
+        padic_one(c, ctx);
+        for (i = 0; i < e; i++)
+            padic_mul(c, c, a, ctx);
+
+        result = (padic_equal(b, c, ctx));
+        if (!result)
+        {
+            printf("FAIL:\n\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("e = %ld\n", e);
+            abort();
+        }
+
+        padic_clear(a, ctx);
+        padic_clear(b, ctx);
+        padic_clear(c, ctx);
+
+        fmpz_clear(p);
+        padic_ctx_clear(ctx);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
