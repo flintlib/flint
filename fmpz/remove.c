@@ -34,6 +34,9 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
     fmpz y = *x;
     fmpz q = *f;
 
+    if (fmpz_is_zero(x))
+        return 0;
+
     if (!COEFF_IS_MPZ(y))  /* x is small */
     {
         if (!COEFF_IS_MPZ(q))  /* f is small */
