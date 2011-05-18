@@ -25,6 +25,35 @@
 
 *******************************************************************************
 
+    Module documentation
+
+    Implements the field of $p$-adic numbers $\mathbf{Q}_p$ to some 
+    finite precision $p^N$.
+
+    The main idea behind the treatment of the precision is that 
+    where possible $p$-adic numbers that are input arguments to 
+    a function are interpreted as exact $p$-adic numbers and the 
+    precision of the context object is only used as the precision 
+    to which the output is to be computed.
+
+*******************************************************************************
+
+fmpz * padic_unit(const padic_t op)
+
+    Returns the unit part of the $p$-adic number as a FLINT integer. 
+
+    Note that this function is implemented as a macro.
+
+long padic_val(const padic_t op)
+
+    Returns the valuation part of the $p$-adic number.
+
+    Note that this function is implemented as a macro and that 
+    the expression \code{padic_val(op)} can be used as both an 
+    \emph{lvalue} and an \emph{rvalue}.
+
+*******************************************************************************
+
     Context
 
 *******************************************************************************
@@ -158,6 +187,8 @@ void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 
     Swaps the two $p$-adic numbers \code{op1} and \code{op2}.
+
+    N.B.  No reduction takes place.
 
 void padic_zero(padic_t rop, const padic_ctx_t ctx)
 
