@@ -28,60 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
-
-mp_size_t mpn_gcd_adjusted(mp_ptr arrayg, 
-    mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
-{
-   mp_size_t s1 = 0, s2 = 0, m, b1, b2, mb, len1, len2, leng;
-   mp_ptr in1, in2;
-   mp_limb_t cy;
-
-   while (array1[s1] == 0) s1++; len1 = limbs1 - s1;
-   while (array2[s2] == 0) s2++; len2 = limbs2 - s2;
-   m = FLINT_MIN(s1, s2);
-   mpn_zero(arrayg, m);
-
-   b1 = mpn_scan1(array1 + s1, 0);
-   b2 = mpn_scan1(array2 + s2, 0);
-   mb = FLINT_MIN(b1, b2);
-   if (s1 > s2) mb = b2;
-   if (s2 > s1) mb = b1;
-
-   if (b1 == 0)
-      in1 = array1 + s1;
-   else
-   {
-      in1 = malloc(len1*sizeof(mp_limb_t));
-      mpn_rshift(in1, array1 + s1, len1, b1);
-      len1 -= (in1[len1 - 1] == 0); 
-   }
-
-   if (b2 == 0)
-      in2 = array2 + s2;
-   else
-   {
-      in2 = malloc(len2*sizeof(mp_limb_t));
-      mpn_rshift(in2, array2 + s2, len2, b2);
-      len2 -= (in2[len2 - 1] == 0); 
-   }
-   
-   if (len1 >= len2)
-      leng = mpn_gcd(arrayg + m, in1, len1, in2, len2);
-   else 
-      leng = mpn_gcd(arrayg + m, in2, len2, in1, len1);
-
-   if (mb)
-   {
-      cy = mpn_lshift(arrayg + m, arrayg + m, leng, mb);
-      if (cy)
-         arrayg[m + leng++] = cy;
-   }
-
-   if (b1) free(in1);
-   if (b2) free(in2);
-
-   return m + leng;
-}
+#include "mpn_extras.h"
 
 /* Assumes len1 != 0 != len2 */
 
@@ -197,7 +144,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 	limbs2 = (pack_bits*len2 - 1)/FLINT_BITS + 1;
 	while (!array2[limbs2 - 1]) limbs2--;
 	
-	limbsg = mpn_gcd_adjusted(arrayg, array1, limbs1, array2, limbs2);
+	limbsg = mpn_gcd_full(arrayg, array1, limbs1, array2, limbs2);
 	
    /* may have one extra coeff due to 1 0 -x being packed as 0 -1 -x */
    length = (limbsg*FLINT_BITS)/pack_bits + 1; 

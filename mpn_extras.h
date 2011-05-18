@@ -35,7 +35,7 @@
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd
- */
+*/
 
 #ifdef mpn_modexact_1_odd
 #define mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
@@ -80,6 +80,8 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
 
 int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
 
+mp_size_t mpn_gcd_full(mp_ptr arrayg, 
+          mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2);
 
 /*
 Macros for common operations with carry management.
