@@ -98,46 +98,54 @@ void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to a copy of \code{op}.
 
+    N.B.  No reduction takes place.
+
 void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the \code{long} integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the 
+    \code{long} integer \code{op} reduced modulo $p^N$.
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the \code{unsigned long} 
-    integer \code{op}.
+    integer \code{op} reduced modulo $p^N$.
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the integer \code{op} 
+    reduced modulo $p^N$.
 
 void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op} 
+    reduced modulo $p^N$.
 
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
-    Sets \code{rop} to the rational number \code{op}, reduced 
+    Sets \code{rop} to the MPIR rational \code{op} reduced 
     modulo $p^N$.
 
 void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the integer \code{rop} to the $p$-adic integer \code{op}. 
-    No reduction takes place.
+    Sets the integer \code{rop} to the $p$-adic integer \code{op}.
 
     If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
+
+    N.B.  No reduction takes place.
 
 void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the MPIR integer \code{rop} to the $p$-adic integer \code{op}.
-    No reduction takes place.
 
     If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
+
+    N.B.  No reduction takes place.
 
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the rational \code{rop} to the value of \code{op}.  
-    No reduction takes place.
+    
+    N.B.  No reduction takes place.
 
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 

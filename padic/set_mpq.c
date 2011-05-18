@@ -2,8 +2,7 @@
 
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 {
-
-    if (mpz_sgn(mpq_numref(op)) == 0)
+    if (mpq_sgn(op) == 0)
     {
         padic_zero(rop, ctx);
     }

@@ -23,8 +23,13 @@ void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
     }
     else if (e < 0)
     {
-        padic_pow_si(rop, op, -e, ctx);
-        padic_inv(rop, rop, ctx);
+        _padic_inv(rop, op, ctx->p, (ctx->N - op[1] * e + (-e - 1)) / -e);
+        rop[1] = e * op[1];
+
+        fmpz_init(pow);
+        fmpz_pow_ui(pow, ctx->p, ctx->N - rop[1]);
+        fmpz_powm_ui(rop, rop, -e, pow);
+        fmpz_clear(pow);
     }
     else
     {

@@ -6,16 +6,14 @@ void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
     {
         padic_zero(rop, ctx);
     }
-
-    else if (fmpz_cmp_ui(ctx->p, op) > 0)
+    else if (fmpz_cmp_ui(op, ctx->p) < 0)
     {
         fmpz_set_ui(rop, op);
         rop[1] = 0;
     }
-
     else
     {
-        ulong p = fmpz_get_ui(ctx->p), q, r = 1;
+        ulong p = fmpz_get_ui(ctx->p), q, r;
 
         /* Remove factors of p */
         rop[1] = 0;
