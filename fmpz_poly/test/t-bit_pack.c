@@ -116,6 +116,89 @@ main(void)
         fmpz_poly_clear(b);
     }
 
+    /* Test fmpz functions */
+    for (i = 0; i < 20000; i++)
+    {
+        fmpz_t f;
+        fmpz_poly_t A, B;
+        long b;
+
+        fmpz_init(f);
+        fmpz_poly_init(A);
+        fmpz_poly_init(B);
+
+        fmpz_poly_randtest(A, state, 1+n_randint(state,100),
+            1+n_randint(state,300));
+
+        b = FLINT_ABS(fmpz_poly_max_bits(A)) + 1;
+
+        fmpz_poly_bit_pack(f, A, b);
+        fmpz_poly_bit_unpack(B, f, b);
+
+        if (!fmpz_poly_equal(A, B))
+        {
+            mpz_t zz;
+            printf("FAIL:\n");
+            printf("BITS: %ld (signed)\n", b);
+            printf("INPUT: ");
+            fmpz_poly_print_pretty(A, "x");
+            printf("\n");
+            mpz_init(zz); fmpz_get_mpz(zz, f);
+            printf("PACKED: ");
+            mpz_out_str(stdout, 2, zz);
+            printf("\n");
+            printf("OUTPUT: ");
+            fmpz_poly_print_pretty(B, "x");
+            printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(f);
+        fmpz_poly_clear(A);
+        fmpz_poly_clear(B);
+    }
+
+    for (i = 0; i < 20000; i++)
+    {
+        fmpz_t f;
+        fmpz_poly_t A, B;
+        long b;
+
+        fmpz_init(f);
+        fmpz_poly_init(A);
+        fmpz_poly_init(B);
+
+        fmpz_poly_randtest_unsigned(A, state, 1+n_randint(state,100),
+            1+n_randint(state,300));
+
+        b = FLINT_ABS(fmpz_poly_max_bits(A));
+
+        fmpz_poly_bit_pack(f, A, b);
+        fmpz_poly_bit_unpack_unsigned(B, f, b);
+
+        if (!fmpz_poly_equal(A, B))
+        {
+            mpz_t zz;
+            printf("FAIL:\n");
+            printf("BITS: %ld (unsigned)\n", b);
+            printf("INPUT: ");
+            fmpz_poly_print_pretty(A, "x");
+            printf("\n");
+            mpz_init(zz); fmpz_get_mpz(zz, f);
+            printf("PACKED: ");
+            mpz_out_str(stdout, 2, zz);
+            printf("\n");
+            printf("OUTPUT: ");
+            fmpz_poly_print_pretty(B, "x");
+            printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(f);
+        fmpz_poly_clear(A);
+        fmpz_poly_clear(B);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");

@@ -61,10 +61,11 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     long len;
     __mpz_struct * mpz;
     long i, d;
+    int negate;
 
     len = fmpz_poly_length(poly);
 
-    if (len == 0)
+    if (len == 0 || bit_size == 0)
     {
         fmpz_zero(f);
         return;
@@ -77,7 +78,7 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     mpn_zero(mpz->_mp_d, d);
 
     if (fmpz_sgn(fmpz_poly_lead(poly)) < 0)
-        negate = 1;
+        negate = -1;
     else
         negate = 0;
 

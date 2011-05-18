@@ -273,11 +273,21 @@ void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1,
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
                                 long len, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
+int _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                            mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                        mp_srcptr arr, mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
+        mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size);
+
 
 /*  Multiplication  **********************************************************/
 

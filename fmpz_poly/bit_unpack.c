@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void
+int
 _fmpz_poly_bit_unpack(fmpz * poly, long len,
                       mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
 {
@@ -52,6 +52,8 @@ _fmpz_poly_bit_unpack(fmpz * poly, long len,
             limbs++;
         }
     }
+
+    return borrow;
 }
 
 void
@@ -77,70 +79,79 @@ _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
     }
 }
 
+void
+fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
+                                        mp_bitcnt_t bit_size)
+{
+    long len;
+    mpz_t tmp;
+
+    if (fmpz_sgn(f) < 0)
+    {
+        printf("fmpz_poly_bit_unpack_unsigned: expected an unsigned value!\n");
+        abort();
+    }
+
+    if (bit_size == 0 || fmpz_is_zero(f))
+    {
+        fmpz_poly_zero(poly);
+        return;
+    }
+
+    len = (fmpz_bits(f) + bit_size - 1) / bit_size;
+
+    mpz_init2(tmp, bit_size*len);
+    mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    fmpz_get_mpz(tmp, f);
+
+    fmpz_poly_fit_length(poly, len);
+
+    _fmpz_poly_bit_unpack_unsigned(poly->coeffs, len, tmp->_mp_d, bit_size);
+    _fmpz_poly_set_length(poly, len);
+    _fmpz_poly_normalise(poly);
+
+    mpz_clear(tmp);
+}
+
 
 void
 fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 {
     long len;
     mpz_t tmp;
-    __mpz_struct * mpz;
-    int negate;
+    int negate, borrow;
 
-    if (COEFF_IS_MPZ(*f))
+    if (bit_size == 0 || fmpz_is_zero(f))
     {
-        mpz = COEFF_TO_PTR(*f);
+        fmpz_poly_zero(poly);
+        return;
+    }
+
+    /* Round up */
+    len = (fmpz_bits(f) + bit_size - 1) / bit_size;
+    negate = (fmpz_sgn(f) < 0) ? -1 : 0;
+
+    mpz_init2(tmp, bit_size*len);
+
+    /* TODO: avoid all this wastefulness */
+    mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    fmpz_get_mpz(tmp, f);
+
+    fmpz_poly_fit_length(poly, len + 1);
+
+    borrow = _fmpz_poly_bit_unpack(poly->coeffs, len,
+                    tmp->_mp_d, bit_size, negate);
+
+    if (borrow)
+    {
+        fmpz_set_si(poly->coeffs + len, negate ? -1L : 1L);
+        _fmpz_poly_set_length(poly, len + 1);
     }
     else
     {
-        mpz_init(tmp);
-        fmpz_get_mpz(tmp, f);
-        mpz = tmp;
+        _fmpz_poly_set_length(poly, len);
+        _fmpz_poly_normalise(poly);
     }
 
-    negate = (mpz->_mp_size < 0);
-
-    len = fmpz_bits(f) / bit_size + 1;
-
-    fmpz_poly_fit_length(poly, len);
-
-    _fmpz_poly_bit_unpack(poly->coeffs, len, mpz->_mp_d, bit_size, negate);
-    _fmpz_poly_set_length(poly, len);
-    _fmpz_poly_normalise(poly);
-
-    if (!COEFF_IS_MPZ(*f))
-        mpz_clear(tmp);
-}
-
-void
-fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
-{
-    long len;
-    mpz_t tmp;
-    __mpz_struct * mpz;
-    int negate;
-
-    if (COEFF_IS_MPZ(*f))
-    {
-        mpz = COEFF_TO_PTR(*f);
-    }
-    else
-    {
-        mpz_init(tmp);
-        fmpz_get_mpz(tmp, f);
-        mpz = tmp;
-    }
-
-    if (mpz->_mp_size < 0)
-        abort();
-
-    len = fmpz_bits(f) / bit_size + 1;
-
-    fmpz_poly_fit_length(poly, len);
-
-    _fmpz_poly_bit_unpack_unsigned(poly->coeffs, len, mpz->_mp_d, bit_size);
-    _fmpz_poly_set_length(poly, len);
-    _fmpz_poly_normalise(poly);
-
-    if (!COEFF_IS_MPZ(*f))
-        mpz_clear(tmp);
+    mpz_clear(tmp);
 }
