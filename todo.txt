@@ -150,11 +150,24 @@ fmpz_poly
 * Fix the inefficient cases in CRT_ui, and move the relevant parts of this
   function to the fmpz_vec module
 
+* Avoid redundant work and memory allocation in fmpz_poly_bit_unpack
+  and fmpz_poly_bit_unpack_unsigned.
+
+* Implement Taylor shift.
+
 
 fmpq_poly
 ---------
 
 * add fmpq_poly_fprint_pretty
+
+
+fmpz_poly_mat
+-------------
+
+* Tune multiplication cutoffs.
+
+* Add more random functions.
 
 
 arith
