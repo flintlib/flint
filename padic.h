@@ -45,13 +45,18 @@ enum padic_print_mode
 };
 
 typedef struct {
+
     fmpz_t p;
     long N;
+
     double pinv;
+
     fmpz *pow;
     long min;
     long max;
+
     enum padic_print_mode mode;
+
 } padic_ctx_struct;
 
 typedef padic_ctx_struct padic_ctx_t[1];
@@ -62,6 +67,22 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N,
                     enum padic_print_mode mode);
 
 void padic_ctx_clear(padic_ctx_t ctx);
+
+static __inline__ 
+void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
+{
+    if (ctx->min <= e && e < ctx->max)
+    {
+        *alloc = 0;
+        *rop   = *(ctx->pow + (e - ctx->min));
+    }
+    else
+    {
+        *alloc = 1;
+        *rop   = 0L;
+        fmpz_pow_ui(rop, ctx->p, e);
+    }
+}
 
 /* Memory management *********************************************************/
 

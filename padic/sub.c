@@ -8,7 +8,6 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
         padic_set(rop, op1, ctx);
         return;
     }
-
     if (padic_is_zero(op1, ctx))
     {
         padic_neg(rop, op2, ctx);
@@ -30,13 +29,14 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
     if (op1[1] > op2[1])
     {
         /* u1 p^v1 - u2 p^v2 = p^v2 (u1 p^{v1-v2} - u2) */
-        fmpz_t pow;
+        fmpz *pow;
+        int alloc;
 
-        fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, op1[1] - op2[1]);
+        _padic_ctx_pow_ui(&pow, &alloc, op1[1] - op2[1], ctx);
         fmpz_neg(rop, op2);
         fmpz_addmul(rop, op1, pow);
-        fmpz_clear(pow);
+        if (alloc)
+            fmpz_clear(pow);
 
         rop[1] = op2[1];
 
@@ -45,13 +45,14 @@ void padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
     else if (op1[1] < op2[1])
     {
         /* u1 p^v1 - u2 p^v2 = p^v1 (u1 - u2 p^{v2-v1}) */
-        fmpz_t pow;
+        fmpz *pow;
+        int alloc;
 
-        fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, op2[1] - op1[1]);
+        _padic_ctx_pow_ui(&pow, &alloc, op2[1] - op1[1], ctx);
         fmpz_set(rop, op1);
         fmpz_submul(rop, op2, pow);
-        fmpz_clear(pow);
+        if (alloc)
+            fmpz_clear(pow);
 
         rop[1] = op1[1];
 
