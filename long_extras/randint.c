@@ -19,23 +19,26 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#ifndef LONG_EXTRAS_H
-#define LONG_EXTRAS_H
+#include <limits.h>
 
-#include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 
-/* Randomisation  ************************************************************/
+mp_limb_t z_randint(flint_rand_t state, mp_limb_t limit) 
+{
+    mp_limb_t z;
 
-mp_limb_signed_t z_randtest(flint_rand_t state);
+    if ((limit == 0UL) || (limit > LONG_MAX))
+        limit = LONG_MAX;
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
+    z = n_randlimb(state) % limit;
+    if (n_randint(state, 2))
+        z = -z;
 
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
-
-#endif
-
+    return z;
+}
