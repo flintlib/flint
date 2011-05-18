@@ -514,6 +514,14 @@ void _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n);
 void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
                                          const fmpz_poly_t B, long n);
 
+/*  Divisibility testing  ***************************************************/
+
+int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
+                                         long len1, const fmpz * b, long len2);
+
+int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b);
+
+
 /*  Pseudo division  *********************************************************/
 
 void _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d, 

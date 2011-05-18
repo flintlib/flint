@@ -1201,6 +1201,35 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
 *******************************************************************************
 
+    Divisibility testing
+
+*******************************************************************************
+
+int _fmpz_poly_divides(fmpz * Q, const fmpz * A, 
+                  long lenA, const fmpz * B, long lenB)
+
+   Returns 1 if \code{(B, lenB)} divides \code{(A, lenA)} exactly and
+   sets $Q$ to the quotient, otherwise returns 0. 
+
+   It is assumed that $\len(A) \geq \len(B) > 0$ and that $Q$ has space
+   for $\len(A) - \len(B) + 1$ coefficients.
+
+   Aliasing of $Q$ with either of the inputs is not permitted.
+
+   This function is currently unoptimised and provided for convenience
+   only.
+
+int fmpz_poly_divides(fmpz_poly_t Q, 
+              const fmpz_poly_t A, const fmpz_poly_t B)
+
+   Returns 1 if $B$ divides $A$ exactly and sets $Q$ to the quotient,
+   otherwise returns 0.
+
+   This function is currently unoptimised and provided for convenience
+   only.
+
+*******************************************************************************
+
     Power series division
 
 *******************************************************************************

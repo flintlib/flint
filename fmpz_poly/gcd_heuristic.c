@@ -29,19 +29,6 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
-                       long len1, const fmpz * b, long len2)
-{
-   fmpz * r = _fmpz_vec_init(len1);
-   
-   _fmpz_poly_divrem(q, r, a, len1, b, len2);
-   while ((len1) && r[len1 - 1] == 0) len1--;
-   
-   _fmpz_vec_clear(r, len1);
-
-   return (len1 == 0);
-}
-
 mp_size_t mpn_gcd_adjusted(mp_ptr arrayg, 
     mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
 {
