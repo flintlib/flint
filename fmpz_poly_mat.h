@@ -98,6 +98,10 @@ void fmpz_poly_mat_neg(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
 
 void fmpz_poly_mat_mul(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
 
+void fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
+
+void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
+
 /* Row reduction */
 
 int fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c);
