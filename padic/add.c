@@ -13,10 +13,10 @@
 void _padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                 const padic_ctx_t ctx)
 {
-    fmpz *pow;
+    fmpz_t pow;
     int alloc;
 
-    _padic_ctx_pow_ui(&pow, &alloc, op1[1] - op2[1], ctx);
+    _padic_ctx_pow_ui(pow, &alloc, op1[1] - op2[1], ctx);
 
     if (rop == op1)
     {

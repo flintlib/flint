@@ -7,10 +7,10 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
     rop[1] = n_randint(state, max - min + 1) + min;
 
     {
-        fmpz *pow;
+        fmpz_t pow;
         int alloc;
 
-        _padic_ctx_pow_ui(&pow, &alloc, ctx->N - rop[1], ctx);
+        _padic_ctx_pow_ui(pow, &alloc, ctx->N - rop[1], ctx);
         fmpz_randm(rop, state, pow);
         if (alloc)
             fmpz_clear(pow);
