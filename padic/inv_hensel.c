@@ -27,9 +27,9 @@
 #include "padic.h"
 
 /*
-    Assumes that op is a unit modulo $p^N$.
+    Assumes that \code{op} is a unit modulo $p^N$.
 
-    In the current implementation, supports aliasing, but this 
+    In the current implementation supports aliasing, but this 
     might change.
  */
 void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
@@ -112,7 +112,7 @@ void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op, ctx))
     {
-        printf("Exception (padic_inv).  Zero is not invertible.\n");
+        printf("Exception (padic_inv_hensel).  Zero is not invertible.\n");
         abort();
     }
 
@@ -120,14 +120,14 @@ void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         If x = u p^v has negative valuation with N <= -v 
         then there is no inverse of x defined modulo p^N.
      */
-    if (ctx->N + op[1] <= 0)
+    if (ctx->N + padic_val(op) <= 0)
     {
         padic_zero(rop, ctx);
         return;
     }
 
-    _padic_inv_hensel(rop, op, ctx->p, ctx->N + op[1]);
+    _padic_inv_hensel(padic_unit(rop), padic_unit(op), ctx->p, ctx->N + padic_val(op));
 
-    rop[1] = -op[1];
+    padic_val(rop) = - padic_val(op);
 }
 

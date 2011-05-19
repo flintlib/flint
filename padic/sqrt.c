@@ -252,20 +252,20 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return 1;
     }
 
-    if (op[1] & 1L)
+    if (padic_val(op) & 1L)
     {
         return 0;
     }
 
-    rop[1] = op[1] / 2;
+    padic_val(rop) = padic_val(op) / 2;
 
-    if (fmpz_cmp_ui(ctx->p,2))
+    if (fmpz_cmp_ui(ctx->p, 2))
     {
-        return _padic_sqrt(rop, op, ctx->p, ctx->N - rop[1]);
+        return _padic_sqrt(padic_unit(rop), padic_unit(op), ctx->p, ctx->N - padic_val(rop));
     }
     else
     {
-        return _padic_sqrt_2(rop, op, ctx->N - rop[1]);
+        return _padic_sqrt_2(padic_unit(rop), padic_unit(op), ctx->N - padic_val(rop));
     }
 }
 

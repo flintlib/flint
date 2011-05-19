@@ -43,6 +43,12 @@ static long sizeinbase_si(long n, long b)
 
 char * padic_get_str(const padic_t op, const padic_ctx_t ctx)
 {
+    if (1)
+    {
+        printf("ERROR (padic_get_str).  Not implemented yet.\n");
+        abort();
+    }
+
     return NULL;
 }
 

@@ -3,6 +3,7 @@
 void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     fmpz_t pow;
+    int alloc;
 
     if (padic_is_zero(op, ctx))
     {
@@ -10,12 +11,11 @@ void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return;
     }
 
-    /* TODO:  Compute power */
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, ctx->p, ctx->N - op[1]);
-    fmpz_sub(rop, pow, op);
-    fmpz_clear(pow);
+    _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op), ctx);
+    fmpz_sub(padic_unit(rop), pow, padic_unit(op));
+    if (alloc)
+        fmpz_clear(pow);
 
-    rop[1] = op[1];
+    padic_val(rop) = padic_val(op);
 }
 

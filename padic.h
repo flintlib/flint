@@ -32,6 +32,7 @@
 
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
@@ -106,22 +107,35 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
 
 /* Assignment ****************************************************************/
 
+void _padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+void _padic_set_si(padic_t rop, long op, const padic_ctx_t ctx);
 void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx);
 
+void _padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
+void _padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
 
+void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx);
+
+void _padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
 void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
 
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
 
+void _padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
+void _padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx);
+void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx);
+
+void _padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 
+void _padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
 static __inline__
@@ -202,6 +216,12 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 /* Comparison ****************************************************************/
 
 static __inline__
+int _padic_is_zero(const padic_t op, const padic_ctx_t ctx)
+{
+    return fmpz_is_zero(padic_unit(op));
+}
+
+static __inline__
 int padic_is_zero(const padic_t op, const padic_ctx_t ctx)
 {
     return fmpz_is_zero(padic_unit(op)) || (padic_val(op) >= ctx->N);
@@ -213,13 +233,13 @@ int padic_is_one(const padic_t op, const padic_ctx_t ctx)
     if (ctx->N > 0)
         return (padic_val(op) == 0) && fmpz_is_one(padic_unit(op));
     else
-        return padic_val(op) >= ctx->N;
+        return (padic_val(op) >= ctx->N);
 }
 
 static __inline__
 int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 {
-    /* Quick guess */
+    /* Exact equality? */
     if (   (padic_val(op1) == padic_val(op2))
         && (fmpz_equal(padic_unit(op1), padic_unit(op2))))
         return 1;
@@ -237,9 +257,7 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
         _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op1), ctx);
 
-        if (   (fmpz_sgn(padic_unit(op1)) > 0) 
-            && (fmpz_sgn(padic_unit(op2)) > 0)
-            && (fmpz_cmp(padic_unit(op1), pow) < 0) 
+        if (   (fmpz_cmp(padic_unit(op1), pow) < 0) 
             && (fmpz_cmp(padic_unit(op2), pow) < 0))
         {
             ans = fmpz_equal(padic_unit(op1), padic_unit(op2));
@@ -263,42 +281,16 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
         return ans;
     }
     else
+    {
         return 0;
+    }
 }
 
 /* Special functions *********************************************************/
 
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-static 
-void padic_val_factorial(fmpz_t rop, const fmpz_t op, const fmpz_t p)
-{
-    fmpz_t t, q, pow;
-
-    if (fmpz_sgn(op) <= 0)
-    {
-        printf("Exception (padic_val_factorial).  op is non-positive.\n");
-        abort();
-    }
-
-    fmpz_init(t);
-    fmpz_init(q);
-    fmpz_init(pow);
-    fmpz_set_ui(pow, 1);
-
-    do 
-    {
-        fmpz_mul(pow, pow, p);
-        fmpz_fdiv_q(q, op, pow);
-        fmpz_add(t, t, q);
-    }
-    while (!fmpz_is_zero(q));
-
-    fmpz_swap(rop, t);
-    fmpz_clear(t);
-    fmpz_clear(q);
-    fmpz_clear(pow);
-}
+void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/
 
