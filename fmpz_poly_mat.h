@@ -89,6 +89,12 @@ void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state, long len, m
 
 void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x);
 
+/* Norms */
+
+long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A);
+
+long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A);
+
 /* Matrix arithmetic */
 
 void fmpz_poly_mat_add(fmpz_poly_mat_t C, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
@@ -113,12 +119,15 @@ int fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c);
 
 long fmpz_poly_mat_rowreduce(long * perm, fmpz_poly_mat_t B, fmpz_poly_t den, const fmpz_poly_mat_t A, int options);
 
+void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A);
+
+/* TBA
+
 int fmpz_poly_mat_solve(fmpz_poly_mat_t X, fmpz_poly_t den, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);
 
 int fmpz_poly_mat_inv(fmpz_poly_mat_t B, fmpz_poly_t den, const fmpz_poly_mat_t A);
 
-void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A);
-
 long fmpz_poly_mat_rank(const fmpz_poly_mat_t A);
+*/
 
 #endif
