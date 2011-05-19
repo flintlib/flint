@@ -80,6 +80,9 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
 
 int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
 
+int mpn_divides(mp_ptr q, mp_srcptr array1, 
+         mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
+
 mp_size_t mpn_gcd_full(mp_ptr arrayg, 
           mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2);
 
