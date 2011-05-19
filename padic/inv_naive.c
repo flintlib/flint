@@ -24,14 +24,14 @@ void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         If x = u p^v has negative valuation with N <= -v 
         then there is no inverse of x defined modulo p^N.
      */
-    if (ctx->N + op[1] <= 0)
+    if (ctx->N + padic_val(op) <= 0)
     {
         padic_zero(rop, ctx);
         return;
     }
 
-    _padic_inv_naive(rop, op, ctx->p, ctx->N + op[1]);
+    _padic_inv_naive(padic_unit(rop), padic_unit(op), ctx->p, ctx->N + padic_val(op));
 
-    rop[1] = -op[1];
+    padic_val(rop) = - padic_val(op);
 }
 

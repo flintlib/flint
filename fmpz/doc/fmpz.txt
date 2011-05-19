@@ -535,8 +535,11 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     Remove all occurrences of the factor $f > 1$ from the 
-    non-zero integer \code{op} and sets \code{rop} to the 
-    resulting integer.
+    integer \code{op} and sets \code{rop} to the resulting 
+    integer.
+
+    If \code{op} is zero, sets \code{rop} to \code{op} and 
+    return $0$.
 
     Returns an \code{abort} signal if any of the assumptions 
     are violated.
