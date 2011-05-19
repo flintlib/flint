@@ -13,12 +13,10 @@
 void _padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                 const padic_ctx_t ctx)
 {
-    /* TODO:  Faster powering using the context. */
+    fmpz *pow;
+    int alloc;
 
-    fmpz_t pow;
-
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, ctx->p, op1[1] - op2[1]);
+    _padic_ctx_pow_ui(&pow, &alloc, op1[1] - op2[1], ctx);
 
     if (rop == op1)
     {
@@ -36,9 +34,10 @@ void _padic_add(padic_t rop, const padic_t op1, const padic_t op2,
         fmpz_addmul(rop, op1, pow);
     }
 
-    fmpz_clear(pow);
-
     rop[1] = op2[1];
+
+    if (alloc)
+        fmpz_clear(pow);
 }
 
 /*

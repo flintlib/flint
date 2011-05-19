@@ -42,6 +42,14 @@ void padic_ctx_clear(padic_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
 
+void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
+
+    Sets \code{*rop} to $p^e$ as efficiently as possible.  If \code{*alloc} 
+    is set to a non-zero value then it is the responsibility of the caller 
+    to clear the returned integer.
+
+    N.B.  Expects \code{rop} to be an uninitialised \code{fmpz_t}.
+
 *******************************************************************************
 
     Memory management
@@ -98,18 +106,54 @@ void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to a copy of \code{op}.
 
+    N.B.  No reduction takes place.
+
 void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the \code{long} integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the 
+    \code{long} integer \code{op} reduced modulo $p^N$.
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the \code{unsigned long} 
-    integer \code{op}.
+    integer \code{op} reduced modulo $p^N$.
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the integer \code{op} 
+    reduced modulo $p^N$.
+
+void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
+
+    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op} 
+    reduced modulo $p^N$.
+
+void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the MPIR rational \code{op} reduced 
+    modulo $p^N$.
+
+void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets the integer \code{rop} to the $p$-adic integer \code{op}.
+
+    If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
+
+    N.B.  No reduction takes place.
+
+void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets the MPIR integer \code{rop} to the $p$-adic integer \code{op}.
+
+    If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
+
+    N.B.  No reduction takes place.
+
+void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Sets the rational \code{rop} to the value of \code{op}.  
+    
+    N.B.  No reduction takes place.
 
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 
@@ -155,6 +199,11 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
 
     Sets \code{rop} to the product of \code{op1} and \code{op2} 
     modulo $p^N$.
+
+void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op} and $p^v$, 
+    reduced modulo $p^N$.
 
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
@@ -242,6 +291,24 @@ int padic_is_one(const padic_t op, const padic_ctx_t ctx)
 int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
     Returns whether \code{op1} and \code{op2} are equal modulo $p^N$.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the Teichmuller lift of the p-adic unit \code{op}.
+
+    If \code{op} is a $p$-adic integer divisible by $p$, sets \code{rop} 
+    to zero, which satisfies $t^p - t = 0$, although it is clearly not 
+    a $(p-1)$st root of unity.
+
+    If \code{op} has negative valuation, raises an abort signal.
+
+    Supports aliasing, of course.
 
 *******************************************************************************
 

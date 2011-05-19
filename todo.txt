@@ -331,3 +331,17 @@ fmpq_mat
 
 padic
 -----
+
+* Improve the implementation of "padic_teichmuller"
+
+* Add macros "PADIC_U" and "PADIC_V" and use these throughout(!)
+
+* Change the implementation of "padic_pow_si" for negative exponents
+
+* Change the comparison functions to take the context into account
+
+* Add a function which returns powers of p, either from the context 
+  when available or from scratch
+
+* Add test code for "pow_si"
+

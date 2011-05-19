@@ -45,13 +45,18 @@ enum padic_print_mode
 };
 
 typedef struct {
+
     fmpz_t p;
     long N;
+
     double pinv;
+
     fmpz *pow;
     long min;
     long max;
+
     enum padic_print_mode mode;
+
 } padic_ctx_struct;
 
 typedef padic_ctx_struct padic_ctx_t[1];
@@ -62,6 +67,22 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N,
                     enum padic_print_mode mode);
 
 void padic_ctx_clear(padic_ctx_t ctx);
+
+static __inline__ 
+void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
+{
+    if (ctx->min <= e && e < ctx->max)
+    {
+        *alloc = 0;
+        *rop   = *(ctx->pow + (e - ctx->min));
+    }
+    else
+    {
+        *alloc = 1;
+        *rop   = 0L;
+        fmpz_pow_ui(rop, ctx->p, e);
+    }
+}
 
 /* Memory management *********************************************************/
 
@@ -89,6 +110,16 @@ void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx);
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx);
+
+void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx);
+
+void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx);
+
+void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx);
+
+void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
+
+void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
 static __inline__
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
@@ -130,6 +161,8 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
 
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
+
+void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx);
 
 void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
@@ -176,6 +209,40 @@ static __inline__
 int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 {
     return (op1[1] == op2[1]) && fmpz_equal(op1, op2);
+}
+
+/* Special functions *********************************************************/
+
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
+static 
+void padic_val_factorial(fmpz_t rop, const fmpz_t op, const fmpz_t p)
+{
+    fmpz_t t, q, pow;
+
+    if (fmpz_sgn(op) <= 0)
+    {
+        printf("Exception (padic_val_factorial).  op is non-positive.\n");
+        abort();
+    }
+
+    fmpz_init(t);
+    fmpz_init(q);
+    fmpz_init(pow);
+    fmpz_set_ui(pow, 1);
+
+    do 
+    {
+        fmpz_mul(pow, pow, p);
+        fmpz_fdiv_q(q, op, pow);
+        fmpz_add(t, t, q);
+    }
+    while (!fmpz_is_zero(q));
+
+    fmpz_swap(rop, t);
+    fmpz_clear(t);
+    fmpz_clear(q);
+    fmpz_clear(pow);
 }
 
 /* Input and output **********************************************************/

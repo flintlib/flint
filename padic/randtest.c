@@ -6,14 +6,14 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
     rop[1] = n_randint(state, max - min + 1) + min;
 
-    /* TODO:  Faster powering */
     {
-        fmpz_t pow;
+        fmpz *pow;
+        int alloc;
 
-        fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, ctx->N - rop[1]);
+        _padic_ctx_pow_ui(&pow, &alloc, ctx->N - rop[1], ctx);
         fmpz_randm(rop, state, pow);
-        fmpz_clear(pow);
+        if (alloc)
+            fmpz_clear(pow);
     }
 
     padic_normalise(rop, ctx);
@@ -22,9 +22,14 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
                              const padic_ctx_t ctx)
 {
-    /* TODO:  Convince yourself this terminates */
-    do 
+    long i;
+
+    padic_randtest(rop, state, ctx);
+
+    for (i = 0; !padic_is_zero(rop, ctx) && i < 10; i++)
         padic_randtest(rop, state, ctx);
-    while (padic_is_zero(rop, ctx));
+
+    if (padic_is_zero(rop, ctx))
+        padic_one(rop, ctx);
 }
 

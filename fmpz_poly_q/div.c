@@ -1,29 +1,18 @@
-#include "fmpz_poly_q.h"
+#include "fmpq_poly.h"
 
-void fmpz_poly_q_div_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
-{
-    if (fmpz_poly_q_is_zero(op))
-    {
-        printf("ERROR (fmpz_poly_q_div_in_place).  Division by zero.\n");
-        abort();
-    }
-    
-    if (fmpz_poly_q_is_zero(rop))
-        return;
-    
-    fmpz_poly_q_inv(rop, rop);
-    fmpz_poly_q_mul_in_place(rop, op);
-    fmpz_poly_q_inv(rop, rop);
-}
+#include "fmpz_poly_q.h"
 
 void fmpz_poly_q_div(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
-    fmpz_poly_t t, u;
-    
     if (fmpz_poly_q_is_zero(op2))
     {
         printf("ERROR (fmpz_poly_q_div).  Division by zero.\n");
         abort();
+    }
+    if (fmpz_poly_q_is_zero(op1))
+    {
+        fmpz_poly_q_zero(rop);
+        return;
     }
     
     if (op1 == op2)
@@ -31,22 +20,14 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly
         fmpz_poly_q_one(rop);
         return;
     }
-    
-    if (fmpz_poly_q_is_zero(op1))
+    if (rop == op1 || rop == op2)
     {
-        fmpz_poly_q_zero(rop);
-        return;
-    }
-    
-    if (rop == op1)
-    {
-        fmpz_poly_q_div_in_place(rop, op2);
-        return;
-    }
-    if (rop == op2)
-    {
-        fmpz_poly_q_div_in_place(rop, op1);
-        fmpz_poly_q_inv(rop, rop);
+        fmpz_poly_q_t t;
+
+        fmpz_poly_q_init(t);
+        fmpz_poly_q_div(t, op1, op2);
+        fmpz_poly_q_swap(rop, t);
+        fmpz_poly_q_clear(t);
         return;
     }
     
@@ -65,7 +46,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly
               in the very end.
      */
     
-    /* Are both denominators equal to one? */
+    /* Denominator/ numerator equal to one? */
     if (fmpz_poly_is_one(op1->den) && fmpz_poly_is_one(op2->num))
     {
         fmpz_poly_mul(rop->num, op1->num, op2->den);
@@ -105,6 +86,8 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_poly
         }
         else
         {
+            fmpz_poly_t t, u;
+
             fmpz_poly_init(t);
             fmpz_poly_init(u);
             fmpz_poly_div(t, op1->num, rop->num);

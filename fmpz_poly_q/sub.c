@@ -1,3 +1,5 @@
+#include "fmpq_poly.h"
+
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_sub_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
@@ -18,6 +20,17 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
                 const fmpz_poly_q_t op1, const fmpz_poly_q_t op2)
 {
     fmpz_poly_t d, r2, s2;
+    
+    if (fmpz_poly_is_zero(op1->num))
+    {
+        fmpz_poly_q_neg(rop, op2);
+        return;
+    }
+    if (fmpz_poly_is_zero(op2->num))
+    {
+        fmpz_poly_q_set(rop, op1);
+        return;
+    }
     
     if (op1 == op2)
     {
@@ -45,34 +58,29 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
               of the summation code.
      */
 
-    if (fmpz_poly_is_zero(op1->num))
+    /* Polynomials? */
+    if (fmpz_poly_length(op1->den) == 1 && fmpz_poly_length(op2->den) == 1)
     {
-        fmpz_poly_q_neg(rop, op2);
+        const long len1 = fmpz_poly_length(op1->num);
+        const long len2 = fmpz_poly_length(op2->num);
+
+        fmpz_poly_fit_length(rop->num, FLINT_MAX(len1, len2));
+        _fmpq_poly_sub(rop->num->coeffs, rop->den->coeffs, 
+                       op1->num->coeffs, op1->den->coeffs, len1, 
+                       op2->num->coeffs, op2->den->coeffs, len2);
+        _fmpz_poly_set_length(rop->num, FLINT_MAX(len1, len2));
+        _fmpz_poly_set_length(rop->den, 1);
+        _fmpz_poly_normalise(rop->num);
         return;
     }
-    if (fmpz_poly_is_zero(op2->num))
-    {
-        fmpz_poly_q_set(rop, op1);
-        return;
-    }
-    
-    /* Is one or are even both denominators equal to one? */
+
+    /* Denominators equal to one? */
     if (fmpz_poly_is_one(op1->den))
     {
-        if (fmpz_poly_is_one(op2->den))
-        {
-            fmpz_poly_sub(rop->num, op1->num, op2->num);
-            fmpz_poly_zero(rop->den);
-            fmpz_poly_set_coeff_si(rop->den, 0, 1);
-            return;
-        }
-        else
-        {
-            fmpz_poly_mul(rop->num, op1->num, op2->den);
-            fmpz_poly_sub(rop->num, rop->num, op2->num);
-            fmpz_poly_set(rop->den, op2->den);
-            return;
-        }
+        fmpz_poly_mul(rop->num, op1->num, op2->den);
+        fmpz_poly_sub(rop->num, rop->num, op2->num);
+        fmpz_poly_set(rop->den, op2->den);
+        return;
     }
     if (fmpz_poly_is_one(op2->den))
     {
@@ -89,8 +97,6 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
         two denominators' greatest common divisor
      */
     fmpz_poly_gcd(rop->num, op1->den, op2->den);
-    if (fmpz_sgn(fmpz_poly_lead(rop->num)) < 0)
-        fmpz_poly_neg(rop->num, rop->num);
     
     if (fmpz_poly_is_one(rop->num))
     {
@@ -128,8 +134,6 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
             fmpz_poly_mul(rop->den, op1->den, s2);
             
             fmpz_poly_gcd(r2, rop->num, d);
-            if (fmpz_sgn(fmpz_poly_lead(r2)) < 0)
-                fmpz_poly_neg(r2, r2);
             
             if (!fmpz_poly_is_one(r2))
             {

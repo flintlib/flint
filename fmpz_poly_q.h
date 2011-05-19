@@ -102,7 +102,7 @@ void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 static __inline__ 
 int fmpz_poly_q_is_zero(const fmpz_poly_q_t op)
 {
-    return fmpz_poly_length(op->num) < 1;
+    return fmpz_poly_is_zero(op->num);
 }
 
 static __inline__ 
@@ -139,8 +139,6 @@ void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const
 void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
 
 /* Multiplication and division ***********************************************/
-
-void fmpz_poly_q_mul_in_place(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
 void fmpz_poly_q_mul(fmpz_poly_q_t rop, 
                      const fmpz_poly_q_t op1, const fmpz_poly_q_t op2);

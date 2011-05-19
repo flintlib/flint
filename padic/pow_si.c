@@ -12,19 +12,29 @@ void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
     
     if (e > 0)
     {
+        fmpz *pow;
+        int alloc;
+
         /* Form u' = u^e mod p^{N - v'} */
         rop[1] = e * op[1];
 
-        /* TODO:  Compute power */
-        fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, ctx->N - rop[1]);
+        _padic_ctx_pow_ui(&pow, &alloc, ctx->N - rop[1], ctx);
         fmpz_powm_ui(rop, op, e, pow);
-        fmpz_clear(pow);
+        if (alloc)
+            fmpz_clear(pow);
     }
     else if (e < 0)
     {
-        padic_pow_si(rop, op, -e, ctx);
-        padic_inv(rop, rop, ctx);
+        fmpz *pow;
+        int alloc;
+
+        _padic_inv(rop, op, ctx->p, (ctx->N - op[1] * e + (-e - 1)) / -e);
+        rop[1] = e * op[1];
+
+        _padic_ctx_pow_ui(&pow, &alloc, ctx->N - rop[1], ctx);
+        fmpz_powm_ui(rop, rop, -e, pow);
+        if (alloc)
+            fmpz_clear(pow);
     }
     else
     {
