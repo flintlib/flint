@@ -48,8 +48,7 @@ main(void)
 {
     int i, result, d1, d2;
     flint_rand_t state;
-    long success = 0, fail = 0;
-
+    
     printf("gcd_heuristic....");
     fflush(stdout);
 
@@ -146,9 +145,7 @@ main(void)
               printf("d = "), fmpz_poly_print(d), printf("\n");
               abort();
            }
-           success++;
-        } else
-           fail++;
+        }
 
         fmpz_poly_clear(a);
         fmpz_poly_clear(d);
@@ -157,8 +154,6 @@ main(void)
         fmpz_poly_clear(q);
         fmpz_poly_clear(r);
     }
-
-    printf("success = %ld, fail = %ld\n", success, fail);
 
     /* Check that a == GCD(af, ag) when GCD(f, g) = 1 */
     for (i = 0; i < 3000; i++)
