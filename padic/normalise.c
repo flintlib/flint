@@ -2,11 +2,11 @@
 
 void padic_normalise(padic_t rop, const padic_ctx_t ctx)
 {
-    if (!fmpz_is_zero(rop) && (rop[1] < ctx->N))
+    if (!fmpz_is_zero(padic_unit(rop)) && (padic_val(rop) < ctx->N))
     {
-        rop[1] += _fmpz_remove(rop, ctx->p, ctx->pinv);
+        padic_val(rop) += _fmpz_remove(padic_unit(rop), ctx->p, ctx->pinv);
 
-        if (rop[1] < ctx->N)
+        if (padic_val(rop) < ctx->N)
             _padic_reduce_unit(rop, ctx);
         else
             padic_zero(rop, ctx);

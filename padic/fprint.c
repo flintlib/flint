@@ -18,15 +18,15 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
     
     if (ctx->mode == PADIC_TERSE)
     {
-        if (op[1] >= 0)
+        if (padic_val(op) >= 0)
         {
             fmpz_t pow, x;
 
             fmpz_init(pow);
             fmpz_init(x);
 
-            fmpz_pow_ui(pow, ctx->p, op[1]);
-            fmpz_mul(x, pow, op);
+            fmpz_pow_ui(pow, ctx->p, padic_val(op));
+            fmpz_mul(x, pow, padic_unit(op));
 
             fmpz_fprint(file, x);
 
@@ -41,8 +41,8 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
             fmpz_init(pow);
             mpq_init(y);
 
-            fmpz_pow_ui(pow, ctx->p, op[1]);
-            fmpz_get_mpz(mpq_numref(y), op);
+            fmpz_pow_ui(pow, ctx->p, - (ulong) padic_val(op));
+            fmpz_get_mpz(mpq_numref(y), padic_unit(op));
             fmpz_get_mpz(mpq_denref(y), pow);
 
             gmp_fprintf(file, "%Qd", y);
@@ -50,6 +50,10 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
             fmpz_clear(pow);
             mpq_clear(y);
         }
+
+        fprintf(file, " + O(");
+        fmpz_fprint(file, ctx->p);
+        fprintf(file, "^%ld)", ctx->N);
     }
     else if (ctx->mode == PADIC_SERIES)
     {
@@ -60,9 +64,9 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
         fmpz_init(d);
         fmpz_init(x);
 
-        fmpz_set(x, op);
+        fmpz_set(x, padic_unit(op));
         
-        for (j = 0; j < ctx->N - op[1]; j++)
+        for (j = 0; j < ctx->N - padic_val(op); j++)
         {
             fmpz_mod(d, x, ctx->p);       /* d = u mod p^{j+1} */
             fmpz_sub(x, x, d);            /* x = x - d */
@@ -70,12 +74,12 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 
             if (!fmpz_is_zero(d))
             {
-                if(j + op[1] != 0)
+                if(j + padic_val(op) != 0)
                 {
                     fmpz_fprint(file, d);
                     fprintf(file, "*");
                     fmpz_fprint(file, ctx->p);
-                    fprintf(file, "^%ld + ", j + op[1]);
+                    fprintf(file, "^%ld + ", j + padic_val(op));
                 }
                 else
                 {
@@ -94,10 +98,20 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
     {
-        fmpz_fprint(file, op);
+        fmpz_t x, pow;
+        int alloc;
+
+        fmpz_init(x);
+
+        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op), ctx);
+        fmpz_mod(x, padic_unit(op), pow);
+        if (alloc)
+            fmpz_clear(pow);
+
+        fmpz_fprint(file, x);
         fprintf(file, "*");
         fmpz_fprint(file, ctx->p);
-        fprintf(file, "^%ld + O(", op[1]);
+        fprintf(file, "^%ld + O(", padic_val(op));
         fmpz_fprint(file, ctx->p);
         fprintf(file, "^%ld)", ctx->N);
     }

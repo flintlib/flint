@@ -3,21 +3,21 @@
 void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 {
-    if (padic_is_zero(op1, ctx) || padic_is_zero(op2, ctx))
+    if (fmpz_is_zero(padic_unit(op1)) || fmpz_is_zero(padic_unit(op2)))
     {
         padic_zero(rop, ctx);
         return;
     }
 
-    rop[1] = op1[1] + op2[1];
+    padic_val(rop) = padic_val(op1) + padic_val(op2);
 
-    if (rop[1] >= ctx->N)
+    if (padic_val(rop) >= ctx->N)
     {
         padic_zero(rop, ctx);
     }
     else
     {
-        fmpz_mul(rop, op1, op2);
+        fmpz_mul(padic_unit(rop), padic_unit(op1), padic_unit(op2));
         _padic_reduce_unit(rop, ctx);
     }
 }

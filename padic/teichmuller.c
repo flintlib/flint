@@ -5,14 +5,14 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     fmpz_t u, x, ppow;
 
     /* If op is not a p-adic integer, raise an abort signal. */
-    if (op[1] < 0)
+    if (padic_val(op) < 0)
     {
         printf("ERROR (padic_teichmuller).  op is not a p-adic integer.\n");
         abort();
     }
 
     /* If op is divisible by p, return zero. */
-    if (op[1] > 0)
+    if (padic_val(op) > 0)
     {
         padic_zero(rop, ctx);
         return;
@@ -24,7 +24,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     
     /* Let ppow = p^N, set x = op modulo p^N */
     fmpz_pow_ui(ppow, ctx->p, ctx->N);
-    fmpz_mod(x, op, ppow);
+    fmpz_mod(x, padic_unit(op), ppow);
     
     /* Let u be the inverse of 1-p modulo p^N */
     fmpz_sub(u, ppow, ctx->p);
@@ -33,23 +33,23 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     
     /* Let rop = x + u * (x^p - x) modulo p^N */
     fmpz_powm(rop, x, ctx->p, ppow);
-    fmpz_sub(rop, rop, x);
-    fmpz_mul(rop, u, rop);
-    fmpz_add(rop, x, rop);
-    fmpz_mod(rop, rop, ppow);
+    fmpz_sub(padic_unit(rop), padic_unit(rop), x);
+    fmpz_mul(padic_unit(rop), u, padic_unit(rop));
+    fmpz_add(padic_unit(rop), x, padic_unit(rop));
+    fmpz_mod(padic_unit(rop), padic_unit(rop), ppow);
     
     /* Repeat this until rop == x modulo p^N */
-    while (!fmpz_equal(rop, x))
+    while (!fmpz_equal(padic_unit(rop), x))
     {
-        fmpz_swap(x, rop);
-        fmpz_powm(rop, x, ctx->p, ppow);
-        fmpz_sub(rop, rop, x);
-        fmpz_mul(rop, u, rop);
-        fmpz_add(rop, x, rop);
-        fmpz_mod(rop, rop, ppow);
+        fmpz_swap(x, padic_unit(rop));
+        fmpz_powm(padic_unit(rop), x, ctx->p, ppow);
+        fmpz_sub(padic_unit(rop), padic_unit(rop), x);
+        fmpz_mul(padic_unit(rop), u, padic_unit(rop));
+        fmpz_add(padic_unit(rop), x, padic_unit(rop));
+        fmpz_mod(padic_unit(rop), padic_unit(rop), ppow);
     }
     
-    rop[1] = 0;
+    padic_val(rop) = 0;
     
     fmpz_clear(x);
     fmpz_clear(u);
