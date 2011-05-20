@@ -91,7 +91,7 @@ void _padic_exp_p(fmpz_t rop, const fmpz_t p, long N)
 
     M = *hi;
 
-    padic_val_factorial(t, hi, p);
+    padic_val_fac(t, hi, p);
     n = *t;
 
     fmpz_pow_ui(pow, p, N + n);
