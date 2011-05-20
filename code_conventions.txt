@@ -59,6 +59,15 @@ comes second, e.g.
 
 nmod_poly_randtest(poly, state, len, bits)
 
+Conversion functions
+--------------------
+
+When naming functions which convert between objects of different modules, use
+the convention module1_get_module2 and module1_set_module2, where module1 is
+notionally the more complex of the two modules. E.g. fmpz_poly_get_nmod_poly.
+The set function should set an object of module1 to the value of an object of
+module2, and the get function should do the opposite.
+
 Code formatting
 ---------------
 
