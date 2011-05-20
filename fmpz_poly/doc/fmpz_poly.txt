@@ -844,12 +844,16 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 
 mp_limb_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len)
 
-    Returns the number of bits of the normalised Euclidean norm of
-    \code{(poly, len)}, i.e. the number of bits of the Euclidean 
-    norm divided by the leading coefficient. This is used in the
-    computation of the Landau-Mignotte bound. 
+    Returns an upper bound on the number of bits of the normalised 
+    Euclidean norm of \code{(poly, len)}, i.e. the number of bits of 
+    the Euclidean norm divided by the absolute value of the leading 
+    coefficient. The returned value will be no more than 1 bit too 
+    large. 
+    
+    This is used in the computation of the Landau-Mignotte bound. 
 
-    It is assumed that \code{len > 0}.
+    It is assumed that \code{len > 0}. The result only makes sense 
+    if the leading coefficient is nonzero.
 
 *******************************************************************************
 
