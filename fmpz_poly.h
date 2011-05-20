@@ -395,7 +395,7 @@ void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len);
 
 void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly);
 
-mp_limb_t _fmpz_poly_2norm_normalised(const fmpz * poly, long len);
+mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len);
 
 /*  Greatest common divisor  *************************************************/
 

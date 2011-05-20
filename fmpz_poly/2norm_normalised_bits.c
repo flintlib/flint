@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-mp_limb_t _fmpz_poly_2norm_normalised(const fmpz * poly, long len)
+mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len)
 {
    fmpz_t norm;
    mp_bitcnt_t bits;

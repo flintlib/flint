@@ -830,11 +830,26 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
 *******************************************************************************
 
+void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
+
+    Sets \code{res} to the Euclidean norm of \code{(poly, len)}, that is, 
+    the integer square root of the sum of the squares of the coefficients 
+    of \code{poly}.
+
 void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 
     Sets \code{res} to the Euclidean norm of \code{poly}, that is, the 
     integer square root of the sum of the squares of the coefficients of 
     \code{poly}.
+
+mp_limb_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len)
+
+    Returns the number of bits of the normalised Euclidean norm of
+    \code{(poly, len)}, i.e. the number of bits of the Euclidean 
+    norm divided by the leading coefficient. This is used in the
+    computation of the Landau-Mignotte bound. 
+
+    It is assumed that \code{len > 0}.
 
 *******************************************************************************
 

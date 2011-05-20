@@ -41,9 +41,5 @@ _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
 void
 fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 {
-    long i;
-    fmpz_zero(res);
-    for (i = 0; i < poly->length; i++)
-        fmpz_addmul(res, poly->coeffs + i, poly->coeffs + i);
-    fmpz_sqrt(res, res);
+    _fmpz_poly_2norm(res, poly->coeffs, poly->length);
 }

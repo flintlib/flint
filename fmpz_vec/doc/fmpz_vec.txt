@@ -130,6 +130,27 @@ int _fmpz_vec_print(const fmpz * vec, long len)
 
 *******************************************************************************
 
+    Conversions
+
+*******************************************************************************
+
+void _fmpz_vec_get_nmod_vec(mp_ptr res, 
+                            const fmpz * poly, long len, nmod_t mod)
+
+    Reduce the coefficients of \code{(poly, len)} modulo the given
+    modulus and set \code{(res, len)} to the result.
+
+void _fmpz_vec_set_nmod_vec(fmpz * res, 
+                               mp_srcptr poly, long len, nmod_t mod)
+
+    Set the coefficients of \code{(res, len)} to the symmetric modulus
+    of the coefficients of \code{(poly, len)}, i.e. convert the given
+    coefficients modulo the given modulus $n$ to their signed integer
+    representatives in the range $[-n/2, n/2)$.
+
+
+*******************************************************************************
+
     Assignment and basic manipulation
 
 *******************************************************************************

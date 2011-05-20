@@ -68,6 +68,14 @@ int _fmpz_vec_read(fmpz ** vec, long * len)
     return _fmpz_vec_fread(stdin, vec, len);
 }
 
+/*  Conversions  *************************************************************/
+
+void _fmpz_vec_set_nmod_vec(fmpz * res, 
+                                       mp_srcptr poly, long len, nmod_t mod);
+
+void _fmpz_vec_get_nmod_vec(mp_ptr res, 
+                                    const fmpz * poly, long len, nmod_t mod);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2);
@@ -77,12 +85,6 @@ void _fmpz_vec_swap(fmpz * vec1, fmpz * vec2, long len2);
 void _fmpz_vec_zero(fmpz * vec, long len);
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, long len2);
-
-void _fmpz_vec_set_nmod_vec(fmpz * res, 
-                                       mp_srcptr poly, long len, nmod_t mod);
-
-void _fmpz_vec_get_nmod_vec(mp_ptr res, 
-                                    const fmpz * poly, long len, nmod_t mod);
 
 /*  Comparison  **************************************************************/
 

@@ -81,8 +81,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 
 	if (len1 < 64 && len2 < 64)
 	{
-		nb1 = _fmpz_poly_2norm_normalised(A, len1);
-		nb2 = _fmpz_poly_2norm_normalised(B, len2);
+		nb1 = _fmpz_poly_2norm_normalised_bits(A, len1);
+		nb2 = _fmpz_poly_2norm_normalised_bits(B, len2);
 	} else /* approximate to save time */
 	{
 		nb1 = (2*bits1 + FLINT_BIT_COUNT(len1) + 1)/2 - fmpz_bits(lead_A) + 1;
@@ -125,7 +125,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    
    /* set size of first prime */
    pbits = FLINT_BITS - 1;
-   p = (1L<<(FLINT_BITS - 1));
+   p = (1UL<<(FLINT_BITS - 1));
 
    fmpz_init(modulus);
    
