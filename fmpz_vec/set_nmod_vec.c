@@ -19,31 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
 #include "fmpz_poly.h"
+#include "nmod_poly.h"
 
 void
-_fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
+_fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, long len, nmod_t mod)
 {
     long i;
-    fmpz_zero(res);
+        
     for (i = 0; i < len; i++)
-        fmpz_addmul(res, poly + i, poly + i);
-    fmpz_sqrt(res, res);
-}
-
-void
-fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
-{
-    long i;
-    fmpz_zero(res);
-    for (i = 0; i < poly->length; i++)
-        fmpz_addmul(res, poly->coeffs + i, poly->coeffs + i);
-    fmpz_sqrt(res, res);
+       fmpz_set_ui_mod(res + i, poly[i], mod.n);
 }

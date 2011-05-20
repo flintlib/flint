@@ -886,6 +886,27 @@ int fmpz_poly_gcd_heuristic(fmpz_poly_t res, const fmpz_poly_t poly1,
     coefficients of the GCD) and take the integer GCD. Unpack the 
     result and test divisibility.
 
+void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2)
+
+    Computes the greatest common divisor \code{(res, len2)} of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}, assuming 
+    \code{len1 >= len2 > 0}.  The result is normalised to have 
+    positive leading coefficient.  Aliasing between \code{res}, 
+    \code{poly1} and \code{poly2} is not supported. 
+
+void fmpz_poly_gcd_modular(fmpz_poly_t res,
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Computes the greatest common divisor \code{res} of \code{poly1} and 
+    \code{poly2}, normalised to have non-negative leading coefficient.
+    
+    This function uses the modular GCD algorithm. The basic
+    strategy is to remove the content of the polynomials, reduce them 
+    modulo sufficiently many primes and do CRT reconstruction until
+    some bound is reached (or we can prove with trial division that
+    we have the GCD).
+
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)
 

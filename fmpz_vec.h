@@ -78,6 +78,12 @@ void _fmpz_vec_zero(fmpz * vec, long len);
 
 void _fmpz_vec_neg(fmpz * vec1, const fmpz * vec2, long len2);
 
+void _fmpz_vec_set_nmod_vec(fmpz * res, 
+                                       mp_srcptr poly, long len, nmod_t mod);
+
+void _fmpz_vec_get_nmod_vec(mp_ptr res, 
+                                    const fmpz * poly, long len, nmod_t mod);
+
 /*  Comparison  **************************************************************/
 
 int _fmpz_vec_equal(const fmpz * vec1, const fmpz * vec2, long len);
