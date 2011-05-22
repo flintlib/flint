@@ -835,6 +835,79 @@ terms, and they do not allow their input and output arguments to be aliased.
 \input{input/fmpq_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Rational functions                                                           %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_poly\_q}
+\epigraph{Rational functions over $\Q$}{}
+
+\section{Introduction}
+
+The module \code{fmpz_poly_q} provides functions for performing 
+arithmetic on rational functions in $\mathbf{Q}(t)$, represented as 
+quotients of integer polynomials of type \code{fmpz_poly_t}.  These 
+functions start with the prefix \code{fmpz_poly_q_}.
+
+Rational functions are stored in objects of type \code{fmpz_poly_q_t}, 
+which is an array of \code{fmpz_poly_q_struct}'s of length one.  This 
+permits passing parameters of type \code{fmpz_poly_q_t} by reference.  
+
+The representation of a rational function as the quotient of two integer 
+polynomials can be made canonical by demanding the numerator and 
+denominator to be coprime (as integer polynomials) and the denominator to 
+have positive leading coefficient.  As the only special case, we represent 
+the zero function as $0/1$.  All arithmetic functions assume that the 
+operands are in this canonical form, and canonicalize their result.  If the 
+numerator or denominator is modified individually, for example using the 
+macros \code{fmpz_poly_q_numref()} and \code{fmpz_poly_q_denref()}, 
+it is the user's responsibility to canonicalise the rational function 
+using the function \code{fmpz_poly_q_canonicalise()} if necessary.
+
+All methods support aliasing of their inputs and outputs \emph{unless} 
+explicitly stated otherwise, subject to the following caveat.  If 
+different rational functions (as objects in memory, not necessarily in the 
+mathematical sense) share some of the underlying integer polynomial 
+objects, the behaviour is undefined.
+
+The basic arithmetic operations, addition, subtraction and multiplication, 
+are all implemented using adapted versions of Henrici's algorithms, 
+see~\citep{Hen1956}.  Differentiation is implemented in a way slightly 
+improving on the algorithm described in~\citep{Hor1972}.
+
+\section{Simple example}
+
+
+The following example computes the product of two rational functions and 
+prints the result:
+\begin{lstlisting}[language=c]
+#include "fmpz_poly_q.h"
+...
+char *str, *strf, *strg;
+fmpz_poly_q_t f, g;
+fmpz_poly_q_init(f);
+fmpz_poly_q_init(g);
+fmpz_poly_q_set_str(f, "2  1 3/1  2");
+fmpz_poly_q_set_str(g, "1  3/2  2 7");
+strf = fmpz_poly_q_get_str_pretty(f, "t");
+strg = fmpz_poly_q_get_str_pretty(g, "t");
+fmpz_poly_q_mul(f, f, g);
+str  = fmpz_poly_q_get_str_pretty(f, "t");
+printf("%s * %s = %s\n", strf, strg, str);
+free(str);
+free(strf);
+free(strg);
+fmpz_poly_q_clear(f);
+fmpz_poly_q_clear(g);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}[language=c]
+(3*t+1)/2 * 3/(7*t+2) = (9*t+3)/(14*t+4)
+\end{lstlisting}
+
+\input{input/fmpz_poly_q.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                                              %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
