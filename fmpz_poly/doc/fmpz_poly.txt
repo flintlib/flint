@@ -851,11 +851,30 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
 *******************************************************************************
 
+void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
+
+    Sets \code{res} to the Euclidean norm of \code{(poly, len)}, that is, 
+    the integer square root of the sum of the squares of the coefficients 
+    of \code{poly}.
+
 void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
 
     Sets \code{res} to the Euclidean norm of \code{poly}, that is, the 
     integer square root of the sum of the squares of the coefficients of 
     \code{poly}.
+
+mp_limb_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len)
+
+    Returns an upper bound on the number of bits of the normalised 
+    Euclidean norm of \code{(poly, len)}, i.e. the number of bits of 
+    the Euclidean norm divided by the absolute value of the leading 
+    coefficient. The returned value will be no more than 1 bit too 
+    large. 
+    
+    This is used in the computation of the Landau-Mignotte bound. 
+
+    It is assumed that \code{len > 0}. The result only makes sense 
+    if the leading coefficient is nonzero.
 
 *******************************************************************************
 
@@ -906,6 +925,27 @@ int fmpz_poly_gcd_heuristic(fmpz_poly_t res, const fmpz_poly_t poly1,
     using Kronecker segmentation (given a bound on the size of the
     coefficients of the GCD) and take the integer GCD. Unpack the 
     result and test divisibility.
+
+void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2)
+
+    Computes the greatest common divisor \code{(res, len2)} of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}, assuming 
+    \code{len1 >= len2 > 0}.  The result is normalised to have 
+    positive leading coefficient.  Aliasing between \code{res}, 
+    \code{poly1} and \code{poly2} is not supported. 
+
+void fmpz_poly_gcd_modular(fmpz_poly_t res,
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Computes the greatest common divisor \code{res} of \code{poly1} and 
+    \code{poly2}, normalised to have non-negative leading coefficient.
+    
+    This function uses the modular GCD algorithm. The basic
+    strategy is to remove the content of the polynomials, reduce them 
+    modulo sufficiently many primes and do CRT reconstruction until
+    some bound is reached (or we can prove with trial division that
+    we have the GCD).
 
 void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)

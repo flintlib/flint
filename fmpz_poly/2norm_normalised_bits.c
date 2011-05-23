@@ -19,41 +19,26 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
    
 ******************************************************************************/
 
-#include "fmpz_poly_q.h"
+#include <mpir.h>
+#include <stdlib.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
-void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len)
 {
-    if (fmpz_poly_is_zero(op->num))
-    {
-        printf("ERROR (fmpz_poly_q_inv).  Denominator is zero.\n");
-        abort();
-    }
-    
-    if (rop == op)
-    {
-        fmpz_poly_swap(rop->num, rop->den);
-        if (fmpz_sgn(fmpz_poly_lead(rop->den)) < 0)
-        {
-            fmpz_poly_neg(rop->num, rop->num);
-            fmpz_poly_neg(rop->den, rop->den);
-        }
-    }
-    else
-    {
-        if (fmpz_sgn(fmpz_poly_lead(op->num)) > 0)
-        {
-            fmpz_poly_set(rop->num, op->den);
-            fmpz_poly_set(rop->den, op->num);
-        }
-        else
-        {
-            fmpz_poly_neg(rop->num, op->den);
-            fmpz_poly_neg(rop->den, op->num);
-        }
-    }
-}
+   fmpz_t norm;
+   mp_bitcnt_t bits;
+   fmpz_init(norm);
 
+	_fmpz_poly_2norm(norm, poly, len);
+
+	bits = fmpz_bits(norm);
+	fmpz_clear(norm);
+   
+   return bits - fmpz_bits(poly + len - 1) + 1;
+}

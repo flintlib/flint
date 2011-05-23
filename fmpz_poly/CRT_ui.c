@@ -32,7 +32,7 @@
 
 
 void
-__fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
+_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
                 mp_limb_t m2inv, int sign)
 {
@@ -98,7 +98,7 @@ fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     fmpz_poly_fit_length(res, len);
 
-    __fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
+    _fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
         poly2->coeffs, poly2->length, poly2->mod.n, poly2->mod.ninv, 1);
 
     _fmpz_poly_set_length(res, len);
@@ -121,7 +121,7 @@ fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     fmpz_poly_fit_length(res, len);
 
-    __fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
+    _fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
         poly2->coeffs, poly2->length, poly2->mod.n, poly2->mod.ninv, 0);
 
     _fmpz_poly_set_length(res, len);

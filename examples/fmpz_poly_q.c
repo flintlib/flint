@@ -19,41 +19,43 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 Sebastian Pancratz
-   
+    Copyright (C) 2011 Sebastian Pancratz
+
 ******************************************************************************/
 
+/*
+    Simple example demonstrating the use of the fmpz_poly_q module.
+ */
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <mpir.h>
+
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+int main(int argc, char* argv[])
 {
-    if (fmpz_poly_is_zero(op->num))
-    {
-        printf("ERROR (fmpz_poly_q_inv).  Denominator is zero.\n");
-        abort();
-    }
-    
-    if (rop == op)
-    {
-        fmpz_poly_swap(rop->num, rop->den);
-        if (fmpz_sgn(fmpz_poly_lead(rop->den)) < 0)
-        {
-            fmpz_poly_neg(rop->num, rop->num);
-            fmpz_poly_neg(rop->den, rop->den);
-        }
-    }
-    else
-    {
-        if (fmpz_sgn(fmpz_poly_lead(op->num)) > 0)
-        {
-            fmpz_poly_set(rop->num, op->den);
-            fmpz_poly_set(rop->den, op->num);
-        }
-        else
-        {
-            fmpz_poly_neg(rop->num, op->den);
-            fmpz_poly_neg(rop->den, op->num);
-        }
-    }
+    char *str, *strf, *strg;
+    fmpz_poly_q_t f, g;
+
+    fmpz_poly_q_init(f);
+    fmpz_poly_q_init(g);
+    fmpz_poly_q_set_str(f, "2  1 3/1  2");
+    fmpz_poly_q_set_str(g, "1  3/2  2 7");
+    strf = fmpz_poly_q_get_str_pretty(f, "t");
+    strg = fmpz_poly_q_get_str_pretty(g, "t");
+    fmpz_poly_q_mul(f, f, g);
+    str  = fmpz_poly_q_get_str_pretty(f, "t");
+    printf("%s * %s = %s\n", strf, strg, str);
+    free(str);
+    free(strf);
+    free(strg);
+    fmpz_poly_q_clear(f);
+    fmpz_poly_q_clear(g);
+
+    return EXIT_SUCCESS;
 }
 

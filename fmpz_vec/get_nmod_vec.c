@@ -19,41 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 Sebastian Pancratz
-   
+    Copyright (C) 2011 Fredrik Johansson
+
 ******************************************************************************/
 
-#include "fmpz_poly_q.h"
+#include <mpir.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_poly.h"
+#include "nmod_poly.h"
 
-void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+void
+_fmpz_vec_get_nmod_vec(mp_ptr res, const fmpz * poly, long len, nmod_t mod)
 {
-    if (fmpz_poly_is_zero(op->num))
-    {
-        printf("ERROR (fmpz_poly_q_inv).  Denominator is zero.\n");
-        abort();
-    }
-    
-    if (rop == op)
-    {
-        fmpz_poly_swap(rop->num, rop->den);
-        if (fmpz_sgn(fmpz_poly_lead(rop->den)) < 0)
-        {
-            fmpz_poly_neg(rop->num, rop->num);
-            fmpz_poly_neg(rop->den, rop->den);
-        }
-    }
-    else
-    {
-        if (fmpz_sgn(fmpz_poly_lead(op->num)) > 0)
-        {
-            fmpz_poly_set(rop->num, op->den);
-            fmpz_poly_set(rop->den, op->num);
-        }
-        else
-        {
-            fmpz_poly_neg(rop->num, op->den);
-            fmpz_poly_neg(rop->den, op->num);
-        }
-    }
+    long i;
+        
+    for (i = 0; i < len; i++)
+       res[i] = fmpz_fdiv_ui(poly + i, mod.n);
 }
-

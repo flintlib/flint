@@ -19,41 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010, 2011 Sebastian Pancratz
-   
+    Copyright (C) 2011 William Hart
+
 ******************************************************************************/
 
-#include "fmpz_poly_q.h"
+#include <stdlib.h>
+#include <mpir.h>
+#include "flint.h"
+#include "fmpz.h"
+#include "mpn_extras.h"
 
-void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
+int mpn_divides(mp_ptr q, mp_srcptr array1, 
+      mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
 {
-    if (fmpz_poly_is_zero(op->num))
-    {
-        printf("ERROR (fmpz_poly_q_inv).  Denominator is zero.\n");
-        abort();
-    }
-    
-    if (rop == op)
-    {
-        fmpz_poly_swap(rop->num, rop->den);
-        if (fmpz_sgn(fmpz_poly_lead(rop->den)) < 0)
-        {
-            fmpz_poly_neg(rop->num, rop->num);
-            fmpz_poly_neg(rop->den, rop->den);
-        }
-    }
-    else
-    {
-        if (fmpz_sgn(fmpz_poly_lead(op->num)) > 0)
-        {
-            fmpz_poly_set(rop->num, op->den);
-            fmpz_poly_set(rop->den, op->num);
-        }
-        else
-        {
-            fmpz_poly_neg(rop->num, op->den);
-            fmpz_poly_neg(rop->den, op->num);
-        }
-    }
-}
+   mpn_tdiv_qr(q, temp, 0, array1, limbs1, arrayg, limbsg);
+   while ((limbsg) && temp[limbsg - 1] == 0) limbsg--;
 
+   return (limbsg == 0);
+}

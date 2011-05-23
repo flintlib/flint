@@ -178,6 +178,12 @@ int fmpz_is_one(const fmpz_t f)
    return (*f == 1);
 }
 
+static __inline__
+int fmpz_is_pm1(const fmpz_t f)
+{
+   return (*f == 1 || *f == -1);
+}
+
 void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);

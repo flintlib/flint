@@ -46,10 +46,10 @@ int _t_gcd_is_canonical(const fmpz_poly_t poly)
 int
 main(void)
 {
-    int i, result, d1, d2;
+    int i, result;
     flint_rand_t state;
     
-    printf("gcd_heuristic....");
+    printf("gcd_modular....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,11 +65,10 @@ main(void)
         fmpz_poly_randtest(b, state, n_randint(state, 40), 80);
         fmpz_poly_randtest(c, state, n_randint(state, 40), 80);
 
-        d1 = fmpz_poly_gcd_heuristic(a, b, c);
-        d2 = fmpz_poly_gcd_heuristic(b, b, c);
+        fmpz_poly_gcd_modular(a, b, c);
+        fmpz_poly_gcd_modular(b, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, b) 
-                                           && _t_gcd_is_canonical(a)));
+        result = (fmpz_poly_equal(a, b) && _t_gcd_is_canonical(a));
         if (!result)
         {
             printf("FAIL (aliasing a and b):\n");
@@ -94,11 +93,10 @@ main(void)
         fmpz_poly_randtest(b, state, n_randint(state, 40), 80);
         fmpz_poly_randtest(c, state, n_randint(state, 40), 80);
 
-        d1 = fmpz_poly_gcd_heuristic(a, b, c);
-        d2 = fmpz_poly_gcd_heuristic(c, b, c);
+        fmpz_poly_gcd_modular(a, b, c);
+        fmpz_poly_gcd_modular(c, b, c);
 
-        result = ((d1 == 0 && d2 == 0) || (fmpz_poly_equal(a, c) 
-                                           && _t_gcd_is_canonical(a)));
+        result = (fmpz_poly_equal(a, c) && _t_gcd_is_canonical(a));
         if (!result)
         {
             printf("FAIL (aliasing a and c):\n");
@@ -129,22 +127,19 @@ main(void)
 
         fmpz_poly_mul(f, a, f);
         fmpz_poly_mul(g, a, g);
-        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+        fmpz_poly_gcd_modular(d, f, g);
 
-        if (d1)
+        fmpz_poly_divrem_divconquer(q, r, d, a);
+
+        result = fmpz_poly_is_zero(r) && _t_gcd_is_canonical(d);
+        if (!result)
         {
-           fmpz_poly_divrem_divconquer(q, r, d, a);
-
-           result = fmpz_poly_is_zero(r) && _t_gcd_is_canonical(d);
-           if (!result)
-           {
-              printf("FAIL (check a | gcd(af, ag)):\n");
-              printf("f = "), fmpz_poly_print(f), printf("\n");
-              printf("g = "), fmpz_poly_print(g), printf("\n");
-              printf("a = "), fmpz_poly_print(a), printf("\n");
-              printf("d = "), fmpz_poly_print(d), printf("\n");
-              abort();
-           }
+           printf("FAIL (check a | gcd(af, ag)):\n");
+           printf("f = "), fmpz_poly_print(f), printf("\n");
+           printf("g = "), fmpz_poly_print(g), printf("\n");
+           printf("a = "), fmpz_poly_print(a), printf("\n");
+           printf("d = "), fmpz_poly_print(d), printf("\n");
+           abort();
         }
 
         fmpz_poly_clear(a);
@@ -175,22 +170,19 @@ main(void)
 
         fmpz_poly_mul(f, a, f);
         fmpz_poly_mul(g, a, g);
-        d1 = fmpz_poly_gcd_heuristic(d, f, g);
+        fmpz_poly_gcd_modular(d, f, g);
 
-        if (d1)
+        if (!_t_gcd_is_canonical(a)) fmpz_poly_neg(a, a);
+
+        result = fmpz_poly_equal(d, a) && _t_gcd_is_canonical(d);
+        if (!result)
         {
-           if (!_t_gcd_is_canonical(a)) fmpz_poly_neg(a, a);
-
-           result = fmpz_poly_equal(d, a) && _t_gcd_is_canonical(d);
-           if (!result)
-           {
-              printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
-              printf("f = "), fmpz_poly_print(f), printf("\n");
-              printf("g = "), fmpz_poly_print(g), printf("\n");
-              printf("a = "), fmpz_poly_print(a), printf("\n");
-              printf("d = "), fmpz_poly_print(d), printf("\n");
-              abort();
-           }
+           printf("FAIL (check a == gcd(af, ag) when gcd(f, g) = 1):\n");
+           printf("f = "), fmpz_poly_print(f), printf("\n");
+           printf("g = "), fmpz_poly_print(g), printf("\n");
+           printf("a = "), fmpz_poly_print(a), printf("\n");
+           printf("d = "), fmpz_poly_print(d), printf("\n");
+           abort();
         } 
 
         fmpz_poly_clear(a);
@@ -213,7 +205,7 @@ main(void)
        fmpz_poly_set_coeff_si(a, 0, -32);
        fmpz_poly_set_coeff_si(a, 1, 24);
 
-       fmpz_poly_gcd_heuristic(d, a, b);
+       fmpz_poly_gcd_modular(d, a, b);
 
        result = (d->length == 1 && fmpz_is_one(d->coeffs));
        if (!result)

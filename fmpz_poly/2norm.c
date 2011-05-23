@@ -29,11 +29,17 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
+_fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
 {
     long i;
     fmpz_zero(res);
-    for (i = 0; i < poly->length; i++)
-        fmpz_addmul(res, poly->coeffs + i, poly->coeffs + i);
+    for (i = 0; i < len; i++)
+        fmpz_addmul(res, poly + i, poly + i);
     fmpz_sqrt(res, res);
+}
+
+void
+fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly)
+{
+    _fmpz_poly_2norm(res, poly->coeffs, poly->length);
 }

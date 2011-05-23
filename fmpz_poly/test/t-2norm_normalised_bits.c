@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -27,72 +28,62 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "mpn_extras.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "ulong_extras.h"
 
-int main(void)
+int
+main(void)
 {
     int i, result;
-    mpz_t a, b, c, g;
-    gmp_randstate_t st;
     flint_rand_t state;
-    long s1, s2;
-    
-    printf("gcd_full....");
+
+    printf("2norm_normalised_bits....");
     fflush(stdout);
 
-    mpz_init(a);
-    mpz_init(b);
-    mpz_init(c);
-    /* don't init g */
-    gmp_randinit_default(st);
     flint_randinit(state);
 
+    /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
-       do {
-          mpz_urandomb(a, st, n_randint(state, 200));
-       } while (mpz_sgn(a) == 0);
-       do {
-          mpz_urandomb(b, st, n_randint(state, 200));
-       } while (mpz_sgn(b) == 0);
-       do {
-          mpz_urandomb(c, st, n_randint(state, 200));
-       } while (mpz_sgn(c) == 0);
+        fmpz_t a, b, c;
+        fmpz_poly_t f;
+        mp_bitcnt_t b1, b2;
 
-       mpz_mul(a, a, c);
-       mpz_mul(b, b, c);
-       mpz_mul_2exp(a, a, n_randint(state, 200));
-       mpz_mul_2exp(b, b, n_randint(state, 200));
+        fmpz_init(a);
+        fmpz_init(b);
+        fmpz_init(c);
+        fmpz_poly_init(f);
+        do {
+            fmpz_poly_randtest(f, state, n_randint(state, 100) + 1, 200);
+        } while (f->length == 0);
 
-       mpz_gcd(c, a, b);
+        fmpz_poly_2norm(a, f);
+        fmpz_abs(b, fmpz_poly_lead(f));
+        fmpz_fdiv_q(c, a, b);
+        b1 = fmpz_bits(c);
 
-       s1 = (mpz_sizeinbase(a, 2) - 1)/FLINT_BITS + 1;
-       s2 = (mpz_sizeinbase(b, 2) - 1)/FLINT_BITS + 1;
+        b2 = _fmpz_poly_2norm_normalised_bits(f->coeffs, f->length);
 
-       g->_mp_d = malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
+        result = (b1 == b2 || b1 + 1 == b2);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_print(a), printf("\n\n");
+            fmpz_print(b), printf("\n\n");
+            fmpz_print(c), printf("\n\n");
+            printf("b1 = %ld, b2 = %ld\n", b1, b2);
+            abort();
+        }
 
-       g->_mp_size = mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
-
-       result = (mpz_cmp(g, c) == 0);
-       if (!result)
-       {
-          printf("FAIL:\n");
-          gmp_printf("%Zd\n", g);
-          gmp_printf("%Zd\n", c);
-          abort();
-       }
-
-       free(g->_mp_d);
+        fmpz_clear(a);
+        fmpz_clear(b);
+        fmpz_clear(c);
+        fmpz_poly_clear(f);
     }
 
-    mpz_clear(a);
-    mpz_clear(b);
-    mpz_clear(c);
-    /* don't clear g */
-    gmp_randclear(st);
     flint_randclear(state);
-
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

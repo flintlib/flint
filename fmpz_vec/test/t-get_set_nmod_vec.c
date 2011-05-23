@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2009, 2010 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -27,72 +28,69 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "mpn_extras.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
 
-int main(void)
+int
+main(void)
 {
     int i, result;
-    mpz_t a, b, c, g;
-    gmp_randstate_t st;
     flint_rand_t state;
-    long s1, s2;
-    
-    printf("gcd_full....");
+
+    printf("get/set_nmod_vec....");
     fflush(stdout);
 
-    mpz_init(a);
-    mpz_init(b);
-    mpz_init(c);
-    /* don't init g */
-    gmp_randinit_default(st);
     flint_randinit(state);
 
+    /* Check conversion to and from nmod_vec */
     for (i = 0; i < 10000; i++)
     {
-       do {
-          mpz_urandomb(a, st, n_randint(state, 200));
-       } while (mpz_sgn(a) == 0);
-       do {
-          mpz_urandomb(b, st, n_randint(state, 200));
-       } while (mpz_sgn(b) == 0);
-       do {
-          mpz_urandomb(c, st, n_randint(state, 200));
-       } while (mpz_sgn(c) == 0);
+        fmpz *a, *b;
+        mp_ptr c;
+        nmod_t mod;
+        long i;
+        mp_limb_t t;
 
-       mpz_mul(a, a, c);
-       mpz_mul(b, b, c);
-       mpz_mul_2exp(a, a, n_randint(state, 200));
-       mpz_mul_2exp(b, b, n_randint(state, 200));
+        long len = n_randint(state, 100);
+        mp_limb_t n = n_randtest_not_zero(state);
 
-       mpz_gcd(c, a, b);
+        a = _fmpz_vec_init(len);
+        b = _fmpz_vec_init(len);
+        c = _nmod_vec_init(len);
 
-       s1 = (mpz_sizeinbase(a, 2) - 1)/FLINT_BITS + 1;
-       s2 = (mpz_sizeinbase(b, 2) - 1)/FLINT_BITS + 1;
+        nmod_init(&mod, n);
 
-       g->_mp_d = malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
+        _fmpz_vec_randtest(a, state, len, 200);
 
-       g->_mp_size = mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
+        _fmpz_vec_get_nmod_vec(c, a, len, mod);
+        _fmpz_vec_set_nmod_vec(b, c, len, mod);
 
-       result = (mpz_cmp(g, c) == 0);
-       if (!result)
-       {
-          printf("FAIL:\n");
-          gmp_printf("%Zd\n", g);
-          gmp_printf("%Zd\n", c);
-          abort();
-       }
+        for (i = 0; i < len; i++)
+        {
+            fmpz_mod_ui(a + i, a + i, n);
+            t = fmpz_get_ui(a + i);
+            if (t >= n/2)
+                fmpz_sub_ui(a + i, a + i, n);
+        }
 
-       free(g->_mp_d);
+        result = (_fmpz_vec_equal(a, b, len));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            _fmpz_vec_print(a, len), printf("\n\n");
+            _fmpz_vec_print(b, len), printf("\n\n");
+            abort();
+        }
+
+        _fmpz_vec_clear(a, len);
+        _fmpz_vec_clear(b, len);
+        _nmod_vec_free(c);
     }
 
-    mpz_clear(a);
-    mpz_clear(b);
-    mpz_clear(c);
-    /* don't clear g */
-    gmp_randclear(st);
     flint_randclear(state);
-
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
