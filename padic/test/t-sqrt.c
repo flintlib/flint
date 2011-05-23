@@ -30,6 +30,7 @@
 #include "fmpz.h"
 #include "padic.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
 int main(void)
 {
@@ -54,8 +55,8 @@ int main(void)
         padic_t a, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        fmpz_set_ui(p, 2);
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -70,6 +71,7 @@ int main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
+            printf("p = "), fmpz_print(p), printf("\n");
             printf("a = "), padic_debug(a, ctx), printf("\n");
             printf("d = "), padic_debug(d, ctx), printf("\n");
             abort();
@@ -93,8 +95,8 @@ int main(void)
         padic_t a, b, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 100) + 1;
+        fmpz_set_ui(p, 2);
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -107,12 +109,12 @@ int main(void)
 
         padic_mul(d, b, b, ctx);
 
-        if (ans && a[1] < 0)
+        if (ans && padic_val(a) < 0)
         {
             padic_ctx_t ctx2;
             padic_t a2, d2;
 
-            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+            padic_ctx_init(ctx2, p, N + padic_val(a), PADIC_SERIES);
 
             padic_init(a2, ctx2);
             padic_init(d2, ctx2);
@@ -173,8 +175,8 @@ int main(void)
         padic_t a, b, c, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 100) + 1;
+        fmpz_set_ui(p, 2);
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -189,12 +191,12 @@ int main(void)
 
         padic_mul(d, c, c, ctx);
 
-        if (ans && a[1] < 0)
+        if (ans && padic_val(a) < 0)
         {
             padic_ctx_t ctx2;
             padic_t a2, d2;
 
-            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+            padic_ctx_init(ctx2, p, N + padic_val(a), PADIC_SERIES);
 
             padic_init(a2, ctx2);
             padic_init(d2, ctx2);
@@ -260,8 +262,8 @@ int main(void)
         padic_t a, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, 2);
-        N = n_randint(state, 50) + 1;
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -276,7 +278,6 @@ int main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            printf("p = "), fmpz_print(p), printf("\n");
             printf("a = "), padic_debug(a, ctx), printf("\n");
             printf("d = "), padic_debug(d, ctx), printf("\n");
             abort();
@@ -300,8 +301,8 @@ int main(void)
         padic_t a, b, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, 2);
-        N = n_randint(state, 100) + 1;
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -314,12 +315,12 @@ int main(void)
 
         padic_mul(d, b, b, ctx);
 
-        if (ans && a[1] < 0)
+        if (ans && padic_val(a) < 0)
         {
             padic_ctx_t ctx2;
             padic_t a2, d2;
 
-            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+            padic_ctx_init(ctx2, p, N + padic_val(a), PADIC_SERIES);
 
             padic_init(a2, ctx2);
             padic_init(d2, ctx2);
@@ -380,8 +381,8 @@ int main(void)
         padic_t a, b, c, d;
 
         fmpz_init(p);
-        fmpz_set_ui(p, 2);
-        N = n_randint(state, 100) + 1;
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -396,12 +397,12 @@ int main(void)
 
         padic_mul(d, c, c, ctx);
 
-        if (ans && a[1] < 0)
+        if (ans && padic_val(a) < 0)
         {
             padic_ctx_t ctx2;
             padic_t a2, d2;
 
-            padic_ctx_init(ctx2, p, N + a[1], PADIC_SERIES);
+            padic_ctx_init(ctx2, p, N + padic_val(a), PADIC_SERIES);
 
             padic_init(a2, ctx2);
             padic_init(d2, ctx2);
@@ -457,5 +458,5 @@ int main(void)
     flint_randclear(state);
 
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }

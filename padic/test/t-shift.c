@@ -28,6 +28,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 #include "padic.h"
 
 int
@@ -53,7 +54,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -61,9 +62,7 @@ main(void)
         padic_init(c, ctx);
 
         padic_randtest(a, state, ctx);
-        v = n_randint(state, (N + 2) / 3);
-        if (n_randint(state, 2))
-            v = -v;
+        v = z_randint(state, (FLINT_ABS(N) + 4) / 3);
 
         padic_set(b, a, ctx);
         padic_shift(c, b, v, ctx);
@@ -99,7 +98,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -107,12 +106,8 @@ main(void)
         padic_init(c, ctx);
 
         padic_randtest(a, state, ctx);
-        v1 = n_randint(state, (N + 2) / 3);
-        if (n_randint(state, 2))
-            v1 = -v1;
-        v2 = n_randint(state, (N + 2) / 3);
-        if (n_randint(state, 2))
-            v2 = -v2;
+        v1 = z_randint(state, (FLINT_ABS(N) + 4) / 3);
+        v2 = z_randint(state, (FLINT_ABS(N) + 4) / 3);
 
         padic_shift(b, a, v1, ctx);
         padic_shift(b, b, v2, ctx);
@@ -121,7 +116,7 @@ main(void)
         padic_shift(c, c, v1, ctx);
 
         v = FLINT_MIN(v1, v2);
-        v = FLINT_MIN(v, a[1]);
+        v = FLINT_MIN(v, padic_val(a));
         v = FLINT_MIN(v, 0);
 
         if ((v >= 0) || (-v < N)) /* Otherwise, no precision left */

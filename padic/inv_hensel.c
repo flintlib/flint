@@ -110,7 +110,7 @@ void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
 void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    if (padic_is_zero(op, ctx))
+    if (_padic_is_zero(op))
     {
         printf("Exception (padic_inv_hensel).  Zero is not invertible.\n");
         abort();

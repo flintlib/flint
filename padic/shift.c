@@ -2,7 +2,7 @@
 
 void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
 {
-    if (fmpz_is_zero(padic_unit(op)) || (padic_val(op) + v >= ctx->N))
+    if (_padic_is_zero(op) || (padic_val(op) + v >= ctx->N))
     {
         padic_zero(rop, ctx);
     }

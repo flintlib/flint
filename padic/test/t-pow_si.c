@@ -54,7 +54,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 100) + 1;
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -64,7 +64,7 @@ main(void)
         padic_randtest(a, state, ctx);
         padic_set(b, a, ctx);
 
-        e = z_randint(state, 50);
+        e = z_randint(state, 20);
 
         padic_pow_si(c, b, e, ctx);
         padic_pow_si(b, b, e, ctx);
@@ -72,7 +72,7 @@ main(void)
         result = (padic_equal(b, c, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (aliasing):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");
@@ -88,7 +88,7 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Compare with multiplication for e > 0 */
+    /* Compare with multiplication for e > 0 and val(a) >= 0 */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -100,7 +100,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 100);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -108,18 +108,19 @@ main(void)
         padic_init(c, ctx);
 
         padic_randtest(a, state, ctx);
+        padic_val(a) = FLINT_ABS(padic_val(a));
 
         e = n_randint(state, 50) + 1;
 
         padic_pow_si(b, a, e, ctx);
-        padic_one(c, ctx);
-        for (i = 0; i < e; i++)
+        _padic_one(c);
+        for (j = 0; j < e; j++)
             padic_mul(c, c, a, ctx);
 
         result = (padic_equal(b, c, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (cmp with multiplication):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");

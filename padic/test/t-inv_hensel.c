@@ -28,6 +28,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 #include "padic.h"
 
 int
@@ -54,7 +55,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, 2);
-        N = n_randint(state, 1500) + 1;
+        N = z_randint(state, 1500) + 1;
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -101,7 +102,7 @@ main(void)
         padic_init(d, ctx);
 
         padic_randtest_not_zero(a, state, ctx);
-        v = a[1];
+        v = padic_val(a);
 
         if (-v < N) /* Otherwise, no precision left */
         {
@@ -148,7 +149,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 1500) + 1;
+        N = z_randint(state, 1500) + 1;
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -195,7 +196,7 @@ main(void)
         padic_init(d, ctx);
 
         padic_randtest_not_zero(a, state, ctx);
-        v = a[1];
+        v = padic_val(a);
 
         if (-v < N) /* Otherwise, no precision left */
         {
@@ -232,6 +233,6 @@ main(void)
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }
 

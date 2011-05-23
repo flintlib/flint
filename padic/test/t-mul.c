@@ -28,6 +28,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 #include "padic.h"
 
 int
@@ -52,7 +53,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -94,7 +95,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -136,7 +137,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -174,7 +175,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -220,7 +221,7 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
@@ -233,8 +234,8 @@ main(void)
         padic_randtest(b, state, ctx);
         padic_randtest(c, state, ctx);
 
-        v = FLINT_MIN(a[1], b[1]);
-        v = FLINT_MIN(v, c[1]);
+        v = FLINT_MIN(padic_val(a), padic_val(b));
+        v = FLINT_MIN(v, padic_val(c));
         v = FLINT_MIN(v, 0);
 
         if ((v >= 0) || (-v < N)) /* Otherwise, no precision left */
@@ -286,14 +287,14 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
+        N = z_randint(state, 50);
         padic_ctx_init(ctx, p, N, PADIC_SERIES);
 
         padic_init(a, ctx);
         padic_init(b, ctx);
 
         padic_randtest(a, state, ctx);
-        padic_one(b, ctx);
+        _padic_one(b);
 
         padic_mul(b, a, b, ctx);
 
@@ -316,6 +317,6 @@ main(void)
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }
 

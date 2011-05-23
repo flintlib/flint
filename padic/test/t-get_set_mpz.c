@@ -61,9 +61,9 @@ main(void)
         mpz_init(c);
 
         padic_randtest(a, state, ctx);
-        if (a[1] < 0)
+        if (padic_val(a) < 0)
         {
-            a[1] = -a[1];
+            padic_val(a) = - padic_val(a);
             padic_normalise(a, ctx);
         }
 

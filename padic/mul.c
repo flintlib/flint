@@ -3,7 +3,7 @@
 void padic_mul(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 {
-    if (fmpz_is_zero(padic_unit(op1)) || fmpz_is_zero(padic_unit(op2)))
+    if (_padic_is_zero(op1) || _padic_is_zero(op2))
     {
         padic_zero(rop, ctx);
         return;

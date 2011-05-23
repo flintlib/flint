@@ -42,10 +42,10 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
 
     padic_randtest(rop, state, ctx);
 
-    for (i = 0; !_padic_is_zero(rop, ctx) && i < 10; i++)
+    for (i = 0; !_padic_is_zero(rop) && i < 10; i++)
         padic_randtest(rop, state, ctx);
 
-    if (_padic_is_zero(rop, ctx))
+    if (_padic_is_zero(rop))
     {
         fmpz_set_ui(padic_unit(rop), 1);
         padic_val(rop) = ctx->N - 1;

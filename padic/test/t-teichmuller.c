@@ -59,19 +59,8 @@ main(void)
         padic_init(b, ctx);
         padic_init(c, ctx);
 
-        {
-            fmpz_t ppow;
-
-            fmpz_init(ppow);
-            fmpz_pow_ui(ppow, ctx->p, ctx->N);
-            fmpz_randm(a, state, ppow);
-            fmpz_clear(ppow);
-
-            a[1] = 0;
-
-            padic_normalise(a, ctx);
-        }
-
+        padic_randtest_not_zero(a, state, ctx);
+        padic_val(a) = FLINT_ABS(padic_val(a));
         padic_set(b, a, ctx);
 
         padic_teichmuller(c, b, ctx);
@@ -113,18 +102,8 @@ main(void)
         padic_init(b, ctx);
         padic_init(c, ctx);
 
-        {
-            fmpz_t ppow;
-
-            fmpz_init(ppow);
-            fmpz_pow_ui(ppow, ctx->p, ctx->N);
-            fmpz_randm(a, state, ppow);
-            fmpz_clear(ppow);
-
-            a[1] = 0;
-
-            padic_normalise(a, ctx);
-        }
+        padic_randtest(a, state, ctx);
+        padic_val(a) = FLINT_ABS(padic_val(a));
 
         padic_teichmuller(b, a, ctx);
 

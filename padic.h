@@ -159,14 +159,18 @@ void padic_zero(padic_t rop, const padic_ctx_t ctx)
     padic_val(rop) = 0;
 }
 
+static __inline__
+void _padic_one(padic_t rop)
+{
+    fmpz_set_ui(padic_unit(rop), 1);
+    padic_val(rop) = 0;
+}
+
 static __inline__ 
 void padic_one(padic_t rop, const padic_ctx_t ctx)
 {
     if (ctx->N > 0)
-    {
-        fmpz_set_ui(padic_unit(rop), 1);
-        padic_val(rop) = 0;
-    }
+        _padic_one(rop);
     else
         padic_zero(rop, ctx);
 }
@@ -219,7 +223,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 /* Comparison ****************************************************************/
 
 static __inline__
-int _padic_is_zero(const padic_t op, const padic_ctx_t ctx)
+int _padic_is_zero(const padic_t op)
 {
     return fmpz_is_zero(padic_unit(op));
 }
@@ -310,7 +314,9 @@ int padic_print(const padic_t op, const padic_ctx_t ctx)
 static __inline__
 void padic_debug(const padic_t op, const padic_ctx_t ctx)
 {
-    printf("[u = "), fmpz_print(op), printf(", v = %ld]", op[1]);
+    printf("{u = ");
+    fmpz_print(padic_unit(op)); 
+    printf(", v = %ld}", padic_val(op));
 }
 
 #endif
