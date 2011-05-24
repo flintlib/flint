@@ -70,6 +70,19 @@ void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src);
 
 void fmpq_mat_zero(fmpq_mat_t mat);
 
+void fmpq_mat_one(fmpq_mat_t mat);
+
+/* Addition, scalar multiplication  ******************************************/
+
+void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+
+void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
+
+void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op);
+
+void fmpq_mat_scalar_mul_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
+
+void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x);
 
 /* Basic comparison and properties *******************************************/
 

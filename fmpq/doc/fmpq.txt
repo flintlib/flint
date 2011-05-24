@@ -87,6 +87,10 @@ void fmpq_zero(fmpq_t res)
 
     Sets the value of \code{res} to 0.
 
+void fmpq_one(fmpq_t res)
+
+    Sets the value of \code{res} to $1$.
+
 *******************************************************************************
 
     Comparison
@@ -252,6 +256,16 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
     Sets \code{dest} to \code{1 / src}. The result is placed in canonical
     form, assuming that \code{src} is already in canonical form.
 
+
+void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
+
+    Sets \code{res} to the product of the rational number \code{op} 
+    and the integer \code{x}.
+
+void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
+
+    Sets \code{res} to the quotient of the rational number \code{op} 
+    and the integer \code{x}.
 
 *******************************************************************************
 
