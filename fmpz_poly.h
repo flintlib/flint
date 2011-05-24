@@ -729,6 +729,11 @@ void fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly);
 
 void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t res, const nmod_poly_t poly);
 
+void
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+
 void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
                                                     mp_limb_t m2inv, int sign);

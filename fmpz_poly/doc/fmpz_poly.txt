@@ -1858,6 +1858,34 @@ void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
     Sets the coefficients of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
+void
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
+
+    Sets the coefficients in \code{res} to the CRT reconstruction modulo
+    \code{m1m2} of the residues \code{(poly1, len1)} and \code{(poly2, len2)}
+    which are images modulo \code{m1} and \code{m2} respectively.
+    The caller must supply the precomputed product of the input moduli as
+    \code{m1m2}, the inverse of \code{m1} modulo \code{m2} as \code{c}, and
+    the precomputed inverse of \code{m2} (in the form computed by
+    \code{n_preinvert_limb}) as \code{m2inv}.
+
+    If \code{sign} = 0, residues $0 <= r < m_1 m_2$ are computed, while
+    if \code{sign} = 1, residues $-m_1 m_2/2 <= r < m_1 m_2/2$ are computed.
+
+    Coefficients of \code{res} are written up to the maximum of
+    \code{len1} and \code{len2}.
+
+void
+_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, int sign)
+
+    This function is identical to \code{_fmpz_poly_CRT_ui_precomp},
+    apart from automatically computing \code{m1m2} and \code{c}. It also
+    aborts if \code{c} cannot be computed.
+
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
                         const fmpz_t m, const nmod_poly_t poly2)
 
