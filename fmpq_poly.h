@@ -133,6 +133,7 @@ void fmpq_poly_zero(fmpq_poly_t poly);
 
 static __inline__ void fmpq_poly_one(fmpq_poly_t poly)
 {
+    fmpq_poly_fit_length(poly, 1);
     _fmpq_poly_set_length(poly, 1);
     fmpz_set_ui(poly->coeffs, 1);
     fmpz_set_ui(poly->den, 1);
