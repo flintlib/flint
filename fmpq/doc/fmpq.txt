@@ -110,6 +110,10 @@ int fmpq_equal(const fmpq_t x, const fmpq_t y)
     Returns nonzero if \code{x} and \code{y} are equal, and zero otherwise.
     Assumes that \code{x} and \code{y} are both in canonical form.
 
+int fmpq_sgn(const fmpq_t x)
+
+    Returns the sign of the rational number $x$.
+
 void fmpq_height(fmpz_t height, const fmpq_t x)
 
     Sets \code{height} to the height of $x$, defined as the larger of

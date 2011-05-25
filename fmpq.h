@@ -73,6 +73,11 @@ static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)
            fmpz_equal(fmpq_denref(x), fmpq_denref(y));
 }
 
+static __inline__ int fmpq_sgn(const fmpq_t x)
+{
+    return fmpz_sgn(fmpq_numref(x));
+}
+
 static __inline__ int fmpq_is_zero(const fmpq_t x)
 {
     return fmpz_is_zero(fmpq_numref(x));
