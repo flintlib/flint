@@ -83,8 +83,10 @@ void fmpq_mat_zero(fmpq_mat_t mat)
 
 void fmpq_mat_one(fmpq_mat_t mat)
 
-    Sets the square matrix \code{mat} to the identity matrix.  Raises an 
-    abort signal if \code{mat} is not square.
+    Let $m$ be the minimum of the number of rows and columns 
+    in the matrix \code{mat}.  This function sets the first 
+    $m \times m$ block to the identity matrix, and the remaining 
+    block to zero.
 
 *******************************************************************************
 

@@ -31,18 +31,15 @@
 
 void fmpq_mat_one(fmpq_mat_t mat)
 {
-    long i, j;
-
-    if (mat->r != mat->c)
-    {
-        printf("Exception:  matrix not square in fmpq_mat_one.\n");
-        abort();
-    }
+    long i, j, min;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)
             fmpq_zero(fmpq_mat_entry(mat, i, j));
-    for (i = 0; i < mat->r; i++)
+
+    min = FLINT_MIN(mat->r, mat->c);
+
+    for (i = 0; i < min; i++)
         fmpq_one(fmpq_mat_entry(mat, i, i));
 }
 
