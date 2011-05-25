@@ -292,6 +292,10 @@ void fmpq_poly_truncate(fmpq_poly_t poly, long n)
 
 *******************************************************************************
 
+void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, long n)
+
+    Retrieves the $n$th coefficient of \code{poly}, in lowest terms.
+
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n)
 
     Retrieves the $n$th coefficient of \code{poly}, in lowest terms.
@@ -307,6 +311,10 @@ void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, long n, ulong x)
 void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, long n, const fmpz_t x)
 
     Sets the $n$th coefficient in \code{poly} to the integer $x$.
+
+void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, long n, const fmpq_t x)
+
+    Sets the $n$th coefficient in \code{poly} to the rational $x$.
 
 void fmpq_poly_set_coeff_mpz(fmpq_poly_t rop, long n, const mpz_t x)
 

@@ -30,6 +30,7 @@
 
 #include <mpir.h>
 #include "fmpz.h"
+#include "fmpq.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
@@ -149,6 +150,8 @@ void fmpq_poly_truncate(fmpq_poly_t poly, long n)
 
 /*  Getting and setting coefficients  ****************************************/
 
+void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, long n);
+
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n);
 
 void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x);
@@ -156,6 +159,8 @@ void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x);
 void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, long n, ulong x);
 
 void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, long n, const fmpz_t x);
+
+void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, long n, const fmpq_t x);
 
 void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, long n, const mpz_t x);
 
