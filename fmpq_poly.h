@@ -129,6 +129,13 @@ char * fmpq_poly_get_str_pretty(const fmpq_poly_t poly, const char * var);
 
 void fmpq_poly_zero(fmpq_poly_t poly);
 
+static __inline__ void fmpq_poly_one(fmpq_poly_t poly)
+{
+    _fmpq_poly_set_length(poly, 1);
+    fmpz_set_ui(poly->coeffs, 1);
+    fmpz_set_ui(poly->den, 1);
+}
+
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
 void fmpq_poly_inv(fmpq_poly_t poly1, const fmpq_poly_t poly2);
@@ -267,6 +274,28 @@ void _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_mullow(fmpq_poly_t res, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n);
+
+static __inline__ 
+void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+{
+    fmpq_poly_t t;
+
+    fmpq_poly_init(t);
+    fmpq_poly_mul(t, op1, op2);
+    fmpq_poly_add(rop, rop, t);
+    fmpq_poly_clear(t);
+}
+
+static __inline__ 
+void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+{
+    fmpq_poly_t t;
+
+    fmpq_poly_init(t);
+    fmpq_poly_mul(t, op1, op2);
+    fmpq_poly_sub(rop, rop, t);
+    fmpq_poly_clear(t);
+}
 
 /*  Powering  ****************************************************************/
 
