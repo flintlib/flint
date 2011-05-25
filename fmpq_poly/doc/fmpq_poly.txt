@@ -209,6 +209,11 @@ void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x)
     Sets \code{poly} to the rational $x$, which is assumed to be 
     given in lowest terms.
 
+void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
+
+    Sets the rational polynomial \code{rop} to the same value 
+    as the integer polynomial \code{op}.
+
 void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
 
     Sets \code{(poly, den)} to the polynomial given by the 

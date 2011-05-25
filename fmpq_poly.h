@@ -115,6 +115,8 @@ void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
 
+void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op);
+
 void _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n);
 
 void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n);
