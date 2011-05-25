@@ -58,10 +58,19 @@ main(void)
         fmpq_init(d);
 
         /* XXX: replace with a randtest function */
-        do {
-            fmpq_mat_randtest(A, state, bits);
-            fmpq_mat_det(d, A);
-        } while (fmpq_is_zero(d));
+        {
+            long k;
+
+            for (k = 0; (k < 100) && fmpq_is_zero(d); k++)
+            {
+                fmpq_mat_randtest(A, state, bits);
+                fmpq_mat_det(d, A);
+            }
+            if (fmpq_is_zero(d))
+            {
+                fmpq_mat_one(A);
+            }
+        }
 
         fmpq_clear(d);
 
