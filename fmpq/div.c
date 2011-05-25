@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,11 +30,9 @@
 #include "fmpq.h"
 #include "ulong_extras.h"
 
-
-
 void
 _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
-            const fmpz_t op2num, const fmpz_t op2den)
+                                    const fmpz_t op2num, const fmpz_t op2den)
 {
     fmpz_t t, u;
 
@@ -54,12 +53,11 @@ _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num, const fmpz_t op1den,
     }
 }
 
-
 void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 {
-    if (fmpz_is_zero(fmpq_denref(op2)))
+    if (fmpq_is_zero(op2))
     {
-        printf("exception: fmpq_div: division by zero");
+        printf("Exception: fmpq_div: division by zero");
         abort();
     }
 
@@ -67,3 +65,4 @@ void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
               fmpq_numref(op1), fmpq_denref(op1),
               fmpq_numref(op2), fmpq_denref(op2));
 }
+
