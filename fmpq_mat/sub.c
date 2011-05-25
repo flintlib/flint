@@ -34,8 +34,8 @@ void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 {
     long i, j;
 
-    for (i = 0; i < mat->m; i++)
-        for (j = 0; j < mat->n; j++)
+    for (i = 0; i < mat->r; i++)
+        for (j = 0; j < mat->c; j++)
             fmpq_sub(fmpq_mat_entry(mat, i, j), 
                      fmpq_mat_entry(mat1, i, j), fmpq_mat_entry(mat2, i, j));
 }

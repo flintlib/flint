@@ -78,6 +78,11 @@ static __inline__ int fmpq_is_zero(const fmpq_t x)
     return fmpz_is_zero(fmpq_numref(x));
 }
 
+static __inline__ int fmpq_is_one(const fmpq_t x)
+{
+    return fmpz_is_one(fmpq_numref(x)) && fmpz_is_one(fmpq_denref(x));
+}
+
 static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
 {
     fmpz_set(fmpq_numref(dest), fmpq_numref(src));

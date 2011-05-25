@@ -30,12 +30,13 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, const fmpq_mat_t op, const fmpz_t x)
+void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, 
+                              const fmpq_mat_t op, const fmpz_t x)
 {
     long i, j;
 
-    for (i = 0; i < op->m; i++)
-        for (j = 0; j < op->n; j++)
+    for (i = 0; i < op->r; i++)
+        for (j = 0; j < op->c; j++)
             fmpq_div_fmpz(fmpq_mat_entry(rop, i, j), 
                           fmpq_mat_entry(op, i, j), x);
 }

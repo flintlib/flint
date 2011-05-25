@@ -31,13 +31,13 @@
 
 void fmpq_mat_one(fmpq_mat_t mat)
 {
+    long i, j;
+
     if (mat->r != mat->c)
     {
         printf("Exception:  matrix not square in fmpq_mat_one.\n");
         abort();
     }
-
-    long i, j;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)
