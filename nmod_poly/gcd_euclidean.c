@@ -28,13 +28,7 @@
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
-
-long NORM(mp_srcptr R, long len)
-{
-    while (len != 0 && R[len - 1] == 0)
-        len--;
-    return len;
-}
+#include "mpn_extras.h"
 
 long
 _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA, 
@@ -49,12 +43,14 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
     F = R1;
 
     _nmod_poly_divrem(Q, R1, A, lenA, B, lenB, mod);
-    lenR1 = NORM(R1, lenB - 1);
+    lenR1 = lenB - 1;
+    MPN_NORM(R1, lenR1);
 
     if (lenR1 > 1)
     {
         _nmod_poly_divrem(Q, R2, B, lenB, R1, lenR1, mod);
-        lenR2 = NORM(R2, lenR1 - 1);
+        lenR2 = lenR1 - 1;
+        MPN_NORM(R2, lenR2);
     } else
     {
         if (lenR1 == 0)
@@ -74,7 +70,8 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
     while (lenR2 > 1)
     {
         _nmod_poly_divrem(Q, R3, R1, lenR1, R2, lenR2, mod);
-        lenR3 = NORM(R3, lenR2 - 1);
+        lenR3 = lenR2 - 1;
+        MPN_NORM(R3, lenR3);
         if (++steps == 3) steps = 0;
         T = R1; R1 = R2; R2 = R3; R3 = T;
         lenR1 = lenR2; lenR2 = lenR3;
