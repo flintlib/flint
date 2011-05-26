@@ -521,6 +521,12 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t, 
+           mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, nmod_t mod);
+
+void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                                     const nmod_poly_t A, const nmod_poly_t B);
+
 /* Square roots **************************************************************/
 
 void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
