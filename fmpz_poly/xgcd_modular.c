@@ -109,7 +109,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
       if (!stabilised) /* need to keep computing xgcds mod p */
       {
          /* compute xgcd mod p */
-         _nmod_poly_xgcd_euclidean(G, S, T, A, len1, B, len2, mod);
+         _nmod_poly_xgcd(G, S, T, A, len1, B, len2, mod);
          RGinv = n_invmod(G[0], mod.n);
          RGinv = n_mulmod2_preinv(RGinv, R, mod.n, mod.ninv);
 

@@ -154,7 +154,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
       _fmpz_vec_get_nmod_vec(b, B, len2, mod);
       
       /* compute gcd over Z/pZ */
-      hlen = _nmod_poly_gcd_euclidean(h, a, len1, b, len2, mod);
+      hlen = _nmod_poly_gcd(h, a, len1, b, len2, mod);
       
       if (hlen == 1) /* gcd is 1 */
       {

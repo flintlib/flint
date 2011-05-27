@@ -893,6 +893,22 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     polynomial $P$ is defined to be $P$. Except in the case where
     the GCD is zero, the GCD $G$ is made monic.
 
+long _nmod_poly_gcd(mp_ptr G, 
+                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
+    is returned by the function. No attempt is made to make the GCD monic. It
+    is required that $G$ have space for \code{lenB} coefficients.
+
+void nmod_poly_gcd(nmod_poly_t G, 
+                             const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
 long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
              mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 
@@ -909,6 +925,33 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
     No aliasing of input and output operands is permitted.
 
 void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                                       const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+    Polynomials \code{S} and \code{T} are computed such that 
+    \code{S*A + T*B = G}. The length of \code{S} will be at most 
+    \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+             mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
+    is returned by the function. No attempt is made to make the GCD monic. It
+    is required that $G$ have space for \code{lenB} coefficients. 
+
+    Polynomials \code{S} and \code{T} are also computed such that 
+    \code{S*A + B*T = G}. The length of \code{S} will be \code{lenB} 
+    and the length of \code{T} will be \code{lenA} (both zero padded if 
+    required).
+
+    No aliasing of input and output operands is permitted.
+
+void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
                                        const nmod_poly_t A, const nmod_poly_t B)
 
     Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
