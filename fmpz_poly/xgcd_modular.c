@@ -30,26 +30,22 @@
 #include "fmpz_poly.h"
 #include "mpn_extras.h"
 
-void _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, mp_srcptr A, long len1, mp_srcptr B, long len2)
-{
-   /* stub to get things to compile temporarily */
-}
-
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
-                            const fmpz * poly1, long len1, 
+                                  const fmpz * poly1, long len1, 
                                         const fmpz * poly2, long len2)
 {
    fmpz_t prod;
    int stabilised = 0, first;
-   mp_limb_t p, R;
+   mp_limb_t p, R, RGinv;
    mp_ptr G, S, T, A, B, T1, T2;
-   long tlen, bound, bound1, bound2;
+   fmpz * prod1, * prod2;
+   long tlen, plen, bound, bound1, bound2;
    mp_bitcnt_t s_bits = 0, t_bits = 0, new_s_bits, new_t_bits;
    nmod_t mod;
 
    /* compute resultant of input polys */
    _fmpz_poly_resultant(r, poly1, len1, poly2, len2);
-
+   
    if (fmpz_is_zero(r)) 
       return;
 
@@ -68,6 +64,8 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
    B = _nmod_vec_init(len2);
    T1 = _nmod_vec_init(len1 + len2);
    T2 = _nmod_vec_init(len1 + len2);
+   prod1 = _fmpz_vec_init(len1 + len2);
+   prod2 = _fmpz_vec_init(len1 + len2);
 
    first = 1;
    
@@ -75,10 +73,10 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
    {
       /* get next prime */
       p = n_nextprime(p, 0);
-
+      
       /* resultant mod p */
       R = fmpz_fdiv_ui(r, p);
-
+      
       /* if p divides resultant or either leading coeff, discard p */
       if ((fmpz_fdiv_ui(poly1 + len1 - 1, p) == 0L) || (fmpz_fdiv_ui(poly2 + len2 - 1, p) == 0L)
          || (R == 0))
@@ -111,11 +109,13 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
       if (!stabilised) /* need to keep computing xgcds mod p */
       {
          /* compute xgcd mod p */
-         _nmod_poly_xgcd(G, S, T, A, len1, B, len2);
-         
+         _nmod_poly_xgcd_euclidean(G, S, T, A, len1, B, len2, mod);
+         RGinv = n_invmod(G[0], mod.n);
+         RGinv = n_mulmod2_preinv(RGinv, R, mod.n, mod.ninv);
+
          /* scale appropriately */
-         _nmod_vec_scalar_mul_nmod(S, S, len2, R, mod);
-         _nmod_vec_scalar_mul_nmod(T, T, len1, R, mod);
+         _nmod_vec_scalar_mul_nmod(S, S, len2, RGinv, mod);
+         _nmod_vec_scalar_mul_nmod(T, T, len1, RGinv, mod);
         
          if (first) /* first time around set s and t to S and T */
          {
@@ -157,7 +157,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             break;
       }
    }
-
+  
    _nmod_vec_free(G);
    _nmod_vec_free(S);
    _nmod_vec_free(T);
@@ -165,6 +165,8 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
    _nmod_vec_free(B);
    _nmod_vec_free(T1);
    _nmod_vec_free(T2);
+   _fmpz_vec_clear(prod1, len1 + len2);
+   _fmpz_vec_clear(prod2, len1 + len2);
 
    fmpz_clear(prod);
 }
@@ -180,7 +182,7 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
 
     if (len1 == 0 || len2 == 0)
     {
-        fmpz_poly_zero(r);
+        fmpz_zero(r);
         return;
     }
 

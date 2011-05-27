@@ -150,6 +150,9 @@ fmpz_poly
 * Fix the inefficient cases in CRT_ui, and move the relevant parts of this
   function to the fmpz_vec module
 
+* xgcd_modular is really slow. But it is not clear why. 1/3 of the time is
+  spent in resultant, but the CRT code or the nmod_poly_xgcd code may also
+  be to blame.
 
 fmpq_poly
 ---------

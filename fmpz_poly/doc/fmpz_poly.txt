@@ -943,6 +943,25 @@ void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     Computes the greatest common divisor \code{res} of \code{poly1} and 
     \code{poly2}, normalised to have non-negative leading coefficient.
 
+void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
+                          const fmpz * f, long len1, const fmpz * g, long len2)
+
+    Set $r$ to the resultant of \code{(f, len1)} and \code{(g, len2)}.
+    If the resultant is zero, the function returns immediately. Otherwise it
+    finds polynomials $s$ and $t$ such that \code{s*f + t*g = r}. The length
+    of $s$ will be no greater than \code{len2} and the length of $t$ will be
+    no greater than \code{len1} (both are zero padded if necessary).
+
+    It is assumed that \code{len1 >= len2 > 0}. No aliasing of inputs and 
+    outputs is permitted.
+
+void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
+                                       const fmpz_poly_t f, const fmpz_poly_t g)
+
+    Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
+    function then returns immediately, otherwise $s$ and $t$ are found such
+    that \code{s*f + t*g = r}.
+
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2)
 

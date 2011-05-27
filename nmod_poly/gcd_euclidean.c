@@ -37,7 +37,15 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
     int steps = 2;
     long lenR1, lenR2 = 0, lenR3 = 0, len = 0;
 
-    mp_ptr F, T, Q, R3 = G, R2, R1 = _nmod_vec_init(FLINT_MAX(lenA - lenB + 1, lenB - 1) + 2*lenB - 3);
+    mp_ptr F, T, Q, R3 = G, R2, R1;
+    
+    if (lenB == 1) /* if lenA == 1 then so does lenB */
+    {
+        G[0] = B[0];
+        return 1;
+    }
+
+    R1 = _nmod_vec_init(FLINT_MAX(lenA - lenB + 1, lenB - 1) + 2*lenB - 3);
     R2 = R1 + lenB - 1;
     Q = R2 + lenB - 2;
     F = R1;

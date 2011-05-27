@@ -43,6 +43,13 @@ long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t,
    mpn_zero(s, len2);
    mpn_zero(t, len1);
    
+   if (len2 == 1) /* if len1 == 1 then so does len2 */
+   {
+       res[0] = poly2[0];
+       t[0] = 1;
+       return 1;
+   }
+
    p = mod.n;
   
    /* initialise arrays to store intermediate info */
