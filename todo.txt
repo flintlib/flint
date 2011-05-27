@@ -153,7 +153,8 @@ fmpz_poly
 * Avoid redundant work and memory allocation in fmpz_poly_bit_unpack
   and fmpz_poly_bit_unpack_unsigned.
 
-* Implement Taylor shift.
+* Add functions for composition, multiplication and division
+  by a monic linear factor, i.e. P(x +/- c), P * (x +/- c), P / (x +/- c).
 
 
 fmpq_poly
