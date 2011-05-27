@@ -1579,6 +1579,54 @@ mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
 
     Evaluates \code{poly} at the value $a$ modulo $n$ and returns the result. 
 
+void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
+                                                const fmpz * a, long n)
+
+    Evaluates \code{f} at the $n$ values given in the vector \code{f},
+    writing the results to \code{res}.
+
+*******************************************************************************
+
+    Interpolation
+
+*******************************************************************************
+
+void
+_fmpz_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
+                                    const fmpz * xs, const fmpz * ys, long n)
+
+    Sets \code{poly} / \code{den} to the unique interpolating polynomial of
+    degree at most $n - 1$ satisfying $f(x_i) = y_i$ for every pair $x_i, y_i$
+    in \code{xs} and \code{ys}. This interpolating polynomial will have
+    integer coefficients if and only if the coefficients in \code{poly} are
+    all exactly divisible by \code{den}.
+
+    The vector \code{poly} must have room for \code{n+1} coefficients,
+    even if the interpolating polynomial is shorter.
+    Aliasing of \code{poly} or \code{den} with any other argument is not
+    allowed.
+
+    It is assumed that the $x$ values are distinct.
+
+    This function uses a simple $O(n^2)$ implementation of Lagrange
+    interpolation, clearing denominators to avoid working with fractions.
+    It is currently not designed to be efficient for large $n$.
+
+
+void
+fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, long n)
+
+    Sets \code{poly} to the unique interpolating polynomial of degree at
+    most $n - 1$ satisfying $f(x_i) = y_i$ for every pair $x_i, y_u$ in
+    \code{xs} and \code{ys}, assuming that this polynomial has integer
+    coefficients.
+
+    If an interpolating polynomial with integer coefficients does not
+    exist, the result is undefined.
+
+    It is assumed that the $x$ values are distinct.
+
 *******************************************************************************
 
     Composition
@@ -1899,3 +1947,26 @@ void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
     Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
     with unsigned coefficients satisfying $0 <= c < mn$.
+
+*******************************************************************************
+
+    Products
+
+*******************************************************************************
+
+void
+_fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
+
+    Sets \code{(poly, n + 1)} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.
+
+    Aliasing of the input and output is not allowed.
+
+
+void
+fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, long n)
+
+    Sets \code{poly} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.

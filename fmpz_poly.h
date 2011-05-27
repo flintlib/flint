@@ -744,4 +744,27 @@ void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
 void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
                                      const fmpz_t m1, const nmod_poly_t poly2);
 
+
+/* Products *****************************************************************/
+
+void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
+                                        const fmpz * xs, long n);
+
+void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
+                                        const fmpz * xs, long n);
+
+/* Multipoint evaluation and interpolation *********************************/
+
+void
+fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
+                                const fmpz * a, long n);
+
+void
+fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, long n);
+
+void
+_fmpz_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
+                                    const fmpz * xs, const fmpz * ys, long n);
+
 #endif
