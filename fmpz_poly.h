@@ -763,8 +763,4 @@ void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n);
 
-void
-_fmpz_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
-                                    const fmpz * xs, const fmpz * ys, long n);
-
 #endif

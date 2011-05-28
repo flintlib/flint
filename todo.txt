@@ -162,6 +162,12 @@ fmpq_poly
 
 * add fmpq_poly_fprint_pretty
 
+* In _fmpq_poly_interpolate_fmpz_vec, check if it is faster to use
+  _fmpq_poly_add repeatedly instead of clearing all denominators.
+
+* Add versions of fmpq_poly_interpolate_fmpz_vec for fmpq y values,
+  and fmpq values of both x and y.
+
 
 fmpz_poly_mat
 -------------

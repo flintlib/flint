@@ -985,6 +985,38 @@ void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 
 *******************************************************************************
 
+    Interpolation
+
+*******************************************************************************
+
+void
+_fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
+                                    const fmpz * xs, const fmpz * ys, long n)
+
+    Sets \code{poly} / \code{den} to the unique interpolating polynomial of
+    degree at most $n - 1$ satisfying $f(x_i) = y_i$ for every pair $x_i, y_i$
+    in \code{xs} and \code{ys}.
+
+    The vector \code{poly} must have room for \code{n+1} coefficients,
+    even if the interpolating polynomial is shorter.
+    Aliasing of \code{poly} or \code{den} with any other argument is not
+    allowed.
+
+    It is assumed that the $x$ values are distinct.
+
+    This function uses a simple $O(n^2)$ implementation of Lagrange
+    interpolation, clearing denominators to avoid working with fractions.
+    It is currently not designed to be efficient for large $n$.
+
+fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, long n)
+
+    Sets \code{poly} to the unique interpolating polynomial of degree
+    at most $n - 1$ satisfying $f(x_i) = y_i$ for every pair $x_i, y_i$
+    in \code{xs} and \code{ys}. It is assumed that the $x$ values are distinct.
+
+*******************************************************************************
+
     Composition
 
 *******************************************************************************
