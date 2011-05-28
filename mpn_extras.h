@@ -31,6 +31,24 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+#define MPN_NORM(a, an)                   \
+    do {                                  \
+        while (an != 0 && a[an - 1] == 0) \
+           an--;                          \
+    } while (0)
+
+#define MPN_SWAP(a, an, b, bn) \
+    do {                       \
+        mp_ptr __t;            \
+        mp_size_t __tn;        \
+        __t = a;               \
+        a = b;                 \
+        b = __t;               \
+        __tn = an;             \
+        an = bn;               \
+        bn = __tn;             \
+    } while (0)
+
 /* Not defined in mpir.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);

@@ -434,10 +434,30 @@ void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
                                                     const fmpz_poly_t poly2);
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
-                                      const fmpz * poly2, long len2);
+                                              const fmpz * poly2, long len2);
 
 void fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
-                                     const fmpz_poly_t poly2);
+                                                    const fmpz_poly_t poly2);
+
+void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
+               const fmpz * poly1, long len1, const fmpz * poly2, long len2);
+
+void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
+
+static __inline__
+void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t, 
+                const fmpz * poly1, long len1, const fmpz * poly2, long len2)
+{
+    _fmpz_poly_xgcd_modular(r, s, t, poly1, len1, poly2, len2);
+}
+
+static __inline__
+void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
+                            const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+{
+    fmpz_poly_xgcd_modular(r, s, t, poly1, poly2);
+}
 
 /*  Gaussian content  ********************************************************/
 
