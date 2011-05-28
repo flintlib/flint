@@ -121,6 +121,8 @@ long fmpz_poly_mat_rowreduce(long * perm, fmpz_poly_mat_t B, fmpz_poly_t den, co
 
 void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A);
 
+void fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A);
+
 /* TBA
 
 int fmpz_poly_mat_solve(fmpz_poly_mat_t X, fmpz_poly_t den, const fmpz_poly_mat_t A, const fmpz_poly_mat_t B);

@@ -234,6 +234,13 @@ int fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c)
 
     Internal function for pivoting during row reduction.
 
+
+*******************************************************************************
+
+    Determinants
+
+*******************************************************************************
+
 void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
 
     Sets \code{det} to the determinant of the square matrix \code{A}.
@@ -241,3 +248,9 @@ void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
     copy of \code{A}, except for matrices of size 2 or smaller which
     are handled directly.
 
+void fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
+
+    Sets \code{det} to the determinant of the square matrix \code{A}.
+    The determinant is computed by determing a bound $n$ for its length,
+    evaluating the matrix at $n$ distinct points, computing the determinant
+    of each integer matrix, and forming the interpolating polynomial.
