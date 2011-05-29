@@ -4,8 +4,8 @@
 # (C) 2011, William Hart
 
 PREFIX="/usr/local"
-MPIR_DIR=${PREFIX}
-MPFR_DIR=${PREFIX}
+MPIR_DIR="/usr"
+MPFR_DIR="/usr"
 SHARED=1
 STATIC=1
 
