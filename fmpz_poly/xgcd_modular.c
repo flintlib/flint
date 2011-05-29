@@ -39,7 +39,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
    mp_limb_t p, R, RGinv;
    mp_ptr G, S, T, A, B, T1, T2;
    fmpz * prod1, * prod2;
-   long tlen, plen, bound, bound1, bound2;
+   long tlen, bound, bound1, bound2;
    mp_bitcnt_t s_bits = 0, t_bits = 0, new_s_bits, new_t_bits;
    nmod_t mod;
 
