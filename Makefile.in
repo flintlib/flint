@@ -84,6 +84,8 @@ library-recursive:
 $(FLINT_LIB): library
 
 install: library
+	mkdir -p $(PREFIX)/lib
+	mkdir -p $(PREFIX)/include
 ifdef FLINT_SHARED
 	cp $(FLINT_LIB) $(PREFIX)/lib
 endif
