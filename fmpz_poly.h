@@ -29,8 +29,12 @@
 #ifndef FMPZ_POLY_H
 #define FMPZ_POLY_H
 
+#undef ulong /* interferes with system includes */
 #include <stdio.h>
+#define ulong unsigned long
+
 #include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "nmod_poly.h"

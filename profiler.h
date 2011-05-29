@@ -23,9 +23,11 @@
 
 ******************************************************************************/
 
+#undef ulong /* interferes with system includes, redefined by flint.h below */
 #include <time.h>
 #include <sys/time.h>
 #include <sys/resource.h>
+#define ulong unsigned long
 
 #ifndef FLINT_PROFILER_H
 #define FLINT_PROFILER_H

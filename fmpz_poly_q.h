@@ -26,7 +26,9 @@
 #ifndef FMPZ_POLY_Q_H
 #define FMPZ_POLY_Q_H
 
+#undef ulong /* interferes with system includes */
 #include <stdlib.h>
+#define ulong unsigned long
 
 #include "flint.h"
 #include "fmpz.h"

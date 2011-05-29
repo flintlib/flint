@@ -27,8 +27,12 @@
 #ifndef NMOD_MAT_H
 #define NMOD_MAT_H
 
+#undef ulong /* interferes with system includes */
 #include <stdlib.h>
+#define ulong unsigned long
+
 #include <mpir.h>
+#include "flint.h"
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"

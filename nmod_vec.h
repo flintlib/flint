@@ -26,7 +26,10 @@
 #ifndef NMOD_VEC_H
 #define NMOD_VEC_H
 
+#undef ulong /* interferes with system includes */
 #include <stdlib.h>
+#define ulong unsigned long
+
 #include <mpir.h>
 #include "longlong.h"
 #include "ulong_extras.h"

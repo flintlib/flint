@@ -26,8 +26,11 @@
 #ifndef PADIC_H
 #define PADIC_H
 
+#undef ulong /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
+#define ulong unsigned long
+
 #include <mpir.h>
 
 #include "flint.h"
