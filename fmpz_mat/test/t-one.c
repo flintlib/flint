@@ -37,7 +37,7 @@ main(void)
     long m, n, i, j, rep;
     flint_rand_t state;
 
-    printf("unit....");
+    printf("one....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -52,7 +52,7 @@ main(void)
         fmpz_mat_init(A, m, n);
 
         fmpz_mat_randtest(A, state, 100);
-        fmpz_mat_unit(A);
+        fmpz_mat_one(A);
 
         for (i = 0; i < m; i++)
         {

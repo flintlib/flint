@@ -99,10 +99,11 @@ void fmpz_poly_mat_zero(fmpz_poly_mat_t mat)
 
     Sets \code{mat} to the zero matrix.
 
-void fmpz_poly_mat_unit(fmpz_poly_mat_t mat)
+void fmpz_poly_mat_one(fmpz_poly_mat_t mat)
 
     Sets \code{mat} to the unit or identity matrix of given shape,
     having the element 1 on the main diagonal and zeros elsewhere.
+    If \code{mat} is nonsquare, it is set to the truncation of a unit matrix.
 
 *******************************************************************************
 

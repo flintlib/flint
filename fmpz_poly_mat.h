@@ -79,7 +79,7 @@ fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
 
 void fmpz_poly_mat_zero(fmpz_poly_mat_t mat);
 
-void fmpz_poly_mat_unit(fmpz_poly_mat_t mat);
+void fmpz_poly_mat_one(fmpz_poly_mat_t mat);
 
 /* Random matrices */
 

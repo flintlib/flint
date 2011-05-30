@@ -73,7 +73,7 @@ fmpz_mat_is_square(const fmpz_mat_t mat)
 }
 
 void fmpz_mat_zero(fmpz_mat_t mat);
-void fmpz_mat_unit(fmpz_mat_t mat);
+void fmpz_mat_one(fmpz_mat_t mat);
 
 
 /* Input and output  *********************************************************/

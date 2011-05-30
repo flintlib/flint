@@ -23,18 +23,19 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpz_mat.h"
 
 void
-fmpz_poly_mat_unit(fmpz_poly_mat_t A)
+fmpz_mat_one(fmpz_mat_t mat)
 {
-    long i;
+    long i, n;
 
-    fmpz_poly_mat_zero(A);
+    fmpz_mat_zero(mat);
+    n = FLINT_MIN(mat->r, mat->c);
 
-    for (i = 0; i < FLINT_MIN(A->r, A->c); i++)
-        fmpz_poly_set_ui(fmpz_poly_mat_entry(A, i, i), 1UL);
+    for (i = 0; i < n; i++)
+        fmpz_set_ui(fmpz_mat_entry(mat, i, i), 1UL);
 }
