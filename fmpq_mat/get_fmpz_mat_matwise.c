@@ -33,35 +33,20 @@
 void
 fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den, const fmpq_mat_t mat)
 {
+    fmpz_t t, lcm;
     long i, j;
 
-    fmpz_t t, u, lcm;
-    fmpz * d;
-
-    fmpz_init(t);
-    fmpz_init(u);
-    fmpz_init(lcm);
-
-    if (mat->r <= 0 || mat->c <= 0)
+    if (fmpq_mat_is_empty(mat))
         return;
 
+    fmpz_init(t);
+    fmpz_init(lcm);
     fmpz_set_ui(lcm, 1UL);
 
     /* Compute common denominator of matrix */
     for (i = 0; i < mat->r; i++)
-    {
         for (j = 0; j < mat->c; j++)
-        {
-            d = fmpq_mat_entry_den(mat, i, j);
-
-            if (!fmpz_is_one(d))
-            {
-                fmpz_mul(t, lcm, d);
-                fmpz_gcd(u, lcm, d);
-                fmpz_divexact(lcm, t, u);
-            }
-        }
-    }
+            fmpz_lcm(lcm, lcm, fmpq_mat_entry_den(mat, i, j));
 
     fmpz_set(den, lcm);
 
@@ -85,6 +70,5 @@ fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den, const fmpq_mat_t mat)
     }
 
     fmpz_clear(t);
-    fmpz_clear(u);
     fmpz_clear(lcm);
 }

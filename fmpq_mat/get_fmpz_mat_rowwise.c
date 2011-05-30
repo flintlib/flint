@@ -35,15 +35,14 @@ void
 _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
                         const fmpq_mat_struct ** mat, long n)
 {
+    fmpz_t t, lcm;
     long i, j, k;
-    fmpz_t t, u, lcm;
+
+    if (fmpq_mat_is_empty(mat[0]))
+        return;
 
     fmpz_init(t);
-    fmpz_init(u);
     fmpz_init(lcm);
-
-    if (mat[0]->r <= 0 || mat[0]->c <= 0)
-        return;
 
     for (i = 0; i < mat[0]->r; i++)
     {
@@ -51,19 +50,8 @@ _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
         fmpz_set(lcm, fmpq_mat_entry_den(mat[0], i, 0));
 
         for (k = 0; k < n; k++)
-        {
             for (j = (k == 0); j < mat[k]->c; j++)
-            {
-                fmpz * d = fmpq_mat_entry_den(mat[k], i, j);
-
-                if (!fmpz_is_one(d))
-                {
-                    fmpz_mul(t, lcm, d);
-                    fmpz_gcd(u, lcm, d);
-                    fmpz_divexact(lcm, t, u);
-                }
-            }
-        }
+                fmpz_lcm(lcm, lcm, fmpq_mat_entry_den(mat[k], i, j));
 
         if (den != NULL)
             fmpz_set(den + i, lcm);
@@ -90,7 +78,6 @@ _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
     }
 
     fmpz_clear(t);
-    fmpz_clear(u);
     fmpz_clear(lcm);
 }
 
