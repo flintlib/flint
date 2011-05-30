@@ -25,147 +25,6 @@
 
 *******************************************************************************
 
-    Module level documentation
-
-    \section Overview
-    
-    The module <tt>fmpz_poly_q</tt> provides functions for performing 
-    arithmetic on rational functions in \f$\mathbf{Q}(t)\f$, represented as 
-    quotients of integer polynomials of type <tt>fmpz_poly_t</tt>.  These 
-    functions start with the prefix <tt>fmpz_poly_q_</tt>.
-    
-    Rational functions are stored in objects of type #fmpz_poly_q_t, 
-    which is an array of #fmpz_poly_q_struct's of length one.  This 
-    permits passing parameters of type #fmpz_poly_q_t by reference.  
-    We also define the type #fmpz_poly_q_ptr to be a pointer to 
-    #fmpz_poly_q_struct's.
-    
-    The representation of a rational function as the quotient of two integer 
-    polynomials can be made canonical by demanding the numerator and 
-    denominator to be coprime (as integer polynomials) and the denominator to 
-    have positive leading coefficient.  As the only special case, we represent 
-    the zero function as \f$0/1\f$.  All arithmetic functions assume that the 
-    operands are in this canonical form, and canonicalize their result.  If the 
-    numerator or denominator is modified individually, for example using the 
-    methods in the group \ref NumDen, it is the user's responsibility to 
-    canonicalize the rational function using the function 
-    #fmpz_poly_q_canonicalize() if necessary.
-    
-    All methods support aliasing of their inputs and outputs \e unless 
-    explicitly stated otherwise, subject to the following caveat.  If 
-    different rational functions (as objects in memory, not necessarily in the 
-    mathematical sense) share some of the underlying integer polynomial 
-    objects, the behaviour is undefined.
-    
-    The basic arithmetic operations, addition, subtraction and multiplication, 
-    are all implemented using adapted versions of Henrici's algorithms, see
-    [H56].  Differentiation is implemented in a way slightly improving on the 
-    algorithm described in [H80].
-    
-    \section Example  Simple example
-    
-    The following example computes the product of two rational functions and 
-    prints the result.
-    
-    \code
-    #include "fmpz_poly_q.h"
-    ...
-    char *str, *strf, *strg;
-    fmpz_poly_q_t f, g;
-    fmpz_poly_q_init(f);
-    fmpz_poly_q_init(g);
-    fmpz_poly_q_from_string(f, "2  1 3/1  2");
-    fmpz_poly_q_from_string(g, "1  3/2  2 7");
-    strf = fmpz_poly_q_to_string_pretty(f, "t");
-    strg = fmpz_poly_q_to_string_pretty(g, "t");
-    fmpz_poly_q_mul(f, f, g);
-    str  = fmpz_poly_q_to_string_pretty(f, "t");
-    printf("%s * %s = %s\n", strf, strg, str);
-    free(str);
-    free(strf);
-    free(strg);
-    fmpz_poly_q_clear(f);
-    fmpz_poly_q_clear(g);
-    \endcode
-    
-    The output is:
-    \code
-    (3*t+1)/2 * 3/(7*t+2) = (9*t+3)/(14*t+4)
-    \endcode
-    
-    \section Changelog  Version history
-    
-    - 1.4.0
-      - Include #fmpz_poly_q_print() and #fmpz_poly_q_print_pretty()
-      - Fix a bug in #fmpz_poly_q_derivative() which leaves the derivative 
-        in a non-canonical form
-      - Fix a bug in #fmpz_poly_q_evaluate() which under-allocated a 
-        <tt>fmpz_t</tt>
-      - Add various <tt>_randtest</tt> functions, which provide random 
-        (non-zero) rational functions, polynomials, and integers
-      - Add lots of test code
-    - 1.3.0
-      - Rename everything from <tt>qfmpz_poly_</tt> to <tt>fmpz_poly_q_</tt>
-        in preparation for the integration into FLINT
-      - Small change in the grouping of methods, to fit the better with 
-        other modules in FLINT or GMP
-    - 1.2.2
-      - Rename <tt>_fmpz_evaluate_horner_mpq</tt> to 
-        <tt>_fmpz_poly_evaluate_mpq_horner</tt>, and remove the condition that 
-        the length of the polynomial must fit into a <tt>long</tt> rather than 
-        merely an <tt>unsigned long</tt>
-      - Replacing <tt>exit</tt> statements with <tt>abort</tt> statements, 
-        since Sage apparently handles these better
-    - 1.2.1
-      - Remove dependency on <tt>assert.h</tt>, replacing assertions by 
-        explicit checks followed by an error message and an <tt>exit</tt> 
-        statement
-      - Small change to <tt>_fmpz_poly_q_sub_in_place()</tt>
-      - Minor documentation changes
-    - 1.2.0
-      - Henrici-like algorithm for <tt>qfmpz_poly_derivative()</tt>
-      - Changed from <tt>fmpz_poly_t</tt> to <tt>fmpz_poly_p</tt> for the 
-        numerator and denominator
-      - Direct access to the numerator and denominator
-      - Increased code coverage through <tt>qfmpz_poly-test</tt> 
-        (<tt>qfmpz_poly.h</tt> 100%, <tt>qfmpz_poly.c</tt> 94.78%)
-    - 1.1.0
-      - Minor bugfix in <tt>qfmpz_poly_evaluate()</tt>
-    - 1.0.0
-      - First complete version
-    
-    \bug  The method #fmpz_poly_q_to_string_pretty() leaks memory because the 
-          underlying FLINT 1.5.0 method does so.
-    
-    \todo  Implement some form of lazy evaluation.  One strategy would be to 
-           change the representation of a rational function in the case of the 
-           zero function to <tt>NULL</tt>.  This gives savings on 
-           initialization and checking whether a function is zero.  Note that 
-           it is typically unlikely that an arithmetic operation on two 
-           functions yields zero, which is the only case in which this design 
-           choice yields extra work.
-           Another approach would be to implement a delayed initialization of 
-           both the numerator and denominator.
-           In either case, the methods providing direct access to the 
-           underlying polynomial objects would require more care.
-    
-    \see [H56] - Peter Henrici, 
-                 <em>A Subroutine for Computations with Rational Numbers</em>, 
-                 J. ACM, \b 3, \b 1, 1956, 6-9, 
-                 http://doi.acm.org/10.1145/320815.320818
-    
-    \see [H80] - Ellis Horowitz, 
-                 <em>Algorithms for Rational Function Arithmetic 
-                 Operations</em>, 
-                 Annual ACM Symposium on Theory of Computing:  Proceedings of 
-                 the Fourth Annual ACM Symposium on Theory of Computing 
-                 (Denver), 108-118, 1972,
-                 http://doi.acm.org/10.1145/800152.804903
-
-*******************************************************************************
-
-*******************************************************************************
-
     Memory management
 
     We represent a rational function over $\mathbf{Q}$ as the quotient 
@@ -312,20 +171,38 @@ void fmpz_poly_q_submul(fmpz_poly_q_t rop,
 void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, 
                                const fmpz_poly_q_t op, long x)
 
+    Sets \code{rop} to the product of the rational function \code{op} 
+    and the \code{long} integer $x$.
+
 void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, 
                                 const fmpz_poly_q_t op, const mpz_t x)
+
+    Sets \code{rop} to the product of the rational function \code{op} 
+    and the \code{mpz_t} integer $x$.
 
 void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, 
                                 const fmpz_poly_q_t op, const mpq_t x)
 
+    Sets \code{rop} to the product of the rational function \code{op} 
+    and the \code{mpq_t} rational $x$.
+
 void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, 
                                const fmpz_poly_q_t op, long x)
+
+    Sets \code{rop} to the quotient of the rational function \code{op} 
+    and the \code{long} integer $x$.
 
 void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, 
                                 const fmpz_poly_q_t op, const mpz_t x)
 
+    Sets \code{rop} to the quotient of the rational function \code{op} 
+    and the \code{mpz_t} integer $x$.
+
 void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, 
                                 const fmpz_poly_q_t op, const mpq_t x)
+
+    Sets \code{rop} to the quotient of the rational function \code{op} 
+    and the \code{mpq_t} rational $x$.
 
 *******************************************************************************
 
@@ -395,7 +272,7 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
     $n + 1$ is represented by the string \code{"n+1  a_0 a_1 ... a_n"}, 
     where there are two space characters following the length and single 
     space characters separating the individual coefficients.  There is no 
-    leading or trailing white-space.  In contrast, the zero polynomial is 
+    leading or trailing white-space.  The zero polynomial is simply 
     represented by \code{"0"}.
     
     We adapt this notation for rational functions as follows.  We denote the 
@@ -410,7 +287,7 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
     \code{fmpz_poly_get_str_pretty} and introduces parentheses where 
     necessary.
 
-    Note that currently these functions are not optimized for performance and 
+    Note that currently these functions are not optimised for performance and 
     are intended to be used only for debugging purposes or one-off input and 
     output, rather than as a low-level parser.
 

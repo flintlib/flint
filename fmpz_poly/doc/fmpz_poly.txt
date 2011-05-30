@@ -462,12 +462,14 @@ void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
     \code{bit_size}, negating the coefficients before packing 
     if \code{negate} is set to $-1$.
 
-void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
+int _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                                mp_srcptr arr, mp_bitcnt_t bit_size, int negate)
 
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given \code{bit_size}, finally negating the coefficients 
-    if \code{negate} is set to $-1$.
+    if \code{negate} is set to $-1$. Returns borrow, which is nonzero if a
+    leading term with coefficient $\pm1$ should be added at
+    position \code{len} of \code{poly}.
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                          mp_srcptr_t arr, mp_bitcnt_t bit_size)
@@ -475,6 +477,25 @@ void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len,
     Unpacks the polynomial of given length from the array as packed into 
     fields of the given \code{bit_size}.  The coefficients are assumed to 
     be unsigned.
+
+void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly, mp_bitcnt_t bit_size)
+
+    Packs \code{poly} into bitfields of size \code{bit_size}, writing the
+    result to \code{f}. If sign of \code{f} will be the same as that of
+    the leading coefficient of \code{poly].
+
+void  fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size)
+
+    Unpacks the polynomial with signed coefficients packed into
+    fields of size \code{bit_size} as represented by the integer \code{f}.
+
+void  fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size)
+
+    Unpacks the polynomial with unsigned coefficients packed into
+    fields of size \code{bit_size} as represented by the integer \code{f}.
+    It is required that \code{f} is nonnegative.
 
 *******************************************************************************
 
@@ -1603,6 +1624,32 @@ mp_limb_t fmpz_poly_evaluate_mod(const fmpz_poly_t poly, mp_limb_t a,
 
     Evaluates \code{poly} at the value $a$ modulo $n$ and returns the result. 
 
+void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
+                                                const fmpz * a, long n)
+
+    Evaluates \code{f} at the $n$ values given in the vector \code{f},
+    writing the results to \code{res}.
+
+*******************************************************************************
+
+    Interpolation
+
+*******************************************************************************
+
+void
+fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, long n)
+
+    Sets \code{poly} to the unique interpolating polynomial of degree at
+    most $n - 1$ satisfying $f(x_i) = y_i$ for every pair $x_i, y_u$ in
+    \code{xs} and \code{ys}, assuming that this polynomial has integer
+    coefficients.
+
+    If an interpolating polynomial with integer coefficients does not
+    exist, the result is undefined.
+
+    It is assumed that the $x$ values are distinct.
+
 *******************************************************************************
 
     Composition
@@ -1882,6 +1929,34 @@ void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
     Sets the coefficients of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
+void
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
+
+    Sets the coefficients in \code{res} to the CRT reconstruction modulo
+    \code{m1m2} of the residues \code{(poly1, len1)} and \code{(poly2, len2)}
+    which are images modulo \code{m1} and \code{m2} respectively.
+    The caller must supply the precomputed product of the input moduli as
+    \code{m1m2}, the inverse of \code{m1} modulo \code{m2} as \code{c}, and
+    the precomputed inverse of \code{m2} (in the form computed by
+    \code{n_preinvert_limb}) as \code{m2inv}.
+
+    If \code{sign} = 0, residues $0 <= r < m_1 m_2$ are computed, while
+    if \code{sign} = 1, residues $-m_1 m_2/2 <= r < m_1 m_2/2$ are computed.
+
+    Coefficients of \code{res} are written up to the maximum of
+    \code{len1} and \code{len2}.
+
+void
+_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, int sign)
+
+    This function is identical to \code{_fmpz_poly_CRT_ui_precomp},
+    apart from automatically computing \code{m1m2} and \code{c}. It also
+    aborts if \code{c} cannot be computed.
+
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
                         const fmpz_t m, const nmod_poly_t poly2)
 
@@ -1895,3 +1970,26 @@ void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
     Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
     with unsigned coefficients satisfying $0 <= c < mn$.
+
+*******************************************************************************
+
+    Products
+
+*******************************************************************************
+
+void
+_fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
+
+    Sets \code{(poly, n + 1)} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.
+
+    Aliasing of the input and output is not allowed.
+
+
+void
+fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, long n)
+
+    Sets \code{poly} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.

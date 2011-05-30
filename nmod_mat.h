@@ -36,6 +36,7 @@
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
+#include "mat_common.h"
 
 typedef struct
 {
@@ -101,10 +102,6 @@ void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
-
-#define ROWREDUCE_FAST_ABORT 1
-#define ROWREDUCE_FULL 2
-#define ROWREDUCE_CLEAR_LOWER 4
 
 int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
 

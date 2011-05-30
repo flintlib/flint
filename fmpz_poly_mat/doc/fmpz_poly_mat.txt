@@ -1,0 +1,256 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpz_poly_mat_init(fmpz_poly_mat_t mat, long rows, long cols)
+
+    Initialises a matrix with the given number of rows and columns for use.
+
+void fmpz_poly_mat_init_set(fmpz_poly_mat_t mat, const fmpz_poly_mat_t src)
+
+    Initialises a matrix \code{mat} of the same dimensions as \code{src},
+    and sets it to a copy of \code{src}.
+
+void fmpz_poly_mat_clear(fmpz_poly_mat_t mat)
+
+    Frees all memory associated with the matrix. The matrix must be
+    reinitialised if it is to be used again.
+
+*******************************************************************************
+
+    Basic assignment and manipulation
+
+*******************************************************************************
+
+MACRO fmpz_poly_mat_entry(mat,i,j)
+
+    Gives a reference to the entry at row \code{i} and column \code{j}.
+    The reference can be passed as an input or output variable to any
+    \code{fmpz_poly} function for direct manipulation of the matrix element.
+    No bounds checking is performed.
+
+void fmpz_poly_mat_set(fmpz_poly_mat_t mat1, const fmpz_poly_mat_t mat2)
+
+    Sets \code{mat1} to a copy of \code{mat2}.
+
+void fmpz_poly_mat_swap(fmpz_poly_mat_t mat1, fmpz_poly_mat_t mat2)
+
+    Swaps \code{mat1} and \code{mat2} efficiently.
+
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x)
+
+    Prints the matrix \code{mat} to standard output, using the
+    variable \code{x}.
+
+*******************************************************************************
+
+    Random matrix generation
+
+*******************************************************************************
+
+void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
+    long len, mp_bitcnt_t bits)
+
+    This is equivalent to applying \code{fmpz_poly_randtest} to all entries
+    in the matrix.
+
+*******************************************************************************
+
+    Special matrices
+
+*******************************************************************************
+
+void fmpz_poly_mat_zero(fmpz_poly_mat_t mat)
+
+    Sets \code{mat} to the zero matrix.
+
+void fmpz_poly_mat_unit(fmpz_poly_mat_t mat)
+
+    Sets \code{mat} to the unit or identity matrix of given shape,
+    having the element 1 on the main diagonal and zeros elsewhere.
+
+*******************************************************************************
+
+    Basic comparison and properties
+
+*******************************************************************************
+
+int fmpz_poly_mat_equal(const fmpz_poly_mat_t mat1, const fmpz_poly_mat_t mat2)
+
+    Returns nonzero if \code{mat1} and \code{mat2} have the same shape and
+    all their entries agree, and returns zero otherwise.
+
+int fmpz_poly_mat_is_zero(const fmpz_poly_mat_t mat)
+
+    Returns nonzero if all entries in \code{mat} are zero, and returns
+    zero otherwise.
+
+int fmpz_poly_mat_is_empty(const fmpz_poly_mat_t mat)
+
+    Returns a non-zero value if the number of rows or the number of
+    columns in \code{mat} is zero, and otherwise returns
+    zero.
+
+int fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
+
+    Returns a non-zero value if the number of rows is equal to the
+    number of columns in \code{mat}, and otherwise returns zero.
+
+
+*******************************************************************************
+
+    Norms
+
+*******************************************************************************
+
+long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
+
+    Returns the maximum number of bits among the coefficients of the
+    entries in \code{A}, or the negative of that value of that value if any
+    coefficient is negative.
+
+long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A)
+
+    Returns the maximum polynomial length among all the entries in \code{A}.
+
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+void fmpz_poly_mat_evaluate_fmpz(fmpz_mat_t B, const fmpz_poly_mat_t A, const fmpz_t x)
+
+    Sets the \code{fmpz_mat_t} \code{B} to \code{A} evaluated entrywise
+    at the point \code{x}.
+
+
+*******************************************************************************
+
+    Arithmetic
+
+*******************************************************************************
+
+void fmpz_poly_mat_add(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+        const fmpz_poly_mat_t B)
+
+    Sets \code{C} to the sum of \code{A} and \code{B}.
+    All matrices must have the same shape. Aliasing is allowed.
+
+void fmpz_poly_mat_sub(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+        const fmpz_poly_mat_t B)
+
+    Sets \code{C} to the sum of \code{A} and \code{B}.
+    All matrices must have the same shape. Aliasing is allowed.
+
+void fmpz_poly_mat_neg(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
+
+    Sets \code{B} to the negation of \code{A}.
+    The matrices must have the same shape. Aliasing is allowed.
+
+void fmpz_poly_mat_mul(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+    const fmpz_poly_mat_t B)
+
+    Sets \code{B} to the matrix product of \code{A}.
+    The matrices must have compatible dimensions for matrix multiplication.
+    Aliasing is allowed. This function automatically chooses between
+    classical and KS multiplication.
+
+void fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+    const fmpz_poly_mat_t B)
+
+    Sets \code{B} to the matrix product of \code{A}, computed using
+    the classical algorithm. The matrices must have compatible
+    dimensions for matrix multiplication. Aliasing is allowed.
+
+void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+    const fmpz_poly_mat_t B)
+
+    Sets \code{B} to the matrix product of \code{A}, computed using
+    Kronecker segmentation. The matrices must have compatible
+    dimensions for matrix multiplication. Aliasing is allowed.
+
+
+*******************************************************************************
+
+    Row reduction
+
+*******************************************************************************
+
+long fmpz_poly_mat_rowreduce(long * perm, fmpz_poly_mat_t B, fmpz_poly_t den,
+    const fmpz_poly_mat_t A, int options)
+
+    Sets \code{B} to the row reduced form of \code{A} as computed using
+    fraction-free Gaussian elimination, and returns the rank. The denominator
+    is written to \code{den}.
+
+    If \code{perm} is non-\code{NULL}, the permutation of
+    rows in the matrix will also be applied to \code{perm}.
+
+    This function accepts the option flags \code{ROWREDUCE_FAST_ABORT}
+    for aborting if the matrix does not have full rank, \code{ROWREDUCE_FULL}
+    to obtain a (fraction-free) reduced row echelon form, and
+    \code{ROWREDUCE_CLEAR_LOWER} to zero entries below the pivots 
+    (otherwise a fraction-free LU decomposition is computed, with the
+    $L$ matrix stored in the lower part).
+
+int fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c)
+
+    Internal function for pivoting during row reduction.
+
+
+*******************************************************************************
+
+    Determinants
+
+*******************************************************************************
+
+void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
+
+    Sets \code{det} to the determinant of the square matrix \code{A}.
+    The determinant is computed by performing row reduction on a temporary
+    copy of \code{A}, except for matrices of size 2 or smaller which
+    are handled directly.
+
+void fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
+
+    Sets \code{det} to the determinant of the square matrix \code{A}.
+    The determinant is computed by determing a bound $n$ for its length,
+    evaluating the matrix at $n$ distinct points, computing the determinant
+    of each integer matrix, and forming the interpolating polynomial.

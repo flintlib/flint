@@ -521,6 +521,13 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h)
     result is always positive, even if one of $g$ and $h$ is
     negative.
 
+void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to the least common multiple of $g$ and $h$.  The 
+    result is always nonnegative, even if one of $g$ and $h$ is
+    negative.
+
+
 *******************************************************************************
 
     Modular arithmetic

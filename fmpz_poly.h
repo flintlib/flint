@@ -277,11 +277,21 @@ void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1,
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
                                 long len, mp_bitcnt_t bit_size, int negate);
 
-void _fmpz_poly_bit_unpack(fmpz * poly, long len, 
+int _fmpz_poly_bit_unpack(fmpz * poly, long len, 
                            mp_srcptr arr, mp_bitcnt_t bit_size, int negate);
 
 void _fmpz_poly_bit_unpack_unsigned(fmpz * poly, long len, 
                                        mp_srcptr arr, mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
+        mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_unpack(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size);
+
+void fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size);
+
 
 /*  Multiplication  **********************************************************/
 
@@ -743,6 +753,11 @@ void fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly);
 
 void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t res, const nmod_poly_t poly);
 
+void
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign);
+
 void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
                                                     mp_limb_t m2inv, int sign);
@@ -752,5 +767,24 @@ void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
                                      const fmpz_t m1, const nmod_poly_t poly2);
+
+
+/* Products *****************************************************************/
+
+void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
+                                        const fmpz * xs, long n);
+
+void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
+                                        const fmpz * xs, long n);
+
+/* Multipoint evaluation and interpolation *********************************/
+
+void
+fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
+                                const fmpz * a, long n);
+
+void
+fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
+                                    const fmpz * xs, const fmpz * ys, long n);
 
 #endif

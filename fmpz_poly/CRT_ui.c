@@ -32,26 +32,11 @@
 
 
 void
-_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
+_fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
                const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
-                mp_limb_t m2inv, int sign)
+                mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
 {
     long i;
-
-    mp_limb_t c;
-    fmpz_t m1m2;
-
-    c = fmpz_fdiv_ui(m1, m2);
-    c = n_invmod(c, m2);
-
-    if (c == 0)
-    {
-        printf("Exception in fmpz_poly_CRT_ui: m1 not invertible modulo m2!\n");
-        abort();
-    }
-
-    fmpz_init(m1m2);
-    fmpz_mul_ui(m1m2, m1, m2);
 
     for (i = 0; i < FLINT_MIN(len1, len2); i++)
     {
@@ -59,7 +44,6 @@ _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                                 poly2[i], m2, m2inv, m1m2, c, sign);
     }
 
-    /* TODO: do this efficiently; write an fmpz or fmpz_vec function for it */
     if (len2 > len1)
     {
         fmpz_t zero;
@@ -72,12 +56,35 @@ _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
         fmpz_clear(zero);
     }
 
-    /* TODO: do this efficiently; write an fmpz or fmpz_vec function for it */
     for (i = len2; i < len1; i++)
     {
         _fmpz_CRT_ui_precomp(res + i, res + i, m1,
                             0, m2, m2inv, m1m2, c, sign);
     }
+}
+
+void
+_fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
+               const fmpz_t m1, mp_srcptr poly2, long len2, mp_limb_t m2,
+                mp_limb_t m2inv, int sign)
+{
+    mp_limb_t c;
+    fmpz_t m1m2;
+
+    c = fmpz_fdiv_ui(m1, m2);
+    c = n_invmod(c, m2);
+
+    if (c == 0)
+    {
+        printf("Exception in _fmpz_poly_CRT_ui: m1 not invertible modulo m2!\n");
+        abort();
+    }
+
+    fmpz_init(m1m2);
+    fmpz_mul_ui(m1m2, m1, m2);
+
+    _fmpz_poly_CRT_ui_precomp(res, poly1, len1, m1,
+                                   poly2, len2, m2, m2inv, m1m2, c, sign);
 
     fmpz_clear(m1m2);
 }

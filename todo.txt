@@ -150,14 +150,42 @@ fmpz_poly
 * Fix the inefficient cases in CRT_ui, and move the relevant parts of this
   function to the fmpz_vec module
 
+* Avoid redundant work and memory allocation in fmpz_poly_bit_unpack
+  and fmpz_poly_bit_unpack_unsigned.
+
+* Add functions for composition, multiplication and division
+  by a monic linear factor, i.e. P(x +/- c), P * (x +/- c), P / (x +/- c).
+
 * xgcd_modular is really slow. But it is not clear why. 1/3 of the time is
   spent in resultant, but the CRT code or the nmod_poly_xgcd code may also
   be to blame.
+
 
 fmpq_poly
 ---------
 
 * add fmpq_poly_fprint_pretty
+
+* In _fmpq_poly_interpolate_fmpz_vec, check if it is faster to use
+  _fmpq_poly_add repeatedly instead of clearing all denominators.
+
+* Add versions of fmpq_poly_interpolate_fmpz_vec for fmpq y values,
+  and fmpq values of both x and y.
+
+
+fmpz_poly_mat
+-------------
+
+* Tune multiplication cutoffs.
+
+* Benchmark fmpz_poly_mat_det_interpolate and add cutoffs for using it
+  by default.
+
+* Take sparseness into account when selecting between algorithms.
+
+* Investigate more clever pivoting strategies in row reduction.
+
+* Add more random functions.
 
 
 arith
@@ -264,6 +292,11 @@ fmpz_mat
 * Add CRT functions
 
 * Add transpose versions of common functions, in-place addmul etc.
+
+* Take sparseness into account when selecting between algorithms.
+
+* Maybe simplify the interface for row reduction by guaranteeing
+  that the denominator is the determinant.
 
 
 nmod_mat
