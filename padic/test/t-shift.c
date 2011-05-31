@@ -125,8 +125,8 @@ main(void)
 
             padic_ctx_init(ctx2, p, (v >= 0) ? N : N + v, PADIC_SERIES);
 
-            padic_normalise(b, ctx2);
-            padic_normalise(c, ctx2);
+            padic_reduce(b, ctx2);
+            padic_reduce(c, ctx2);
 
             result = (padic_equal(b, c, ctx2));
             if (!result)

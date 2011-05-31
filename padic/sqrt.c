@@ -240,18 +240,13 @@ int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
     return 1;
 }
 
-/*
-    Returns whether \code{op} has a square root, and sets \code{rop} 
-    to a square root of \code{op} if this is the case.
- */
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    if (padic_is_zero(op, ctx))
+    if (_padic_is_zero(op))
     {
         padic_zero(rop, ctx);
         return 1;
     }
-
     if (padic_val(op) & 1L)
     {
         return 0;
@@ -259,13 +254,21 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     padic_val(rop) = padic_val(op) / 2;
 
+    if (padic_val(rop) >= ctx->N)
+    {
+        padic_zero(rop, ctx);
+        return 1;
+    }
+
     if (fmpz_cmp_ui(ctx->p, 2))
     {
-        return _padic_sqrt(padic_unit(rop), padic_unit(op), ctx->p, ctx->N - padic_val(rop));
+        return _padic_sqrt(padic_unit(rop), 
+                           padic_unit(op), ctx->p, ctx->N - padic_val(rop));
     }
     else
     {
-        return _padic_sqrt_2(padic_unit(rop), padic_unit(op), ctx->N - padic_val(rop));
+        return _padic_sqrt_2(padic_unit(rop), 
+                             padic_unit(op), ctx->N - padic_val(rop));
     }
 }
 

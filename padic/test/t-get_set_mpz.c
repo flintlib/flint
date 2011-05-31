@@ -64,7 +64,7 @@ main(void)
         if (padic_val(a) < 0)
         {
             padic_val(a) = - padic_val(a);
-            padic_normalise(a, ctx);
+            padic_reduce(a, ctx);
         }
 
         padic_get_mpz(c, a, ctx);

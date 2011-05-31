@@ -120,8 +120,8 @@ int main(void)
             padic_init(d2, ctx2);
             padic_set(a2, a, ctx2);
             padic_set(d2, d, ctx2);
-            padic_normalise(a2, ctx2);
-            padic_normalise(d2, ctx2);
+            padic_reduce(a2, ctx2);
+            padic_reduce(d2, ctx2);
 
             result = (padic_equal(a2, d2, ctx2));
             if (!result)
@@ -202,8 +202,8 @@ int main(void)
             padic_init(d2, ctx2);
             padic_set(a2, a, ctx2);
             padic_set(d2, d, ctx2);
-            padic_normalise(a2, ctx2);
-            padic_normalise(d2, ctx2);
+            padic_reduce(a2, ctx2);
+            padic_reduce(d2, ctx2);
 
             result = (padic_equal(a2, d2, ctx2));
             if (!result)
@@ -326,8 +326,8 @@ int main(void)
             padic_init(d2, ctx2);
             padic_set(a2, a, ctx2);
             padic_set(d2, d, ctx2);
-            padic_normalise(a2, ctx2);
-            padic_normalise(d2, ctx2);
+            padic_reduce(a2, ctx2);
+            padic_reduce(d2, ctx2);
 
             result = (padic_equal(a2, d2, ctx2));
             if (!result)
@@ -408,8 +408,8 @@ int main(void)
             padic_init(d2, ctx2);
             padic_set(a2, a, ctx2);
             padic_set(d2, d, ctx2);
-            padic_normalise(a2, ctx2);
-            padic_normalise(d2, ctx2);
+            padic_reduce(a2, ctx2);
+            padic_reduce(d2, ctx2);
 
             result = (padic_equal(a2, d2, ctx2));
             if (!result)

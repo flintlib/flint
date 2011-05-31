@@ -32,8 +32,8 @@
     \end{equation*}
     modulo $p^N$.
 
-    Assumes that $\ord_p(x) > 1 / (p - 1)$ for otherwise the 
-    function does not converge.  Let $d = \ord_p(x) - 1 / (p - 1) > 0$.
+    Assumes that $\ord_p(x) > 1 / (p - 1)$ for otherwise the function 
+    does not converge.  Let $d = \ord_p(x) - 1 / (p - 1) > 0$.
 
     Note $\ord_p(i!) \leq (i - 1) / (p - 1)$ and hence 
     \begin{align*}
@@ -130,10 +130,6 @@ void _padic_exp_p(fmpz_t rop, const fmpz_t p, long N)
     _fmpz_vec_clear(j, M + 1);
 }
 
-/*
-    Returns whether the $p$-adic exponential function converges at 
-    the point \code{op}, and if so sets \code{rop} to its value.
- */
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op, ctx))
@@ -175,7 +171,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
     else if (!(fmpz_cmp_ui(ctx->p, 2)) && (padic_val(op) >= 2))
     {
-        printf("Exception (padic_exp).  Case p = 2.\n");
+        printf("Exception (padic_exp).  Case p = 2 not implemented yet.\n");
         abort();
     }
     else

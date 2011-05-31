@@ -33,7 +33,6 @@
 int
 main(void)
 {
-    int i, result;
     flint_rand_t state;
 
     printf("all... ");
