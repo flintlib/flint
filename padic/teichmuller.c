@@ -57,7 +57,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     fmpz_invmod(u, u, ppow);
     
     /* Let rop = x + u * (x^p - x) modulo p^N */
-    fmpz_powm(rop, x, ctx->p, ppow);
+    fmpz_powm(padic_unit(rop), x, ctx->p, ppow);
     fmpz_sub(padic_unit(rop), padic_unit(rop), x);
     fmpz_mul(padic_unit(rop), u, padic_unit(rop));
     fmpz_add(padic_unit(rop), x, padic_unit(rop));

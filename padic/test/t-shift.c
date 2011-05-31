@@ -137,6 +137,7 @@ main(void)
                 printf("c = "), padic_print(c, ctx2), printf("\n");
                 abort();
             }
+            padic_ctx_clear(ctx2);
         }
 
         padic_clear(a, ctx);

@@ -264,6 +264,7 @@ main(void)
                 printf("e = "), padic_debug(e, ctx2), printf("\n");
                 abort();
             }
+            padic_ctx_clear(ctx2);
         }
 
         padic_clear(a, ctx);

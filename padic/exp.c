@@ -158,7 +158,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         _padic_exp_p(padic_unit(rop), ctx->p, ctx->N);
 
         _padic_ctx_pow_ui(pow, &alloc, ctx->N, ctx);
-        fmpz_powm(rop, rop, e, pow);
+        fmpz_powm(padic_unit(rop), padic_unit(rop), e, pow);
         if (alloc)
             fmpz_clear(pow);
 

@@ -37,8 +37,6 @@ void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
 void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    fmpz_t pow;
-    
     if (_padic_is_zero(op))
     {
         printf("Exception (padic_inv_naive).  Zero is not invertible.\n");

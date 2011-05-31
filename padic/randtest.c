@@ -52,7 +52,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
         int alloc;
 
         _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
-        fmpz_randm(rop, state, pow);
+        fmpz_randm(padic_unit(rop), state, pow);
         if (alloc)
             fmpz_clear(pow);
     }
