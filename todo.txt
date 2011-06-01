@@ -361,6 +361,8 @@ padic
 
 * Implement "padic_get_str"
 
+* Implement "padic_exp" for the case p = 2
+
 * Improve "padic_set_si" along the lines of "padic_set_ui"
 
 * Improve "_padic_set_si" and "_padic_set_ui"

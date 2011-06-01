@@ -25,30 +25,6 @@
 
 *******************************************************************************
 
-    Module documentation
-
-    Implements the field of $p$-adic numbers $\mathbf{Q}_p$ to some 
-    finite precision $p^N$.
-
-    Independent of the context, we consider a $p$-adic number 
-    $x = u p^v$ to be in \emph{canonical form} whenever either 
-    $u = v = 0$ or $p \nmid u$ and $v \in \mathbf{Z}$.
-
-    With a given context, i.e.\ a prime $p$ and a precision $N$, in 
-    mind, we say a $p$-adic number $x = u p^v$ is \emph{reduced} if 
-    either $u = v = 0$ or $p \nmid u$, $v \in \mathbf{Z}$ and 
-    $u \in (0, p^N)$.
-
-    The main idea behind the treatment of the precision is that 
-    where possible $p$-adic numbers that are input arguments to 
-    a function are interpreted as exact $p$-adic numbers and the 
-    precision of the context object is only used as the precision 
-    to which the output is to be computed.
-
-*******************************************************************************
-
-*******************************************************************************
-
     Data structures
 
 *******************************************************************************
@@ -387,7 +363,7 @@ void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     Computes the inverse of \code{op} modulo $p^N$.
 
     This function naively refers to the function \code{fmpz_invmod},
-    which works for any ring $\mathbf{Z} / m \code{Z}$.
+    which works for any ring $\mathbf{Z} / m \mathbf{Z}$.
 
 void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 

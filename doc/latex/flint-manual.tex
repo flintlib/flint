@@ -224,6 +224,7 @@
 \newcommand{\Q}{\mathbf{Q}}%  Rationals
 
 \DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\ord}{ord}
 
 \allowdisplaybreaks[4]
 %\numberwithin{equation}{section}
@@ -949,6 +950,36 @@ Functions that require the modulus to be a prime number document this
 requirement explicitly.
 
 \input{input/nmod_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Padic numbers                                                                %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{padic}
+\epigraph{$p$-Adic numbers in $\mathbf{Q}_p$}{}
+
+\section{Introduction}
+
+The \code{padic_t} data type represents elements of $\mathbf{Q}_p$, 
+stored in the form $x = p^v u$ with $u, v \in \mathbf{Z}$.  Arithmetic 
+operations can be carried out with respect to a context containing 
+the prime number $p$ and precision $N$.
+
+Independent of the context, we consider a $p$-adic number 
+$x = u p^v$ to be in \emph{canonical form} whenever either 
+$p \nmid u$ or $u = v = 0$.
+
+With a given context, i.e.\ a prime $p$ and a precision $N$, in 
+mind, we say a $p$-adic number $x = u p^v$ is \emph{reduced} if 
+either $u = v = 0$ or $p \nmid u$ and $u \in (0, p^N)$.
+
+The main idea behind the treatment of the precision is that 
+where possible $p$-adic numbers that are input arguments to 
+a function are interpreted as exact $p$-adic numbers and the 
+precision of the context object is only used as the precision 
+to which the output is to be computed.
+
+\input{input/padic.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Arithmetic functions                                                         %
