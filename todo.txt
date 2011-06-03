@@ -369,3 +369,6 @@ padic
 
 * Add test code with negative precisions
 
+* Add test code for the various output formats; 
+  perhaps in the form of examples?
+
