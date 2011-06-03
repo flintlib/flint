@@ -46,6 +46,7 @@ main(void)
         fmpz_t h;
         mp_bitcnt_t b;
 
+        fmpz_init(h);
         fmpq_init(x);
         fmpq_randtest(x, state, 200);
 
@@ -63,6 +64,7 @@ main(void)
         }
 
         fmpq_clear(x);
+        fmpz_clear(h);
     }
 
     flint_randclear(state);
