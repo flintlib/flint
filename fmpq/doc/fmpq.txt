@@ -190,7 +190,7 @@ void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
     both having exactly \code{bits} bits before canonicalisation,
     and then puts \code{res} in canonical form. Note that as a result
     of the canonicalisation, the resulting numerator and denominator can
-    be slightly slightly smaller than \code{bits} bits.
+    be slightly smaller than \code{bits} bits.
 
 void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state,
         mp_bitcnt_t bits)
@@ -287,7 +287,7 @@ int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
 
     Sets the integer \code{res} to the residue $a$ of
     $x = n/d$ = \code{(num, den)} modulo the positive integer $m$ = \code{mod},
-    defined as the $0 \ge a < m$ satisfying $n \equiv a d \pmod m$.
+    defined as the $0 \le a < m$ satisfying $n \equiv a d \pmod m$.
     If such an $a$ exists, 1 will be returned, otherwise 0 will
     be returned.
 
@@ -300,7 +300,7 @@ int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
     from its residue $a$ modulo $m$. This is essentially the
     inverse operation of \code{fmpq_mod_fmpz}.
 
-    More precisely, assuming $m > 1$ and $0 \ge a < m$ this function either
+    More precisely, assuming $m > 1$ and $0 \le a < m$ this function either
     finds the unique rational number $n/d$ with $|n|, d \le \sqrt{m/2}$ and
     $n \equiv ad \pmod m$ and returns 0, or returns 1 if no such rational
     number exists.
