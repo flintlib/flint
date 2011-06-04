@@ -45,7 +45,7 @@ distclean: clean
 	rm -f Makefile
 
 dist:
-	git archive --format tar --prefix flint-2.2/ master > ../flint-2.2.tar; gzip ../flint-2.2.tar
+	git archive --format tar --prefix flint-2.2/ trunk > ../flint-2.2.tar; gzip ../flint-2.2.tar
 
 profile: all profiler.o
 	mkdir -p build/profile
