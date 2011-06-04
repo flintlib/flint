@@ -776,6 +776,11 @@ nmod_poly
   * Added nmod_poly_xgcd_euclidean (and nmod_poly_xgcd wrapper)
   * nmod_poly_gcd wrapper
 
+mpn_extras
+----------
+  * Added MPN_NORM and MPN_SWAP macros.
+  * Added mpn_gcd_full to remove some of the restrictions from the usual mpn_gcd
+
 build fixes
 ------------
   * fixed make install to create nonexistent dirs (reported by Serge Torres)
