@@ -142,7 +142,7 @@ int fmpz_poly_mat_is_square(const fmpz_poly_mat_t mat)
 long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
 
     Returns the maximum number of bits among the coefficients of the
-    entries in \code{A}, or the negative of that value of that value if any
+    entries in \code{A}, or the negative of that value if any
     coefficient is negative.
 
 long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A)
@@ -188,7 +188,7 @@ void fmpz_poly_mat_neg(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 void fmpz_poly_mat_mul(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 
-    Sets \code{B} to the matrix product of \code{A}.
+    Sets \code{C} to the matrix product of \code{A} and \code{B}.
     The matrices must have compatible dimensions for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between
     classical and KS multiplication.
@@ -196,16 +196,16 @@ void fmpz_poly_mat_mul(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
 void fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 
-    Sets \code{B} to the matrix product of \code{A}, computed using
-    the classical algorithm. The matrices must have compatible
-    dimensions for matrix multiplication. Aliasing is allowed.
+    Sets \code{C} to the matrix product of \code{A} and \code{B}, 
+    computed using the classical algorithm. The matrices must have 
+    compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 
-    Sets \code{B} to the matrix product of \code{A}, computed using
-    Kronecker segmentation. The matrices must have compatible
-    dimensions for matrix multiplication. Aliasing is allowed.
+    Sets \code{C} to the matrix product of \code{A} and \code{B}, 
+    computed using Kronecker segmentation. The matrices must have 
+    compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 
 *******************************************************************************
