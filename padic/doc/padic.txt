@@ -187,14 +187,14 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
 
 void _padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op}.
+    Sets the $p$-adic number \code{rop} to the MPIR integer \code{op}.
 
     The unit part is reduced modulo $p^N$ if and only if \code{op} 
     is negative.
 
 void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the MIPR integer \code{op} 
+    Sets the $p$-adic number \code{rop} to the MPIR integer \code{op} 
     reduced modulo $p^N$.
 
 void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
@@ -444,7 +444,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     If \code{op} is a $p$-adic integer divisible by $p$, sets \code{rop} 
     to zero, which satisfies $t^p - t = 0$, although it is clearly not 
-    a $(p-1)$st root of unity.
+    a $(p-1)$-st root of unity.
 
     If \code{op} has negative valuation, raises an abort signal.
 
