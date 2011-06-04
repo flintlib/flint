@@ -1093,6 +1093,51 @@ combinatorial special number sequences and polynomials.
 \chapter{ulong\_extras}
 \epigraph{Unsigned single limb arithmetic}{}
 
+\section{Introduction}
+
+This module implements functions for single limb unsigned integers, 
+including arithmetic with a precomputed inverse and modular arithmetic.
+
+The module includes functions for square roots, factorisation and 
+primality testing. Almost all the functions in this module are highly
+developed and extremely well optimised.
+
+The basic type is the \code{mp_limb_t} as defined by MPIR. Functions
+which take a precomputed inverse either have the suffix \code{preinv} 
+and take an \code{mp_limb_t} precomputed inverse as computed by 
+\code{n_preinvert_limb} or have the suffix \code{_precomp} and accept
+a \code{double} precomputed inverse as computed by 
+\code{n_precompute_inverse}. 
+
+Some functions with the \code{n_ll_} or \code{n_lll_} prefix accept
+parameters of two or three limbs.
+
+\section{Simple example}
+
+The following example computes $ab \pmod{n}$ using a precomputed 
+inverse, where $a = 12345678, b = 87654321$ and $n = 111111111$.
+
+\begin{lstlisting}[language=c]
+#include <stdio.h>
+#include "ulong_extras.h"
+...
+mp_limb_t r, a, b, n, ninv;
+
+a = 12345678UL;
+b = 87654321UL;
+n = 111111111UL;
+ninv = n_preinvert_limb(n);
+
+r = n_mulmod2_preinv(a, b, n, ninv);
+
+printf("%lu*%lu mod %lu is %lu\n", a, b, n, r);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}[language=c]
+12345678*87654321 mod 111111111 is 23456790
+\end{lstlisting}
+
 \input{input/ulong_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
