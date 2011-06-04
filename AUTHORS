@@ -23,6 +23,8 @@ Richard Howell-Peak : Polynomial factorisation and irreducibility testing for
 Peter Shrimpton : Basic prime sieve, Pocklingtom-Lehmer, Lucas, BPSW and n-1
                   primality tests and a Weiferich prime search program
 
+Jan Tuitman : contributed to the design of the padics module.
+
 Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
