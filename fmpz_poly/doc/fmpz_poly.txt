@@ -982,7 +982,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     modulo further primes until a proven bound is reached.
 
 void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
-                                       const fmpz_poly_t f, const fmpz_poly_t g)
+                                    const fmpz_poly_t f, const fmpz_poly_t g)
 
     Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
     function then returns immediately, otherwise $s$ and $t$ are found such
@@ -1003,7 +1003,7 @@ void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t,
     outputs is permitted.
 
 void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
-                                       const fmpz_poly_t f, const fmpz_poly_t g)
+                                    const fmpz_poly_t f, const fmpz_poly_t g)
 
     Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
     function then returns immediately, otherwise $s$ and $t$ are found such
@@ -1311,28 +1311,28 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
 *******************************************************************************
 
-int _fmpz_poly_divides(fmpz * Q, const fmpz * A, 
+int _fmpz_poly_divides(fmpz * Q, const fmpz * A,
                   long lenA, const fmpz * B, long lenB)
 
-   Returns 1 if \code{(B, lenB)} divides \code{(A, lenA)} exactly and
-   sets $Q$ to the quotient, otherwise returns 0. 
+    Returns 1 if \code{(B, lenB)} divides \code{(A, lenA)} exactly and
+    sets $Q$ to the quotient, otherwise returns 0. 
 
-   It is assumed that $\len(A) \geq \len(B) > 0$ and that $Q$ has space
-   for $\len(A) - \len(B) + 1$ coefficients.
+    It is assumed that $\len(A) \geq \len(B) > 0$ and that $Q$ has space
+    for $\len(A) - \len(B) + 1$ coefficients.
 
-   Aliasing of $Q$ with either of the inputs is not permitted.
+    Aliasing of $Q$ with either of the inputs is not permitted.
 
-   This function is currently unoptimised and provided for convenience
-   only.
+    This function is currently unoptimised and provided for convenience
+    only.
 
-int fmpz_poly_divides(fmpz_poly_t Q, 
+int fmpz_poly_divides(fmpz_poly_t Q,
               const fmpz_poly_t A, const fmpz_poly_t B)
 
-   Returns 1 if $B$ divides $A$ exactly and sets $Q$ to the quotient,
-   otherwise returns 0.
+    Returns 1 if $B$ divides $A$ exactly and sets $Q$ to the quotient,
+    otherwise returns 0.
 
-   This function is currently unoptimised and provided for convenience
-   only.
+    This function is currently unoptimised and provided for convenience
+    only.
 
 *******************************************************************************
 

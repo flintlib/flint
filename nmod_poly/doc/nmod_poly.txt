@@ -925,7 +925,7 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
     No aliasing of input and output operands is permitted.
 
 void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                    const nmod_poly_t A, const nmod_poly_t B)
 
     Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
     defined to be zero, whereas the GCD of the zero polynomial and some other
@@ -952,7 +952,7 @@ long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T,
     No aliasing of input and output operands is permitted.
 
 void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
-                                       const nmod_poly_t A, const nmod_poly_t B)
+                                    const nmod_poly_t A, const nmod_poly_t B)
 
     Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
     defined to be zero, whereas the GCD of the zero polynomial and some other

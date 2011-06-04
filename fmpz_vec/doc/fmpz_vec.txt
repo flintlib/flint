@@ -349,3 +349,10 @@ void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len)
     The content of a zero vector, including the case when the length is zero, 
     is defined to be zero.
 
+void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, long len)
+
+    Sets \code{res} to the nonnegative least common multiple of the entries
+    in \code{vec}. The least common multiple is zero if any entry in
+    the vector is zero. The least common multiple of a length zero vector is
+    defined to be one.
+
