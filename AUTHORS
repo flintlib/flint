@@ -27,7 +27,7 @@ Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
-Kedlaya, William Stein, Robert Bradshaw and many others.
+Kedlaya, William Stein, Robert Bradshaw, Serge Torres and many others.
 
 Some code (longlong.h and clz_tab.c) has been used from the GMP library, 
 whose main author is Torbjorn Granlund.
