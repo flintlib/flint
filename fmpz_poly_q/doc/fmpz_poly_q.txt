@@ -228,7 +228,7 @@ void fmpz_poly_q_div(fmpz_poly_q_t rop,
 
 void fmpz_poly_q_pow(fmpz_poly_q_t rop, const fmpz_poly_q_t op, ulong exp)
 
-    Sets \code{rop} to the \code{exp}th power of \code{op}.
+    Sets \code{rop} to the \code{exp}-th power of \code{op}.
 
     The corner case of \code{exp == 0} is handled by setting \code{rop} to 
     the constant function $1$.  Note that this includes the case $0^0 = 1$.
