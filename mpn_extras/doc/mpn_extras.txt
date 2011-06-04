@@ -110,7 +110,7 @@ int mpn_divides(mp_ptr q, mp_srcptr array1,
     returned, otherwise 0 is returned. The temporary space \code{temp}
     must have space for \code{limbsg} limbs.
 
-   Assumes limbs1 \code{limbs1 >= limbsg > 0}.
+    Assumes limbs1 \code{limbs1 >= limbsg > 0}.
 
 *******************************************************************************
 
@@ -121,11 +121,11 @@ int mpn_divides(mp_ptr q, mp_srcptr array1,
 mp_size_t mpn_gcd_full(mp_ptr arrayg, 
     mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
 
-   Sets \code{(arrayg, retvalue)} to the gcd of \code{(array1, limbs1)} and
-   \code{(array1, limbs2)}. 
+    Sets \code{(arrayg, retvalue)} to the gcd of \code{(array1, limbs1)} and
+    \code{(array1, limbs2)}. 
 
-   The only assumption is that neither \code{limbs1} or \code{limbs2} is
-   zero.
+    The only assumption is that neither \code{limbs1} or \code{limbs2} is
+    zero.
 
 *******************************************************************************
 
