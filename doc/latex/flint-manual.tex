@@ -306,7 +306,7 @@ FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later.
 
 To configure FLINT you must specify where MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
-e.g. in \code{/usr/local} or it can work with the libraries built
+e.g. in \code{/usr} or it can work with the libraries built
 from source in their standard source trees. 
 
 In the case that a library is installed in say \code{/usr/local}
@@ -321,7 +321,7 @@ pass the directories as parameters to FLINT's configure, e.g.\
 ./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/
 \end{lstlisting}
 If no directories are specified, FLINT assumes it will find the
-libraries it needs in \code{/usr/local}.
+libraries it needs in \code{/usr}.
 
 Note that FLINT builds static and shared libraries by default. If
 you do not require one of these then you may pass 
@@ -355,6 +355,19 @@ with the options \code{-lflint -lmpfr -lgmp}.
 Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
 for your system to let the linker know where to find these libraries.
 Please refer to your system documentation for how to do this.
+
+If you have any difficulties with conflicts with system headers on
+your machine, you can do the following in your code:
+
+\begin{lstlisting}[language=C]
+#undef ulong
+#include <stdio.h>
+// other system headers
+#define ulong unsigned long
+\end{lstlisting}
+
+This prevents FLINT's definition of \code{ulong} interfering with
+your system headers.
 
 The FLINT make system responds to the standard commands
 \begin{lstlisting}[language=bash]
