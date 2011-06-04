@@ -691,3 +691,93 @@ documentation
 -------------
   * Large number of corrections
 
+2.2 -- 4 Jun 2011
+
+fmpq (multiprecision rational numbers)
+--------------------------------------
+  * Basic arithmetic functions
+  * Utility functions
+  * Rational reconstruction
+  * Functions for enumerating the rationals
+
+fmpq_mat (matrices over Q)
+--------------------------
+  * Basic arithmetic functions
+  * Utility functions
+  * Fast multiplication
+  * Classical and fraction-free reduced row echelon form
+  * Determinants
+  * Fast non-singular solving
+
+fmpz_poly_mat (matrices over Z[x]
+---------------------------------
+  * Basic arithmetic functions
+  * Utility functions
+  * Fraction-free row reduction and determinants
+  * Fast determinants (experimental)
+
+fmpz_mat
+--------
+  * Added more utility functions (scalar multiplication, etc)
+  * Added Dixon's p-adic algorithm (used by fast nonsingular rational system
+    solving)
+  * Added reduced row echelon form
+  * Added conversions between fmpz_mat and nmod_mat
+  * Added CRT functions for fmpz_mats
+  * Faster matrix multiplication for small to medium dimensions
+
+longlong.h
+----------
+  * Added x86 assembly macros for accumulating sums of two limb operands
+
+nmod_mat
+--------
+  * Sped up arithmetic for moduli close to FLINT_BITS
+
+arith
+-----
+  * Changed interface of various functions to use new fmpq type
+
+fmpz
+----
+  * Added fmpz_set_ui_mod
+  * Inlined fmpz_neg, fmpz_set_si, fmpz_set_ui for better performance
+  * Added fmpz_lcm
+  * Small performance improvement to fmpz_CRT_ui
+
+fmpz_vec
+--------
+  * Added _fmpz_vec_lcm
+
+fmpz_poly_q (rational functions over Q, modeled as quotients of fmpz_polys)
+---------------------------------------------------------------------------
+  * Basic arithmetic functions
+  * Conversion and IO functions
+  * Evaluation
+
+padic (p-adic numbers -- experimental)
+-------------------------------------
+  * Basic arithmetic
+  * Data conversion and IO
+  * Inverse and square root using Newton iteration
+  * Teichmuller lifts (not optimised)
+  * p-adic exponential function (not optimised)
+
+fmpz_poly
+---------
+  * Added fmpz_poly_gcd_modular (and fmpz_poly_gcd wrapper)
+  * Added fmpz_poly_xgcd_modular (and fmpz_poly_xgcd wrapper)
+  * Added conversions between fmpz_poly and nmod_poly
+  * Added CRT functions
+  * Added multipoint evaluation and interpolation
+
+nmod_poly
+---------
+  * Added nmod_poly_xgcd_euclidean (and nmod_poly_xgcd wrapper)
+  * nmod_poly_gcd wrapper
+
+build fixes
+------------
+  * fixed make install to create nonexistent dirs (reported by Serge Torres)
+  * -L use /usr instead of /usr/local by default (reported by Serge Torres)
+  * guards for system headers because of flint's use of ulong
