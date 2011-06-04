@@ -748,12 +748,38 @@ We now describe the functions available in \code{fmpz_poly}.
 
 \section{Introduction}
 
-The \code{fmpq_t} data type represents rational numbers. An \code{fmpq_t}
-is an array of length 1 of type \code{fmpq}, with \code{fmpq} being
-implemented as a pair of \code{fmpz}'s representing numerator and
-denominator. This format allows efficient representation of rational
-numbers with small numerators or denominators.
+The \code{fmpq_t} data type represents rational numbers
+as fractions of multiprecision integers.
 
+An \code{fmpq_t} is an array of length 1 of type \code{fmpq},
+with \code{fmpq} being implemented as a pair of \code{fmpz}'s
+representing numerator and denominator.
+
+This format is designed to allow rational numbers with small
+numerators or denominators to be stored and manipulated
+efficiently. When components no longer fit in single
+machine words, the cost of \code{fmpq_t} arithmetic
+is roughly the same as that of \code{mpq_t} arithmetic,
+plus a small amount of overhead.
+
+A fraction is said to be in canonical form if the numerator
+and denominator have no common factor and the denominator is
+positive. Except where otherwise noted, all functions in the
+\code{fmpq} module assume that
+inputs are in canonical form, and produce outputs in canonical form.
+The user can manipulate the numerator and denominator of an
+\code{fmpq_t} as arbitrary integers, but then becomes
+responsible for canonicalising the number (for example by calling
+\code{fmpq_canonicalise}) before passing it to any library function.
+
+For most operations, both a function operating
+on \code{fmpq_t}'s and an underscore version operating
+on \code{fmpz_t} components are provided. The underscore
+functions may perform less error checking,
+and may impose limitations on aliasing between the
+input and output variables, but 
+generally assume that the components are in
+canonical form just like the non-underscore functions.
 
 \input{input/fmpq.tex}
 
