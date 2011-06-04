@@ -1922,12 +1922,12 @@ void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, fmpz_poly_t A)
 void fmpz_poly_set_nmod_poly(fmpz_poly_t A, const nmod_poly_t Amod)
 
     Sets the coefficients of \code{Amod} to the residues in \code{Amod},
-    normalised to the interval $-m/2 <= r < m/2$ where $m$ is the modulus.
+    normalised to the interval $-m/2 \le r < m/2$ where $m$ is the modulus.
 
 void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
 
     Sets the coefficients of \code{Amod} to the residues in \code{Amod},
-    normalised to the interval $0 <= r < m$ where $m$ is the modulus.
+    normalised to the interval $0 \le r < m$ where $m$ is the modulus.
 
 void
 _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
@@ -1935,11 +1935,11 @@ _fmpz_poly_CRT_ui_precomp(fmpz * res, const fmpz * poly1, long len1,
                 mp_limb_t m2inv, fmpz_t m1m2, mp_limb_t c, int sign)
 
     Sets the coefficients in \code{res} to the CRT reconstruction modulo
-    \code{m1m2} of the residues \code{(poly1, len1)} and \code{(poly2, len2)}
-    which are images modulo \code{m1} and \code{m2} respectively.
+    $m_1m_2$ of the residues \code{(poly1, len1)} and \code{(poly2, len2)}
+    which are images modulo $m_1$ and $m_2$ respectively.
     The caller must supply the precomputed product of the input moduli as
-    \code{m1m2}, the inverse of \code{m1} modulo \code{m2} as \code{c}, and
-    the precomputed inverse of \code{m2} (in the form computed by
+    $m_1m_2$, the inverse of $m_1$ modulo $m_2$ as $c$, and
+    the precomputed inverse of $m_2$ (in the form computed by
     \code{n_preinvert_limb}) as \code{m2inv}.
 
     If \code{sign} = 0, residues $0 <= r < m_1 m_2$ are computed, while
@@ -1954,22 +1954,22 @@ _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                 mp_limb_t m2inv, int sign)
 
     This function is identical to \code{_fmpz_poly_CRT_ui_precomp},
-    apart from automatically computing \code{m1m2} and \code{c}. It also
-    aborts if \code{c} cannot be computed.
+    apart from automatically computing $m_1m_2$ and $c$. It also
+    aborts if $c$ cannot be computed.
 
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
                         const fmpz_t m, const nmod_poly_t poly2)
 
     Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
-    with signed coefficients satisfying $-mn/2 <= c < mn/2$.
+    with signed coefficients satisfying $-mn/2 \le c < mn/2$.
 
 void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
                         const fmpz_t m1, const nmod_poly_t poly2)
 
     Given \code{poly1} with coefficients modulo \code{m} and \code{poly2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
-    with unsigned coefficients satisfying $0 <= c < mn$.
+    with unsigned coefficients satisfying $0 \le c < mn$.
 
 *******************************************************************************
 
