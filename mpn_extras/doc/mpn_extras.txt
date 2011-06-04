@@ -29,12 +29,12 @@
 
 *******************************************************************************
 
-MPN_NORM(a, an)
+MACRO MPN_NORM(a, an)
 
     Normalise \code{(a, an)} so that either \code{an} is zero or 
     \code{a[an - 1]} is nonzero.
 
-MPN_SWAP(a, an, b, bn)
+MACRO MPN_SWAP(a, an, b, bn)
 
     Swap \code{(a, an)} and \code{(b, bn)}, i.e. swap pointers and sizes.
 
