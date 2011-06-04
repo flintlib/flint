@@ -1178,8 +1178,17 @@ and take an \code{mp_limb_t} precomputed inverse as computed by
 a \code{double} precomputed inverse as computed by 
 \code{n_precompute_inverse}. 
 
+Sometimes three functions with similar names are provided for the 
+same task, e.g. \code{n_mod_precomp}, \code{n_mod2_precomp} and
+\code{n_mod2_preinv}. If the part of the name that designates the
+functionality ends in 2 then the function has few if any limitations 
+on its inputs. Otherwise the function may have limitations such as
+being limited to 52 or 53 bits. In practice we found that the 
+preinv functions are generally faster anyway, so most times it pays
+to just use the \code{n_blah2_preinv} variants.
+
 Some functions with the \code{n_ll_} or \code{n_lll_} prefix accept
-parameters of two or three limbs.
+parameters of two or three limbs respectively.
 
 \section{Simple example}
 
