@@ -51,7 +51,7 @@ void fmpq_canonicalise(fmpq_t res)
 
     Puts \code{res} in canonical form: the numerator and denominator are
     reduced to lowest terms, and the denominator is made positive.
-    If the numerator is zero, the denominator is set to zero.
+    If the numerator is zero, the denominator is set to one.
 
     If the denominator is zero, the outcome of calling this function is
     undefined, regardless of the value of the numerator.
