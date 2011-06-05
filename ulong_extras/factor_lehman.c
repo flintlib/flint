@@ -49,6 +49,10 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
    if (n_factor_trial_range(&factors, n, 0, bound) != n)
       return factors.p[0];
    
+   if (factors.p[0] = n_factor_one_line(n, FLINT_FACTOR_ONE_LINE_ITERS))
+       if (factors.p[0] != n)
+           return factors.p[0];
+
 	for (k = 1; k <= cuberoot + 1; k++)
    {
 		mp_limb_t x = (mp_limb_t) ceil(2.0*sqrt((double) k)*sqrt((double) n));
