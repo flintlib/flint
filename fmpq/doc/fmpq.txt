@@ -83,6 +83,10 @@ void fmpq_set(fmpq_t dest, const fmpq_t src)
     Sets \code{dest} to a copy of \code{src}. No canonicalisation
     is performed.
 
+void fmpq_swap(fmpq_t op1, fmpq_t op2)
+
+    Swaps the two rational numbers \code{op1} and \code{op2}.
+
 void fmpq_zero(fmpq_t res)
 
     Sets the value of \code{res} to 0.
