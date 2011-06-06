@@ -72,6 +72,8 @@ void fmpq_mat_zero(fmpq_mat_t mat);
 
 void fmpq_mat_one(fmpq_mat_t mat);
 
+void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op);
+
 /* Addition, scalar multiplication  ******************************************/
 
 void fmpq_mat_add(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2);
