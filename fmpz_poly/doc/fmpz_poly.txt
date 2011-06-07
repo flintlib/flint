@@ -680,6 +680,59 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 *******************************************************************************
 
+    Squaring
+
+*******************************************************************************
+
+void _fmpz_poly_sqr_KS(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    Kronecker segmentation.
+
+void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the Karatsuba multiplication algorithm.
+
+void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the classical or schoolbook method.
+
+void _fmpz_poly_sqr(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op}.
+
+*******************************************************************************
+
     Powering
 
 *******************************************************************************

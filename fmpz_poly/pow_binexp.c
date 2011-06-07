@@ -78,7 +78,7 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
        We unroll the first step of the loop, referring to {poly, len}
      */
     
-    _fmpz_poly_mul(R, poly, len, poly, len);
+    _fmpz_poly_sqr(R, poly, len);
     rlen = 2 * len - 1;
     if ((bit & e))
     {
@@ -93,14 +93,14 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
     {
         if ((bit & e))
         {
-            _fmpz_poly_mul(S, R, rlen, R, rlen);
+            _fmpz_poly_sqr(S, R, rlen);
             rlen += rlen - 1;
             _fmpz_poly_mul(R, S, rlen, poly, len);
             rlen += len - 1;
         }
         else
         {
-            _fmpz_poly_mul(S, R, rlen, R, rlen);
+            _fmpz_poly_sqr(S, R, rlen);
             rlen += rlen - 1;
             T = R;
             R = S;
@@ -132,7 +132,7 @@ fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         else if (e == 1UL)
             fmpz_poly_set(res, poly);
         else  /* e == 2UL */
-            fmpz_poly_mul(res, poly, poly);
+            fmpz_poly_sqr(res, poly);
         return;
     }
 
