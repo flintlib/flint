@@ -205,20 +205,14 @@ void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
 				                long len, mp_limb_t c, nmod_t mod);
 
 
-static __inline__ int
-_nmod_vec_dot_bound_limbs(long len, nmod_t mod)
-{
-    mp_limb_t t2, t1, t0, u1, u0;
+int _nmod_vec_dot_bound_limbs(long len, nmod_t mod);
 
-    umul_ppmm(t1, t0, mod.n - 1, mod.n - 1);
-    umul_ppmm(t2, t1, t1, len);
-    umul_ppmm(u1, u0, t0, len);
-    add_sssaaaaaa(t2, t1, t0,  t2, t1, 0UL,  0UL, u1, u0);
+mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
+    long len, nmod_t mod, int nlimbs);
 
-    if (t2 != 0) return 3;
-    if (t1 != 0) return 2;
-    return (t0 != 0);
-}
+mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset,
+    long len, nmod_t mod, int nlimbs);
+
 
 #endif
 
