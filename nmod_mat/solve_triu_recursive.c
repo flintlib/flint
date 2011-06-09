@@ -30,50 +30,48 @@
 #include "nmod_vec.h"
 
 void
-nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
-                                                const nmod_mat_t B, int unit)
+nmod_mat_solve_triu_recursive(nmod_mat_t X,
+                                    const nmod_mat_t U, const nmod_mat_t B,
+                                                                    int unit)
 {
-    int nlimbs;
-    long i, j, n, m;
-    nmod_t mod;
-    mp_ptr inv, tmp;
+    nmod_mat_t UA, UB, UD, XX, XY, BX, BY, T;
+    long r, n, m;
 
-    n = L->r;
+    n = U->r;
     m = B->c;
-    mod = L->mod;
+    r = n / 2;
 
-    if (!unit)
-    {
-        inv = _nmod_vec_init(n);
-        for (i = 0; i < n; i++)
-            inv[i] = n_invmod(nmod_mat_entry(L, i, i), mod.n);
-    }
-    else
-        inv = NULL;
+    if (n == 0 || m == 0)
+        return;
 
-    nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
-    tmp = _nmod_vec_init(n);
+    /*
+    Denoting inv(M) by M^, we have:
 
-    for (i = 0; i < m; i++)
-    {
-        for (j = 0; j < n; j++)
-            tmp[j] = nmod_mat_entry(X, j, i);
+    [A B]^ [X]  ==  [A^ (X - B D^ Y)]
+    [0 D]  [Y]  ==  [    D^ Y       ]
+    */
 
-        for (j = 0; j < n; j++)
-        {
-            mp_limb_t s;
-            s = _nmod_vec_dot(L->rows[j], tmp, j, mod, nlimbs);
-            s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
-            if (!unit)
-                s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);
-            tmp[j] = s;
-        }
+    nmod_mat_window_init(UA, U, 0, 0, r, n);
+    nmod_mat_window_init(UB, U, 0, r, r, n);
+    nmod_mat_window_init(UD, U, r, r, n, n);
+    nmod_mat_window_init(BX, B, 0, 0, r, m);
+    nmod_mat_window_init(BY, B, r, 0, n, m);
+    nmod_mat_window_init(XX, X, 0, 0, r, m);
+    nmod_mat_window_init(XY, X, r, 0, n, m);
 
-        for (j = 0; j < n; j++)
-            nmod_mat_entry(X, j, i) = tmp[j];
-    }
+    nmod_mat_init(T, r, m, U->mod.n);
 
-    _nmod_vec_free(tmp);
-    if (!unit)
-        _nmod_vec_free(inv);
+    nmod_mat_solve_triu(XY, UD, BY, unit);
+    nmod_mat_mul(T, UB, XY);
+    nmod_mat_sub(XX, BX, T);
+    nmod_mat_solve_triu(XX, UA, XX, unit);
+
+    nmod_mat_clear(T);
+    nmod_mat_window_clear(UA);
+    nmod_mat_window_clear(UB);
+    nmod_mat_window_clear(UD);
+    nmod_mat_window_clear(BX);
+    nmod_mat_window_clear(BY);
+    nmod_mat_window_clear(XX);
+    nmod_mat_window_clear(XY);
 }

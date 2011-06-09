@@ -29,9 +29,6 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
-/* TODO: tune for nonsquare matrices */
-#define TRANSPOSE_CUTOFF 24
-
 void
 nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -47,7 +44,9 @@ nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     nlimbs = _nmod_vec_dot_bound_limbs(k, A->mod);
 
-    if (m < TRANSPOSE_CUTOFF || n < TRANSPOSE_CUTOFF || k < TRANSPOSE_CUTOFF)
+    if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
+        n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
+        k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
     {
         for (i = 0; i < m; i++)
             for (j = 0; j < n; j++)

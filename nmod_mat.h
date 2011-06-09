@@ -78,6 +78,7 @@ int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, long rank);
 void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
+void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
 
 void nmod_mat_print_pretty(const nmod_mat_t mat);
@@ -125,5 +126,22 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
 void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
 void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+
+void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+
+/* Tuning parameters *********************************************************/
+
+/* Size at which pre-transposing becomes faster in classical multiplication */
+#define NMOD_MAT_MUL_TRANSPOSE_CUTOFF 20
+
+/* It is questionable whether we need two different parameters */
+#define NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF 256
+#define NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF 64
+
+/* Cutoff between classical and recursive triangular solving */
+#define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
+#define NMOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
 
 #endif

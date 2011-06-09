@@ -29,15 +29,12 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
-/* Arbitrary; needs tuning */
-#define NMOD_MAT_SOLVE_TRI_CUTOFF_ROWS 64
-#define NMOD_MAT_SOLVE_TRI_CUTOFF_COLS 64
-
 void
-nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit)
+nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L,
+                                    const nmod_mat_t B, int unit)
 {
-    if (B->r < NMOD_MAT_SOLVE_TRI_CUTOFF_ROWS ||
-        B->c < NMOD_MAT_SOLVE_TRI_CUTOFF_COLS)
+    if (B->r < NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF ||
+        B->c < NMOD_MAT_SOLVE_TRI_COLS_CUTOFF)
     {
         nmod_mat_solve_tril_classical(X, L, B, unit);
     }

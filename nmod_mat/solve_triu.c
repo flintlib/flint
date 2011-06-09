@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,22 +30,16 @@
 #include "nmod_vec.h"
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U,
+                                    const nmod_mat_t B, int unit)
 {
-    long m, k, n;
-
-    m = A->r;
-    k = A->c;
-    n = B->c;
-
-    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
+    if (B->r < NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF ||
+        B->c < NMOD_MAT_SOLVE_TRI_COLS_CUTOFF)
     {
-        nmod_mat_mul_classical(C, A, B);
+        nmod_mat_solve_triu_classical(X, U, B, unit);
     }
     else
     {
-        nmod_mat_mul_strassen(C, A, B);
+        nmod_mat_solve_triu_recursive(X, U, B, unit);
     }
 }

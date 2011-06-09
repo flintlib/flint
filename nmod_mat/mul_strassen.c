@@ -31,8 +31,6 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-#define CUTOFF 64
-
 
 /* TODO: optimise this */
 static void
@@ -73,7 +71,9 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     b = A->c;
     c = B->c;
 
-    if (a <= CUTOFF || b <= CUTOFF || c <= CUTOFF)
+    if (a <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF ||
+        b <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF ||
+        c <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF)
     {
         nmod_mat_mul(C, A, B);
         return;

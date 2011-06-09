@@ -128,6 +128,13 @@ void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
     it will have ones on the main diagonal, otherwise it will have random
     nonzero entries on the main diagonal.
 
+void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit)
+
+    Sets \code{mat} to a random upper triangular matrix. If \code{unit} is 1,
+    it will have ones on the main diagonal, otherwise it will have random
+    nonzero entries on the main diagonal.
+
+
 *******************************************************************************
 
     Matrix arithmetic
@@ -259,6 +266,12 @@ int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
     $A$ and $B$ must be square matrices with the same dimensions
     and modulus. The modulus must be prime.
 
+*******************************************************************************
+
+    Triangular solving
+
+*******************************************************************************
+
 void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L,
                             const nmod_mat_t B, int unit)
 
@@ -266,10 +279,8 @@ void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L,
     matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
     main diagonal, and the main diagonal will not be read.
     $X$ and $B$ are allowed to be the same matrix, but no other
-    aliasing is allowed.
-
-    Automatically chooses between the classical and recursive
-    algorithms.
+    aliasing is allowed. Automatically chooses between the classical and
+    recursive algorithms.
 
 void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
                             const nmod_mat_t B, int unit)
@@ -278,9 +289,7 @@ void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
     matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
     main diagonal, and the main diagonal will not be read.
     $X$ and $B$ are allowed to be the same matrix, but no other
-    aliasing is allowed.
-
-    Uses forward substitution.
+    aliasing is allowed. Uses forward substitution.
 
 void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L,
                             const nmod_mat_t B, int unit)
@@ -297,6 +306,45 @@ void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L,
     \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
     \begin{pmatrix} X \\ Y \end{pmatrix} =
     \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular solving
+    of smaller systems.
+
+void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Uses forward substitution.
+
+void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
     $$
 
     to reduce the problem to matrix multiplication and triangular solving

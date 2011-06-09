@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -27,25 +27,30 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit)
 {
-    long m, k, n;
+    long i, j;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
-
-    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
+    for (i = 0; i < mat->r; i++)
     {
-        nmod_mat_mul_classical(C, A, B);
-    }
-    else
-    {
-        nmod_mat_mul_strassen(C, A, B);
+        for (j = 0; j < mat->c; j++)
+        {
+            if (j > i)
+            {
+                nmod_mat_entry(mat, i, j) = n_randlimb(state) % (mat->mod.n);
+            }
+            else if (i == j)
+            {
+                nmod_mat_entry(mat, i, j) = n_randlimb(state) % (mat->mod.n);
+                if (unit || nmod_mat_entry(mat, i, j) == 0UL)
+                    nmod_mat_entry(mat, i, j) = 1UL;
+            }
+            else
+            {
+                nmod_mat_entry(mat, i, j) = 0UL;
+            }
+        }
     }
 }

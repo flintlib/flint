@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,22 +30,51 @@
 #include "nmod_vec.h"
 
 void
-nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U,
+                                                const nmod_mat_t B, int unit)
 {
-    long m, k, n;
+    int nlimbs;
+    long i, j, n, m;
+    nmod_t mod;
+    mp_ptr inv, tmp;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    n = U->r;
+    m = B->c;
+    mod = U->mod;
 
-    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
+    if (!unit)
     {
-        nmod_mat_mul_classical(C, A, B);
+        inv = _nmod_vec_init(n);
+        for (i = 0; i < n; i++)
+            inv[i] = n_invmod(nmod_mat_entry(U, i, i), mod.n);
     }
     else
+        inv = NULL;
+
+    nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
+    tmp = _nmod_vec_init(n);
+
+    for (i = 0; i < m; i++)
     {
-        nmod_mat_mul_strassen(C, A, B);
+        for (j = 0; j < n; j++)
+            tmp[j] = nmod_mat_entry(X, j, i);
+
+        for (j = n - 1; j >= 0; j--)
+        {
+            mp_limb_t s;
+            s = _nmod_vec_dot(U->rows[j] + j + 1,
+                              tmp + j + 1, n - j - 1, mod, nlimbs);
+            s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
+            if (!unit)
+                s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);
+            tmp[j] = s;
+        }
+
+        for (j = 0; j < n; j++)
+            nmod_mat_entry(X, j, i) = tmp[j];
     }
+
+    _nmod_vec_free(tmp);
+    if (!unit)
+        _nmod_vec_free(inv);
 }
