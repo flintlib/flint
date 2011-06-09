@@ -91,16 +91,8 @@ void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 /* Arithmetic */
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
-void _nmod_mat_mul_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
-void _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 

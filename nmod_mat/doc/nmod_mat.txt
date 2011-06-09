@@ -137,61 +137,30 @@ void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
 void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
 
     Sets $B$ to the transpose of $A$. Dimensions must be compatible.
-    $B$ and $A$ may be the same object if and only if the matrix is 
-    square. Entries will be reduced to the modulus of B.
+    $B$ and $A$ may be the same object if and only if the matrix is square.
 
 void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Computes $C = A + B$. Dimensions must be identical.
-    Entries will be reduced to the modulus of $C$.
 
 void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Computes the matrix product $C = A B$. Dimensions must be compatible
-    for matrix multiplication. $C$ is not allowed to be aliased with $A$ 
-    or $B$. Entries will be reduced to the modulus of $C$.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. This function
+    automatically chooses between classical and Strassen multiplication.
 
 void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Performs matrix multiplication using the classical algorithm, by 
-    calling \code{_nmod_mat_mul_1()} etc.  The interface is identical 
-    to \code{nmod_mat_mul()}.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses classical
+    matrix multiplication, creating a temporary transposed copy of $B$
+    to improve memory locality if the matrices are large enough.
 
 void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Performs matrix multiplication respectively using Strassen 
-    multiplication.  The interface is identical to \code{nmod_mat_mul()}.
-
-void _nmod_mat_mul_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-
-void _nmod_mat_mul_transpose_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_transpose_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-
-    Computes $C = A B$ or $C = A B^T$, respectively, using classical
-    matrix multiplication. That is, for each $i$ and $j$, $C_{ij}$ is 
-    set to the scalar product of row $i$ of $A$ with column $j$ of $B$ 
-    (or row $j$ of $B$ when transposed).
-
-    The \code{_X} version uses a register \code{X} limbs wide to accumulate 
-    the scalar product, and a modular reduction is performed only at the end.
-    The caller must ensure that elements are sufficiently small for
-    overflow not to occur.
-
-    Let $k$ be the scalar product size, i.e.\ the number of columns of $A$,
-    and let $a$ and $b$ the largest absolute values of the elements in $A$ 
-    and $B$, respectively. Then the following conditions are sufficient to 
-    guarantee correctness:
-    \begin{verbatim}
-        1  :   k*a*b  <  2^FLINT_BITS
-        2  :   k*a*b  <  2^(2*FLINT_BITS)
-        3  :   always
-    \end{verbatim}
-
-    Dimensions must be compatible for matrix multiplication. $C$ is not
-    allowed to be aliased with $A$ or $B$.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses Strassen
+    multiplication.
 
 *******************************************************************************
 

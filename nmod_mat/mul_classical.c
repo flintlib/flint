@@ -35,40 +35,38 @@
 void
 nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    mp_bitcnt_t amag;
-    mp_bitcnt_t bmag;
-    mp_bitcnt_t cmag;
-
-    long m, k, n;
-
-    int limbs;
+    long m, k, n, i, j;
+    int nlimbs;
 
     m = A->r;
     k = A->c;
     n = B->c;
 
-    amag = FLINT_BIT_COUNT(A->mod.n - 1);
-    bmag = FLINT_BIT_COUNT(B->mod.n - 1);
-    cmag = FLINT_BIT_COUNT(k) + amag + bmag;
+    if (k == 0)
+        return;
 
-    limbs = cmag < FLINT_BITS ? 1 : (cmag < 2*FLINT_BITS ? 2 : 3);
+    nlimbs = _nmod_vec_dot_bound_limbs(k, A->mod);
 
     if (m < TRANSPOSE_CUTOFF || n < TRANSPOSE_CUTOFF || k < TRANSPOSE_CUTOFF)
     {
-        if      (limbs == 1) _nmod_mat_mul_1(C, A, B);
-        else if (limbs == 2) _nmod_mat_mul_2(C, A, B);
-        else                 _nmod_mat_mul_3(C, A, B);
+        for (i = 0; i < m; i++)
+            for (j = 0; j < n; j++)
+                nmod_mat_entry(C, i, j) = _nmod_vec_dot_ptr(A->rows[i],
+                    B->rows, j, k, C->mod, nlimbs);
     }
     else
     {
-        nmod_mat_t T;
-        nmod_mat_init(T, B->c, B->r, B->mod.n);
-        nmod_mat_transpose(T, B);
+        mp_ptr tmp = malloc(sizeof(mp_limb_t) * k * n);
 
-        if      (limbs == 1) _nmod_mat_mul_transpose_1(C, A, T);
-        else if (limbs == 2) _nmod_mat_mul_transpose_2(C, A, T);
-        else                 _nmod_mat_mul_transpose_3(C, A, T);
+        for (i = 0; i < k; i++)
+            for (j = 0; j < n; j++)
+                tmp[j*k + i] = B->rows[i][j];
 
-        nmod_mat_clear(T);
+        for (i = 0; i < m; i++)
+            for (j = 0; j < n; j++)
+                nmod_mat_entry(C, i, j) = _nmod_vec_dot(A->rows[i],
+                    tmp + j*k, k, C->mod, nlimbs);
+
+        free(tmp);
     }
 }

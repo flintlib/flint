@@ -33,18 +33,15 @@ void
 nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
                                                 const nmod_mat_t B, int unit)
 {
-    int size;
-    long i, j, k, n, m;
-    register mp_limb_t s0, s1, s2;
-    register mp_limb_t t0, t1;
+    int nlimbs;
+    long i, j, n, m;
     nmod_t mod;
     mp_ptr inv;
+    mp_ptr tmp;
 
     n = L->r;
     m = B->c;
     mod = L->mod;
-
-    size = _nmod_vec_dot_bound_limbs(n, mod);
 
     if (!unit)
     {
@@ -55,57 +52,30 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
     else
         inv = NULL;
 
-    for (k = 0; k < m; k++)
+    nlimbs = _nmod_vec_dot_bound_limbs(n, mod);
+
+    tmp = _nmod_vec_init(n);
+
+    for (i = 0; i < m; i++)
     {
-        for (i = 0; i < n; i++)
+        for (j = 0; j < n; j++)
+            tmp[j] = nmod_mat_entry(X, j, i);
+
+        for (j = 0; j < n; j++)
         {
-            s0 = s1 = s2 = 0UL;
-
-            switch (size)
-            {
-                case 1:
-                    for (j = 0; j < i; j++)
-                    {
-                        s0 += nmod_mat_entry(L, i, j) * 
-                              nmod_mat_entry(X, j, k);
-                    }
-                    NMOD_RED(s0, s0, mod);
-                    break;
-
-                case 2:
-                    for (j = 0; j < i; j++)
-                    {
-                        umul_ppmm(t1, t0, nmod_mat_entry(L, i, j),
-                                          nmod_mat_entry(X, j, k));
-                        add_ssaaaa(s1, s0, s1, s0, t1, t0);
-                    }
-                    NMOD2_RED2(s0, s1, s0, mod);
-                    break;
-
-                case 3:
-                    for (j = 0; j < i; j++)
-                    {
-                        umul_ppmm(t1, t0, nmod_mat_entry(L, i, j),
-                                          nmod_mat_entry(X, j, k));
-                        add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
-                    }
-                    NMOD_RED(s2, s2, mod);
-                    NMOD_RED3(s0, s2, s1, s0, mod);
-                    break;
-
-                default:
-                    for (j = 0; j < i; j++)
-                        NMOD_ADDMUL(s0, nmod_mat_entry(L, i, j),
-                                        nmod_mat_entry(X, j, k), mod);
-            }
-
-            s0 = nmod_sub(nmod_mat_entry(B, i, k), s0, mod);
+            mp_limb_t s;
+            s = _nmod_vec_dot(L->rows[j], tmp, j, mod, nlimbs);
+            s = nmod_sub(nmod_mat_entry(B, j, i), s, mod);
             if (!unit)
-                s0 = n_mulmod2_preinv(s0, inv[i], mod.n, mod.ninv);
-
-            nmod_mat_entry(X, i, k) = s0;
+                s = n_mulmod2_preinv(s, inv[j], mod.n, mod.ninv);
+            tmp[j] = s;
         }
+
+        for (j = 0; j < n; j++)
+            nmod_mat_entry(X, j, i) = tmp[j];
     }
+
+    _nmod_vec_free(tmp);
 
     if (!unit)
         _nmod_vec_free(inv);
