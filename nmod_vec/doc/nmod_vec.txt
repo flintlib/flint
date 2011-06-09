@@ -187,3 +187,18 @@ void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec,
 
     Adds \code{(vec, len)} times $c$ to the vector \code{(res, len)}.
 
+
+*******************************************************************************
+
+    Dot products
+
+*******************************************************************************
+
+int _nmod_vec_dot_bound_limbs(long len, nmod_t mod)
+
+    Returns the number of limbs (0, 1, 2 or 3) needed to represent the
+    unreduced dot product of two vectors of length \code{len} having entries
+    modulo \code{mod.n}, assuming that \code{len} is nonnegative and that
+    \code{mod.n} is nonzero. In other words, returns
+    \code{len} times \code{mod.n ^ 2}. The computed bound is tight.
+
