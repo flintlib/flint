@@ -77,6 +77,8 @@ int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
                  const mp_limb_t * diag, long n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, long rank);
 void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
+void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
+
 
 void nmod_mat_print_pretty(const nmod_mat_t mat);
 
@@ -125,5 +127,11 @@ int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
 int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
 
 int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
+
+/* New solvers */
+
+void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
 
 #endif

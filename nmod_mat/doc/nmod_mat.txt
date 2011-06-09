@@ -114,13 +114,19 @@ void nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{nmod_mat_randops()}.
 
-void nmod_mat_randops(fmpz_mat_t mat, long count, flint_rand_t state)
+void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
 
     Randomises \code{mat} by performing elementary row or column 
     operations. More precisely, at most \code{count} random additions 
     or subtractions of distinct rows and columns will be performed. 
     This leaves the rank (and for square matrices, determinant) 
     unchanged.
+
+void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
+
+    Sets \code{mat} to a random lower triangular matrix. If \code{unit} is 1,
+    it will have ones on the main diagonal, otherwise it will have random
+    nonzero entries on the main diagonal.
 
 *******************************************************************************
 
@@ -284,3 +290,45 @@ int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
     $A$ and $B$ must be square matrices with the same dimensions
     and modulus. The modulus must be prime.
 
+void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Automatically chooses between the classical and recursive
+    algorithms.
+
+void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Uses forward substitution.
+
+void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular solving
+    of smaller systems.
