@@ -680,6 +680,59 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 *******************************************************************************
 
+    Squaring
+
+*******************************************************************************
+
+void _fmpz_poly_sqr_KS(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    Kronecker segmentation.
+
+void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the Karatsuba multiplication algorithm.
+
+void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the classical or schoolbook method.
+
+void _fmpz_poly_sqr(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op}.
+
+*******************************************************************************
+
     Powering
 
 *******************************************************************************
@@ -1008,6 +1061,33 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
+
+void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2)
+
+    Sets \code{(res, len1 + len2 - 1)} to the least common multiple 
+    of the two polynomials \code{(poly1, len1)} and \code{(poly2, len2)}, 
+    normalised to have non-negative leading coefficient.
+
+    Assumes that \code{len1 >= len2 > 0}.
+
+    Does not support aliasing.
+
+void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                    const fmpz_poly_t poly2)
+
+    Sets \code{res} to the least common multiple of the two 
+    polynomials \code{poly1} and \code{poly2}, normalised to 
+    have non-negative leading coefficient.
+
+    If either of the two polynomials is zero, sets \code{res} 
+    to zero.
+
+    This ensures that the equality
+    \begin{equation*}
+    f g = \gcd(f, g) \lcm(f, g)
+    \end{equation*}
+    holds up to sign.
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2)

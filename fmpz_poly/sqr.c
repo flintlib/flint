@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
@@ -29,38 +29,51 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
+void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, long len)
 {
-    switch (e)
+    mp_size_t limbs;
+
+    if (len < 7)
     {
-        case 0:
-            fmpz_set_ui(res, 1);
-            break;
-        case 1:
-            _fmpz_vec_set(res, poly, len);
-            break;
-        case 2:
-            _fmpz_poly_sqr(res, poly, len);
-            break;
-        case 3:
-        {
-            long alloc = 2 * len - 1;
-            fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_sqr(t, poly, len);
-            _fmpz_poly_mul(res, t, alloc, poly, len);
-            _fmpz_vec_clear(t, alloc);
-            break;
-        }
-        case 4:
-        {
-            long alloc = 2 * len - 1;
-            fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_sqr(t, poly, len);
-            _fmpz_poly_sqr(res, t, alloc);
-            _fmpz_vec_clear(t, alloc);
-            break;
-        }
+        _fmpz_poly_sqr_classical(res, poly, len);
+        return;
     }
+
+    limbs = _fmpz_vec_max_limbs(poly, len);
+
+    if (len < 25 && limbs > 12)
+        _fmpz_poly_sqr_karatsuba(res, poly, len);
+    else
+        _fmpz_poly_sqr_KS(res, poly, len);
+}
+
+void fmpz_poly_sqr(fmpz_poly_t res, const fmpz_poly_t poly)
+{
+    long len = poly->length;
+    long rlen;
+
+    if (len == 0)
+    {
+        fmpz_poly_zero(res);
+        return;
+    }
+
+    rlen = 2 * len - 1;
+
+    if (res == poly)
+    {
+        fmpz_poly_t t;
+        fmpz_poly_init2(t, rlen);
+        _fmpz_poly_sqr(t->coeffs, poly->coeffs, len);
+        fmpz_poly_swap(res, t);
+        fmpz_poly_clear(t);
+    }
+    else
+    {
+        fmpz_poly_fit_length(res, rlen);
+        _fmpz_poly_sqr(res->coeffs, poly->coeffs, len);
+    }
+
+    _fmpz_poly_set_length(res, rlen);
 }
 

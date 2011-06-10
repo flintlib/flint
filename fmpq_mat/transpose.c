@@ -19,48 +19,34 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
+#include "fmpz_mat.h"
+#include "fmpq.h"
+#include "fmpq_mat.h"
 
-void
-_fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
+void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
 {
-    switch (e)
+    long i, j;
+
+    if (rop == op)
     {
-        case 0:
-            fmpz_set_ui(res, 1);
-            break;
-        case 1:
-            _fmpz_vec_set(res, poly, len);
-            break;
-        case 2:
-            _fmpz_poly_sqr(res, poly, len);
-            break;
-        case 3:
-        {
-            long alloc = 2 * len - 1;
-            fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_sqr(t, poly, len);
-            _fmpz_poly_mul(res, t, alloc, poly, len);
-            _fmpz_vec_clear(t, alloc);
-            break;
-        }
-        case 4:
-        {
-            long alloc = 2 * len - 1;
-            fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_sqr(t, poly, len);
-            _fmpz_poly_sqr(res, t, alloc);
-            _fmpz_vec_clear(t, alloc);
-            break;
-        }
+        for (i = 0; i < rop->r; i++)
+            for (j = 0; j < i; j++)
+                fmpq_swap(fmpq_mat_entry(rop, i, j), 
+                          fmpq_mat_entry(rop, j, i));
+    }
+    else
+    {
+        for (i = 0; i < rop->r; i++)
+            for (j = 0; j < rop->c; j++)
+                fmpq_set(fmpq_mat_entry(rop, i, j), 
+                         fmpq_mat_entry(op, j, i));
     }
 }
 

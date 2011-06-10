@@ -364,6 +364,24 @@ void fmpz_poly_mullow(fmpz_poly_t res,
 void fmpz_poly_mulhigh_n(fmpz_poly_t res, 
                   const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
 
+/* Squaring ******************************************************************/
+
+void _fmpz_poly_sqr_KS(fmpz * rop, const fmpz * op, long len);
+
+void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op);
+
+void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op);
+
+void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, long len);
+
+void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, long len);
+
+void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op);
+
+void _fmpz_poly_sqr(fmpz * rop, const fmpz * op, long len);
+
+void fmpz_poly_sqr(fmpz_poly_t rop, const fmpz_poly_t op);
+
 /*  Powering  ****************************************************************/
 
 void _fmpz_poly_pow_multinomial(fmpz * res, const fmpz * poly, long len, ulong e);
@@ -435,6 +453,12 @@ void _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
                                               const fmpz * poly2, long len2);
 
 void fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                    const fmpz_poly_t poly2);
+
+void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2);
+
+void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                     const fmpz_poly_t poly2);
 
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 

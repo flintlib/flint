@@ -58,7 +58,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
     {
         int d, i, j;
         
-        _fmpz_poly_mul(v, poly, len, poly, len);
+        _fmpz_poly_sqr(v, poly, len);
         
         for (i = 1; i < n-1; i++)
         {
@@ -122,7 +122,7 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         else if (e == 1UL)
             fmpz_poly_set(res, poly);
         else  /* e == 2UL */
-            fmpz_poly_mul(res, poly, poly);
+            fmpz_poly_sqr(res, poly);
         return;
     }
     

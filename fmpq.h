@@ -94,6 +94,12 @@ static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
+static __inline__ void fmpq_swap(fmpq_t op1, fmpq_t op2)
+{
+    fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));
+    fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));
+}
+
 static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
 {
     fmpz_neg(fmpq_numref(dest), fmpq_numref(src));
