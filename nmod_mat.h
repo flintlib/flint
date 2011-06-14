@@ -118,8 +118,9 @@ mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved);
 mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved);
 mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
 
+/* Determinant */
 
-mp_limb_t _nmod_mat_det_rowreduce(nmod_mat_t A);
+mp_limb_t _nmod_mat_det(nmod_mat_t A);
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
 
 long nmod_mat_rank(const nmod_mat_t A);

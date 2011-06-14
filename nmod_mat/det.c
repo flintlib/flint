@@ -31,28 +31,68 @@
 #include "nmod_mat.h"
 
 
+static int
+perm_parity(long * perm, long n)
+{
+    long i;
+    int * encountered;
+    int parity;
+
+    if (n <= 1)
+        return 0;
+
+    parity = 0;
+    encountered = calloc(n, sizeof(int));
+
+    for (i = 0; i < n; i++)
+    {
+        if (encountered[i] != 0)
+        {
+            parity ^= 1;
+        }
+        else
+        {
+            long k = i;
+            do
+            {
+                k = perm[k];
+                encountered[k] = 1;
+            } while (k != i);
+        }
+    }
+
+    free(encountered);
+    return parity;
+}
+
+
 mp_limb_t
-_nmod_mat_det_rowreduce(nmod_mat_t A)
+_nmod_mat_det(nmod_mat_t A)
 {
     mp_limb_t det;
+    long * P;
 
     long m = A->r;
     long rank;
     long i;
 
-    rank = _nmod_mat_rowreduce(A, ROWREDUCE_FAST_ABORT);
+    P = malloc(sizeof(long) * m);
+    rank = nmod_mat_lu(P, A, 1);
 
     det = 0UL;
 
-    if (FLINT_ABS(rank) == m)
+    if (rank == m)
     {
         det = 1UL;
         for (i = 0; i < m; i++)
-            det = n_mulmod2_preinv(det, A->rows[i][i], A->mod.n, A->mod.ninv);
-        if (rank < 0)
-            det = nmod_neg(det, A->mod);
+            det = n_mulmod2_preinv(det, nmod_mat_entry(A, i, i),
+                A->mod.n, A->mod.ninv);
     }
 
+    if (perm_parity(P, m))
+        det = nmod_neg(det, A->mod);
+
+    free(P);
     return det;
 }
 
@@ -70,10 +110,11 @@ nmod_mat_det(const nmod_mat_t A)
     }
 
     if (dim == 0) return 1UL;
-    if (dim == 1) return A->entries[0];
+    if (dim == 1) return nmod_mat_entry(A, 0, 0);
 
     nmod_mat_init_set(tmp, A);
-    det = _nmod_mat_det_rowreduce(tmp);
+    det = _nmod_mat_det(tmp);
     nmod_mat_clear(tmp);
+
     return det;
 }

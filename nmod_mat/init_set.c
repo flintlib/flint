@@ -41,10 +41,11 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
         mat->entries = malloc(rows * cols * sizeof(mp_limb_t));
         mat->rows = malloc(rows * sizeof(mp_limb_t *));
 
-        mpn_copyi(mat->entries, src->entries, rows * cols);
-
         for (i = 0; i < rows; i++)
+        {
             mat->rows[i] = mat->entries + i * cols;
+            mpn_copyi(mat->rows[i], src->rows[i], cols);
+        }
     }
     else
         mat->entries = NULL;

@@ -64,7 +64,7 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     fmpz_set_ui(prod, prime);
 
     fmpz_mat_get_nmod_mat(Amod, A);
-    detmod = _nmod_mat_det_rowreduce(Amod);
+    detmod = _nmod_mat_det(Amod);
 
     fmpz_set_ui(det, detmod);
     /* May be signed */
@@ -80,7 +80,7 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
         _nmod_mat_set_mod(Amod, prime);
 
         fmpz_mat_get_nmod_mat(Amod, A);
-        detmod = _nmod_mat_det_rowreduce(Amod);
+        detmod = _nmod_mat_det(Amod);
         fmpz_CRT_ui(det_new, det, prod, detmod, prime);
 
         if (fmpz_equal(det_new, det))

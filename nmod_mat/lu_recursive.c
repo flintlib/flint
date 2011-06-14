@@ -70,7 +70,10 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
     n = A->c;
 
     if (m < NMOD_MAT_LU_RECURSIVE_CUTOFF || n < NMOD_MAT_LU_RECURSIVE_CUTOFF)
-        return nmod_mat_lu_classical(P, A, rank_check);
+    {
+        r1 = nmod_mat_lu_classical(P, A, rank_check);
+        return r1;
+    }
 
     n1 = n / 2;
 
@@ -78,13 +81,12 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
         P[i] = i;
 
     P1 = malloc(sizeof(long) * m);
-
     nmod_mat_window_init(A0, A, 0, 0, m, n1);
     nmod_mat_window_init(A1, A, 0, n1, m, n);
 
     r1 = nmod_mat_lu(P1, A0, rank_check);
 
-    if (rank_check && r1 != m)
+    if (rank_check && (r1 != n1))
     {
         free(P1);
         nmod_mat_window_clear(A0);
@@ -110,7 +112,7 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
 
     r2 = nmod_mat_lu(P1, A11, rank_check);
 
-    if (rank_check && r2 != (m - r1))
+    if (rank_check && (r1 + r2 < FLINT_MIN(m, n)))
     {
         r1 = r2 = 0;
     }
@@ -140,5 +142,6 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
     nmod_mat_window_clear(A11);
     nmod_mat_window_clear(A0);
     nmod_mat_window_clear(A1);
+
     return r1 + r2;
 }

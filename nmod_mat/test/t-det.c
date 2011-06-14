@@ -37,7 +37,6 @@ int
 main(void)
 {
     long m, mod, rep;
-    long i;
     flint_rand_t state;
     flint_randinit(state);
 
@@ -50,22 +49,36 @@ main(void)
         fmpz_mat_t B;
         mp_limb_t Adet;
         fmpz_t Bdet;
+        ulong t;
 
-        m = n_randint(state, 20);
+        m = n_randint(state, 30);
         mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
         fmpz_mat_init(B, m, m);
 
-        nmod_mat_randtest(A, state);
+        switch (rep % 3)
+        {
+            case 0:
+                nmod_mat_randrank(A, state, m);
+                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                break;
+            case 1:
+                t = n_randint(state, m);
+                t = FLINT_MIN(t, m);
+                nmod_mat_randrank(A, state, m);
+                nmod_mat_randops(A, n_randint(state, 2*m + 1), state);
+                break;
+            default:
+                nmod_mat_randtest(A, state);
+        }
 
-        for (i = 0; i < m*m; i++)
-            fmpz_set_ui(&B->entries[i], A->entries[i]);
+        fmpz_mat_set_nmod_mat_unsigned(B, A);
 
         Adet = nmod_mat_det(A);
 
         fmpz_init(Bdet);
-        fmpz_mat_det(Bdet, B);
+        fmpz_mat_det_bareiss(Bdet, B);
         fmpz_mod_ui(Bdet, Bdet, mod);
 
         if (Adet != fmpz_get_ui(Bdet))
