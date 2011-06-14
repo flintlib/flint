@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,13 +30,28 @@
 #include "nmod_vec.h"
 
 void
-nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
+nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B)
 {
-    long i;
+    long m, k, n;
 
-    if (B == A || A->c == 0)
-        return;
+    m = A->r;
+    k = A->c;
+    n = B->c;
 
-    for (i = 0; i < A->r; i++)
-        _nmod_vec_set(B->rows[i], A->rows[i], A->c);
+    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
+        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
+        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
+    {
+        nmod_mat_addmul_classical(D, C, A, B);
+    }
+    else
+    {
+        nmod_mat_t tmp;
+        printf("ASRT!\n");
+        nmod_mat_init(tmp, m, n, A->mod.n);
+        nmod_mat_mul_strassen(tmp, A, B);
+        nmod_mat_add(D, C, tmp);
+        nmod_mat_clear(tmp);
+    }
 }

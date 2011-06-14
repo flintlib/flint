@@ -23,18 +23,20 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
+
 void
 nmod_mat_solve_tril_recursive(nmod_mat_t X,
                                     const nmod_mat_t L, const nmod_mat_t B,
                                                                     int unit)
 {
-    nmod_mat_t LA, LC, LD, XX, XY, BX, BY, T;
+    nmod_mat_t LA, LC, LD, XX, XY, BX, BY;
     long r, n, m;
 
     n = L->r;
@@ -51,21 +53,18 @@ nmod_mat_solve_tril_recursive(nmod_mat_t X,
     [C D]  [Y]  ==  [-D^ C A^    D^] [Y]  ==  [D^ (Y - C A^ X)]
     */
 
-    nmod_mat_window_init(LA, L, 0, 0, r, n);
+    nmod_mat_window_init(LA, L, 0, 0, r, r);
     nmod_mat_window_init(LC, L, r, 0, n, r);
     nmod_mat_window_init(LD, L, r, r, n, n);
     nmod_mat_window_init(BX, B, 0, 0, r, m);
     nmod_mat_window_init(BY, B, r, 0, n, m);
     nmod_mat_window_init(XX, X, 0, 0, r, m);
     nmod_mat_window_init(XY, X, r, 0, n, m);
-    nmod_mat_init(T, n-r, m, L->mod.n);
 
     nmod_mat_solve_tril(XX, LA, BX, unit);
-    nmod_mat_mul(T, LC, XX);
-    nmod_mat_sub(XY, BY, T);
+    nmod_mat_submul(XY, BY, LC, XX);
     nmod_mat_solve_tril(XY, LD, XY, unit);
 
-    nmod_mat_clear(T);
     nmod_mat_window_clear(LA);
     nmod_mat_window_clear(LC);
     nmod_mat_window_clear(LD);

@@ -34,7 +34,7 @@ nmod_mat_solve_triu_recursive(nmod_mat_t X,
                                     const nmod_mat_t U, const nmod_mat_t B,
                                                                     int unit)
 {
-    nmod_mat_t UA, UB, UD, XX, XY, BX, BY, T;
+    nmod_mat_t UA, UB, UD, XX, XY, BX, BY;
     long r, n, m;
 
     n = U->r;
@@ -51,7 +51,7 @@ nmod_mat_solve_triu_recursive(nmod_mat_t X,
     [0 D]  [Y]  ==  [    D^ Y       ]
     */
 
-    nmod_mat_window_init(UA, U, 0, 0, r, n);
+    nmod_mat_window_init(UA, U, 0, 0, r, r);
     nmod_mat_window_init(UB, U, 0, r, r, n);
     nmod_mat_window_init(UD, U, r, r, n, n);
     nmod_mat_window_init(BX, B, 0, 0, r, m);
@@ -59,14 +59,10 @@ nmod_mat_solve_triu_recursive(nmod_mat_t X,
     nmod_mat_window_init(XX, X, 0, 0, r, m);
     nmod_mat_window_init(XY, X, r, 0, n, m);
 
-    nmod_mat_init(T, r, m, U->mod.n);
-
     nmod_mat_solve_triu(XY, UD, BY, unit);
-    nmod_mat_mul(T, UB, XY);
-    nmod_mat_sub(XX, BX, T);
+    nmod_mat_submul(XX, BX, UB, XY);
     nmod_mat_solve_triu(XX, UA, XX, unit);
 
-    nmod_mat_clear(T);
     nmod_mat_window_clear(UA);
     nmod_mat_window_clear(UB);
     nmod_mat_window_clear(UD);

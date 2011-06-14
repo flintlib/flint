@@ -97,6 +97,15 @@ void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
+void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
+
+void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
 
 int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
 
