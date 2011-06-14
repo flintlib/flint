@@ -143,6 +143,7 @@ void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_
 
 long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check);
 long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
+long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
 
 
 
@@ -158,5 +159,8 @@ long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
 /* Cutoff between classical and recursive triangular solving */
 #define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
 #define NMOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
+
+/* Cutoff between classical and recursive LU decomposition */
+#define NMOD_MAT_LU_RECURSIVE_CUTOFF 4
 
 #endif

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -33,5 +33,5 @@
 long 
 nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
 {
-    return nmod_mat_lu_classical(P, A, rank_check);
+    return nmod_mat_lu_recursive(P, A, rank_check);
 }

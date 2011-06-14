@@ -113,18 +113,18 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("lu_classical....");
+    printf("lu_recursive....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 20000; i++)
     {
         nmod_mat_t A, LU;
         mp_limb_t mod;
         long m, n, r, d, rank;
         long * P;
 
-        m = n_randint(state, 20);
-        n = n_randint(state, 20);
+        m = n_randint(state, 30);
+        n = n_randint(state, 30);
         mod = n_randtest_prime(state, 0);
 
         for (r = 0; r <= FLINT_MIN(m, n); r++)
@@ -141,7 +141,7 @@ main(void)
             nmod_mat_init_set(LU, A);
             P = malloc(sizeof(long) * m);
 
-            rank = nmod_mat_lu_classical(P, LU, 0);
+            rank = nmod_mat_lu_recursive(P, LU, 0);
 
             if (r != rank)
             {
