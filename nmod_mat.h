@@ -140,6 +140,12 @@ void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, i
 void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 
+
+long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check);
+long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
+
+
+
 /* Tuning parameters *********************************************************/
 
 /* Size at which pre-transposing becomes faster in classical multiplication */

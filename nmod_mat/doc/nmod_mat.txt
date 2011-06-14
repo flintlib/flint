@@ -294,6 +294,38 @@ int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
 
 *******************************************************************************
 
+    LU decomposition
+
+*******************************************************************************
+
+long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$.
+
+    If $A$ is a nonsingular square matrix, it will be overwritten with
+    a unit diagonal lower triangular matrix $L$ and an upper triangular
+    matrix $U$ (the diagonal of $L$ will not be stored explicitly).
+    
+    If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row echelon
+    form having $r$ nonzero rows, and $L$ will be lower triangular
+    but truncated to $r$ columns, having implicit ones on the $r$ first
+    entries of the main diagonal. All other entries will be zero.
+
+    If a nonzero value for \code{rank_check} is passed, the
+    function will abandon the output matrix in an undefined state and
+    return 0 if $A$ is detected to be rank-deficient.
+
+
+long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this function
+    is identical to that of \code{nmod_mat_lu}. Uses Gaussian elimination.
+
+
+*******************************************************************************
+
     Triangular solving
 
 *******************************************************************************
