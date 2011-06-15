@@ -58,36 +58,6 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
         pivots = p;            /* length = rank */
         nonpivots = p + rank;  /* length = nullity */
 
-/*
-        for (i = j = k = 0; i < rank; i++)
-        {
-            while (fmpz_is_zero(tmp->rows[i] + j))
-            {
-                nonpivots[k] = j;
-                k++;
-                j++;
-            }
-            pivots[i] = j;
-            j++;
-        }
-        while (k < nullity)
-        {
-            nonpivots[k] = j;
-            k++;
-            j++;
-        }
-
-        fmpz_set(den, tmp->rows[0] + pivots[0]);
-
-        for (i = 0; i < nullity; i++)
-        {
-            for (j = 0; j < rank; j++)
-                fmpz_set(res->rows[pivots[j]] + i, tmp->rows[j] + nonpivots[i]);
-            fmpz_neg(res->rows[nonpivots[i]] + i, den);
-        }
-*/
-
-
         for (i = j = k = 0; i < rank; i++)
         {
             while (nmod_mat_entry(tmp, i, j) == 0UL)
@@ -123,44 +93,3 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 
     return nullity;
 }
-
-/*
-
-            ONE = R(1)
-            for i in xrange(self._ncols):
-                if not (i in pivots_set):
-                    v = V(0)
-                    v[i] = ONE
-                    for r in range(len(pivots)):
-                        v[pivots[r]] = -E[r,i]
-                    basis.append(v)
-
-
-
-
-WANT:
-(1, 0, 0, 0, 100, 0, 0, 51),
-(0, 1, 0, 0, 1, 0, 0, 51),
-(0, 0, 1, 0, 0, 0, 100, 50),
-(0, 0, 0, 1, 100, 100, 0, 0)
-
-
-RREF:
-[  1   0   0   0  51  50  51 100]
-[  0   1   0   0  50  51  51 100]
-[  0   0   1   0   0   0   1   0]
-[  0   0   0   1   0   1   0   0]
-[  0   0   0   0   0   0   0   0]
-
-HAVE(STUPID):
-[ 51  50  51 100   0   0   0   0]
-[ 50  51  51 100   0   0   0   0]
-[  0   0   1   0   0   0   0   0]
-[  0   1   0   0   0   0   0   0]
-[  1   0   0   0   0   0   0   0]
-[  0   1   0   0   0   0   0   0]
-[  0   0   1   0   0   0   0   0]
-[  0   0   0   1   0   0   0   0]
-
-
-*/
