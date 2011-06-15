@@ -416,3 +416,39 @@ void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U,
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
+
+*******************************************************************************
+
+    Reduced row echelon form
+
+*******************************************************************************
+
+long nmod_mat_rref(long * P, nmod_mat_t A)
+
+    Puts $A$ in reduced row echelon form, stores the row permutations
+    in $P$ and returns the rank of $A$.
+
+    The rref is computed by first obtaining an unreduced row echelon
+    form via LU decomposition and then solving an additional
+    triangular system.
+
+
+*******************************************************************************
+
+    Nullspace
+
+*******************************************************************************
+
+long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
+
+    Computes the nullspace of $A$ and returns the nullity.
+
+    More precisely, this function sets $X$ to a maximum rank matrix
+    such that $AX = 0$ and returns the rank of $X$. The columns of
+    $X$ will form a basis for the nullspace of $A$.
+
+    $X$ must have sufficient space to store all basis vectors
+    in the nullspace.
+
+    This function computes the reduced row echelon form and then reads
+    off the basis vectors.

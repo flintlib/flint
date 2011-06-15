@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -48,7 +48,7 @@ typedef struct
 }
 nmod_mat_struct;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
+/* nmod_mat_t allows reference-like semantics for nmod_mat_struct */
 typedef nmod_mat_struct nmod_mat_t[1];
 
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
@@ -85,13 +85,17 @@ void nmod_mat_print_pretty(const nmod_mat_t mat);
 
 int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 
+void nmod_mat_zero(nmod_mat_t mat);
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 
-/* Arithmetic */
+/* Addition and subtraction */
+
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+
+/* Matrix multiplication */
 
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
@@ -106,6 +110,8 @@ void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
+
+/* Row reduction (old functions) */
 
 int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
 
@@ -123,15 +129,15 @@ mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
 mp_limb_t _nmod_mat_det(nmod_mat_t A);
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
 
+/* Rank */
+
 long nmod_mat_rank(const nmod_mat_t A);
 
-void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
-int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
-int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
+/* Inverse */
 
 int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
 
-/* New solvers */
+/* Triangular solving */
 
 void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
 void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
@@ -141,11 +147,25 @@ void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, i
 void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
 
+/* LU decomposition */
 
 long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check);
 long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
 long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
 
+/* Nonsingular solving */
+
+void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
+int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
+int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
+
+/* Reduced row echelon form */
+
+long nmod_mat_rref(long * P, nmod_mat_t A);
+
+/* Nullspace */
+
+long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
 
 /* Tuning parameters *********************************************************/
