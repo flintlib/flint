@@ -31,8 +31,14 @@
 long
 nmod_mat_rref(long * P, nmod_mat_t A)
 {
-    long i, j, col, rank;
+    long i, j, k, m, n, rank;
+    long * pivots;
+    long * nonpivots;
+
     nmod_mat_t U, V;
+
+    m = A->r;
+    n = A->c;
 
     rank = nmod_mat_lu(P, A, 0);
 
@@ -44,24 +50,70 @@ nmod_mat_rref(long * P, nmod_mat_t A)
         for (j = 0; j < FLINT_MIN(i, rank); j++)
             nmod_mat_entry(A, i, j) = 0UL;
 
-    nmod_mat_init(V, rank, rank, A->mod.n);
-    nmod_mat_window_init(U, A, 0, 0, rank, A->c);
+    /* We now reorder U to proper upper triangular form U | V
+       with U full-rank triangular, set V = U^(-1) V, and then
+       put the column back in the original order.
 
-    /* V = compact(U) */
-    col = 0;
-    for (i = 0; i < rank; i++)
+       An improvement for some matrices would be to compress V by
+       discarding columns containing nothing but zeros. */
+
+    nmod_mat_init(U, rank, rank, A->mod.n);
+    nmod_mat_init(V, rank, n - rank, A->mod.n);
+
+    pivots = malloc(sizeof(long) * rank);
+    nonpivots = malloc(sizeof(long) * (n - rank));
+
+    for (i = j = k = 0; i < rank; i++)
     {
-        while (nmod_mat_entry(A, i, col) == 0UL)
-            col++;
-        for (j = 0; j <= i; j++)
-            nmod_mat_entry(V, j, i) = nmod_mat_entry(A, j, col);
+        while (nmod_mat_entry(A, i, j) == 0UL)
+        {
+            nonpivots[k] = j;
+            k++;
+            j++;
+        }
+        pivots[i] = j;
+        j++;
+    }
+    while (k < n - rank)
+    {
+        nonpivots[k] = j;
+        k++;
+        j++;
     }
 
-    /* R = V^{-1} U */
-    nmod_mat_solve_triu(U, V, U, 0);
+    for (i = 0; i < rank; i++)
+    {
+        for (j = 0; j <= i; j++)
+            nmod_mat_entry(U, j, i) = nmod_mat_entry(A, j, pivots[i]);
+    }
 
+    for (i = 0; i < n - rank; i++)
+    {
+        for (j = 0; j < rank; j++)
+            nmod_mat_entry(V, j, i) = nmod_mat_entry(A, j, nonpivots[i]);
+    }
+
+    nmod_mat_solve_triu(V, U, V, 0);
+
+    /* Clear pivot columns */
+    for (i = 0; i < rank; i++)
+    {
+        for (j = 0; j <= i; j++)
+            nmod_mat_entry(A, i, pivots[i]) = (i == j);
+    }
+
+    /* Write back the actual content */
+    for (i = 0; i < n - rank; i++)
+    {
+        for (j = 0; j < rank; j++)
+            nmod_mat_entry(A, j, nonpivots[i]) = nmod_mat_entry(V, j, i);
+    }
+
+    nmod_mat_clear(U);
     nmod_mat_clear(V);
-    nmod_mat_window_clear(U);
+
+    free(pivots);
+    free(nonpivots);
 
     return rank;
 }
