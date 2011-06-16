@@ -111,19 +111,6 @@ void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
 void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
-/* Row reduction (old functions) */
-
-int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
-
-long _nmod_mat_rowreduce_1(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce_2(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce_r(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce(nmod_mat_t mat, int options);
-
-mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved);
-mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved);
-mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
-
 /* Determinant */
 
 mp_limb_t _nmod_mat_det(nmod_mat_t A);
@@ -154,8 +141,6 @@ long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
 long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
 
 /* Nonsingular solving */
-
-void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
 
 int nmod_mat_solve(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);

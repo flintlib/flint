@@ -54,7 +54,7 @@ fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     fmpz_mat_det_bound(bound, A);
     fmpz_mul_ui(bound, bound, 2UL);  /* signed */
 
-    prime = _nmod_mat_fast_rowreduce_modulus(dim, dim, proved);
+    prime = n_nextprime(1UL << (FLINT_BITS - 4), proved);
 
     /* 2 as a modulus would not let us distinguish between -1 and 1 */
     if (prime == 2UL)
