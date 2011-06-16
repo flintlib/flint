@@ -51,10 +51,6 @@ void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
     Sets \code{mat} to a copy of \code{src}. It is assumed 
     that \code{mat} and \code{src} have identical dimensions.
 
-int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
-
-    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
-    and zero otherwise. The moduli are ignored.
 
 *******************************************************************************
 
@@ -135,7 +131,18 @@ void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit)
 
 *******************************************************************************
 
-    Matrix arithmetic
+    Comparison
+
+*******************************************************************************
+
+int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
+
+    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
+    and zero otherwise. The moduli are ignored.
+
+*******************************************************************************
+
+    Transpose
 
 *******************************************************************************
 
@@ -144,9 +151,23 @@ void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
     Sets $B$ to the transpose of $A$. Dimensions must be compatible.
     $B$ and $A$ may be the same object if and only if the matrix is square.
 
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
 void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Computes $C = A + B$. Dimensions must be identical.
+
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
 
 void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
@@ -224,71 +245,6 @@ int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
 
     $A$ and $B$ must be square matrices with the same dimensions
     and modulus. The modulus must be prime.
-
-
-*******************************************************************************
-
-    Nonsingular square solving
-
-*******************************************************************************
-
-int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
-
-    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$ 
-    is the modulus of $A$ which must be a prime number.
-
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
-    elements of $x$ to undefined values.
-
-int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
-
-    Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$ 
-    is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$ 
-    should have the same moduli.
-
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the 
-    elements of $X$ to undefined values.
-
-
-*******************************************************************************
-
-    LU decomposition
-
-*******************************************************************************
-
-long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
-
-    Computes a generalised LU decomposition $LU = PA$ of a given
-    matrix $A$, returning the rank of $A$.
-
-    If $A$ is a nonsingular square matrix, it will be overwritten with
-    a unit diagonal lower triangular matrix $L$ and an upper triangular
-    matrix $U$ (the diagonal of $L$ will not be stored explicitly).
-
-    If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row echelon
-    form having $r$ nonzero rows, and $L$ will be lower triangular
-    but truncated to $r$ columns, having implicit ones on the $r$ first
-    entries of the main diagonal. All other entries will be zero.
-
-    If a nonzero value for \code{rank_check} is passed, the
-    function will abandon the output matrix in an undefined state and
-    return 0 if $A$ is detected to be rank-deficient.
-
-    This function calls \code{nmod_mat_lu_recursive}.
-
-long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
-
-    Computes a generalised LU decomposition $LU = PA$ of a given
-    matrix $A$, returning the rank of $A$. The behavior of this function
-    is identical to that of \code{nmod_mat_lu}. Uses Gaussian elimination.
-
-long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
-
-    Computes a generalised LU decomposition $LU = PA$ of a given
-    matrix $A$, returning the rank of $A$. The behavior of this function
-    is identical to that of \code{nmod_mat_lu}. Uses recursive block
-    decomposition, switching to classical Gaussian elimination for
-    sufficiently small blocks.
 
 
 *******************************************************************************
@@ -374,6 +330,72 @@ void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U,
 
     to reduce the problem to matrix multiplication and triangular solving
     of smaller systems.
+
+
+*******************************************************************************
+
+    Nonsingular square solving
+
+*******************************************************************************
+
+int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+
+    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$
+    is the modulus of $A$ which must be a prime number.
+
+    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
+    elements of $x$ to undefined values.
+
+int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+
+    Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$
+    is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$
+    should have the same moduli.
+
+    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
+    elements of $X$ to undefined values.
+
+
+*******************************************************************************
+
+    LU decomposition
+
+*******************************************************************************
+
+long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$.
+
+    If $A$ is a nonsingular square matrix, it will be overwritten with
+    a unit diagonal lower triangular matrix $L$ and an upper triangular
+    matrix $U$ (the diagonal of $L$ will not be stored explicitly).
+
+    If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row echelon
+    form having $r$ nonzero rows, and $L$ will be lower triangular
+    but truncated to $r$ columns, having implicit ones on the $r$ first
+    entries of the main diagonal. All other entries will be zero.
+
+    If a nonzero value for \code{rank_check} is passed, the
+    function will abandon the output matrix in an undefined state and
+    return 0 if $A$ is detected to be rank-deficient.
+
+    This function calls \code{nmod_mat_lu_recursive}.
+
+long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this function
+    is identical to that of \code{nmod_mat_lu}. Uses Gaussian elimination.
+
+long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this function
+    is identical to that of \code{nmod_mat_lu}. Uses recursive block
+    decomposition, switching to classical Gaussian elimination for
+    sufficiently small blocks.
+
 
 *******************************************************************************
 
