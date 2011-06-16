@@ -48,9 +48,17 @@ main(void)
 
         long m, k, n;
 
-        m = n_randint(state, 300);
-        k = n_randint(state, 300);
-        n = n_randint(state, 300);
+        m = n_randint(state, 100);
+        k = n_randint(state, 100);
+        n = n_randint(state, 100);
+
+        /* Force Strassen test */
+        if (i < 5)
+        {
+            m += 300;
+            k += 300;
+            n += 300;
+        }
 
         nmod_mat_init(A, m, k, mod);
         nmod_mat_init(B, k, n, mod);

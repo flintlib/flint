@@ -156,7 +156,8 @@ long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
 /* Nonsingular solving */
 
 void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
-int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
+
+int nmod_mat_solve(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
 
 /* Reduced row echelon form */

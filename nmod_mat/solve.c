@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -30,44 +30,30 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-
 int
-_nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
+nmod_mat_solve(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
 {
-    long dim, i, rank;
-    nmod_mat_t T;
-    mp_limb_t * tmp;
+    nmod_mat_t X, B;
     int result;
+    long i, m;
 
-    dim = A->r;
+    m = A->r;
 
-    nmod_mat_init_set(T, A);
-    rank = _nmod_mat_rowreduce(T, 0);
+    if (m == 0)
+        return 1;
 
-    result = 0;
-    if (FLINT_ABS(rank) == dim)
-    {
-        tmp = _nmod_vec_init(dim);
+    /* This is a bit of a hack. There should be a function to create
+       a window into a vector */
+    nmod_mat_window_init(X, A, 0, 0, m, 1);
+    nmod_mat_window_init(B, A, 0, 0, m, 1);
 
-        for (i = 0; i < dim; i++)
-        {
-            /* Insert in same order as the pivots */
-            tmp[i] = b[(T->rows[i] - T->entries) / dim];
-        }
+    for (i = 0; i < m; i++) X->rows[i] = x + i;
+    for (i = 0; i < m; i++) B->rows[i] = (mp_ptr) (b + i);
 
-        _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
-        mpn_copyi(x, tmp, dim);
-        _nmod_vec_free(tmp);
-        result = 1;
-    }
+    result = nmod_mat_solve_mat(X, A, B);
 
-    nmod_mat_clear(T);
+    nmod_mat_window_clear(X);
+    nmod_mat_window_clear(B);
+
     return result;
 }
-
-int
-nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
-{
-    return (A->r) ? _nmod_mat_solve_lu(x, A, b) : 1;
-}
-

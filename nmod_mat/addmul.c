@@ -48,7 +48,6 @@ nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
     else
     {
         nmod_mat_t tmp;
-        printf("ASRT!\n");
         nmod_mat_init(tmp, m, n, A->mod.n);
         nmod_mat_mul_strassen(tmp, A, B);
         nmod_mat_add(D, C, tmp);

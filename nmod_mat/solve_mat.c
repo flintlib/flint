@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -34,54 +34,40 @@
 int
 nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long i, dim, eq, equations, rank;
-    nmod_mat_t T;
-    mp_limb_t * tmp;
+    long i, rank, *perm;
+    nmod_mat_t LU;
     int result;
 
-    dim = A->r;
-    equations = B->c;
-
-    /* Potentially faster when only solving a single equation */
-    if (equations <= 1 || dim < 1)
-    {
-        if (equations == 1)
-            return nmod_mat_solve(X->entries, A, B->entries);
-        /* else nothing to do */
+    if (A->r == 0 || B->c == 0)
         return 1;
-    }
 
-    /* Compute LU decomposition */
-    nmod_mat_init_set(T, A);
-    rank = _nmod_mat_rowreduce(T, ROWREDUCE_FAST_ABORT);
+    nmod_mat_init_set(LU, A);
+    perm = malloc(sizeof(long) * A->r);
+    for (i = 0; i < A->r; i++)
+        perm[i] = i;
 
-    result = 0;
-    if (FLINT_ABS(rank) == dim)
+    rank = nmod_mat_lu(perm, LU, 1);
+
+    if (rank == A->r)
     {
-        long * order;
+        nmod_mat_t PB;
+        nmod_mat_window_init(PB, B, 0, 0, B->r, B->c);
+        for (i = 0; i < A->r; i++)
+            PB->rows[i] = B->rows[perm[i]];
 
-        /* Pivot order */
-        order = malloc(sizeof(long) * dim);
-        for (i = 0; i < dim; i++)
-            order[(T->rows[i] - T->entries) / dim] = i;
+        nmod_mat_solve_tril(X, LU, PB, 1);
+        nmod_mat_solve_triu(X, LU, X, 0);
 
-        /* Solve for each column of B using precomputed LU decomposition */
-        tmp = _nmod_vec_init(dim);
-        for (eq = 0; eq < equations; eq++)
-        {
-            for (i = 0; i < dim; i++)
-                tmp[order[i]] = B->rows[i][eq];
-
-            _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
-
-            for (i = 0; i < dim; i++)
-                X->rows[i][eq] = tmp[i];
-        }
-        _nmod_vec_free(tmp);
-        free(order);
+        nmod_mat_window_clear(PB);
         result = 1;
     }
+    else
+    {
+        result = 0;
+    }
 
-    nmod_mat_clear(T);
+    nmod_mat_clear(LU);
+    free(perm);
+
     return result;
 }
