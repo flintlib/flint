@@ -197,58 +197,9 @@ void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
 
 *******************************************************************************
 
-    Row reduction, solving
+    Determinant and rank
 
 *******************************************************************************
-
-long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
-
-    Row reduces the $m$-by-$n$ matrix \code{mat} using standard in-place
-    Gaussian elimination with pivoting. The modulus \code{mat->mod.n} must 
-    be a prime number.
-
-    The \code{options} parameter is a bitfield which may be set to any 
-    combination of the following flags, where using \code{options = 0} to 
-    disable all and perform in-place $LU$ decomposition.
-    \begin{itemize}
-    \item \code{ROWREDUCE_FAST_ABORT}.
-
-        If set, the function immediately aborts and returns $0$ if the 
-        matrix is detected to be rank-deficient, i.e.\ singular. In this 
-        event, the state of the matrix will be undefined.
-
-    \item \code{ROWREDUCE_FULL}.
-
-        If set, performs Gauss--Jordan elimination, i.e.\ eliminates the
-        elements above each pivot element as well as those below.
-        If not set, regular Gaussian elimination is performed and only
-        the elements below pivots are eliminated.
-
-    \item \code{ROWREDUCE_CLEAR_LOWER}.
-
-        If set, clears, i.e.\ zeros, elements below the pivots.
-
-        If not set, the output becomes the $LU$ decomposition of the input
-        matrix. That is, the input matrix $A$ is overwritten with $L$, $U$
-        such that $A = P L U$ where $P$ is a permutation matrix. $U$ is 
-        stored in the upper triangular part (including the main diagonal), 
-        and $L$ is stored with an implicit unit main diagonal in the lower 
-        triangular part.
-    \end{itemize}
-
-    Pivoting (to avoid division by zero entries) is performed by permuting
-    the vector of row pointers in-place so that they point to the successive
-    pivot rows. The matrix entries themselves retain their original order
-    in memory.
-
-    The return value $r$ is the rank of the matrix, multiplied by a sign
-    indicating the parity of row interchanges. If $r = 0$, the matrix has 
-    rank zero, unless \code{ROWREDUCE_FAST_ABORT} is set, in which case 
-    $r = 0$ indicates any deficient rank. Otherwise, the leading non-zero 
-    entries of $a[0], a[1], \dotsc, a[\abs(r)-1]$ will point to the 
-    successive pivot elements.  If $\abs{r} = m = n$, the determinant of 
-    the matrix is given by $\sgn(r)$ times the product of the entries on 
-    the main diagonal.
 
 mp_limb_t nmod_mat_det(nmod_mat_t A)
 
@@ -258,13 +209,28 @@ long nmod_mat_rank(nmod_mat_t A)
 
     Returns the rank of $A$. The modulus of $A$ must be a prime number.
 
-void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** LU,
-    long n, nmod_t mod)
 
-    Transforms $b$ to the solution $x$ of $L U x = b$ where \code{LU} 
-    points to the rows of a precomputed $LU$~factorisation of a 
-    nonsingular $n$-by-$n$ matrix with modulus \code{mod.n}. The modulus 
-    must be a prime number.
+*******************************************************************************
+
+    Inverse
+
+*******************************************************************************
+
+int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
+
+    Sets $B = A^{-1}$ and returns $1$ if $A$ is invertible. 
+    If $A$ is singular, returns $0$ and sets the elements of 
+    $B$ to undefined values.
+
+    $A$ and $B$ must be square matrices with the same dimensions
+    and modulus. The modulus must be prime.
+
+
+*******************************************************************************
+
+    Nonsingular square solving
+
+*******************************************************************************
 
 int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
@@ -283,14 +249,6 @@ int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
     Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the 
     elements of $X$ to undefined values.
 
-int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
-
-    Sets $B = A^{-1}$ and returns $1$ if $A$ is invertible. 
-    If $A$ is singular, returns $0$ and sets the elements of 
-    $B$ to undefined values.
-
-    $A$ and $B$ must be square matrices with the same dimensions
-    and modulus. The modulus must be prime.
 
 *******************************************************************************
 
@@ -306,7 +264,7 @@ long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
     If $A$ is a nonsingular square matrix, it will be overwritten with
     a unit diagonal lower triangular matrix $L$ and an upper triangular
     matrix $U$ (the diagonal of $L$ will not be stored explicitly).
-    
+
     If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row echelon
     form having $r$ nonzero rows, and $L$ will be lower triangular
     but truncated to $r$ columns, having implicit ones on the $r$ first
