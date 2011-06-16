@@ -116,7 +116,11 @@ static void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
 /* Randomisation *************************************************************/
 
-void _perm_randtest(long * vec, long n, flint_rand_t state);
+int _perm_randtest(long * vec, long n, flint_rand_t state);
+
+/* Parity ********************************************************************/
+
+int _perm_parity(long * vec, long n);
 
 /* Input and output **********************************************************/
 

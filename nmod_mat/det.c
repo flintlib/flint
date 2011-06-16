@@ -29,41 +29,7 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 #include "nmod_mat.h"
-
-
-static int
-perm_parity(long * perm, long n)
-{
-    long i;
-    int * encountered;
-    int parity;
-
-    if (n <= 1)
-        return 0;
-
-    parity = 0;
-    encountered = calloc(n, sizeof(int));
-
-    for (i = 0; i < n; i++)
-    {
-        if (encountered[i] != 0)
-        {
-            parity ^= 1;
-        }
-        else
-        {
-            long k = i;
-            do
-            {
-                k = perm[k];
-                encountered[k] = 1;
-            } while (k != i);
-        }
-    }
-
-    free(encountered);
-    return parity;
-}
+#include "perm.h"
 
 
 mp_limb_t
@@ -89,7 +55,7 @@ _nmod_mat_det(nmod_mat_t A)
                 A->mod.n, A->mod.ninv);
     }
 
-    if (perm_parity(P, m))
+    if (_perm_parity(P, m) == 1)
         det = nmod_neg(det, A->mod);
 
     free(P);

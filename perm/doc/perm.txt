@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -72,13 +73,25 @@ void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
 *******************************************************************************
 
+    Parity
+
+*******************************************************************************
+
+int _perm_parity(long *vec, long n)
+
+    Returns the parity of \code{vec}, 0 if the permutation is even and 1 if
+    the permutation is odd.
+
+*******************************************************************************
+
     Randomisation
 
 *******************************************************************************
 
-void _perm_randtest(long *vec, long n, flint_rand_t state)
+int _perm_randtest(long *vec, long n, flint_rand_t state)
 
-    Generates a random permutation vector of length $n$.
+    Generates a random permutation vector of length $n$ and returns
+    its parity, 0 or 1.
 
     This function uses the Knuth shuffle algorithm to generate a uniformly 
     random permutation without retries.

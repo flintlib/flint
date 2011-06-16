@@ -19,37 +19,43 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
 #include "perm.h"
 
 int
-nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state,
-                            mp_srcptr diag, long n)
+_perm_parity(long *vec, long n)
 {
+    long i, k;
+    int * encountered;
     int parity;
-    long i;
-    long * rows;
-    long * cols;
 
-    rows = _perm_init(mat->r);
-    cols = _perm_init(mat->c);
+    if (n <= 1)
+        return 0;
 
-    parity = _perm_randtest(rows, mat->r, state);
-    parity ^= _perm_randtest(cols, mat->c, state);
+    parity = 0;
+    encountered = calloc(n, sizeof(int));
 
-    nmod_mat_zero(mat);
     for (i = 0; i < n; i++)
-        nmod_mat_entry(mat, rows[i], cols[i]) = diag[i];
+    {
+        if (encountered[i] != 0)
+        {
+            parity ^= 1;
+        }
+        else
+        {
+            k = i;
+            do
+            {
+                k = vec[k];
+                encountered[k] = 1;
+            }
+            while (k != i);
+        }
+    }
 
-    _perm_clear(rows);
-    _perm_clear(cols);
-
+    free(encountered);
     return parity;
 }

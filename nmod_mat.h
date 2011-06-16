@@ -74,7 +74,7 @@ void nmod_mat_window_clear(nmod_mat_t window);
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, 
-                 const mp_limb_t * diag, long n);
+                 mp_srcptr diag, long n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, long rank);
 void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
