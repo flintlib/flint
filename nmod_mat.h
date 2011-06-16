@@ -170,4 +170,14 @@ long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 /* Cutoff between classical and recursive LU decomposition */
 #define NMOD_MAT_LU_RECURSIVE_CUTOFF 4
 
+/*
+   Suggested initial modulus size for multimodular algorithms. This should
+   be chosen so that we get the most number of bits per cycle
+   in matrix multiplication. On x86-64 it appears to be optimal to use
+   moduli giving nlimbs = 2. This should hold both in the classical
+   range and in Strassen blocks.
+ */
+#define NMOD_MAT_OPTIMAL_MODULUS_BITS (FLINT_BITS-5)
+
+
 #endif

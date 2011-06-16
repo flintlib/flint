@@ -71,7 +71,7 @@ fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     fmpz_mat_solve_bound(N, D, A, B);
 
     /* Compute inverse */
-    p = n_nextprime(1UL << (FLINT_BITS - 4), 0);
+    p = n_nextprime(1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS, 0);
     fmpz_set_ui(tested_p, 1UL);
     while (1)
     {
