@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,23 +30,21 @@
 #include "fmpq.h"
 #include "ulong_extras.h"
 
-
-void
-_fmpq_print(const fmpz_t num, const fmpz_t den)
+void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 {
     if (fmpz_is_one(den))
     {
-        fmpz_print(num);
+        fmpz_fprint(file, num);
     }
     else
     {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
+        fmpz_fprint(file, num);
+        fputc('/', file);
+        fmpz_fprint(file, den);
     }
 }
 
-void fmpq_print(const fmpq_t x)
+void fmpq_fprint(FILE * file, const fmpq_t x)
 {
-    _fmpq_print(&x->num, &x->den);
+    _fmpq_fprint(file, &x->num, &x->den);
 }

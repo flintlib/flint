@@ -157,6 +157,17 @@ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
 *******************************************************************************
 
+void fmpq_fprint(FILE * file, const fmpq_t x)
+
+    Prints \code{x} as a fraction to the stream \code{file}.   
+    The numerator and denominator are printed verbatim as integers, 
+    with a forward slash (/) printed in between.
+
+void _fmpq_fprint(FILE * file, fmpz_t num, fmpz_t den)
+
+    Does the same thing as \code{fmpq_fprint}, but for numerator
+    and denominator given explicitly as \code{fmpz_t} variables. 
+
 void fmpq_print(const fmpq_t x)
 
     Prints \code{x} as a fraction. The numerator and denominator are
