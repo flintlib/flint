@@ -33,13 +33,10 @@
 long
 fmpz_mat_rank(const fmpz_mat_t A)
 {
-    long m, n, rank;
     fmpz_mat_t tmp;
+    long rank;
 
-    m = A->r;
-    n = A->c;
-
-    if (m < 1 || n < 1)
+    if (fmpz_mat_is_empty(A))
         return 0;
 
     fmpz_mat_init_set(tmp, A);

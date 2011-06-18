@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,32 +28,16 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "nmod_mat.h"
+#include "nmod_vec.h"
 
 
 void
-fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
+fmpz_mat_det_modular_accelerated(fmpz_t det, const fmpz_mat_t A, int proved)
 {
-    long dim = A->r;
-
-    if (dim != A->c)
-    {
-        printf("fmpz_mat_det: nonsquare matrix");
-        abort();
-    }
-
-    if (dim < 5)
-        fmpz_mat_det_cofactor(det, A);
-    else if (dim < 25)
-        fmpz_mat_det_bareiss(det, A);
-    else if (dim < 60)
-        fmpz_mat_det_modular(det, A, 1);
-    else
-    {
-        long bits = fmpz_mat_max_bits(A);
-
-        if (dim < FLINT_ABS(bits))
-            fmpz_mat_det_modular(det, A, 1);
-        else
-            fmpz_mat_det_modular_accelerated(det, A, 1);
-    }
+    fmpz_t d;
+    fmpz_init(d);
+    fmpz_mat_det_divisor(d, A);
+    fmpz_mat_det_modular_given_divisor(det, A, d, proved);
+    fmpz_clear(d);
 }

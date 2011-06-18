@@ -468,11 +468,13 @@ void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     Sets \code{det} to the determinant of the square matrix $A$.
-    This function automatically chooses between \code{fmpz_mat_det_cofactor},
-    \code{fmpz_mat_det_bareiss} and \code{fmpz_mat_det_multi_mod}
-    (with \code{proved} = 1), depending on the size of the matrix.
-
     The matrix of dimension $0 \times 0$ is defined to have determinant 1.
+
+    This function automatically chooses between \code{fmpz_mat_det_cofactor},
+    \code{fmpz_mat_det_bareiss}, \code{fmpz_mat_det_modular} and
+    \code{fmpz_mat_det_modular_accelerated}
+    (with \code{proved} = 1), depending on the size of the matrix
+    and its entries.
 
 void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 
@@ -488,7 +490,7 @@ void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
     determinant is read off from the last element on the main
     diagonal.
 
-void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
+void fmpz_mat_det_modular(fmpz_t det, const fmpz_mat_t A, int proved)
 
     Sets \code{det} to the determinant of the square matrix $A$
     (if \code{proved} = 1), or a probabilistic value for the
@@ -502,6 +504,30 @@ void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
     With \code{proved} = 0, the determinant is considered determined
     if it remains unchanged modulo several consecutive primes
     (currently if their product exceeds $2^{100}$).
+
+void fmpz_mat_det_modular_accelerated(fmpz_t det,
+        const fmpz_mat_t A, int proved)
+
+    Sets \code{det} to the determinant of the square matrix $A$
+    (if \code{proved} = 1), or a probabilistic value for the
+    determinant (\code{proved} = 0), computed using a multimodular
+    algorithm.
+
+    This function uses the same basic algorithm as \code{fmpz_mat_det_modular},
+    but instead of computing $\det(A)$ directly, it generates a divisor $d$
+    of $\det(A)$ and then computes $x = \det(A) / d$ modulo several
+    small primes not dividing $d$. This is typically accelerates the
+    computation by requiring fewer primes for large matrices, since $d$
+    with high probability will be nearly as large as the determinant.
+    This trick is described in \citep{AbbottBronsteinMulders1999}.
+
+void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
+        const fmpz_t d, int proved)
+
+    Given a positive divisor $d$ of $\det(A)$, sets \code{det} to the
+    determinant of the square matrix $A$ (if \code{proved} = 1), or a
+    probabilistic value for the determinant (\code{proved} = 0), computed
+    using a multimodular algorithm.
 
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 

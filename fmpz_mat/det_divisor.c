@@ -54,7 +54,7 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
     /* Create a "random" vector */
     for (i = 0; i < n; i++)
     {
-        fmpz_set_si(fmpz_mat_entry(B, i, 0), 2*(i%2) - 1);
+        fmpz_set_si(fmpz_mat_entry(B, i, 0), 2*(i % 2) - 1);
     }
 
     success = fmpz_mat_solve_dixon(X, mod, A, B);

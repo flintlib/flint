@@ -42,7 +42,7 @@ main(void)
 
     fmpz_t det1, det2;
 
-    printf("det_multi_mod....");
+    printf("det_modular_accelerated....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,7 +60,7 @@ main(void)
         fmpz_mat_randtest(A, state, 1+n_randint(state,200));
 
         fmpz_mat_det_bareiss(det1, A);
-        fmpz_mat_det_multi_mod(det2, A, proved);
+        fmpz_mat_det_modular_accelerated(det2, A, proved);
 
         if (!fmpz_equal(det1, det2))
         {
@@ -79,15 +79,17 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
+        int proved = n_randlimb(state) % 2;
         m = 2 + n_randint(state, 10);
         fmpz_mat_init(A, m, m);
         fmpz_init(det2);
 
-        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1), 1+n_randint(state, 10));
+        fmpz_mat_randrank(A, state, 1+n_randint(state, m - 1),
+                                    1+n_randint(state, 10));
         fmpz_mat_randops(A, state, n_randint(state, 2*m*m + 1));
 
-        fmpz_mat_det_multi_mod(det2, A, 0);
-        if (*det2)
+        fmpz_mat_det_modular_accelerated(det2, A, proved);
+        if (!fmpz_is_zero(det2))
         {
             printf("FAIL:\n");
             printf("expected zero determinant!\n");

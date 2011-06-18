@@ -31,78 +31,105 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
+/* Enable to exercise corner cases */
+#define DEBUG_USE_SMALL_PRIMES 0
+
+
+static mp_limb_t
+next_good_prime(const fmpz_t d, mp_limb_t p)
+{
+    mp_limb_t r = 0;
+
+    /*  p == 2 would not always let us distinguish signs with the CRT
+        bound used below */
+    while (r == 0 || p == 2)
+    {
+        p = n_nextprime(p, 0);
+        r = fmpz_fdiv_ui(d, p);
+    }
+
+    return p;
+}
+
 
 void
-fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved)
+fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
+    const fmpz_t d, int proved)
 {
-    fmpz_t prod, stable_prod, det_new, bound;
-    mp_limb_t prime, detmod;
+    fmpz_t bound, prod, stable_prod, x, xnew;
+    mp_limb_t p, xmod;
     nmod_mat_t Amod;
-    long dim = A->r;
+    long n = A->r;
 
-    if (dim < 1)
+    if (n == 0)
     {
         fmpz_set_ui(det, 1UL);
         return;
     }
 
-    fmpz_init(prod);
-    fmpz_init(det_new);
+    if (fmpz_is_zero(d))
+    {
+        fmpz_zero(det);
+        return;
+    }
+
     fmpz_init(bound);
+    fmpz_init(prod);
     fmpz_init(stable_prod);
+    fmpz_init(x);
+    fmpz_init(xnew);
 
+    /* Bound x = det(A) / d */
     fmpz_mat_det_bound(bound, A);
-    fmpz_mul_ui(bound, bound, 2UL);  /* signed */
+    fmpz_mul_ui(bound, bound, 2UL);  /* accomodate sign */
+    fmpz_cdiv_q(bound, bound, d);
 
-    prime = n_nextprime(1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS, proved);
+    nmod_mat_init(Amod, n, n, 2);
+    fmpz_zero(x);
+    fmpz_set_ui(prod, 1UL);
 
-    /* 2 as a modulus would not let us distinguish between -1 and 1 */
-    if (prime == 2UL)
-        prime = 3UL;
+#if DEBUG_USE_SMALL_PRIMES
+    p = 1UL;
+#else
+    p = 1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS;
+#endif
 
-    nmod_mat_init(Amod, A->r, A->c, prime);
-    fmpz_set_ui(prod, prime);
-
-    fmpz_mat_get_nmod_mat(Amod, A);
-    detmod = _nmod_mat_det(Amod);
-
-    fmpz_set_ui(det, detmod);
-    /* May be signed */
-    fmpz_sub_ui(det_new, det, prime);
-    if (fmpz_cmpabs(det_new, det) < 0)
-        fmpz_set(det, det_new);
-
-    fmpz_set_ui(stable_prod, detmod == 0UL ? prime : 1UL);
-
+    /* Compute x = det(A) / d */
     while (fmpz_cmp(prod, bound) < 0)
     {
-        prime = n_nextprime(prime, proved);
-        _nmod_mat_set_mod(Amod, prime);
-
+        p = next_good_prime(d, p);
+        _nmod_mat_set_mod(Amod, p);
         fmpz_mat_get_nmod_mat(Amod, A);
-        detmod = _nmod_mat_det(Amod);
-        fmpz_CRT_ui(det_new, det, prod, detmod, prime);
 
-        if (fmpz_equal(det_new, det))
+        /* Compute x = det(A) / d mod p */
+        xmod = _nmod_mat_det(Amod);
+        xmod = n_mulmod2_preinv(xmod,
+            n_invmod(fmpz_fdiv_ui(d, p), p), Amod->mod.n, Amod->mod.ninv);
+
+        fmpz_CRT_ui(xnew, x, prod, xmod, p);
+
+        if (fmpz_equal(xnew, x))
         {
-            fmpz_mul_ui(stable_prod, stable_prod, prime);
+            fmpz_mul_ui(stable_prod, stable_prod, p);
             if (!proved && fmpz_bits(stable_prod) > 100)
                 break;
         }
         else
         {
-            fmpz_set_ui(stable_prod, prime);
+            fmpz_set_ui(stable_prod, p);
         }
 
-        /* printf("prime,bits %lu, %ld\n", prime, fmpz_bits(prod)); */
-
-        fmpz_mul_ui(prod, prod, prime);
-        fmpz_set(det, det_new);
+        fmpz_mul_ui(prod, prod, p);
+        fmpz_set(x, xnew);
     }
 
+    /* det(A) = x * d */
+    fmpz_mul(det, x, d);
+
     nmod_mat_clear(Amod);
+    fmpz_clear(bound);
     fmpz_clear(prod);
     fmpz_clear(stable_prod);
-    fmpz_clear(det_new);
-    fmpz_clear(bound);
+    fmpz_clear(x);
+    fmpz_clear(xnew);
 }
