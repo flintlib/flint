@@ -516,7 +516,7 @@ void fmpz_mat_det_modular_accelerated(fmpz_t det,
     This function uses the same basic algorithm as \code{fmpz_mat_det_modular},
     but instead of computing $\det(A)$ directly, it generates a divisor $d$
     of $\det(A)$ and then computes $x = \det(A) / d$ modulo several
-    small primes not dividing $d$. This is typically accelerates the
+    small primes not dividing $d$. This typically accelerates the
     computation by requiring fewer primes for large matrices, since $d$
     with high probability will be nearly as large as the determinant.
     This trick is described in \citep{AbbottBronsteinMulders1999}.
