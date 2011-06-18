@@ -113,33 +113,9 @@ static __inline__ void _padic_canonicalise(padic_t rop, const padic_ctx_t ctx)
     }
 }
 
-static __inline__ void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
-{
-    if (!fmpz_is_zero(padic_unit(rop)))
-    {
-        if (padic_val(rop) >= ctx->N)
-        {
-            fmpz_zero(padic_unit(rop));
-            padic_val(rop) = 0;
-        }
-        else
-        {
-            int alloc;
-            fmpz_t pow;
+void _padic_reduce(padic_t rop, const padic_ctx_t ctx);
 
-            _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
-            fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
-            if (alloc)
-                fmpz_clear(pow);
-        }
-    }
-}
-
-static __inline__ void padic_reduce(padic_t rop, const padic_ctx_t ctx)
-{
-    _padic_canonicalise(rop, ctx);
-    _padic_reduce(rop, ctx);
-}
+void padic_reduce(padic_t rop, const padic_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
@@ -181,8 +157,7 @@ void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 void _padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ void 
-padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
+static __inline__ void _padic_swap(padic_t op1, padic_t op2)
 {
     long t;
 
@@ -190,6 +165,12 @@ padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
     t              = padic_val(op1);
     padic_val(op1) = padic_val(op2);
     padic_val(op2) = t;
+}
+
+static __inline__ void 
+padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
+{
+    _padic_swap(op1, op2);
 }
 
 static __inline__ void _padic_zero(padic_t rop)
@@ -296,64 +277,9 @@ static __inline__ int padic_is_one(const padic_t op, const padic_ctx_t ctx)
         return (padic_val(op) >= ctx->N);
 }
 
-static __inline__ int _padic_equal(const padic_t op1, const padic_t op2)
-{
-    return (padic_val(op1) == padic_val(op2)) && 
-           (fmpz_equal(padic_unit(op1), padic_unit(op2)));
-}
+int _padic_equal(const padic_t op1, const padic_t op2);
 
-static __inline__
-int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
-{
-    /* Exact equality? */
-    if (_padic_equal(op1, op2))
-    {
-        return 1;
-    }
-
-    /* Cases where either op1 or op2 is zero mod p^N */
-    if (padic_is_zero(op1, ctx))
-        return padic_is_zero(op2, ctx);
-    if (padic_is_zero(op2, ctx))
-        return 0;
-
-    if (padic_val(op1) == padic_val(op2))
-    {
-        fmpz_t pow;
-        int alloc, ans;
-
-        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op1), ctx);
-
-        if (   (fmpz_sgn(padic_unit(op1)) > 0)
-            && (fmpz_cmp(padic_unit(op1), pow) < 0)
-            && (fmpz_sgn(padic_unit(op2)) > 0)
-            && (fmpz_cmp(padic_unit(op1), pow) < 0))
-        {
-            ans = fmpz_equal(padic_unit(op1), padic_unit(op2));
-        }
-        else
-        {
-            fmpz_t u1, u2;
-
-            fmpz_init(u1);
-            fmpz_init(u2);
-            fmpz_mod(u1, padic_unit(op1), pow);
-            fmpz_mod(u2, padic_unit(op2), pow);
-            ans = fmpz_equal(u1, u2);
-            fmpz_clear(u1);
-            fmpz_clear(u2);
-        }
-
-        if (alloc)
-            fmpz_clear(pow);
-
-        return ans;
-    }
-    else
-    {
-        return 0;
-    }
-}
+int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
@@ -373,25 +299,23 @@ int _padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ 
-int __padic_print(const fmpz_t u, long v, const padic_ctx_t ctx)
+static __inline__ int 
+__padic_print(const fmpz_t u, long v, const padic_ctx_t ctx)
 {
     return __padic_fprint(stdout, u, v, ctx);
 }
 
-static __inline__ 
-int _padic_print(const padic_t op, const padic_ctx_t ctx)
+static __inline__ int _padic_print(const padic_t op, const padic_ctx_t ctx)
 {
     return _padic_fprint(stdout, op, ctx);
 }
 
-static __inline__ 
-int padic_print(const padic_t op, const padic_ctx_t ctx)
+static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
 {
     return padic_fprint(stdout, op, ctx);
 }
 
-static __inline__ void padic_debug(const padic_t op, const padic_ctx_t ctx)
+static __inline__ void _padic_debug(const padic_t op)
 {
     printf("{u = ");
     fmpz_print(padic_unit(op)); 

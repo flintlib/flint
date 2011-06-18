@@ -257,6 +257,8 @@ void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the MPIR rational \code{rop} to the value of \code{op}, 
     reduced modulo $p^N$.
+
+void _padic_swap(padic_t op1, padic_t op2)
     
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 
