@@ -178,6 +178,7 @@ void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
 void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved);
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
+void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x);

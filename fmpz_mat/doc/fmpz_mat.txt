@@ -511,6 +511,17 @@ void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
     $|\det(A)| \le \prod \|a_i\|_2$ where the product is taken
     over the rows $a_i$ of $A$.
 
+void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
+
+    Sets $d$ to some positive divisor of the determinant of the given
+    square matrix $A$, if the determinant is nonzero. If $|\det(A)| = 0$,
+    $d$ will always be set to zero.
+
+    A divisor is obtained by solving $Ax = b$ for an arbitrarily chosen
+    right-hand side $b$ using Dixon's algorithm and computing the least
+    common multiple of the denominators in $x$. This yields a divisor $d$
+    such that $|\det(A)| / d$ is tiny with very high probability.
+
 
 *******************************************************************************
 
@@ -589,8 +600,8 @@ void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A,
     const fmpz_mat_t B)
 
     Assuming that $A$ is nonsingular, computes integers $N$ and $D$
-    such that the numerators and denominators in $A^{-1} B$ are bounded
-    by $N$ and $D$ respectively.
+    such that the reduced numerators and denominators $n/d$ in
+    $A^{-1} B$ satisfy the bounds $0 \le |n| \le N$ and $0 \le d \le D$.
 
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
         const fmpz_mat_t B)
