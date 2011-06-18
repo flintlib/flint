@@ -20,20 +20,47 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
- 
+
 ******************************************************************************/
 
+/*
+    Demo FLINT program to demonstrate some use of the padic module.
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <mpir.h>
+
+#include "flint.h"
 #include "padic.h"
 
-
-void _padic_init(padic_t rop)
+int main(void)
 {
-    fmpz_init(padic_unit(rop));
-    padic_val(rop) = 0;
-}
+    fmpz_t p;
+    padic_ctx_t ctx;
 
-void padic_init(padic_t rop, const padic_ctx_t ctx)
-{
-    _padic_init(rop);
+    padic_t x;
+
+    fmpz_init(p);
+    fmpz_set_ui(p, 7);
+    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+
+    _padic_init(x);
+    _padic_set_ui(x, 127, ctx);
+
+    ctx->mode = PADIC_TERSE;
+    _padic_print(x, ctx), printf("\n");
+
+    ctx->mode = PADIC_SERIES;
+    _padic_print(x, ctx), printf("\n");
+
+    ctx->mode = PADIC_VAL_UNIT;
+    _padic_print(x, ctx), printf("\n");
+
+    _padic_clear(x);
+    padic_ctx_clear(ctx);
+    fmpz_clear(p);
+
+    return EXIT_SUCCESS;
 }
 

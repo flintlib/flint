@@ -93,7 +93,11 @@ _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
 
 /* Memory management *********************************************************/
 
+void _padic_init(padic_t rop);
+
 void padic_init(padic_t rop, const padic_ctx_t ctx);
+
+void _padic_clear(padic_t rop);
 
 void padic_clear(padic_t rop, const padic_ctx_t ctx);
 
@@ -363,9 +367,26 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 char * padic_get_str(const padic_t op, const padic_ctx_t ctx);
 
+int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx);
+
+int _padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
+
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
+static __inline__ 
+int __padic_print(const fmpz_t u, long v, const padic_ctx_t ctx)
+{
+    return __padic_fprint(stdout, u, v, ctx);
+}
+
+static __inline__ 
+int _padic_print(const padic_t op, const padic_ctx_t ctx)
+{
+    return _padic_fprint(stdout, op, ctx);
+}
+
+static __inline__ 
+int padic_print(const padic_t op, const padic_ctx_t ctx)
 {
     return padic_fprint(stdout, op, ctx);
 }

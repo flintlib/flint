@@ -85,9 +85,13 @@ void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
 
 *******************************************************************************
 
+void _padic_init(padic_t rop)
+
 void padic_init(padic_t rop, const padic_ctx_t ctx)
 
     Initialises the $p$-adic number \code{rop}.
+
+void _padic_clear(padic_t rop)
 
 void padic_clear(padic_t rop, const padic_ctx_t ctx)
 
