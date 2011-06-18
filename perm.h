@@ -60,6 +60,17 @@ static void _perm_clear(long * vec)
 
 /* Assignment ****************************************************************/
 
+static long _perm_equal(const long *vec1, const long *vec2, long n)
+{
+    long i;
+
+    for (i = 0; i < n; i++)
+        if (vec1[i] != vec2[i])
+            return 0;
+
+    return 1;
+}
+
 static void _perm_set(long *res, const long *vec, long n)
 {
     long i;
@@ -76,7 +87,8 @@ static void _perm_set_one(long *vec, long n)
         vec[i] = i;
 }
 
-static void _perm_inv(long *res, const long *vec, long n)
+static void
+ _perm_inv(long *res, const long *vec, long n)
 {
     long i;
 
@@ -106,12 +118,27 @@ static void _perm_inv(long *res, const long *vec, long n)
 
 /* Composition ***************************************************************/
 
-static void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
+static void
+_perm_compose(long *res, const long *vec1, const long *vec2, long n)
 {
     long i;
 
-    for (i = 0; i < n; i++)
-        res[i] = vec1[vec2[i]];
+    if (res == vec1)
+    {
+        long *t = malloc(n * sizeof(long));
+
+        for (i = 0; i < n; i++)
+            t[i] = vec1[i];
+        for (i = 0; i < n; i++)
+            res[i] = t[vec2[i]];
+
+        free(t);
+    }
+    else
+    {
+        for (i = 0; i < n; i++)
+            res[i] = vec1[vec2[i]];
+    }
 }
 
 /* Randomisation *************************************************************/
@@ -120,7 +147,7 @@ int _perm_randtest(long * vec, long n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-int _perm_parity(long * vec, long n);
+int _perm_parity(const long * vec, long n);
 
 /* Input and output **********************************************************/
 

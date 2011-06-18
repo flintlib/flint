@@ -31,6 +31,7 @@
 int _perm_randtest(long *vec, long n, flint_rand_t state)
 {
     long i, j, t;
+
     int parity = 0;
 
     for (i = 0; i < n; i++)
@@ -39,7 +40,7 @@ int _perm_randtest(long *vec, long n, flint_rand_t state)
     for (i = n - 1; i > 0; i--)
     {
         j = n_randint(state, i + 1);
-        parity ^= (i == j);
+        parity ^= (i != j);
         t = vec[i];
         vec[i] = vec[j];
         vec[j] = t;
