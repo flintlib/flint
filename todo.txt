@@ -274,22 +274,21 @@ fmpz_mat
 
 * Implement fast null space computation.
 
-* Implement p-adic determinant calculation.
+* The Dixon p-adic solver should implement output-sensitive termination.
 
-* Implement fast multimodular and/or p-adic solving.
-
-* fmpz_mat_mul: If the product bound is less than COEFF_MAX, treat the fmpzs
-  as longs and perform direct arithmetic.
+* The Dixon p-adic solver currently spends most of the time computing
+  integer matrix-vector products. Instead of using a single prime, it
+  is likely to be faster to use a product of primes to increase the
+  proportion of time spent on modular linear algebra (IML uses this trick,
+  and it is presumably responsible for much of the speed difference).
 
 * Maybe optimise multimodular multiplication by pre-transposing
-  so that nmod_mat_mul_transpose can be used directly instead of
+  so that transposed nmod_mat multiplication can be used directly instead of
   creating a transposed copy in nmod_mat_mul. However, this doesn't help
   in the Strassen range unless there also is a transpose version of
   nmod_mat_mul_strassen.
 
 * Use _fmpz_vec functions instead of for loops in some more places.
-
-* Add CRT functions
 
 * Add transpose versions of common functions, in-place addmul etc.
 
@@ -306,30 +305,17 @@ nmod_mat
 
 * Implement methods for setting the zero matrix, identity matrix, etc.
 
-* Change the interface for _nmod_mat_rowreduce to generate
-  an explicit permutation array.
-
-* Add a user-friendly function for LUP decomposition.
-
-* Implement null space computation.
-
 * Implement nmod_mat_pow_ui.
 
 * Add functions for computing A*B^T and A^T*B, using transpose
   multiplications directly to avoid creating a temporary copy.
 
-* Write cleaner versions of the bound_size functions in
-  rowreduce.c, solve_lu_precomp.c (and combine them?)
-
-* Maybe: Optimise basecase multiplication using register blocking
-  and unrolling.
-
 * Maybe: add asserts to check that the modulus is a prime
   where this is assumed.
 
-* Implement Strassen inverse.
-
 * Add transpose versions of common functions, in-place addmul etc.
+
+* Improve rref and inverse to perform everything in-place.
 
 
 fmpq
