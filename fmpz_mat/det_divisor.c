@@ -66,7 +66,13 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
         {
             fmpz_mul(t, d, fmpz_mat_entry(X, i, 0));
             fmpz_fdiv_qr(u, t, t, mod);
-            _fmpq_reconstruct_fmpz(u, v, t, mod);
+            if (!_fmpq_reconstruct_fmpz(u, v, t, mod))
+            {
+                printf("Exception: fmpz_mat_det_divisor: "
+                       "rational reconstruction failed!\n");
+                abort();
+            }
+
             fmpz_mul(d, v, d);
         }
     }
