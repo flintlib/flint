@@ -138,15 +138,16 @@ int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
         }
         else if (v == 1)
         {
-            fmpz_fprint(file, ctx->p);
-            fputc('*', file);
             fmpz_fprint(file, u);
+            fputc('*', file);
+            fmpz_fprint(file, ctx->p);
         }
         else 
         {
-            fmpz_fprint(file, ctx->p);
-            fprintf("^%ld*", v);
             fmpz_fprint(file, u);
+            fputc('*', file);
+            fmpz_fprint(file, ctx->p);
+            fprintf(file, "^%ld", v);
         }
     }
     else
