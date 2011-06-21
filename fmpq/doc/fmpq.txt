@@ -291,19 +291,29 @@ int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
     If such an $a$ exists, 1 will be returned, otherwise 0 will
     be returned.
 
-int _fmpq_reconstruct_fmpz(fmpz_t num, fmpz_t den, const fmpz_t a,
+int _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d, const fmpz_t a,
+        const fmpz_t m, const fmpz_t N, const fmpz_t D)
+
+int fmpq_reconstruct_fmpz_2(fmpq_t res, const fmpz_t a, const fmpz_t m,
+        const fmpz_t N, const fmpz_t D)
+
+    Reconstructs a rational number from its residue $a$ modulo $m$.
+
+    Given a modulus $m > 1$, a residue $0 \le a < m$, and positive $N, D$
+    satisfying $2ND < m$, this function attempts to find a fraction $n/d$ with
+    $0 \le |n| \le N$ and $0 < d \le D$ such that $\gcd(n,d) = 1$ and
+    $n \equiv ad \pmod m$. If a solution exists, then it is also unique.
+    The function returns 1 if successful, and 0 to indicate that no solution
+    exists.
+
+int _fmpq_reconstruct_fmpz(fmpz_t n, fmpz_t d, const fmpz_t a,
     const fmpz_t m)
 
 int fmpq_reconstruct_fmpz(fmpq_t res, const fmpz_t a, const fmpz_t m)
 
-    Reconstructs a rational number \code{res} = \code{(num, den)}
-    from its residue $a$ modulo $m$. This is essentially the
-    inverse operation of \code{fmpq_mod_fmpz}.
-
-    More precisely, assuming $m > 1$ and $0 \le a < m$ this function either
-    finds the unique rational number $n/d$ with $|n|, d \le \sqrt{m/2}$ and
-    $n \equiv ad \pmod m$ and returns 0, or returns 1 if no such rational
-    number exists.
+    Reconstructs a rational number from its residue $a$ modulo $m$,
+    returning 1 if successful and 0 if no solution exists.
+    Uses the balanced bounds $N = D = \lfloor\sqrt{m/2}\rfloor$.
 
 
 *******************************************************************************
