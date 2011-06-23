@@ -32,30 +32,6 @@
 #include "nmod_mat.h"
 
 
-/* TODO: optimise this */
-static void
-nmod_mat_addmul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
-{
-    long i, j, k;
-
-    long r1 = A->r;
-    long c1 = A->c;
-    long c2 = B->c;
-
-    for (i = 0; i < r1; i++)
-    {
-        for (j = 0; j < c2; j++)
-        {
-            for (k = 0; k < c1; k++)
-            {
-                NMOD_ADDMUL(C->rows[i][j],
-                    A->rows[i][k], B->rows[k][j], C->mod);
-            }
-        }
-    }
-}
-
-
 void
 nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -187,7 +163,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
         nmod_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
         nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
-        nmod_mat_addmul_classical(Cb, Ac, Br);
+        nmod_mat_addmul_classical(Cb, Cb, Ac, Br);
         nmod_mat_window_clear(Ac);
         nmod_mat_window_clear(Br);
         nmod_mat_window_clear(Cb);
