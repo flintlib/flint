@@ -338,22 +338,22 @@ void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U,
 
 *******************************************************************************
 
-int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
-
-    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$
-    is the modulus of $A$ which must be a prime number.
-
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
-    elements of $x$ to undefined values.
-
-int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
 
     Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$
     is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$
     should have the same moduli.
 
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
+    Returns $1$ if $A$ has full rank; otherwise returns $0$ and sets the
     elements of $X$ to undefined values.
+
+int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+
+    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$
+    is the modulus of $A$ which must be a prime number.
+
+    Returns $1$ if $A$ has full rank; otherwise returns $0$ and sets the
+    elements of $x$ to undefined values.
 
 
 *******************************************************************************

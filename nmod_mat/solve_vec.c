@@ -30,44 +30,30 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-
 int
-nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
 {
-    long i, rank, *perm;
-    nmod_mat_t LU;
+    nmod_mat_t X, B;
     int result;
+    long i, m;
 
-    if (A->r == 0 || B->c == 0)
+    m = A->r;
+
+    if (m == 0)
         return 1;
 
-    nmod_mat_init_set(LU, A);
-    perm = malloc(sizeof(long) * A->r);
-    for (i = 0; i < A->r; i++)
-        perm[i] = i;
+    /* This is a bit of a hack. There should be a function to create
+       a window into a vector */
+    nmod_mat_window_init(X, A, 0, 0, m, 1);
+    nmod_mat_window_init(B, A, 0, 0, m, 1);
 
-    rank = nmod_mat_lu(perm, LU, 1);
+    for (i = 0; i < m; i++) X->rows[i] = x + i;
+    for (i = 0; i < m; i++) B->rows[i] = (mp_ptr) (b + i);
 
-    if (rank == A->r)
-    {
-        nmod_mat_t PB;
-        nmod_mat_window_init(PB, B, 0, 0, B->r, B->c);
-        for (i = 0; i < A->r; i++)
-            PB->rows[i] = B->rows[perm[i]];
+    result = nmod_mat_solve(X, A, B);
 
-        nmod_mat_solve_tril(X, LU, PB, 1);
-        nmod_mat_solve_triu(X, LU, X, 0);
-
-        nmod_mat_window_clear(PB);
-        result = 1;
-    }
-    else
-    {
-        result = 0;
-    }
-
-    nmod_mat_clear(LU);
-    free(perm);
+    nmod_mat_window_clear(X);
+    nmod_mat_window_clear(B);
 
     return result;
 }

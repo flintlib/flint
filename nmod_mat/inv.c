@@ -62,7 +62,7 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
             nmod_mat_init(I, dim, dim, B->mod.n);
             for (i = 0; i < dim; i++)
                 nmod_mat_entry(I, i, i) = 1UL;
-            result = nmod_mat_solve_mat(B, A, I);
+            result = nmod_mat_solve(B, A, I);
             nmod_mat_clear(I);
     }
 

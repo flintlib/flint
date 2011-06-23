@@ -35,90 +35,96 @@
 int
 main(void)
 {
-    nmod_mat_t A, x, b, Ax;
-    long i, m, r;
-    int solved;
+    nmod_mat_t A, X, B, AX;
+    long i, m, n, r;
     mp_limb_t mod;
+    int solved;
     flint_rand_t state;
     flint_randinit(state);
 
     printf("solve....");
     fflush(stdout);
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 10000; i++)
     {
         m = n_randint(state, 20);
+        n = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
-        nmod_mat_init(b, m, 1, mod);
-        nmod_mat_init(x, m, 1, mod);
-        nmod_mat_init(Ax, m, 1, mod);
+        nmod_mat_init(B, m, n, mod);
+        nmod_mat_init(X, m, n, mod);
+        nmod_mat_init(AX, m, n, mod);
 
         nmod_mat_randrank(A, state, m);
-        nmod_mat_randtest(b, state);
+        nmod_mat_randtest(B, state);
 
         /* Dense */
         if (n_randint(state, 2))
             nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
-        solved = nmod_mat_solve(x->entries, A, b->entries);
-        nmod_mat_mul(Ax, A, x);
+        solved = nmod_mat_solve(X, A, B);
 
-        if (!nmod_mat_equal(Ax, b) || !solved)
+        nmod_mat_mul(AX, A, X);
+
+        if (!nmod_mat_equal(AX, B) || !solved)
         {
             printf("FAIL:\n");
-            printf("Ax != b!\n");
+            printf("AX != B!\n");
             printf("A:\n");
             nmod_mat_print_pretty(A);
-            printf("b:\n");
-            nmod_mat_print_pretty(b);
-            printf("x:\n");
-            nmod_mat_print_pretty(x);
-            printf("Ax:\n");
-            nmod_mat_print_pretty(Ax);
+            printf("B:\n");
+            nmod_mat_print_pretty(B);
+            printf("X:\n");
+            nmod_mat_print_pretty(X);
+            printf("AX:\n");
+            nmod_mat_print_pretty(AX);
             printf("\n");
             abort();
         }
 
         nmod_mat_clear(A);
-        nmod_mat_clear(b);
-        nmod_mat_clear(x);
-        nmod_mat_clear(Ax);
+        nmod_mat_clear(B);
+        nmod_mat_clear(X);
+        nmod_mat_clear(AX);
     }
 
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
         m = 1 + n_randint(state, 20);
+        n = 1 + n_randint(state, 20);
         r = n_randint(state, m);
         mod = n_randtest_prime(state, 0);
 
         nmod_mat_init(A, m, m, mod);
-        nmod_mat_init(b, m, 1, mod);
-        nmod_mat_init(x, m, 1, mod);
-        nmod_mat_init(Ax, m, 1, mod);
+        nmod_mat_init(B, m, n, mod);
+        nmod_mat_init(X, m, n, mod);
+        nmod_mat_init(AX, m, n, mod);
 
         nmod_mat_randrank(A, state, r);
-        nmod_mat_randtest(b, state);
+        nmod_mat_randtest(B, state);
 
         /* Dense */
         if (n_randint(state, 2))
             nmod_mat_randops(A, 1+n_randint(state, 1+m*m), state);
 
-        solved = nmod_mat_solve(x->entries, A, b->entries);
+        solved = nmod_mat_solve(X, A, B);
 
         if (solved)
         {
             printf("FAIL:\n");
             printf("singular system was 'solved'\n");
+            nmod_mat_print_pretty(A);
+            nmod_mat_print_pretty(X);
+            nmod_mat_print_pretty(B);
             abort();
         }
 
         nmod_mat_clear(A);
-        nmod_mat_clear(b);
-        nmod_mat_clear(x);
-        nmod_mat_clear(Ax);
+        nmod_mat_clear(B);
+        nmod_mat_clear(X);
+        nmod_mat_clear(AX);
     }
 
     flint_randclear(state);
