@@ -110,6 +110,8 @@ main(void)
         else
             nmod_mat_randfull(B, state);
 
+        nmod_mat_randtest(C, state);  /* make sure noise in the output is ok */
+
         nmod_mat_mul(C, A, B);
         nmod_mat_mul_check(D, A, B);
 

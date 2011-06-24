@@ -30,45 +30,13 @@
 #include "nmod_vec.h"
 
 void
-nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A)
 {
-    long m, k, n, i, j;
-    int nlimbs;
+    long i;
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
-
-    if (k == 0)
-    {
-        nmod_mat_zero(C);
+    if (A->c == 0)
         return;
-    }
 
-    nlimbs = _nmod_vec_dot_bound_limbs(k, A->mod);
-
-    if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
-        n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
-        k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
-    {
-        for (i = 0; i < m; i++)
-            for (j = 0; j < n; j++)
-                nmod_mat_entry(C, i, j) = _nmod_vec_dot_ptr(A->rows[i],
-                    B->rows, j, k, C->mod, nlimbs);
-    }
-    else
-    {
-        mp_ptr tmp = malloc(sizeof(mp_limb_t) * k * n);
-
-        for (i = 0; i < k; i++)
-            for (j = 0; j < n; j++)
-                tmp[j*k + i] = B->rows[i][j];
-
-        for (i = 0; i < m; i++)
-            for (j = 0; j < n; j++)
-                nmod_mat_entry(C, i, j) = _nmod_vec_dot(A->rows[i],
-                    tmp + j*k, k, C->mod, nlimbs);
-
-        free(tmp);
-    }
+    for (i = 0; i < A->r; i++)
+        _nmod_vec_neg(B->rows[i], A->rows[i], A->c, A->mod);
 }

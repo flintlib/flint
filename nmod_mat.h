@@ -94,6 +94,11 @@ void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
+
+/* Matrix-scalar arithmetic */
+
+void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
 
 /* Matrix multiplication */
 

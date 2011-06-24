@@ -23,52 +23,68 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "ulong_extras.h"
 
-void
-nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+int
+main(void)
 {
-    long m, k, n, i, j;
-    int nlimbs;
+    long m, n, mod, rep;
+    flint_rand_t state;
+    flint_randinit(state);
 
-    m = A->r;
-    k = A->c;
-    n = B->c;
+    printf("neg....");
+    fflush(stdout);
 
-    if (k == 0)
+    for (rep = 0; rep < 10000; rep++)
     {
-        nmod_mat_zero(C);
-        return;
+        nmod_mat_t A, B, C, D;
+
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
+        mod = n_randtest_not_zero(state);
+
+        nmod_mat_init(A, m, n, mod);
+        nmod_mat_init(B, m, n, mod);
+        nmod_mat_init(C, m, n, mod);
+        nmod_mat_init(D, m, n, mod);
+
+        nmod_mat_randtest(A, state);
+        nmod_mat_randtest(B, state);
+
+        nmod_mat_sub(C, A, B);
+
+        nmod_mat_neg(B, B);
+        nmod_mat_add(D, A, B);
+
+        if (!nmod_mat_equal(C, D))
+        {
+            printf("FAIL\n");
+            abort();
+        }
+
+        nmod_mat_neg(C, B);
+        nmod_mat_neg(B, B);
+
+        if (!nmod_mat_equal(C, B))
+        {
+            printf("FAIL\n");
+            abort();
+        }
+
+        nmod_mat_clear(A);
+        nmod_mat_clear(B);
+        nmod_mat_clear(C);
+        nmod_mat_clear(D);
     }
 
-    nlimbs = _nmod_vec_dot_bound_limbs(k, A->mod);
+    flint_randclear(state);
 
-    if (m < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
-        n < NMOD_MAT_MUL_TRANSPOSE_CUTOFF ||
-        k < NMOD_MAT_MUL_TRANSPOSE_CUTOFF)
-    {
-        for (i = 0; i < m; i++)
-            for (j = 0; j < n; j++)
-                nmod_mat_entry(C, i, j) = _nmod_vec_dot_ptr(A->rows[i],
-                    B->rows, j, k, C->mod, nlimbs);
-    }
-    else
-    {
-        mp_ptr tmp = malloc(sizeof(mp_limb_t) * k * n);
-
-        for (i = 0; i < k; i++)
-            for (j = 0; j < n; j++)
-                tmp[j*k + i] = B->rows[i][j];
-
-        for (i = 0; i < m; i++)
-            for (j = 0; j < n; j++)
-                nmod_mat_entry(C, i, j) = _nmod_vec_dot(A->rows[i],
-                    tmp + j*k, k, C->mod, nlimbs);
-
-        free(tmp);
-    }
+    printf("PASS\n");
+    return 0;
 }
