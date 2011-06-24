@@ -25,71 +25,69 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-
+#include "fmpq.h"
+#include "fmpq_mat.h"
 
 int
 main(void)
 {
+    int i, result;
     flint_rand_t state;
-    long i;
-
-    printf("mul_KS....");
-    fflush(stdout);
-
     flint_randinit(state);
 
-    for (i = 0; i < 2000; i++)
+    printf("mul....");
+    fflush(stdout);
+
+    for (i = 0; i < 1000; i++)
     {
-        fmpz_poly_mat_t A, B, C, D;
-        long m, n, k, bits, deg;
+        fmpq_mat_t A, B, C, D;
 
-        /* TODO: add separate unsigned tests */
-        m = n_randint(state, 15);
-        n = n_randint(state, 15);
-        k = n_randint(state, 15);
-        deg = 1 + n_randint(state, 15);
-        bits = 1 + n_randint(state, 150);
+        long m, n, k, bits;
 
-        fmpz_poly_mat_init(A, m, n);
-        fmpz_poly_mat_init(B, n, k);
-        fmpz_poly_mat_init(C, m, k);
-        fmpz_poly_mat_init(D, m, k);
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
+        k = n_randint(state, 10);
 
-        fmpz_poly_mat_randtest(A, state, deg, bits);
-        fmpz_poly_mat_randtest(B, state, deg, bits);
+        bits = 1 + n_randint(state, 100);
 
-        fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
+        fmpq_mat_init(A, m, k);
+        fmpq_mat_init(B, k, n);
+        fmpq_mat_init(C, m, n);
+        fmpq_mat_init(D, m, n);
 
-        fmpz_poly_mat_mul_classical(C, A, B);
-        fmpz_poly_mat_mul_KS(D, A, B);
+        fmpq_mat_randtest(A, state, bits);
+        fmpq_mat_randtest(B, state, bits);
+        fmpq_mat_randtest(C, state, bits);  /* noise in output */
 
-        if (!fmpz_poly_mat_equal(C, D))
+        fmpq_mat_mul_direct(C, A, B);
+        fmpq_mat_mul_cleared(D, A, B);
+
+        result = fmpq_mat_equal(C, D);
+        if (!result)
         {
             printf("FAIL:\n");
-            printf("products don't agree!\n");
             printf("A:\n");
-            fmpz_poly_mat_print(A, "x");
+            fmpq_mat_print(A);
             printf("B:\n");
-            fmpz_poly_mat_print(B, "x");
+            fmpq_mat_print(B);
             printf("C:\n");
-            fmpz_poly_mat_print(C, "x");
+            fmpq_mat_print(C);
             printf("D:\n");
-            fmpz_poly_mat_print(D, "x");
-            printf("\n");
+            fmpq_mat_print(D);
             abort();
         }
 
-        fmpz_poly_mat_clear(A);
-        fmpz_poly_mat_clear(B);
-        fmpz_poly_mat_clear(C);
-        fmpz_poly_mat_clear(D);
+        fmpq_mat_clear(A);
+        fmpq_mat_clear(B);
+        fmpq_mat_clear(C);
+        fmpq_mat_clear(D);
     }
 
     flint_randclear(state);
+
     _fmpz_cleanup();
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }
