@@ -27,7 +27,62 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpq_poly.h"
+
+
+static void
+_fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
+{
+    fmpz_t p, q, t;
+    long i, j;
+
+    fmpz_init(p);
+    fmpz_init(q);
+    fmpz_init(t);
+
+    for (i = 1; i < n; i++)
+    {
+        fmpz_set(t, ys + i - 1);
+
+        for (j = i; j < n; j++)
+        {
+            fmpz_sub(p, ys + j, t);
+            fmpz_sub(q, xs + j, xs + j - i);
+            fmpz_set(t, ys + j);
+            fmpz_divexact(ys + j, p, q);
+        }
+    }
+
+    fmpz_clear(p);
+    fmpz_clear(q);
+    fmpz_clear(t);
+}
+
+static void
+_fmpz_poly_newton_to_monomial(fmpz * ys, const fmpz * xs, long n)
+{
+    fmpz_t t;
+    long i, j;
+
+    fmpz_init(t);
+
+    for (i = n - 2; i >= 0; i--)
+    {
+        fmpz_set(t, ys + i);
+        fmpz_set(ys + i, ys + i + 1);
+
+        for (j = i + 1; j < n - 1; j++)
+        {
+            fmpz_mul(ys + j, ys + j, xs + i);
+            fmpz_sub(ys + j, ys + j + 1, ys + j);
+        }
+
+        fmpz_mul(ys + n - 1, ys + n - 1, xs + i);
+        fmpz_sub(ys + n - 1, t, ys + n - 1);
+    }
+
+    _fmpz_poly_reverse(ys, ys, n, n);
+    fmpz_clear(t);
+}
 
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
@@ -48,8 +103,9 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
         fmpz_t den;
         fmpz_init(den);
         fmpz_poly_fit_length(poly, n);
-        _fmpq_poly_interpolate_fmpz_vec(poly->coeffs, den, xs, ys, n);
-        _fmpz_vec_scalar_divexact_fmpz(poly->coeffs, poly->coeffs, n, den);
+        _fmpz_vec_set(poly->coeffs, ys, n);
+        _fmpz_poly_interpolate_newton(poly->coeffs, xs, n);
+        _fmpz_poly_newton_to_monomial(poly->coeffs, xs, n);
         _fmpz_poly_set_length(poly, n);
         _fmpz_poly_normalise(poly);
         fmpz_clear(den);
