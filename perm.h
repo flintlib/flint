@@ -35,7 +35,7 @@
 
 /* Memory management *********************************************************/
 
-static long * _perm_init(long n)
+static __inline__ long * _perm_init(long n)
 {
     long i, *vec;
 
@@ -53,14 +53,14 @@ static long * _perm_init(long n)
     return vec;
 }
 
-static void _perm_clear(long * vec)
+static __inline__ void _perm_clear(long * vec)
 {
     free(vec);
 }
 
 /* Assignment ****************************************************************/
 
-static long _perm_equal(const long *vec1, const long *vec2, long n)
+static __inline__ long _perm_equal(const long *vec1, const long *vec2, long n)
 {
     long i;
 
@@ -71,7 +71,7 @@ static long _perm_equal(const long *vec1, const long *vec2, long n)
     return 1;
 }
 
-static void _perm_set(long *res, const long *vec, long n)
+static __inline__ void _perm_set(long *res, const long *vec, long n)
 {
     long i;
 
@@ -79,7 +79,7 @@ static void _perm_set(long *res, const long *vec, long n)
         res[i] = vec[i];
 }
 
-static void _perm_set_one(long *vec, long n)
+static __inline__ void _perm_set_one(long *vec, long n)
 {
     long i;
 
@@ -87,7 +87,7 @@ static void _perm_set_one(long *vec, long n)
         vec[i] = i;
 }
 
-static void
+static __inline__ void
  _perm_inv(long *res, const long *vec, long n)
 {
     long i;
@@ -118,7 +118,7 @@ static void
 
 /* Composition ***************************************************************/
 
-static void
+static __inline__ void
 _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 {
     long i;
@@ -151,7 +151,7 @@ int _perm_parity(const long * vec, long n);
 
 /* Input and output **********************************************************/
 
-static int _long_vec_print(const long * vec, long len)
+static __inline__  int _long_vec_print(const long * vec, long len)
 {
     long i;
 
@@ -166,7 +166,7 @@ static int _long_vec_print(const long * vec, long len)
     return 1;
 }
 
-static int _perm_print(const long * vec, long n)
+static __inline__ int _perm_print(const long * vec, long n)
 {
     long i;
 
