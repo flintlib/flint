@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,34 +28,20 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-mp_limb_t
-_nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, nmod_t mod)
+void
+_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod)
 {
-    long m;
-    mp_limb_t val;
+    long i;
 
-    if (len == 0)
-        return 0;
-
-    if (len == 1 || c == 0)
-        return poly[0];
-
-    m = len - 1;
-    
-    val = poly[m];
-    m--;
-
-    for ( ; m >= 0; m--)
-    {
-        val = n_mulmod2_preinv(val, c, mod.n, mod.ninv);
-        val = n_addmod(val, poly[m], mod.n);
-    }
-
-    return val;
+    for (i = 0; i < n; i++)
+        ys[i] = _nmod_poly_evaluate_nmod(coeffs, len, xs[i], mod);
 }
 
-mp_limb_t
-nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
+void
+nmod_poly_evaluate_nmod_vec(mp_ptr ys,
+        const nmod_poly_t poly, mp_srcptr xs, long n)
 {
-    return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
+    _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
+                                        poly->length, xs, n, poly->mod);
 }

@@ -817,6 +817,35 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
+void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr poly, long len,
+                                    mp_srcptr xs, long n, nmod_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
+                                    mp_srcptr xs, long n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+*******************************************************************************
+
+    Interpolation
+
+*******************************************************************************
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    Sets \code{poly} to the unique polynomial of length \code{n} that
+    interpolates the \code{n} given evaluation points \code{xs} and
+    values \code{ys}. The values in \code{xs} and \code{ys} should be
+    reduced modulo the modulus, and all \code{ys} must be distinct.
+
 *******************************************************************************
 
     Composition

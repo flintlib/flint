@@ -500,6 +500,18 @@ mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly,
 
 mp_limb_t nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c);
 
+void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
+        const nmod_poly_t poly, mp_srcptr xs, long n);
+
+/* Interpolation  ************************************************************/
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n);
+
+
 /* Composition  **************************************************************/
 
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
