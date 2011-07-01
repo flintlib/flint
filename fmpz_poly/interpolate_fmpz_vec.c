@@ -100,14 +100,11 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
     }
     else
     {
-        fmpz_t den;
-        fmpz_init(den);
         fmpz_poly_fit_length(poly, n);
         _fmpz_vec_set(poly->coeffs, ys, n);
         _fmpz_poly_interpolate_newton(poly->coeffs, xs, n);
-        _fmpz_poly_newton_to_monomial(poly->coeffs, xs, n);
         _fmpz_poly_set_length(poly, n);
         _fmpz_poly_normalise(poly);
-        fmpz_clear(den);
+        _fmpz_poly_newton_to_monomial(poly->coeffs, xs, poly->length);
     }
 }
