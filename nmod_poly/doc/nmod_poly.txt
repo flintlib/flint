@@ -851,6 +851,18 @@ void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
 
 *******************************************************************************
 
+void _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    Sets \code{poly} to the unique polynomial of length at most \code{n}
+    that interpolates the \code{n} given evaluation points \code{xs} and
+    values \code{ys}. If the interpolating polynomial is shorter than
+    length \code{n}, the leading coefficients are set to zero.
+
+    The values in \code{xs} and \code{ys} should be reduced modulo the
+    modulus, and all \code{ys} must be distinct. Aliasing between
+    \code{poly} and \code{xs} or \code{ys} is not allowed.
+
 void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 
@@ -858,6 +870,41 @@ void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     interpolates the \code{n} given evaluation points \code{xs} and
     values \code{ys}. The values in \code{xs} and \code{ys} should be
     reduced modulo the modulus, and all \code{ys} must be distinct.
+
+void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    The interface specification for this function is identical to
+    that of \code{_nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial in the Newton basis using
+    the method of divided differences and then converts it to
+    monomial form.
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    The interface specification for this function is identical to
+    that of \code{nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial in the Newton basis using
+    the method of divided differences and then converts it to
+    monomial form.
+
+void _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    The interface specification for this function is identical to
+    that of \code{_nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial using the barycentric form
+    of Lagrange interpolation.
+
+void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    The interface specification for this function is identical to
+    that of \code{nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial using the barycentric form
+    of Lagrange interpolation.
+
 
 *******************************************************************************
 

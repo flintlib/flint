@@ -31,17 +31,51 @@
 
 
 void
-_nmod_poly_interpolate_nmod_vec(mp_ptr poly,
+_nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
                             mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
 {
-    if (n < 6)
-        _nmod_poly_interpolate_nmod_vec_newton(poly, xs, ys, n, mod);
-    else
-        _nmod_poly_interpolate_nmod_vec_barycentric(poly, xs, ys, n, mod);
+    mp_ptr P, Q, w;
+    long i, j;
+
+    if (n == 1)
+    {
+        poly[0] = ys[0];
+        return;
+    }
+
+    P = _nmod_vec_init(3*n + 1);
+    Q = _nmod_vec_init(n);
+    w = _nmod_vec_init(n);
+
+    _nmod_poly_product_roots_nmod_vec(P, xs, n, mod);
+
+    for (i = 0; i < n; i++)
+    {
+        w[i] = 1UL;
+        for (j = 0; j < n; j++)
+        {
+            if (i != j)
+                w[i] = nmod_mul(w[i], nmod_sub(xs[i], xs[j], mod), mod);
+        }
+        w[i] = n_invmod(w[i], mod.n);
+    }
+
+    _nmod_vec_zero(poly, n);
+
+    for (i = 0; i < n; i++)
+    {
+        _nmod_poly_div_root(Q, P, n + 1, xs[i], mod);
+        _nmod_vec_scalar_addmul_nmod(poly, Q, n,
+            nmod_mul(w[i], ys[i], mod), mod);
+    }
+
+    _nmod_vec_free(P);
+    _nmod_vec_free(Q);
+    _nmod_vec_free(w);
 }
 
 void
-nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 {
     if (n == 0)
@@ -52,7 +86,7 @@ nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     {
         nmod_poly_fit_length(poly, n);
         poly->length = n;
-        _nmod_poly_interpolate_nmod_vec(poly->coeffs,
+        _nmod_poly_interpolate_nmod_vec_barycentric(poly->coeffs,
             xs, ys, n, poly->mod);
         _nmod_poly_normalise(poly);
     }

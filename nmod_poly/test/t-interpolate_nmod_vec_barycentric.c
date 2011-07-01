@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("interpolate_nmod_vec....");
+    printf("interpolate_nmod_vec_barycentric....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -65,7 +65,7 @@ main(void)
             x[j] = j;
 
         nmod_poly_evaluate_nmod_vec(y, P, x, npoints);
-        nmod_poly_interpolate_nmod_vec(Q, x, y, npoints);
+        nmod_poly_interpolate_nmod_vec_barycentric(Q, x, y, npoints);
 
         result = nmod_poly_equal(P, Q);
 

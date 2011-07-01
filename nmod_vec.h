@@ -46,14 +46,14 @@ typedef struct
    do { \
       mp_limb_t q0, q1, r1; \
       const mp_limb_t u1 = ((a_hi)<<(mod).norm) + r_shift((a_lo), FLINT_BITS - (mod).norm);	\
-	  const mp_limb_t u0 = ((a_lo)<<(mod).norm); \
-	  const mp_limb_t nxx = ((mod).n<<(mod).norm); \
+      const mp_limb_t u0 = ((a_lo)<<(mod).norm); \
+      const mp_limb_t nxx = ((mod).n<<(mod).norm); \
       umul_ppmm(q1, q0, (mod).ninv, u1); \
-	  add_ssaaaa(q1, q0, q1, q0, u1, u0); \
-	  r1 = (u0 - (q1 + 1)*nxx); \
+      add_ssaaaa(q1, q0, q1, q0, u1, u0); \
+      r1 = (u0 - (q1 + 1)*nxx); \
       if (r1 >= q0) r1 += nxx; \
-	  if (r1 < nxx) r = (r1>>(mod).norm); \
-	  else r = ((r1 - nxx)>>(mod).norm); \
+      if (r1 < nxx) r = (r1>>(mod).norm); \
+      else r = ((r1 - nxx)>>(mod).norm); \
    } while (0)
 
 #define NMOD_RED(r, a, mod) \
@@ -62,26 +62,26 @@ typedef struct
    } while (0)
 
 #define NMOD2_RED2(r, a_hi, a_lo, mod) \
-	do { \
-	   mp_limb_t v_hi;	\
-	   NMOD_RED(v_hi, a_hi, mod); \
-	   NMOD_RED2(r, v_hi, a_lo, mod); \
-	} while (0)
+    do { \
+       mp_limb_t v_hi;	\
+       NMOD_RED(v_hi, a_hi, mod); \
+       NMOD_RED2(r, v_hi, a_lo, mod); \
+    } while (0)
 
 #define NMOD_RED3(r, a_hi, a_me, a_lo, mod) \
-	do { \
-	   mp_limb_t v_hi;	\
-	   NMOD_RED2(v_hi, a_hi, a_me, mod); \
-	   NMOD_RED2(r, v_hi, a_lo, mod); \
-	} while (0)
+    do { \
+       mp_limb_t v_hi;	\
+       NMOD_RED2(v_hi, a_hi, a_me, mod); \
+       NMOD_RED2(r, v_hi, a_lo, mod); \
+    } while (0)
 
 #define NMOD_ADDMUL(r, a, b, mod) \
-	do { \
-	   mp_limb_t a_hi, a_lo; \
-	   umul_ppmm(a_hi, a_lo, a, b); \
-	   add_ssaaaa(a_hi, a_lo, a_hi, a_lo, (mp_limb_t) 0, r); \
-	   NMOD_RED2(r, a_hi, a_lo, mod); \
-	} while (0)
+    do { \
+       mp_limb_t a_hi, a_lo; \
+       umul_ppmm(a_hi, a_lo, a, b); \
+       add_ssaaaa(a_hi, a_lo, a_hi, a_lo, (mp_limb_t) 0, r); \
+       NMOD_RED2(r, a_hi, a_lo, mod); \
+    } while (0)
 
 static __inline__
 mp_limb_t _nmod_add(mp_limb_t a, mp_limb_t b, nmod_t mod)
@@ -130,6 +130,13 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 static __inline__
 mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
+    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
+}
+
+static __inline__
+mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
+{
+    b = n_invmod(b, mod.n);
     return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
 }
 
@@ -193,22 +200,22 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 }
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
-					                         long len, nmod_t mod);
+                                        long len, nmod_t mod);
 
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-				           mp_srcptr vec2, long len, nmod_t mod);
+                        mp_srcptr vec2, long len, nmod_t mod);
 
 void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
-				           mp_srcptr vec2, long len, nmod_t mod);
+                        mp_srcptr vec2, long len, nmod_t mod);
 
 void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
-				                             long len, nmod_t mod);
+                                            long len, nmod_t mod);
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				                long len, mp_limb_t c, nmod_t mod);
+                            long len, mp_limb_t c, nmod_t mod);
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				                long len, mp_limb_t c, nmod_t mod);
+                            long len, mp_limb_t c, nmod_t mod);
 
 
 int _nmod_vec_dot_bound_limbs(long len, nmod_t mod);

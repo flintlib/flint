@@ -30,18 +30,70 @@
 #include "nmod_poly.h"
 
 
-void
-_nmod_poly_interpolate_nmod_vec(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+static void
+_interpolate_newton(mp_ptr ys, mp_srcptr xs, long n, nmod_t mod)
 {
-    if (n < 6)
-        _nmod_poly_interpolate_nmod_vec_newton(poly, xs, ys, n, mod);
-    else
-        _nmod_poly_interpolate_nmod_vec_barycentric(poly, xs, ys, n, mod);
+    mp_limb_t p, q, t;
+    long i, j;
+
+    for (i = 1; i < n; i++)
+    {
+        t = ys[i - 1];
+
+        for (j = i; j < n; j++)
+        {
+            p = nmod_sub(ys[j], t, mod);
+            q = nmod_sub(xs[j], xs[j - i], mod);
+            t = ys[j];
+            q = n_invmod(q, mod.n);
+            ys[j] = n_mulmod2_preinv(p, q, mod.n, mod.ninv);
+        }
+    }
+}
+
+static void
+_newton_to_monomial(mp_ptr ys, mp_srcptr xs, long n, nmod_t mod)
+{
+    mp_limb_t t;
+    long i, j;
+
+    for (i = n - 2; i >= 0; i--)
+    {
+        t = ys[i];
+        ys[i] = ys[i + 1];
+
+        for (j = i + 1; j < n - 1; j++)
+        {
+            ys[j] = nmod_sub(ys[j + 1],
+                n_mulmod2_preinv(ys[j], xs[i], mod.n, mod.ninv), mod);
+        }
+
+        ys[n - 1] = nmod_sub(t,
+            n_mulmod2_preinv(ys[n - 1], xs[i], mod.n, mod.ninv), mod);
+    }
+
+    _nmod_poly_reverse(ys, ys, n, n);
 }
 
 void
-nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+_nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
+    mp_srcptr ys, long n, nmod_t mod)
+{
+    if (n == 1)
+    {
+        poly[0] = ys[0];
+    }
+    else
+    {
+        _nmod_vec_set(poly, ys, n);
+        _interpolate_newton(poly, xs, n, mod);
+        while (n > 0 && !poly[n-1]) n--;
+        _newton_to_monomial(poly, xs, n, mod);
+    }
+}
+
+void
+nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 {
     if (n == 0)
@@ -52,7 +104,7 @@ nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     {
         nmod_poly_fit_length(poly, n);
         poly->length = n;
-        _nmod_poly_interpolate_nmod_vec(poly->coeffs,
+        _nmod_poly_interpolate_nmod_vec_newton(poly->coeffs,
             xs, ys, n, poly->mod);
         _nmod_poly_normalise(poly);
     }

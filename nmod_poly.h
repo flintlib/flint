@@ -515,9 +515,23 @@ void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
 
 /* Interpolation  ************************************************************/
 
-void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, long n);
+void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
 
+void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
+
+void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
 
 /* Composition  **************************************************************/
 
