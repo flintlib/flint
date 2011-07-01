@@ -131,6 +131,12 @@ nmod_poly
 
 * Implement fast mulmid and use to improve Newton iteration
 
+* Write a version of nmod_poly_interpolate_nmod_vec using barycentric
+  Lagrange interpolation. This is potentially faster, as it can be
+  done with O(n) rather than O(n^2) scalar divisions
+
+* Write an asymptotically fast nmod_poly_interpolate_nmod_vec
+
 
 fmpz_poly
 ---------
