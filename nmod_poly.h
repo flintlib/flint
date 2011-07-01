@@ -639,4 +639,13 @@ void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, long n);
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
 
+/* Products */
+
+void
+nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n);
+
+void
+_nmod_poly_product_roots_nmod_vec(mp_ptr poly,
+    mp_srcptr xs, long n, nmod_t mod);
+
 #endif
