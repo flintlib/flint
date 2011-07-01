@@ -128,6 +128,12 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
 }
 
 static __inline__
+mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
+{
+    return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
+}
+
+static __inline__
 void nmod_init(nmod_t * mod, mp_limb_t n)
 {
    mod->n = n;

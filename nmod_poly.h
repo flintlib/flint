@@ -483,6 +483,13 @@ void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                                     const nmod_poly_t A, const nmod_poly_t B);
 
+mp_limb_t
+_nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len, mp_limb_t c, nmod_t mod);
+
+mp_limb_t
+nmod_poly_div_root(nmod_poly_t Q, 
+                 const nmod_poly_t A, mp_limb_t c);
+
 /* Derivative  ***************************************************************/
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
