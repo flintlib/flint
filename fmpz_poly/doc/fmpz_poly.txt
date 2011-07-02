@@ -1305,6 +1305,20 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
     the division is exact, this is the same as division over~$\Q$.  An 
     exception is raised if $B$ is zero.
 
+void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
+
+    Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
+    division by $x - c$.
+
+    Supports aliasing of \code{Q} and \code{A}, but the result is
+    undefined in case of partial overlap.
+
+void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
+
+    Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
+    division by $x - c$.
+
+
 *******************************************************************************
 
     Divisibility testing

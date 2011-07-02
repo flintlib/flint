@@ -116,8 +116,8 @@ main(void)
         {
             printf("FAIL (aliasing)!\n");
             printf("P:\n"); nmod_poly_print(P); printf("\n\n");
-            printf("Q1:\n"); nmod_poly_print(P); printf("\n\n");
-            printf("Q2:\n"); nmod_poly_print(P); printf("\n\n");
+            printf("Q1:\n"); nmod_poly_print(Q1); printf("\n\n");
+            printf("Q2:\n"); nmod_poly_print(Q2); printf("\n\n");
             abort();
         }
 
