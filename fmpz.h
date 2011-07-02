@@ -329,6 +329,10 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h);
 
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
+int fmpz_divisible(const fmpz_t f, const fmpz_t g);
+
+int fmpz_divisible_si(const fmpz_t f, long g);
+
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h);

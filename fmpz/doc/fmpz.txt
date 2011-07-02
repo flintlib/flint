@@ -450,6 +450,14 @@ void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
     the division is exact, i.e.\ $g$ is a multiple of $h$.
     If $x$ or $y$ is $0$ an exception is raised.
 
+int fmpz_divisible(const fmpz_t f, const fmpz_t g)
+
+    Returns whether $f$ is divisible by $g > 0$.
+
+int fmpz_divisible_si(const fmpz_t f, long g)
+
+    Returns whether $f$ is divisible by $g > 0$.
+
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the remainder of $g$ divided by $h$.  The remainder
