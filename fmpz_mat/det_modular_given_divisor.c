@@ -40,9 +40,7 @@ next_good_prime(const fmpz_t d, mp_limb_t p)
 {
     mp_limb_t r = 0;
 
-    /*  p == 2 would not always let us distinguish signs with the CRT
-        bound used below */
-    while (r == 0 || p == 2)
+    while (r == 0)
     {
         p = n_nextprime(p, 0);
         r = fmpz_fdiv_ui(d, p);
@@ -95,7 +93,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 #endif
 
     /* Compute x = det(A) / d */
-    while (fmpz_cmp(prod, bound) < 0)
+    while (fmpz_cmp(prod, bound) <= 0)
     {
         p = next_good_prime(d, p);
         _nmod_mat_set_mod(Amod, p);
