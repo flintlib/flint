@@ -43,7 +43,7 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
         return;
     }
 
-    P = _nmod_vec_init(3*n + 1);
+    P = _nmod_vec_init(n + 1);
     Q = _nmod_vec_init(n);
     w = _nmod_vec_init(n);
 
