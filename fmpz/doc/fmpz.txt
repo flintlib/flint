@@ -562,7 +562,7 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Assumes that $x$ is non-zero, that $f > 1$ and that \code{finv} 
     is the precomputed \code{double} inverse of $f$ whenever $f$ is 
-    a small integer.
+    a small integer and $0$ otherwise.
 
     Does not support aliasing.
 
@@ -573,7 +573,7 @@ long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     integer.
 
     If \code{op} is zero, sets \code{rop} to \code{op} and 
-    return $0$.
+    returns $0$.
 
     Returns an \code{abort} signal if any of the assumptions 
     are violated.
