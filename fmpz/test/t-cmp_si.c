@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -36,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("cmp_ui....");
+    printf("cmp_si....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -45,7 +46,7 @@ main(void)
     for (i = 0; i < 100000; i++)
     {
         fmpz_t a, b;
-        ulong n;
+        long n;
         int lhs, rhs;
 
         fmpz_init(a);
@@ -53,11 +54,11 @@ main(void)
 
         fmpz_randtest(a, state, 200);
 
-        n = n_randtest(state);
-        fmpz_set_ui(b, n);
+        n = z_randtest(state);
+        fmpz_set_si(b, n);
 
         lhs = fmpz_cmp(a, b);
-        rhs = fmpz_cmp_ui(a, n);
+        rhs = fmpz_cmp_si(a, n);
 
         result = (lhs < 0) ? (rhs < 0) : ((lhs > 0) ? (rhs > 0) : (rhs == 0));
         if (result == 0)
@@ -65,9 +66,9 @@ main(void)
             printf("FAIL:\n");
             printf("a = "), fmpz_print(a), printf("\n");
             printf("b = "), fmpz_print(b), printf("\n");
-            printf("n = %lu\n", n);
+            printf("n = %ld\n", n);
             printf("cmp(a, b) = %d\n", fmpz_cmp(a, b));
-            printf("cmp_ui(a, n) = %d\n", fmpz_cmp_ui(a, n));
+            printf("cmp_si(a, n) = %d\n", fmpz_cmp_si(a, n));
             abort();
         }
 
