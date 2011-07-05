@@ -50,6 +50,8 @@ typedef fmpz_mat_struct fmpz_mat_t[1];
 /* Memory management  ********************************************************/
 
 #define fmpz_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+#define fmpz_mat_nrows(mat) ((mat)->r)
+#define fmpz_mat_ncols(mat) ((mat)->c)
 
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);

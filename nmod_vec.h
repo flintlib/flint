@@ -199,6 +199,17 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
    return 1;
 }
 
+static __inline__
+int _nmod_vec_is_zero(mp_srcptr vec, long len)
+{
+   long i;
+
+   for (i = 0; i < len; i++)
+      if (vec[i] != 0) return 0;
+
+   return 1;
+}
+
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
                                         long len, nmod_t mod);
 

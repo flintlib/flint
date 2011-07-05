@@ -52,6 +52,8 @@ nmod_mat_struct;
 typedef nmod_mat_struct nmod_mat_t[1];
 
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
+#define nmod_mat_nrows(mat) ((mat)->r)
+#define nmod_mat_ncols(mat) ((mat)->c)
 
 static __inline__
 void
@@ -86,6 +88,21 @@ void nmod_mat_print_pretty(const nmod_mat_t mat);
 int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 
 void nmod_mat_zero(nmod_mat_t mat);
+
+int nmod_mat_is_zero(const nmod_mat_t mat);
+
+static __inline__ int
+nmod_mat_is_empty(const nmod_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+
+static __inline__ int
+nmod_mat_is_square(const nmod_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
+
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
