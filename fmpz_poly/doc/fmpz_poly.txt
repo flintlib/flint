@@ -1728,6 +1728,86 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
+void
+_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses the Horner scheme.
+
+void
+fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses the Horner scheme.
+
+void
+_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses Brent-Kung algorithm 2.1.
+
+void
+fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses Brent-Kung algorithm 2.1.
+
+void
+_fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+void
+fmpz_poly_compose_series(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+
+
+
 *******************************************************************************
 
     Signature

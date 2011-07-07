@@ -692,6 +692,31 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+void
+_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+
 /*  Signature  ***************************************************************/
 
 void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len);
