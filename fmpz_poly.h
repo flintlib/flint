@@ -692,6 +692,8 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Power series composition and compositional inverse  **********************/
+
 void
 _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2, long n);
@@ -715,6 +717,24 @@ _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1,
 void
 fmpz_poly_compose_series(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_compinv_series_newton(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 
 
 /*  Signature  ***************************************************************/

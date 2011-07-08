@@ -1728,9 +1728,14 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
-void
-_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, long len1, 
-                                      const fmpz * poly2, long len2, long n)
+*******************************************************************************
+
+    Power series composition
+
+*******************************************************************************
+
+void _fmpz_poly_compose_series_horner(fmpz * res,
+        const fmpz * poly1, long len1, const fmpz * poly2, long len2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
     modulo $x^n$, where the constant term of \code{poly2} is required
@@ -1743,8 +1748,7 @@ _fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, long len1,
 
     This implementation uses the Horner scheme.
 
-void
-fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+void fmpz_poly_compose_series_horner(fmpz_poly_t res, 
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
@@ -1753,9 +1757,8 @@ fmpz_poly_compose_series_horner(fmpz_poly_t res,
 
     This implementation uses the Horner scheme.
 
-void
-_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
-                                      const fmpz * poly2, long len2, long n)
+void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1,
+        long len1, const fmpz * poly2, long len2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
     modulo $x^n$, where the constant term of \code{poly2} is required
@@ -1768,9 +1771,8 @@ _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1,
 
     This implementation uses Brent-Kung algorithm 2.1.
 
-void
-fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+                const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
     modulo $x^n$, where the constant term of \code{poly2} is required
@@ -1778,8 +1780,7 @@ fmpz_poly_compose_series_brent_kung(fmpz_poly_t res,
 
     This implementation uses Brent-Kung algorithm 2.1.
 
-void
-_fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
+void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
@@ -1794,9 +1795,8 @@ _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1,
     This implementation automatically switches between the Horner scheme
     and Brent-Kung algorithm 2.1 depending on the size of the inputs.
 
-void
-fmpz_poly_compose_series(fmpz_poly_t res, 
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+void fmpz_poly_compose_series(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
     Sets \code{res} to the composition of \code{poly1} and \code{poly2}
     modulo $x^n$, where the constant term of \code{poly2} is required
@@ -1805,7 +1805,56 @@ fmpz_poly_compose_series(fmpz_poly_t res,
     This implementation automatically switches between the Horner scheme
     and Brent-Kung algorithm 2.1 depending on the size of the inputs.
 
+void _fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    The inputs must both have length \code{n} and may not be aliased.
+
+    This implementation uses the Lagrange inversion formula.
+
+void fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv,
+            const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+
+    This implementation uses the Lagrange inversion formula.
+
+void _fmpz_poly_compinv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    The inputs must both have length \code{n} and may not be aliased.
+
+    This implementation uses Newton iteration.
+
+void fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv,
+        const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+
+    This implementation uses Newton iteration.
+
+void _fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    The inputs must both have length \code{n} and may not be aliased.
+
+    This implementation automatically chooses between the Lagrange
+    inversion formula and Newton iteration based on the size of the
+    input.
+
+void fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
+    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+
+    This implementation automatically chooses between the Lagrange
+    inversion formula and Newton iteration based on the size of the
+    input.
 
 
 *******************************************************************************
