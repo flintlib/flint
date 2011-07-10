@@ -552,6 +552,29 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+/* Power series composition **************************************************/
+
+void
+_nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series_horner(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series_brent_kung(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
 /* GCD  **********************************************************************/
 
 long _nmod_poly_gcd_euclidean(mp_ptr G, 
