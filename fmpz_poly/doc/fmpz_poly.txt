@@ -1805,43 +1805,59 @@ void fmpz_poly_compose_series(fmpz_poly_t res,
     This implementation automatically switches between the Horner scheme
     and Brent-Kung algorithm 2.1 depending on the size of the inputs.
 
+*******************************************************************************
+
+    Power series reversion
+
+*******************************************************************************
+
 void _fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
-    The inputs must both have length \code{n} and may not be aliased.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses the Lagrange inversion formula.
 
 void fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv,
             const fmpz_poly_t Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses the Lagrange inversion formula.
 
 void _fmpz_poly_compinv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
-    The inputs must both have length \code{n} and may not be aliased.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
 void fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv,
         const fmpz_poly_t Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
 void _fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
-    The inputs must both have length \code{n} and may not be aliased.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation automatically chooses between the Lagrange
     inversion formula and Newton iteration based on the size of the
@@ -1849,8 +1865,10 @@ void _fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n)
 
 void fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 
-    Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
-    series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
 
     This implementation automatically chooses between the Lagrange
     inversion formula and Newton iteration based on the size of the

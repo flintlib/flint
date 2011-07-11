@@ -552,7 +552,7 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
-/* Power series composition **************************************************/
+/* Power series composition and reversion ************************************/
 
 void
 _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1, 
@@ -572,8 +572,29 @@ void
 _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1, 
                             mp_srcptr poly2, long len2, long n, nmod_t mod);
 void
-nmod_poly_compose_series(nmod_poly_t res, 
+nmod_poly_compose_series(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_compinv_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_compinv_series_lagrange(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
+_nmod_poly_compinv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_compinv_series_newton(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
+_nmod_poly_compinv_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_compinv_series(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
 
 /* GCD  **********************************************************************/
 

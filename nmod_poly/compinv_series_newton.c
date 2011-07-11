@@ -1,0 +1,134 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+   Copyright (C) 2010 Sebastian Pancratz
+   Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+#include <mpir.h>
+#include "flint.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
+#include "ulong_extras.h"
+
+
+#define FLINT_COMPINV_NEWTON_CUTOFF 15
+
+void
+_nmod_poly_compinv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+{
+    long *a, i, k;
+    mp_ptr Qprime, T, U, V;
+
+    if (n >= 1) Qinv[0] = 0UL;
+    if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
+    if (n <= 2)
+        return;
+
+    Qprime = _nmod_vec_init(n);
+    T = _nmod_vec_init(n);
+    U = _nmod_vec_init(n);
+    V = _nmod_vec_init(n);
+
+    _nmod_poly_derivative(T, Q, n, mod);
+    _nmod_poly_inv_series(Qprime, T, n - 1, mod);
+    Qprime[n - 1] = 0UL;
+
+    k = n;
+    for (i = 1; (1L << i) < k; i++);
+    a = (long *) malloc(i * sizeof(long));
+    a[i = 0] = k;
+    while (k >= FLINT_COMPINV_NEWTON_CUTOFF)
+        a[++i] = (k = (k + 1) / 2);
+
+    _nmod_poly_compinv_series_lagrange(Qinv, Q, k, mod);
+    _nmod_vec_zero(Qinv + k, n - k);
+
+    for (i--; i >= 0; i--)
+    {
+        k = a[i];
+        _nmod_poly_compose_series(T, Q, k, Qinv, k, k, mod);
+        _nmod_poly_compose_series(U, Qprime, k, Qinv, k, k, mod);
+        T[1] = 0UL;
+        _nmod_poly_mullow(V, T, k, U, k, k, mod);
+        _nmod_vec_sub(Qinv, Qinv, V, k, mod);
+    }
+
+    free(a);
+    _nmod_vec_free(Qprime);
+    _nmod_vec_free(T);
+    _nmod_vec_free(U);
+    _nmod_vec_free(V);
+}
+
+void
+nmod_poly_compinv_series_newton(nmod_poly_t Qinv, 
+                                 const nmod_poly_t Q, long n)
+{
+    mp_ptr Qinv_coeffs, Q_coeffs;
+    nmod_poly_t t1;
+    long Qlen;
+    
+    Qlen = Q->length;
+
+    if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
+    {
+        printf("exception: nmod_poly_compinv_series_newton: input must have "
+            "zero constant and an invertible coefficient of x^1");
+        abort();
+    }
+
+    if (Qlen < n)
+    {
+        Q_coeffs = _nmod_vec_init(n);
+        mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
+        mpn_zero(Q_coeffs + Qlen, n - Qlen);
+    }
+    else
+        Q_coeffs = Q->coeffs;
+
+    if (Q == Qinv && Qlen >= n)
+    {
+        nmod_poly_init2(t1, Q->mod.n, n);
+        Qinv_coeffs = t1->coeffs;
+    }
+    else
+    {
+        nmod_poly_fit_length(Qinv, n);
+        Qinv_coeffs = Qinv->coeffs;
+    }
+
+    _nmod_poly_compinv_series_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
+
+    if (Q == Qinv && Qlen >= n)
+    {
+        nmod_poly_swap(Qinv, t1);
+        nmod_poly_clear(t1);
+    }
+    
+    Qinv->length = n;
+
+    if (Qlen < n)
+        _nmod_vec_free(Q_coeffs);
+
+    _nmod_poly_normalise(Qinv);
+}
