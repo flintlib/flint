@@ -105,13 +105,7 @@ fmpz_poly_compose_series_brent_kung(fmpz_poly_t res,
         return;
     }
 
-    if (len2 == 0)
-    {
-        fmpz_poly_set_fmpz(res, poly1->coeffs);
-        return;
-    }
-
-    if (len1 == 1)
+    if (len2 == 0 || len1 == 1)
     {
         fmpz_poly_set_fmpz(res, poly1->coeffs);
         return;
