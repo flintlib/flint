@@ -1769,7 +1769,7 @@ void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1,
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
-    This implementation uses Brent-Kung algorithm 2.1.
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
 
 void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
                 const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
@@ -1778,7 +1778,7 @@ void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res,
     modulo $x^n$, where the constant term of \code{poly2} is required
     to be zero.
 
-    This implementation uses Brent-Kung algorithm 2.1.
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
 
 void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2, long n)
@@ -1827,7 +1827,7 @@ void _fmpz_poly_compinv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
     series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
     The inputs must both have length \code{n} and may not be aliased.
 
-    This implementation uses Newton iteration.
+    This implementation uses Newton iteration \cite{BrentKung1978}.
 
 void fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv,
         const fmpz_poly_t Q, long n)
@@ -1835,7 +1835,7 @@ void fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv,
     Sets \code{Qinv} to the compositional inverse of \code{Q} as a power
     series, i.e. such that $f(f^{-1}(x)) = f^{-1}(f(x)) = x \bmod x^n$.
 
-    This implementation uses Newton iteration.
+    This implementation uses Newton iteration \cite{BrentKung1978}.
 
 void _fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n)
 
