@@ -266,7 +266,7 @@ static __inline__ int padic_is_zero(const padic_t op, const padic_ctx_t ctx)
 
 static __inline__ int _padic_is_one(const padic_t op)
 {
-    return fmpz_is_one(padic_unit(op)) || (padic_val(op) == 0);
+    return fmpz_is_one(padic_unit(op)) && (padic_val(op) == 0);
 }
 
 static __inline__ int padic_is_one(const padic_t op, const padic_ctx_t ctx)
