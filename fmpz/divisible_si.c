@@ -28,11 +28,6 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-/*
-    Returns whether the integer $x$ is divisible 
-    by the unsigned integer $p > 0$.
- */
-
 int fmpz_divisible_si(const fmpz_t x, long p)
 {
     fmpz y = *x;

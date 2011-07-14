@@ -28,11 +28,6 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-/*
-    Returns whether the integer $x$ is divisible 
-    by the integer $p > 0$.
- */
-
 int fmpz_divisible(const fmpz_t x, const fmpz_t p)
 {
     fmpz y = *x;
