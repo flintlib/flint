@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -33,10 +34,12 @@
 
 static void check(fmpz_t x, int expected)
 {
-    if (fmpz_abs_fits_ui(x) != expected)
+    if (fmpz_fits_si(x) != expected)
     {
         printf("FAIL:\n\n");
         printf("x = "), fmpz_print(x), printf("\n");
+        printf("fmpz_fits_si(x) = %d\n", fmpz_fits_si(x));
+        printf("LONG_MIN = %ld\n", LONG_MIN);
         abort();
     }
 }
@@ -47,7 +50,7 @@ main(void)
     long i;
     fmpz_t x;
 
-    printf("abs_fits_ui....");
+    printf("fits_si....");
     fflush(stdout);
 
     fmpz_init(x);
@@ -58,32 +61,39 @@ main(void)
     fmpz_set_si(x, COEFF_MAX);
     check(x, 1);
 
-    fmpz_set_ui(x, ULONG_MAX);
+    fmpz_set_si(x, LONG_MAX);
+    check(x, 1);
+
+    fmpz_set_si(x, LONG_MIN);
     check(x, 1);
 
     fmpz_set_ui(x, ULONG_MAX);
-    fmpz_neg(x, x);
-    check(x, 1);
-
-    fmpz_set_ui(x, ULONG_MAX);
-    fmpz_add_ui(x, x, 1UL);
     check(x, 0);
 
+    fmpz_set_ui(x, ULONG_MAX);
     fmpz_neg(x, x);
+    check(x, 0);
+
+    fmpz_set_si(x, LONG_MAX);
+    fmpz_add_ui(x, x, 1);
+    check(x, 0);
+
+    fmpz_set_si(x, LONG_MIN);
+    fmpz_sub_ui(x, x, 1);
     check(x, 0);
 
     for (i = 0; i < 1000; i++)
     {
-        fmpz_set_ui(x, 1UL);
+        fmpz_set_ui(x, 1);
         fmpz_mul_2exp(x, x, i);
-        check(x, i < FLINT_BITS);
+        check(x, i < FLINT_BITS - 1);
         fmpz_neg(x, x);
-        check(x, i < FLINT_BITS);
+        check(x, i < FLINT_BITS);  /* LONG_MIN fits */
     }
 
     fmpz_clear(x);
 
     _fmpz_cleanup();
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }

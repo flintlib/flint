@@ -162,6 +162,8 @@ int fmpz_set_str(fmpz_t f, char * str, int b);
 
 int fmpz_abs_fits_ui(const fmpz_t f);
 
+int fmpz_fits_si(const fmpz_t f);
+
 static __inline__
 void fmpz_zero(fmpz_t f)
 {

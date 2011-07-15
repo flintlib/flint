@@ -258,6 +258,15 @@ void fmpz_zero(fmpz_t f)
 
     Sets $f$ to zero.
 
+int fmpz_abs_fits_ui(const fmpz_t f)
+
+    Returns whether the absolute value of $f$ 
+    fits into an \code{unsigned long}.
+
+int fmpz_fits_si(const fmpz_t f)
+
+    Returns whether the value of $f$ fits into a \code{long}.
+
 *******************************************************************************
 
     Comparison
