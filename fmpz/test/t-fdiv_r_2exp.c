@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -36,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("fdiv_q_2exp....");
+    printf("fdiv_r_2exp....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -59,8 +60,8 @@ main(void)
         fmpz_get_mpz(d, a);
         x = n_randint(state, 200);
 
-        fmpz_fdiv_q_2exp(b, a, x);
-        mpz_fdiv_q_2exp(e, d, x);
+        fmpz_fdiv_r_2exp(b, a, x);
+        mpz_fdiv_r_2exp(e, d, x);
 
         fmpz_get_mpz(f, b);
 
@@ -98,8 +99,8 @@ main(void)
         fmpz_get_mpz(d, a);
         x = n_randint(state, 200);
 
-        fmpz_fdiv_q_2exp(a, a, x);
-        mpz_fdiv_q_2exp(e, d, x);
+        fmpz_fdiv_r_2exp(a, a, x);
+        mpz_fdiv_r_2exp(e, d, x);
 
         fmpz_get_mpz(f, a);
 
@@ -121,5 +122,6 @@ main(void)
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
-    return 0;
+    return EXIT_SUCCESS;
 }
+

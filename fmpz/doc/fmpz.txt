@@ -420,6 +420,11 @@ void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to $g$ divided by \code{2^exp}, but rounded down.
 
+void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+
+    Sets $f$ to the remainder of $g$ upon division by \code{2^exp}, 
+    where the remainder is non-negative.
+
 void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
