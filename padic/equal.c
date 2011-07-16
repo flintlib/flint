@@ -47,30 +47,15 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
     if (padic_val(op1) == padic_val(op2))
     {
-        fmpz_t pow;
+        fmpz_t d, pow;
         int alloc, ans;
 
         _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op1), ctx);
 
-        if (   (fmpz_sgn(padic_unit(op1)) > 0)
-            && (fmpz_cmp(padic_unit(op1), pow) < 0)
-            && (fmpz_sgn(padic_unit(op2)) > 0)
-            && (fmpz_cmp(padic_unit(op1), pow) < 0))
-        {
-            ans = fmpz_equal(padic_unit(op1), padic_unit(op2));
-        }
-        else
-        {
-            fmpz_t u1, u2;
-
-            fmpz_init(u1);
-            fmpz_init(u2);
-            fmpz_mod(u1, padic_unit(op1), pow);
-            fmpz_mod(u2, padic_unit(op2), pow);
-            ans = fmpz_equal(u1, u2);
-            fmpz_clear(u1);
-            fmpz_clear(u2);
-        }
+        fmpz_init(d);
+        fmpz_sub(d, padic_unit(op1), padic_unit(op2));
+        ans = fmpz_divisible(d, pow);
+        fmpz_clear(d);
 
         if (alloc)
             fmpz_clear(pow);

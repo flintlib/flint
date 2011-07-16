@@ -287,6 +287,10 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+ulong padic_val_fac_ui2(ulong N);
+
+ulong padic_val_fac_ui(ulong N, const fmpz_t p);
+
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/

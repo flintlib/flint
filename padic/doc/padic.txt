@@ -468,9 +468,13 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     elements $x \in \mathbf{Q}_p$, this means that $\ord_p(x) \geq 1$ 
     when $p \geq 3$ and $\ord_2(x) \geq 2$ when $p = 2$.
 
-void padic_val_fac(fmpz_t rop, const fmpz_t n, const fmpz_t p)
+ulong padic_val_fac_ui2(ulong N)
 
-    Computes the $p$-adic valuation of $n!$, assuming that $n > 0$.
+    Computes the $2$-adic valuation of $n!$.
+
+ulong padic_val_fac_ui(ulong N, const fmpz_t p)
+
+    Computes the $p$-adic valuation of $n!$.
 
 *******************************************************************************
 

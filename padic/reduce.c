@@ -29,12 +29,7 @@ void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(padic_unit(rop)))
     {
-        if (padic_val(rop) >= ctx->N)
-        {
-            fmpz_zero(padic_unit(rop));
-            padic_val(rop) = 0;
-        }
-        else
+        if (padic_val(rop) < ctx->N)
         {
             int alloc;
             fmpz_t pow;
@@ -43,6 +38,11 @@ void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
             fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
             if (alloc)
                 fmpz_clear(pow);
+        }
+        else
+        {
+            fmpz_zero(padic_unit(rop));
+            padic_val(rop) = 0;
         }
     }
 }

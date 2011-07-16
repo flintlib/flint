@@ -25,7 +25,6 @@
 
 #include "padic.h"
 
-
 void _padic_init(padic_t rop)
 {
     fmpz_init(padic_unit(rop));

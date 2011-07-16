@@ -354,18 +354,10 @@ padic
 
 * Improve the implementation of "padic_teichmuller"
 
-* Add test code for "pow_si"
-
 * Implement "padic_get_str"
-
-* Implement "padic_exp" for the case p = 2
-
-* Improve "padic_set_si" along the lines of "padic_set_ui"
-
-* Improve "_padic_set_si" and "_padic_set_ui"
-
-* Add test code with negative precisions
 
 * Add test code for the various output formats; 
   perhaps in the form of examples?
+
+* Implement padic_val_fac for generic inputs
 

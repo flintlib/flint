@@ -69,7 +69,7 @@ main(void)
         result = (padic_equal(a, d, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (alias a = a - b):\n\n");
             printf("a = "), _padic_print(a, ctx), printf("\n");
             printf("b = "), _padic_print(b, ctx), printf("\n");
             printf("d = "), _padic_print(d, ctx), printf("\n");
@@ -111,7 +111,7 @@ main(void)
         result = (padic_equal(b, d, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (alias b = a - b):\n\n");
             printf("a = "), _padic_print(a, ctx), printf("\n");
             printf("b = "), _padic_print(b, ctx), printf("\n");
             printf("d = "), _padic_print(d, ctx), printf("\n");
