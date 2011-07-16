@@ -26,52 +26,51 @@
 
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
-void
-fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
+void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
     {
         printf("Exception (fmpz_powm).  Modulus is less than 1.\n");
         abort();
     }
-
-    if (!COEFF_IS_MPZ(*e))
+    else if (!COEFF_IS_MPZ(*e))  /* e is small */
     {
         fmpz_powm_ui(f, g, *e, m);
-        return;
     }
-
-    if (fmpz_is_one(m))
+    else  /* e is large */
     {
-        fmpz_zero(f);
-        return;
-    }
+        if (!COEFF_IS_MPZ(*m))  /* m is small */
+        {
+            ulong g2 = fmpz_fdiv_ui(g, *m);
+            ulong e2 = fmpz_fdiv_ui(e, n_euler_phi(*m));
 
-    /* TODO:  Implement this properly! */
-    {
-        mpz_t f2, g2, e2, m2;
+            fmpz_set_ui(f, n_powmod(g2, e2, *m));
+        }
+        else  /* m is large */
+        {
+            if (!COEFF_IS_MPZ(*g))  /* g is small */
+            {
+                __mpz_struct * mpz_ptr;
+                mpz_t g2;
 
-        mpz_init(f2);
-        mpz_init(g2);
-        mpz_init(e2);
-        mpz_init(m2);
+                mpz_init_set_si(g2, *g);
+                mpz_ptr = _fmpz_promote(f);
+                mpz_powm(mpz_ptr, g2, COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
+                mpz_clear(g2);
+                _fmpz_demote_val(f);
+            }
+            else  /* g is large */
+            {
+                __mpz_struct * mpz_ptr = _fmpz_promote(f);
 
-        fmpz_get_mpz(f2, f);
-        fmpz_get_mpz(g2, g);
-        fmpz_get_mpz(e2, e);
-        fmpz_get_mpz(m2, m);
-
-        mpz_powm(f2, g2, e2, m2);
-
-        fmpz_set_mpz(f, f2);
-
-        mpz_clear(f2);
-        mpz_clear(g2);
-        mpz_clear(e2);
-        mpz_clear(m2);
+                mpz_powm(mpz_ptr, 
+                    COEFF_TO_PTR(*g), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
+                _fmpz_demote_val(f);
+            }
+        }
     }
 }
 

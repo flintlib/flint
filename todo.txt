@@ -46,9 +46,6 @@ fmpz
 
 * Consider using mpz's instead of fmpz's in the multi CRT code
 
-* fmpz_powm_ui and fmpz_powm are currently very naive wrappers of 
-  the MPIR functionality;  they need to be re-written.
-
 
 ulong_extras
 ------------
