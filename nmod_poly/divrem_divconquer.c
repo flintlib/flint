@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009, 2011 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -29,9 +30,10 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
-_nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
-                             mp_srcptr B, long lenB, nmod_t mod)
+static 
+void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
+                                   mp_srcptr A, long lenA, 
+                                   mp_srcptr B, long lenB, nmod_t mod)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -77,19 +79,22 @@ _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
     else if (lenA > 2 * lenB - 1)
     {
         /*
+           XXX:  In this case, we expect R to be of length 
+           2 * (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod))
+           and A to be modifiable.
+         */
+
+        /*
            We shift A right until it is of length 2 lenB - 1, call this p1
          */
 
         const long shift = lenA - 2 * lenB + 1;
         mp_srcptr p1 = A + shift;
 
-        mp_ptr V = _nmod_vec_init(lenA + (2 * lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod));
-        mp_ptr W = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
-
         mp_ptr q1   = Q + shift;
         mp_ptr q2   = Q;
-        mp_ptr dq1  = W;
-        mp_ptr d1q1 = dq1 + shift;
+        mp_ptr d1q1 = R +     (lenB - 1);
+        mp_ptr V    = R + 2 * (lenB - 1);
 
         /* 
            Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
@@ -106,15 +111,14 @@ _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
            terms which we use in the division
          */
 
-        mpn_copyi(dq1, A, shift);
-        _nmod_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1, mod);
-        
+        _nmod_vec_sub((mp_ptr) A + shift, A + shift, d1q1, lenB - 1, mod);
+
         /*
            Compute q2 = trunc(R) div B; it is a smaller division than the 
            original since len(trunc(R)) = lenA - lenB
          */
 
-        _nmod_poly_divrem_divconquer(q2, R, dq1, lenA - lenB, B, lenB, mod);
+        __nmod_poly_divrem_divconquer(q2, R, A, lenA - lenB, B, lenB, mod);
 
         /*
            We have Q = q1 * x^shift + q2; Q has length lenB + shift; 
@@ -123,8 +127,6 @@ _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
 
            We've also written the remainder in place
          */
-
-        _nmod_vec_free(V);
     }
     else  /* lenA = 2 * lenB - 1 */
     {
@@ -138,25 +140,47 @@ _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
     }
 }
 
-void
-nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
-                            const nmod_poly_t A, const nmod_poly_t B)
+void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
+                                  mp_srcptr A, long lenA, 
+                                  mp_srcptr B, long lenB, nmod_t mod)
+{
+    if (lenA <= 2 * lenB - 1)
+    {
+        __nmod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, mod);
+    }
+    else  /* lenA > 2 * lenB - 1 */
+    {
+        mp_ptr S, T;
+
+        S = malloc((lenA + 2 * (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod)) 
+            * sizeof(mp_limb_t));
+        T = S + lenA;
+        mpn_copyi(S, A, lenA);
+
+        __nmod_poly_divrem_divconquer(Q, T, S, lenA, B, lenB, mod);
+
+        mpn_copyi(R, T, lenB - 1);
+        free(S);
+    }
+}
+
+void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
+                                 const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    long Alen, Blen;
+    long lenA, lenB;
 
-    Blen = B->length;
+    lenA = A->length;
+    lenB = B->length;
 
-    if (Blen == 0)
+    if (lenB == 0)
     {
         printf("Exception: division by zero in nmod_poly_divrem_divconquer\n");
         abort();
     }
 
-    Alen = A->length;
-
-    if (Alen < Blen)
+    if (lenA < lenB)
     {
         nmod_poly_zero(Q);
         nmod_poly_set(R, A);
@@ -165,44 +189,42 @@ nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 
     if (Q == A || Q == B)
     {
-        nmod_poly_init2(tQ, A->mod.n, Alen - Blen + 1);
+        nmod_poly_init2(tQ, A->mod.n, lenA - lenB + 1);
         q = tQ->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(Q, Alen - Blen + 1);
+        nmod_poly_fit_length(Q, lenA - lenB + 1);
         q = Q->coeffs;
     }
 
     if (R == A || R == B)
     {
-        nmod_poly_init2(tR, A->mod.n, Blen - 1);
+        nmod_poly_init2(tR, A->mod.n, lenB - 1);
         r = tR->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(R, Blen - 1);
+        nmod_poly_fit_length(R, lenB - 1);
         r = R->coeffs;
     }
 
-    _nmod_poly_divrem_divconquer(q, r, A->coeffs, Alen,
-                                       B->coeffs, Blen, A->mod);
+    _nmod_poly_divrem_divconquer(q, r, A->coeffs, lenA,
+                                       B->coeffs, lenB, A->mod);
 
     if (Q == A || Q == B)
     {
         nmod_poly_swap(tQ, Q);
         nmod_poly_clear(tQ);
     }
-    
-    Q->length = Alen - Blen + 1;
-
     if (R == A || R == B)
     {
         nmod_poly_swap(tR, R);
         nmod_poly_clear(tR);
     }
     
-    R->length = Blen - 1;
+    Q->length = lenA - lenB + 1;
+    R->length = lenB - 1;
 
     _nmod_poly_normalise(R);
 }
