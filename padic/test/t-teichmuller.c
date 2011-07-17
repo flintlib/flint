@@ -84,7 +84,7 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Check correctness */
+    /* Check correctness:  for word-sized p */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -107,7 +107,7 @@ main(void)
 
         padic_teichmuller(b, a, ctx);
 
-        padic_pow_si(c, b, *p, ctx);  /* XXX.  Assumes p is small */
+        padic_pow_si(c, b, fmpz_get_si(p), ctx);
         padic_sub(c, c, b, ctx);
 
         result = (padic_is_zero(c, ctx));
