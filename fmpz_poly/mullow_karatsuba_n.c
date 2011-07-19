@@ -113,9 +113,9 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
 {
     const long len1 = FLINT_MIN(poly1->length, n);
     const long len2 = FLINT_MIN(poly2->length, n);
-    long lenr;
+    long i, lenr;
 
-    int clear = 0, i;
+    int clear = 0;
     fmpz *copy1, *copy2;
 
     if (len1 == 0 || len2 == 0)
