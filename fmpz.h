@@ -303,6 +303,11 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
 
+long fmpz_flog(const fmpz_t x, const fmpz_t b);
+long fmpz_flog_ui(const fmpz_t x, ulong b);
+long fmpz_clog(const fmpz_t x, const fmpz_t b);
+long fmpz_clog_ui(const fmpz_t x, ulong b);
+
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
