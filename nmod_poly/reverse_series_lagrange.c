@@ -30,15 +30,38 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-
 void
-_nmod_poly_compinv_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
-    _nmod_poly_compinv_series_lagrange_2(Qinv, Q, n, mod);
+    long i;
+    mp_ptr R, S, T, tmp;
+
+    if (n >= 1) Qinv[0] = 0UL;
+    if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
+    if (n <= 2)
+        return;
+
+    R = _nmod_vec_init(n - 1);
+    S = _nmod_vec_init(n - 1);
+    T = _nmod_vec_init(n - 1);
+
+    _nmod_poly_inv_series(R, Q + 1, n - 1, mod);
+    _nmod_vec_set(S, R, n - 1);
+
+    for (i = 2; i < n; i++)
+    {
+        _nmod_poly_mullow(T, S, n - 1, R, n - 1, n - 1, mod);
+        Qinv[i] = nmod_div(T[i - 1], i, mod);
+        tmp = S; S = T; T = tmp;
+    }
+
+    _nmod_vec_free(R);
+    _nmod_vec_free(S);
+    _nmod_vec_free(T);
 }
 
 void
-nmod_poly_compinv_series(nmod_poly_t Qinv, 
+nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -49,7 +72,7 @@ nmod_poly_compinv_series(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_compinv_series: input must have "
+        printf("exception: nmod_poly_reverse_series_lagrange: input must have "
             "zero constant and an invertible coefficient of x^1");
         abort();
     }
@@ -74,7 +97,7 @@ nmod_poly_compinv_series(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_compinv_series(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_reverse_series_lagrange(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

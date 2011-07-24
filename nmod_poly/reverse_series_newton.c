@@ -30,38 +30,53 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
+#define FLINT_reverse_NEWTON_CUTOFF 15
+
 void
-_nmod_poly_compinv_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
-    long i;
-    mp_ptr R, S, T, tmp;
+    long *a, i, k;
+    mp_ptr T, U, V;
 
     if (n >= 1) Qinv[0] = 0UL;
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
     if (n <= 2)
         return;
 
-    R = _nmod_vec_init(n - 1);
-    S = _nmod_vec_init(n - 1);
-    T = _nmod_vec_init(n - 1);
+    T = _nmod_vec_init(n);
+    U = _nmod_vec_init(n);
+    V = _nmod_vec_init(n);
 
-    _nmod_poly_inv_series(R, Q + 1, n - 1, mod);
-    _nmod_vec_set(S, R, n - 1);
+    k = n;
+    for (i = 1; (1L << i) < k; i++);
+    a = (long *) malloc(i * sizeof(long));
+    a[i = 0] = k;
+    while (k >= FLINT_reverse_NEWTON_CUTOFF)
+        a[++i] = (k = (k + 1) / 2);
 
-    for (i = 2; i < n; i++)
+    _nmod_poly_reverse_series_lagrange(Qinv, Q, k, mod);
+    _nmod_vec_zero(Qinv + k, n - k);
+
+    for (i--; i >= 0; i--)
     {
-        _nmod_poly_mullow(T, S, n - 1, R, n - 1, n - 1, mod);
-        Qinv[i] = nmod_div(T[i - 1], i, mod);
-        tmp = S; S = T; T = tmp;
+        k = a[i];
+        _nmod_poly_compose_series(T, Q, k, Qinv, k, k, mod);
+        _nmod_poly_derivative(U, T, k, mod); U[k - 1] = 0UL;
+        T[1] = 0UL;
+        _nmod_poly_div_series(V, T, U, k, mod);
+        _nmod_poly_derivative(T, Qinv, k, mod);
+        _nmod_poly_mullow(U, V, k, T, k, k, mod);
+        _nmod_vec_sub(Qinv, Qinv, U, k, mod);
     }
 
-    _nmod_vec_free(R);
-    _nmod_vec_free(S);
+    free(a);
     _nmod_vec_free(T);
+    _nmod_vec_free(U);
+    _nmod_vec_free(V);
 }
 
 void
-nmod_poly_compinv_series_lagrange(nmod_poly_t Qinv, 
+nmod_poly_reverse_series_newton(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -72,7 +87,7 @@ nmod_poly_compinv_series_lagrange(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_compinv_series_lagrange: input must have "
+        printf("exception: nmod_poly_reverse_series_newton: input must have "
             "zero constant and an invertible coefficient of x^1");
         abort();
     }
@@ -97,7 +112,7 @@ nmod_poly_compinv_series_lagrange(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_compinv_series_lagrange(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_reverse_series_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

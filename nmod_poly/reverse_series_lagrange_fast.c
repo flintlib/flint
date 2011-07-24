@@ -35,7 +35,8 @@
 #define Ri(ii) (R + (n-1)*((ii)-1))
 
 void
-_nmod_poly_compinv_series_lagrange_2(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_reverse_series_lagrange_fast(mp_ptr Qinv,
+                                            mp_srcptr Q, long n, nmod_t mod)
 {
     long i, j, k, m;
     mp_ptr R, S, T, tmp;
@@ -83,7 +84,7 @@ _nmod_poly_compinv_series_lagrange_2(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mo
 }
 
 void
-nmod_poly_compinv_series_lagrange_2(nmod_poly_t Qinv, 
+nmod_poly_reverse_series_lagrange_fast(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -94,8 +95,8 @@ nmod_poly_compinv_series_lagrange_2(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_compinv_series_lagrange_2: input must have "
-            "zero constant and an invertible coefficient of x^1");
+        printf("exception: nmod_poly_reverse_series_lagrange_fast: input must "
+            "have zero constant and an invertible coefficient of x^1");
         abort();
     }
 
@@ -119,7 +120,7 @@ nmod_poly_compinv_series_lagrange_2(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_compinv_series_lagrange_2(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_reverse_series_lagrange_fast(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {
