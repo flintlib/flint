@@ -33,41 +33,8 @@ mp_limb_t
 _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset,
                             long len, nmod_t mod, int nlimbs)
 {
-    mp_limb_t t0, t1;
-    mp_limb_t s0, s1, s2;
+    mp_limb_t res;
     long i;
-
-    s0 = s1 = s2 = 0UL;
-
-    switch (nlimbs)
-    {
-        case 1:
-            for (i = 0; i < len; i++)
-            {
-                s0 += vec1[i] * vec2[i][offset];
-            }
-            NMOD_RED(s0, s0, mod);
-            break;
-
-        case 2:
-            for (i = 0; i < len; i++)
-            {
-                umul_ppmm(t1, t0, vec1[i], vec2[i][offset]);
-                add_ssaaaa(s1, s0, s1, s0, t1, t0);
-            }
-            NMOD2_RED2(s0, s1, s0, mod);
-            break;
-
-        default:
-            for (i = 0; i < len; i++)
-            {
-                umul_ppmm(t1, t0, vec1[i], vec2[i][offset]);
-                add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
-            }
-            NMOD_RED(s2, s2, mod);
-            NMOD_RED3(s0, s2, s1, s0, mod);
-            break;
-    }
-
-    return s0;
+    NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i][offset], mod, nlimbs);
+    return res;
 }

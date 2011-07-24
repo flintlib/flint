@@ -200,13 +200,28 @@ int _nmod_vec_dot_bound_limbs(long len, nmod_t mod)
     unreduced dot product of two vectors of length \code{len} having entries
     modulo \code{mod.n}, assuming that \code{len} is nonnegative and that
     \code{mod.n} is nonzero. The computed bound is tight. In other words,
-    this function returns the limb size of \code{len} times \code{mod.n ^ 2}.
+    this function returns the precise limb size of \code{len} times
+    \code{(mod.n - 1) ^ 2}.
+
+macro NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
+
+    Effectively performs the computation
+
+    \begin{verbatim}
+        res = 0;
+        for (i = 0; i < len; i++)
+            res += (expr1) * (expr2);
+    \end{verbatim}
+
+    but with the arithmetic performed modulo \code{mod}.
+    The \code{nlimbs} parameter should be 0, 1, 2 or 3, specifying the
+    number of limbs needed to represent the unreduced result.
 
 mp_limb_t
 _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, long len, nmod_t mod, int nlimbs)
 
     Returns the dot product of (\code{vec1}, \code{len}) and
-    (\code{vec2}, \code{len}). The \code{nlimbs} parameters should be
+    (\code{vec2}, \code{len}). The \code{nlimbs} parameter should be
     0, 1, 2 or 3, specifying the number of limbs needed to represent the
     unreduced result.
 
@@ -215,6 +230,6 @@ _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset, long len,
     nmod_t mod, int nlimbs)
 
     Returns the dot product of (\code{vec1}, \code{len}) and the values at
-    \code{vec2[i][offset]}. The \code{nlimbs} parameters should be
+    \code{vec2[i][offset]}. The \code{nlimbs} parameter should be
     0, 1, 2 or 3, specifying the number of limbs needed to represent the
     unreduced result.
