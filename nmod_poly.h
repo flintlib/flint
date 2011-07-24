@@ -583,6 +583,13 @@ nmod_poly_compinv_series_lagrange(nmod_poly_t Qinv,
                                  const nmod_poly_t Q, long n);
 
 void
+_nmod_poly_compinv_series_lagrange_2(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_compinv_series_lagrange_2(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
 _nmod_poly_compinv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
 
 void

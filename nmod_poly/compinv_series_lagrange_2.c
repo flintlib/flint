@@ -31,14 +31,59 @@
 #include "ulong_extras.h"
 
 
+/* pointer to (x/Q)^i */
+#define Ri(ii) (R + (n-1)*((ii)-1))
+
 void
-_nmod_poly_compinv_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_compinv_series_lagrange_2(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
-    _nmod_poly_compinv_series_lagrange_2(Qinv, Q, n, mod);
+    long i, j, k, m;
+    mp_ptr R, S, T, tmp;
+
+    if (n >= 1) Qinv[0] = 0UL;
+    if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
+    if (n <= 2)
+        return;
+
+    m = n_sqrt(n);
+
+    R = _nmod_vec_init((n - 1) * m);
+    S = _nmod_vec_init(n - 1);
+    T = _nmod_vec_init(n - 1);
+
+    _nmod_poly_inv_series(Ri(1), Q + 1, n - 1, mod);
+    for (i = 2; i <= m; i++)
+        _nmod_poly_mullow(Ri(i), Ri(i-1), n - 1, Ri(1), n - 1, n - 1, mod);
+    for (i = 2; i < m; i++)
+        Qinv[i] = nmod_div(Ri(i)[i-1], i, mod);
+
+    _nmod_vec_set(S, Ri(m), n - 1);
+
+    for (i = m; i < n; i += m)
+    {
+        Qinv[i] = nmod_div(S[i-1], i, mod);
+        for (j = 1; j < m && i + j < n; j++)
+        {
+            mp_limb_t s;
+            int nlimbs = _nmod_vec_dot_bound_limbs(i + j, mod);
+            NMOD_VEC_DOT(s, k, i + j, S[k], Ri(j)[i+j-1-k], mod, nlimbs);
+            Qinv[i+j] = nmod_div(s, i+j, mod);
+        }
+
+        if (i + 1 < n)
+        {
+            _nmod_poly_mullow(T, S, n - 1, Ri(m), n - 1, n - 1, mod);
+            tmp = S; S = T; T = tmp;
+        }
+    }
+
+    _nmod_vec_free(R);
+    _nmod_vec_free(S);
+    _nmod_vec_free(T);
 }
 
 void
-nmod_poly_compinv_series(nmod_poly_t Qinv, 
+nmod_poly_compinv_series_lagrange_2(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -49,7 +94,7 @@ nmod_poly_compinv_series(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_compinv_series: input must have "
+        printf("exception: nmod_poly_compinv_series_lagrange_2: input must have "
             "zero constant and an invertible coefficient of x^1");
         abort();
     }
@@ -74,7 +119,7 @@ nmod_poly_compinv_series(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_compinv_series(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_compinv_series_lagrange_2(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

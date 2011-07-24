@@ -30,28 +30,22 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-
 #define FLINT_COMPINV_NEWTON_CUTOFF 15
 
 void
 _nmod_poly_compinv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
     long *a, i, k;
-    mp_ptr Qprime, T, U, V;
+    mp_ptr T, U, V;
 
     if (n >= 1) Qinv[0] = 0UL;
     if (n >= 2) Qinv[1] = n_invmod(Q[1], mod.n);
     if (n <= 2)
         return;
 
-    Qprime = _nmod_vec_init(n);
     T = _nmod_vec_init(n);
     U = _nmod_vec_init(n);
     V = _nmod_vec_init(n);
-
-    _nmod_poly_derivative(T, Q, n, mod);
-    _nmod_poly_inv_series(Qprime, T, n - 1, mod);
-    Qprime[n - 1] = 0UL;
 
     k = n;
     for (i = 1; (1L << i) < k; i++);
@@ -67,14 +61,15 @@ _nmod_poly_compinv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     {
         k = a[i];
         _nmod_poly_compose_series(T, Q, k, Qinv, k, k, mod);
-        _nmod_poly_compose_series(U, Qprime, k, Qinv, k, k, mod);
+        _nmod_poly_derivative(U, T, k, mod); U[k - 1] = 0UL;
         T[1] = 0UL;
-        _nmod_poly_mullow(V, T, k, U, k, k, mod);
-        _nmod_vec_sub(Qinv, Qinv, V, k, mod);
+        _nmod_poly_div_series(V, T, U, k, mod);
+        _nmod_poly_derivative(T, Qinv, k, mod);
+        _nmod_poly_mullow(U, V, k, T, k, k, mod);
+        _nmod_vec_sub(Qinv, Qinv, U, k, mod);
     }
 
     free(a);
-    _nmod_vec_free(Qprime);
     _nmod_vec_free(T);
     _nmod_vec_free(U);
     _nmod_vec_free(V);
