@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#define FLINT_reverse_NEWTON_CUTOFF 15
+#define FLINT_REVERSE_NEWTON_CUTOFF 15
 
 void
 _nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
@@ -51,7 +51,7 @@ _nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     for (i = 1; (1L << i) < k; i++);
     a = (long *) malloc(i * sizeof(long));
     a[i = 0] = k;
-    while (k >= FLINT_reverse_NEWTON_CUTOFF)
+    while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
         a[++i] = (k = (k + 1) / 2);
 
     _nmod_poly_reverse_series_lagrange(Qinv, Q, k, mod);

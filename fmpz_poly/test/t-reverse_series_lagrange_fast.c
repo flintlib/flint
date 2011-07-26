@@ -39,13 +39,13 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("compinv_series....");
+    printf("reverse_series_lagrange_fast....");
     fflush(stdout);
 
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 100; i++)
     {
         fmpz_poly_t f, g;
         long n;
@@ -60,8 +60,8 @@ main(void)
             fmpz_poly_neg(g, g);  /* get -x term */
         n = n_randint(state, 50);
 
-        fmpz_poly_compinv_series(f, g, n);
-        fmpz_poly_compinv_series(g, g, n);
+        fmpz_poly_reverse_series_lagrange_fast(f, g, n);
+        fmpz_poly_reverse_series_lagrange_fast(g, g, n);
 
         result = (fmpz_poly_equal(f, g));
         if (!result)
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check f(f^(-1)) = id */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 100; i++)
     {
         fmpz_poly_t f, g, h;
         long n;
@@ -85,14 +85,14 @@ main(void)
         fmpz_poly_init(f);
         fmpz_poly_init(g);
         fmpz_poly_init(h);
-        fmpz_poly_randtest(g, state, n_randint(state, 50), 10);
+        fmpz_poly_randtest(g, state, n_randint(state, 50), 1+n_randint(state,100));
         fmpz_poly_set_coeff_ui(g, 0, 0);
         fmpz_poly_set_coeff_ui(g, 1, 1);
         if (n_randlimb(state) % 2)
             fmpz_poly_neg(g, g);  /* get -x term */
         n = n_randint(state, 50);
 
-        fmpz_poly_compinv_series(f, g, n);
+        fmpz_poly_reverse_series_lagrange_fast(f, g, n);
         fmpz_poly_compose_series(h, g, f, n);
 
         result = ((n <= 1 && fmpz_poly_is_zero(h)) ||

@@ -30,17 +30,56 @@
 #include "fmpz_poly.h"
 
 
+#define FLINT_REVERSE_NEWTON_CUTOFF 10
+
 void
-_fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 {
-    if (n < 200)
-        _fmpz_poly_compinv_series_lagrange(Qinv, Q, n);
+    if (n <= 2)
+    {
+        _fmpz_vec_set(Qinv, Q, n);
+        return;
+    }
     else
-        _fmpz_poly_compinv_series_newton(Qinv, Q, n);
+    {
+        long *a, i, k;
+        fmpz *T, *U, *V;
+
+        T = _fmpz_vec_init(n);
+        U = _fmpz_vec_init(n);
+        V = _fmpz_vec_init(n);
+
+        k = n;
+        for (i = 1; (1L << i) < k; i++);
+        a = (long *) malloc(i * sizeof(long));
+        a[i = 0] = k;
+        while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
+            a[++i] = (k = (k + 1) / 2);
+
+        _fmpz_poly_reverse_series_lagrange(Qinv, Q, k);
+        _fmpz_vec_zero(Qinv + k, n - k);
+
+        for (i--; i >= 0; i--)
+        {
+            k = a[i];
+            _fmpz_poly_compose_series(T, Q, k, Qinv, k, k);
+            _fmpz_poly_derivative(U, T, k); fmpz_zero(U + k - 1);
+            fmpz_zero(T + 1);
+            _fmpz_poly_div_series(V, T, U, k);
+            _fmpz_poly_derivative(T, Qinv, k);
+            _fmpz_poly_mullow(U, V, k, T, k, k);
+            _fmpz_vec_sub(Qinv, Qinv, U, k);
+        }
+
+        free(a);
+        _fmpz_vec_clear(T, n);
+        _fmpz_vec_clear(U, n);
+        _fmpz_vec_clear(V, n);
+    }
 }
 
 void
-fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 {
     fmpz *Qcopy;
     int Qalloc;
@@ -48,7 +87,7 @@ fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
-        printf("exception: fmpz_poly_compinv_series: input must have "
+        printf("exception: fmpz_poly_reverse_series_newton: input must have "
             "zero constant term and +1 or -1 as coefficient of x^1");
         abort();
     }
@@ -72,20 +111,21 @@ fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_compinv_series(Qinv->coeffs, Qcopy, n);
+        _fmpz_poly_reverse_series_newton(Qinv->coeffs, Qcopy, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_compinv_series(t->coeffs, Qcopy, n);
+        _fmpz_poly_reverse_series_newton(t->coeffs, Qcopy, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }
-    
+
     _fmpz_poly_set_length(Qinv, n);
     _fmpz_poly_normalise(Qinv);
 
     if (Qalloc)
         free(Qcopy);
 }
+

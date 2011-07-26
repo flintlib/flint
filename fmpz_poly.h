@@ -719,22 +719,29 @@ fmpz_poly_compose_series(fmpz_poly_t res,
                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
 
 void
-_fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n);
+_fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n);
 
 void
-fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 
 void
-_fmpz_poly_compinv_series_newton(fmpz * Qinv, const fmpz * Q, long n);
+_fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, long n);
 
 void
-fmpz_poly_compinv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
+    const fmpz_poly_t Q, long n);
 
 void
-_fmpz_poly_compinv_series(fmpz * Qinv, const fmpz * Q, long n);
+_fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n);
 
 void
-fmpz_poly_compinv_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_reverse_series(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_reverse_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 
 
 /*  Signature  ***************************************************************/

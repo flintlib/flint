@@ -28,13 +28,18 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
+
+/* pointer to (x/Q)^i */
+#define Ri(ii) (R + (n-1)*((ii)-1))
 
 void
-_fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, long n)
 {
-    long i;
+    long i, j, k, m;
     fmpz *R, *S, *T, *tmp;
+    fmpz_t t;
 
     if (n <= 2)
     {
@@ -42,30 +47,51 @@ _fmpz_poly_compinv_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
         return;
     }
 
-    R = _fmpz_vec_init(n - 1);
+    m = n_sqrt(n);
+
+    fmpz_init(t);
+    R = _fmpz_vec_init((n - 1) * m);
     S = _fmpz_vec_init(n - 1);
     T = _fmpz_vec_init(n - 1);
 
     fmpz_zero(Qinv);
     fmpz_set(Qinv + 1, Q + 1);
 
-    _fmpz_poly_inv_series(R, Q + 1, n - 1);
-    _fmpz_vec_set(S, R, n - 1);
+    _fmpz_poly_inv_series(Ri(1), Q + 1, n - 1);
+    for (i = 2; i <= m; i++)
+        _fmpz_poly_mullow(Ri(i), Ri(i-1), n - 1, Ri(1), n - 1, n - 1);
+    for (i = 2; i < m; i++)
+        fmpz_divexact_ui(Qinv + i, Ri(i) + i - 1, i);
 
-    for (i = 2; i < n; i++)
+    _fmpz_vec_set(S, Ri(m), n - 1);
+
+    for (i = m; i < n; i += m)
     {
-        _fmpz_poly_mullow(T, S, n - 1, R, n - 1, n - 1);
-        fmpz_divexact_ui(Qinv + i, T + i - 1, i);
-        tmp = S; S = T; T = tmp;
+        fmpz_divexact_ui(Qinv + i, S + i - 1, i);
+
+        for (j = 1; j < m && i + j < n; j++)
+        {
+            fmpz_mul(t, S + 0, Ri(j) + i + j - 1);
+            for (k = 1; k <= i + j - 1; k++)
+                fmpz_addmul(t, S + k, Ri(j) + i + j - 1 - k);
+            fmpz_divexact_ui(Qinv + i + j, t, i + j);
+        }
+
+        if (i + 1 < n)
+        {
+            _fmpz_poly_mullow(T, S, n - 1, Ri(m), n - 1, n - 1);
+            tmp = S; S = T; T = tmp;
+        }
     }
 
-    _fmpz_vec_clear(R, n - 1);
+    fmpz_clear(t);
+    _fmpz_vec_clear(R, (n - 1) * m);
     _fmpz_vec_clear(S, n - 1);
     _fmpz_vec_clear(T, n - 1);
 }
 
 void
-fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv,
+fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
                                         const fmpz_poly_t Q, long n)
 {
     fmpz *Qcopy;
@@ -74,8 +100,8 @@ fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv,
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
-        printf("exception: fmpz_poly_compinv_series_lagrange: input must have "
-            "zero constant term and +1 or -1 as coefficient of x^1");
+        printf("exception: fmpz_poly_reverse_series_lagrange_fast: input must "
+            "have zero constant term and +1 or -1 as coefficient of x^1");
         abort();
     }
 
@@ -98,13 +124,13 @@ fmpz_poly_compinv_series_lagrange(fmpz_poly_t Qinv,
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_compinv_series_lagrange(Qinv->coeffs, Qcopy, n);
+        _fmpz_poly_reverse_series_lagrange_fast(Qinv->coeffs, Qcopy, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_compinv_series_lagrange(t->coeffs, Qcopy, n);
+        _fmpz_poly_reverse_series_lagrange_fast(t->coeffs, Qcopy, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }
