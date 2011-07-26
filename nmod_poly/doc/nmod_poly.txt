@@ -880,7 +880,7 @@ void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
     the method of divided differences and then converts it to
     monomial form.
 
-void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 
     The interface specification for this function is identical to
