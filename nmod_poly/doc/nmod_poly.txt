@@ -871,6 +871,29 @@ void nmod_poly_compose(nmod_poly_t res,
     Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
     that is, evaluates \code{poly1} at \code{poly2}.
 
+void _nmod_poly_compose_series_divconquer(mp_ptr res, 
+    mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, long N, nmod_t mod)
+
+    Composes \code{poly1} of length $\ell_1$ with \code{poly2} of 
+    length $\ell_2$ modulo $x^N$ and sets \code{res} to the result, 
+    i.e.\ evaluates \code{poly1} at \code{poly2}.
+
+    Writes $\min\{(\ell_1 - 1)(\ell_2 - 2) + 1, N\}$ coefficients 
+    to the vector \code{res}.
+
+    The algorithm used is the divide and conquer algorithm. 
+    It is assumed that $0 < \ell_1$ and $0 < \ell_2 \leq N$.
+
+    Does not support aliasing between the inputs and the output.
+
+void nmod_poly_compose_series_divconquer(nmod_poly_t res, 
+    const nmod_poly_t poly1, const nmod_poly_t poly2, long N)
+
+    Composes \code{poly1} with \code{poly2} modulo $x^N$ and sets \code{res} 
+    to the result, i.e.\ evaluates \code{poly1} at \code{poly2}.
+
+    The algorithm used is the divide and conquer algorithm.
+
 *******************************************************************************
 
     GCD
