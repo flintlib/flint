@@ -84,7 +84,12 @@ main(void)
         fmpq_poly_init(g);
         fmpq_poly_init(h);
         do {
-            fmpq_poly_randtest(g, state, n_randint(state, 50), 1+n_randint(state,100));
+            if (n_randint(state, 20) == 0)
+                fmpq_poly_randtest(g, state,
+                    n_randint(state, 50), 1);
+            else
+                fmpq_poly_randtest(g, state,
+                    n_randint(state, 50), 1+n_randint(state,100));
         } while (fmpq_poly_length(g) < 2 || fmpz_is_zero(g->coeffs + 1));
         fmpq_poly_set_coeff_ui(g, 0, 0);
         n = n_randint(state, 50);

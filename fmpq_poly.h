@@ -543,6 +543,14 @@ void
 fmpq_poly_reverse_series_newton(fmpq_poly_t res, 
                     const fmpq_poly_t poly, long n);
 
+void
+_fmpq_poly_reverse_series(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long n);
+
+void
+fmpq_poly_reverse_series(fmpq_poly_t res, 
+                    const fmpq_poly_t poly, long n);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpq_poly_content(mpq_t res, 
