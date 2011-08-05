@@ -35,13 +35,17 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     if (!COEFF_IS_MPZ(d))
     {
         mpz_t copy;
+
         mpz_init(copy);
         fmpz_get_mpz(copy, f);
         str = mpz_get_str(str, b, copy);
         mpz_clear(copy);
     }
     else
+    {
         str = mpz_get_str(str, b, COEFF_TO_PTR(d));
+    }
+
     return str;
 }
 

@@ -32,8 +32,8 @@ int fmpz_set_str(fmpz_t f, char * str, int b)
 {
     int ans;
     mpz_t copy;
-    mpz_init(copy);
-    ans = mpz_set_str(copy, str, b);
+
+    ans = mpz_init_set_str(copy, str, b);
     if (ans == 0)
         fmpz_set_mpz(f, copy);
     mpz_clear(copy);

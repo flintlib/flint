@@ -26,9 +26,7 @@ fmpz
 
 * Use fmpz_init and fmpz_clear in the t-fmpz test
 
-* Check and improve the functions fmpz_get_str and 
-  fmpz_set_str, which in a first adhoc implementation only wrap the GMP/ MPIR 
-  functionality.  Once this has been done, also include test code for these
+* [maybe] Improve the functions fmpz_get_str and fmpz_set_str
 
 * [maybe] figure out how to write robust test code for fmpz_read (which reads
   from stdin), perhaps using a pipe
