@@ -19,27 +19,60 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#ifndef LONG_EXTRAS_H
-#define LONG_EXTRAS_H
-
+#include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "long_extras.h"
+#include "ulong_extras.h"
 
-/* Properties ****************************************************************/
+int
+main(void)
+{
+    int i, result;
+    flint_rand_t state;
 
-size_t z_sizeinbase(long n, int b);
+    printf("sizeinbase....");
+    fflush(stdout);
 
-/* Randomisation  ************************************************************/
+    flint_randinit(state);
 
-mp_limb_signed_t z_randtest(flint_rand_t state);
+    for (i = 0; i < 100000; i++)
+    {
+        long a;
+        mpz_t b;
+        int base;
+        size_t r1, r2;
 
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
+        a = z_randtest(state);
+        mpz_init_set_si(b, a);
+        base = (int) (n_randint(state, 61) + 2);
 
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
+        r1 = z_sizeinbase(a, base);
+        r2 = mpz_sizeinbase(b, base);
+        result = (r1 == r2 || r1 + 1 == r2);
 
-#endif
+        if (!result)
+        {
+            printf("FAIL:\n");
+            gmp_printf("b = %Zd\n", b);
+            printf("base = %d\n", base);
+            printf("r1 = %lu\n, r2 = %lu\n", (ulong) r1, (ulong) r2);
+            abort();
+        }
 
+        mpz_clear(b);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
+}

@@ -59,7 +59,7 @@ main(void)
 
         r1 = fmpz_sizeinbase(a, base);
         r2 = mpz_sizeinbase(b, base);
-        result = (r1 == r2);
+        result = (r1 == r2 || r1 + 1 == r2);
 
         if (!result)
         {

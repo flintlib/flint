@@ -19,27 +19,44 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
-
+    Copyright (C) 2011 Sebastian Pancratz
+ 
 ******************************************************************************/
 
-#ifndef LONG_EXTRAS_H
-#define LONG_EXTRAS_H
+#include <stdlib.h>
+#include <limits.h>
 
-#include <mpir.h>
-#include "flint.h"
+size_t z_sizeinbase(long n, int b)
+{
+    long c = 0;
 
-/* Properties ****************************************************************/
+    if (n == 0)
+    {
+        return 1;
+    }
 
-size_t z_sizeinbase(long n, int b);
+    if (n <= 0)
+    {
+        if (n > LONG_MIN)
+        {
+            n = -n;
+        }
+        else  /* n == LONG_MIN */
+        {
+            if (n % b)
+            {
+                n = - (n + 1);
+            }
+            else
+            {
+                n = - (n / b);
+                c = 1;
+            }
+        }
+    }
 
-/* Randomisation  ************************************************************/
+    for ( ; n > 0; n /= b, c++) ;
 
-mp_limb_signed_t z_randtest(flint_rand_t state);
-
-mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
-
-mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
-
-#endif
+    return c;
+}
 

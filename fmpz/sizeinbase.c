@@ -19,29 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+   Copyright (C) 2010, 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "long_extras.h"
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 {
-    size_t ans;
     fmpz d = *f;
     
     if (!COEFF_IS_MPZ(d))
-    {
-        mpz_t copy;
-        mpz_init_set_si(copy, d);
-        ans = mpz_sizeinbase(copy, b);
-        mpz_clear(copy);
-    }
+        return z_sizeinbase(d, b);
     else
-        ans = mpz_sizeinbase(COEFF_TO_PTR(d), b);
-    return ans;
+        return mpz_sizeinbase(COEFF_TO_PTR(d), b);
 }
 
