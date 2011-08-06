@@ -1246,7 +1246,7 @@ void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     memory.
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                        const fmpz * A, long lenB, const fmpz * B, long lenB)
+                        const fmpz * A, long lenA, const fmpz * B, long lenB)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
     $A = B Q + R$ and each coefficient of $R$ beyond $\len(B) - 1$ is 
