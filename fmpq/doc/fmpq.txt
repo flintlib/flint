@@ -235,7 +235,7 @@ void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
 
     Sets \code{(rnum, rden)} to the canonical form of the sum,
     difference, product or quotient respectively of the fractions
-    represented by \code{(op1num, op1den)} and \code{(op1num, op1den)}.
+    represented by \code{(op1num, op1den)} and \code{(op2num, op2den)}.
     Aliasing between any combination of the variables is allowed,
     as long as no numerator is aliased with a denominator.
 
@@ -254,8 +254,8 @@ void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     const fmpz_t op1den, const fmpz_t op2num, const fmpz_t op2den)
 
     Sets \code{(rnum, rden)} to the canonical form of the fraction
-    \code{(rnum, rden)} + \code{(op1num, op1den)} * \code{(op1num, op1den)} or
-    \code{(rnum, rden)} - \code{(op1num, op1den)} * \code{(op1num, op1den)}
+    \code{(rnum, rden)} + \code{(op1num, op1den)} * \code{(op2num, op2den)} or
+    \code{(rnum, rden)} - \code{(op1num, op1den)} * \code{(op2num, op2den)}
     respectively. Aliasing between any combination of the variables is allowed,
     as long as no numerator is aliased with a denominator.
 
@@ -263,7 +263,6 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
     Sets \code{dest} to \code{1 / src}. The result is placed in canonical
     form, assuming that \code{src} is already in canonical form.
-
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 
