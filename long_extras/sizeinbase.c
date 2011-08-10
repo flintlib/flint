@@ -19,33 +19,44 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
-
+    Copyright (C) 2011 Sebastian Pancratz
+ 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
+#include <stdlib.h>
+#include <limits.h>
 
-
-void
-_fmpq_print(const fmpz_t num, const fmpz_t den)
+size_t z_sizeinbase(long n, int b)
 {
-    if (fmpz_is_one(den))
+    long c = 0;
+
+    if (n == 0)
     {
-        fmpz_print(num);
+        return 1;
     }
-    else
+
+    if (n <= 0)
     {
-        fmpz_print(num);
-        printf("/");
-        fmpz_print(den);
+        if (n > LONG_MIN)
+        {
+            n = -n;
+        }
+        else  /* n == LONG_MIN */
+        {
+            if (n % b)
+            {
+                n = - (n + 1);
+            }
+            else
+            {
+                n = - (n / b);
+                c = 1;
+            }
+        }
     }
+
+    for ( ; n > 0; n /= b, c++) ;
+
+    return c;
 }
 
-void fmpq_print(const fmpq_t x)
-{
-    _fmpq_print(&x->num, &x->den);
-}

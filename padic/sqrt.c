@@ -34,10 +34,9 @@
     Assumes that \code{op} is a unit modulo $p^N$.  Assumes $p$ is an 
     odd prime.
 
-    In the current implementation, allows aliasing, but this 
-    might change.
+    In the current implementation, allows aliasing.
  */
-int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+static int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
     int ans;
 
@@ -142,11 +141,9 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
     Assumes that \code{op} is a unit modulo $2^N$.
 
-    In the current implementation, allows aliasing, but this 
-    might change.
+    In the current implementation, allows aliasing.
  */
-
-int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
+static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
 {
     assert(fmpz_is_odd(op));
 
@@ -165,7 +162,7 @@ int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
         for (i = 1; (1L << i) < N; i++) ;
 
         /* Compute sequence of exponents */
-        a = malloc((i + 2) * sizeof(long));  /* XXX.  Enough? */
+        a = malloc((i + 2) * sizeof(long));
         for (a[i = 0] = N; a[i] > 3; i++)
             a[i + 1] = (a[i] + 3) / 2;
         len = i + 1;
@@ -267,8 +264,8 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
     else
     {
-        return _padic_sqrt_2(padic_unit(rop), 
-                             padic_unit(op), ctx->N - padic_val(rop));
+        return _padic_sqrt2(padic_unit(rop), 
+                            padic_unit(op), ctx->N - padic_val(rop));
     }
 }
 

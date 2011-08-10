@@ -26,6 +26,10 @@
 #ifndef FMPQ_H
 #define FMPQ_H
 
+#undef ulong /* interferes with system includes */
+#include <stdio.h>
+#define ulong unsigned long
+
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -94,6 +98,12 @@ static __inline__ void fmpq_set(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
+static __inline__ void fmpq_swap(fmpq_t op1, fmpq_t op2)
+{
+    fmpz_swap(fmpq_numref(op1), fmpq_numref(op2));
+    fmpz_swap(fmpq_denref(op1), fmpq_denref(op2));
+}
+
 static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
 {
     fmpz_neg(fmpq_numref(dest), fmpq_numref(src));
@@ -126,9 +136,19 @@ static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
-void _fmpq_print(const fmpz_t num, const fmpz_t den);
+void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
-void fmpq_print(const fmpq_t x);
+void fmpq_fprint(FILE * file, const fmpq_t x);
+
+static __inline__ void _fmpq_print(const fmpz_t num, const fmpz_t den)
+{
+    _fmpq_fprint(stdout, num, den);
+}
+
+static __inline__ void fmpq_print(const fmpq_t x)
+{
+    fmpq_fprint(stdout, x);
+}
 
 void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
 

@@ -162,6 +162,8 @@ int fmpz_set_str(fmpz_t f, char * str, int b);
 
 int fmpz_abs_fits_ui(const fmpz_t f);
 
+int fmpz_fits_si(const fmpz_t f);
+
 static __inline__
 void fmpz_zero(fmpz_t f)
 {
@@ -303,6 +305,11 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
 
+long fmpz_flog(const fmpz_t x, const fmpz_t b);
+long fmpz_flog_ui(const fmpz_t x, ulong b);
+long fmpz_clog(const fmpz_t x, const fmpz_t b);
+long fmpz_clog_ui(const fmpz_t x, ulong b);
+
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
@@ -331,6 +338,10 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h);
 
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
+int fmpz_divisible(const fmpz_t f, const fmpz_t g);
+
+int fmpz_divisible_si(const fmpz_t f, long g);
+
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h);
@@ -348,6 +359,8 @@ void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h);
 
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
+
+void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

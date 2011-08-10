@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -34,21 +34,23 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
 {
     long i;
     mpz_t d, t;
-    
+
     mpz_init_set_ui(d, 1);
     mpz_init(t);
     for (i = 0; i < n; i++)
+    {
         mpz_lcm(d, d, mpq_denref(a[i]));
-    
+    }
+
     for (i = 0; i < n; i++)
     {
+        __mpz_struct *ptr = _fmpz_promote(poly + i);
+
         mpz_divexact(t, d, mpq_denref(a[i]));
-        mpz_mul((mpz_ptr) mpq_numref(a[i]), (mpz_ptr) mpq_numref(a[i]), t);
+        mpz_mul(ptr, mpq_numref(a[i]), t);
+        _fmpz_demote_val(poly + i);
     }
-    
-    for (i = 0; i < n; i++)
-        fmpz_set_mpz(poly + i, (mpz_ptr) mpq_numref(a[i]));
-    
+
     fmpz_set_mpz(den, d);
     mpz_clear(d);
     mpz_clear(t);
@@ -57,7 +59,9 @@ _fmpq_poly_set_array_mpq(fmpz * poly, fmpz_t den, const mpq_t * a, long n)
 void fmpq_poly_set_array_mpq(fmpq_poly_t poly, const mpq_t * a, long n)
 {
     if (n == 0)
+    {
         fmpq_poly_zero(poly);
+    }
     else
     {
         fmpq_poly_fit_length(poly, n);

@@ -680,6 +680,113 @@ void fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
 *******************************************************************************
 
+    Squaring
+
+*******************************************************************************
+
+void _fmpz_poly_sqr_KS(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    Kronecker segmentation.
+
+void _fmpz_poly_sqr_karatsuba(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_karatsuba(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the Karatsuba multiplication algorithm.
+
+void _fmpz_poly_sqr_classical(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op} using 
+    the classical or schoolbook method.
+
+void _fmpz_poly_sqr(fmpz * rop, const fmpz * op, long len);
+
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{len > 0}.
+
+    Supports zero-padding in \code{(op, len)}.  Does not support aliasing.
+
+void fmpz_poly_sqr(fmpz_poly_t rop, const fmpz_poly_t op);
+
+    Sets \code{rop} to the square of the polynomial \code{op}.
+
+void _fmpz_poly_sqrlow_KS(fmpz * res, const fmpz * poly, long len, long n)
+
+    Sets \code{(res, n)} to the lowest $n$ coefficients 
+    of the square of \code{(poly, len)}.
+
+    Assumes that \code{len} is positive, but does allow for the polynomial 
+    to be zero-padded.  The polynomial may be zero, too.  Assumes $n$ is 
+    positive.  Supports aliasing between \code{res} and \code{poly}.
+
+void fmpz_poly_sqrlow_KS(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+
+    Sets \code{res} to the lowest $n$ coefficients 
+    of the square of \code{poly}.
+
+void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, long n)
+
+    Sets \code{(res, n)} to the square of \code{(poly, n)} truncated 
+    to length $n$, which is assumed to be positive.  Allows for \code{poly} 
+    to be zero-oadded. 
+
+void fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, 
+                                  const fmpz_poly_t poly, long n)
+
+    Sets \code{res} to the square of \code{poly} and 
+    truncates to the given length.
+
+void _fmpz_poly_sqrlow_classical(fmpz * res, 
+                                 const fmpz * poly, long len, long n)
+
+    Sets \code{(res, n)} to the first $n$ coefficients of the square 
+    of \code{(poly, len)}.
+
+    Assumes that \code{0 < n <= 2 * len - 1}.  
+
+void fmpz_poly_sqrlow_classical(fmpz_poly_t res, 
+                                const fmpz_poly_t poly, long n)
+
+    Sets \code{res} to the first $n$ coefficients of 
+    the square of \code{poly}.
+
+void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, long len, long n)
+
+    Sets \code{(res, n)} to the lowest $n$ coefficients 
+    of the square of \code{(poly, len)}.
+
+    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= 2 * len - 1}.  
+    Allows for zero-padding in the input.  Does not support aliasing 
+    between the input and the output.
+
+void fmpz_poly_sqrlow(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+
+    Sets \code{res} to the lowest $n$ coefficients 
+    of the square of \code{poly}.
+
+*******************************************************************************
+
     Powering
 
 *******************************************************************************
@@ -1009,6 +1116,33 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
 
+void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
+                                              const fmpz * poly2, long len2)
+
+    Sets \code{(res, len1 + len2 - 1)} to the least common multiple 
+    of the two polynomials \code{(poly1, len1)} and \code{(poly2, len2)}, 
+    normalised to have non-negative leading coefficient.
+
+    Assumes that \code{len1 >= len2 > 0}.
+
+    Does not support aliasing.
+
+void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
+                                                    const fmpz_poly_t poly2)
+
+    Sets \code{res} to the least common multiple of the two 
+    polynomials \code{poly1} and \code{poly2}, normalised to 
+    have non-negative leading coefficient.
+
+    If either of the two polynomials is zero, sets \code{res} 
+    to zero.
+
+    This ensures that the equality
+    \begin{equation*}
+    f g = \gcd(f, g) \lcm(f, g)
+    \end{equation*}
+    holds up to sign.
+
 void _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
                                       const fmpz * poly2, long len2)
 
@@ -1112,7 +1246,7 @@ void _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     memory.
 
 void _fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-                        const fmpz * A, long lenB, const fmpz * B, long lenB)
+                        const fmpz * A, long lenA, const fmpz * B, long lenB)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
     $A = B Q + R$ and each coefficient of $R$ beyond $\len(B) - 1$ is 

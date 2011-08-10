@@ -41,13 +41,13 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
             _fmpz_vec_set(res, poly, len);
             break;
         case 2:
-            _fmpz_poly_mul(res, poly, len, poly, len);
+            _fmpz_poly_sqr(res, poly, len);
             break;
         case 3:
         {
             long alloc = 2 * len - 1;
             fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_mul(t, poly, len, poly, len);
+            _fmpz_poly_sqr(t, poly, len);
             _fmpz_poly_mul(res, t, alloc, poly, len);
             _fmpz_vec_clear(t, alloc);
             break;
@@ -56,8 +56,8 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
         {
             long alloc = 2 * len - 1;
             fmpz *t = _fmpz_vec_init(alloc);
-            _fmpz_poly_mul(t, poly, len, poly, len);
-            _fmpz_poly_mul(res, t, alloc, t, alloc);
+            _fmpz_poly_sqr(t, poly, len);
+            _fmpz_poly_sqr(res, t, alloc);
             _fmpz_vec_clear(t, alloc);
             break;
         }

@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("div_2exp....");
+    printf("fdiv_q_2exp....");
     fflush(stdout);
 
     flint_randinit(state);

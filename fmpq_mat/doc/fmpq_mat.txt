@@ -88,6 +88,11 @@ void fmpq_mat_one(fmpq_mat_t mat)
     $m \times m$ block to the identity matrix, and the remaining 
     block to zero.
 
+void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
+
+    Sets the matrix \code{rop} to the tranpose of the matrix \code{op}, 
+    assuming that their dimensios are compatible.
+
 *******************************************************************************
 
     Addition, scalar multiplication

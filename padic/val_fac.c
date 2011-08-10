@@ -25,6 +25,53 @@
 
 #include "padic.h"
 
+/* 
+    Returns $\ord_2(N!)$.
+
+    Note that since $N$ fits into an \code{unsigned long}, so does 
+    $\ord_2(N!)$ since $\ord_2{N!) \leq (N - 1) / (p - 1) = N - 1$.
+ */
+ulong padic_val_fac_ui2(ulong N)
+{
+    ulong s = 0, t = N;
+
+    do
+    {
+        t /= 2;
+        s += t;
+    }
+    while (t);
+
+    return s;
+}
+
+/* 
+    Returns $\ord_p(N!)$.
+
+    Note that since $N$ fits into an \code{unsigned long}, so does 
+    $\ord_p(N!)$ since $\ord_p{N!) \leq (N - 1) / (p - 1)$.
+ */
+ulong padic_val_fac_ui(ulong N, const fmpz_t p)
+{
+    if (fmpz_abs_fits_ui(p))
+    {
+        ulong q = fmpz_get_ui(p), s = 0, t = N;
+
+        do
+        {
+            t /= q;
+            s += t;
+        }
+        while (t);
+
+        return s;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 {
     fmpz_t t, q, pow;

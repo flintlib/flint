@@ -68,7 +68,7 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         else if (e == 1UL)
             fmpz_poly_set(res, poly);
         else  /* e == 2UL */
-            fmpz_poly_mul(res, poly, poly);
+            fmpz_poly_sqr(res, poly);
         return;
     }
 

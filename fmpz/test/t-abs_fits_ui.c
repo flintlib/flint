@@ -31,13 +31,12 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void check(fmpz_t x, int expected)
+static void check(fmpz_t x, int expected)
 {
     if (fmpz_abs_fits_ui(x) != expected)
     {
-        printf("FAIL:");
-        fmpz_print(x);
-        printf("\n");
+        printf("FAIL:\n\n");
+        printf("x = "), fmpz_print(x), printf("\n");
         abort();
     }
 }

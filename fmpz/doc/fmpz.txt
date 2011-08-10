@@ -228,8 +228,8 @@ int fmpz_fprint(FILE * file, fmpz_t x)
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 
-    Returns the size of $f$ in base~$b$, measured in numbers of digits. 
-    The base~$b$ can be between $2$ and $62$, inclusive.
+    Returns the size of the absolute value of $f$ in base~$b$, measured in 
+    numbers of digits. The base~$b$ can be between $2$ and $62$, inclusive.
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f)
 
@@ -257,6 +257,15 @@ void fmpz_set(fmpz_t f, const fmpz_t g)
 void fmpz_zero(fmpz_t f)
 
     Sets $f$ to zero.
+
+int fmpz_abs_fits_ui(const fmpz_t f)
+
+    Returns whether the absolute value of $f$ 
+    fits into an \code{unsigned long}.
+
+int fmpz_fits_si(const fmpz_t f)
+
+    Returns whether the value of $f$ fits into a \code{long}.
 
 *******************************************************************************
 
@@ -416,6 +425,11 @@ void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to $g$ divided by \code{2^exp}, but rounded down.
 
+void fmpz_fdiv_r_2exp(fmpz_t f, const fmpz_t g, ulong exp)
+
+    Sets $f$ to the remainder of $g$ upon division by \code{2^exp}, 
+    where the remainder is non-negative.
+
 void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
@@ -455,6 +469,14 @@ void fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
     the division is exact, i.e.\ $g$ is a multiple of $h$.
     If $x$ or $y$ is $0$ an exception is raised.
 
+int fmpz_divisible(const fmpz_t f, const fmpz_t g)
+
+    Returns whether $f$ is divisible by $g > 0$.
+
+int fmpz_divisible_si(const fmpz_t f, long g)
+
+    Returns whether $f$ is divisible by $g > 0$.
+
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the remainder of $g$ divided by $h$.  The remainder
@@ -487,6 +509,24 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
     Sets $f$ to $g^e \bmod{m}$.  If $e = 0$, sets $f$ to $1$.
 
     Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
+
+long fmpz_clog(const fmpz_t x, const fmpz_t b)
+
+long fmpz_clog_ui(const fmpz_t x, ulong b)
+
+    Returns $\ceil{\log_b x}$.
+
+    Assumes that $x \geq 1$ and $b \geq 2$ and that 
+    the return value fits into a signed \code{long}.
+
+long fmpz_flog(const fmpz_t x, const fmpz_t b)
+
+long fmpz_flog_ui(const fmpz_t x, ulong b)
+
+    Returns $\floor{\log_b x}$.
+
+    Assumes that $x \geq 1$ and $b \geq 2$ and that 
+    the return value fits into a signed \code{long}.
 
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
@@ -545,7 +585,7 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Assumes that $x$ is non-zero, that $f > 1$ and that \code{finv} 
     is the precomputed \code{double} inverse of $f$ whenever $f$ is 
-    a small integer.
+    a small integer and $0$ otherwise.
 
     Does not support aliasing.
 
@@ -556,7 +596,7 @@ long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
     integer.
 
     If \code{op} is zero, sets \code{rop} to \code{op} and 
-    return $0$.
+    returns $0$.
 
     Returns an \code{abort} signal if any of the assumptions 
     are violated.

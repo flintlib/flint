@@ -85,9 +85,13 @@ void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
 
 *******************************************************************************
 
+void _padic_init(padic_t rop)
+
 void padic_init(padic_t rop, const padic_ctx_t ctx)
 
     Initialises the $p$-adic number \code{rop}.
+
+void _padic_clear(padic_t rop)
 
 void padic_clear(padic_t rop, const padic_ctx_t ctx)
 
@@ -253,6 +257,8 @@ void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the MPIR rational \code{rop} to the value of \code{op}, 
     reduced modulo $p^N$.
+
+void _padic_swap(padic_t op1, padic_t op2)
     
 void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
 
@@ -462,9 +468,13 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     elements $x \in \mathbf{Q}_p$, this means that $\ord_p(x) \geq 1$ 
     when $p \geq 3$ and $\ord_2(x) \geq 2$ when $p = 2$.
 
-void padic_val_fac(fmpz_t rop, const fmpz_t n, const fmpz_t p)
+ulong padic_val_fac_ui2(ulong N)
 
-    Computes the $p$-adic valuation of $n!$, assuming that $n > 0$.
+    Computes the $2$-adic valuation of $n!$.
+
+ulong padic_val_fac_ui(ulong N, const fmpz_t p)
+
+    Computes the $p$-adic valuation of $n!$.
 
 *******************************************************************************
 
