@@ -136,6 +136,10 @@ static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
+char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
+
+char * fmpq_get_str(char * str, int b, const fmpq_t x);
+
 void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den);
 
 void fmpq_fprint(FILE * file, const fmpq_t x);

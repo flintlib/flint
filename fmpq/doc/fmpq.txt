@@ -151,6 +151,17 @@ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
     Sets the value of \code{dest}
 
+char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
+
+char * fmpq_get_str(char * str, int b, const fmpq_t x)
+
+    Prints the string representation of $x$ in base $b \in [2, 36]$ 
+    to a suitable buffer.
+
+    If \code{str} is not \code{NULL}, this is used as the buffer and 
+    also the return value.  If \code{str} is \code{NULL}, allocates 
+    sufficient space and returns a pointer to the string.
+
 *******************************************************************************
 
     Input and output
