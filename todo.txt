@@ -44,6 +44,8 @@ fmpz
 
 * Consider using mpz's instead of fmpz's in the multi CRT code
 
+* Improve, document and test fmpz_fdiv_r.
+
 
 ulong_extras
 ------------
@@ -282,8 +284,9 @@ fmpz_mat
 * The Dixon p-adic solver currently spends most of the time computing
   integer matrix-vector products. Instead of using a single prime, it
   is likely to be faster to use a product of primes to increase the
-  proportion of time spent on modular linear algebra (IML uses this trick,
-  and it is presumably responsible for much of the speed difference).
+  proportion of time spent on modular linear algebra. The code should also
+  use fast radix conversion instead of building up the result incrementally
+  to improve performance when the output gets large.
 
 * Maybe optimise multimodular multiplication by pre-transposing
   so that transposed nmod_mat multiplication can be used directly instead of
@@ -317,6 +320,9 @@ nmod_mat
   where this is assumed.
 
 * Add transpose versions of common functions, in-place addmul etc.
+
+* The current addmul/submul functions are misnamed since they
+  implement a more general operation.
 
 * Improve rref and inverse to perform everything in-place.
 
