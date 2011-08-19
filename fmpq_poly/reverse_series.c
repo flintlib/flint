@@ -34,7 +34,7 @@ void
 _fmpq_poly_reverse_series(fmpz * Qinv, fmpz_t den,
         const fmpz * Q, const fmpz_t Qden, long n)
 {
-    _fmpq_poly_reverse_series_newton(Qinv, den, Q, Qden, n);
+    _fmpq_poly_reverse_series_lagrange_fast(Qinv, den, Q, Qden, n);
 }
 
 
