@@ -295,7 +295,9 @@ void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p);
 
 /* Input and output **********************************************************/
 
-char * padic_get_str(const padic_t op, const padic_ctx_t ctx);
+char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
+
+char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
 int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx);
 

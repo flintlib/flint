@@ -482,10 +482,28 @@ ulong padic_val_fac_ui(ulong N, const fmpz_t p)
 
 *******************************************************************************
 
-char * padic_get_str(const padic_t op, const padic_ctx_t ctx)
+char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
 
     Returns the string representation of the $p$-adic number \code{op}, 
     according to the printing mode set in the context.
+
+    If \code{str} is \code{NULL} then a new block of memory is allocated 
+    and a pointer to this is returned.  Otherwise, it is assumed that 
+    the string \code{str} is large enough to hold the representation and 
+    it is also the return value.
+
+    Note that a negative unit part of \code{op} and the printing mode 
+    \code{SERIES} are not compatible.
+
+char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
+
+    Returns the string representation of the $p$-adic number \code{op}
+    reduced modulo $p^N$, according to the printing mode set in the context.
+
+    If \code{str} is \code{NULL} then a new block of memory is allocated 
+    and a pointer to this is returned.  Otherwise, it is assumed that 
+    the string \code{str} is large enough to hold the representation and 
+    it is also the return value.
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 
