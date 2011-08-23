@@ -191,6 +191,13 @@ void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
 
 void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
 
+/* Cyclotomic polynomials ****************************************************/
+
+void _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
+                                        long num_factors, ulong phi);
+
+void cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
+
 /* Legendre polynomials ******************************************************/
 
 void legendre_polynomial(fmpq_poly_t poly, ulong n);
