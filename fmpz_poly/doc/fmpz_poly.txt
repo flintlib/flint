@@ -93,17 +93,6 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
 
     Returns the degree of \code{poly}, which is one less than its length.
 
-ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
-
-    Returns the maximum number of limbs required to store the absolute value 
-    of coefficients of \code{poly}.  If \code{poly} is zero, returns $0$.
-
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
-
-    Computes the maximum number of bits $b$ required to store the absolute 
-    value of coefficients of \code{poly}.  If all the coefficients of 
-    \code{poly} are non-negative, $b$ is returned, otherwise $-b$ is returned.
-
 *******************************************************************************
 
     Assignment and basic manipulation
@@ -954,9 +943,27 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
 *******************************************************************************
 
-    Norms
+    Bit sizes and norms
 
 *******************************************************************************
+
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+
+    Returns the maximum number of limbs required to store the absolute value 
+    of coefficients of \code{poly}.  If \code{poly} is zero, returns $0$.
+
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
+
+    Computes the maximum number of bits $b$ required to store the absolute 
+    value of coefficients of \code{poly}.  If all the coefficients of 
+    \code{poly} are non-negative, $b$ is returned, otherwise $-b$ is returned.
+
+void fmpz_poly_height(fmpz_t height, const fmpz_poly_t poly)
+
+    Computes the height of \code{poly}, defined as the largest of the
+    absolute values the coefficients of \code{poly}. Equivalently, this
+    gives the infinity norm of the coefficients. If \code{poly} is zero,
+    the height is $0$.
 
 void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
 

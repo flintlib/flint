@@ -58,7 +58,7 @@ void _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state,
 
 *******************************************************************************
 
-    Bit sizes
+    Bit sizes and norms
 
 *******************************************************************************
 
@@ -73,6 +73,12 @@ ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
     Returns the maximum number of limbs needed to store the absolute value 
     of any entry in \code{(vec, len)}.  If all entries are zero, returns 
     zero.
+
+void _fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
+
+    Computes the height of \code{(vec, len)}, defined as the largest of the
+    absolute values the coefficients. Equivalently, this gives the infinity
+    norm of the vector. If \code{len} is zero, the height is $0$.
 
 *******************************************************************************
 
