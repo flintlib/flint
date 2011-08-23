@@ -1146,7 +1146,7 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     This ensures that the equality
     \begin{equation*}
-    f g = \gcd(f, g) \lcm(f, g)
+    f g = \gcd(f, g) \operatorname{lcm}(f, g)
     \end{equation*}
     holds up to sign.
 
