@@ -40,15 +40,15 @@ _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     int small;
     ulong D;
 
+    D = phi / 2;
+
     /* Phi_p(x) = 1 + x + x^2 + ... + x^{p-1} */
     if (num_factors == 1)
     {
-        for (i = 0; i < n; i++)
+        for (i = 0; i <= D; i++)
             fmpz_set_ui(a + i, 1UL);
         return;
     }
-
-    D = phi / 2;
 
     /* Phi_{2n}(x) = Phi_n(-x)*/
     if (factors[0] == 2UL)
