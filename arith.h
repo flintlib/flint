@@ -216,4 +216,16 @@ void partition_function_vec(fmpz * res, long len);
 
 void landau_function_vec(fmpz * res, long len);
 
+/* Dedekind sums *************************************************************/
+
+void dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+double dedekind_sum_coprime_d(double h, double k);
+
+void dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
 #endif
