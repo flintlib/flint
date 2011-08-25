@@ -46,6 +46,8 @@ fmpz
 
 * Improve, document and test fmpz_fdiv_r.
 
+* Add fmpz_set_d / fmpz_get_d (and fix dedekind_sum_coprime).
+
 
 ulong_extras
 ------------
