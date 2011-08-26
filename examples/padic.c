@@ -40,7 +40,7 @@ int main(void)
     padic_ctx_t ctx;
 
     char *str;
-    padic_t x;
+    padic_t x, y;
 
     printf("Output:\n\n");
 
@@ -133,6 +133,28 @@ int main(void)
     free(str);
 
     _padic_clear(x);
+
+    padic_ctx_clear(ctx);
+    fmpz_clear(p);
+
+    /* Log */
+    printf("Log of 7380996 mod 5^10\n");
+
+    fmpz_init(p);
+    fmpz_set_ui(p, 5);
+    padic_ctx_init(ctx, p, 10, PADIC_SERIES);
+
+    _padic_init(x);
+    _padic_init(y);
+    _padic_set_ui(x, 7380996, ctx);
+
+    padic_log(y, x, ctx);
+
+    printf("x = "), padic_print(x, ctx), printf("\n");
+    printf("y = "), padic_print(y, ctx), printf("\n");
+
+    _padic_clear(x);
+    _padic_clear(y);
 
     padic_ctx_clear(ctx);
     fmpz_clear(p);
