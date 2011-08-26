@@ -153,6 +153,52 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
+    /* Check: log(exp(x)) == x */
+    for (i = 0; i < 10000; i++)
+    {
+        fmpz_t p;
+        long N;
+        padic_ctx_t ctx;
+
+        padic_t a, b, c;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = n_randint(state, 50) + 1;
+        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+
+        _padic_init(a);
+        _padic_init(b);
+        _padic_init(c);
+
+        padic_randtest(a, state, ctx);
+        if (!_padic_is_zero(a) && padic_val(a) < 1)
+        {
+            padic_val(a) = 1;
+            padic_reduce(a, ctx);
+        }
+
+        padic_exp(b, a, ctx);
+        padic_log(c, b, ctx);
+
+        result = (padic_equal(a, c, ctx));
+        if (!result)
+        {
+            printf("FAIL (log(exp(x)) == x):\n\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
+            abort();
+        }
+
+        _padic_clear(a);
+        _padic_clear(b);
+        _padic_clear(c);
+
+        fmpz_clear(p);
+        padic_ctx_clear(ctx);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
