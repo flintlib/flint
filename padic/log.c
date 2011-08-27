@@ -33,9 +33,15 @@ static long bound(long v, long N, long p)
 
 /*
     Computes 
+    \begin{equation*}
+    z = \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
     \begin{align*}
     \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
-            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
     \end{align*}
 
     Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
@@ -87,7 +93,6 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         fmpz_divexact(z, z, q + k);
         fmpz_mul(z, z, y);
-        fmpz_neg(z, z);
 
         fmpz_clear(m);
         fmpz_clear(s);
@@ -126,7 +131,6 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
         }
 
         fmpz_mul(z, z, y);
-        fmpz_neg(z, z);
 
         fmpz_clear(m);
         fmpz_clear(t);
@@ -173,6 +177,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 else
                 {
                     _padic_log(padic_unit(rop), x, v, ctx);
+                    fmpz_neg(padic_unit(rop), padic_unit(rop));
                     padic_val(rop) = 0;
                     padic_reduce(rop, ctx);
                 }
