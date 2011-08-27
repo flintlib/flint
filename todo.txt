@@ -251,13 +251,24 @@ arith
 
 * Implement Bell polynomials.
 
-* Implement cyclotomic polynomials.
-
 * Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
   Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
 
+* Some steps in the partition function code will overflow on 32 bits for
+  large n. This can be fixed by using doubles in the commented places.
+
+* Implement fast computation of a range of partition function values
+  (e.g. by just caching/precomputing values of Dedekind sums, or even
+  caching the exponential sums as a whole).
+
+* Make partition_function_mpfr more general by allowing it to be
+  used for approximate calculation of p(n) (i.e. using less than
+  the full precision). This should be a simple modification (some care
+  is needed to get all conditionals right and to write proper tests).
+
+* Write tests for the dedekind_cosine_sum functions.
 
 fmpz_mat
 --------

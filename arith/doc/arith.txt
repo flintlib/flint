@@ -544,25 +544,6 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 
 *******************************************************************************
 
-    Partition function
-
-*******************************************************************************
-
-void partition_function_vec(fmpz * res, long len)
-
-    Computes first \code{len} values of the partition function $p(n)$
-    starting with $p(0)$. Uses inversion of Euler's pentagonal series.
-
-
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
-
-    Computes first \code{len} values of the partition function $p(n)$
-    starting with $p(0)$, modulo the modulus defined by \code{mod}.
-    Uses inversion of Euler's pentagonal series.
-
-
-*******************************************************************************
-
     Landau's function
 
 *******************************************************************************
@@ -576,6 +557,7 @@ void landau_function_vec(fmpz * res, long len)
     Implements the ``basic algorithm'' given in
     \cite{DelegliseNicolasZimmermann2009}. The running time is
     $O(n^{3/2} / \sqrt{\log n})$.
+
 
 *******************************************************************************
 
@@ -674,3 +656,108 @@ void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
     For any $q > 0$, $s(qh,qk) = s(h,k)$.
     If $0 < k < h$ and $(h,k) = 1$,
     $s(h,k) = (1+h(h-3k)+k^2) / (12hk) - t(k,h).$
+
+*******************************************************************************
+
+    Exponential Dedekind sums
+
+*******************************************************************************
+
+void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
+
+    Evaluates
+
+        $$A_k(n) = \sum_{h=0}^{k-1}
+            \cos\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right)$$
+
+    where $s(h,k)$ is a Dedekind sum. This is the same as the real part of
+
+        $$A_k(n) = \sum_{h=0}^{k-1}
+            \exp\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right).$$
+
+    This function implements the definition naively. It is mainly intended
+    for testing purposes.
+
+    The calculations are done with the precision of the \code{sum} variable.
+    The caller must allocate guard bits as necessary.
+
+void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
+
+    This is a faster version of \code{dedekind_cosine_sum_mpfr_naive}.
+    To reduce the number of cosine evaluations, we reduce all arguments
+    to the interval $[0, \pi/4)$ by exploiting the periodicity and reflection
+    symmetries of trigonometric functions, tracking the (signed)
+    multiplicity of each argument in a table.
+
+double dedekind_cosine_sum_d(ulong k, ulong n)
+
+    This function is basically equivalent to
+    \code{dedekind_cosine_sum_mpfr_naive}, but works with double precision
+    arithmetic. It also exploits argument symmetry of Dedekind sums to reduce
+    the number of evaluations in half, but does not go as far as
+    the \code{_mpfr_fast} version to avoid cosine evaluations.
+
+*******************************************************************************
+
+    Number of partitions
+
+*******************************************************************************
+
+void partition_function_vec(fmpz * res, long len)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$. Uses inversion of Euler's pentagonal series.
+
+    This function is mainly intended for for testing purposes. To compute
+    multiple values of $p(n)$, it is faster to call
+    \code{number_of_partitions} repeatedly.
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
+
+    Computes first \code{len} values of the partition function $p(n)$
+    starting with $p(0)$, modulo the modulus defined by \code{mod}.
+    Uses inversion of Euler's pentagonal series.
+
+void number_of_partitions_mpfr(mpfr_t x, ulong n)
+
+    Sets the pre-initialised MPFR variable $x$ to the exact value of $p(n)$.
+    The value is computed using the Hardy-Ramanujan-Rademacher formula.
+
+    The precision of $x$ will be changed to allow $p(n)$ to be represented
+    exactly. The interface of this function may be updated in the future
+    to allow computing an approximation of $p(n)$ to smaller precision.
+
+    The Hardy-Ramanujan-Rademacher formula is given with error bounds
+    in \cite{Rademacher1937}. It can be stated in the following form:
+
+        $$p(n) = \frac{1}{\pi \sqrt{2}} \sum_{k=1}^N A_k(n) \sqrt{k}
+            \frac{d}{dn} \left[ \frac{\sinh\left(
+                \frac{\pi}{k} \sqrt{\frac{2}{3}\left(n-\frac{1}{24}\right)}
+            \right)}{\sqrt{n-\frac{1}{24}}} \right] + R(n,N)$$
+
+    where $A(k,n)$ is the real part of an exponential Dedekind sum (see
+    the corresponding section of the documentation for definitions
+    and implementation notes) and where
+
+        $$|R(n,N)| < \frac{44 \pi^2}{225 \sqrt{3}} N^{-1/2} +
+            \frac{\pi \sqrt{2}}{75} \left(\frac{N}{n-1}\right)^{1/2}
+            \sinh\left(\pi \sqrt{\frac{2}{3}} \frac{\sqrt{n}}{N} \right).$$
+
+    The summation can be stopped as soon as $|R(n,N)| < 1/2$, since
+    rounding the truncated sum to the nearest integer then gives
+    the correct value of $p(n)$.
+
+    The remainder estimate at step $k$ also provides an upper bound for the
+    size of the $k$-th term and hence gives the precision needed to evaluate
+    the $k$-th term. A small number of guard bits is added to suppress
+    the influence of rounding errors. To improve performance, we sum only
+    the initial terms using MPFR arithmetic, and switch to doubles as
+    soon as the precision (including guard bits) falls below 53 bits.
+
+void number_of_partitions(fmpz_t x, ulong n)
+
+    Sets $x$ to $p(n)$, the number of ways that $n$ can be written
+    as a sum of positive integers without regard to order.
+
+    This function uses a lookup table for $n < 128$ (where $p(n) < 2^{32}$),
+    and otherwise calls \code{number_of_partitions_mpfr}.

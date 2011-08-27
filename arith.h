@@ -206,12 +206,6 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n);
 
 void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
 
-/* Partition function ********************************************************/
-
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
-
-void partition_function_vec(fmpz * res, long len);
-
 /* Landau function ***********************************************************/
 
 void landau_function_vec(fmpz * res, long len);
@@ -227,5 +221,21 @@ void dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
 void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
 void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+double dedekind_cosine_sum_d(ulong k, ulong n);
+
+void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n);
+
+void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n);
+
+/* Partition function ********************************************************/
+
+void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
+
+void partition_function_vec(fmpz * res, long len);
+
+void number_of_partitions_mpfr(mpfr_t x, ulong n);
+
+void number_of_partitions(fmpz_t x, ulong n);
 
 #endif
