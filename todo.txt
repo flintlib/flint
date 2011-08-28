@@ -270,6 +270,10 @@ arith
 
 * Write tests for the dedekind_cosine_sum functions.
 
+* Investigate whether Knuth's algorithm is better for dedekind_sum_d.
+  It seems unlikely to be faster, but it might allow accurate
+  calculation for larger arguments.
+
 fmpz_mat
 --------
 

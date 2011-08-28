@@ -563,7 +563,7 @@ void landau_function_vec(fmpz * res, long len)
 
     Dedekind sums
 
-    Most of the definitions and relations used in the following functions
+    Most of the definitions and relations used in the following section
     are given by Apostol \cite{Apostol1997}. The Dedekind sum $s(h,k)$ is
     defined for all integers $h$ and $k$ as
 
@@ -630,13 +630,16 @@ double dedekind_sum_coprime_d(double h, double k)
 
 void dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 < h < k$ and $(h,k) = 1$.
-    This function evaluates the remainder sequence sum using \code{fmpz}
-    and \code{fmpq} arithmetic, without optimising for any special cases.
+    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 \le h \le k$ and
+    $(h,k) = 1$. This function effectively evaluates the remainder
+    sequence sum using \code{fmpz} arithmetic, without optimising for
+    any special cases. To avoid rational arithmetic, we use
+    the integer algorithm of Knuth \cite{Knuth1977}.
 
 void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
-    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 < h < k$ and $(h,k) = 1$.
+    Computes $s(h,k)$ for $h$ and $k$ satisfying $0 \le h \le k$
+    and $(h,k) = 1$.
 
     This function calls \code{dedekind_sum_coprime_d} if $k$ is small
     enough for a double-precision estimate of the sum to yield a correct
@@ -735,7 +738,7 @@ void number_of_partitions_mpfr(mpfr_t x, ulong n)
                 \frac{\pi}{k} \sqrt{\frac{2}{3}\left(n-\frac{1}{24}\right)}
             \right)}{\sqrt{n-\frac{1}{24}}} \right] + R(n,N)$$
 
-    where $A(k,n)$ is the real part of an exponential Dedekind sum (see
+    where $A_k(n)$ is the real part of an exponential Dedekind sum (see
     the corresponding section of the documentation for definitions
     and implementation notes) and where
 

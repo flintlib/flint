@@ -30,13 +30,11 @@
 #include "ulong_extras.h"
 #include "arith.h"
 
-#define p (fmpq_numref(s))
-#define q (fmpq_denref(s))
-
 void
 dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
-    fmpz_t a, b, t, u;
+    fmpz_t sigma, p, pp, hh, kk, a, t;
+
     int sign;
 
     if (fmpz_cmp_ui(k, 2UL) <= 0)
@@ -45,51 +43,59 @@ dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k)
         return;
     }
 
-    fmpz_init(a);
-    fmpz_init(b);
-    fmpz_init(t);
-    fmpz_init(u);
-
-    fmpz_set(a, k);
-    fmpz_set(b, h);
-
     sign = 1;
 
-    fmpz_zero(p);
-    fmpz_set_ui(q, 1UL);
+    fmpz_init(sigma);
+    fmpz_init(hh);
+    fmpz_init(kk);
+    fmpz_init(p);
+    fmpz_init(pp);
+    fmpz_init(a);
+    fmpz_init(t);
 
-    while (!fmpz_is_zero(b))
+    fmpz_set_ui(p, 1UL);
+    fmpz_set(hh, h);
+    fmpz_set(kk, k);
+
+    while (!fmpz_is_zero(hh))
     {
-        fmpz_mul(t, a, a);
-        fmpz_addmul(t, b, b);
-        fmpz_add_ui(t, t, 1UL);
-        fmpz_mul(u, a, b);
+        fmpz_fdiv_qr(a, t, kk, hh);
 
-        if (sign == -1)
-            fmpz_neg(t, t);
-
-        _fmpq_add(p, q, p, q, t, u);
-
-        fmpz_mod(t, a, b);
-        fmpz_swap(t, a);
-        fmpz_swap(a, b);
+        if (sign == 1)
+            fmpz_add(sigma, sigma, a);
+        else
+            fmpz_sub(sigma, sigma, a);
 
         sign = -sign;
-    }
 
-    fmpz_mul_ui(q, q, 12UL);
+        /* kk, hh = hh, kk mod hh */
+        fmpz_swap(kk, hh);
+        fmpz_swap(hh, t);
+
+        /* p, pp = a*p + pp, p */
+        fmpz_addmul(pp, a, p);
+        fmpz_swap(p, pp);
+    }
 
     if (sign < 0)
-    {
-        fmpz_mul_2exp(p, p, 2UL);
-        fmpz_sub(p, p, q);
-        fmpz_mul_2exp(q, q, 2UL);
-    }
+        fmpz_sub_ui(sigma, sigma, 3UL);
 
-    _fmpq_canonicalise(p, q);
+    /* s = (sigma + (h - p*s) / p) / 12 */
+    if (sign < 0)
+        fmpz_add(fmpq_numref(s), h, pp);
+    else
+        fmpz_sub(fmpq_numref(s), h, pp);
 
+    fmpz_addmul(fmpq_numref(s), sigma, p);
+    fmpz_mul_ui(fmpq_denref(s), p, 12UL);
+
+    _fmpq_canonicalise(fmpq_numref(s), fmpq_denref(s));
+
+    fmpz_clear(sigma);
+    fmpz_clear(hh);
+    fmpz_clear(kk);
+    fmpz_clear(p);
+    fmpz_clear(pp);
     fmpz_clear(a);
-    fmpz_clear(b);
     fmpz_clear(t);
-    fmpz_clear(u);
 }

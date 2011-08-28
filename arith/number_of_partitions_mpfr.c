@@ -41,7 +41,7 @@
 #define ROUNDUP 1e-13
 #define HRR_A (1.1143183348516376904 + ROUNDUP)  /* 44*pi^2/(225*sqrt(3)) */
 #define HRR_B (0.0592384391754448833 + ROUNDUP)  /* pi*sqrt(2)/75 */
-#define HRR_C (2.5650996603237281911 + ROUNDUP)  /* pi*sqrt(mpf(2)/3) */
+#define HRR_C (2.5650996603237281911 + ROUNDUP)  /* pi*sqrt(2/3) */
 
 
 static double partitions_remainder_bound(double n, double terms)

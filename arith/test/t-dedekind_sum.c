@@ -91,8 +91,6 @@ static const long testdata[][4] =
     {0, 0, 0, 0}
 };
 
-
-
 int main(void)
 {
     flint_rand_t state;
@@ -153,6 +151,25 @@ int main(void)
             abort();
         }
     }
+
+    /* Check a large value computed with Pari */
+    fmpz_set_ui(hh, 1);
+    fmpz_mul_2exp(hh, hh, 1000);
+    fmpz_add_ui(hh, hh, 1);
+    fmpz_set_ui(kk, 1);
+    fmpz_mul_2exp(kk, kk, 1001);
+    fmpz_add_ui(kk, kk, 1);
+
+    dedekind_sum(s1, hh, kk);
+    if ((fmpz_fdiv_ui(fmpq_numref(s1), 1000000000) != 906445312) ||
+        (fmpz_fdiv_ui(fmpq_denref(s1), 1000000000) != 8416259))
+    {
+        printf("Wrong large value:\n");
+        fmpq_print(s1);
+        printf("\n");
+        abort();
+    }
+
 
     /* Just check that nothing crashes with bignums */
     for (i = 0; i < 1000; i++)
