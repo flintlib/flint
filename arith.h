@@ -234,8 +234,14 @@ void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
 void partition_function_vec(fmpz * res, long len);
 
-void number_of_partitions_mpfr(mpfr_t x, ulong n);
+void number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits,
+    double cutoff, double heuristic_cutoff, unsigned int heuristic_count);
+
+/* This nice round number precisely fits on 32 bits */
+#define NUMBER_OF_SMALL_PARTITIONS 128
 
 void number_of_partitions(fmpz_t x, ulong n);
+
+void number_of_partitions_heuristic(fmpz_t x, ulong n);
 
 #endif

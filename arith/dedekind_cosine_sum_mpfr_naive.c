@@ -35,9 +35,8 @@ void
 dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
 {
     mpfr_t t, u;
-    long p;
-    double s;
-    ulong h, q;
+    double s, q;
+    ulong h;
 
     mpfr_set_si(sum, 0L, MPFR_RNDN);
     mpfr_init2(t, mpfr_get_prec(sum) + 5);
@@ -46,22 +45,22 @@ dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
     mpfr_const_pi(u, MPFR_RNDN);
     mpfr_div_ui(u, u, 6 * k, MPFR_RNDN);
 
-    q = 6 * k;
+    q = fmod(12.0 * ((double) n), 12.0 * k);
 
     for (h = 0; h < k; h++)
     {
         if (n_gcd(k, h) == 1UL)
         {
             s = dedekind_sum_coprime_d(h, k);
-            p = floor((s * q) + 0.5);
-            p -= 12*h*n; /* XXX: 32-bit overflow */
+            s = floor(s * (6.0 * k) + 0.5);
+            s -= h*q;
 
-            if (p < 0)
-                p = (-p) % (12 * k);
+            if (s < 0)
+                s = fmod(-s, 12.0 * k);
             else
-                p = p % (12 * k);
+                s = fmod(s, 12.0 * k);
 
-            mpfr_mul_si(t, u, p, MPFR_RNDN);
+            mpfr_mul_d(t, u, s, MPFR_RNDN);
             mpfr_cos(t, t, MPFR_RNDN);
             mpfr_add(sum, sum, t, MPFR_RNDN);
         }

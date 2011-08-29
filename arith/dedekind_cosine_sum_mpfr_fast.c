@@ -24,6 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
+#include <string.h>
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
@@ -33,30 +34,36 @@
 
 
 static __inline__ void
-update_count(int * count, long p, ulong k)
+update_count(int * count, double p, double k)
 {
     if (p < 0)
         p = -p;
 
-    p = p % (12 * k);
+    p = fmod(p, 12.0 * k);
 
-    if (p >= 6 * k)
-        p = 12 * k - p;
+    if (p >= 6.0 * k)
+        p = 12.0 * k - p;
 
-    if (p > 3 * k)
-        count[6*k - p]--;
+    if (p > 3.0 * k)
+        count[(int)(6.0*k - p)]--;
     else
-        count[p]++;
+        count[(int)(p)]++;
 }
+
+#define TAB_SIZE 128
 
 void
 dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
 {
-    mpfr_t t, u;
-    ulong h, q;
-    long i, p;
+    mpfr_t t, u, cosa, sina, cc, ss, cs, sc;
+    ulong h;
+    long i, prev;
     int * count;
-    double s;
+    mpfr_t cos_tab[TAB_SIZE];
+    mpfr_t sin_tab[TAB_SIZE];
+    char have_diff[TAB_SIZE];
+    double s, q;
+    mpfr_prec_t wp;
 
     if (k > 1000000)
     {
@@ -79,41 +86,92 @@ dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
     }
 
     count = calloc((3*k + 1), sizeof(int));
-    q = 6 * k;
+    q = fmod(12.0 * ((double) n), 12.0 * k);
 
     for (h = 0; h < (k + 1) / 2; h++)
     {
         if (n_gcd(k, h) == 1UL)
         {
             s = dedekind_sum_coprime_d(h, k);
-            p = floor((s * q) + 0.5);
-
-            /* XXX: 32-bit overflow */
-            update_count(count, p - 12*h*n, k);
-            update_count(count, -p - 12*(k-h)*n, k);
+            s = floor(s * (6.0 * k) + 0.5);
+            update_count(count, s - q*h, k);
+            update_count(count, -s - q*(k-h), k);
         }
     }
 
     mpfr_set_si(sum, count[0], MPFR_RNDN);
-    mpfr_init2(t, mpfr_get_prec(sum) + 5);
-    mpfr_init2(u, mpfr_get_prec(sum) + 5);
+
+    wp = mpfr_get_prec(sum) + 5;
+
+    mpfr_init2(t, wp);
+    mpfr_init2(u, wp);
+    mpfr_init2(cosa, wp);
+    mpfr_init2(sina, wp);
+    mpfr_init2(cc, wp);
+    mpfr_init2(ss, wp);
+    mpfr_init2(cs, wp);
+    mpfr_init2(sc, wp);
 
     mpfr_const_pi(u, MPFR_RNDN);
     mpfr_div_ui(u, u, 6 * k, MPFR_RNDN);
+
+    prev = 0;
+    memset(have_diff, 0, TAB_SIZE);
 
     for (i = 1; i < 3 * k; i++)
     {
         if (count[i] != 0)
         {
-            mpfr_mul_si(t, u, i, MPFR_RNDN);
-            mpfr_cos(t, t, MPFR_RNDN);
+            if (prev > 2 && i - prev < TAB_SIZE)
+            {
+                if (!have_diff[i - prev])
+                {
+                    mpfr_init2(sin_tab[i - prev], wp);
+                    mpfr_init2(cos_tab[i - prev], wp);
+                    mpfr_mul_si(t, u, i - prev, MPFR_RNDN);
+                    mpfr_sin_cos(sin_tab[i - prev],
+                                 cos_tab[i - prev], t, GMP_RNDN);
+                    have_diff[i - prev] = 1;
+                }
+
+                mpfr_mul(cc, cosa, cos_tab[i - prev], MPFR_RNDN);
+                mpfr_mul(ss, sina, sin_tab[i - prev], MPFR_RNDN);
+                mpfr_mul(cs, cosa, sin_tab[i - prev], MPFR_RNDN);
+                mpfr_mul(sc, sina, cos_tab[i - prev], MPFR_RNDN);
+
+                mpfr_sub(cosa, cc, ss, MPFR_RNDN);
+                mpfr_add(sina, sc, cs, MPFR_RNDN);
+            }
+            else
+            {
+                mpfr_mul_si(t, u, i, MPFR_RNDN);
+                mpfr_sin_cos(sina, cosa, t, GMP_RNDN);
+            }
+
             if (count[i] != 1)
-                mpfr_mul_si(t, t, count[i], MPFR_RNDN);
+                mpfr_mul_si(t, cosa, count[i], MPFR_RNDN);
+
             mpfr_add(sum, sum, t, MPFR_RNDN);
+            prev = i;
+        }
+    }
+
+    for (i = 0; i < TAB_SIZE; i++)
+    {
+        if (have_diff[i])
+        {
+            mpfr_clear(sin_tab[i]);
+            mpfr_clear(cos_tab[i]);
         }
     }
 
     mpfr_clear(t);
     mpfr_clear(u);
+    mpfr_clear(cosa);
+    mpfr_clear(sina);
+    mpfr_clear(cc);
+    mpfr_clear(ss);
+    mpfr_clear(cs);
+    mpfr_clear(sc);
     free(count);
 }

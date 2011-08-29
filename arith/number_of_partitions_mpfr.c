@@ -32,17 +32,10 @@
 #include "ulong_extras.h"
 #include "arith.h"
 
-/* Parameters for evaluation of the Hardy-Ramanujan-Rademacher formula.
-   See the documentation section for additional information. */
-
-#define HRR_GUARD_BITS 15
-#define HRR_CUTOFF 0.4      /* Quit when error < cutoff. Should be < 0.5 */
-
 #define ROUNDUP 1e-13
 #define HRR_A (1.1143183348516376904 + ROUNDUP)  /* 44*pi^2/(225*sqrt(3)) */
 #define HRR_B (0.0592384391754448833 + ROUNDUP)  /* pi*sqrt(2)/75 */
 #define HRR_C (2.5650996603237281911 + ROUNDUP)  /* pi*sqrt(2/3) */
-
 
 static double partitions_remainder_bound(double n, double terms)
 {
@@ -70,11 +63,13 @@ static double partitions_remainder_bound_log2(double n, double N)
 }
 
 void
-number_of_partitions_mpfr(mpfr_t x, ulong n)
+number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits, double cutoff,
+    double heuristic_cutoff, unsigned int heuristic_count)
 {
     mpfr_t t, u, v, w, C0, C1, C2, C3;
     double s, D0, D1, D2, D3;
     long k, prec;
+    int small_count;
 
     if (n <= 2)
     {
@@ -82,7 +77,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
         return;
     }
 
-    prec = partitions_remainder_bound_log2(n, 1) + HRR_GUARD_BITS;
+    prec = partitions_remainder_bound_log2(n, 1) + guard_bits;
 
     mpfr_set_prec(x, prec);
     mpfr_set_ui(x, 0UL, GMP_RNDN);
@@ -117,11 +112,11 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
 
     for (k = 1; ; k++)
     {
-        prec = partitions_remainder_bound_log2(n, k) + HRR_GUARD_BITS;
+        prec = partitions_remainder_bound_log2(n, k) + guard_bits;
 
         /* printf("%ld: %ld\n", k, prec); */
 
-        mpfr_set_prec(t, prec);  /* raw! */
+        mpfr_set_prec(t, prec);
         mpfr_set_prec(u, prec);
         mpfr_set_prec(v, prec);
         mpfr_set_prec(w, prec);
@@ -129,7 +124,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
         /* t = A(h,k) */
         dedekind_cosine_sum_mpfr_fast(t, k, n);
 
-        if (!mpfr_zero_p(t))  /* XXX: is this what breaks */
+        if (!mpfr_zero_p(t))
         {
             /* sum += A(h,k) * sqrt(k)*(C2*cosh(C1/k)/k - C3*sinh(C1/k) */
             mpfr_div_ui(u, C1, k, GMP_RNDN);
@@ -148,7 +143,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
             break;
     }
 
-    mpfr_set_prec(t, FLINT_D_BITS + HRR_GUARD_BITS);
+    mpfr_set_prec(t, FLINT_D_BITS + guard_bits);
     mpfr_set_ui(t, 0UL, GMP_RNDN);
 
     D0 = mpfr_get_d(C0, GMP_RNDN);
@@ -156,14 +151,34 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
     D2 = mpfr_get_d(C2, GMP_RNDN);
     D3 = mpfr_get_d(C3, GMP_RNDN);
 
+    small_count = 0;
+
     for (k++; ; k++)
     {
         s = dedekind_cosine_sum_d(k, n);
-        s = s * sqrt(k) * (D2*cosh(D1/k)/k - D3*sinh(D1/k));
-        mpfr_add_d(t, t, s, GMP_RNDN);
 
-        if (partitions_remainder_bound(n, k) < HRR_CUTOFF)
+        if (s != 0.0)
+        {
+            s = s * sqrt(k) * (D2*cosh(D1/k)/k - D3*sinh(D1/k));
+            mpfr_add_d(t, t, s, GMP_RNDN);
+
+            if (fabs(s) < heuristic_cutoff)
+                small_count++;
+            else
+                small_count = 0;
+        }
+
+        if (partitions_remainder_bound(n, k) < cutoff ||
+                small_count > heuristic_count)
+        {
             break;
+        }
+
+/*
+        if (k % 100 == 0)
+            printf("%ld ... %.12g, %.12g\n", k,
+                partitions_remainder_bound(n, k), s);
+*/
     }
 
     mpfr_add(x, x, t, GMP_RNDN);
