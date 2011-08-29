@@ -725,12 +725,12 @@ dbouel dedekind_cosine_sum_d(ulong k, ulong n)
 
 *******************************************************************************
 
-void partition_function_vec(fmpz * res, long len)
+void number_of_partitions_vec(fmpz * res, long len)
 
     Computes first \code{len} values of the partition function $p(n)$
     starting with $p(0)$. Uses inversion of Euler's pentagonal series.
 
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
+void number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod)
 
     Computes first \code{len} values of the partition function $p(n)$
     starting with $p(0)$, modulo the modulus defined by \code{mod}.

@@ -43,7 +43,7 @@ int main(void)
 
     const long maxn = 1000;
 
-    printf("partition_function_vec....");
+    printf("number_of_partitions_vec....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -56,8 +56,8 @@ int main(void)
         nmod_t mod;
         nmod_init(&mod, n_randtest_prime(state, 0));
 
-        partition_function_vec(p, n);
-        partition_function_nmod_vec(pmod, n, mod);
+        number_of_partitions_vec(p, n);
+        number_of_partitions_nmod_vec(pmod, n, mod);
 
         for (k = 0; k < n; k++)
         {

@@ -34,43 +34,8 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod)
-{
-    mp_ptr tmp;
-    mp_limb_t r;
-    long k, n;
-
-    r = mod.n - 1UL;
-
-    if (len < 1)
-        return;
-
-    tmp = _nmod_vec_init(len);
-    _nmod_vec_zero(tmp, len);
-
-    tmp[0] = 1UL;
-
-    for (n = k = 1; n + 4*k + 2 < len; k += 2)
-    {
-        tmp[n] = r;
-        tmp[n + k] = r;
-        tmp[n + 3*k + 1] = 1UL;
-        tmp[n + 4*k + 2] = 1UL;
-        n += 6*k + 5;
-    }
-
-    if (n < len) tmp[n] = r;
-    if (n + k < len) tmp[n + k] = r;
-    if (n + 3*k + 1 < len) tmp[n + 3*k + 1] = 1L;
-
-    _nmod_poly_inv_series(res, tmp, len, mod);
-
-    _nmod_vec_free(tmp);
-}
-
-
-void partition_function_vec(fmpz * res, long len)
+void
+number_of_partitions_vec(fmpz * res, long len)
 {
     fmpz * tmp;
     long k, n;

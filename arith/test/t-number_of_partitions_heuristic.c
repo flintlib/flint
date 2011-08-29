@@ -121,7 +121,7 @@ int main(void)
     fmpz_init(p);
     v = _fmpz_vec_init(2000);
 
-    partition_function_vec(v, 2000);
+    number_of_partitions_vec(v, 2000);
 
     for (i = 0; i < 2000; i++)
     {

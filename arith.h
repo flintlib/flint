@@ -228,11 +228,11 @@ void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n);
 
 void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n);
 
-/* Partition function ********************************************************/
+/* Number of partitions ******************************************************/
 
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
+void number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
-void partition_function_vec(fmpz * res, long len);
+void number_of_partitions_vec(fmpz * res, long len);
 
 void number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits,
     double cutoff, double heuristic_cutoff, unsigned int heuristic_count);
