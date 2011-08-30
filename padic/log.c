@@ -45,7 +45,8 @@ static long bound(long v, long N, long p)
     \end{align*}
 
     Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$.
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
 
     Assumes that $v < N$.
 
@@ -64,6 +65,7 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         p = fmpz_get_si(ctx->p);
         i = bound(v, ctx->N, p) - 1;
+
         k = n_flog(i, p);
 
         fmpz_init(m);
