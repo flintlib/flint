@@ -52,7 +52,7 @@ static long bound(long v, long N, long p)
 
     Does not support aliasing between $y$ and $z$.
  */
-void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
+static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 {
     if (fmpz_fits_si(ctx->p))
     {
@@ -62,11 +62,14 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
         long e, i, j, k, p;
         fmpz_t m, s, t;
         fmpz *q;
+        padic_inv_t pre;
 
         p = fmpz_get_si(ctx->p);
         i = bound(v, ctx->N, p) - 1;
 
         k = n_flog(i, p);
+
+        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
 
         fmpz_init(m);
         fmpz_init(s);
@@ -86,7 +89,7 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
             j = i;
             e = n_remove((mp_limb_t *) &j, p);
-            _padic_inv(s, (fmpz *) &j, ctx->p, ctx->N + k);
+            _padic_inv_precomp(s, (fmpz *) &j, pre);
             fmpz_mul(z, s, q + (k - e));
 
             fmpz_add(z, z, t);
@@ -95,11 +98,11 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         fmpz_divexact(z, z, q + k);
         fmpz_mul(z, z, y);
-
         fmpz_clear(m);
         fmpz_clear(s);
         fmpz_clear(t);
         _fmpz_vec_clear(q, k + 1);
+        _padic_inv_clear(pre);
     }
     else
     {
@@ -195,3 +198,4 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         return ans;
     }
 }
+

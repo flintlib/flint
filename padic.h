@@ -68,6 +68,14 @@ typedef struct {
 
 typedef padic_ctx_struct padic_ctx_t[1];
 
+typedef struct {
+    long n;
+    fmpz *pow;
+    fmpz *u;
+} padic_inv_struct;
+
+typedef padic_inv_struct padic_inv_t[1];
+
 /* Context *******************************************************************/
 
 void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N, 
@@ -227,25 +235,15 @@ void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx);
 void padic_div(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
 
-void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
+void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N);
 
-void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_inv_clear(padic_inv_t S);
 
-void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
+void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S);
 
-void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
-static __inline__ 
-void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
-{
-    _padic_inv_hensel(rop, op, p, N);
-}
-
-static __inline__ 
-void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-{
-    padic_inv_hensel(rop, op, ctx);
-}
+void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
