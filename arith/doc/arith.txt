@@ -666,13 +666,12 @@ void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
 *******************************************************************************
 
-void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
+void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, mp_limb_t k, mp_limb_t n)
 
     Evaluates
 
         $$A_k(n) = \sum_{h=0}^{k-1}
-            \cos\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right)
-            = \operatorname{Re}
+            \cos\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right) =
             \sum_{h=0}^{k-1}
             \exp\left(\pi i \left[ s(h,k) - \frac{2hn}{k}\right]\right)$$
 
@@ -683,40 +682,42 @@ void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
     This function implements the sum in the definition naively, and
     is mainly intended for testing purposes.
 
+
+void dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
+
+    Decomposes the exponential sum $A_k(n)$ into a product of cosines.
+    The factorisation is based on the comprehensive set of identities
+    given in \code{Whiteman1956}.
+
+    The special \code{trig_prod_t} structure \code{prod} represents a
+    product of cosines of rational arguments, multiplied by an algebraic
+    prefactor. It must be pre-initialised with \code{trig_prod_init}.
+
+    Assumes that $24k$ and $24n$ do not overflow a single limb.
+    If $n$ is larger, pre-reduce it modulo $k$.
+
 void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
 
-    This is a faster version of \code{dedekind_cosine_sum_mpfr_naive}.
+    Evaluates $A_k(n)$ using MPFR arithmetic with the precision of the
+    \code{sum} variable. This function uses factorisation of the
+    exponential sum.
 
-    To eliminate redundant cosine evaluations, we reduce all angles
-    to the interval $[0, \pi/4)$ by exploiting the periodicity and reflection
-    symmetries of trigonometric functions, storing the (signed)
-    multiplicity of each angle in a table.
+    Assumes that $24k$ and $24n$ do not overflow a single limb.
+    If $n$ is larger, pre-reduce it modulo $k$.
 
-    Further, when traversing the arguments $\theta_i$, we avoid computing
-    each $\cos(\theta_i)$ from scratch. Instead, we keep a dynamically
-    populated table of sines and cosines evaluated at small integer
-    multiples of the common denominator and compute
-    $\cos(\theta_i), \sin(\theta_i)$ from
-    $\cos(\theta_{i-1})$, $\cos(\theta_{i-1})$ and 
-    $\cos(\theta_i-\theta_{i-1}), \sin(\theta_i-\theta_{i-1})$
-    using the addition theorems for sine and cosine, whenever the
-    difference between consecutive arguments is small enough to
-    fit in the table.
+double dedekind_cosine_sum_d(mp_limb_t k, mp_limb_t n)
 
-double dedekind_cosine_sum_d(ulong k, ulong n)
+    Evaluates $A_k(n)$ using MPFR arithmetic with the precision of the
+    \code{sum} variable. This function uses factorisation of the
+    exponential sum.
 
-    This function evaluates $A_k(n)$ using double-precision arithmetic.
+    To improve numerical accuracy, we symbolically transform the
+    angles to have an absolute value less than $\pi / 4$, using
+    sine instead of cosine when close to a root. This guarantees that
+    the relative error will always be small.
 
-    Like \code{dedekind_cosine_sum_mpfr_fast}, we reduce angles to
-    $[0, \pi/4)$ and count their multiplicities in order to avoid redundant
-    cosine evaluations.
-
-    However, we do not use the difference-of-angles trick. At least on
-    modern x86 processors, the hardware cosine function is extremely fast
-    for small arguments, so this trick would not improve performance
-    significantly (if at all), while slightly hurting accuracy. This
-    trick might still be useful to consider in the future for other
-    platforms or for extremely large calculations.
+    Assumes that $24k$ and $24n$ do not overflow a single limb.
+    If $n$ is larger, pre-reduce it modulo $k$.
 
 
 *******************************************************************************
