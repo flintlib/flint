@@ -28,150 +28,72 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
-#include "math.h"
 #include "arith.h"
 #include "ulong_extras.h"
 
-
-static __inline__ void
-update_count(int * count, double p, double k)
-{
-    if (p < 0)
-        p = -p;
-
-    p = fmod(p, 12.0 * k);
-
-    if (p >= 6.0 * k)
-        p = 12.0 * k - p;
-
-    if (p > 3.0 * k)
-        count[(int)(6.0*k - p)]--;
-    else
-        count[(int)(p)]++;
-}
-
-#define TAB_SIZE 128
-
 void
-dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
+dedekind_cosine_sum_mpfr_fast(mpfr_t sum, mp_limb_t k, mp_limb_t n)
 {
-    mpfr_t t, u, cosa, sina, cc, ss, cs, sc;
-    ulong h;
-    long i, prev;
-    int * count;
-    mpfr_t cos_tab[TAB_SIZE];
-    mpfr_t sin_tab[TAB_SIZE];
-    char have_diff[TAB_SIZE];
-    double s, q;
+    trig_prod_t prod;
     mpfr_prec_t wp;
-
-    if (k > 1000000)
-    {
-        /* TODO: just don't use doubles for large k ... */
-        printf("Exception: dedekind_cosine_sum: large k not yet supported\n");
-        abort();
-    }
+    mpfr_t t, pi;
+    mp_limb_t v;
+    int i;
 
     if (k <= 2)
     {
         if (k == 0)
-            mpfr_set_ui(sum, 0UL, GMP_RNDN);
+            mpfr_set_ui(sum, 0UL, MPFR_RNDN);
         else if (k == 1)
-            mpfr_set_ui(sum, 1UL, GMP_RNDN);
+            mpfr_set_ui(sum, 1UL, MPFR_RNDN);
         else if (n % 2 == 1)
-            mpfr_set_si(sum, -1L, GMP_RNDN);
+            mpfr_set_si(sum, -1L, MPFR_RNDN);
         else
-            mpfr_set_si(sum, 1L, GMP_RNDN);
+            mpfr_set_si(sum, 1L, MPFR_RNDN);
         return;
     }
 
-    count = calloc((3*k + 1), sizeof(int));
-    q = fmod(12.0 * ((double) n), 12.0 * k);
+    trig_prod_init(prod);
+    dedekind_cosine_sum_factored(prod, k, n);
 
-    for (h = 0; h < (k + 1) / 2; h++)
+    if (prod->prefactor == 0)
     {
-        if (n_gcd(k, h) == 1UL)
-        {
-            s = dedekind_sum_coprime_d(h, k);
-            s = floor(s * (6.0 * k) + 0.5);
-            update_count(count, s - q*h, k);
-            update_count(count, -s - q*(k-h), k);
-        }
+        mpfr_set_ui(sum, 0UL, MPFR_RNDN);
+        return;
     }
-
-    mpfr_set_si(sum, count[0], MPFR_RNDN);
 
     wp = mpfr_get_prec(sum) + 5;
-
     mpfr_init2(t, wp);
-    mpfr_init2(u, wp);
-    mpfr_init2(cosa, wp);
-    mpfr_init2(sina, wp);
-    mpfr_init2(cc, wp);
-    mpfr_init2(ss, wp);
-    mpfr_init2(cs, wp);
-    mpfr_init2(sc, wp);
+    mpfr_init2(pi, wp);
 
-    mpfr_const_pi(u, MPFR_RNDN);
-    mpfr_div_ui(u, u, 6 * k, MPFR_RNDN);
+    mpfr_const_pi(pi, MPFR_RNDN);
 
-    prev = 0;
-    memset(have_diff, 0, TAB_SIZE);
+    mpfr_set_si(sum, prod->prefactor, MPFR_RNDN);
+    v = n_gcd(FLINT_MAX(prod->sqrt_p, prod->sqrt_q),
+              FLINT_MIN(prod->sqrt_p, prod->sqrt_q));
+    prod->sqrt_p /= v;
+    prod->sqrt_q /= v;
 
-    for (i = 1; i < 3 * k; i++)
+    if (prod->sqrt_p != 1)
     {
-        if (count[i] != 0)
-        {
-            if (prev > 2 && i - prev < TAB_SIZE)
-            {
-                if (!have_diff[i - prev])
-                {
-                    mpfr_init2(sin_tab[i - prev], wp);
-                    mpfr_init2(cos_tab[i - prev], wp);
-                    mpfr_mul_si(t, u, i - prev, MPFR_RNDN);
-                    mpfr_sin_cos(sin_tab[i - prev],
-                                 cos_tab[i - prev], t, GMP_RNDN);
-                    have_diff[i - prev] = 1;
-                }
-
-                mpfr_mul(cc, cosa, cos_tab[i - prev], MPFR_RNDN);
-                mpfr_mul(ss, sina, sin_tab[i - prev], MPFR_RNDN);
-                mpfr_mul(cs, cosa, sin_tab[i - prev], MPFR_RNDN);
-                mpfr_mul(sc, sina, cos_tab[i - prev], MPFR_RNDN);
-
-                mpfr_sub(cosa, cc, ss, MPFR_RNDN);
-                mpfr_add(sina, sc, cs, MPFR_RNDN);
-            }
-            else
-            {
-                mpfr_mul_si(t, u, i, MPFR_RNDN);
-                mpfr_sin_cos(sina, cosa, t, GMP_RNDN);
-            }
-
-            if (count[i] != 1)
-                mpfr_mul_si(t, cosa, count[i], MPFR_RNDN);
-
-            mpfr_add(sum, sum, t, MPFR_RNDN);
-            prev = i;
-        }
+        mpfr_sqrt_ui(t, prod->sqrt_p, MPFR_RNDN);
+        mpfr_mul(sum, sum, t, MPFR_RNDN);
     }
 
-    for (i = 0; i < TAB_SIZE; i++)
+    if (prod->sqrt_q != 1)
     {
-        if (have_diff[i])
-        {
-            mpfr_clear(sin_tab[i]);
-            mpfr_clear(cos_tab[i]);
-        }
+        mpfr_sqrt_ui(t, prod->sqrt_q, MPFR_RNDN);
+        mpfr_div(sum, sum, t, MPFR_RNDN);
     }
 
+    for (i = 0; i < prod->n; i++)
+    {
+        mpfr_mul_si(t, pi, prod->cos_p[i], MPFR_RNDN);
+        mpfr_div_ui(t, t, prod->cos_q[i], MPFR_RNDN);
+        mpfr_cos(t, t, MPFR_RNDN);
+        mpfr_mul(sum, sum, t, MPFR_RNDN);
+    }
+
+    mpfr_clear(pi);
     mpfr_clear(t);
-    mpfr_clear(u);
-    mpfr_clear(cosa);
-    mpfr_clear(sina);
-    mpfr_clear(cc);
-    mpfr_clear(ss);
-    mpfr_clear(cs);
-    mpfr_clear(sc);
-    free(count);
 }

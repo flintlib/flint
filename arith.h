@@ -222,11 +222,36 @@ void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
 void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
-double dedekind_cosine_sum_d(ulong k, ulong n);
+/* Exponential sums **********************************************************/
 
-void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n);
+typedef struct
+{
+    int n;
+    int prefactor;
+    mp_limb_t sqrt_p;
+    mp_limb_t sqrt_q;
+    mp_limb_signed_t cos_p[FLINT_BITS];
+    mp_limb_t cos_q[FLINT_BITS];
+} trig_prod_struct;
 
-void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n);
+typedef trig_prod_struct trig_prod_t[1];
+
+static __inline__
+void trig_prod_init(trig_prod_t sum)
+{
+    sum->n = 0;
+    sum->prefactor = 1;
+    sum->sqrt_p = 1;
+    sum->sqrt_q = 1;
+}
+
+double dedekind_cosine_sum_d(mp_limb_t k, mp_limb_t n);
+
+void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, mp_limb_t k, mp_limb_t n);
+
+void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, mp_limb_t k, mp_limb_t n);
+
+void dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
 
 /* Number of partitions ******************************************************/
 
@@ -243,5 +268,9 @@ void number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits,
 void number_of_partitions(fmpz_t x, ulong n);
 
 void number_of_partitions_heuristic(fmpz_t x, ulong n);
+
+void number_of_distinct_partitions_vec(fmpz * res, long len);
+
+void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
 #endif

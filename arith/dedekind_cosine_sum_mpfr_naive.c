@@ -24,19 +24,19 @@
 ******************************************************************************/
 
 #include <stdlib.h>
+#include <math.h>
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
-#include "math.h"
 #include "arith.h"
 #include "ulong_extras.h"
 
 void
-dedekind_cosine_sum_mpfr_naive(mpfr_t sum, ulong k, ulong n)
+dedekind_cosine_sum_mpfr_naive(mpfr_t sum, mp_limb_t k, mp_limb_t n)
 {
     mpfr_t t, u;
     double s, q;
-    ulong h;
+    mp_limb_t h;
 
     mpfr_set_si(sum, 0L, MPFR_RNDN);
     mpfr_init2(t, mpfr_get_prec(sum) + 5);

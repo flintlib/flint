@@ -23,13 +23,13 @@
 
 ******************************************************************************/
 
+#include <math.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
 #include "ulong_extras.h"
 #include "arith.h"
-#include "math.h"
 
 double
 dedekind_sum_coprime_d(double h, double k)

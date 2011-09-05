@@ -107,13 +107,13 @@ void stirling_number_1(fmpz_t s, long n, long k)
 void stirling_number_2(fmpz_t s, long n, long k)
 
     Sets $s$ to $S(n,k)$ where $S(n,k)$ denotes an unsigned Stirling
-    number of the first kind $\abs{S_1(n, k)}$, a signed Stirling number 
+    number of the first kind $|S_1(n, k)|$, a signed Stirling number 
     of the first kind $S_1(n, k)$, or a Stirling number of the second 
     kind $S_2(n, k)$.  The Stirling numbers are defined using the 
     generating functions
     \begin{align*}
         x_{(n)} & = \sum_{k=0}^n S_1(n,k) x^k \\
-        x^{(n)} & = \sum_{k=0}^n \abs{S_1(n,k)} x^k \\
+        x^{(n)} & = \sum_{k=0}^n |S_1(n,k)| x^k \\
         x^n     & = \sum_{k=0}^n S_2(n,k) x_{(k)}
     \end{align*}
     where $x_{(n)} = x(x-1)(x-2) \dotsm (x-n+1)$ is a falling factorial 
@@ -703,7 +703,7 @@ void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, ulong k, ulong n)
     difference between consecutive arguments is small enough to
     fit in the table.
 
-dbouel dedekind_cosine_sum_d(ulong k, ulong n)
+double dedekind_cosine_sum_d(ulong k, ulong n)
 
     This function evaluates $A_k(n)$ using double-precision arithmetic.
 

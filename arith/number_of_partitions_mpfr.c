@@ -25,10 +25,10 @@
 
 ******************************************************************************/
 
+#include <math.h>
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
-#include "math.h"
 #include "ulong_extras.h"
 #include "arith.h"
 
@@ -61,6 +61,11 @@ static double partitions_remainder_bound_log2(double n, double N)
 
     return (FLINT_MAX(t1, t2) + 1) * 1.4426950408889634074;
 }
+
+
+void
+dedekind_cosine_sum_mpfr_fastest(mpfr_t sum, mp_limb_t k, mp_limb_t n);
+
 
 void
 number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits, double cutoff,
@@ -114,6 +119,8 @@ number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits, double cutoff,
     {
         prec = partitions_remainder_bound_log2(n, k) + guard_bits;
 
+        /* Account for error computing sinh and cosh */
+        prec += 0.5*FLINT_BIT_COUNT(n) - FLINT_BIT_COUNT(k);
         /* printf("%ld: %ld\n", k, prec); */
 
         mpfr_set_prec(t, prec);
@@ -139,11 +146,17 @@ number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits, double cutoff,
             mpfr_add(x, x, t, GMP_RNDN);
         }
 
-        if (prec < FLINT_D_BITS)
+        /*
+        if ((k < 20 || k % 100 == 0))
+            printf("SIZE prec=%ld real=%ld\n", prec - guard_bits,
+                mpfr_get_exp(t));
+        */
+
+        if (prec < 53)
             break;
     }
 
-    mpfr_set_prec(t, FLINT_D_BITS + guard_bits);
+    mpfr_set_prec(t, 53 + guard_bits);
     mpfr_set_ui(t, 0UL, GMP_RNDN);
 
     D0 = mpfr_get_d(C0, GMP_RNDN);
@@ -174,11 +187,11 @@ number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits, double cutoff,
             break;
         }
 
-/*
-        if (k % 100 == 0)
+        /*
+        if (k % 1000 == 0)
             printf("%ld ... %.12g, %.12g\n", k,
                 partitions_remainder_bound(n, k), s);
-*/
+        */
     }
 
     mpfr_add(x, x, t, GMP_RNDN);
