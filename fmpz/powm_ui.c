@@ -56,12 +56,24 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
             if (!COEFF_IS_MPZ(g2))  /* g is small */
             {
                 int sgn = (g2 >= 0) ? 1 : -1;
+                mp_limb_t minv = n_preinvert_limb(m2);
 
-                fmpz_set_ui(f, 
-                    n_powmod(sgn * g2, (e <= (ulong) LONG_MAX) ? 
-                    e : (e = e % n_euler_phi(m2)), m2));
-                if (sgn < 0 && e % 2UL)
-                    *f = n_negmod(*f, m2);
+                g2 = n_mod2_preinv(g2 * sgn, m2, minv);
+
+                if (g2 == 0)
+                {
+                    fmpz_zero(f);
+                }
+                else
+                {
+                    if ((ulong) m2 < e)
+                        e = e % n_euler_phi(m2);
+
+                    fmpz_set_ui(f, n_powmod2_preinv(g2, e, m2, minv));
+
+                    if ((sgn < 0) && (e & 1UL))
+                        *f = n_negmod(*f, m2);
+                }
             }
             else  /* g is large */
             {
