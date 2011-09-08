@@ -30,10 +30,8 @@
 #include "fmpz.h"
 #include "arith.h"
 
-#define GUARD_BITS 15
-#define CUTOFF 0.49
-#define HEURISTIC_CUTOFF 0.0
-#define HEURISTIC_COUNT 1
+/* This nice round number precisely fits on 32 bits */
+#define NUMBER_OF_SMALL_PARTITIONS 128
 
 const unsigned int
 partitions_lookup[NUMBER_OF_SMALL_PARTITIONS] = 
@@ -68,8 +66,7 @@ number_of_partitions(fmpz_t x, ulong n)
     {
         mpfr_t t;
         mpfr_init(t);
-        number_of_partitions_mpfr(t, n, GUARD_BITS, CUTOFF, HEURISTIC_CUTOFF,
-            HEURISTIC_COUNT);
+        number_of_partitions_mpfr(t, n);
         mpfr_get_z(_fmpz_promote(x), t, MPFR_RNDN);
         _fmpz_demote_val(x);
         mpfr_clear(t);

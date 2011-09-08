@@ -309,4 +309,5 @@ dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
     if (fac.num != 0 && prod->prefactor != 0)
         trigprod_mul_prime_power(prod, k, n,
             fac.p[fac.num - 1], fac.exp[fac.num - 1]);
+
 }

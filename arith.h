@@ -245,12 +245,6 @@ void trig_prod_init(trig_prod_t sum)
     sum->sqrt_q = 1;
 }
 
-double dedekind_cosine_sum_d(mp_limb_t k, mp_limb_t n);
-
-void dedekind_cosine_sum_mpfr_fast(mpfr_t sum, mp_limb_t k, mp_limb_t n);
-
-void dedekind_cosine_sum_mpfr_naive(mpfr_t sum, mp_limb_t k, mp_limb_t n);
-
 void dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
 
 /* Number of partitions ******************************************************/
@@ -259,15 +253,9 @@ void number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
 void number_of_partitions_vec(fmpz * res, long len);
 
-void number_of_partitions_mpfr(mpfr_t x, ulong n, int guard_bits,
-    double cutoff, double heuristic_cutoff, unsigned int heuristic_count);
-
-/* This nice round number precisely fits on 32 bits */
-#define NUMBER_OF_SMALL_PARTITIONS 128
+void number_of_partitions_mpfr(mpfr_t x, ulong n);
 
 void number_of_partitions(fmpz_t x, ulong n);
-
-void number_of_partitions_heuristic(fmpz_t x, ulong n);
 
 void number_of_distinct_partitions_vec(fmpz * res, long len);
 
