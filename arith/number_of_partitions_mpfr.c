@@ -39,6 +39,17 @@
 #define HRR_C (2.5650996603237281911 + 1e-12)  /* pi*sqrt(2/3) */
 
 
+void mpfr_sqrt_z(mpfr_t x, mpz_t z, mpfr_rnd_t rnd)
+{
+    if (mpz_fits_ulong_p(z))
+        mpfr_sqrt_ui(x, mpz_get_ui(z), rnd);
+    else
+    {
+        mpfr_set_z(x, z, rnd);
+        mpfr_sqrt(x, x, rnd);
+    }
+}
+
 static double partitions_remainder_bound(double n, double terms)
 {
     return HRR_A/sqrt(terms)
@@ -170,6 +181,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
 {
     trig_prod_t prod;
     mpfr_t acc, C, t1, t2, t3, t4;
+    mpz_t n24;
     double Cd;
     long k, N, prec, guard_bits, mag_bound;
 
@@ -180,8 +192,8 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
     }
 
     /* Compute number of needed terms */
-    for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N += 10);
-    for ( ; partitions_remainder_bound(n, N) > 0.25; N += 10);
+    for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
+    for ( ; partitions_remainder_bound(n, N) > (n > 1500 ? 0.25 : 1); N++);
 
     /* Compute initial precision */
     guard_bits = 2 * FLINT_BIT_COUNT(N) + 32;
@@ -199,9 +211,14 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
     mpfr_set_ui(x, 0, MPFR_RNDN);
     mpfr_set_ui(acc, 0, MPFR_RNDN);
 
+    mpz_init(n24);
+    mpz_set_ui(n24, n);
+    mpz_mul_ui(n24, n24, 24);
+    mpz_sub_ui(n24, n24, 1);
+
     /* C = (pi/6)*sqrt(24*n-1) */
     mpfr_const_pi(t1, MPFR_RNDN);
-    mpfr_sqrt_ui(t2, 24*n - 1, MPFR_RNDN);
+    mpfr_sqrt_z(t2, n24, MPFR_RNDN);
     mpfr_mul(t1, t1, t2, MPFR_RNDN);
     mpfr_div_ui(C, t1, 6, MPFR_RNDN);
     Cd = mpfr_get_d(C, MPFR_RNDN);
@@ -213,25 +230,28 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
 
         if (prod->prefactor != 0)
         {
-            mag_bound = partitions_remainder_bound_log2(n, k);
-            guard_bits = (long) FLINT_BIT_COUNT(n) / 2 - 
-                        ((long) FLINT_BIT_COUNT(k));
-            guard_bits = FLINT_MAX(guard_bits, (long)(FLINT_BIT_COUNT(N)));
-            guard_bits += 5;
-            prec = mag_bound + guard_bits;
-            prec = FLINT_MAX(prec, DOUBLE_PREC);
+            if (prec > DOUBLE_PREC)
+            {
+                mag_bound = partitions_remainder_bound_log2(n, k);
+                guard_bits = (long) FLINT_BIT_COUNT(n) / 2 - 
+                            ((long) FLINT_BIT_COUNT(k));
+                guard_bits = FLINT_MAX(guard_bits, (long)(FLINT_BIT_COUNT(N)));
+                guard_bits += 5;
+                prec = mag_bound + guard_bits;
+                prec = FLINT_MAX(prec, DOUBLE_PREC);
 
-            mpfr_set_prec(t1, prec);
-            mpfr_set_prec(t2, prec);
-            mpfr_set_prec(t3, prec);
-            mpfr_set_prec(t4, prec);
+                mpfr_set_prec(t1, prec);
+                mpfr_set_prec(t2, prec);
+                mpfr_set_prec(t3, prec);
+                mpfr_set_prec(t4, prec);
+            }
 
             /* Compute A_k(n) * sqrt(3/k) * 4 / (24*n-1) */
             prod->prefactor *= 4;
             prod->sqrt_p *= 3;
             prod->sqrt_q *= k;
             eval_trig_prod(t1, prod);
-            mpfr_div_ui(t1, t1, 24*n - 1, MPFR_RNDN);
+            mpfr_div_z(t1, t1, n24, MPFR_RNDN);
 
             /* Multiply by (cosh(z) - sinh(z)/z) where z = C / k*/
             if (prec <= DOUBLE_PREC)
@@ -262,6 +282,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
     mpfr_add(x, x, acc, MPFR_RNDN);
     mpfr_rint(x, x, MPFR_RNDN);
 
+    mpz_clear(n24);
     mpfr_clear(acc);
     mpfr_clear(C);
     mpfr_clear(t1);

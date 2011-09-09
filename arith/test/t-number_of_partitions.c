@@ -119,11 +119,11 @@ int main(void)
     flint_randinit(state);
 
     fmpz_init(p);
-    v = _fmpz_vec_init(2000);
+    v = _fmpz_vec_init(3000);
 
-    number_of_partitions_vec(v, 2000);
+    number_of_partitions_vec(v, 3000);
 
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 3000; i++)
     {
         number_of_partitions(p, i);
         if (!fmpz_equal(p, v + i))
@@ -136,7 +136,7 @@ int main(void)
         }
     }
 
-    _fmpz_vec_clear(v, 2000);
+    _fmpz_vec_clear(v, 3000);
 
     for (i = 0; testdata[i][0] != 0; i++)
     {
