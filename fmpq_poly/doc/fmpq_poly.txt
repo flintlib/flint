@@ -751,6 +751,75 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
 
 *******************************************************************************
 
+    Greatest common divisor
+
+*******************************************************************************
+
+void _fmpq_poly_gcd(fmpz *G, fmpz_t denG, 
+                    const fmpz *A, long lenA, const fmpz *B, long lenB)
+
+    Computes the monic greatest common divisor $G$ of $A$ and $B$.
+
+    Assumes that $G$ has space for $\len(B)$ coefficients, 
+    where $\len(A) \geq \len(B) > 0$.
+
+    Aliasing between the output and input arguments is not supported.
+
+    Does not support zero-padding.
+
+void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
+
+    Computes the monic greatest common divisor $G$ of $A$ and $B$.
+
+    In the the special case when $A = B = 0$, sets $G = 0$.
+
+void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, 
+                     fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, 
+                     const fmpz *A, const fmpz_t denA, long lenA, 
+                     const fmpz *B, const fmpz_t denB, long lenB)
+
+    Computes polynomials $G$, $S$, and $T$ such that 
+    $G = \gcd(A, B) = S A + T B$, where $G$ is the monic 
+    greatest common divisor of $A$ and $B$.
+
+    Assumes that $G$, $S$, and $T$ have space for $\len(B)$, 
+    $\len(B)$, and $\len(A)$ coefficients, respectively, 
+    where it is also assumed that $\len(A) \geq \len(B) > 0$.
+
+    Does not support zero padding of the input arguments.
+
+void fmpq_poly_xgcd(fmpq_poly_t G, fmpz_poly_t S, fmpz_poly_t T, 
+                    const fmpq_poly_t A, const fmpq_poly_t B)
+
+    Computes polynomials $G$, $S$, and $T$ such that 
+    $G = \gcd(A, B) = S A + T B$, where $G$ is the monic 
+    greatest common divisor of $A$ and $B$.
+
+    Corner cases are handled as follows.  If $A = B = 0$, returns 
+    $G = S = T = 0$.  If $A \neq 0$, $B = 0$, returns the suitable 
+    scalar multiple of $G = A$, $S = 1$, and $T = 0$.  The case 
+    when $A = 0$, $B \neq 0$ is handled similarly.
+
+void _fmpq_poly_lcm(fmpz *L, fmpz_t denL, 
+                    const fmpz *A, long lenA, const fmpz *B, long lenB)
+
+    Computes the monic least common multiple $L$ of $A$ and $B$.
+
+    Assumes that $L$ has space for $\len(A) + \len(B) - 1$ coefficients, 
+    where $\len(A) \geq \len(B) > 0$.
+
+    Aliasing between the output and input arguments is not supported.
+
+    Does not support zero-padding.
+
+void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B)
+
+    Computes the monic least common multiple $L$ of $A$ and $B$.
+
+    In the special case when $A = B = 0$, sets $L = 0$.
+
+*******************************************************************************
+
     Derivative and integral
 
 *******************************************************************************
