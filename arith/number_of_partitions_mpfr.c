@@ -31,6 +31,8 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "arith.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
 #define DOUBLE_PREC 53
 #define PI 3.141592653589793238462643
@@ -39,25 +41,16 @@
 #define HRR_C (2.5650996603237281911 + 1e-12)  /* pi*sqrt(2/3) */
 
 
-void mpfr_sqrt_z(mpfr_t x, mpz_t z, mpfr_rnd_t rnd)
-{
-    if (mpz_fits_ulong_p(z))
-        mpfr_sqrt_ui(x, mpz_get_ui(z), rnd);
-    else
-    {
-        mpfr_set_z(x, z, rnd);
-        mpfr_sqrt(x, x, rnd);
-    }
-}
-
-static double partitions_remainder_bound(double n, double terms)
+static double
+partitions_remainder_bound(double n, double terms)
 {
     return HRR_A/sqrt(terms)
             + HRR_B*sqrt(terms/(n-1)) * sinh(HRR_C * sqrt(n)/terms);
 }
 
 /* Crude upper bound, sufficient to estimate the precision */
-static double log_sinh(double x)
+static double
+log_sinh(double x)
 {
     if (x > 4)
         return x;
@@ -65,7 +58,8 @@ static double log_sinh(double x)
         return log(x) + x*x*(1/6.);
 }
 
-static double partitions_remainder_bound_log2(double n, double N)
+static double
+partitions_remainder_bound_log2(double n, double N)
 {
     double t1, t2;
 
@@ -75,7 +69,38 @@ static double partitions_remainder_bound_log2(double n, double N)
     return (FLINT_MAX(t1, t2) + 1) * 1.4426950408889634074;
 }
 
-double cos_pi_pq(mp_limb_signed_t p, mp_limb_signed_t q)
+long
+partitions_needed_terms(long n)
+{
+    long N;
+    for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
+    for ( ; partitions_remainder_bound(n, N) > (n > 1500 ? 0.25 : 1); N++);
+    return N;
+}
+
+/* p(n), term k, N total terms */
+static long
+partitions_prec_bound(long n, long k, long N)
+{
+    long guard_bits, mag_bound, prec;
+
+    mag_bound = partitions_remainder_bound_log2(n, k);
+
+    /* Error computing cosh(x) */
+    guard_bits = (long) FLINT_BIT_COUNT(n) / 2 -
+                ((long) FLINT_BIT_COUNT(k));
+
+    /* Want an error less than 0.25/N */
+    guard_bits = FLINT_MAX(guard_bits, (long)(FLINT_BIT_COUNT(N)));
+    guard_bits += 5;
+
+    prec = mag_bound + guard_bits;
+    prec = FLINT_MAX(prec, DOUBLE_PREC);
+    return prec;
+}
+
+double
+cos_pi_pq(mp_limb_signed_t p, mp_limb_signed_t q)
 {
     /* Force 0 <= p < q */
     p = FLINT_ABS(p);
@@ -91,6 +116,147 @@ double cos_pi_pq(mp_limb_signed_t p, mp_limb_signed_t q)
         return -cos((q - p) * PI / q);
 }
 
+void
+mpfr_sqrt_z(mpfr_t x, mpz_t z, mpfr_rnd_t rnd)
+{
+    if (mpz_fits_ulong_p(z))
+        mpfr_sqrt_ui(x, mpz_get_ui(z), rnd);
+    else
+    {
+        mpfr_set_z(x, z, rnd);
+        mpfr_sqrt(x, x, rnd);
+    }
+}
+
+void
+mpfr_set_fmpz(mpfr_t c, const fmpz_t b)
+{
+    if (COEFF_IS_MPZ(*b))
+        mpfr_set_z(c, COEFF_TO_PTR(*b), MPFR_RNDN);
+    else
+        mpfr_set_si(c, *b, MPFR_RNDN);
+}
+
+void
+mpfr_mul_fmpz(mpfr_t c, mpfr_srcptr a, const fmpz_t b)
+{
+    if (COEFF_IS_MPZ(*b))
+        mpfr_mul_z(c, a, COEFF_TO_PTR(*b), MPFR_RNDN);
+    else
+        mpfr_mul_si(c, a, *b, MPFR_RNDN);
+}
+
+void
+mpfr_add_fmpz(mpfr_t c, mpfr_srcptr a, const fmpz_t b)
+{
+    if (COEFF_IS_MPZ(*b))
+        mpfr_add_z(c, a, COEFF_TO_PTR(*b), MPFR_RNDN);
+    else
+        mpfr_add_si(c, a, *b, MPFR_RNDN);
+}
+
+
+void
+_fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz * f, long len,
+                           const mpfr_t a)
+{
+    if (len == 0)
+        mpfr_set_ui(res, 0, MPFR_RNDN);
+    else if (len == 1)
+        mpfr_set_fmpz(res, f);
+    else
+    {
+        long i = len - 1;
+        mpfr_t t;
+        mpfr_init2(t, mpfr_get_prec(res));
+        mpfr_set_fmpz(res, f + i);
+        for (i = len - 2; i >= 0; i--)
+        {
+            mpfr_mul(t, res, a, MPFR_RNDN);
+            mpfr_add_fmpz(res, t, f + i);
+        }
+        mpfr_clear(t);
+    }
+}
+
+void
+fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz_poly_t f, const mpfr_t a)
+{
+    if (res == a)
+    {
+        mpfr_t t;
+        mpfr_init2(t, mpfr_get_prec(res));
+        _fmpz_poly_evaluate_mpfr(t, f->coeffs, f->length, a);
+        mpfr_swap(res, t);
+        mpfr_clear(t);
+    }
+    else
+    {
+        _fmpz_poly_evaluate_mpfr(res, f->coeffs, f->length, a);
+    }
+}
+
+void
+findroot(mpfr_t x, fmpz_poly_t poly, double x0)
+{
+    long i, prec, initial_prec, target_prec, guard_bits;
+    long precs[FLINT_BITS];
+    fmpz_poly_t poly2;
+    mpfr_t t, u, xn;
+
+    initial_prec = 48;
+    target_prec = mpfr_get_prec(x) + 32;
+
+    mpfr_init2(t, 53);
+    mpfr_init2(u, 53);
+    mpfr_init2(xn, 53);
+    mpfr_set_d(xn, x0, MPFR_RNDN);
+
+    fmpz_poly_init(poly2);
+    fmpz_poly_derivative(poly2, poly);
+    guard_bits = fmpz_poly_max_bits(poly2);
+    guard_bits = FLINT_ABS(guard_bits);
+
+    for (i = 0, prec = target_prec; prec >= initial_prec; i++)
+    {
+        precs[i] = prec;
+        prec = prec / 2 + 8;
+    }
+
+    for (i--; i >= 0; i--)
+    {
+        mpfr_set_prec(t, precs[i] + guard_bits);
+        mpfr_set_prec(u, precs[i] + guard_bits);
+        mpfr_prec_round(xn, precs[i], MPFR_RNDN);
+        fmpz_poly_evaluate_mpfr(t, poly, xn);
+        fmpz_poly_evaluate_mpfr(u, poly2, xn);
+        mpfr_div(t, t, u, MPFR_RNDN);
+        mpfr_sub(xn, xn, t, MPFR_RNDN);
+    }
+
+    mpfr_set(x, xn, MPFR_RNDN);
+
+    fmpz_poly_clear(poly2);
+    mpfr_clear(t);
+    mpfr_clear(u);
+    mpfr_clear(xn);
+}
+
+void cos_minpoly(fmpz_poly_t poly, long p, long q)
+{
+    if (p % 2 == 0)
+        cyclotomic_cos_polynomial(poly, q);
+    else
+        cyclotomic_cos_polynomial(poly, 2 * q);
+}
+
+int use_newton(long prec, long q)
+{
+    if (q < 250 && prec > 400 + 4*q*q)
+        return 1;
+    return 0;
+}
+
 void mpfr_cos_pi_pq(mpfr_t t, mp_limb_signed_t p, mp_limb_signed_t q)
 {
     /* Force 0 <= p < q */
@@ -99,26 +265,41 @@ void mpfr_cos_pi_pq(mpfr_t t, mp_limb_signed_t p, mp_limb_signed_t q)
     if (p >= q)
         p = 2 * q - p;
 
-    mpfr_const_pi(t, MPFR_RNDN);
-
-    if (4 * p <= q)
+    if (use_newton(mpfr_get_prec(t), q))
     {
-        mpfr_mul_si(t, t, p, MPFR_RNDN);
-        mpfr_div_ui(t, t, q, MPFR_RNDN);
-        mpfr_cos(t, t, MPFR_RNDN);
-    }
-    else if (4 * p < 3 * q)
-    {
-        mpfr_mul_si(t, t, q - 2*p, MPFR_RNDN);
-        mpfr_div_ui(t, t, 2 * q, MPFR_RNDN);
-        mpfr_sin(t, t, MPFR_RNDN);
+        fmpz_poly_t poly;
+        long d;
+        fmpz_poly_init(poly);
+        d = n_gcd(q, p);
+        q /= d;
+        p /= d;
+        cos_minpoly(poly, p, q);
+        findroot(t, poly, cos(3.1415926535897932385 * p / q));
+        fmpz_poly_clear(poly);
     }
     else
     {
-        mpfr_mul_si(t, t, q - p, MPFR_RNDN);
-        mpfr_div_ui(t, t, q, MPFR_RNDN);
-        mpfr_cos(t, t, MPFR_RNDN);
-        mpfr_neg(t, t, MPFR_RNDN);
+        mpfr_const_pi(t, MPFR_RNDN);
+
+        if (4 * p <= q)
+        {
+            mpfr_mul_si(t, t, p, MPFR_RNDN);
+            mpfr_div_ui(t, t, q, MPFR_RNDN);
+            mpfr_cos(t, t, MPFR_RNDN);
+        }
+        else if (4 * p < 3 * q)
+        {
+            mpfr_mul_si(t, t, q - 2*p, MPFR_RNDN);
+            mpfr_div_ui(t, t, 2 * q, MPFR_RNDN);
+            mpfr_sin(t, t, MPFR_RNDN);
+        }
+        else
+        {
+            mpfr_mul_si(t, t, q - p, MPFR_RNDN);
+            mpfr_div_ui(t, t, q, MPFR_RNDN);
+            mpfr_cos(t, t, MPFR_RNDN);
+            mpfr_neg(t, t, MPFR_RNDN);
+        }
     }
 }
 
@@ -175,15 +356,31 @@ eval_trig_prod(mpfr_t sum, trig_prod_t prod)
     }
 }
 
+void
+sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, long k)
+{
+    mpfr_t t;
+    mpfr_root(ch, ex, k, MPFR_RNDN);
+    /* The second term doesn't need full precision,
+       but this doesn't affect performance that much... */
+    mpfr_init2(t, mpfr_get_prec(ch));
+    mpfr_ui_div(t, 1, ch, MPFR_RNDN);
+    mpfr_sub(sh, ch, t, MPFR_RNDN);
+    mpfr_add(ch, ch, t, MPFR_RNDN);
+    mpfr_div_2exp(ch, ch, 1, MPFR_RNDN);
+    mpfr_div_2exp(sh, sh, 1, MPFR_RNDN);
+    mpfr_clear(t);
+}
+
 
 void
-number_of_partitions_mpfr(mpfr_t x, ulong n)
+_number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
 {
     trig_prod_t prod;
-    mpfr_t acc, C, t1, t2, t3, t4;
+    mpfr_t acc, C, t1, t2, t3, t4, exp1;
     mpz_t n24;
     double Cd;
-    long k, N, prec, guard_bits, mag_bound;
+    long k, prec, guard_bits;
 
     if (n <= 2)
     {
@@ -191,14 +388,10 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
         return;
     }
 
-    /* Compute number of needed terms */
-    for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
-    for ( ; partitions_remainder_bound(n, N) > (n > 1500 ? 0.25 : 1); N++);
-
     /* Compute initial precision */
     guard_bits = 2 * FLINT_BIT_COUNT(N) + 32;
-    prec = partitions_remainder_bound_log2(n, 1) + guard_bits;
-    prec = FLINT_MAX(prec, 53);
+    prec = partitions_remainder_bound_log2(n, N0) + guard_bits;
+    prec = FLINT_MAX(prec, DOUBLE_PREC);
 
     mpfr_set_prec(x, prec);
     mpfr_init2(acc, prec);
@@ -218,12 +411,16 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
 
     /* C = (pi/6)*sqrt(24*n-1) */
     mpfr_const_pi(t1, MPFR_RNDN);
+
     mpfr_sqrt_z(t2, n24, MPFR_RNDN);
     mpfr_mul(t1, t1, t2, MPFR_RNDN);
     mpfr_div_ui(C, t1, 6, MPFR_RNDN);
     Cd = mpfr_get_d(C, MPFR_RNDN);
 
-    for (k = 1; k <= N; k++)
+    mpfr_init2(exp1, prec);
+    mpfr_exp(exp1, C, prec);
+
+    for (k = N0; k <= N; k++)
     {
         trig_prod_init(prod);
         dedekind_cosine_sum_factored(prod, k, n % k);
@@ -232,13 +429,7 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
         {
             if (prec > DOUBLE_PREC)
             {
-                mag_bound = partitions_remainder_bound_log2(n, k);
-                guard_bits = (long) FLINT_BIT_COUNT(n) / 2 - 
-                            ((long) FLINT_BIT_COUNT(k));
-                guard_bits = FLINT_MAX(guard_bits, (long)(FLINT_BIT_COUNT(N)));
-                guard_bits += 5;
-                prec = mag_bound + guard_bits;
-                prec = FLINT_MAX(prec, DOUBLE_PREC);
+                prec = partitions_prec_bound(n, k, N);
 
                 mpfr_set_prec(t1, prec);
                 mpfr_set_prec(t2, prec);
@@ -262,7 +453,12 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
             else
             {
                 mpfr_div_ui(t2, C, k, MPFR_RNDN);
-                mpfr_sinh_cosh(t3, t4, t2, MPFR_RNDN);
+
+                if (k < 35)
+                    sinh_cosh_divk_precomp(t3, t4, exp1, k);
+                else
+                    mpfr_sinh_cosh(t3, t4, t2, MPFR_RNDN);
+
                 mpfr_div(t3, t3, t2, MPFR_RNDN);
                 mpfr_sub(t2, t4, t3, MPFR_RNDN);
                 mpfr_mul(t1, t1, t2, MPFR_RNDN);
@@ -280,13 +476,19 @@ number_of_partitions_mpfr(mpfr_t x, ulong n)
     }
 
     mpfr_add(x, x, acc, MPFR_RNDN);
-    mpfr_rint(x, x, MPFR_RNDN);
 
     mpz_clear(n24);
     mpfr_clear(acc);
+    mpfr_clear(exp1);
     mpfr_clear(C);
     mpfr_clear(t1);
     mpfr_clear(t2);
     mpfr_clear(t3);
     mpfr_clear(t4);
+}
+
+void
+number_of_partitions_mpfr(mpfr_t x, ulong n)
+{
+    _number_of_partitions_mpfr(x, n, 1, partitions_needed_terms(n));
 }
