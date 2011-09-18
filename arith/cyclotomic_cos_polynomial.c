@@ -175,6 +175,42 @@ _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
         return;
     }
 
+    /* Direct formula for odd primes > 3 */
+    if (n_is_prime(n))
+    {
+        long s = (n - 1) / 2;
+
+        switch (s % 4)
+        {
+            case 0:
+                fmpz_set_si(coeffs, 1L);
+                fmpz_set_si(coeffs + 1, -s);
+                break;
+            case 1:
+                fmpz_set_si(coeffs, 1L);
+                fmpz_set_si(coeffs + 1, s + 1);
+                break;
+            case 2:
+                fmpz_set_si(coeffs, -1L);
+                fmpz_set_si(coeffs + 1, s);
+                break;
+            case 3:
+                fmpz_set_si(coeffs, -1L);
+                fmpz_set_si(coeffs + 1, -s - 1);
+                break;
+        }
+
+        for (i = 2; i <= s; i++)
+        {
+            long b = (s - i) % 2;
+            fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, s+i-b, s+2-b-i);
+            fmpz_divexact2_uiui(coeffs + i, coeffs + i, i, i-1);
+            fmpz_neg(coeffs + i, coeffs + i);
+        }
+
+        return;
+    }
+
     prec = magnitude_bound(d) + 5 + FLINT_BIT_COUNT(d);
 
     alpha = _fmpz_vec_init(d);

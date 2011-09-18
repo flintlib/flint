@@ -554,6 +554,9 @@ void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
     in $\prod_{i=1}^d (x - \alpha)$ can be bounded by the central
     coefficient in the binomial expansion of $(x+1)^d$.
 
+    When $n$ is an odd prime, we use a direct formula for the coefficients
+    (\url{http://mathworld.wolfram.com/TrigonometricAngles.html}).
+
 void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the minimal polynomial $\Psi_n(x)$ of
