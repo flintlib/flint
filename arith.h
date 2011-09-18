@@ -198,6 +198,10 @@ void _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
 
 void cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
 
+void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n);
+
+void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n);
+
 /* Legendre polynomials ******************************************************/
 
 void legendre_polynomial(fmpq_poly_t poly, ulong n);

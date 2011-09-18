@@ -399,7 +399,7 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n)
 void chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
 
     Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
-    defined formally by $T_n(x) = \cos(n \acos(x))$. The coefficients are
+    defined formally by $T_n(x) = \cos(n \cos^{-1}(x))$. The coefficients are
     calculated using a hypergeometric recurrence.
 
 void chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
@@ -535,6 +535,33 @@ void cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
 
     We factor $n$ into $n = qs$ where $q$ is squarefree,
     and compute $\Phi_q(x)$. Then $\Phi_n(x) = \Phi_q(x^s)$.
+
+void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
+
+    For $n \ge 1$, sets \code{(coeffs, d+1)} to the minimal polynomial
+    $\Psi_n(x)$ of $\cos(2 \pi / n)$, scaled to have integer coefficients
+    by multiplying by $2^d$ ($2^{d-1}$ when $n$ is a power of two).
+
+    The polynomial $\Psi_n(x)$ is described in \cite{WaktinsZeitlin1993}.
+    As proved in that paper, the roots of $\Psi_n(x)$ for $n \ge 3$ are
+    $\cos(2 \pi k / n)$ where $0 \le k < d$ and where $\gcd(k, n) = 1$.
+
+    To calculate $\Psi_n(x)$, we compute the roots numerically with MPFR
+    and use a balanced product tree to form a polynomial with fixed-point
+    coefficients, i.e. an approximation of $2^p 2^d \Psi_n(x)$.
+
+    To determine the precision $p$, we note that the coefficients
+    in $\prod_{i=1}^d (x - \alpha)$ can be bounded by the central
+    coefficient in the binomial expansion of $(x+1)^d$.
+
+void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the minimal polynomial $\Psi_n(x)$ of
+    $\cos(2 \pi / n)$, scaled to have integer coefficients. This
+    polynomial has degree 1 if $n = 1$ or $n = 2$, and
+    degree $\phi(n) / 2$ otherwise.
+
+    We allow $n = 0$ and define $\Psi_0 = 1$.
 
 
 *******************************************************************************
