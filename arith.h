@@ -202,6 +202,12 @@ void cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
 
 void legendre_polynomial(fmpq_poly_t poly, ulong n);
 
+/* Chebyshev polynomials *****************************************************/
+
+void chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
+
+void chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
+
 /* Swinnerton-Dyer polynomials ***********************************************/
 
 void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);

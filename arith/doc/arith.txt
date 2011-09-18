@@ -396,6 +396,18 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n)
     denominator is given by
     $\gcd(n!,2^n) = 2^{\lfloor n/2 \rfloor + \lfloor n/4 \rfloor + \ldots}.$
 
+void chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Chebyshev polynomial of the first kind $T_n(x)$,
+    defined formally by $T_n(x) = \cos(n \acos(x))$. The coefficients are
+    calculated using a hypergeometric recurrence.
+
+void chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
+
+    Sets \code{poly} to the Chebyshev polynomial of the first kind $U_n(x)$,
+    which satisfies $(n+1) U_n(x) = T'_{n+1}(x)$.
+    The coefficients are calculated using a hypergeometric recurrence.
+
 *******************************************************************************
 
     Multiplicative functions
