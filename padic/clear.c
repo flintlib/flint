@@ -25,8 +25,13 @@
 
 #include "padic.h"
 
-void padic_clear(padic_t rop, const padic_ctx_t ctx)
+void _padic_clear(padic_t rop)
 {
     fmpz_clear(padic_unit(rop));
+}
+
+void padic_clear(padic_t rop, const padic_ctx_t ctx)
+{
+    _padic_clear(rop);
 }
 

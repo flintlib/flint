@@ -36,7 +36,7 @@ fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j)
     if (j > poly->length)
         j = poly->length;
 
-    _fmpz_vec_zero(poly->coeffs, j - i);
+    _fmpz_vec_zero(poly->coeffs + i, j - i);
 
     if (j == poly->length)
     {

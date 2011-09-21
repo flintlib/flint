@@ -29,6 +29,10 @@
 #include <mpir.h>
 #include "flint.h"
 
+/* Properties ****************************************************************/
+
+size_t z_sizeinbase(long n, int b);
+
 /* Randomisation  ************************************************************/
 
 mp_limb_signed_t z_randtest(flint_rand_t state);

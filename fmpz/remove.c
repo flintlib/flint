@@ -25,43 +25,33 @@
 
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
 long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 {
-    long e;
     fmpz y = *x;
     fmpz q = *f;
-
-    if (fmpz_is_zero(x))
-        return 0;
 
     if (!COEFF_IS_MPZ(y))  /* x is small */
     {
         if (!COEFF_IS_MPZ(q))  /* f is small */
         {
-            mp_limb_t quo, rem;
-            int sgn = 1;
-
-            if (y < 0)
+            if (y > 0)
             {
-                sgn = -1;
-                y = -y;
+                return n_remove2_precomp((mp_limb_t *) x, q, finv);
             }
-
-            e = 0;
-            rem = n_divrem2_precomp(&quo, y, q, finv);
-            while (rem == 0)
+            else
             {
-                y = quo;
-                e++;
-                rem = n_divrem2_precomp(&quo, y, q, finv);
+                ulong z = - (ulong) y;
+                long e  = n_remove2_precomp(&z, q, finv);
+
+                if (e > 0)
+                {
+                    *x = - (long) z;
+                }
+                return e;
             }
-
-            *x = sgn * y;
-
-            return e;
         }
         else  /* f is large */
         {
@@ -70,36 +60,51 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
     }
     else  /* x is big */
     {
+        __mpz_struct *z = COEFF_TO_PTR(y);
+
         if (!COEFF_IS_MPZ(q))  /* f is small */
         {
-            if (!mpz_divisible_ui_p(COEFF_TO_PTR(y), q))
+            if (!mpz_divisible_ui_p(z, q))
             {
                 return 0;
             }
             else
             {
-                mpz_t h;
+                mpz_divexact_ui(z, z, q);
 
-                mpz_init_set_ui(h, q);
-                e = mpz_remove(COEFF_TO_PTR(y), COEFF_TO_PTR(y), h);
-                _fmpz_demote_val(x);
-                mpz_clear(h);
+                if (!mpz_divisible_ui_p(z, q))
+                {
+                    return 1;
+                }
+                else
+                {
+                    mpz_t r;
+                    long e;
 
-                return e;
+                    mpz_divexact_ui(z, z, q);
+                    mpz_init_set_ui(r, q);
+                    e = 2 + mpz_remove(z, z, r);
+                    mpz_clear(r);
+                    _fmpz_demote_val(x);
+
+                    return e;
+                }
             }
         }
         else  /* f is large */
         {
-            __mpz_struct *a = COEFF_TO_PTR(y);
-            __mpz_struct *b = COEFF_TO_PTR(q);
+            __mpz_struct *r = COEFF_TO_PTR(q);
 
-            if (!mpz_divisible_p(a, b))
+            if (!mpz_divisible_p(z, r))
             {
                 return 0;
             }
             else
             {
-                e = mpz_remove(a, a, b);
+                long e;
+
+                mpz_divexact(z, z, r);
+                e = 1 + mpz_remove(z, z, r);
                 _fmpz_demote_val(x);
                 return e;
             }
@@ -110,7 +115,6 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 {
     double finv;
-    long ans;
 
     if ((fmpz_sgn(f) <= 0) || fmpz_is_one(f))
     {
@@ -120,6 +124,7 @@ long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     if (rop == f)
     {
+        long ans;
         fmpz_t t;
 
         fmpz_init(t);

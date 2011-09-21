@@ -23,39 +23,40 @@
  
 ******************************************************************************/
 
-#include "padic.h"
+#include <stdlib.h>
+#include <limits.h>
 
-void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+size_t z_sizeinbase(long n, int b)
 {
-    fmpz_t pow;
+    long c = 0;
 
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, p, N);
-    fmpz_invmod(rop, op, pow);
-    fmpz_clear(pow);
-}
-
-void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-{
-    if (_padic_is_zero(op))
+    if (n == 0)
     {
-        printf("Exception (padic_inv_naive).  Zero is not invertible.\n");
-        abort();
+        return 1;
     }
 
-    /*
-        If x = u p^v has negative valuation with N <= -v then its 
-        exact inverse is equal to zero when reduced modulo p^N.
-     */
-    if (ctx->N + padic_val(op) <= 0)
+    if (n <= 0)
     {
-        padic_zero(rop, ctx);
-        return;
+        if (n > LONG_MIN)
+        {
+            n = -n;
+        }
+        else  /* n == LONG_MIN */
+        {
+            if (n % b)
+            {
+                n = - (n + 1);
+            }
+            else
+            {
+                n = - (n / b);
+                c = 1;
+            }
+        }
     }
 
-    _padic_inv_naive(padic_unit(rop), 
-                     padic_unit(op), ctx->p, ctx->N + padic_val(op));
+    for ( ; n > 0; n /= b, c++) ;
 
-    padic_val(rop) = - padic_val(op);
+    return c;
 }
 

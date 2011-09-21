@@ -40,25 +40,23 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
         _nmod_poly_divrem_newton(Q, R, A, lenA, B, lenB, mod);
 }
 
-void
-nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
-                 const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
+                      const nmod_poly_t A, const nmod_poly_t B)
 {
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    long A_len, B_len;
+    long lenA, lenB;
 
-    B_len = B->length;
+    lenA = A->length;
+    lenB = B->length;
     
-    if (B_len == 0)
+    if (lenB == 0)
     {
         printf("Exception: division by zero in nmod_poly_divrem\n");
         abort();
     }
 
-    A_len = A->length;
-    
-    if (A_len < B_len)
+    if (lenA < lenB)
     {
         nmod_poly_zero(Q);
         nmod_poly_set(R, A);
@@ -67,44 +65,42 @@ nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 
     if (Q == A || Q == B)
     {
-        nmod_poly_init2(tQ, A->mod.n, A_len - B_len + 1);
+        nmod_poly_init2_preinv(tQ, A->mod.n, A->mod.ninv, lenA - lenB + 1);
         q = tQ->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(Q, A_len - B_len + 1);
+        nmod_poly_fit_length(Q, lenA - lenB + 1);
         q = Q->coeffs;
     }
 
     if (R == A || R == B)
     {
-        nmod_poly_init2(tR, A->mod.n, B_len - 1);
+        nmod_poly_init2_preinv(tR, B->mod.n, B->mod.ninv, lenB - 1);
         r = tR->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(R, B_len - 1);
+        nmod_poly_fit_length(R, lenB - 1);
         r = R->coeffs;
     }
 
-    _nmod_poly_divrem(q, r, A->coeffs, A_len,
-                            B->coeffs, B_len, A->mod);
+    _nmod_poly_divrem(q, r, A->coeffs, lenA, B->coeffs, lenB, A->mod);
 
     if (Q == A || Q == B)
     {
-        nmod_poly_swap(tQ, Q);
+        nmod_poly_swap(Q, tQ);
         nmod_poly_clear(tQ);
     }
-    
-    Q->length = A_len - B_len + 1;
-
     if (R == A || R == B)
     {
-        nmod_poly_swap(tR, R);
+        nmod_poly_swap(R, tR);
         nmod_poly_clear(tR);
     }
         
-    R->length = B_len - 1;
+    Q->length = lenA - lenB + 1;
+    R->length = lenB - 1;
 
     _nmod_poly_normalise(R);
 }
+

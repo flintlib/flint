@@ -363,6 +363,26 @@ void _fmpq_poly_div_series(fmpz * Q, fmpz_t denQ,
 void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A, 
                                          const fmpq_poly_t B, long n);
 
+/*  Greatest common divisor **************************************************/
+
+void _fmpq_poly_gcd(fmpz *G, fmpz_t denG, 
+                    const fmpz *A, long lenA, const fmpz *B, long lenB);
+
+void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B);
+
+void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, 
+                     fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, 
+                     const fmpz *A, const fmpz_t denA, long lenA, 
+                     const fmpz *B, const fmpz_t denB, long lenB);
+
+void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T, 
+                    const fmpq_poly_t A, const fmpq_poly_t B);
+
+void _fmpq_poly_lcm(fmpz *G, fmpz_t denG, 
+                    const fmpz *A, long lenA, const fmpz *B, long lenB);
+
+void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B);
+
 /*  Derivative and integral  *************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 

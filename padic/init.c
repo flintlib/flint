@@ -25,9 +25,14 @@
 
 #include "padic.h"
 
-void padic_init(padic_t rop, const padic_ctx_t ctx)
+void _padic_init(padic_t rop)
 {
     fmpz_init(padic_unit(rop));
     padic_val(rop) = 0;
+}
+
+void padic_init(padic_t rop, const padic_ctx_t ctx)
+{
+    _padic_init(rop);
 }
 

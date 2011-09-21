@@ -25,12 +25,12 @@
 ******************************************************************************/
 
 #include <mpir.h>
+#include <limits.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
 
-void
-fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
+void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
 {
     if (fmpz_sgn(m) <= 0)
     {
@@ -41,34 +41,74 @@ fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
     if (fmpz_is_one(m))
     {
         fmpz_zero(f);
-        return;
     }
-
-    if (e == 0)
+    else if (e == 0)
     {
         fmpz_set_ui(f, 1);
-        return;
     }
-
-    /* TODO:  Implement this properly! */
+    else  /* e != 0, m > 0 */
     {
-        mpz_t f2, g2, m2;
+        fmpz g2 = *g;
+        fmpz m2 = *m;
 
-        mpz_init(f2);
-        mpz_init(g2);
-        mpz_init(m2);
+        if (!COEFF_IS_MPZ(m2))  /* m is small */
+        {
+            if (!COEFF_IS_MPZ(g2))  /* g is small */
+            {
+                int sgn = (g2 >= 0) ? 1 : -1;
+                mp_limb_t minv = n_preinvert_limb(m2);
 
-        fmpz_get_mpz(f2, f);
-        fmpz_get_mpz(g2, g);
-        fmpz_get_mpz(m2, m);
+                g2 = n_mod2_preinv(g2 * sgn, m2, minv);
 
-        mpz_powm_ui(f2, g2, e, m2);
+                if (g2 == 0)
+                {
+                    fmpz_zero(f);
+                }
+                else
+                {
+                    if ((ulong) m2 < e)
+                        e = e % n_euler_phi(m2);
 
-        fmpz_set_mpz(f, f2);
+                    fmpz_set_ui(f, n_powmod2_preinv(g2, e, m2, minv));
 
-        mpz_clear(f2);
-        mpz_clear(g2);
-        mpz_clear(m2);
+                    if ((sgn < 0) && (e & 1UL))
+                        *f = n_negmod(*f, m2);
+                }
+            }
+            else  /* g is large */
+            {
+                __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_t m3;
+
+                mpz_init_set_ui(m3, m2);
+                mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, m3);
+                mpz_clear(m3);
+
+                _fmpz_demote_val(f);
+            }
+        }
+        else  /* m is large */
+        {
+            if (!COEFF_IS_MPZ(g2))  /* g is small */
+            {
+                __mpz_struct *ptr = _fmpz_promote(f);
+                mpz_t g3;
+
+                mpz_init_set_si(g3, g2);
+                mpz_powm_ui(ptr, g3, e, COEFF_TO_PTR(m2));
+                mpz_clear(g3);
+
+                _fmpz_demote_val(f);
+            }
+            else  /* g is large */
+            {
+               __mpz_struct * ptr = _fmpz_promote(f);
+
+                mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, COEFF_TO_PTR(m2));
+
+                _fmpz_demote_val(f);
+            }
+        }
     }
 }
 

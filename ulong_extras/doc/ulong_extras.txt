@@ -108,6 +108,17 @@ mp_limb_t n_pow(mp_limb_t n, ulong exp)
     The algorithm simply uses a for loop. Repeated squaring is
     unlikely to speed up this algorithm.
 
+mp_limb_t n_flog(mp_limb_t n, mp_limb_t b)
+
+    Returns $\floor{\log_b x}$.
+
+    Assumes that $x \geq 1$ and $b \geq 2$.
+
+mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
+
+    Returns $\ceil{\log_b x}$.
+
+    Assumes that $x \geq 1$ and $b \geq 2$.
 
 *******************************************************************************
 

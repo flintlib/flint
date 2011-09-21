@@ -519,6 +519,15 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+void
+_nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
+                                                 mp_srcptr poly2, long len2, 
+                                                 long N, nmod_t mod);
+
+void 
+nmod_poly_compose_series_divconquer(nmod_poly_t res, 
+    const nmod_poly_t poly1, const nmod_poly_t poly2, long N);
+
 /* GCD  **********************************************************************/
 
 long _nmod_poly_gcd_euclidean(mp_ptr G, 

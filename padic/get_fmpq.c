@@ -33,29 +33,30 @@ void _padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx)
     }
     else
     {
-        fmpz_t pow;
-        int alloc = 0;
-
-        fmpz_set(fmpq_numref(rop), padic_unit(op));
-
         if (padic_val(op) == 0)
         {
+            fmpz_set(fmpq_numref(rop), padic_unit(op));
             fmpz_set_ui(fmpq_denref(rop), 1);
         }
-        else if (padic_val(op) > 0)
+        else
         {
-            _padic_ctx_pow_ui(pow, &alloc, padic_val(op), ctx);
-            fmpz_mul(fmpq_numref(rop), fmpq_numref(rop), pow);
-            fmpz_set_ui(fmpq_denref(rop), 1);
-        }
-        else  /* padic_val(op) < 0 */
-        {
-            _padic_ctx_pow_ui(pow, &alloc, - padic_val(op), ctx);
-            fmpz_set(fmpq_denref(rop), pow);
-        }
+            fmpz_t pow;
 
-        if (alloc)
+            fmpz_init(pow);
+            if (padic_val(op) > 0)
+            {
+                fmpz_pow_ui(pow, ctx->p, padic_val(op));
+                fmpz_mul(fmpq_numref(rop), padic_unit(op), pow);
+                fmpz_set_ui(fmpq_denref(rop), 1);
+            }
+            else  /* padic_val(op) < 0 */
+            {
+                fmpz_pow_ui(pow, ctx->p, - padic_val(op));
+                fmpz_set(fmpq_numref(rop), padic_unit(op));
+                fmpz_set(fmpq_denref(rop), pow);
+            }
             fmpz_clear(pow);
+        }
     }
 }
 

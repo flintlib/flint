@@ -75,7 +75,7 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
        We unroll the first step of the loop, referring to {poly, n}
      */
     
-    _fmpz_poly_mullow(R, poly, n, poly, n, n);
+    _fmpz_poly_sqrlow(R, poly, n, n);
     if ((bit & e))
     {
         _fmpz_poly_mullow(S, R, n, poly, n, n);
@@ -88,12 +88,12 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
     {
         if ((bit & e))
         {
-            _fmpz_poly_mullow(S, R, n, R, n, n);
+            _fmpz_poly_sqrlow(S, R, n, n);
             _fmpz_poly_mullow(R, S, n, poly, n, n);
         }
         else
         {
-            _fmpz_poly_mullow(S, R, n, R, n, n);
+            _fmpz_poly_sqrlow(S, R, n, n);
             T = R;
             R = S;
             S = T;
@@ -148,7 +148,7 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
                 fmpz_poly_truncate(res, len);
         }
         else  /* e == 2 */
-            fmpz_poly_mullow(res, poly, poly, n);
+            fmpz_poly_sqrlow(res, poly, n);
         return;
     }
 

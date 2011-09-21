@@ -91,6 +91,10 @@ mp_limb_t n_randtest_prime(flint_rand_t state, int proved);
 
 mp_limb_t n_pow(mp_limb_t n, ulong exp);
 
+mp_limb_t n_flog(mp_limb_t n, mp_limb_t b);
+
+mp_limb_t n_clog(mp_limb_t n, mp_limb_t b);
+
 static __inline__ 
 double n_precompute_inverse(mp_limb_t n)
 {
