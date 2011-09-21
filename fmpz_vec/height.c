@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long
+void
 _fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
 {
     long i;
