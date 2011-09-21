@@ -34,7 +34,7 @@ nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
     long i;
 
-    if (C->c < 1)
+    if (C->c == 0)
         return;
 
     for (i = 0; i < C->r; i++)

@@ -41,7 +41,10 @@ fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     bc = B->c;
 
     if (br == 0)
+    {
+        fmpz_poly_mat_zero(C);
         return;
+    }
 
     if (C == A || C == B)
     {

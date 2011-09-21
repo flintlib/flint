@@ -59,6 +59,9 @@ int main(void)
         fmpz_mat_randtest(A, state, n_randint(state, 200) + 1);
         fmpz_mat_randtest(B, state, n_randint(state, 200) + 1);
 
+        /* Make sure noise in the output is ok */
+        fmpz_mat_randtest(C, state, n_randint(state, 200) + 1);
+
         fmpz_mat_mul_classical_inline(C, A, B);
         fmpz_mat_mul_multi_mod(D, A, B);
 

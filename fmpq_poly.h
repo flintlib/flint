@@ -508,6 +508,69 @@ void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly,
 
 void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x);
 
+/*  Power series composition  ************************************************/
+
+void
+_fmpq_poly_compose_series_horner(fmpz * res, fmpz_t den, const fmpz * poly1,
+        const fmpz_t den1, long len1, const fmpz * poly2,
+        const fmpz_t den2, long len2, long n);
+
+void
+fmpq_poly_compose_series_horner(fmpq_poly_t res, 
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n);
+
+void
+_fmpq_poly_compose_series_brent_kung(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long len1,
+        const fmpz * poly2, const fmpz_t den2, long len2, long n);
+
+void
+fmpq_poly_compose_series_brent_kung(fmpq_poly_t res, 
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n);
+
+void
+_fmpq_poly_compose_series(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long len1,
+        const fmpz * poly2, const fmpz_t den2, long len2, long n);
+
+void
+fmpq_poly_compose_series(fmpq_poly_t res, 
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n);
+
+/*  Power series reversion  ************************************************/
+
+void
+_fmpq_poly_reverse_series_lagrange(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long n);
+
+void
+fmpq_poly_reverse_series_lagrange(fmpq_poly_t res, 
+                    const fmpq_poly_t poly, long n);
+
+void
+_fmpq_poly_reverse_series_lagrange_fast(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long n);
+
+void
+fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res, 
+                    const fmpq_poly_t poly, long n);
+
+void
+_fmpq_poly_reverse_series_newton(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long n);
+
+void
+fmpq_poly_reverse_series_newton(fmpq_poly_t res, 
+                    const fmpq_poly_t poly, long n);
+
+void
+_fmpq_poly_reverse_series(fmpz * res, fmpz_t den,
+        const fmpz * poly1, const fmpz_t den1, long n);
+
+void
+fmpq_poly_reverse_series(fmpq_poly_t res, 
+                    const fmpq_poly_t poly, long n);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpq_poly_content(mpq_t res, 

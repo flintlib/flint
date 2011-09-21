@@ -62,10 +62,13 @@ void sample(void * arg, ulong count)
 
     if (algorithm == 0)
         for (i = 0; i < count; i++)
-            fmpz_mat_det(d, A);
+            fmpz_mat_det_bareiss(d, A);
     else if (algorithm == 1)
         for (i = 0; i < count; i++)
-            fmpz_mat_det_multi_mod(d, A, 1);
+            fmpz_mat_det_modular(d, A, 1);
+    else if (algorithm == 2)
+        for (i = 0; i < count; i++)
+            fmpz_mat_det_modular_accelerated(d, A, 1);
 
     prof_stop();
 
@@ -77,7 +80,7 @@ void sample(void * arg, ulong count)
 
 int main(void)
 {
-    double min_default, min_classical, min_multi_mod, max;
+    double min_default, min_classical, min_modular, min_modular_2, max;
     mat_mul_t params;
     long dim, bits;
 
@@ -93,15 +96,18 @@ int main(void)
             params.dim = dim;
 
             params.algorithm = 0;
-            prof_repeat(&min_default, &max, sample, &params);
+            prof_repeat(&min_classical, &max, sample, &params);
 
             params.algorithm = 1;
-            prof_repeat(&min_multi_mod, &max, sample, &params);
+            prof_repeat(&min_modular, &max, sample, &params);
 
-            printf("dim = %ld default/multi_mod %.2f %.2f (us)\n", 
-                dim, min_default, min_multi_mod);
+            params.algorithm = 2;
+            prof_repeat(&min_modular_2, &max, sample, &params);
 
-            if (min_default > min_multi_mod)
+            printf("dim = %ld classical/modular/acc. %.2f %.2f %.2f (us)\n", 
+                dim, min_classical, min_modular, min_modular_2);
+
+            if (min_modular > 1.1*min_modular_2)
                 break;
         }
     }

@@ -220,6 +220,8 @@ int fmpz_cmp(const fmpz_t f, const fmpz_t g);
 
 int fmpz_cmp_ui(const fmpz_t f, ulong g);
 
+int fmpz_cmp_si(const fmpz_t f, long g);
+
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
 static __inline__
@@ -349,6 +351,8 @@ void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 void fmpz_fdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 

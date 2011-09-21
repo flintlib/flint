@@ -483,6 +483,13 @@ void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                                     const nmod_poly_t A, const nmod_poly_t B);
 
+mp_limb_t
+_nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len, mp_limb_t c, nmod_t mod);
+
+mp_limb_t
+nmod_poly_div_root(nmod_poly_t Q, 
+                 const nmod_poly_t A, mp_limb_t c);
+
 /* Derivative  ***************************************************************/
 
 void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod);
@@ -499,6 +506,32 @@ mp_limb_t _nmod_poly_evaluate_nmod(mp_srcptr poly,
                                            long len, mp_limb_t c, nmod_t mod);
 
 mp_limb_t nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c);
+
+void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
+        const nmod_poly_t poly, mp_srcptr xs, long n);
+
+/* Interpolation  ************************************************************/
+
+void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
+
+void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
+
+void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec(mp_ptr poly, mp_srcptr xs,
+                        mp_srcptr ys, long n, nmod_t mod);
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                        mp_srcptr xs, mp_srcptr ys, long n);
 
 /* Composition  **************************************************************/
 
@@ -518,6 +551,58 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+/* Power series composition and reversion ************************************/
+
+void
+_nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series_horner(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series_brent_kung(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1, 
+                            mp_srcptr poly2, long len2, long n, nmod_t mod);
+void
+nmod_poly_compose_series(nmod_poly_t res,
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n);
+
+void
+_nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
+_nmod_poly_reverse_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
+    long n, nmod_t mod);
+
+void
+nmod_poly_reverse_series_lagrange_fast(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
+_nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_reverse_series_newton(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
+
+void
+_nmod_poly_reverse_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod);
+
+void
+nmod_poly_reverse_series(nmod_poly_t Qinv,
+                                 const nmod_poly_t Q, long n);
 
 void
 _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
@@ -635,5 +720,14 @@ void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, long n);
 
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
+
+/* Products */
+
+void
+nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n);
+
+void
+_nmod_poly_product_roots_nmod_vec(mp_ptr poly,
+    mp_srcptr xs, long n, nmod_t mod);
 
 #endif

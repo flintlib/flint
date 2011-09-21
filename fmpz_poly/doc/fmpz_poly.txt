@@ -93,17 +93,6 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
 
     Returns the degree of \code{poly}, which is one less than its length.
 
-ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
-
-    Returns the maximum number of limbs required to store the absolute value 
-    of coefficients of \code{poly}.  If \code{poly} is zero, returns $0$.
-
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
-
-    Computes the maximum number of bits $b$ required to store the absolute 
-    value of coefficients of \code{poly}.  If all the coefficients of 
-    \code{poly} are non-negative, $b$ is returned, otherwise $-b$ is returned.
-
 *******************************************************************************
 
     Assignment and basic manipulation
@@ -954,9 +943,27 @@ void fmpz_poly_shift_right(fmpz_poly_t res, const fmpz_poly_t poly, long n)
 
 *******************************************************************************
 
-    Norms
+    Bit sizes and norms
 
 *******************************************************************************
+
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+
+    Returns the maximum number of limbs required to store the absolute value 
+    of coefficients of \code{poly}.  If \code{poly} is zero, returns $0$.
+
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
+
+    Computes the maximum number of bits $b$ required to store the absolute 
+    value of coefficients of \code{poly}.  If all the coefficients of 
+    \code{poly} are non-negative, $b$ is returned, otherwise $-b$ is returned.
+
+void fmpz_poly_height(fmpz_t height, const fmpz_poly_t poly)
+
+    Computes the height of \code{poly}, defined as the largest of the
+    absolute values the coefficients of \code{poly}. Equivalently, this
+    gives the infinity norm of the coefficients. If \code{poly} is zero,
+    the height is $0$.
 
 void _fmpz_poly_2norm(fmpz_t res, const fmpz * poly, long len)
 
@@ -1139,7 +1146,7 @@ void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1,
 
     This ensures that the equality
     \begin{equation*}
-    f g = \gcd(f, g) \lcm(f, g)
+    f g = \gcd(f, g) \operatorname{lcm}(f, g)
     \end{equation*}
     holds up to sign.
 
@@ -1438,6 +1445,20 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
     coefficient of $B$.  If the leading coefficient of $B$ is $\pm 1$ or 
     the division is exact, this is the same as division over~$\Q$.  An 
     exception is raised if $B$ is zero.
+
+void _fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
+
+    Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
+    division by $x - c$.
+
+    Supports aliasing of \code{Q} and \code{A}, but the result is
+    undefined in case of partial overlap.
+
+void fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
+
+    Computes the quotient \code{(Q, len-1)} of \code{(A, len)} upon
+    division by $x - c$.
+
 
 *******************************************************************************
 
@@ -1850,6 +1871,174 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 *******************************************************************************
 
+    Power series composition
+
+*******************************************************************************
+
+void _fmpz_poly_compose_series_horner(fmpz * res,
+        const fmpz * poly1, long len1, const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses the Horner scheme.
+
+void fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses the Horner scheme.
+
+void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1,
+        long len1, const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+
+void fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+                const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+
+void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+void fmpz_poly_compose_series(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+*******************************************************************************
+
+    Power series reversion
+
+*******************************************************************************
+
+void _fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses the Lagrange inversion formula.
+
+void fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
+            const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses the Lagrange inversion formula.
+
+void _fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv,
+        const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses a reduced-complexity implementation
+    of the Lagrange inversion formula.
+
+void fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
+            const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses a reduced-complexity implementation
+    of the Lagrange inversion formula.
+
+void _fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses Newton iteration \cite{BrentKung1978}.
+
+void fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv,
+        const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation uses Newton iteration \cite{BrentKung1978}.
+
+void _fmpz_poly_reverse_series(fmpz * Qinv, const fmpz * Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation defaults to the fast version of
+    Lagrange interpolation.
+
+void fmpz_poly_reverse_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+    It is required that $Q_0 = 0$ and $Q_1 = \pm 1$.
+
+    This implementation defaults to the fast version of
+    Lagrange interpolation.
+
+
+*******************************************************************************
+
     Signature
 
 *******************************************************************************
@@ -2111,8 +2300,7 @@ void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
 
 *******************************************************************************
 
-void
-_fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
+void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
 
     Sets \code{(poly, n + 1)} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
@@ -2121,8 +2309,8 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
     Aliasing of the input and output is not allowed.
 
 
-void
-fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, long n)
+void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
+        const fmpz * xs, long n)
 
     Sets \code{poly} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being

@@ -50,6 +50,8 @@ typedef fmpz_mat_struct fmpz_mat_t[1];
 /* Memory management  ********************************************************/
 
 #define fmpz_mat_entry(mat,i,j) ((mat)->rows[i] + (j))
+#define fmpz_mat_nrows(mat) ((mat)->r)
+#define fmpz_mat_ncols(mat) ((mat)->c)
 
 void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols);
 void fmpz_mat_init_set(fmpz_mat_t mat, const fmpz_mat_t src);
@@ -171,17 +173,27 @@ long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options);
 long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B,
     fmpz_t den, const fmpz_mat_t A);
 
-/* Determinant */
+/* Determinant **************************************************************/
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
-void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
-void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
-void fmpz_mat_det_multi_mod(fmpz_t det, const fmpz_mat_t A, int proved);
-void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 
+void fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A);
 void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x);
 void _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x);
+
+void fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A);
+
+void fmpz_mat_det_modular(fmpz_t det, const fmpz_mat_t A, int proved);
+
+void fmpz_mat_det_modular_accelerated(fmpz_t det,
+    const fmpz_mat_t A, int proved);
+
+void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
+        const fmpz_t d, int proved);
+
+void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
+void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
 /* Rank */
 

@@ -1111,18 +1111,37 @@ We now describe the functions available in \code{nmod_poly}.
 \section{Introduction}
 
 An \code{nmod_mat_t} represents a matrix of integers modulo $n$, for any 
-non-zero $n$ that fits in a single limb, up to $2^{32}-1$ or $2^{64}-1$. The
-implementation uses functions and data types of the \code{nmod_vec} module
-for low-level operations.
+non-zero modulus $n$ that fits in a single limb,
+up to $2^{32}-1$ or $2^{64}-1$.
 
-One or both dimensions of a matrix may be zero.
+The \code{nmod_mat_t} type is defined as an array of
+\code{nmod_mat_struct}'s of length one.
+This  permits passing parameters of type \code{nmod_mat_t}
+by reference.
 
-Except where otherwise noted, it is assumed all entries in input
-data are already reduced in the range $[0, n)$. It is also assumed that
-all arguments have the same modulus.
+An \code{nmod_mat_t} internally consists of a single array of
+\code{mp_limb_t}'s, representing a dense matrix in row-major order.
+This array is only directly indexed during memory allocation and
+deallocation. A separate array holds pointers to the start of each
+row, and is used for all indexing. This allows the rows of a matrix
+to be permuted quickly by swapping pointers.
 
-Functions that require the modulus to be a prime number document this
-requirement explicitly.
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation.
+The user is assumed to provide input and output variables
+whose dimensions are compatible with the given operation.
+
+It is assumed that all matrices passed to a function have the same modulus.
+The modulus is assumed to be a prime number in functions that
+perform some kind of division, solving, or Gaussian elimination
+(including computation of rank and determinant),
+but can be composite in functions that only perform basic manipulation
+and ring operations (e.g. transpose and matrix multiplication).
+
+The user can manipulate matrix entries directly, but must
+assume responsibility for normalising all values to the range $[0, n)$.
+
 
 \input{input/nmod_mat.tex}
 

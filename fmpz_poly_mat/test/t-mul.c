@@ -161,6 +161,8 @@ main(void)
         fmpz_poly_mat_randtest(A, state, deg, bits);
         fmpz_poly_mat_randtest(B, state, deg, bits);
 
+        fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
+
         fmpz_poly_mat_mul(C, A, B);
         fmpz_poly_mat_mul(B, A, B);
 

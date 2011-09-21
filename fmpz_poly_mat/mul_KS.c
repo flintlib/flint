@@ -41,7 +41,10 @@ fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     fmpz_mat_t AA, BB, CC;
 
     if (B->r == 0)
+    {
+        fmpz_poly_mat_zero(C);
         return;
+    }
 
     if (C == A || C == B)
     {

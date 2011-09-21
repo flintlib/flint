@@ -40,8 +40,11 @@ void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
         abort();
     }
 
-    if (!(A->c))
+    if (A->c == 0)
+    {
+        fmpq_mat_zero(C);
         return;
+    }
 
     for (i = 0; i < A->r; i++)
     {

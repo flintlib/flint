@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -48,10 +48,12 @@ typedef struct
 }
 nmod_mat_struct;
 
-/* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
+/* nmod_mat_t allows reference-like semantics for nmod_mat_struct */
 typedef nmod_mat_struct nmod_mat_t[1];
 
 #define nmod_mat_entry(mat,i,j) ((mat)->rows[(i)][(j)])
+#define nmod_mat_nrows(mat) ((mat)->r)
+#define nmod_mat_ncols(mat) ((mat)->c)
 
 static __inline__
 void
@@ -74,56 +76,130 @@ void nmod_mat_window_clear(nmod_mat_t window);
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, 
-                 const mp_limb_t * diag, long n);
+                 mp_srcptr diag, long n);
 void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, long rank);
 void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
+void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
+void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
+
 
 void nmod_mat_print_pretty(const nmod_mat_t mat);
 
 int nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2);
 
+void nmod_mat_zero(nmod_mat_t mat);
+
+int nmod_mat_is_zero(const nmod_mat_t mat);
+
+static __inline__ int
+nmod_mat_is_empty(const nmod_mat_t mat)
+{
+    return (mat->r == 0) || (mat->c == 0);
+}
+
+static __inline__ int
+nmod_mat_is_square(const nmod_mat_t mat)
+{
+    return (mat->r == mat->c);
+}
+
 
 void nmod_mat_set(nmod_mat_t B, const nmod_mat_t A);
 void nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A);
 
-/* Arithmetic */
+/* Addition and subtraction */
+
 void nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_sub(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_neg(nmod_mat_t B, const nmod_mat_t A);
+
+/* Matrix-scalar arithmetic */
+
+void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c);
+
+/* Matrix multiplication */
+
 void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
-void _nmod_mat_mul_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
-void _nmod_mat_mul_transpose_1(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_transpose_2(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-void _nmod_mat_mul_transpose_3(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
-
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
+void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
 
-int _nmod_mat_pivot(mp_limb_t ** rows, long n, long start_row, long col);
+void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
+void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B);
 
-long _nmod_mat_rowreduce_1(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce_2(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce_r(nmod_mat_t mat, int options);
-long _nmod_mat_rowreduce(nmod_mat_t mat, int options);
+/* Determinant */
 
-mp_limb_t _nmod_mat_fast_rowreduce_modulus_1(long rows, long cols, int proved);
-mp_limb_t _nmod_mat_fast_rowreduce_modulus_2(long rows, long cols, int proved);
-mp_limb_t _nmod_mat_fast_rowreduce_modulus(long rows, long cols, int proved);
-
-
-mp_limb_t _nmod_mat_det_rowreduce(nmod_mat_t A);
+mp_limb_t _nmod_mat_det(nmod_mat_t A);
 mp_limb_t nmod_mat_det(const nmod_mat_t A);
+
+/* Rank */
 
 long nmod_mat_rank(const nmod_mat_t A);
 
-void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** const LU, long n, nmod_t mod);
-int nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b);
-int nmod_mat_solve_mat(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
+/* Inverse */
 
 int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A);
+
+/* Triangular solving */
+
+void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L, const nmod_mat_t B, int unit);
+
+void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_mat_t B, int unit);
+
+/* LU decomposition */
+
+long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check);
+long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
+long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
+
+/* Nonsingular solving */
+
+int nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B);
+int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
+
+/* Reduced row echelon form */
+
+long nmod_mat_rref(long * P, nmod_mat_t A);
+
+/* Nullspace */
+
+long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
+
+
+/* Tuning parameters *********************************************************/
+
+/* Size at which pre-transposing becomes faster in classical multiplication */
+#define NMOD_MAT_MUL_TRANSPOSE_CUTOFF 20
+
+/* It is questionable whether we need two different parameters */
+#define NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF 256
+#define NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF 64
+
+/* Cutoff between classical and recursive triangular solving */
+#define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
+#define NMOD_MAT_SOLVE_TRI_COLS_CUTOFF 64
+
+/* Cutoff between classical and recursive LU decomposition */
+#define NMOD_MAT_LU_RECURSIVE_CUTOFF 4
+
+/*
+   Suggested initial modulus size for multimodular algorithms. This should
+   be chosen so that we get the most number of bits per cycle
+   in matrix multiplication. On x86-64 it appears to be optimal to use
+   moduli giving nlimbs = 2. This should hold both in the classical
+   range and in Strassen blocks.
+ */
+#define NMOD_MAT_OPTIMAL_MODULUS_BITS (FLINT_BITS-5)
+
 
 #endif

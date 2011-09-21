@@ -48,15 +48,9 @@ void nmod_mat_clear(nmod_mat_t mat)
 
 void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
 
-    Sets the elements of \code{mat} to those of \code{src}. It is assumed 
-    that \code{mat} and \code{src} have identical dimensions, but the 
-    moduli need not be the same. The elements will be reduced to the 
-    modulus of \code{mat}.
+    Sets \code{mat} to a copy of \code{src}. It is assumed 
+    that \code{mat} and \code{src} have identical dimensions.
 
-int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
-
-    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
-    and zero otherwise. The moduli are ignored.
 
 *******************************************************************************
 
@@ -114,7 +108,7 @@ void nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{nmod_mat_randops()}.
 
-void nmod_mat_randops(fmpz_mat_t mat, long count, flint_rand_t state)
+void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
 
     Randomises \code{mat} by performing elementary row or column 
     operations. More precisely, at most \code{count} random additions 
@@ -122,125 +116,130 @@ void nmod_mat_randops(fmpz_mat_t mat, long count, flint_rand_t state)
     This leaves the rank (and for square matrices, determinant) 
     unchanged.
 
+void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
+
+    Sets \code{mat} to a random lower triangular matrix. If \code{unit} is 1,
+    it will have ones on the main diagonal, otherwise it will have random
+    nonzero entries on the main diagonal.
+
+void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit)
+
+    Sets \code{mat} to a random upper triangular matrix. If \code{unit} is 1,
+    it will have ones on the main diagonal, otherwise it will have random
+    nonzero entries on the main diagonal.
+
+
 *******************************************************************************
 
-    Matrix arithmetic
+    Comparison
+
+*******************************************************************************
+
+int nmod_mat_equal(nmod_mat_t mat1, nmod_mat_t mat2)
+
+    Returns nonzero if mat1 and mat2 have the same dimensions and elements,
+    and zero otherwise. The moduli are ignored.
+
+*******************************************************************************
+
+    Transpose
 
 *******************************************************************************
 
 void nmod_mat_transpose(nmod_mat_t B, nmod_mat_t A)
 
     Sets $B$ to the transpose of $A$. Dimensions must be compatible.
-    $B$ and $A$ may be the same object if and only if the matrix is 
-    square. Entries will be reduced to the modulus of B.
+    $B$ and $A$ may be the same object if and only if the matrix is square.
+
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
 
 void nmod_mat_add(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
     Computes $C = A + B$. Dimensions must be identical.
-    Entries will be reduced to the modulus of $C$.
+
+void nmod_mat_sub(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+
+    Computes $C = A - B$. Dimensions must be identical.
+
+void nmod_mat_neg(nmod_mat_t A, nmod_mat_t B)
+
+    Sets $B = -A$. Dimensions must be identical.
+
+*******************************************************************************
+
+    Matrix-scalar arithmetic
+
+*******************************************************************************
+
+void nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
+
+    Sets $B = cA$, where the scalar $c$ is assumed to be reduced
+    modulo the modulus. Dimensions of $A$ and $B$ must be identical.
+
+
+*******************************************************************************
+
+    Matrix multiplication
+
+*******************************************************************************
 
 void nmod_mat_mul(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Computes the matrix product $C = A B$. Dimensions must be compatible
-    for matrix multiplication. $C$ is not allowed to be aliased with $A$ 
-    or $B$. Entries will be reduced to the modulus of $C$.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. This function
+    automatically chooses between classical and Strassen multiplication.
 
 void nmod_mat_mul_classical(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Performs matrix multiplication using the classical algorithm, by 
-    calling \code{_nmod_mat_mul_1()} etc.  The interface is identical 
-    to \code{nmod_mat_mul()}.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses classical
+    matrix multiplication, creating a temporary transposed copy of $B$
+    to improve memory locality if the matrices are large enough.
 
 void nmod_mat_mul_strassen(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
 
-    Performs matrix multiplication respectively using Strassen 
-    multiplication.  The interface is identical to \code{nmod_mat_mul()}.
+    Sets $C = AB$. Dimensions must be compatible for matrix multiplication.
+    $C$ is not allowed to be aliased with $A$ or $B$. Uses Strassen
+    multiplication.
 
-void _nmod_mat_mul_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
+    const nmod_mat_t A, const nmod_mat_t B)
 
-void _nmod_mat_mul_transpose_1(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_transpose_2(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
-void _nmod_mat_mul_transpose_3(nmod_mat_t C, nmod_mat_t A, nmod_mat_t B)
+    Sets $D = C + AB$. $C$ and $D$ may be aliased with each other but
+    not with $A$ or $B$. Automatically selects between classical
+    and Strassen multiplication.
 
-    Computes $C = A B$ or $C = A B^T$, respectively, using classical
-    matrix multiplication. That is, for each $i$ and $j$, $C_{ij}$ is 
-    set to the scalar product of row $i$ of $A$ with column $j$ of $B$ 
-    (or row $j$ of $B$ when transposed).
+void nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
+    const nmod_mat_t A, const nmod_mat_t B)
 
-    The \code{_X} version uses a register \code{X} limbs wide to accumulate 
-    the scalar product, and a modular reduction is performed only at the end.
-    The caller must ensure that elements are sufficiently small for
-    overflow not to occur.
+    Sets $D = C + AB$, using classical matrix multiplication and
+    updating $D$ in-place. $C$ and $D$ may be aliased with each other but
+    not with $A$ or $B$.
 
-    Let $k$ be the scalar product size, i.e.\ the number of columns of $A$,
-    and let $a$ and $b$ the largest absolute values of the elements in $A$ 
-    and $B$, respectively. Then the following conditions are sufficient to 
-    guarantee correctness:
-    \begin{verbatim}
-        1  :   k*a*b  <  2^FLINT_BITS
-        2  :   k*a*b  <  2^(2*FLINT_BITS)
-        3  :   always
-    \end{verbatim}
+void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
+    const nmod_mat_t A, const nmod_mat_t B)
 
-    Dimensions must be compatible for matrix multiplication. $C$ is not
-    allowed to be aliased with $A$ or $B$.
+    Sets $D = C + AB$. $C$ and $D$ may be aliased with each other but
+    not with $A$ or $B$.
+
+void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
+    const nmod_mat_t A, const nmod_mat_t B)
+
+    Sets $D = C - AB$, using classical matrix multiplication and
+    updating $D$ in-place. $C$ and $D$ may be aliased with each other but
+    not with $A$ or $B$.
+
 
 *******************************************************************************
 
-    Row reduction, solving
+    Determinant and rank
 
 *******************************************************************************
-
-long _nmod_mat_rowreduce(nmod_mat_t mat, int options)
-
-    Row reduces the $m$-by-$n$ matrix \code{mat} using standard in-place
-    Gaussian elimination with pivoting. The modulus \code{mat->mod.n} must 
-    be a prime number.
-
-    The \code{options} parameter is a bitfield which may be set to any 
-    combination of the following flags, where using \code{options = 0} to 
-    disable all and perform in-place $LU$ decomposition.
-    \begin{itemize}
-    \item \code{ROWREDUCE_FAST_ABORT}.
-
-        If set, the function immediately aborts and returns $0$ if the 
-        matrix is detected to be rank-deficient, i.e.\ singular. In this 
-        event, the state of the matrix will be undefined.
-
-    \item \code{ROWREDUCE_FULL}.
-
-        If set, performs Gauss--Jordan elimination, i.e.\ eliminates the
-        elements above each pivot element as well as those below.
-        If not set, regular Gaussian elimination is performed and only
-        the elements below pivots are eliminated.
-
-    \item \code{ROWREDUCE_CLEAR_LOWER}.
-
-        If set, clears, i.e.\ zeros, elements below the pivots.
-
-        If not set, the output becomes the $LU$ decomposition of the input
-        matrix. That is, the input matrix $A$ is overwritten with $L$, $U$
-        such that $A = P L U$ where $P$ is a permutation matrix. $U$ is 
-        stored in the upper triangular part (including the main diagonal), 
-        and $L$ is stored with an implicit unit main diagonal in the lower 
-        triangular part.
-    \end{itemize}
-
-    Pivoting (to avoid division by zero entries) is performed by permuting
-    the vector of row pointers in-place so that they point to the successive
-    pivot rows. The matrix entries themselves retain their original order
-    in memory.
-
-    The return value $r$ is the rank of the matrix, multiplied by a sign
-    indicating the parity of row interchanges. If $r = 0$, the matrix has 
-    rank zero, unless \code{ROWREDUCE_FAST_ABORT} is set, in which case 
-    $r = 0$ indicates any deficient rank. Otherwise, the leading non-zero 
-    entries of $a[0], a[1], \dotsc, a[\abs(r)-1]$ will point to the 
-    successive pivot elements.  If $\abs{r} = m = n$, the determinant of 
-    the matrix is given by $\sgn(r)$ times the product of the entries on 
-    the main diagonal.
 
 mp_limb_t nmod_mat_det(nmod_mat_t A)
 
@@ -250,30 +249,12 @@ long nmod_mat_rank(nmod_mat_t A)
 
     Returns the rank of $A$. The modulus of $A$ must be a prime number.
 
-void _nmod_mat_solve_lu_precomp(mp_limb_t * b, mp_limb_t ** LU,
-    long n, nmod_t mod)
 
-    Transforms $b$ to the solution $x$ of $L U x = b$ where \code{LU} 
-    points to the rows of a precomputed $LU$~factorisation of a 
-    nonsingular $n$-by-$n$ matrix with modulus \code{mod.n}. The modulus 
-    must be a prime number.
+*******************************************************************************
 
-int nmod_mat_solve(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+    Inverse
 
-    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$ 
-    is the modulus of $A$ which must be a prime number.
-
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the
-    elements of $x$ to undefined values.
-
-int nmod_mat_solve_mat(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
-
-    Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$ 
-    is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$ 
-    should have the same moduli.
-
-    Returns $0$ if $A$ has full rank; otherwise returns $1$ and sets the 
-    elements of $X$ to undefined values.
+*******************************************************************************
 
 int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
 
@@ -284,3 +265,189 @@ int nmod_mat_inv(nmod_mat_t B, nmod_mat_t A)
     $A$ and $B$ must be square matrices with the same dimensions
     and modulus. The modulus must be prime.
 
+
+*******************************************************************************
+
+    Triangular solving
+
+*******************************************************************************
+
+void nmod_mat_solve_tril(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+void nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Uses forward substitution.
+
+void nmod_mat_solve_tril_recursive(nmod_mat_t X, const nmod_mat_t L,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = L^{-1} B$ where $L$ is a full rank lower triangular square
+    matrix. If \code{unit} = 1, $L$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & 0 \\ C & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} X \\ D^{-1} ( Y - C A^{-1} X ) \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular solving
+    of smaller systems.
+
+void nmod_mat_solve_triu(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Automatically chooses between the classical and
+    recursive algorithms.
+
+void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed. Uses forward substitution.
+
+void nmod_mat_solve_triu_recursive(nmod_mat_t X, const nmod_mat_t U,
+                            const nmod_mat_t B, int unit)
+
+    Sets $X = U^{-1} B$ where $U$ is a full rank upper triangular square
+    matrix. If \code{unit} = 1, $U$ is assumed to have ones on its
+    main diagonal, and the main diagonal will not be read.
+    $X$ and $B$ are allowed to be the same matrix, but no other
+    aliasing is allowed.
+
+    Uses the block inversion formula
+
+    $$
+    \begin{pmatrix} A & B \\ 0 & D \end{pmatrix}^{-1}
+    \begin{pmatrix} X \\ Y \end{pmatrix} =
+    \begin{pmatrix} A^{-1} (X - B D^{-1} Y) \\ D^{-1} Y \end{pmatrix}
+    $$
+
+    to reduce the problem to matrix multiplication and triangular solving
+    of smaller systems.
+
+
+*******************************************************************************
+
+    Nonsingular square solving
+
+*******************************************************************************
+
+int nmod_mat_solve(nmod_mat_t X, nmod_mat_t A, nmod_mat_t B)
+
+    Solves the matrix-matrix equation $AX = B$ over $\Z / p \Z$ where $p$
+    is the modulus of $X$ which must be a prime number. $X$, $A$, and $B$
+    should have the same moduli.
+
+    Returns $1$ if $A$ has full rank; otherwise returns $0$ and sets the
+    elements of $X$ to undefined values.
+
+int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
+
+    Solves the matrix-vector equation $Ax = b$ over $\Z / p \Z$ where $p$
+    is the modulus of $A$ which must be a prime number.
+
+    Returns $1$ if $A$ has full rank; otherwise returns $0$ and sets the
+    elements of $x$ to undefined values.
+
+
+*******************************************************************************
+
+    LU decomposition
+
+*******************************************************************************
+
+long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$.
+
+    If $A$ is a nonsingular square matrix, it will be overwritten with
+    a unit diagonal lower triangular matrix $L$ and an upper triangular
+    matrix $U$ (the diagonal of $L$ will not be stored explicitly).
+
+    If $A$ is an arbitrary matrix of rank $r$, $U$ will be in row echelon
+    form having $r$ nonzero rows, and $L$ will be lower triangular
+    but truncated to $r$ columns, having implicit ones on the $r$ first
+    entries of the main diagonal. All other entries will be zero.
+
+    If a nonzero value for \code{rank_check} is passed, the
+    function will abandon the output matrix in an undefined state and
+    return 0 if $A$ is detected to be rank-deficient.
+
+    This function calls \code{nmod_mat_lu_recursive}.
+
+long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this function
+    is identical to that of \code{nmod_mat_lu}. Uses Gaussian elimination.
+
+long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
+
+    Computes a generalised LU decomposition $LU = PA$ of a given
+    matrix $A$, returning the rank of $A$. The behavior of this function
+    is identical to that of \code{nmod_mat_lu}. Uses recursive block
+    decomposition, switching to classical Gaussian elimination for
+    sufficiently small blocks.
+
+
+*******************************************************************************
+
+    Reduced row echelon form
+
+*******************************************************************************
+
+long nmod_mat_rref(long * P, nmod_mat_t A)
+
+    Puts $A$ in reduced row echelon form, stores the row permutations
+    in $P$ and returns the rank of $A$.
+
+    The rref is computed by first obtaining an unreduced row echelon
+    form via LU decomposition and then solving an additional
+    triangular system.
+
+
+*******************************************************************************
+
+    Nullspace
+
+*******************************************************************************
+
+long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
+
+    Computes the nullspace of $A$ and returns the nullity.
+
+    More precisely, this function sets $X$ to a maximum rank matrix
+    such that $AX = 0$ and returns the rank of $X$. The columns of
+    $X$ will form a basis for the nullspace of $A$.
+
+    $X$ must have sufficient space to store all basis vectors
+    in the nullspace.
+
+    This function computes the reduced row echelon form and then reads
+    off the basis vectors.

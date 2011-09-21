@@ -90,18 +90,6 @@ long fmpz_poly_degree(const fmpz_poly_t poly)
     return poly->length - 1;
 }
 
-static __inline__ 
-ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
-{
-    return _fmpz_vec_max_limbs(poly->coeffs, poly->length);
-}
-
-static __inline__ 
-long fmpz_poly_max_bits(const fmpz_poly_t poly)
-{
-    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
-}
-
 /*  Assignment and basic manipulation  ***************************************/
 
 void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
@@ -445,6 +433,24 @@ void fmpz_poly_2norm(fmpz_t res, const fmpz_poly_t poly);
 
 mp_bitcnt_t _fmpz_poly_2norm_normalised_bits(const fmpz * poly, long len);
 
+static __inline__ 
+ulong fmpz_poly_max_limbs(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_limbs(poly->coeffs, poly->length);
+}
+
+static __inline__ 
+long fmpz_poly_max_bits(const fmpz_poly_t poly)
+{
+    return _fmpz_vec_max_bits(poly->coeffs, poly->length);
+}
+
+static __inline__ void
+fmpz_poly_height(fmpz_t res, const fmpz_poly_t poly)
+{
+    _fmpz_vec_height(res, poly->coeffs, poly->length);
+}
+
 /*  Greatest common divisor  *************************************************/
 
 void _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1, 
@@ -570,6 +576,12 @@ void _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA,
                               const fmpz * B, long lenB);
 
 void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B);
+
+void
+fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c);
+
+void
+_fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c);
 
 /*  Power series division  ***************************************************/
 
@@ -725,6 +737,58 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
+
+/*  Power series composition and compositional inverse  **********************/
+
+void
+_fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series_brent_kung(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_compose_series_horner(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series_horner(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1, 
+                                      const fmpz * poly2, long len2, long n);
+
+void
+fmpz_poly_compose_series(fmpz_poly_t res, 
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
+void
+_fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
+    const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+void
+_fmpz_poly_reverse_series(fmpz * Qinv, const fmpz * Q, long n);
+
+void
+fmpz_poly_reverse_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
 
 /*  Signature  ***************************************************************/
 

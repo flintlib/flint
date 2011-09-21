@@ -29,9 +29,6 @@
 #include "nmod_mat.h"
 #include "nmod_vec.h"
 
-
-#define STRASSEN_CUTOFF 256
-
 void
 nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
@@ -41,8 +38,9 @@ nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     k = A->c;
     n = B->c;
 
-    if (m < STRASSEN_CUTOFF || n < STRASSEN_CUTOFF ||
-        k < STRASSEN_CUTOFF)
+    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
+        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
+        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
     {
         nmod_mat_mul_classical(C, A, B);
     }

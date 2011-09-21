@@ -43,8 +43,17 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     if (dim < 5)
         fmpz_mat_det_cofactor(det, A);
-    else if (dim < 30)
+    else if (dim < 25)
         fmpz_mat_det_bareiss(det, A);
+    else if (dim < 60)
+        fmpz_mat_det_modular(det, A, 1);
     else
-        fmpz_mat_det_multi_mod(det, A, 1);
+    {
+        long bits = fmpz_mat_max_bits(A);
+
+        if (dim < FLINT_ABS(bits))
+            fmpz_mat_det_modular(det, A, 1);
+        else
+            fmpz_mat_det_modular_accelerated(det, A, 1);
+    }
 }

@@ -34,16 +34,21 @@ long
 nmod_mat_rank(const nmod_mat_t A)
 {
     long m, n, rank;
+    long * perm;
     nmod_mat_t tmp;
 
     m = A->r;
     n = A->c;
 
-    if (m < 1 || n < 1)
+    if (m == 0 || n == 0)
         return 0;
 
     nmod_mat_init_set(tmp, A);
-    rank = _nmod_mat_rowreduce(tmp, 0);
+    perm = malloc(sizeof(long) * m);
+
+    rank = nmod_mat_lu(perm, tmp, 0);
+
+    free(perm);
     nmod_mat_clear(tmp);
-    return FLINT_ABS(rank);
+    return rank;
 }

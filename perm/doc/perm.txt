@@ -1,0 +1,108 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+long * _perm_init(long n)
+
+    Initialises the permutation for use.
+
+void _perm_clear(long *vec)
+
+    Clears the permutation.
+
+*******************************************************************************
+
+    Assignment
+
+*******************************************************************************
+
+void _perm_set(long *res, const long *vec, long n)
+
+    Sets the permutation \code{res} to the same as the permutation \code{vec}.
+
+void _perm_set_one(long *vec, long n)
+
+    Sets the permutation to the identity permutation.
+
+void _perm_inv(long *res, const long *vec, long n)
+
+    Sets \code{res} to the inverse permutation of \code{vec}.
+    Allows aliasing of \code{res} and \code{vec}.
+
+*******************************************************************************
+
+    Composition
+
+*******************************************************************************
+
+void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
+
+    Forms the composition $\pi_1 \circ \pi_2$ of two permutations 
+    $\pi_1$ and $\pi_2$.  Here, $\pi_2$ is applied first, that is, 
+    $(\pi_1 \circ \pi_2)(i) = \pi_1(\pi_2(i))$.
+
+    Allows aliasing of \code{res}, \code{vec1} and \code{vec2}.
+
+*******************************************************************************
+
+    Parity
+
+*******************************************************************************
+
+int _perm_parity(const long *vec, long n)
+
+    Returns the parity of \code{vec}, 0 if the permutation is even and 1 if
+    the permutation is odd.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+int _perm_randtest(long *vec, long n, flint_rand_t state)
+
+    Generates a random permutation vector of length $n$ and returns
+    its parity, 0 or 1.
+
+    This function uses the Knuth shuffle algorithm to generate a uniformly 
+    random permutation without retries.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int _perm_print(const long * vec, long n)
+
+    Prints the permutation vector of length $n$ to \code{stdout}.
+

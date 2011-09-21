@@ -44,6 +44,10 @@ fmpz
 
 * Consider using mpz's instead of fmpz's in the multi CRT code
 
+* Improve, document and test fmpz_fdiv_r.
+
+* Add fmpz_set_d / fmpz_get_d (and fix dedekind_sum_coprime).
+
 
 ulong_extras
 ------------
@@ -126,6 +130,11 @@ nmod_poly
 
 * Implement fast mulmid and use to improve Newton iteration
 
+* Determine cutoffs for compose_series_divconquer for default use in
+  compose_series (only when one polynomial is small).
+
+* Write an asymptotically fast nmod_poly_interpolate_nmod_vec
+
 
 fmpz_poly
 ---------
@@ -161,8 +170,11 @@ fmpq_poly
 
 * add fmpq_poly_fprint_pretty
 
-* In _fmpq_poly_interpolate_fmpz_vec, check if it is faster to use
-  _fmpq_poly_add repeatedly instead of clearing all denominators.
+* Add fmpq versions of functions that take mpq input or output.
+
+* Rewrite _fmpq_poly_interpolate_fmpz_vec to use the Newton form as done
+  in the fmpz_poly interpolation function. In general this should
+  be much faster.
 
 * Add versions of fmpq_poly_interpolate_fmpz_vec for fmpq y values,
   and fmpq values of both x and y.
@@ -239,13 +251,28 @@ arith
 
 * Implement Bell polynomials.
 
-* Implement cyclotomic polynomials.
-
 * Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
   Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
 
+* Some steps in the partition function code will overflow on 32 bits for
+  large n. This can be fixed by using doubles in the commented places.
+
+* Implement fast computation of a range of partition function values
+  (e.g. by just caching/precomputing values of Dedekind sums, or even
+  caching the exponential sums as a whole).
+
+* Make partition_function_mpfr more general by allowing it to be
+  used for approximate calculation of p(n) (i.e. using less than
+  the full precision). This should be a simple modification (some care
+  is needed to get all conditionals right and to write proper tests).
+
+* Write tests for the dedekind_cosine_sum functions.
+
+* Investigate whether Knuth's algorithm is better for dedekind_sum_d.
+  It seems unlikely to be faster, but it might allow accurate
+  calculation for larger arguments.
 
 fmpz_mat
 --------
@@ -269,22 +296,22 @@ fmpz_mat
 
 * Implement fast null space computation.
 
-* Implement p-adic determinant calculation.
+* The Dixon p-adic solver should implement output-sensitive termination.
 
-* Implement fast multimodular and/or p-adic solving.
-
-* fmpz_mat_mul: If the product bound is less than COEFF_MAX, treat the fmpzs
-  as longs and perform direct arithmetic.
+* The Dixon p-adic solver currently spends most of the time computing
+  integer matrix-vector products. Instead of using a single prime, it
+  is likely to be faster to use a product of primes to increase the
+  proportion of time spent on modular linear algebra. The code should also
+  use fast radix conversion instead of building up the result incrementally
+  to improve performance when the output gets large.
 
 * Maybe optimise multimodular multiplication by pre-transposing
-  so that nmod_mat_mul_transpose can be used directly instead of
+  so that transposed nmod_mat multiplication can be used directly instead of
   creating a transposed copy in nmod_mat_mul. However, this doesn't help
   in the Strassen range unless there also is a transpose version of
   nmod_mat_mul_strassen.
 
 * Use _fmpz_vec functions instead of for loops in some more places.
-
-* Add CRT functions
 
 * Add transpose versions of common functions, in-place addmul etc.
 
@@ -301,30 +328,20 @@ nmod_mat
 
 * Implement methods for setting the zero matrix, identity matrix, etc.
 
-* Change the interface for _nmod_mat_rowreduce to generate
-  an explicit permutation array.
-
-* Add a user-friendly function for LUP decomposition.
-
-* Implement null space computation.
-
 * Implement nmod_mat_pow_ui.
 
 * Add functions for computing A*B^T and A^T*B, using transpose
   multiplications directly to avoid creating a temporary copy.
 
-* Write cleaner versions of the bound_size functions in
-  rowreduce.c, solve_lu_precomp.c (and combine them?)
-
-* Maybe: Optimise basecase multiplication using register blocking
-  and unrolling.
-
 * Maybe: add asserts to check that the modulus is a prime
   where this is assumed.
 
-* Implement Strassen inverse.
-
 * Add transpose versions of common functions, in-place addmul etc.
+
+* The current addmul/submul functions are misnamed since they
+  implement a more general operation.
+
+* Improve rref and inverse to perform everything in-place.
 
 
 fmpq

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010,2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -32,42 +32,42 @@
 
 
 int
-_nmod_mat_solve_lu(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
+nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long dim, i, rank;
-    nmod_mat_t T;
-    mp_limb_t * tmp;
+    long i, rank, *perm;
+    nmod_mat_t LU;
     int result;
 
-    dim = A->r;
+    if (A->r == 0 || B->c == 0)
+        return 1;
 
-    nmod_mat_init_set(T, A);
-    rank = _nmod_mat_rowreduce(T, 0);
+    nmod_mat_init_set(LU, A);
+    perm = malloc(sizeof(long) * A->r);
+    for (i = 0; i < A->r; i++)
+        perm[i] = i;
 
-    result = 0;
-    if (FLINT_ABS(rank) == dim)
+    rank = nmod_mat_lu(perm, LU, 1);
+
+    if (rank == A->r)
     {
-        tmp = _nmod_vec_init(dim);
+        nmod_mat_t PB;
+        nmod_mat_window_init(PB, B, 0, 0, B->r, B->c);
+        for (i = 0; i < A->r; i++)
+            PB->rows[i] = B->rows[perm[i]];
 
-        for (i = 0; i < dim; i++)
-        {
-            /* Insert in same order as the pivots */
-            tmp[i] = b[(T->rows[i] - T->entries) / dim];
-        }
+        nmod_mat_solve_tril(X, LU, PB, 1);
+        nmod_mat_solve_triu(X, LU, X, 0);
 
-        _nmod_mat_solve_lu_precomp(tmp, T->rows, dim, T->mod);
-        mpn_copyi(x, tmp, dim);
-        _nmod_vec_free(tmp);
+        nmod_mat_window_clear(PB);
         result = 1;
     }
+    else
+    {
+        result = 0;
+    }
 
-    nmod_mat_clear(T);
+    nmod_mat_clear(LU);
+    free(perm);
+
     return result;
 }
-
-int
-nmod_mat_solve(mp_limb_t * x, const nmod_mat_t A, const mp_limb_t * b)
-{
-    return (A->r) ? _nmod_mat_solve_lu(x, A, b) : 1;
-}
-

@@ -191,22 +191,84 @@ void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
 
 void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
 
+/* Cyclotomic polynomials ****************************************************/
+
+void _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
+                                        long num_factors, ulong phi);
+
+void cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
+
+void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n);
+
+void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n);
+
 /* Legendre polynomials ******************************************************/
 
 void legendre_polynomial(fmpq_poly_t poly, ulong n);
+
+/* Chebyshev polynomials *****************************************************/
+
+void chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
+
+void chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
 
 /* Swinnerton-Dyer polynomials ***********************************************/
 
 void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
 
-/* Partition function ********************************************************/
-
-void partition_function_nmod_vec(mp_ptr res, long len, nmod_t mod);
-
-void partition_function_vec(fmpz * res, long len);
-
 /* Landau function ***********************************************************/
 
 void landau_function_vec(fmpz * res, long len);
+
+/* Dedekind sums *************************************************************/
+
+void dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+double dedekind_sum_coprime_d(double h, double k);
+
+void dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+
+/* Exponential sums **********************************************************/
+
+typedef struct
+{
+    int n;
+    int prefactor;
+    mp_limb_t sqrt_p;
+    mp_limb_t sqrt_q;
+    mp_limb_signed_t cos_p[FLINT_BITS];
+    mp_limb_t cos_q[FLINT_BITS];
+} trig_prod_struct;
+
+typedef trig_prod_struct trig_prod_t[1];
+
+static __inline__
+void trig_prod_init(trig_prod_t sum)
+{
+    sum->n = 0;
+    sum->prefactor = 1;
+    sum->sqrt_p = 1;
+    sum->sqrt_q = 1;
+}
+
+void dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
+
+/* Number of partitions ******************************************************/
+
+void number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
+
+void number_of_partitions_vec(fmpz * res, long len);
+
+void number_of_partitions_mpfr(mpfr_t x, ulong n);
+
+void number_of_partitions(fmpz_t x, ulong n);
+
+void number_of_distinct_partitions_vec(fmpz * res, long len);
+
+void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
 #endif

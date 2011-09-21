@@ -32,8 +32,11 @@
 void
 nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
 {
-    if (A->mod.n <= B->mod.n)
-        _nmod_vec_set(B->entries, A->entries, A->r*A->c);
-    else
-        _nmod_vec_reduce(B->entries, A->entries, A->r*A->c, B->mod);
+    long i;
+
+    if (B == A || A->c == 0)
+        return;
+
+    for (i = 0; i < A->r; i++)
+        _nmod_vec_set(B->rows[i], A->rows[i], A->c);
 }

@@ -162,13 +162,13 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 *******************************************************************************
 
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-				     mp_srcptr vec2, long len, nmod_t mod)
+                        mp_srcptr vec2, long len, nmod_t mod)
 
     Sets \code{(res, len)} to the sum of \code{(vec1, len)} 
     and \code{(vec2, len)}.
 
 void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
-				     mp_srcptr vec2, long len, nmod_t mod)
+                        mp_srcptr vec2, long len, nmod_t mod)
 
     Sets \code{(res, len)} to the difference of \code{(vec1, len)} 
     and \code{(vec2, len)}.
@@ -178,12 +178,58 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
     Sets \code{(res, len)} to the negation of \code{(vec, len)}.
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				        long len, mp_limb_t c, nmod_t mod)
+                        long len, mp_limb_t c, nmod_t mod)
 
     Sets \code{(res, len)} to \code{(vec, len)} multiplied by $c$.
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-				        long len, mp_limb_t c, nmod_t mod)
+                        long len, mp_limb_t c, nmod_t mod)
 
     Adds \code{(vec, len)} times $c$ to the vector \code{(res, len)}.
 
+
+*******************************************************************************
+
+    Dot products
+
+*******************************************************************************
+
+int _nmod_vec_dot_bound_limbs(long len, nmod_t mod)
+
+    Returns the number of limbs (0, 1, 2 or 3) needed to represent the
+    unreduced dot product of two vectors of length \code{len} having entries
+    modulo \code{mod.n}, assuming that \code{len} is nonnegative and that
+    \code{mod.n} is nonzero. The computed bound is tight. In other words,
+    this function returns the precise limb size of \code{len} times
+    \code{(mod.n - 1) ^ 2}.
+
+macro NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)
+
+    Effectively performs the computation
+
+    \begin{verbatim}
+        res = 0;
+        for (i = 0; i < len; i++)
+            res += (expr1) * (expr2);
+    \end{verbatim}
+
+    but with the arithmetic performed modulo \code{mod}.
+    The \code{nlimbs} parameter should be 0, 1, 2 or 3, specifying the
+    number of limbs needed to represent the unreduced result.
+
+mp_limb_t
+_nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, long len, nmod_t mod, int nlimbs)
+
+    Returns the dot product of (\code{vec1}, \code{len}) and
+    (\code{vec2}, \code{len}). The \code{nlimbs} parameter should be
+    0, 1, 2 or 3, specifying the number of limbs needed to represent the
+    unreduced result.
+
+mp_limb_t
+_nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset, long len,
+    nmod_t mod, int nlimbs)
+
+    Returns the dot product of (\code{vec1}, \code{len}) and the values at
+    \code{vec2[i][offset]}. The \code{nlimbs} parameter should be
+    0, 1, 2 or 3, specifying the number of limbs needed to represent the
+    unreduced result.

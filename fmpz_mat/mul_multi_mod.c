@@ -50,8 +50,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     nmod_mat_t * mod_A;
     nmod_mat_t * mod_B;
 
-    /* TODO: find the best choice of primes */
-    primes_bits = FLINT_BITS - FLINT_BIT_COUNT(A->c) - 2;
+    primes_bits = NMOD_MAT_OPTIMAL_MODULUS_BITS;
 
     if (bits < primes_bits)
     {

@@ -46,6 +46,8 @@ typedef fmpq_mat_struct fmpq_mat_t[1];
 #define fmpq_mat_entry_num(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).num)))
 #define fmpq_mat_entry_den(mat,i,j) ((fmpz *)(&((*fmpq_mat_entry(mat,i,j)).den)))
 
+#define fmpq_mat_nrows(mat) ((mat)->r)
+#define fmpq_mat_ncols(mat) ((mat)->c)
 
 void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols);
 

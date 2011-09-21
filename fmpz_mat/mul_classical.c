@@ -39,7 +39,10 @@ fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     bc = B->c;
 
     if (br == 0)
+    {
+        fmpz_mat_zero(C);
         return;
+    }
 
     for (i = 0; i < ar; i++)
     {

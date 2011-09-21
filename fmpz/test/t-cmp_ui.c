@@ -53,7 +53,7 @@ main(void)
 
         fmpz_randtest(a, state, 200);
 
-        n = n_randtest_not_zero(state);
+        n = n_randtest(state);
         fmpz_set_ui(b, n);
 
         lhs = fmpz_cmp(a, b);

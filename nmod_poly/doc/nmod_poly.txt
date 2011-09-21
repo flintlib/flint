@@ -766,6 +766,19 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
     The algorithm used is to call \code{div_newton()} and then multiply out 
     and compute the remainder.
 
+mp_limb_t _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len,
+                                mp_limb_t c, nmod_t mod)
+
+    Sets \code{(Q, len-1)} to the quotient of \code{(A, len)} on division
+    by $(x - c)$, and returns the remainder, equal to the value of $A$
+    evaluated at $c$. $A$ and $Q$ are allowed to be the same, but may
+    not overlap partially in any other way.
+
+mp_limb_t nmod_poly_div_root(nmod_poly_t Q, const nmod_poly_t A, mp_limb_t c)
+
+    Sets $Q$ to the quotient of $A$ on division by $(x - c)$, and returns
+    the remainder, equal to the value of $A$ evaluated at $c$.
+
 *******************************************************************************
 
     Derivative and integral
@@ -816,6 +829,82 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     Evaluates \code{poly} at the value~\code{c} and reduces modulo the 
     modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
+
+void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr poly, long len,
+                                    mp_srcptr xs, long n, nmod_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
+                                    mp_srcptr xs, long n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+*******************************************************************************
+
+    Interpolation
+
+*******************************************************************************
+
+void _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    Sets \code{poly} to the unique polynomial of length at most \code{n}
+    that interpolates the \code{n} given evaluation points \code{xs} and
+    values \code{ys}. If the interpolating polynomial is shorter than
+    length \code{n}, the leading coefficients are set to zero.
+
+    The values in \code{xs} and \code{ys} should be reduced modulo the
+    modulus, and all \code{ys} must be distinct. Aliasing between
+    \code{poly} and \code{xs} or \code{ys} is not allowed.
+
+void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    Sets \code{poly} to the unique polynomial of length \code{n} that
+    interpolates the \code{n} given evaluation points \code{xs} and
+    values \code{ys}. The values in \code{xs} and \code{ys} should be
+    reduced modulo the modulus, and all \code{ys} must be distinct.
+
+void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    The interface specification for this function is identical to
+    that of \code{_nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial in the Newton basis using
+    the method of divided differences and then converts it to
+    monomial form.
+
+void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    The interface specification for this function is identical to
+    that of \code{nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial in the Newton basis using
+    the method of divided differences and then converts it to
+    monomial form.
+
+void _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    The interface specification for this function is identical to
+    that of \code{_nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial using the barycentric form
+    of Lagrange interpolation.
+
+void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    The interface specification for this function is identical to
+    that of \code{nmod_poly_interpolate_nmod_vec}.
+    Forms the interpolating polynomial using the barycentric form
+    of Lagrange interpolation.
+
 
 *******************************************************************************
 
@@ -985,6 +1074,194 @@ void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     The polynomials \code{S} and \code{T} are set such that 
     \code{S*A + T*B = G}. The length of \code{S} will be at most 
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+
+*******************************************************************************
+
+    Power series composition
+
+*******************************************************************************
+
+void _nmod_poly_compose_series_horner(mp_ptr res,
+        mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses the Horner scheme.
+
+void nmod_poly_compose_series_horner(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses the Horner scheme.
+
+void _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1,
+        long len1, mp_srcptr poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+
+void nmod_poly_compose_series_brent_kung(nmod_poly_t res, 
+                const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+
+void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1, 
+                                      mp_srcptr poly2, long len2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
+    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    space for \code{n} coefficients. Does not support aliasing between any
+    of the inputs and the output.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+void nmod_poly_compose_series(nmod_poly_t res, 
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}
+    modulo $x^n$, where the constant term of \code{poly2} is required
+    to be zero.
+
+    This implementation automatically switches between the Horner scheme
+    and Brent-Kung algorithm 2.1 depending on the size of the inputs.
+
+*******************************************************************************
+
+    Power series reversion
+
+*******************************************************************************
+
+void _nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q,
+        long n, nmod_t mod)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses the Lagrange inversion formula.
+
+void nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
+            const nmod_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses the Lagrange inversion formula.
+
+void _nmod_poly_reverse_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
+        long n, nmod_t mod)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses a reduced-complexity implementation
+    of the Lagrange inversion formula.
+
+void nmod_poly_reverse_series_lagrange_fast(nmod_poly_t Qinv,
+            const nmod_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses a reduced-complexity implementation
+    of the Lagrange inversion formula.
+
+void _nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q,
+    long n, nmod_t mod)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses Newton iteration \cite{BrentKung1978}.
+
+void nmod_poly_reverse_series_newton(nmod_poly_t Qinv,
+        const nmod_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation uses Newton iteration \cite{BrentKung1978}.
+
+void _nmod_poly_reverse_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$. The arguments must
+    both have length \code{n} and may not be aliased.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation automatically chooses between the Lagrange
+    inversion formula and Newton iteration based on the size of the
+    input.
+
+void nmod_poly_reverse_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+
+    Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
+    as a power series, i.e. computes $Q^{-1}$ such that
+    $Q(Q^{-1}(x)) = Q^{-1}(Q(x)) = x \bmod x^n$.
+
+    It is required that $Q_0 = 0$ and that $Q_1$ as well as the integers
+    $1, 2, \ldots, n-1$ are invertible modulo the modulus.
+
+    This implementation automatically chooses between the Lagrange
+    inversion formula and Newton iteration based on the size of the
+    input.
 
 *******************************************************************************
 
@@ -1222,3 +1499,24 @@ void _nmod_poly_tanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 void nmod_poly_tanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     Set $g = \operatorname{tanh}(h) + O(x^n)$.
+
+*******************************************************************************
+
+    Products
+
+*******************************************************************************
+
+void _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs,
+    long n, nmod_t mod)
+
+    Sets \code{(poly, n + 1)} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.
+
+    Aliasing of the input and output is not allowed.
+
+void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n)
+
+    Sets \code{poly} to the monic polynomial which is the product
+    of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
+    given by \code{xs}.

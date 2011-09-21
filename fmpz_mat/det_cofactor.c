@@ -30,7 +30,8 @@
 #include "fmpz_mat.h"
 
 
-void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x)
+void
+_fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x)
 {
     fmpz_t t;
     fmpz_init(t);
@@ -42,7 +43,8 @@ void _fmpz_mat_det_cofactor_2x2(fmpz_t det, fmpz ** const x)
     fmpz_clear(t);
 }
 
-void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x)
+void
+_fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x)
 {
     fmpz_t a, t;
 
@@ -67,7 +69,8 @@ void _fmpz_mat_det_cofactor_3x3(fmpz_t det, fmpz ** const x)
     fmpz_clear(t);
 }
 
-void _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x)
+void
+_fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x)
 {
     fmpz_t a, b, t;
 

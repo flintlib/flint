@@ -31,6 +31,33 @@
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 
+void
+nmod_mat_mul_check(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
+{
+    long i, j, k;
+
+    mp_limb_t s0, s1, s2;
+    mp_limb_t t0, t1;
+
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < B->c; j++)
+        {
+            s0 = s1 = s2 = 0UL;
+
+            for (k = 0; k < A->c; k++)
+            {
+                umul_ppmm(t1, t0, A->rows[i][k], B->rows[k][j]);
+                add_sssaaaaaa(s2, s1, s0, s2, s1, s0, 0, t1, t0);
+            }
+
+            NMOD_RED(s2, s2, C->mod);
+            NMOD_RED3(s0, s2, s1, s0, C->mod);
+            C->rows[i][j] = s0;
+        }
+    }
+}
+
 int
 main(void)
 {
@@ -44,6 +71,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         nmod_mat_t A, B, C, D;
+        mp_limb_t mod;
 
         long m, k, n;
 
@@ -56,41 +84,21 @@ main(void)
         switch (n_randint(state, 3))
         {
             case 0:
-                nmod_mat_init(A, m, n, n_randtest_not_zero(state));
+                mod = n_randtest_not_zero(state);
                 break;
             case 1:
-                nmod_mat_init(A, m, n, ULONG_MAX/2 + 1 - n_randbits(state, 4));
+                mod = ULONG_MAX/2 + 1 - n_randbits(state, 4);
                 break;
             case 2:
-                nmod_mat_init(A, m, n, ULONG_MAX - n_randbits(state, 4));
+            default:
+                mod = ULONG_MAX - n_randbits(state, 4);
                 break;
         }
 
-        switch (n_randint(state, 3))
-        {
-            case 0:
-                nmod_mat_init(B, n, k, n_randtest_not_zero(state));
-                break;
-            case 1:
-                nmod_mat_init(B, n, k, ULONG_MAX/2 + 1 - n_randbits(state, 4));
-                break;
-            case 2:
-                nmod_mat_init(B, n, k, ULONG_MAX - n_randbits(state, 4));
-                break;
-        }
-
-        /* Small modulus with high probability, again to trigger reductions */
-        switch (n_randint(state, 2))
-        {
-            case 0:
-                nmod_mat_init(C, m, k, n_randtest_not_zero(state));
-                break;
-            case 1:
-                nmod_mat_init(C, m, k, 1+n_randbits(state, 4));
-                break;
-        }
-
-        nmod_mat_init(D, m, k, C->mod.n);
+        nmod_mat_init(A, m, n, mod);
+        nmod_mat_init(B, n, k, mod);
+        nmod_mat_init(C, m, k, mod);
+        nmod_mat_init(D, m, k, mod);
 
         if (n_randint(state, 2))
             nmod_mat_randtest(A, state);
@@ -102,8 +110,10 @@ main(void)
         else
             nmod_mat_randfull(B, state);
 
+        nmod_mat_randtest(C, state);  /* make sure noise in the output is ok */
+
         nmod_mat_mul(C, A, B);
-        _nmod_mat_mul_3(D, A, B);
+        nmod_mat_mul_check(D, A, B);
 
         if (!nmod_mat_equal(C, D))
         {

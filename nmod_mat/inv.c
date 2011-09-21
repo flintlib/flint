@@ -46,13 +46,14 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
             break;
 
         case 1:
-            if (A->entries[0] == 0UL)
+            if (nmod_mat_entry(A, 0, 0) == 0UL)
             {
                 result = 0;
             }
             else
             {
-                B->entries[0] = n_invmod(A->entries[0], B->mod.n);
+                nmod_mat_entry(B, 0, 0) = 
+                    n_invmod(nmod_mat_entry(A, 0, 0), B->mod.n);
                 result = 1;
             }
             break;
@@ -60,8 +61,8 @@ int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
         default:
             nmod_mat_init(I, dim, dim, B->mod.n);
             for (i = 0; i < dim; i++)
-                I->rows[i][i] = 1UL;
-            result = nmod_mat_solve_mat(B, A, I);
+                nmod_mat_entry(I, i, i) = 1UL;
+            result = nmod_mat_solve(B, A, I);
             nmod_mat_clear(I);
     }
 
