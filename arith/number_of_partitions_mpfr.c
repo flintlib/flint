@@ -33,12 +33,19 @@
 #include "arith.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "profiler.h"
+
 
 #define DOUBLE_PREC 53
 #define PI 3.141592653589793238462643
 #define HRR_A (1.1143183348516376904 + 1e-12)  /* 44*pi^2/(225*sqrt(3)) */
 #define HRR_B (0.0592384391754448833 + 1e-12)  /* pi*sqrt(2)/75 */
 #define HRR_C (2.5650996603237281911 + 1e-12)  /* pi*sqrt(2/3) */
+
+#define PI_USE_CHUDNOVSKY 1
+#define PI_CHUDNOVSKY_CUTOFF 1000000
+
+#define VERBOSE 0
 
 
 static double
@@ -70,7 +77,7 @@ partitions_remainder_bound_log2(double n, double N)
 }
 
 long
-partitions_needed_terms(long n)
+partitions_needed_terms(ulong n)
 {
     long N;
     for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
@@ -80,7 +87,7 @@ partitions_needed_terms(long n)
 
 /* p(n), term k, N total terms */
 static long
-partitions_prec_bound(long n, long k, long N)
+partitions_prec_bound(ulong n, long k, long N)
 {
     long guard_bits, mag_bound, prec;
 
@@ -381,6 +388,9 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
     mpz_t n24;
     double Cd;
     long k, prec, guard_bits;
+#if VERBOSE
+    timeit_t t0;
+#endif
 
     if (n <= 2)
     {
@@ -409,8 +419,16 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
     mpz_mul_ui(n24, n24, 24);
     mpz_sub_ui(n24, n24, 1);
 
+#if VERBOSE
+    timeit_start(t0);
+#endif
+
     /* C = (pi/6)*sqrt(24*n-1) */
-    mpfr_const_pi(t1, MPFR_RNDN);
+
+    if (PI_USE_CHUDNOVSKY && prec > PI_CHUDNOVSKY_CUTOFF)
+        mpfr_pi_chudnovsky(t1, MPFR_RNDN);
+    else
+        mpfr_const_pi(t1, MPFR_RNDN);
 
     mpfr_sqrt_z(t2, n24, MPFR_RNDN);
     mpfr_mul(t1, t1, t2, MPFR_RNDN);
@@ -419,6 +437,11 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
 
     mpfr_init2(exp1, prec);
     mpfr_exp(exp1, C, prec);
+
+#if VERBOSE
+    timeit_stop(t0);
+    printf("TERM 1: %ld ms\n", t0->cpu);
+#endif
 
     for (k = N0; k <= N; k++)
     {

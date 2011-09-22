@@ -807,3 +807,17 @@ void number_of_partitions(fmpz_t x, ulong n)
 
     This function uses a lookup table for $n < 128$ (where $p(n) < 2^{32}$),
     and otherwise calls \code{number_of_partitions_mpfr}.
+
+*******************************************************************************
+
+    MPFR extras
+
+*******************************************************************************
+
+void mpfr_pi_chudnovsky(mpfr_t x, mpfr_rnd_t rnd)
+
+    Sets \code{x} to $\pi$, rounded in the direction \code{rnd}.
+
+    Uses the Chudnovsky algorithm, which typically is about four times
+    faster than the MPFR default function. As currently implemented, the
+    value is not cached for repeated use.

@@ -271,4 +271,8 @@ void number_of_distinct_partitions_vec(fmpz * res, long len);
 
 void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
+/* MPFR extras ***************************************************************/
+
+void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
+
 #endif
