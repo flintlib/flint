@@ -436,7 +436,7 @@ void fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
 
 static __inline__
 void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, 
-                              ulong r2, ulong m2, ulong c, double pre)
+                              ulong r2, ulong m2, ulong c, mp_limb_t pre)
 {
    ulong r1mod, s;
    fmpz_t r1modd, sm1;

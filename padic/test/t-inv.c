@@ -37,7 +37,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("inv_hensel... ");
+    printf("inv... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,8 +63,8 @@ main(void)
 
         padic_randtest_not_zero(a, state, ctx);
 
-        padic_inv_hensel(d, a, ctx);
-        padic_inv_hensel(a, a, ctx);
+        padic_inv(d, a, ctx);
+        padic_inv(a, a, ctx);
 
         result = (padic_equal(a, d, ctx));
         if (!result)
@@ -110,7 +110,7 @@ main(void)
 
             padic_ctx_init(ctx2, p, N - FLINT_ABS(v), PADIC_SERIES);
 
-            padic_inv_hensel(b, a, ctx);
+            padic_inv(b, a, ctx);
             padic_mul(d, a, b, ctx);
 
             padic_reduce(d, ctx2);
@@ -156,8 +156,8 @@ main(void)
 
         padic_randtest_not_zero(a, state, ctx);
 
-        padic_inv_hensel(d, a, ctx);
-        padic_inv_hensel(a, a, ctx);
+        padic_inv(d, a, ctx);
+        padic_inv(a, a, ctx);
 
         result = (padic_equal(a, d, ctx));
         if (!result)
@@ -203,7 +203,7 @@ main(void)
 
             padic_ctx_init(ctx2, p, N - FLINT_ABS(v), PADIC_SERIES);
 
-            padic_inv_hensel(b, a, ctx);
+            padic_inv(b, a, ctx);
             padic_mul(d, a, b, ctx);
 
             padic_reduce(d, ctx2);

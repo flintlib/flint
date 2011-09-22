@@ -340,6 +340,35 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
     Sets \code{rop} to the quotient of \code{op1} and \code{op2}, 
     reduced modulo $p^N$.
 
+void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
+
+    Pre-computes some data and allocates temporary space for 
+    $p$-adic inversion using Hensel lifting.
+
+    Assumes that $N \geq 2$.
+
+    This implies that $n = \ceil{\log_2 N} + 1 \geq 2$.
+
+void _padic_inv_clear(padic_inv_t S)
+
+    Frees the memory used by $S$.
+
+void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
+
+    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
+    assuming that \code{op} is a unit and $N \geq 1$.
+
+    In the current implementation, allows aliasing, but this might 
+    change in future versions.
+
+    Uses some pre-computed data $S$ that can be computed by 
+    calling the function \code{_padic_inv_precompute()}. 
+    Note that this object is not declared \code{const} 
+    and in fact it carries a field providing temporary 
+    work space.  This allows repeated calls of this function 
+    to avoid repeated memory allocations, as used e.g.\ by 
+    the function \code{padic_log()}.
+
 void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
     Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
@@ -355,33 +384,6 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     Suppose that \code{op} is given as $x = u p^v$. 
     Raises an \code{abort} signal if $v < -N$.  Otherwise, 
     computes the inverse of $u$ modulo $p^{N+v}$.
-
-void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
-
-    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
-    assuming that \code{op} is a unit and $N \geq 1$.
-
-    In the current implementation, allows aliasing, but this might 
-    change in future versions.
-
-void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-
-    Computes the inverse of \code{op} modulo $p^N$.
-
-    This function naively refers to the function \code{fmpz_invmod},
-    which works for any ring $\mathbf{Z} / m \mathbf{Z}$.
-
-void _padic_inv_hensel(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
-
-    Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
-    assuming that \code{op} is a unit and $N \geq 1$.
-
-    In the current implementation, allows aliasing, but this might 
-    change in future versions.
-
-void padic_inv_hensel(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-
-    Computes the inverse of \code{op} modulo $p^N$.
 
     This function employs Hensel lifting of an inverse modulo $p$.
 
@@ -468,6 +470,19 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     elements $x \in \mathbf{Q}_p$, this means that $\ord_p(x) \geq 1$ 
     when $p \geq 3$ and $\ord_2(x) \geq 2$ when $p = 2$.
 
+int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    the $p$-adic number \code{op}, and if so sets \code{rop} to its 
+    value.
+
+    The $p$-adic logarithm function is defined by the usual series 
+    \begin{equation*}
+    \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
+    \end{equation*}
+    but this only converges when $\ord_p(x)$ is at least $2$ or $1$ 
+    when $p = 2$ or $p > 2$, respectively.
+
 ulong padic_val_fac_ui2(ulong N)
 
     Computes the $2$-adic valuation of $n!$.
@@ -482,10 +497,28 @@ ulong padic_val_fac_ui(ulong N, const fmpz_t p)
 
 *******************************************************************************
 
-char * padic_get_str(const padic_t op, const padic_ctx_t ctx)
+char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
 
     Returns the string representation of the $p$-adic number \code{op}, 
     according to the printing mode set in the context.
+
+    If \code{str} is \code{NULL} then a new block of memory is allocated 
+    and a pointer to this is returned.  Otherwise, it is assumed that 
+    the string \code{str} is large enough to hold the representation and 
+    it is also the return value.
+
+    Note that a negative unit part of \code{op} and the printing mode 
+    \code{SERIES} are not compatible.
+
+char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
+
+    Returns the string representation of the $p$-adic number \code{op}
+    reduced modulo $p^N$, according to the printing mode set in the context.
+
+    If \code{str} is \code{NULL} then a new block of memory is allocated 
+    and a pointer to this is returned.  Otherwise, it is assumed that 
+    the string \code{str} is large enough to hold the representation and 
+    it is also the return value.
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 

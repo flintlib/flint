@@ -39,7 +39,13 @@ int main(void)
     fmpz_t p;
     padic_ctx_t ctx;
 
-    padic_t x;
+    char *str;
+    padic_t x, y;
+
+    printf("Output:\n\n");
+
+    /* Case 1 */
+    printf("Positive integer:  x = 127 mod 7^10\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 7);
@@ -49,15 +55,107 @@ int main(void)
     _padic_set_ui(x, 127, ctx);
 
     ctx->mode = PADIC_TERSE;
-    _padic_print(x, ctx), printf("\n");
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
 
     ctx->mode = PADIC_SERIES;
-    _padic_print(x, ctx), printf("\n");
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
-    _padic_print(x, ctx), printf("\n");
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
 
     _padic_clear(x);
+
+    padic_ctx_clear(ctx);
+    fmpz_clear(p);
+
+    /* Case 2 */
+    printf("Positive integer larger than p^N:  x = 1057 mod 2^10\n");
+
+    fmpz_init(p);
+    fmpz_set_ui(p, 2);
+    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+
+    _padic_init(x);
+    _padic_set_ui(x, 1057, ctx);
+
+    ctx->mode = PADIC_TERSE;
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
+
+    ctx->mode = PADIC_SERIES;
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
+
+    ctx->mode = PADIC_VAL_UNIT;
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
+
+    _padic_clear(x);
+
+    padic_ctx_clear(ctx);
+    fmpz_clear(p);
+
+    /* Case 3 */
+    printf("Negative integer:  x = -127 mod 3^10\n");
+
+    fmpz_init(p);
+    fmpz_set_ui(p, 3);
+    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+
+    _padic_init(x);
+    _padic_set_si(x, -127, ctx);
+
+    ctx->mode = PADIC_TERSE;
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
+
+    ctx->mode = PADIC_VAL_UNIT;
+    str = _padic_get_str(NULL, x, ctx);
+    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("get_str: %s\n", str);
+    free(str);
+
+    _padic_clear(x);
+
+    padic_ctx_clear(ctx);
+    fmpz_clear(p);
+
+    /* Log */
+    printf("Log of 7380996 mod 5^10\n");
+
+    fmpz_init(p);
+    fmpz_set_ui(p, 5);
+    padic_ctx_init(ctx, p, 10, PADIC_SERIES);
+
+    _padic_init(x);
+    _padic_init(y);
+    _padic_set_ui(x, 7380996, ctx);
+
+    padic_log(y, x, ctx);
+
+    printf("x = "), padic_print(x, ctx), printf("\n");
+    printf("y = "), padic_print(y, ctx), printf("\n");
+
+    _padic_clear(x);
+    _padic_clear(y);
+
     padic_ctx_clear(ctx);
     fmpz_clear(p);
 

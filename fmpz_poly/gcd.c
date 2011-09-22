@@ -98,7 +98,5 @@ fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
     
     _fmpz_poly_set_length(res, rlen);
     _fmpz_poly_normalise(res);
-    
-    return;
 }
 

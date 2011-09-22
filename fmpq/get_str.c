@@ -19,43 +19,48 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
- 
+   Copyright (C) 2011 Sebastian Pancratz
+
 ******************************************************************************/
 
-#include "padic.h"
+#include <mpir.h>
+#include "flint.h"
+#include "ulong_extras.h"
+#include "fmpq.h"
 
-void _padic_inv_naive(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
 {
-    fmpz_t pow;
+    char *s;
 
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, p, N);
-    fmpz_invmod(rop, op, pow);
-    fmpz_clear(pow);
+    if (str == NULL)
+    {
+        str = malloc(fmpz_sizeinbase(num, b) + fmpz_sizeinbase(den, b) + 3);
+
+        if (str == NULL)
+        {
+            printf("Exception (_fmpq_get_str).  Not enough memory.\n");
+            abort();
+        }
+    }
+
+    fmpz_get_str(str, b, num);
+
+    if (!fmpz_is_one(den))
+    {
+        s = str;
+        while (*s != '\0')
+            s++;
+
+        *s = '/';
+        s++;
+        fmpz_get_str(s, b, den);
+    }
+
+    return str;
 }
 
-void padic_inv_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+char * fmpq_get_str(char * str, int b, const fmpq_t f)
 {
-    if (_padic_is_zero(op))
-    {
-        printf("Exception (padic_inv_naive).  Zero is not invertible.\n");
-        abort();
-    }
-
-    /*
-        If x = u p^v has negative valuation with N <= -v then its 
-        exact inverse is equal to zero when reduced modulo p^N.
-     */
-    if (ctx->N + padic_val(op) <= 0)
-    {
-        padic_zero(rop, ctx);
-        return;
-    }
-
-    _padic_inv_naive(padic_unit(rop), 
-                     padic_unit(op), ctx->p, ctx->N + padic_val(op));
-
-    padic_val(rop) = - padic_val(op);
+    return _fmpq_get_str(str, b, fmpq_numref(f), fmpq_denref(f));
 }
 

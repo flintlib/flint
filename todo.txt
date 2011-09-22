@@ -369,8 +369,6 @@ padic
 
 * Improve the implementation of "padic_teichmuller"
 
-* Implement "padic_get_str"
-
 * Add test code for the various output formats; 
   perhaps in the form of examples?
 
