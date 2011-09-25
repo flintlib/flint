@@ -39,18 +39,18 @@ __mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f)
 
         if (*f > 0)
         {
-            z            = malloc(sizeof(__mpz_struct));
+            z            = malloc(sizeof(__mpz_struct) + sizeof(mp_limb_t));
             z->_mp_alloc = 1;
             z->_mp_size  = 1;
-            z->_mp_d     = malloc(sizeof(mp_limb_t));
+            z->_mp_d     = (mp_ptr) ((char *) z + sizeof(__mpz_struct));
             z->_mp_d[0]  = *f;
         }
         else if (*f < 0)
         {
-            z            = malloc(sizeof(__mpz_struct));
+            z            = malloc(sizeof(__mpz_struct) + sizeof(mp_limb_t));
             z->_mp_alloc = 1;
             z->_mp_size  = -1;
-            z->_mp_d     = malloc(sizeof(mp_limb_t));
+            z->_mp_d     = (mp_ptr) ((char *) z + sizeof(__mpz_struct));
             z->_mp_d[0]  = -(*f);
         }
         else

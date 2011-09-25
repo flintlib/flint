@@ -29,15 +29,8 @@
 
 void fmpz_clear_mpz_readonly(__mpz_struct *z)
 {
-    if (z->_mp_size == 1 || z->_mp_size == -1)
-    {
-        if (z->_mp_d[0] <= COEFF_MAX)
-        {
-            free(z->_mp_d);
-            free(z);
-        }
-    }
-    else if (z->_mp_size == 0)
+    if ((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX)
+        || (z->_mp_size == 0))
     {
         free(z);
     }
