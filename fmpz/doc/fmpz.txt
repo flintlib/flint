@@ -159,6 +159,21 @@ void fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     $-m/2 \le y < m/2$, given $x$ which is assumed to satisfy
     $0 \le x < m$.
 
+__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f)
+
+    Returns a read-only \code{__mpz_struct *}.
+
+    In the case when the \code{fmpz_t}~$f$ is already backed by 
+    a \code{__mpz_struct}, a pointer to this structure is returned. 
+    Otherwise, when $f$ is small, a one-limb \code{__mpz_struct} 
+    is allocated.
+
+    This has to be cleared by a call to \code{fmpz_clear_mpz_readonly()}.
+
+void fmpz_clear_mpz_readonly(__mpz_struct *z)
+
+    Clears the memory that was possibly allocated for the integer~$z$ 
+    when calling \code{fmpz_get_mpz_readonly()}.
 
 *******************************************************************************
 
