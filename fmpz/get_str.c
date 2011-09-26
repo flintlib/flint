@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+   Copyright (C) 2010, 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -30,20 +30,17 @@
 
 char * fmpz_get_str(char * str, int b, const fmpz_t f)
 {
-    fmpz d = *f;
-    
-    if (!COEFF_IS_MPZ(d))
+    if (!COEFF_IS_MPZ(*f))
     {
-        mpz_t copy;
+        mpz_t z;
 
-        mpz_init(copy);
-        fmpz_get_mpz(copy, f);
-        str = mpz_get_str(str, b, copy);
-        mpz_clear(copy);
+        mpz_init_set_si(z, *f);
+        str = mpz_get_str(str, b, z);
+        mpz_clear(z);
     }
     else
     {
-        str = mpz_get_str(str, b, COEFF_TO_PTR(d));
+        str = mpz_get_str(str, b, COEFF_TO_PTR(*f));
     }
 
     return str;
