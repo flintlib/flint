@@ -375,6 +375,13 @@ void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1, 
                                               const nmod_poly_t poly2, long n);
 
+void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, mp_srcptr f,
+                            long lenf, nmod_t mod);
+
+void nmod_poly_mulmod(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f);
+
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(mp_ptr res, 

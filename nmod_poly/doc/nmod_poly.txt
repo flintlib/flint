@@ -486,6 +486,25 @@ void nmod_poly_mulhigh(nmod_poly_t res, const nmod_poly_t poly1,
     corresponding coefficients of the product of \code{poly1} and 
     \code{poly2}, the remaining coefficients being arbitrary.
 
+void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, long len1, 
+                             mp_srcptr poly2, long len2, mp_srcptr f,
+                            long lenf, nmod_t mod)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{len1 + len2 - lenf > 0}, which is equivalent
+    to requiring that the result will actually be reduced. Otherwise, simply
+    use \code{_nmod_poly_mul} instead.
+
+    Aliasing of \code{f} and \code{res} is not permitted.
+
+void nmod_poly_mulmod(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}.
+
 *******************************************************************************
 
     Powering
