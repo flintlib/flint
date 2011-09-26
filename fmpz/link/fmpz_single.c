@@ -118,30 +118,24 @@ __mpz_struct * _fmpz_promote_val(fmpz_t f)
 void _fmpz_demote_val(fmpz_t f)
 {
     __mpz_struct * mpz_ptr = COEFF_TO_PTR(*f);
-    long size = mpz_ptr->_mp_size;
-    
-    if (size == 0L) /* value is zero */
+    int size = mpz_ptr->_mp_size;
+
+    if (!(((unsigned int) size + 1U) & ~2U))  /* size +-1 */
+    {
+        ulong uval = mpz_ptr->_mp_d[0];
+
+        if (uval <= (ulong) COEFF_MAX)
+        {
+            _fmpz_clear_mpz(*f);
+            *f = size * (fmpz) uval;
+        }
+    }
+    else if (size == 0)  /* value is 0 */
     {
         _fmpz_clear_mpz(*f);
-        (*f) = 0;
-    } else if (size == 1L) /* value is positive and 1 limb */
-    {
-        ulong uval = mpz_get_ui(mpz_ptr);
-        if (uval <= (ulong) COEFF_MAX) 
-        {
-            _fmpz_clear_mpz(*f);
-            (*f) = (fmpz) uval;
-        }
+        *f = 0;
     }
-    else if (size == -1L) /* value is negative and 1 limb */
-    {
-        ulong uval = mpz_get_ui(mpz_ptr);
-        if (uval <= (ulong) COEFF_MAX) 
-        {
-            _fmpz_clear_mpz(*f);
-            (*f) = (fmpz) -uval;
-        }
-    }
+
     /* don't do anything if value has to be multi precision */
 }
 
