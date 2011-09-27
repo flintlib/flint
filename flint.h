@@ -55,6 +55,7 @@
 typedef struct
 {
     gmp_randstate_t gmp_state;
+    int gmp_init;
 } flint_rand_s;
 
 typedef flint_rand_s flint_rand_t[1];
@@ -62,13 +63,24 @@ typedef flint_rand_s flint_rand_t[1];
 static __inline__
 void flint_randinit(flint_rand_t state)
 {
-    gmp_randinit_default(state->gmp_state);
+    state->gmp_init = 0;
+}
+
+static __inline__
+void _flint_rand_init_gmp(flint_rand_t state)
+{
+    if (!state->gmp_init)
+    {
+        gmp_randinit_default(state->gmp_state);
+        state->gmp_init = 1;
+    }
 }
 
 static __inline__
 void flint_randclear(flint_rand_t state)
 {
-    gmp_randclear(state->gmp_state);
+    if (state->gmp_init)
+        gmp_randclear(state->gmp_state);
 }
 
 /*

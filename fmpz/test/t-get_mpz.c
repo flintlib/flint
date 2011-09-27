@@ -52,7 +52,9 @@ main(void)
 
         bits = n_randint(state, 200) + 1;
 
+        _flint_rand_init_gmp(state);
         mpz_rrandomb(b, state->gmp_state, bits);
+
         if (n_randint(state, 2))
             mpz_neg(b, b);
 

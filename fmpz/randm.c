@@ -45,6 +45,8 @@ fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
+
+        _flint_rand_init_gmp(state);
         mpz_urandomm(mpz_ptr, state->gmp_state, COEFF_TO_PTR(*m));
         if (sgn < 0)
             mpz_neg(mpz_ptr, mpz_ptr);

@@ -44,7 +44,9 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
+        _flint_rand_init_gmp(state);
         mpz_urandomb(mpz_ptr, state->gmp_state, bits);
+
         if (n_randint(state, 2))
             mpz_neg(mpz_ptr, mpz_ptr);
     }
