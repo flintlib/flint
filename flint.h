@@ -56,6 +56,8 @@ typedef struct
 {
     gmp_randstate_t gmp_state;
     int gmp_init;
+    mp_limb_t __randval;
+    mp_limb_t __randval2;
 } flint_rand_s;
 
 typedef flint_rand_s flint_rand_t[1];
@@ -64,6 +66,13 @@ static __inline__
 void flint_randinit(flint_rand_t state)
 {
     state->gmp_init = 0;
+#if FLINT64
+    state->__randval = 4035456057UL;
+    state->__randval2 = 6748392731UL;
+#else
+    state->__randval = 3119766748UL;
+    state->__randval2 = 4225528843UL;
+#endif
 }
 
 static __inline__

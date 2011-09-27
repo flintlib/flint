@@ -39,7 +39,7 @@ void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state,
 {
     ulong m;
 
-    m = n_randlimb(NULL);
+    m = n_randlimb(state);
 
     fmpq_poly_fit_length(poly, len);
     _fmpq_poly_set_length(poly, len);
@@ -77,7 +77,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, flint_rand_t state,
 {
     ulong m;
 
-    m = n_randlimb(NULL);
+    m = n_randlimb(state);
 
     fmpq_poly_fit_length(poly, len);
     _fmpq_poly_set_length(poly, len);

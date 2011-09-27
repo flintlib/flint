@@ -39,7 +39,7 @@ fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     fmpz_randtest_unsigned(f, state, bits);
 
-    m = n_randlimb(NULL);
+    m = n_randlimb(state);
     if (m & 1UL)
         fmpz_neg(f, f);
 }

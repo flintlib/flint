@@ -29,28 +29,26 @@
 
 #if FLINT64
 
-mp_limb_t __randval = 4035456057UL;
-mp_limb_t __randval2 = 6748392731UL;
-
 mp_limb_t n_randlimb(flint_rand_t state) 
 {   
-    __randval = (__randval*1025416097UL + 286824428UL)%4294967311UL;
-    __randval2 = (__randval2*1647637699UL + 286824428UL)%4294967357UL;
+    state->__randval = (state->__randval*1025416097UL + 286824428UL)
+        % 4294967311UL;
+    state->__randval2 = (state->__randval2*1647637699UL + 286824428UL)
+        % 4294967357UL;
 
-    return __randval + (__randval2<<32);
+    return state->__randval + (state->__randval2 << 32);
 }
 
 #else
 
-mp_limb_t __randval = 3119766748UL;
-mp_limb_t __randval2 = 4225528843UL;
-
 mp_limb_t n_randlimb(flint_rand_t state) 
 {   
-    __randval = (__randval*1573677563UL +  1626832774UL)%65537UL;
-    __randval2 = (__randval2*897228705UL +  1626832774UL)% 65539UL;
+    state->__randval = (state->__randval*1573677563UL +  1626832774UL)
+        % 65537UL;
+    state->__randval2 = (state->__randval2*897228705UL +  1626832774UL)
+        % 65539UL;
 
-    return __randval + (__randval2<<16);
+    return state->__randval + (state->__randval2 << 16);
 }
 
 #endif
