@@ -917,7 +917,7 @@ void _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
     length \code{n}, the leading coefficients are set to zero.
 
     The values in \code{xs} and \code{ys} should be reduced modulo the
-    modulus, and all \code{ys} must be distinct. Aliasing between
+    modulus, and all \code{xs} must be distinct. Aliasing between
     \code{poly} and \code{xs} or \code{ys} is not allowed.
 
 void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
@@ -926,7 +926,7 @@ void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     Sets \code{poly} to the unique polynomial of length \code{n} that
     interpolates the \code{n} given evaluation points \code{xs} and
     values \code{ys}. The values in \code{xs} and \code{ys} should be
-    reduced modulo the modulus, and all \code{ys} must be distinct.
+    reduced modulo the modulus, and all \code{xs} must be distinct.
 
 void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
                             mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
@@ -1577,3 +1577,73 @@ void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n)
     Sets \code{poly} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}.
+
+*******************************************************************************
+
+    Factorisation
+
+*******************************************************************************
+
+void nmod_poly_factor_init(nmod_poly_factor_t fac)
+
+    Initialises \code{fac} for use. An \code{nmod_poly_factor_t}
+    represents a polynomial in factorised form as a product of
+    polynomials with associated exponents.
+
+void nmod_poly_factor_clear(nmod_poly_factor_t fac)
+
+    Frees all memory associated with \code{fac}.
+
+void nmod_poly_factor_print(const nmod_poly_factor_t fac)
+
+    Prints the entries of \code{fac} to standard output.
+
+void nmod_poly_factor_insert(nmod_poly_factor_t fac,
+        const nmod_poly_t poly, ulong exp)
+
+    Inserts the factor \code{poly} with multiplicity \code{exp} into
+    the factorisation \code{fac}.
+
+    If \code{fac} already contains \code{poly}, then \code{exp} simply
+    gets added to the exponent of the existing entry.
+
+void nmod_poly_factor_concat(nmod_poly_factor_t res,
+                        const nmod_poly_factor_t fac)
+
+    Concatenates two factorisations. This is equivalent to calling
+    \code{nmod_poly_factor_insert} repeatedly with the individual
+    factors of \code{fac}.
+
+ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
+
+    Removes the highest possible power of \code{p} from \code{f} and
+    returns the exponent.
+
+int nmod_poly_is_irreducible(const nmod_poly_t f)
+
+    Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
+
+int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
+    flint_rand_t state, const nmod_poly_t pol, ulong d)
+
+    Probabilistic equal degree factorisation of \code{pol} into
+    irreducible factors of degree \code{d}. If it passes, a factor is
+    placed in factor and 1 is returned, otherwise 0 is returned and
+    the value of factor is undetermined.
+
+    Requires that \code{pol} be monic, non-constant and squarefree.
+
+void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
+                                    const nmod_poly_t pol, ulong d)
+
+    Assuming \code{pol} is a product of irreducible factors all of
+    degree \code{d}, finds all those factors and places them in factors.
+    Requires that \code{pol} be monic, non-constant and squarefree.
+
+void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
+    const nmod_poly_t f)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the Cantor-Zassenhaus algorithm.
+
+    The modulus must be a prime greater than 2.
