@@ -41,39 +41,48 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_berlekamp....");
+    printf("factor_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 300; iter++)
     {
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res;
         mp_limb_t modulus;
-        long i, length, num_factors;
+        ulong exponents[5], prod1;
+        long length, i, j, num_factors;
 
         modulus = n_randtest_prime(state, 0);
-
+      
         nmod_poly_init(pol1, modulus);
         nmod_poly_init(poly, modulus);
         nmod_poly_init(quot, modulus);
         nmod_poly_init(rem, modulus);
      
-        length = n_randint(state, 10) + 2;
+        nmod_poly_zero(pol1);
+        nmod_poly_set_coeff_ui(pol1, 0, 1);
+
+        length = n_randint(state, 7) + 2;
+
         do 
         {
-            nmod_poly_randtest(pol1, state, length);
-            if (pol1->length)
-                nmod_poly_make_monic(pol1, pol1);
+            nmod_poly_randtest(poly, state, length); 
+            nmod_poly_make_monic(poly, poly);
         }
-        while ((!nmod_poly_is_irreducible(pol1)) || (pol1->length < 2));
+        while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
+        exponents[0] = n_randprime(state, 5, 0);
+
+        prod1 = exponents[0];
+        for (i = 0; i < exponents[0]; i++)
+            nmod_poly_mul(pol1, pol1, poly);
 
         num_factors = n_randint(state, 5) + 1;
         for (i = 1; i < num_factors; i++)
         {
             do 
             {
-                length = n_randint(state, 10) + 2;
+                length = n_randint(state, 7) + 2;
                 nmod_poly_randtest(poly, state, length); 
                 if (poly->length)
                 {
@@ -81,22 +90,41 @@ main(void)
                     nmod_poly_divrem(quot, rem, pol1, poly);
                 }
             }
-            while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2)
-                || (rem->length == 0));
-            nmod_poly_mul(pol1, pol1, poly);
+            while ((!nmod_poly_is_irreducible(poly)) ||
+                (poly->length < 2) || (rem->length == 0));
+
+            do exponents[i] = n_randprime(state, 5, 0);
+            while (prod1 % exponents[i] == 0);
+
+            prod1 *= exponents[i];
+            for (j = 0; j < exponents[i]; j++)
+                nmod_poly_mul(pol1, pol1, poly);
         }
      
         nmod_poly_factor_init(res);
-        nmod_poly_factor_berlekamp(res, pol1);
+        nmod_poly_factor_squarefree(res, pol1);
 
-        result = (res->num_factors == num_factors);
+        result &= (res->num_factors == num_factors);
+        if (result)
+        {
+            ulong prod2 = 1;
+            for (i = 0; i < num_factors; i++)
+                prod2 *= res->exponents[i];
+            result &= (prod1 == prod2);
+        }
+
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %ld\n", modulus,
-                num_factors, res->num_factors);
+            printf("Error: exponents don't match. Modulus = %lu\n", modulus);
+            for (i = 0; i < res->num_factors; i++)
+                printf("%ld ", res->exponents[i]);
+            printf("\n");
+            for (i = 0; i < num_factors; i++)
+                printf("%ld ", exponents[i]);
+            printf("\n");
             abort();
         }
-      
+
         nmod_poly_clear(quot);
         nmod_poly_clear(rem);
         nmod_poly_clear(pol1);

@@ -777,21 +777,23 @@ typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
 
 void nmod_poly_factor_clear(nmod_poly_factor_t fac);
 
-void nmod_poly_factor_concat(nmod_poly_factor_t res,
-                        const nmod_poly_factor_t fac);
-
-void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                                    const nmod_poly_t pol, ulong d);
-
-int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, ulong d);
-
 void nmod_poly_factor_init(nmod_poly_factor_t fac);
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
         const nmod_poly_t poly, ulong exp);
 
 void nmod_poly_factor_print(const nmod_poly_factor_t fac);
+
+void nmod_poly_factor_concat(nmod_poly_factor_t res,
+                        const nmod_poly_factor_t fac);
+
+void nmod_poly_factor_pow(nmod_poly_factor_t fac, ulong exp);
+
+void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
+                                    const nmod_poly_t pol, ulong d);
+
+int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
+    flint_rand_t state, const nmod_poly_t pol, ulong d);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
@@ -806,5 +808,7 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
 
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     const nmod_poly_t f);
+
+void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
 #endif

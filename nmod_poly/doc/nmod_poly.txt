@@ -1619,6 +1619,10 @@ void nmod_poly_factor_concat(nmod_poly_factor_t res,
     \code{nmod_poly_factor_insert} repeatedly with the individual
     factors of \code{fac}.
 
+void nmod_poly_factor_pow(nmod_poly_factor_t fac, ulong exp)
+
+    Raises \code{fac} to the power \code{exp}.
+
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
 
     Removes the highest possible power of \code{p} from \code{f} and
@@ -1638,6 +1642,10 @@ int nmod_poly_is_squarefree(nmod_poly_t f)
 
     Returns 1 if \code{f} is squarefree, and 0 otherwise. As a special
     case, the zero polynomial is not considered squarefree.
+
+void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
+
+    Sets \code{res} to a square-free factorization of \code{f}.
 
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, ulong d)
