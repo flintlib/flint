@@ -69,7 +69,8 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
 
         /* Compute x^q mod f */
         nmod_poly_powpowmod(x_p, x, p, n, f);
-        nmod_poly_make_monic(x_p, x_p);
+        if (!nmod_poly_is_zero(x_p))
+            nmod_poly_make_monic(x_p, x_p);
 
         /* Now do the irreducibility test */
         if (!nmod_poly_equal(x_p, x))

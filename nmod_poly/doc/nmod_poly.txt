@@ -1628,6 +1628,17 @@ int nmod_poly_is_irreducible(const nmod_poly_t f)
 
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
 
+int _nmod_poly_is_squarefree(mp_srcptr f, long len, nmod_t mod)
+
+    Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
+    special case, the zero polynomial is not considered squarefree.
+    There are no restrictions on the length.
+
+int nmod_poly_is_squarefree(nmod_poly_t f)
+
+    Returns 1 if \code{f} is squarefree, and 0 otherwise. As a special
+    case, the zero polynomial is not considered squarefree.
+
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, ulong d)
 

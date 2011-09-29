@@ -797,6 +797,10 @@ ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 int nmod_poly_is_irreducible(const nmod_poly_t f);
 
+int _nmod_poly_is_squarefree(mp_srcptr f, long len, nmod_t mod);
+
+int nmod_poly_is_squarefree(nmod_poly_t f);
+
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
     const nmod_poly_t f);
 

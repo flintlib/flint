@@ -92,7 +92,7 @@ main(void)
         result = (res->num_factors == num_factors);
         if (!result)
         {
-            printf("FAIL: %ld, %ld, %ld\n", modulus,
+            printf("FAIL: %lu, %ld, %ld\n", modulus,
                 num_factors, res->num_factors);
             abort();
         }
