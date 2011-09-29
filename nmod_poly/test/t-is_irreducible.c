@@ -38,65 +38,65 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_squarefree....");
+    printf("is_irreducible....");
     fflush(stdout);
 
-    for (iter = 0; iter < 2000; iter++)
+    for (iter = 0; iter < 200; iter++)
     {
-        nmod_poly_t poly, Q, R, t;
+        nmod_poly_t poly, poly2, poly3;
+        nmod_poly_factor_t factors;
         mp_limb_t modulus;
-        long i, num_factors, exp, max_exp;
-        int v, result;
+        long bits, length, length2;
+        int result = 1;
 
         modulus = n_randtest_prime(state, 0);
 
         nmod_poly_init(poly, modulus);
-        nmod_poly_init(t, modulus);
-        nmod_poly_init(Q, modulus);
-        nmod_poly_init(R, modulus);
+        nmod_poly_init(poly2, modulus);
+        nmod_poly_init(poly3, modulus);
+      
+        length = n_randint(state, 10) + 2;
 
-        nmod_poly_set_coeff_ui(poly, 0, n_randint(state, modulus));
-        num_factors = n_randint(state, 5);
-
-        max_exp = 0;
-        for (i = 0; i < num_factors; i++)
+        do
         {
-            do {
-                nmod_poly_randtest(t, state, n_randint(state, 10));
-            } while (!nmod_poly_is_irreducible(t) ||
-                    (nmod_poly_length(t) < 2));
-
-            exp = n_randint(state, 4) + 1;
-            if (n_randint(state, 2) == 0)
-                exp = 1;
-
-            nmod_poly_divrem(Q, R, poly, t);
-            if (!nmod_poly_is_zero(R))
-            {
-                nmod_poly_pow(t, t, exp);
-                nmod_poly_mul(poly, poly, t);
-                max_exp = FLINT_MAX(exp, max_exp);
-            }
+            nmod_poly_randtest(poly, state, length);
+            nmod_poly_make_monic(poly, poly);
         }
+        while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
 
-        v = nmod_poly_is_squarefree(poly);
-
-        if (v == 1)
-            result = (max_exp <= 1 && !nmod_poly_is_zero(poly));
-        else
-            result = (max_exp > 1 || nmod_poly_is_zero(poly));
-
+        nmod_poly_factor_init(factors);
+        nmod_poly_factor_berlekamp(factors, poly);
+        result &= (factors->num_factors == 1);
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %d\n", modulus, max_exp, v);
+            printf("Error: irreducible polynomial should not have non-trivial factors!\n");
             nmod_poly_print(poly); printf("\n");
+            abort();
+        }
+        nmod_poly_factor_clear(factors);
+
+        length2 = n_randint(state, 10) + 2;
+
+        do 
+        {
+            nmod_poly_randtest(poly2, state, length2); 
+            nmod_poly_make_monic(poly2, poly2);
+        }
+        while ((!nmod_poly_is_irreducible(poly2)) || (poly2->length < 2));
+
+        nmod_poly_mul(poly3, poly, poly2);
+
+        result &= !nmod_poly_is_irreducible(poly3);
+        if (!result)
+        {
+            printf("Error: reducible polynomial declared irreducible!\n");
+            nmod_poly_print(poly3); printf("\n");
             abort();
         }
 
         nmod_poly_clear(poly);
-        nmod_poly_clear(t);
-        nmod_poly_clear(Q);
-        nmod_poly_clear(R);
+        nmod_poly_clear(poly2);
+        nmod_poly_clear(poly3);
     }
 
     flint_randclear(state);
