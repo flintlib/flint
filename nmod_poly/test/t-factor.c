@@ -41,10 +41,11 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_with_berlekamp....");
+    printf("factor....");
     fflush(stdout);
 
-    for (iter = 0; iter < 500; iter++)
+    /* Default algorithm */
+    for (iter = 0; iter < 100; iter++)
     {
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem, product;
@@ -100,7 +101,23 @@ main(void)
         }
 
         nmod_poly_factor_init(res);
-        lead = nmod_poly_factor_with_berlekamp(res, pol1);
+
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                lead = nmod_poly_factor(res, pol1);
+                break;
+            case 1:
+                lead = nmod_poly_factor_with_berlekamp(res, pol1);
+                break;
+            case 2:
+                if (modulus == 2)
+                    lead = nmod_poly_factor(res, pol1);
+                else
+                    lead = nmod_poly_factor_with_cantor_zassenhaus(res, pol1);
+                break;
+        }
+
         result &= (res->num_factors == num_factors);
         if (!result)
         {
@@ -130,6 +147,122 @@ main(void)
         nmod_poly_clear(pol1);
         nmod_poly_clear(poly);
         nmod_poly_factor_clear(res);
+    }
+
+    /* Test deflation trick */
+    for (iter = 0; iter < 100; iter++)
+    {
+        int result = 1;
+        nmod_poly_t pol1, poly, quot, rem;
+        nmod_poly_factor_t res, res2;
+        mp_limb_t modulus, lead, lead2;
+        long length, num_factors, i, j;
+        ulong exponents[5], prod1;
+        ulong inflation;
+        int found;
+
+        do {
+            modulus = n_randtest_prime(state, 0);
+        } while (modulus == 2); /* To compare with CZ */
+
+        nmod_poly_init(pol1, modulus);
+        nmod_poly_init(poly, modulus);
+        nmod_poly_init(quot, modulus);
+        nmod_poly_init(rem, modulus);
+
+        nmod_poly_zero(pol1);
+        nmod_poly_set_coeff_ui(pol1, 0, 1);
+
+        inflation = n_randint(state, 7) + 1;
+
+        length = n_randint(state, 7) + 2;
+        do 
+        {
+            nmod_poly_randtest(poly, state, length); 
+            if (poly->length)
+                nmod_poly_make_monic(poly, poly);
+        }
+        while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
+        nmod_poly_inflate(poly, poly, inflation);
+
+        exponents[0] = n_randint(state, 6) + 1;
+        prod1 = exponents[0];
+        for (i = 0; i < exponents[0]; i++)
+            nmod_poly_mul(pol1, pol1, poly);
+
+        num_factors = n_randint(state, 5) + 1;
+        for (i = 1; i < num_factors; i++)
+        {
+            do
+            {
+                length = n_randint(state, 6) + 2;
+                nmod_poly_randtest(poly, state, length); 
+                if (poly->length)
+                {
+                    nmod_poly_make_monic(poly, poly);
+                    nmod_poly_divrem(quot, rem, pol1, poly);
+                }
+            }
+            while ((!nmod_poly_is_irreducible(poly)) ||
+                (poly->length < 2) || (rem->length == 0));
+            exponents[i] = n_randint(state, 6) + 1;
+            prod1 *= exponents[i];
+            nmod_poly_inflate(poly, poly, inflation);
+
+            for (j = 0; j < exponents[i]; j++)
+                nmod_poly_mul(pol1, pol1, poly);
+        }
+
+        nmod_poly_factor_init(res);
+        nmod_poly_factor_init(res2);
+
+        switch (n_randint(state, 3))
+        {
+            case 0:
+                nmod_poly_factor(res, pol1);
+                break;
+            case 1:
+                nmod_poly_factor_with_berlekamp(res, pol1);
+                break;
+            case 2:
+                nmod_poly_factor_with_cantor_zassenhaus(res, pol1);
+                break;
+        }
+
+        nmod_poly_factor_cantor_zassenhaus(res2, pol1);
+
+        if (res->num_factors != res2->num_factors)
+        {
+            printf("FAIL: different number of factors found\n");
+            abort();
+        }
+
+        for (i = 0; i < res->num_factors; i++)
+        {
+            found = 0;
+            for (j = 0; j < res2->num_factors; j++)
+            {
+                if (nmod_poly_equal(res->factors[i], res2->factors[j]) &&
+                        res->exponents[i] == res2->exponents[j])
+                {
+                    found = 1;
+                    break;
+                }
+            }
+
+            if (!found)
+            {
+                printf("FAIL: factor not found\n");
+                abort();
+            }
+        }
+
+        nmod_poly_clear(quot);
+        nmod_poly_clear(rem);
+        nmod_poly_clear(pol1);
+        nmod_poly_clear(poly);
+        nmod_poly_factor_clear(res);
+        nmod_poly_factor_clear(res2);
     }
 
     flint_randclear(state);

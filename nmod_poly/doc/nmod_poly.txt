@@ -1707,8 +1707,35 @@ mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
 
     Factorises a general polynomial \code{f} into monic irreducible factors
     and returns the leading coefficient of \code{f}, or 0 if \code{f}
-    is the zero polynomial. This function first checks for small special
-    cases, then performs a square-free factorisation, and finally
-    runs Berlekamp on all the individual square-free factors.
+    is the zero polynomial.
 
+    This function first checks for small special cases, deflates \code{f}
+    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
+    square-free factorisation, and finally runs Berlekamp on all the
+    individual square-free factors.
 
+mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res,
+        const nmod_poly_t f)
+
+    Factorises a general polynomial \code{f} into monic irreducible factors
+    and returns the leading coefficient of \code{f}, or 0 if \code{f}
+    is the zero polynomial.
+
+    This function first checks for small special cases, deflates \code{f}
+    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
+    square-free factorisation, and finally runs Cantor-Zassenhaus on all the
+    individual square-free factors.
+
+mp_limb_t nmod_poly_factor(nmod_poly_factor_t res,
+        const nmod_poly_t f)
+
+    Factorises a general polynomial \code{f} into monic irreducible factors
+    and returns the leading coefficient of \code{f}, or 0 if \code{f}
+    is the zero polynomial.
+
+    This function first checks for small special cases, deflates \code{f}
+    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
+    square-free factorisation, and finally runs either Cantor-Zassenhaus
+    or Berlekamp on all the individual square-free factors.
+    Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
+    which case Berlekamp is used.

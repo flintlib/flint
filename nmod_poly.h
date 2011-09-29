@@ -821,7 +821,13 @@ void nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
 void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
-mp_limb_t
-nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result, nmod_poly_t input);
+mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
+    const nmod_poly_t input);
+
+mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
+    const nmod_poly_t input);
+
+mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
+    const nmod_poly_t input);
 
 #endif
