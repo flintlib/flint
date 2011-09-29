@@ -135,6 +135,22 @@ nmod_poly
 
 * Write an asymptotically fast nmod_poly_interpolate_nmod_vec
 
+* Add resultants
+
+* Optimise, write an underscore version of, and test
+  nmod_poly_remove
+
+* Implement modular composition
+
+* Improve powmod and powpowmod using precomputed Newton inverse,
+  2^k-ary/sliding window powering, and the Kaltofen-Shoup
+  baby step giant step technique
+
+* Maybe restructure the code in factor.c
+
+* Add a (fast) function to convert an nmod_poly_factor_t to
+  an expanded polynomial
+
 
 fmpz_poly
 ---------
@@ -164,6 +180,8 @@ fmpz_poly
   spent in resultant, but the CRT code or the nmod_poly_xgcd code may also
   be to blame.
 
+* Make resultants use fast GCD?
+
 
 fmpq_poly
 ---------
@@ -178,6 +196,10 @@ fmpq_poly
 
 * Add versions of fmpq_poly_interpolate_fmpz_vec for fmpq y values,
   and fmpq values of both x and y.
+
+* Add mulhigh
+
+* Add resultants
 
 
 fmpz_poly_mat
