@@ -1674,7 +1674,16 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
 
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 
-    Factorises a non-constant polynomial \code{f} into monic irreducible
-    factors using the Berlekamp algorithm.
+    Factorises a non-constant, squarefree polynomial \code{f} into monic
+    irreducible factors using the Berlekamp algorithm.
 
-    Assumes that \code{f} is squarefree.
+mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
+        const nmod_poly_t f)
+
+    Factorises a general polynomial \code{f} into monic irreducible factors
+    and returns the leading coefficient of \code{f}, or 0 if \code{f}
+    is the zero polynomial. This function first checks for small special
+    cases, then performs a square-free factorisation, and finally
+    runs Berlekamp on all the individual square-free factors.
+
+
