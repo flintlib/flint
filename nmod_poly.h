@@ -281,6 +281,13 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
     return (poly->length == 0);
 }
 
+static __inline__ int
+nmod_poly_is_one(const nmod_poly_t poly)
+{
+    return (poly->length == 1) && (poly->coeffs[0] == 1);
+}
+
+
 /* Shifting  *****************************************************************/
 
 void _nmod_poly_shift_left(mp_ptr res, mp_srcptr poly, long len, long k);
@@ -793,5 +800,7 @@ int nmod_poly_is_irreducible(const nmod_poly_t f);
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
     const nmod_poly_t f);
 
+void nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
+    const nmod_poly_t f);
 
 #endif

@@ -39,7 +39,7 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
     if (f->mod.n == 2)
     {
         printf("Not implemented: factoring mod 2\n");
-        return;
+        abort();
     }
 
     nmod_poly_init_preinv(h, f->mod.n, f->mod.ninv);
@@ -57,6 +57,7 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
     {
         i++;
         nmod_poly_powmod_ui_binexp(h, h, f->mod.n, v);
+
         nmod_poly_sub(h, h, x);
         nmod_poly_gcd(g, h, v);
         nmod_poly_add(h, h, x);
@@ -70,7 +71,8 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
             for (j = num; j < res->num_factors; j++)
                 res->exponents[j] = nmod_poly_remove(v, res->factors[j]);
         }
-    } while (v->length >= 2*i + 3);
+    }
+    while (v->length >= 2*i + 3);
 
     if (v->length > 1)
         nmod_poly_factor_insert(res, v, 1);

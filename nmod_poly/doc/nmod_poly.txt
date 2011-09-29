@@ -245,6 +245,11 @@ int nmod_poly_is_zero(const nmod_poly_t poly)
     Returns~$1$ if the polynomial \code{poly} is the zero polynomial,
     otherwise returns~$0$.
 
+int nmod_poly_is_one(const nmod_poly_t poly)
+
+    Returns~$1$ if the polynomial \code{poly} is the constant polynomial 1,
+    otherwise returns~$0$.
+
 *******************************************************************************
 
     Shifting
@@ -1647,3 +1652,10 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
     factors using the Cantor-Zassenhaus algorithm.
 
     The modulus must be a prime greater than 2.
+
+void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the Berlekamp algorithm.
+
+    Assumes that \code{f} is squarefree.
