@@ -38,65 +38,52 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_irreducible....");
+    printf("inflate....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 1000; iter++)
     {
-        nmod_poly_t poly, poly2, poly3;
-        nmod_poly_factor_t factors;
+        nmod_poly_t poly1, poly2, poly3, xp;
         mp_limb_t modulus;
-        long length, length2;
-        int result = 1;
+        ulong inflation;
 
         modulus = n_randtest_prime(state, 0);
 
-        nmod_poly_init(poly, modulus);
+        nmod_poly_init(poly1, modulus);
         nmod_poly_init(poly2, modulus);
         nmod_poly_init(poly3, modulus);
-      
-        length = n_randint(state, 10) + 2;
+        nmod_poly_init(xp, modulus);
 
-        do
+        nmod_poly_randtest(poly1, state, n_randint(state, 20));
+        inflation = n_randint(state, 10);
+
+        nmod_poly_inflate(poly2, poly1, inflation);
+
+        nmod_poly_set_coeff_ui(xp, inflation, 1);
+        nmod_poly_compose(poly3, poly1, xp);
+
+        if (!nmod_poly_equal(poly2, poly3))
         {
-            nmod_poly_randtest(poly, state, length);
-            nmod_poly_make_monic(poly, poly);
-        }
-        while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
-
-        nmod_poly_factor_init(factors);
-        nmod_poly_factor_berlekamp(factors, poly);
-        result &= (factors->num_factors == 1);
-        if (!result)
-        {
-            printf("Error: irreducible polynomial should not have non-trivial factors!\n");
-            nmod_poly_print(poly); printf("\n");
-            abort();
-        }
-        nmod_poly_factor_clear(factors);
-
-        length2 = n_randint(state, 10) + 2;
-
-        do 
-        {
-            nmod_poly_randtest(poly2, state, length2); 
-            nmod_poly_make_monic(poly2, poly2);
-        }
-        while ((!nmod_poly_is_irreducible(poly2)) || (poly2->length < 2));
-
-        nmod_poly_mul(poly3, poly, poly2);
-
-        result &= !nmod_poly_is_irreducible(poly3);
-        if (!result)
-        {
-            printf("Error: reducible polynomial declared irreducible!\n");
-            nmod_poly_print(poly3); printf("\n");
+            printf("FAIL: not equal to compose (inflation = %lu)\n", inflation);
+            printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
+            printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
+            printf("poly3:\n"); nmod_poly_print(poly3); printf("\n\n");
             abort();
         }
 
-        nmod_poly_clear(poly);
+        nmod_poly_inflate(poly1, poly1, inflation);
+        if (!nmod_poly_equal(poly1, poly2))
+        {
+            printf("FAIL: aliasing (inflation = %lu)\n", inflation);
+            printf("poly1:\n"); nmod_poly_print(poly1); printf("\n\n");
+            printf("poly2:\n"); nmod_poly_print(poly2); printf("\n\n");
+            abort();
+        }
+
+        nmod_poly_clear(poly1);
         nmod_poly_clear(poly2);
         nmod_poly_clear(poly3);
+        nmod_poly_clear(xp);
     }
 
     flint_randclear(state);

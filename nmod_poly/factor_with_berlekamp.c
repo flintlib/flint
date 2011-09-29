@@ -66,7 +66,7 @@ nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result, nmod_poly_t input)
     nmod_poly_factor_squarefree(sqfree_factors, monic_input);
     nmod_poly_clear(monic_input);
 
-    /* Run berlekamp on each of the square-free factors */
+    /* Run Berlekamp on each of the square-free factors */
     for (i = 0; i < sqfree_factors->num_factors; i++)
     {
         nmod_poly_factor_init(factors);

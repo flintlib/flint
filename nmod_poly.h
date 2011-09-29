@@ -763,6 +763,16 @@ void
 _nmod_poly_product_roots_nmod_vec(mp_ptr poly,
     mp_srcptr xs, long n, nmod_t mod);
 
+/* Inflation and deflation ***************************************************/
+
+ulong nmod_poly_deflation(const nmod_poly_t input);
+
+void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input,
+    ulong deflation);
+
+void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
+    ulong inflation);
+
 /* Factoring  ****************************************************************/
 
 typedef struct

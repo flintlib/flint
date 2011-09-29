@@ -1585,6 +1585,31 @@ void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n)
 
 *******************************************************************************
 
+    Inflation and deflation
+
+*******************************************************************************
+
+void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
+    ulong inflation)
+
+    Sets \code{result} to the inflated polynomial $p(x^n)$ where
+    $p$ is given by \code{input} and $n$ is given by \code{deflation}.
+
+void nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input,
+    ulong deflation)
+
+    Sets \code{result} to the deflated polynomial $p(x^{1/n})$ where
+    $p$ is given by \code{input} and $n$ is given by \code{deflation}.
+    Requires $n > 0$.
+
+ulong nmod_poly_deflation(const nmod_poly_t input)
+
+    Returns the largest integer by which \code{input} can be deflated.
+    As special cases, returns 0 if \code{input} is the zero polynomial
+    and 1 of \code{input} is a constant polynomial.
+
+*******************************************************************************
+
     Factorisation
 
 *******************************************************************************
