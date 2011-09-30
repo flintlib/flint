@@ -101,6 +101,23 @@ void fmpz_init(fmpz_t f)
 void fmpz_init2(fmpz_t f, ulong limbs);
 
 static __inline__
+void fmpz_init_set(fmpz_t f, const fmpz_t g)
+{
+    if (!COEFF_IS_MPZ(*g))
+    {
+        *f = *g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set(ptr, COEFF_TO_PTR(*g));
+    }
+}
+
+static __inline__
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
