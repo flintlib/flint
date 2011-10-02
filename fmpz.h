@@ -345,6 +345,8 @@ void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
+
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);

@@ -586,6 +586,13 @@ void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
     result is always nonnegative, even if one of $g$ and $h$ is
     negative.
 
+void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
+
+    Given integers $f, g$ with $0 \leq f < g$, computes the 
+    greatest common divisor $d = \gcd(f, g)$ and the modular 
+    inverse $a = f^{-1} \pmod{g}$, whenever $f \neq 0$.
+
+    Assumes that $d$ and $a$ are not aliased.
 
 *******************************************************************************
 
