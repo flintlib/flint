@@ -91,7 +91,6 @@ fmpz_poly_mullow(fmpz_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
-    long lenr;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {
@@ -109,9 +108,7 @@ fmpz_poly_mullow(fmpz_poly_t res,
         return;
     }
 
-    lenr = len1 + len2 - 1;
-    if (n > lenr)
-        n = lenr;
+    n = FLINT_MIN(n, len1 + len2 - 1);
 
     fmpz_poly_fit_length(res, n);
     if (len1 >= len2)
