@@ -166,6 +166,10 @@ void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2,
 void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, 
                                                long len2, long c, ulong exp);
 
+/*  Reduction mod p **********************************************************/
+
+void _fmpz_vec_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len);
