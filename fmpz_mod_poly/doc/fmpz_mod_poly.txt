@@ -1,0 +1,362 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2009, 2008 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p)
+
+    Initialises \code{poly} for use over $\mathbf{Z} / p \mathbf{Z}$, 
+    setting its length to zero.
+
+    A corresponding call to \code{fmpz_mod_poly_clear()} must be made after 
+    finishing with the \code{fmpz_mod_poly_t} to free the memory used by 
+    the polynomial.  The user is also responsible to clearing the 
+    integer~$p$.
+
+void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, long alloc)
+
+    Initialises \code{poly} with space for at least \code{alloc} coefficients 
+    and sets the length to zero.  The allocated coefficients are all set to 
+    zero.
+
+void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
+
+    Clears the given polynomial, releasing any memory used.  It must 
+    be reinitialised in order to be used again.
+
+void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, long alloc)
+
+    Reallocates the given polynomial to have space for \code{alloc} 
+    coefficients.  If \code{alloc} is zero the polynomial is cleared 
+    and then reinitialised.  If the current length is greater than 
+    \code{alloc} the polynomial is first truncated to length \code{alloc}.
+
+void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, long len)
+
+    If \code{len} is greater than the number of coefficients currently 
+    allocated, then the polynomial is reallocated to have space for at 
+    least \code{len} coefficients.  No data is lost when calling this 
+    function.
+
+    The function efficiently deals with the case where it is called 
+    many times in small increments by at least doubling the number of 
+    allocated coefficients when length is larger than the number of 
+    coefficients currently allocated.
+
+void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
+
+    Sets the length of \code{poly} so that the top coefficient is non-zero. 
+    If all coefficients are zero, the length is set to zero.  This function 
+    is mainly used internally, as all functions guarantee normalisation.
+
+void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, long len)
+
+    Demotes the coefficients of \code{poly} beyond \code{len} and sets 
+    the length of \code{poly} to \code{len}.
+
+void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, long len)
+
+    If the current length of \code{poly} is greater than \code{len}, it 
+    is truncated to have the given length.  Discarded coefficients are 
+    not necessarily set to zero.
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len)
+
+    Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
+
+void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
+                                     flint_rand_t state, long len)
+
+    Sets the polynomial~$f$ to a random polynomial of length up~\code{len}, 
+    assuming \code{len} is positive.
+
+*******************************************************************************
+
+    Conversion
+
+*******************************************************************************
+
+void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
+
+    Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that 
+    is part of the data structure of $f$.
+
+void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
+
+    Sets $f$ to $g$.  This is done simply by lifting the coefficients 
+    of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
+
+*******************************************************************************
+
+    Reduction modulo $p$
+
+*******************************************************************************
+
+void _fmpz_mod_poly_reduce_coeffs(fmpz_mod_poly_t poly)
+
+    Reduces the coefficients of the polynomial \code{poly} modulo~$p$, 
+    where $p$ is the modulus in the data structure of \code{poly}.  
+    The polynomial normalised, too.
+
+void _fmpz_poly_reduce_coeffs(fmpz_poly_t poly, const fmpz_t p)
+
+    Reduces the coefficients of \code{poly} modulo $p$.  The polynomial 
+    might not be normalised on exit.
+
+*******************************************************************************
+
+    Attributes
+
+*******************************************************************************
+
+long fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
+
+    Returns the degree of the polynomial.  The degree of the zero 
+    polynomial is defined to be $-1$.
+
+long fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
+
+    Returns the length of the polynomial, which is one more than 
+    its degree.
+
+*******************************************************************************
+
+    Assignment and swap
+
+*******************************************************************************
+
+void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
+
+    Sets the polynomial \code{poly1} to the value of \code{poly2}.
+
+void fmpz_mod_poly_swap(fmpz_mod_poly_t poly1, fmpz_mod_poly_t poly2)
+
+    Swaps the two polynomials.  This is done efficiently by swapping 
+    pointers rather than individual coefficients.
+
+void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
+
+    Sets \code{poly} to the zero polynomial.
+
+void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j)
+
+    Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
+    to zero.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fmpz_mod_poly_equal(const fmpz_mod_poly_t poly1, 
+                        const fmpz_mod_poly_t poly2)
+
+    Returns non-zero if the two polynomials are equal.
+
+int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
+
+    Returns non-zero if the polynomial is zero.
+
+*******************************************************************************
+
+    Getting and setting coefficients
+
+*******************************************************************************
+
+void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, long n, const fmpz_t x)
+
+    Sets the coefficient of $X^n$ in the polynomial to $x$, 
+    assuming $n \geq 0$.
+
+void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, long n)
+
+    Sets $x$ to the coefficient of $X^n$ in the polynomial, 
+    assumng $n \geq 0$.
+
+*******************************************************************************
+
+    Shifting
+
+*******************************************************************************
+
+void _fmpz_mod_poly_shift_left(fmpz * res, 
+                               const fmpz * poly, long len, long n)
+
+    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by 
+    $n$ coefficients.  
+
+    Inserts zero coefficients at the lower end.  Assumes that \code{len} 
+    and $n$ are positive, and that \code{res} fits \code{len + n} elements.
+    Supports aliasing between \code{res} and \code{poly}.
+
+void fmpz_mod_poly_shift_left(fmpz_mod_poly_t f, 
+                              const fmpz_mod_poly_t g, long n)
+
+    Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero 
+    coefficients are inserted.
+
+void _fmpz_mod_poly_shift_right(fmpz * res, 
+                                const fmpz * poly, long len, long n)
+
+    Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by 
+    $n$ coefficients.  
+
+    Assumes that \code{len} and $n$ are positive, that \code{len > n}, 
+    and that \code{res} fits \code{len - n} elements.  Supports aliasing 
+    between \code{res} and \code{poly}, although in this case the top 
+    coefficients of \code{poly} are not set to zero.
+
+void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f, 
+                               const fmpz_mod_poly_t g, long n)
+
+    Sets \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$ 
+    is equal to or greater than the current length of \code{poly}, \code{res} 
+    is set to the zero polynomial.
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, long len1, 
+                                   const fmpz *poly2, long len2, 
+                                   const fmpz_t p)
+
+    Sets \code{res} to the sum of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}.  It is assumed that \code{res} has 
+    sufficient space for the longer of the two polynomials.
+
+void fmpz_mod_poly_add(fmpz_mod_poly_t res, 
+                       const fmpz_mod_poly_t poly1, 
+                       const fmpz_mod_poly_t poly2)
+
+    Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
+
+void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, long len1, 
+                                   const fmpz *poly2, long len2, 
+                                   const fmpz_t p)
+
+    Sets \code{res} to \code{(poly1, len1)} minus \code{(poly2, len2)}.  It 
+    is assumed that \code{res} has sufficient space for the longer of the 
+    two polynomials.
+
+void fmpz_mod_poly_sub(fmpz_mod_poly_t res, 
+                       const fmpz_mod_poly_t poly1, 
+                       const fmpz_mod_poly_t poly2)
+
+    Sets \code{res} to \code{poly1} minus \code{poly2}.
+
+void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
+
+    Sets \code{(res, len)} to the negative of \code{(poly, len)} 
+    modulo $p$.
+
+void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Sets \code{res} to the negative of \code{poly} modulo $p$.
+
+*******************************************************************************
+
+    Scalar multiplication
+
+*******************************************************************************
+
+void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, long len, 
+                                    const fmpz_t p, const fmpz_t x)
+
+    Sets \code{(res, len}) to \code{(poly, len)} multiplied by $x$, 
+    reduced modulo $p$.
+
+void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, 
+    const fmpz_mod_poly_t poly, const fmpz_t x)
+
+    Sets \code{res} to \code{poly} multiplied by $x$.
+
+*******************************************************************************
+
+    Multiplication
+
+*******************************************************************************
+
+void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, long len1, 
+                                   const fmpz *poly2, long len2, 
+                                   const fmpz_t p)
+
+    Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
+    and \code{(poly2, len2)}.  Assumes \code{len1 >= len2 > 0}.  Allows 
+    zero-padding of the two input polynomials.
+
+void fmpz_mod_poly_mul(fmpz_mod_poly_t res, 
+                       const fmpz_mod_poly_t poly1, 
+                       const fmpz_mod_poly_t poly2)
+
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}.
+
+void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1, 
+                                      const fmpz *poly2, long len2, 
+                                      const fmpz_t p, long n)
+
+    Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
+    \code{(poly1, len1)} and \code{(poly2, len2)}.
+
+    Assumes \code{len1 >= len2 > 0} and \code{0 < n <= len1 + len2 - 1}.  
+    Allows for zero-padding in the inputs.  Does not support aliasing between 
+    the inputs and the output.
+
+void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
+    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, long n)
+
+    Sets \code{res} to the lowest $n$ coefficients of the product of 
+    \code{poly1} and \code{poly2}.
+
+*******************************************************************************
+
+    Input and output
+
+*******************************************************************************
+
+int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
+
+int fmpz_mod_poly_fprint_pretty(FILE * file, 
+                                const fmpz_mod_poly_t poly, const char * x)
+
+int fmpz_mod_poly_print(const fmpz_mod_poly_t poly)
+
+int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
+
