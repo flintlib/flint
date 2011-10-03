@@ -153,6 +153,11 @@ long fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
     Returns the length of the polynomial, which is one more than 
     its degree.
 
+fmpz * fmpz_mod_poly(const fmpz_mod_poly_t poly)
+
+    Returns a pointer to the first leading coefficient of \code{poly} 
+    if this is non-zero, otherwise returns \code{NULL}.
+
 *******************************************************************************
 
     Assignment and swap

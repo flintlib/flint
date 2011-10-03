@@ -141,6 +141,15 @@ long fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
     return poly->length;
 }
 
+static __inline__
+fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
+{
+    if (poly->length)
+        return poly->coeffs + (poly->length - 1);
+    else
+        return NULL;
+}
+
 /*  Assignment and swap ******************************************************/
 
 void fmpz_mod_poly_set(fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2);
