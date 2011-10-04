@@ -266,6 +266,21 @@ void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
                                      const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+static __inline__
+void _fmpz_mod_poly_divrem(fmpz *Q, fmpz *R, 
+                           const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                           const fmpz_t invB, const fmpz_t p)
+{
+    _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+}
+
+static __inline__ 
+void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
+}
+
 /*  Input and output *********************************************************/
 
 static __inline__ 
