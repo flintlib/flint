@@ -546,6 +546,12 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     the difference $g - f^2$.  If $g$ is negative, an exception is raised.  
     The behaviour is undefined if $f$ and $r$ are aliases.
 
+void fmpz_root(fmpz_t r, fmpz_t f, long n)
+
+    Set $r$ to the integer part of the $n$-th root of $f$. Requires that
+    $n > 0$ and that if $n$ is even then $f$ be non-negative, otherwise an 
+    exception is raides.
+
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
     Sets $f$ to $n!$ where $n$ is an \code{unsigned long}.

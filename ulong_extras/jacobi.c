@@ -96,7 +96,7 @@ n_jacobi(mp_limb_signed_t x, mp_limb_t y)
         if (((exp * (a * a - 1)) / 8) % 2 == 1UL)
             s = -s;
 
-        /* We are only interested in values mo 4, so overflows don't matter here */
+        /* We are only interested in values mod 4, so overflows don't matter here */
         if ((((a - 1) * (b - 1)) / 4) % 2 == 1UL)
             s = -s;
     }
