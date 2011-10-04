@@ -404,6 +404,12 @@ fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
     }
 }
 
+void fmpz_fac_ui(fmpz_t f, ulong n);
+
+void fmpz_fib_ui(fmpz_t f, ulong n);
+
+void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
+
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
 
@@ -454,10 +460,6 @@ void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1,
    fmpz_clear(sm1);
    fmpz_clear(r1modd);
 }
-
-void fmpz_fac_ui(fmpz_t f, ulong n);
-
-void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
 
 void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
