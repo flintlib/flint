@@ -36,7 +36,7 @@ void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
     for (i = 0; i < len; i++)
     {
         if (poly[i])
-            fmpz_sub(res + i, poly + i, p);
+            fmpz_sub(res + i, p, poly + i);
         else
             fmpz_zero(res + i);
     }
