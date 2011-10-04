@@ -246,6 +246,26 @@ void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1,
 void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, long n);
 
+/*  Division *****************************************************************/
+
+void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
+    const fmpz * A, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+                                     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 /*  Input and output *********************************************************/
 
 static __inline__ 

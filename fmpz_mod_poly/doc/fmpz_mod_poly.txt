@@ -352,6 +352,97 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
+    Division
+
+*******************************************************************************
+
+void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    $A = B Q + R$ with $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    modulo $p$, and that \code{invB} is the inverse.
+
+    Assumes that $\len(A), \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  $R$ and $A$ may be aliased, but apart from this no 
+    aliasing of input and output operands is allowed.
+
+void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    modulo $p$.
+
+void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
+    const fmpz * A, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Computes \code{(Q, lenB)}, \code{(BQ, 2 lenB - 1)} such that 
+    $BQ = B \times Q$ and $A = B Q + R$ where $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    modulo $p$, and that \code{invB} is the inverse.
+
+    Assumes $\len(B) > 0$.  Allows zero-padding in \code{(A, lenA)}.  Requires 
+    a temporary array \code{(W, 2 lenB - 1)}.  No aliasing of input and output 
+    operands is allowed.
+
+    This function does not read the bottom $\len(B) - 1$ coefficients from 
+    $A$, which means that they might not even need to exist in allocated 
+    memory.
+
+void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    modulo $p$, and that \code{invB} is the inverse.
+
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    allowed.
+
+void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes $Q$, $R$ such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
+
+    Assumes that $B$ is non-zero and that the leading coefficient 
+    of $B$ is invertible modulo $p$.
+
+void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA, 
+    const fmpz * B, long lenB, const fmpz_t invB, const fmpz_t p)
+
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
+
+    Assumes that $B$ is non-zero, that the leading coefficient 
+    of $B$ is invertible modulo $p$ and that \code{invB} is 
+    the inverse.
+
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    allowed.
+
+void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Computes $Q$, $R$ such that $A = B Q + R$ and $0 \leq (R) < \len(B)$.
+
+    Assumes that $B$ is non-zero and that the leading coefficient 
+    of $B$ is invertible modulo $p$.
+
+*******************************************************************************
+
     Input and output
 
 *******************************************************************************
