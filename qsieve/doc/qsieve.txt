@@ -1,0 +1,36 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 William Hart
+
+******************************************************************************/
+
+mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
+
+    Given an integer \code{n = (hi, lo)} find a factor and return it. 
+    If a tiny factor is encountered, this is returned very quickly. 
+    Otherwise the quadratic sieve algorithm is employed. The algorithm
+    requires that $n$ not be prime and not be a perfect power. There is
+    also a limit to the size of $n$. During the algorithm $n$ will be
+    multiplied by a small multiplier $k$ (from 1 to 47). The product
+    $kn$ must fit in two limbs. If not the algorithm will silently 
+    fail, returning 0. Otherwise a factor of $n$ which fits in a single
+    limb will be returned. 
