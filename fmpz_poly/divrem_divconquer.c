@@ -31,7 +31,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
+static void 
 __fmpz_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
                               const fmpz * A, long lenA, 
                               const fmpz * B, long lenB)
@@ -182,8 +182,8 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (lenA < lenB)
     {
-        fmpz_poly_zero(Q);
         fmpz_poly_set(R, A);
+        fmpz_poly_zero(Q);
         return;
     }
 
