@@ -554,7 +554,12 @@ void fmpz_root(fmpz_t r, fmpz_t f, long n)
 
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
-    Sets $f$ to $n!$ where $n$ is an \code{unsigned long}.
+    Sets $f$ to the factorial $n!$ where $n$ is an \code{unsigned long}.
+
+void fmpz_fib_ui(fmpz_t f, ulong n)
+
+    Sets $f$ to the Fibonacci number $F_n$ where $n$ is an
+    \code{unsigned long}.
 
 void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 

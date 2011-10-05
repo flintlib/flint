@@ -35,30 +35,34 @@ int
 main(void)
 {
     long i, n;
-    fmpz_t x;
-    fmpz_t y;
+    fmpz_t x, y, z, w;
 
-    printf("fac_ui....");
+    printf("fib_ui....");
     fflush(stdout);
 
     fmpz_init(x);
     fmpz_init(y);
+    fmpz_init(z);
+    fmpz_init(w);
 
     /* Twice to check demotion */
     for (n = 0; n < 2; n++)
     {
-        fmpz_set_ui(y, 1UL);
-
-        for (i = 0; i < 100; i++)
+        for (i = 0; i < 200; i++)
         {
-            fmpz_fac_ui(x, i);
-            fmpz_mul_ui(y, y, FLINT_MAX(1, i));
-            if (!fmpz_equal(x, y))
+            fmpz_fib_ui(x, i);
+            fmpz_fib_ui(y, i+1);
+            fmpz_fib_ui(z, i+2);
+            fmpz_add(w, x, y);
+
+            if (!fmpz_equal(w, z))
             {
                 printf("FAIL: %ld\n", i);
                 fmpz_print(x);
                 printf("\n");
                 fmpz_print(y);
+                printf("\n");
+                fmpz_print(z);
                 printf("\n");
                 abort();
             }
@@ -67,6 +71,8 @@ main(void)
 
     fmpz_clear(x);
     fmpz_clear(y);
+    fmpz_clear(z);
+    fmpz_clear(w);
 
     _fmpz_cleanup();
     printf("PASS\n");
