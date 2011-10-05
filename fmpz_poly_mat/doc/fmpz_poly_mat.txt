@@ -247,6 +247,28 @@ void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     computed using Kronecker segmentation. The matrices must have 
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
+void fmpz_poly_mat_sqr(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix.
+    Aliasing is allowed. This function automatically chooses between
+    classical and KS squaring.
+
+void fmpz_poly_mat_sqr_classical(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix.
+    Aliasing is allowed. This function uses direct formulas for very small
+    matrices, and otherwise classical matrix multiplication.
+
+void fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix.
+    Aliasing is allowed. This function uses Kronecker segmentation.
+
+void fmpz_poly_mat_sqr(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
+
+    Sets \code{B} to \code{A} raised to the power \code{exp}, where \code{A}
+    is a square matrix. Uses exponentiation by squaring. Aliasing is allowed.
+
 
 *******************************************************************************
 
