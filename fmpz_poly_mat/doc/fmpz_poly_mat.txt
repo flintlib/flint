@@ -269,6 +269,12 @@ void fmpz_poly_mat_sqr(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
     Sets \code{B} to \code{A} raised to the power \code{exp}, where \code{A}
     is a square matrix. Uses exponentiation by squaring. Aliasing is allowed.
 
+void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
+                            fmpz_poly_mat_t * const factors, long n)
+
+    Sets \code{res} to the product of the \code{n} matrices given in
+    the vector \code{factor}, all of which must be square and of the
+    same size. Uses binary splitting.
 
 *******************************************************************************
 

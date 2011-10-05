@@ -153,6 +153,9 @@ void fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
 
 void fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp);
 
+void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
+                        fmpz_poly_mat_t * const factors, long n);
+
 /* Evaluation ****************************************************************/
 
 void fmpz_poly_mat_evaluate_fmpz(fmpz_mat_t B,
