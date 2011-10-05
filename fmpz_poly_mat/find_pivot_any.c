@@ -28,14 +28,17 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+long
+fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
+                                    long start_row, long end_row, long c)
 {
-    long i, n;
+    long r;
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
+    for (r = start_row; r < end_row; r++)
+    {
+        if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(mat, r, c)))
+            return r;
+    }
 
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    return -1;
 }

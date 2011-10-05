@@ -19,40 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdlib.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-int
-fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c)
+
+long
+fmpz_poly_mat_rank(const fmpz_poly_mat_t A)
 {
-    long t, j;
-    fmpz_poly_struct * u;
+    fmpz_poly_mat_t tmp;
+    fmpz_poly_t den;
+    long rank;
 
-    if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(A, r, c)))
-        return 1;
+    if (fmpz_poly_mat_is_empty(A))
+        return 0;
 
-    for (j = r + 1; j < A->r; j++)
-    {
-        if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(A, j, c)))
-        {
-            if (perm)
-            {
-                t = perm[j];
-                perm[j] = perm[r];
-                perm[r] = t;
-            }
-
-            u = A->rows[j];
-            A->rows[j] = A->rows[r];
-            A->rows[r] = u; 
-            return -1;
-        }
-    }
-    return 0;
+    fmpz_poly_mat_init_set(tmp, A);
+    fmpz_poly_init(den);
+    rank = fmpz_poly_mat_fflu(tmp, den, NULL, tmp, 0);
+    fmpz_poly_mat_clear(tmp);
+    fmpz_poly_clear(den);
+    return rank;
 }

@@ -28,14 +28,40 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+long
+fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
+                                    long start_row, long end_row, long c)
 {
-    long i, n;
+    long best_row, best_length, best_bits, i;
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
+    best_row = start_row;
+    best_length = fmpz_poly_length(fmpz_poly_mat_entry(mat, start_row, c));
 
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    best_bits = fmpz_poly_max_bits(fmpz_poly_mat_entry(mat, start_row, c));
+    best_bits = FLINT_ABS(best_bits);
+
+    for (i = start_row + 1; i < end_row; i++)
+    {
+        long b, l;
+
+        l = fmpz_poly_length(fmpz_poly_mat_entry(mat, i, c));
+
+        if (l != 0 && (best_length == 0 || l <= best_length))
+        {
+            b = fmpz_poly_max_bits(fmpz_poly_mat_entry(mat, i, c));
+            b = FLINT_ABS(b);
+
+            if (best_length == 0 || l < best_length || b < best_bits)
+            {
+                best_row = i;
+                best_length = l;
+                best_bits = b;
+            }
+        }
+    }
+
+    if (best_length == 0)
+        return -1;
+
+    return best_row;
 }

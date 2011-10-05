@@ -27,15 +27,27 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
+#include "perm.h"
 
 void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+fmpz_poly_mat_det_fflu(fmpz_poly_t det, const fmpz_poly_mat_t A)
 {
-    long i, n;
+    long n = fmpz_poly_mat_nrows(A);
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
+    if (n == 0)
+        fmpz_poly_one(det);
+    else
+    {
+        fmpz_poly_mat_t tmp;
+        long * perm;
+        fmpz_poly_mat_init_set(tmp, A);
+        perm = _perm_init(n);
 
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+        fmpz_poly_mat_fflu(tmp, det, perm, tmp, 1);
+        if (_perm_parity(perm, n))
+            fmpz_poly_neg(det, det);
+
+        _perm_clear(perm);
+        fmpz_poly_mat_clear(tmp);
+    }
 }

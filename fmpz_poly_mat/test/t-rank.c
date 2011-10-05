@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
+#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
@@ -36,71 +37,56 @@ main(void)
     flint_rand_t state;
     long i;
 
-    printf("det....");
+    printf("rank....");
     fflush(stdout);
 
     flint_randinit(state);
 
     for (i = 0; i < 1000; i++)
     {
-        fmpz_poly_mat_t A, B, C;
-        fmpz_poly_t a, b, ab, c;
-        long n, bits, deg;
+        fmpz_poly_mat_t A;
+        fmpz_mat_t Ax;
+        fmpz_t x;
+        long j, m, n, bits, deg, rank, zrank;
         float density;
 
-        n = n_randint(state, 10);
+        m = n_randint(state, 15);
+        n = n_randint(state, 15);
         deg = 1 + n_randint(state, 5);
         bits = 1 + n_randint(state, 100);
         density = n_randint(state, 100) * 0.01;
 
-        fmpz_poly_mat_init(A, n, n);
-        fmpz_poly_mat_init(B, n, n);
-        fmpz_poly_mat_init(C, n, n);
-
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(ab);
-        fmpz_poly_init(c);
+        fmpz_poly_mat_init(A, m, n);
+        fmpz_mat_init(Ax, m, n);
+        fmpz_init(x);
 
         fmpz_poly_mat_randtest_sparse(A, state, deg, bits, density);
-        fmpz_poly_mat_randtest_sparse(B, state, deg, bits, density);
-        fmpz_poly_mat_mul(C, A, B);
 
-        fmpz_poly_mat_det(a, A);
-        fmpz_poly_mat_det(b, B);
-        fmpz_poly_mat_det(c, C);
-        fmpz_poly_mul(ab, a, b);
+        /* Probabilistic rank computation */
+        zrank = 0;
+        for (j = 0; j < 5; j++)
+        {
+            long r;
+            fmpz_randbits(x, state, 15);
+            fmpz_poly_mat_evaluate_fmpz(Ax, A, x);
+            r = fmpz_mat_rank(Ax);
+            zrank = FLINT_MAX(zrank, r);
+        }
 
-        if (!fmpz_poly_equal(c, ab))
+        rank = fmpz_poly_mat_rank(A);
+
+        if (rank != zrank)
         {
             printf("FAIL:\n");
-            printf("determinants don't agree!\n");
             printf("A:\n");
             fmpz_poly_mat_print(A, "x");
-            printf("B:\n");
-            fmpz_poly_mat_print(B, "x");
-            printf("C:\n");
-            fmpz_poly_mat_print(C, "x");
-            printf("det(A):\n");
-            fmpz_poly_print_pretty(a, "x");
-            printf("\ndet(B):\n");
-            fmpz_poly_print_pretty(b, "x");
-            printf("\ndet(C):\n");
-            fmpz_poly_print_pretty(c, "x");
-            printf("\ndet(A)*det(B):\n");
-            fmpz_poly_print_pretty(ab, "x");
-            printf("\n");
+            printf("Computed rank: %ld (zrank = %ld)\n", rank, zrank);
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(ab);
-        fmpz_poly_clear(c);
-
+        fmpz_clear(x);
+        fmpz_mat_clear(Ax);
         fmpz_poly_mat_clear(A);
-        fmpz_poly_mat_clear(B);
-        fmpz_poly_mat_clear(C);
     }
 
     flint_randclear(state);

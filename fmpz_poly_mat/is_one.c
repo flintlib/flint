@@ -28,14 +28,30 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+int
+fmpz_poly_mat_is_one(const fmpz_poly_mat_t A)
 {
-    long i, n;
+    long i, j;
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
+    if (A->r == 0 || A->c == 0)
+        return 1;
 
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < A->c; j++)
+        {
+            if (i == j)
+            {
+                if (!fmpz_poly_is_one(fmpz_poly_mat_entry(A, i, j)))
+                    return 0;
+            }
+            else
+            {
+                if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(A, i, j)))
+                    return 0;
+            }
+        }
+    }
+
+    return 1;
 }

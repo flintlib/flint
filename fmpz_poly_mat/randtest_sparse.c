@@ -27,15 +27,29 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
+#include "ulong_extras.h"
 
 void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, long len,
+    mp_bitcnt_t bits, float density)
 {
-    long i, n;
+    long i, j;
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
-
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    for (i = 0; i < A->r; i++)
+    {
+        for (j = 0; j < A->c; j++)
+        {
+            if (n_randint(state, 1000) < density * 1000)
+            {
+                long l = n_randint(state, len + 1);
+                l = FLINT_MAX(l, 1);
+                fmpz_poly_randtest_not_zero(fmpz_poly_mat_entry(A, i, j),
+                    state, l, bits);
+            }
+            else
+            {
+                fmpz_poly_zero(fmpz_poly_mat_entry(A, i, j));
+            }
+        }
+    }
 }

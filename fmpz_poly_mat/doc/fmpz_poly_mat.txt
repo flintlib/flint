@@ -46,6 +46,21 @@ void fmpz_poly_mat_clear(fmpz_poly_mat_t mat)
 
 *******************************************************************************
 
+    Basic properties
+
+*******************************************************************************
+
+long fmpz_poly_mat_nrows(const fmpz_poly_mat_t mat)
+
+    Returns the number of rows in \code{mat}.
+
+long fmpz_poly_mat_ncols(const fmpz_poly_mat_t mat)
+
+    Returns the number of columns in \code{mat}.
+
+
+*******************************************************************************
+
     Basic assignment and manipulation
 
 *******************************************************************************
@@ -84,10 +99,19 @@ void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x)
 *******************************************************************************
 
 void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
-    long len, mp_bitcnt_t bits)
+        long len, mp_bitcnt_t bits)
 
     This is equivalent to applying \code{fmpz_poly_randtest} to all entries
     in the matrix.
+
+void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
+        long len, mp_bitcnt_t bits, float density)
+
+    Creates a random matrix with the amount of nonzero entries given
+    approximately by the \code{density} variable, which should be a fraction
+    between 0 (most sparse) and 1 (most dense).
+
+    The nonzero entries will have random lengths between 1 and \code{len}.
 
 *******************************************************************************
 
@@ -120,6 +144,12 @@ int fmpz_poly_mat_is_zero(const fmpz_poly_mat_t mat)
 
     Returns nonzero if all entries in \code{mat} are zero, and returns
     zero otherwise.
+
+int fmpz_poly_mat_is_one(const fmpz_poly_mat_t mat)
+
+    Returns nonzero if all entry of \code{mat} on the main diagonal
+    are the constant polynomial 1 and all remaining entries are zero,
+    and returns zero otherwise. The matrix need not be square.
 
 int fmpz_poly_mat_is_empty(const fmpz_poly_mat_t mat)
 
@@ -214,12 +244,41 @@ void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
 
 *******************************************************************************
 
+long fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
+                                    long start_row, long end_row, long c)
+
+    Attempts to find a pivot entry for row reduction.
+    Returns a row index $r$ between \code{start_row} (inclusive) and
+    \code{stop_row} (exclusive) such that column $c$ in \code{mat} has
+    a nonzero entry on row $r$, or returns -1 if no such entry exists.
+
+    This implementation simply chooses the first nonzero entry from
+    it encounters. This is likely to be a nearly optimal choice if all
+    entries in the matrix have roughly the same size, but can lead to
+    unnecessary coefficient growth if the entries vary in size.
+
+long fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
+                                    long start_row, long end_row, long c)
+
+    Attempts to find a pivot entry for row reduction.
+    Returns a row index $r$ between \code{start_row} (inclusive) and
+    \code{stop_row} (exclusive) such that column $c$ in \code{mat} has
+    a nonzero entry on row $r$, or returns -1 if no such entry exists.
+
+    This implementation searches all the rows in the column and
+    chooses the nonzero entry of smallest degree. If there are several
+    entries with the same minimal degree, it chooses the entry with
+    the smallest coefficient bit bound. This heuristic typically reduces
+    coefficient growth when the matrix entries vary in size.
+
 long fmpz_poly_mat_rowreduce(long * perm, fmpz_poly_mat_t B, fmpz_poly_t den,
     const fmpz_poly_mat_t A, int options)
 
     Sets \code{B} to the row reduced form of \code{A} as computed using
     fraction-free Gaussian elimination, and returns the rank. The denominator
     is written to \code{den}.
+
+    Uses \code{fmpz_poly_mat_find_pivot_partial} to find pivot elements.
 
     If \code{perm} is non-\code{NULL}, the permutation of
     rows in the matrix will also be applied to \code{perm}.
@@ -230,10 +289,6 @@ long fmpz_poly_mat_rowreduce(long * perm, fmpz_poly_mat_t B, fmpz_poly_t den,
     \code{ROWREDUCE_CLEAR_LOWER} to zero entries below the pivots 
     (otherwise a fraction-free LU decomposition is computed, with the
     $L$ matrix stored in the lower part).
-
-int fmpz_poly_mat_pivot(long * perm, fmpz_poly_mat_t A, long r, long c)
-
-    Internal function for pivoting during row reduction.
 
 
 *******************************************************************************

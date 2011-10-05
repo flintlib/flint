@@ -52,16 +52,12 @@ fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
         fmpz_poly_sub(det, det, tmp);
         fmpz_poly_clear(tmp);
     }
+    else if (n < 15)  /* should be entry sensitive too */
+    {
+        fmpz_poly_mat_det_fflu(det, A);
+    }
     else
     {
-        fmpz_poly_mat_t T;
-        long rank;
-
-        fmpz_poly_mat_init_set(T, A);
-        rank = fmpz_poly_mat_rowreduce(NULL, T, det, T, ROWREDUCE_FAST_ABORT);
-        if (rank != n)
-            fmpz_poly_zero(det);
-
-        fmpz_poly_mat_clear(T);
+        fmpz_poly_mat_det_interpolate(det, A);
     }
 }

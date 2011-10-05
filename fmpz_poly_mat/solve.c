@@ -19,23 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdlib.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
+#include "perm.h"
 
-void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+int
+fmpz_poly_mat_solve(fmpz_poly_mat_t X, fmpz_poly_t den,
+                    const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
 {
-    long i, n;
-
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
-
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    return fmpz_poly_mat_solve_fflu(X, den, A, B);
 }

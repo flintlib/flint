@@ -23,19 +23,63 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mat.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-void
-fmpz_poly_mat_one(fmpz_poly_mat_t A)
+int
+main(void)
 {
-    long i, n;
+    flint_rand_t state;
+    int iter;
 
-    fmpz_poly_mat_zero(A);
-    n = FLINT_MIN(A->r, A->c);
+    printf("zero/is_zero....");
+    fflush(stdout);
 
-    for (i = 0; i < n; i++)
-        fmpz_poly_one(fmpz_poly_mat_entry(A, i, i));
+    flint_randinit(state);
+
+    for (iter = 0; iter < 1000; iter++)
+    {
+        fmpz_poly_mat_t A;
+        long m, n;
+
+        m = n_randint(state, 10);
+        n = n_randint(state, 10);
+
+        fmpz_poly_mat_init(A, m, n);
+        fmpz_poly_mat_randtest(A, state, n_randint(state, 5),
+            n_randint(state, 100));
+        fmpz_poly_mat_zero(A);
+
+        if (!fmpz_poly_mat_is_zero(A))
+        {
+            printf("FAIL: expected matrix to be zero\n");
+            abort();
+        }
+
+        if (m > 0 && n > 0)
+        {
+            m = n_randint(state, m);
+            n = n_randint(state, n);
+            fmpz_poly_randtest_not_zero(fmpz_poly_mat_entry(A, m, n),
+                state, 5, 5);
+
+            if (fmpz_poly_mat_is_zero(A))
+            {
+                printf("FAIL: expected matrix not to be zero\n");
+                abort();
+            }
+        }
+
+        fmpz_poly_mat_clear(A);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
