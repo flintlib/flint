@@ -30,6 +30,12 @@
 #include <mpir.h>
 #include "fmpz.h"
 
+#define FMPZ_VEC_NORM(vec, i)          \
+do {                                   \
+    while ((i) && vec[(i) - 1] == 0L)  \
+        (i)--;                         \
+} while (0)
+
 /*  Memory management  *******************************************************/
 
 fmpz * _fmpz_vec_init(long len);
