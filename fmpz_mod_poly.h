@@ -281,6 +281,18 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
 }
 
+/*  Greatest common divisor **************************************************/
+
+void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
+
+long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA, 
+                                           const fmpz *B, long lenB, 
+                                           const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, 
+                                 const fmpz_mod_poly_t A,
+                                 const fmpz_mod_poly_t B);
+
 /*  Input and output *********************************************************/
 
 static __inline__ 
