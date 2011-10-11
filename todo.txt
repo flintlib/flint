@@ -207,14 +207,9 @@ fmpz_poly_mat
 
 * Tune multiplication cutoffs.
 
-* Benchmark fmpz_poly_mat_det_interpolate and add cutoffs for using it
-  by default.
-
 * Take sparseness into account when selecting between algorithms.
 
 * Investigate more clever pivoting strategies in row reduction.
-
-* Add more random functions.
 
 
 arith
@@ -273,17 +268,12 @@ arith
 
 * Implement Bell polynomials.
 
-* Implement orthogonal polynomials (Chebyshev T/U, Jacobi,
-  Hermite, Laguerre, Gegenbauer).
+* Implement orthogonal polynomials (Jacobi, Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
 
-* Some steps in the partition function code will overflow on 32 bits for
-  large n. This can be fixed by using doubles in the commented places.
-
-* Implement fast computation of a range of partition function values
-  (e.g. by just caching/precomputing values of Dedekind sums, or even
-  caching the exponential sums as a whole).
+* Change the partition function code to use an fmpz (or mpz) instead of
+  ulong for n, to allow n larger than 10^9 on 32 bits (or 10^19 on 64 bits!)
 
 * Make partition_function_mpfr more general by allowing it to be
   used for approximate calculation of p(n) (i.e. using less than
@@ -373,8 +363,6 @@ fmpq
   separate bounds for the numerator and denominator.
   Also optimise detection of integers: 
 
-* Add a user-friendly function for LUP decomposition.
-
 * Add CRT functions.
 
 * Add more random functions.
@@ -384,6 +372,8 @@ fmpq_mat
 --------
 
 * Add more random functions.
+
+* Add a user-friendly function for LUP decomposition.
 
 
 padic
