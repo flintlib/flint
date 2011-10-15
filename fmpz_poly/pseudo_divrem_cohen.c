@@ -62,8 +62,8 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
         _fmpz_vec_scalar_submul_fmpz(R + (lenA - lenB), B, lenB - 1, R + (lenA - 1));
         fmpz_zero(R + (lenA - 1));
 
-        for (lenA -= 2; (lenA >= 0) && (R[lenA] == 0L); lenA--) ;
-        lenA++;
+        lenA--;
+        FMPZ_VEC_NORM(R, lenA);
     }
     while (lenA >= lenB)
     {
@@ -74,8 +74,8 @@ _fmpz_poly_pseudo_divrem_cohen(fmpz * Q, fmpz * R, const fmpz * A,
         _fmpz_vec_scalar_submul_fmpz(R + lenA - lenB, B, lenB - 1, R + (lenA - 1));
         fmpz_zero(R + (lenA - 1));
 
-        for (lenA -= 2; (lenA >= 0) && (R[lenA] == 0L); lenA--) ;
-        lenA++;
+        lenA--;
+        FMPZ_VEC_NORM(R, lenA);
 
         e--;
     }

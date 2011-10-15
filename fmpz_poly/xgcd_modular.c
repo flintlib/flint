@@ -101,7 +101,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
             _nmod_poly_mul(T2, T, len1, B, len2, mod);
             _nmod_vec_add(T1, T1, T2, len1 + len2 - 1, mod);
             tlen = len1 + len2 - 1;
-            while ((tlen) && !T1[tlen - 1]) tlen--;
+            FMPZ_VEC_NORM(T1, tlen);
 
             if (tlen == 1 && T1[0] == R) /* It is, so this prime is good */
                 fmpz_mul_ui(prod, prod, p);

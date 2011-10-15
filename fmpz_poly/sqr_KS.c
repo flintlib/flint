@@ -40,8 +40,7 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, long len)
     mp_limb_t *arr, *arr3;
     long sign = 0;
 
-    for (len--; len >= 0 && !op[len]; len--) ;
-    len++;
+    FMPZ_VEC_NORM(op, len);
 
     if (!len)
     {

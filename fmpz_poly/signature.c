@@ -70,9 +70,9 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
 
         _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
 
-        for (lenA = lenB - 1; (lenA >= 0) && (A[lenA] == 0L); lenA--) ;
-        lenA++;
-        
+        lenA = lenB;
+        FMPZ_VEC_NORM(A, lenA);
+
 		if (lenA == 0)
 		{
 			printf("Exception: non-squarefree polynomial detected in fmpz_poly_signature\n");

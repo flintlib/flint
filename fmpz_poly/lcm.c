@@ -32,15 +32,15 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1,
                                               const fmpz * poly2, long len2)
 {
     fmpz *W;
-    long lenW;
+    long lenW = len2;
 
     W = _fmpz_vec_init(len2);
 
     _fmpz_poly_mul(res, poly1, len1, poly2, len2);
 
     _fmpz_poly_gcd(W, poly1, len1, poly2, len2);
-    for (lenW = len2 - 1; (lenW >= 0) && !W[lenW]; lenW--) ;
-    lenW++;
+
+    FMPZ_VEC_NORM(W, lenW);
 
     if (lenW == 1)
     {
