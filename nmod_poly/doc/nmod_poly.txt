@@ -737,18 +737,24 @@ void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen,
 
     Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
     $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
-    and \code{B} is of length \code{lenB}, but return only $Q$. We require 
-    that $Q$ have space for \code{lenA - lenB + 1} coefficients. The 
-    algorithm used is to reverse the polynomials and divde the resulting 
-    power series, then reverse the result.
+    and \code{B} is of length \code{lenB}, but return only $Q$.
+
+    We require that $Q$ have space for \code{lenA - lenB + 1} coefficients 
+    and assume that the leading coefficient of $B$ is a unit.
+
+    The algorithm used is to reverse the polynomials and divide the 
+    resulting power series, then reverse the result.
 
 void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
                                          const nmod_poly_t B)
 
     Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
-    $\len(R) < \len(B)$, but returns only $Q$. The algorithm used is to 
-    reverse the polynomials and divide the resulting power series, 
-    then reverse the result.
+    $\len(R) < \len(B)$, but returns only $Q$.
+
+    We assume that the leading coefficient of $B$ is a unit.
+
+    The algorithm used is to reverse the polynomials and divide the 
+    resulting power series, then reverse the result.
 
 void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long Alen, 
                                         mp_srcptr B, long Blen, nmod_t mod)
