@@ -34,32 +34,30 @@
 #define FMPQ_POLY_INV_NEWTON_CUTOFF  32
 
 void 
-_fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden, 
-                      const fmpz * poly, const fmpz_t den, long n)
+_fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden, 
+                             const fmpz * Q, const fmpz_t Qden, long n)
 {
     if (n == 1)
     {
-        if (fmpz_sgn(poly) > 0)
+        if (fmpz_sgn(Q) > 0)
         {
-            fmpz_set(rpoly, den);
-            fmpz_set(rden, poly);
+            fmpz_set(Qinv, Qden);
+            fmpz_set(Qinvden, Q);
         }
         else
         {
-            fmpz_neg(rpoly, den);
-            fmpz_neg(rden, poly);
+            fmpz_neg(Qinv, Qden);
+            fmpz_neg(Qinvden, Q);
         }
     }
     else
     {
-        const long alloc = FLINT_MAX(2 * n, 3 * FMPQ_POLY_INV_NEWTON_CUTOFF);
-        long *a, i;
-        fmpz *W0, *W1, *W0den, *W1den;
+        const long alloc = FLINT_MAX(n, 3 * FMPQ_POLY_INV_NEWTON_CUTOFF);
+        long *a, i, m;
+        fmpz *W, *Wden;
 
-        W0 = _fmpz_vec_init(alloc + 2);
-        W1 = W0 + n;
-        W0den = W0 + alloc;
-        W1den = W0 + alloc + 1;
+        W = _fmpz_vec_init(alloc + 1);
+        Wden = W + alloc;
 
         for (i = 1; (1L << i) < n; i++) ;
 
@@ -70,84 +68,75 @@ _fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden,
 
         /* Base case */
         {
-            fmpz *rev = W0 + 2 * FMPQ_POLY_INV_NEWTON_CUTOFF;
+            fmpz *rev = W + 2 * FMPQ_POLY_INV_NEWTON_CUTOFF;
 
-            _fmpz_poly_reverse(rev, poly, n, n);
-            _fmpz_vec_zero(W0, 2*n - 2);
-            fmpz_set_ui(W0 + (2*n - 2), 1);
-            fmpz_set_ui(W0den, 1);
+            _fmpz_poly_reverse(rev, Q, n, n);
+            _fmpz_vec_zero(W, 2*n - 2);
+            fmpz_set_ui(W + (2*n - 2), 1);
+            fmpz_set_ui(Wden, 1);
 
-            _fmpq_poly_div(rpoly, rden, W0, W0den, 2*n - 1, 
-                                        rev, den, n);
+            _fmpq_poly_div(Qinv, Qinvden, W, Wden, 2*n - 1, rev, Qden, n);
 
-            _fmpz_poly_reverse(rpoly, rpoly, n, n);
+            _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }
 
         for (i--; i >= 0; i--)
         {
-            long len;
-
+            m = n;
             n = a[i];
 
-            _fmpz_poly_mullow(W0, poly, n, rpoly, n, n);
-            fmpz_mul(W0den, den, rden);
-            for (len = n - 1; len >= 0 && !W0[len]; len--) ;
-            len++;
-            _fmpq_poly_canonicalise(W0, W0den, len);
+            _fmpz_poly_mullow(W, Q, n, Qinv, m, n);
+            fmpz_mul(Wden, Qden, Qinvden);
 
-            fmpz_sub(W0, W0, W0den);
+            _fmpz_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m);
+            fmpz_mul(Qinvden, Qinvden, Wden);
+            _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
 
-            _fmpz_poly_mullow(W1, W0, n, rpoly, n, n);
-            fmpz_mul(W1den, W0den, rden);
-            for (len = n - 1; len >= 0 && !W1[len]; len--) ;
-            len++;
-            _fmpq_poly_canonicalise(W1, W1den, len);
-
-            _fmpq_poly_sub(rpoly, rden, rpoly, rden, n, W1, W1den, n);
+            _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
         }
 
-        _fmpz_vec_clear(W0, alloc + 2);
+        _fmpz_vec_clear(W, alloc + 1);
         free(a);
     }
 }
 
-void fmpq_poly_inv_series_newton(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_inv_series_newton(fmpq_poly_t Qinv, const fmpq_poly_t Q, long n)
 {
     fmpz *copy;
     int alloc;
 
-    if (poly->length >= n)
+    if (Q->length >= n)
     {
-        copy = poly->coeffs;
+        copy = Q->coeffs;
         alloc = 0;
     }
     else
     {
         long i;
         copy = (fmpz *) malloc(n * sizeof(fmpz));
-        for (i = 0; i < poly->length; i++)
-            copy[i] = poly->coeffs[i];
+        for (i = 0; i < Q->length; i++)
+            copy[i] = Q->coeffs[i];
         for ( ; i < n; i++)
             copy[i] = 0;
         alloc = 1;
     }
 
-    if (res != poly)
+    if (Qinv != Q)
     {
-        fmpq_poly_fit_length(res, n);
-        _fmpq_poly_inv_series_newton(res->coeffs, res->den, copy, poly->den, n);
+        fmpq_poly_fit_length(Qinv, n);
+        _fmpq_poly_inv_series_newton(Qinv->coeffs, Qinv->den, copy, Q->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_inv_series_newton(t->coeffs, t->den, copy, poly->den, n);
-        fmpq_poly_swap(res, t);
+        _fmpq_poly_inv_series_newton(t->coeffs, t->den, copy, Q->den, n);
+        fmpq_poly_swap(Qinv, t);
         fmpq_poly_clear(t);
     }
 
-    _fmpq_poly_set_length(res, n);
-    fmpq_poly_canonicalise(res);
+    _fmpq_poly_set_length(Qinv, n);
+    fmpq_poly_canonicalise(Qinv);
 
     if (alloc)
         free(copy);

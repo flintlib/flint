@@ -21,6 +21,7 @@
 
     Copyright (C) 2011 William Hart
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -31,54 +32,51 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#define NMOD_NEWTON_INVERSE_CUTOFF 400
+#define NMOD_POLY_INV_NEWTON_CUTOFF 400
 
-static void 
-__nmod_poly_inv_series_newton_prealloc(mp_ptr Qinv, 
-                                  mp_srcptr Q, mp_ptr tmp, long n, nmod_t mod)
+void 
+_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
-    int alloc;
-    long m;
-
-    if (n < NMOD_NEWTON_INVERSE_CUTOFF)
+    if (n < NMOD_POLY_INV_NEWTON_CUTOFF)
     {
         _nmod_poly_inv_series_basecase(Qinv, Q, n, mod);
-        return;
     }
+    else
+    {
+        long *a, i, m;
+        mp_ptr W;
 
-    m = (n + 1)/2;
+        for (i = 1; (1L << i) < n; i++) ;
 
-    alloc = (tmp == NULL);
-    if (alloc)
-        tmp = _nmod_vec_init(n);
+        W = malloc(n * sizeof(mp_limb_t) + i * sizeof(long));
+        a = (long *) (W + n);
 
-    __nmod_poly_inv_series_newton_prealloc(Qinv, Q, tmp, m, mod);
+        a[i = 0] = n;
+        while (n >= NMOD_POLY_INV_NEWTON_CUTOFF)
+            a[++i] = (n = (n + 1) / 2);
 
-    _nmod_poly_mullow(tmp, Q, n, Qinv, m, n, mod);
-    _nmod_poly_mullow(Qinv + m, Qinv, m, tmp + m, n - m, n - m, mod);
-    _nmod_vec_neg(Qinv + m, Qinv + m, n - m, mod);
+        _nmod_poly_inv_series_basecase(Qinv, Q, n, mod);
 
-    if (alloc)
-        _nmod_vec_free(tmp);
+        for (i--; i >= 0; i--)
+        {
+            m = n;
+            n = a[i];
+
+            _nmod_poly_mullow(W, Q, n, Qinv, m, n, mod);
+            _nmod_poly_mullow(Qinv + m, Qinv, m, W + m, n - m, n - m, mod);
+            _nmod_vec_neg(Qinv + m, Qinv + m, n - m, mod);
+        }
+
+        free(W);
+    }
 }
 
-
 void
-_nmod_poly_inv_series_newton(mp_ptr Qinv, 
-                                  mp_srcptr Q, long n, nmod_t mod)
+nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 {
-    __nmod_poly_inv_series_newton_prealloc(Qinv, Q, NULL, n, mod);
-}
+    const long Qlen = Q->length;
 
-void
-nmod_poly_inv_series_newton(nmod_poly_t Qinv, 
-                                 const nmod_poly_t Q, long n)
-{
-    mp_ptr Qinv_coeffs, Q_coeffs;
-    nmod_poly_t t1;
-    long Qlen;
-    
-    Qlen = Q->length;
+    mp_ptr q, qinv;
 
     if (n == 0 || Q->length == 0 || Q->coeffs[0] == 0)
     {
@@ -88,36 +86,45 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv,
 
     if (Qlen < n)
     {
-        Q_coeffs = _nmod_vec_init(n);
-        mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
-        mpn_zero(Q_coeffs + Qlen, n - Qlen);
+        q = _nmod_vec_init(n);
+
+        mpn_copyi(q, Q->coeffs, Qlen);
+        mpn_zero(q + Qlen, n - Qlen);
     }
     else
-        Q_coeffs = Q->coeffs;
+    {
+        q = Q->coeffs;
+    }
 
     if (Q == Qinv && Qlen >= n)
     {
-        nmod_poly_init2(t1, Q->mod.n, n);
-        Qinv_coeffs = t1->coeffs;
+        qinv = _nmod_vec_init(n);
     }
     else
     {
         nmod_poly_fit_length(Qinv, n);
-        Qinv_coeffs = Qinv->coeffs;
+        qinv = Qinv->coeffs;
     }
 
-    _nmod_poly_inv_series_newton(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_inv_series_newton(qinv, q, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {
-        nmod_poly_swap(Qinv, t1);
-        nmod_poly_clear(t1);
+        free(Qinv->coeffs);
+        Qinv->coeffs = qinv;
+        Qinv->alloc  = n;
+        Qinv->length = n;
+    }
+    else
+    {
+        Qinv->length = n;
     }
     
-    Qinv->length = n;
-
     if (Qlen < n)
-        _nmod_vec_free(Q_coeffs);
+    {
+        _nmod_vec_free(q);
+    }
 
     _nmod_poly_normalise(Qinv);
 }
+
