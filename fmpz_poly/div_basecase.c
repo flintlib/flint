@@ -37,7 +37,7 @@ _fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
 {
     const fmpz * leadB = B + lenB - 1;
     long B1, iQ = lenA - lenB;
-    int alloc;
+    long alloc;
 
     while (lenA >= lenB && fmpz_cmpabs(A + lenA - 1, leadB) < 0)
     {
