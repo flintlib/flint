@@ -76,6 +76,7 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
             fmpz_set_ui(Wden, 1);
 
             _fmpq_poly_div(Qinv, Qinvden, W, Wden, 2*n - 1, rev, Qden, n);
+            _fmpq_poly_canonicalise(Qinv, Qinvden, n);
 
             _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }
@@ -93,9 +94,9 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
             _fmpz_vec_scalar_mul_fmpz(Qinv, Qinv, m, Wden);
 
             _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
-        }
 
-        _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+            _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+        }
 
         _fmpz_vec_clear(W, alloc + 1);
         free(a);
