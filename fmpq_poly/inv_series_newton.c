@@ -95,6 +95,8 @@ _fmpq_poly_inv_series_newton(fmpz * Qinv, fmpz_t Qinvden,
             _fmpz_vec_neg(Qinv + m, Qinv + m, n - m);
         }
 
+        _fmpq_poly_canonicalise(Qinv, Qinvden, n);
+
         _fmpz_vec_clear(W, alloc + 1);
         free(a);
     }
