@@ -35,9 +35,9 @@
 void 
 _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 {
-    if (n == 1)
+    if (n == 1)  /* Q is +-1 */
     {
-        fmpz_set_ui(Qinv, 1);
+        fmpz_set(Qinv, Q);
     }
     else
     {
