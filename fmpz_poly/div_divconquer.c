@@ -31,9 +31,9 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
-                                    const fmpz * B, long lenB)
+static void
+__fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
+                                     const fmpz * B, long lenB)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -61,8 +61,14 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 
         fmpz * q2   = Q;
         fmpz * q1   = Q + shift;
-        fmpz * dq1  = _fmpz_vec_init(lenA);
-        fmpz * d1q1 = dq1 + shift;
+        fmpz * dq1  = (fmpz *) A;
+        fmpz * d1q1 = (fmpz *) A + lenA;
+
+        /* 
+            XXX:  In this case, we expect A to be modifiable, and we 
+            expect an extra 2 lenB - 1 coefficients at the top of A 
+            which we can use as temporary space
+         */
 
         /* 
            Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
@@ -80,22 +86,19 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
            significant terms which we use in the division
          */
 
-        _fmpz_vec_set(dq1, A, shift);
-        _fmpz_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1);
+        _fmpz_vec_sub(dq1 + shift, A + shift, d1q1, lenB - 1);
 
         /*
            Compute q2 = trunc(R) div B;  it is a smaller division than the 
            original since len(trunc(R)) = lenA - lenB
          */
 
-        _fmpz_poly_div_divconquer(q2, dq1, lenA - lenB, B, lenB);
+        __fmpz_poly_div_divconquer(q2, dq1, lenA - lenB, B, lenB);
 
         /*
            We have Q = q1 x^shift + q2;  Q has length lenB + shift, q2 has 
            length shift since it is an lenA - lenB by lenB division
          */
-
-        _fmpz_vec_clear(dq1, lenA);
     }
     else  /* lenA = 2 lenB - 1 */
     {
@@ -107,16 +110,35 @@ _fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
     }
 }
 
+void _fmpz_poly_div_divconquer(fmpz *Q, 
+                               const fmpz *A, long lenA, 
+                               const fmpz *B, long lenB)
+{
+    if (lenA <= 2 * lenB - 1)
+    {
+        __fmpz_poly_div_divconquer(Q, A, lenA, B, lenB);
+    }
+    else  /* lenA > 2 * lenB - 1 */
+    {
+        fmpz *S;
+
+        S = _fmpz_vec_init(lenA + (2 * lenB - 1));
+        _fmpz_vec_set(S, A, lenA);
+
+        __fmpz_poly_div_divconquer(Q, S, lenA, B, lenB);
+
+        _fmpz_vec_clear(S, lenA + (2 * lenB - 1));
+    }
+}
+
 void
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenA, lenB;
+    const long lenA = A->length;
+    const long lenB = B->length;
     fmpz_poly_t t;
-    fmpz * q;
-
-    lenA = A->length;
-    lenB = B->length;
+    fmpz *q;
 
     if (lenB == 0)
     {

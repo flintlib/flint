@@ -152,6 +152,8 @@ fmpz_poly
   spent in resultant, but the CRT code or the nmod_poly_xgcd code may also
   be to blame.
 
+* In fmpz_poly_pseudo_divrem_divconquer, fix the repeated memory allocation 
+  of size O(lenA) in the case when lenA >> lenB.
 
 fmpq_poly
 ---------

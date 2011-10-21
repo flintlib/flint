@@ -167,12 +167,10 @@ void
 fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
                             const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenA, lenB;
+    const long lenA = A->length;
+    const long lenB = B->length;
     fmpz_poly_t tQ, tR;
     fmpz *q, *r;
-
-    lenA = A->length;
-    lenB = B->length;
 
     if (lenB == 0)
     {
