@@ -54,7 +54,7 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
 
     if ((res == poly1) || (res == poly2))
     {
-        fmpz *t = calloc(n, sizeof(fmpz));
+        fmpz *t = _fmpz_vec_init(n);
 
         if (len1 >= len2)
             _fmpz_mod_poly_mullow(t, poly1->coeffs, len1, 
@@ -64,9 +64,9 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
                                      poly1->coeffs, len1, &(res->p), n);
 
         _fmpz_vec_clear(res->coeffs, res->alloc);
+        res->coeffs = t;
         res->alloc  = n;
         res->length = n;
-        res->coeffs = t;
         _fmpz_mod_poly_normalise(res);
     }
     else

@@ -106,39 +106,6 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 
 *******************************************************************************
 
-    Conversion
-
-*******************************************************************************
-
-void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
-
-    Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that 
-    is part of the data structure of $f$.
-
-void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
-
-    Sets $f$ to $g$.  This is done simply by lifting the coefficients 
-    of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
-
-*******************************************************************************
-
-    Reduction modulo $p$
-
-*******************************************************************************
-
-void _fmpz_mod_poly_reduce_coeffs(fmpz_mod_poly_t poly)
-
-    Reduces the coefficients of the polynomial \code{poly} modulo~$p$, 
-    where $p$ is the modulus in the data structure of \code{poly}.  
-    The polynomial normalised, too.
-
-void _fmpz_poly_reduce_coeffs(fmpz_poly_t poly, const fmpz_t p)
-
-    Reduces the coefficients of \code{poly} modulo $p$.  The polynomial 
-    might not be normalised on exit.
-
-*******************************************************************************
-
     Attributes
 
 *******************************************************************************
@@ -181,6 +148,22 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j)
 
     Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
     to zero.
+
+*******************************************************************************
+
+    Conversion
+
+*******************************************************************************
+
+void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
+
+    Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that 
+    is part of the data structure of $f$.
+
+void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
+
+    Sets $f$ to $g$.  This is done simply by lifting the coefficients 
+    of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
 
 *******************************************************************************
 
@@ -379,6 +362,25 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible 
     modulo $p$.
 
+void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$ but only sets \code{(Q, lenA - lenB + 1)}.
+
+    Requires temporary space \code{(R, lenA)}.  Allows aliasing 
+    only between $A$ and $R$.  Allows zero-padding in $A$ but 
+    not in $B$.  Assumes that the leading coefficient of $B$ 
+    is a unit modulo $p$.
+
+void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leg \len(R) < \len(B)$ assuming that the leading term 
+    of $B$ is a unit.
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p)
@@ -441,6 +443,20 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient 
     of $B$ is invertible modulo $p$.
 
+void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n, 
+                                      const fmpz_t cinv, const fmpz_t p)
+
+    Sets \code{(Qinv, n)} to the inverse of \code{(Q, n)} modulo $x^n$, 
+    where $n \geq 1$, assuming that the bottom coefficient of $Q$ is 
+    invertible modulo $p$ and that its inverse is \code{cinv}.
+
+void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, long n)
+
+    Sets \code{Qinv} to the inverse of \code{Q} modulo $x^n$, 
+    where $n \geq 1$, assuming that the bottom coefficient of 
+    $Q$ is a unit.
+
 *******************************************************************************
 
     Greatest common divisor
@@ -485,14 +501,54 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
 
     Input and output
 
+    The printing options supported by this module are very similar to 
+    what can be found in the two related modules \code{fmpz_poly} and 
+    \code{nmod_poly}.
+
+    Consider, for example, the polynomial $f(x) = 5x^3 + 2x + 1$ in 
+    $(\mathbf{Z}/6\mathbf{Z})[x]$.  Its simple string representation 
+    is \code{"4 6  1 2 0 5"}, where the first two numbers denote the 
+    length of the polynomial and the modulus.  The pretty string 
+    representation is \code{"5*x^3+2*x+1"}.
+
 *******************************************************************************
 
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, long len, 
+                          const fmpz_t p)
+
+    Prints the polynomial \code{(poly, len)} to the stream \code{file}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
+
+    Prints the polynomial to the stream \code{file}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
 
 int fmpz_mod_poly_fprint_pretty(FILE * file, 
                                 const fmpz_mod_poly_t poly, const char * x)
 
+    Prints the pretty representation of \code{(poly, len)} to the stream 
+    \code{file}, using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int fmpz_mod_poly_print(const fmpz_mod_poly_t poly)
 
+    Prints the polynomial to \code{stdout}.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
 int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
+
+    Prints the pretty representation of \code{poly} to \code{stdout},
+    using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
 

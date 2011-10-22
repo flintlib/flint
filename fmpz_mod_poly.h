@@ -100,33 +100,6 @@ void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, long len);
 
-/*  Conversion ***************************************************************/
-
-void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g);
-
-void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g);
-
-/*  Reduction modulo p *******************************************************/
-
-static __inline__ 
-void _fmpz_mod_poly_reduce_coeffs(fmpz_mod_poly_t poly)
-{
-    long i;
-
-    for (i = 0; i < poly->length; i++)
-        fmpz_mod(poly->coeffs + i, poly->coeffs + i, &(poly->p));
-    _fmpz_mod_poly_normalise(poly);
-}
-
-static __inline__ 
-void _fmpz_poly_reduce_coeffs(fmpz_poly_t poly, const fmpz_t p)
-{
-    long i;
-
-    for (i = 0; i < poly->length; i++)
-        fmpz_mod(poly->coeffs + i, poly->coeffs + i, p);
-}
-
 /*  Attributes ***************************************************************/
 
 static __inline__ 
@@ -163,6 +136,28 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 }
 
 void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j);
+
+/*  Conversion ***************************************************************/
+
+static __inline__ 
+void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong x)
+{
+    if (x)
+    {
+        fmpz_mod_poly_fit_length(f, 1);
+        _fmpz_mod_poly_set_length(f, 1);
+        fmpz_set_ui(f->coeffs, x);
+        fmpz_mod(f->coeffs, f->coeffs, &(f->p));
+    }
+    else
+    {
+        fmpz_mod_poly_zero(f);
+    }
+}
+
+void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g);
+
+void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g);
 
 /*  Comparison ***************************************************************/
 
@@ -255,6 +250,13 @@ void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R,
 void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p);
@@ -281,6 +283,13 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
 }
 
+void 
+_fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n, 
+                                 const fmpz_t cinv, const fmpz_t p);
+
+void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
+    const fmpz_mod_poly_t Q, long n);
+
 /*  Greatest common divisor **************************************************/
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
@@ -295,29 +304,34 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
 
 /*  Input and output *********************************************************/
 
-static __inline__ 
-int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly)
-{
-    return fmpz_poly_fprint(file, (fmpz_poly_struct *) poly);
-}
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, long len, 
+                          const fmpz_t p);
+
+int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly);
 
 static __inline__ 
 int fmpz_mod_poly_fprint_pretty(FILE * file, 
                                 const fmpz_mod_poly_t poly, const char * x)
 {
-    return fmpz_poly_fprint_pretty(file, (fmpz_poly_struct *) poly, x);
+    return _fmpz_poly_fprint_pretty(file, poly->coeffs, poly->length, x);
+}
+
+static __inline__ 
+int _fmpz_mod_poly_print(const fmpz *poly, long len, const fmpz_t p)
+{
+    return _fmpz_mod_poly_fprint(stdout, poly, len, p);
 }
 
 static __inline__
 int fmpz_mod_poly_print(const fmpz_mod_poly_t poly)
 {
-    return fmpz_poly_print((fmpz_poly_struct *) poly);
+    return fmpz_mod_poly_fprint(stdout, poly);
 }
 
 static __inline__
 int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
 {
-    return fmpz_poly_print_pretty((fmpz_poly_struct *) poly, x);
+    return fmpz_mod_poly_fprint_pretty(stdout, poly, x);
 }
 
 #endif
