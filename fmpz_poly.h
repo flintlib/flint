@@ -736,6 +736,9 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly);
 
 int fmpz_poly_fprint(FILE * file, const fmpz_poly_t poly);
 
+int _fmpz_poly_fprint_pretty(FILE * file, 
+                             const fmpz * poly, long len, const char * x);
+
 int fmpz_poly_fprint_pretty(FILE * file, 
                                        const fmpz_poly_t poly, const char * x);
 
