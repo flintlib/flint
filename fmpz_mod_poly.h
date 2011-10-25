@@ -241,6 +241,17 @@ void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1,
 void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
     const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, long n);
 
+void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p);
+
+void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
+
+/*  Powering *****************************************************************/
+
+void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
+                        const fmpz_t p);
+
+void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e);
+
 /*  Division *****************************************************************/
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 

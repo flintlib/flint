@@ -333,6 +333,32 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
     Sets \code{res} to the lowest $n$ coefficients of the product of 
     \code{poly1} and \code{poly2}.
 
+void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
+
+    Sets \code{res} to the square of \code{poly}.
+
+void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Computes \code{res} as the square of \code{poly}.
+
+*******************************************************************************
+
+    Powering
+
+*******************************************************************************
+
+void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
+                        const fmpz_t p)
+
+    Sets \code{res = poly^e}, assuming that \code{e, len > 0} and that 
+    \code{res} has space for \code{e*(len - 1) + 1} coefficients.  Does 
+    not support aliasing.
+
+void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
+
+    Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
+    so that in particular \code{0^0 = 1}.
+
 *******************************************************************************
 
     Division
