@@ -257,33 +257,33 @@ dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
         /* k = 2 * k1 with k1 odd */
         if (p == 2UL && fac.exp[i] == 1)
         {
-            k1 = k / 2;
-            inv = n_preinvert_limb(k1);
+            k2 = k / 2;
+            inv = n_preinvert_limb(k2);
 
-            n1 = n_invmod(32, k1);
-            n1 = n_mulmod2_preinv(n1,
-                    n_mod2_preinv(8*n + 1, k1, inv), k1, inv);
-            n2 = ((k1 % 8 == 3) || (k1 % 8 == 5)) ^ (n & 1);
+            n2 = n_invmod(32, k2);
+            n2 = n_mulmod2_preinv(n2,
+                    n_mod2_preinv(8*n + 1, k2, inv), k2, inv);
+            n1 = ((k2 % 8 == 3) || (k2 % 8 == 5)) ^ (n & 1);
 
-            trigprod_mul_prime_power(prod, 2, n2, 2, 1);
-            k = k1;
-            n = n1;
+            trigprod_mul_prime_power(prod, 2, n1, 2, 1);
+            k = k2;
+            n = n2;
         }
         /* k = 4 * k1 with k1 odd */
         else if (p == 2UL && fac.exp[i] == 2)
         {
-            k1 = k / 4;
-            inv = n_preinvert_limb(k1);
+            k2 = k / 4;
+            inv = n_preinvert_limb(k2);
 
-            n1 = n_invmod(128, k1);
-            n1 = n_mulmod2_preinv(n1,
-                n_mod2_preinv(8*n + 5, k1, inv), k1, inv);
-            n2 = (n + mod4_tab[(k1 / 2) % 8]) % 4;
+            n2 = n_invmod(128, k2);
+            n2 = n_mulmod2_preinv(n2,
+                n_mod2_preinv(8*n + 5, k2, inv), k2, inv);
+            n1 = (n + mod4_tab[(k2 / 2) % 8]) % 4;
 
-            trigprod_mul_prime_power(prod, 4, n2, 2, 2);
+            trigprod_mul_prime_power(prod, 4, n1, 2, 2);
             prod->prefactor *= -1;
-            k = k1;
-            n = n1;
+            k = k2;
+            n = n2;
         }
         /* k = k1 * k2 with k1 odd or divisible by 8 */
         else

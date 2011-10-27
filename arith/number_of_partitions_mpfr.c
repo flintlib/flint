@@ -85,24 +85,44 @@ partitions_needed_terms(ulong n)
     return N;
 }
 
-/* p(n), term k, N total terms */
+/* Bound number of prime factors in k */
+static mp_limb_t primorial_tab[] = {
+    1, 2, 6, 30, 210, 2310, 30030, 510510, 9699690, 223092870,
+#if FLINT64
+    6469693230UL, 200560490130UL, 7420738134810UL, 304250263527210UL,
+    13082761331670030UL, 614889782588491410UL
+#endif
+};
+
+static __inline__ int
+bound_primes(ulong k)
+{
+    int i;
+
+    for (i = 0; i < sizeof(primorial_tab) / sizeof(mp_limb_t); i++)
+        if (k <= primorial_tab[i])
+            return i;
+
+    return i;
+}
+
+
+static __inline__ long
+log2_ceil(double x)
+{
+    /* ceil(log2(n)) = bitcount(n-1);
+       this is too large if x is a power of two */
+    return FLINT_BIT_COUNT((long) x);
+}
+
 static long
 partitions_prec_bound(ulong n, long k, long N)
 {
-    long guard_bits, mag_bound, prec;
+    long prec;
 
-    mag_bound = partitions_remainder_bound_log2(n, k);
+    prec = partitions_remainder_bound_log2(n, k);
+    prec += log2_ceil(8 * N * (26 * (sqrt(n) / k) + 7 * bound_primes(k) + 22));
 
-    /* Error computing cosh(x) */
-    guard_bits = (long) FLINT_BIT_COUNT(n) / 2 -
-                ((long) FLINT_BIT_COUNT(k));
-
-    /* Want an error less than 0.25/N */
-    guard_bits = FLINT_MAX(guard_bits, (long)(FLINT_BIT_COUNT(N)));
-    guard_bits += 5;
-
-    prec = mag_bound + guard_bits;
-    prec = FLINT_MAX(prec, DOUBLE_PREC);
     return prec;
 }
 
@@ -453,7 +473,6 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
             if (prec > DOUBLE_PREC)
             {
                 prec = partitions_prec_bound(n, k, N);
-
                 mpfr_set_prec(t1, prec);
                 mpfr_set_prec(t2, prec);
                 mpfr_set_prec(t3, prec);
@@ -467,7 +486,7 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
             eval_trig_prod(t1, prod);
             mpfr_div_z(t1, t1, n24, MPFR_RNDN);
 
-            /* Multiply by (cosh(z) - sinh(z)/z) where z = C / k*/
+            /* Multiply by (cosh(z) - sinh(z)/z) where z = C / k */
             if (prec <= DOUBLE_PREC)
             {
                 double z = Cd / k;
