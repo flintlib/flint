@@ -30,17 +30,8 @@
 
 int n_sizeinbase(mp_limb_t n, int base)
 {
-    int size;
-
-    if (n == 0UL)
+    if (n == 0)
         return 1;
 
-    size = 0;
-    while (n)
-    {
-        n /= base;
-        size++;
-    }
-
-    return size;
+    return n_flog(n, base) + 1;
 }

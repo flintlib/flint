@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -27,14 +28,20 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_flog(mp_limb_t x, mp_limb_t b)
+mp_limb_t n_flog(mp_limb_t n, mp_limb_t b)
 {
-    mp_limb_t n;
+    mp_limb_t r, p, phi;
 
-    for (n = 0; x >= b; n++)
+    r = 0;
+    p = 1;
+
+    while (1)
     {
-        x = x / b;
-    }
+        umul_ppmm(phi, p, p, b);
 
-    return n;
+        if (p <= n && !phi)
+            r++;
+        else
+            return r;
+    }
 }

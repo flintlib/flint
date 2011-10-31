@@ -20,33 +20,31 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <mpir.h>
-#include <limits.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_clog(mp_limb_t x, mp_limb_t b)
+mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
 {
-    if (x == 1)
-    {
-        return 0;
-    }
-    else if (x < b)
-    {
-        return 1;
-    }
-    else
-    {
-        mp_limb_t n;
+    mp_limb_t r, p, t, phi;
 
-        for (n = 1; x > b; n++)
+    r = 0;
+    p = 1;
+
+    while (1)
+    {
+        umul_ppmm(phi, t, p, b);
+
+        if (t <= n && !phi)
         {
-            x = (x + (b - 1)) / b;
+            r++;
+            p = t;
         }
-
-        return n;
+        else
+            return r + (p != n);
     }
 }
