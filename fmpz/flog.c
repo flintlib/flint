@@ -28,40 +28,53 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-long fmpz_flog(const fmpz_t x, const fmpz_t b)
+long
+fmpz_flog(const fmpz_t n, const fmpz_t b)
 {
+    fmpz_t t;
+    int sign;
+    long r;
+
+    if (fmpz_is_one(n))
+        return 0;
+
     if (!COEFF_IS_MPZ(*b))
+        return fmpz_flog_ui(n, *b);
+
+    sign = fmpz_cmp(n, b);
+    if (sign <= 0)
+        return (sign == 0) ? 1 : 0;
+
+    r = fmpz_dlog(n) / fmpz_dlog(b);
+
+    fmpz_init(t);
+    fmpz_pow_ui(t, b, r);
+    sign = fmpz_cmp(t, n);
+
+    /* Adjust down */
+    if (sign > 0)
     {
-        return fmpz_flog_ui(x, *b);
-    }
-    else
-    {
-        if (!COEFF_IS_MPZ(*x))
+        while (sign > 0)
         {
-            return 0;
+            fmpz_divexact(t, t, b);
+            sign = fmpz_cmp(t, n);
+            r--;
         }
-        else
+    }
+    /* Adjust up */
+    else if (sign < 0)
+    {
+        while (1)
         {
-            if (fmpz_cmp(x, b) < 0)
-            {
-                return 0;
-            }
+            fmpz_mul(t, t, b);
+            if (fmpz_cmp(t, n) <= 0)
+                r++;
             else
-            {
-                long n;
-                fmpz_t t;
-
-                fmpz_init(t);
-                fmpz_set(t, b);
-                for (n = 0; fmpz_cmp(t, x) <= 0; n++)
-                {
-                    fmpz_mul(t, t, b);
-                }
-                fmpz_clear(t);
-
-                return n;
-            }
+                break;
         }
     }
+
+    fmpz_clear(t);
+    return r;
 }
 

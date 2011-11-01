@@ -19,60 +19,71 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-long
-fmpz_clog(const fmpz_t n, const fmpz_t b)
+int
+main(void)
 {
-    fmpz_t t;
-    int sign;
-    long r;
+    int i, result;
+    flint_rand_t state;
 
-    if (fmpz_is_one(n))
-        return 0;
+    printf("dlog....");
+    fflush(stdout);
 
-    if (!COEFF_IS_MPZ(*b))
-        return fmpz_clog_ui(n, *b);
+    flint_randinit(state);
 
-    if (fmpz_cmp(n, b) <= 0)
-        return 1;
-
-    r = fmpz_dlog(n) / fmpz_dlog(b);
-
-    fmpz_init(t);
-    fmpz_pow_ui(t, b, r);
-    sign = fmpz_cmp(t, n);
-
-    /* Adjust down */
-    if (sign > 0)
+    for (i = 0; i < 10000; i++)
     {
-        while (sign > 0)
+        fmpz_t x;
+        mpz_t z;
+        mpfr_t r;
+        double y, w;
+
+        fmpz_init(x);
+        mpz_init(z);
+        mpfr_init2(r, 53);
+
+        fmpz_randtest_not_zero(x, state, 10000);
+        fmpz_abs(x, x);
+
+        y = fmpz_dlog(x);
+
+        fmpz_get_mpz(z, x);
+        mpfr_set_z(r, z, MPFR_RNDN);
+
+        mpfr_log(r, r, MPFR_RNDN);
+        w = mpfr_get_d(r, MPFR_RNDN);
+
+        result = (FLINT_ABS(y - w) <= w * 1e-13);
+
+        if (!result)
         {
-            fmpz_divexact(t, t, b);
-            sign = fmpz_cmp(t, n);
-            r--;
+            printf("FAIL:\n");
+            printf("x = "), fmpz_print(x), printf("\n");
+            printf("y = %.20g\n", y);
+            printf("w = %.20g\n", w);
+            abort();
         }
-        r += (sign != 0);
-    }
-    /* Adjust up */
-    else if (sign < 0)
-    {
-        while (sign < 0)
-        {
-            fmpz_mul(t, t, b);
-            sign = fmpz_cmp(t, n);
-            r++;
-        }
+
+        fmpz_clear(x);
+        mpz_clear(z);
+        mpfr_clear(r);
     }
 
-    fmpz_clear(t);
-    return r;
+    mpfr_free_cache();
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return EXIT_SUCCESS;
 }
+

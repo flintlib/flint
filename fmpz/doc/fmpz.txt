@@ -528,6 +528,15 @@ long fmpz_flog_ui(const fmpz_t x, ulong b)
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
     the return value fits into a signed \code{long}.
 
+double fmpz_dlog(const fmpz_t x)
+
+    Returns a double precision approximation of the
+    natural logarithm of $x$.
+
+    The accuracy depends on the implementation of the floating-point
+    logarithm provided by the C standard library. The result can
+    typically be expected to have a relative error no greater than 1-2 bits.
+
 int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
 
     Returns whether $a$ is a quadratic residue or zero modulo $p$ 

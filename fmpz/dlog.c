@@ -19,60 +19,29 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <math.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-long
-fmpz_clog(const fmpz_t n, const fmpz_t b)
+double
+fmpz_dlog(const fmpz_t x)
 {
-    fmpz_t t;
-    int sign;
-    long r;
-
-    if (fmpz_is_one(n))
-        return 0;
-
-    if (!COEFF_IS_MPZ(*b))
-        return fmpz_clog_ui(n, *b);
-
-    if (fmpz_cmp(n, b) <= 0)
-        return 1;
-
-    r = fmpz_dlog(n) / fmpz_dlog(b);
-
-    fmpz_init(t);
-    fmpz_pow_ui(t, b, r);
-    sign = fmpz_cmp(t, n);
-
-    /* Adjust down */
-    if (sign > 0)
+    if (!COEFF_IS_MPZ(*x))
     {
-        while (sign > 0)
-        {
-            fmpz_divexact(t, t, b);
-            sign = fmpz_cmp(t, n);
-            r--;
-        }
-        r += (sign != 0);
+        return log(*x);
     }
-    /* Adjust up */
-    else if (sign < 0)
+    else
     {
-        while (sign < 0)
-        {
-            fmpz_mul(t, t, b);
-            sign = fmpz_cmp(t, n);
-            r++;
-        }
-    }
+        double s;
+        long e;
 
-    fmpz_clear(t);
-    return r;
+        s = mpz_get_d_2exp(&e, COEFF_TO_PTR(*x));
+        return log(s) + e * 0.69314718055994530942;
+    }
 }
