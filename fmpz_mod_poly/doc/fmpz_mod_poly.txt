@@ -165,6 +165,77 @@ void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
     Sets $f$ to $g$.  This is done simply by lifting the coefficients 
     of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
 
+void _fmpz_mod_poly_change_radix_precomp(fmpz **Rpow, fmpz **Rinv, 
+                    const fmpz *R, long lenR, long k, 
+                    const fmpz_t invL, const fmpz_t p)
+
+    Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses 
+    modulo $x^{2^{i} \deg(R)}$ for $i = 0, \dotsc, k-1$.
+
+    Assumes that the vectors \code{Rpow[i]} and \code{Rinv[i]} have space 
+    for $2^i \deg(R) + 1$ and $2^i \deg(R)$ coefficients, respectively.
+
+    Assumes that the polynomial $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
+
+    Assumes that the leading coefficient of $R$ is a unit and that the 
+    argument \code{invL} is the inverse of the coefficient modulo~$p$.
+
+    The argument~$p$ is the modulus, which in $p$-adic applications is 
+    typically a prime power, although this is not necessary.  Here, we 
+    only assume that $p \geq 2$.
+
+    Note that this precomputed data can be used for any $F$ such that 
+    $\len(F) \leg 2^k \deg(R)$.
+
+void _fmpz_mod_poly_change_radix_recursive(fmpz **B,
+                    const fmpz *F, fmpz **Rpow, fmpz **Rinv, long degR, 
+                    long k, long i, fmpz *W, const fmpz_t p)
+
+    This is the main recursive function used by the 
+    function \code{fmpz_mod_poly_change_radix()}.
+
+    The variable $k$ denotes the factors of $r$ that have 
+    previously been counted for the polynomial $F$, which 
+    is assumed to have length $2^{i+1} \deg(R)$, possibly 
+    including zero-padding.
+
+    Assumes that $W$ is a vector providing temporary space 
+    of length $\len(F) = 2^{i+1} \deg(R)$.
+
+    Thus, the top level call will have $F$ and $i$ set as 
+    in the original problem, and $k = 0$.
+
+    Recursively, this function then computes $Q$ and $S$ 
+    both of length $2^{i} \deg(R)$ such that 
+    \begin{equation*}
+    F = Q R^{2^i} + S.
+    \end{equation*}
+
+void _fmpz_mod_poly_change_radix(fmpz **B, const fmpz *F, 
+          const fmpz *R, long lenR, long k, const fmpz_t invL, const fmpz_t p)
+
+    Given a polynomial $F$ of length $2^k \deg(R)$, possibly zero-padded, 
+    computes polynomials $B_0, \dotsc, B_N$ of degree less than $\deg(R)$ 
+    such that 
+    \begin{equation*}
+    F = b_0 + b_1 r + \dotsb + b_N r^N, 
+    \end{equation*}
+    where necessarily $N = 2^k - 1$.
+
+    The entire computation takes place over $\mathbf{Z} / p \mathbf{Z}$, 
+    where $p \geq 2$ is a natural number.
+
+    Assumes that, for all $i = 0, \dotsc, N$, the vector \code{B[i]} has 
+    space for $\deg(R)$ coefficients.
+
+    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
+
+    Assumes that the leading coefficient of $R$ is a unit and 
+    that the inverse modulo $p$ is given by \code{invL}.
+
+void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B, 
+                             const fmpz_mod_poly_t F, const fmpz_mod_poly_t R)
+
 *******************************************************************************
 
     Comparison
