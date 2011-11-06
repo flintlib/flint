@@ -165,77 +165,6 @@ void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g)
     Sets $f$ to $g$.  This is done simply by lifting the coefficients 
     of $g$ taking representatives $[0, p) \subset \mathbf{Z}$.
 
-void _fmpz_mod_poly_change_radix_precomp(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, long lenR, long k, 
-                    const fmpz_t invL, const fmpz_t p)
-
-    Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses 
-    modulo $x^{2^{i} \deg(R)}$ for $i = 0, \dotsc, k-1$.
-
-    Assumes that the vectors \code{Rpow[i]} and \code{Rinv[i]} have space 
-    for $2^i \deg(R) + 1$ and $2^i \deg(R)$ coefficients, respectively.
-
-    Assumes that the polynomial $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
-
-    Assumes that the leading coefficient of $R$ is a unit and that the 
-    argument \code{invL} is the inverse of the coefficient modulo~$p$.
-
-    The argument~$p$ is the modulus, which in $p$-adic applications is 
-    typically a prime power, although this is not necessary.  Here, we 
-    only assume that $p \geq 2$.
-
-    Note that this precomputed data can be used for any $F$ such that 
-    $\len(F) \leg 2^k \deg(R)$.
-
-void _fmpz_mod_poly_change_radix_recursive(fmpz **B,
-                    const fmpz *F, fmpz **Rpow, fmpz **Rinv, long degR, 
-                    long k, long i, fmpz *W, const fmpz_t p)
-
-    This is the main recursive function used by the 
-    function \code{fmpz_mod_poly_change_radix()}.
-
-    The variable $k$ denotes the factors of $r$ that have 
-    previously been counted for the polynomial $F$, which 
-    is assumed to have length $2^{i+1} \deg(R)$, possibly 
-    including zero-padding.
-
-    Assumes that $W$ is a vector providing temporary space 
-    of length $\len(F) = 2^{i+1} \deg(R)$.
-
-    Thus, the top level call will have $F$ and $i$ set as 
-    in the original problem, and $k = 0$.
-
-    Recursively, this function then computes $Q$ and $S$ 
-    both of length $2^{i} \deg(R)$ such that 
-    \begin{equation*}
-    F = Q R^{2^i} + S.
-    \end{equation*}
-
-void _fmpz_mod_poly_change_radix(fmpz **B, const fmpz *F, 
-          const fmpz *R, long lenR, long k, const fmpz_t invL, const fmpz_t p)
-
-    Given a polynomial $F$ of length $2^k \deg(R)$, possibly zero-padded, 
-    computes polynomials $B_0, \dotsc, B_N$ of degree less than $\deg(R)$ 
-    such that 
-    \begin{equation*}
-    F = b_0 + b_1 r + \dotsb + b_N r^N, 
-    \end{equation*}
-    where necessarily $N = 2^k - 1$.
-
-    The entire computation takes place over $\mathbf{Z} / p \mathbf{Z}$, 
-    where $p \geq 2$ is a natural number.
-
-    Assumes that, for all $i = 0, \dotsc, N$, the vector \code{B[i]} has 
-    space for $\deg(R)$ coefficients.
-
-    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
-
-    Assumes that the leading coefficient of $R$ is a unit and 
-    that the inverse modulo $p$ is given by \code{invL}.
-
-void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B, 
-                             const fmpz_mod_poly_t F, const fmpz_mod_poly_t R)
-
 *******************************************************************************
 
     Comparison
@@ -593,6 +522,98 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     In general, the greatest common divisor is defined in the polynomial 
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
+
+*******************************************************************************
+
+    Radix conversion
+
+    The following functions provide the functionality to solve the 
+    radix conversion problems for polynomials, which is to express 
+    a polynomial $f(X)$ with respect to a given radix $r(X)$ as 
+    \begin{equation*}
+    f(X) = \sum_{i = 0}^{N} b_i(X) r(X)^i
+    \end{equation*}
+    where $N = \floor{\deg(f) / \deg(r)}$.
+
+    The algorithm implemented here is a recursive one, which performs 
+    Euclidean divisions by powers of $r$ of the form $r^{2^i}$, and it 
+    has time complexity $\Theta(\deg(f) \log \deg(f))$.
+
+    It facilitates the repeated use of precomputed data, namely the 
+    powers of $r$ and their power series inverses.  This data is stored 
+    in objects of type \code{fmpz_mod_poly_radix_t} and it is computed 
+    using the function \code{fmpz_mod_poly_radix_init()}, which only 
+    depends on~$r$ and an upper bound on the degree of~$f$.
+
+*******************************************************************************
+
+void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
+                    const fmpz *R, long lenR, long k, 
+                    const fmpz_t invL, const fmpz_t p)
+
+    Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses 
+    modulo $x^{2^{i} \deg(R)}$ for $i = 0, \dotsc, k-1$.
+
+    Assumes that the vectors \code{Rpow[i]} and \code{Rinv[i]} have space 
+    for $2^i \deg(R) + 1$ and $2^i \deg(R)$ coefficients, respectively.
+
+    Assumes that the polynomial $R$ is non-constant, i.e.\ $\deg(R) \geq 1$.
+
+    Assumes that the leading coefficient of $R$ is a unit and that the 
+    argument \code{invL} is the inverse of the coefficient modulo~$p$.
+
+    The argument~$p$ is the modulus, which in $p$-adic applications is 
+    typically a prime power, although this is not necessary.  Here, we 
+    only assume that $p \geq 2$.
+
+    Note that this precomputed data can be used for any $F$ such that 
+    $\len(F) \leg 2^k \deg(R)$.
+
+void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
+                              const fmpz_mod_poly_t R, long degF)
+
+    Carries out the precomputation necessary to perform radix conversion 
+    to radix~$R$ for polynomials~$F$ of degree at most \code{degF}.
+
+    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$, 
+    and that the leading coefficient is a unit.
+
+void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
+                          long degR, long k, long i, fmpz *W, const fmpz_t p)
+
+    This is the main recursive function used by the 
+    function \code{fmpz_mod_poly_radix()}.
+
+    Assumes that, for all $i = 0, \dotsc, N$, the vector 
+    \code{B[i]} has space for $\deg(R)$ coefficients.
+
+    The variable $k$ denotes the factors of $r$ that have 
+    previously been counted for the polynomial $F$, which 
+    is assumed to have length $2^{i+1} \deg(R)$, possibly 
+    including zero-padding.
+
+    Assumes that $W$ is a vector providing temporary space 
+    of length $\len(F) = 2^{i+1} \deg(R)$.
+
+    The entire computation takes place over $\mathbf{Z} / p \mathbf{Z}$, 
+    where $p \geq 2$ is a natural number.
+
+    Thus, the top level call will have $F$ as in the original 
+    problem, and $k = 0$.
+
+void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F, 
+                         const fmpz_mod_poly_radix_t D)
+
+    Given a polynomial $F$ and the precomputed data $D$ for the radix $R$, 
+    computes polynomials $B_0, \dotsc, B_N$ of degree less than $\deg(R)$ 
+    such that 
+    \begin{equation*}
+    F = B_0 + B_1 R + \dotsb + B_N R^N, 
+    \end{equation*}
+    where necessarily $N = \floor{\deg(F) / \deg(R)}$.
+
+    Assumes that $R$ is non-constant, i.e.\ $\deg(R) \geq 1$, 
+    and that the leading coefficient is a unit.
 
 *******************************************************************************
 

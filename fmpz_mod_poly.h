@@ -159,20 +159,6 @@ void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g);
 
 void fmpz_mod_poly_get_fmpz_poly(fmpz_poly_t f, const fmpz_mod_poly_t g);
 
-void _fmpz_mod_poly_change_radix_precomp(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, long lenR, long k, 
-                    const fmpz_t invL, const fmpz_t p);
-
-void _fmpz_mod_poly_change_radix_recursive(fmpz **B,
-                    const fmpz *F, fmpz **Rpow, fmpz **Rinv, long degR, 
-                    long k, long i, fmpz *W, const fmpz_t p);
-
-void _fmpz_mod_poly_change_radix(fmpz **B, const fmpz *F, 
-          const fmpz *R, long lenR, long k, const fmpz_t invL, const fmpz_t p);
-
-void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B, 
-                             const fmpz_mod_poly_t F, const fmpz_mod_poly_t R);
-
 /*  Comparison ***************************************************************/
 
 static __inline__ 
@@ -326,6 +312,35 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
 void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, 
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B);
+
+/*  Radix conversion *********************************************************/
+
+typedef struct {
+    fmpz *V;
+    fmpz *W;
+    fmpz **Rpow;
+    fmpz **Rinv;
+    long degR;
+    long k;
+    fmpz invL;
+} fmpz_mod_poly_radix_struct;
+
+typedef fmpz_mod_poly_radix_struct fmpz_mod_poly_radix_t[1];
+
+void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
+                    const fmpz *R, long lenR, long k, 
+                    const fmpz_t invL, const fmpz_t p);
+
+void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
+                              const fmpz_mod_poly_t R, long degF);
+
+void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D);
+
+void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
+                          long degR, long k, long i, fmpz *W, const fmpz_t p);
+
+void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F, 
+                         const fmpz_mod_poly_radix_t D);
 
 /*  Input and output *********************************************************/
 

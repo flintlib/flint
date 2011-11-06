@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_change_radix_precomp(fmpz **Rpow, fmpz **Rinv, 
+void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
                     const fmpz *R, long lenR, long k, 
                     const fmpz_t invL, const fmpz_t p)
 {
@@ -72,9 +72,65 @@ void _fmpz_mod_poly_change_radix_precomp(fmpz **Rpow, fmpz **Rinv,
     free(W);
 }
 
-void _fmpz_mod_poly_change_radix_recursive(fmpz **B, 
-                    const fmpz *F, fmpz **Rpow, fmpz **Rinv, long degR, 
-                    long k, long i, fmpz *W, const fmpz_t p)
+void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
+                              const fmpz_mod_poly_t R, long degF)
+{
+    const long degR = R->length - 1;
+
+    if (degF < degR)
+    {
+        D->k = 0;
+    }
+    else
+    {
+        const long N = degF / degR;
+        const long k = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}} */
+        const long lenV = degR * ((1L << k) - 1) + k;
+        const long lenW = degR * ((1L << k) - 1);
+
+        long i;
+
+        D->V = _fmpz_vec_init(lenV + lenW);
+        D->W = D->V + lenV;
+
+        D->Rpow = malloc(k * sizeof(fmpz *));
+        D->Rinv = malloc(k * sizeof(fmpz *));
+
+        for (i = 0; i < k; i++)
+        {
+            D->Rpow[i] = D->V + (degR * ((1L << i) - 1) + i);
+            D->Rinv[i] = D->W + (degR * ((1L << i) - 1));
+        }
+
+        fmpz_init(&(D->invL));
+        fmpz_invmod(&(D->invL), R->coeffs + degR, &(R->p));
+
+        _fmpz_mod_poly_radix_init(D->Rpow, D->Rinv, R->coeffs, degR + 1, 
+                                  k, &(D->invL), &(R->p));
+
+        D->k = k;
+        D->degR = degR;
+    }
+}
+
+void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
+{
+    if (D->k)
+    {
+        const long degR = D->degR;
+        const long k    = D->k;
+        const long lenV = degR * ((1L << k) - 1) + k;
+        const long lenW = degR * ((1L << k) - 1);
+
+        _fmpz_vec_clear(D->V, lenV + lenW);
+        free(D->Rpow);
+        free(D->Rinv);
+        fmpz_clear(&(D->invL));
+    }
+}
+
+void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
+                          long degR, long k, long i, fmpz *W, const fmpz_t p)
 {
     if (i == -1)
     {
@@ -92,60 +148,22 @@ void _fmpz_mod_poly_change_radix_recursive(fmpz **B,
         _fmpz_mod_poly_mullow(Q, Frev, lenQ, Rinv[i], lenQ, p, lenQ);
         _fmpz_poly_reverse(Q, Q, lenQ, lenQ);
 
-        _fmpz_mod_poly_change_radix_recursive(B, Q, Rpow, Rinv, degR, 
-                                              k + (1L << i), i-1, W, p);
+        _fmpz_mod_poly_radix(B, Q, Rpow, Rinv, degR, k + (1L << i), i-1, W, p);
 
         _fmpz_mod_poly_mullow(S, Rpow[i], lenQ, Q, lenQ, p, lenQ);
         _fmpz_mod_poly_sub(S, F, lenQ, S, lenQ, p);
 
-        _fmpz_mod_poly_change_radix_recursive(B, S, Rpow, Rinv, degR, 
-                                              k, i-1, W + lenQ, p);
+        _fmpz_mod_poly_radix(B, S, Rpow, Rinv, degR, k, i-1, W + lenQ, p);
     }
 }
 
-void _fmpz_mod_poly_change_radix(fmpz **B, const fmpz *F, 
-                                 const fmpz *R, long lenR, long k, 
-                                 const fmpz_t invL, const fmpz_t p)
-{
-    const long degR = lenR - 1;
-    const long lenV = degR * ((1L << k) - 1) + k;
-    const long lenW = degR * ((1L << k) - 1);
-    const long lenX = degR * (1L << k);
-
-    long i;
-    fmpz **Rpow, **Rinv;
-    fmpz *V, *W, *X;
-
-    V = _fmpz_vec_init(lenV + lenW + lenX);
-    W = V + lenV;
-    X = W + lenW;
-
-    Rpow = malloc(k * sizeof(fmpz *));
-    Rinv = malloc(k * sizeof(fmpz *));
-
-    for (i = 0; i < k; i++)
-    {
-        Rpow[i] = V + (degR * ((1L << i) - 1) + i);
-        Rinv[i] = W + (degR * ((1L << i) - 1));
-    }
-
-    _fmpz_mod_poly_change_radix_precomp(Rpow, Rinv, R, lenR, k, invL, p);
-
-    _fmpz_mod_poly_change_radix_recursive(B, F, Rpow, Rinv, degR, 0, k-1, X, p);
-
-    free(Rpow);
-    free(Rinv);
-
-    _fmpz_vec_clear(V, lenV + lenW + lenX);
-}
-
-void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B, 
-                                const fmpz_mod_poly_t F, 
-                                const fmpz_mod_poly_t R)
+void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, 
+                         const fmpz_mod_poly_t F, 
+                         const fmpz_mod_poly_radix_t D)
 {
     const long lenF = F->length;
     const long degF = F->length - 1;
-    const long degR = R->length - 1;
+    const long degR = D->degR;
     const long N    = degF / degR;
 
     if (N == 0)
@@ -154,12 +172,15 @@ void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B,
     }
     else
     {
-        const long k    = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}} */
-        const long lenG = (1L << k) * degR;       /* Padded size */
-        const long t    = (lenG - 1) / degR - N;  /* Extra {degR}-blocks */
+        const long k    = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}}    */
+        const long lenG = (1L << k) * degR;       /* Padded size            */
+        const long t    = (lenG - 1) / degR - N;  /* Extra {degR}-blocks    */
 
-        fmpz *G, *T, **C;
-        fmpz_t invL;
+        fmpz *G;                                  /* Padded copy of F       */
+        fmpz *T;                                  /* Additional B[i]        */
+        fmpz **C;                                 /* Enlarged version of B  */
+        fmpz *W;                                  /* Temporary space        */
+
         long i;
 
         if (lenF < lenG)
@@ -188,12 +209,11 @@ void fmpz_mod_poly_change_radix(fmpz_mod_poly_struct **B,
             C[N + 1 + i] = T + i * degR;
         }
 
-        fmpz_init(invL);
-        fmpz_invmod(invL, R->coeffs + degR, &(R->p));
+        W = _fmpz_vec_init(lenG);
 
-        _fmpz_mod_poly_change_radix(C, G, R->coeffs, R->length, k, invL, &(R->p));
+        _fmpz_mod_poly_radix(C, G, D->Rpow, D->Rinv, degR, 0, k-1, W, &(F->p));
 
-        fmpz_clear(invL);
+        _fmpz_vec_clear(W, lenG);
 
         for (i = 0; i <= N; i++)
         {

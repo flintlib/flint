@@ -61,7 +61,7 @@ int main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("change_radix....");
+    printf("radix....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -71,6 +71,7 @@ int main(void)
         fmpz_t p;
         fmpz_mod_poly_t f, r;
         fmpz_mod_poly_struct **b;
+        fmpz_mod_poly_radix_t D;
         long j, N;
 
         fmpz_init(p);
@@ -84,7 +85,7 @@ int main(void)
             fmpz_mod_poly_randtest_not_zero(r, state, n_randint(state, 20) + 2);
         while (r->length < 2);
 
-        N = fmpz_mod_poly_degree(f) / fmpz_mod_poly_degree(r);
+        N = FLINT_MAX(0, fmpz_mod_poly_degree(f) / fmpz_mod_poly_degree(r));
         b = malloc((N + 1) * sizeof(fmpz_mod_poly_struct *));
         for (j = 0; j <= N; j++)
         {
@@ -107,7 +108,9 @@ int main(void)
             fmpz_clear(d);
         }
 
-        fmpz_mod_poly_change_radix(b, f, r);
+        fmpz_mod_poly_radix_init(D, r, f->length - 1 + n_randint(state, 50));
+
+        fmpz_mod_poly_radix(b, f, D);
 
         result = _check(b, f, r);
         if (!result)
@@ -127,6 +130,7 @@ int main(void)
 
         fmpz_mod_poly_clear(f);
         fmpz_mod_poly_clear(r);
+        fmpz_mod_poly_radix_clear(D);
         for (j = 0; j <= N; j++)
         {
             fmpz_mod_poly_clear(b[j]);
