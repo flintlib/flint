@@ -360,7 +360,7 @@ void fmpz_poly_mat_det_fflu(fmpz_poly_t det, const fmpz_poly_mat_t A)
 
     Sets \code{det} to the determinant of the square matrix \code{A}.
     The determinant is computed by performing a fraction-free LU
-    decomposition on copy of \code{A}.
+    decomposition on a copy of \code{A}.
 
 void fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
 
@@ -393,7 +393,7 @@ int fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
     Note that the determinant is not necessarily the minimal denominator.
 
     Uses fraction-free LU decomposition, followed by solving for
-    the idensity matrix.
+    the identity matrix.
 
 
 *******************************************************************************
