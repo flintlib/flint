@@ -256,6 +256,8 @@ int fmpz_sgn(const fmpz_t f);
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f);
 
+mp_bitcnt_t fmpz_val2(const fmpz_t x);
+
 static __inline__ void
 fmpz_neg(fmpz_t f1, const fmpz_t f2)
 {

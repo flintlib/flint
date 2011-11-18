@@ -204,6 +204,11 @@ void fmpq_div(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 void fmpq_div_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
 
+void fmpq_mul_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
+
+void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp);
+
+
 int _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod);
 
 int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod);

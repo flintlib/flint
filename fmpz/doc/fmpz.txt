@@ -246,6 +246,12 @@ int fmpz_sgn(const fmpz_t f)
     Returns $-1$ is the sign of $f$ is negative, $+1$ if it is positive,
     otherwise returns $0$.
 
+mp_bitcnt_t fmpz_val2(const fmpz_t f)
+
+    Returns the exponent of the largest power of two dividing $f$, or
+    equivalently the number of trailing zeros in the binary expansion of $f$.
+    If $f$ is zero then $0$ is returned.
+
 void fmpz_swap(fmpz_t f, fmpz_t g)
 
     Efficiently swaps $f$ and $g$.  No data is copied.
