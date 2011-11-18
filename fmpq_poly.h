@@ -478,9 +478,13 @@ void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
 void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
                              const fmpz_t a);
 
-void _fmpq_poly_evaluate_mpq(fmpz_t rnum, fmpz_t rden, 
-                             const fmpz * poly, const fmpz_t den, long len, 
-                             const fmpz_t anum, const fmpz_t aden);
+void
+_fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
+                        const fmpz * poly, const fmpz_t den, long len, 
+                        const fmpz_t anum, const fmpz_t aden);
+
+void 
+fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
 

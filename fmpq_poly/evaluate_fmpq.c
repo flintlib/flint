@@ -31,15 +31,39 @@
 #include "fmpq_poly.h"
 #include "fmpq.h"
 
-void 
-fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
+void
+_fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden, 
+                        const fmpz * poly, const fmpz_t den, long len, 
+                        const fmpz_t anum, const fmpz_t aden)
 {
-    fmpq_t r, b;
-    fmpq_init(r);
-    fmpq_init(b);
-    fmpq_set_mpq(b, a);
-    fmpq_poly_evaluate_fmpq(r, poly, b);
-    fmpq_get_mpq(res, r);
-    fmpq_clear(r);
-    fmpq_clear(b);
+    fmpz_t d;
+    
+    _fmpz_poly_evaluate_horner_mpq(rnum, rden, poly, len, anum, aden);
+    fmpz_mul(rden, rden, den);
+    
+    fmpz_init(d);
+    fmpz_gcd(d, rnum, rden);
+    if (*d != 1L)
+    {
+        fmpz_divexact(rnum, rnum, d);
+        fmpz_divexact(rden, rden, d);
+    }
+    fmpz_clear(d);
+}
+
+void 
+fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
+{
+    if (res == a)
+    {
+        fmpq_t t;
+        fmpq_init(t);
+        fmpq_set(t, a);
+        fmpq_poly_evaluate_fmpq(res, poly, t);
+        fmpq_clear(t);
+        return;
+    }
+
+    _fmpq_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
+        poly->coeffs, poly->den, poly->length, fmpq_numref(a), fmpq_denref(a));
 }
