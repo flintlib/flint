@@ -421,3 +421,43 @@ void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
     Starting with zero, this generates every rational number once
     and only once, but not in order of minimal height.
 
+*******************************************************************************
+
+    Continued fractions
+
+*******************************************************************************
+
+long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
+
+    Generates up to $n$ terms of the (simple) continued fraction expansion
+    of $x$, writing the coefficients to the vector $c$ and the remainder $r$
+    to the \code{rem} variable. The return value is the number $k$ of
+    generated terms. The output satisfies:
+
+    $$
+    x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
+        \cfrac{1}{ \ddots + \cfrac{1}{c_{k-1} + r }}}}
+    $$
+
+    If $r$ is zero, the continued fraction expansion is complete.
+    If $r$ is nonzero, $1/r$ can be passed back as input to generate
+    $c_k, c_{k+1}, \ldots$. Calls to \code{fmpq_get_cfrac} can therefore
+    be chained to generate the continued fraction incrementally,
+    extracting any desired number of coefficients at a time.
+
+    In general, a rational number has exactly two continued fraction
+    expansions. By convention, we generate the shorter one. The longer
+    expansion can be obtained by replacing the last coefficient
+    $a_{k-1}$ by the pair of coefficients $a_{k-1} - 1, 1$.
+
+    As a special case, the continued fraction expansion of zero consists
+    of a single zero (and not the empty sequence).
+
+long fmpq_cfrac_bound(const fmpq_t x)
+
+    Returns an upper bound for the number of terms in the continued
+    fraction expansion of $x$. The computed bound is not necessarily sharp.
+
+    We use the fact that the smallest denominator
+    that can give a continued fraction of length $n$ is the Fibonacci
+    number $F_{n+1}$.

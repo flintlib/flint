@@ -255,6 +255,9 @@ _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
 void
 fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
 
+long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n);
+
+long fmpq_cfrac_bound(const fmpq_t x);
 
 
 #endif
