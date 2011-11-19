@@ -367,6 +367,10 @@ fmpq
 
 * Add more random functions.
 
+* Write a subquadratic fmpq_get_cfrac
+
+* Implement subquadratic rational reconstruction
+
 
 fmpq_mat
 --------

@@ -453,6 +453,9 @@ long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
     As a special case, the continued fraction expansion of zero consists
     of a single zero (and not the empty sequence).
 
+    This function implements a simple algorithm, performing repeated
+    divisions. The running time is quadratic.
+
 void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
 
     Sets $x$ to the value of the continued fraction
@@ -464,6 +467,11 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
 
     where all $c_i$ except $c_0$ should be nonnegative.
     It is assumed that $n > 0$.
+
+    For large $n$, this function implements a subquadratic algorithm.
+    The convergents are given by a chain product of 2 by 2 matrices.
+    This product is split in half recursively to balance the size
+    of the coefficients.
 
 long fmpq_cfrac_bound(const fmpq_t x)
 
