@@ -453,6 +453,18 @@ long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
     As a special case, the continued fraction expansion of zero consists
     of a single zero (and not the empty sequence).
 
+void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
+
+    Sets $x$ to the value of the continued fraction
+
+    $$
+    x = c_0 + \cfrac{1}{c_1 + \cfrac{1}{c_2 +
+        \cfrac{1}{ \ddots + \cfrac{1}{c_{n-1}}}}}
+    $$
+
+    where all $c_i$ except $c_0$ should be nonnegative.
+    It is assumed that $n > 0$.
+
 long fmpq_cfrac_bound(const fmpq_t x)
 
     Returns an upper bound for the number of terms in the continued
