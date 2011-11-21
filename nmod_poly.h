@@ -186,6 +186,14 @@ void nmod_poly_zero(nmod_poly_t res)
 }
 
 static __inline__
+void nmod_poly_one(nmod_poly_t res)
+{
+    nmod_poly_fit_length(res, 1);
+    res->length = 1;
+    res->coeffs[0] = 1;
+}
+
+static __inline__
 void nmod_poly_truncate(nmod_poly_t poly, long len)
 {
     if (poly->length > len)
@@ -199,9 +207,44 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m);
 
 void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m);
 
+/* Comparison  ***************************************************************/
+
+static __inline__
+int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
+{
+    if (a->length != b->length)
+        return 0;
+
+    if (a != b)
+        if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
+            return 0;
+
+   return 1;
+}
+
+static __inline__
+int nmod_poly_is_zero(const nmod_poly_t poly)
+{
+    return (poly->length == 0);
+}
+
+static __inline__ int
+nmod_poly_is_one(const nmod_poly_t poly)
+{
+    return (poly->length == 1) && (poly->coeffs[0] == 1);
+}
+
 /* Randomisation  ************************************************************/
 
 void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len);
+
+static __inline__ void
+nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, long len)
+{
+    do {
+        nmod_poly_randtest(poly, state, len);
+    } while (nmod_poly_is_zero(poly));
+}
 
 /* Getting and setting coefficients  *****************************************/
 
@@ -259,34 +302,6 @@ int nmod_poly_read(nmod_poly_t poly)
 {
     return nmod_poly_fread(stdin, poly);
 }
-
-/* Comparison  ***************************************************************/
-
-static __inline__
-int nmod_poly_equal(const nmod_poly_t a, const nmod_poly_t b)
-{
-    if (a->length != b->length)
-        return 0;
-
-    if (a != b)
-        if (!_nmod_vec_equal(a->coeffs, b->coeffs, a->length))
-            return 0;
-
-   return 1;
-}
-
-static __inline__
-int nmod_poly_is_zero(const nmod_poly_t poly)
-{
-    return (poly->length == 0);
-}
-
-static __inline__ int
-nmod_poly_is_one(const nmod_poly_t poly)
-{
-    return (poly->length == 1) && (poly->coeffs[0] == 1);
-}
-
 
 /* Shifting  *****************************************************************/
 

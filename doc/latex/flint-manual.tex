@@ -1142,8 +1142,39 @@ and ring operations (e.g. transpose and matrix multiplication).
 The user can manipulate matrix entries directly, but must
 assume responsibility for normalising all values to the range $[0, n)$.
 
-
 \input{input/nmod_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Matrices over integer polynomials                                            %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{nmod\_poly\_mat}
+\epigraph{Matrices over $\Z / n \Z[x]$ for word-sized moduli}{}
+
+The \code{nmod_poly_mat_t} data type represents matrices whose
+entries are polynomials having coefficients in $\Z / n \Z$.
+We generally assume that $n$ is a prime number.
+
+The \code{nmod_poly_mat_t} type is defined as an array of
+\code{nmod_poly_mat_struct}'s of length one.
+This permits passing parameters of type \code{nmod_poly_mat_t}
+by reference.
+
+A matrix internally consists of a single array
+of \code{nmod_poly_struct}'s, representing a dense matrix in
+row-major order. This array is only directly indexed
+during memory allocation and deallocation. A separate array
+holds pointers to the start of each row, and is used for all
+indexing. This allows the rows of a matrix to be permuted
+quickly by swapping pointers.
+
+Matrices having zero rows or columns are allowed.
+
+The shape of a matrix is fixed upon initialisation.
+The user is assumed to provide input and output variables
+whose dimensions are compatible with the given operation.
+
+\input{input/nmod_poly_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Padic numbers                                                                %

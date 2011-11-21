@@ -26,9 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
-
+#include "nmod_poly.h"
+#include "nmod_poly_mat.h"
 
 int
 main(void)
@@ -44,78 +43,79 @@ main(void)
     /* Test aliasing */
     for (i = 0; i < 400; i++)
     {
-        fmpz_poly_mat_t A, Ainv;
-        fmpz_poly_t den1, den2;
-        long n, bits, deg;
+        nmod_poly_mat_t A, Ainv;
+        nmod_poly_t den1, den2;
+        long n, deg;
         float density;
-        int ns1, ns2;
-        int result;
+        int ns1, ns2, result;
+        mp_limb_t mod;
 
+        mod = n_randtest_prime(state, 0);
         n = n_randint(state, 8);
         deg = 1 + n_randint(state, 5);
-        bits = 1 + n_randint(state, 100);
         density = n_randint(state, 100) * 0.01;
 
-        fmpz_poly_mat_init(A, n, n);
-        fmpz_poly_mat_init(Ainv, n, n);
-        fmpz_poly_init(den1);
-        fmpz_poly_init(den2);
+        nmod_poly_mat_init(A, n, n, mod);
+        nmod_poly_mat_init(Ainv, n, n, mod);
+        nmod_poly_init(den1, mod);
+        nmod_poly_init(den2, mod);
 
-        fmpz_poly_mat_randtest_sparse(A, state, deg, bits, density);
+        nmod_poly_mat_randtest_sparse(A, state, deg, density);
 
-        ns1 = fmpz_poly_mat_inv(Ainv, den1, A);
-        ns2 = fmpz_poly_mat_inv(A, den2, A);
+        ns1 = nmod_poly_mat_inv(Ainv, den1, A);
+        ns2 = nmod_poly_mat_inv(A, den2, A);
 
         result = ns1 == ns2;
 
         if (result && ns1 != 0)
         {
-            result = fmpz_poly_equal(den1, den2) &&
-                fmpz_poly_mat_equal(A, Ainv);
+            result = nmod_poly_equal(den1, den2) &&
+                nmod_poly_mat_equal(A, Ainv);
         }
 
         if (!result)
         {
             printf("FAIL (aliasing)!\n");
-            fmpz_poly_mat_print(A, "x"); printf("\n");
-            fmpz_poly_mat_print(Ainv, "x"); printf("\n");
+            nmod_poly_mat_print(A, "x"); printf("\n");
+            nmod_poly_mat_print(Ainv, "x"); printf("\n");
             abort();
         }
 
-        fmpz_poly_mat_clear(A);
-        fmpz_poly_mat_clear(Ainv);
-        fmpz_poly_clear(den1);
-        fmpz_poly_clear(den2);
+        nmod_poly_mat_clear(A);
+        nmod_poly_mat_clear(Ainv);
+        nmod_poly_clear(den1);
+        nmod_poly_clear(den2);
     }
 
     /* Check A^(-1) = A = 1 */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_poly_mat_t A, Ainv, B, Iden;
-        fmpz_poly_t den, det;
-        long n, bits, deg;
+        nmod_poly_mat_t A, Ainv, B, Iden;
+        nmod_poly_t den, det;
+        long n, deg;
         float density;
         int nonsingular;
+        mp_limb_t mod;
 
+        mod = n_randtest_prime(state, 0);
         n = n_randint(state, 10);
         deg = 1 + n_randint(state, 5);
-        bits = 1 + n_randint(state, 100);
         density = n_randint(state, 100) * 0.01;
 
-        fmpz_poly_mat_init(A, n, n);
-        fmpz_poly_mat_init(Ainv, n, n);
-        fmpz_poly_mat_init(B, n, n);
-        fmpz_poly_mat_init(Iden, n, n);
-        fmpz_poly_init(den);
-        fmpz_poly_init(det);
+        nmod_poly_mat_init(A, n, n, mod);
+        nmod_poly_mat_init(Ainv, n, n, mod);
+        nmod_poly_mat_init(B, n, n, mod);
+        nmod_poly_mat_init(Iden, n, n, mod);
+        nmod_poly_init(den, mod);
+        nmod_poly_init(det, mod);
 
-        fmpz_poly_mat_randtest_sparse(A, state, deg, bits, density);
-        nonsingular = fmpz_poly_mat_inv(Ainv, den, A);
-        fmpz_poly_mat_det_interpolate(det, A);
+        nmod_poly_mat_randtest_sparse(A, state, deg, density);
+        nonsingular = nmod_poly_mat_inv(Ainv, den, A);
+        nmod_poly_mat_det_interpolate(det, A);
 
         if (n == 0)
         {
-            if (nonsingular == 0 || !fmpz_poly_is_one(den))
+            if (nonsingular == 0 || !nmod_poly_is_one(den))
             {
                 printf("FAIL: expected empty matrix to pass\n");
                 abort();
@@ -123,42 +123,41 @@ main(void)
         }
         else
         {
-            if (!fmpz_poly_equal(den, det))
+            if (!nmod_poly_equal(den, det))
             {
-                fmpz_poly_neg(det, det);
+                nmod_poly_neg(det, det);
                 printf("FAIL: den != det(A)\n");
                 abort();
             }
 
-            fmpz_poly_mat_mul(B, Ainv, A);
-            fmpz_poly_mat_one(Iden);
-            fmpz_poly_mat_scalar_mul_fmpz_poly(Iden, Iden, den);
+            nmod_poly_mat_mul(B, Ainv, A);
+            nmod_poly_mat_one(Iden);
+            nmod_poly_mat_scalar_mul_nmod_poly(Iden, Iden, den);
 
-            if (!fmpz_poly_mat_equal(B, Iden))
+            if (!nmod_poly_mat_equal(B, Iden))
             {
                 printf("FAIL:\n");
                 printf("A:\n");
-                fmpz_poly_mat_print(A, "x");
+                nmod_poly_mat_print(A, "x");
                 printf("Ainv:\n");
-                fmpz_poly_mat_print(Ainv, "x");
+                nmod_poly_mat_print(Ainv, "x");
                 printf("B:\n");
-                fmpz_poly_mat_print(B, "x");
+                nmod_poly_mat_print(B, "x");
                 printf("den:\n");
-                fmpz_poly_print_pretty(den, "x");
+                nmod_poly_print(den);
                 abort();
             }
         }
 
-        fmpz_poly_clear(den);
-        fmpz_poly_clear(det);
-        fmpz_poly_mat_clear(A);
-        fmpz_poly_mat_clear(Ainv);
-        fmpz_poly_mat_clear(B);
-        fmpz_poly_mat_clear(Iden);
+        nmod_poly_clear(den);
+        nmod_poly_clear(det);
+        nmod_poly_mat_clear(A);
+        nmod_poly_mat_clear(Ainv);
+        nmod_poly_mat_clear(B);
+        nmod_poly_mat_clear(Iden);
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
