@@ -29,6 +29,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 int
 main(void)
@@ -83,8 +84,53 @@ main(void)
         nmod_poly_clear(b);
     }
 
-    flint_randclear(state);
+    for (i = 0; i < 20000; i++)
+    {
+        fmpz_t f;
+        nmod_poly_t A, B;
+        long b;
+        mp_limb_t n;
 
+        do
+        {
+            n = n_randtest_not_zero(state);
+        } while (n == 1);
+
+        fmpz_init(f);
+        nmod_poly_init(A, n);
+        nmod_poly_init(B, n);
+
+        nmod_poly_randtest(A, state, 1+n_randint(state,100));
+
+        b = FLINT_BIT_COUNT(n) + n_randint(state, FLINT_BITS);
+
+        nmod_poly_bit_pack(f, A, b);
+        nmod_poly_bit_unpack(B, f, b);
+
+        if (!nmod_poly_equal(A, B))
+        {
+            mpz_t zz;
+            printf("FAIL:\n");
+            printf("INPUT: ");
+            nmod_poly_print(A);
+            printf("\n");
+            mpz_init(zz); fmpz_get_mpz(zz, f);
+            printf("PACKED: ");
+            mpz_out_str(stdout, 2, zz);
+            printf("\n");
+            printf("OUTPUT: ");
+            nmod_poly_print(B);
+            printf("\n\n");
+            abort();
+        }
+
+        fmpz_clear(f);
+        nmod_poly_clear(A);
+        nmod_poly_clear(B);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

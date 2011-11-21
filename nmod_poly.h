@@ -35,6 +35,7 @@
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 #define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
@@ -346,6 +347,12 @@ void _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly,
 
 void _nmod_poly_bit_unpack(mp_ptr res, long len, 
                                   mp_srcptr mpn, mp_bitcnt_t bits, nmod_t mod);
+
+void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
+                   mp_bitcnt_t bit_size);
+
+void
+nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size);
 
 /* Multiplication  ***********************************************************/
 

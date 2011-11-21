@@ -25,33 +25,30 @@
 
 #include <stdlib.h>
 #include "flint.h"
-#include "fmpz_poly.h"
-#include "fmpz_poly_mat.h"
+#include "nmod_poly.h"
+#include "nmod_poly_mat.h"
+#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
-fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
+nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 {
-    fmpz_mat_t AA, BB;
     long i, j, n;
     long A_len;
-    int signs;
-    mp_bitcnt_t A_bits, bit_size;
+    mp_bitcnt_t bit_size;
+    fmpz_mat_t AA, BB;
 
     n = A->r;
 
     if (n == 0)
     {
-        fmpz_poly_mat_zero(B);
+        nmod_poly_mat_zero(B);
         return;
     }
 
-    A_len = fmpz_poly_mat_max_length(A);
-    A_bits = fmpz_poly_mat_max_bits(A);
+    A_len = nmod_poly_mat_max_length(A);
 
-    signs = A_bits < 0;
-
-    bit_size = 2 * FLINT_ABS(A_bits) + signs;
+    bit_size = 2 * FLINT_BIT_COUNT(nmod_poly_mat_modulus(A));
     bit_size += FLINT_BIT_COUNT(A_len);
     bit_size += FLINT_BIT_COUNT(n);
 
@@ -59,20 +56,16 @@ fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     fmpz_mat_init(BB, n, n);
 
     for (i = 0; i < n; i++)
-        for (j = 0; j < n; j++)
-            fmpz_poly_bit_pack(fmpz_mat_entry(AA, i, j),
-                               fmpz_poly_mat_entry(A, i, j), bit_size);
+        for (j = 0; j < A->c; j++)
+            nmod_poly_bit_pack(fmpz_mat_entry(AA, i, j),
+                               nmod_poly_mat_entry(A, i, j), bit_size);
 
     /* Should use fmpz_mat_sqr */
     fmpz_mat_mul(BB, AA, AA);
 
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
-            if (signs)
-                fmpz_poly_bit_unpack_unsigned(fmpz_poly_mat_entry(B, i, j),
-                    fmpz_mat_entry(BB, i, j), bit_size);
-            else
-                fmpz_poly_bit_unpack(fmpz_poly_mat_entry(B, i, j),
+                nmod_poly_bit_unpack(nmod_poly_mat_entry(B, i, j),
                     fmpz_mat_entry(BB, i, j), bit_size);
 
     fmpz_mat_clear(AA);

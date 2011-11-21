@@ -229,12 +229,44 @@ void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
 
     Sets \code{C} to the matrix product of \code{A} and \code{B}.
     The matrices must have compatible dimensions for matrix multiplication.
-    Aliasing is allowed.
+    Aliasing is allowed. This function automatically chooses between
+    classical and KS multiplication.
+
+void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+    const nmod_poly_mat_t B)
+
+    Sets \code{C} to the matrix product of \code{A} and \code{B}, 
+    computed using the classical algorithm. The matrices must have 
+    compatible dimensions for matrix multiplication. Aliasing is allowed.
+
+void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+    const nmod_poly_mat_t B)
+
+    Sets \code{C} to the matrix product of \code{A} and \code{B}, 
+    computed using Kronecker segmentation. The matrices must have 
+    compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 void nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 
     Sets \code{B} to the square of \code{A}, which must be a square matrix.
-    Aliasing is allowed.
+    Aliasing is allowed. This function automatically chooses between
+    classical and KS squaring.
+
+void nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix.
+    Aliasing is allowed. This function uses direct formulas for very small
+    matrices, and otherwise classical matrix multiplication.
+
+void nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix.
+    Aliasing is allowed. This function uses Kronecker segmentation.
+
+void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
+
+    Sets \code{B} to \code{A} raised to the power \code{exp}, where \code{A}
+    is a square matrix. Uses exponentiation by squaring. Aliasing is allowed.
 
 *******************************************************************************
 

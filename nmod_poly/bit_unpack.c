@@ -29,6 +29,7 @@
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 
 /* Assumes len > 0, bits > 0. */
 void
@@ -209,4 +210,37 @@ _nmod_poly_bit_unpack(mp_ptr res, long len, mp_srcptr mpn, mp_bitcnt_t bits,
             }
         }
     }
+}
+
+void
+nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
+{
+    long len;
+    mpz_t tmp;
+
+    if (fmpz_sgn(f) < 0)
+    {
+        printf("nmod_poly_bit_unpack: expected an unsigned value!\n");
+        abort();
+    }
+
+    if (bit_size == 0 || fmpz_is_zero(f))
+    {
+        nmod_poly_zero(poly);
+        return;
+    }
+
+    len = (fmpz_bits(f) + bit_size - 1) / bit_size;
+
+    mpz_init2(tmp, bit_size*len);
+    mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    fmpz_get_mpz(tmp, f);
+
+    nmod_poly_fit_length(poly, len);
+
+    _nmod_poly_bit_unpack(poly->coeffs, len, tmp->_mp_d, bit_size, poly->mod);
+    poly->length = len;
+    _nmod_poly_normalise(poly);
+
+    mpz_clear(tmp);
 }

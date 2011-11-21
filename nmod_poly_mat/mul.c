@@ -27,54 +27,27 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
+#define KS_MIN_DIM 10
+#define KS_MAX_LENGTH 128
+
 void
 nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B)
 {
     long ar, bc, br;
-    long i, j, k;
-    nmod_poly_t t;
 
     ar = A->r;
     br = B->r;
     bc = B->c;
 
-    if (br == 0 || ar == 0 || bc == 0)
+    if (ar < KS_MIN_DIM || br < KS_MIN_DIM || bc < KS_MIN_DIM
+        || nmod_poly_mat_max_length(A) > KS_MAX_LENGTH
+        || nmod_poly_mat_max_length(B) > KS_MAX_LENGTH)
     {
-        nmod_poly_mat_zero(C);
-        return;
+        nmod_poly_mat_mul_classical(C, A, B);
     }
-
-    if (C == A || C == B)
+    else
     {
-        nmod_poly_mat_t T;
-        nmod_poly_mat_init(T, ar, bc, nmod_poly_mat_modulus(A));
-        nmod_poly_mat_mul(T, A, B);
-        nmod_poly_mat_swap(C, T);
-        nmod_poly_mat_clear(T);
-        return;
+        nmod_poly_mat_mul_KS(C, A, B);
     }
-
-    nmod_poly_init(t, nmod_poly_mat_modulus(A));
-
-    for (i = 0; i < ar; i++)
-    {
-        for (j = 0; j < bc; j++)
-        {
-            nmod_poly_mul(nmod_poly_mat_entry(C, i, j),
-                          nmod_poly_mat_entry(A, i, 0),
-                          nmod_poly_mat_entry(B, 0, j));
-
-            for (k = 1; k < br; k++)
-            {
-                nmod_poly_mul(t, nmod_poly_mat_entry(A, i, k),
-                                 nmod_poly_mat_entry(B, k, j));
-
-                nmod_poly_add(nmod_poly_mat_entry(C, i, j),
-                              nmod_poly_mat_entry(C, i, j), t);
-            }
-        }
-    }
-
-    nmod_poly_clear(t);
 }

@@ -64,6 +64,7 @@ main(void)
         fmpz_init(x);
 
         fmpz_poly_mat_randtest(A, state, deg, bits);
+        fmpz_poly_mat_randtest(C, state, deg, bits);
 
         fmpz_poly_mat_sqr(C, A);
 
@@ -108,6 +109,7 @@ main(void)
         fmpz_poly_mat_init(B, m, m);
 
         fmpz_poly_mat_randtest(A, state, deg, bits);
+        fmpz_poly_mat_randtest(B, state, deg, bits);
 
         fmpz_poly_mat_sqr(B, A);
         fmpz_poly_mat_sqr(A, A);

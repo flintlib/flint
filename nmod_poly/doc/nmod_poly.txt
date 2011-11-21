@@ -369,6 +369,18 @@ void _nmod_poly_bit_unpack(mp_ptr res, long len,
     There are no restrictions on the size of the actual coefficients as 
     stored within the bitfields. 
 
+void nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly, mp_bitcnt_t bit_size)
+
+    Packs \code{poly} into bitfields of size \code{bit_size}, writing the
+    result to \code{f}.
+
+void nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f,
+        mp_bitcnt_t bit_size)
+
+    Unpacks the polynomial from fields of size \code{bit_size} as
+    represented by the integer \code{f}.
+
+
 *******************************************************************************
 
     Multiplication

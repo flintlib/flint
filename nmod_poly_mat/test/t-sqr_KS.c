@@ -26,9 +26,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flint.h"
-#include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
+#include "fmpz.h"
 
 int
 main(void)
@@ -36,38 +36,36 @@ main(void)
     flint_rand_t state;
     long i;
 
-    printf("pow....");
+    printf("sqr_KS....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 2000; i++)
     {
         nmod_poly_mat_t A, B, C;
-        long m, j, exp, deg;
+        long n, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);
-        m = n_randint(state, 6);
-        deg = 1 + n_randint(state, 6);
-        exp = n_randint(state, 20);
+        n = n_randint(state, 15);
+        deg = 1 + n_randint(state, 15);
 
-        nmod_poly_mat_init(A, m, m, mod);
-        nmod_poly_mat_init(B, m, m, mod);
-        nmod_poly_mat_init(C, m, m, mod);
+        nmod_poly_mat_init(A, n, n, mod);
+        nmod_poly_mat_init(B, n, n, mod);
+        nmod_poly_mat_init(C, n, n, mod);
 
         nmod_poly_mat_randtest(A, state, deg);
+        nmod_poly_mat_randtest(B, state, deg);
+        nmod_poly_mat_randtest(C, state, deg);  /* noise in output */
 
-        nmod_poly_mat_pow(B, A, exp);
+        nmod_poly_mat_sqr_classical(B, A);
+        nmod_poly_mat_sqr_KS(C, A);
 
-        nmod_poly_mat_one(C);
-        for (j = 0; j < exp; j++)
-            nmod_poly_mat_mul(C, C, A);
-
-        if (!nmod_poly_mat_equal(C, B))
+        if (!nmod_poly_mat_equal(B, C))
         {
             printf("FAIL:\n");
-            printf("exp = %ld\n", exp);
+            printf("products don't agree!\n");
             printf("A:\n");
             nmod_poly_mat_print(A, "x");
             printf("B:\n");
@@ -87,26 +85,25 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         nmod_poly_mat_t A, B;
-        long m, exp, deg;
+        long m, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);
-        m = n_randint(state, 6);
-        deg = 1 + n_randint(state, 6);
-        exp = n_randint(state, 20);
+        m = n_randint(state, 20);
+        deg = 1 + n_randint(state, 10);
 
         nmod_poly_mat_init(A, m, m, mod);
         nmod_poly_mat_init(B, m, m, mod);
 
         nmod_poly_mat_randtest(A, state, deg);
+        nmod_poly_mat_randtest(B, state, deg);  /* noise in output */
 
-        nmod_poly_mat_pow(B, A, exp);
-        nmod_poly_mat_pow(A, A, exp);
+        nmod_poly_mat_sqr_KS(B, A);
+        nmod_poly_mat_sqr_KS(A, A);
 
-        if (!nmod_poly_mat_equal(A, B))
+        if (!nmod_poly_mat_equal(B, A))
         {
-            printf("FAIL (aliasing)\n");
-            printf("exp = %ld\n", exp);
+            printf("FAIL (aliasing):\n");
             printf("A:\n");
             nmod_poly_mat_print(A, "x");
             printf("B:\n");

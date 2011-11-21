@@ -60,7 +60,6 @@ main(void)
 
         fmpz_poly_mat_randtest(A, state, deg, bits);
         fmpz_poly_mat_randtest(B, state, deg, bits);
-
         fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
 
         fmpz_poly_mat_mul_classical(C, A, B);
@@ -86,6 +85,86 @@ main(void)
         fmpz_poly_mat_clear(B);
         fmpz_poly_mat_clear(C);
         fmpz_poly_mat_clear(D);
+    }
+
+    /* Check aliasing C and A */
+    for (i = 0; i < 100; i++)
+    {
+        fmpz_poly_mat_t A, B, C;
+        long m, n, bits, deg;
+
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
+        deg = 1 + n_randint(state, 10);
+        bits = 1 + n_randint(state, 100);
+
+        fmpz_poly_mat_init(A, m, n);
+        fmpz_poly_mat_init(B, n, n);
+        fmpz_poly_mat_init(C, m, n);
+
+        fmpz_poly_mat_randtest(A, state, deg, bits);
+        fmpz_poly_mat_randtest(B, state, deg, bits);
+        fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
+
+        fmpz_poly_mat_mul_KS(C, A, B);
+        fmpz_poly_mat_mul_KS(A, A, B);
+
+        if (!fmpz_poly_mat_equal(C, A))
+        {
+            printf("FAIL:\n");
+            printf("A:\n");
+            fmpz_poly_mat_print(A, "x");
+            printf("B:\n");
+            fmpz_poly_mat_print(B, "x");
+            printf("C:\n");
+            fmpz_poly_mat_print(C, "x");
+            printf("\n");
+            abort();
+        }
+
+        fmpz_poly_mat_clear(A);
+        fmpz_poly_mat_clear(B);
+        fmpz_poly_mat_clear(C);
+    }
+
+    /* Check aliasing C and B */
+    for (i = 0; i < 100; i++)
+    {
+        fmpz_poly_mat_t A, B, C;
+        long m, n, bits, deg;
+
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
+        deg = 1 + n_randint(state, 10);
+        bits = 1 + n_randint(state, 100);
+
+        fmpz_poly_mat_init(A, m, m);
+        fmpz_poly_mat_init(B, m, n);
+        fmpz_poly_mat_init(C, m, n);
+
+        fmpz_poly_mat_randtest(A, state, deg, bits);
+        fmpz_poly_mat_randtest(B, state, deg, bits);
+        fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
+
+        fmpz_poly_mat_mul_KS(C, A, B);
+        fmpz_poly_mat_mul_KS(B, A, B);
+
+        if (!fmpz_poly_mat_equal(C, B))
+        {
+            printf("FAIL:\n");
+            printf("A:\n");
+            fmpz_poly_mat_print(A, "x");
+            printf("B:\n");
+            fmpz_poly_mat_print(B, "x");
+            printf("C:\n");
+            fmpz_poly_mat_print(C, "x");
+            printf("\n");
+            abort();
+        }
+
+        fmpz_poly_mat_clear(A);
+        fmpz_poly_mat_clear(B);
+        fmpz_poly_mat_clear(C);
     }
 
     flint_randclear(state);

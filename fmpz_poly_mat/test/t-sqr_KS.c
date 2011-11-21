@@ -56,7 +56,6 @@ main(void)
         fmpz_poly_mat_init(D, m, m);
 
         fmpz_poly_mat_randtest(A, state, deg, bits);
-
         fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
 
         fmpz_poly_mat_sqr_classical(C, A);
@@ -79,6 +78,40 @@ main(void)
         fmpz_poly_mat_clear(A);
         fmpz_poly_mat_clear(C);
         fmpz_poly_mat_clear(D);
+    }
+
+    /* Check aliasing B and A */
+    for (i = 0; i < 100; i++)
+    {
+        fmpz_poly_mat_t A, B;
+        long m, bits, deg;
+
+        m = n_randint(state, 20);
+        deg = 1 + n_randint(state, 10);
+        bits = 1 + n_randint(state, 100);
+
+        fmpz_poly_mat_init(A, m, m);
+        fmpz_poly_mat_init(B, m, m);
+
+        fmpz_poly_mat_randtest(A, state, deg, bits);
+        fmpz_poly_mat_randtest(B, state, deg, bits);
+
+        fmpz_poly_mat_sqr_KS(B, A);
+        fmpz_poly_mat_sqr_KS(A, A);
+
+        if (!fmpz_poly_mat_equal(B, A))
+        {
+            printf("FAIL (aliasing):\n");
+            printf("A:\n");
+            fmpz_poly_mat_print(A, "x");
+            printf("B:\n");
+            fmpz_poly_mat_print(B, "x");
+            printf("\n");
+            abort();
+        }
+
+        fmpz_poly_mat_clear(A);
+        fmpz_poly_mat_clear(B);
     }
 
     flint_randclear(state);

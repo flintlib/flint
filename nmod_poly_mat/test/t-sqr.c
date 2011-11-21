@@ -29,6 +29,7 @@
 #include "nmod_mat.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
+#include "fmpz.h"
 
 int
 main(void)
@@ -61,6 +62,7 @@ main(void)
         nmod_mat_init(d, m, m, mod);
 
         nmod_poly_mat_randtest(A, state, deg);
+        nmod_poly_mat_randtest(C, state, deg);  /* noise in output */
 
         nmod_poly_mat_sqr(C, A);
 
@@ -104,6 +106,7 @@ main(void)
         nmod_poly_mat_init(B, m, m, mod);
 
         nmod_poly_mat_randtest(A, state, deg);
+        nmod_poly_mat_randtest(B, state, deg);  /* noise in output */
 
         nmod_poly_mat_sqr(B, A);
         nmod_poly_mat_sqr(A, A);
@@ -124,6 +127,7 @@ main(void)
     }
 
     flint_randclear(state);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

@@ -28,20 +28,51 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-#define KS_MIN_DIM 10
-#define KS_MAX_LENGTH 128
+static __inline__ void
+nmod_poly_sqr(nmod_poly_t y, const nmod_poly_t x)
+{
+    nmod_poly_mul(y, x, x);
+}
+
+#define E nmod_poly_mat_entry
 
 void
-nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 {
     long n = A->r;
 
-    if (n < KS_MIN_DIM || nmod_poly_mat_max_length(A) > KS_MAX_LENGTH)
+    if (n == 0)
+        return;
+
+    if (n == 1)
     {
-        nmod_poly_mat_sqr_classical(B, A);
+        nmod_poly_sqr(E(B, 0, 0), E(A, 0, 0));
+        return;
     }
-    else
+
+    if (n == 2)
     {
-        nmod_poly_mat_sqr_KS(B, A);
+        nmod_poly_t t, u;
+
+        nmod_poly_init(t, nmod_poly_mat_modulus(A));
+        nmod_poly_init(u, nmod_poly_mat_modulus(A));
+
+        nmod_poly_add(t, E(A, 0, 0), E(A, 1, 1));
+        nmod_poly_mul(u, E(A, 0, 1), E(A, 1, 0));
+
+        nmod_poly_sqr(E(B, 0, 0), E(A, 0, 0));
+        nmod_poly_add(E(B, 0, 0), E(B, 0, 0), u);
+
+        nmod_poly_sqr(E(B, 1, 1), E(A, 1, 1));
+        nmod_poly_add(E(B, 1, 1), E(B, 1, 1), u);
+
+        nmod_poly_mul(E(B, 0, 1), E(A, 0, 1), t);
+        nmod_poly_mul(E(B, 1, 0), E(A, 1, 0), t);
+
+        nmod_poly_clear(t);
+        nmod_poly_clear(u);
+        return;
     }
+
+    nmod_poly_mat_mul_classical(B, A, A);
 }

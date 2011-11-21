@@ -28,6 +28,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
+#include "fmpz.h"
 
 int
 main(void)
@@ -158,6 +159,7 @@ main(void)
     }
 
     flint_randclear(state);
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

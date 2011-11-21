@@ -50,7 +50,7 @@ main(void)
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem, product;
         nmod_poly_factor_t res;
-        mp_limb_t modulus, lead;
+        mp_limb_t modulus, lead = 1;
         long length, num_factors, i, j;
         ulong exponents[5], prod1;
 
@@ -152,10 +152,9 @@ main(void)
     /* Test deflation trick */
     for (iter = 0; iter < 100; iter++)
     {
-        int result = 1;
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;
-        mp_limb_t modulus, lead, lead2;
+        mp_limb_t modulus;
         long length, num_factors, i, j;
         ulong exponents[5], prod1;
         ulong inflation;

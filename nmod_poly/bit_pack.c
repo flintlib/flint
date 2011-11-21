@@ -29,6 +29,7 @@
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "fmpz.h"
 
 /* Assumes length > 0, bits > 0. */
 void
@@ -136,4 +137,37 @@ _nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len, mp_bitcnt_t bits)
             }
         }
     }
+}
+
+void
+nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
+                   mp_bitcnt_t bit_size)
+{
+    long len, limbs;
+    __mpz_struct * mpz;
+    long i;
+
+    len = nmod_poly_length(poly);
+
+    if (len == 0 || bit_size == 0)
+    {
+        fmpz_zero(f);
+        return;
+    }
+
+    mpz = _fmpz_promote(f);
+    mpz_realloc2(mpz, len * bit_size);
+
+    limbs = (len * bit_size - 1) / FLINT_BITS + 1;
+
+    _nmod_poly_bit_pack(mpz->_mp_d, poly->coeffs, len, bit_size);
+
+    for (i = limbs - 1; i >= 0; i--)
+    {
+        if (mpz->_mp_d[i] != 0)
+            break;
+    }
+
+    mpz->_mp_size = i + 1;
+    _fmpz_demote_val(f);
 }
