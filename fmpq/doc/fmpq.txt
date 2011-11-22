@@ -40,6 +40,16 @@ void fmpq_clear(fmpq_t x)
     Clears the \code{fmpq_t} variable \code{x}. To use the variable again,
     it must be re-initialised with \code{fmpq_init}.
 
+fmpq * _fmpq_vec_init(long n)
+
+    Initialises a vector of \code{fmpq} values of length $n$ and sets
+    all values to 0. This is equivalent to generating a \code{fmpz} vector
+    of length $2n$ with \code{_fmpz_vec_init} and setting all denominators
+    to 1.
+
+void _fmpq_vec_clear(fmpq * vec, long n)
+
+    Frees an \code{fmpq} vector.
 
 *******************************************************************************
 
@@ -133,6 +143,12 @@ mp_bitcnt_t fmpq_height_bits(const fmpq_t x)
 
 *******************************************************************************
 
+void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
+
+    Sets \code{res} to the canonical form of the fraction \code{p / q}.
+    This is equivalent to assigning the numerator and denominator
+    separately and calling \code{fmpq_canonicalise}.
+
 void fmpq_set_si(fmpq_t res, long p, ulong q);
 
     Sets \code{res} to the canonical form of the fraction \code{p / q}.
@@ -150,6 +166,13 @@ void fmpq_set_mpq(fmpq_t dest, const mpq_t src)
 void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
 
     Sets the value of \code{dest}
+
+int fmpq_get_mpfr(mpfr_t dest, const fmpq_t src, mpfr_rnd_t rnd)
+
+    Sets the MPFR variable \code{dest} to the value of \code{src},
+    rounded to the nearest representable binary floating-point value
+    in direction \code{rnd}. Returns the sign of the rounding,
+    according to MPFR conventions.
 
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
 
@@ -209,6 +232,11 @@ void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state,
     Does the same thing as \code{fmpq_randtest}, but for numerator
     and denominator given explicitly as \code{fmpz_t} variables. Aliasing
     of \code{num} and \code{den} is not allowed.
+
+void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
+
+    Does the same thing as \code{fmpq_randtest}, but does not
+    generate the number zero.
 
 void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
 
@@ -481,3 +509,63 @@ long fmpq_cfrac_bound(const fmpq_t x)
     We use the fact that the smallest denominator
     that can give a continued fraction of length $n$ is the Fibonacci
     number $F_{n+1}$.
+
+*******************************************************************************
+
+    Summation
+
+*******************************************************************************
+
+void fmpq_bsplit_init(fmpq_bsplit_t s)
+
+    Initialises the variable $s$ representing a partial sum
+    of a series of rational numbers computed using binary splitting.
+    The algorithm is described in \cite{HaiPap1998}.
+
+void fmpq_bsplit_clear(fmpq_bsplit_t s);
+
+    Frees the binary splitting variable $s$.
+
+void fmpq_bsplit_get_fmpq(fmpq_t x, const fmpq_bsplit_t s)
+
+    Sets $x$ to the value of the sum $s(0,n)$ represented by $s$,
+    reduced to a single fraction in canonical form.
+
+void fmpq_bsplit_get_mpfr(mpfr_t x, const fmpq_bsplit_t s)
+
+    Sets $x$ to a numerical approximation of the sum $s$. To improve
+    performance, the final fraction is computed using floating-point
+    multiplications and divisions, possibly resulting in 3-4 bits
+    of roundoff error.
+
+void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, long n1, long n2)
+
+    With $n_1 = 0$ and $n_2 = n$, computes
+
+    $$s(0,n) = \sum_{k=0}^{n} \frac{a_k}{b_k}
+            \left( \sum_{i=0}^k \frac{c_i}{d_i} \right)
+            \left( \prod_{i=0}^k \frac{p_i}{q_i} \right)$$
+
+    using binary splitting. With $0 \le n_1 \le n_2 \le n$, computes
+    the content of the sum corresponding to that interval.
+
+void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
+        const fmpq * ab, const fmpq * pq, long n1, long n2)
+
+    With $n_1 = 0$ and $n_2 = n$, computes
+
+    $$s(0,n) = \sum_{k=0}^{n} \frac{a_k}{b_k}
+            \left( \prod_{i=0}^k \frac{p_i}{q_i} \right)$$
+
+    using binary splitting. With $0 \le n_1 \le n_2 \le n$, computes
+    the content of the sum corresponding to that interval.
+
+void fmpq_bsplit_sum_pq(fmpq_bsplit_t s,
+        const fmpq * ab, const fmpq * cd, const fmpq * pq, long n1, long n2)
+
+    With $n_1 = 0$ and $n_2 = n$, computes
+
+    $$s(0,n) = \sum_{k=0}^{n} \prod_{i=0}^k \frac{p_i}{q_i}$$
+
+    using binary splitting. With $0 \le n_1 \le n_2 \le n$, computes
+    the content of the sum corresponding to that interval.

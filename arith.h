@@ -275,4 +275,6 @@ void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
 void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 
+void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
+
 #endif
