@@ -36,24 +36,37 @@
 int main(void)
 {
     long k;
+    flint_rand_t state;
 
-    printf("const_euler_brent_mcmillan....");
+    printf("zeta_ui_bsplit....");
     fflush(stdout);
 
-    for (k = 2; k < 17; k++)
+    flint_randinit(state);
+
+    for (k = 0; k < 100; k++)
     {
+        long prec, n;
         mpfr_t x, y;
 
-        mpfr_init2(x, 1L << k);
-        mpfr_init2(y, 1L << k);
+        n = 2 + n_randint(state, 20);
+        prec = 2 + n_randint(state, 10000);
 
-        mpfr_const_euler(x, MPFR_RNDN);
-        mpfr_const_euler_brent_mcmillan(y, MPFR_RNDN);
+        mpfr_init2(x, prec);
+        mpfr_init2(y, prec);
+
+        mpfr_zeta_ui(x, n, MPFR_RNDN);
+        mpfr_zeta_ui_bsplit(y, n, MPFR_RNDN);
 
         if (!mpfr_equal_p(x, y))
         {
             printf("FAIL:\n");
-            printf("Wrong value at prec = %ld\n", 1L << k);
+            printf("Wrong value at n = %ld, prec = %ld\n", n, prec);
+            printf("x:\n");
+            mpfr_out_str(stdout, 10, 0, x, MPFR_RNDN);
+            printf("\n");
+            printf("x:\n");
+            mpfr_out_str(stdout, 10, 0, y, MPFR_RNDN);
+            printf("\n");
             abort();
         }
 
@@ -61,6 +74,7 @@ int main(void)
         mpfr_clear(y);
     }
 
+    flint_randclear(state);
     mpfr_free_cache();
     _fmpz_cleanup();
     printf("PASS\n");

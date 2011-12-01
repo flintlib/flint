@@ -277,4 +277,6 @@ void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 
 void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
 
+void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
+
 #endif
