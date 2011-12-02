@@ -313,6 +313,21 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B);
 
+/*  Derivative  **************************************************************/
+
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
+                               const fmpz_t p);
+ 
+void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
+
+/*  Evaluation  **************************************************************/
+
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len, 
+                                  const fmpz_t a, const fmpz_t p);
+
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
+                                 const fmpz_mod_poly_t poly, const fmpz_t a);
+
 /*  Radix conversion *********************************************************/
 
 typedef struct {

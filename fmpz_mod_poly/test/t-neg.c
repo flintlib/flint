@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2009 William Hart
 
 ******************************************************************************/
@@ -28,7 +29,7 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 int
@@ -44,29 +45,35 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        fmpz_poly_t a, b, c;
+        fmpz_t p;
+        fmpz_mod_poly_t a, b, c;
 
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
+        fmpz_init(p);
+        fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
+        fmpz_add_ui(p, p, 2);
 
-        fmpz_poly_neg(b, a);
-        fmpz_poly_neg(c, b);
+        fmpz_mod_poly_init(a, p);
+        fmpz_mod_poly_init(b, p);
+        fmpz_mod_poly_init(c, p);
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 100));
 
-        result = (fmpz_poly_equal(a, c));
+        fmpz_mod_poly_neg(b, a);
+        fmpz_mod_poly_neg(c, b);
+
+        result = (fmpz_mod_poly_equal(a, c));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
+            fmpz_mod_poly_print(a), printf("\n\n");
+            fmpz_mod_poly_print(b), printf("\n\n");
+            fmpz_mod_poly_print(c), printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
+        fmpz_mod_poly_clear(a);
+        fmpz_mod_poly_clear(b);
+        fmpz_mod_poly_clear(c);
+        fmpz_clear(p);
     }
 
     flint_randclear(state);

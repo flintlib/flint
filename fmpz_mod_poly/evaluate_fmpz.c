@@ -19,18 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
-void
-_fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
-                           const fmpz_t a)
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len, 
+                                  const fmpz_t a, const fmpz_t p)
 {
     if (len == 0)
     {
@@ -38,7 +36,7 @@ _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
     }
     else if (len == 1 || fmpz_is_zero(a))
     {
-        fmpz_set(res, f);
+        fmpz_set(res, poly);
     }
     else
     {
@@ -46,27 +44,37 @@ _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
         fmpz_t t;
 
         fmpz_init(t);
-        fmpz_set(res, f + i);
+        fmpz_set(res, poly + i);
         for (i = len - 2; i >= 0; i--)
         {
             fmpz_mul(t, res, a);
-            fmpz_add(res, f + i, t);
+            fmpz_mod(t, t, p);
+            fmpz_add(res, poly + i, t);
         }
         fmpz_clear(t);
+
+        if (fmpz_cmpabs(res, p) >= 0)
+            fmpz_sub(res, res, p);
     }
 }
 
-void
-fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz_poly_t f, const fmpz_t a)
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
+                                 const fmpz_mod_poly_t poly, const fmpz_t a)
 {
     if (res == a)
     {
         fmpz_t t;
+
         fmpz_init(t);
-        _fmpz_poly_evaluate_horner_fmpz(t, f->coeffs, f->length, a);
+        _fmpz_mod_poly_evaluate_fmpz(t, poly->coeffs, poly->length, 
+                                     a, &(poly->p));
         fmpz_swap(res, t);
         fmpz_clear(t);
     }
     else
-        _fmpz_poly_evaluate_horner_fmpz(res, f->coeffs, f->length, a);
+    {
+        _fmpz_mod_poly_evaluate_fmpz(res, poly->coeffs, poly->length, 
+                                     a, &(poly->p));
+    }
 }
+

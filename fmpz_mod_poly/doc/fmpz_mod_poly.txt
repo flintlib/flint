@@ -350,9 +350,9 @@ void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
                         const fmpz_t p)
 
-    Sets \code{res = poly^e}, assuming that \code{e, len > 0} and that 
-    \code{res} has space for \code{e*(len - 1) + 1} coefficients.  Does 
-    not support aliasing.
+    Sets \code{res = poly^e}, assuming that $e > 1$ and \code{elen > 0}, 
+    and that \code{res} has space for \code{e*(len - 1) + 1} coefficients. 
+    Does not support aliasing.
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 
@@ -522,6 +522,45 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     In general, the greatest common divisor is defined in the polynomial 
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
+
+*******************************************************************************
+
+    Derivative
+
+*******************************************************************************
+
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
+                               const fmpz_t p)
+
+    Sets \code{(res, len - 1)} to the derivative of \code{(poly, len)}.  
+    Also handles the cases where \code{len} is $0$ or $1$ correctly. 
+    Supports aliasing of \code{res} and \code{poly}.
+
+void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+
+    Sets \code{res} to the derivative of \code{poly}.
+
+*******************************************************************************
+
+    Evaluation
+
+*******************************************************************************
+
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len, 
+                                  const fmpz_t a, const fmpz_t p)
+
+    Evaluates the polynomial \code{(poly, len)} at the integer $a$ and sets 
+    \code{res} to the result.  Aliasing between \code{res} and $a$ or any
+    of the coefficients of \code{poly} is not supported.
+
+void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
+                                 const fmpz_mod_poly_t poly, const fmpz_t a)
+
+    Evaluates the polynomial \code{poly} at the integer $a$ and sets 
+    \code{res} to the result.
+
+    As expected, aliasing between \code{res} and $a$ is supported.  However, 
+    \code{res} may not be aliased with a coefficient of \code{poly}.
 
 *******************************************************************************
 

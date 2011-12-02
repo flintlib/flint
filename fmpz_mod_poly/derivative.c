@@ -19,58 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "ulong_extras.h"
+#include "fmpz_mod_poly.h"
 
-int
-main(void)
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
+                               const fmpz_t p)
 {
-    int i, result;
-    flint_rand_t state;
-
-    printf("neg....");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    for (i = 0; i < 10000; i++)
-    {
-        fmpz_poly_t a, b, c;
-
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_init(c);
-        fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
-
-        fmpz_poly_neg(b, a);
-        fmpz_poly_neg(c, b);
-
-        result = (fmpz_poly_equal(a, c));
-        if (!result)
-        {
-            printf("FAIL:\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(b), printf("\n\n");
-            fmpz_poly_print(c), printf("\n\n");
-            abort();
-        }
-
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
-        fmpz_poly_clear(c);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    _fmpz_poly_derivative(res, poly, len);
+    _fmpz_vec_mod_fmpz(res, res, len - 1, p);
 }
+
+void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
+{
+    const long len = poly->length;
+
+    if (len < 2)
+    {
+        fmpz_mod_poly_zero(res);
+    }
+    else
+    {
+        fmpz_mod_poly_fit_length(res, len - 1);
+        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len, &(res->p));
+        _fmpz_mod_poly_set_length(res, len - 1);
+        _fmpz_mod_poly_normalise(res);
+    }
+}
+
