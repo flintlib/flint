@@ -168,6 +168,12 @@ void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2,
 void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, 
                                                long len2, long c, ulong exp);
 
+/*  Vector sum and product  **************************************************/
+
+void _fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len);
+
+void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len);
+
 /*  Gaussian content  ********************************************************/
 
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len);

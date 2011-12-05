@@ -345,6 +345,23 @@ void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1,
 
 *******************************************************************************
 
+    Sums and products
+
+*******************************************************************************
+
+void _fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len)
+
+    Sets \code{res} to the sum of the entries in \code{(vec, len)}.
+    Aliasing of \code{res} with the entries in \code{vec} is not permitted.
+
+void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len)
+
+    Sets \code{res} to the product of the entries in \code{(vec, len)}.
+    Aliasing of \code{res} with the entries in \code{vec} is not permitted.
+    Uses binary splitting.
+
+*******************************************************************************
+
     Gaussian content
 
 *******************************************************************************
