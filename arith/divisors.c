@@ -29,6 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_vec.h"
+#include "fmpz_factor.h"
 #include "arith.h"
 #include "ulong_extras.h"
 
@@ -61,7 +62,8 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 };
 
 
-void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
+void
+_fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
     ulong *exp = malloc(sizeof(ulong) * factors->length);
@@ -115,7 +117,8 @@ void _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 }
 
 
-void _fmpz_divisors_tiny(fmpz_poly_t res, long n)
+void
+_fmpz_divisors_tiny(fmpz_poly_t res, long n)
 {
     long size;
     long i, k;
@@ -136,7 +139,8 @@ void _fmpz_divisors_tiny(fmpz_poly_t res, long n)
     return;
 }
 
-void fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
+void
+fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
 {
     long i, size, m;
     fmpz_factor_t factors;

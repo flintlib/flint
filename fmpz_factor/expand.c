@@ -19,55 +19,17 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
-#include "arith.h"
-#include "ulong_extras.h"
 
-
-void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+void
+fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor)
 {
-    fmpz_factor_t factors;
-    fmpz_t t;
-    ulong exp;
-    long i;
-
-    if (fmpz_sgn(n) <= 0)
-    {
-        fmpz_zero(res);
-        return;
-    }
-
-    if (fmpz_abs_fits_ui(n))
-    {
-        fmpz_set_ui(res, n_euler_phi(fmpz_get_ui(n)));
-        return;
-    }
-
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    fmpz_set_ui(res, 1UL);
-
-    fmpz_init(t);
-    for (i = 0; i < factors->length; i++)
-    {
-        fmpz_sub_ui(t, factors->p + i, 1UL);
-        fmpz_mul(res, res, t);
-        exp = fmpz_get_ui(factors->exp + i);
-        if (exp != 1)
-        {
-            fmpz_pow_ui(t, factors->p + i, exp - 1UL);
-            fmpz_mul(res, res, t);
-        }
-    }
-
-    fmpz_clear(t);
-    fmpz_factor_clear(factors);
+    fmpz_factor_expand_multiexp(n, factor);
 }

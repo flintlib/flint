@@ -28,9 +28,9 @@
 #include <limits.h>
 #include <mpir.h>
 #include "flint.h"
-#include "arith.h"
+#include "fmpz.h"
+#include "fmpz_factor.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
 void check(fmpz_t n)
 {
@@ -41,7 +41,7 @@ void check(fmpz_t n)
     fmpz_init(m);
 
     fmpz_factor(factor, n);
-    fmpz_unfactor(m, factor);
+    fmpz_factor_expand(m, factor);
 
     if (!fmpz_equal(n, m))
     {
@@ -77,7 +77,6 @@ int main(void)
 
     fmpz_init(x);
     mpz_init(y);
-
 
     /* Some corner cases */
     fmpz_set_ui(x, ULONG_MAX);

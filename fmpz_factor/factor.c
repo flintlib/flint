@@ -27,12 +27,12 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "arith.h"
+#include "fmpz_factor.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-
-void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
+void
+fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 {
     ulong exp;
     mp_limb_t p;
@@ -44,7 +44,7 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     if (!COEFF_IS_MPZ(*n))
     {
-        _fmpz_factor_si(factor, *n);
+        fmpz_factor_si(factor, *n);
         return;
     }
 
@@ -68,13 +68,12 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     /* Factor out powers of two */
     xsize = mpn_remove_2exp(xd, xsize, &exp);
-    if (exp)
-    {
+    if (exp != 0)
         _fmpz_factor_append_ui(factor, 2UL, exp);
-    }
 
     trial_start = 1;
     trial_stop = 1000;
+
     while (xsize > 1)
     {
         found = mpn_factor_trial(xd, xsize, trial_start, trial_stop);
@@ -123,9 +122,7 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     /* Any single-limb factor left? */
     if (xd[0] != 1)
-    {
-        _fmpz_factor_extend_factor_n(factor, xd[0]);
-    }
+        _fmpz_factor_extend_factor_ui(factor, xd[0]);
 
     mpz_clear(x);
     return;

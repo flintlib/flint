@@ -19,75 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-/* note: destroys factors! */
 void
-_fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
+_fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
 {
-    long i;
-    fmpz * p;
-    fmpz_t r;
+    long i, len;
+    n_factor_t nfac;
 
-    fmpz_set_ui(res, 1UL);
-
-    if (factors->length == 0)
-        return;
-
-    fmpz_init(r);
-
-    if (k == 0)
+    if (n == 0)
     {
-        for (i = 0; i < factors->length; i++)
-        {
-            fmpz_add_ui(r, factors->exp + i, 1UL);
-            fmpz_mul(res, res, r);
-        }
-        return;
-    }
-    else
-    {
-        for (i = 0; i < factors->length; i++)
-        {
-            p = factors->p + i;
-            fmpz_set(p, factors->p + i);
-            fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1UL);
-            fmpz_sub_ui(r, r, 1UL);
-            fmpz_sub_ui(p, p, 1UL);
-            fmpz_divexact(p, r, p);
-        }
-
-        _fmpz_vec_prod(res, factors->p, factors->length);
-    }
-
-    fmpz_clear(r);
-}
-
-void
-fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
-{
-    fmpz_factor_t factors;
-
-    if (fmpz_is_zero(n))
-    {
-        fmpz_zero(res);
+        _fmpz_factor_set_length(factor, 0);
+        factor->sign = 0;
         return;
     }
 
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    _fmpz_divisor_sigma(res, factors, k);
-    fmpz_factor_clear(factors);
+    n_factor_init(&nfac);
+    n_factor(&nfac, n, 0);
+
+    len = factor->length;
+
+    _fmpz_factor_fit_length(factor, len + nfac.num);
+    _fmpz_factor_set_length(factor, len + nfac.num);
+
+    for (i = 0; i < nfac.num; i++)
+    {
+        fmpz_set_ui(factor->p + len + i, nfac.p[i]);
+        fmpz_set_ui(factor->exp + len + i, nfac.exp[i]);
+    }
 }

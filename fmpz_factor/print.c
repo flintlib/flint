@@ -19,75 +19,48 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
+#include <stdio.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
-#include "arith.h"
-#include "ulong_extras.h"
 
-/* note: destroys factors! */
 void
-_fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
+fmpz_factor_print(const fmpz_factor_t factor)
 {
     long i;
-    fmpz * p;
-    fmpz_t r;
 
-    fmpz_set_ui(res, 1UL);
-
-    if (factors->length == 0)
-        return;
-
-    fmpz_init(r);
-
-    if (k == 0)
+    if (factor->sign == 0)
     {
-        for (i = 0; i < factors->length; i++)
-        {
-            fmpz_add_ui(r, factors->exp + i, 1UL);
-            fmpz_mul(res, res, r);
-        }
+        printf("0");
         return;
     }
-    else
+
+    if (factor->sign == -1)
     {
-        for (i = 0; i < factors->length; i++)
+        if (factor->length)
+            printf("-1 * ");
+        else
+            printf("-1");
+    }
+
+    for (i = 0; i < factor->length; i++)
+    {
+        fmpz_print(factor->p + i);
+
+        if (fmpz_get_ui(factor->exp + i) != 1UL)
         {
-            p = factors->p + i;
-            fmpz_set(p, factors->p + i);
-            fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1UL);
-            fmpz_sub_ui(r, r, 1UL);
-            fmpz_sub_ui(p, p, 1UL);
-            fmpz_divexact(p, r, p);
+            printf("^");
+            fmpz_print(factor->exp + i);
         }
 
-        _fmpz_vec_prod(res, factors->p, factors->length);
+        if (i != factor->length - 1)
+            printf(" * ");
     }
-
-    fmpz_clear(r);
-}
-
-void
-fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
-{
-    fmpz_factor_t factors;
-
-    if (fmpz_is_zero(n))
-    {
-        fmpz_zero(res);
-        return;
-    }
-
-    fmpz_factor_init(factors);
-    fmpz_factor(factors, n);
-    _fmpz_divisor_sigma(res, factors, k);
-    fmpz_factor_clear(factors);
 }

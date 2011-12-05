@@ -35,41 +35,22 @@
 #include "fmpq_poly.h"
 #include "fmpq.h"
 
-typedef struct
-{
-    int sign;
-    fmpz * p;
-    fmpz * exp;
-    long alloc;
-    long length;
-} fmpz_factor_struct;
-
-typedef fmpz_factor_struct fmpz_factor_t[1];
-
-
-void fmpz_factor_init(fmpz_factor_t factor);
-void fmpz_factor_clear(fmpz_factor_t factor);
-void fmpz_factor_print(const fmpz_factor_t factor);
-
-void _fmpz_factor_si(fmpz_factor_t factor, long n);
-void _fmpz_factor_fit_length(fmpz_factor_t factor, long len);
-void _fmpz_factor_append_ui(fmpz_factor_t factor, ulong p, ulong exp);
-void _fmpz_factor_set_length(fmpz_factor_t factor, long newlen);
-void _fmpz_factor_extend_factor_n(fmpz_factor_t factor, ulong n);
-
-void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor);
-
 void fmpz_primorial(fmpz_t res, long n);
+
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
+
 void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n);
+
 void fmpz_divisors(fmpz_poly_t res, const fmpz_t n);
+
 void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 
 int fmpz_moebius_mu(const fmpz_t n);
+
 void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
 
 void _harmonic_number(fmpz_t num, fmpz_t den, long n);
+
 void harmonic_number(fmpq_t x, long n);
 
 /* Stirling numbers **********************************************************/

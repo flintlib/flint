@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
@@ -26,22 +27,23 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "arith.h"
+#include "fmpz_vec.h"
+#include "fmpz_factor.h"
 
-
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
+void
+fmpz_factor_si(fmpz_factor_t factor, long n)
 {
-    long i;
-    fmpz_t tmp;
+    _fmpz_factor_set_length(factor, 0);
 
-    fmpz_set_si(n, factor->sign);
-
-    fmpz_init(tmp);
-    for (i = 0; i < factor->length; i++)
+    if (n < 0)
     {
-        fmpz_pow_ui(tmp, factor->p + i, fmpz_get_ui(factor->exp + i));
-        fmpz_mul(n, n, tmp);
+        _fmpz_factor_extend_factor_ui(factor, -n);
+        factor->sign = -1;
+        return;
     }
-
-    fmpz_clear(tmp);
+    else
+    {
+        factor->sign = 1;
+        _fmpz_factor_extend_factor_ui(factor, n);
+    }
 }
