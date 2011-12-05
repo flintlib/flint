@@ -142,18 +142,21 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j);
 static __inline__ 
 void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong x)
 {
-    if (x)
+    if (x == 0)
+    {
+        fmpz_mod_poly_zero(f);
+    }
+    else
     {
         fmpz_mod_poly_fit_length(f, 1);
         _fmpz_mod_poly_set_length(f, 1);
         fmpz_set_ui(f->coeffs, x);
         fmpz_mod(f->coeffs, f->coeffs, &(f->p));
-    }
-    else
-    {
-        fmpz_mod_poly_zero(f);
+        _fmpz_mod_poly_normalise(f);
     }
 }
+
+void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t poly, const fmpz_t c);
 
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g);
 
@@ -327,6 +330,31 @@ void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len,
 
 void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
                                  const fmpz_mod_poly_t poly, const fmpz_t a);
+
+/*  Composition  *************************************************************/
+
+void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
+                                              const fmpz *poly2, long len2, 
+                                              const fmpz_t p);
+
+void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, 
+                                  const fmpz_mod_poly_t poly1, 
+                                  const fmpz_mod_poly_t poly2);
+
+static __inline__
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, long len1, 
+                                       const fmpz *poly2, long len2, 
+                                       const fmpz_t p)
+{
+    _fmpz_mod_poly_compose_horner(res, poly1, len1, poly2, len2, p);
+}
+
+static __inline__
+void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
+                                                const fmpz_mod_poly_t poly2)
+{
+    fmpz_mod_poly_compose_horner(res, poly1, poly2);
+}
 
 /*  Radix conversion *********************************************************/
 

@@ -155,6 +155,14 @@ void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, long i, long j)
 
 *******************************************************************************
 
+void fmpz_mod_poly_set_ui(fmpz_mod_poly_t f, ulong c)
+
+    Sets the polynomial $f$ to the constant $c$ reduced modulo $p$.
+
+void fmpz_mod_poly_set_fmpz(fmpz_mod_poly_t f, const fmpz_t c)
+
+    Sets the polynomial $f$ to the constant $c$ reduced modulo $p$.
+
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
 
     Sets $f$ to $g$ reduced modulo $p$, where $p$ is the modulus that 
@@ -561,6 +569,61 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
 
     As expected, aliasing between \code{res} and $a$ is supported.  However, 
     \code{res} may not be aliased with a coefficient of \code{poly}.
+
+*******************************************************************************
+
+    Composition
+
+*******************************************************************************
+
+void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
+                                              const fmpz *poly2, long len2, 
+                                              const fmpz_t p)
+
+    Sets \code{res} to the composition of \code{(poly1, len1)} and 
+    \code{(poly2, len2)} using Horner's algorithm.
+
+    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1} 
+    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually 
+    be the length of the resulting polynomial when $p$ is not a prime.  
+
+    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.  
+    Does not support aliasing between any of the inputs and the output.
+
+void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res, 
+                                  const fmpz_mod_poly_t poly1, 
+                                  const fmpz_mod_poly_t poly2)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2} 
+    using Horner's algorithm.
+
+    To be precise about the order of composition, denoting \code{res}, 
+    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
+    sets $f(t) = g(h(t))$.
+
+
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, long len1, 
+                                       const fmpz *poly2, long len2, 
+                                       const fmpz_t p)
+
+    Sets \code{res} to the composition of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}.  
+
+    Assumes that \code{res} has space for \code{(len1-1)*(len2-1) + 1} 
+    coefficients, although in $\mathbf{Z}_p[X]$ this might not actually 
+    be the length of the resulting polynomial when $p$ is not a prime.  
+
+    Assumes that \code{poly1} and \code{poly2} are non-zero polynomials.  
+    Does not support aliasing between any of the inputs and the output.
+
+void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
+                                                const fmpz_mod_poly_t poly2)
+
+    Sets \code{res} to the composition of \code{poly1} and \code{poly2}.  
+
+    To be precise about the order of composition, denoting \code{res}, 
+    \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
+    sets $f(t) = g(h(t))$.
 
 *******************************************************************************
 
