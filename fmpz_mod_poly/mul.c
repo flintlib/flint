@@ -42,6 +42,7 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
+    const long lenr = len1 + len2 - 1;
 
     if ((len1 == 0) || (len2 == 0))
     {
@@ -51,7 +52,7 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res,
 
     if ((res == poly1) || (res == poly2))
     {
-        fmpz *t = calloc(len1 + len2 - 1, sizeof(fmpz));
+        fmpz *t = _fmpz_vec_init(lenr);
 
         if (len1 >= len2)
             _fmpz_mod_poly_mul(t, poly1->coeffs, len1, 
@@ -61,26 +62,23 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res,
                                   poly1->coeffs, len1, &(res->p));
 
         _fmpz_vec_clear(res->coeffs, res->alloc);
-        res->alloc  = len1 + len2 - 1;
-        res->length = len1 + len2 - 1;
+        res->alloc  = lenr;
+        res->length = lenr;
         res->coeffs = t;
-        _fmpz_mod_poly_normalise(res);
     }
     else
     {
-        fmpz_mod_poly_fit_length(res, len1 + len2 - 1);
+        fmpz_mod_poly_fit_length(res, lenr);
     
         if (len1 >= len2)
             _fmpz_mod_poly_mul(res->coeffs, poly1->coeffs, len1, 
                                             poly2->coeffs, len2, &(res->p));
         else
-        {
             _fmpz_mod_poly_mul(res->coeffs, poly2->coeffs, len2, 
                                             poly1->coeffs, len1, &(res->p));
-        }
 
-        _fmpz_mod_poly_set_length(res, len1 + len2 - 1);
-        _fmpz_mod_poly_normalise(res);
+        _fmpz_mod_poly_set_length(res, lenr);
     }
+    _fmpz_mod_poly_normalise(res);
 }
 
