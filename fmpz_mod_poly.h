@@ -341,19 +341,28 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
                                   const fmpz_mod_poly_t poly1, 
                                   const fmpz_mod_poly_t poly2);
 
+void _fmpz_mod_poly_compose_divconquer(fmpz *res, 
+                                       const fmpz *poly1, long len1, 
+                                       const fmpz *poly2, long len2, 
+                                       const fmpz_t p);
+
+void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res, 
+                                  const fmpz_mod_poly_t poly1, 
+                                  const fmpz_mod_poly_t poly2);
+
 static __inline__
 void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, long len1, 
                                        const fmpz *poly2, long len2, 
                                        const fmpz_t p)
 {
-    _fmpz_mod_poly_compose_horner(res, poly1, len1, poly2, len2, p);
+    _fmpz_mod_poly_compose_divconquer(res, poly1, len1, poly2, len2, p);
 }
 
 static __inline__
 void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1, 
                                                 const fmpz_mod_poly_t poly2)
 {
-    fmpz_mod_poly_compose_horner(res, poly1, poly2);
+    fmpz_mod_poly_compose_divconquer(res, poly1, poly2);
 }
 
 /*  Radix conversion *********************************************************/
