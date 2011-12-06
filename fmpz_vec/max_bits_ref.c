@@ -19,56 +19,28 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+long
+_fmpz_vec_max_bits_ref(const fmpz * vec, long len)
 {
-    int i, result;
-    flint_rand_t state;
+    long i, bits, max_bits = 0, sign = 1;
 
-    printf("max_bits....");
-    fflush(stdout);
-
-    flint_randinit(state);
-
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < len; i++)
     {
-        fmpz *a;
-        long len, bits, bits2, bits3;
-
-        len = n_randint(state, 100);
-
-        a = _fmpz_vec_init(len);
-        bits = n_randint(state, 200);
-        _fmpz_vec_randtest(a, state, len, bits);
-
-        bits2 = _fmpz_vec_max_bits(a, len);
-        bits3 = _fmpz_vec_max_bits_ref(a, len);
-
-        result = (bits >= FLINT_ABS(bits2) && bits2 == bits3);
-        if (!result)
-        {
-            printf("FAIL:\n");
-            printf("bits = %ld, bits2 = %ld bits3 = %ld\n", bits, bits2, bits3);
-            abort();
-        }
-
-        _fmpz_vec_clear(a, len);
+        bits = fmpz_bits(vec + i);
+        if (bits > max_bits)
+            max_bits = bits;
+        if (fmpz_sgn(vec + i) < 0)
+            sign = -1L;
     }
 
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+    return max_bits * sign;
 }

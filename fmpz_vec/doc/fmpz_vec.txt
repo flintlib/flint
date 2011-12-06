@@ -68,6 +68,13 @@ long _fmpz_vec_max_bits(const fmpz * vec, long len)
     coefficient of \code{vec}, then if any coefficient of \code{vec} is 
     negative, $-b$ is returned, else $b$ is returned.
 
+long _fmpz_vec_max_bits_ref(const fmpz * vec, long len)
+
+    If $b$ is the maximum number of bits of the absolute value of any 
+    coefficient of \code{vec}, then if any coefficient of \code{vec} is 
+    negative, $-b$ is returned, else $b$ is returned.
+    This is a slower reference implementation of \code{_fmpz_vec_max_bits}.
+
 ulong _fmpz_vec_max_limbs(const fmpz * vec, long len)
 
     Returns the maximum number of limbs needed to store the absolute value 
