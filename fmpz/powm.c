@@ -44,27 +44,38 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
     {
         if (!COEFF_IS_MPZ(*m))  /* m is small */
         {
-            ulong g2 = fmpz_fdiv_ui(g, *m);
-            ulong e2 = fmpz_fdiv_ui(e, n_euler_phi(*m));
+            ulong g1 = fmpz_fdiv_ui(g, *m);
+            mpz_t g2, m2;
+            __mpz_struct *mpz_ptr;
 
-            fmpz_set_ui(f, n_powmod(g2, e2, *m));
+            mpz_init_set_ui(g2, g1);
+            mpz_init_set_ui(m2, *m);
+            mpz_ptr = _fmpz_promote(f);
+
+            mpz_powm(mpz_ptr, g2, COEFF_TO_PTR(*e), m2);
+
+            mpz_clear(g2);
+            mpz_clear(m2);
+            _fmpz_demote_val(f);
         }
         else  /* m is large */
         {
             if (!COEFF_IS_MPZ(*g))  /* g is small */
             {
-                __mpz_struct * mpz_ptr;
                 mpz_t g2;
+                __mpz_struct *mpz_ptr;
 
                 mpz_init_set_si(g2, *g);
                 mpz_ptr = _fmpz_promote(f);
+
                 mpz_powm(mpz_ptr, g2, COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));
+
                 mpz_clear(g2);
                 _fmpz_demote_val(f);
             }
             else  /* g is large */
             {
-                __mpz_struct * mpz_ptr = _fmpz_promote(f);
+                __mpz_struct *mpz_ptr = _fmpz_promote(f);
 
                 mpz_powm(mpz_ptr, 
                     COEFF_TO_PTR(*g), COEFF_TO_PTR(*e), COEFF_TO_PTR(*m));

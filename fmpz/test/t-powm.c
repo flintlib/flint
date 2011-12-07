@@ -78,8 +78,8 @@ main(void)
         result = (mpz_cmp(e, f) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            gmp_printf("d = %Zd, e = %Zd, f = %Zd, x = %Zd, m = %Zd\n", d, e, f, y, m);
+            printf("FAIL (cmp f with MPIR e := d^y mod m):\n");
+            gmp_printf("d = %Zd, e = %Zd, f = %Zd, y = %Zd, m = %Zd\n", d, e, f, y, m);
             abort();
         }
 
@@ -117,7 +117,7 @@ main(void)
         result = (fmpz_equal(a, b));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias a and b):\n");
             printf("a = "), fmpz_print(a), printf("\n");
             printf("b = "), fmpz_print(b), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
@@ -153,7 +153,7 @@ main(void)
         result = (fmpz_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias a and c):\n");
             printf("a = "), fmpz_print(a), printf("\n");
             printf("b = "), fmpz_print(b), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
@@ -187,7 +187,7 @@ main(void)
         result = (fmpz_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (alias a and b,c):\n");
             printf("a = "), fmpz_print(a), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
             printf("n = "), fmpz_print(n), printf("\n");
@@ -204,3 +204,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+
