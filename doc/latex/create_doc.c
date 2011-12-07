@@ -41,6 +41,7 @@ static char * docsin[] = {
     "../../nmod_vec/doc/nmod_vec.txt",
     "../../nmod_mat/doc/nmod_mat.txt",
     "../../nmod_poly/doc/nmod_poly.txt",
+    "../../fmpz_mod_poly/doc/fmpz_mod_poly.txt",
     "../../padic/doc/padic.txt", 
     "../../arith/doc/arith.txt", 
     "../../ulong_extras/doc/ulong_extras.txt",
@@ -63,6 +64,7 @@ static char * docsout[] = {
     "input/nmod_vec.tex",
     "input/nmod_mat.tex",
     "input/nmod_poly.tex",
+    "input/fmpz_mod_poly.tex",
     "input/padic.tex", 
     "input/arith.tex", 
     "input/ulong_extras.tex",
@@ -298,7 +300,7 @@ static void processfile(void)
             if (n == 0)
                 NEXTSTATE(1);
             if (n > 4 && (buf[0] == ' ' && buf[1] == ' ' && buf[2] == ' ' 
-                                        && buf[3] == ' ' && isalpha(buf[4])))
+                                        && buf[3] == ' ' && (isalpha(buf[4]) || buf[4] == '_')))
             {
                 strncpy(grp, buf + 4, n - 4);
                 grp[n - 4] = '\0';
@@ -383,7 +385,7 @@ static void processfile(void)
                     NEXTSTATE(1);
                 }
             }
-            if (isalpha(buf[0]))
+            if (isalpha(buf[0]) || buf[0] == '_')
                 NEXTSTATE(5a);
         }
         NEXTSTATE(eof);
@@ -494,7 +496,7 @@ static void processfile(void)
                 open_description();
                 NEXTSTATE(9);
             }
-            if (isalpha(buf[0]))
+            if (isalpha(buf[0]) || buf[0] == '_')
                 NEXTSTATE(5a);
             NEXTSTATE(pe);
         }
@@ -526,7 +528,7 @@ static void processfile(void)
                 if (i == n)
                     NEXTSTATE(1);
             }
-            if (isalpha(buf[0]))
+            if (isalpha(buf[0]) || buf[0] == '_')
                 NEXTSTATE(5a);
             NEXTSTATE(pe);
         }
