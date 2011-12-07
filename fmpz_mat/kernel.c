@@ -43,20 +43,19 @@ fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat)
     n = mat->c;
 
     fmpz_mat_init_set(tmp, mat);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, ROWREDUCE_FULL);
-    rank = FLINT_ABS(rank);
+    fmpz_init(den);
+
+    rank = fmpz_mat_rref(tmp, den, NULL, mat);
     nullity = n - rank;
 
     fmpz_mat_zero(res);
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            fmpz_set_ui(res->rows[i] + i, 1UL);
+            fmpz_set_ui(res->rows[i] + i, 1);
     }
     else if (nullity)
     {
-        fmpz_init(den);
-
         pivots = malloc(rank * sizeof(long));
         nonpivots = malloc(nullity * sizeof(long));
 
@@ -89,9 +88,10 @@ fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat)
 
         free(pivots);
         free(nonpivots);
-        fmpz_clear(den);
     }
 
+    fmpz_clear(den);
     fmpz_mat_clear(tmp);
+
     return nullity;
 }

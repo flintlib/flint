@@ -102,10 +102,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
         for (i = 0; i < n; i++)
             fmpz_set(fmpz_mat_entry(I, i, i), den + i);
 
-        /* TODO: use other solve algorithm or fmpz_mat_inv? */
-        fmpz_mat_solve_mat(Bclear, den, Aclear, I);
-        success = !fmpz_is_zero(den);
-
+        success = fmpz_mat_solve(Bclear, den, Aclear, I);
         if (success)
             fmpq_mat_set_fmpz_mat_div_fmpz(B, Bclear, den);
 

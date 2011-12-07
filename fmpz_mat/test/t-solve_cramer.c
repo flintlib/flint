@@ -42,14 +42,14 @@ main(void)
     long i, m, n, r;
     int success;
 
-    printf("solve....");
+    printf("solve_cramer....");
     fflush(stdout);
 
     flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        m = n_randint(state, 10);
+        m = n_randint(state, 4);
         n = n_randint(state, 10);
 
         fmpz_mat_init(A, m, m);
@@ -65,7 +65,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
-        success = fmpz_mat_solve(X, den, A, B);
+        success = fmpz_mat_solve_cramer(X, den, A, B);
 
         fmpz_mat_mul(AX, A, X);
         fmpz_mat_scalar_divexact_fmpz(AX, AX, den);
@@ -92,7 +92,7 @@ main(void)
     /* Test singular systems */
     for (i = 0; i < 10000; i++)
     {
-        m = 1 + n_randint(state, 10);
+        m = 1 + n_randint(state, 3);
         n = 1 + n_randint(state, 10);
         r = n_randint(state, m);
 
@@ -109,7 +109,7 @@ main(void)
         if (n_randint(state, 2))
             fmpz_mat_randops(A, state, 1+n_randint(state, 1 + m*m));
 
-        success = fmpz_mat_solve(X, den, A, B);
+        success = fmpz_mat_solve_cramer(X, den, A, B);
 
         if (!fmpz_is_zero(den) || success)
         {

@@ -92,14 +92,8 @@ nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
 
         for (j = pivot_row + 1; j < m; j++)
         {
-            if (j == pivot_row)
-                continue;
-
             for (k = pivot_col + 1; k < n; k++)
             {
-                if (k == pivot_col)
-                    continue;
-
                 nmod_poly_mul(E(j, k), E(j, k), E(pivot_row, pivot_col));
                 nmod_poly_mul(t, E(j, pivot_col), E(pivot_row, k));
                 nmod_poly_sub(E(j, k), E(j, k), t);

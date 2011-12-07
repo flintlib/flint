@@ -28,24 +28,20 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
+#include "perm.h"
 
 void
 _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    long rank;
+    long *perm, n = fmpz_mat_nrows(tmp);
+    perm = _perm_init(n);
 
-    rank = _fmpz_mat_rowreduce(NULL, tmp, ROWREDUCE_FAST_ABORT);
+    fmpz_mat_fflu(tmp, det, perm, tmp, 1);
 
-    if (FLINT_ABS(rank) == tmp->r)
-    {
-        if (rank < 0)
-            fmpz_neg(det, tmp->rows[-rank-1] + (-rank-1));
-        else
-            fmpz_set(det, tmp->rows[rank-1] + (rank-1));
-    }
-    else
-        fmpz_zero(det);
+    if (_perm_parity(perm, n) == 1)
+        fmpz_neg(det, det);
+
+    _perm_clear(perm);
 }
 
 void

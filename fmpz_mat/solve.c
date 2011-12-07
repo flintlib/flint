@@ -19,26 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "perm.h"
 
-
-void
-fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
+int
+fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
+                    const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long dim = A->r;
-
-    FMPZ_MAT_ASSERT(dim == A->c, "fmpz_mat_solve: matrix must be square");
-
-    if (dim <= 3)
-        fmpz_mat_solve_cramer(x, den, A, b);
+    if (fmpz_mat_nrows(A) <= 3)
+        return fmpz_mat_solve_cramer(X, den, A, B);
     else
-        fmpz_mat_solve_fraction_free_LU(x, den, A, b);
+        return fmpz_mat_solve_fflu(X, den, A, B);
 }

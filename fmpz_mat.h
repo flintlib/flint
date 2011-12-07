@@ -164,14 +164,38 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 
-/* Gaussian elimination */
+/* Permutations */
 
-int fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c);
+static __inline__ void
+fmpz_mat_swap_rows(fmpz_mat_t mat, long * perm, long r, long s)
+{
+    if (r != s)
+    {
+        fmpz * u;
+        long t;
 
-long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options);
+        if (perm)
+        {
+            t = perm[s];
+            perm[s] = perm[r];
+            perm[r] = t;
+        }
 
-long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B,
-    fmpz_t den, const fmpz_mat_t A);
+        u = mat->rows[s];
+        mat->rows[s] = mat->rows[r];
+        mat->rows[r] = u; 
+    }
+}
+
+/* Gaussian elimination *****************************************************/
+
+long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+                                    long start_row, long end_row, long c);
+
+long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
+                            const fmpz_mat_t A, int rank_check);
+
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A);
 
 /* Determinant **************************************************************/
 
@@ -195,56 +219,51 @@ void fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 void fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A);
 void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A);
 
-/* Rank */
+/* Rank *********************************************************************/
 
 long fmpz_mat_rank(const fmpz_mat_t A);
 
-/* Nonsingular solving */
+/* Nonsingular solving ******************************************************/
 
-void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A, const fmpz_mat_t B);
+void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
+        const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
-void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
-void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b);
-void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU);
+int fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
+        const fmpz_mat_t A, const fmpz_mat_t B);
 
-void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
+        const fmpz_mat_t A, const fmpz_mat_t B);
 
-int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod, const fmpz_mat_t A, const fmpz_mat_t B);
+int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
+        const fmpz_mat_t A, const fmpz_mat_t B);
 
-/* Kernel */
+void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const long * perm,
+        const fmpz_mat_t FFLU, const fmpz_mat_t B);
+
+int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
+        const fmpz_mat_t A, const fmpz_mat_t B);
+
+/* Kernel *******************************************************************/
 
 long fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat);
 
-/* Inverse */
+/* Inverse ******************************************************************/
 
-void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
+int fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
-/* Modular reduction and reconstruction  ************************************/
+/* Modular reduction and reconstruction *************************************/
 
 void fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod);
+
 void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod);
 
 void fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A);
 
-void
-fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
+void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2);
 
-void
-fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
+void fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
                             const fmpz_t m1, const nmod_mat_t mat2);
-
-
-#define FMPZ_MAT_ASSERT(expr, msg)       \
-    if (1)                               \
-    {                                    \
-        if (!(expr))                     \
-        {                                \
-            printf(msg);                 \
-            abort();                     \
-        }                                \
-    }                                    \
 
 #endif
 

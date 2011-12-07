@@ -34,13 +34,19 @@ long
 fmpz_mat_rank(const fmpz_mat_t A)
 {
     fmpz_mat_t tmp;
+    fmpz_t den;
     long rank;
 
     if (fmpz_mat_is_empty(A))
         return 0;
 
     fmpz_mat_init_set(tmp, A);
-    rank = _fmpz_mat_rowreduce(NULL, tmp, 0);
+    fmpz_init(den);
+
+    rank = fmpz_mat_fflu(tmp, den, NULL, tmp, 0);
+
     fmpz_mat_clear(tmp);
-    return FLINT_ABS(rank);
+    fmpz_clear(den);
+
+    return rank;
 }

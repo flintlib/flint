@@ -21,7 +21,7 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2010 Andy Novocin
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2010-2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -39,6 +39,47 @@ void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
 void fmpz_mat_clear(fmpz_mat_t mat)
 
     Clears the given matrix.
+
+*******************************************************************************
+
+    Basic assignment and manipulation
+
+*******************************************************************************
+
+void fmpz_mat_set(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+    Sets \code{mat1} to a copy of \code{mat2}. The dimensions of 
+    \code{mat1} and \code{mat2} must be the same.
+
+void fmpz_mat_init_set(fmpz_mat_t mat, fmpz_mat_t src)
+
+    Initialises the matrix \code{mat} to the same size as \code{src} and 
+    sets it to a copy of \code{src}.
+
+void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
+
+    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
+    are allowed to be different.
+
+fmpz * fmpz_mat_entry(fmpz_mat_t mat, long i, long j)
+
+    Returns a reference to the entry of \code{mat} at row $i$ and column $j$.
+    This reference can be passed as an input or output variable to any
+    function in the \code{fmpz} module for direct manipulation.
+
+    Both $i$ and $j$ must not exceed the dimensions of the matrix.
+
+    This function is implemented as a macro.
+
+void fmpz_mat_zero(fmpz_mat_t mat)
+
+    Sets all entries of \code{mat} to 0.
+
+void fmpz_mat_one(fmpz_mat_t mat)
+
+    Sets \code{mat} to the unit matrix, having ones on the main diagonal
+    and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
+    truncation of a unit matrix.
 
 
 *******************************************************************************
@@ -158,47 +199,6 @@ void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
     distinct rows and columns will be performed. This leaves the rank
     (and for square matrices, the determinant) unchanged.
 
-
-*******************************************************************************
-
-    Basic assignment and manipulation
-
-*******************************************************************************
-
-void fmpz_mat_set(fmpz_mat_t mat1, fmpz_mat_t mat2)
-
-    Sets \code{mat1} to a copy of \code{mat2}. The dimensions of 
-    \code{mat1} and \code{mat2} must be the same.
-
-void fmpz_mat_init_set(fmpz_mat_t mat, fmpz_mat_t src)
-
-    Initialises the matrix \code{mat} to the same size as \code{src} and 
-    sets it to a copy of \code{src}.
-
-void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
-
-    Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
-    are allowed to be different.
-
-fmpz * fmpz_mat_entry(fmpz_mat_t mat, long i, long j)
-
-    Returns a reference to the entry of \code{mat} at row $i$ and column $j$.
-    This reference can be passed as an input or output variable to any
-    function in the \code{fmpz} module for direct manipulation.
-
-    Both $i$ and $j$ must not exceed the dimensions of the matrix.
-
-    This function is implemented as a macro.
-
-void fmpz_mat_zero(fmpz_mat_t mat)
-
-    Sets all entries of \code{mat} to 0.
-
-void fmpz_mat_one(fmpz_mat_t mat)
-
-    Sets \code{mat} to the unit matrix, having ones on the main diagonal
-    and zeroes elsewhere. If \code{mat} is nonsquare, it is set to the
-    truncation of a unit matrix.
 
 *******************************************************************************
 
@@ -447,16 +447,18 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
 
 *******************************************************************************
 
-void fmpz_mat_inv(fmpz_mat_t B, fmpz_t d, const fmpz_mat_t A)
+int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
 
-    Sets \code{(B, d)} to the inverse matrix of the square matrix $A$,
-    i.e.\ computes an integer matrix $B$ and an integer $d$ such
-    that $A B = B A = d I$, the identity matrix.
+    Sets (\code{Ainv}, \code{den}) to the inverse matrix of \code{A}.
+    Returns 1 if \code{A} is nonsingular and 0 if \code{A} is singular.
+    Aliasing of \code{Ainv} and \code{A} is allowed.
 
-    If $A$ is singular, $d$ will be set to zero and the value of 
-    $B$ will be undefined.
-    In general, \code{(B, d)} will not be reduced to lowest terms.
-    $A$ and $B$ are allowed to be the same object.
+    The denominator is not guaranteed to be minimal, but is guaranteed
+    to be a divisor of the determinant of \code{A}.
+
+    This function uses a direct formula for matrices of size two or less,
+    and otherwise solves for the identity matrix using
+    fraction-free LU decomposition.
 
 
 *******************************************************************************
@@ -566,61 +568,63 @@ long fmpz_mat_rank(const fmpz_mat_t A)
 
     Nonsingular solving
 
-    The following functions allow solving matrix-vector equations
-    $Ax = b$ or matrix-matrix equations $AX = B$ where the system
-    matrix $A$ is square and has full rank. The solving is implicitly
-    done over the field of rational numbers: all functions compute an
-    integer vector or matrix $\hat x$ and a separate denominator
-    $d$ (\code{den}) such that $A(\hat x/d) = b$, or equivalently
-    such that $A\hat x = bd$ holds over the integers.
+    The following functions allow solving matrix-matrix equations $AX = B$
+    where the system matrix $A$ is square and has full rank. The solving
+    is implicitly done over the field of rational numbers: except
+    where otherwise noted, an integer matrix $\hat X$ and a separate
+    denominator $d$ (\code{den}) are computed such that $A(\hat X/d) = b$,
+    equivalently such that $A\hat X = bd$ holds over the integers.
 
     No guarantee is made that the numerators and denominator
-    are reduced to lowest terms. If $A$ is singular, \code{den} will be
-    set to zero and the elements of the solution vector or matrix will
-    have undefined values. No aliasing is allowed between arguments.
+    are reduced to lowest terms, but the denominator is always guaranteed
+    to be a divisor of the determinant of $A$. If $A$ is singular,
+    \code{den} will be set to zero and the elements of the solution
+    vector or matrix will have undefined values. No aliasing is
+    allowed between arguments.
 
 *******************************************************************************
 
-void fmpz_mat_solve(fmpz * x, fmpz_t den, const fmpz_mat_t A, const fmpz * b)
+int fmpz_mat_solve(fmpz_mat_t X, fmpz_t den,
+                    const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves the matrix-vector equation $Ax = b$ where $A$ is a nonsingular
-    square matrix of size $m$ and $b$ is an integer vector of length $m$.
-    This function calls \code{fmpz_mat_solve_cramer} for small
-    matrices and \code{fmpz_mat_solve_fraction_free_LU} otherwise.
+    Solves the equation $AX = B$ for nonsingular $A$. More precisely, computes
+    (\code{X}, \code{den}) such that $AX = B \times \operatorname{den}$.
+    Returns 1 if $A$ is nonsingular and 0 if $A$ is singular.
+    The computed denominator will not generally be minimal.
 
-void fmpz_mat_solve_cramer(fmpz * x, fmpz_t den, const fmpz_mat_t A,
-    const fmpz * b)
+    This function uses Cramer's rule for small systems and
+    fraction-free LU decomposition followed by fraction-free forward
+    and back substitution for larger systems.
 
-    Solves the matrix-vector equation $Ax = b$ using Cramer's rule.
-    Only systems of size up to $3 \times 3$ are allowed.
+    Note that for very large systems, it is faster to compute a modular
+    solution using \code{fmpz_mat_solve_dixon}.
 
-void fmpz_mat_solve_fraction_free_LU(fmpz * x, fmpz_t den, const fmpz_mat_t A,
-    const fmpz * b)
+int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
+                            const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves the matrix-vector equation $Ax = b$ by computing a fraction-free
-    LU decomposition of $A$ and then solving the triangular systems
-    $Ly = b$, $Ux = y$ using fraction-free forward and backward
-    substitution.
+    Solves the equation $AX = B$ for nonsingular $A$. More precisely, computes
+    (\code{X}, \code{den}) such that $AX = B \times \operatorname{den}$.
+    Returns 1 if $A$ is nonsingular and 0 if $A$ is singular.
+    The computed denominator will not generally be minimal.
 
-void fmpz_mat_solve_mat(fmpz_mat_t X, fmpz_t den, 
-    const fmpz_mat_t A, const fmpz_mat_t B)
+    Uses fraction-free LU decomposition followed by fraction-free
+    forward and back substitution.
 
-    Solves $AX = B$ for the $m$-by-$n$ matrix $X$, where $A$ is an
-    $m$-by-$m$ integer matrix and $B$ is an $m$-by-$n$ integer matrix.
-    Equivalently, solves $Ax = b$ for each respective column vector
-    $x$ in $X$ and $b$ in $B$.
+void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
+                    const long * perm,
+                    const fmpz_mat_t FFLU, const fmpz_mat_t B)
 
-    This function computes a fraction-free LU decomposition of $A$
-    and reuses the LU decomposition to solve the column equations
-    one by one.
+    Performs fraction-free forward and back substitution given a precomputed
+    fraction-free LU decomposition and corresponding permutation.
 
-void _fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
+int fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
+                            const fmpz_mat_t A, const fmpz_mat_t B)
 
-    Solves the numerator part of the matrix-vector equation $Ax = b$, given
-    a precomputed fraction-free LU decomposition of $A$. \code{b} is
-    overwritten with the solution vector in-place. If the rows of the
-    system matrix were permuted during the LU decomposition, replace
-    \code{b[i]} with \code{b[perm[i]]} in the input.
+    Solves the equation $AX = B$ for nonsingular $A$. More precisely, computes
+    (\code{X}, \code{den}) such that $AX = B \times \operatorname{den}$.
+    Returns 1 if $A$ is nonsingular and 0 if $A$ is singular.
+
+    Uses Cramer's rule. Only systems of size up to $3 \times 3$ are allowed.
 
 void fmpz_mat_solve_bound(fmpz_t N, fmpz_t D, const fmpz_mat_t A,
     const fmpz_mat_t B)
@@ -650,6 +654,65 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
 
     Aliasing between input and output matrices is allowed.
 
+*******************************************************************************
+
+    Row reduction
+
+*******************************************************************************
+
+long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+                                    long start_row, long end_row, long c)
+
+    Attempts to find a pivot entry for row reduction.
+    Returns a row index $r$ between \code{start_row} (inclusive) and
+    \code{stop_row} (exclusive) such that column $c$ in \code{mat} has
+    a nonzero entry on row $r$, or returns -1 if no such entry exists.
+
+    This implementation simply chooses the first nonzero entry from
+    it encounters. This is likely to be a nearly optimal choice if all
+    entries in the matrix have roughly the same size, but can lead to
+    unnecessary coefficient growth if the entries vary in size.
+
+long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
+                            const fmpz_mat_t A, int rank_check)
+
+    Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
+    fraction-free LU decomposition of \code{A} and returns the
+    rank of \code{A}. Aliasing of \code{A} and \code{B} is allowed.
+
+    Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.
+    If \code{perm} is non-\code{NULL}, the permutation of
+    rows in the matrix will also be applied to \code{perm}.
+
+    If \code{rank_check} is set, the function aborts and returns 0 if the
+    matrix is detected not to have full rank without completing the
+    elimination.
+
+    The denominator \code{den} is set to $\pm \operatorname{det}(S)$ where
+    $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square)
+    and the sign is decided by the parity of the permutation. Note that the
+    determinant is not generally the minimal denominator.
+
+    The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
+
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den, long * perm,
+                            const fmpz_mat_t A)
+
+    Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
+    to the reduced row echelon form of \code{A} and returns the
+    rank of \code{A}. Aliasing of \code{A} and \code{B} is allowed.
+
+    Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.
+    If \code{perm} is non-\code{NULL}, the permutation of
+    rows in the matrix will also be applied to \code{perm}.
+
+    The denominator \code{den} is set to $\pm \operatorname{det}(S)$ where
+    $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square)
+    and the sign is decided by the parity of the permutation. Note that the
+    determinant is not generally the minimal denominator.
+
+    The fraction-free Gauss-Jordan algorithm is given
+    in \citep{NakTurWil1997}.
 
 *******************************************************************************
 
@@ -694,72 +757,3 @@ long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B, fmpz_t den,
     The denominator will always be a divisor of the determinant of (some
     submatrix of) $A$, but is not guaranteed to be minimal or canonical in
     any other sense.
-
-
-*******************************************************************************
-
-    Internal functions for row reduction
-
-*******************************************************************************
-
-int fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c)
-
-    Helper function for row reduction. Returns 1 if the entry of \code{mat}
-    at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero
-    entry in the same column among rows $r+1, r+2, \ldots$. If a nonzero
-    entry is found at row $s$, swaps rows $r$ and $s$ and the corresponding
-    entries in \code{perm} (unless \code{NULL}) and returns -1. If no
-    nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
-
-long _fmpz_mat_rowreduce(long * perm, fmpz_mat_t mat, int options)
-
-    Row reduces the matrix in-place using fraction-free Gaussian
-    elimination. The number of rows $m$ and columns $n$ may be arbitrary.
-
-    This function effectively implements the algorithms FFGE, FFGJ and FFLU
-    given in~\citep{NakTurWil1997}, but with pivoting. The \code{options} 
-    parameter is a bitfield which may be set to any combination of the 
-    following flags; use \code{options = 0} to disable all, resulting in FFLU:
-
-    \begin{itemize}
-    \item \code{ROWREDUCE_FAST_ABORT}
-
-        If set, the function immediately aborts and returns $0$ when (if) the
-        matrix is detected to be rank-deficient (singular). In this event,
-        the state of the matrix will be undefined.
-
-    \item \code{ROWREDUCE_FULL}
-
-        If set, performs fraction-free Gauss-Jordan elimination (FFGJ), 
-        i.e.\ eliminates the elements above each pivot element as well as 
-        those below. If not set, regular Gaussian elimination is performed 
-        and only the elements below pivots are eliminated.
-
-    \item \code{ROWREDUCE_CLEAR_LOWER}
-
-        If set, clears (i.e.\ zeros) elements below the pivots (FFGE). If not
-        set, the output becomes the fraction-free $LU$ decomposition of the
-        matrix with $L$ in the lower triangular part.
-
-    \end{itemize}
-
-    Pivoting (to avoid division by zero entries) is performed by permuting
-    the vector of row pointers in-place. The matrix entries themselves
-    retain their original order in memory.
-
-    The permutation order will also be written to \code{perm} unless this
-    argument is \code{NULL}. That is, row \code{i} of the output matrix will
-    correspond to row \code{perm[i]} of the input matrix.
-
-    The return value $r$ is the rank of the matrix, multiplied by a sign
-    indicating the parity of row interchanges. If $r = 0$, the matrix has rank
-    zero, unless \code{ROWREDUCE_FAST_ABORT} is set, in which case $r = 0$ 
-    indicates any deficient rank. Otherwise, the leading nonzero entries of
-    $a[0], a[1], \dotsc, a[\abs{r}-1]$ will point to the successive pivot 
-    elements. If $\abs{r} = m = n$, the determinant of the matrix is given 
-    by $\sgn(r) \times a\bigl[\abs{r}-1\bigr]\bigl[\abs{r}-1\bigr]$.
-
-    % George C.\ Nakos, Peter R.\ Turner and Robert M.\ Williams,
-    % ``Fraction-Free Algorithms for Linear and Polynomial Equations'',
-    % ACM SIGSAM Bull. 31, 3 (Sep. 1997), 11-19
-

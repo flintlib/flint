@@ -19,40 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010,2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-
-void
-_fmpz_mat_solve_fraction_free_LU_precomp(fmpz * b, const fmpz_mat_t LU)
+long
+fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+                                    long start_row, long end_row, long c)
 {
-    long i, j, n;
-    fmpz ** a = LU->rows;
-    n = LU->r;
+    long r;
 
-    for (i = 0; i < n - 1; i++)
+    for (r = start_row; r < end_row; r++)
     {
-        for (j = i + 1; j < n; j++)
-        {
-            fmpz_mul(b + j, b + j, a[i] + i);
-            fmpz_submul(b + j, a[j] + i, b + i);
-            if (i > 0)
-                fmpz_divexact(b + j, b + j, a[i-1] + (i-1));
-        }
+        if (!fmpz_is_zero(fmpz_mat_entry(mat, r, c)))
+            return r;
     }
 
-    for (i = n - 2; i >= 0; i--)
-    {
-        fmpz_mul(b + i, b + i, a[n-1] + (n-1));
-        for (j = i + 1; j < n; j++)
-            fmpz_submul(b + i, b + j, a[i] + j);
-        fmpz_divexact(b + i, b + i, a[i] + i);
-    }
+    return -1;
 }

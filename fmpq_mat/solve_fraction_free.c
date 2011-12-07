@@ -47,15 +47,10 @@ fmpq_mat_solve_fraction_free(fmpq_mat_t X, const fmpq_mat_t A,
     fmpz_init(den);
 
     fmpq_mat_get_fmpz_mat_rowwise_2(Anum, Bnum, NULL, A, B);
-    fmpz_mat_solve_mat(Xnum, den, Anum, Bnum);
+    success = fmpz_mat_solve(Xnum, den, Anum, Bnum);
 
-    /* TODO: improve interface of fmpz_mat_solve_mat to allow just catching
-            the return value*/
-    success = !fmpz_is_zero(den);
     if (success)
         fmpq_mat_set_fmpz_mat_div_fmpz(X, Xnum, den);
-    else if ((A->r == 0) || (B->c == 0))
-        success = 1;
 
     fmpz_mat_clear(Anum);
     fmpz_mat_clear(Bnum);

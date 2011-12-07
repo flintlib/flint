@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010-2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -29,9 +29,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-
-
-void _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
+void
+_fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
 {
     fmpz_t tmp;
 
@@ -47,37 +46,38 @@ void _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
     fmpz_clear(tmp);
 }
 
-void fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+int
+fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 {
-    fmpz_mat_t I;
-    long i, dim;
+    long dim = A->r;
 
-    dim = A->r;
-
-    FMPZ_MAT_ASSERT(dim == A->c,
-        "fmpz_mat_inv: matrix must be square");
-    FMPZ_MAT_ASSERT(B->r == A->r,
-        "fmpz_mat_inv: output must have same size as input");
-    FMPZ_MAT_ASSERT(B->c == A->c,
-        "fmpz_mat_inv: output must have same size as input");
-
-    switch (dim)
+    if (dim == 0)
     {
-        case 0:
-            fmpz_set_ui(den, 1UL);
-            break;
-        case 1:
-            fmpz_set(den, A->entries);
-            fmpz_set_ui(B->entries, 1UL);
-            break;
-        case 2:
-            _fmpz_mat_inv_2x2(B->rows, den, A->rows);
-            break;
-        default:
-            fmpz_mat_init(I, dim, dim);
-            for (i = 0; i < dim; i++)
-                fmpz_set_ui(I->rows[i] + i, 1UL);
-            fmpz_mat_solve_mat(B, den, A, I);
-            fmpz_mat_clear(I);
+        fmpz_set_ui(den, 1);
+        return 1;
+    }
+    else if (dim == 1)
+    {
+        fmpz_set(den, A->entries);
+        fmpz_set_ui(B->entries, 1);
+        return !fmpz_is_zero(den);
+    }
+    else if (dim == 2)
+    {
+        _fmpz_mat_inv_2x2(B->rows, den, A->rows);
+        return !fmpz_is_zero(den);
+    }
+    else
+    {
+        fmpz_mat_t I;
+        long i;
+        int success;
+
+        fmpz_mat_init(I, dim, dim);
+        for (i = 0; i < dim; i++)
+            fmpz_set_ui(fmpz_mat_entry(I, i, i), 1);
+        success = fmpz_mat_solve_fflu(B, den, A, I);
+        fmpz_mat_clear(I);
+        return success;
     }
 }

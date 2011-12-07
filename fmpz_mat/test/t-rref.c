@@ -32,7 +32,7 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-void check_row_echelon_form(long * perm, fmpz_mat_t A)
+void check_rref(long * perm, fmpz_mat_t A)
 {
     long i, j, prev_pivot, prev_row_zero;
 
@@ -72,14 +72,17 @@ int
 main(void)
 {
     fmpz_mat_t A;
+    fmpz_t den;
     flint_rand_t state;
     long i, m, n, b, d, r, rank;
     long * perm;
 
-    printf("rowreduce....");
+    printf("rref....");
     fflush(stdout);
 
     flint_randinit(state);
+
+    fmpz_init(den);
 
     /* Maximally sparse matrices of given rank */
     for (i = 0; i < 10000; i++)
@@ -94,14 +97,14 @@ main(void)
             d = n_randint(state, 2*m*n + 1);
             fmpz_mat_init(A, m, n);
             fmpz_mat_randrank(A, state, r, b);
-            rank = _fmpz_mat_rowreduce(perm, A, ROWREDUCE_CLEAR_LOWER);
-            if (r != FLINT_ABS(rank))
+            rank = fmpz_mat_rref(A, den, perm, A);
+            if (r != rank)
             {
                 printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
-            check_row_echelon_form(perm, A);
+            check_rref(perm, A);
             fmpz_mat_clear(A);
         }
 
@@ -125,21 +128,24 @@ main(void)
 
             fmpz_mat_randops(A, state, d);
 
-            rank = _fmpz_mat_rowreduce(perm, A, ROWREDUCE_CLEAR_LOWER);
-            if (r != FLINT_ABS(rank))
+            rank = fmpz_mat_rref(A, den, perm, A);
+
+            if (r != rank)
             {
                 printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
 
-            check_row_echelon_form(perm, A);
+            check_rref(perm, A);
 
             fmpz_mat_clear(A);
         }
 
         free(perm);
     }
+
+    fmpz_clear(den);
 
     flint_randclear(state);
     _fmpz_cleanup();

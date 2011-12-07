@@ -27,32 +27,33 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
+#include "perm.h"
 
 int
-fmpz_mat_pivot(long * perm, fmpz_mat_t mat, long r, long c)
+fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
+                    const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long t, j;
-    fmpz * u;
+    fmpz_mat_t LU;
+    long dim, *perm;
+    int result;
 
-    if (!fmpz_is_zero(fmpz_mat_entry(mat, r, c)))
-        return 1;
-
-    for (j = r + 1; j < mat->r; j++)
+    if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
     {
-        if (!fmpz_is_zero(fmpz_mat_entry(mat, j, c)))
-        {
-            if (perm)
-            {
-                t = perm[j];
-                perm[j] = perm[r];
-                perm[r] = t;
-            }
-
-            u = mat->rows[j];
-            mat->rows[j] = mat->rows[r];
-            mat->rows[r] = u; 
-            return -1;
-        }
+        fmpz_set_ui(den, 1);
+        return 1;
     }
-    return 0;
+
+    dim = fmpz_mat_nrows(A);
+    perm = _perm_init(dim);
+    fmpz_mat_init_set(LU, A);
+    result = (fmpz_mat_fflu(LU, den, perm, LU, 1) == dim);
+
+    if (result)
+        fmpz_mat_solve_fflu_precomp(X, perm, LU, B);
+    else
+        fmpz_zero(den);
+
+    _perm_clear(perm);
+    fmpz_mat_clear(LU);
+    return result;
 }

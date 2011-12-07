@@ -68,7 +68,7 @@ main(void)
         fmpz_mat_randtest(B, state, b2);
 
         fmpz_mat_solve_bound(N, D, A, B);
-        fmpz_mat_solve_mat(X, den, A, B);
+        fmpz_mat_solve(X, den, A, B);
 
         if (fmpz_cmpabs(D, den) < 0)
         {
