@@ -182,6 +182,8 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 
 void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, long n, const fmpz_t x);
 
+void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, long n, ulong x);
+
 static __inline__ 
 void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, long n)
 {

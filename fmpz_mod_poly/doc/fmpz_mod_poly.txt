@@ -120,7 +120,7 @@ long fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
     Returns the length of the polynomial, which is one more than 
     its degree.
 
-fmpz * fmpz_mod_poly(const fmpz_mod_poly_t poly)
+fmpz * fmpz_mod_poly_lead(const fmpz_mod_poly_t poly)
 
     Returns a pointer to the first leading coefficient of \code{poly} 
     if this is non-zero, otherwise returns \code{NULL}.
@@ -412,7 +412,7 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
-    $0 \leg \len(R) < \len(B)$ assuming that the leading term 
+    $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
 
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
@@ -695,7 +695,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     only assume that $p \geq 2$.
 
     Note that this precomputed data can be used for any $F$ such that 
-    $\len(F) \leg 2^k \deg(R)$.
+    $\len(F) \leq 2^k \deg(R)$.
 
 void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
                               const fmpz_mod_poly_t R, long degF)
