@@ -118,6 +118,23 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
 }
 
 static __inline__
+void fmpz_init_set_ui(fmpz_t f, ulong g)
+{
+    if (g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set_ui(ptr, g);
+    }
+}
+
+static __inline__
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);

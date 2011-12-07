@@ -54,6 +54,10 @@ void fmpz_init_set(fmpz_t f, const fmpz_t g)
 
     Initialises $f$ and sets it to the value of $g$.
 
+void fmpz_init_set_ui(fmpz_t f, ulong g)
+
+    Initialises $f$ and sets it to the value of $g$.
+
 *******************************************************************************
 
     Random generation
