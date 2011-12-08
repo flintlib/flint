@@ -32,7 +32,7 @@
 void
 nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
 {
-    long i, l, n, p;
+    long i, l, n, len;
 
     nmod_mat_t X;
     mp_ptr x, d;
@@ -42,6 +42,7 @@ nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
     if (n == 0)
     {
         nmod_poly_one(det);
+        return;
     }
 
     l = nmod_poly_mat_max_length(A);
@@ -49,30 +50,31 @@ nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
     if (l == 0)
     {
         nmod_poly_zero(det);
+        return;
     }
 
     /* Bound degree based on Laplace expansion */
-    p = n*(l - 1) + 1;
+    len = n*(l - 1) + 1;
 
     /* Not enough points to interpolate */
-    if (p > nmod_poly_mat_modulus(A))
+    if (len > nmod_poly_mat_modulus(A))
     {
         nmod_poly_mat_det_fflu(det, A);
         return;
     }
 
-    x = _nmod_vec_init(p);
-    d = _nmod_vec_init(p);
+    x = _nmod_vec_init(len);
+    d = _nmod_vec_init(len);
     nmod_mat_init(X, n, n, nmod_poly_mat_modulus(A));
 
-    for (i = 0; i < p; i++)
+    for (i = 0; i < len; i++)
     {
         x[i] = i;
         nmod_poly_mat_evaluate_nmod(X, A, x[i]);
         d[i] = nmod_mat_det(X);
     }
 
-    nmod_poly_interpolate_nmod_vec(det, x, d, p);
+    nmod_poly_interpolate_nmod_vec(det, x, d, len);
 
     _nmod_vec_free(x);
     _nmod_vec_free(d);
