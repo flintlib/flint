@@ -58,7 +58,7 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
             return 0;
         }
     }
-    else  /* x is big */
+    else  /* x is large */
     {
         __mpz_struct *z = COEFF_TO_PTR(y);
 
@@ -74,6 +74,7 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
                 if (!mpz_divisible_ui_p(z, q))
                 {
+                    _fmpz_demote_val(x);
                     return 1;
                 }
                 else
