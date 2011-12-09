@@ -116,6 +116,18 @@ ulong fmpz_get_ui(const fmpz_t f)
     Returns $f$ as an \code{unsigned long}.  The result is undefined
     if $f$ does not fit into an \code{unsigned long} or is negative.
 
+void fmpz_set_d(fmpz_t f, double c)
+
+    Sets $f$ to the \code{double} $c$, rounding down towards zero if
+    the value of $c$ is fractional. The outcome is undefined if $c$ is
+    infinite, not-a-number, or subnormal.
+
+double fmpz_get_d(const fmpz_t f)
+
+    Returns $f$ as a \code{double}, rounding down towards zero if
+    \code{f} cannot be represented exactly. The outcome is undefined
+    if \code{f} is too large to fit in the normal range of a double.
+
 double fmpz_get_d_2exp(long * exp, const fmpz_t f)
 
     Returns $f$ as a normalized \code{double} along with a $2$-exponent 
