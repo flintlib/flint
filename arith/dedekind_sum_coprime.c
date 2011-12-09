@@ -42,13 +42,13 @@ dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
         t = dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
 
+        /* Round to nearest after truncation */
         if (t > 0)
             t += 0.5;
         else
             t -= 0.5;
 
-        /* FIXME: 32-bit overflow; need fmpz_set_d !*/
-        fmpz_set_si(fmpq_numref(s), (long) t);
+        fmpz_set_d(fmpq_numref(s), t);
         fmpz_set_ui(fmpq_denref(s), 6UL * (*k));
         fmpq_canonicalise(s);
     }
