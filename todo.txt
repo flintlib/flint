@@ -105,6 +105,13 @@ fmpz_vec
 * make use of mpfr type througout LLL, mpfr_vec and mpfr_mat modules
 
 
+fmpz_factor
+-----------
+
+* Add primality testing, perfect power testing, fast factorisation
+  (Brent-Pollard, QS, ...)
+
+
 fmpz_mpoly / nmod_mpoly
 -----------------------
 
@@ -218,19 +225,12 @@ arith
 
 * Write profiling code.
 
-* Improve the _fmpz_prod function in divisor_sigma.c and move it
-  to the fmpz_vec module.
-
 * Write a faster fmpz_divisors using the merge sort algorithm
   (see Sage's implementation). Alternatively (or as a complement)
   write a supernaturally fast _fmpz_vec_sort.
 
 * Improve fmpz_divisors by using long and longlong arithmetic
   for divisors that fit in 1 or 2 limbs.
-
-* Implement primality testing, perfect power testing,
-  and fast factorisation algorithm (Brent-Pollard, QS, ...) in
-  fmpz_factor.
 
 * Optimise memory management in mpq_harmonic.
 
@@ -243,8 +243,6 @@ arith
   or something similar.
 
 * Maybe: move Stirling number matrix functions to the fmpz_mat module.
-
-* Write a fast version of fmpz_unfactor.
 
 * Implement computation of Bernoulli numbers modulo a prime
   (e.g. porting the code from flint 1)
@@ -264,8 +262,6 @@ arith
 
 * Implement Fibonacci polynomials and fmpz Fibonacci numbers.
 
-* Implement Bell polynomials.
-
 * Implement orthogonal polynomials (Jacobi, Hermite, Laguerre, Gegenbauer).
 
 * Implement hypergeometric polynomials and series.
@@ -279,10 +275,6 @@ arith
   is needed to get all conditionals right and to write proper tests).
 
 * Write tests for the dedekind_cosine_sum functions.
-
-* Investigate whether Knuth's algorithm is better for dedekind_sum_d.
-  It seems unlikely to be faster, but it might allow accurate
-  calculation for larger arguments.
 
 fmpz_mat
 --------
