@@ -32,44 +32,15 @@
 #include "nmod_vec.h"
 #include "arith.h"
 
-void
-__bell_number_vec_mod_p(mp_ptr res, mp_ptr tmp, long n, nmod_t mod)
-{
-    mp_limb_t fac, c;
-    long k;
-
-    /* Divide by factorials */
-    fac = n_factorial_mod2_preinv(n-1, mod.n, mod.ninv);
-    c = n_invmod(fac, mod.n);
-
-    for (k = n - 1; k > 0; k--)
-    {
-        tmp[k] = c;
-        c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);
-    }
-    tmp[0] = 0UL;
-
-    _nmod_poly_exp_series(res, tmp, n, mod);
-
-    /* Multiply by factorials */
-    c = 1UL;
-    for (k = 1; k < n; k++)
-    {
-        c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);
-        res[k] = n_mulmod2_preinv(res[k], c, mod.n, mod.ninv);
-    }
-}
-
 #define CRT_MAX_RESOLUTION 16
 
-void __bell_number_vec_multi_mod(fmpz * res, long n)
+void
+bell_number_vec_multi_mod(fmpz * res, long n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
-    mp_limb_t * primes;
-    mp_limb_t * residues;
+    mp_ptr primes, residues;
     mp_ptr * polys;
-    mp_ptr temppoly;
     nmod_t mod;
     long i, j, k, size, prime_bits, num_primes, num_primes_k, resolution;
 
@@ -90,13 +61,13 @@ void __bell_number_vec_multi_mod(fmpz * res, long n)
     primes[0] = n_nextprime(1UL<<prime_bits, 0);
     for (k = 1; k < num_primes; k++)
         primes[k] = n_nextprime(primes[k-1], 0);
-    temppoly = _nmod_vec_init(n);
+
     for (k = 0; k < num_primes; k++)
     {
         /* printf("prime %ld of %ld\n", k, num_primes); */
         polys[k] = _nmod_vec_init(n);
         nmod_init(&mod, primes[k]);
-        __bell_number_vec_mod_p(polys[k], temppoly, n, mod);
+        bell_number_nmod_vec(polys[k], n, mod);
     }
 
     /* Init CRT comb */
@@ -126,7 +97,7 @@ void __bell_number_vec_multi_mod(fmpz * res, long n)
     /* Cleanup */
     for (k = 0; k < num_primes; k++)
         _nmod_vec_free(polys[k]);
-    _nmod_vec_free(temppoly);
+
     for (i = 0; i < resolution; i++)
     {
         fmpz_comb_temp_clear(temp[i]);
@@ -137,9 +108,3 @@ void __bell_number_vec_multi_mod(fmpz * res, long n)
     free(residues);
     free(polys);
 }
-
-void _bell_number_vec_multi_mod(fmpz * res, long n)
-{
-    __bell_number_vec_multi_mod(res, n);
-}
-

@@ -74,32 +74,34 @@ void stirling_number_2_mat(fmpz_mat_t mat);
 /* Bell numbers **************************************************************/
 
 #if FLINT64
-#define SMALL_BELL_LIMIT 25
+#define BELL_NUMBER_TAB_SIZE 26
 #else
-#define SMALL_BELL_LIMIT 15
+#define BELL_NUMBER_TAB_SIZE 16
 #endif
 
-static const mp_limb_t bell_number_small[] = 
-{
-    1UL, 1UL, 2UL, 5UL, 15UL, 52UL, 203UL, 877UL, 4140UL, 21147UL, 115975UL,
-    678570UL, 4213597UL, 27644437UL, 190899322UL, 1382958545UL,
-#if FLINT64
-    10480142147UL, 82864869804UL, 682076806159UL, 5832742205057UL,
-    51724158235372UL, 474869816156751UL, 4506715738447323UL,
-    44152005855084346UL, 445958869294805289UL,
-    4638590332229999353UL,
-#endif
-};
-
-void bell_number(fmpz_t b, ulong n);
-
-void bell_number_vec(fmpz * b, long n);
+extern const mp_limb_t bell_number_tab[];
 
 double bell_number_size(ulong n);
 
-void _bell_number_vec_recursive(fmpz * b, long n);
+void bell_number(fmpz_t b, ulong n);
 
-void _bell_number_vec_multi_mod(fmpz * b, long n);
+void bell_number_bsplit(fmpz_t res, ulong n);
+
+void bell_number_multi_mod(fmpz_t res, ulong n);
+
+void bell_number_vec(fmpz * b, long n);
+
+void bell_number_vec_recursive(fmpz * b, long n);
+
+void bell_number_vec_multi_mod(fmpz * b, long n);
+
+mp_limb_t bell_number_nmod(ulong n, nmod_t mod);
+
+void bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod);
+
+void bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod);
+
+void bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod);
 
 
 /* Zeta Euler product ********************************************************/

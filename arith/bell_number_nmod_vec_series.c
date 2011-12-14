@@ -23,15 +23,40 @@
 
 ******************************************************************************/
 
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
+#include "ulong_extras.h"
 
 void
-bell_number_vec(fmpz * res, long n)
+bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
 {
-    if (n < 5000)
-        bell_number_vec_recursive(res, n);
-    else
-        bell_number_vec_multi_mod(res, n);
+    mp_limb_t fac, c;
+    mp_ptr tmp;
+    long k;
+
+    tmp = malloc(sizeof(mp_limb_t) * n);
+
+    /* Divide by factorials */
+    fac = n_factorial_mod2_preinv(n-1, mod.n, mod.ninv);
+    c = n_invmod(fac, mod.n);
+
+    for (k = n - 1; k > 0; k--)
+    {
+        tmp[k] = c;
+        c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);
+    }
+    tmp[0] = 0UL;
+
+    _nmod_poly_exp_series(res, tmp, n, mod);
+
+    /* Multiply by factorials */
+    c = 1UL;
+    for (k = 1; k < n; k++)
+    {
+        c = n_mulmod2_preinv(c, k, mod.n, mod.ninv);
+        res[k] = n_mulmod2_preinv(res[k], c, mod.n, mod.ninv);
+    }
+
+    free(tmp);
 }

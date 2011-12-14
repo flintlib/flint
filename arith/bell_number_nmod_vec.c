@@ -23,15 +23,16 @@
 
 ******************************************************************************/
 
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
+#include "ulong_extras.h"
 
 void
-bell_number_vec(fmpz * res, long n)
+bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
 {
-    if (n < 5000)
-        bell_number_vec_recursive(res, n);
+    if (n < 2000 || mod.n <= n)
+        bell_number_nmod_vec_recursive(b, n, mod);
     else
-        bell_number_vec_multi_mod(res, n);
+        bell_number_nmod_vec_series(b, n, mod);
 }

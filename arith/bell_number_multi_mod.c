@@ -23,15 +23,47 @@
 
 ******************************************************************************/
 
+#include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
 #include "arith.h"
 
 void
-bell_number_vec(fmpz * res, long n)
+bell_number_multi_mod(fmpz_t res, ulong n)
 {
-    if (n < 5000)
-        bell_number_vec_recursive(res, n);
-    else
-        bell_number_vec_multi_mod(res, n);
+    fmpz_comb_temp_t temp;
+    fmpz_comb_t comb;
+    nmod_t mod;
+    mp_ptr primes, residues;
+    long k, size, prime_bits, num_primes;
+
+    size = bell_number_size(n);
+    prime_bits = FLINT_BITS - 1;
+    num_primes = (size + prime_bits - 1) / prime_bits;
+
+    primes = malloc(num_primes * sizeof(mp_limb_t));
+    residues = malloc(num_primes * sizeof(mp_limb_t));
+
+    primes[0] = n_nextprime(1UL << prime_bits, 0);
+    for (k = 1; k < num_primes; k++)
+        primes[k] = n_nextprime(primes[k-1], 0);
+
+    for (k = 0; k < num_primes; k++)
+    {
+        nmod_init(&mod, primes[k]);
+        residues[k] = bell_number_nmod(n, mod);
+    }
+
+    fmpz_comb_init(comb, primes, num_primes);
+    fmpz_comb_temp_init(temp, comb);
+
+    fmpz_multi_CRT_ui_unsigned(res, residues, comb, temp);
+
+    fmpz_comb_clear(comb);
+    fmpz_comb_temp_clear(temp);
+
+    free(primes);
+    free(residues);
 }

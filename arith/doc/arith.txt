@@ -25,44 +25,6 @@
 
 *******************************************************************************
 
-    Factoring integers 
-
-    An integer may be represented in factored form using the 
-    \code{fmpz_factor_t} data structure. This consists of two \code{fmpz} 
-    vectors representing bases and exponents, respectively. Canonically, 
-    the bases will be prime numbers sorted in ascending order and the 
-    exponents will be positive.
-
-    A separate \code{int} field holds the sign, which may be $-1$, $0$ or $1$.
-
-*******************************************************************************
-
-void fmpz_factor_init(fmpz_factor_t factor)
-
-    Initialises an \code{fmpz_factor_t} structure.
-
-void fmpz_factor_clear(fmpz_factor_t factor)
-
-    Clears an \code{fmpz_factor_t} structure.
-
-void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
-
-    Factors $n$ into prime numbers. If $n$ is zero or negative, the
-    sign field of the \code{factor} object will be set accordingly.
-
-    This currently only uses trial division, falling back to \code{n_factor()}
-    as soon as the number shrinks to a single limb.
-
-void fmpz_unfactor(fmpz_t n, const fmpz_factor_t factor)
-
-    Evaluates an integer in factored form back to an \code{fmpz_t}.
-
-    This currently exponentiates the bases separately and multiplies
-    them together one by one, although much more efficient algorithms
-    exist. 
-
-*******************************************************************************
-
     Primorials
 
 *******************************************************************************
@@ -175,45 +137,99 @@ void stirling_number_2_mat(fmpz_mat_t mat)
 
 void bell_number(fmpz_t b, ulong n)
 
-    Sets \code{b} to the \code{n}:th Bell number $B_n$, defined as the
-    number of partitions of a set with \code{n} members. Equivalently,
+    Sets $b$ to the Bell number $B_n$, defined as the
+    number of partitions of a set with $n$ members. Equivalently,
     $B_n = \sum_{k=0}^n S_2(n,k)$ where $S_2(n,k)$ denotes a Stirling number
     of the second kind.
 
-    This function uses a table lookup if $B_n$ fits in a single word,
-    and otherwise evaluates a precise truncation of the series
-    $B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}$ using binary splitting.
+    This function automatically selects between table lookup, binary
+    splitting, and the multimodular algorithm.
+
+void bell_number_bsplit(fmpz_t res, ulong n)
+
+    Computes the Bell number $B_n$ by evaluating a precise truncation of
+    the series $B_n = e^{-1} \sum_{k=0}^{\infty} \frac{k^n}{k!}$ using
+    binary splitting.
+
+void bell_number_multi_mod(fmpz_t res, ulong n)
+
+    Computes the Bell number $B_n$ using a multimodular algorithm.
+
+    This function evaluates the Bell number modulo several limb-size
+    primes using \code{bell_number_nmod} and reconstructs the integer
+    value using the fast Chinese remainder algorithm.
+    A bound for the number of needed primes is computed using
+    \code{bell_number_size}.
 
 void bell_number_vec(fmpz * b, long n)
 
-    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive. Automatically switches between the \code{recursive}
     and \code{multi_mod} algorithms depending on the size of $n$.
+
+void bell_number_vec_recursive(fmpz * b, long n)
+
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive. This function uses table lookup if $B_{n-1}$ fits in a
+    single word, and a standard triangular recurrence otherwise.
+
+void bell_number_vec_multi_mod(fmpz * b, long n)
+
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive.
+
+    This function evaluates the Bell numbers modulo several limb-size
+    primes \code{bell_number_nmod_vec} and reconstructs the integer
+    values using the fast Chinese remainder algorithm.
+    A bound for the number of needed primes is computed using
+    \code{bell_number_size}.
+
+mp_limb_t bell_number_nmod(ulong n, nmod_t mod)
+
+    Computes the Bell number $B_n$ modulo a prime $p$ given by \code{mod}
+
+    After handling special cases, we use the formula
+
+    $$B_n = \sum_{k=0}^n \frac{(n-k)^n}{(n-k)!}
+        \sum_{k=0}^{n-k} \frac{(-1)^j}{j!}.$$
+
+    We arrange the operations in such a way that we only have to
+    multiply (and not divide) in the main loop. As a further optimisation,
+    we use sieving to reduce the number of powers that need to be
+    evaluated. This results in $O(n)$ memory usage.
+
+    The divisions by factorials require $n > p$, so we fall back to
+    calling \code{bell_number_nmod_vec_recursive} and reading off the
+    last entry when $p \le n$.
+
+void bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
+
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive modulo a prime $p$ given by \code{mod}. Automatically
+    switches between the \code{recursive} and \code{series} algorithms
+    depending on the size of $n$ and whether $p$ is large enough for the
+    series algorithm to work.
+
+void bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
+
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive modulo a prime $p$ given by \code{mod}. This function uses
+    table lookup if $B_{n-1}$ fits in a single word, and a standard
+    triangular recurrence otherwise.
+
+void bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod)
+
+    Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
+    inclusive modulo a prime $p$ given by \code{mod}. This function
+    expands the exponential generating function
+    $$\sum_{k=0}^{\infty} \frac{B_n}{n!} x^n = \exp(e^x-1)$$.
+    We require that $p \ge n$.
 
 double bell_number_size(ulong n)
 
     Returns $b$ such that $B_n < 2^{\lfloor b \rfloor}$, using the inequality
     $$B_n < \left(\frac{0.792n}{\log(n+1)}\right)^n$$
     which is given in \cite{BerTas2010}.
-
-void _bell_number_vec_recursive(fmpz * b, long n)
-
-    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
-    inclusive. This function uses table lookup if $B_{n-1}$ fits in a
-    single word, and a simple triangular recurrence otherwise.
-
-void _bell_number_vec_multi_mod(fmpz * b, long n)
-
-    Sets \code{b} to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
-    inclusive.
-
-    This function evaluates the Bell numbers modulo several limb-size
-    primes using the exponential generating function
-    $$e^{e^x-1} = \sum_{n=0}^{\infty} \frac{B_n}{n!} x^n$$ and
-    \code{nmod_poly} arithmetic. A tight bound for the number of needed
-    primes is computed using \code{bell_number_size}, and the final
-    integer values are recovered using balanced CRT reconstruction.
-
 
 *******************************************************************************
 

@@ -30,15 +30,16 @@
 #include "fmpz_vec.h"
 #include "arith.h"
 
-void _bell_number_vec_recursive(fmpz * b, long n)
+void
+bell_number_vec_recursive(fmpz * b, long n)
 {
     long i, k;
     fmpz * t;
 
-    if (n <= SMALL_BELL_LIMIT)
+    if (n < BELL_NUMBER_TAB_SIZE)
     {
         for (i = 0; i < n; i++)
-            fmpz_set_ui(b + i, bell_number_small[i]);
+            fmpz_set_ui(b + i, bell_number_tab[i]);
         return;
     }
 

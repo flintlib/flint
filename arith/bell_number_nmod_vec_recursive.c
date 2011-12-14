@@ -23,15 +23,38 @@
 
 ******************************************************************************/
 
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
+#include "ulong_extras.h"
+#include "nmod_vec.h"
 
 void
-bell_number_vec(fmpz * res, long n)
+bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
 {
-    if (n < 5000)
-        bell_number_vec_recursive(res, n);
-    else
-        bell_number_vec_multi_mod(res, n);
+    long i, k;
+    mp_ptr t;
+
+    if (n < BELL_NUMBER_TAB_SIZE)
+    {
+        for (i = 0; i < n; i++)
+            b[i] = n_mod2_preinv(bell_number_tab[i], mod.n, mod.ninv);
+        return;
+    }
+
+    n -= 1;
+    t = _nmod_vec_init(n);
+
+    t[0] = b[0] = b[1] = 1;
+
+    for (i = 1; i < n; i++)
+    {
+        t[i] = t[0];
+        for (k = i; k > 0; k--)
+            t[k - 1] = n_addmod(t[k - 1], t[k], mod.n);
+
+        b[i + 1] = t[0];
+    }
+
+    _nmod_vec_free(t);
 }

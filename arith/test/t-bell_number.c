@@ -25,17 +25,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
 int main(void)
 {
+    flint_rand_t state;
     fmpz * b1;
     fmpz * b2;
     long n, k;
@@ -44,6 +43,8 @@ int main(void)
 
     printf("bell_number....");
     fflush(stdout);
+
+    flint_randinit(state);
 
     b1 = _fmpz_vec_init(maxn);
 
@@ -54,7 +55,6 @@ int main(void)
     for (n = 0; n < maxn; n++)
     {
         b2 = _fmpz_vec_init(n);
-
         bell_number_vec(b2, n);
 
         if (!_fmpz_vec_equal(b1, b2, n))
@@ -90,10 +90,31 @@ int main(void)
             abort();
         }
 
+        /* Also check nmod value */
+        {
+            nmod_t mod;
+            mp_limb_t bb;
+
+            nmod_init(&mod, n_randtest_prime(state, 0));
+            bb = bell_number_nmod(n, mod);
+
+            if (fmpz_fdiv_ui(b1, mod.n) != bb)
+            {
+                printf("FAIL:\n");
+                printf("n = %ld\n", n);
+                fmpz_print(b1);
+                printf("\n");
+                printf("should be %lu mod %lu\n", bb, mod.n);
+                abort();
+            }
+        }
+
         _fmpz_vec_clear(b2, n+1);
     }
 
     _fmpz_vec_clear(b1, maxn);
+
+    flint_randclear(state);
 
     mpfr_free_cache();
     _fmpz_cleanup();

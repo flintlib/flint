@@ -25,13 +25,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
-#include "profiler.h"
 
 int main(void)
 {
@@ -49,8 +47,8 @@ int main(void)
 
     for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
-        _bell_number_vec_recursive(b1, n);
-        _bell_number_vec_multi_mod(b2, n);
+        bell_number_vec_recursive(b1, n);
+        bell_number_vec_multi_mod(b2, n);
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {

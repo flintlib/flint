@@ -23,15 +23,57 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
+#include "nmod_vec.h"
+#include "ulong_extras.h"
 
-void
-bell_number_vec(fmpz * res, long n)
+int main(void)
 {
-    if (n < 5000)
-        bell_number_vec_recursive(res, n);
-    else
-        bell_number_vec_multi_mod(res, n);
+    flint_rand_t state;
+    mp_ptr b1, b2;
+    long n;
+
+    const long maxn = 3000;
+
+    printf("bell_number_nmod_vec....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    b1 = _nmod_vec_init(maxn);
+    b2 = _nmod_vec_init(maxn);
+
+    for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
+    {
+        nmod_t mod;
+        mp_limb_t p;
+
+        do {
+            p = n_randtest_prime(state, 0);
+        } while (p < n);
+
+        nmod_init(&mod, p);
+
+        bell_number_nmod_vec_recursive(b1, n, mod);
+        bell_number_nmod_vec_series(b2, n, mod);
+
+        if (!_nmod_vec_equal(b1, b2, n))
+        {
+            printf("FAIL:\n");
+            printf("n = %ld\n", n);
+            abort();
+        }
+    }
+
+    _nmod_vec_free(b1);
+    _nmod_vec_free(b2);
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
