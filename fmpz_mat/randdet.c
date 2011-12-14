@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_vec.h"
-#include "arith.h"
+#include "fmpz_factor.h"
 #include "ulong_extras.h"
 
 
