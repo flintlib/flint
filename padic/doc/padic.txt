@@ -410,6 +410,10 @@ void padic_pow_si(padic_t rop, const padic_t op, long e,
     valuation of \code{op} do not overflow in the \code{long} 
     range.
 
+    Note that if the input $x = p^v u$ is defined modulo $p^N$ 
+    then $x^e = p^{ev} u^e$ is defined modulo $p^{N + (e - 1) v}$, 
+    which is a precision loss in case $v < 0$.
+
 *******************************************************************************
 
     Comparison
