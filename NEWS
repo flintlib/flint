@@ -786,3 +786,7 @@ build fixes
   * fixed make install to create nonexistent dirs (reported by Serge Torres)
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
+
+2.3 -- 16 Dec 2011
+
+  * Watch this space....
