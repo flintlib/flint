@@ -46,7 +46,7 @@ void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1,
              "res = a(m) * poly2 + a(m-1)".
          */
         {
-            _fmpz_mod_poly_scalar_mul_fmpz(res, poly2, len2, p, poly1 + i);
+            _fmpz_mod_poly_scalar_mul_fmpz(res, poly2, len2, poly1 + i, p);
             i--;
             fmpz_add(res, res, poly1 + i);
             if (fmpz_cmpabs(res, p) >= 0)

@@ -50,7 +50,7 @@ void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res,
     }
     else if (len1 == 2)
     {
-        _fmpz_mod_poly_scalar_mul_fmpz(res, pow2[0], len2, p, poly1 + 1);
+        _fmpz_mod_poly_scalar_mul_fmpz(res, pow2[0], len2, poly1 + 1, p);
         fmpz_add(res, res, poly1);
         if (fmpz_cmpabs(res, p) >= 0)
             fmpz_sub(res, res, p);

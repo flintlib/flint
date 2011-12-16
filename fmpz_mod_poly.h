@@ -226,7 +226,7 @@ void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
 /*  Scalar multiplication ****************************************************/
 
 void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, long len, 
-                                    const fmpz_t p, const fmpz_t x);
+                                    const fmpz_t x, const fmpz_t p);
 
 void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res, 
     const fmpz_mod_poly_t poly, const fmpz_t x);

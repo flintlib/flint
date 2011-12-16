@@ -30,7 +30,7 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, long len, 
-                                    const fmpz_t p, const fmpz_t x)
+                                    const fmpz_t x, const fmpz_t p)
 {
     _fmpz_vec_scalar_mul_fmpz(res, poly, len, x);
     _fmpz_vec_mod_fmpz(res, res, len, p);
@@ -41,7 +41,7 @@ void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
 {
     fmpz_mod_poly_fit_length(res, poly->length);
     _fmpz_mod_poly_scalar_mul_fmpz(res->coeffs, 
-                                   poly->coeffs, poly->length, &(poly->p), x);
+                                   poly->coeffs, poly->length, x, &(poly->p));
 
     _fmpz_mod_poly_set_length(res, poly->length);
     _fmpz_mod_poly_normalise(res);
