@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -183,6 +184,11 @@ void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
+
+void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
+                  const fmpz_t opnum, const fmpz_t opden, long e);
+
+void fmpq_pow_si(fmpq_t rop, const fmpq_t op, long e);
 
 
 void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
