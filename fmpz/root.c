@@ -36,8 +36,7 @@ void
 fmpz_root(fmpz_t r, fmpz_t f, long n)
 {
     fmpz c = *f;
-    fmpz d = *r;
-   
+    
     if (n == 0)
     {
         printf("Exception: unable to take 0-th root in fmpz_root\n");
@@ -65,7 +64,8 @@ fmpz_root(fmpz_t r, fmpz_t f, long n)
         {
             __mpz_struct mpz2; 
             __mpz_struct * mpz1;
-        
+            mp_limb_t cval;
+
             if (c == 0)
             {
                 fmpz_set_ui(r, 0);
@@ -74,7 +74,7 @@ fmpz_root(fmpz_t r, fmpz_t f, long n)
 
             mpz1 = _fmpz_promote(r);
             
-            mp_limb_t cval = FLINT_ABS(c);
+            cval = FLINT_ABS(c);
             mpz2._mp_d = &cval; /* mock up an mpz */
             mpz2._mp_size = 1;
             if (c < 0L)

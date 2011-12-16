@@ -31,7 +31,6 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
-#include "mat_common.h"
 
 /* Types *********************************************************************/
 

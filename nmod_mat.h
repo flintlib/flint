@@ -36,7 +36,6 @@
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"
-#include "mat_common.h"
 
 typedef struct
 {

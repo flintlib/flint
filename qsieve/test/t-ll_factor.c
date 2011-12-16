@@ -46,7 +46,7 @@ int main(void)
    fmpz_init(n);
    fmpz_init(t);
 
-   for (i = 0; i < 10000; i++) /* Test random n */
+   for (i = 0; i < 1000; i++) /* Test random n */
    {
       mp_limb_t hi = 0, lo;
       

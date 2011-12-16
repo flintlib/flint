@@ -35,7 +35,6 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "nmod_mat.h"
-#include "mat_common.h"
 
 typedef struct
 {
