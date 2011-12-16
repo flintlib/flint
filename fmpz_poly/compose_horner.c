@@ -71,38 +71,36 @@ fmpz_poly_compose_horner(fmpz_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
-    long lenr;
     
     if (len1 == 0)
     {
         fmpz_poly_zero(res);
-        return;
     }
-    if (len1 == 1 || len2 == 0)
+    else if (len1 == 1 || len2 == 0)
     {
         fmpz_poly_set_fmpz(res, poly1->coeffs);
-        return;
-    }
-    
-    lenr = (len1 - 1) * (len2 - 1) + 1;
-    
-    if ((res != poly1) && (res != poly2))
-    {
-        fmpz_poly_fit_length(res, lenr);
-        _fmpz_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
-                                               poly2->coeffs, len2);
-        _fmpz_poly_set_length(res, lenr);
-        _fmpz_poly_normalise(res);
     }
     else
     {
-        fmpz_poly_t t;
-        fmpz_poly_init2(t, lenr);
-        _fmpz_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
-                                             poly2->coeffs, len2);
-        _fmpz_poly_set_length(t, lenr);
-        _fmpz_poly_normalise(t);
-        fmpz_poly_swap(res, t);
-        fmpz_poly_clear(t);
+        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        
+        if ((res != poly1) && (res != poly2))
+        {
+            fmpz_poly_fit_length(res, lenr);
+            _fmpz_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+                                                   poly2->coeffs, len2);
+            _fmpz_poly_set_length(res, lenr);
+        }
+        else
+        {
+            fmpz_poly_t t;
+            fmpz_poly_init2(t, lenr);
+            _fmpz_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
+                                                 poly2->coeffs, len2);
+            _fmpz_poly_set_length(t, lenr);
+            fmpz_poly_swap(res, t);
+            fmpz_poly_clear(t);
+        }
+        _fmpz_poly_normalise(res);
     }
 }

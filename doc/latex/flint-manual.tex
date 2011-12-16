@@ -225,6 +225,7 @@
 
 \DeclareMathOperator{\sgn}{sgn}
 \DeclareMathOperator{\ord}{ord}
+\DeclareMathOperator{\lcm}{lcm}
 
 \allowdisplaybreaks[4]
 %\numberwithin{equation}{section}
@@ -1015,7 +1016,7 @@ x^2-3*x-1
 \input{input/fmpz_poly_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                              %
+% Vectors over Z / nZ for word-sized moduli                                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{nmod\_vec}
@@ -1024,7 +1025,7 @@ x^2-3*x-1
 \input{input/nmod_vec.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                                                                              %
+% Polynomials over Z / nZ for word-sized moduli                                %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{nmod\_poly}
@@ -1145,7 +1146,7 @@ assume responsibility for normalising all values to the range $[0, n)$.
 \input{input/nmod_mat.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Matrices over integer polynomials                                            %
+% Matrices over integer polynomials mod n                                      %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \chapter{nmod\_poly\_mat}
@@ -1175,6 +1176,89 @@ The user is assumed to provide input and output variables
 whose dimensions are compatible with the given operation.
 
 \input{input/nmod_poly_mat.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Polynomials over Z/nZ for general moduli                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_mod\_poly}
+\epigraph{Polynomials over $\Z / n \Z$ for general moduli}{}
+
+\section{Introduction}
+
+The \code{fmpz_mod_poly_t} data type represents elements of $\Z/n\Z[x]$ for
+a fixed modulus $n$. The \code{fmpz_mod_poly} module provides routines for 
+memory management, basic arithmetic and some higher level functions
+such as GCD, etc.
+
+Each coefficient of an \code{fmpz_mod_poly_t} is of type \code{fmpz} 
+and represents an integer reduced modulo the fixed modulus $n$ in the 
+range $[0,n)$.
+
+Unless otherwise specified, all functions in this section permit aliasing 
+between their input arguments and between their input and output arguments.
+
+\section{Simple example}
+
+The following example computes the square of the polynomial $5x^3 + 6$
+in $\Z/7\Z[x]$.
+\begin{lstlisting}[language=c]
+#include "fmpz_mod_poly.h"
+...
+fmpz_t n;
+fmpz_mod_poly_t x, y;
+
+fmpz_init_set_ui(n, 7);
+fmpz_mod_poly_init(x, n);
+fmpz_mod_poly_init(y, n);
+fmpz_mod_poly_set_coeff_ui(x, 3, 5);
+fmpz_mod_poly_set_coeff_ui(x, 0, 6);
+fmpz_mod_poly_sqr(y, x);
+fmpz_mod_poly_print(x); printf("\n");
+fmpz_mod_poly_print(y); printf("\n");
+fmpz_mod_poly_clear(x);
+fmpz_mod_poly_clear(y);
+fmpz_clear(n);
+\end{lstlisting}
+
+The output is:
+\begin{lstlisting}
+4 7  6 0 0 5
+7 7  1 0 0 4 0 0 4
+\end{lstlisting}
+
+\section{Definition of the fmpz\_mod\_poly\_t type}
+
+The \code{fmpz_mod_poly_t} type is a typedef for an array of length~1 of 
+\code{fmpz_mod_poly_struct}'s.  This permits passing parameters of type 
+\code{fmpz_mod_poly_t} by reference. 
+
+In reality one never deals directly with the \code{struct} and simply deals 
+with objects of type \code{fmpz_mod_poly_t}.  For simplicity we will think of an 
+\code{fmpz_mod_poly_t} as a \code{struct}, though in practice to access fields 
+of this \code{struct}, one needs to dereference first, e.g.\ to access the 
+\code{length} field of an \code{fmpz_mod_poly_t} called \code{poly1} one writes 
+\code{poly1->length}. 
+
+An \code{fmpz_mod_poly_t} is said to be \emph{normalised} if either 
+\code{length} is zero, or if the leading coefficient of the polynomial is 
+non-zero.  All \code{fmpz_mod_poly} functions expect their inputs to be 
+normalised and all coefficients to be reduced modulo~$n$, and unless 
+otherwise specified they produce output that is normalised with coefficients 
+reduced modulo~$n$.
+
+It is recommended that users do not access the fields of an 
+\code{fmpz_mod_poly_t} or its coefficient data directly, but make use of the 
+functions designed for this purpose, detailed below.
+
+Functions in \code{fmpz_mod_poly} do all the memory management for the user. 
+One does not need to specify the maximum length in advance before using a 
+polynomial object.  FLINT reallocates space automatically as the computation 
+proceeds, if more space is required. 
+
+We now describe the functions available in \code{fmpz_mod_poly}.
+
+\input{input/fmpz_mod_poly.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Padic numbers                                                                %

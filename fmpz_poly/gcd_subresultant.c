@@ -74,8 +74,7 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
 
             _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
 
-            for (lenA--; lenA >= 0 && !A[lenA]; lenA--) ;
-            lenA++;
+            FMPZ_VEC_NORM(A, lenA);
 
             if (lenA <= 1)
                 break;

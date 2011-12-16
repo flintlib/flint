@@ -55,23 +55,20 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
         {
             if (!COEFF_IS_MPZ(g2))  /* g is small */
             {
-                int sgn = (g2 >= 0) ? 1 : -1;
                 mp_limb_t minv = n_preinvert_limb(m2);
 
-                g2 = n_mod2_preinv(g2 * sgn, m2, minv);
+                _fmpz_demote(f);
 
-                if (g2 == 0)
+                if (g2 >= 0)
                 {
-                    fmpz_zero(f);
+                    g2 = n_mod2_preinv(g2, m2, minv);
+                    *f = n_powmod2_preinv(g2, e, m2, minv);
                 }
                 else
                 {
-                    if ((ulong) m2 < e)
-                        e = e % n_euler_phi(m2);
-
-                    fmpz_set_ui(f, n_powmod2_preinv(g2, e, m2, minv));
-
-                    if ((sgn < 0) && (e & 1UL))
+                    g2 = n_mod2_preinv(-g2, m2, minv);
+                    *f = n_powmod2_preinv(g2, e, m2, minv);
+                    if ((e & 1UL))
                         *f = n_negmod(*f, m2);
                 }
             }
@@ -102,7 +99,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
             }
             else  /* g is large */
             {
-               __mpz_struct * ptr = _fmpz_promote(f);
+               __mpz_struct *ptr = _fmpz_promote(f);
 
                 mpz_powm_ui(ptr, COEFF_TO_PTR(g2), e, COEFF_TO_PTR(m2));
 

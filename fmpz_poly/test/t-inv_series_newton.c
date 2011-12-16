@@ -52,11 +52,43 @@ main(void)
         fmpz_poly_init(b);
         fmpz_poly_init(c);
         fmpz_poly_init(one);
+
         fmpz_poly_randtest_not_zero(a, state, n_randint(state, 80) + 1, 100);
-        fmpz_poly_set_coeff_ui(a, 0, 1);
-        fmpz_poly_fit_length(one, 1);
-        fmpz_set_ui(one->coeffs, 1);
-        one->length = 1;
+        fmpz_poly_set_coeff_si(a, 0, n_randint(state, 2) ? 1 : -1);
+
+        fmpz_poly_set_ui(one, 1);
+
+        fmpz_poly_inv_series_newton(b, a, n);
+        fmpz_poly_mullow(c, a, b, n);
+
+        result = (fmpz_poly_equal(c, one));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            printf("c = "), fmpz_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(one);
+    }
+
+    /* Verify bug fix for the case Q = -1 mod (x) */
+    {
+        fmpz_poly_t a, b, c, one;
+        long n = 1;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(one);
+
+        fmpz_poly_set_si(a, -1);
+        fmpz_poly_set_ui(one, 1);
 
         fmpz_poly_inv_series_newton(b, a, n);
         fmpz_poly_mullow(c, a, b, n);

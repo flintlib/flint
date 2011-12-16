@@ -101,6 +101,40 @@ void fmpz_init(fmpz_t f)
 void fmpz_init2(fmpz_t f, ulong limbs);
 
 static __inline__
+void fmpz_init_set(fmpz_t f, const fmpz_t g)
+{
+    if (!COEFF_IS_MPZ(*g))
+    {
+        *f = *g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set(ptr, COEFF_TO_PTR(*g));
+    }
+}
+
+static __inline__
+void fmpz_init_set_ui(fmpz_t f, ulong g)
+{
+    if (g <= COEFF_MAX)
+    {
+        *f = g;
+    }
+    else
+    {
+        __mpz_struct *ptr;
+
+        ptr = _fmpz_new_mpz();
+        *f = PTR_TO_COEFF(ptr);
+        mpz_set_ui(ptr, g);
+    }
+}
+
+static __inline__
 void fmpz_clear(fmpz_t f)
 {
 	_fmpz_demote(f);
@@ -163,6 +197,10 @@ double fmpz_get_d(const fmpz_t f);
 void fmpz_set_d(fmpz_t f, double c);
 
 int fmpz_set_str(fmpz_t f, char * str, int b);
+
+__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f);
+
+void fmpz_clear_mpz_readonly(__mpz_struct *z);
 
 int fmpz_abs_fits_ui(const fmpz_t f);
 
@@ -334,6 +372,8 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 

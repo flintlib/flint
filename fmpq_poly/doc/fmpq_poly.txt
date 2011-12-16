@@ -706,6 +706,8 @@ void _fmpq_poly_inv_series_newton(fmpz * rpoly, fmpz_t rden,
     Computes the first $n$ terms of the inverse power series of 
     \code{poly} using Newton iteration.
 
+    The result is produced in canonical form.
+
     Assumes that $n \geq 1$, that \code{poly} has length at least~$n$ 
     and non-zero constant term.  Does not support aliasing.
 

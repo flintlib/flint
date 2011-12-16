@@ -30,6 +30,12 @@
 #include <mpir.h>
 #include "fmpz.h"
 
+#define FMPZ_VEC_NORM(vec, i)          \
+do {                                   \
+    while ((i) && vec[(i) - 1] == 0L)  \
+        (i)--;                         \
+} while (0)
+
 /*  Memory management  *******************************************************/
 
 fmpz * _fmpz_vec_init(long len);
@@ -175,6 +181,10 @@ void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2,
 void _fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len);
 
 void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len);
+
+/*  Reduction mod p **********************************************************/
+
+void _fmpz_vec_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
 
 /*  Gaussian content  ********************************************************/
 

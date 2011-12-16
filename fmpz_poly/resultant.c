@@ -74,8 +74,7 @@ _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1,
 
             _fmpz_poly_pseudo_rem_cohen(A, A, len1, B, len2);
 
-            for (len1--; len1 >= 0 && !A[len1]; len1--) ;
-            len1++;
+            FMPZ_VEC_NORM(A, len1);
 
             if (len1 == 0)
             {

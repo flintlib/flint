@@ -33,13 +33,18 @@ _fmpz_poly_evaluate_horner_fmpz(fmpz_t res, const fmpz * f, long len,
                            const fmpz_t a)
 {
     if (len == 0)
-        fmpz_set_ui(res, 0);
-    else if (len == 1)
+    {
+        fmpz_zero(res);
+    }
+    else if (len == 1 || fmpz_is_zero(a))
+    {
         fmpz_set(res, f);
+    }
     else
     {
         long i = len - 1;
         fmpz_t t;
+
         fmpz_init(t);
         fmpz_set(res, f + i);
         for (i = len - 2; i >= 0; i--)

@@ -72,8 +72,8 @@ fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
     }
     if (A->length < B->length)
     {
-        fmpz_poly_zero(Q);
         fmpz_poly_set(R, A);
+        fmpz_poly_zero(Q);
         return;
     }
 

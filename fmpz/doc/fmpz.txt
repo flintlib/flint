@@ -50,6 +50,14 @@ void fmpz_clear(fmpz_t f)
     with it, either back to the stack or the OS, depending on
     whether the reentrant or non-reentrant version of FLINT is built.
 
+void fmpz_init_set(fmpz_t f, const fmpz_t g)
+
+    Initialises $f$ and sets it to the value of $g$.
+
+void fmpz_init_set_ui(fmpz_t f, ulong g)
+
+    Initialises $f$ and sets it to the value of $g$.
+
 *******************************************************************************
 
     Random generation
@@ -171,6 +179,21 @@ void fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     $-m/2 \le y < m/2$, given $x$ which is assumed to satisfy
     $0 \le x < m$.
 
+__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f)
+
+    Returns a read-only \code{__mpz_struct *}.
+
+    In the case when the \code{fmpz_t}~$f$ is already backed by 
+    a \code{__mpz_struct}, a pointer to this structure is returned. 
+    Otherwise, when $f$ is small, a one-limb \code{__mpz_struct} 
+    is allocated.
+
+    This has to be cleared by a call to \code{fmpz_clear_mpz_readonly()}.
+
+void fmpz_clear_mpz_readonly(__mpz_struct *z)
+
+    Clears the memory that was possibly allocated for the integer~$z$ 
+    when calling \code{fmpz_get_mpz_readonly()}.
 
 *******************************************************************************
 
@@ -621,6 +644,13 @@ void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h)
     result is always nonnegative, even if one of $g$ and $h$ is
     negative.
 
+void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g)
+
+    Given integers $f, g$ with $0 \leq f < g$, computes the 
+    greatest common divisor $d = \gcd(f, g)$ and the modular 
+    inverse $a = f^{-1} \pmod{g}$, whenever $f \neq 0$.
+
+    Assumes that $d$ and $a$ are not aliased.
 
 *******************************************************************************
 

@@ -107,13 +107,9 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
              */
 
             _fmpz_vec_neg(R, R, lenA - n2);
-            {
-                long i;
-                for (i = 0; i < lenA - lenB; i++)
-                    fmpz_add(R + n1 + i, R + n1 + i, R + lenA - (n2 - 1) + i);
-                for ( ; i < n2 - 1; i++)
-                    fmpz_swap(R + n1 + i, R + lenA - (n2 - 1) + i);
-            }
+            _fmpz_vec_add(R + n1, R + n1, R + lenA - n2 + 1, lenA - lenB);
+            _fmpz_vec_swap(R + lenA - n2, R + 2 * lenA - lenB + 1 - n2, n2 - (lenA - lenB + 1));
+
             f = R + lenB - 1;
             fmpz_pow_ui(f, B + (lenB - 1), *d);
             _fmpz_vec_scalar_addmul_fmpz(R, A, n1 + n2 - 1, f);

@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -34,43 +35,40 @@ void
 _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen, 
                       mp_srcptr B, long Blen, nmod_t mod)
 {
-    long len = Alen - Blen + 1;
+    long Qlen = Alen - Blen + 1;
     mp_ptr Arev, Brev;
 
-    Arev = _nmod_vec_init(2*len);
-    Brev = Arev + len;
+    Arev = _nmod_vec_init(2 * Qlen);
+    Brev = Arev + Qlen;
 
-    if (Alen >= len)
-        _nmod_poly_reverse(Arev, A + Alen - len, len, len);
-    else
+    _nmod_poly_reverse(Arev, A + (Alen - Qlen), Qlen, Qlen);
+
+    if (Blen >= Qlen)
     {
-        _nmod_poly_reverse(Arev, A, Alen, Alen);
-        mpn_zero(Arev + Alen, len - Alen);
+        _nmod_poly_reverse(Brev, B + (Blen - Qlen), Qlen, Qlen);
     }
-
-    if (Blen >= len)
-        _nmod_poly_reverse(Brev, B + Blen - len, len, len);
     else
     {
         _nmod_poly_reverse(Brev, B, Blen, Blen);
-        mpn_zero(Brev + Blen, len - Blen);
+        mpn_zero(Brev + Blen, Qlen - Blen);
     }
 
-    _nmod_poly_div_series(Q, Arev, Brev, len, mod);
-    
-    _nmod_poly_reverse(Q, Q, len, len);
+    _nmod_poly_div_series(Q, Arev, Brev, Qlen, mod);
+
+    _nmod_poly_reverse(Q, Q, Qlen, Qlen);
+
     _nmod_vec_free(Arev);
 }
 
 void
 nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
-                                            const nmod_poly_t B)
+                                    const nmod_poly_t B)
 {
-    mp_ptr Q_coeffs;
-    nmod_poly_t t1;
-    long Alen, Blen;
+    const long Alen = A->length;
+    const long Blen = B->length;
+    const long Qlen = Alen - Blen + 1;
 
-    Blen = B->length;
+    mp_ptr q;
 
     if (Blen == 0)
     {
@@ -78,37 +76,33 @@ nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
         abort();
     }
 
-    Alen = A->length;
-
     if (Alen < Blen)
     {
         nmod_poly_zero(Q);
-
         return;
     }
 
     if (Q == A || Q == B)
     {
-        nmod_poly_init2_preinv(t1, B->mod.n, B->mod.ninv,
-                               Alen - Blen + 1);
-        Q_coeffs = t1->coeffs;
+        q = malloc(Qlen * sizeof(mp_limb_t));
     }
     else
     {
-        nmod_poly_fit_length(Q, Alen - Blen + 1);
-        Q_coeffs = Q->coeffs;
+        nmod_poly_fit_length(Q, Qlen);
+        q = Q->coeffs;
     }
 
-    _nmod_poly_div_newton(Q_coeffs, A->coeffs, Alen,
-                               B->coeffs, Blen, B->mod);
+    _nmod_poly_div_newton(q, A->coeffs, Alen, B->coeffs, Blen, B->mod);
 
     if (Q == A || Q == B)
     {
-        nmod_poly_swap(Q, t1);
-        nmod_poly_clear(t1);
+        free(Q->coeffs);
+        Q->coeffs = q;
+        Q->alloc  = Qlen;
+        Q->length = Qlen;
     }
-    
-    Q->length = Alen - Blen + 1;
-
-    _nmod_poly_normalise(Q);
+    else
+    {
+        Q->length = Qlen;
+    }
 }

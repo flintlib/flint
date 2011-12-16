@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -317,6 +318,15 @@ void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
     Sets \code{dest} to \code{1 / src}. The result is placed in canonical
     form, assuming that \code{src} is already in canonical form.
+
+void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
+                  const fmpz_t opnum, const fmpz_t opden, long e);
+
+void fmpq_pow_si(fmpq_t res, const fmpq_t op, long e);
+
+    Sets \code{res} to \code{op} raised to the power~$e$, where~$e$ 
+    is a \code{signed long}.  If $e$ is $0$ and \code{op} is $0$, then 
+    \code{res} will be set to $1$.
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 

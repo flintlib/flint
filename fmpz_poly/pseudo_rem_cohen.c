@@ -54,8 +54,8 @@ _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, long lenA,
         _fmpz_vec_scalar_submul_fmpz(R + (lenA - lenB), B, lenB - 1, R + (lenA - 1));
         fmpz_zero(R + (lenA - 1));
 
-        for (lenA -= 2; (lenA >= 0) && (R[lenA] == 0L); lenA--) ;
-        lenA++;
+        lenA--;
+        FMPZ_VEC_NORM(R, lenA);
 
         e--;
     }

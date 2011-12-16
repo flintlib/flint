@@ -35,5 +35,5 @@ fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
     if (n < poly->length)
         fmpz_set(x, poly->coeffs + n);
     else
-        fmpz_set_ui(x, 0);
+        fmpz_zero(x);
 }
