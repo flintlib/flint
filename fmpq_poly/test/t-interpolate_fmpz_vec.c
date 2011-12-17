@@ -48,7 +48,7 @@ main(void)
     {
         fmpq_poly_t P;
         fmpz *x, *y, *z;
-        mpq_t q;
+        fmpq_t q;
         long j, n, l, bits;
 
         n = n_randint(state, 50);
@@ -68,13 +68,13 @@ main(void)
 
         fmpq_poly_interpolate_fmpz_vec(P, x, y, n);
 
-        mpq_init(q);
+        fmpq_init(q);
         for (j = 0; j < n; j++)
         {
             fmpq_poly_evaluate_fmpz(q, P, x + j);
-            fmpz_set_mpz(z + j, mpq_numref(q));
+            fmpz_set(z + j, fmpq_numref(q));
 
-            if (!fmpz_equal(z + j, y + j) || mpz_cmp_ui(mpq_denref(q), 1))
+            if (!fmpz_equal(z + j, y + j) || !fmpz_is_one(fmpq_denref(q)))
             {
                 printf("FAIL:\n");
                 printf("x:\n"); _fmpz_vec_print(x, n); printf("\n\n");
@@ -83,7 +83,7 @@ main(void)
                 abort();
             }
         }
-        mpq_clear(q);
+        fmpq_clear(q);
 
         fmpq_poly_clear(P);
         _fmpz_vec_clear(x, n);

@@ -48,10 +48,10 @@ main(void)
     {
         fmpz_t a;
         fmpq_poly_t f, g, h;
-        mpq_t x, y;
+        fmpq_t x, y;
 
-        mpq_init(x);
-        mpq_init(y);
+        fmpq_init(x);
+        fmpq_init(y);
         fmpz_init(a);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
@@ -62,24 +62,24 @@ main(void)
 
         fmpq_poly_evaluate_fmpz(x, f, a);
         fmpq_poly_evaluate_fmpz(y, g, a);
-        mpq_add(x, x, y);
+        fmpq_add(x, x, y);
         fmpq_poly_add(h, f, g);
         fmpq_poly_evaluate_fmpz(y, h, a);
 
-        result = (mpq_equal(x, y));
+        result = (fmpq_equal(x, y));
         if (!result)
         {
             printf("FAIL:\n");
             printf("f = "), fmpq_poly_debug(f), printf("\n");
             printf("g = "), fmpq_poly_debug(g), printf("\n");
             printf("a = "), fmpz_print(a), printf("\n");
-            gmp_printf("f(a) + g(a) = %Qd\n", x);
-            gmp_printf("(f + g)(a)  = %Qd\n", y);
+            printf("f(a) + g(a) = "), fmpq_print(x), printf("\n\n");
+            printf("(f + g)(a)  = "), fmpq_print(y), printf("\n\n");
             abort();
         }
 
-        mpq_clear(x);
-        mpq_clear(y);
+        fmpq_clear(x);
+        fmpq_clear(y);
         fmpz_clear(a);
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
@@ -91,10 +91,10 @@ main(void)
     {
         fmpz_t a;
         fmpq_poly_t f, g;
-        mpq_t x, y;
+        fmpq_t x, y;
 
-        mpq_init(x);
-        mpq_init(y);
+        fmpq_init(x);
+        fmpq_init(y);
         fmpz_init(a);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
@@ -104,11 +104,11 @@ main(void)
 
         fmpq_poly_evaluate_fmpz(x, f, a);
         fmpq_poly_evaluate_fmpz(y, g, a);
-        mpq_mul(x, x, y);
+        fmpq_mul(x, x, y);
         fmpq_poly_mul(f, f, g);
         fmpq_poly_evaluate_fmpz(y, f, a);
 
-        result = (mpq_equal(x, y));
+        result = (fmpq_equal(x, y));
         if (!result)
         {
             printf("FAIL:\n");
@@ -116,8 +116,8 @@ main(void)
             abort();
         }
 
-        mpq_clear(x);
-        mpq_clear(y);
+        fmpq_clear(x);
+        fmpq_clear(y);
         fmpz_clear(a);
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);

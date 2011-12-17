@@ -54,16 +54,20 @@ _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 void 
 fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a)
 {
-    if (res == a)
+    if (res != a)
+    {
+        _fmpq_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
+            poly->coeffs, poly->den, poly->length, 
+            fmpq_numref(a), fmpq_denref(a));
+    }
+    else
     {
         fmpq_t t;
+
         fmpq_init(t);
         fmpq_set(t, a);
         fmpq_poly_evaluate_fmpq(res, poly, t);
         fmpq_clear(t);
-        return;
     }
-
-    _fmpq_poly_evaluate_fmpq(fmpq_numref(res), fmpq_denref(res),
-        poly->coeffs, poly->den, poly->length, fmpq_numref(a), fmpq_denref(a));
 }
+

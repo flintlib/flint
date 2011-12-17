@@ -30,24 +30,10 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-/*
-    Sets {res, denr, len} to {poly, den, len} with the indeterminate rescaled 
-    by the rational {xnum, xden}.
-    
-    Assumes len > 0 and {xnum, xden} is non-zero and in lowest terms.
-    
-    ( a0 + a1 t + ... + an t^n ) / d
-
-    Replace t by xnum t / xden
-    
-    (a0 + a1 xnum t / xden + ... + an xnum^n t^n / xden^n) / d
-    ( a0 xden^n + a xnum xden^{n-1} t + ... + an xnum^n t^n ) / (d xden^n)
-    
-*/
-
 void
-_fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
-              const fmpz_t den, long len, const fmpz_t xnum, const fmpz_t xden)
+_fmpq_poly_rescale(fmpz * res, fmpz_t denr, 
+                   const fmpz * poly, const fmpz_t den, long len, 
+                   const fmpz_t xnum, const fmpz_t xden)
 {
     if (len < 2L)
     {
@@ -85,31 +71,22 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly,
     }
 }
 
-void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x)
+void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const fmpq_t x)
 {
-    fmpz_t xnum, xden;
-    
-    if (mpq_sgn(x) == 0)
+    if (fmpq_is_zero(x))
     {
         fmpq_poly_zero(res);
-        return;
     }
-    if (poly->length < 2L)
+    else if (poly->length < 2L)
     {
         fmpq_poly_set(res, poly);
-        return;
     }
-    
-    fmpz_init(xnum);
-    fmpz_init(xden);
-    fmpz_set_mpz(xnum, mpq_numref(x));
-    fmpz_set_mpz(xden, mpq_denref(x));
-    
-    fmpq_poly_fit_length(res, poly->length);
-    _fmpq_poly_rescale(res->coeffs, res->den, 
-                       poly->coeffs, poly->den, poly->length, xnum, xden);
-    _fmpq_poly_set_length(res, poly->length);
-    
-    fmpz_clear(xnum);
-    fmpz_clear(xden);
+    else
+    {
+        fmpq_poly_fit_length(res, poly->length);
+        _fmpq_poly_rescale(res->coeffs, res->den, 
+                           poly->coeffs, poly->den, poly->length, 
+                           fmpq_numref(x), fmpq_denref(x));
+        _fmpq_poly_set_length(res, poly->length);
+    }
 }

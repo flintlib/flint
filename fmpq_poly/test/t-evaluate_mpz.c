@@ -37,78 +37,102 @@ main(void)
 {
     int i, result;
     flint_rand_t state;
-    ulong cflags = 0UL;
 
-    printf("rescale....");
+    printf("evaluate_mpz....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Check aliasing */
+    /* Check that (f+g)(a) = f(a) + g(a) */
     for (i = 0; i < 1000; i++)
     {
+        fmpz_t a;
+        fmpq_t x;
+        mpz_t b;
+        mpq_t y, z;
         fmpq_poly_t f, g;
-        fmpq_t a;
 
+        fmpz_init(a);
+        fmpq_init(x);
+        mpz_init(b);
+        mpq_init(y);
+        mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(state, 100), 100);
+        fmpq_poly_randtest(f, state, n_randint(state, 80), 100);
+        fmpq_poly_randtest(g, state, n_randint(state, 80), 100);
+        fmpz_randtest(a, state, 80);
+        fmpz_get_mpz(b, a);
 
-        fmpq_init(a);
-        fmpq_randtest(a, state, 100);
-        
-        fmpq_poly_rescale(g, f, a);
-        fmpq_poly_rescale(f, f, a);
+        fmpq_poly_evaluate_mpz(y, f, b);
+        fmpq_poly_evaluate_mpz(z, g, b);
+        mpq_add(y, y, z);
+        fmpq_poly_add(f, f, g);
+        fmpq_poly_evaluate_mpz(z, f, b);
 
-        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
-        result = (fmpq_poly_equal(f, g) && !cflags);
+        result = (mpq_equal(y, z));
         if (!result)
         {
-            printf("FAIL (aliasing):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            printf("FAIL:\n");
+            fmpz_print(a), printf("\n\n");
+            gmp_printf("y = %Qd\n\n", y);
+            gmp_printf("z = %Qd\n\n", z);
             abort();
         }
 
+        fmpz_clear(a);
+        fmpq_clear(x);
+        mpz_clear(b);
+        mpq_clear(y);
+        mpq_clear(z);
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
-        fmpq_clear(a);
     }
 
-    /* Check that rescaling by a and then by 1/a is the identity */
+    /* Check that (f*g)(a) = f(a) * g(a) */
     for (i = 0; i < 1000; i++)
     {
+        fmpz_t a;
+        fmpq_t x;
+        mpz_t b;
+        mpq_t y, z;
         fmpq_poly_t f, g;
-        fmpq_t a;
 
+        fmpz_init(a);
+        fmpq_init(x);
+        mpz_init(b);
+        mpq_init(y);
+        mpq_init(z);
         fmpq_poly_init(f);
         fmpq_poly_init(g);
-        fmpq_poly_randtest(f, state, n_randint(state, 100), 100);
-        
-        fmpq_init(a);
-        fmpq_randtest_not_zero(a, state, 100);
-        
-        fmpq_poly_rescale(g, f, a);
-        fmpq_inv(a, a);
-        fmpq_poly_rescale(g, g, a);
+        fmpq_poly_randtest(f, state, n_randint(state, 50), 80);
+        fmpq_poly_randtest(g, state, n_randint(state, 50), 80);
+        fmpz_randtest(a, state, 80);
+        fmpz_get_mpz(b, a);
 
-        cflags |= fmpq_poly_is_canonical(f) ? 0 : 1;
-        cflags |= fmpq_poly_is_canonical(g) ? 0 : 2;
-        result = (fmpq_poly_equal(f, g) && !cflags);
+        fmpq_poly_evaluate_mpz(y, f, b);
+        fmpq_poly_evaluate_mpz(z, g, b);
+        mpq_mul(y, y, z);
+        fmpq_poly_mul(f, f, g);
+        fmpq_poly_evaluate_mpz(z, f, b);
+
+        result = (mpq_equal(y, z));
         if (!result)
         {
-            printf("FAIL (composition of a and 1/a):\n");
-            fmpq_poly_debug(f), printf("\n\n");
-            fmpq_poly_debug(g), printf("\n\n");
-            printf("cflags = %lu\n\n", cflags);
+            printf("FAIL:\n");
+            fmpz_print(a), printf("\n\n");
+            gmp_printf("y = %Qd\n\n", y);
+            gmp_printf("z = %Qd\n\n", z);
             abort();
         }
 
+        fmpz_clear(a);
+        fmpq_clear(x);
+        mpz_clear(b);
+        mpq_clear(y);
+        mpq_clear(z);
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
-        fmpq_clear(a);
     }
 
     flint_randclear(state);

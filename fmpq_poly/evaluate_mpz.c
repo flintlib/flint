@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,33 +29,18 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
+#include "fmpq.h"
 
-void 
-_fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
-                         const fmpz_t den, long len, const fmpz_t a)
+void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a)
 {
-    fmpz_t d;
-    
-    _fmpz_poly_evaluate_horner_fmpz(rnum, poly, len, a);
-    
-    fmpz_init(d);
-    fmpz_gcd(d, rnum, den);
-    if (*d != 1L)
-    {
-        fmpz_divexact(rnum, rnum, d);
-        fmpz_divexact(rden, den, d);
-    }
-    else
-    {
-        fmpz_set(rden, den);
-    }
-    fmpz_clear(d);
-}
+    fmpq_t r;
+    fmpz_t b;
 
-void 
-fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
-{
-    _fmpq_poly_evaluate_fmpz(fmpq_numref(res), fmpq_denref(res), 
-                             poly->coeffs, poly->den, poly->length, a);
+    fmpq_init(r);
+    fmpz_init(b);
+    fmpz_set_mpz(b, a);
+    fmpq_poly_evaluate_fmpz(r, poly, b);
+    fmpq_get_mpq(res, r);
+    fmpq_clear(r);
+    fmpz_clear(b);
 }
-

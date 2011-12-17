@@ -483,7 +483,7 @@ void fmpq_poly_tanh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
                               const fmpz_t den, long len, const fmpz_t a);
 
-void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, 
+void fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, 
                              const fmpz_t a);
 
 void
@@ -493,6 +493,8 @@ _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
 
 void 
 fmpq_poly_evaluate_fmpq(fmpq_t res, const fmpq_poly_t poly, const fmpq_t a);
+
+void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a);
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a);
 
@@ -518,7 +520,8 @@ void fmpq_poly_compose(fmpq_poly_t res,
 void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly, 
              const fmpz_t den, long len, const fmpz_t xnum, const fmpz_t xden);
 
-void fmpq_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t x);
+void fmpq_poly_rescale(fmpq_poly_t res, 
+                       const fmpq_poly_t poly, const fmpq_t x);
 
 /*  Power series composition  ************************************************/
 

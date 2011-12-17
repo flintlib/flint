@@ -35,6 +35,7 @@ void
 fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 {
     fmpq_t r, b;
+
     fmpq_init(r);
     fmpq_init(b);
     fmpq_set_mpq(b, a);

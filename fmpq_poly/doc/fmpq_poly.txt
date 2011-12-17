@@ -1073,7 +1073,7 @@ void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
     Evaluates the polynomial \code{(poly, den, len)} at the integer $a$ and 
     sets \code{(rnum, rden)} to the result in lowest terms.
 
-void fmpq_poly_evaluate_fmpz(mpq_t res, const fmpq_poly_t poly, const fmpz_t a)
+void fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
 
     Evaluates the polynomial \code{poly} at the integer $a$ and sets 
     \code{res} to the result.
@@ -1087,10 +1087,16 @@ void _fmpq_poly_evaluate_fmpq(fmpz_t rnum, fmpz_t rden,
     lowest terms.  Aliasing between \code{(rnum, rden)} and 
     \code{(anum, aden)} is not supported.
 
-void fmpq_poly_evaluate_fmpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
+void fmpq_poly_evaluate_fmpq(fmpq_t res, 
+                             const fmpq_poly_t poly, const fmpq_t a)
 
     Evaluates the polynomial \code{poly} at the rational $a$ and 
     sets \code{res} to the result.
+
+void fmpq_poly_evaluate_mpz(mpq_t res, const fmpq_poly_t poly, const mpz_t a)
+
+    Evaluates the polynomial \code{poly} at the integer $a$ of type
+    \code{mpz} and sets \code{res} to the result.
 
 void fmpq_poly_evaluate_mpq(mpq_t res, const fmpq_poly_t poly, const mpq_t a)
 
@@ -1160,7 +1166,8 @@ void _fmpq_poly_rescale(fmpz * res, fmpz_t denr, const fmpz * poly,
     in lowest terms.  Supports aliasing between \code{(res, denr, len)} and 
     \code{(poly, den, len)}.
 
-void fmpz_poly_rescale(fmpq_poly_t res, const fmpq_poly_t poly, const mpq_t a)
+void fmpz_poly_rescale(fmpq_poly_t res, 
+                       const fmpq_poly_t poly, const fmpq_t a)
 
     Sets \code{res} to \code{poly} with the indeterminate rescaled by $a$.
 
