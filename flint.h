@@ -39,6 +39,8 @@
     #define __inline__  inline
 #endif
 
+extern char version[];
+
 #define ulong unsigned long
 
 #if __GMP_BITS_PER_MP_LIMB == 64
