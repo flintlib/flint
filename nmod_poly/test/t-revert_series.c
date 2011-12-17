@@ -29,8 +29,8 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpq_poly.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 #include "ulong_extras.h"
 
 int
@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("reverse_series....");
+    printf("revert_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -47,75 +47,76 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 100; i++)
     {
-        fmpq_poly_t f, g;
+        nmod_poly_t f, g;
+        mp_limb_t m;
         long n;
 
-        fmpq_poly_init(f);
-        fmpq_poly_init(g);
+        m = n_randtest_prime(state, 0);
+        nmod_poly_init(f, m);
+        nmod_poly_init(g, m);
         do {
-            fmpq_poly_randtest(g, state, n_randint(state, 50), 1+n_randint(state,100));
-        } while (fmpq_poly_length(g) < 2 || fmpz_is_zero(g->coeffs + 1));
-        fmpq_poly_set_coeff_ui(g, 0, 0);
-        n = n_randint(state, 50);
+            nmod_poly_randtest(g, state, n_randint(state, 100));
+        } while (nmod_poly_get_coeff_ui(g, 1) == 0);
+        nmod_poly_set_coeff_ui(g, 0, 0);
+        do {
+            n = n_randint(state, 100);
+        } while (n >= m);
 
-        fmpq_poly_reverse_series(f, g, n);
-        fmpq_poly_reverse_series(g, g, n);
+        nmod_poly_revert_series(f, g, n);
+        nmod_poly_revert_series(g, g, n);
 
-        result = (fmpq_poly_equal(f, g));
+        result = (nmod_poly_equal(f, g));
         if (!result)
         {
             printf("FAIL (aliasing):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
+            nmod_poly_print(f), printf("\n\n");
+            nmod_poly_print(g), printf("\n\n");
             abort();
         }
 
-        fmpq_poly_clear(f);
-        fmpq_poly_clear(g);
+        nmod_poly_clear(f);
+        nmod_poly_clear(g);
     }
 
     /* Check f(f^(-1)) = id */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 1000; i++)
     {
-        fmpq_poly_t f, g, h;
+        nmod_poly_t f, g, h;
+        mp_limb_t m;
         long n;
 
-        fmpq_poly_init(f);
-        fmpq_poly_init(g);
-        fmpq_poly_init(h);
+        m = n_randtest_prime(state, 0);
+        nmod_poly_init(f, m);
+        nmod_poly_init(g, m);
+        nmod_poly_init(h, m);
         do {
-            if (n_randint(state, 20) == 0)
-                fmpq_poly_randtest(g, state,
-                    n_randint(state, 50), 1);
-            else
-                fmpq_poly_randtest(g, state,
-                    n_randint(state, 50), 1+n_randint(state,100));
-        } while (fmpq_poly_length(g) < 2 || fmpz_is_zero(g->coeffs + 1));
-        fmpq_poly_set_coeff_ui(g, 0, 0);
-        n = n_randint(state, 50);
+            nmod_poly_randtest(g, state, n_randint(state, 100));
+        } while (nmod_poly_get_coeff_ui(g, 1) == 0);
+        nmod_poly_set_coeff_ui(g, 0, 0);
+        do {
+            n = n_randint(state, 100);
+        } while (n >= m);
 
-        fmpq_poly_reverse_series(f, g, n);
-        fmpq_poly_compose_series(h, g, f, n);
+        nmod_poly_revert_series(f, g, n);
+        nmod_poly_compose_series(h, g, f, n);
 
-        result = ((n <= 1 && fmpq_poly_is_zero(h)) ||
-            (h->length == 2 && fmpz_is_zero(h->coeffs + 0) &&
-                fmpz_is_one(h->coeffs + 1)));
+        result = ((n <= 1 && nmod_poly_is_zero(h)) ||
+            (h->length == 2 && h->coeffs[0] == 0 && h->coeffs[1] == 1));
         if (!result)
         {
             printf("FAIL (comparison):\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
-            fmpq_poly_print(h), printf("\n\n");
+            nmod_poly_print(g), printf("\n\n");
+            nmod_poly_print(f), printf("\n\n");
+            nmod_poly_print(h), printf("\n\n");
             abort();
         }
 
-        fmpq_poly_clear(f);
-        fmpq_poly_clear(g);
-        fmpq_poly_clear(h);
+        nmod_poly_clear(f);
+        nmod_poly_clear(g);
+        nmod_poly_clear(h);
     }
 
     flint_randclear(state);
-    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

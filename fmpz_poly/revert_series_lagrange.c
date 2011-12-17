@@ -31,7 +31,7 @@
 
 
 void
-_fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 {
     long i;
     fmpz *R, *S, *T, *tmp;
@@ -65,7 +65,7 @@ _fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 }
 
 void
-fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
+fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
                                         const fmpz_poly_t Q, long n)
 {
     fmpz *Qcopy;
@@ -74,7 +74,7 @@ fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
-        printf("exception: fmpz_poly_reverse_series_lagrange: input must have "
+        printf("exception: fmpz_poly_revert_series_lagrange: input must have "
             "zero constant term and +1 or -1 as coefficient of x^1");
         abort();
     }
@@ -98,13 +98,13 @@ fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
     if (Qinv != Q)
     {
         fmpz_poly_fit_length(Qinv, n);
-        _fmpz_poly_reverse_series_lagrange(Qinv->coeffs, Qcopy, n);
+        _fmpz_poly_revert_series_lagrange(Qinv->coeffs, Qcopy, n);
     }
     else
     {
         fmpz_poly_t t;
         fmpz_poly_init2(t, n);
-        _fmpz_poly_reverse_series_lagrange(t->coeffs, Qcopy, n);
+        _fmpz_poly_revert_series_lagrange(t->coeffs, Qcopy, n);
         fmpz_poly_swap(Qinv, t);
         fmpz_poly_clear(t);
     }

@@ -1249,7 +1249,7 @@ void fmpq_poly_compose_series(fmpq_poly_t res,
 
 *******************************************************************************
 
-void _fmpq_poly_reverse_series_lagrange(fmpz * res, fmpz_t den,
+void _fmpq_poly_revert_series_lagrange(fmpz * res, fmpz_t den,
     const fmpz * poly1, const fmpz_t den1, long n)
 
     Sets \code{(res, den)} to the power series reversion of
@@ -1264,7 +1264,7 @@ void _fmpq_poly_reverse_series_lagrange(fmpz * res, fmpz_t den,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void fmpq_poly_reverse_series_lagrange(fmpq_poly_t res, 
+void fmpq_poly_revert_series_lagrange(fmpq_poly_t res, 
                     const fmpq_poly_t poly, long n)
 
     Sets \code{res} to the power series reversion of \code{poly1} modulo $x^n$.
@@ -1275,7 +1275,7 @@ void fmpq_poly_reverse_series_lagrange(fmpq_poly_t res,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void _fmpq_poly_reverse_series_lagrange_fast(fmpz * res, fmpz_t den,
+void _fmpq_poly_revert_series_lagrange_fast(fmpz * res, fmpz_t den,
         const fmpz * poly1, const fmpz_t den1, long n)
 
     Sets \code{(res, den)} to the power series reversion of
@@ -1291,7 +1291,7 @@ void _fmpq_poly_reverse_series_lagrange_fast(fmpz * res, fmpz_t den,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res, 
+void fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res, 
                     const fmpq_poly_t poly, long n)
 
     Sets \code{res} to the power series reversion of \code{poly1} modulo $x^n$.
@@ -1303,7 +1303,7 @@ void fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void _fmpq_poly_reverse_series_newton(fmpz * res, fmpz_t den,
+void _fmpq_poly_revert_series_newton(fmpz * res, fmpz_t den,
         const fmpz * poly1, const fmpz_t den1, long n)
 
     Sets \code{(res, den)} to the power series reversion of
@@ -1318,7 +1318,7 @@ void _fmpq_poly_reverse_series_newton(fmpz * res, fmpz_t den,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void fmpq_poly_reverse_series_newton(fmpq_poly_t res, 
+void fmpq_poly_revert_series_newton(fmpq_poly_t res, 
                     const fmpq_poly_t poly, long n)
 
     Sets \code{res} to the power series reversion of \code{poly1} modulo $x^n$.
@@ -1329,7 +1329,7 @@ void fmpq_poly_reverse_series_newton(fmpq_poly_t res,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void _fmpq_poly_reverse_series(fmpz * res, fmpz_t den,
+void _fmpq_poly_revert_series(fmpz * res, fmpz_t den,
         const fmpz * poly1, const fmpz_t den1, long n)
 
     Sets \code{(res, den)} to the power series reversion of
@@ -1344,7 +1344,7 @@ void _fmpq_poly_reverse_series(fmpz * res, fmpz_t den,
     The default \code{fmpz_poly} reversion algorithm is automatically
     used when the reversion can be performed over the integers.
 
-void fmpq_poly_reverse_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_revert_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
     Sets \code{res} to the power series reversion of \code{poly1} modulo $x^n$.
     The constant term of \code{poly2} is required to be zero and

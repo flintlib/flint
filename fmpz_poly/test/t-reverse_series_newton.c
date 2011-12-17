@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("reverse_series_newton....");
+    printf("revert_series_newton....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -60,8 +60,8 @@ main(void)
             fmpz_poly_neg(g, g);  /* get -x term */
         n = n_randint(state, 50);
 
-        fmpz_poly_reverse_series_newton(f, g, n);
-        fmpz_poly_reverse_series_newton(g, g, n);
+        fmpz_poly_revert_series_newton(f, g, n);
+        fmpz_poly_revert_series_newton(g, g, n);
 
         result = (fmpz_poly_equal(f, g));
         if (!result)
@@ -92,7 +92,7 @@ main(void)
             fmpz_poly_neg(g, g);  /* get -x term */
         n = n_randint(state, 50);
 
-        fmpz_poly_reverse_series_newton(f, g, n);
+        fmpz_poly_revert_series_newton(f, g, n);
         fmpz_poly_compose_series(h, g, f, n);
 
         result = ((n <= 1 && fmpz_poly_is_zero(h)) ||

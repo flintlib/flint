@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("reverse_series_lagrange....");
+    printf("revert_series_lagrange_fast....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -63,8 +63,8 @@ main(void)
         } while (n >= m);
 
 
-        nmod_poly_reverse_series_lagrange(f, g, n);
-        nmod_poly_reverse_series_lagrange(g, g, n);
+        nmod_poly_revert_series_lagrange_fast(f, g, n);
+        nmod_poly_revert_series_lagrange_fast(g, g, n);
 
         result = (nmod_poly_equal(f, g));
         if (!result)
@@ -98,7 +98,7 @@ main(void)
             n = n_randint(state, 100);
         } while (n >= m);
 
-        nmod_poly_reverse_series_lagrange(f, g, n);
+        nmod_poly_revert_series_lagrange_fast(f, g, n);
         nmod_poly_compose_series(h, g, f, n);
 
         result = ((n <= 1 && nmod_poly_is_zero(h)) ||
