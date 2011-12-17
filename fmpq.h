@@ -111,6 +111,11 @@ static __inline__ void fmpq_neg(fmpq_t dest, const fmpq_t src)
     fmpz_set(fmpq_denref(dest), fmpq_denref(src));
 }
 
+static __inline__ void fmpq_abs(fmpq_t dest, const fmpq_t src)
+{
+    fmpz_abs(fmpq_numref(dest), fmpq_numref(src));
+}
+
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 void fmpq_canonicalise(fmpq_t res);
@@ -137,6 +142,14 @@ static __inline__ void fmpq_get_mpq(mpq_t dest, const fmpq_t src)
     fmpz_get_mpz(mpq_denref(dest), fmpq_denref(src));
 }
 
+void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f);
+
+void flint_mpq_clear_readonly(mpq_t z);
+
+void fmpq_init_set_readonly(fmpq_t f, const mpq_t z);
+
+void fmpq_clear_readonly(fmpq_t f);
+
 char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den);
 
 char * fmpq_get_str(char * str, int b, const fmpq_t x);
@@ -158,6 +171,8 @@ static __inline__ void fmpq_print(const fmpq_t x)
 void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
 
 void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
+
+void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits);
 
 void _fmpq_randbits(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits);
 

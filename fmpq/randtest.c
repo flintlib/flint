@@ -71,3 +71,16 @@ void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
 {
     _fmpq_randtest(&res->num, &res->den, state, bits);
 }
+
+void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, mp_bitcnt_t bits)
+{
+    if (bits == 0)
+    {
+        printf("Exception: 0 passed to fmpq_randtest_not_zero\n");
+        abort();
+    }
+
+    fmpq_randtest(f, state, bits);
+    if (fmpq_is_zero(f))
+        fmpq_one(f);
+}
