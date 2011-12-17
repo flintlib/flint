@@ -27,12 +27,15 @@
 #include "flint.h"
 #include "fmpz.h"
 
-void fmpz_clear_mpz_readonly(__mpz_struct *z)
+void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 {
-    if ((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX)
-        || (z->_mp_size == 0))
+    if (COEFF_IS_MPZ(*f))
     {
-        free(z);
+        *z = *COEFF_TO_PTR(*f);
+    }
+    else
+    {
+        mpz_init_set_si(z, *f);
     }
 }
 

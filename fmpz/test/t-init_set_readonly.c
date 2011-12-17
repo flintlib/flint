@@ -35,7 +35,7 @@ int main(void)
     int i;
     flint_rand_t state;
     
-    printf("mpz_readonly....");
+    printf("init_set_readonly....");
     fflush(stdout);
     
     flint_randinit(state);
@@ -44,55 +44,75 @@ int main(void)
     for (i = 0; i < 100000; i++)
     {
         fmpz_t f;
-        __mpz_struct *z;
+        mpz_t z;
 
         *f = z_randint(state, COEFF_MAX + 1);
 
-        z = fmpz_get_mpz_readonly(f);
-        fmpz_clear_mpz_readonly(z);
+        mpz_init(z);
+        fmpz_get_mpz(z, f);
+
+        {
+            fmpz_t g;
+
+            fmpz_init_set_readonly(g, z);
+            fmpz_clear_readonly(g);
+        }
+
+        mpz_clear(z);
     }
 
-    /* Create some large fmpz integers, do not clear the mpz_t */
+    /* Create some small fmpz integers, do *not* clear the mpz_t */
     for (i = 0; i < 100000; i++)
     {
         fmpz_t f;
-        __mpz_struct *z;
+        mpz_t z;
 
-        fmpz_init(f);
-        fmpz_randtest(f, state, 2 * FLINT_BITS);
+        *f = z_randint(state, COEFF_MAX + 1);
 
-        if (COEFF_IS_MPZ(*f))
+        mpz_init(z);
+        fmpz_get_mpz(z, f);
+
         {
-            z = fmpz_get_mpz_readonly(f);
+            fmpz_t g;
+
+            fmpz_init_set_readonly(g, z);
         }
 
-        fmpz_clear(f);
+        mpz_clear(z);
     }
 
     /* Create some more fmpz integers */
     for (i = 0; i < 100000; i++)
     {
-        fmpz_t f, g;
-        __mpz_struct *z;
+        fmpz_t f;
+        mpz_t z;
 
         fmpz_init(f);
-        fmpz_init(g);
         fmpz_randtest(f, state, 2 * FLINT_BITS);
+        mpz_init(z);
+        fmpz_get_mpz(z, f);
 
-        z = fmpz_get_mpz_readonly(f);
-        fmpz_set_mpz(g, z);
-
-        if (!fmpz_equal(f, g))
         {
-            printf("FAIL:\n\n");
-            printf("f = "), fmpz_print(f), printf("\n");
-            printf("g = "), fmpz_print(g), printf("\n");
-            gmp_printf("z = %Zd\n", z);
+            fmpz_t g, h;
+
+            fmpz_init_set_readonly(g, z);
+            fmpz_init(h);
+            fmpz_set_mpz(h, z);
+
+            if (!fmpz_equal(g, h))
+            {
+                printf("FAIL:\n\n");
+                printf("g = "), fmpz_print(g), printf("\n");
+                printf("h = "), fmpz_print(h), printf("\n");
+                gmp_printf("z = %Zd\n", z);
+            }
+
+            fmpz_clear_readonly(g);
+            fmpz_clear(h);
         }
 
         fmpz_clear(f);
-        fmpz_clear(g);
-        fmpz_clear_mpz_readonly(z);
+        mpz_clear(z);
     }
 
     flint_randclear(state);

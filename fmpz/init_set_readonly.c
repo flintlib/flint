@@ -27,40 +27,26 @@
 #include "flint.h"
 #include "fmpz.h"
 
-__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f)
+void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
 {
-    if (COEFF_IS_MPZ(*f))
+    if (z->_mp_size == 1 && z->_mp_d[0] <= COEFF_MAX)
     {
-        return COEFF_TO_PTR(*f);
+        *f = z->_mp_d[0];
+    }
+    else if (z->_mp_size == -1 && z->_mp_d[0] <= COEFF_MAX)
+    {
+        *f = -(z->_mp_d[0]);
+    }
+    else if (z->_mp_size)
+    {
+        __mpz_struct *ptr = _fmpz_promote(f);
+
+        mpz_clear(ptr);
+        *ptr = *z;
     }
     else
     {
-        __mpz_struct *z; 
-
-        if (*f > 0)
-        {
-            z            = malloc(sizeof(__mpz_struct) + sizeof(mp_limb_t));
-            z->_mp_alloc = 1;
-            z->_mp_size  = 1;
-            z->_mp_d     = (mp_ptr) ((char *) z + sizeof(__mpz_struct));
-            z->_mp_d[0]  = *f;
-        }
-        else if (*f < 0)
-        {
-            z            = malloc(sizeof(__mpz_struct) + sizeof(mp_limb_t));
-            z->_mp_alloc = 1;
-            z->_mp_size  = -1;
-            z->_mp_d     = (mp_ptr) ((char *) z + sizeof(__mpz_struct));
-            z->_mp_d[0]  = -(*f);
-        }
-        else
-        {
-            z            = malloc(sizeof(__mpz_struct));
-            z->_mp_alloc = 1;
-            z->_mp_size  = 0;
-        }
-
-        return z;
+        *f = 0L;
     }
 }
 

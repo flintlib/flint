@@ -194,9 +194,13 @@ void fmpz_set_mpz(fmpz_t f, const mpz_t x);
 
 int fmpz_set_str(fmpz_t f, char * str, int b);
 
-__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f);
+void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
 
-void fmpz_clear_mpz_readonly(__mpz_struct *z);
+void flint_mpz_clear_readonly(mpz_t z);
+
+void fmpz_init_set_readonly(fmpz_t f, const mpz_t z);
+
+void fmpz_clear_readonly(fmpz_t f);
 
 int fmpz_abs_fits_ui(const fmpz_t f);
 
