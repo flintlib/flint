@@ -34,8 +34,62 @@
 void
 fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
-    fmpz_t t;
-    fmpz_init(t);
-    fmpz_fdiv_qr(t, f, g, h);
-    fmpz_clear(t);
+    fmpz c1 = *g;
+    fmpz c2 = *h;
+
+    if (fmpz_is_zero(h))
+    {
+        printf("Exception: division by zero in fmpz_fdiv_r\n");
+        abort();
+    }
+
+    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    {
+        if (!COEFF_IS_MPZ(c2))  /* h is also small */
+        {
+            fmpz q = c1 / c2;   /* compute C quotient */
+            fmpz r = c1 - c2 * q;   /* compute remainder */
+
+            if ((c2 > 0L && r < 0L) || (c2 < 0L && r > 0L))
+                r += c2;
+
+            fmpz_set_si(f, r);
+        }
+        else                    /* h is large and g is small */
+        {
+            if (c1 == 0L)
+            {
+                fmpz_set_si(f, c1);
+            }
+            else if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
+            {
+                fmpz_set_si(f, c1);
+            }
+            else
+            {
+                fmpz_add(f, g, h);
+            }
+        }
+    }
+    else                        /* g is large */
+    {
+        __mpz_struct * mpz_ptr = _fmpz_promote(f);
+
+        if (!COEFF_IS_MPZ(c2))  /* h is small */
+        {
+            if (c2 > 0)         /* h > 0 */
+            {
+                mpz_fdiv_r_ui(mpz_ptr, COEFF_TO_PTR(c1), c2);
+            }
+            else
+            {
+                mpz_cdiv_r_ui(mpz_ptr, COEFF_TO_PTR(c1), -c2);
+            }
+        }
+        else                    /* both are large */
+        {
+            mpz_fdiv_r(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
+        }
+        _fmpz_demote_val(f);    /* division by h may result in small value */
+    }
 }
