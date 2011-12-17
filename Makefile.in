@@ -1,7 +1,7 @@
 LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lflint -lmpir -lmpfr -lm
 LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lmpir -lmpfr -lm
 INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
-LINKLIBS=$(FLINT_MPIR_LIB_DIR)/libmpir.a $(FLINT_MPFR_LIB_DIR)/libmpfr.a
+LINKLIBS=
 
 LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -11,13 +11,11 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
-
-LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
-
-LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
+OBJS = $(patsubst %.c, build/%.o, $(LIB_SOURCES))
 
 LIB_OBJS = $(patsubst %.c, build/%.lo, $(LIB_SOURCES))
+
+LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -79,7 +77,12 @@ ifdef FLINT_STATIC
 endif
 
 library-recursive:
+ifdef FLINT_STATIC
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);)
+endif
+ifdef FLINT_SHARED
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) 
+endif
 
 $(FLINT_LIB): library
 

@@ -31,13 +31,13 @@ until [ -z "$1" ]; do
          exit 0
          ;;
       "--with-mpir="*)
-         MPIR_DIR=`expr substr $1 13 length $1`
+         MPIR_DIR=`expr substr "$1" 13 length "$1"`
          ;;
       "--with-mpfr="*)
-         MPFR_DIR=`expr substr $1 13 length $1`
+         MPFR_DIR=`expr substr "$1" 13 length "$1"`
          ;;
       "--prefix="*)
-         PREFIX=`expr substr $1 10 length $1`
+         PREFIX=`expr substr "$1" 10 length "$1"`
 	 ;;
       "--disable-shared")
          SHARED=0
@@ -46,13 +46,13 @@ until [ -z "$1" ]; do
          STATIC=0
          ;;
       "AR="*)
-         AR=`expr substr $1 4 length $1`
+         AR=`expr substr "$1" 4 length "$1"`
          ;;
       "CC="*)
-         CC=`expr substr $1 4 length $1`
+         CC=`expr substr "$1" 4 length "$1"`
          ;;
       "CFLAGS="*)
-         CFLAGS=`expr substr $1 8 length $1`
+         CFLAGS=`expr substr "$1" 8 length "$1"`
          ;;
       *) usage
          exit 1
