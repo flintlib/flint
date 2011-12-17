@@ -41,7 +41,7 @@ void _fmpq_poly_divrem(fmpz * Q, fmpz_t q, fmpz * R, fmpz_t r,
     
     if (lenB == 1)
     {
-        _fmpq_poly_scalar_div_mpq(Q, q, A, a, lenA, B, b);
+        _fmpq_poly_scalar_div_fmpq(Q, q, A, a, lenA, B, b);
         fmpz_set_ui(r, 1);
         return;
     }

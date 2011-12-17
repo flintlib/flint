@@ -32,31 +32,10 @@
 
 void fmpq_poly_set_coeff_mpz(fmpq_poly_t poly, long n, const mpz_t x)
 {
-    long len = poly->length;
-    const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
-    
-    if (!replace && mpz_sgn(x) == 0)
-        return;
-    
-    if (n + 1 > len)
-    {
-        fmpq_poly_fit_length(poly, n + 1);
-        _fmpq_poly_set_length(poly, n + 1);
-        mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
-    }
-    
-    if (*poly->den == 1L)
-    {
-        fmpz_set_mpz(poly->coeffs + n, x);
-        if (replace)
-            _fmpq_poly_normalise(poly);
-    }
-    else
-    {
-        fmpz_set_mpz(poly->coeffs + n, x);
-        fmpz_mul(poly->coeffs + n, poly->coeffs + n, poly->den);
-        if (replace)
-            fmpq_poly_canonicalise(poly);
-    }
+    fmpz_t f;
+
+    fmpz_init_set_readonly(f, x);
+    fmpq_poly_set_coeff_fmpz(poly, n, f);
+    fmpz_clear_readonly(f);
 }
 

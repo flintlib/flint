@@ -46,44 +46,37 @@ main(void)
     /* Check that content(a f) = abs(a) content(f) */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t a, b;
-        fmpq_poly_t f;
-        mpq_t x, y, z;
+        fmpq_poly_t f, g;
+        fmpq_t a, b, c;
 
-        fmpz_init(a);
-        fmpz_init(b);
         fmpq_poly_init(f);
-        fmpq_poly_randtest(f, state, n_randint(state, 100), 200);
-        fmpz_randtest(a, state, 100);
-        fmpz_randtest_not_zero(b, state, 100);
-        mpq_init(x);
-        mpq_init(y);
-        mpq_init(z);
+        fmpq_poly_init(g);
 
-        fmpz_get_mpz(mpq_numref(x), a);
-        fmpz_get_mpz(mpq_denref(x), b);
-        mpq_canonicalize(x);
+        fmpq_init(a);
+        fmpq_init(b);
+        fmpq_init(c);
 
-        fmpq_poly_content(y, f);
-        fmpq_poly_scalar_mul_mpq(f, f, x);
-        mpq_abs(x, x);
-        mpq_mul(y, x, y);
-        fmpq_poly_content(z, f);
+        fmpq_poly_randtest_not_zero(f, state, n_randint(state, 100) + 1, 100);
+        fmpq_randtest_not_zero(a, state, 100);
 
-        result = (mpq_equal(y, z));
+        fmpq_poly_scalar_mul_fmpq(g, f, a);
+        fmpq_poly_content(b, g);
+        fmpq_poly_content(c, f);
+        fmpq_mul(c, a, c);
+        fmpq_abs(c, c);
+
+        result = (fmpq_equal(b, c));
         if (!result)
         {
             printf("FAIL:\n");
-            gmp_printf("y = %Qd\nz = %Qd\n", y, z);
+            fmpq_poly_print(f), printf("\n\n");
+            fmpq_poly_print(g), printf("\n\n");
+            fmpq_print(a), printf("\n\n");
+            fmpq_print(b), printf("\n\n");
+            fmpq_print(c), printf("\n\n");
             abort();
         }
 
-        fmpz_clear(a);
-        fmpz_clear(b);
-        mpq_clear(x);
-        mpq_clear(y);
-        mpq_clear(z);
-        fmpq_poly_clear(f);
     }
 
     flint_randclear(state);

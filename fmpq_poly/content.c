@@ -29,18 +29,14 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_content(mpq_t res, const fmpz * poly, 
+void _fmpq_poly_content(fmpq_t res, const fmpz * poly, 
                         const fmpz_t den, long len)
 {
-    fmpz_t num;
-    fmpz_init(num);
-    _fmpz_poly_content(num, poly, len);
-    fmpz_get_mpz(mpq_numref(res), num);
-    fmpz_get_mpz(mpq_denref(res), den);
-    fmpz_clear(num);
+    _fmpz_poly_content(fmpq_numref(res), poly, len);
+    fmpz_set(fmpq_denref(res), den);
 }
 
-void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly)
+void fmpq_poly_content(fmpq_t res, const fmpq_poly_t poly)
 {
     _fmpq_poly_content(res, poly->coeffs, poly->den, poly->length);
 }
