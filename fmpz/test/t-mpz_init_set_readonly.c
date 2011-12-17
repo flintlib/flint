@@ -19,7 +19,6 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -28,55 +27,72 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
+#include "long_extras.h"
 #include "fmpz.h"
-#include "fmpq_poly.h"
-#include "ulong_extras.h"
 
-int
-main(void)
+int main(void)
 {
-    int i, result;
+    int i;
     flint_rand_t state;
-
-    printf("content....");
+    
+    printf("mpz_init_set_readonly....");
     fflush(stdout);
-
+    
     flint_randinit(state);
 
-    /* Check that content(a f) = abs(a) content(f) */
-    for (i = 0; i < 10000; i++)
+    /* Create some small fmpz integers, clear the mpz_t */
+    for (i = 0; i < 100000; i++)
     {
-        fmpq_poly_t f, g;
-        fmpq_t a, b, c;
+        fmpz_t f;
+        mpz_t z;
 
-        fmpq_poly_init(f);
-        fmpq_poly_init(g);
+        *f = z_randint(state, COEFF_MAX + 1);
 
-        fmpq_init(a);
-        fmpq_init(b);
-        fmpq_init(c);
+        flint_mpz_init_set_readonly(z, f);
+        flint_mpz_clear_readonly(z);
+    }
 
-        fmpq_poly_randtest_not_zero(f, state, n_randint(state, 100) + 1, 100);
-        fmpq_randtest_not_zero(a, state, 100);
+    /* Create some large fmpz integers, do not clear the mpz_t */
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t f;
+        mpz_t z;
 
-        fmpq_poly_scalar_mul_fmpq(g, f, a);
-        fmpq_poly_content(b, g);
-        fmpq_poly_content(c, f);
-        fmpq_mul(c, a, c);
-        fmpq_abs(c, c);
+        fmpz_init(f);
+        fmpz_randtest(f, state, 2 * FLINT_BITS);
 
-        result = (fmpq_equal(b, c));
-        if (!result)
+        if (COEFF_IS_MPZ(*f))
         {
-            printf("FAIL:\n");
-            fmpq_poly_print(f), printf("\n\n");
-            fmpq_poly_print(g), printf("\n\n");
-            fmpq_print(a), printf("\n\n");
-            fmpq_print(b), printf("\n\n");
-            fmpq_print(c), printf("\n\n");
-            abort();
+            flint_mpz_init_set_readonly(z, f);
         }
 
+        fmpz_clear(f);
+    }
+
+    /* Create some more fmpz integers */
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t f, g;
+        mpz_t z;
+
+        fmpz_init(f);
+        fmpz_init(g);
+        fmpz_randtest(f, state, 2 * FLINT_BITS);
+
+        flint_mpz_init_set_readonly(z, f);
+        fmpz_set_mpz(g, z);
+
+        if (!fmpz_equal(f, g))
+        {
+            printf("FAIL:\n\n");
+            printf("f = "), fmpz_print(f), printf("\n");
+            printf("g = "), fmpz_print(g), printf("\n");
+            gmp_printf("z = %Zd\n", z);
+        }
+
+        fmpz_clear(f);
+        fmpz_clear(g);
+        flint_mpz_clear_readonly(z);
     }
 
     flint_randclear(state);

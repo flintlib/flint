@@ -111,6 +111,8 @@ void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x);
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 
+void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x);
+
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);
@@ -221,7 +223,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
 void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden, 
                const fmpz * poly, const fmpz_t den, long len, const fmpz_t c);
 
-void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                   const fmpz_t den, long len, const fmpz_t r, const fmpz_t s);
 
 void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c);
@@ -230,6 +232,9 @@ void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 
 void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop, 
                                const fmpq_poly_t op, const fmpz_t c);
+
+void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, 
+                               const fmpq_poly_t op, const fmpq_t c);
 
 void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, 
                               const fmpq_poly_t op, const mpz_t c);
@@ -246,7 +251,7 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden,
 void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, 
                const fmpz * poly, const fmpz_t den, long len, const fmpz_t c);
 
-void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                   const fmpz_t den, long len, const fmpz_t r, const fmpz_t s);
 
 void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c);
@@ -255,6 +260,9 @@ void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 
 void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, 
                                const fmpq_poly_t op, const fmpz_t c);
+
+void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, 
+                               const fmpq_poly_t op, const fmpq_t c);
 
 void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, 
                               const fmpq_poly_t op, const mpz_t c);
@@ -577,10 +585,10 @@ fmpq_poly_reverse_series(fmpq_poly_t res,
 
 /*  Gaussian content  ********************************************************/
 
-void _fmpq_poly_content(mpq_t res, 
+void _fmpq_poly_content(fmpq_t res, 
                         const fmpz * poly, const fmpz_t den, long len);
 
-void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly);
+void fmpq_poly_content(fmpq_t res, const fmpq_poly_t poly);
 
 void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden, 
                                const fmpz * poly, const fmpz_t den, long len);

@@ -32,17 +32,10 @@
 
 void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, const fmpq_poly_t op, const mpz_t c)
 {
-    fmpz_t fc;
-    
-    if (mpz_sgn(c) == 0)
-    {
-        printf("Exception: division by zero in fmpq_poly_scalar_div_mpz\n");
-        abort();
-    }
-    
-    fmpz_init(fc);
-    fmpz_set_mpz(fc, c);
-    fmpq_poly_scalar_div_fmpz(rop, op, fc);
-    fmpz_clear(fc);
+    fmpz_t f;
+
+    fmpz_init_set_readonly(f, c);
+    fmpq_poly_scalar_div_fmpz(rop, op, f);
+    fmpz_clear_readonly(f);
 }
 

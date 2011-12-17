@@ -200,6 +200,11 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
 
     Sets \code{poly} to the integer $x$.
 
+void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x)
+
+    Sets \code{poly} to the rational $x$, which is assumed to be 
+    given in lowest terms.
+
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
 
     Sets \code{poly} to the integer $x$.
@@ -466,7 +471,7 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
     Supports exact aliasing between \code{(rpoly, den)} 
     and \code{(poly, den)}.
 
-void _fmpq_poly_scalar_mul_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
     Sets \code{(rpoly, rden)} to the product of $r/s$ and 
@@ -491,13 +496,18 @@ void fmpq_poly_scalar_mul_fmpz(fmpq_poly_t rop,
     Sets \code{rop} to $c$ times \code{op}.  Assumes that the \code{fmpz_t c} 
     is not part of \code{rop}.
 
+void fmpq_poly_scalar_mul_fmpq(fmpq_poly_t rop, 
+                                           const fmpq_poly_t op, const mpq_t c)
+
+    Sets \code{rop} to $c$ times \code{op}.
+
 void fmpq_poly_scalar_mul_mpz(fmpq_poly_t rop, 
                                            const fmpq_poly_t op, const mpz_t c)
 
     Sets \code{rop} to $c$ times \code{op}.
 
 void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop, 
-                                           const fmpq_poly_t op, const mpq_t c)
+                                          const fmpq_poly_t op, const fmpq_t c)
 
     Sets \code{rop} to $c$ times \code{op}.
 
@@ -529,7 +539,7 @@ void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     Assumes that \code{len} is positive.  Assumes that $c$ is non-zero. 
     Supports aliasing between \code{(rpoly, rden)} and \code{(poly, den)}.
 
-void _fmpq_poly_scalar_div_mpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
+void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                    const fmpz_t den, long len, const fmpz_t r, const fmpz_t s)
 
     Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $r/s$,
@@ -546,6 +556,9 @@ void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 
 void fmpq_poly_scalar_div_fmpz(fmpq_poly_t rop, 
                                          const fmpq_poly_t op, const fmpz_t c);
+
+void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, 
+                                         const fmpq_poly_t op, const fmpq_t c);
 
 void fmpq_poly_scalar_div_mpz(fmpq_poly_t rop, 
                                           const fmpq_poly_t op, const mpz_t c);
@@ -1360,13 +1373,13 @@ void fmpq_poly_reverse_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
 *******************************************************************************
 
-void _fmpq_poly_content(mpq_t res, 
+void _fmpq_poly_content(fmpq_t res, 
                         const fmpz * poly, const fmpz_t den, long len)
 
     Sets \code{res} to the content of \code{(poly, den, len)}.  
     If \code{len == 0}, sets \code{res} to zero.
 
-void fmpq_poly_content(mpq_t res, const fmpq_poly_t poly)
+void fmpq_poly_content(fmpq_t res, const fmpq_poly_t poly)
 
     Sets \code{res} to the content of \code{poly}.  The content of the zero 
     polynomial is defined to be zero.

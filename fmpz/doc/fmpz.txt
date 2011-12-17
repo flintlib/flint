@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -179,21 +180,77 @@ void fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     $-m/2 \le y < m/2$, given $x$ which is assumed to satisfy
     $0 \le x < m$.
 
-__mpz_struct * fmpz_get_mpz_readonly(const fmpz_t f)
+void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
-    Returns a read-only \code{__mpz_struct *}.
+    Sets the unitialised \code{mpz_t} $z$ to the value of the 
+    readonly \code{fmpz_t} $f$.
 
-    In the case when the \code{fmpz_t}~$f$ is already backed by 
-    a \code{__mpz_struct}, a pointer to this structure is returned. 
-    Otherwise, when $f$ is small, a one-limb \code{__mpz_struct} 
-    is allocated.
+    Note that it is assumed that $f$ does not change during 
+    the lifetime of $z$.
 
-    This has to be cleared by a call to \code{fmpz_clear_mpz_readonly()}.
+    The integer $z$ has to be cleared by a call to 
+    \code{flint_mpz_clear_readonly()}.
 
-void fmpz_clear_mpz_readonly(__mpz_struct *z)
+    The suggested use of the two functions is as follows:
+    \begin{lstlisting}[language=C]
+    fmpz_t f;
+    ...
+    {
+        mpz_t z;
 
-    Clears the memory that was possibly allocated for the integer~$z$ 
-    when calling \code{fmpz_get_mpz_readonly()}.
+        flint_mpz_init_set_readonly(z, f);
+        foo(..., z);
+        flint_mpz_clear_readonly(z);
+    }
+    \end{lstlisting}
+
+    This provides a convenient function for user code, only 
+    requiring to work with the types \code{fmpz_t} and \code{mpz_t}.
+
+    In critical code, the following approach may be favourable:
+    \begin{lstlisting}[language=C]
+    fmpz_t f;
+    ...
+    {
+        __mpz_struct *z;
+
+        z = _fmpz_promote_val(f);
+        foo(..., z);
+        _fmpz_demote_val(f);
+    }
+    \end{lstlisting}
+
+void flint_mpz_clear_readonly(mpz_t z)
+
+    Clears the readonly \code{mpz_t} $z$.
+
+void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
+
+    Sets the uninitialised \code{fmpz_t} $f$ to a readonly 
+    version of the integer $z$.
+
+    Note that the value of $z$ is assumed to remain constant 
+    throughout the lifetime of $f$.
+
+    The \code{fmpz_t} $f$ has to be cleared by calling the 
+    function \code{fmpz_clear_readonly()}.
+
+    The suggested use of the two functions is as follows:
+    \begin{lstlisting}[language=C]
+    mpz_t z;
+    ...
+    {
+        fmpz_t f;
+
+        fmpz_init_set_readonly(f, z);
+        foo(..., f);
+        fmpz_clear_readonly(f);
+    }
+    \end{lstlisting}
+
+void fmpz_clear_readonly(fmpz_t f)
+
+    Clears the readonly \code{fmpz_t} $f$.
 
 *******************************************************************************
 
@@ -699,7 +756,7 @@ int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift,
     Shifts the given coefficient to the left by \code{shift} bits and adds 
     it to the integer in \code{arr} in a field of the given number of bits.
 
-    \begin{lstlisting}
+    \begin{estlisting}
     shift  bits  --------------
 
     X X X C C C C 0 0 0 0 0 0 0

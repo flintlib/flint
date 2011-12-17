@@ -26,13 +26,11 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
+#include "fmpq.h"
 
-void fmpz_clear_mpz_readonly(__mpz_struct *z)
+void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
 {
-    if ((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX)
-        || (z->_mp_size == 0))
-    {
-        free(z);
-    }
+    fmpz_init_set_readonly(fmpq_numref(f), mpq_numref(z));
+    fmpz_init_set_readonly(fmpq_denref(f), mpq_denref(z));
 }
 

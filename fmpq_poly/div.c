@@ -40,7 +40,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
     
     if (lenB == 1)
     {
-        _fmpq_poly_scalar_div_mpq(Q, q, A, a, lenA, B, b);
+        _fmpq_poly_scalar_div_fmpq(Q, q, A, a, lenA, B, b);
         return;
     }
     

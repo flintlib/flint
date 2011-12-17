@@ -19,23 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq_poly.h"
 
-void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
+void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 {
-    fmpq_t f;
-
-    fmpq_init_set_readonly(f, c);
-    fmpq_poly_scalar_div_fmpq(rop, op, f);
-    fmpq_clear_readonly(f);
+    if (COEFF_IS_MPZ(*f))
+    {
+        *z = *COEFF_TO_PTR(*f);
+    }
+    else
+    {
+        mpz_init_set_si(z, *f);
+    }
 }
 

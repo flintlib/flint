@@ -23,19 +23,17 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_scalar_div_mpq(fmpq_poly_t rop, const fmpq_poly_t op, const mpq_t c)
+void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x)
 {
-    fmpq_t f;
-
-    fmpq_init_set_readonly(f, c);
-    fmpq_poly_scalar_div_fmpq(rop, op, f);
-    fmpq_clear_readonly(f);
+    fmpq_poly_fit_length(poly, 1);
+    fmpz_set(poly->coeffs, fmpq_numref(x));
+    fmpz_set(poly->den, fmpq_denref(x));
+    _fmpq_poly_set_length(poly, 1);
+    _fmpq_poly_normalise(poly);
 }
 

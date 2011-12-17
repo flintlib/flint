@@ -98,6 +98,14 @@ void fmpq_swap(fmpq_t op1, fmpq_t op2)
 
     Swaps the two rational numbers \code{op1} and \code{op2}.
 
+void fmpq_neg(fmpq_t dest, const fmpq_t src)
+
+    Sets \code{dest} to the additive inverse of \code{src}.
+
+void fmpq_abs(fmpq_t dest, const fmpq_t src)
+
+    Sets \code{dest} to the absolute value of \code{src}.
+
 void fmpq_zero(fmpq_t res)
 
     Sets the value of \code{res} to 0.
@@ -186,6 +194,65 @@ char * fmpq_get_str(char * str, int b, const fmpq_t x)
     also the return value.  If \code{str} is \code{NULL}, allocates 
     sufficient space and returns a pointer to the string.
 
+void flint_mpq_init_set_readonly(mpq_t z, const fmpq_t f)
+
+    Sets the unitialised \code{mpq_t} $z$ to the value of the 
+    readonly \code{fmpq_t} $f$.
+
+    Note that it is assumed that $f$ does not change during 
+    the lifetime of $z$.
+
+    The rational $z$ has to be cleared by a call to 
+    \code{flint_mpq_clear_readonly()}.
+
+    The suggested use of the two functions is as follows:
+    \begin{lstlisting}[language=C]
+    fmpq_t f;
+    ...
+    {
+        mpq_t z;
+
+        flint_mpq_init_set_readonly(z, f);
+        foo(..., z);
+        flint_mpq_clear_readonly(z);
+    }
+    \end{lstlisting}
+
+    This provides a convenient function for user code, only 
+    requiring to work with the types \code{fmpq_t} and \code{mpq_t}.
+
+void flint_mpq_clear_readonly(mpq_t z)
+
+    Clears the readonly \code{mpq_t} $z$.
+
+void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)
+
+    Sets the uninitialised \code{fmpq_t} $f$ to a readonly 
+    version of the rational $z$.
+
+    Note that the value of $z$ is assumed to remain constant 
+    throughout the lifetime of $f$.
+
+    The \code{fmpq_t} $f$ has to be cleared by calling the 
+    function \code{fmpq_clear_readonly()}.
+
+    The suggested use of the two functions is as follows:
+    \begin{lstlisting}[language=C]
+    mpq_t z;
+    ...
+    {
+        fmpq_t f;
+
+        fmpq_init_set_readonly(f, z);
+        foo(..., f);
+        fmpq_clear_readonly(f);
+    }
+    \end{lstlisting}
+
+void fmpq_clear_readonly(fmpq_t f)
+
+    Clears the readonly \code{fmpq_t} $f$.
+
 *******************************************************************************
 
     Input and output
@@ -236,8 +303,8 @@ void _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state,
 
 void fmpq_randtest_not_zero(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
 
-    Does the same thing as \code{fmpq_randtest}, but does not
-    generate the number zero.
+    As per \code{fmpq_randtest}, but the result will not be $0$. 
+    If \code{bits} is set to $0$, an exception will result.
 
 void fmpq_randbits(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
 
