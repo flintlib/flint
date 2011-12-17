@@ -80,7 +80,7 @@ void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, mp_bitcnt_t bits)
         abort();
     }
 
-    fmpq_randtest(f, state, bits);
-    if (fmpq_is_zero(f))
-        fmpq_one(f);
+    do {
+        fmpq_randtest(f, state, bits);
+    } while (fmpq_is_zero(f));
 }
