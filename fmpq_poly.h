@@ -111,6 +111,8 @@ void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x);
 
 void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x);
 
+void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x);
+
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x);
 
 void fmpq_poly_set_mpq(fmpq_poly_t poly, const mpq_t x);

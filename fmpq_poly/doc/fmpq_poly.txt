@@ -200,6 +200,11 @@ void fmpq_poly_set_fmpz(fmpq_poly_t poly, const fmpz_t x)
 
     Sets \code{poly} to the integer $x$.
 
+void fmpq_poly_set_fmpq(fmpq_poly_t poly, const fmpq_t x)
+
+    Sets \code{poly} to the rational $x$, which is assumed to be 
+    given in lowest terms.
+
 void fmpq_poly_set_mpz(fmpq_poly_t poly, const mpz_t x)
 
     Sets \code{poly} to the integer $x$.
