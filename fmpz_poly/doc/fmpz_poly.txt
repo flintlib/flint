@@ -1953,7 +1953,7 @@ void fmpz_poly_compose_series(fmpz_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
+void _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
@@ -1963,7 +1963,7 @@ void _fmpz_poly_reverse_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 
     This implementation uses the Lagrange inversion formula.
 
-void fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
+void fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
             const fmpz_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1973,7 +1973,7 @@ void fmpz_poly_reverse_series_lagrange(fmpz_poly_t Qinv,
 
     This implementation uses the Lagrange inversion formula.
 
-void _fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv,
+void _fmpz_poly_revert_series_lagrange_fast(fmpz * Qinv,
         const fmpz * Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1985,7 +1985,7 @@ void _fmpz_poly_reverse_series_lagrange_fast(fmpz * Qinv,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
+void fmpz_poly_revert_series_lagrange_fast(fmpz_poly_t Qinv,
             const fmpz_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1996,7 +1996,7 @@ void fmpz_poly_reverse_series_lagrange_fast(fmpz_poly_t Qinv,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void _fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n)
+void _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
@@ -2006,7 +2006,7 @@ void _fmpz_poly_reverse_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv,
+void fmpz_poly_revert_series_newton(fmpz_poly_t Qinv,
         const fmpz_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -2016,7 +2016,7 @@ void fmpz_poly_reverse_series_newton(fmpz_poly_t Qinv,
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void _fmpz_poly_reverse_series(fmpz * Qinv, const fmpz * Q, long n)
+void _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
@@ -2027,7 +2027,7 @@ void _fmpz_poly_reverse_series(fmpz * Qinv, const fmpz * Q, long n)
     This implementation defaults to the fast version of
     Lagrange interpolation.
 
-void fmpz_poly_reverse_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
+void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that

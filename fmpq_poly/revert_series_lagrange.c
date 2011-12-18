@@ -53,7 +53,7 @@ _set_vec(fmpz * rnum, fmpz_t den,
 }
 
 void
-_fmpq_poly_reverse_series_lagrange(fmpz * Qinv, fmpz_t den,
+_fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
                             const fmpz * Q, const fmpz_t Qden, long n)
 {
     long i;
@@ -62,7 +62,7 @@ _fmpq_poly_reverse_series_lagrange(fmpz * Qinv, fmpz_t den,
 
     if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
     {
-        _fmpz_poly_reverse_series(Qinv, Q, n);
+        _fmpz_poly_revert_series(Qinv, Q, n);
         fmpz_set_ui(den, 1UL);
     }
     else if (n <= 2)
@@ -120,7 +120,7 @@ _fmpq_poly_reverse_series_lagrange(fmpz * Qinv, fmpz_t den,
 }
 
 void
-fmpq_poly_reverse_series_lagrange(fmpq_poly_t res,
+fmpq_poly_revert_series_lagrange(fmpq_poly_t res,
             const fmpq_poly_t poly, long n)
 {
     fmpz *copy;
@@ -129,7 +129,7 @@ fmpq_poly_reverse_series_lagrange(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("exception: fmpq_poly_reverse_series_lagrange: input must have "
+        printf("exception: fmpq_poly_revert_series_lagrange: input must have "
             "zero constant term and nonzero coefficient of x^1");
         abort();
     }
@@ -159,14 +159,14 @@ fmpq_poly_reverse_series_lagrange(fmpq_poly_t res,
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_reverse_series_lagrange(res->coeffs,
+        _fmpq_poly_revert_series_lagrange(res->coeffs,
                 res->den, copy, poly->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_reverse_series_lagrange(t->coeffs,
+        _fmpq_poly_revert_series_lagrange(t->coeffs,
                 t->den, copy, poly->den, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
