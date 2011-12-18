@@ -160,6 +160,9 @@ void fmpq_poly_truncate(fmpq_poly_t poly, long n)
     }
 }
 
+void fmpq_poly_get_slice(fmpq_poly_t rop, 
+                         const fmpq_poly_t op, long i, long j);
+
 /*  Getting and setting coefficients  ****************************************/
 
 void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, long n);
