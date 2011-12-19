@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
+#include "long_extras.h"
 #include "fmpz.h"
 
 int
