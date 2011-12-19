@@ -31,7 +31,7 @@
 
 
 long
-fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat)
+fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
 {
     long i, j, k, m, n, rank, nullity;
     long * pivots;
