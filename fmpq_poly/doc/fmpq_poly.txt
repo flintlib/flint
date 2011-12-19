@@ -839,6 +839,33 @@ void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B)
 
     In the special case when $A = B = 0$, sets $L = 0$.
 
+void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
+                          const fmpz *poly1, const fmpz_t den1, long len1, 
+                          const fmpz *poly2, const fmpz_t den2, long len2)
+
+    Sets \code{(rnum, rden)} to the resultant of the two input 
+    polynomials.
+
+    Assumes that \code{len1 >= len2 > 0}.  Does not support zero-padding 
+    of the input polynomials.  Does not support aliasing of the input and 
+    output arguments.
+
+void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
+
+    Returns the resultant of $f$ and $g$.
+
+    Enumerating the roots of $f$ and $g$ over $\bar{\mathbf{Q}}$ as 
+    $r_1, \dotsc, r_m$ and $s_1, \dotsc, s_n$, respectively, and 
+    letting $x$ and $y$ denote the leading coefficients, the resultant 
+    is defined as 
+    \begin{equation*}
+     x^{\deg(f)} y^{\deg(g)} \prod_{1 \leq i, j \leq n} (r_i - s_j).
+    \end{equation*}
+
+    We handle special cases as follows:  if one of the polynomials is zero, 
+    the resultant is zero.  Note that otherwise if one of the polynomials is 
+    constant, the last term in the above expression is the empty product.
+
 *******************************************************************************
 
     Derivative and integral

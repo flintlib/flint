@@ -394,6 +394,12 @@ void _fmpq_poly_lcm(fmpz *G, fmpz_t denG,
 
 void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B);
 
+void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
+                          const fmpz *poly1, const fmpz_t den1, long len1, 
+                          const fmpz *poly2, const fmpz_t den2, long len2);
+
+void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g);
+
 /*  Derivative and integral  *************************************************/
 
 void _fmpq_poly_derivative(fmpz * rpoly, fmpz_t rden, 
