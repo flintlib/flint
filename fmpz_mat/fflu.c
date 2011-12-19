@@ -40,7 +40,7 @@ fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
 
     if (fmpz_mat_is_empty(A))
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
         return 0;
     }
 

@@ -66,7 +66,7 @@ static int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
         /* Compute powers of p */
         {
-            fmpz_set_ui(W, 1);
+            fmpz_one(W);
             fmpz_set(pow + i, p);
         }
         for (i--; i >= 1; i--)
@@ -152,7 +152,7 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
 
     if (N <= 3)
     {
-        fmpz_set_ui(rop, 1);
+        fmpz_one(rop);
     }
     else
     {
@@ -173,7 +173,7 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
 
         /* Compute powers of p */
         {
-            fmpz_set_ui(W, 1);
+            fmpz_one(W);
             fmpz_set_ui(pow + i, 8);
         }
         for (i--; i >= 1; i--)
@@ -214,7 +214,7 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
 
         /* Run Newton iteration */
         i = len - 1;
-        fmpz_set_ui(rop, 1);
+        fmpz_one(rop);
         for (i--; i >= 0; i--)  /* z := z - z (a z^2 - 1) / 2 */
         {
             fmpz_mul(W, rop, rop);

@@ -44,13 +44,13 @@ _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
     if (fmpz_cmp(a, N) <= 0)
     {
         fmpz_set(n, a);
-        fmpz_set_ui(d, 1UL);
+        fmpz_one(d);
         return 1;
     }
     fmpz_sub(n, a, m);
     if (fmpz_cmpabs(n, N) <= 0)
     {
-        fmpz_set_ui(d, 1UL);
+        fmpz_one(d);
         return 1;
     }
 
@@ -59,8 +59,8 @@ _fmpq_reconstruct_fmpz_2(fmpz_t n, fmpz_t d,
     fmpz_init(s);
     fmpz_init(t);
 
-    fmpz_set(r, m); fmpz_set_ui(s, 0UL);
-    fmpz_set(n, a); fmpz_set_ui(d, 1UL);
+    fmpz_set(r, m); fmpz_zero(s);
+    fmpz_set(n, a); fmpz_one(d);
 
     while (fmpz_cmpabs(n, N) > 0)
     {

@@ -40,7 +40,7 @@ _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
     fmpz * p;
     fmpz_t r;
 
-    fmpz_set_ui(res, 1UL);
+    fmpz_one(res);
 
     if (factors->length == 0)
         return;

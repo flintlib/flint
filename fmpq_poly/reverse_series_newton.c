@@ -40,7 +40,7 @@ _fmpq_poly_reverse_series_newton(fmpz * Qinv, fmpz_t den,
     if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
     {
         _fmpz_poly_reverse_series(Qinv, Q, n);
-        fmpz_set_ui(den, 1UL);
+        fmpz_one(den);
     }
     else if (n <= 2)
     {

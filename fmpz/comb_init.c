@@ -108,7 +108,7 @@ fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
     num = (1L << n);
 	for (; i < num; i += 2, j++)
     {
-        fmpz_set_ui(comb->comb[0] + j, 1L);
+        fmpz_one(comb->comb[0] + j);
     }
 
     /* Compute rest of comb by multiplying in pairs */

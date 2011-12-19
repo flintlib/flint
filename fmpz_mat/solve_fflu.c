@@ -39,7 +39,7 @@ fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
 
     if (fmpz_mat_is_empty(A) || fmpz_mat_is_empty(B))
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
         return 1;
     }
 

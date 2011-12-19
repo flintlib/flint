@@ -44,7 +44,7 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, ulong * e, long len)
     if (len <= 1)
     {
         if (len < 1)
-            fmpz_set_ui(res, 1);
+            fmpz_one(res);
         else
             fmpz_pow_ui(res, p, e[0]);
         return;
@@ -59,7 +59,7 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, ulong * e, long len)
     for (mask = 1; emax >= (mask << 1); mask <<= 1);
 
     fmpz_init(tmp);
-    fmpz_set_ui(res, 1);
+    fmpz_one(res);
 
     while (mask)
     {

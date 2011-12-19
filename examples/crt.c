@@ -53,8 +53,8 @@ int main(int argc, char* argv[])
     fmpz_set_str(x, argv[1], 10);
     bit_bound = fmpz_bits(x) + 2;
 
-    fmpz_set_ui(y, 0);
-    fmpz_set_ui(prod, 1);
+    fmpz_zero(y);
+    fmpz_one(prod);
 
     prime = 0;
     for (i = 0; fmpz_bits(prod) < bit_bound; i++)

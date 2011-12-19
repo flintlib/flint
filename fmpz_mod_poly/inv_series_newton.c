@@ -62,7 +62,7 @@ _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n,
 
             _fmpz_poly_reverse(Qrev, Q, n, n);
             _fmpz_vec_zero(W, 2*n - 2);
-            fmpz_set_ui(W + (2*n - 2), 1);
+            fmpz_one(W + (2*n - 2));
             _fmpz_mod_poly_div_basecase(Qinv, W, W, 2*n - 1, Qrev, n, cinv, p);
             _fmpz_poly_reverse(Qinv, Qinv, n, n);
         }

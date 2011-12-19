@@ -68,7 +68,7 @@ void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat)
         fmpq_mat_get_fmpz_mat_rowwise(num, den, mat);
         fmpz_mat_det(&det->num, num);
 
-        fmpz_set_ui(&det->den, 1UL);
+        fmpz_one(&det->den);
         for (i = 0; i < mat->r; i++)
             fmpz_mul(&det->den, &det->den, den + i);
 

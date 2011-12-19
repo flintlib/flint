@@ -42,7 +42,7 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
     {
         if (fmpz_is_zero(input)) 
         {
-            fmpz_set_ui(output, 0L);
+            fmpz_zero(output);
             return;
         }
 

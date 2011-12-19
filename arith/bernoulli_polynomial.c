@@ -54,7 +54,7 @@ void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     fmpz_mul_ui(poly->coeffs + 1, poly->coeffs + 1, n);
 
     /* Multiply even terms by binomial coefficients */
-    fmpz_set_ui(t, 1UL);
+    fmpz_one(t);
     for (k = 2; k <= n; k += 2)
     {
         fmpz_mul2_uiui(t, t, n-k+1, n-k+2);

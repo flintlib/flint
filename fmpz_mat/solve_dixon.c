@@ -41,7 +41,7 @@ find_good_prime_and_invert(nmod_mat_t Ainv,
 
     p = 1UL << NMOD_MAT_OPTIMAL_MODULUS_BITS;
     fmpz_init(tested);
-    fmpz_set_ui(tested, 1UL);
+    fmpz_one(tested);
 
     while (1)
     {
@@ -157,7 +157,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     nmod_mat_init(d_mod, n, cols, p);
     nmod_mat_init(y_mod, n, cols, p);
 
-    fmpz_set_ui(ppow, 1UL);
+    fmpz_one(ppow);
 
     while (fmpz_cmp(ppow, bound) <= 0)
     {

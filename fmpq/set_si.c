@@ -34,7 +34,7 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
     if (q == 1 || p == 0)
     {
         fmpz_set_si(rnum, p);
-        fmpz_set_ui(rden, 1);
+        fmpz_one(rden);
     }
     else
     {

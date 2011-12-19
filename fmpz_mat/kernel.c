@@ -52,7 +52,7 @@ fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat)
     if (rank == 0)
     {
         for (i = 0; i < nullity; i++)
-            fmpz_set_ui(res->rows[i] + i, 1);
+            fmpz_one(res->rows[i] + i);
     }
     else if (nullity)
     {

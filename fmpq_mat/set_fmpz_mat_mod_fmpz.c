@@ -46,7 +46,7 @@ fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X,
     fmpz_init(t);
     fmpz_init(u);
 
-    fmpz_set_ui(d, 1UL);
+    fmpz_one(d);
 
     for (i = 0; i < Xmod->r; i++)
     {

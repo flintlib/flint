@@ -68,7 +68,7 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
 
     if (_padic_is_zero(rop))
     {
-        fmpz_set_ui(padic_unit(rop), 1);
+        fmpz_one(padic_unit(rop));
         padic_val(rop) = ctx->N - 1;
     }
 }

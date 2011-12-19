@@ -41,7 +41,7 @@ fmpq_mat_get_fmpz_mat_matwise(fmpz_mat_t num, fmpz_t den, const fmpq_mat_t mat)
 
     fmpz_init(t);
     fmpz_init(lcm);
-    fmpz_set_ui(lcm, 1UL);
+    fmpz_one(lcm);
 
     /* Compute common denominator of matrix */
     for (i = 0; i < mat->r; i++)

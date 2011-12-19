@@ -49,7 +49,7 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
 
     /* Compute powers of p */
     {
-        fmpz_set_ui(t, 1);
+        fmpz_one(t);
         fmpz_set(pow + i, p);
     }
     for (i--; i >= 1; i--)

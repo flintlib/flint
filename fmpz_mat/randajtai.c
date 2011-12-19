@@ -55,7 +55,7 @@ fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
     {
         mp_bitcnt_t bits = (mp_bitcnt_t) pow((double) (2 * d - i), alpha);
 
-        fmpz_set_ui(tmp, 1);
+        fmpz_one(tmp);
         fmpz_mul_2exp(tmp, tmp, bits);
         fmpz_sub_ui(tmp, tmp, 1);
         fmpz_randm(mat->rows[i] + i, state, tmp);

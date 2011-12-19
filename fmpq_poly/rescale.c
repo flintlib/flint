@@ -50,14 +50,14 @@ _fmpq_poly_rescale(fmpz * res, fmpz_t denr,
         
         fmpz_init(t);
         
-        fmpz_set_ui(t, 1UL);
+        fmpz_one(t);
         fmpz_set(res, poly);
         for (i = 1L; i < len; i++)
         {
             fmpz_mul(t, t, xnum);
             fmpz_mul(res + i, poly + i, t);
         }
-        fmpz_set_ui(t, 1UL);
+        fmpz_one(t);
         for (i = len - 2L; i >= 0L; i--)
         {
             fmpz_mul(t, t, xden);

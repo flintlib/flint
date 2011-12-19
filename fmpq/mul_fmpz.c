@@ -34,7 +34,7 @@ void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
     fmpz_t y;
 
     fmpz_init(y);
-    fmpz_set_ui(y, 1);
+    fmpz_one(y);
 
     _fmpq_mul(fmpq_numref(res), fmpq_denref(res),
               fmpq_numref(op), fmpq_denref(op), x, y);

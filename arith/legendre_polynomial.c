@@ -42,7 +42,7 @@ static __inline__ void __legendre_denom(fmpz_t den, ulong n)
         d += k;
     }
 
-    fmpz_set_ui(den, 1UL);
+    fmpz_one(den);
     fmpz_mul_2exp(den, den, d);
 }
 
@@ -92,9 +92,9 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n)
 
     if (n == 1)
     {
-        fmpz_set_ui(poly->coeffs, 0UL);
-        fmpz_set_ui(poly->coeffs + 1, 1UL);
-        fmpz_set_ui(poly->den, 1UL);
+        fmpz_zero(poly->coeffs);
+        fmpz_one(poly->coeffs + 1);
+        fmpz_one(poly->den);
     }
     else
         _legendre_polynomial(poly->coeffs, poly->den, n);

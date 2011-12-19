@@ -46,7 +46,7 @@ fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
     fmpz_init(t);
     fmpz_init(u);
 
-    fmpz_set_ui(t, 0UL);
+    fmpz_zero(t);
 
     /* Largest column norm of B */
     for (j = 0; j < n; j++)

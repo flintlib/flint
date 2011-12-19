@@ -33,13 +33,13 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, long n)
 {
     if (n == 0)
     {
-        fmpz_set_ui(poly, 1UL);
+        fmpz_one(poly);
     }
     else if (n < 20)
     {
         long i, j;
 
-        fmpz_set_ui(poly + n, 1UL);
+        fmpz_one(poly + n);
         fmpz_neg(poly + n - 1, xs);
 
         for (i = 1; i < n; i++)

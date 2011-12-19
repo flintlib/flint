@@ -59,7 +59,7 @@ _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1, long len1,
     _fmpz_vec_set(B->rows[i], poly1 + i*m, len1 % m);
 
     /* Set rows of A to powers of poly2 */
-    fmpz_set_ui(A->rows[0], 1UL);
+    fmpz_one(A->rows[0]);
     _fmpz_vec_set(A->rows[1], poly2, len2);
     for (i = 2; i < m; i++)
         _fmpz_poly_mullow(A->rows[i], A->rows[i-1], n, poly2, len2, n);

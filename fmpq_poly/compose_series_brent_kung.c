@@ -40,7 +40,7 @@ _fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, long i)
     long j;
     fmpz_t t;
     fmpz_init(t);
-    fmpz_set_ui(den, 1UL);
+    fmpz_one(den);
 
     for (j = 0; j < fmpq_mat_ncols(A); j++)
         fmpz_lcm(den, den, fmpq_mat_entry_den(A, i, j));

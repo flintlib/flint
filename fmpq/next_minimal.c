@@ -91,7 +91,7 @@ _fmpq_next_minimal(fmpz_t rnum, fmpz_t rden,
         }
 
         fmpz_add_ui(rden, rden, 1UL);
-        fmpz_set_ui(rnum, 1UL);
+        fmpz_one(rnum);
         fmpz_clear(t);
     }
 }

@@ -89,5 +89,5 @@ fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
     fmpz_randtest(f, state, bits);
     if (fmpz_is_zero(f))
-        fmpz_set_ui(f, 1);
+        fmpz_one(f);
 }

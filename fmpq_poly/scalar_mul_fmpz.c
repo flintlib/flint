@@ -38,12 +38,12 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
     if (fmpz_is_zero(c))
     {
         _fmpz_vec_zero(rpoly, len);
-        fmpz_set_ui(rden, 1);
+        fmpz_one(rden);
         return;
     }
 
     fmpz_init(gcd);
-    fmpz_set_ui(gcd, 1);
+    fmpz_one(gcd);
     if (*c != 1L)
         fmpz_gcd(gcd, c, den);
     if (*gcd == 1L)

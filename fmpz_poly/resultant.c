@@ -58,8 +58,8 @@ _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1,
         _fmpz_vec_scalar_divexact_fmpz(A, poly1, len1, a);
         _fmpz_vec_scalar_divexact_fmpz(B, poly2, len2, b);
 
-        fmpz_set_ui(g, 1);
-        fmpz_set_ui(h, 1);
+        fmpz_one(g);
+        fmpz_one(h);
 
         fmpz_pow_ui(a, a, len2 - 1);
         fmpz_pow_ui(b, b, len1 - 1);

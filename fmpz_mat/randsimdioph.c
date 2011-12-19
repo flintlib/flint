@@ -46,7 +46,7 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_b
         abort();
     }
 
-    fmpz_set_ui(mat->rows[0], 1);
+    fmpz_one(mat->rows[0]);
     fmpz_mul_2exp(mat->rows[0], mat->rows[0], bits2);
     for (j = 1; j < c; j++)
         fmpz_randbits(mat->rows[0] + j, state, bits);
@@ -54,7 +54,7 @@ fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_b
     {
         for (j = 0; j < i; j++)
             fmpz_zero(mat->rows[i] + j);
-        fmpz_set_ui(mat->rows[i] + i, 1);
+        fmpz_one(mat->rows[i] + i);
         fmpz_mul_2exp(mat->rows[i] + i, mat->rows[i] + i, bits);
         for (j = i + 1; j < c; j++)
             fmpz_zero(mat->rows[i] + j);

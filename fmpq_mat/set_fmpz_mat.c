@@ -39,7 +39,7 @@ void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src)
         for (j = 0; j < src->c; j++)
         {
             fmpz_set(fmpq_mat_entry_num(dest, i, j), fmpz_mat_entry(src, i, j));
-            fmpz_set_ui(fmpq_mat_entry_den(dest, i, j), 1UL);
+            fmpz_one(fmpq_mat_entry_den(dest, i, j));
         }
     }
 }

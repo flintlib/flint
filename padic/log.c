@@ -77,7 +77,7 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
         q = _fmpz_vec_init(k + 1);
 
         fmpz_pow_ui(m, ctx->p, ctx->N + k);
-        fmpz_set_ui(q + 0, 1);
+        fmpz_one(q + 0);
         for (j = 1; j <= k; j++)
             fmpz_mul_ui(q + j, q + (j - 1), p);
 

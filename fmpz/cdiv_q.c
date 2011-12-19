@@ -57,7 +57,7 @@ fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
         else  /* h is large and g is small */
         {
             if ((c1 < 0L && fmpz_sgn(h) < 0) || (c1 > 0L && fmpz_sgn(h) > 0))  /* signs are the same */
-                fmpz_set_ui(f, 1);  /* quotient is positive, round up to one */
+                fmpz_one(f);  /* quotient is positive, round up to one */
             else
                 fmpz_zero(f);  /* quotient is zero, or negative, round up to zero */  
         }

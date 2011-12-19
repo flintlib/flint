@@ -195,7 +195,7 @@ static __inline__ void padic_zero(padic_t rop, const padic_ctx_t ctx)
 
 static __inline__ void _padic_one(padic_t rop)
 {
-    fmpz_set_ui(padic_unit(rop), 1);
+    fmpz_one(padic_unit(rop));
     padic_val(rop) = 0;
 }
 

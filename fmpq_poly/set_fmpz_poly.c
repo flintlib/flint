@@ -40,7 +40,7 @@ void fmpq_poly_set_fmpz_poly(fmpq_poly_t rop, const fmpz_poly_t op)
         fmpq_poly_fit_length(rop, fmpz_poly_length(op));
         _fmpq_poly_set_length(rop, fmpz_poly_length(op));
         _fmpz_vec_set(rop->coeffs, op->coeffs, rop->length);
-        fmpz_set_ui(rop->den, 1);
+        fmpz_one(rop->den);
     }
 }
 
