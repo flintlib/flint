@@ -732,10 +732,15 @@ void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA,
     and \code{B} is of length \code{lenB}, but returns only \code{Q}. We 
     require that \code{Q} have space for \code{lenA - lenB + 1} coefficients.
 
-void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
-    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
-    $\len(R) < \len(B)$, but returns only $Q$.
+void _nmod_poly_div(mp_ptr R, mp_srcptr A, long lenA, 
+                                            mp_srcptr B, long lenB, nmod_t mod)
+
+    Computes the remainder $R$ on polynomial division of $A$ by $B$.
+
+void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the remainder $R$ on polynomial division of $A$ by $B$.
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                     mp_srcptr Q, long n, nmod_t mod)

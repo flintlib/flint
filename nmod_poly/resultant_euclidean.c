@@ -58,15 +58,14 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
     {
         mp_limb_t res = 1;
 
-        mp_ptr u, v, q, r, t, w;
+        mp_ptr u, v, r, t, w;
         long l0, l1, l2;
         mp_limb_t lc;
 
-        w = _nmod_vec_init(4 * len1);
+        w = _nmod_vec_init(3 * len1);
         u = w;
         v = w + len1;
-        q = v + len1;
-        r = q + len1;
+        r = v + len1;
 
         _nmod_vec_set(u, poly1, len1);
         _nmod_vec_set(v, poly2, len2);
@@ -79,7 +78,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
             l1 = l2;
             lc = v[l1 - 1];
 
-            _nmod_poly_divrem(q, r, u, l0, v, l1, mod);
+            _nmod_poly_rem(r, u, l0, v, l1, mod);
             l2 = l1 - 1;
             MPN_NORM(r, l2);
             {
