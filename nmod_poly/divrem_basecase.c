@@ -299,7 +299,7 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
         
     R->length = Blen - 1;
 
-    _nmod_vec_free(W);
+    _nmod_vec_clear(W);
     _nmod_poly_normalise(Q);
     _nmod_poly_normalise(R);
 }

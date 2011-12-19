@@ -80,8 +80,8 @@ main(void)
             abort();
         }
 
-        _nmod_vec_free(x);
-        _nmod_vec_free(y);
+        _nmod_vec_clear(x);
+        _nmod_vec_clear(y);
         free(z);
     }
 

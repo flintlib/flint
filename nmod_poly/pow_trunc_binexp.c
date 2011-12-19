@@ -102,7 +102,7 @@ _nmod_poly_pow_trunc_binexp(mp_ptr res, mp_srcptr poly,
         }
     }
     
-    _nmod_vec_free(v);
+    _nmod_vec_clear(v);
 }
 
 void
@@ -165,7 +165,7 @@ nmod_poly_pow_trunc_binexp(nmod_poly_t res,
     }
 
     if (pcopy)
-        _nmod_vec_free(p);
+        _nmod_vec_clear(p);
 
     res->length = trunc;
     _nmod_poly_normalise(res);

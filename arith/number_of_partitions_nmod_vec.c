@@ -67,5 +67,5 @@ number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod)
 
     _nmod_poly_inv_series(res, tmp, len, mod);
 
-    _nmod_vec_free(tmp);
+    _nmod_vec_clear(tmp);
 }

@@ -102,10 +102,10 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 
     __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod, 0);
 
-    _nmod_vec_free(hprime);
-    _nmod_vec_free(g);
-    _nmod_vec_free(T);
-    _nmod_vec_free(U);
+    _nmod_vec_clear(hprime);
+    _nmod_vec_clear(g);
+    _nmod_vec_clear(T);
+    _nmod_vec_clear(U);
 }
 
 void
@@ -189,7 +189,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
     f->length = n;
 
     if (hlen < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     _nmod_poly_normalise(f);
 }

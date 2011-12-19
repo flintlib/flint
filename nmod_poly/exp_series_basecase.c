@@ -52,7 +52,7 @@ _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
         f[k] = n_mulmod2_preinv(s, n_invmod(k, mod.n), mod.n, mod.ninv);
     }
 
-    _nmod_vec_free(a);
+    _nmod_vec_clear(a);
 }
 
 void

@@ -57,7 +57,7 @@ _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen,
 
     _nmod_poly_reverse(Q, Q, Qlen, Qlen);
 
-    _nmod_vec_free(Arev);
+    _nmod_vec_clear(Arev);
 }
 
 void

@@ -142,8 +142,8 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 
     /* Cleanup */
     for (k = 0; k < num_primes; k++)
-        _nmod_vec_free(polys[k]);
-    _nmod_vec_free(temppoly);
+        _nmod_vec_clear(polys[k]);
+    _nmod_vec_clear(temppoly);
     for (i = 0; i < resolution; i++)
     {
         fmpz_comb_temp_clear(temp[i]);

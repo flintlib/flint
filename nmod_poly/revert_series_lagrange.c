@@ -55,9 +55,9 @@ _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
         tmp = S; S = T; T = tmp;
     }
 
-    _nmod_vec_free(R);
-    _nmod_vec_free(S);
-    _nmod_vec_free(T);
+    _nmod_vec_clear(R);
+    _nmod_vec_clear(S);
+    _nmod_vec_clear(T);
 }
 
 void
@@ -108,7 +108,7 @@ nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        _nmod_vec_free(Q_coeffs);
+        _nmod_vec_clear(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }

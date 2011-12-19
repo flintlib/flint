@@ -264,6 +264,6 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
     
     Q->length = Alen - Blen + 1;
 
-    _nmod_vec_free(W);
+    _nmod_vec_clear(W);
     _nmod_poly_normalise(Q);
 }

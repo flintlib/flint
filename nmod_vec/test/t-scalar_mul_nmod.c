@@ -72,9 +72,9 @@ main(void)
             abort();
         }
 
-        _nmod_vec_free(vec);
-        _nmod_vec_free(vec2);
-        _nmod_vec_free(vec3);
+        _nmod_vec_clear(vec);
+        _nmod_vec_clear(vec2);
+        _nmod_vec_clear(vec3);
     }
 
     flint_randclear(state);

@@ -76,8 +76,8 @@ _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, long len1,
         _nmod_poly_add(res, t, n, C->rows[i], n, mod);
     }
 
-    _nmod_vec_free(h);
-    _nmod_vec_free(t);
+    _nmod_vec_clear(h);
+    _nmod_vec_clear(t);
 
     nmod_mat_clear(A);
     nmod_mat_clear(B);

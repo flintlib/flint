@@ -70,7 +70,7 @@ _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly,
         }
     }
 
-    _nmod_vec_free(T);
+    _nmod_vec_clear(T);
 }
 
 
@@ -152,7 +152,7 @@ nmod_poly_powmod_ui_binexp(nmod_poly_t res,
     }
 
     if (pcopy)
-        _nmod_vec_free(p);
+        _nmod_vec_clear(p);
 
     res->length = trunc;
     _nmod_poly_normalise(res);
