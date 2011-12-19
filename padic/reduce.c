@@ -34,7 +34,7 @@ void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
             int alloc;
             fmpz_t pow;
 
-            _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
+            alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
             fmpz_mod(padic_unit(rop), padic_unit(rop), pow);
             if (alloc)
                 fmpz_clear(pow);

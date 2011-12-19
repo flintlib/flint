@@ -54,16 +54,16 @@ void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
     else
     {
         fmpz_t pow;
-        int alloc = 0;
+        int alloc;
 
-        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op), ctx);
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(op), ctx);
         fmpz_mod(rop, padic_unit(op), pow);
 
         if (padic_val(op) > 0)
         {
             if (alloc)
                 fmpz_clear(pow);
-            _padic_ctx_pow_ui(pow, &alloc, padic_val(op), ctx);
+            alloc = _padic_ctx_pow_ui(pow, padic_val(op), ctx);
             fmpz_mul(rop, rop, pow);
         }
 

@@ -71,10 +71,11 @@ void padic_ctx_clear(padic_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
 
-void _padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
+int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 
-    Sets \code{*rop} to $p^e$ as efficiently as possible.  If \code{*alloc} 
-    is set to a non-zero value on return then it is the responsibility of 
+    Sets \code{rop} to $p^e$ as efficiently as possible.
+
+    The return value is non-zero, it is the responsibility of 
     the caller to clear the returned integer.
 
     N.B.  Expects \code{rop} to be an uninitialised \code{fmpz_t}.
