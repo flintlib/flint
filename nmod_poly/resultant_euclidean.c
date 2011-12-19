@@ -58,15 +58,15 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
     {
         mp_limb_t res = 1;
 
-        mp_ptr u, v, q, r;
+        mp_ptr u, v, q, r, t, w;
         long l0, l1, l2;
         mp_limb_t lc;
 
-        /* INIT */
-        u = _nmod_vec_init(len1);
-        v = _nmod_vec_init(len1);
-        q = _nmod_vec_init(len1);
-        r = _nmod_vec_init(len1);
+        w = _nmod_vec_init(4 * len1);
+        u = w;
+        v = w + len1;
+        q = v + len1;
+        r = q + len1;
 
         _nmod_vec_set(u, poly1, len1);
         _nmod_vec_set(v, poly2, len2);
@@ -82,14 +82,17 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
             _nmod_poly_divrem(q, r, u, l0, v, l1, mod);
             l2 = l1 - 1;
             MPN_NORM(r, l2);
-
-            _nmod_vec_set(u, v, l1);
-            _nmod_vec_set(v, r, l2);
+            {
+                t = u;
+                u = v;
+                v = r;
+                r = t;
+            }
 
             if (l2 >= 1) 
             {
                 lc  = n_powmod2_preinv(lc, l0 - l2, mod.n, mod.ninv);
-                res = n_powmod2_preinv(res, lc, mod.n, mod.ninv);
+                res = n_mulmod2_preinv(res, lc, mod.n, mod.ninv);
 
                 if (((l0 | l1) & 1) == 0)
                 {
@@ -101,7 +104,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
                 if (l1 == 1)
                 {
                     lc  = n_powmod2_preinv(lc, l0 - 1, mod.n, mod.ninv);
-                    res = n_powmod2_preinv(res, lc, mod.n, mod.ninv);
+                    res = n_mulmod2_preinv(res, lc, mod.n, mod.ninv);
                 }
                 else
                 {
@@ -111,10 +114,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
         }
         while (l2 > 0);
 
-        free(u);
-        free(v);
-        free(q);
-        free(r);
+        _nmod_vec_free(w);
 
         return res;
     }
