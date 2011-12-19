@@ -31,15 +31,15 @@
 #include "fmpq_poly.h"
 
 void
-_fmpq_poly_reverse_series(fmpz * Qinv, fmpz_t den,
+_fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
         const fmpz * Q, const fmpz_t Qden, long n)
 {
-    _fmpq_poly_reverse_series_lagrange_fast(Qinv, den, Q, Qden, n);
+    _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, n);
 }
 
 
 void
-fmpq_poly_reverse_series(fmpq_poly_t res,
+fmpq_poly_revert_series(fmpq_poly_t res,
             const fmpq_poly_t poly, long n)
 {
     fmpz *copy;
@@ -48,7 +48,7 @@ fmpq_poly_reverse_series(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("exception: fmpq_poly_reverse_series: input must have "
+        printf("exception: fmpq_poly_revert_series: input must have "
             "zero constant term and nonzero coefficient of x^1");
         abort();
     }
@@ -78,14 +78,14 @@ fmpq_poly_reverse_series(fmpq_poly_t res,
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_reverse_series(res->coeffs,
+        _fmpq_poly_revert_series(res->coeffs,
                 res->den, copy, poly->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_reverse_series(t->coeffs,
+        _fmpq_poly_revert_series(t->coeffs,
                 t->den, copy, poly->den, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);

@@ -39,7 +39,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("reverse_series....");
+    printf("revert_series....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -58,8 +58,8 @@ main(void)
         fmpq_poly_set_coeff_ui(g, 0, 0);
         n = n_randint(state, 50);
 
-        fmpq_poly_reverse_series(f, g, n);
-        fmpq_poly_reverse_series(g, g, n);
+        fmpq_poly_revert_series(f, g, n);
+        fmpq_poly_revert_series(g, g, n);
 
         result = (fmpq_poly_equal(f, g));
         if (!result)
@@ -94,7 +94,7 @@ main(void)
         fmpq_poly_set_coeff_ui(g, 0, 0);
         n = n_randint(state, 50);
 
-        fmpq_poly_reverse_series(f, g, n);
+        fmpq_poly_revert_series(f, g, n);
         fmpq_poly_compose_series(h, g, f, n);
 
         result = ((n <= 1 && fmpq_poly_is_zero(h)) ||

@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 {
     long i;
     mp_ptr R, S, T, tmp;
@@ -61,7 +61,7 @@ _nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 }
 
 void
-nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv, 
+nmod_poly_revert_series_lagrange(nmod_poly_t Qinv, 
                                  const nmod_poly_t Q, long n)
 {
     mp_ptr Qinv_coeffs, Q_coeffs;
@@ -72,7 +72,7 @@ nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_reverse_series_lagrange: input must have "
+        printf("exception: nmod_poly_revert_series_lagrange: input must have "
             "zero constant and an invertible coefficient of x^1");
         abort();
     }
@@ -97,7 +97,7 @@ nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
         Qinv_coeffs = Qinv->coeffs;
     }
 
-    _nmod_poly_reverse_series_lagrange(Qinv_coeffs, Q_coeffs, n, Q->mod);
+    _nmod_poly_revert_series_lagrange(Qinv_coeffs, Q_coeffs, n, Q->mod);
 
     if (Q == Qinv && Qlen >= n)
     {

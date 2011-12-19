@@ -1288,7 +1288,7 @@ void nmod_poly_compose_series(nmod_poly_t res,
 
 *******************************************************************************
 
-void _nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q,
+void _nmod_poly_revert_series_lagrange(mp_ptr Qinv, mp_srcptr Q,
         long n, nmod_t mod)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1301,7 +1301,7 @@ void _nmod_poly_reverse_series_lagrange(mp_ptr Qinv, mp_srcptr Q,
 
     This implementation uses the Lagrange inversion formula.
 
-void nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
+void nmod_poly_revert_series_lagrange(nmod_poly_t Qinv,
             const nmod_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1313,7 +1313,7 @@ void nmod_poly_reverse_series_lagrange(nmod_poly_t Qinv,
 
     This implementation uses the Lagrange inversion formula.
 
-void _nmod_poly_reverse_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
+void _nmod_poly_revert_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
         long n, nmod_t mod)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1327,7 +1327,7 @@ void _nmod_poly_reverse_series_lagrange_fast(mp_ptr Qinv, mp_srcptr Q,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void nmod_poly_reverse_series_lagrange_fast(nmod_poly_t Qinv,
+void nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv,
             const nmod_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1340,7 +1340,7 @@ void nmod_poly_reverse_series_lagrange_fast(nmod_poly_t Qinv,
     This implementation uses a reduced-complexity implementation
     of the Lagrange inversion formula.
 
-void _nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q,
+void _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q,
     long n, nmod_t mod)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1353,7 +1353,7 @@ void _nmod_poly_reverse_series_newton(mp_ptr Qinv, mp_srcptr Q,
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void nmod_poly_reverse_series_newton(nmod_poly_t Qinv,
+void nmod_poly_revert_series_newton(nmod_poly_t Qinv,
         const nmod_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
@@ -1365,7 +1365,7 @@ void nmod_poly_reverse_series_newton(nmod_poly_t Qinv,
 
     This implementation uses Newton iteration \cite{BrentKung1978}.
 
-void _nmod_poly_reverse_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+void _nmod_poly_revert_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that
@@ -1379,7 +1379,7 @@ void _nmod_poly_reverse_series(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     inversion formula and Newton iteration based on the size of the
     input.
 
-void nmod_poly_reverse_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     Sets \code{Qinv} to the compositional inverse or reversion of \code{Q}
     as a power series, i.e. computes $Q^{-1}$ such that

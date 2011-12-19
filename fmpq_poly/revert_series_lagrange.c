@@ -29,12 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
-#include "ulong_extras.h"
 
-
-/* pointer to (x/Q)^i */
-#define Ri(ii) (R + (n-1)*((ii)-1))
-#define Rdeni(ii) (Rden + ii - 1)
 
 static void
 _set_vec(fmpz * rnum, fmpz_t den,
@@ -58,21 +53,19 @@ _set_vec(fmpz * rnum, fmpz_t den,
 }
 
 void
-_fmpq_poly_reverse_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
-                                    const fmpz * Q, const fmpz_t Qden, long n)
+_fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
+                            const fmpz * Q, const fmpz_t Qden, long n)
 {
-    long i, j, k, m;
-    fmpz *R, *Rden, *S, *T, *dens, *tmp;
-    fmpz_t Sden, Tden, t;
+    long i;
+    fmpz *R, *S, *T, *dens, *tmp;
+    fmpz_t Rden, Sden, Tden;
 
     if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
     {
-        _fmpz_poly_reverse_series(Qinv, Q, n);
+        _fmpz_poly_revert_series(Qinv, Q, n);
         fmpz_one(den);
-        return;
     }
-
-    if (n <= 2)
+    else if (n <= 2)
     {
         fmpz_zero(Qinv);
         if (n == 2)
@@ -81,84 +74,53 @@ _fmpq_poly_reverse_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
             fmpz_set(den, Q + 1);
             _fmpq_poly_canonicalise(Qinv, den, 2);
         }
-        return;
     }
-
-    m = n_sqrt(n);
-
-    fmpz_init(t);
-    dens = _fmpz_vec_init(n);
-    R = _fmpz_vec_init((n - 1) * m);
-    S = _fmpz_vec_init(n - 1);
-    T = _fmpz_vec_init(n - 1);
-    Rden = _fmpz_vec_init(m);
-    fmpz_init(Sden);
-    fmpz_init(Tden);
-
-    fmpz_zero(Qinv);
-    fmpz_one(dens);
-
-    _fmpq_poly_inv_series(Ri(1), Rdeni(1), Q + 1, Qden, n - 1);
-    _fmpq_poly_canonicalise(Ri(1), Rdeni(1), n - 1);
-
-    for (i = 2; i <= m; i++)
+    else
     {
-        _fmpq_poly_mullow(Ri(i), Rdeni(i), Ri(i-1), Rdeni(i-1), n - 1,
-                Ri(1), Rdeni(1), n - 1, n - 1);
-        _fmpq_poly_canonicalise(Ri(i), Rdeni(i), n - 1);
-    }
+        dens = _fmpz_vec_init(n);
+        R = _fmpz_vec_init(n - 1);
+        S = _fmpz_vec_init(n - 1);
+        T = _fmpz_vec_init(n - 1);
+        fmpz_init(Rden);
+        fmpz_init(Sden);
+        fmpz_init(Tden);
 
-    for (i = 1; i < m; i++)
-    {
-        fmpz_set(Qinv + i, Ri(i) + i - 1);
-        fmpz_mul_ui(dens + i, Rdeni(i), i);
-    }
+        fmpz_zero(Qinv);
+        fmpz_one(dens);
+        fmpz_set(Qinv + 1, Qden);
+        fmpz_set(dens + 1, Q + 1);
 
-    _fmpz_vec_set(S, Ri(m), n - 1);
-    fmpz_set(Sden, Rdeni(m));
+        _fmpq_poly_inv_series(R, Rden, Q + 1, Qden, n - 1);
+        _fmpq_poly_canonicalise(R, Rden, n - 1);
 
-    for (i = m; i < n; i += m)
-    {
-        fmpz_set(Qinv + i, S + i - 1);
-        fmpz_mul_ui(dens + i, Sden, i);
+        _fmpz_vec_set(S, R, n - 1);
+        fmpz_set(Sden, Rden);
 
-        for (j = 1; j < m && i + j < n; j++)
+        for (i = 2; i < n; i++)
         {
-            fmpz_mul(t, S + 0, Ri(j) + i + j - 1);
-
-            for (k = 1; k <= i + j - 1; k++)
-                fmpz_addmul(t, S + k, Ri(j) + i + j - 1 - k);
-
-            fmpz_set(Qinv + i + j, t);
-            fmpz_mul(dens + i + j, Sden, Rdeni(j));
-            fmpz_mul_ui(dens + i + j, dens + i + j, i + j);
-        }
-
-        if (i + 1 < n)
-        {
-            _fmpq_poly_mullow(T, Tden, S, Sden, n - 1,
-                Ri(m), Rdeni(m), n - 1, n - 1);
+            _fmpq_poly_mullow(T, Tden, S, Sden, n - 1, R, Rden, n - 1, n - 1);
             _fmpq_poly_canonicalise(T, Tden, n - 1);
-            fmpz_swap(Tden, Sden);
+            fmpz_set(Qinv + i, T + i - 1);
+            fmpz_mul_ui(dens + i, Tden, i);
             tmp = S; S = T; T = tmp;
+            fmpz_swap(Sden, Tden);
         }
+
+        _set_vec(Qinv, den, Qinv, dens, n);
+        _fmpq_poly_canonicalise(Qinv, den, n);
+
+        _fmpz_vec_clear(R, n - 1);
+        _fmpz_vec_clear(S, n - 1);
+        _fmpz_vec_clear(T, n - 1);
+        _fmpz_vec_clear(dens, n);
+        fmpz_clear(Rden);
+        fmpz_clear(Sden);
+        fmpz_clear(Tden);
     }
-
-    _set_vec(Qinv, den, Qinv, dens, n);
-    _fmpq_poly_canonicalise(Qinv, den, n);
-
-    fmpz_clear(t);
-    _fmpz_vec_clear(dens, n);
-    _fmpz_vec_clear(R, (n - 1) * m);
-    _fmpz_vec_clear(S, n - 1);
-    _fmpz_vec_clear(T, n - 1);
-    _fmpz_vec_clear(Rden, m);
-    fmpz_clear(Sden);
-    fmpz_clear(Tden);
 }
 
 void
-fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res,
+fmpq_poly_revert_series_lagrange(fmpq_poly_t res,
             const fmpq_poly_t poly, long n)
 {
     fmpz *copy;
@@ -167,8 +129,8 @@ fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("exception: fmpq_poly_reverse_series_lagrange_fast: input must "
-            "have zero constant term and nonzero coefficient of x^1");
+        printf("exception: fmpq_poly_revert_series_lagrange: input must have "
+            "zero constant term and nonzero coefficient of x^1");
         abort();
     }
 
@@ -197,14 +159,14 @@ fmpq_poly_reverse_series_lagrange_fast(fmpq_poly_t res,
     if (res != poly)
     {
         fmpq_poly_fit_length(res, n);
-        _fmpq_poly_reverse_series_lagrange_fast(res->coeffs,
+        _fmpq_poly_revert_series_lagrange(res->coeffs,
                 res->den, copy, poly->den, n);
     }
     else
     {
         fmpq_poly_t t;
         fmpq_poly_init2(t, n);
-        _fmpq_poly_reverse_series_lagrange_fast(t->coeffs,
+        _fmpq_poly_revert_series_lagrange(t->coeffs,
                 t->den, copy, poly->den, n);
         fmpq_poly_swap(res, t);
         fmpq_poly_clear(t);
