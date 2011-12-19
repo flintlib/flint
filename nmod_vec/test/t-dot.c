@@ -88,8 +88,8 @@ main(void)
         mpz_clear(s);
         mpz_clear(t);
 
-        _nmod_vec_free(x);
-        _nmod_vec_free(y);
+        _nmod_vec_clear(x);
+        _nmod_vec_clear(y);
     }
 
     flint_randclear(state);

@@ -35,8 +35,8 @@ void _fmpq_poly_lcm(fmpz *L, fmpz_t denL,
 {
     if (lenA == 1)  /* lenA == lenB == 1 */
     {
-        fmpz_set_ui(L, 1);
-        fmpz_set_ui(denL, 1);
+        fmpz_one(L);
+        fmpz_one(denL);
     }
     else
     {

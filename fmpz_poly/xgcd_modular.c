@@ -48,7 +48,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
         return;
 
     fmpz_init(prod);
-    fmpz_set_ui(prod, 1);
+    fmpz_one(prod);
 
     _fmpz_vec_zero(s, len2);
     _fmpz_vec_zero(t, len1);
@@ -168,7 +168,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
         }
     }
 
-    _nmod_vec_free(G);
+    _nmod_vec_clear(G);
     fmpz_clear(prod);
 }
 

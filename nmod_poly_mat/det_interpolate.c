@@ -76,7 +76,7 @@ nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
 
     nmod_poly_interpolate_nmod_vec(det, x, d, len);
 
-    _nmod_vec_free(x);
-    _nmod_vec_free(d);
+    _nmod_vec_clear(x);
+    _nmod_vec_clear(d);
     nmod_mat_clear(X);
 }

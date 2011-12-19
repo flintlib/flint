@@ -69,7 +69,6 @@ nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
     {
         nmod_poly_set(R, A);
         nmod_poly_zero(Q);
-
         return;
     }
 

@@ -1155,6 +1155,55 @@ void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     \code{S*A + T*B = G}. The length of \code{S} will be at most 
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
+mp_limb_t 
+_nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1, 
+                               mp_srcptr poly2, long len2, nmod_t mod)
+
+    Returns the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)} using the Euclidean algorithm.
+
+    Assumes that \code{len1 >= len2 > 0}.
+
+    Asumes that the modulus is prime.
+
+mp_limb_t 
+nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
+
+    Computes the resultant of $f$ and $g$ using the Euclidean algorithm.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
+
+mp_limb_t 
+_nmod_poly_resultant(mp_srcptr poly1, long len1, 
+                     mp_srcptr poly2, long len2, nmod_t mod)
+
+    Returns the resultant of \code{(poly1, len1)} and 
+    \code{(poly2, len2)}.
+
+    Assumes that \code{len1 >= len2 > 0}.
+
+    Asumes that the modulus is prime.
+
+mp_limb_t 
+nmod_poly_resultant(const nmod_poly_t f, const nmod_poly_t g)
+
+    Computes the resultant of $f$ and $g$.
+
+    For two non-zero polynomials $f(x) = a_m x^m + \dotsb + a_0$ and 
+    $g(x) = b_n x^n + \dotsb + b_0$ of degrees $m$ and $n$, the resultant 
+    is defined to be 
+    \begin{equation*}
+        a_m^n b_n^m \prod_{(x, y) : f(x) = g(y) = 0} (x - y).
+    \end{equation*}
+    For convenience, we define the resultant to be equal to zero if either 
+    of the two polynomials is zero.
 
 *******************************************************************************
 

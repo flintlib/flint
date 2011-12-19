@@ -38,7 +38,7 @@ _set_vec(fmpz * rnum, fmpz_t den,
     long j;
     fmpz_t t;
     fmpz_init(t);
-    fmpz_set_ui(den, 1UL);
+    fmpz_one(den);
 
     for (j = 0; j < len; j++)
         fmpz_lcm(den, den, xden + j);
@@ -63,7 +63,7 @@ _fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
     if (fmpz_is_one(Qden) && (n > 1) && fmpz_is_pm1(Q + 1))
     {
         _fmpz_poly_revert_series(Qinv, Q, n);
-        fmpz_set_ui(den, 1UL);
+        fmpz_one(den);
     }
     else if (n <= 2)
     {
@@ -85,8 +85,8 @@ _fmpq_poly_revert_series_lagrange(fmpz * Qinv, fmpz_t den,
         fmpz_init(Sden);
         fmpz_init(Tden);
 
-        fmpz_set_ui(Qinv, 0UL);
-        fmpz_set_ui(dens, 1UL);
+        fmpz_zero(Qinv);
+        fmpz_one(dens);
         fmpz_set(Qinv + 1, Qden);
         fmpz_set(dens + 1, Q + 1);
 

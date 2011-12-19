@@ -36,7 +36,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
     fmpz_t t;
 
     fmpz_init(t);
-    fmpz_set_ui(t, 1UL);
+    fmpz_one(t);
 
     for (k = len - 1; k > 0; k--)
     {

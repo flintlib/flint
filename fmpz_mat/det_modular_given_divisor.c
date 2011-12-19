@@ -61,7 +61,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 
     if (n == 0)
     {
-        fmpz_set_ui(det, 1UL);
+        fmpz_one(det);
         return;
     }
 
@@ -84,7 +84,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
 
     nmod_mat_init(Amod, n, n, 2);
     fmpz_zero(x);
-    fmpz_set_ui(prod, 1UL);
+    fmpz_one(prod);
 
 #if DEBUG_USE_SMALL_PRIMES
     p = 1UL;

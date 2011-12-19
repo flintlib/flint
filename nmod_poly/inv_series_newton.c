@@ -122,7 +122,7 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     
     if (Qlen < n)
     {
-        _nmod_vec_free(q);
+        _nmod_vec_clear(q);
     }
 
     _nmod_poly_normalise(Qinv);

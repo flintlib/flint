@@ -67,7 +67,7 @@ _nmod_poly_compose_series_horner(mp_ptr res, mp_srcptr poly1, long len1,
         }
 
         _nmod_vec_zero(res + lenr, n - lenr);
-        _nmod_vec_free(t);
+        _nmod_vec_clear(t);
     }
 }
 

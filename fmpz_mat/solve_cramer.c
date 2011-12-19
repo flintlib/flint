@@ -124,7 +124,7 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
 
     if (dim == 0)
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
         return 1;
     }
     else if (dim == 1)

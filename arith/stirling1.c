@@ -44,11 +44,11 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
     switch (span)
     {
     case 0:
-        fmpz_set_ui(res, 1UL);
+        fmpz_one(res);
         break;
     case 1:
         fmpz_set_ui(res, a);
-        if (trunc > 1) fmpz_set_ui(res+1, 1UL);
+        if (trunc > 1) fmpz_one(res+1);
         break;
     case 2:
         fmpz_set_ui(res, a);
@@ -56,7 +56,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
         if (trunc > 1)
         {
             fmpz_set_ui(res+1, 2*a + 1UL);
-            if (trunc > 2) fmpz_set_ui(res+2, 1UL);
+            if (trunc > 2) fmpz_one(res+2);
         }
         break;
     case 3:
@@ -72,7 +72,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
             {
                 fmpz_set_ui(res+2, 3*(a+1));
                 if (trunc > 3)
-                    fmpz_set_ui(res+3, 1UL);
+                    fmpz_one(res+3);
             }
         }
         break;

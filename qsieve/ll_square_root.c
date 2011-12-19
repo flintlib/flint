@@ -50,8 +50,8 @@ void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
       
    memset(prime_count, 0, num_primes*sizeof(long));
       
-   fmpz_set_ui(X, 1);
-   fmpz_set_ui(Y, 1);
+   fmpz_one(X);
+   fmpz_one(Y);
    
    for (i = 0; i < ncols; i++)
    {

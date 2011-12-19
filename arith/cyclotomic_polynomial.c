@@ -46,7 +46,7 @@ _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     if (num_factors == 1)
     {
         for (i = 0; i <= D; i++)
-            fmpz_set_ui(a + i, 1UL);
+            fmpz_one(a + i);
         return;
     }
 
@@ -59,7 +59,7 @@ _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
         return;
     }
 
-    fmpz_set_ui(a, 1UL);
+    fmpz_one(a);
     for (i = 1; i <= D; i++)
         fmpz_zero(a + i);
 

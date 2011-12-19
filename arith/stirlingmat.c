@@ -36,7 +36,7 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
 
     if (n == 0)
     {
-        fmpz_set_ui(new, 1UL);
+        fmpz_one(new);
         return;
     }
 
@@ -45,10 +45,10 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
 
     fmpz_init(t);
     fmpz_init(u);
-    fmpz_set_ui(new, 0UL);
+    fmpz_zero(new);
 
     if (klen > n)
-        fmpz_set_ui(new + n, 1UL);
+        fmpz_one(new + n);
 
     for (k = 1; k < FLINT_MIN(n, klen); k++)
     {
@@ -80,7 +80,7 @@ _fmpz_stirling_mat(fmpz ** rows, long r, long c, int kind)
     if (r == 0 || c == 0)
         return;
 
-    fmpz_set_ui(rows[0], 1UL);
+    fmpz_one(rows[0]);
     for (i = 1; i < c; i++)
         fmpz_zero(rows[0] + i);
 

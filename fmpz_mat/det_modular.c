@@ -37,7 +37,7 @@ fmpz_mat_det_modular(fmpz_t det, const fmpz_mat_t A, int proved)
 {
     fmpz_t d;
     fmpz_init(d);
-    fmpz_set_ui(d, 1UL);
+    fmpz_one(d);
     fmpz_mat_det_modular_given_divisor(det, A, d, proved);
     fmpz_clear(d);
 }

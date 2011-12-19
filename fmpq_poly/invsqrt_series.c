@@ -43,8 +43,8 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
 
     if (n == 1)
     {
-        fmpz_set_ui(rpoly, 1UL);
-        fmpz_set_ui(rden, 1UL);
+        fmpz_one(rpoly);
+        fmpz_one(rden);
         return;
     }
 

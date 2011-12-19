@@ -61,7 +61,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 
     diag = _fmpz_vec_init(n);
     for (i = 0; i < n; i++)
-        fmpz_set_ui(&diag[i], 1UL);
+        fmpz_one(&diag[i]);
 
     /* Form diagonal entries that multiply to the determinant */
     for (i = 0; i < factor->length; i++)

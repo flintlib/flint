@@ -81,7 +81,7 @@ _mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
     if (n <= 0)
     {
         fmpz_zero(num);
-        fmpz_set_ui(den, 1UL);
+        fmpz_one(den);
         return;
     }
 

@@ -65,8 +65,8 @@ _fmpz_poly_gcd_subresultant(fmpz * res, const fmpz * poly1, long len1,
         _fmpz_vec_scalar_divexact_fmpz(B, poly2, lenB, b);
 
         fmpz_gcd(d, a, b);
-        fmpz_set_ui(g, 1);
-        fmpz_set_ui(h, 1);
+        fmpz_one(g);
+        fmpz_one(h);
 
         while (1)
         {

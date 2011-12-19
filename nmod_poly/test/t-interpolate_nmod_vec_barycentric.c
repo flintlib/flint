@@ -80,8 +80,8 @@ main(void)
 
         nmod_poly_clear(P);
         nmod_poly_clear(Q);
-        _nmod_vec_free(x);
-        _nmod_vec_free(y);
+        _nmod_vec_clear(x);
+        _nmod_vec_clear(y);
     }
 
     flint_randclear(state);

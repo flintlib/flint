@@ -37,5 +37,5 @@ fmpz_mat_one(fmpz_mat_t mat)
     n = FLINT_MIN(mat->r, mat->c);
 
     for (i = 0; i < n; i++)
-        fmpz_set_ui(fmpz_mat_entry(mat, i, i), 1UL);
+        fmpz_one(fmpz_mat_entry(mat, i, i));
 }

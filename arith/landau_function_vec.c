@@ -45,7 +45,7 @@ void landau_function_vec(fmpz * res, long len)
         return;
 
     for (k = 0; k < len; k++)
-        fmpz_set_ui(res + k, 1UL);
+        fmpz_one(res + k);
 
     pmax = 1.328 * sqrt(len*log(len) + 1);
 

@@ -58,7 +58,7 @@ fmpz_mat_randntrulike(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulon
     {
         for (j = 0; j < i; j++)
             fmpz_zero(mat->rows[i] + j);
-        fmpz_set_ui(mat->rows[i] + i, 1);
+        fmpz_one(mat->rows[i] + i);
         for (j = i + 1; j < d; j++)
             fmpz_zero(mat->rows[i] + j);
     }

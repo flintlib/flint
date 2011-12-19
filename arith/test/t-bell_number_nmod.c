@@ -68,7 +68,7 @@ int main(void)
             }
         }
 
-        _nmod_vec_free(b);
+        _nmod_vec_clear(b);
     }
 
     flint_randclear(state);

@@ -38,8 +38,8 @@ void _fmpq_poly_mul(fmpz * rpoly, fmpz_t rden,
     fmpz_t gcd2;  /* GCD( poly2, den1 ) */
     fmpz_init(gcd1);
     fmpz_init(gcd2);
-    fmpz_set_ui(gcd1, 1);
-    fmpz_set_ui(gcd2, 1);
+    fmpz_one(gcd1);
+    fmpz_one(gcd2);
     
     if (*den2 != 1L)
     {

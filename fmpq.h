@@ -81,13 +81,13 @@ static __inline__ void _fmpq_vec_clear(fmpq * vec, long n)
 static __inline__ void fmpq_zero(fmpq_t res)
 {
     fmpz_zero(fmpq_numref(res));
-    fmpz_set_ui(fmpq_denref(res), 1UL);
+    fmpz_one(fmpq_denref(res));
 }
 
 static __inline__ void fmpq_one(fmpq_t res)
 {
-    fmpz_set_ui(fmpq_numref(res), 1);
-    fmpz_set_ui(fmpq_denref(res), 1);
+    fmpz_one(fmpq_numref(res));
+    fmpz_one(fmpq_denref(res));
 }
 
 static __inline__ int fmpq_equal(const fmpq_t x, const fmpq_t y)

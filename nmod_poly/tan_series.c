@@ -60,8 +60,8 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     _nmod_vec_sub(t + m, h + m, t + m, n - m, mod);
     _nmod_poly_mullow(g + m, u, n, t + m, n - m, n - m, mod);
 
-    _nmod_vec_free(t);
-    _nmod_vec_free(u);
+    _nmod_vec_clear(t);
+    _nmod_vec_clear(u);
 }
 
 void
@@ -116,7 +116,7 @@ nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n)
     g->length = n;
 
     if (h_len < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     _nmod_poly_normalise(g);
 }

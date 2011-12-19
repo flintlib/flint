@@ -34,7 +34,7 @@ void fmpq_poly_init(fmpq_poly_t poly)
 {
     poly->coeffs = NULL;
     fmpz_init(poly->den);
-    fmpz_set_ui(poly->den, 1UL);
+    fmpz_one(poly->den);
     poly->alloc  = 0;
     poly->length = 0;
 }
@@ -45,7 +45,7 @@ void fmpq_poly_init2(fmpq_poly_t poly, long alloc)
     poly->coeffs = (alloc ? (fmpz *) calloc(alloc, sizeof(fmpz)) : NULL);
     
     fmpz_init(poly->den);
-    fmpz_set_ui(poly->den, 1UL);
+    fmpz_one(poly->den);
     poly->alloc  = alloc;
     poly->length = 0;
 }

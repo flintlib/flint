@@ -158,7 +158,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
       
       if (hlen == 1) /* gcd is 1 */
       {
-         fmpz_set_ui(res, 1);
+         fmpz_one(res);
          break; 
       }
       
@@ -276,9 +276,9 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    fmpz_clear(modulus);
    fmpz_clear(g); 
 
-   _nmod_vec_free(a);
-   _nmod_vec_free(b);
-   _nmod_vec_free(h); 
+   _nmod_vec_clear(a);
+   _nmod_vec_clear(b);
+   _nmod_vec_clear(h); 
         
    /* finally multiply by content */
    _fmpz_vec_scalar_mul_fmpz(res, res, hlen, d);

@@ -36,7 +36,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len)
         if (len == 1)
             fmpz_set(res, vec);
         else
-            fmpz_set_ui(res, 1);
+            fmpz_one(res);
     }
     else if (len <= 3)
     {

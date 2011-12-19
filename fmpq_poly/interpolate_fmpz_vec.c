@@ -44,7 +44,7 @@ _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
     if (n == 1)
     {
         fmpz_set(poly, ys);
-        fmpz_set_ui(den, 1UL);
+        fmpz_one(den);
         return;
     }
 
@@ -70,7 +70,7 @@ _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
     /* Weights */
     for (i = 0; i < n; i++)
     {
-        fmpz_set_ui(w + i, 1UL);
+        fmpz_one(w + i);
         for (j = 0; j < n; j++)
         {
             if (i != j)

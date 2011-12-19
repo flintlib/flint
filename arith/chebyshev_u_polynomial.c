@@ -67,7 +67,7 @@ chebyshev_u_polynomial(fmpz_poly_t poly, ulong n)
 
     if (n == 1)
     {
-        fmpz_set_ui(poly->coeffs, 0UL);
+        fmpz_zero(poly->coeffs);
         fmpz_set_ui(poly->coeffs + 1, 2UL);
     }
     else

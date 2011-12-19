@@ -27,40 +27,42 @@
 
 void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
 {
-    fmpz_t pow;
-    int alloc = 0;
-
     if (_padic_is_zero(op) || e * padic_val(op) >= ctx->N)
     {
         padic_zero(rop, ctx);
         return;
     }
-    
-    if (e > 0)
+
+    if (e)
     {
-        /* Form u' = u^e mod p^{N - v'} */
-        padic_val(rop) = e * padic_val(op);
+        fmpz_t pow;
+        int alloc;
 
-        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
-        fmpz_powm_ui(padic_unit(rop), padic_unit(op), e, pow);
-    }
-    else if (e < 0)
-    {
-        /* Need u^{-1} to precision ceil((N - v e) / -e) */
-        _padic_inv(padic_unit(rop), padic_unit(op), 
-                   ctx->p, (ctx->N - padic_val(op) * e + (-e - 1)) / -e);
+        if (e > 0)
+        {
+            padic_val(rop) = e * padic_val(op);
 
-        padic_val(rop) = e * padic_val(op);
+            alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
+            fmpz_powm_ui(padic_unit(rop), padic_unit(op), e, pow);
+        }
+        else if (e < 0)
+        {
+            /* u^{-1} to precision ceil((N - v e) / -e) */
+            _padic_inv(padic_unit(rop), padic_unit(op), 
+                       ctx->p, (ctx->N - padic_val(op) * e + (-e - 1)) / -e);
 
-        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
-        fmpz_powm_ui(padic_unit(rop), padic_unit(rop), -e, pow);
+            padic_val(rop) = e * padic_val(op);
+
+            alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
+            fmpz_powm_ui(padic_unit(rop), padic_unit(rop), -e, pow);
+        }
+
+        if (alloc)
+            fmpz_clear(pow);
     }
     else
     {
         padic_one(rop, ctx);
     }
-
-    if (alloc)
-        fmpz_clear(pow);
 }
 

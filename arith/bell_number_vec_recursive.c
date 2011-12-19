@@ -46,9 +46,9 @@ bell_number_vec_recursive(fmpz * b, long n)
     n -= 1;
     t = _fmpz_vec_init(n);
 
-    fmpz_set_ui(t, 1UL);
-    fmpz_set_ui(b, 1UL);
-    fmpz_set_ui(b + 1, 1UL);
+    fmpz_one(t);
+    fmpz_one(b);
+    fmpz_one(b + 1);
 
     for (i = 1; i < n; i++)
     {

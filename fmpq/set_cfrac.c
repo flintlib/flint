@@ -36,8 +36,8 @@ _fmpq_set_cfrac_basecase(fmpz_t p, fmpz_t t, fmpz_t q, fmpz_t u,
     long i;
 
     fmpz_set(p, c);
-    fmpz_set_ui(q, 1);
-    fmpz_set_ui(t, 1);
+    fmpz_one(q);
+    fmpz_one(t);
     fmpz_zero(u);
 
     for (i = 1; i < n; i++)

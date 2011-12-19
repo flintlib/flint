@@ -67,7 +67,7 @@ void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state,
     }
     else
     {
-        fmpz_set_ui(poly->den, 1);
+        fmpz_one(poly->den);
         _fmpq_poly_normalise(poly);
     }
 }
@@ -105,7 +105,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, flint_rand_t state,
     }
     else
     {
-        fmpz_set_ui(poly->den, 1);
+        fmpz_one(poly->den);
         _fmpq_poly_normalise(poly);
     }
 }

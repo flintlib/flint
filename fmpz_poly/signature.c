@@ -56,8 +56,8 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
     _fmpz_poly_derivative(B, A, lenA);
     _fmpz_poly_primitive_part(B, B, lenB);
     
-    fmpz_set_ui(g, 1);
-    fmpz_set_ui(h, 1);
+    fmpz_one(g);
+    fmpz_one(h);
     
     s = 1;
     t = (lenA & 1L) ? -s : s;

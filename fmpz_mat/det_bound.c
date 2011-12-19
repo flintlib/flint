@@ -41,11 +41,11 @@ fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
     fmpz_init(p);
     fmpz_init(s);
     fmpz_init(t);
-    fmpz_set_ui(p, 1UL);
+    fmpz_one(p);
 
     for (i = 0; i < A->r; i++)
     {
-        fmpz_set_ui(s, 0UL);
+        fmpz_zero(s);
 
         for (j = 0; j < A->c; j++)
             fmpz_addmul(s, A->rows[i] + j, A->rows[i] + j);

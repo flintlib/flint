@@ -83,19 +83,19 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N,
 
 void padic_ctx_clear(padic_ctx_t ctx);
 
-static __inline__ void 
-_padic_ctx_pow_ui(fmpz *rop, int *alloc, ulong e, const padic_ctx_t ctx)
+static __inline__ int 
+_padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 {
     if (ctx->min <= e && e < ctx->max)
     {
-        *alloc = 0;
         *rop   = *(ctx->pow + (e - ctx->min));
+        return 0;
     }
     else
     {
-        *alloc = 1;
         fmpz_init(rop);
         fmpz_pow_ui(rop, ctx->p, e);
+        return 1;
     }
 }
 
@@ -195,7 +195,7 @@ static __inline__ void padic_zero(padic_t rop, const padic_ctx_t ctx)
 
 static __inline__ void _padic_one(padic_t rop)
 {
-    fmpz_set_ui(padic_unit(rop), 1);
+    fmpz_one(padic_unit(rop));
     padic_val(rop) = 0;
 }
 

@@ -52,7 +52,7 @@ fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xnum,
             {
                 fmpz_neg(fmpq_mat_entry_num(X, i, j),
                     fmpz_mat_entry(Xnum, i, j));
-                fmpz_set_ui(fmpq_mat_entry_den(X, i, j), 1UL);
+                fmpz_one(fmpq_mat_entry_den(X, i, j));
             }
         }
 

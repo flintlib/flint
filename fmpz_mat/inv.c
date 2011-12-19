@@ -53,13 +53,13 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
     if (dim == 0)
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
         return 1;
     }
     else if (dim == 1)
     {
         fmpz_set(den, A->entries);
-        fmpz_set_ui(B->entries, 1);
+        fmpz_one(B->entries);
         return !fmpz_is_zero(den);
     }
     else if (dim == 2)
@@ -75,7 +75,7 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
         fmpz_mat_init(I, dim, dim);
         for (i = 0; i < dim; i++)
-            fmpz_set_ui(fmpz_mat_entry(I, i, i), 1);
+            fmpz_one(fmpz_mat_entry(I, i, i));
         success = fmpz_mat_solve_fflu(B, den, A, I);
         fmpz_mat_clear(I);
         return success;

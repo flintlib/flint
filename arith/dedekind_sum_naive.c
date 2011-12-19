@@ -50,7 +50,7 @@ dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 
     fmpz_zero(fmpq_numref(s));
 
-    for (fmpz_set_ui(i, 1); fmpz_cmp(i, k) < 0; fmpz_add_ui(i, i, 1))
+    for (fmpz_one(i); fmpz_cmp(i, k) < 0; fmpz_add_ui(i, i, 1))
     {
         fmpz_fdiv_qr(q1, r1, i, k);
         if (fmpz_is_zero(r1))

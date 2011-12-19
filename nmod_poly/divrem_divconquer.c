@@ -74,7 +74,7 @@ void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
         _nmod_vec_add(R + n2, R + n2, d2q1 + n2, n1 - 1, mod);
         _nmod_vec_sub(R, A, R, lenB - 1, mod);
 
-        _nmod_vec_free(V);
+        _nmod_vec_clear(V);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -136,7 +136,7 @@ void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
         _nmod_poly_divrem_divconquer_recursive(Q, R, W, V, A, B, lenB, mod);
         _nmod_vec_sub(R, A, R, lenB - 1, mod);
 
-        _nmod_vec_free(V);
+        _nmod_vec_clear(V);
     }
 }
 
@@ -182,8 +182,8 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenA < lenB)
     {
-        nmod_poly_zero(Q);
         nmod_poly_set(R, A);
+        nmod_poly_zero(Q);
         return;
     }
 

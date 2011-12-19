@@ -155,7 +155,7 @@ mp_ptr _nmod_vec_init(long len)
 }
 
 static __inline__
-void _nmod_vec_free(mp_ptr vec)
+void _nmod_vec_clear(mp_ptr vec)
 {
    free(vec);
 }

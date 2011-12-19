@@ -41,8 +41,8 @@ _fmpq_poly_exp_series(fmpz * g, fmpz_t gden,
 
     if (n < 2)
     {
-        fmpz_set_ui(g, 1UL);
-        fmpz_set_ui(gden, 1UL);
+        fmpz_one(g);
+        fmpz_one(gden);
         return;
     }
 

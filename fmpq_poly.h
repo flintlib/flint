@@ -137,8 +137,8 @@ static __inline__ void fmpq_poly_one(fmpq_poly_t poly)
 {
     fmpq_poly_fit_length(poly, 1);
     _fmpq_poly_set_length(poly, 1);
-    fmpz_set_ui(poly->coeffs, 1);
-    fmpz_set_ui(poly->den, 1);
+    fmpz_one(poly->coeffs);
+    fmpz_one(poly->den);
 }
 
 void fmpq_poly_neg(fmpq_poly_t poly1, const fmpq_poly_t poly2);
@@ -393,6 +393,12 @@ void _fmpq_poly_lcm(fmpz *G, fmpz_t denG,
                     const fmpz *A, long lenA, const fmpz *B, long lenB);
 
 void fmpq_poly_lcm(fmpq_poly_t L, const fmpq_poly_t A, const fmpq_poly_t B);
+
+void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
+                          const fmpz *poly1, const fmpz_t den1, long len1, 
+                          const fmpz *poly2, const fmpz_t den2, long len2);
+
+void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g);
 
 /*  Derivative and integral  *************************************************/
 

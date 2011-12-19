@@ -53,7 +53,7 @@ void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
 
     fmpz_factor_init(factors);
     fmpz_factor(factors, n);
-    fmpz_set_ui(res, 1UL);
+    fmpz_one(res);
 
     fmpz_init(t);
     for (i = 0; i < factors->length; i++)
