@@ -156,7 +156,7 @@ void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
                                  g->coeffs, g->den, len2, 
                                  f->coeffs, f->den, len1);
 
-            if (((len1 - 1) & 1L) * ((len2 - 1) & 1L))
+            if (((len1 | len2) & 1L) == 0L)
                 fmpq_neg(r, r);
         }
     }
