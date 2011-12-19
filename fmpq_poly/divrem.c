@@ -155,8 +155,8 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
     
     if (poly1->length < poly2->length)
     {
-        fmpq_poly_zero(Q);
         fmpq_poly_set(R, poly1);
+        fmpq_poly_zero(Q);
         return;
     }
     

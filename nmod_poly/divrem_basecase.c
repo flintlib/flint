@@ -252,7 +252,6 @@ nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
     {
         nmod_poly_set(R, A);
         nmod_poly_zero(Q);
-
         return;
     }
 

@@ -56,8 +56,8 @@ fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (lenA < lenB)
     {
-        fmpz_poly_zero(Q);
         fmpz_poly_set(R, A);
+        fmpz_poly_zero(Q);
         return;
     }
 
