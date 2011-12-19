@@ -80,8 +80,8 @@ _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
     }
 
     fmpz_init(d);
-    fmpz_set_ui(res, 1UL);
-    fmpz_set_ui(d, 1UL);
+    fmpz_one(res);
+    fmpz_one(d);
     res++;
 
     i = 0;

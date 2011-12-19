@@ -39,7 +39,7 @@ void _fmpq_canonicalise(fmpz_t num, fmpz_t den)
 
     if (*num == 0L)
     {
-        fmpz_set_ui(den, 1UL);
+        fmpz_one(den);
         return;
     }
 

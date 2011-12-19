@@ -45,7 +45,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
         return -1;
     if (len == 0)
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
         return 0;
     }
 
@@ -128,7 +128,7 @@ fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
     else
     {
         _fmpz_vec_zero(poly->coeffs, len);
-        fmpz_set_ui(poly->den, 1);
+        fmpz_one(poly->den);
         _fmpq_poly_set_length(poly, 0);
     }
     

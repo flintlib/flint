@@ -45,7 +45,7 @@ _fmpq_poly_compose(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1
         fmpz_t one;
         fmpz * v = _fmpz_vec_init(len1);
         fmpz_init(one);
-        fmpz_set_ui(one, 1UL);
+        fmpz_one(one);
         
         _fmpq_poly_rescale(v, den, poly1, den1, len1, one, den2);
         _fmpz_poly_compose(res, v, len1, poly2, len2);

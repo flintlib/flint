@@ -35,8 +35,8 @@ void _fmpq_poly_gcd(fmpz *G, fmpz_t denG,
 {
     if (lenA == 1)  /* lenA == lenB == 1 */
     {
-        fmpz_set_ui(G, 1);
-        fmpz_set_ui(denG, 1);
+        fmpz_one(G);
+        fmpz_one(denG);
     }
     else
     {

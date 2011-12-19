@@ -35,7 +35,7 @@ _fmpz_poly_pow_small(fmpz * res, const fmpz * poly, long len, ulong e)
     switch (e)
     {
         case 0:
-            fmpz_set_ui(res, 1);
+            fmpz_one(res);
             break;
         case 1:
             _fmpz_vec_set(res, poly, len);

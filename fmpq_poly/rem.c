@@ -40,7 +40,7 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
     
     if (lenB == 1)
     {
-        fmpz_set_ui(r, 1);
+        fmpz_one(r);
         return;
     }
     
@@ -59,7 +59,7 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
     /* 1.  lead^d == +-1.  {R, r} = {R, a} up to sign */
     if (d == 0UL || *lead == 1L || *lead == -1L)
     {
-        fmpz_set_ui(r, 1);
+        fmpz_one(r);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, a);
         
@@ -79,7 +79,7 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
         fmpz_pow_ui(den, lead, d);
         fmpz_mul(den, a, den);
         
-        fmpz_set_ui(r, 1);
+        fmpz_one(r);
         if (lenR > 0)
             _fmpq_poly_scalar_div_fmpz(R, r, R, r, lenR, den);
         

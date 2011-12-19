@@ -158,7 +158,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
       
       if (hlen == 1) /* gcd is 1 */
       {
-         fmpz_set_ui(res, 1);
+         fmpz_one(res);
          break; 
       }
       

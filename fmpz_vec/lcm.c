@@ -33,7 +33,7 @@ _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, long len)
 {
     long i;
 
-    fmpz_set_ui(res, 1UL);
+    fmpz_one(res);
     for (i = 0; i < len && !fmpz_is_zero(res); i++)
         fmpz_lcm(res, res, vec + i);
 

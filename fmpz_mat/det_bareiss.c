@@ -51,7 +51,7 @@ fmpz_mat_det_bareiss(fmpz_t det, const fmpz_mat_t A)
 
     if (A->r < 1)
     {
-        fmpz_set_ui(det, 1UL);
+        fmpz_one(det);
         return;
     }
 

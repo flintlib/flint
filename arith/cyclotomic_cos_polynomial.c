@@ -128,7 +128,7 @@ balanced_product(fmpz * c, fmpz * alpha, long len, long prec)
 {
     if (len == 1)
     {
-        fmpz_set_ui(c + 1, 1UL);
+        fmpz_one(c + 1);
         fmpz_mul_2exp(c + 1, c + 1, prec);
         fmpz_set(c, alpha);
     }
@@ -137,7 +137,7 @@ balanced_product(fmpz * c, fmpz * alpha, long len, long prec)
         fmpz_mul(c, alpha, alpha + 1);
         fmpz_fdiv_q_2exp(c, c, prec);
         fmpz_add(c + 1, alpha, alpha + 1);
-        fmpz_set_ui(c + 2, 1UL);
+        fmpz_one(c + 2);
         fmpz_mul_2exp(c + 2, c + 2, prec);
     }
     else
@@ -218,7 +218,7 @@ _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
     mpfr_init2(t, prec);
     mpfr_init2(u, prec);
 
-    fmpz_set_ui(half, 1UL);
+    fmpz_one(half);
     fmpz_mul_2exp(half, half, prec - 1);
     mpfr_const_pi(t, prec);
     mpfr_div_ui(t, t, n, MPFR_RNDN);

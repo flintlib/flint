@@ -35,7 +35,7 @@ fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong exp)
 
     if (exp == 0L)
     {
-        fmpz_set_ui(f, 1);
+        fmpz_one(f);
         return;
     }
 

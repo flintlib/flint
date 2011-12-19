@@ -38,7 +38,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
     
     fmpz_t d;
     fmpz_init(d);
-    fmpz_set_ui(d, 1UL);
+    fmpz_one(d);
     if (*den1 != 1L && *den2 != 1L)
         fmpz_gcd(d, den1, den2);
     
@@ -65,7 +65,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
             _fmpz_vec_scalar_mul_fmpz(rpoly + min, poly2 + min, max - min, den11);
         
         if (_fmpz_vec_is_zero(rpoly, max))
-            fmpz_set_ui(rden, 1);
+            fmpz_one(rden);
         else
         {
             fmpz_t e;

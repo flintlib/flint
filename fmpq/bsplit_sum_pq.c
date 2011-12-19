@@ -35,7 +35,7 @@ _fmpq_bsplit_sum_pq(fmpz_t P, fmpz_t Q, fmpz_t T,
     if (n2 - n1 <= 0)
     {
         fmpz_zero(P);
-        fmpz_set_ui(Q, 1UL);
+        fmpz_one(Q);
     }
     else if (n2 - n1 == 1)
     {

@@ -35,13 +35,13 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
 {
     if (len == 0)
     {
-        fmpz_set_ui(rnum, 0);
-        fmpz_set_ui(rden, 1);
+        fmpz_zero(rnum);
+        fmpz_one(rden);
     }
     else if (len == 1)
     {
         fmpz_set(rnum, f);
-        fmpz_set_ui(rden, 1);
+        fmpz_one(rden);
     }
     else
     {
@@ -50,7 +50,7 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
         fmpz_init(d);
         
         fmpz_set(rnum, f + i);
-        fmpz_set_ui(rden, 1);
+        fmpz_one(rden);
         do
         {
             --i;
@@ -64,7 +64,7 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
             
             fmpz_addmul(rnum, rden, f + i);
             if (*rnum == 0L)
-                fmpz_set_ui(rden, 1);
+                fmpz_one(rden);
         } while (i);
         
         fmpz_clear(d);

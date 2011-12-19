@@ -58,8 +58,8 @@ void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenA < lenB)
     {
-        nmod_poly_zero(Q);
         nmod_poly_set(R, A);
+        nmod_poly_zero(Q);
         return;
     }
 

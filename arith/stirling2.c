@@ -55,7 +55,7 @@ _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
     max_bc = (k+1) / 2;
 
     bc = _fmpz_vec_init(max_bc + 1);
-    fmpz_set_ui(bc, 1UL);
+    fmpz_one(bc);
     for (j = 1; j <= max_bc; j++)
     {
         fmpz_set(bc+j, bc+j-1);
@@ -103,7 +103,7 @@ stirling_number_2(fmpz_t s, long n, long k)
     if (k >= n - 1)
     {
         if (k == n)
-            fmpz_set_ui(s, 1UL);
+            fmpz_one(s);
         else /* k == n - 1 */
         {
             /* S(n,n-1) = binomial(n,2) */
@@ -122,7 +122,7 @@ stirling_number_2(fmpz_t s, long n, long k)
         else
         {
             /* S(n,2) = 2^(n-1)-1 */
-            fmpz_set_ui(s, 1UL);
+            fmpz_one(s);
             fmpz_mul_2exp(s, s, n-1);
             fmpz_sub_ui(s, s, 1UL);
         }
@@ -142,7 +142,7 @@ stirling_number_2_vec(fmpz * row, long n, long klen)
     if (klen < 1)
         return;
 
-    fmpz_set_ui(row, 1UL);
+    fmpz_one(row);
     for (m = 1; m <= n; m++)
         _fmpz_stirling_next_row(row, row, m, klen, 2);
 }

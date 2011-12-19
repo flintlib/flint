@@ -45,7 +45,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     fmpz_init(x);
     fmpz_init(u);
 
-    _padic_ctx_pow_ui(ppow, &alloc, ctx->N, ctx);
+    alloc = _padic_ctx_pow_ui(ppow, ctx->N, ctx);
 
     /* Set x = op mod p^N */
     fmpz_mod(x, padic_unit(op), ppow);

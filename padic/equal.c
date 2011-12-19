@@ -50,7 +50,7 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
         fmpz_t d, pow;
         int alloc, ans;
 
-        _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(op1), ctx);
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(op1), ctx);
 
         fmpz_init(d);
         fmpz_sub(d, padic_unit(op1), padic_unit(op2));

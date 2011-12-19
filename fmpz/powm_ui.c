@@ -44,7 +44,7 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
     }
     else if (e == 0)
     {
-        fmpz_set_ui(f, 1);
+        fmpz_one(f);
     }
     else  /* e != 0, m > 0 */
     {

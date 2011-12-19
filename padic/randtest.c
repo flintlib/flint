@@ -49,7 +49,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
     padic_val(rop) = n_randint(state, max - min) + min;
 
-    _padic_ctx_pow_ui(pow, &alloc, ctx->N - padic_val(rop), ctx);
+    alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
     fmpz_randm(padic_unit(rop), state, pow);
     _padic_canonicalise(rop, ctx);
     if (alloc)
@@ -68,7 +68,7 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
 
     if (_padic_is_zero(rop))
     {
-        fmpz_set_ui(padic_unit(rop), 1);
+        fmpz_one(padic_unit(rop));
         padic_val(rop) = ctx->N - 1;
     }
 }

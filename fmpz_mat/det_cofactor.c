@@ -129,8 +129,8 @@ fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 
     switch (dim)
     {
-        case 0:  fmpz_set_ui(det, 1UL);           break;
-        case 1:  fmpz_set(det, A->rows[0]);       break;
+        case 0:  fmpz_one(det);                            break;
+        case 1:  fmpz_set(det, A->rows[0]);                break;
         case 2:  _fmpz_mat_det_cofactor_2x2(det, A->rows); break;
         case 3:  _fmpz_mat_det_cofactor_3x3(det, A->rows); break;
         case 4:  _fmpz_mat_det_cofactor_4x4(det, A->rows); break;

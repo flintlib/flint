@@ -78,7 +78,7 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     T = poly->coeffs;
 
     fmpz_init(one);
-    fmpz_set_ui(one, 1UL);
+    fmpz_one(one);
     fmpz_mul_2exp(one, one, prec);
 
     square_roots = _fmpz_vec_init(n);
@@ -132,7 +132,7 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
         fmpz_add(T + i, T + i, one);
 
     _fmpz_vec_scalar_fdiv_q_2exp(T, T, N, prec);
-    fmpz_set_ui(T + (1UL << n), 1UL);
+    fmpz_one(T + (1UL << n));
     _fmpz_poly_set_length(poly, N + 1);
 
     _fmpz_vec_clear(square_roots, n);

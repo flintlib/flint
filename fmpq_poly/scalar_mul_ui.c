@@ -38,7 +38,7 @@ void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden,
     if (c == 0)
     {
         _fmpz_vec_zero(rpoly, len);
-        fmpz_set_ui(rden, 1);
+        fmpz_one(rden);
         return;
     }
 

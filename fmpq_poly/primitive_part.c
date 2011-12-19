@@ -33,22 +33,24 @@ void _fmpq_poly_primitive_part(fmpz * rpoly, fmpz_t rden,
                                const fmpz * poly, const fmpz_t den, long len)
 {
     _fmpz_poly_primitive_part(rpoly, poly, len);
-    fmpz_set_ui(rden, 1UL);
+    fmpz_one(rden);
 }
 
 void fmpq_poly_primitive_part(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    long len = poly->length;
+    const long len = poly->length;
+
     if (len == 0)
     {
         fmpq_poly_zero(res);
-        return;
     }
-    
-    fmpq_poly_fit_length(res, len);
-    _fmpq_poly_set_length(res, len);
-    
-    _fmpq_poly_primitive_part(res->coeffs, res->den, 
-                              poly->coeffs, poly->den, len);
+    else
+    {
+        fmpq_poly_fit_length(res, len);
+        _fmpq_poly_set_length(res, len);
+        
+        _fmpq_poly_primitive_part(res->coeffs, res->den, 
+                                  poly->coeffs, poly->den, len);
+    }
 }
 

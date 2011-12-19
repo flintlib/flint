@@ -38,7 +38,7 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
     
     fmpz_t d;
     fmpz_init(d);
-    fmpz_set_ui(d, 1UL);
+    fmpz_one(d);
     if (*den1 != 1L && *den2 != 1L)
         fmpz_gcd(d, den1, den2);
     
@@ -71,7 +71,7 @@ void _fmpq_poly_sub(fmpz * rpoly, fmpz_t rden,
         }
         
         if (_fmpz_vec_is_zero(rpoly, max))
-            fmpz_set_ui(rden, 1UL);
+            fmpz_one(rden);
         else
         {
             fmpz_t e;

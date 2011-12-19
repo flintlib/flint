@@ -37,7 +37,7 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
 {
     if (lenB == 1)
     {
-        fmpz_set_ui(G, 1);
+        fmpz_one(G);
     }
     else  /* lenA >= lenB > 1 */
     {
@@ -124,7 +124,7 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     if (lenA == 1 || lenB == 1)
     {
         fmpz_mod_poly_fit_length(G, 1);
-        fmpz_set_ui(G->coeffs, 1);
+        fmpz_one(G->coeffs);
         _fmpz_mod_poly_set_length(G, 1);
         return;
     }
@@ -170,7 +170,7 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     _fmpz_mod_poly_set_length(G, lenG);
     
     if (lenG == 1)
-        fmpz_set_ui(G->coeffs, 1);
+        fmpz_one(G->coeffs);
     else
         fmpz_mod_poly_make_monic(G, G);
 }

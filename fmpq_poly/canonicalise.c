@@ -38,11 +38,11 @@ void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, long len)
     if (*den == -1L)
     {
         _fmpz_vec_neg(poly, poly, len);
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
     }
     else if (len == 0)
     {
-        fmpz_set_ui(den, 1);
+        fmpz_one(den);
     }
     else
     {

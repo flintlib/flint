@@ -61,7 +61,7 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
     if (success)
     {
-        fmpz_set_ui(d, 1UL);
+        fmpz_one(d);
         for (i = 0; i < n; i++)
         {
             fmpz_mul(t, d, fmpz_mat_entry(X, i, 0));

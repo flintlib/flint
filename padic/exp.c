@@ -99,8 +99,8 @@ void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         fmpz_pow_ui(m, ctx->p, ctx->N + k);
 
-        fmpz_set_ui(padic_unit(rop), 1);
-        fmpz_set_ui(f, 1);
+        fmpz_one(padic_unit(rop));
+        fmpz_one(f);
 
         for (i--; i >= 0; i--)
         {

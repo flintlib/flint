@@ -76,7 +76,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     fmpz_poly_init(poly);
     fmpz_poly_ramanujan_tau(poly, max_prime + 1);
 
-    fmpz_set_ui(res, 1);
+    fmpz_one(res);
     fmpz_init(tau_p);
     fmpz_init(p_11);
     fmpz_init(next);
@@ -90,7 +90,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
         fmpz_set(tau_p, poly->coeffs + p);
         fmpz_set_ui(p_11, p);
         fmpz_pow_ui(p_11, p_11, 11);
-        fmpz_set_ui(prev, 1);
+        fmpz_one(prev);
         fmpz_set(this, tau_p);
 
         for (r = 1; r < fmpz_get_ui(factors->exp + k); r++)

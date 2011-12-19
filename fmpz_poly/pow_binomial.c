@@ -40,8 +40,8 @@ _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
     *b = 1L;
     *c = 1L;
     
-    fmpz_set_ui(res, 1);
-    fmpz_set_ui(res + e, 1);
+    fmpz_one(res);
+    fmpz_one(res + e);
     
     for (i = 1UL, f = e - 1UL; i <= (e - 1UL) >> 1; i++, f--)
     {

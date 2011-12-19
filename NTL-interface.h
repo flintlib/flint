@@ -19,13 +19,54 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    NTL-interface.h: Header file for NTL-interface.cpp
+
+    Copyright (C) 2007 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#ifndef FLINT_NTL_INT_H
+#define FLINT_NTL_INT_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include <NTL/ZZ.h>
+#include <NTL/ZZX.h>
+#include <NTL/vec_ZZ.h>
+#include <NTL/mat_ZZ.h>
+
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
+
+/*
+   Returns the number of limbs taken up by an NTL ZZ.
+ */
+mp_size_t ZZ_limbs(const ZZ& op);
+
+/* 
+   Converts an NTL ZZ to an fmpz_t.
+
+   Assumes the fmpz_t has already been allocated to have sufficient space.
+ */
+void fmpz_set_ZZ(fmpz_t rop, const ZZ& op);
+
+/*
+   Converts an fmpz_poly_t to an NTL ZZX.
+ */
+void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op);
+
+/*
+   Converts an NTL ZZX to an fmpz_poly_t.
+*/
+void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op);
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif
 

@@ -55,7 +55,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
     /* 1.  lead^d == +-1.  {Q, q} = {b Q, a} up to sign */
     if (d == 0UL || *lead == 1L || *lead == -1L)
     {
-        fmpz_set_ui(q, 1);
+        fmpz_one(q);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, a);
         
@@ -75,7 +75,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
         fmpz_pow_ui(den, lead, d);
         fmpz_mul(den, a, den);
         
-        fmpz_set_ui(q, 1);
+        fmpz_one(q);
         _fmpq_poly_scalar_mul_fmpz(Q, q, Q, q, lenQ, b);
         _fmpq_poly_scalar_div_fmpz(Q, q, Q, q, lenQ, den);
         

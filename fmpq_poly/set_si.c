@@ -32,7 +32,7 @@ void fmpq_poly_set_si(fmpq_poly_t poly, long x)
 {
     fmpq_poly_fit_length(poly, 1);
     fmpz_set_si(poly->coeffs, x);
-    fmpz_set_ui(poly->den, 1UL);
+    fmpz_one(poly->den);
     _fmpq_poly_set_length(poly, 1);
     _fmpq_poly_normalise(poly);
 }
