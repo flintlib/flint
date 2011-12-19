@@ -217,6 +217,16 @@ void fmpz_zero(fmpz_t f)
    (*f) = 0L;
 }
 
+static __inline__ 
+void fmpz_one(fmpz_t f)
+{
+    if (COEFF_IS_MPZ(*f)) 
+    {
+        _fmpz_clear_mpz(*f);
+	}
+    *f = 1L;
+}
+
 static __inline__
 int fmpz_is_zero(const fmpz_t f)
 {

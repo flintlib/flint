@@ -356,6 +356,10 @@ void fmpz_zero(fmpz_t f)
 
     Sets $f$ to zero.
 
+void fmpz_one(fmpz_t f)
+
+    Sets $f$ to one.
+
 int fmpz_abs_fits_ui(const fmpz_t f)
 
     Returns whether the absolute value of $f$ 
