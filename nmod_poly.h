@@ -709,6 +709,13 @@ void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     nmod_poly_xgcd_euclidean(G, S, T, A, B);
 }
 
+mp_limb_t 
+_nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1, 
+                               mp_srcptr poly2, long len2, nmod_t mod);
+
+mp_limb_t 
+nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g);
+
 /* Square roots **************************************************************/
 
 void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
