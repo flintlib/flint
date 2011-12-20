@@ -153,6 +153,8 @@ nmod_poly
 * Add a (fast) function to convert an nmod_poly_factor_t to
   an expanded polynomial
 
+* Write proper nmod_poly_rem functions and use throughout
+
 
 fmpz_poly
 ---------

@@ -732,10 +732,15 @@ void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA,
     and \code{B} is of length \code{lenB}, but returns only \code{Q}. We 
     require that \code{Q} have space for \code{lenA - lenB + 1} coefficients.
 
-void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B)
 
-    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
-    $\len(R) < \len(B)$, but returns only $Q$.
+void _nmod_poly_div(mp_ptr R, mp_srcptr A, long lenA, 
+                                            mp_srcptr B, long lenB, nmod_t mod)
+
+    Computes the remainder $R$ on polynomial division of $A$ by $B$.
+
+void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the remainder $R$ on polynomial division of $A$ by $B$.
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                     mp_srcptr Q, long n, nmod_t mod)
@@ -1040,28 +1045,64 @@ void nmod_poly_compose(nmod_poly_t res,
     Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
     that is, evaluates \code{poly1} at \code{poly2}.
 
-void _nmod_poly_compose_series_divconquer(mp_ptr res, 
-    mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, long N, nmod_t mod)
+*******************************************************************************
 
-    Composes \code{poly1} of length $\ell_1$ with \code{poly2} of 
-    length $\ell_2$ modulo $x^N$ and sets \code{res} to the result, 
-    i.e.\ evaluates \code{poly1} at \code{poly2}.
+    Modular composition
 
-    Writes $\min\{(\ell_1 - 1)(\ell_2 - 2) + 1, N\}$ coefficients 
-    to the vector \code{res}.
+*******************************************************************************
 
-    The algorithm used is the divide and conquer algorithm. 
-    It is assumed that $0 < \ell_1$ and $0 < \ell_2 \leq N$.
+void _nmod_poly_compose_mod_horner(mp_ptr res,
+    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
 
-    Does not support aliasing between the inputs and the output.
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
 
-void nmod_poly_compose_series_divconquer(nmod_poly_t res, 
-    const nmod_poly_t poly1, const nmod_poly_t poly2, long N)
+    The algorithm used is Horner's rule.
 
-    Composes \code{poly1} with \code{poly2} modulo $x^N$ and sets \code{res} 
-    to the result, i.e.\ evaluates \code{poly1} at \code{poly2}.
+void nmod_poly_compose_mod_horner(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h)
 
-    The algorithm used is the divide and conquer algorithm.
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. The algorithm used is Horner's rule.
+
+
+void _nmod_poly_compose_mod_brent_kung(mp_ptr res,
+    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. The output is not allowed
+    to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void _nmod_poly_compose_mod(mp_ptr res,
+    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+void nmod_poly_compose_mod(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero.
+
 
 *******************************************************************************
 
@@ -1256,6 +1297,29 @@ void nmod_poly_compose_series_brent_kung(nmod_poly_t res,
     to be zero.
 
     This implementation uses Brent-Kung algorithm 2.1 \cite{BrentKung1978}.
+
+void _nmod_poly_compose_series_divconquer(mp_ptr res, 
+    mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, long N, nmod_t mod)
+
+    Composes \code{poly1} of length $\ell_1$ with \code{poly2} of 
+    length $\ell_2$ modulo $x^N$ and sets \code{res} to the result, 
+    i.e.\ evaluates \code{poly1} at \code{poly2}.
+
+    Writes $\min\{(\ell_1 - 1)(\ell_2 - 2) + 1, N\}$ coefficients 
+    to the vector \code{res}.
+
+    The algorithm used is the divide and conquer algorithm. 
+    It is assumed that $0 < \ell_1$ and $0 < \ell_2 \leq N$.
+
+    Does not support aliasing between the inputs and the output.
+
+void nmod_poly_compose_series_divconquer(nmod_poly_t res, 
+    const nmod_poly_t poly1, const nmod_poly_t poly2, long N)
+
+    Composes \code{poly1} with \code{poly2} modulo $x^N$ and sets \code{res} 
+    to the result, i.e.\ evaluates \code{poly1} at \code{poly2}.
+
+    The algorithm used is the divide and conquer algorithm.
 
 void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1, 
                                       mp_srcptr poly2, long len2, long n)

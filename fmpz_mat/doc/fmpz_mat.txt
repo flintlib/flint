@@ -716,16 +716,17 @@ long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
 *******************************************************************************
 
-    Kernel
+    Nullspace
 
 *******************************************************************************
 
-long fmpz_mat_kernel(fmpz_mat_t B, const fmpz_mat_t A)
+long fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
 
-    Computes a basis for the right kernel (or null space) of $A$ and returns
-    the dimension of the kernel. $B$ is set to matrix with linearly
-    independent columns and maximal rank such that $AB = 0$ (i.e. $Ab = 0$
-    for each column $b$ in $B$), and the rank of $B$ is returned.
+    Computes a basis for the right rational nullspace of $A$ and returns
+    the dimension of the nullspace (or nullity). $B$ is set to a matrix with
+    linearly independent columns and maximal rank such that $AB = 0$
+    (i.e. $Ab = 0$ for each column $b$ in $B$), and the rank of $B$ is
+    returned.
 
     In general, the entries in $B$ will not be minimal: in particular,
     the pivot entries in $B$ will generally differ from unity.
