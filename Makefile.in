@@ -69,7 +69,7 @@ endif
 
 library: library-recursive $(OBJS) $(LIB_OBJS)
 	mkdir -p build
-	mkdir -p build/iterfaces
+	mkdir -p build/interfaces
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
