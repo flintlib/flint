@@ -241,7 +241,7 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (_padic_is_zero(op))
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return 1;
     }
     if (padic_val(op) & 1L)
@@ -253,7 +253,7 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     if (padic_val(rop) >= ctx->N)
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return 1;
     }
 
