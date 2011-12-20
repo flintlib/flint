@@ -40,7 +40,7 @@ main(void)
     flint_rand_t state;
     long i, m, n, b, d, r, nullity, nulrank;
 
-    printf("kernel....");
+    printf("nullspace....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -64,7 +64,7 @@ main(void)
             if (n_randlimb(state) % 2)
                 fmpz_mat_randops(A, state, d);
 
-            nullity = fmpz_mat_kernel(ker, A);
+            nullity = fmpz_mat_nullspace(ker, A);
             nulrank = fmpz_mat_rank(ker);
 
             if (nullity != nulrank)

@@ -242,9 +242,9 @@ void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X, const long * perm,
 int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
         const fmpz_mat_t A, const fmpz_mat_t B);
 
-/* Kernel *******************************************************************/
+/* Nullspace ****************************************************************/
 
-long fmpz_mat_kernel(fmpz_mat_t res, const fmpz_mat_t mat);
+long fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat);
 
 /* Inverse ******************************************************************/
 
