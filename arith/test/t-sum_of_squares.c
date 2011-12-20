@@ -55,7 +55,7 @@ int main(void)
     fflush(stdout);
 
     r = _fmpz_vec_init(N);
-    fmpz_init(r);
+    fmpz_init(t);
 
     for (i = 0; i < N; i++)
     {
@@ -78,6 +78,7 @@ int main(void)
     }
 
     _fmpz_vec_clear(r, N);
+    fmpz_clear(t);
 
     _fmpz_cleanup();
     printf("PASS\n");
