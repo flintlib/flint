@@ -37,7 +37,7 @@ _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA,
     mp_ptr Q;
     Q = _nmod_vec_init(lenA - lenB + 1);
     _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
-    _nmod_vec_free(Q);
+    _nmod_vec_clear(Q);
 }
 
 void

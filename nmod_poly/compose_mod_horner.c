@@ -67,7 +67,7 @@ _nmod_poly_compose_mod_horner(mp_ptr res,
         _nmod_poly_add(res, t, len, f + i, 1, mod);
     }
 
-    _nmod_vec_free(t);
+    _nmod_vec_clear(t);
 }
 
 void
@@ -129,5 +129,5 @@ nmod_poly_compose_mod_horner(nmod_poly_t res,
     res->length = len;
     _nmod_poly_normalise(res);
 
-    _nmod_vec_free(ptr2);
+    _nmod_vec_clear(ptr2);
 }
