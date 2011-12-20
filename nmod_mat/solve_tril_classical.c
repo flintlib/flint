@@ -73,7 +73,7 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
             nmod_mat_entry(X, j, i) = tmp[j];
     }
 
-    _nmod_vec_free(tmp);
+    _nmod_vec_clear(tmp);
     if (!unit)
-        _nmod_vec_free(inv);
+        _nmod_vec_clear(inv);
 }

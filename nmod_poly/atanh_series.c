@@ -44,8 +44,8 @@ _nmod_poly_atanh_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     _nmod_poly_div_series(g, t, u, n, mod);
     _nmod_poly_integral(g, g, n, mod);
 
-    _nmod_vec_free(t);
-    _nmod_vec_free(u);
+    _nmod_vec_clear(t);
+    _nmod_vec_clear(u);
 }
 
 void
@@ -80,7 +80,7 @@ nmod_poly_atanh_series(nmod_poly_t g, const nmod_poly_t h, long n)
     _nmod_poly_atanh_series(g->coeffs, h_coeffs, n, h->mod);
 
     if (h_len < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     g->length = n;
 	_nmod_poly_normalise(g);

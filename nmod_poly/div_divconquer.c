@@ -50,7 +50,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
 
         _nmod_poly_div_divconquer_recursive(Q, W, V, p1, d1, n1, mod);
 
-        _nmod_vec_free(V);
+        _nmod_vec_clear(V);
     }
     else if (lenA > 2 * lenB - 1)
     {
@@ -101,7 +101,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
            lenA - lenB by lenB
          */
 
-        _nmod_vec_free(V);
+        _nmod_vec_clear(V);
     }
     else  /* lenA = 2 * lenB - 1 */
     {
@@ -110,7 +110,7 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
  
         _nmod_poly_div_divconquer_recursive(Q, W, V, A, B, lenB, mod);
         
-        _nmod_vec_free(V);
+        _nmod_vec_clear(V);
     }
 }
 

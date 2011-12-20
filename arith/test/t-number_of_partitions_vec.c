@@ -111,7 +111,7 @@ int main(void)
     }
 
     _fmpz_vec_clear(p, maxn);
-    _nmod_vec_free(pmod);
+    _nmod_vec_clear(pmod);
 
     flint_randclear(state);
     _fmpz_cleanup();

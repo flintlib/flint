@@ -48,5 +48,5 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, long rank)
 
     nmod_mat_randpermdiag(mat, state, diag, rank);
 
-    _nmod_vec_free(diag);
+    _nmod_vec_clear(diag);
 }

@@ -86,7 +86,7 @@ main(void)
 
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
-        _nmod_vec_free(c);
+        _nmod_vec_clear(c);
     }
 
     flint_randclear(state);

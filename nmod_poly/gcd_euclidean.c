@@ -64,13 +64,13 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
         if (lenR1 == 0)
         {
             mpn_copyi(G, B, lenB);
-            _nmod_vec_free(F);
+            _nmod_vec_clear(F);
             return lenB;
         }
         else
         {
             G[0] = R1[0];
-            _nmod_vec_free(F);
+            _nmod_vec_clear(F);
             return 1;
         }
     }
@@ -98,7 +98,7 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
             mpn_copyi(G, R1, lenR1);
     }
 
-    _nmod_vec_free(F);
+    _nmod_vec_clear(F);
     return len;
 }
 

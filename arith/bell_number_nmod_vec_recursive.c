@@ -56,5 +56,5 @@ bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
         b[i + 1] = t[0];
     }
 
-    _nmod_vec_free(t);
+    _nmod_vec_clear(t);
 }

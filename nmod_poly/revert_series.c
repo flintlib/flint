@@ -85,7 +85,7 @@ nmod_poly_revert_series(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        _nmod_vec_free(Q_coeffs);
+        _nmod_vec_clear(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }

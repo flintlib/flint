@@ -72,8 +72,8 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
 
     if (alloc)
     {
-        _nmod_vec_free(t);
-        _nmod_vec_free(u);
+        _nmod_vec_clear(t);
+        _nmod_vec_clear(u);
     }
 }
 
@@ -138,7 +138,7 @@ nmod_poly_invsqrt_series(nmod_poly_t g,
     g->length = n;
 
     if (hlen < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     _nmod_poly_normalise(g);
 }

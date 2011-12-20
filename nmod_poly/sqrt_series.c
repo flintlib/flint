@@ -38,7 +38,7 @@ _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     mp_ptr t = _nmod_vec_init(n);
     _nmod_poly_invsqrt_series(t, h, n, mod);
     _nmod_poly_mullow(g, t, n, h, n, n, mod);
-    _nmod_vec_free(t);
+    _nmod_vec_clear(t);
 }
 
 void
@@ -94,7 +94,7 @@ nmod_poly_sqrt_series(nmod_poly_t g,
     g->length = n;
 
     if (hlen < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     _nmod_poly_normalise(g);
 }

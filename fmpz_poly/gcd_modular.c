@@ -276,9 +276,9 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    fmpz_clear(modulus);
    fmpz_clear(g); 
 
-   _nmod_vec_free(a);
-   _nmod_vec_free(b);
-   _nmod_vec_free(h); 
+   _nmod_vec_clear(a);
+   _nmod_vec_clear(b);
+   _nmod_vec_clear(h); 
         
    /* finally multiply by content */
    _fmpz_vec_scalar_mul_fmpz(res, res, hlen, d);

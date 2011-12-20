@@ -39,7 +39,7 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B,
     _nmod_poly_inv_series(Binv, B, n, mod);
     _nmod_poly_mullow(Q, Binv, n, A, n, n, mod);
 
-    _nmod_vec_free(Binv);
+    _nmod_vec_clear(Binv);
 }
 
 void
@@ -100,10 +100,10 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
     Q->length = n;
 
     if (Alen < n)
-        _nmod_vec_free(A_coeffs);
+        _nmod_vec_clear(A_coeffs);
 
     if (Blen < n)
-        _nmod_vec_free(B_coeffs);
+        _nmod_vec_clear(B_coeffs);
 
     _nmod_poly_normalise(Q);
 }

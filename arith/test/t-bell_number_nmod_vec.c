@@ -69,8 +69,8 @@ int main(void)
         }
     }
 
-    _nmod_vec_free(b1);
-    _nmod_vec_free(b2);
+    _nmod_vec_clear(b1);
+    _nmod_vec_clear(b2);
 
     flint_randclear(state);
     _fmpz_cleanup();
