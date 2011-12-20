@@ -254,6 +254,12 @@ void number_of_distinct_partitions_vec(fmpz * res, long len);
 
 void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
 
+/* Number of sums of squares representations *********************************/
+
+void sum_of_squares(fmpz_t r, ulong k, const fmpz_t n);
+
+void sum_of_squares_vec(fmpz * r, ulong k, long n);
+
 /* MPFR extras ***************************************************************/
 
 void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
