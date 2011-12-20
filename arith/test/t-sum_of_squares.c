@@ -30,37 +30,55 @@
 #include "arith.h"
 #include "fmpz_vec.h"
 
-static const mp_limb_t known[] = {
-    1, 1, 2, 3, 4, 6, 6, 12, 15, 20, 30, 30, 60, 60, 84, 105, 140, 210,
-    210, 420, 420, 420, 420, 840, 840, 1260, 1260, 1540, 2310, 2520,
-    4620, 4620, 5460, 5460, 9240, 9240, 13860, 13860, 16380, 16380,
-    27720, 30030, 32760, 60060, 60060, 60060, 60060, 120120
+#define N 10
+
+static const fmpz known[N][N] = {
+    {1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 2, 0, 0, 2, 0, 0, 0, 0, 2}, 
+    {1, 4, 4, 0, 4, 8, 0, 0, 4, 4},
+    {1, 6, 12, 8, 6, 24, 24, 0, 12, 30}, 
+    {1, 8, 24, 32, 24, 48, 96, 64, 24, 104}, 
+    {1, 10, 40, 80, 90, 112, 240, 320, 200, 250}, 
+    {1, 12, 60, 160, 252, 312, 544, 960, 1020, 876}, 
+    {1, 14, 84, 280, 574, 840, 1288, 2368, 3444, 3542}, 
+    {1, 16, 112, 448, 1136, 2016, 3136, 5504, 9328, 12112}, 
+    {1, 18, 144, 672, 2034, 4320, 7392, 12672, 22608, 34802}
 };
 
 int main(void)
 {
-    fmpz * res;
-    long k, n;
+    fmpz * r;
+    fmpz_t t;
+    long i, j;
 
-    printf("landau_function_vec....");
+    printf("sum_of_squares....");
     fflush(stdout);
 
-    n = 45;
-    res = _fmpz_vec_init(n);
-    landau_function_vec(res, n);
+    r = _fmpz_vec_init(N);
+    fmpz_init(t);
 
-    for (k = 0; k < n; k++)
+    for (i = 0; i < N; i++)
     {
-        if (fmpz_cmp_ui(res + k, known[k]))
+        sum_of_squares_vec(r, i, N);
+
+        for (j = 0; j < N; j++)
         {
-            printf("FAIL:\n");
-            printf("k = %ld, res[k] = %ld, expected: %ld\n",
-                k, fmpz_get_si(res + k), known[k]);
-            abort();
+            fmpz_set_ui(t, j);
+            sum_of_squares(t, i, t);
+
+            if (!fmpz_equal(t, r + j) || !fmpz_equal(t, known[i] + j))
+            {
+                printf("FAIL:\n");
+                printf("i, j = %ld, %ld, r[j] = %ld, r(j) = %ld, "
+                    "expected: %ld\n",
+                    i, j, fmpz_get_si(r + j), fmpz_get_si(t), known[i][j]);
+                abort();
+            }
         }
     }
 
-    _fmpz_vec_clear(res, n);
+    _fmpz_vec_clear(r, N);
+    fmpz_clear(t);
 
     _fmpz_cleanup();
     printf("PASS\n");

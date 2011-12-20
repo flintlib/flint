@@ -826,6 +826,33 @@ void number_of_partitions(fmpz_t x, ulong n)
 
 *******************************************************************************
 
+    Sums of squares
+
+*******************************************************************************
+
+void sum_of_squares(fmpz_t r, ulong k, const fmpz_t n)
+
+    Sets $r$ to the number of ways $r_k(n)$ in which $n$ can be represented
+    as a sum of $k$ squares.
+
+    If $k = 2$ or $k = 4$, we write $r_k(n)$ as a divisor sum.
+
+    Otherwise, we either recurse on $k$ or compute the theta function
+    expansion up to $O(x^{n+1})$ and read off the last coefficient.
+    This is generally optimal.
+
+void sum_of_squares_vec(fmpz * r, ulong k, long n)
+
+    For $i = 0, 1, \ldots, n-1$, sets $r_i$ to the number of
+    representations of $i$ a sum of $k$ squares, $r_k(i)$.
+    This effectively computes the $q$-expansion of $\vartheta_3(q)$
+    raised to the $k$th power, i.e.
+
+    $$\vartheta_3^k(q) = \left( \sum_{i=-\infty}^{\infty} q^{i^2} \right)^k.$$
+
+
+*******************************************************************************
+
     MPFR extras
 
 *******************************************************************************

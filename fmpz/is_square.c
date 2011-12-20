@@ -23,52 +23,23 @@
 
 ******************************************************************************/
 
-#include <math.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "arith.h"
 #include "ulong_extras.h"
-#include "longlong.h"
+#include "fmpz.h"
 
-
-void landau_function_vec(fmpz * res, long len)
+int
+fmpz_is_square(const fmpz_t x)
 {
-    mp_limb_t p, pmax;
-    mp_limb_t pk, pkhi;
-    fmpz_t a;
-    ulong k, n;
+    fmpz c = *x;
 
-    if (len < 1)
-        return;
-
-    for (k = 0; k < len; k++)
-        fmpz_one(res + k);
-
-    pmax = 1.328 * sqrt(len*log(len) + 1);
-
-    fmpz_init(a);
-
-    for (p = 2UL; p <= pmax; p = n_nextprime(p, 0))
+    if (!COEFF_IS_MPZ(c))
     {
-        for (n = len - 1; n >= p; n--)
-        {
-            pk = p;
-            pkhi = 0UL;
+        if (c <= 1)
+            return (c >= 0);
 
-            for (k = 1; k <= len; k++)
-            {
-                if (pk > n || pkhi)
-                    break;
-
-                fmpz_mul_ui(a, res + n - pk, pk);
-                if (fmpz_cmp(res + n, a) < 0)
-                    fmpz_set(res + n, a);
-
-                umul_ppmm(pkhi, pk, pk, p);
-            }
-        }
+        return n_is_square(c);
     }
-
-    fmpz_clear(a);
+    else
+        return mpz_perfect_square_p(COEFF_TO_PTR(c));
 }

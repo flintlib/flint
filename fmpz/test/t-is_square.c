@@ -19,56 +19,62 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "arith.h"
 #include "ulong_extras.h"
-#include "longlong.h"
+#include "fmpz.h"
 
-
-void landau_function_vec(fmpz * res, long len)
+int
+main(void)
 {
-    mp_limb_t p, pmax;
-    mp_limb_t pk, pkhi;
-    fmpz_t a;
-    ulong k, n;
+    int i, result;
+    flint_rand_t state;
 
-    if (len < 1)
-        return;
+    printf("is_square....");
+    fflush(stdout);
 
-    for (k = 0; k < len; k++)
-        fmpz_one(res + k);
+    flint_randinit(state);
 
-    pmax = 1.328 * sqrt(len*log(len) + 1);
-
-    fmpz_init(a);
-
-    for (p = 2UL; p <= pmax; p = n_nextprime(p, 0))
+    for (i = 0; i < 100000; i++)
     {
-        for (n = len - 1; n >= p; n--)
+        fmpz_t a;
+        mpz_t b;
+        int r1, r2;
+
+        fmpz_init(a);
+
+        mpz_init(b);
+
+        fmpz_randtest(a, state, 200);
+        if (n_randint(state, 2) == 0)
+            fmpz_mul(a, a, a);
+
+        fmpz_get_mpz(b, a);
+
+        r1 = fmpz_is_square(a);
+        r2 = mpz_perfect_square_p(b);
+        result = (r1 == r2);
+
+        if (!result)
         {
-            pk = p;
-            pkhi = 0UL;
-
-            for (k = 1; k <= len; k++)
-            {
-                if (pk > n || pkhi)
-                    break;
-
-                fmpz_mul_ui(a, res + n - pk, pk);
-                if (fmpz_cmp(res + n, a) < 0)
-                    fmpz_set(res + n, a);
-
-                umul_ppmm(pkhi, pk, pk, p);
-            }
+            printf("FAIL:\n");
+            gmp_printf("b = %Zd\n", b);
+            abort();
         }
+
+        fmpz_clear(a);
+
+        mpz_clear(b);
     }
 
-    fmpz_clear(a);
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

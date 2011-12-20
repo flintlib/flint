@@ -373,6 +373,8 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p);
 
 void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
+int fmpz_is_square(const fmpz_t f);
+
 void fmpz_root(fmpz_t r, fmpz_t f, long n);
 
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
