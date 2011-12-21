@@ -59,6 +59,10 @@ int main(void)
     nmod_poly_init(bp, p);
     nmod_poly_init(dp, p);
 
+    fmpz_poly_t temp, temp2;
+    fmpz_poly_init(temp);
+    fmpz_poly_init(temp2);
+
     nmod_poly_set(gp, facs->factors[0]);
     nmod_poly_set(hp, facs->factors[1]);
     nmod_poly_xgcd(dp, ap, bp, gp, hp);
@@ -74,9 +78,56 @@ int main(void)
     fmpz_poly_set_nmod_poly(b, bp);
 
     fmpz_poly_hensel_lift(g, h, a, b, pol, g, h, a, b, P, Q, PQ);
+    
+    fmpz_poly_mul(temp, g, h);
+    fmpz_poly_sub(temp, f, temp);
+    fmpz_poly_scalar_mod_fmpz(temp, PQ);
+    long result = fmpz_poly_is_zero(temp);
+    if (result > 0)
+        printf("hensel_lift part worked\n");
+    else
+        printf("hensel_lift part failed\n");
 
-    fmpz_poly_print(g); printf("\n");
-    fmpz_poly_print(h); printf("\n");
+    fmpz_poly_mul(temp, g, a);
+    fmpz_poly_mul(temp1, h, b);
+    fmpz_poly_add(temp, temp, temp1);
+    fmpz_poly_scalar_mod_fmpz(temp, PQ);
+    long result = fmpz_poly_is_one(temp);
+    if (result > 0)
+        printf("hensel_lift inverse part worked\n");
+    else
+        printf("hensel_lift inverse part failed\n");
+
+/* Now lifing to 89^3*/
+/*
+    fmpz_set(P, PQ);
+    fmpz_mul(PQ, PQ, Q);
+    
+    fmpz_poly_hensel_lift_without_inverse(g, h, f, g, h, a, b, P, Q, PQ);
+    fmpz_poly_mul(temp, g, h);
+    fmpz_poly_sub(temp, f, temp);
+    fmpz_poly_scalar_mod_fmpz(temp, PQ);
+    long result = fmpz_poly_is_zero(temp);
+    if (result > 0)
+        printf("hensel_lift_without_inverse worked\n");
+    else
+        printf("hensel_lift_without_inverse failed\n");
+
+    fmpz_poly_hensel_lift_only_inverse(a, b, f, g, h, a, b, P, Q, PQ);
+
+    fmpz_poly_mul(temp, g, a);
+    fmpz_poly_mul(temp1, h, b);
+    fmpz_poly_add(temp, temp, temp1);
+    fmpz_poly_scalar_mod_fmpz(temp, PQ);
+    long result = fmpz_poly_is_one(temp);
+    if (result > 0)
+        printf("hensel_lift_only_inverse worked\n");
+    else
+        printf("hensel_lift_only_inverse failed\n");
+*/
+
+    fmpz_poly_clear(temp);
+    fmpz_poly_clear(temp1);
 
     nmod_poly_factor_clear(facs);
     fmpz_poly_clear(pol);
