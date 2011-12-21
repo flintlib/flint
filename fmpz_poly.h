@@ -894,4 +894,17 @@ void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n);
 
+/* Factoring *****************************************************************/
+
+void fmpz_poly_build_hensel_tree(long * link, fmpz_poly_t *v, fmpz_poly_t *w, 
+                                 const nmod_poly_factor_t fac);
+
+void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+    fmpz_poly_t Aout, fmpz_poly_t Bout, 
+    const fmpz_poly_t f, 
+    const fmpz_poly_t g, const fmpz_poly_t h, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
 #endif
+
