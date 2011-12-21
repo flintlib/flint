@@ -923,5 +923,16 @@ void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout,
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
 
+void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+    const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
+void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
+    const fmpz_poly_t f, 
+    const fmpz_poly_t G, const fmpz_poly_t H, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
 #endif
 

@@ -99,7 +99,7 @@ int main(void)
         printf("hensel_lift inverse part failed\n");
 
 /* Now lifing to 89^3*/
-/*
+
     fmpz_set(P, PQ);
     fmpz_mul(PQ, PQ, Q);
     
@@ -124,7 +124,6 @@ int main(void)
         printf("hensel_lift_only_inverse worked\n");
     else
         printf("hensel_lift_only_inverse failed\n");
-*/
 
     fmpz_poly_clear(temp);
     fmpz_poly_clear(temp1);
