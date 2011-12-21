@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2010 Andy Novocin
+    Copyright (C) 2010-2011 Andy Novocin
     Copyright (C) 2010-2011 Fredrik Johansson
 
 ******************************************************************************/
@@ -236,6 +236,23 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
     Prints the given matrix to \code{stdout}.  For further details, 
     see \code{fmpz_mat_fprint_pretty()}.
 
+int fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
+
+    Reads a matrix from the stream \code{file}, storing the result 
+    in \code{mat}.  The expected format is the number of rows, a 
+    space, the number of columns, two spaces, then a space separated
+    list of coefficients, one row after the other.
+
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive value.
+
+int fmpz_mat_read(fmpz_mat_t mat)
+
+    Reads a matrix from \code{stdin}, storing the result 
+    in \code{mat}.
+    
+    In case of success, returns a positive number.  In case of failure, 
+    returns a non-positive value.
 
 *******************************************************************************
 
