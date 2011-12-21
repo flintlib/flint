@@ -89,6 +89,38 @@ void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
     }
 }
 
+void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
+{
+   mp_limb_t *xp;
+   _ntl_gbigint *x = &rop.rep;
+   long lw = fmpz_size(op);
+   fmpz c = *op;
+
+   if (lw == 0) 
+   {
+      if (*x) ZZ_SIZE(*x) = 0;
+      return;
+   }
+
+   _ntl_gsetlength(x, lw); 
+   xp = ZZ_DATA(*x);
+
+   if (COEFF_IS_MPZ(c))
+   {
+      __mpz_struct * m = COEFF_TO_PTR(c);
+      mpn_copyi(xp, m->_mp_d, lw);
+   } else
+   {
+      if (c < 0L)
+         xp[0] = -c;
+      else
+         xp[0] = c;
+   }
+   
+   if (fmpz_sgn(op) < 0) ZZ_SIZE(*x) = -lw;
+   else ZZ_SIZE(*x) = lw;
+}
+
 void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 {
     const long len = op->length;
