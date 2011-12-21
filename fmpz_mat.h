@@ -95,6 +95,14 @@ int fmpz_mat_print_pretty(const fmpz_mat_t mat)
     return fmpz_mat_fprint_pretty(stdout, mat);
 }
 
+int fmpz_mat_fread(FILE* file, fmpz_mat_t mat);
+
+static __inline__
+int fmpz_mat_read(fmpz_mat_t mat)
+{
+    return fmpz_mat_fread(stdin, mat);
+}
+
 /* Random matrix generation  *************************************************/
 
 void fmpz_mat_randbits(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits);
