@@ -260,6 +260,23 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1,
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);
 
+static __inline__ 
+void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
+                               const fmpz_poly_t poly2, const fmpz_t x)
+{
+    if (poly2->length == 0)
+    {
+        fmpz_poly_zero(poly1);
+    }
+    else
+    {
+        fmpz_poly_fit_length(poly1, poly2->length);
+        _fmpz_vec_mod_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
+        _fmpz_poly_set_length(poly1, poly2->length);
+        _fmpz_poly_normalise(poly1);
+    }
+}
+
 /*  Bit packing  *************************************************************/
 
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,

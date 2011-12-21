@@ -438,6 +438,12 @@ void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
     assuming the coefficient is exact for every coefficient.
 
+void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
+                               const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2}, reducing each coefficient modulo $x$, 
+    assuming that $x > 0$.
+
 *******************************************************************************
 
     Bit packing
