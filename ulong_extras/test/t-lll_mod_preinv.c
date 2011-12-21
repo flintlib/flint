@@ -44,7 +44,6 @@ int main(void)
       mp_limb_t d, dinv, nh, nm, nl, r1, r2, m;
 
       d = n_randtest_not_zero(state);
-      m = n_randtest(state);
       nh = n_randint(state, d);
       nm = n_randtest(state);
       nl = n_randtest(state);

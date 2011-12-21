@@ -40,7 +40,7 @@ int main(void)
 
    for (i = 0; i < 100000; i++) 
    {
-      mp_limb_t u, d;
+      mp_limb_t d;
       mpz_t a_m, d_m;
       mp_limb_signed_t a;
       int r1, r2;
@@ -50,7 +50,6 @@ int main(void)
       
       a = n_randtest(state);
       d = n_randtest_not_zero(state) | 1L;
-      u = FLINT_ABS(a);
       
       r1 = n_jacobi(a, d);
 
