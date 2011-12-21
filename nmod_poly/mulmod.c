@@ -48,7 +48,7 @@ void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, long len1,
         _nmod_poly_mul(T, poly2, len2, poly1, len1, mod);
 
     _nmod_poly_divrem(Q, res, T, lenT, f, lenf, mod);
-    _nmod_vec_free(T);
+    _nmod_vec_clear(T);
 }
 
 void

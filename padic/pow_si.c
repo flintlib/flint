@@ -29,7 +29,7 @@ void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
 {
     if (_padic_is_zero(op) || e * padic_val(op) >= ctx->N)
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return;
     }
 

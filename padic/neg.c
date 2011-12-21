@@ -35,7 +35,7 @@ void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op, ctx))
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
     }
     else
     {

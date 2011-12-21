@@ -44,10 +44,10 @@ _nmod_poly_cosh_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
     _nmod_vec_add(f, f, g, n, mod);
     _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(2UL, mod.n), mod);
 
-    _nmod_vec_free(hprime);
-    _nmod_vec_free(g);
-    _nmod_vec_free(T);
-    _nmod_vec_free(U);
+    _nmod_vec_clear(hprime);
+    _nmod_vec_clear(g);
+    _nmod_vec_clear(T);
+    _nmod_vec_clear(U);
 }
 
 void
@@ -104,7 +104,7 @@ nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n)
     g->length = n;
 
     if (h_len < n)
-        _nmod_vec_free(h_coeffs);
+        _nmod_vec_clear(h_coeffs);
 
     _nmod_poly_normalise(g);
 }

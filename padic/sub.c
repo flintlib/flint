@@ -89,7 +89,90 @@ void _padic_sub(padic_t rop, const padic_t op1, const padic_t op2,
 void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 {
-    _padic_sub(rop, op1, op2, ctx);
-    _padic_reduce(rop, ctx);
+    if (fmpz_is_zero(padic_unit(op1)))
+    {
+        padic_neg(rop, op2, ctx);
+    }
+    else if (fmpz_is_zero(padic_unit(op2)))
+    {
+        _padic_set(rop, op1);
+    }
+    else if (padic_val(op1) == padic_val(op2))
+    {
+        int alloc;
+        fmpz_t pow;
+
+        fmpz_sub(padic_unit(rop), padic_unit(op1), padic_unit(op2));
+        padic_val(rop) = padic_val(op1);
+
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
+
+        if (fmpz_sgn(padic_unit(rop)) < 0)
+            fmpz_add(padic_unit(rop), padic_unit(rop), pow);
+
+        if (alloc)
+            fmpz_clear(pow);
+
+        _padic_canonicalise(rop, ctx);
+    }
+    else if (padic_val(op1) < padic_val(op2))
+    {
+        int alloc;
+        fmpz_t f, pow;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, ctx->p, padic_val(op2) - padic_val(op1));
+        if (rop != op2)
+        {
+            fmpz_set(padic_unit(rop), padic_unit(op1));
+            fmpz_submul(padic_unit(rop), f, padic_unit(op2));
+        }
+        else
+        {
+            fmpz_mul(padic_unit(rop), f, padic_unit(op2));
+            fmpz_sub(padic_unit(rop), padic_unit(rop), padic_unit(op1));
+            fmpz_neg(padic_unit(rop), padic_unit(rop));
+        }
+        fmpz_clear(f);
+
+        padic_val(rop) = padic_val(op1);
+
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
+
+        if (fmpz_sgn(padic_unit(rop)) < 0)
+            fmpz_add(padic_unit(rop), padic_unit(rop), pow);
+
+        if (alloc)
+            fmpz_clear(pow);
+    }
+    else  /* padic_val(op1) > padic_val(op2) */
+    {
+        int alloc;
+        fmpz_t f, pow;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, ctx->p, padic_val(op1) - padic_val(op2));
+        if (rop != op1)
+        {
+            fmpz_neg(padic_unit(rop), padic_unit(op2));
+            fmpz_addmul(padic_unit(rop), f, padic_unit(op1));
+        }
+        else
+        {
+            fmpz_mul(padic_unit(rop), f, padic_unit(op1));
+            fmpz_sub(padic_unit(rop), padic_unit(rop), padic_unit(op2));
+        }
+        fmpz_clear(f);
+
+        padic_val(rop) = padic_val(op2);
+
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
+
+        if (fmpz_sgn(padic_unit(rop)) < 0)
+            fmpz_add(padic_unit(rop), padic_unit(rop), pow);
+
+        if (alloc)
+            fmpz_clear(pow);
+    }
 }
 

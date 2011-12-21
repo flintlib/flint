@@ -27,6 +27,17 @@
 
     Data structures
 
+    A $p$-adic number $x$ in $\mathbf{Q}_p$ is stored internally 
+    in the form $x = u p^v$, where $u$ is the unit part of $x$ 
+    and $v$ is its valuation.
+
+    We say such a number is in \emph{canonical} form if either 
+    $u = v = 0$ or $p \nmid u$.
+
+    When working modulo $p^N$, we say that the number is \emph{reduced} 
+    if it is in canonical form and moreover, when $u \neq 0$, we have 
+    that $0 < u < p^{N-v}$.
+
 *******************************************************************************
 
 fmpz * padic_unit(const padic_t op)
@@ -64,8 +75,24 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N,
     Initialises the context \code{ctx} with prime $p$, precision $N$, and 
     printing mode.
 
-    Assumes that $p$ is a prime and that printing mode is one of 
-    \code{PADIC_TERSE}, \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
+    Assumes that $p$ is a prime.
+
+    Assumes that the printing mode is one of \code{PADIC_TERSE}, 
+    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.  Using the example 
+    $x = 7^{-1} 12$ in $\mathbf{Q}_7$, these behave as follows:
+    \begin{itemize}
+    \item In \code{PADIC_TERSE} mode, a $p$-adic number is printed 
+          in the same way as a rational number, e.g.\ \code{12/7}.
+    \item In \code{PADIC_SERIES} mode, a $p$-adic number is printed 
+          digit by digit, e.g.\ \code{5*7^-1 + 1}.
+    \item In \code{PADIC_VAL_UNIT} mode, a $p$-adic number is 
+          printed showing the valuation and unit parts separately, 
+          e.g.\ \code{12*7^-1}.
+    \end{itemize}
+
+    This function also carries out some relevant precomputation for 
+    arithmetic in $\mathbf{Q}_p / (p^N)$ such as powers of $p$ close 
+    to $p^N$.
 
 void padic_ctx_clear(padic_ctx_t ctx);
 
@@ -103,8 +130,8 @@ void _padic_canonicalise(padic_t rop, const padic_ctx_t ctx)
     Brings the $p$-adic number \code{rop} into canonical form.
 
     That is to say, ensures that either $u = v = 0$ or 
-    $p \nmid u$.  This operation does not reduce the 
-    precision of the number.
+    $p \nmid u$.  There is no reduction modulo a power 
+    of $p$.
 
 void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
 
@@ -115,11 +142,6 @@ void padic_reduce(padic_t rop, const padic_ctx_t ctx)
 
     Ensures that the $p$-adic number \code{rop} is reduced 
     with respect to the given context.
-
-    That is to say, ensures that $v < N$, and that $0 \leq u < p^{N - v}$, 
-    and that $u$, if non-zero, is not divisible by $p$.  If $v \geq N$, 
-    sets $u = 0$, $v = 0$.  If $u = 0$, sets $v = 0$.  Thus, the unique 
-    value of zero is $(u, v) = (0, 0)$.
 
 *******************************************************************************
 
@@ -142,15 +164,17 @@ void padic_randtest_not_zero(padic_t rop, flint_rand_t state,
 
 *******************************************************************************
 
-    Assignment
+    Assignments and conversions
+
+    Between many data types there are two types of conversions, an 
+    exact version presented in a function prefixed with an underscore 
+    and a version modulo $p^N$.
 
 *******************************************************************************
 
-void _padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_set(padic_t rop, const padic_t op)
 
-    Sets \code{rop} to a copy of \code{op}.
-
-    N.B.  No reduction takes place.
+    Sets \code{rop} to an exact copy of \code{op}.
 
 void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -194,9 +218,6 @@ void _padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the MPIR integer \code{op}.
 
-    The unit part is reduced modulo $p^N$ if and only if \code{op} 
-    is negative.
-
 void padic_set_mpz(padic_t rop, const mpz_t op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the MPIR integer \code{op} 
@@ -209,11 +230,9 @@ void padic_set_mpq(padic_t rop, const mpq_t op, const padic_ctx_t ctx)
 
 void _padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the integer \code{rop} to the $p$-adic integer \code{op}.
+    Sets the integer \code{rop} to the exact $p$-adic integer \code{op}.
 
     If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
-
-    N.B.  No reduction takes place.
 
 void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -224,9 +243,7 @@ void padic_get_fmpz(fmpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
 void _padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the rational \code{rop} to the $p$-adic integer \code{op}.
-
-    N.B.  No reduction takes place.
+    Sets the rational \code{rop} to the exact $p$-adic integer \code{op}.
 
 void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -235,11 +252,9 @@ void padic_get_fmpq(fmpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
 void _padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR integer \code{rop} to the $p$-adic integer \code{op}.
+    Sets the MPIR integer \code{rop} to the exact $p$-adic integer \code{op}.
 
     If \code{op} is not a $p$-adic integer, sets \code{rop} to zero.
-
-    N.B.  No reduction takes place.
 
 void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
@@ -250,28 +265,18 @@ void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx)
 
 void _padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets the MPIR rational \code{rop} to the value of \code{op}.
+    Sets the MPIR rational \code{rop} to the exact value of \code{op}.
     
-    N.B.  No reduction takes place.
-
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets the MPIR rational \code{rop} to the value of \code{op}, 
     reduced modulo $p^N$.
 
-void _padic_swap(padic_t op1, padic_t op2)
-    
-void padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
+void padic_swap(padic_t op1, padic_t op2)
 
     Swaps the two $p$-adic numbers \code{op1} and \code{op2}.
 
-    N.B.  No reduction takes place.
-
-void _padic_zero(padic_t rop)
-
-    Sets the $p$-adic number \code{rop} to zero.
-
-void padic_zero(padic_t rop, const padic_ctx_t ctx)
+void padic_zero(padic_t rop)
 
     Sets the $p$-adic number \code{rop} to zero.
 
@@ -292,33 +297,40 @@ void padic_one(padic_t rop, const padic_ctx_t ctx)
 void _padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                 const padic_ctx_t ctx)
 
-    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+    Sets \code{rop} to the exact sum of \code{op1} and \code{op2}.
 
 void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
-    Sets \code{rop} to the sum of \code{op1} and \code{op2}, 
-    reduced modulo $p^N$.
+    Sets \code{rop} to the sum of \code{op1} and \code{op2} modulo $p^N$.
+
+    Assumes that the input arguments are reduced modulo $p^N$ and 
+    guarantees that the output will be, too.
 
 void _padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
                 const padic_ctx_t ctx)
 
-    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+    Sets \code{rop} to the exact difference of \code{op1} and \code{op2}.
 
 void padic_sub(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx)
 
-    Sets \code{rop} to the difference of \code{op1} and \code{op2}, 
-    reduced modulo $p^N$.
+    Sets \code{rop} to the difference of \code{op1} and \code{op2} 
+    modulo $p^N$.
+
+    Assumes that the input arguments are reduced modulo $p^N$ and 
+    guarantees that the output will be, too.
 
 void _padic_neg(padic_t rop, const padic_t op)
 
-    Sets \code{rop} to the additive inverse of \code{op}.
+    Sets \code{rop} to the exact additive inverse of \code{op}.
 
 void padic_neg(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
-    Sets \code{rop} to the additive inverse of \code{op}, 
-    reduced  modulo $p^N$.
+    Sets \code{rop} to the additive inverse of \code{op}.
+
+    Assumes that the input arguments are reduced modulo $p^N$ and 
+    guarantees that the output will be, too.
 
 void _padic_mul(padic_t rop, const padic_t op1, const padic_t op2)
 

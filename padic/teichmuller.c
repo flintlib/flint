@@ -38,7 +38,7 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     if (_padic_is_zero(op) || (padic_val(op) > 0))
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return;
     }
 

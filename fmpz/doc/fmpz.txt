@@ -674,6 +674,10 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
     the difference $g - f^2$.  If $g$ is negative, an exception is raised.  
     The behaviour is undefined if $f$ and $r$ are aliases.
 
+int fmpz_is_square(const fmpz_t f)
+
+    Returns nonzero if $f$ is a perfect square and zero otherwise.
+
 void fmpz_root(fmpz_t r, fmpz_t f, long n)
 
     Set $r$ to the integer part of the $n$-th root of $f$. Requires that

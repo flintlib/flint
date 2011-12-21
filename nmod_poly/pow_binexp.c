@@ -108,7 +108,7 @@ _nmod_poly_pow_binexp(mp_ptr res, mp_srcptr poly, long len, ulong e, nmod_t mod)
         }
     }
     
-    _nmod_vec_free(v);
+    _nmod_vec_clear(v);
 }
 
 void

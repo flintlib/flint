@@ -210,7 +210,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     _nmod_poly_mul(res, pow, powlen, h[1], hlen[1], mod);
     _nmod_vec_add(res, res, h[0], hlen[0], mod);
     
-    _nmod_vec_free(v);
+    _nmod_vec_clear(v);
     free(h);
     free(hlen);
 }

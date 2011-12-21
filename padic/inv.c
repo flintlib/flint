@@ -153,7 +153,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
      */
     if (ctx->N + padic_val(op) <= 0)
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return;
     }
 

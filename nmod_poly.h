@@ -612,6 +612,37 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+/* Modular composition */
+
+void
+_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, long lenf, 
+                            mp_srcptr g,
+                            mp_srcptr h, long lenh, nmod_t mod);
+
+void
+nmod_poly_compose_mod_brent_kung(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h);
+
+void
+_nmod_poly_compose_mod_horner(mp_ptr res,
+    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod);
+
+void
+nmod_poly_compose_mod_horner(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h);
+
+void
+_nmod_poly_compose_mod(mp_ptr res, mp_srcptr f, long lenf, 
+                            mp_srcptr g,
+                            mp_srcptr h, long lenh, nmod_t mod);
+
+void
+nmod_poly_compose_mod(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h);
+
 /* Power series composition and reversion ************************************/
 
 void

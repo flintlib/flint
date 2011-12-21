@@ -96,7 +96,7 @@ nmod_poly_pow_trunc(nmod_poly_t res,
     }
 
     if (pcopy)
-        _nmod_vec_free(p);
+        _nmod_vec_clear(p);
 
     res->length = trunc;
     _nmod_poly_normalise(res);

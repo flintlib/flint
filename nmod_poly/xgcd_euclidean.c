@@ -141,16 +141,16 @@ long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t,
    mpn_copyi(t, v1, v1_len);
       
    if (steps == 2) 
-      _nmod_vec_free(A);
+      _nmod_vec_clear(A);
 
-   _nmod_vec_free(u1);
-   _nmod_vec_free(u2);
-   _nmod_vec_free(v1);
-   _nmod_vec_free(v2);
-   _nmod_vec_free(prod);
-   _nmod_vec_free(B);
-   _nmod_vec_free(R);
-   _nmod_vec_free(Q);
+   _nmod_vec_clear(u1);
+   _nmod_vec_clear(u2);
+   _nmod_vec_clear(v1);
+   _nmod_vec_clear(v2);
+   _nmod_vec_clear(prod);
+   _nmod_vec_clear(B);
+   _nmod_vec_clear(R);
+   _nmod_vec_clear(Q);
 
    return len;
 }

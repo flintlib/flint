@@ -69,9 +69,9 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
             nmod_mul(w[i], ys[i], mod), mod);
     }
 
-    _nmod_vec_free(P);
-    _nmod_vec_free(Q);
-    _nmod_vec_free(w);
+    _nmod_vec_clear(P);
+    _nmod_vec_clear(Q);
+    _nmod_vec_clear(w);
 }
 
 void

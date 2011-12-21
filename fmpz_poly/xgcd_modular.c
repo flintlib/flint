@@ -168,7 +168,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
         }
     }
 
-    _nmod_vec_free(G);
+    _nmod_vec_clear(G);
     fmpz_clear(prod);
 }
 

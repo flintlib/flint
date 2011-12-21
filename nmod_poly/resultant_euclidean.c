@@ -113,7 +113,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
         }
         while (l2 > 0);
 
-        _nmod_vec_free(w);
+        _nmod_vec_clear(w);
 
         return res;
     }

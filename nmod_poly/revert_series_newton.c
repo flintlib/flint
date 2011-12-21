@@ -70,9 +70,9 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     }
 
     free(a);
-    _nmod_vec_free(T);
-    _nmod_vec_free(U);
-    _nmod_vec_free(V);
+    _nmod_vec_clear(T);
+    _nmod_vec_clear(U);
+    _nmod_vec_clear(V);
 }
 
 void
@@ -123,7 +123,7 @@ nmod_poly_revert_series_newton(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        _nmod_vec_free(Q_coeffs);
+        _nmod_vec_clear(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }

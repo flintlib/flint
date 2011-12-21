@@ -49,7 +49,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv,
 
     _nmod_poly_reverse(Qinv, Qinv, n, n);
     
-    _nmod_vec_free(X2n + n - 1);
+    _nmod_vec_clear(X2n + n - 1);
 }
 
 void
@@ -99,7 +99,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     Qinv->length = n;
 
     if (Qlen < n)
-        _nmod_vec_free(Q_coeffs);
+        _nmod_vec_clear(Q_coeffs);
 
     _nmod_poly_normalise(Qinv);
 }

@@ -167,7 +167,7 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
                       FLINT_MIN(N, powlen + hlen[1] - 1), mod);
     _nmod_vec_add(res, res, h[0], hlen[0], mod);
     
-    _nmod_vec_free(v);
+    _nmod_vec_clear(v);
     free(h);
     free(hlen);
 }

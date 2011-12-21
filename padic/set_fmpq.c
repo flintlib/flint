@@ -29,7 +29,7 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
 {
     if (fmpq_is_zero(op))
     {
-        _padic_zero(rop);
+        padic_zero(rop);
     }
     else
     {
@@ -42,7 +42,7 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
 
         if (padic_val(rop) >= ctx->N)
         {
-            padic_zero(rop, ctx);
+            padic_zero(rop);
         }
         else
         {

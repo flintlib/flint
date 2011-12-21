@@ -43,8 +43,8 @@ _nmod_poly_log_series(mp_ptr res, mp_srcptr f, long n, nmod_t mod)
     _nmod_poly_mullow(res, f_diff, n - 1, f_inv, n - 1, n - 1, mod);
     _nmod_poly_integral(res, res, n, mod);
 
-    _nmod_vec_free(f_diff);
-    _nmod_vec_free(f_inv);
+    _nmod_vec_clear(f_diff);
+    _nmod_vec_clear(f_inv);
 }
 
 void
@@ -90,7 +90,7 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
         _nmod_poly_log_series(res->coeffs, f_coeffs, n, res->mod);
 
         if (flen < n)
-            _nmod_vec_free(f_coeffs);
+            _nmod_vec_clear(f_coeffs);
     }
 
     res->length = n;

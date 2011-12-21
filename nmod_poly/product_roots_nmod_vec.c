@@ -71,7 +71,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
         _nmod_poly_product_roots_nmod_vec(tmp + m + 1, xs + m, n - m, mod);
         _nmod_poly_mul(poly, tmp, m + 1, tmp + m + 1, n - m + 1, mod);
 
-        _nmod_vec_free(tmp);
+        _nmod_vec_clear(tmp);
     }
 }
 

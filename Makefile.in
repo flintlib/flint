@@ -1,9 +1,9 @@
-LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR)
+LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lflint -lmpir -lmpfr -lm
+LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lmpir -lmpfr -lm
+INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
 LINKLIBS=
 
-LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${LD_LIBRARY_PATH}
+LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
 export
 
@@ -69,20 +69,29 @@ endif
 
 library: library-recursive $(OBJS) $(LIB_OBJS)
 	mkdir -p build
-ifdef FLINT_SHARED
-	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB) 
-endif
-ifdef FLINT_STATIC
-	$(AR) rcs libflint.a $(OBJS) $(LINKLIBS)
-endif
+	mkdir -p build/interfaces
+	if [ "$(WANT_NTL)" -eq "1" ]; then \
+		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
+		fi; \
+		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+                	$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
+		fi; \
+	fi
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+        	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	fi
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+        	$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
+	fi
 
 library-recursive:
-ifdef FLINT_STATIC
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);)
-endif
-ifdef FLINT_SHARED
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) 
-endif
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) \
+	fi
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) \
+	fi
 
 $(FLINT_LIB): library
 

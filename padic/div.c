@@ -38,7 +38,7 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 
     if (_padic_is_zero(op1) || (padic_val(op1) - padic_val(op2) >= ctx->N))
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
         return;
     }
 
