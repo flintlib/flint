@@ -299,6 +299,31 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
 }
 
+static __inline__ 
+void _fmpz_mod_poly_rem(fmpz *R, 
+                        const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                        const fmpz_t invB, const fmpz_t p)
+{
+    fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
+
+    _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+
+    _fmpz_vec_clear(Q, lenA - lenB + 1);
+}
+
+static __inline__ 
+void fmpz_mod_poly_rem(fmpz_mod_poly_t R, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_t Q;
+
+    fmpz_mod_poly_init(Q, &(A->p));
+    fmpz_mod_poly_divrem(Q, R, A, B);
+    fmpz_mod_poly_clear(Q);
+}
+
+/*  Power series inversion ***************************************************/
+
 void 
 _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n, 
                                  const fmpz_t cinv, const fmpz_t p);
