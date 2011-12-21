@@ -279,7 +279,7 @@ main(void)
         padic_init(b, ctx);
 
         padic_randtest(a, state, ctx);
-        padic_zero(b, ctx);
+        padic_zero(b);
 
         padic_add(b, a, b, ctx);
 

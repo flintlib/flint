@@ -29,7 +29,7 @@ void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
 {
     if (_padic_is_zero(op) || (padic_val(op) + v >= ctx->N))
     {
-        padic_zero(rop, ctx);
+        padic_zero(rop);
     }
     else
     {

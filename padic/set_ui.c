@@ -29,7 +29,7 @@ void _padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 {
     if (op == 0)
     {
-        _padic_zero(rop);
+        padic_zero(rop);
     }
     else if (fmpz_cmp_ui(ctx->p, op) > 0)
     {

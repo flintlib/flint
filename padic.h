@@ -39,10 +39,15 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-typedef long padic_t[2];
+typedef struct {
+    fmpz u;
+    long v;
+} padic_struct;
 
-#define padic_unit(x)  (x)
-#define padic_val(x)   ((x)[1])
+typedef padic_struct padic_t[1];
+
+#define padic_unit(x)  (&((x)->u))
+#define padic_val(x)   ((x)->v)
 
 enum padic_print_mode
 {
@@ -132,7 +137,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx);
 void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
                              const padic_ctx_t ctx);
 
-/* Assignment ****************************************************************/
+/* Assignments and conversions ***********************************************/
 
 void _padic_set(padic_t rop, const padic_t op);
 void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx);
@@ -165,7 +170,7 @@ void padic_get_mpz(mpz_t rop, const padic_t op, const padic_ctx_t ctx);
 void _padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_get_mpq(mpq_t rop, const padic_t op, const padic_ctx_t ctx);
 
-static __inline__ void _padic_swap(padic_t op1, padic_t op2)
+static __inline__ void padic_swap(padic_t op1, padic_t op2)
 {
     long t;
 
@@ -175,19 +180,7 @@ static __inline__ void _padic_swap(padic_t op1, padic_t op2)
     padic_val(op2) = t;
 }
 
-static __inline__ void 
-padic_swap(padic_t op1, padic_t op2, const padic_ctx_t ctx)
-{
-    _padic_swap(op1, op2);
-}
-
-static __inline__ void _padic_zero(padic_t rop)
-{
-    fmpz_zero(padic_unit(rop));
-    padic_val(rop) = 0;
-}
-
-static __inline__ void padic_zero(padic_t rop, const padic_ctx_t ctx)
+static __inline__ void padic_zero(padic_t rop)
 {
     fmpz_zero(padic_unit(rop));
     padic_val(rop) = 0;
@@ -204,7 +197,7 @@ static __inline__ void padic_one(padic_t rop, const padic_ctx_t ctx)
     if (ctx->N > 0)
         _padic_one(rop);
     else
-        _padic_zero(rop);
+        padic_zero(rop);
 }
 
 /* Arithmetic operations *****************************************************/

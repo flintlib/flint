@@ -161,7 +161,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         if (fmpz_is_zero(x))
         {
-            padic_zero(rop, ctx);
+            padic_zero(rop);
             ans = 1;
         }
         else
@@ -177,7 +177,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             {
                 if (v >= ctx->N)
                 {
-                    padic_zero(rop, ctx);
+                    padic_zero(rop);
                 }
                 else
                 {

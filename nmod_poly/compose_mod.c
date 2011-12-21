@@ -98,5 +98,5 @@ nmod_poly_compose_mod(nmod_poly_t res,
     res->length = len;
     _nmod_poly_normalise(res);
 
-    _nmod_vec_free(ptr2);
+    _nmod_vec_clear(ptr2);
 }

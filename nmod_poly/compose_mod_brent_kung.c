@@ -90,8 +90,8 @@ _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr poly1, long len1,
         _nmod_poly_add(res, t, n, C->rows[i], n, mod);
     }
 
-    _nmod_vec_free(h);
-    _nmod_vec_free(t);
+    _nmod_vec_clear(h);
+    _nmod_vec_clear(t);
 
     nmod_mat_clear(A);
     nmod_mat_clear(B);
@@ -165,5 +165,5 @@ nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
     res->length = len;
     _nmod_poly_normalise(res);
 
-    _nmod_vec_free(ptr2);
+    _nmod_vec_clear(ptr2);
 }
