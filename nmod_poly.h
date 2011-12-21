@@ -250,12 +250,12 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, long len)
 /* Getting and setting coefficients  *****************************************/
 
 static __inline__
-ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
+ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, long j)
 {
     return (j >= poly->length) ? 0 : poly->coeffs[j];
 }
 
-void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c);
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c);
 
 /* Input and output  *********************************************************/
 

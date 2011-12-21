@@ -34,7 +34,7 @@
 #include <NTL/lip.h>
 #include <NTL/ctools.h>
 #include <NTL/g_lip.h>
-#include <gmp.h>
+#include <mpir.h>
 
 #include "flint.h"
 #include "fmpz.h"
@@ -43,6 +43,8 @@
 
 #define ZZ_SIZE(p) (((long *) (p))[1])
 #define ZZ_DATA(p) ((mp_limb_t *) (((long *) (p)) + 2))
+
+NTL_CLIENT
 
 static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
 {

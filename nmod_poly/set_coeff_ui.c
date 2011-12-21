@@ -29,7 +29,7 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c)
 {
     if (c >= poly->mod.n)
         NMOD_RED(c, c, poly->mod);
