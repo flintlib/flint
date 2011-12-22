@@ -913,6 +913,25 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
 
 /* Factoring *****************************************************************/
 
+typedef struct {
+    fmpz_poly_struct *factors;
+    long *exponents;
+    long alloc;
+    long length;
+} fmpz_poly_factor_struct;
+
+typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
+
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
+
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
+
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
+
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
+
+void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
+
 void fmpz_poly_build_hensel_tree(long * link, fmpz_poly_t *v, fmpz_poly_t *w, 
                                  const nmod_poly_factor_t fac);
 
@@ -940,6 +959,10 @@ void fmpz_poly_tree_hensel_lift_recursive(long *link,
 
 void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
     fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv);
+
+long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, 
+    const nmod_poly_factor_t local_fac, long target_exp);
 
 #endif
 
