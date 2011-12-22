@@ -50,6 +50,7 @@ static char * docsin[] = {
     "../../doc/longlong.txt",
     "../../mpn_extras/doc/mpn_extras.txt",
     "../../doc/profiler.txt", 
+    "../../interfaces/doc/interfaces.txt",
 };
 
 static char * docsout[] = {
@@ -74,6 +75,7 @@ static char * docsout[] = {
     "input/longlong.tex", 
     "input/mpn_extras.tex",
     "input/profiler.tex", 
+    "input/interfaces.tex",
 };
 
 static const int ndocs = sizeof(docsin) / sizeof(char *);
