@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include "flint.h"
 #include "fmpz_poly.h"
@@ -23,13 +22,13 @@ void fmpz_poly_rec_tree_hensel_check(long * link, fmpz_poly_t * v, fmpz_poly_t *
     if (result <= 0)
         printf("hensel_lift part failed******\n");
 
-    fmpz_poly_mul(temp, v[j], w[j]);
+/*    fmpz_poly_mul(temp, v[j], w[j]);
     fmpz_poly_mul(temp1, v[j+1], w[j+1]);
     fmpz_poly_add(temp, temp, temp1);
     fmpz_poly_scalar_mod_fmpz(temp, temp, PQ);
     result = fmpz_poly_is_one(temp);
     if (result <= 0)
-        printf("hensel_lift inverse part failed*****\n");
+        printf("hensel_lift inverse part failed*****\n");*/
 
     fmpz_poly_clear(temp);
     fmpz_poly_clear(temp1);
@@ -213,15 +212,23 @@ int main(void)
     long link[2*r - 2];
     fmpz_poly_t v[2*r - 2];
     fmpz_poly_t w[2*r - 2];
+    fmpz_poly_factor_t lifted_fac;
+    fmpz_poly_factor_init(lifted_fac);
 
+    ulong texp;
+    
     for(i = 0; i < 2*r - 2; i++)
     {
         fmpz_poly_init(v[i]);
         fmpz_poly_init(w[i]);
     }
 
+    texp = _fmpz_poly_start_hensel_lift(lifted_fac, link, v, w, f, facs, 2) 
+
+/*
     fmpz_poly_build_hensel_tree(link, v, w, facs);
     fmpz_poly_tree_hensel_lift_recursive(link, v, w, f, 2*r - 4, 1, P, Q, PQ);
+*/
        
     printf("start rec check\n");
     fmpz_poly_rec_tree_hensel_check(link, v, w, P, f, 2*r - 4, Q, PQ);
@@ -233,6 +240,7 @@ int main(void)
         fmpz_poly_clear(w[i]);
     }
 
+    fmpz_poly_factor_clear(lifted_fac);
     nmod_poly_factor_clear(facs);
     nmod_poly_clear(mod_pol);
     fmpz_poly_clear(f);
@@ -242,3 +250,49 @@ int main(void)
     return EXIT_SUCCESS;
 }
 
+/*
+int 
+fmpz_poly_hensel_checker(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, fmpz_t P)
+{
+    if (lifted_fac->length == 0)
+    {
+        if (F->length > 0)
+            return 0;
+        else
+            return 1;
+    }
+
+    fmpz_mod_poly_t product, temp;
+    fmpz_mod_poly_init(product, P);
+    fmpz_mod_poly_init(temp, P);
+
+    fmpz_t lead_coeff;
+    fmpz_init(lead_coeff);
+
+    fmpz_poly_to_fmpz_mod_poly(product, lifted_fac->factors[0]);
+
+    long i;
+    for (i = 1; i < lifted_fac->num_factors; i++)
+    {
+        fmpz_poly_to_fmpz_mod_poly(temp, lifted_fac->factors[i]);
+        fmpz_mod_poly_mul(product, product, temp);
+    }
+
+    fmpz_poly_to_fmpz_mod_poly(temp, F);
+
+    fmpz_set(lead_coeff, F->coeffs + F->length - 1);
+
+    fmpz_mod_poly_scalar_mul(product, product, lead_coeff);
+
+    _fmpz_mod_poly_reduce_coeffs(product);
+    _fmpz_mod_poly_reduce_coeffs(temp);
+   
+    int res = fmpz_mod_poly_equal(product, temp);
+   
+    fmpz_clear(lead_coeff);
+    fmpz_mod_poly_clear(temp);
+    fmpz_mod_poly_clear(product);
+   
+    return res;
+}
+*/
