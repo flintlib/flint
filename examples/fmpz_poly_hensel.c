@@ -14,7 +14,7 @@ void fmpz_poly_rec_tree_hensel_check(long * link, fmpz_poly_t * v, fmpz_poly_t *
     fmpz_poly_init(temp);
     fmpz_poly_init(temp1);
 
-    //f, v[j], v[j + 1], w[j], w[j + 1] == f, g, h, a, b
+    /*f, v[j], v[j + 1], w[j], w[j + 1] == f, g, h, a, b*/
 
     fmpz_poly_mul(temp, v[j], v[j+1]);
     fmpz_poly_sub(temp, f, temp);
@@ -77,7 +77,7 @@ int main(void)
     nmod_poly_factor(facs, mod_pol);
 
 /*    nmod_poly_factor_print(facs); */
-    long r = facs->num_factors;
+/*    long r = facs->num_factors;  */
 /*    printf("number of factors found = %ld\n", r); */
 
     nmod_poly_t gp, hp, ap, bp, dp;
@@ -184,9 +184,14 @@ int main(void)
     nmod_poly_factor_t facs;
     nmod_poly_factor_init(facs);
 
-    FILE * polyfile = fopen("P1_flint", "r");
+    FILE * polyfile = fopen("../../examples/P1_flint", "r");
+
+    if (!polyfile)
+        printf("error\n");
+        
     fmpz_poly_fread(polyfile, f);
-    long p = 89;
+    
+    long p = 89, i;
     fmpz_t P, Q, PQ;
 
     nmod_poly_t mod_pol;
@@ -198,35 +203,35 @@ int main(void)
     nmod_poly_init(mod_pol, p);
 
     fmpz_poly_get_nmod_poly(mod_pol, f);
+
     nmod_poly_factor(facs, mod_pol);
 
 /*    nmod_poly_factor_print(facs); */
     long r = facs->num_factors;
 /*    printf("number of factors found = %ld\n", r); */
 
-/* fmpz_poly_build_hensel_tree(long * link, fmpz_poly_t *v, fmpz_poly_t *w, 
-                                 const nmod_poly_factor_t fac);*/
     long link[2*r - 2];
     fmpz_poly_t v[2*r - 2];
     fmpz_poly_t w[2*r - 2];
 
-    for(long i = 0; i < 2*r - 2; i++)
+    for(i = 0; i < 2*r - 2; i++)
     {
         fmpz_poly_init(v[i]);
         fmpz_poly_init(w[i]);
     }
 
-    fmpz_poly_rec_tree_hensel_lift(link, v, w, P, f, 2*r - 4, 1, Q, PQ);
-   
-    for (long i = 0; i < 2*r - 2; i++)
+    fmpz_poly_build_hensel_tree(link, v, w, facs);
+    fmpz_poly_tree_hensel_lift_recursive(link, v, w, f, 2*r - 4, 1, P, Q, PQ);
+       
+    printf("start rec check\n");
+    fmpz_poly_rec_tree_hensel_check(link, v, w, P, f, 2*r - 4, Q, PQ);
+    printf("finish rec check\n");
+
+    for (i = 0; i < 2*r - 2; i++)
     {
         fmpz_poly_clear(v[i]);
         fmpz_poly_clear(w[i]);
     }
-
-    printf("start rec check\n");
-    fmpz_poly_rec_tree_hensel_check(link, v, w, P, f, 2*r - 4, Q, PQ);
-    printf("finish rec check\n");
 
     nmod_poly_factor_clear(facs);
     nmod_poly_clear(mod_pol);
