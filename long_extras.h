@@ -29,6 +29,10 @@
 #include <mpir.h>
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Properties ****************************************************************/
 
 size_t z_sizeinbase(long n, int b);
@@ -40,6 +44,10 @@ mp_limb_signed_t z_randtest(flint_rand_t state);
 mp_limb_signed_t z_randtest_not_zero(flint_rand_t state);
 
 mp_limb_signed_t z_randint(flint_rand_t state, mp_limb_t limit);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

@@ -37,6 +37,10 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     mp_limb_t * entries;
@@ -200,5 +204,8 @@ long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
  */
 #define NMOD_MAT_OPTIMAL_MODULUS_BITS (FLINT_BITS-5)
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

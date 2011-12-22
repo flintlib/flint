@@ -29,6 +29,10 @@
 #include <mpir.h>
 #include <mpfr.h> 
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 __mpfr_struct * _mpfr_vec_init(long length, mp_bitcnt_t prec);
 
 void _mpfr_vec_clear(__mpfr_struct * vec, long length);
@@ -45,6 +49,10 @@ void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, long length, mpfr_t c);
 
 void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
 								    __mpfr_struct * vec2, long length);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

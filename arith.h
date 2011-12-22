@@ -35,6 +35,10 @@
 #include "fmpq_poly.h"
 #include "fmpq.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 void fmpz_primorial(fmpz_t res, long n);
 
 void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
@@ -267,5 +271,9 @@ void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
 void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
 
 void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

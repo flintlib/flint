@@ -32,6 +32,10 @@
 #ifndef FLINT_PROFILER_H
 #define FLINT_PROFILER_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     long cpu;
@@ -143,6 +147,10 @@ void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 #define DURATION_THRESHOLD 5000.0
 
 #define DURATION_TARGET 10000.0
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

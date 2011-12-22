@@ -33,6 +33,10 @@
 
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Memory management *********************************************************/
 
 static __inline__ long * _perm_init(long n)
@@ -181,5 +185,8 @@ static __inline__ int _perm_print(const long * vec, long n)
     return 1;
 }
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif

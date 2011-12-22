@@ -32,6 +32,10 @@
 #include "fmpz_mat.h"
 #include "fmpq.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     fmpq * entries;
@@ -177,5 +181,9 @@ long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 long fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
 
 long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

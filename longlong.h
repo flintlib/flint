@@ -28,6 +28,10 @@
 #ifndef FLINT_LONGLONG_H
 #define FLINT_LONGLONG_H
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* x86 : 64 bit */
 #if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__amd64__)) 
 
@@ -389,6 +393,10 @@
     (r) = _r;                                           \
     (q) = _q;                                           \
   } while (0)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

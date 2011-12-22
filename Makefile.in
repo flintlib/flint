@@ -60,9 +60,14 @@ examples: all $(LOBJS) library
 check: $(FLINT_LIB)
 ifndef MOD
 	mkdir -p build/test
+	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 	$(foreach prog, $(TESTS), build/$(prog);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
+	if [ "$(WANT_NTL)" -eq "1" ]; then \
+		$(CXX) $(CFLAGS) $(INCS) interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o -o build/interfaces/test/t-NTL-interface $(LIBS) -lntl; \
+		build/interfaces/test/t-NTL-interface; \
+	fi
 else
 	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
 endif
@@ -75,15 +80,16 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-                	$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
+			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
 		fi; \
 	fi
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-        	$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+		$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-        	$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
+		$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
 	fi
+
 
 library-recursive:
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
@@ -98,12 +104,12 @@ $(FLINT_LIB): library
 install: library
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include
-ifdef FLINT_SHARED
-	cp $(FLINT_LIB) $(PREFIX)/lib
-endif
-ifdef FLINT_STATIC
-	cp libflint.a $(PREFIX)/lib
-endif
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		cp $(FLINT_LIB) $(PREFIX)/lib; 
+	fi
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+		cp libflint.a $(PREFIX)/lib;
+	fi
 	cp *.h $(PREFIX)/include
 
 .PHONY: profile library library-recursive recursive clean check check-recursive all

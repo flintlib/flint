@@ -39,6 +39,10 @@
 #include "fmpz_vec.h"
 #include "nmod_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -893,5 +897,9 @@ fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

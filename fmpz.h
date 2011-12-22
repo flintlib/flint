@@ -36,6 +36,10 @@
 #include "flint.h"
 #include "nmod_vec.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef long fmpz;
 typedef fmpz fmpz_t[1];
 
@@ -589,6 +593,10 @@ fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
     else
         fmpz_set_si(f, x - m);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

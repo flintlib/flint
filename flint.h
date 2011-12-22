@@ -30,6 +30,10 @@
 #include <mpfr.h>
 #include "longlong.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*
    We define alternative key words for "asm" and "inline", allowing 
    the code to be compiled with the "-ansi" flag under GCC
@@ -164,6 +168,10 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

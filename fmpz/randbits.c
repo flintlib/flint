@@ -49,5 +49,7 @@ fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 
         if (n_randint(state, 2))
             mpz_neg(mpz_ptr, mpz_ptr);
+
+        _fmpz_demote_val(f);
     }
 }

@@ -35,6 +35,10 @@
 #include "ulong_extras.h"
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
    mp_limb_t n;
@@ -273,6 +277,9 @@ mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
 mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset,
     long len, nmod_t mod, int nlimbs);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

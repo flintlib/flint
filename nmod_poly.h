@@ -37,6 +37,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 #define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
 
@@ -907,5 +911,9 @@ mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
 
 mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -33,6 +33,10 @@
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Types *********************************************************************/
 
 typedef struct
@@ -206,5 +210,9 @@ int nmod_poly_mat_solve_fflu(nmod_poly_mat_t X, nmod_poly_t den,
 void nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
                     const long * perm,
                     const nmod_poly_mat_t FFLU, const nmod_poly_mat_t B);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

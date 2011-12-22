@@ -37,6 +37,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     fmpz num;
@@ -333,5 +337,9 @@ void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
 
 void fmpq_bsplit_sum_abcdpq(fmpq_bsplit_t s,
         const fmpq * ab, const fmpq * cd, const fmpq * pq, long n1, long n2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

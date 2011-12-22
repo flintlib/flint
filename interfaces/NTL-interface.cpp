@@ -49,13 +49,9 @@ NTL_CLIENT
 static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
 {
     if (limbs == 0)
-    {
         fmpz_zero(f);
-    }
     else if (limbs == 1)
-    {
         fmpz_set_ui(f, x[0]);
-    }
     else
     {
         __mpz_struct *mpz_ptr = _fmpz_promote(f);
@@ -64,22 +60,15 @@ static void fmpz_set_limbs(fmpz_t f, mp_srcptr x, mp_size_t limbs)
     }
 }
 
-mp_size_t ZZ_limbs(const ZZ& z)
-{
-    return (z.rep) ? FLINT_ABS(ZZ_SIZE(z.rep)) : 0;
-}
-
 void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 {
     const _ntl_gbigint x = op.rep;
 
     if (!x) 
-    {
         fmpz_zero(rop);
-    }
     else
     {
-        const mp_size_t lw = ZZ_limbs(op);
+        const mp_size_t lw = op.size();
         const mp_limb_t *xp = ZZ_DATA(x);
 
         fmpz_set_limbs(rop, xp, lw);

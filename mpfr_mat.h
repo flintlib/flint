@@ -29,6 +29,10 @@
 #include <mpir.h>
 #include <mpfr.h> 
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     __mpfr_struct * entries;
@@ -44,6 +48,10 @@ typedef mpfr_mat_struct mpfr_mat_t[1];
 void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec);
 
 void mpfr_mat_clear(mpfr_mat_t mat);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

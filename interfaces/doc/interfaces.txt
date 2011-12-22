@@ -36,10 +36,6 @@
 
 *******************************************************************************
 
-mp_size_t ZZ_limbs(const ZZ& op)
-
-   Returns the number of limbs taken up by an NTL ZZ.
-
 void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 
    Converts an NTL ZZ to an fmpz_t.

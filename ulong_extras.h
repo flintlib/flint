@@ -32,6 +32,10 @@
 #include <mpir.h>
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct pair_s
 {
     mp_limb_t x, y;
@@ -278,5 +282,9 @@ int n_sizeinbase(mp_limb_t n, int base);
 mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

@@ -36,6 +36,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*  Type definitions *********************************************************/
 
 typedef struct
@@ -427,6 +431,10 @@ int fmpz_mod_poly_print_pretty(const fmpz_mod_poly_t poly, const char * x)
 {
     return fmpz_mod_poly_fprint_pretty(stdout, poly, x);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

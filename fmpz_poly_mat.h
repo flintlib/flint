@@ -32,6 +32,10 @@
 #include "fmpz_mat.h"
 #include "fmpz_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /* Types *********************************************************************/
 
 typedef struct
@@ -204,5 +208,9 @@ int fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den,
 void fmpz_poly_mat_solve_fflu_precomp(fmpz_poly_mat_t X,
                     const long * perm,
                     const fmpz_poly_mat_t FFLU, const fmpz_poly_mat_t B);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

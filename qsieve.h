@@ -30,6 +30,10 @@
 #include "flint.h"
 #include "fmpz.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #ifndef uint64_t
 #define uint64_t unsigned long
 #endif
@@ -293,4 +297,9 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows, long dense_rows,
 
 void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
                              uint64_t * nullrows, long ncols, long l, fmpz_t N);
+
+#ifdef __cplusplus
+}
+#endif
+
 #endif

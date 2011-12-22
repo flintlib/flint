@@ -34,6 +34,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*  Type definitions  ********************************************************/
 
 typedef struct
@@ -652,6 +656,10 @@ int fmpq_poly_read(fmpq_poly_t poly)
 {
     return fmpq_poly_fread(stdin, poly);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

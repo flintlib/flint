@@ -36,18 +36,12 @@ extern "C" {
 #include <NTL/ZZ.h>
 #include <NTL/ZZX.h>
 #include <NTL/vec_ZZ.h>
-#include <NTL/mat_ZZ.h>
 
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
 NTL_CLIENT
-
-/*
-   Returns the number of limbs taken up by an NTL ZZ.
- */
-mp_size_t ZZ_limbs(const ZZ& op);
 
 /* 
    Converts an NTL ZZ to an fmpz_t.

@@ -30,6 +30,10 @@
 #include <mpir.h>
 #include "fmpz.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define FMPZ_VEC_NORM(vec, i)          \
 do {                                   \
     while ((i) && vec[(i) - 1] == 0L)  \
@@ -191,6 +195,10 @@ void _fmpz_vec_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
 void _fmpz_vec_content(fmpz_t res, const fmpz * vec, long len);
 
 void _fmpz_vec_lcm(fmpz_t res, const fmpz * vec, long len);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

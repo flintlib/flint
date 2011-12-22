@@ -34,6 +34,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     fmpz_poly_struct *num;
@@ -169,6 +173,10 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x);
 
 int fmpz_poly_q_print(const fmpz_poly_q_t op);
 int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

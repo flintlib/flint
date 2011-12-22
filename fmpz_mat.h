@@ -36,6 +36,10 @@
 #include "fmpz.h"
 #include "nmod_mat.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     fmpz * entries;
@@ -271,6 +275,10 @@ void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
 void fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
                             const fmpz_t m1, const nmod_mat_t mat2);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
 

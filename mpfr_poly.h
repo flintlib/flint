@@ -30,6 +30,10 @@
 #include <mpfr.h> 
 #include "flint.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     __mpfr_struct * coeffs;
@@ -126,5 +130,9 @@ int _mpfr_poly_bound_newton(double * inter, double * slope,
 
 void mpfr_poly_mul(mpfr_poly_t res, mpfr_poly_t poly1, 
                                     mpfr_poly_t poly2, mpfr_prec_t fb);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

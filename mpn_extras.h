@@ -31,6 +31,10 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 #define MPN_NORM(a, an)                   \
     do {                                  \
         while (an != 0 && a[an - 1] == 0) \
@@ -179,5 +183,9 @@ void
 mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
                           long a, long b, long n, int d);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

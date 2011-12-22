@@ -30,6 +30,10 @@
 #include "flint.h"
 #include "fmpz.h"
 
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
 typedef struct
 {
     int sign;
@@ -71,5 +75,9 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
 void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
 void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
