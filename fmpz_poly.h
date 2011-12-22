@@ -934,5 +934,12 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
 
+void fmpz_poly_tree_hensel_lift_recursive(long *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
+void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
+    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv);
+
 #endif
 
