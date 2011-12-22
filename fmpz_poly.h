@@ -945,7 +945,7 @@ void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout,
 void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
     const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
-    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+    const fmpz_t p, const fmpz_t p1);
 
 void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
     const fmpz_poly_t f, 
@@ -955,14 +955,21 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
 
 void fmpz_poly_tree_hensel_lift_recursive(long *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
-    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+    const fmpz_t p0, const fmpz_t p1, const fmpz_t P);
 
 void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
     fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv);
 
 long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link, 
-    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, 
+    fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
     const nmod_poly_factor_t local_fac, long target_exp);
+
+long _fmpz_poly_continue_hensel_lift(fmpz_poly_factor_t lifted_fac, 
+    long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
+    long prev, long curr, long N, const fmpz_t p);
+
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+                                const nmod_poly_factor_t local_fac, long N);
 
 #endif
 

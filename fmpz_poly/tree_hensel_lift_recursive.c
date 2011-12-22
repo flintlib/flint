@@ -29,30 +29,46 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+
 /*
-    XXX: Can alias f and v, w.
+    Takes a current Hensel tree {link, v, w} and a pair {j, j+1} 
+    of entries in the tree and lifts the tree from mod $p_0$ to 
+    mod $P = p_0 p_1$.
+
+    Set \code{inv} to $-1$ if restarting Hensel lifting, $0$ if stopping 
+    and $1$ otherwise. 
+
+    Here $f = g h$ is the polynomial whose factors we are trying to lift. 
+    We will have that \code{v[j]} is the product of \code{v[link[j]]} and 
+    \code{v[link[j] + 1]} as described above.
+
+    Does support aliasing of $f$ with one of the polynomials in 
+    the lists $v$ and $w$.  But the polynomials in these two lists 
+    are not allowed to be aliases of each other.
  */
 
 void fmpz_poly_tree_hensel_lift_recursive(long *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
-    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P)
+    const fmpz_t p0, const fmpz_t p1, const fmpz_t P)
 {
     if (j >= 0)
     {
         if (inv == 1)
             fmpz_poly_hensel_lift(v[j], v[j + 1], w[j], w[j + 1], f, 
                                   v[j], v[j + 1], w[j], w[j + 1], 
-                                  p, p1, big_P);
+                                  p0, p1, P);
         else if (inv == -1)
-            fmpz_poly_hensel_lift_only_inverse(w[j], w[j + 1], f, 
-                               v[j], v[j + 1], w[j], w[j + 1], p, p1, big_P);
+            fmpz_poly_hensel_lift_only_inverse(w[j], w[j+1], f, 
+                                 v[j], v[j+1], w[j], w[j+1], p0, p1, P);
         else
-            fmpz_poly_hensel_lift_without_inverse(v[j], v[j + 1], f, 
-                                                  v[j], v[j + 1], w[j], w[j + 1], 
-                                                  p, p1, big_P);
+            fmpz_poly_hensel_lift_without_inverse(v[j], v[j+1], f, 
+                                                  v[j], v[j+1], w[j], w[j+1], 
+                                                  p0, p1);
 
-        fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j], link[j], inv, p, p1, big_P);
-        fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j + 1], link[j + 1], inv, p, p1, big_P);
+        fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j], link[j], 
+            inv, p0, p1, P);
+        fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j+1], link[j+1], 
+            inv, p0, p1, P);
     }
 }
 

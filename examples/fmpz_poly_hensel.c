@@ -2,6 +2,7 @@
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
+#include "ulong_extras.h"
 
 static void 
 fmpz_poly_tree_hensel_recursive_check(long *link, 
@@ -133,7 +134,7 @@ int main(void)
         fmpz_set(P, PQ);
         fmpz_mul(PQ, PQ, Q);
 
-        fmpz_poly_hensel_lift_without_inverse(g, h, f, g, h, a, b, P, Q, PQ);
+        fmpz_poly_hensel_lift_without_inverse(g, h, f, g, h, a, b, P, Q);
         fmpz_poly_mul(temp, g, h);
         fmpz_poly_sub(temp, f, temp);
         fmpz_poly_scalar_mod_fmpz(temp, temp, PQ);
@@ -309,6 +310,79 @@ int main(void)
 
             printf("Return value %ld\n", e[i+1]);
 
+            free(e);
+        }
+    }
+
+    /* Part IV ***************************************************************/
+    if (0)
+    {
+        long i, prev, current, target;
+
+        /* Code from flint-1 
+        for(prev = 1; prev < 10; prev++)
+            for (current = prev + 10; current < prev + 30; current++)
+                for (target = current + 40; target < current + 60; target++)
+        {
+            long num_steps = 2 + FLINT_FLOG2(target - prev);
+
+            long *exponents = malloc(num_steps * sizeof(long));
+            long pow;
+
+            pow = current;
+            exponents[0] = prev;
+
+            for (i = 1; (i < num_steps) && (pow < target); i++)
+            { 
+                exponents[i] = pow;
+                pow = pow * 2;
+            }
+
+            num_steps = i;
+            if (exponents[num_steps - 1] != target)
+            {
+                exponents[num_steps] = target;
+                num_steps++;
+            }
+   
+            printf("{%ld %ld %ld}\n", prev, current, target);
+            printf("0[%ld %ld]\n", exponents[0], exponents[1]);
+
+            for (i = 1; i < num_steps - 2; i++)
+                printf("1[%ld %ld]\n", exponents[i], exponents[i+1]);
+
+            printf("2[%ld %ld]\n", exponents[i], exponents[i+1]);
+
+            printf("{%ld}\n", exponents[i]);
+            printf("--------\n");
+            free(exponents);
+        } */
+
+        /* Code from flint-2 */
+        for(prev = 1; prev < 10; prev++)
+            for (current = prev + 10; current < prev + 30; current++)
+                for (target = current + 40; target < current + 60; target++)
+        {
+
+            long n = 2 + FLINT_FLOG2(target - prev);
+
+            long *e = malloc(n * sizeof(long));
+
+            for (e[i = 0] = target; e[i] > current; i++)
+                e[i + 1] = (e[i] + 1) / 2;
+            e[i]   = current;
+            e[i+1] = prev;
+
+            printf("{%ld %ld %ld}\n", prev, current, target); fflush(stdout);
+            printf("0[%ld %ld]\n", e[i+1], e[i]);
+
+            for (i--; i > 0; i--)
+                printf("1[%ld %ld]\n", e[i+1], e[i]);
+
+            printf("2[%ld %ld]\n", e[i+1], e[i]);
+
+            printf("{%ld}\n", e[i+1]);
+            printf("--------\n");
             free(e);
         }
     }

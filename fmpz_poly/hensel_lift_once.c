@@ -1,5 +1,6 @@
 /*=============================================================================
 
+
     This file is part of FLINT.
 
     FLINT is free software; you can redistribute it and/or modify
@@ -20,50 +21,45 @@
 /******************************************************************************
 
     Copyright (C) 2011 Andy Novocin
+    Copyright (C) 2011 William Hart
     Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "nmod_poly.h"
 
 /*
-    Computes $p_0 = p^{e_0}$ and $p_1 = p^{e_1 - e_0}$ for a small prime $p$ 
-    and $P = p^{e_1}$.
+    This function does a Hensel lift. 
 
-    If we aim to lift to $p^b$ then $f$ is the polynomial whose factors we 
-    wish to lift, made monic mod $p^b$. As usual, \code{{link, v, w}} is an 
-    initialised tree.
-
-    This starts the recursion on lifting the \emph{product tree} for lifting 
-    from $p^{e_0} to $p^{e_1}$. The value of \code{inv} corresponds to that 
-    given for the function \code{fmpz_poly_tree_hensel_lift_recursive()}. We 
-    set $r$ to the number of local factors of $f$.
-
-    In terms of the notation, above $P = p^{e_1}$, $p_0 = p^{e_0}$ and 
-    $p_1 = p^{e_1-e_0}$.
-
-    Assumes that $f$ is monic.
+    It lifts local factors (stored in \code{local_fac}) of $f$ to $p^N$. 
+    The lifted factors will be stored in \code{lifted_fac}. This lift can't 
+    be restarted. This function is a convenience function intended for end 
+    users. The product of local factors must be squarefree.
  */
-
-void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
-    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv)
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+                                const nmod_poly_factor_t local_fac, long N)
 {
-    fmpz_t p0, p1;
+    const long r = local_fac->num_factors;
 
-    fmpz_init(p0);
-    fmpz_init(p1);
+    long i;
+    long link[2*r - 2];
+    fmpz_poly_t v[2*r - 2];
+    fmpz_poly_t w[2*r - 2];
 
-    fmpz_pow_ui(p0, p, e0);
-    fmpz_pow_ui(p1, p, e1 - e0);
+    for(i = 0; i < 2*r - 2; i++)
+    {
+        fmpz_poly_init(v[i]);
+        fmpz_poly_init(w[i]);
+    }
 
-    fmpz_mul(P, p0, p1);
+    _fmpz_poly_start_hensel_lift(lifted_fac, link, v, w, f, local_fac, N);
 
-    fmpz_poly_tree_hensel_lift_recursive(link, v, w, f, 2*r - 4, inv, p0, p1, P);
-
-    fmpz_clear(p0);
-    fmpz_clear(p1);
+    for (i = 0; i < 2*r - 2; i++)
+    {
+        fmpz_poly_clear(v[i]);
+        fmpz_poly_clear(w[i]);
+    }
 }
 
