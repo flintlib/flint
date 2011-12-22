@@ -52,7 +52,7 @@ void fmpz_poly_tree_hensel_lift_recursive(long *link,
                                                   p, p1, big_P);
 
         fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j], link[j], inv, p, p1, big_P);
-        fmpz_poly_rec_tree_hensel_lift(link, v, w, v[j + 1], link[j + 1], inv, p, p1, big_P);
+        fmpz_poly_tree_hensel_lift_recursive(link, v, w, v[j + 1], link[j + 1], inv, p, p1, big_P);
     }
 }
 
