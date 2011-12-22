@@ -438,6 +438,12 @@ void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
     assuming the coefficient is exact for every coefficient.
 
+void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
+                               const fmpz_poly_t poly2, const fmpz_t x)
+
+    Sets \code{poly1} to \code{poly2}, reducing each coefficient modulo $x$, 
+    assuming that $x > 0$.
+
 *******************************************************************************
 
     Bit packing
@@ -2062,6 +2068,37 @@ void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
 
     This function uses the algorithm described 
     in~\citep[Algorithm~4.1.11]{Coh1996}.
+
+*******************************************************************************
+
+    Factoring
+
+*******************************************************************************
+
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
+
+    Initialises a new factor structure.
+
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
+
+    Initialises a new factor structure, providing space for 
+    at least \code{alloc} factors.
+
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
+
+    Reallocates the factor structure to provide space for 
+    precisely \code{alloc} factors.
+
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
+
+    Ensures that the factor structure has space for at 
+    least \code{len} factors.  This functions takes care 
+    of the case of repeated calls by always at least 
+    doubling the number of factors the structure can hold.
+
+void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
+
+    Releases all memory occupied by the factor structure.
 
 *******************************************************************************
 

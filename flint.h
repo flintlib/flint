@@ -135,6 +135,10 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
    return FLINT_BITS - zeros;
 }
 
+#define FLINT_FLOG2(k)  (FLINT_BIT_COUNT(k) - 1)
+
+#define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
+
 #undef mpn_zero
 #define mpn_zero(xxx, nnn) \
     do \

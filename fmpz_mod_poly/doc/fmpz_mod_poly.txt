@@ -477,6 +477,12 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient 
     of $B$ is invertible modulo $p$.
 
+*******************************************************************************
+
+    Power series inversion
+
+*******************************************************************************
+
 void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n, 
                                       const fmpz_t cinv, const fmpz_t p)
 

@@ -264,6 +264,23 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1,
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);
 
+static __inline__ 
+void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
+                               const fmpz_poly_t poly2, const fmpz_t x)
+{
+    if (poly2->length == 0)
+    {
+        fmpz_poly_zero(poly1);
+    }
+    else
+    {
+        fmpz_poly_fit_length(poly1, poly2->length);
+        _fmpz_vec_mod_fmpz(poly1->coeffs, poly2->coeffs, poly2->length, x);
+        _fmpz_poly_set_length(poly1, poly2->length);
+        _fmpz_poly_normalise(poly1);
+    }
+}
+
 /*  Bit packing  *************************************************************/
 
 void _fmpz_poly_bit_pack(mp_ptr arr, const fmpz * poly,
@@ -898,8 +915,69 @@ void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n);
 
+/* Factoring *****************************************************************/
+
+typedef struct {
+    fmpz_poly_struct *factors;
+    long *exponents;
+    long alloc;
+    long length;
+} fmpz_poly_factor_struct;
+
+typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
+
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
+
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
+
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
+
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
+
+void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
+
+void fmpz_poly_build_hensel_tree(long * link, fmpz_poly_t *v, fmpz_poly_t *w, 
+                                 const nmod_poly_factor_t fac);
+
+void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+    fmpz_poly_t Aout, fmpz_poly_t Bout, 
+    const fmpz_poly_t f, 
+    const fmpz_poly_t g, const fmpz_poly_t h, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
+void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+    const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1);
+
+void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
+    const fmpz_poly_t f, 
+    const fmpz_poly_t G, const fmpz_poly_t H, 
+    const fmpz_poly_t a, const fmpz_poly_t b, 
+    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P);
+
+void fmpz_poly_tree_hensel_lift_recursive(long *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
+    const fmpz_t p0, const fmpz_t p1, const fmpz_t P);
+
+void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
+    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv);
+
+long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
+    const nmod_poly_factor_t local_fac, long target_exp);
+
+long _fmpz_poly_continue_hensel_lift(fmpz_poly_factor_t lifted_fac, 
+    long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
+    long prev, long curr, long N, const fmpz_t p);
+
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+                                const nmod_poly_factor_t local_fac, long N);
+
 #ifdef __cplusplus
 }
 #endif
 
 #endif
+

@@ -514,6 +514,10 @@ The function \code{FLINT_BIT_COUNT(x)} returns the number of binary bits
 required to represent an \code{unsigned long x}.  If \code{x} is zero, 
 returns~$0$.
 
+Derived from this there are the two macros \code{FLINT_FLOG2(x)} and 
+\code{FLINT_CLOG2(x)} which, for any $x \geq 1$, compute $\floor{\log_2{x}}$ 
+and $\ceil{\log_2{x}}$.
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integers                                                                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
