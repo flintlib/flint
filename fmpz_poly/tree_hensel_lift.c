@@ -33,9 +33,8 @@
     Assumes that f is monic.
  */
 
-void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, 
-    long e0, long e1, fmpz_poly_t f, long r, long inv, 
-    const fmpz_t p, const fmpz_t P)
+void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
+    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv)
 {
     fmpz_t p0, p1;
 
