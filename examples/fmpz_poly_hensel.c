@@ -247,6 +247,72 @@ int main(void)
         fmpz_poly_clear(f);
     }
 
+    /* Part III **************************************************************/
+    if (0)
+    {
+        long i, target_exp;
+
+        /* Code from flint-1 */
+        for (target_exp = 1; target_exp < 17; target_exp++)
+        {
+            long num_steps = FLINT_MIN(target_exp, 5 + FLINT_BIT_COUNT(target_exp) - 1);
+            long *exponents;
+            long *copy_exponents;
+            long pow = target_exp;
+            long max_steps;
+
+            exponents = malloc(num_steps * sizeof(long));
+            copy_exponents = malloc(num_steps * sizeof(long));
+
+            for (i = 0; i < num_steps && pow > 1; i++)
+            { 
+                copy_exponents[i] = pow;
+                pow = (pow + 1)/2;
+            }
+
+            max_steps = i;
+            exponents[0] = 1;
+            for (i = 1; i <= max_steps; i++)
+                exponents[i] = copy_exponents[max_steps - i];
+
+            num_steps = max_steps + 1;
+
+            for (i = 0; i < num_steps - 2; i++)
+                printf("-(%ld, %ld), ", exponents[i], exponents[i+1]);
+            if (num_steps > 1)
+                printf("+(%ld, %ld), ", exponents[i], exponents[i+1]);
+            printf("\n");
+
+            printf("Return value %ld\n", exponents[i]);
+
+            free(exponents);
+            free(copy_exponents);
+        }
+
+        /* Code from flint-2 */
+        for (target_exp = 1; target_exp < 17; target_exp++)
+        {
+            long n, *e;
+
+            n = FLINT_BIT_COUNT(target_exp - 1) + 1;
+            e = malloc(n * sizeof(long));
+            for (e[i = 0] = target_exp; e[i] > 1; i++)
+                e[i + 1] = (e[i] + 1) / 2;
+
+            for (i--; i >= 1; i--)
+            {
+                printf("-(%ld, %ld), ", e[i+1], e[i]);
+            }
+            if (target_exp > 1)
+                printf("+(%ld, %ld), ", e[i+1], e[i]);
+            printf("\n");
+
+            printf("Return value %ld\n", e[i+1]);
+
+            free(e);
+        }
+    }
+
     return EXIT_SUCCESS;
 }
 
