@@ -158,14 +158,14 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 
 *******************************************************************************
 
-ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, ulong j)
+ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, long j)
 
     Returns the coefficient of \code{poly} at index~\code{j}, where 
     coefficients are numbered with zero being the constant coefficient, 
     and returns it as an \code{unsigned long}. If \code{j} refers to a 
     coefficient beyond the end of \code{poly}, zero is returned.
 
-void nmod_poly_set_coeff_ui(nmod_poly_t poly, ulong j, ulong c)
+void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c)
 
     Sets the coefficient of \code{poly} at index \code{j}, where 
     coefficients are numbered with zero being the constant coefficient, 

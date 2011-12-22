@@ -42,6 +42,8 @@ extern "C" {
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+NTL_CLIENT
+
 /*
    Returns the number of limbs taken up by an NTL ZZ.
  */
@@ -53,6 +55,11 @@ mp_size_t ZZ_limbs(const ZZ& op);
    Assumes the fmpz_t has already been allocated to have sufficient space.
  */
 void fmpz_set_ZZ(fmpz_t rop, const ZZ& op);
+
+/* 
+   Converts an fmpz_t to an NTL ZZ. Allocation is automatically handled.
+ */
+void fmpz_get_ZZ(ZZ& rop, const fmpz_t op);
 
 /*
    Converts an fmpz_poly_t to an NTL ZZX.
