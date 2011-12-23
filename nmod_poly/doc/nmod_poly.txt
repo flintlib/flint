@@ -1771,9 +1771,12 @@ void nmod_poly_factor_insert(nmod_poly_factor_t fac,
 void nmod_poly_factor_concat(nmod_poly_factor_t res,
                              const nmod_poly_factor_t fac)
 
-    Concatenates two factorisations. This is equivalent to calling
-    \code{nmod_poly_factor_insert} repeatedly with the individual
-    factors of \code{fac}.
+    Concatenates two factorisations.
+
+    This is equivalent to calling \code{nmod_poly_factor_insert()} 
+    repeatedly with the individual factors of \code{fac}.
+
+    Does not support aliasing between \code{res} and \code{fac}.
 
 void nmod_poly_factor_pow(nmod_poly_factor_t fac, long exp)
 
