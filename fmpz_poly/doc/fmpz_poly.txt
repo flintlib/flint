@@ -2100,6 +2100,10 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 
     Releases all memory occupied by the factor structure.
 
+void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
+
+    Prints the entries of \code{fac} to standard output.
+
 *******************************************************************************
 
     Input and output

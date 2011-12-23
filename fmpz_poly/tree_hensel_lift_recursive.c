@@ -56,10 +56,10 @@ void fmpz_poly_tree_hensel_lift_recursive(long *link,
         if (inv == 1)
             fmpz_poly_hensel_lift(v[j], v[j + 1], w[j], w[j + 1], f, 
                                   v[j], v[j + 1], w[j], w[j + 1], 
-                                  p0, p1, P);
+                                  p0, p1);
         else if (inv == -1)
             fmpz_poly_hensel_lift_only_inverse(w[j], w[j+1], f, 
-                                 v[j], v[j+1], w[j], w[j+1], p0, p1, P);
+                                 v[j], v[j+1], w[j], w[j+1], p0, p1);
         else
             fmpz_poly_hensel_lift_without_inverse(v[j], v[j+1], f, 
                                                   v[j], v[j+1], w[j], w[j+1], 

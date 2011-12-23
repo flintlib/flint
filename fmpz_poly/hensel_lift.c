@@ -52,7 +52,7 @@ void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout,
     const fmpz_poly_t f, 
     const fmpz_poly_t g, const fmpz_poly_t h, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
-    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P)
+    const fmpz_t p, const fmpz_t p1)
 {
     fmpz_poly_t c, g1, h1, G, H, A, B;
 

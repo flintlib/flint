@@ -36,10 +36,10 @@
     It lifts from \code{curr} to $N$. It also requires \code{prev} 
     (to lift the inverses) given as the return value of the function 
     \code{_fmpz_poly_start_hensel_lift()} or the function 
-    \code{_fmpz_poly_continue_hensel_lift()}. The curr lifted factors 
+    \code{_fmpz_poly_continue_hensel_lift()}. The current lifted factors 
     are supplied in \code{lifted_fac} and upon return are updated
     there. As usual \code{link}, \code{v}, and \code{w} describe the 
-    curr Hensel tree, $r$ is the number of local factors and $p$ is 
+    current Hensel tree, $r$ is the number of local factors and $p$ is 
     the small prime modulo whose power we are lifting to. It is required 
     that \code{curr} be at least $1$ and that \code{N > curr}.
  */

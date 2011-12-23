@@ -38,7 +38,7 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     const fmpz_poly_t f, 
     const fmpz_poly_t G, const fmpz_poly_t H, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
-    const fmpz_t p, const fmpz_t p1, const fmpz_t big_P)
+    const fmpz_t p, const fmpz_t p1)
 {
     fmpz_poly_t A, B;
     fmpz_poly_t a1, b1, t1, t2, r, unity;
