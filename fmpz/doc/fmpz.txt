@@ -504,8 +504,8 @@ void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
 
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
-    Sets $f$ to $g$ divided by \code{2^exp}, rounding up towards
-    infinity.
+    Sets $f$ to $g$ divided by \code{2^exp}, rounding down 
+    towards minus infinity.
 
 void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
