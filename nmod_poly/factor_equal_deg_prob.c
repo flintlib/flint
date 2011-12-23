@@ -34,7 +34,7 @@
 
 int
 nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, ulong d)
+    flint_rand_t state, const nmod_poly_t pol, long d)
 {
     nmod_poly_t a, b;
     mpz_t exp;
