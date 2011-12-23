@@ -770,7 +770,7 @@ int fmpz_bit_pack(mp_limb_t * arr, mp_bitcnt_t shift,
     Shifts the given coefficient to the left by \code{shift} bits and adds 
     it to the integer in \code{arr} in a field of the given number of bits.
 
-    \begin{estlisting}
+    \begin{lstlisting}
     shift  bits  --------------
 
     X X X C C C C 0 0 0 0 0 0 0
