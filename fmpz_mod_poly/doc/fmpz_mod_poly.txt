@@ -472,7 +472,34 @@ void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
 void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 
-    Computes $Q$, $R$ such that $A = B Q + R$ and $0 \leq (R) < \len(B)$.
+    Computes $Q$, $R$ such that $A = B Q + R$ and 
+    $0 \leq \len(R) < \len(B)$.
+
+    Assumes that $B$ is non-zero and that the leading coefficient 
+    of $B$ is invertible modulo $p$.
+
+void _fmpz_mod_poly_rem(fmpz *R, 
+                        const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                        const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} 
+    such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$, returning 
+    only the remainder part.
+
+    Assumes that $B$ is non-zero, that the leading coefficient 
+    of $B$ is invertible modulo $p$ and that \code{invB} is 
+    the inverse.
+
+    Assumes $\len(A) \geq \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  No aliasing of input and output operands is 
+    allowed.
+
+void fmpz_mod_poly_rem(fmpz_mod_poly_t R, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ 
+    and $0 \leq \len(R) < \len(B)$, returning only the remainder 
+    part.
 
     Assumes that $B$ is non-zero and that the leading coefficient 
     of $B$ is invertible modulo $p$.

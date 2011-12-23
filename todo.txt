@@ -208,6 +208,13 @@ fmpq_poly
 * Add resultants
 
 
+fmpz_mod_poly
+-------------
+
+* Replace fmpz_mod_poly_rem by a proper implementation which 
+  actually saves work over divrem.  Then, also add test code.
+
+
 fmpz_poly_mat
 -------------
 
