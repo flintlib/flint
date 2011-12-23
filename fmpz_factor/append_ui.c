@@ -33,8 +33,8 @@
 void
 _fmpz_factor_append_ui(fmpz_factor_t factor, ulong p, ulong exp)
 {
-    _fmpz_factor_fit_length(factor, factor->length + 1);
-    fmpz_set_ui(factor->p + factor->length, p);
-    fmpz_set_ui(factor->exp + factor->length, exp);
-    factor->length++;
+    _fmpz_factor_fit_length(factor, factor->num + 1);
+    fmpz_set_ui(factor->p + factor->num, p);
+    fmpz_set_ui(factor->exp + factor->num, exp);
+    factor->num++;
 }

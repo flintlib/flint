@@ -1,4 +1,4 @@
-/*============================================================================
+/*=============================================================================
 
     This file is part of FLINT.
 
@@ -16,10 +16,10 @@
     along with FLINT; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
 
-===============================================================================*/
+=============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -40,7 +40,7 @@ typedef struct
     fmpz * p;
     fmpz * exp;
     long alloc;
-    long length;
+    long num;
 } fmpz_factor_struct;
 
 typedef fmpz_factor_struct fmpz_factor_t[1];

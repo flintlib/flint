@@ -65,11 +65,11 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
         if (g->length != 1)
         {
             nmod_poly_make_monic(g, g);
-            num = res->num_factors;
+            num = res->num;
             nmod_poly_factor_equal_deg(res, g, i);
 
-            for (j = num; j < res->num_factors; j++)
-                res->exponents[j] = nmod_poly_remove(v, res->factors[j]);
+            for (j = num; j < res->num; j++)
+                res->exp[j] = nmod_poly_remove(v, res->p[j]);
         }
     }
     while (v->length >= 2*i + 3);

@@ -66,11 +66,12 @@ main(void)
 
         nmod_poly_factor_init(factors);
         nmod_poly_factor_berlekamp(factors, poly);
-        result &= (factors->num_factors == 1);
+        result &= (factors->num == 1);
         if (!result)
         {
-            printf("Error: irreducible polynomial should not have non-trivial factors!\n");
-            nmod_poly_print(poly); printf("\n");
+            printf("FAIL:\n");
+            printf("Irreducible polynomial should not have non-trivial factors!\n");
+            printf("poly = "), nmod_poly_print(poly), printf("\n");
             abort();
         }
         nmod_poly_factor_clear(factors);

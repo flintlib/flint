@@ -36,8 +36,8 @@ nmod_poly_factor_clear(nmod_poly_factor_t fac)
     long i;
 
     for (i = 0; i < fac->alloc; i++)
-        nmod_poly_clear(fac->factors[i]);
+        nmod_poly_clear(fac->p[i]);
 
-    free(fac->factors);
-    free(fac->exponents);
+    free(fac->p);
+    free(fac->exp);
 }

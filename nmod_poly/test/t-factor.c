@@ -51,8 +51,8 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem, product;
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead = 1;
-        long length, num_factors, i, j;
-        ulong exponents[5], prod1;
+        long length, num, i, j;
+        ulong exp[5], prod1;
 
         modulus = n_randtest_prime(state, 0);
 
@@ -73,13 +73,13 @@ main(void)
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
 
-        exponents[0] = n_randint(state, 30) + 1;
-        prod1 = exponents[0];
-        for (i = 0; i < exponents[0]; i++)
+        exp[0] = n_randint(state, 30) + 1;
+        prod1 = exp[0];
+        for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
-        num_factors = n_randint(state, 5) + 1;
-        for (i = 1; i < num_factors; i++)
+        num = n_randint(state, 5) + 1;
+        for (i = 1; i < num; i++)
         {
             do 
             {
@@ -93,10 +93,10 @@ main(void)
             }
             while ((!nmod_poly_is_irreducible(poly)) ||
                 (poly->length < 2) || (rem->length == 0));
-            exponents[i] = n_randint(state, 30) + 1;
-            prod1 *= exponents[i];
+            exp[i] = n_randint(state, 30) + 1;
+            prod1 *= exp[i];
 
-            for (j = 0; j < exponents[i]; j++)
+            for (j = 0; j < exp[i]; j++)
                 nmod_poly_mul(pol1, pol1, poly);
         }
 
@@ -118,19 +118,19 @@ main(void)
                 break;
         }
 
-        result &= (res->num_factors == num_factors);
+        result &= (res->num == num);
         if (!result)
         {
             printf("Error: number of factors incorrect, %ld, %ld\n",
-                res->num_factors, num_factors);
+                res->num, num);
             abort();
         }
 
         nmod_poly_init(product, pol1->mod.n);
         nmod_poly_set_coeff_ui(product, 0, 1);
-        for (i = 0; i < res->num_factors; i++)
-            for (j = 0; j < res->exponents[i]; j++)
-                nmod_poly_mul(product, product, res->factors[i]);
+        for (i = 0; i < res->num; i++)
+            for (j = 0; j < res->exp[i]; j++)
+                nmod_poly_mul(product, product, res->p[i]);
         nmod_poly_scalar_mul_nmod(product, product, lead);
         result &= nmod_poly_equal(pol1, product);
         if (!result)
@@ -155,8 +155,8 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;
         mp_limb_t modulus;
-        long length, num_factors, i, j;
-        ulong exponents[5], prod1;
+        long length, num, i, j;
+        long exp[5], prod1;
         ulong inflation;
         int found;
 
@@ -184,13 +184,13 @@ main(void)
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
         nmod_poly_inflate(poly, poly, inflation);
 
-        exponents[0] = n_randint(state, 6) + 1;
-        prod1 = exponents[0];
-        for (i = 0; i < exponents[0]; i++)
+        exp[0] = n_randint(state, 6) + 1;
+        prod1 = exp[0];
+        for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
-        num_factors = n_randint(state, 5) + 1;
-        for (i = 1; i < num_factors; i++)
+        num = n_randint(state, 5) + 1;
+        for (i = 1; i < num; i++)
         {
             do
             {
@@ -204,11 +204,11 @@ main(void)
             }
             while ((!nmod_poly_is_irreducible(poly)) ||
                 (poly->length < 2) || (rem->length == 0));
-            exponents[i] = n_randint(state, 6) + 1;
-            prod1 *= exponents[i];
+            exp[i] = n_randint(state, 6) + 1;
+            prod1 *= exp[i];
             nmod_poly_inflate(poly, poly, inflation);
 
-            for (j = 0; j < exponents[i]; j++)
+            for (j = 0; j < exp[i]; j++)
                 nmod_poly_mul(pol1, pol1, poly);
         }
 
@@ -230,19 +230,19 @@ main(void)
 
         nmod_poly_factor_cantor_zassenhaus(res2, pol1);
 
-        if (res->num_factors != res2->num_factors)
+        if (res->num != res2->num)
         {
             printf("FAIL: different number of factors found\n");
             abort();
         }
 
-        for (i = 0; i < res->num_factors; i++)
+        for (i = 0; i < res->num; i++)
         {
             found = 0;
-            for (j = 0; j < res2->num_factors; j++)
+            for (j = 0; j < res2->num; j++)
             {
-                if (nmod_poly_equal(res->factors[i], res2->factors[j]) &&
-                        res->exponents[i] == res2->exponents[j])
+                if (nmod_poly_equal(res->p[i], res2->p[j]) &&
+                        res->exp[i] == res2->exp[j])
                 {
                     found = 1;
                     break;

@@ -80,15 +80,15 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, ulong * e, long len)
 void
 fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor)
 {
-    if (factor->length != 0 && factor->p[0] == 2)
+    if (factor->num != 0 && factor->p[0] == 2)
     {
         _fmpz_factor_eval_multiexp(n, factor->p + 1,
-            (ulong *) (factor->exp + 1), factor->length - 1);
+            (ulong *) (factor->exp + 1), factor->num - 1);
         fmpz_mul_2exp(n, n, factor->exp[0]);
     }
     else
         _fmpz_factor_eval_multiexp(n, factor->p,
-            (ulong *) factor->exp, factor->length);
+            (ulong *) factor->exp, factor->num);
 
     fmpz_mul_si(n, n, factor->sign);
 }

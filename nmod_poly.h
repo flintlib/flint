@@ -859,10 +859,10 @@ void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
 
 typedef struct
 {
+    nmod_poly_t *p;
+    long *exp;
+    long num;
     long alloc;
-    long num_factors;
-    nmod_poly_t * factors;
-    ulong * exponents;
 } nmod_poly_factor_struct;
 
 typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
@@ -872,20 +872,20 @@ void nmod_poly_factor_clear(nmod_poly_factor_t fac);
 void nmod_poly_factor_init(nmod_poly_factor_t fac);
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
-        const nmod_poly_t poly, ulong exp);
+                             const nmod_poly_t poly, long exp);
 
 void nmod_poly_factor_print(const nmod_poly_factor_t fac);
 
 void nmod_poly_factor_concat(nmod_poly_factor_t res,
                         const nmod_poly_factor_t fac);
 
-void nmod_poly_factor_pow(nmod_poly_factor_t fac, ulong exp);
+void nmod_poly_factor_pow(nmod_poly_factor_t fac, long exp);
 
 void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                                    const nmod_poly_t pol, ulong d);
+                                const nmod_poly_t pol, long d);
 
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, ulong d);
+    flint_rand_t state, const nmod_poly_t pol, long d);
 
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 

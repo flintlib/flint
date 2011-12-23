@@ -50,7 +50,7 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res;
         mp_limb_t modulus;
-        long i, length, num_factors;
+        long i, length, num;
 
         modulus = n_randtest_prime(state, 0);
 
@@ -68,8 +68,8 @@ main(void)
         }
         while ((!nmod_poly_is_irreducible(pol1)) || (pol1->length < 2));
 
-        num_factors = n_randint(state, 5) + 1;
-        for (i = 1; i < num_factors; i++)
+        num = n_randint(state, 5) + 1;
+        for (i = 1; i < num; i++)
         {
             do 
             {
@@ -89,11 +89,10 @@ main(void)
         nmod_poly_factor_init(res);
         nmod_poly_factor_berlekamp(res, pol1);
 
-        result = (res->num_factors == num_factors);
+        result = (res->num == num);
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %ld\n", modulus,
-                num_factors, res->num_factors);
+            printf("FAIL: %lu, %ld, %ld\n", modulus, num, res->num);
             abort();
         }
       

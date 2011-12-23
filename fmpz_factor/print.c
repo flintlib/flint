@@ -44,13 +44,13 @@ fmpz_factor_print(const fmpz_factor_t factor)
 
     if (factor->sign == -1)
     {
-        if (factor->length)
+        if (factor->num)
             printf("-1 * ");
         else
             printf("-1");
     }
 
-    for (i = 0; i < factor->length; i++)
+    for (i = 0; i < factor->num; i++)
     {
         fmpz_print(factor->p + i);
 
@@ -60,7 +60,7 @@ fmpz_factor_print(const fmpz_factor_t factor)
             fmpz_print(factor->exp + i);
         }
 
-        if (i != factor->length - 1)
+        if (i != factor->num - 1)
             printf(" * ");
     }
 }

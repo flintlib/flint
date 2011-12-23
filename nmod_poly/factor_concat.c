@@ -35,6 +35,6 @@ nmod_poly_factor_concat(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
 {
     long i;
 
-    for (i = 0; i < fac->num_factors; i++)
-        nmod_poly_factor_insert(res, fac->factors[i], fac->exponents[i]);
+    for (i = 0; i < fac->num; i++)
+        nmod_poly_factor_insert(res, fac->p[i], fac->exp[i]);
 }

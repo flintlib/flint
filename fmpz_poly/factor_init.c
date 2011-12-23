@@ -31,10 +31,10 @@
 
 void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
 {
-   fac->factors   = NULL;
-   fac->exponents = NULL;
-   fac->alloc     = 0;
-   fac->length    = 0;
+   fac->p     = NULL;
+   fac->exp   = NULL;
+   fac->num   = 0;
+   fac->alloc = 0;
 }
 
 void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
@@ -43,22 +43,22 @@ void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
     {
         long i;
 
-        fac->factors   = malloc(alloc * sizeof(fmpz_poly_struct));
-        fac->exponents = malloc(alloc * sizeof(long));
+        fac->p   = malloc(alloc * sizeof(fmpz_poly_struct));
+        fac->exp = malloc(alloc * sizeof(long));
 
         for (i = 0; i < alloc; i++)
         {
-            fmpz_poly_init(fac->factors + i);
-            fac->exponents[i] = 0L;
+            fmpz_poly_init(fac->p + i);
+            fac->exp[i] = 0L;
         }
     }
     else
     {
-        fac->factors   = NULL;
-        fac->exponents = NULL;
+        fac->p   = NULL;
+        fac->exp = NULL;
     }
 
-    fac->alloc  = alloc;
-    fac->length = 0;
+    fac->num   = 0;
+    fac->alloc = alloc;
 }
 

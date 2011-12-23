@@ -1760,7 +1760,7 @@ void nmod_poly_factor_print(const nmod_poly_factor_t fac)
     Prints the entries of \code{fac} to standard output.
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
-        const nmod_poly_t poly, ulong exp)
+                             const nmod_poly_t poly, long exp)
 
     Inserts the factor \code{poly} with multiplicity \code{exp} into
     the factorisation \code{fac}.
@@ -1769,13 +1769,13 @@ void nmod_poly_factor_insert(nmod_poly_factor_t fac,
     gets added to the exponent of the existing entry.
 
 void nmod_poly_factor_concat(nmod_poly_factor_t res,
-                        const nmod_poly_factor_t fac)
+                             const nmod_poly_factor_t fac)
 
     Concatenates two factorisations. This is equivalent to calling
     \code{nmod_poly_factor_insert} repeatedly with the individual
     factors of \code{fac}.
 
-void nmod_poly_factor_pow(nmod_poly_factor_t fac, ulong exp)
+void nmod_poly_factor_pow(nmod_poly_factor_t fac, long exp)
 
     Raises \code{fac} to the power \code{exp}.
 
@@ -1804,7 +1804,7 @@ void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
     Sets \code{res} to a square-free factorization of \code{f}.
 
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, ulong d)
+    flint_rand_t state, const nmod_poly_t pol, long d)
 
     Probabilistic equal degree factorisation of \code{pol} into
     irreducible factors of degree \code{d}. If it passes, a factor is
@@ -1814,14 +1814,14 @@ int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                                    const nmod_poly_t pol, ulong d)
+                                const nmod_poly_t pol, long d)
 
     Assuming \code{pol} is a product of irreducible factors all of
     degree \code{d}, finds all those factors and places them in factors.
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
-    const nmod_poly_t f)
+                                        const nmod_poly_t f)
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Cantor-Zassenhaus algorithm.
@@ -1834,7 +1834,7 @@ void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
     irreducible factors using the Berlekamp algorithm.
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
-        const nmod_poly_t f)
+                                          const nmod_poly_t f)
 
     Factorises a general polynomial \code{f} into monic irreducible factors
     and returns the leading coefficient of \code{f}, or 0 if \code{f}
@@ -1846,7 +1846,7 @@ mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
     individual square-free factors.
 
 mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res,
-        const nmod_poly_t f)
+                                                  const nmod_poly_t f)
 
     Factorises a general polynomial \code{f} into monic irreducible factors
     and returns the leading coefficient of \code{f}, or 0 if \code{f}
@@ -1857,8 +1857,7 @@ mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res,
     square-free factorisation, and finally runs Cantor-Zassenhaus on all the
     individual square-free factors.
 
-mp_limb_t nmod_poly_factor(nmod_poly_factor_t res,
-        const nmod_poly_t f)
+mp_limb_t nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a general polynomial \code{f} into monic irreducible factors
     and returns the leading coefficient of \code{f}, or 0 if \code{f}
@@ -1870,3 +1869,4 @@ mp_limb_t nmod_poly_factor(nmod_poly_factor_t res,
     or Berlekamp on all the individual square-free factors.
     Currently Cantor-Zassenhaus is used by default unless the modulus is 2, in
     which case Berlekamp is used.
+

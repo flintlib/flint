@@ -33,37 +33,37 @@
 
 void
 nmod_poly_factor_insert(nmod_poly_factor_t fac,
-                                    const nmod_poly_t poly, ulong exp)
+                        const nmod_poly_t poly, long exp)
 {
     long i;
 
     if (poly->length <= 1)
         return;
 
-    for (i = 0; i < fac->num_factors; i++)
+    for (i = 0; i < fac->num; i++)
     {
-        if (nmod_poly_equal(poly, fac->factors[i]))
+        if (nmod_poly_equal(poly, fac->p[i]))
         {
-            fac->exponents[i] += exp;
+            fac->exp[i] += exp;
             return;
         }
     }
 
-    if (fac->alloc == fac->num_factors)
+    if (fac->alloc == fac->num)
     {
         long new_size = 2 * fac->alloc;
 
-        fac->factors = realloc(fac->factors, sizeof(nmod_poly_t) * new_size);
-        fac->exponents = realloc(fac->exponents, sizeof(ulong) * new_size);
+        fac->p   = realloc(fac->p, sizeof(nmod_poly_t) * new_size);
+        fac->exp = realloc(fac->exp, sizeof(long) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)
-            nmod_poly_init_preinv(fac->factors[i], 0, 0);
+            nmod_poly_init_preinv(fac->p[i], 0, 0);
 
         fac->alloc = new_size;
     }
 
-    nmod_poly_set(fac->factors[fac->num_factors], poly);
-    fac->factors[fac->num_factors]->mod = poly->mod;
-    fac->exponents[fac->num_factors] = exp;
-    fac->num_factors++;
+    nmod_poly_set(fac->p[fac->num], poly);
+    fac->p[fac->num]->mod = poly->mod;
+    fac->exp[fac->num] = exp;
+    fac->num++;
 }

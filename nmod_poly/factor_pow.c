@@ -32,10 +32,10 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_factor_pow(nmod_poly_factor_t fac, ulong exp)
+nmod_poly_factor_pow(nmod_poly_factor_t fac, long exp)
 {
     long i;
 
-    for (i = 0; i < fac->num_factors; i++)
-        fac->exponents[i] *= exp;
+    for (i = 0; i < fac->num; i++)
+        fac->exp[i] *= exp;
 }

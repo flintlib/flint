@@ -48,7 +48,7 @@ long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link,
     fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
     const nmod_poly_factor_t local_fac, long N)
 {
-    const long r = local_fac->num_factors;
+    const long r = local_fac->num;
 
     long i, preve;
     fmpz_t p, P, big_P;
@@ -59,7 +59,7 @@ long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link,
     fmpz_poly_init(monic_f);
 
     /* Set P := p, monic_f := monic(f) */
-    fmpz_set_ui(p, (local_fac->factors[0])->mod.n);
+    fmpz_set_ui(p, (local_fac->p[0])->mod.n);
     fmpz_set(P, p);
 
     if (fmpz_is_one(fmpz_poly_lead(f)))
@@ -126,11 +126,11 @@ long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link,
     { 
         if (link[i] < 0)
         {
-            fmpz_poly_scalar_mod_fmpz(lifted_fac->factors + (- link[i] - 1), v[i], P);
-            lifted_fac->exponents[- link[i] - 1] = 1L; 
+            fmpz_poly_scalar_mod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
+            lifted_fac->exp[- link[i] - 1] = 1L; 
         }
     }
-    lifted_fac->length = r;
+    lifted_fac->num = r;
 
     fmpz_clear(p);
     fmpz_clear(P);

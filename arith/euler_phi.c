@@ -56,7 +56,7 @@ void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
     fmpz_one(res);
 
     fmpz_init(t);
-    for (i = 0; i < factors->length; i++)
+    for (i = 0; i < factors->num; i++)
     {
         fmpz_sub_ui(t, factors->p + i, 1UL);
         fmpz_mul(res, res, t);

@@ -41,12 +41,15 @@
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N)
 {
-    const long r = local_fac->num_factors;
+    const long r = local_fac->num;
 
     long i;
-    long link[2*r - 2];
-    fmpz_poly_t v[2*r - 2];
-    fmpz_poly_t w[2*r - 2];
+    long *link;
+    fmpz_poly_t *v, *w;
+
+    link = malloc((2*r - 2) * sizeof(long));
+    v    = malloc(2*(2*r - 2) * sizeof(fmpz_poly_t));
+    w    = v + (2*r - 2);
 
     for(i = 0; i < 2*r - 2; i++)
     {
@@ -61,5 +64,7 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f,
         fmpz_poly_clear(v[i]);
         fmpz_poly_clear(w[i]);
     }
+    free(link);
+    free(v);
 }
 

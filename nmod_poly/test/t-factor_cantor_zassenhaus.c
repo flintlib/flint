@@ -51,8 +51,8 @@ main(void)
         nmod_poly_t product;
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead;
-        long i, j, length, num_factors;
-        ulong prod1, exponents[5];
+        long i, j, length, num;
+        long prod1, exp[5];
 
         do { modulus = n_randtest_prime(state, 0); } while (modulus <= 2);
 
@@ -73,14 +73,14 @@ main(void)
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
 
-        exponents[0] = n_randint(state, 30) + 1;
-        prod1 = exponents[0];
-        for (i = 0; i < exponents[0]; i++)
+        exp[0] = n_randint(state, 30) + 1;
+        prod1 = exp[0];
+        for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
-        num_factors = n_randint(state, 5) + 1;
+        num = n_randint(state, 5) + 1;
 
-        for (i = 1; i < num_factors; i++)
+        for (i = 1; i < num; i++)
         {
             do 
             {
@@ -93,27 +93,27 @@ main(void)
             while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2) ||
                 (rem->length == 0));
 
-            exponents[i] = n_randint(state, 30) + 1;
-            prod1 *= exponents[i];
-            for (j = 0; j < exponents[i]; j++)
+            exp[i] = n_randint(state, 30) + 1;
+            prod1 *= exp[i];
+            for (j = 0; j < exp[i]; j++)
                 nmod_poly_mul(pol1, pol1, poly);
         }
 
         nmod_poly_factor_init(res);
         nmod_poly_factor_cantor_zassenhaus(res, pol1);
-        result &= (res->num_factors == num_factors);
+        result &= (res->num == num);
 
         if (!result)
         {
             printf("Error: number of factors incorrect, %ld, %ld\n",
-                res->num_factors, num_factors);
+                res->num, num);
         }
 
         nmod_poly_init(product, pol1->mod.n);
         nmod_poly_set_coeff_ui(product, 0, 1);
-        for (i = 0; i < res->num_factors; i++)
-            for (j = 0; j < res->exponents[i]; j++)
-                nmod_poly_mul(product, product, res->factors[i]);
+        for (i = 0; i < res->num; i++)
+            for (j = 0; j < res->exp[i]; j++)
+                nmod_poly_mul(product, product, res->p[i]);
 
         lead = pol1->coeffs[pol1->length - 1];
         nmod_poly_scalar_mul_nmod(product, product, lead);

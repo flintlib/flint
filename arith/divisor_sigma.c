@@ -42,14 +42,14 @@ _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 
     fmpz_one(res);
 
-    if (factors->length == 0)
+    if (factors->num == 0)
         return;
 
     fmpz_init(r);
 
     if (k == 0)
     {
-        for (i = 0; i < factors->length; i++)
+        for (i = 0; i < factors->num; i++)
         {
             fmpz_add_ui(r, factors->exp + i, 1UL);
             fmpz_mul(res, res, r);
@@ -58,7 +58,7 @@ _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
     }
     else
     {
-        for (i = 0; i < factors->length; i++)
+        for (i = 0; i < factors->num; i++)
         {
             p = factors->p + i;
             fmpz_set(p, factors->p + i);
@@ -69,7 +69,7 @@ _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
             fmpz_divexact(p, r, p);
         }
 
-        _fmpz_vec_prod(res, factors->p, factors->length);
+        _fmpz_vec_prod(res, factors->p, factors->num);
     }
 
     fmpz_clear(r);

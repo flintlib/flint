@@ -34,30 +34,31 @@
 
 void
 nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
-                                    const nmod_poly_t pol, ulong d)
+                           const nmod_poly_t pol, long d)
 {
-    nmod_poly_t f, g;
-    flint_rand_t state;
-
     if (pol->length == d + 1)
     {
         nmod_poly_factor_insert(factors, pol, 1);
-        return;
     }
+    else
+    {
+        nmod_poly_t f, g;
+        flint_rand_t state;
 
-    nmod_poly_init_preinv(f, pol->mod.n, pol->mod.ninv);
+        nmod_poly_init_preinv(f, pol->mod.n, pol->mod.ninv);
 
-    flint_randinit(state);
+        flint_randinit(state);
 
-    while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d)) {};
+        while (!nmod_poly_factor_equal_deg_prob(f, state, pol, d)) {};
 
-    flint_randclear(state);
+        flint_randclear(state);
 
-    nmod_poly_init_preinv(g, pol->mod.n, pol->mod.ninv);
-    nmod_poly_div(g, pol, f);
+        nmod_poly_init_preinv(g, pol->mod.n, pol->mod.ninv);
+        nmod_poly_div(g, pol, f);
 
-    nmod_poly_factor_equal_deg(factors, f, d);
-    nmod_poly_clear(f);
-    nmod_poly_factor_equal_deg(factors, g, d);
-    nmod_poly_clear(g);
+        nmod_poly_factor_equal_deg(factors, f, d);
+        nmod_poly_clear(f);
+        nmod_poly_factor_equal_deg(factors, g, d);
+        nmod_poly_clear(g);
+    }
 }

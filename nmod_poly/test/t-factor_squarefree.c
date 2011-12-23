@@ -50,8 +50,8 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res;
         mp_limb_t modulus;
-        ulong exponents[5], prod1;
-        long length, i, j, num_factors;
+        long exp[5], prod1;
+        long length, i, j, num;
 
         modulus = n_randtest_prime(state, 0);
       
@@ -71,14 +71,14 @@ main(void)
             nmod_poly_make_monic(poly, poly);
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
-        exponents[0] = n_randprime(state, 5, 0);
+        exp[0] = n_randprime(state, 5, 0);
 
-        prod1 = exponents[0];
-        for (i = 0; i < exponents[0]; i++)
+        prod1 = exp[0];
+        for (i = 0; i < exp[0]; i++)
             nmod_poly_mul(pol1, pol1, poly);
 
-        num_factors = n_randint(state, 5) + 1;
-        for (i = 1; i < num_factors; i++)
+        num = n_randint(state, 5) + 1;
+        for (i = 1; i < num; i++)
         {
             do 
             {
@@ -93,34 +93,34 @@ main(void)
             while ((!nmod_poly_is_irreducible(poly)) ||
                 (poly->length < 2) || (rem->length == 0));
 
-            do exponents[i] = n_randprime(state, 5, 0);
-            while (prod1 % exponents[i] == 0);
+            do exp[i] = n_randprime(state, 5, 0);
+            while (prod1 % exp[i] == 0);
 
-            prod1 *= exponents[i];
-            for (j = 0; j < exponents[i]; j++)
+            prod1 *= exp[i];
+            for (j = 0; j < exp[i]; j++)
                 nmod_poly_mul(pol1, pol1, poly);
         }
      
         nmod_poly_factor_init(res);
         nmod_poly_factor_squarefree(res, pol1);
 
-        result &= (res->num_factors == num_factors);
+        result &= (res->num == num);
         if (result)
         {
             ulong prod2 = 1;
-            for (i = 0; i < num_factors; i++)
-                prod2 *= res->exponents[i];
+            for (i = 0; i < num; i++)
+                prod2 *= res->exp[i];
             result &= (prod1 == prod2);
         }
 
         if (!result)
         {
-            printf("Error: exponents don't match. Modulus = %lu\n", modulus);
-            for (i = 0; i < res->num_factors; i++)
-                printf("%ld ", res->exponents[i]);
+            printf("Error: exp don't match. Modulus = %lu\n", modulus);
+            for (i = 0; i < res->num; i++)
+                printf("%ld ", res->exp[i]);
             printf("\n");
-            for (i = 0; i < num_factors; i++)
-                printf("%ld ", exponents[i]);
+            for (i = 0; i < num; i++)
+                printf("%ld ", exp[i]);
             printf("\n");
             abort();
         }

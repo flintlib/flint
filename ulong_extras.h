@@ -43,8 +43,7 @@ typedef struct pair_s
 
 #define FLINT_MAX_FACTORS_IN_LIMB 15
 
-typedef struct factor_s
-{
+typedef struct {
    int num;
    int exp[FLINT_MAX_FACTORS_IN_LIMB];
    mp_limb_t p[FLINT_MAX_FACTORS_IN_LIMB];

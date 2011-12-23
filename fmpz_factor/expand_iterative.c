@@ -38,11 +38,10 @@ fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
     fmpz_set_si(n, factor->sign);
 
     fmpz_init(tmp);
-    for (i = 0; i < factor->length; i++)
+    for (i = 0; i < factor->num; i++)
     {
         fmpz_pow_ui(tmp, factor->p + i, fmpz_get_ui(factor->exp + i));
         fmpz_mul(n, n, tmp);
     }
-
     fmpz_clear(tmp);
 }

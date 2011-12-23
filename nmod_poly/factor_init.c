@@ -37,10 +37,10 @@ nmod_poly_factor_init(nmod_poly_factor_t fac)
     long i;
 
     fac->alloc = 5;
-    fac->num_factors = 0;
-    fac->factors = malloc(sizeof(nmod_poly_t) * 5);
-    fac->exponents = malloc(sizeof(ulong) * 5);
+    fac->num   = 0;
+    fac->p     = malloc(sizeof(nmod_poly_t) * 5);
+    fac->exp   = malloc(sizeof(long) * 5);
 
     for (i = 0; i < 5; i++)
-        nmod_poly_init_preinv(fac->factors[i], 0, 0);
+        nmod_poly_init_preinv(fac->p[i], 0, 0);
 }

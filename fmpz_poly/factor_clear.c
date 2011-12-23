@@ -37,13 +37,13 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 
         for (i = 0; i < fac->alloc; i++)
         {
-            fmpz_poly_clear(fac->factors + i);
+            fmpz_poly_clear(fac->p + i);
         }
 
-        free(fac->factors);
-        free(fac->exponents);
-        fac->factors   = NULL;
-        fac->exponents = NULL;
+        free(fac->p);
+        free(fac->exp);
+        fac->p   = NULL;
+        fac->exp = NULL;
     }
 }
 

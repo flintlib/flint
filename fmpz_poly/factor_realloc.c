@@ -42,24 +42,24 @@ void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
         {
             long i;
 
-            for (i = alloc; i < fac->length; i++)
-                fmpz_poly_clear(fac->factors + i);
+            for (i = alloc; i < fac->num; i++)
+                fmpz_poly_clear(fac->p + i);
 
-            fac->factors   = realloc(fac->factors, alloc * sizeof(fmpz_poly_struct));
-            fac->exponents = realloc(fac->exponents, alloc * sizeof(long));
+            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
+            fac->exp = realloc(fac->exp, alloc * sizeof(long));
             fac->alloc     = alloc;
         }
         else if (fac->alloc < alloc)
         {
             long i;
 
-            fac->factors   = realloc(fac->factors, alloc * sizeof(fmpz_poly_struct));
-            fac->exponents = realloc(fac->exponents, alloc * sizeof(long));
+            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
+            fac->exp = realloc(fac->exp, alloc * sizeof(long));
 
             for (i = fac->alloc; i < alloc; i++)
             {
-                fmpz_poly_init(fac->factors + i);
-                fac->exponents[i] = 0L;
+                fmpz_poly_init(fac->p + i);
+                fac->exp[i] = 0L;
             }
             fac->alloc = alloc;
         }

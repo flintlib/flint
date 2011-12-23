@@ -45,7 +45,7 @@ int fmpz_moebius_mu(const fmpz_t n)
     fmpz_factor(factors, n);
 
     mu = 1;
-    for (i = 0; i < factors->length; i++)
+    for (i = 0; i < factors->num; i++)
     {
         if (fmpz_get_ui(factors->exp + i) != 1UL)
         {
@@ -54,7 +54,7 @@ int fmpz_moebius_mu(const fmpz_t n)
         }
     }
 
-    if (factors->length % 2)
+    if (factors->num % 2)
         mu = -mu;
 
     fmpz_factor_clear(factors);

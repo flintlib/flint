@@ -36,9 +36,9 @@ nmod_poly_factor_print(const nmod_poly_factor_t fac)
 {
     long i;
 
-    for (i = 0; i < fac->num_factors; i++)
+    for (i = 0; i < fac->num; i++)
     {
-        nmod_poly_print(fac->factors[i]);
-        printf(" ^ %ld\n", fac->exponents[i]);
+        nmod_poly_print(fac->p[i]);
+        printf(" ^ %ld\n", fac->exp[i]);
     }
 }

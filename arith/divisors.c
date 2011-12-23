@@ -66,12 +66,12 @@ void
 _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
-    ulong *exp = malloc(sizeof(ulong) * factors->length);
-    ulong *exp_max = malloc(sizeof(ulong) * factors->length);
-    fmpz *powers = _fmpz_vec_init(factors->length);
+    long *exp = malloc(sizeof(long) * factors->num);
+    long *exp_max = malloc(sizeof(long) * factors->num);
+    fmpz *powers = _fmpz_vec_init(factors->num);
     fmpz_t d;
 
-    for (i = 0; i < factors->length; i++)
+    for (i = 0; i < factors->num; i++)
     {
         exp[i] = 0;
         fmpz_set(powers + i, factors->p + i);
@@ -89,7 +89,7 @@ _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
     {
         while (1)
         {
-            if (i == factors->length)
+            if (i == factors->num)
                 goto all_done;
             if (exp[i] < exp_max[i])
             {
@@ -113,7 +113,7 @@ _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
     fmpz_clear(d);
     free(exp);
     free(exp_max);
-    _fmpz_vec_clear(powers, factors->length);
+    _fmpz_vec_clear(powers, factors->num);
 }
 
 
@@ -160,7 +160,7 @@ fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
 
     /* TODO: check for overflow for huge n */
     size = 1;
-    for (i = 0; i < factors->length; i++)
+    for (i = 0; i < factors->num; i++)
         size *= fmpz_get_ui(factors->exp + i) + 1;
 
     fmpz_poly_fit_length(res, size);

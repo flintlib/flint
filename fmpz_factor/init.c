@@ -33,9 +33,9 @@
 void
 fmpz_factor_init(fmpz_factor_t factor)
 {
-    factor->sign = 0;
-    factor->p = NULL;
-    factor->exp = NULL;
-    factor->length = 0;
+    factor->sign  = 0;
+    factor->p     = NULL;
+    factor->exp   = NULL;
+    factor->num   = 0;
     factor->alloc = 0;
 }

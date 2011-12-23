@@ -75,7 +75,7 @@ int main(void)
         nmod_poly_factor(facs, mod_pol);
 
      /* nmod_poly_factor_print(facs);
-        long r = facs->num_factors;
+        long r = facs->num;
         printf("number of factors found = %ld\n", r); */
 
         fmpz_poly_init(g);
@@ -92,8 +92,8 @@ int main(void)
         fmpz_poly_init(temp);
         fmpz_poly_init(temp1);
 
-        nmod_poly_set(gp, facs->factors[0]);
-        nmod_poly_set(hp, facs->factors[1]);
+        nmod_poly_set(gp, facs->p[0]);
+        nmod_poly_set(hp, facs->p[1]);
         nmod_poly_xgcd(dp, ap, bp, gp, hp);
 
      /* nmod_poly_print(gp);
@@ -211,7 +211,7 @@ int main(void)
 
         nmod_poly_factor(facs, mod_pol);
 
-        r = facs->num_factors;
+        r = facs->num;
 
         fmpz_poly_factor_init(lifted_fac);
 
@@ -394,7 +394,7 @@ int main(void)
 int 
 fmpz_poly_hensel_checker(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, fmpz_t P)
 {
-    if (lifted_fac->length == 0)
+    if (lifted_fac->num == 0)
     {
         if (F->length > 0)
             return 0;
@@ -409,12 +409,12 @@ fmpz_poly_hensel_checker(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, fmpz_t P)
     fmpz_t lead_coeff;
     fmpz_init(lead_coeff);
 
-    fmpz_poly_to_fmpz_mod_poly(product, lifted_fac->factors[0]);
+    fmpz_poly_to_fmpz_mod_poly(product, lifted_fac->p[0]);
 
     long i;
-    for (i = 1; i < lifted_fac->num_factors; i++)
+    for (i = 1; i < lifted_fac->num; i++)
     {
-        fmpz_poly_to_fmpz_mod_poly(temp, lifted_fac->factors[i]);
+        fmpz_poly_to_fmpz_mod_poly(temp, lifted_fac->p[i]);
         fmpz_mod_poly_mul(product, product, temp);
     }
 

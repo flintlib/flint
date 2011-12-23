@@ -41,9 +41,8 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     const fmpz_t p, const fmpz_t p1, const fmpz_t big_P)
 {
     fmpz_poly_t A, B;
-
     fmpz_poly_t a1, b1, t1, t2, r, unity;
-
+    fmpz_mod_poly_t gg, hh, aa, bb, g, h;
     fmpz_mod_poly_t rr, aa1, bb1;
 
     fmpz_poly_init(A);
@@ -57,7 +56,6 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     fmpz_poly_init(unity);
 
     /* Make a check that c is divisible by p */
-    fmpz_mod_poly_t gg, hh, aa, bb, g, h;
     fmpz_mod_poly_init(gg, p1);
     fmpz_mod_poly_init(hh, p1);
     fmpz_mod_poly_init(g, p);

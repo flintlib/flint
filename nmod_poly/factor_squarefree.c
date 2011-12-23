@@ -42,7 +42,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 
     if (f->length <= 1) 
     {
-        res->num_factors = 0;
+        res->num = 0;
         return;
     }
 
@@ -109,10 +109,10 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
             if (z->length > 1)
             {
                 nmod_poly_factor_insert(res, z, 1);
-                nmod_poly_make_monic(res->factors[res->num_factors - 1],
-                    res->factors[res->num_factors - 1]);
-                if (res->num_factors)
-                    res->exponents[res->num_factors-1] *= i;
+                nmod_poly_make_monic(res->p[res->num - 1],
+                    res->p[res->num - 1]);
+                if (res->num)
+                    res->exp[res->num - 1] *= i;
             }
 
             i++;

@@ -67,7 +67,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     ulong max_prime;
 
     max_prime = 1UL;
-    for (k = 0; k < factors->length; k++)
+    for (k = 0; k < factors->num; k++)
     {
         /* TODO: handle overflow properly */
         max_prime = FLINT_MAX(max_prime, fmpz_get_ui(factors->p + k));
@@ -83,7 +83,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     fmpz_init(this);
     fmpz_init(prev);
 
-    for (k = 0; k < factors->length; k++)
+    for (k = 0; k < factors->num; k++)
     {
         ulong p = fmpz_get_ui(factors->p + k);
 

@@ -918,10 +918,10 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
 /* Factoring *****************************************************************/
 
 typedef struct {
-    fmpz_poly_struct *factors;
-    long *exponents;
+    fmpz_poly_struct *p;
+    long *exp;
+    long num;
     long alloc;
-    long length;
 } fmpz_poly_factor_struct;
 
 typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];

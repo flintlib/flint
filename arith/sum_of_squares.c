@@ -42,7 +42,7 @@ sum_of_two_squares(fmpz_t r, const fmpz_t n)
     fmpz_factor(fac, n);
     fmpz_set_ui(r, 1UL);
 
-    for (i = 0; i < fac->length; i++)
+    for (i = 0; i < fac->num; i++)
     {
         int res = fmpz_fdiv_ui(fac->p + i, 4);
 
