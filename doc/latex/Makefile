@@ -11,4 +11,7 @@ manual :
 	pdflatex flint-manual.tex
 	rm create_doc.o create_doc
 	rm flint-manual.aux flint-manual.log flint-manual.out flint-manual.toc flint-manual.bbl flint-manual.blg
+	mv input/title.tex input/title
+	rm input/*.tex
+	mv input/title input/title.tex
 
