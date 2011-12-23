@@ -35,6 +35,8 @@ void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
 {
     long i;
 
+    fmpz_print(&(fac->c));
+    printf("\n");
     for (i = 0; i < fac->num; i++)
     {
         fmpz_poly_print(fac->p + i);

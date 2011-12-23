@@ -31,14 +31,17 @@
 
 void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
 {
-   fac->p     = NULL;
-   fac->exp   = NULL;
-   fac->num   = 0;
-   fac->alloc = 0;
+    fmpz_init_set_ui(&(fac->c), 1);
+    fac->p     = NULL;
+    fac->exp   = NULL;
+    fac->num   = 0;
+    fac->alloc = 0;
 }
 
 void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
 {
+    fmpz_init_set_ui(&(fac->c), 1);
+
     if (alloc)
     {
         long i;

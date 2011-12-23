@@ -19,32 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2008 Richard Howell-Peak
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
+void
+fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 {
-    if (fac->alloc)
-    {
-        long i;
+    long i;
 
-        for (i = 0; i < fac->alloc; i++)
-        {
-            fmpz_poly_clear(fac->p + i);
-        }
+    fmpz_mul(&(res->c), &(res->c), &(fac->c));
 
-        fmpz_clear(&(fac->c));
-        free(fac->p);
-        free(fac->exp);
-        fac->p   = NULL;
-        fac->exp = NULL;
-    }
+    for (i = 0; i < fac->num; i++)
+        fmpz_poly_factor_insert(res, fac->p + i, fac->exp[i]);
 }
-

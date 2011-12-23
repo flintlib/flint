@@ -936,6 +936,7 @@ fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
 /* Factoring *****************************************************************/
 
 typedef struct {
+    fmpz c;
     fmpz_poly_struct *p;
     long *exp;
     long num;
@@ -953,6 +954,12 @@ void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
 void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
 
 void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
+
+void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
+                             const fmpz_poly_t p, long exp);
+
+void fmpz_poly_factor_concat(fmpz_poly_factor_t res, 
+                             const fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
 
