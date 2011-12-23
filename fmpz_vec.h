@@ -188,7 +188,9 @@ void _fmpz_vec_prod(fmpz_t res, const fmpz * vec, long len);
 
 /*  Reduction mod p **********************************************************/
 
-void _fmpz_vec_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
+void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
+
+void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p);
 
 /*  Gaussian content  ********************************************************/
 

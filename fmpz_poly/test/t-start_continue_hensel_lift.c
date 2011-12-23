@@ -115,7 +115,7 @@ main(void)
 
         if (part_exp < 1)
         {
-            _fmpz_poly_start_hensel_lift(F_fac, link, v, w, F_poly, f_fac, exp);
+            _fmpz_poly_hensel_start_lift(F_fac, link, v, w, F_poly, f_fac, exp);
         }
         else
         {
@@ -123,16 +123,18 @@ main(void)
 
             fmpz_init_set_ui(nn, n);
 
-            prev_exp = _fmpz_poly_start_hensel_lift(F_fac, link, v, w, 
+            prev_exp = _fmpz_poly_hensel_start_lift(F_fac, link, v, w, 
                 F_poly, f_fac, part_exp);
-            _fmpz_poly_continue_hensel_lift(F_fac, link, v, w, 
-                F_poly, prev_exp, part_exp, exp, (fmpz *) &n);
+            _fmpz_poly_hensel_continue_lift(F_fac, link, v, w, 
+                F_poly, prev_exp, part_exp, exp, nn);
+
+            fmpz_clear(nn);
         }
 
         result = 1;
         for (j = 0; j < F_fac->num; j++)
         {
-            fmpz_poly_rem(R, F_poly, F_fac->p + i);
+            fmpz_poly_rem(R, F_poly, F_fac->p + j);
             result &= (R->length == 0);
         }
 

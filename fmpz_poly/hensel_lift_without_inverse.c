@@ -30,59 +30,72 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-#define lift(G, g, b)                                                                     \
-do {                                                                                      \
-    fmpz_poly_fit_length(G, g->length);                                                   \
-    _fmpz_poly_set_length(G, g->length);                                                  \
-    _fmpz_mod_poly_mul(T1, C, f->length, b->coeffs, b->length, p1);                       \
-    _fmpz_mod_poly_rem(T2, T1, f->length + b->length - 1, g->coeffs, g->length, one, p1); \
-    _fmpz_vec_scalar_mul_fmpz(T1, T2, g->length, p);                                      \
-    _fmpz_vec_add(G->coeffs, T1, g->coeffs, g->length);                                   \
-    _fmpz_poly_normalise(G);                                                              \
-} while(0);
-
-
-/*
-    This is the main Hensel lifting routine, which performs a Hensel step
-    from polynomials mod $p$ to polynomials mod $p p_1$.
-
-    One starts with polynomials $f$, $g$, $h$ such that $f = gh \pmod{p}$. 
-    The polynomials $a$, $b$ satisfy $ag + bh = 1 \pmod{p}$.
-
-    Upon return we have $A G + B H = 1 \pmod{p p_1}$ and 
-    $f = G H \pmod{p p_1}$, where $g = G \pmod{p}$, etc.
-
-    We require that $1 < p_1 \leq p$.
-
-    The output arguments $G$ and $H$ may only be aliased with 
-    the input arguments $g$ and $h$, respectively.
- */
-
-void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t G, fmpz_poly_t H, 
-    const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
+void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
+	const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1)
 {
-    fmpz one[1] = {1L};
-    fmpz *C, *T1, *T2;
-    const long lenT = f->length + FLINT_MAX(a->length, b->length) - 1;
-    const long len  = f->length + 2 * lenT;
+    fmpz_poly_t c, g1, h1, G, H;
+    fmpz_mod_poly_t cc, gg, hh, aa, bb, tt, gg1, hh1;
 
-    C  = _fmpz_vec_init(len);
-    T1 = C  + f->length;
-    T2 = T1 + lenT;
+    fmpz_poly_init(c);
+    fmpz_poly_init(g1);
+    fmpz_poly_init(h1);
+    fmpz_poly_init(G);
+    fmpz_poly_init(H);
 
-    /* {C, lenF} := {(f-gh)/p, lenF} */
-    if (g->length >= h->length)
-        _fmpz_poly_mul(C, g->coeffs, g->length, h->coeffs, h->length);
-    else
-        _fmpz_poly_mul(C, h->coeffs, h->length, g->coeffs, g->length);
-    _fmpz_poly_sub(C, f->coeffs, f->length, C, f->length);
-    _fmpz_vec_scalar_divexact_fmpz(C, C, f->length, p);
+    fmpz_poly_mul(c, g, h);
+    fmpz_poly_sub(c, f, c);
+    fmpz_poly_scalar_divexact_fmpz(c, c, p);
 
-    lift(G, g, b);
-    lift(H, h, a);
+    fmpz_mod_poly_init(cc, p1);
+    fmpz_mod_poly_init(gg, p1);
+    fmpz_mod_poly_init(hh, p1);
+    fmpz_mod_poly_init(aa, p1);
+    fmpz_mod_poly_init(bb, p1);
+    fmpz_mod_poly_init(tt, p1);
+    fmpz_mod_poly_init(gg1, p1);
+    fmpz_mod_poly_init(hh1, p1);
 
-    _fmpz_vec_clear(C, len);
+    fmpz_mod_poly_set_fmpz_poly(cc, c);
+    fmpz_mod_poly_set_fmpz_poly(gg, g);
+    fmpz_mod_poly_set_fmpz_poly(hh, h);
+    fmpz_mod_poly_set_fmpz_poly(aa, a);
+    fmpz_mod_poly_set_fmpz_poly(bb, b);
+
+    fmpz_mod_poly_rem(gg1, cc, gg);
+    fmpz_mod_poly_mul(gg1, gg1, bb);
+    fmpz_mod_poly_rem(gg1, gg1, gg);
+
+    fmpz_mod_poly_rem(hh1, cc, hh);
+    fmpz_mod_poly_mul(hh1, hh1, aa);
+    fmpz_mod_poly_rem(hh1, hh1, hh);
+
+    fmpz_mod_poly_get_fmpz_poly(g1, gg1);
+    fmpz_poly_scalar_mul_fmpz(g1, g1, p);
+
+    fmpz_mod_poly_get_fmpz_poly(h1, hh1);
+    fmpz_poly_scalar_mul_fmpz(h1, h1, p);
+
+    fmpz_poly_add(G, g, g1);
+    fmpz_poly_add(H, h, h1);
+
+    fmpz_poly_set(Gout, G);
+    fmpz_poly_set(Hout, H);
+
+    fmpz_mod_poly_clear(cc);
+    fmpz_mod_poly_clear(gg);
+    fmpz_mod_poly_clear(hh);
+    fmpz_mod_poly_clear(aa);
+    fmpz_mod_poly_clear(bb);
+    fmpz_mod_poly_clear(tt);
+    fmpz_mod_poly_clear(gg1);
+    fmpz_mod_poly_clear(hh1);
+
+    fmpz_poly_clear(c);
+    fmpz_poly_clear(g1);
+    fmpz_poly_clear(h1);
+    fmpz_poly_clear(G);
+    fmpz_poly_clear(H);
 }
 

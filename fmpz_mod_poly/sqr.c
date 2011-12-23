@@ -33,7 +33,7 @@
 void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
 {
     _fmpz_poly_sqr(res, poly, len);
-    _fmpz_vec_mod_fmpz(res, res, 2 * len - 1, p);
+    _fmpz_vec_scalar_mod_fmpz(res, res, 2 * len - 1, p);
 }
 
 void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)

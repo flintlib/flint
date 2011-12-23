@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011 Andy Novocin
     Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
@@ -27,29 +28,21 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
-                               const fmpz_t p)
+void fmpz_poly_hensel_lift_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w, 
+    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv)
 {
-    _fmpz_poly_derivative(res, poly, len);
-    _fmpz_vec_scalar_mod_fmpz(res, res, len - 1, p);
-}
+    fmpz_t p0, p1;
 
-void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
-{
-    const long len = poly->length;
+    fmpz_init(p0);
+    fmpz_init(p1);
 
-    if (len < 2)
-    {
-        fmpz_mod_poly_zero(res);
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(res, len - 1);
-        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len, &(res->p));
-        _fmpz_mod_poly_set_length(res, len - 1);
-        _fmpz_mod_poly_normalise(res);
-    }
+    fmpz_pow_ui(p0, p, e0);
+    fmpz_pow_ui(p1, p, e1 - e0);
+
+    fmpz_poly_hensel_lift_tree_recursive(link, v, w, f, 2*r - 4, inv, p0, p1);
+
+    fmpz_clear(p0);
+    fmpz_clear(p1);
 }
 

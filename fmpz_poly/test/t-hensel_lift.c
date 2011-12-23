@@ -163,7 +163,7 @@ main(void)
         fmpz_poly_mul(Prod_2, B, H);
         fmpz_poly_add(Prod_1, Prod_1, Prod_2);
 
-        fmpz_poly_scalar_mod_fmpz(Prod_1, Prod_1, big_P);
+        fmpz_poly_scalar_smod_fmpz(Prod_1, Prod_1, big_P);
 
         result = (Prod_1->length == 1 && fmpz_is_one(Prod_1->coeffs));
 

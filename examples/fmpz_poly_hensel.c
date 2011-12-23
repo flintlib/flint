@@ -106,7 +106,7 @@ int main(void)
         fmpz_poly_set_nmod_poly(a, ap);
         fmpz_poly_set_nmod_poly(b, bp);
 
-        fmpz_poly_hensel_lift(g, h, a, b, f, g, h, a, b, P, Q, PQ);
+        fmpz_poly_hensel_lift(g, h, a, b, f, g, h, a, b, P, Q);
         
         fmpz_poly_mul(temp, g, h);
         fmpz_poly_sub(temp, f, temp);
@@ -145,7 +145,7 @@ int main(void)
         else
             printf("hensel_lift_without_inverse failed\n");
 
-        fmpz_poly_hensel_lift_only_inverse(a, b, f, g, h, a, b, P, Q, PQ);
+        fmpz_poly_hensel_lift_only_inverse(a, b, f, g, h, a, b, P, Q);
 
         fmpz_poly_mul(temp, g, a);
         fmpz_poly_mul(temp1, h, b);
@@ -225,10 +225,10 @@ int main(void)
             fmpz_poly_init(w[i]);
         }
 
-        texp = _fmpz_poly_start_hensel_lift(lifted_fac, link, v, w, f, facs, 2);
+        texp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, facs, 2);
 
-     /* fmpz_poly_build_hensel_tree(link, v, w, facs);
-        fmpz_poly_tree_hensel_lift_recursive(link, v, w, f, 2*r - 4, 1, P, Q, PQ); */
+     /* fmpz_poly_hensel_build_tree(link, v, w, facs);
+        fmpz_poly_hensel_lift_tree_recursive(link, v, w, f, 2*r - 4, 1, P, Q); */
 
         printf("start recursive check\n");
         fmpz_poly_tree_hensel_recursive_check(link, v, w, P, f, 2*r - 4, Q, PQ);

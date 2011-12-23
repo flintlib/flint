@@ -34,7 +34,7 @@ void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, long len1,
                                    const fmpz *poly2, long len2, const fmpz_t p)
 {
     _fmpz_poly_mul(res, poly1, len1, poly2, len2);
-    _fmpz_vec_mod_fmpz(res, res, len1 + len2 - 1, p);
+    _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
 }
 
 void fmpz_mod_poly_mul(fmpz_mod_poly_t res, 

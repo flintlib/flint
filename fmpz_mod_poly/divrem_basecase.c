@@ -51,7 +51,7 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
             fmpz_mod(Q + iQ, Q + iQ, p);
 
             _fmpz_vec_scalar_submul_fmpz(R + iQ, B, lenB, Q + iQ);
-            _fmpz_vec_mod_fmpz(R + iQ, R + iQ, lenB, p);
+            _fmpz_vec_scalar_mod_fmpz(R + iQ, R + iQ, lenB, p);
         }
     }
 }

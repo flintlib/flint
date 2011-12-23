@@ -29,41 +29,28 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-/*
-    Computes $p_0 = p^{e_0}$ and $p_1 = p^{e_1 - e_0}$ for a small prime $p$ 
-    and $P = p^{e_1}$.
-
-    If we aim to lift to $p^b$ then $f$ is the polynomial whose factors we 
-    wish to lift, made monic mod $p^b$. As usual, \code{{link, v, w}} is an 
-    initialised tree.
-
-    This starts the recursion on lifting the \emph{product tree} for lifting 
-    from $p^{e_0} to $p^{e_1}$. The value of \code{inv} corresponds to that 
-    given for the function \code{fmpz_poly_tree_hensel_lift_recursive()}. We 
-    set $r$ to the number of local factors of $f$.
-
-    In terms of the notation, above $P = p^{e_1}$, $p_0 = p^{e_0}$ and 
-    $p_1 = p^{e_1-e_0}$.
-
-    Assumes that $f$ is monic.
- */
-
-void fmpz_poly_tree_hensel_lift(long *link, fmpz_poly_t *v, fmpz_poly_t *w, fmpz_t P, 
-    fmpz_poly_t f, long r, const fmpz_t p, long e0, long e1, long inv)
+void fmpz_poly_hensel_lift_tree_recursive(long *link, 
+    fmpz_poly_t *v, fmpz_poly_t *w, fmpz_poly_t f, long j, long inv, 
+    const fmpz_t p0, const fmpz_t p1)
 {
-    fmpz_t p0, p1;
+    if (j >= 0)
+    {
+        if (inv == 1)
+            fmpz_poly_hensel_lift(v[j], v[j + 1], w[j], w[j + 1], f, 
+                                  v[j], v[j + 1], w[j], w[j + 1], 
+                                  p0, p1);
+        else if (inv == -1)
+            fmpz_poly_hensel_lift_only_inverse(w[j], w[j+1], f, 
+                                 v[j], v[j+1], w[j], w[j+1], p0, p1);
+        else
+            fmpz_poly_hensel_lift_without_inverse(v[j], v[j+1], f, 
+                                                  v[j], v[j+1], w[j], w[j+1], 
+                                                  p0, p1);
 
-    fmpz_init(p0);
-    fmpz_init(p1);
-
-    fmpz_pow_ui(p0, p, e0);
-    fmpz_pow_ui(p1, p, e1 - e0);
-
-    fmpz_mul(P, p0, p1);
-
-    fmpz_poly_tree_hensel_lift_recursive(link, v, w, f, 2*r - 4, inv, p0, p1, P);
-
-    fmpz_clear(p0);
-    fmpz_clear(p1);
+        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j], link[j], 
+            inv, p0, p1);
+        fmpz_poly_hensel_lift_tree_recursive(link, v, w, v[j+1], link[j+1], 
+            inv, p0, p1);
+    }
 }
 

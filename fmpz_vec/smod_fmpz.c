@@ -26,30 +26,26 @@
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_mod_poly.h"
+#include "fmpz_vec.h"
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
-                               const fmpz_t p)
+void _fmpz_vec_scalar_smod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p)
 {
-    _fmpz_poly_derivative(res, poly, len);
-    _fmpz_vec_scalar_mod_fmpz(res, res, len - 1, p);
-}
+    long i;
+    fmpz_t pdiv2;
 
-void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
-{
-    const long len = poly->length;
+    fmpz_init(pdiv2);
+    fmpz_fdiv_q_2exp(pdiv2, p, 1);
 
-    if (len < 2)
+    for (i = 0; i < len; i++)
     {
-        fmpz_mod_poly_zero(res);
+        fmpz_mod(res + i, vec + i, p);
+
+        if (fmpz_cmp(res + i, pdiv2) > 0)
+        {
+            fmpz_sub(res + i, res + i, p);
+        }
     }
-    else
-    {
-        fmpz_mod_poly_fit_length(res, len - 1);
-        _fmpz_mod_poly_derivative(res->coeffs, poly->coeffs, len, &(res->p));
-        _fmpz_mod_poly_set_length(res, len - 1);
-        _fmpz_mod_poly_normalise(res);
-    }
+
+    fmpz_clear(pdiv2);
 }
 

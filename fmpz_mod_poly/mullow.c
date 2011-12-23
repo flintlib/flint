@@ -35,7 +35,7 @@ void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1,
                                       const fmpz_t p, long n)
 {
     _fmpz_poly_mullow(res, poly1, len1, poly2, len2, n);
-    _fmpz_vec_mod_fmpz(res, res, n, p);
+    _fmpz_vec_scalar_mod_fmpz(res, res, n, p);
 }
 
 void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 

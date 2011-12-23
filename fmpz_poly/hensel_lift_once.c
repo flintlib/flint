@@ -30,14 +30,6 @@
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
 
-/*
-    This function does a Hensel lift. 
-
-    It lifts local factors (stored in \code{local_fac}) of $f$ to $p^N$. 
-    The lifted factors will be stored in \code{lifted_fac}. This lift can't 
-    be restarted. This function is a convenience function intended for end 
-    users. The product of local factors must be squarefree.
- */
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N)
 {
@@ -57,7 +49,7 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f,
         fmpz_poly_init(w[i]);
     }
 
-    _fmpz_poly_start_hensel_lift(lifted_fac, link, v, w, f, local_fac, N);
+    _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, local_fac, N);
 
     for (i = 0; i < 2*r - 2; i++)
     {

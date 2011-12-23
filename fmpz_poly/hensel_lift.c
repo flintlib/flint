@@ -32,19 +32,14 @@
 #include "fmpz_mod_poly.h"
 
 /*
-    N.B.  All input polynomials have degree at least 1.
+    f = g h mod p
+    ag + bh = 1 mod p
 
-    TODO:  Change in interface, assume that p1 > 1.
+    G := ([(f - gh)/p] b mod g) p + g
+    H := ([(f - gh)/p] a mod h) p + h
 
-f = g h mod p
-ag + bh = 1 mod p
-
-G := ([(f - gh)/p] b mod g) p + g
-H := ([(f - gh)/p] a mod h) p + h
-
-B := ([(1 - aG - bH)/p] b mod g) p + b
-A := ([(1 - aG - bH)/p] a mod h) p + a
-
+    B := ([(1 - aG - bH)/p] b mod g) p + b
+    A := ([(1 - aG - bH)/p] a mod h) p + a
  */
 
 void fmpz_poly_hensel_lift(fmpz_poly_t Gout, fmpz_poly_t Hout, 

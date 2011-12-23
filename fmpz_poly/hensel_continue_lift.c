@@ -28,39 +28,22 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
-/*
-    This function takes the local factors (in \code{local_fac}) and 
-    Hensel lifts them until they are known mod $p^N$, where $N > 0$. 
-    These lifted factors will be stored (in the same ordering) in 
-    \code{lifted_fac}. It is assumed that \code{link}, \code{v}, and 
-    \code{w} are initialized arrays \code{fmpz_poly_t}'s with at least 
-    $2*r - 2$ entries and that $r \geq 2$.  These are done outside of 
-    this function so that you can keep them for restarting Hensel lifting 
-    later. The product of local factors must be squarefree.
-
-    The return value is an exponent which must be passed to the function 
-    \code{_fmpz_poly_continue_hensel_lift()} as \code{prev_exp} if the 
-    Hensel lifting is to be resumed.
- */
-
-long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link, 
-    fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
-    const nmod_poly_factor_t local_fac, long N)
+long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac, 
+    long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
+    long prev, long curr, long N, const fmpz_t p)
 {
-    const long r = local_fac->num;
+    const long r = lifted_fac->num;
 
-    long i, preve;
-    fmpz_t p, P, big_P;
+    long i, new_prev;
+
+    fmpz_t P;
     fmpz_poly_t monic_f;
 
-    fmpz_init(p);
     fmpz_init(P);
+    fmpz_pow_ui(P, p, N);
     fmpz_poly_init(monic_f);
-
-    /* Set P := p, monic_f := monic(f) */
-    fmpz_set_ui(p, (local_fac->p[0])->mod.n);
-    fmpz_set(P, p);
 
     if (fmpz_is_one(fmpz_poly_lead(f)))
     {
@@ -72,46 +55,40 @@ long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link,
     }
     else
     {
-        fmpz_t t, Q;
+        fmpz_t t;
 
-        fmpz_init(Q);
         fmpz_init(t);
-        fmpz_pow_ui(Q, P, N);
-        fmpz_mod(t, fmpz_poly_lead(f), Q);
+        fmpz_mod(t, fmpz_poly_lead(f), P);
 
-        if (fmpz_invmod(t, t, Q))
+        if (fmpz_invmod(t, t, P))
         {
-            printf("Exception in fmpz_poly_start_hensel_lift.\n");
+            printf("Exception in fmpz_poly_continue_hensel_lift.\n");
             abort();
         }
 
         fmpz_poly_scalar_mul_fmpz(monic_f, f, t);
-        fmpz_poly_scalar_mod_fmpz(monic_f, monic_f, Q);
-        fmpz_clear(Q);
+        fmpz_poly_scalar_mod_fmpz(monic_f, monic_f, P);
         fmpz_clear(t);
     }
 
-    fmpz_poly_build_hensel_tree(link, v, w, local_fac);
-
     {
-        long *e, n = FLINT_CLOG2(N) + 1;
+        long *e, n = 3 + FLINT_FLOG2(N - prev);
 
         e = malloc(n * sizeof(long));
-        for (e[i = 0] = N; e[i] > 1; i++)
+
+        for (e[i = 0] = N; e[i] > curr; i++)
             e[i + 1] = (e[i] + 1) / 2;
+        e[i]   = curr;
+        e[i+1] = prev;
+
+        fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], -1);
 
         for (i--; i > 0; i--)
-        {
-            fmpz_poly_tree_hensel_lift(link, v, w, P, monic_f, r, 
-                p, e[i+1], e[i], 1);
-        }
-        if (N > 1)
-        {
-            fmpz_poly_tree_hensel_lift(link, v, w, P, monic_f, r, 
-                p, e[i+1], e[i], 0);
-        }
+            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], 1);
 
-        preve = e[i+1];
+        fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], 0);
+
+        new_prev = e[i+1];
 
         free(e);
     }
@@ -122,20 +99,19 @@ long _fmpz_poly_start_hensel_lift(fmpz_poly_factor_t lifted_fac, long *link,
      */
     fmpz_poly_factor_fit_length(lifted_fac, r);
 
-    for (i = 0; i < 2*r - 2; i++)
+    for(i = 0; i < 2*r - 2; i++)
     { 
         if (link[i] < 0)
         {
-            fmpz_poly_scalar_mod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
+            fmpz_poly_scalar_smod_fmpz(lifted_fac->p + (- link[i] - 1), v[i], P);
             lifted_fac->exp[- link[i] - 1] = 1L; 
         }
     }
     lifted_fac->num = r;
 
-    fmpz_clear(p);
     fmpz_clear(P);
     fmpz_poly_clear(monic_f);
 
-    return preve;
+    return new_prev;
 }
 
