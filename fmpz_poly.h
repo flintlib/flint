@@ -956,6 +956,8 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
 
+/* Hensel lifting ************************************************************/
+
 void fmpz_poly_hensel_build_tree(long * link, fmpz_poly_t *v, fmpz_poly_t *w, 
                                  const nmod_poly_factor_t fac);
 
