@@ -2183,8 +2183,9 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     Upon return we have $A G + B H = 1 \pmod P$ and $f = G H \pmod P$, 
     where $G = g \pmod p$ etc.
 
-    We require that $1 < p_1 \leq p$ and that all input polynomials 
-    have degree at least~$1$.
+    We require that $1 < p_1 \leq p$ and that the input polynomials $f, g, h$ 
+    have degree at least~$1$ and that the input polynomials $a$ and $b$ are 
+    non-zero.
 
     The output arguments $G$ and $H$ may only be aliased with 
     the input arguments $g$ and $h$, respectively.
