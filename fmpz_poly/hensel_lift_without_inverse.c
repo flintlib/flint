@@ -29,7 +29,14 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
-
+/*
+void _fmpz_poly_hensel_lift_without_inverse(fmpz *G, fmpz *H, 
+    const fmpz *f, long lenF, 
+    const fmpz *a, long lenA, const fmpz *b, long lenB, 
+    const fmpz_t p, const fmpz_t p1)
+{
+}
+*/
 void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
 	const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
@@ -37,7 +44,13 @@ void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout,
 {
     fmpz_poly_t c, g1, h1, G, H;
     fmpz_mod_poly_t cc, gg, hh, aa, bb, tt, gg1, hh1;
-
+/*
+    if (Gout == f || Gout == h || Gout == a || Gout == b ||
+Hout == f || Hout == g || Hout == a || Hout == b)
+{
+    printf("WTF??\n"); abort();
+}
+*/
     fmpz_poly_init(c);
     fmpz_poly_init(g1);
     fmpz_poly_init(h1);

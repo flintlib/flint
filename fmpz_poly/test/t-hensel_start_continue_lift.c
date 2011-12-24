@@ -32,23 +32,22 @@
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-
+#include "mpn_extras.h"
 int
 main(void)
 {
     int i, result;
     flint_rand_t state;
 
-    printf("start_continue_hensel_lift....");
+    printf("hensel_start_continue_lift....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* We check that lifting local factors of F_poly yields factors */
+    /* We check that lifting local factors of F yields factors */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_poly_t F_poly, F_poly2, F_poly3, R;
-        nmod_poly_t fac;
+        fmpz_poly_t F, G, H, R;
         nmod_poly_factor_t f_fac;
         fmpz_poly_factor_t F_fac;
         long bits, length, nbits, n, exp, j, part_exp;
@@ -61,53 +60,56 @@ main(void)
         bits = n_randint(state, 200) + 1;
         nbits = n_randint(state, FLINT_BITS - 6) + 6;
 
-        fmpz_poly_init(F_poly);
-        fmpz_poly_init(F_poly2);
-        fmpz_poly_init(F_poly3);
+        fmpz_poly_init(F);
+        fmpz_poly_init(G);
+        fmpz_poly_init(H);
         fmpz_poly_init(R);
-
         nmod_poly_factor_init(f_fac);
         fmpz_poly_factor_init(F_fac);
 
         n = n_randprime(state, nbits, 0); 
-        exp = bits/(FLINT_BIT_COUNT(n) - 1) + 1;
+        exp = bits / (FLINT_BIT_COUNT(n) - 1) + 1;
         part_exp = n_randint(state, exp);
 
-        nmod_poly_init(fac, n);
+        /* Produce F as the product of random G and H */
+        {
+            nmod_poly_t f;
 
-        do {
-            length = n_randint(state, 200) + 2;  
-            do { fmpz_poly_randtest(F_poly2, state, length, bits); } 
-            while (F_poly2->length < 2);
+            nmod_poly_init(f, n);
 
-            fmpz_set_ui(F_poly2->coeffs, n_randbits(state, FLINT_MIN(bits, FLINT_BITS - 2)));
-            fmpz_set_ui(F_poly2->coeffs + F_poly2->length - 1, 1);
+            do {
+                do {
+                    fmpz_poly_randtest(G, state, n_randint(state, 200) + 2, bits);
+                } while (G->length < 2);
 
-            length = n_randint(state, 200) + 2;  
-            do { fmpz_poly_randtest(F_poly3, state, length, bits); } 
-            while (F_poly3->length < 2);
+                fmpz_randtest_not_zero(G->coeffs, state, bits);
+                fmpz_one(fmpz_poly_lead(G));
 
-            fmpz_set_ui(F_poly3->coeffs, n_randbits(state, FLINT_MIN(bits, FLINT_BITS - 2)));
-            fmpz_set_ui(F_poly3->coeffs + F_poly3->length - 1, 1);
+                do {
+                    fmpz_poly_randtest(H, state, n_randint(state, 200) + 2, bits);
+                } while (H->length < 2);
 
-            fmpz_poly_mul(F_poly, F_poly2, F_poly3);
+                fmpz_randtest_not_zero(H->coeffs, state, bits);
+                fmpz_one(fmpz_poly_lead(H));
 
-            fmpz_poly_get_nmod_poly(fac, F_poly);
-        } while (!nmod_poly_is_squarefree(fac));
+                fmpz_poly_mul(F, G, H);
 
-        fmpz_poly_get_nmod_poly(fac, F_poly2);
-        nmod_poly_factor_insert(f_fac, fac, 1);
+                fmpz_poly_get_nmod_poly(f, F);
+            } while (!nmod_poly_is_squarefree(f));
 
-        fmpz_poly_get_nmod_poly(fac, F_poly3);
-        nmod_poly_factor_insert(f_fac, fac, 1);
-        nmod_poly_clear(fac);
+            fmpz_poly_get_nmod_poly(f, G);
+            nmod_poly_factor_insert(f_fac, f, 1);
+            fmpz_poly_get_nmod_poly(f, H);
+            nmod_poly_factor_insert(f_fac, f, 1);
+            nmod_poly_clear(f);
+        }
 
         r = f_fac->num;
         v = malloc((2*r - 2)*sizeof(fmpz_poly_t));
         w = malloc((2*r - 2)*sizeof(fmpz_poly_t));
         link = malloc((2*r - 2)*sizeof(long));
 
-        for(j = 0; j < 2*r - 2; j++)
+        for (j = 0; j < 2*r - 2; j++)
         {
             fmpz_poly_init(v[j]);
             fmpz_poly_init(w[j]);
@@ -115,7 +117,7 @@ main(void)
 
         if (part_exp < 1)
         {
-            _fmpz_poly_hensel_start_lift(F_fac, link, v, w, F_poly, f_fac, exp);
+            _fmpz_poly_hensel_start_lift(F_fac, link, v, w, F, f_fac, exp);
         }
         else
         {
@@ -124,9 +126,9 @@ main(void)
             fmpz_init_set_ui(nn, n);
 
             prev_exp = _fmpz_poly_hensel_start_lift(F_fac, link, v, w, 
-                F_poly, f_fac, part_exp);
+                F, f_fac, part_exp);
             _fmpz_poly_hensel_continue_lift(F_fac, link, v, w, 
-                F_poly, prev_exp, part_exp, exp, nn);
+                F, prev_exp, part_exp, exp, nn);
 
             fmpz_clear(nn);
         }
@@ -134,7 +136,7 @@ main(void)
         result = 1;
         for (j = 0; j < F_fac->num; j++)
         {
-            fmpz_poly_rem(R, F_poly, F_fac->p + j);
+            fmpz_poly_rem(R, F, F_fac->p + j);
             result &= (R->length == 0);
         }
 
@@ -152,9 +154,9 @@ main(void)
         {
             printf("FAIL:\n");
             printf("length = %ld, bits = %ld, n = %ld, exp = %ld\n", length, bits, n, exp);
-            fmpz_poly_print(F_poly); printf("\n\n");
-            fmpz_poly_print(F_poly2); printf("\n\n");
-            fmpz_poly_print(F_poly3); printf("\n\n");
+            fmpz_poly_print(F); printf("\n\n");
+            fmpz_poly_print(G); printf("\n\n");
+            fmpz_poly_print(H); printf("\n\n");
             fmpz_poly_factor_print(F_fac); printf("\n\n");
             abort();
         } 
@@ -162,11 +164,10 @@ main(void)
         nmod_poly_factor_clear(f_fac);
         fmpz_poly_factor_clear(F_fac);
 
+        fmpz_poly_clear(F);
+        fmpz_poly_clear(H);
+        fmpz_poly_clear(G);
         fmpz_poly_clear(R);
-
-        fmpz_poly_clear(F_poly3);
-        fmpz_poly_clear(F_poly2);
-        fmpz_poly_clear(F_poly);
     }
 
     flint_randclear(state);
