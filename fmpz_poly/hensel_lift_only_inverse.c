@@ -30,90 +30,91 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
+/*
+    Macro for the lift B := [{(1 - aG - bH)/p} * b mod g] p + b, 
+    of length at most lenG - 1.
+
+    Assumes that {C, lenC} contains the inner part {(1 - aG - bH)/p} mod p1, 
+    where lenC = max(lenA + lenG - 1, lenB + lenH - 1).  Requires temporary 
+    space M, D, E.  We really only need 
+        lenM = max(lenG, lenH)
+        lenE = max(lenG + lenB - 2, lenH + lenA - 2)
+        lenD = max(lenC, lenE)
+
+    Writes {B, lenG - 1}.  The cofactor that is lifted is the 
+    polynomial {b, lenB}, which may be aliased with B.  Although 
+    it suffices to have g modulo p, there is no harm in supplying 
+    {g, lenG} only reduced modulo p p1.
+ */
+#define liftinv(B, b, lenB, g, lenG)                                  \
+do {                                                                  \
+    _fmpz_vec_scalar_mod_fmpz(M, g, lenG, p1);                        \
+    _fmpz_mod_poly_rem(D, C, lenC, M, lenG, one, p1);                 \
+    _fmpz_mod_poly_mul(E, D, lenG - 1, b, lenB, p1);                  \
+    if (lenB > 1)                                                     \
+    {                                                                 \
+        _fmpz_mod_poly_rem(D, E, lenG + lenB - 2, M, lenG, one, p1);  \
+        _fmpz_vec_scalar_mul_fmpz(M, D, lenG - 1, p);                 \
+    }                                                                 \
+    else                                                              \
+    {                                                                 \
+        _fmpz_vec_scalar_mul_fmpz(M, E, lenG - 1, p);                 \
+    }                                                                 \
+    _fmpz_poly_add(B, M, lenG - 1, b, lenB);                          \
+} while (0)
+
+void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B, 
+    const fmpz *G, long lenG, const fmpz *H, long lenH, 
+    const fmpz *a, long lenA, const fmpz *b, long lenB, 
+    const fmpz_t p, const fmpz_t p1)
+{
+    const fmpz one[1] = {1L};
+    const long lenC = FLINT_MAX(lenA + lenG - 1, lenB + lenH - 1);
+    const long lenM = FLINT_MAX(lenG, lenH);
+    const long lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
+    const long lenD = FLINT_MAX(lenC, lenE);
+    fmpz *C, *D, *E, *M;
+
+    C = _fmpz_vec_init(lenC + lenD + lenD + lenM);
+    D = C + lenC;
+    E = D + lenD;
+    M = E + lenE;
+
+    if (lenG >= lenA)
+        _fmpz_poly_mul(C, G, lenG, a, lenA);
+    else
+        _fmpz_poly_mul(C, a, lenA, G, lenG);
+    if (lenH >= lenB)
+        _fmpz_poly_mul(D, H, lenH, b, lenB);
+    else
+        _fmpz_poly_mul(D, b, lenB, H, lenH);
+    _fmpz_vec_add(C, C, D, lenC);
+    fmpz_sub_ui(C, C, 1);
+    _fmpz_vec_neg(C, C, lenC);
+    _fmpz_vec_scalar_divexact_fmpz(D, C, lenC, p);
+    _fmpz_vec_scalar_mod_fmpz(C, D, lenC, p1);
+
+    liftinv(B, b, lenB, G, lenG);
+    liftinv(A, a, lenA, H, lenH);
+
+    _fmpz_vec_clear(C, lenC + lenD + lenD + lenM);
+}
+
 void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
     const fmpz_poly_t G, const fmpz_poly_t H, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1)
 {
-    fmpz_poly_t A, B;
-    fmpz_poly_t a1, b1, t1, t2, r, unity;
-    fmpz_mod_poly_t gg, hh, aa, bb;
-    fmpz_mod_poly_t rr, aa1, bb1;
+    fmpz_poly_fit_length(Aout, H->length - 1);
+    fmpz_poly_fit_length(Bout, G->length - 1);
 
-    fmpz_poly_init(A);
-    fmpz_poly_init(B);
+    _fmpz_poly_hensel_lift_only_inverse(Aout->coeffs, Bout->coeffs, 
+        G->coeffs, G->length, H->coeffs, H->length, 
+        a->coeffs, a->length, b->coeffs, b->length, p, p1);
 
-    fmpz_poly_init(a1);
-    fmpz_poly_init(b1);
-    fmpz_poly_init(t1);
-    fmpz_poly_init(t2);
-    fmpz_poly_init(r);
-    fmpz_poly_init(unity);
-
-    /* Make a check that c is divisible by p */
-    fmpz_mod_poly_init(gg, p1);
-    fmpz_mod_poly_init(hh, p1);
-    fmpz_mod_poly_init(aa, p1);
-    fmpz_mod_poly_init(bb, p1);
-
-    fmpz_mod_poly_init(rr, p1);
-    fmpz_mod_poly_init(aa1, p1);
-    fmpz_mod_poly_init(bb1, p1);
-
-    fmpz_mod_poly_set_fmpz_poly(gg, G);
-    fmpz_mod_poly_set_fmpz_poly(hh, H);
-
-    fmpz_mod_poly_set_fmpz_poly(aa, a);
-    fmpz_mod_poly_set_fmpz_poly(bb, b);
-
-    /*Lifting the inverses now*/
-    fmpz_poly_set_coeff_si(unity, 0, -1);
-    fmpz_poly_mul(t1, a, G);
-    fmpz_poly_mul(t2, b, H);
-
-    fmpz_poly_add(t1, t1, t2);
-    fmpz_poly_add(t1, t1, unity);
-    fmpz_poly_neg(t1, t1);
-
-    fmpz_poly_scalar_divexact_fmpz(r, t1, p);
-    fmpz_mod_poly_set_fmpz_poly(rr, r);
-
-    fmpz_mod_poly_rem(bb1, rr, gg);
-    fmpz_mod_poly_mul(bb1, bb1, bb);
-    fmpz_mod_poly_rem(bb1, bb1, gg);
-
-    fmpz_mod_poly_rem(aa1, rr, hh);
-    fmpz_mod_poly_mul(aa1, aa1, aa);
-    fmpz_mod_poly_rem(aa1, aa1, hh);
-
-    fmpz_mod_poly_get_fmpz_poly(a1, aa1);
-    fmpz_poly_scalar_mul_fmpz(a1, a1, p);
-    fmpz_poly_add(A, a, a1);
-
-    fmpz_mod_poly_get_fmpz_poly(b1, bb1);
-    fmpz_poly_scalar_mul_fmpz(b1, b1, p);
-    fmpz_poly_add(B, b, b1);
-
-    fmpz_poly_set(Aout, A);
-    fmpz_poly_set(Bout, B);
-
-    fmpz_mod_poly_clear(rr);
-    fmpz_mod_poly_clear(aa1);
-    fmpz_mod_poly_clear(bb1);
-
-    fmpz_poly_clear(a1);
-    fmpz_poly_clear(b1);
-    fmpz_poly_clear(t1);
-    fmpz_poly_clear(t2);
-    fmpz_poly_clear(r);
-    fmpz_poly_clear(unity);
-
-    fmpz_mod_poly_clear(gg);
-    fmpz_mod_poly_clear(hh);
-    fmpz_mod_poly_clear(aa);
-    fmpz_mod_poly_clear(bb);
-
-    fmpz_poly_clear(A);
-    fmpz_poly_clear(B);
+    _fmpz_poly_set_length(Aout, H->length - 1);
+    _fmpz_poly_set_length(Bout, G->length - 1);
+    _fmpz_poly_normalise(Aout);
+    _fmpz_poly_normalise(Bout);
 }
 

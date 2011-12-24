@@ -39,7 +39,7 @@
         lenE = max(lenG + lenB - 2, lenH + lenA - 2)
         lenD = max(lenE, lenF)
 
-    Does not support aliasing.
+    Only supports aliasing between G and g.
  */
 #define lift(G, g, lenG, b, lenB)                                     \
 do {                                                                  \
