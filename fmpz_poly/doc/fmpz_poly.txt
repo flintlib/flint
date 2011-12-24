@@ -2217,7 +2217,7 @@ void fmpz_poly_hensel_lift_tree_recursive(long *link,
 
     Takes a current Hensel tree \code{(link, v, w)} and a pair $(j,j+1)$ 
     of entries in the tree and lifts the tree from mod $p_0$ to 
-    mod $P = p_0 p_1$.
+    mod $P = p_0 p_1$, where $1 < p_1 \leq p_0$.
 
     Set \code{inv} to $-1$ if restarting Hensel lifting, $0$ if stopping 
     and $1$ otherwise. 
@@ -2250,12 +2250,15 @@ void fmpz_poly_hensel_lift_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
 
     Assumes that $f$ is monic.
 
+    Assumes that $1 < p_1 \leq p_0$, that is, $0 < e_1 \leq e_0$.
+
 long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
     const nmod_poly_factor_t local_fac, long N)
 
-    This function takes the local factors in \code{local_fac} and 
-    Hensel lifts them until they are known mod $p^N$, where $N > 1$.
+    This function takes the local factors in \code{local_fac} 
+    and Hensel lifts them until they are known mod $p^N$, where 
+    $N \geq 1$.
 
     These lifted factors will be stored (in the same ordering) in 
     \code{lifted_fac}. It is assumed that \code{link}, \code{v}, and 
@@ -2267,6 +2270,11 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
     The return value is an exponent which must be passed to the function 
     \code{_fmpz_poly_hensel_continue_lift()} as \code{prev_exp} if the 
     Hensel lifting is to be resumed.
+
+    Currently, supports the case when $N = 1$ for convenience, 
+    although it is preferable in this case to simple iterate 
+    over the local factors and convert them to polynomials over 
+    $\mathbf{Z}$.
 
 long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac, 
     long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
@@ -2283,6 +2291,9 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
     current Hensel tree, $r$ is the number of local factors and $p$ is 
     the small prime modulo whose power we are lifting to. It is required 
     that \code{curr} be at least $1$ and that \code{N > curr}.
+
+    Currently, supports the case when \code{prev} and \code{curr} 
+    are equal.
 
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N)

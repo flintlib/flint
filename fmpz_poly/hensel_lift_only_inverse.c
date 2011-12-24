@@ -38,7 +38,7 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
 {
     fmpz_poly_t A, B;
     fmpz_poly_t a1, b1, t1, t2, r, unity;
-    fmpz_mod_poly_t gg, hh, aa, bb, g, h;
+    fmpz_mod_poly_t gg, hh, aa, bb;
     fmpz_mod_poly_t rr, aa1, bb1;
 
     fmpz_poly_init(A);
@@ -54,8 +54,6 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     /* Make a check that c is divisible by p */
     fmpz_mod_poly_init(gg, p1);
     fmpz_mod_poly_init(hh, p1);
-    fmpz_mod_poly_init(g, p);
-    fmpz_mod_poly_init(h, p);
     fmpz_mod_poly_init(aa, p1);
     fmpz_mod_poly_init(bb, p1);
 
@@ -63,10 +61,9 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     fmpz_mod_poly_init(aa1, p1);
     fmpz_mod_poly_init(bb1, p1);
 
-    fmpz_mod_poly_set_fmpz_poly(g, G); /*reduce mod p*/
-    fmpz_mod_poly_set_fmpz_poly(h, H); /*reduce mod p*/
-    fmpz_mod_poly_set(gg, g); /*embed mod p1*/
-    fmpz_mod_poly_set(hh, h); /*embed mod p1*/
+    fmpz_mod_poly_set_fmpz_poly(gg, G);
+    fmpz_mod_poly_set_fmpz_poly(hh, H);
+
     fmpz_mod_poly_set_fmpz_poly(aa, a);
     fmpz_mod_poly_set_fmpz_poly(bb, b);
 
@@ -116,8 +113,6 @@ void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout,
     fmpz_mod_poly_clear(hh);
     fmpz_mod_poly_clear(aa);
     fmpz_mod_poly_clear(bb);
-    fmpz_mod_poly_clear(g);
-    fmpz_mod_poly_clear(h);
 
     fmpz_poly_clear(A);
     fmpz_poly_clear(B);

@@ -81,7 +81,8 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
         e[i]   = curr;
         e[i+1] = prev;
 
-        fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], -1);
+        if (prev < curr)
+            fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], -1);
 
         for (i--; i > 0; i--)
             fmpz_poly_hensel_lift_tree(link, v, w, monic_f, r, p, e[i+1], e[i], 1);
