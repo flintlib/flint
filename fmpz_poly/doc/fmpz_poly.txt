@@ -2180,6 +2180,14 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     polynomials $f$, $g$, $h$ such that $f = gh \pmod p$. The polynomials 
     $a$, $b$ satisfy $ag + bh = 1 \pmod p$. 
 
+    The lifting formulae are 
+    \begin{align*}
+    G & = \biggl( \bigl( \frac{f-gh}{p} \bigr) b \bmod g \biggr) p + g \\
+    H & = \biggl( \bigl( \frac{f-gh}{p} \bigr) a \bmod h \biggr) p + h \\
+    B & = \biggl( \bigl( \frac{1-aG-bH}{p} \bigr) b \bmod g \biggr) p + b \\
+    A & = \biggl( \bigl( \frac{1-aG-bH}{p} \bigr) a \bmod h \biggr) p + a.
+    \end{align*}
+
     Upon return we have $A G + B H = 1 \pmod P$ and $f = G H \pmod P$, 
     where $G = g \pmod p$ etc.
 
@@ -2187,8 +2195,8 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     have degree at least~$1$ and that the input polynomials $a$ and $b$ are 
     non-zero.
 
-    The output arguments $G$ and $H$ may only be aliased with 
-    the input arguments $g$ and $h$, respectively.
+    The output arguments $G, H, A, B$ may only be aliased with 
+    the input arguments $g, h, a, b$, respectively.
 
 void fmpz_poly_hensel_lift_without_inverse(fmpz_poly_t Gout, fmpz_poly_t Hout, 
     const fmpz_poly_t f, const fmpz_poly_t g, const fmpz_poly_t h, 
