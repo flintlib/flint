@@ -31,7 +31,6 @@
 #include "fmpz_mod_poly.h"
 
 void fmpz_poly_hensel_lift_only_inverse(fmpz_poly_t Aout, fmpz_poly_t Bout, 
-    const fmpz_poly_t f, 
     const fmpz_poly_t G, const fmpz_poly_t H, 
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1)

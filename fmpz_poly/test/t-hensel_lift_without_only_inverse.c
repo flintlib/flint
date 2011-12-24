@@ -149,7 +149,7 @@ main(void)
 
             fmpz_poly_hensel_lift_without_inverse(G_out, H_out, F_poly,
                 G, H, A, B, p, p1);
-            fmpz_poly_hensel_lift_only_inverse(A_out, B_out, F_poly,
+            fmpz_poly_hensel_lift_only_inverse(A_out, B_out, 
                 G_out, H_out, A, B, p, p1);
 
             fmpz_poly_set(G, G_out);
