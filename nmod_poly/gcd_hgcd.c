@@ -31,9 +31,9 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-#define FLINT_ZMOD_POLY_HGCD_CUTOFF 60 /* cutoff between iterative basecase and recursive hgcd */
-#define FLINT_ZMOD_POLY_GCD_CUTOFF 184 /* cutoff between hgcd and euclidean */
-#define FLINT_ZMOD_POLY_SMALL_GCD_CUTOFF 174 /* cutoff between hgcd and euclidean for small moduli */
+#define NMOD_POLY_HGCD_CUTOFF 60        /* HGCD: Basecase -> Recursion */
+#define NMOD_POLY_GCD_CUTOFF 184        /* GCD:  Euclidean -> HGCD */
+#define NMOD_POLY_SMALL_GCD_CUTOFF 174  /* GCD (small n): Euclidean -> HGCD */
 
 
 static __inline__ 
@@ -137,21 +137,21 @@ long nmod_poly_half_gcd_iter(nmod_poly_mat_t res,
     }
 }
 
-long nmod_poly_half_gcd(nmod_poly_mat_t res, nmod_poly_t a_out, nmod_poly_t b_out, 
-    const nmod_poly_t a, const nmod_poly_t b, int FLAG)
+long nmod_poly_half_gcd(nmod_poly_mat_t R, nmod_poly_t A, nmod_poly_t B, 
+    const nmod_poly_t a, const nmod_poly_t b, int flag)
 {
     const long m = a->length/2;
 
     if (b->length < m + 1)
     {
-        nmod_poly_mat_one(res);
-        nmod_poly_set(a_out, a);
-        nmod_poly_set(b_out, b);
+        nmod_poly_mat_one(R);
+        nmod_poly_set(A, a);
+        nmod_poly_set(B, b);
         return 1L;
     }
     else
     {
-        long R_sign;
+        long signR;
         nmod_poly_t a0, b0;
         nmod_poly_t temp, a2, b2; 
         nmod_poly_t a3, b3, a4, b4, s, t;
@@ -166,18 +166,18 @@ long nmod_poly_half_gcd(nmod_poly_mat_t res, nmod_poly_t a_out, nmod_poly_t b_ou
         nmod_poly_init_preinv(a3, a->mod.n, a->mod.ninv);
         nmod_poly_init_preinv(b3, a->mod.n, a->mod.ninv);
 
-        if (a0->length < FLINT_ZMOD_POLY_HGCD_CUTOFF) 
-            R_sign = nmod_poly_half_gcd_iter(res, a3, b3, a0, b0);
+        if (a0->length < NMOD_POLY_HGCD_CUTOFF) 
+            signR = nmod_poly_half_gcd_iter(R, a3, b3, a0, b0);
         else 
-            R_sign = nmod_poly_half_gcd(res, a3, b3, a0, b0, 1);
+            signR = nmod_poly_half_gcd(R, a3, b3, a0, b0, 1);
 
         nmod_poly_attach_truncate(s, a, m);
         nmod_poly_attach_truncate(t, b, m);
 
-        nmod_poly_mul(b2, nmod_poly_mat_entry(res,1,0), s);
-        nmod_poly_mul(temp, nmod_poly_mat_entry(res,0,0), t);
+        nmod_poly_mul(b2, nmod_poly_mat_entry(R,1,0), s);
+        nmod_poly_mul(temp, nmod_poly_mat_entry(R,0,0), t);
 
-        if (R_sign < 0L) 
+        if (signR < 0L) 
             nmod_poly_sub(b2, b2, temp);
         else 
             nmod_poly_sub(b2, temp, b2);
@@ -194,10 +194,10 @@ long nmod_poly_half_gcd(nmod_poly_mat_t res, nmod_poly_t a_out, nmod_poly_t b_ou
         b2->length = FLINT_MAX(m + b3->length, b2->length);
         _nmod_poly_normalise(b2);
 
-        nmod_poly_mul(a2, nmod_poly_mat_entry(res,1,1), s);
-        nmod_poly_mul(temp, nmod_poly_mat_entry(res,0,1), t);
+        nmod_poly_mul(a2, nmod_poly_mat_entry(R,1,1), s);
+        nmod_poly_mul(temp, nmod_poly_mat_entry(R,0,1), t);
 
-        if (R_sign < 0L) 
+        if (signR < 0L) 
             nmod_poly_sub(a2, temp, a2);
         else 
             nmod_poly_sub(a2, a2, temp);
@@ -213,14 +213,14 @@ long nmod_poly_half_gcd(nmod_poly_mat_t res, nmod_poly_t a_out, nmod_poly_t b_ou
 
         if (b2->length < m + 1)
         {
-            nmod_poly_set(a_out, a2);
-            nmod_poly_set(b_out, b2);
+            nmod_poly_set(A, a2);
+            nmod_poly_set(B, b2);
             nmod_poly_clear(temp);
             nmod_poly_clear(a2);
             nmod_poly_clear(b2);
             nmod_poly_clear(a3);
             nmod_poly_clear(b3);
-            return R_sign;
+            return signR;
         }
 
         nmod_poly_t q, d;
@@ -237,51 +237,51 @@ long nmod_poly_half_gcd(nmod_poly_mat_t res, nmod_poly_t a_out, nmod_poly_t b_ou
         nmod_poly_mat_t S;
         nmod_poly_mat_init(S, 2, 2, a->mod.n);
 
-        long S_sign;
+        long signS;
 
-        if (c0->length < FLINT_ZMOD_POLY_HGCD_CUTOFF) 
-            S_sign = nmod_poly_half_gcd_iter(S, a3, b3, c0, d0);
+        if (c0->length < NMOD_POLY_HGCD_CUTOFF) 
+            signS = nmod_poly_half_gcd_iter(S, a3, b3, c0, d0);
         else 
-            S_sign = nmod_poly_half_gcd(S, a3, b3, c0, d0, 1);
+            signS = nmod_poly_half_gcd(S, a3, b3, c0, d0, 1);
 
         nmod_poly_attach_truncate(s, b2, k);
         nmod_poly_attach_truncate(t, d, k);
 
-        nmod_poly_mul(b_out, nmod_poly_mat_entry(S,1,0), s);
+        nmod_poly_mul(B, nmod_poly_mat_entry(S,1,0), s);
         nmod_poly_mul(temp, nmod_poly_mat_entry(S,0,0), t);
 
-        if (S_sign < 0L) 
-            nmod_poly_sub(b_out, b_out, temp);
+        if (signS < 0L) 
+            nmod_poly_sub(B, B, temp);
         else 
-            nmod_poly_sub(b_out, temp, b_out);
+            nmod_poly_sub(B, temp, B);
 
-        nmod_poly_fit_length(b_out, k + b3->length);
-        for (i = b_out->length; i < k + b3->length; i++) 
-            b_out->coeffs[i] = 0L;
-        nmod_poly_attach_shift(b4, b_out, k);
+        nmod_poly_fit_length(B, k + b3->length);
+        for (i = B->length; i < k + b3->length; i++) 
+            B->coeffs[i] = 0L;
+        nmod_poly_attach_shift(b4, B, k);
         b4->alloc = FLINT_MAX(b4->length, b3->length);
         nmod_poly_add(b4, b4, b3);
-        b_out->length = FLINT_MAX(k + b3->length, b_out->length);
-        _nmod_poly_normalise(b_out);
+        B->length = FLINT_MAX(k + b3->length, B->length);
+        _nmod_poly_normalise(B);
 
-        nmod_poly_mul(a_out, nmod_poly_mat_entry(S,1,1), s);
+        nmod_poly_mul(A, nmod_poly_mat_entry(S,1,1), s);
         nmod_poly_mul(temp, nmod_poly_mat_entry(S,0,1), t);
 
-        if (S_sign < 0L) 
-            nmod_poly_sub(a_out, temp, a_out);
+        if (signS < 0L) 
+            nmod_poly_sub(A, temp, A);
         else 
-            nmod_poly_sub(a_out, a_out, temp);
+            nmod_poly_sub(A, A, temp);
 
-        nmod_poly_fit_length(a_out, k + a3->length);
-        for (i = a_out->length; i < k + a3->length; i++) 
-            a_out->coeffs[i] = 0L;
-        nmod_poly_attach_shift(a4, a_out, k);
+        nmod_poly_fit_length(A, k + a3->length);
+        for (i = A->length; i < k + a3->length; i++) 
+            A->coeffs[i] = 0L;
+        nmod_poly_attach_shift(a4, A, k);
         a4->alloc = FLINT_MAX(a4->length, a3->length);
         nmod_poly_add(a4, a4, a3);
-        a_out->length = FLINT_MAX(k + a3->length, a_out->length);
-        _nmod_poly_normalise(a_out);
+        A->length = FLINT_MAX(k + a3->length, A->length);
+        _nmod_poly_normalise(A);
 
-if (FLAG) {
+if (flag) {
 
         nmod_poly_swap(nmod_poly_mat_entry(S,0,0), nmod_poly_mat_entry(S,1,0));
         nmod_poly_swap(nmod_poly_mat_entry(S,0,1), nmod_poly_mat_entry(S,1,1));
@@ -290,7 +290,7 @@ if (FLAG) {
         nmod_poly_mul(temp, nmod_poly_mat_entry(S,1,1), q);
         nmod_poly_add(nmod_poly_mat_entry(S,0,1), nmod_poly_mat_entry(S,0,1), temp);
 
-        nmod_poly_mat_mul(res, res, S);
+        nmod_poly_mat_mul(R, R, S);
 }
 
         nmod_poly_mat_clear(S);
@@ -302,7 +302,7 @@ if (FLAG) {
         nmod_poly_clear(a2);
         nmod_poly_clear(b2);
 
-        return - (R_sign * S_sign);
+        return - (signR * signS);
     }
 }
 
@@ -311,79 +311,69 @@ void nmod_poly_half_gcd_no_matrix(nmod_poly_t a_out, nmod_poly_t b_out, nmod_pol
     nmod_poly_mat_t mat;
 
     nmod_poly_mat_init(mat, 2, 2, a->mod.n);
-nmod_poly_half_gcd(mat, a_out, b_out, 
-    a, b, 0);
+    nmod_poly_half_gcd(mat, a_out, b_out, a, b, 0);
     
     nmod_poly_mat_clear(mat);
 }
 
-
-
 void nmod_poly_gcd_hgcd(nmod_poly_t res, nmod_poly_t f, const nmod_poly_t g)
 {
-	if (f->length == 0)
-	{
-		if (g->length == 0) nmod_poly_zero(res);
-	   else nmod_poly_make_monic(res, g);
-		return;
-	}
-	
-   if (g->length == 0)
-	{
-		nmod_poly_make_monic(res, f);
-		return;
-	}
-	
-	ulong p = f->mod.n;
+    const nmod_t mod  = f->mod;
+    const long CUTOFF = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+    NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
+    nmod_poly_t h, j, r;
 
-	ulong CUTOFF;
-	if (FLINT_BIT_COUNT(p) <= 8) CUTOFF = FLINT_ZMOD_POLY_SMALL_GCD_CUTOFF;
-	else CUTOFF = FLINT_ZMOD_POLY_GCD_CUTOFF;
-	
-	nmod_poly_t h, j, r;
-	nmod_poly_init(r, p);
+    if (f->length == 0)
+    {
+        if (g->length == 0) nmod_poly_zero(res);
+        else nmod_poly_make_monic(res, g);
+        return;
+    }
+    if (g->length == 0)
+    {
+        nmod_poly_make_monic(res, f);
+        return;
+    }
 
-	nmod_poly_rem(r, f, g);
-	if (r->length == 0)
-	{
-		nmod_poly_make_monic(res, g);
-	   nmod_poly_clear(r);
-      return;
-	}
+    nmod_poly_init_preinv(r, mod.n, mod.ninv);
 
-	nmod_poly_init(j, p);
-	nmod_poly_init(h, p);
-	
-	nmod_poly_half_gcd_no_matrix(h, j, g, r);
+    nmod_poly_rem(r, f, g);
+    if (r->length == 0)
+    {
+        nmod_poly_make_monic(res, g);
+        nmod_poly_clear(r);
+        return;
+    }
 
-	while (j->length != 0)
-	{
-      nmod_poly_rem(r, h, j);
-	
-		if (r->length == 0)
-	   {
-		   nmod_poly_make_monic(res, j);
-	      nmod_poly_clear(j);
-	      nmod_poly_clear(h);
-	      nmod_poly_clear(r);
-         return;
-	   }
+    nmod_poly_init_preinv(j, mod.n, mod.ninv);
+    nmod_poly_init_preinv(h, mod.n, mod.ninv);
 
-		if (j->length < CUTOFF)
-	   {
-		   nmod_poly_gcd_euclidean(res, j, r);
-		   nmod_poly_clear(j);
-	      nmod_poly_clear(h);
-	      nmod_poly_clear(r);
-         return;
-	   }
+    nmod_poly_half_gcd_no_matrix(h, j, g, r);
 
-      nmod_poly_half_gcd_no_matrix(h, j, j, r);
-	}
+    while (j->length != 0)
+    {
+        nmod_poly_rem(r, h, j);
 
-	nmod_poly_make_monic(res, h);
+        if (r->length == 0)
+        {
+            nmod_poly_make_monic(res, j);
+            goto gcd_exit;
+        }
 
-	nmod_poly_clear(j);
-	nmod_poly_clear(h);
-	nmod_poly_clear(r);
+        if (j->length < CUTOFF)
+        {
+            nmod_poly_gcd_euclidean(res, j, r);
+            goto gcd_exit;
+        }
+
+        nmod_poly_half_gcd_no_matrix(h, j, j, r);
+    }
+
+    nmod_poly_make_monic(res, h);
+
+  gcd_exit: 
+
+    nmod_poly_clear(j);
+    nmod_poly_clear(h);
+    nmod_poly_clear(r);
 }
