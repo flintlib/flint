@@ -110,6 +110,25 @@ void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
     generalised Fermat number $p = B^\mbox{limbs} + 1$, where 
     $B = 2^\mbox{FLINT_BITS}$.
 
+void mpn_mul_2expmod_2expp1(mp_limb_t * t, 
+                                mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+
+    Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos 
+    complement format reduced modulo $p = B^\mbox{limbs} + 1$ up to some
+    overflow, compute \code{t = i1*2^d} modulo $p$. The result will not
+    necessarily be fully reduced. The number of bits \code{d} must be 
+    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.
+
+void mpn_div_2expmod_2expp1(mp_limb_t * t, 
+                                mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+
+    Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos 
+    complement format reduced modulo $p = B^\mbox{limbs} + 1$ up to some
+    overflow, compute \code{t = i1/2^d} modulo $p$. The result will not
+    necessarily be fully reduced. The number of bits \code{d} must be 
+    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.
+
+
 *******************************************************************************
 
     Generic butterflies

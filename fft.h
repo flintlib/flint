@@ -97,6 +97,12 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
 void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
                        mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y);
 
+void mpn_mul_2expmod_2expp1(mp_limb_t * t, 
+                                  mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d);
+
+void mpn_div_2expmod_2expp1(mp_limb_t * t, 
+                                  mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d);
+
 #ifdef __cplusplus
 }
 #endif
