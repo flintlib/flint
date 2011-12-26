@@ -1126,6 +1126,46 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     polynomial $P$ is defined to be $P$. Except in the case where
     the GCD is zero, the GCD $G$ is made monic.
 
+long _nmod_poly_hgcd(mp_ptr *M, long *lenM, 
+                     mp_ptr A, long *lenA, mp_ptr B, long *lenB, 
+                     mp_srcptr a, long lena, mp_srcptr b, long lenb, 
+                     nmod_t mod)
+
+    Computes the HGCD of $a$ and $b$, that is, a matrix~$M$, a sign~$\sigma$ 
+    and two polynomials $A$ and $B$ such that 
+    \begin{equation*}
+    (A,B)^t = \sigma M^{-1} (a,b)^t.
+    \end{equation*}
+
+    Assumes that $\len(a) > \len(b) > 0$.
+
+    Assumes that $A$ and $B$ have space of size at least $\len(a)$ 
+    and $\len(b)$, respectively.  On exit, \code{*lenA} and \code{*lenB} 
+    will contain the correct lengths of $A$ and $B$.
+
+    Assumes that \code{M[0]}, \code{M[1]}, \code{M[2]}, and \code{M[3]} 
+    each point to a vector of size at least $\len(a)$.
+
+long _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, long lenA, 
+                                   mp_srcptr B, long lenB, nmod_t mod)
+
+    Computes the monic GCD of $A$ and $B$, assuming that 
+    $\len(A) \geq \len(B) > 0$.
+
+    Assumes that $G$ has space for $\len(B)$ coefficients and 
+    returns the length of $G$ on output.
+
+void nmod_poly_gcd_hgcd(nmod_poly_t G, 
+                        const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the monic GCD of $A$ and $B$ using the HGCD algorithm.
+
+    As a special case, the GCD of two zero polynomials is defined to be 
+    the zero polynomial.
+
+    The time complexity of the algorithm is $\mathcal{O}(n \log^2 n)$. 
+    For further details, see~\citep{ThullYap1990}.
+
 long _nmod_poly_gcd(mp_ptr G, 
                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
