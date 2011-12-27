@@ -19,56 +19,60 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2009 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
+#ifndef FMPZ_POLY_FACTOR_H
+#define FMPZ_POLY_FACTOR_H
+
+#undef ulong /* interferes with system includes */
 #include <stdio.h>
-#include <stdlib.h>
+#define ulong unsigned long
+
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_vec.h"
+#include "nmod_poly.h"
 
-int
-main(void)
-{
-    int i, result;
-    flint_rand_t state;
+#ifdef __cplusplus
+ extern "C" {
+#endif
 
-    printf("lead....");
-    fflush(stdout);
+typedef struct {
+    fmpz c;
+    fmpz_poly_struct *p;
+    long *exp;
+    long num;
+    long alloc;
+} fmpz_poly_factor_struct;
 
-    flint_randinit(state);
+typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 
-    for (i = 0; i < 10000; i++)
-    {
-        fmpz_poly_t A;
-        fmpz_t a;
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
 
-        fmpz_poly_init(A);
-        fmpz_poly_randtest(A, state, n_randint(state, 100), 100);
-        fmpz_init(a);
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
 
-        if (fmpz_poly_length(A))
-            fmpz_poly_get_coeff_fmpz(a, A, fmpz_poly_length(A) - 1);
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
 
-        result = fmpz_poly_length(A) ? fmpz_equal(a, fmpz_poly_lead(A)) : 
-                                       fmpz_poly_lead(A) == NULL;
-        if (!result)
-        {
-            printf("FAIL:\n");
-            fmpz_poly_print(A), printf("\n\n");
-            fmpz_print(a), printf("\n\n");
-            abort();
-        }
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
 
-        fmpz_poly_clear(A);
-        fmpz_clear(a);
-    }
+void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
 
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
+                             const fmpz_poly_t p, long exp);
+
+void fmpz_poly_factor_concat(fmpz_poly_factor_t res, 
+                             const fmpz_poly_factor_t fac);
+
+void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
+
+#ifdef __cplusplus
 }
+#endif
+
+#endif
+
