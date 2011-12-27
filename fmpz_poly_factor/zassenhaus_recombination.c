@@ -31,7 +31,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_zassenhaus_naive(fmpz_poly_factor_t final_fac, 
+void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
 	const fmpz_poly_factor_t lifted_fac, 
     const fmpz_poly_t F, const fmpz_t P, long exp)
 {
