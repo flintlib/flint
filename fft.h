@@ -138,6 +138,22 @@ void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
 void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                                mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc);
 
+void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, 
+                         mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, 
+                                mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp);
+
+void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp);
+
+void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
+                   mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp);
+
+void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+            mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc);
+
+void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+            mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc);
+
 #ifdef __cplusplus
 }
 #endif
