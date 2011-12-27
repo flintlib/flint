@@ -50,7 +50,7 @@ main(void)
         fmpz_poly_t F, G, H, R;
         fmpz_poly_factor_t F_fac;
         nmod_poly_factor_t f_fac;
-        long bits, length, nbits, n, exp, j;
+        long bits, nbits, n, exp, j;
 
         bits  = n_randint(state, 200) + 1;
         nbits = n_randint(state,FLINT_BITS - 6) + 6;
@@ -110,7 +110,7 @@ main(void)
         if (!result) 
         {
             printf("FAIL:\n");
-            printf("length = %ld, bits = %ld, n = %ld, exp = %ld\n", length, bits, n, exp);
+            printf("bits = %ld, n = %ld, exp = %ld\n", bits, n, exp);
             fmpz_poly_print(F); printf("\n\n");
             fmpz_poly_print(G); printf("\n\n");
             fmpz_poly_print(H); printf("\n\n");

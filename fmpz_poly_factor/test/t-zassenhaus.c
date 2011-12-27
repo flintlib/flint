@@ -48,7 +48,7 @@ main(void)
         fmpz_poly_init(A);
         fmpz_poly_randtest(A, state, n_randint(state, 100), 100);
         
-        result = ;
+        result = 1;
         if (!result)
         {
             printf("FAIL:\n");
