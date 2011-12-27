@@ -51,6 +51,8 @@ or implied, of William Hart.
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
+extern int mpn_mul_fft_aux (mp_ptr op, mp_size_t pl, mp_srcptr n, 
+                   mp_size_t nl, mp_srcptr m, mp_size_t ml, mp_size_t k, int b);
 
 #define SWAP_PTRS(xx, yy) \
    do { \
@@ -153,6 +155,9 @@ void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
 
 void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc);
+
+void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w);
 
 #ifdef __cplusplus
 }
