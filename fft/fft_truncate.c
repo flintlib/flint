@@ -28,68 +28,63 @@ or implied, of William Hart.
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
+#include "mpir.h"
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fft.h"
-
-int
-main(void)
+      
+void fft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                   mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 {
-    int i;
-    mp_size_t j;
-
-    flint_rand_t state;
-
-    printf("split/combine_bits....");
-    fflush(stdout);
-
-    flint_randinit(state);
-    _flint_rand_init_gmp(state);
-
-    for (i = 0; i < 10000; i++)
+    mp_size_t i;
+    mp_size_t limbs = (w*n)/FLINT_BITS;
+   
+    if (trunc == 2*n)
+        fft_radix2(ii, n, w, t1, t2);
+    else if (trunc <= n)
     {
-        mp_size_t total_limbs = n_randint(state, 1000) + 1;
-        mp_limb_t * in = malloc(total_limbs*sizeof(mp_limb_t));
-        mp_limb_t * out = calloc(total_limbs, sizeof(mp_limb_t));
-        
-        mp_bitcnt_t bits = n_randint(state, 200) + 1;
-        mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
-        long length = (total_limbs*FLINT_BITS - 1)/bits + 1;
-        
-        mp_limb_t ** poly;
-        poly = malloc(length*sizeof(mp_limb_t *));
-        for (j = 0; j < length; j++)
-           poly[j] = malloc((limbs + 1)*sizeof(mp_limb_t));
-
-        mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
-
-        fft_split_bits(poly, in, total_limbs, bits, limbs);
-        fft_combine_bits(out, poly, length, bits, limbs, total_limbs);
-        
-        for (j = 0; j < total_limbs; j++)
-        {
-           if (in[j] != out[j])
-           {
-              printf("FAIL:\n");
-              printf("Error in limb %ld, %lu != %lu\n", j, in[j], out[j]);
-              abort();
-           }
+        for (i = 0; i < n; i++)
+            mpn_add_n(ii[i], ii[i], ii[i+n], limbs + 1);
+      
+        fft_truncate1(ii, n/2, 2*w, t1, t2, trunc);
+    } else
+    {
+        for (i = 0; i < n; i++) 
+        {   
+            fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
+   
+            SWAP_PTRS(ii[i],   *t1);
+            SWAP_PTRS(ii[n+i], *t2);
         }
 
-        free(in);
-        free(out);
+        fft_radix2(ii, n/2, 2*w, t1, t2);
+        fft_truncate1(ii+n, n/2, 2*w, t1, t2, trunc - n);
+   }
+}
 
-        for (j = 0; j < length; j++)
-           free(poly[j]);
+void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
+                  mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+{
+    mp_size_t i;
+    mp_size_t limbs = (w*n)/FLINT_BITS;
+   
+    if (trunc == 2*n)
+       fft_radix2(ii, n, w, t1, t2);
+    else if (trunc <= n)
+       fft_truncate(ii, n/2, 2*w, t1, t2, trunc);
+    else
+    {
+        for (i = 0; i < trunc - n; i++) 
+        {   
+            fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
+   
+            SWAP_PTRS(ii[i],   *t1);
+            SWAP_PTRS(ii[n+i], *t2);
+        }
 
-        free(poly);
-    }
-
-    flint_randclear(state);
-    
-    printf("PASS\n");
-    return 0;
+        for ( ; i < n; i++)
+            fft_adjust(ii[i+n], ii[i], i, limbs, w); 
+   
+        fft_radix2(ii, n/2, 2*w, t1, t2);
+        fft_truncate1(ii+n, n/2, 2*w, t1, t2, trunc - n);
+   }
 }

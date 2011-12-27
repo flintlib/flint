@@ -50,6 +50,14 @@ or implied, of William Hart.
 #endif
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
+
+#define SWAP_PTRS(xx, yy) \
+   do { \
+      mp_limb_t * __ptr = xx; \
+      xx = yy; \
+      yy = __ptr; \
+   } while (0)
 
 /* used for generating random values mod p in test code */
 #define random_fermat(nn, state, limbs) \
@@ -102,6 +110,33 @@ void mpn_mul_2expmod_2expp1(mp_limb_t * t,
 
 void mpn_div_2expmod_2expp1(mp_limb_t * t, 
                                   mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d);
+
+void fft_adjust(mp_limb_t * r, mp_limb_t * i1, 
+                                     mp_size_t i, mp_size_t limbs, mp_bitcnt_t w);
+
+void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w);
+
+void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w);
+
+void fft_radix2(mp_limb_t ** ii, 
+                    mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2);
+
+void fft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc);
+
+void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc);
+
+void ifft_radix2(mp_limb_t ** ii, mp_size_t n, 
+                                 mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2);
+
+void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc);
+
+void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc);
 
 #ifdef __cplusplus
 }

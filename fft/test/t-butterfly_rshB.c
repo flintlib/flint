@@ -1,4 +1,4 @@
-/* mul_fft -- radix 2 fft routines for MPIR.
+/* 
 
 Copyright 2009, 2011 William Hart. All rights reserved.
 

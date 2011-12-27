@@ -135,8 +135,11 @@ void mpn_div_2expmod_2expp1(mp_limb_t * t,
 
 *******************************************************************************
 
+void fft_adjust(mp_limb_t * r, mp_limb_t * i1, 
+                                    mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
-                 mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+                      mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
    We are given two integers \code{i1} and \code{i2} modulo 
    $p = B^\mbox{limbs} + 1$ which are not necessarily normalised. We compute 
@@ -144,11 +147,42 @@ void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
    between inputs and outputs is not permitted. We require \code{x} and \code{y} 
    to be less than \code{limbs} and nonnegative.
 
-void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
-                 mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
+                      mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
    We are given two integers \code{i1} and \code{i2} modulo 
    $p = B^\mbox{limbs} + 1$ which are not necessarily normalised. We compute 
    \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing 
    between inputs and outputs is not permitted. We require \code{x} and \code{y} 
    to be less than \code{limbs} and nonnegative.
+
+*******************************************************************************
+
+    Radix 2 transforms
+
+*******************************************************************************
+
+void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+void fft_radix2(mp_limb_t ** ii, 
+                    mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+
+void fft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void ifft_radix2(mp_limb_t ** ii, 
+                    mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+
+void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+

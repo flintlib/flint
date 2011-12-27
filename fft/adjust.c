@@ -28,68 +28,28 @@ or implied, of William Hart.
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
+#include "mpir.h"
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fft.h"
-
-int
-main(void)
+      
+void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
 {
-    int i;
-    mp_size_t j;
+   mp_bitcnt_t b1;
+   mp_limb_t cy;
+   mp_size_t x;
 
-    flint_rand_t state;
+   b1 = i*w;
+   x  = b1/FLINT_BITS;
+   b1 = b1%FLINT_BITS;
 
-    printf("split/combine_bits....");
-    fflush(stdout);
-
-    flint_randinit(state);
-    _flint_rand_init_gmp(state);
-
-    for (i = 0; i < 10000; i++)
-    {
-        mp_size_t total_limbs = n_randint(state, 1000) + 1;
-        mp_limb_t * in = malloc(total_limbs*sizeof(mp_limb_t));
-        mp_limb_t * out = calloc(total_limbs, sizeof(mp_limb_t));
-        
-        mp_bitcnt_t bits = n_randint(state, 200) + 1;
-        mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
-        long length = (total_limbs*FLINT_BITS - 1)/bits + 1;
-        
-        mp_limb_t ** poly;
-        poly = malloc(length*sizeof(mp_limb_t *));
-        for (j = 0; j < length; j++)
-           poly[j] = malloc((limbs + 1)*sizeof(mp_limb_t));
-
-        mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
-
-        fft_split_bits(poly, in, total_limbs, bits, limbs);
-        fft_combine_bits(out, poly, length, bits, limbs, total_limbs);
-        
-        for (j = 0; j < total_limbs; j++)
-        {
-           if (in[j] != out[j])
-           {
-              printf("FAIL:\n");
-              printf("Error in limb %ld, %lu != %lu\n", j, in[j], out[j]);
-              abort();
-           }
-        }
-
-        free(in);
-        free(out);
-
-        for (j = 0; j < length; j++)
-           free(poly[j]);
-
-        free(poly);
-    }
-
-    flint_randclear(state);
-    
-    printf("PASS\n");
-    return 0;
+   if (x)
+   {
+      mpn_copyi(r + x, i1, limbs - x);
+      r[limbs] = 0;
+      cy = mpn_neg_n(r, i1 + limbs - x, x);
+      mpn_addmod_2expp1_1(r + x, limbs - x, -i1[limbs]);
+      mpn_sub_1(r + x, r + x, limbs - x + 1, cy); 
+      mpn_mul_2expmod_2expp1(r, r, limbs, b1);
+   } else
+      mpn_mul_2expmod_2expp1(r, i1, limbs, b1);
 }
