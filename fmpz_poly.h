@@ -54,6 +54,16 @@ typedef struct
 
 typedef fmpz_poly_struct fmpz_poly_t[1];
 
+#ifdef __cplusplus
+}
+#endif
+
+#include "fmpz_poly_factor.h" /* needs the fmpz_poly_struct to be defined first */
+
+ #ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*  Memory management ********************************************************/
 
 void fmpz_poly_init(fmpz_poly_t poly);
