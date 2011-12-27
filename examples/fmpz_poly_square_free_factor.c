@@ -4,14 +4,14 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_t content, fmpz_poly_t F)
+void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
 {
-   fmpz_poly_content(content, F);
+   fmpz_poly_content(&fac->c, F);
 
    fmpz_poly_t f;
    fmpz_poly_init(f);
 
-   fmpz_poly_scalar_divexact_fmpz(f, F, content);
+   fmpz_poly_scalar_divexact_fmpz(f, F, &fac->c);
 
    fmpz_poly_factor_clear(fac);
    fmpz_poly_factor_init(fac);
@@ -95,22 +95,19 @@ int main(void)
     {
         fmpz_poly_t f;
         fmpz_poly_factor_t facs;
-        fmpz_t content;
 
         fmpz_poly_init(f);
         fmpz_poly_factor_init(facs);
-        fmpz_init(content);
 
         fmpz_poly_set_str(f, "5  190713877264 0 354248 0 1");
 
-        fmpz_poly_factor_squarefree(facs, content, f);
+        fmpz_poly_factor_squarefree(facs, f);
         
         fmpz_poly_factor_print(facs);
         printf(" was facs\n");
         
         fmpz_poly_clear(f);
         fmpz_poly_factor_clear(facs);
-        fmpz_clear(content);
     }
     return EXIT_SUCCESS;
 }
