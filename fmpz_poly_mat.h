@@ -187,6 +187,10 @@ long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
 long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
                             const fmpz_poly_mat_t A);
 
+/* Trace *********************************************************************/
+
+void fmpz_poly_mat_trace(fmpz_poly_t trace, const fmpz_poly_mat_t mat);
+
 /* Determinant and rank ******************************************************/
 
 void fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A);

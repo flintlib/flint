@@ -176,6 +176,10 @@ long nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
 long nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
                             const nmod_poly_mat_t A);
 
+/* Trace *********************************************************************/
+
+void nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat);
+
 /* Determinant and rank ******************************************************/
 
 void nmod_poly_mat_det(nmod_poly_t det, const nmod_poly_mat_t A);

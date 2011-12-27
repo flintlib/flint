@@ -153,9 +153,13 @@ void fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A,
 void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
     const fmpq_mat_t B);
 
+/* Trace *********************************************************************/
+
+void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat);
+
 /* Determinant ***************************************************************/
 
-void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat);
+void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat);
 
 /* Nonsingular solving *******************************************************/
 

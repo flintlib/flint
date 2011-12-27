@@ -366,6 +366,16 @@ long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
     the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
+*******************************************************************************
+
+    Trace
+
+*******************************************************************************
+
+void fmpz_poly_mat_trace(fmpz_poly_t trace, const fmpz_poly_mat_t mat)
+
+    Computes the trace of the matrix, i.e. the sum of the entries on
+    the main diagonal. The matrix is required to be square.
 
 *******************************************************************************
 

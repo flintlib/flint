@@ -234,6 +234,16 @@ void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
     updating $D$ in-place. $C$ and $D$ may be aliased with each other but
     not with $A$ or $B$.
 
+*******************************************************************************
+
+    Trace
+
+*******************************************************************************
+
+mp_limb_t nmod_mat_trace(const nmod_mat_t mat)
+
+    Computes the trace of the matrix, i.e. the sum of the entries on
+    the main diagonal. The matrix is required to be square.
 
 *******************************************************************************
 

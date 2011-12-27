@@ -204,6 +204,10 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
 
 long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A);
 
+/* Trace ********************************************************************/
+
+void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);
+
 /* Determinant **************************************************************/
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
