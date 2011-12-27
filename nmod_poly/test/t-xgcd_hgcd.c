@@ -43,9 +43,9 @@ main(void)
     /* 
        Compare with result from gcd and check a*s + b*t = g
     */
-    for (i = 0; i < 800; i++)
+    for (i = 0; i < 1000; i++)
     {
-        nmod_poly_t a, b, c, g1, s, t, g2;
+        nmod_poly_t a, b, c, g1, g2, s, t, sum, temp;
 
         mp_limb_t n;
         do n = n_randtest_not_zero(state);
@@ -58,11 +58,13 @@ main(void)
         nmod_poly_init(g2, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
+        nmod_poly_init(sum, n);
+        nmod_poly_init(temp, n);
         
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randint(state, 600));
+        nmod_poly_randtest(b, state, n_randint(state, 600));
 
-        nmod_poly_randtest(c, state, n_randint(state, 200));
+        nmod_poly_randtest(c, state, n_randint(state, 400));
         
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
@@ -70,11 +72,11 @@ main(void)
         nmod_poly_gcd_euclidean(g1, a, b);
         nmod_poly_xgcd_hgcd(g2, s, t, a, b);
         
-        nmod_poly_mul(s, s, a);
-        nmod_poly_mul(t, t, b);
-        nmod_poly_add(s, s, t);
+        nmod_poly_mul(sum, s, a);
+        nmod_poly_mul(temp, t, b);
+        nmod_poly_add(sum, sum, temp);
 
-        result = (nmod_poly_equal(g1, g2) && nmod_poly_equal(s, g1) 
+        result = (nmod_poly_equal(g1, g2) && nmod_poly_equal(g1, sum) 
             && (g1->length == 0 || g1->coeffs[g1->length - 1] == 1));
         if (!result)
         {
@@ -84,6 +86,7 @@ main(void)
             nmod_poly_print(c), printf("\n\n");
             nmod_poly_print(g1), printf("\n\n");
             nmod_poly_print(g2), printf("\n\n");
+            nmod_poly_print(sum), printf("\n\n");
             nmod_poly_print(s), printf("\n\n");
             nmod_poly_print(t), printf("\n\n");
             printf("n = %ld\n", n);
@@ -97,8 +100,10 @@ main(void)
         nmod_poly_clear(g2);
         nmod_poly_clear(s);
         nmod_poly_clear(t);
+        nmod_poly_clear(sum);
+        nmod_poly_clear(temp);
     }
-return 0;
+
     /* Check aliasing of a and g */
     for (i = 0; i < 200; i++)
     {

@@ -32,6 +32,32 @@
 #include "nmod_poly_mat.h"
 #include "mpn_extras.h"
 
+/*
+    We define a whole bunch of macros here which essentially provide 
+    the nmod_poly functionality as far as the setting of coefficient 
+    data and lengths is concerned, but which do not do any separate 
+    memory allocation.  None of these macros support aliasing.
+ */
+
+#define __set(B, lenB, A, lenA)      \
+do {                                 \
+    _nmod_vec_set((B), (A), (lenA)); \
+    (lenB) = (lenA);                 \
+} while (0)
+
+#define __add(C, lenC, A, lenA, B, lenB)                \
+do {                                                    \
+    _nmod_poly_add((C), (A), (lenA), (B), (lenB), mod); \
+    (lenC) = FLINT_MAX((lenA), (lenB));                 \
+    MPN_NORM((C), (lenC));                              \
+} while (0)
+
+#define __sub(C, lenC, A, lenA, B, lenB)                \
+do {                                                    \
+    _nmod_poly_sub((C), (A), (lenA), (B), (lenB), mod); \
+    (lenC) = FLINT_MAX((lenA), (lenB));                 \
+    MPN_NORM((C), (lenC));                              \
+} while (0)
 
 #define __mul(C, lenC, A, lenA, B, lenB)                        \
 do {                                                            \
@@ -49,300 +75,283 @@ do {                                                            \
     }                                                           \
 } while (0)
 
-/*
-    Set res = s*f + t*g where res is the gcd of f and g
-Aliasing of res with f and g is permitted
- */
-void nmod_poly_xgcd_hgcd(nmod_poly_t res, nmod_poly_t s, nmod_poly_t t, 
-                         const nmod_poly_t f, const nmod_poly_t g)
+#define __divrem(Q, lenQ, R, lenR, A, lenA, B, lenB)                \
+do {                                                                \
+    if ((lenA) >= (lenB))                                           \
+    {                                                               \
+        _nmod_poly_divrem((Q), (R), (A), (lenA), (B), (lenB), mod); \
+        (lenQ) = (lenA) - (lenB) + 1;                               \
+        (lenR) = (lenB) - 1;                                        \
+        MPN_NORM((R), (lenR));                                      \
+    }                                                               \
+    else                                                            \
+    {                                                               \
+        _nmod_vec_set((R), (A), (lenA));                            \
+        (lenQ) = 0;                                                 \
+        (lenR) = (lenA);                                            \
+    }                                                               \
+} while (0)
+
+#define __div(Q, lenQ, A, lenA, B, lenB)                    \
+do {                                                        \
+    if ((lenA) >= (lenB))                                   \
+    {                                                       \
+        _nmod_poly_div((Q), (A), (lenA), (B), (lenB), mod); \
+        (lenQ) = (lenA) - (lenB) + 1;                       \
+    }                                                       \
+    else                                                    \
+    {                                                       \
+        (lenQ) = 0;                                         \
+    }                                                       \
+} while (0)
+
+long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB, 
+                          nmod_t mod)
 {
-    const nmod_t mod = f->mod;
-    const mp_limb_t p = mod.n;
+	const long cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    int sign;
-    mp_limb_t a;
+    long lenG, lenS, lenT;
 
-    if (f->length == 0)
+    if (lenB == 1)
     {
-        nmod_poly_fit_length(t, 1);
-        if (g->length == 0)
+        G[0] = B[0];
+        T[0] = 1;
+        lenG = 1;
+        lenS = 0;
+        lenT = 1;
+    }
+    else
+    {
+        mp_ptr q = _nmod_vec_init(lenA + lenB);
+        mp_ptr r = q + lenA;
+
+        long lenq, lenr;
+
+        __divrem(q, lenq, r, lenr, A, lenA, B, lenB);
+
+        if (lenr == 0)
         {
-            nmod_poly_zero(res);
-            t->coeffs[0] = 1L;
-        } 
+            __set(G, lenG, B, lenB);
+            T[0] = 1;
+            lenS = 0;
+            lenT = 1;
+        }
+        else
+        {
+            mp_ptr h, j, v, w, R[4], X;
+            long lenh, lenj, lenv, lenw, lenR[4];
+            int sgnR;
+
+            lenh = lenj = lenB;
+            lenv = lenw = lenA + lenB - 2;
+            lenR[0] = lenR[1] = lenR[2] = lenR[3] = (lenB + 1) / 2;
+
+            X = _nmod_vec_init(2 * lenh + 2 * lenv + 4 * lenR[0]);
+            h = X;
+            j = h + lenh;
+            v = j + lenj;
+            w = v + lenv;
+            R[0] = w + lenw;
+            R[1] = R[0] + lenR[0];
+            R[2] = R[1] + lenR[1];
+            R[3] = R[2] + lenR[2];
+
+            sgnR = _nmod_poly_hgcd(R, lenR, h, &lenh, j, &lenj, B, lenB, r, lenr, mod);
+
+            if (sgnR > 0)
+            {
+                _nmod_vec_neg(S, R[1], lenR[1], mod);
+                _nmod_vec_set(T, R[0], lenR[0]);
+            }
+            else
+            {
+                _nmod_vec_set(S, R[1], lenR[1]);
+                _nmod_vec_neg(T, R[0], lenR[0], mod);
+            }
+            lenS = lenR[1];
+            lenT = lenR[0];
+
+            while (lenj != 0)
+            {
+                __divrem(q, lenq, r, lenr, h, lenh, j, lenj);
+                __mul(v, lenv, q, lenq, T, lenT);
+                {
+                    long l;
+                    _nmod_vec_swap(S, T, FLINT_MAX(lenS, lenT));
+                    l = lenS;lenS = lenT; lenT = l;
+                }
+                __sub(T, lenT, T, lenT, v, lenv);
+
+                if (lenr == 0)
+                {
+                    __set(G, lenG, j, lenj);
+
+                    goto cofactor;
+                }
+                if (lenj < cutoff)
+                {
+                    mp_ptr u0 = R[0], u1 = R[1];
+                    long lenu0 = lenr - 1, lenu1 = lenj - 1;
+
+                    lenG = _nmod_poly_xgcd_euclidean(G, u0, u1, j, lenj, r, lenr, mod);
+                    MPN_NORM(u0, lenu0);
+                    MPN_NORM(u1, lenu1);
+
+                    __mul(v, lenv, S, lenS, u0, lenu0);
+                    __mul(w, lenw, T, lenT, u1, lenu1);
+                    __add(S, lenS, v, lenv, w, lenw);
+
+                    goto cofactor;
+                }
+
+                sgnR = _nmod_poly_hgcd(R, lenR, h, &lenh, j, &lenj, j,lenj, r, lenr, mod);
+
+                __mul(v, lenv, R[1], lenR[1], T, lenT);
+                __mul(w, lenw, R[2], lenR[2], S, lenS);
+
+                __mul(q, lenq, S, lenS, R[3], lenR[3]);
+                if (sgnR > 0)
+                    __sub(S, lenS, q, lenq, v, lenv);
+                else
+                    __sub(S, lenS, v, lenv, q, lenq);
+
+                __mul(q, lenq, T, lenT, R[0], lenR[0]);
+                if (sgnR > 0L)
+                    __sub(T, lenT, q, lenq, w, lenw);
+                else
+                    __sub(T, lenT, w, lenw, q, lenq);
+            }
+            __set(G, lenG, h, lenh);
+
+            cofactor:
+
+            __mul(v, lenv, S, lenS, A, lenA);
+            __sub(w, lenw, G, lenG, v, lenv);
+            __div(T, lenT, w, lenw, B, lenB);
+
+            _nmod_vec_clear(X);
+        }
+        _nmod_vec_clear(q);
+    }
+    mpn_zero(S + lenS, lenB - 1 - lenS);
+    mpn_zero(T + lenT, lenA - 1 - lenT);
+
+    return lenG;
+}
+
+void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                         const nmod_poly_t A, const nmod_poly_t B)
+{
+    const long lenA = A->length, lenB = B->length;
+    mp_limb_t inv;
+
+    if (lenA == 0)
+    {
+        if (lenB == 0) 
+        {
+            nmod_poly_zero(G);
+            nmod_poly_zero(S);
+            nmod_poly_zero(T);
+        }
         else 
         {
-            mp_limb_t Z = n_invmod(g->coeffs[g->length - 1], p);
-            nmod_poly_scalar_mul_nmod(res, g, Z);
-            t->coeffs[0] = Z;
+            inv = n_invmod(B->coeffs[lenB - 1], B->mod.n);
+            nmod_poly_scalar_mul_nmod(G, B, inv);
+            nmod_poly_zero(S);
+            nmod_poly_set_coeff_ui(T, 0, inv);
+            T->length = 1;
         }
-        t->length = 1;
-        nmod_poly_zero(s);
-        return;
-    }
-
-    if (g->length == 0)
+    } 
+    else if (lenB == 0)
     {
-        nmod_poly_fit_length(s, 1);
-        mp_limb_t Z = n_invmod(f->coeffs[f->length - 1], p);
-        nmod_poly_scalar_mul_nmod(res, f, Z);
-        s->coeffs[0] = Z;
-        s->length = 1;
-        nmod_poly_zero(t);
-        return;
+        inv = n_invmod(A->coeffs[lenA - 1], A->mod.n);
+        nmod_poly_scalar_mul_nmod(G, A, inv);
+        nmod_poly_zero(T);
+        nmod_poly_set_coeff_ui(S, 0, inv);
+        S->length = 1;
     }
-
-    if (f->length == 1)
+    else
     {
-        a = n_invmod(f->coeffs[0], p);
-        nmod_poly_set_coeff_ui(s, 0, a);
-        s->length = 1;
-        nmod_poly_set_coeff_ui(res, 0, 1L);
-        res->length = 1;
-        nmod_poly_zero(t);
-        return;
+        nmod_poly_t tG, tS, tT;
+        mp_ptr g, s, t;
+        long lenG;
+
+        if (G == A || G == B)
+        {
+            nmod_poly_init2(tG, A->mod.n, FLINT_MIN(lenA, lenB));
+            g = tG->coeffs;
+        }
+        else
+        {
+            nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+            g = G->coeffs;
+        }
+        if (S == A || S == B)
+        {
+            nmod_poly_init2(tS, A->mod.n, lenB - 1);
+            s = tS->coeffs;
+        }
+        else
+        {
+            nmod_poly_fit_length(S, lenB - 1);
+            s = S->coeffs;
+        }
+        if (T == A || T == B)
+        {
+            nmod_poly_init2(tT, A->mod.n, lenA - 1);
+            t = tT->coeffs;
+        }
+        else
+        {
+            nmod_poly_fit_length(T, lenA - 1);
+            t = T->coeffs;
+        }
+
+        if (lenA >= lenB)
+            lenG = _nmod_poly_xgcd_hgcd(g, s, t, A->coeffs, lenA,
+                                                 B->coeffs, lenB, A->mod);
+        else
+            lenG = _nmod_poly_xgcd_hgcd(g, t, s, B->coeffs, lenB,
+                                                 A->coeffs, lenA, A->mod);
+
+        if (G == A || G == B)
+        {
+            nmod_poly_swap(tG, G);
+            nmod_poly_clear(tG);
+        }
+        if (S == A || S == B)
+        {
+            nmod_poly_swap(tS, S);
+            nmod_poly_clear(tS);
+        }
+        if (T == A || T == B)
+        {
+            nmod_poly_swap(tT, T);
+            nmod_poly_clear(tT);
+        }
+        
+        G->length = lenG;
+        S->length = lenB - lenG;
+        T->length = lenA - lenG;
+        MPN_NORM(S->coeffs, S->length);
+        MPN_NORM(T->coeffs, T->length);
+
+        if (G->coeffs[lenG - 1] != 1)
+        {
+            inv = n_invmod(G->coeffs[lenG - 1], A->mod.n);
+            nmod_poly_scalar_mul_nmod(G, G, inv);
+            nmod_poly_scalar_mul_nmod(S, S, inv);
+            nmod_poly_scalar_mul_nmod(T, T, inv);
+        }
     }
-
-    if (g->length == 1)
-    {
-        a = n_invmod(g->coeffs[0], p);
-        nmod_poly_set_coeff_ui(t, 0, a);
-        t->length = 1;
-        nmod_poly_set_coeff_ui(res, 0, 1L);
-        res->length = 1;
-        nmod_poly_zero(s);
-        return;
-    }
-   	
-	long CUTOFF;
-	long bits = FLINT_BIT_COUNT(p);
-	if (bits <= 8) CUTOFF = NMOD_POLY_SMALL_GCD_CUTOFF;
-	else CUTOFF = NMOD_POLY_GCD_CUTOFF;
-	
-	nmod_poly_t h, j, q, r, u0, u1, temp, temp2;
-	nmod_poly_init(q, p);
-   nmod_poly_init(r, p);
-
-	/* g = 0*f + 1*g, r = 1*f - q * g, s is 0, t = 1 */
-	nmod_poly_divrem(q, r, f, g); 
-
-   nmod_poly_zero(s);
-    nmod_poly_one(t);
-
-	if (r->length == 0)
-	{
-		/* t is already initialised, s is already 0 */
-		mp_limb_t Z = n_invmod(g->coeffs[g->length - 1], p);
-		t->coeffs[0] = Z;
-		nmod_poly_scalar_mul_nmod(res, g, Z);
-
-	   nmod_poly_clear(q);
-	   nmod_poly_clear(r);
-		return;
-	}
-
-    mp_ptr R[4];
-    long lenR[4];
-
-    R[0] = _nmod_vec_init(g->length);
-    R[1] = _nmod_vec_init(g->length);
-    R[2] = _nmod_vec_init(g->length);
-    R[3] = _nmod_vec_init(g->length);
-
-    nmod_poly_init(j, p);
-	nmod_poly_init(h, p);
-	nmod_poly_init(u0, p);
-	nmod_poly_init(u1, p);
-	nmod_poly_init(temp, p);
-	nmod_poly_init(temp2, p);
-
-    nmod_poly_fit_length(j, g->length);
-    nmod_poly_fit_length(h, g->length);
-	
-	/*
-	  Let R = (a b)
-	          (c d) then
-			 
-			 (h j) = (g r)(d -c)
-                       (-b a)  if sign > 0 
-
-		     j = -c*g + a*r = -c*(s*f + ?*g) + a*(t*f + ?*g) 
-			    = (a*t - c*s)*f + ?*g = a*t*f at this point as s = 0
-			 i.e. send t -> a
-			  h = d*g - b*r = d*(s*f + ?*g) - b*(t*f + ?*g)
-			    = (d*s - b*t)*f + ?*g = -b*t*f at this point as s = 0
-			 i.e. send s-> -b
-	*/
-printf("%ld %ld\n", g->length, r->length);fflush(stdout);
-    sign = _nmod_poly_hgcd(R, lenR, h->coeffs, &(h->length), j->coeffs, &(j->length), g->coeffs, g->length, r->coeffs, r->length, mod);
-
-    nmod_poly_fit_length(s, lenR[1]);
-    _nmod_vec_neg(s->coeffs, R[1], lenR[1], mod);
-    s->length = lenR[1];
-
-    nmod_poly_fit_length(t, lenR[0]);
-    _nmod_vec_set(t->coeffs, R[0], lenR[0]);
-    t->length = lenR[0];
-
-    if (sign < 0L) 
-    {
-        nmod_poly_neg(s, s);
-        nmod_poly_neg(t, t);
-    }
-
-	while (j->length != 0)
-	{
-      /* r = h - q * j = s*f - q*t*f + ?*g
-		   j = t*f + ?*g
-			i.e. s->t, t ->s - q*t
-		*/
-		nmod_poly_divrem(q, r, h, j);
-	   nmod_poly_mul(temp, q, t);
-		nmod_poly_swap(s, t);
-		nmod_poly_sub(t, t, temp);
-
-		if (r->length == 0)
-	   {
-		   
-			/*
-			   now res = s*f + ?*g
-				so compute ? = (res - s*f)/g
-			*/
-			nmod_poly_mul(temp, s, f);
-			nmod_poly_sub(t, j, temp);
-			nmod_poly_div(t, t, g);
-		   
-			mp_limb_t Z = n_invmod(j->coeffs[j->length - 1], p);
-			nmod_poly_scalar_mul_nmod(s, s, Z);
-			nmod_poly_scalar_mul_nmod(t, t, Z);
-			nmod_poly_scalar_mul_nmod(res, j, Z);
-
-            _nmod_vec_clear(R[0]);	      
-            _nmod_vec_clear(R[1]);	      
-            _nmod_vec_clear(R[2]);	      
-            _nmod_vec_clear(R[3]);	      
-
-	      nmod_poly_clear(u0);
-	      nmod_poly_clear(u1);
-         nmod_poly_clear(j);
-	      nmod_poly_clear(h);
-    	   nmod_poly_clear(q);
-	      nmod_poly_clear(r);
-	      nmod_poly_clear(temp);
-	      nmod_poly_clear(temp2);
-       	return;
-	   }
-
-		if (j->length < CUTOFF)
-	   {
-		   if ((res == f) || (res == g))
-				nmod_poly_xgcd_euclidean(temp2, u0, u1, j, r);
-			else
-				nmod_poly_xgcd_euclidean(res, u0, u1, j, r);
-			/* 
-			   we have res = u0*j + u1*r
-			   and j = s*f + ?*g
-				    r = t*f + ?*g
-				i.e. s -> u0*s + u1*t
-			*/
-			nmod_poly_mul(s, s, u0);
-			nmod_poly_mul(temp, t, u1);
-			nmod_poly_add(s, s, temp);
-			
-			/*
-			   now res = s*f + ?*g
-				so compute ? = (res - s*f)/g
-			*/
-			nmod_poly_mul(temp, s, f);
-			if ((res == f) || (res == g))
-			   nmod_poly_sub(t, temp2, temp);
-			else 
-            nmod_poly_sub(t, res, temp);
-			nmod_poly_div(t, t, g);
-
-			/* 
-			   Note res and hence also s and t are normalised correctly
-			   i.e. res is monic already
-			*/
-			
-			if ((res == f) || (res == g)) 
-				nmod_poly_set(res, temp2);
-			
-
-            _nmod_vec_clear(R[0]);
-            _nmod_vec_clear(R[1]);
-            _nmod_vec_clear(R[2]);
-            _nmod_vec_clear(R[3]);
-
-      	nmod_poly_clear(u0);
-      	nmod_poly_clear(u1);
-	      nmod_poly_clear(j);
-	      nmod_poly_clear(h);
-   	   nmod_poly_clear(q);
-	      nmod_poly_clear(r);
-      	nmod_poly_clear(temp);
-	      nmod_poly_clear(temp2);
-			
-      	return;
-	   }
-
-    sign = _nmod_poly_hgcd(R, lenR, h->coeffs, &(h->length), j->coeffs, &(j->length), j->coeffs, j->length, r->coeffs, r->length, mod);
-
-		/*
-		    j' = -c*j + a*r = -c*(s*f + ?*g) + a*(t*f + ?*g) 
-			    = (a*t - c*s)*f + ?*g 
-			 i.e. send t -> a*t - c*s
-			 h' = d*j - b*r = d*(s*f + ?*g) - b*(t*f + ?*g)
-			    = (d*s - b*t)*f + ?*g
-			 i.e. send s-> d*s - b*t
-		*/
-
-        nmod_poly_fit_length(temp, lenR[1] + t->length - 1);
-        __mul(temp->coeffs, temp->length, R[1], lenR[1], t->coeffs, t->length);
-
-
-        nmod_poly_fit_length(temp2, s->length + lenR[3] - 1);
-        __mul(temp2->coeffs, temp2->length, s->coeffs, s->length, R[3], lenR[3]);
-
-
-		if (sign > 0L) nmod_poly_sub(s, temp2, temp);
-		else nmod_poly_sub(s, temp, temp2);
-
-        nmod_poly_fit_length(temp, lenR[2] + s->length - 1);
-        __mul(temp->coeffs, temp->length, R[2], lenR[2], s->coeffs, s->length);
-
-        nmod_poly_fit_length(temp2, t->length + lenR[0] - 1);
-        __mul(temp2->coeffs, temp2->length, t->coeffs, t->length, R[0], lenR[0]);
-
-		if (sign > 0L) nmod_poly_sub(t, temp2, temp);
-		else nmod_poly_sub(t, temp, temp2);
-	}
-
-	/*
-	   now res = s*f + ?*g
-		so compute ? = (res - s*f)/g
-	*/
-	nmod_poly_mul(temp, s, f);
-	nmod_poly_sub(t, h, temp);
-	nmod_poly_div(t, t, g);
-
-	mp_limb_t Z = n_invmod(h->coeffs[h->length - 1], p);
-	nmod_poly_scalar_mul_nmod(s, s, Z);
-   nmod_poly_scalar_mul_nmod(t, t, Z);
-   nmod_poly_scalar_mul_nmod(res, h, Z);
-
-    _nmod_vec_clear(R[0]);
-    _nmod_vec_clear(R[1]);
-    _nmod_vec_clear(R[2]);
-    _nmod_vec_clear(R[3]);
-
-	nmod_poly_clear(u0);
-	nmod_poly_clear(u1);
-	nmod_poly_clear(j);
-	nmod_poly_clear(h);
-	nmod_poly_clear(q);
-	nmod_poly_clear(r);
-	nmod_poly_clear(temp);
-	nmod_poly_clear(temp2);
 }
+
+#undef __set
+#undef __add
+#undef __sub
+#undef __mul
+#undef __divrem
+#undef __div
 

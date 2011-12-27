@@ -51,7 +51,6 @@ do {                                           \
     (lenB) = ((lenA) < (m)) ? (lenA) : (m);    \
 } while (0)
 
-
 #define __set(B, lenB, A, lenA)      \
 do {                                 \
     _nmod_vec_set((B), (A), (lenA)); \
