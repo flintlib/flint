@@ -745,6 +745,13 @@ long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t,
 void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB, 
+                          nmod_t mod);
+
+void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                         const nmod_poly_t A, const nmod_poly_t B);
+
 static __inline__
 long _nmod_poly_xgcd(mp_ptr res, mp_ptr s, mp_ptr t, 
             mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, nmod_t mod)

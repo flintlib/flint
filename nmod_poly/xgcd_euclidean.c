@@ -208,7 +208,7 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else
         {
-            nmod_poly_fit_length(S, lenB);
+            nmod_poly_fit_length(S, lenB - 1);
             s = S->coeffs;
         }
         if (T == A || T == B)
@@ -218,7 +218,7 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else
         {
-            nmod_poly_fit_length(T, lenA);
+            nmod_poly_fit_length(T, lenA - 1);
             t = T->coeffs;
         }
 
