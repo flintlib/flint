@@ -53,6 +53,7 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
             fmpz_poly_get_nmod_poly(F_tmp, f);
             if (F_tmp->length < f->length)
 		    {
+		        printf("shrank for p=%ld\n", p);
                 p = n_nextprime( p, 0);
                 nmod_poly_clear(F_d);
                 nmod_poly_clear(F_sbo);
@@ -155,6 +156,7 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
         fmpz_poly_init(w[i]);
     }
 
+    printf("going with p = %ld to the a = %ld, r = %ld\n", p, zass_a, r);
     ulong prev_exp;
     prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, zass_a);
 
@@ -332,12 +334,11 @@ int main(void)
     {
         fmpz_poly_t f;
         fmpz_poly_factor_t facs;
-        FILE *polyfile;
 
         fmpz_poly_init(f);
         fmpz_poly_factor_init(facs);
 
-
+/*        FILE *polyfile;
         polyfile = fopen("examples/fmpz_poly_hensel_P1", "r");
 
         if (!polyfile)
@@ -346,9 +347,9 @@ int main(void)
             abort();
         }
 
-        fmpz_poly_fread(polyfile, f);
+        fmpz_poly_fread(polyfile, f);*/
 
-        /*fmpz_poly_set_str(f, "5  190713877264 0 354248 0 1");*/
+        fmpz_poly_set_str(f, "63  1 1 1 -4 -7 -2 -6 -3 -7 18 7 25 -11 95 36 21 16 69 56 35 36 32 33 26 -26 -15 -14 -53 -96 67 72 -67 40 -79 -116 -452 -312 -260 -29 -1393 327 69 -28 -241 230 -54 -309 -125 -74 -450 -69 -3 66 -27 73 68 50 -63 -1290 372 31 -16 2");
 
         fmpz_poly_factor_zassenhaus(facs, f);
         

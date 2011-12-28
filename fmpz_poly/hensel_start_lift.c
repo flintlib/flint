@@ -61,7 +61,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
         fmpz_init(t);
         fmpz_mod(t, fmpz_poly_lead(f), P);
 
-        if (fmpz_invmod(t, t, P))
+        if (fmpz_invmod(t, t, P) == 0)
         {
             printf("Exception in fmpz_poly_start_hensel_lift.\n");
             abort();
