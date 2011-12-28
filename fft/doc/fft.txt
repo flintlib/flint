@@ -1,0 +1,204 @@
+/* 
+Copyright 2009, 2011 William Hart. All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are
+permitted provided that the following conditions are met:
+
+   1. Redistributions of source code must retain the above copyright notice, this list of
+      conditions and the following disclaimer.
+
+   2. Redistributions in binary form must reproduce the above copyright notice, this list
+      of conditions and the following disclaimer in the documentation and/or other materials
+      provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY William Hart ``AS IS'' AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL William Hart OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+The views and conclusions contained in the software and documentation are those of the
+authors and should not be interpreted as representing official policies, either expressed
+or implied, of William Hart. 
+*/
+
+/******************************************************************************
+
+    Copyright (C) 2011 William Hart
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Split/combine FFT coefficients
+
+*******************************************************************************
+
+mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs, 
+          mp_size_t total_limbs, mp_size_t coeff_limbs, mp_size_t output_limbs)
+
+    Split an integer \code{(limbs, total_limbs)} into coefficients of length
+    \code{coeff_limbs} limbs and store as the coefficients of \code{poly}
+    which are assumed to have space for \code{output_limbs + 1} limbs per
+    coefficient. The coefficients of the polynomial do not need to be zeroed
+    before calling this function, however the number of coefficients written
+    is returned by the function and any coefficients beyond this point are
+    not touched.
+
+mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs, 
+               mp_size_t total_limbs, mp_bitcnt_t bits, mp_size_t output_limbs)
+
+    Split an integer \code{(limbs, total_limbs)} into coefficients of the given
+    number of \code{bits} and store as the coefficients of \code{poly} which are
+    assumed to have space for \code{output_limbs + 1} limbs per coefficient. The
+    coefficients of the polynomial do not need to be zeroed before calling this
+    function, however the number of coefficients written is returned by the
+    function and any coefficients beyond this point are not touched. 
+
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length, 
+            mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
+
+    Evaluate the polynomial \code{poly} of the given \code{length} at 
+    $B^\mbox{coeff\_limbs}$, where $B = 2^\mbox{FLINT_BITS}$, and add the result 
+    to the integer \code{(res, total_limbs)} throwing away any bits that exceed 
+    the given number of limbs. The polynomial coefficients are assumed to have at 
+    least \code{output_limbs} limbs each, however any additional limbs are ignored. 
+    If the integer is initially zero the result will just be the evaluation of the 
+    polynomial.
+
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length, 
+                 mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
+
+    Evaluate the polynomial \code{poly} of the given \code{length} at 
+    $2^\mbox{bits}$ and add the result to the integer \code{(res, total_limbs)}
+    throwing away any bits that exceed the given number of limbs. The polynomial
+    coefficients are assumed to have at least \code{output_limbs} limbs each,
+    however any additional limbs are ignored. If the integer is initially zero
+    the result will just be the evaluation of the polynomial.
+
+*******************************************************************************
+
+    Test helper functions
+
+*******************************************************************************
+
+void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
+
+    Convert the Fermat number \code{(i, limbs)} modulo $B^\mbox{limbs} + 1$ to
+    an \code{mpz_t m}. Assumes \code{m} has been initialised. This function is
+    used only in test code.
+
+*******************************************************************************
+
+    Arithmetic modulo a generalised Fermat number
+
+*******************************************************************************
+
+void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
+    Adds the signed limb \code{c} to the generalised fermat number \code{r}
+    modulo $p = B^\mbox{limbs} + 1$. The compiler should be able to inline
+    this for the case that there is no overflow from the first limb.
+
+void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
+
+    Given \code{t} a signed integer of \code{limbs + 1} limbs in twos 
+    complement format, reduce \code{t} to the corresponding value modulo the 
+    generalised Fermat number $p = B^\mbox{limbs} + 1$, where 
+    $B = 2^\mbox{FLINT_BITS}$.
+
+void mpn_mul_2expmod_2expp1(mp_limb_t * t, 
+                                mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+
+    Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos 
+    complement format reduced modulo $p = B^\mbox{limbs} + 1$ up to some
+    overflow, compute \code{t = i1*2^d} modulo $p$. The result will not
+    necessarily be fully reduced. The number of bits \code{d} must be 
+    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.
+
+void mpn_div_2expmod_2expp1(mp_limb_t * t, 
+                                mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+
+    Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos 
+    complement format reduced modulo $p = B^\mbox{limbs} + 1$ up to some
+    overflow, compute \code{t = i1/2^d} modulo $p$. The result will not
+    necessarily be fully reduced. The number of bits \code{d} must be 
+    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.
+
+
+*******************************************************************************
+
+    Generic butterflies
+
+*******************************************************************************
+
+void fft_adjust(mp_limb_t * r, mp_limb_t * i1, 
+                                    mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
+                  mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+
+void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
+                      mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+
+   We are given two integers \code{i1} and \code{i2} modulo 
+   $p = B^\mbox{limbs} + 1$ which are not necessarily normalised. We compute 
+   \code{t = (i1 + i2)*B^x} and \code{u = (i1 - i2)*B^y} modulo $p$. Aliasing 
+   between inputs and outputs is not permitted. We require \code{x} and \code{y} 
+   to be less than \code{limbs} and nonnegative.
+
+void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
+                      mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
+
+   We are given two integers \code{i1} and \code{i2} modulo 
+   $p = B^\mbox{limbs} + 1$ which are not necessarily normalised. We compute 
+   \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing 
+   between inputs and outputs is not permitted. We require \code{x} and \code{y} 
+   to be less than \code{limbs} and nonnegative.
+
+*******************************************************************************
+
+    Radix 2 transforms
+
+*******************************************************************************
+
+void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+                     mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+void fft_radix2(mp_limb_t ** ii, 
+                    mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+
+void fft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void ifft_radix2(mp_limb_t ** ii, 
+                    mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
+
+void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, 
+                         mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, 
+                                mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+
+void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
+   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+
+void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+            mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
+
+void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+            mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
+

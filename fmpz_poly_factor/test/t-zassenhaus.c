@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010 Andy Novocin
 
 ******************************************************************************/
 
@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("lead....");
+    printf("zassenhaus....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -44,27 +44,19 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_poly_t A;
-        fmpz_t a;
-
+        
         fmpz_poly_init(A);
         fmpz_poly_randtest(A, state, n_randint(state, 100), 100);
-        fmpz_init(a);
-
-        if (fmpz_poly_length(A))
-            fmpz_poly_get_coeff_fmpz(a, A, fmpz_poly_length(A) - 1);
-
-        result = fmpz_poly_length(A) ? fmpz_equal(a, fmpz_poly_lead(A)) : 
-                                       fmpz_poly_lead(A) == NULL;
+        
+        result = 1;
         if (!result)
         {
             printf("FAIL:\n");
             fmpz_poly_print(A), printf("\n\n");
-            fmpz_print(a), printf("\n\n");
             abort();
         }
 
         fmpz_poly_clear(A);
-        fmpz_clear(a);
     }
 
     flint_randclear(state);

@@ -1,0 +1,102 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Andy Novocin
+    Copyright (C) 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
+
+    Initialises a new factor structure.
+
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
+
+    Initialises a new factor structure, providing space for 
+    at least \code{alloc} factors.
+
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
+
+    Reallocates the factor structure to provide space for 
+    precisely \code{alloc} factors.
+
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
+
+    Ensures that the factor structure has space for at 
+    least \code{len} factors.  This functions takes care 
+    of the case of repeated calls by always at least 
+    doubling the number of factors the structure can hold.
+
+void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
+
+    Releases all memory occupied by the factor structure.
+
+*******************************************************************************
+
+    Manipulating factors
+
+*******************************************************************************
+
+void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
+                             const fmpz_poly_t p, long e)
+
+    Adds the primitive polynomial $p^e$ to the factorisation \code{fac}.
+
+    Assumes that $\deg(p) \geq 2$ and $e \neq 0$.
+
+void fmpz_poly_factor_concat(fmpz_poly_factor_t res,
+                             const fmpz_poly_factor_t fac)
+
+    Concatenates two factorisations.
+
+    This is equivalent to calling \code{fmpz_poly_factor_insert()} 
+    repeatedly with the individual factors of \code{fac}.
+
+    Does not support aliasing between \code{res} and \code{fac}.
+
+*******************************************************************************
+
+    Input/output
+
+*******************************************************************************
+
+void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
+
+    Prints the entries of \code{fac} to standard output.
+
+*******************************************************************************
+
+    Factoring algorithms
+
+*******************************************************************************
+
+void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
+	                      const fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t F, const fmpz_t P, long exp)
+
+    Does something.......
+

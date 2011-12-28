@@ -54,6 +54,16 @@ typedef struct
 
 typedef fmpz_poly_struct fmpz_poly_t[1];
 
+#ifdef __cplusplus
+}
+#endif
+
+#include "fmpz_poly_factor.h" /* needs the fmpz_poly_struct to be defined first */
+
+ #ifdef __cplusplus
+ extern "C" {
+#endif
+
 /*  Memory management ********************************************************/
 
 void fmpz_poly_init(fmpz_poly_t poly);
@@ -932,36 +942,6 @@ fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n);
-
-/* Factoring *****************************************************************/
-
-typedef struct {
-    fmpz c;
-    fmpz_poly_struct *p;
-    long *exp;
-    long num;
-    long alloc;
-} fmpz_poly_factor_struct;
-
-typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
-
-void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
-
-void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
-
-void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc);
-
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
-
-void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
-
-void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
-                             const fmpz_poly_t p, long exp);
-
-void fmpz_poly_factor_concat(fmpz_poly_factor_t res, 
-                             const fmpz_poly_factor_t fac);
-
-void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
 
 /* Hensel lifting ************************************************************/
 
