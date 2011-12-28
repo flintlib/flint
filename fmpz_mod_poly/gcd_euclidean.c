@@ -38,6 +38,7 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
     if (lenB == 1)
     {
         fmpz_one(G);
+        return 1;
     }
     else  /* lenA >= lenB > 1 */
     {
