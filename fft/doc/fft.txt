@@ -372,3 +372,23 @@ void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
     length, i.e. length $4n$ instead of $2n$. This is achieved by making use 
     of twiddles by powers of a square root of 2, not powers of 2 in the final 
     layer of the transform. 
+
+*******************************************************************************
+
+    Integer multiplication
+
+*******************************************************************************
+
+void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+
+    Integer multiplication using the radix 2 truncated sqrt2 transforms. 
+
+    Set \code{(r1, n1 + n2)} to the product of \code{(i1, n1)} by \code{(i2, n2)}.
+    This is achieved through an FFT convolution of length at most 
+    \code{2^(depth + 2)} with coefficients of size $nw$ bits where 
+    \code{n = 2^depth}. We require \code{depth >= 6}. The input data is broken
+    into chunks of data not exceeding \code{(nw - (depth + 1))/2} bits. If
+    breaking the first integer into chunks of this size results in \code{j1} 
+    coefficients and breaking the second integer results in \code{j2} chunks
+    then \code{j1 + j2 - 1 <= 2^(depth + 2)}.
