@@ -137,7 +137,9 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
    
     fmpz_poly_factor_t lifted_fac;
     fmpz_poly_factor_init(lifted_fac);
-
+    long *link;
+    fmpz_poly_t *v, *w;
+        
     link = malloc((2*r-2) * sizeof(long));
     v = malloc((2*r-2) * sizeof(fmpz_poly_t));
     w = malloc((2*r-2) * sizeof(fmpz_poly_t));
@@ -164,7 +166,7 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
     fmpz_set_ui(P, p);
     fmpz_pow_ui(P, P, zass_a);
 
-    fmpz_poly_zassenhaus_naive(final_fac, lifted_fac, f, P, exp, lc);
+    fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac, f, P, exp);
     
     for (i = 0; i < 2*r - 2; i++)
     {
@@ -330,13 +332,25 @@ int main(void)
     {
         fmpz_poly_t f;
         fmpz_poly_factor_t facs;
+        FILE *polyfile;
 
         fmpz_poly_init(f);
         fmpz_poly_factor_init(facs);
 
-        fmpz_poly_set_str(f, "5  190713877264 0 354248 0 1");
 
-        fmpz_poly_factor_squarefree(facs, f);
+        polyfile = fopen("examples/fmpz_poly_hensel_P1", "r");
+
+        if (!polyfile)
+        {
+            printf("Error.  Could not read P1 from file.\n");
+            abort();
+        }
+
+        fmpz_poly_fread(polyfile, f);
+
+        /*fmpz_poly_set_str(f, "5  190713877264 0 354248 0 1");*/
+
+        fmpz_poly_factor_zassenhaus(facs, f);
         
         fmpz_poly_factor_print(facs);
         printf(" was facs\n");
