@@ -94,16 +94,36 @@ void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
 
 *******************************************************************************
 
-void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
-	                      const fmpz_poly_factor_t lifted_fac, 
-                                const fmpz_poly_t F, const fmpz_t P, long exp)
-
-    Does something.......
-    
-void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
+    void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
 
     Takes as input a polynomial F and a freshly initialized factor_t fac. Updates 
 fac to contain a factorization (not necessarily irreducible) of F into factors 
 that themselves have no repeated factors.  None of the returned 
 factors will have the same exponent. That is we return gi and 
 unique expi st F = prod (gi)^expi and gcd(gi, derivative(gi)) == 1.
+
+    void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
+	                      const fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t F, const fmpz_t P, long exp)
+
+    Takes as input a factor_t lifted_fac containing a squarefree factorization of 
+fmpz_poly F modulo the fmpz P.  The algorithm does a brute force search for 
+irreducible factors of F over the integers each factor is raised to the power exp.
+The impact of the algorithm is to augment a factorization of 
+F^exp to factor_t final_fac.
+
+    void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
+								          ulong exp, fmpz_poly_t f, ulong cutoff)
+
+    This is the internal wrapper of Zassenhaus.  It will attempt to find a small 
+prime such that f modulo p has a minimal number of factors.  If it cannot find 
+a prime giving less than cutoff factors it aborts.  Then it decides a p-adic 
+precision to lift the factors to, hensel lifts, and finally calls 
+Zassenhaus recombination.
+
+    void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
+
+    A wrapper of the Zassenhaus factoring algorithm, takes in any polynomial G, 
+and stores a factorization in final_fac.  The complexity will be exponential in 
+the number of local factors we find for the components of a 
+squarefree factorization of G.

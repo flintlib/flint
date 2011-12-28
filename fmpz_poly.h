@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2009 Andy Novocin
+    Copyright (C) 2009, 2011 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
