@@ -138,8 +138,18 @@ void mpn_div_2expmod_2expp1(mp_limb_t * t,
 void fft_adjust(mp_limb_t * r, mp_limb_t * i1, 
                                     mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
 
+    Set \code{r} to \code{i1} times $z^i$ modulo $B^\mbox{limbs} + 1$ where $z$ 
+    corresponds to multiplication by $2^w$. This can be thought of as part of a 
+    butterfly operation. We require $0 \leq i < n$ where $nw =$ 
+    \code{limbs*FLINT_BITS}. Aliasing is not supported.
+
 void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1, 
                   mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+
+    Set \code{r} to \code{i1} times $z^i$ modulo $B^\mbox{limbs} + 1$ where $z$ 
+    corresponds to multiplication by $\sqrt{2}^w$. This can be thought of as part 
+    of a butterfly operation. We require $0 \leq i < 2*n$ where $nw =$ 
+    \code{limbs*FLINT_BITS}.
 
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
                       mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
@@ -168,37 +178,217 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
 void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
                      mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
 
+    Set \code{s = i1 + i2}, \code{t = z1^i*(i1 - i2)} modulo $B^\mbox{limbs} + 1$
+    where \code{z1 = exp(Pi*I/n)} corresponds to multiplication by $2^w$. 
+    Requires $0 \leq i < n$ where $nw =$ \code{limbs*FLINT_BITS}.
+
 void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
                      mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+    Set \code{s = i1 + z1^i*i2}, \code{t = i1 -  z1^i*i2} modulo 
+    $B^\mbox{limbs} + 1$ where \code{z1 = exp(-Pi*I/n)} corresponds to 
+    division by $2^w$. Requires $0 \leq i < 2n$ where $nw =$ 
+    \code{limbs*FLINT_BITS}.
 
 void fft_radix2(mp_limb_t ** ii, 
                     mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
 
+    The radix 2 DIF FFT works as follows:
+
+    Input: \code{[i0, i1, ..., i{m-1}]}, for $m = 2n$ a power of $2$.
+
+    Output: \code{[r0, r1, ..., r{m-1}] = FFT[i0, i1, ..., i{m-1}]}.
+   
+    Algorithm: 
+
+    $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r{m-2}]} 
+         \code{= FFT[i0+i{m/2}, i1+i{m/2+1}, ..., i{m/2-1}+i{m-1}]}
+
+    $\bullet$ Let \code{[t0, t1, ..., t{m/2-1}]} 
+         \code{= [i0-i{m/2}, i1-i{m/2+1}, ..., i{m/2-1}-i{m-1}]}
+
+    $\bullet$ Let \code{[u0, u1, ..., u{m/2-1}]} 
+         \code{= [z1^0*t0, z1^1*t1, ..., z1^{m/2-1}*t{m/2-1}]}
+         where \code{z1 = exp(2*Pi*I/m)} corresponds to multiplication
+         by $2^w$.
+
+    $\bullet$ Recursively compute \code{[r1, r3, ..., r{m-1}]}
+         \code{= FFT[u0, u1, ..., u{m/2-1}]}
+              
+    The parameters are as follows:
+
+    $\bullet$ \code{2*n} is the length of the input and output 
+         arrays
+
+    $\bullet$ $w$ is such that $2^w$ is an $2n$-th root of unity 
+         in the ring $\mathbb{Z}/p\mathbb{Z}$ that we are working in, 
+         i.e. $p = 2^{wn} + 1$ (here $n$ is divisible by 
+         \code{GMP_LIMB_BITS})
+
+    $\bullet$ \code{ii} is the array of inputs (each input is an 
+         array of limbs of length \code{wn/GMP_LIMB_BITS + 1} (the
+         extra limbs being a "carry limb"). Outputs are written 
+         in-place.
+               
+void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+    As for \code{fft_radix2} except that only the first \code{trunc} coefficients
+    of the output are computed and the input is regarded as having (implied) zero
+    coefficients from coefficient \code{trunc} onwards. The coefficients must
+    exist as the algorithm needs to use this extra space, but their value is
+    irrelevant. The value of \code{trunc} must be divisible by 2.
+
 void fft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                                mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
-void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
-                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+    As for \code{fft_radix2} except that only the first \code{trunc} coefficients
+    of the output are computed. The transform still needs all $2n$ input 
+    coefficients to be specified.
 
 void ifft_radix2(mp_limb_t ** ii, 
                     mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
 
-void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
-                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+    The radix 2 DIF IFFT works as follows:
+
+    Input: \code{[i0, i1, ..., i{m-1}]}, for $m = 2n$ a power of $2$.
+
+    Output: \code{[r0, r1, ..., r{m-1}] = IFFT[i0, i1, ..., i{m-1}]}.
+   
+    Algorithm: 
+
+    $\bullet$ Recursively compute \code{[s0, s1, ...., s{m/2-1}]}     
+         \code{= IFFT[i0, i2, ..., i{m-2}]}
+
+
+    $\bullet$ Recursively compute \code{[t{m/2}, t{m/2+1}, ..., t{m-1}]} 
+         \code{= IFFT[i1, i3, ..., i{m-1}]}
+
+    $\bullet$ Let \code{[r0, r1, ..., r{m/2-1}]} 
+         \code{= [s0+z1^0*t0, s1+z1^1*t1, ..., s{m/2-1}+z1^{m/2-1}*t{m/2-1}]}
+         where \code{z1 = exp(-2*Pi*I/m)} corresponds to division by $2^w$.
+
+    $\bullet$ Let \code{[r{m/2}, r{m/2+1}, ..., r{m-1}]} 
+        \code{= [s0-z1^0*t0, s1-z1^1*t1, ..., s{m/2-1}-z1^{m/2-1}*t{m/2-1}]}
+              
+    The parameters are as follows:
+
+    $\bullet$ \code{2*n} is the length of the input and output 
+        arrays
+
+    $\bullet$ $w$ is such that $2^w$ is an $2n$-th root of unity 
+        in the ring $\mathbb{Z}/p\mathbb{Z}$ that we are working in, 
+        i.e. $p = 2^{wn} + 1$ (here $n$ is divisible by 
+        \code{GMP_LIMB_BITS})
+
+    $\bullet$ \code{ii} is the array of inputs (each input is an 
+        array of limbs of length \code{wn/GMP_LIMB_BITS + 1} (the
+        extra limbs being a "carry limb"). Outputs are written 
+        in-place.
 
 void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                                mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+    As for \code{ifft_radix2} except that the output is assumed to have zeros
+    from coefficient trunc onwards and only the first trunc coefficients of 
+    the input are specified. The remaining coefficients need to exist as the
+    extra space is needed, but their value is irrelevant. The value of 
+    \code{trunc} must be divisible by 2.
+
+    Although the implementation does not require it, we assume for simplicity
+    that \code{trunc} is at greater than $n$. The algorithm begins by computing 
+    the inverse transform of the first $n$ coefficients of the input array. The
+    unspecified coefficients of the second half of the array are then written:
+    coefficient \code{trunc + i} is computed as a twist of coefficient \code{i}
+    by a root of unity. The values of these coefficients are then equal to what 
+    they would have been if the inverse transform of the right hand side of the 
+    input array had been computed with full data from the start. The function
+    \code{ifft_truncate1} is then called on the entire right half of the input
+    array with this auxilliary data filled in. Finally a single layer of the
+    IFFT is completed on all the coefficients up to \code{trunc} being careful 
+    to note that this involves doubling the coefficients from \code{trunc - n}
+    up to \code{n}.
+
+void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                               mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
+
+    Computes the first \code{trunc} coefficients of the radix 2 inverse 
+    transform assuming the first \code{trunc} coefficients are given and that 
+    the remaining coefficients have been set to the value they would have if
+    an inverse transform had already been applied with full data.
+
+    The algorithm is the same as for \code{ifft_truncate} except that the 
+    coefficients from \code{trunc} onwards after the inverse transform are 
+    not inferred to be zero but the supplied values.  
 
 void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, 
                          mp_limb_t * i1, mp_limb_t * i2, mp_size_t i, 
                                 mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
 
+    Let $w = 2k + 1$, $i = 2j + 1$. Set \code{s = i1 + i2}, 
+    \code{t = z1^i*(i1 - i2)} modulo $p = B^\mbox{limbs} + 1$ where 
+    \code{z1 = exp(Pi*I/n)} corresponds to multiplication by $2^w$. Requires 
+    $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
+
+    Here \code{z1} corresponds to multiplication by $2^k$ then multiplication by 
+    \code{(2^{3nw/4} - 2^{nw/4})}. We see \code{z1^i} corresponds to 
+    multiplication by \code{(2^{3nw/4} - 2^{nw/4})*2^{j+ik}}.
+
+    We first multiply by \code{2^{j + ik + wn/4}} then multiply by an
+    additional \code{2^{nw/2}} and subtract.
+
 void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
    mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
+
+    Let $w = 2k + 1$, $i = 2j + 1$. Set \code{s = i1 + z1*i2}, 
+    \code{t = i1 - z1^i*i2} modulo $p = B^\mbox{limbs} + 1$ where 
+    \code{z1 = exp(-Pi*I/n)} corresponds to division by $2^w$. Requires 
+    $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
+
+    Here \code{z1} corresponds to division by $2^k$ then division by 
+    \code{(2^{3nw/4} - 2^{nw/4})}. We see \code{z1^i} corresponds to division by
+    \code{(2^{3nw/4} - 2^{nw/4})*2^{j+ik}} which is the same as division by
+    \code{2^{j+ik + 1}} then multiplication by \code{(2^{3nw/4} - 2^{nw/4})}.
+
+    Of course, division by \code{2^{j+ik + 1}} is the same as multiplication by
+    \code{2^{2*wn - j - ik - 1}}. The exponent is positive as $i \leq 2*n$, 
+    $j < n$, $k < w/2$.
+
+    We first multiply by \code{2^{2*wn - j - ik - 1 + wn/4}} then multiply by an
+    additional \code{2^{nw/2}} and subtract.
 
 void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
 
+    As per \code{fft_truncate} except that the transform is twice the usual 
+    length, i.e. length $4n$ rather than $2n$. This is achieved by making use 
+    of twiddles by powers of a square root of 2, not powers of 2 in the first 
+    layer of the transform.  
+
 void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
 
+    As per \code{ifft_truncate} except that the transform is twice the usual
+    length, i.e. length $4n$ instead of $2n$. This is achieved by making use 
+    of twiddles by powers of a square root of 2, not powers of 2 in the final 
+    layer of the transform. 
+
+*******************************************************************************
+
+    Integer multiplication
+
+*******************************************************************************
+
+void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+
+    Integer multiplication using the radix 2 truncated sqrt2 transforms. 
+
+    Set \code{(r1, n1 + n2)} to the product of \code{(i1, n1)} by \code{(i2, n2)}.
+    This is achieved through an FFT convolution of length at most 
+    \code{2^(depth + 2)} with coefficients of size $nw$ bits where 
+    \code{n = 2^depth}. We require \code{depth >= 6}. The input data is broken
+    into chunks of data not exceeding \code{(nw - (depth + 1))/2} bits. If
+    breaking the first integer into chunks of this size results in \code{j1} 
+    coefficients and breaking the second integer results in \code{j2} chunks
+    then \code{j1 + j2 - 1 <= 2^(depth + 2)}.
