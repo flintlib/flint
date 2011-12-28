@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include "math.h"
 #include "flint.h"
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
@@ -22,8 +21,8 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
     fmpz_t lc;
     fmpz_init(lc);
     fmpz_set(lc, f->coeffs + len - 1);
-    ulong M_bits = 0;
-    M_bits = M_bits + fmpz_bits(lc) + FLINT_ABS(fmpz_poly_max_bits(f)) + len + (long) ceil(log2((double) len));
+    ulong M_bits;
+    M_bits = fmpz_bits(lc) + FLINT_ABS(fmpz_poly_max_bits(f)) + len + FLINT_CLOG2(len);
     nmod_poly_t F, F_d, F_sbo, F_tmp;
 
     int tryme = 1;
@@ -51,10 +50,10 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
             nmod_poly_clear(F);
             nmod_poly_init(F, p);
 
-            fmpz_poly_to_nmod_poly(F_tmp, f);
+            fmpz_poly_get_nmod_poly(F_tmp, f);
             if (F_tmp->length < f->length)
 		    {
-                p = z_nextprime( p, 0);
+                p = n_nextprime( p, 0);
                 nmod_poly_clear(F_d);
                 nmod_poly_clear(F_sbo);
                 nmod_poly_clear(F_tmp);
@@ -65,11 +64,11 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
             nmod_poly_gcd(F_sbo, F_tmp, F_d);
 
 
-            if (zmod_poly_is_one(F_sbo))
+            if (nmod_poly_is_one(F_sbo))
                 tryme = 0;
             else
 		    {
-                p = z_nextprime(p, 0);
+                p = n_nextprime(p, 0);
                 nmod_poly_clear(F_tmp);
             } 
             nmod_poly_clear(F_d);
@@ -90,7 +89,7 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
         nmod_poly_factor_init(temp_fac);
         lead_coeff = nmod_poly_factor(temp_fac, F_tmp);
 
-        r = temp_fac->num_factors;
+        r = temp_fac->num;
 
         if (r <= min_r)
         {
@@ -103,34 +102,15 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
             min_lead_coeff = lead_coeff;
         }
 
-        p = z_nextprime(p, 0);
+        p = n_nextprime(p, 0);
         nmod_poly_clear(F_tmp);
         nmod_poly_factor_clear(temp_fac);
     }
 
     p = min_p;
-    r = fac->num_factors;
+    r = fac->num;
     lead_coeff = min_lead_coeff;
-
-    int use_Hoeij_Novocin = 0;
-    int solved_yet = 0;
    
-    fmpz_mat_t M;
-    ulong bit_r = FLINT_MAX(r, 20);
-    long U_exp = (long) ceil(log2((double) bit_r));;
-   
-    if (r*3 > f->length)
-        U_exp = (long) ceil(log2((double) bit_r));
-
-    if (r > cutoff)
-    {
-        use_Hoeij_Novocin = 1;
-        fmpz_mat_init_identity(M, r);
-
-        fmpz_mat_mul_2exp(M, M, U_exp);
-        ulong i;
-    }
-
    if (r == 0)
    {
       printf("FLINT Exception: r == 0\n");
@@ -152,10 +132,51 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
    /* Begin Hensel Lifting phase, make the tree in v, w, and link
       Later we'll do a check if use_Hoeij_Novocin (try for smaller a)*/
    ulong a;
-   a = (long) ceil((double) M_bits / log2((double) p));
-   a = (long) pow((double) 2, ceil(log2( (double) a)));
-
+   a = (long) M_bits / FLINT_CLOG2(p);
    ulong zass_a = a;
+   
+    fmpz_poly_factor_t lifted_fac;
+    fmpz_poly_factor_init(lifted_fac);
+
+    link = malloc((2*r-2) * sizeof(long));
+    v = malloc((2*r-2) * sizeof(fmpz_poly_t));
+    w = malloc((2*r-2) * sizeof(fmpz_poly_t));
+    
+    if (r > cutoff){
+        printf("not ready for this\n");
+        abort();
+    }
+
+    for(i = 0; i < 2*r - 2; i++)
+    {
+        fmpz_poly_init(v[i]);
+        fmpz_poly_init(w[i]);
+    }
+
+    ulong prev_exp;
+    prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, zass_a);
+
+    nmod_poly_factor_clear(fac);
+    nmod_poly_clear(F);
+
+    fmpz_t P;
+    fmpz_init(P);
+    fmpz_set_ui(P, p);
+    fmpz_pow_ui(P, P, zass_a);
+
+    fmpz_poly_zassenhaus_naive(final_fac, lifted_fac, f, P, exp, lc);
+    
+    for (i = 0; i < 2*r - 2; i++)
+    {
+        fmpz_poly_clear(v[i]);
+        fmpz_poly_clear(w[i]);
+    }
+    free(link);
+    free(v);
+    free(w);
+    fmpz_clear(lc);
+    fmpz_clear(P);
+    fmpz_poly_factor_clear(lifted_fac);   
 }
 
 void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
