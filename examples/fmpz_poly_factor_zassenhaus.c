@@ -8,6 +8,24 @@
 void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac, 
 								          ulong exp, fmpz_poly_t f, ulong cutoff)
 {
+    ulong len;
+    fmpz_t lc;
+    ulong M_bits;
+    nmod_poly_t F, F_d, F_sbo, F_tmp;
+    int tryme = 1;
+    ulong p = 2UL;
+    long i, num_primes;
+    nmod_poly_factor_t fac, temp_fac;
+    ulong min_p = p; 
+    unsigned long lead_coeff, min_lead_coeff;
+    long r, min_r;
+    ulong a, zass_a;
+    fmpz_poly_factor_t lifted_fac;
+    long *link;
+    fmpz_poly_t *v, *w;
+    ulong prev_exp;
+    fmpz_t P;
+
     if (f->length <= 1)
         return;
    
@@ -17,22 +35,11 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
         return;
     }
 
-    ulong len = f->length;
-    fmpz_t lc;
+    len = f->length;
     fmpz_init(lc);
     fmpz_set(lc, f->coeffs + len - 1);
-    ulong M_bits;
     M_bits = fmpz_bits(lc) + FLINT_ABS(fmpz_poly_max_bits(f)) + len + FLINT_CLOG2(len);
-    nmod_poly_t F, F_d, F_sbo, F_tmp;
 
-    int tryme = 1;
-    ulong p = 2UL;
-    long i, num_primes;
-    nmod_poly_factor_t fac, temp_fac;
-
-    ulong min_p = p; 
-    unsigned long lead_coeff, min_lead_coeff;
-    long r, min_r;
     min_r = len;
     i = 0;
 
@@ -112,35 +119,32 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
     r = fac->num;
     lead_coeff = min_lead_coeff;
    
-   if (r == 0)
-   {
-      printf("FLINT Exception: r == 0\n");
-      nmod_poly_clear(F);
-      nmod_poly_factor_clear(fac);
-      fmpz_clear(lc);
-      abort();
-   }
+    if (r == 0)
+    {
+        printf("FLINT Exception: r == 0\n");
+        nmod_poly_clear(F);
+        nmod_poly_factor_clear(fac);
+        fmpz_clear(lc);
+        abort();
+    }
 
-   if (r == 1)
-   {
-      fmpz_poly_factor_insert(final_fac, f, exp);
-      nmod_poly_clear(F);
-      nmod_poly_factor_clear(fac);
-      fmpz_clear(lc);
-	  return;
-   }
+    if (r == 1)
+    {
+        fmpz_poly_factor_insert(final_fac, f, exp);
+        nmod_poly_clear(F);
+        nmod_poly_factor_clear(fac);
+        fmpz_clear(lc);
+	    return;
+    }
 
-   /* Begin Hensel Lifting phase, make the tree in v, w, and link
+    /* Begin Hensel Lifting phase, make the tree in v, w, and link
       Later we'll do a check if use_Hoeij_Novocin (try for smaller a)*/
-   ulong a;
-   a = (long) M_bits / FLINT_CLOG2(p);
-   ulong zass_a = a;
+    a = (long) M_bits / FLINT_CLOG2(p);
+    zass_a = a;
    
-    fmpz_poly_factor_t lifted_fac;
+
     fmpz_poly_factor_init(lifted_fac);
-    long *link;
-    fmpz_poly_t *v, *w;
-        
+            
     link = malloc((2*r-2) * sizeof(long));
     v = malloc((2*r-2) * sizeof(fmpz_poly_t));
     w = malloc((2*r-2) * sizeof(fmpz_poly_t));
@@ -157,13 +161,11 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
     }
 
     printf("going with p = %ld to the a = %ld, r = %ld\n", p, zass_a, r);
-    ulong prev_exp;
     prev_exp = _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, zass_a);
 
     nmod_poly_factor_clear(fac);
     nmod_poly_clear(F);
 
-    fmpz_t P;
     fmpz_init(P);
     fmpz_set_ui(P, p);
     fmpz_pow_ui(P, P, zass_a);
@@ -185,6 +187,11 @@ void fmpz_poly_factor_sq_fr_prim_internal(fmpz_poly_factor_t final_fac,
 
 void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
 {
+   fmpz_poly_t g;
+   ulong x_pow = 0;
+   fmpz_poly_factor_t sq_fr_fac;
+   long j;
+
    if (G->length == 0)
    {
       fmpz_set_ui(&final_fac->c, 0UL);
@@ -199,7 +206,6 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
 	  return;
    }
    
-   fmpz_poly_t g;
    fmpz_poly_init(g);
 
    if (G->length == 2)
@@ -213,7 +219,6 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
    }
 
   /* Does a presearch for a factor of form x^(x_pow) */
-   ulong x_pow = 0;
    while (fmpz_is_zero(G->coeffs + x_pow))
       x_pow++; 
  
@@ -227,7 +232,6 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
    }
    
    fmpz_poly_shift_right(g, G, x_pow);
-   fmpz_poly_factor_t sq_fr_fac;
 
    /* Could make other tests for x-1 or simple things 
     maybe take advantage of the composition algorithm*/
@@ -235,7 +239,6 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G)
    fmpz_poly_factor_squarefree(sq_fr_fac, g);
 
    /* Now we can go through and factor each square free one and add it to final factors.*/
-   long j;
    for (j = 0; j < sq_fr_fac->num; j++)
       fmpz_poly_factor_sq_fr_prim_internal(final_fac, sq_fr_fac->exp[j], sq_fr_fac->p + j, 10);
 

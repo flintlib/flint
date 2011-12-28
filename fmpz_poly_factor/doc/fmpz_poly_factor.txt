@@ -101,6 +101,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     Does something.......
     
 void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
+
     Takes as input a polynomial F and a freshly initialized factor_t fac. Updates 
 fac to contain a factorization (not necessarily irreducible) of F into factors 
 that themselves have no repeated factors.  None of the returned 
