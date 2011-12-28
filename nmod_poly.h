@@ -478,6 +478,13 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                          nmod_t mod);
+
+void nmod_poly_divrem_q1(nmod_poly_t Q, nmod_poly_t R, 
+                         const nmod_poly_t A, const nmod_poly_t B);
+
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                                            mp_srcptr B, long lenB, nmod_t mod);
 
