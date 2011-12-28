@@ -1126,6 +1126,46 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     polynomial $P$ is defined to be $P$. Except in the case where
     the GCD is zero, the GCD $G$ is made monic.
 
+long _nmod_poly_hgcd(mp_ptr *M, long *lenM, 
+                     mp_ptr A, long *lenA, mp_ptr B, long *lenB, 
+                     mp_srcptr a, long lena, mp_srcptr b, long lenb, 
+                     nmod_t mod)
+
+    Computes the HGCD of $a$ and $b$, that is, a matrix~$M$, a sign~$\sigma$ 
+    and two polynomials $A$ and $B$ such that 
+    \begin{equation*}
+    (A,B)^t = \sigma M^{-1} (a,b)^t.
+    \end{equation*}
+
+    Assumes that $\len(a) > \len(b) > 0$.
+
+    Assumes that $A$ and $B$ have space of size at least $\len(a)$ 
+    and $\len(b)$, respectively.  On exit, \code{*lenA} and \code{*lenB} 
+    will contain the correct lengths of $A$ and $B$.
+
+    Assumes that \code{M[0]}, \code{M[1]}, \code{M[2]}, and \code{M[3]} 
+    each point to a vector of size at least $\len(a)$.
+
+long _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, long lenA, 
+                                   mp_srcptr B, long lenB, nmod_t mod)
+
+    Computes the monic GCD of $A$ and $B$, assuming that 
+    $\len(A) \geq \len(B) > 0$.
+
+    Assumes that $G$ has space for $\len(B)$ coefficients and 
+    returns the length of $G$ on output.
+
+void nmod_poly_gcd_hgcd(nmod_poly_t G, 
+                        const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the monic GCD of $A$ and $B$ using the HGCD algorithm.
+
+    As a special case, the GCD of two zero polynomials is defined to be 
+    the zero polynomial.
+
+    The time complexity of the algorithm is $\mathcal{O}(n \log^2 n)$. 
+    For further details, see~\citep{ThullYap1990}.
+
 long _nmod_poly_gcd(mp_ptr G, 
                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
 
@@ -1145,15 +1185,16 @@ void nmod_poly_gcd(nmod_poly_t G,
 long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
              mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 
-    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
-    \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
-    is returned by the function. No attempt is made to make the GCD monic. It
-    is required that $G$ have space for \code{lenB} coefficients. 
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
+    the length of $G$.
 
-    The polynomials \code{S} and \code{T} are set such that 
-    \code{S*A + B*T = G}. The length of \code{S} will be \code{lenB} 
-    and the length of \code{T} will be \code{lenA} (both zero padded if 
-    required).
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
+    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$, 
+    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
+    and $\len(T) \leq \len(A) - \len(G)$.
 
     No aliasing of input and output operands is permitted.
 
@@ -1170,17 +1211,19 @@ void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
 long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
-             mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
+                     mp_srcptr A, long lenA, mp_srcptr B, long lenB, 
+                     nmod_t mod)
 
-    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
-    \code{lenB}, where \code{lenA >= lenB > 0}. The length of the GCD $G$
-    is returned by the function. No attempt is made to make the GCD monic. It
-    is required that $G$ have space for \code{lenB} coefficients. 
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
+    the length of $G$.
 
-    Polynomials \code{S} and \code{T} are also computed such that 
-    \code{S*A + B*T = G}. The length of \code{S} will be \code{lenB} 
-    and the length of \code{T} will be \code{lenA} (both zero padded if 
-    required).
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
+    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$, 
+    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
+    and $\len(T) \leq \len(A) - \len(G)$.
 
     No aliasing of input and output operands is permitted.
 
