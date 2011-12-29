@@ -511,3 +511,9 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
     breaking the first integer into chunks of this size results in \code{j1} 
     coefficients and breaking the second integer results in \code{j2} chunks
     then \code{j1 + j2 - 1 <= 2^(depth + 2)}.
+
+void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+                  mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+
+    As for \code{mul_truncate_sqrt2} except that the cache friendly matrix
+    fourier algorithm is used.

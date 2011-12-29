@@ -189,6 +189,9 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
                       mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                                 mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
 
+void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+                  mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w);
+
 #ifdef __cplusplus
 }
 #endif
