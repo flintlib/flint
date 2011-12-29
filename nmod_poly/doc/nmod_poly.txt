@@ -687,6 +687,24 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$.
 
+void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, mp_srcptr B, long lenA, nmod_t mod)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$, 
+    where $\len(A) = \len(B) > 0$.
+
+    Requires that $Q$ and $R$ have space for $1$ and $\len(B) - 1$ 
+    coefficients, respectively.
+
+    Does not support aliasing or zero-padding.
+
+void nmod_poly_divrem_q0(nmod_poly_t Q, nmod_poly_t R, 
+                         const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$, 
+    where $\len(A) = \len(B) > 0$ so that the quotient $Q$ is a constant 
+    polynomial.
+
 void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
                           mp_srcptr A, long lenA, mp_srcptr B, long lenB,
                           nmod_t mod)
