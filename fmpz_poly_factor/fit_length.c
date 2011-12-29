@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
@@ -27,24 +28,16 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
 {
-    if (fac->alloc)
+    if (len > fac->alloc)
     {
-        long i;
-
-        for (i = 0; i < fac->alloc; i++)
-        {
-            fmpz_poly_clear(fac->p + i);
-        }
-
-        fmpz_clear(&(fac->c));
-        free(fac->p);
-        free(fac->exp);
-        fac->p   = NULL;
-        fac->exp = NULL;
+        /* At least double number of allocated coeffs */
+        if (len < 2 * fac->alloc)
+            len = 2 * fac->alloc;
+        fmpz_poly_factor_realloc(fac, len);
     }
 }
 

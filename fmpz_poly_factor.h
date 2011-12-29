@@ -43,16 +43,6 @@
  extern "C" {
 #endif
 
-typedef struct {
-    fmpz c;
-    fmpz_poly_struct *p;
-    long *exp;
-    long num;
-    long alloc;
-} fmpz_poly_factor_struct;
-
-typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
-
 void fmpz_poly_factor_init(fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc);
@@ -75,7 +65,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
 	const fmpz_poly_factor_t lifted_fac, 
     const fmpz_poly_t F, const fmpz_t P, long exp);
     
-void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F);
+void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F);
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
 								          ulong exp, fmpz_poly_t f, ulong cutoff);

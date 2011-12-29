@@ -54,15 +54,15 @@ typedef struct
 
 typedef fmpz_poly_struct fmpz_poly_t[1];
 
-#ifdef __cplusplus
-}
-#endif
+typedef struct {
+    fmpz c;
+    fmpz_poly_struct *p;
+    long *exp;
+    long num;
+    long alloc;
+} fmpz_poly_factor_struct;
 
-#include "fmpz_poly_factor.h" /* needs the fmpz_poly_struct to be defined first */
-
- #ifdef __cplusplus
- extern "C" {
-#endif
+typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 
 /*  Memory management ********************************************************/
 
