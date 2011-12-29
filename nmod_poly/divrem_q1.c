@@ -63,7 +63,7 @@ void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R,
                 _nmod_vec_scalar_addmul_nmod(R + 1, B, lenB - 2, Q[1], mod);
         }
 
-        _nmod_poly_sub(R, A, lenB - 1, R, lenB - 1, mod);
+        _nmod_vec_sub(R, A, R, lenB - 1, mod);
     }
 }
 
