@@ -269,7 +269,7 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c);
 
 char * nmod_poly_get_str(const nmod_poly_t poly);
 
-int nmod_poly_set_str(const char * s, nmod_poly_t poly);
+int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
 static __inline__
 int nmod_poly_print(const nmod_poly_t a)
