@@ -31,9 +31,11 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
+void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
 {
-    fmpz_poly_content(&fac->c, F);
+    fmpz_poly_content(&(fac->c), F);
+    if (fmpz_sgn(fmpz_poly_lead(F)) < 0)
+        fmpz_neg(&(fac->c), &(fac->c));
 
     if (F->length > 1)
     {
@@ -43,7 +45,7 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
         fmpz_poly_init(d);
         fmpz_poly_init(t1);
 
-        fmpz_poly_scalar_divexact_fmpz(f, F, &fac->c);
+        fmpz_poly_scalar_divexact_fmpz(f, F, &(fac->c));
 
         fmpz_poly_derivative(t1, f);
         fmpz_poly_gcd(d, f, t1);
