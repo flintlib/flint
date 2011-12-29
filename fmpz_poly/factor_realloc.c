@@ -66,7 +66,15 @@ void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
     }
     else                        /* Nothing allocated already so do it now */
     {
-        fmpz_poly_factor_init2(fac, alloc);
+        long i;
+
+        fac->p   = malloc(alloc * sizeof(fmpz_poly_struct));
+        fac->exp = calloc(alloc, sizeof(long));
+
+        for (i = 0; i < alloc; i++)
+            fmpz_poly_init(fac->p + i);
+        fac->num   = 0;
+        fac->alloc = alloc;
     }
 }
 
