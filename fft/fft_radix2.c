@@ -39,8 +39,8 @@ void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
    mp_bitcnt_t b1;
 
    b1 = i*w;
-   y  = b1/GMP_LIMB_BITS;
-   b1 = b1%GMP_LIMB_BITS;
+   y  = b1/FLINT_BITS;
+   b1 = b1%FLINT_BITS;
  
    butterfly_lshB(s, t, i1, i2, limbs, 0, y);
    mpn_mul_2expmod_2expp1(t, t, limbs, b1);

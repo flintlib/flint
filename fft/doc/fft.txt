@@ -375,18 +375,137 @@ void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
 
 *******************************************************************************
 
+    Matrix Fourier Transforms
+
+*******************************************************************************
+
+void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
+   mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, mp_bitcnt_t b1, mp_bitcnt_t b2)
+
+    Set \code{u = 2^b1*(s + t)}, \code{v = 2^b2*(s - t)} modulo 
+    $B^\mbox{limbs} + 1$. This is used to compute \code{u = 2^{ws*tw1}*(s + t)}, 
+    \code{v = 2^{w+ws*tw2}*(s - t)} in the matrix fourier algorithm, i.e. 
+    effectively computing an ordinary butterfly with additional twiddles by
+    \code{z1^rc} for row $r$ and column $c$ of the matrix of coefficients.
+    Aliasing is not allowed.
+
+void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v, 
+   mp_limb_t * s, mp_limb_t * t, mp_size_t limbs, mp_bitcnt_t b1, mp_bitcnt_t b2)
+
+    Set \code{u = s/2^b1 + t/2^b1)}, \code{v = s/2^b1 - t/2^b1} modulo 
+    $B^\mbox{limbs} + 1$. This is used to compute 
+    \code{u = 2^{-ws*tw1}*s + 2^{-ws*tw2}*t)}, 
+    \code{v = 2^{-ws*tw1}*s + 2^{-ws*tw2}*t)} in the matrix fourier algorithm, 
+    i.e. effectively computing an ordinary butterfly with additional twiddles 
+    by \code{z1^(-rc)} for row $r$ and column $c$ of the matrix of coefficients.
+    Aliasing is not allowed.
+
+void fft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
+       mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+                            mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
+
+    As for \code{fft_radix2} except that the coefficients are spaced by 
+    \code{is} in the array \code{ii} and an additional twist by \code{z^c*i}
+    is applied to each coefficient where $i$ starts at $r$ and increases by
+    \code{rs} as one moves from one coefficient to the next. Here \code{z} 
+    corresponds to multiplication by \code{2^ws}. 
+
+void ifft_radix2_twiddle(mp_limb_t ** ii, mp_size_t is,
+        mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+                            mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs)
+
+    As for \code{ifft_radix2} except that the coefficients are spaced by 
+    \code{is} in the array \code{ii} and an additional twist by \code{z^(-c*i)}
+    is applied to each coefficient where $i$ starts at $r$ and increases by
+    \code{rs} as one moves from one coefficient to the next. Here \code{z} 
+    corresponds to multiplication by \code{2^ws}. 
+
+void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
+        mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+           mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
+
+    As per \code{fft_radix2_twiddle} except that the transform is truncated 
+    as per \code{fft_truncate1}.
+
+void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
+        mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+           mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
+
+    As per \code{ifft_radix2_twiddle} except that the transform is truncated
+    as per \code{ifft_truncate1}.
+ 
+void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
+                       mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+
+    This is as per the \code{fft_truncate_sqrt2} function except that the 
+    matrix fourier algorithm is used for the left and right FFTs. The total 
+    transform length is $4n$ where \code{n = 2^depth} so that the left and
+    right transforms are both length $2n$. We require \code{trunc > 2*n} and
+    that \code{trunc} is divisible by \code{2*n1} (explained below).
+
+    The matrix fourier algorithm, which is applied to each transform of length
+    $2n$, works as follows. We set \code{n1} to a power of 2 about the square
+    root of $n$. The data is then thought of as a set of \code{n2} rows each
+    with \code{n1} columns (so that \code{n1*n2 = 2n}). 
+
+    The length $2n$ transform is then computed using a whole pile of short 
+    transforms. These comprise \code{n1} column transforms of length \code{n2}
+    followed by some twiddles by roots of unity (namely \code{z^rc} where $r$ 
+    is the row and $c$ the column within the data) followed by \code{n2}
+    row transforms of length \code{n1}. Along the way the data needs to be
+    rearranged due to the fact that the short transforms output the data in 
+    binary reversed order compared with what is needed.
+
+    The matrix fourier algorithm provides better cache locality by decomposing
+    the long length $2n$ transforms into many transforms of about the square 
+    root of the original length. 
+
+    For better cache locality the sqrt2 layer of the full length $4n$ transform
+    is folded in with the column FFTs performed as part of the first matrix 
+    fourier algorithm on the left half of the data.
+
+    The second half of the data requires a truncated version of the matrix
+    fourier algorithm. This is achieved by truncating to an exact multiple of 
+    the row length so that the row transforms are full length. Moreover, the 
+    column transforms will then be truncated transforms and their truncated 
+    length needs to be a multiple of 2. This explains the condition on 
+    \code{trunc} given above. 
+
+    To improve performance, the extra twiddles by roots of unity are combined
+    with the butterflies performed at the last layer of the column transforms.
+
+void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
+                               mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+
+    This is as per the \code{ifft_truncate_sqrt2} function except that the 
+    matrix fourier algorithm is used for the left and right IFFTs. The total 
+    transform length is $4n$ where \code{n = 2^depth} so that the left and
+    right transforms are both length $2n$. We require \code{trunc > 2*n} and
+    that \code{trunc} is divisible by \code{2*n1}.
+ 
+    We set \code{n1} to a power of 2 about the square root of $n$.
+
+    As per the matrix fourier FFT the sqrt2 layer is folded into the the final
+    column IFFTs for better cache locality and the extra twiddles that occur
+    in the matrix fourier algorithm are combined with the butterflied performed
+    at the first layer of the final column transforms.
+
+*******************************************************************************
+
     Integer multiplication
 
 *******************************************************************************
 
 void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
-                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
+                 mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 
     Integer multiplication using the radix 2 truncated sqrt2 transforms. 
 
-    Set \code{(r1, n1 + n2)} to the product of \code{(i1, n1)} by \code{(i2, n2)}.
-    This is achieved through an FFT convolution of length at most 
-    \code{2^(depth + 2)} with coefficients of size $nw$ bits where 
+    Set \code{(r1, n1 + n2)} to the product of \code{(i1, n1)} by 
+    \code{(i2, n2)}. This is achieved through an FFT convolution of length at 
+    most \code{2^(depth + 2)} with coefficients of size $nw$ bits where 
     \code{n = 2^depth}. We require \code{depth >= 6}. The input data is broken
     into chunks of data not exceeding \code{(nw - (depth + 1))/2} bits. If
     breaking the first integer into chunks of this size results in \code{j1} 
