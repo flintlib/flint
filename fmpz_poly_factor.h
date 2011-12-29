@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2009 Andy Novocin
+    Copyright (C) 2009, 2011 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
@@ -70,6 +70,17 @@ void fmpz_poly_factor_concat(fmpz_poly_factor_t res,
                              const fmpz_poly_factor_t fac);
 
 void fmpz_poly_factor_print(const fmpz_poly_factor_t fac);
+
+void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
+	const fmpz_poly_factor_t lifted_fac, 
+    const fmpz_poly_t F, const fmpz_t P, long exp);
+    
+void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F);
+
+void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
+								          ulong exp, fmpz_poly_t f, ulong cutoff);
+
+void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G);
 
 #ifdef __cplusplus
 }
