@@ -44,9 +44,9 @@
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 #define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
 
-#define NMOD_POLY_HGCD_CUTOFF 60        /* HGCD: Basecase -> Recursion */
-#define NMOD_POLY_GCD_CUTOFF 184        /* GCD:  Euclidean -> HGCD */
-#define NMOD_POLY_SMALL_GCD_CUTOFF 174  /* GCD (small n): Euclidean -> HGCD */
+#define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
+#define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
+#define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
 
 static __inline__
 long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
