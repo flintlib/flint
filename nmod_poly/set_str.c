@@ -30,7 +30,7 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-int nmod_poly_set_str(const char * s, nmod_poly_t poly)
+int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {
     const char * whitespace = " \t\n\r";
     long i, length;

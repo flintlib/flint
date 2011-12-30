@@ -27,46 +27,41 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
+void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
 {
-    if (alloc == 0)             /* Clear up, reinitialise */
+    fmpz_init_set_ui(&(fac->c), 1);
+    fac->p     = NULL;
+    fac->exp   = NULL;
+    fac->num   = 0;
+    fac->alloc = 0;
+}
+
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
+{
+    fmpz_init_set_ui(&(fac->c), 1);
+
+    if (alloc)
     {
-        fmpz_poly_factor_clear(fac);
-        fmpz_poly_factor_init(fac);
-    }
-    else if (fac->alloc)            /* Realloc */
-    {
-        if (fac->alloc > alloc)
+        long i;
+
+        fac->p   = malloc(alloc * sizeof(fmpz_poly_struct));
+        fac->exp = malloc(alloc * sizeof(long));
+
+        for (i = 0; i < alloc; i++)
         {
-            long i;
-
-            for (i = alloc; i < fac->num; i++)
-                fmpz_poly_clear(fac->p + i);
-
-            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
-            fac->alloc     = alloc;
-        }
-        else if (fac->alloc < alloc)
-        {
-            long i;
-
-            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
-
-            for (i = fac->alloc; i < alloc; i++)
-            {
-                fmpz_poly_init(fac->p + i);
-                fac->exp[i] = 0L;
-            }
-            fac->alloc = alloc;
+            fmpz_poly_init(fac->p + i);
+            fac->exp[i] = 0L;
         }
     }
-    else                        /* Nothing allocated already so do it now */
+    else
     {
-        fmpz_poly_factor_init2(fac, alloc);
+        fac->p   = NULL;
+        fac->exp = NULL;
     }
+
+    fac->num   = 0;
+    fac->alloc = alloc;
 }
 

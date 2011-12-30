@@ -44,9 +44,9 @@
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 #define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
 
-#define NMOD_POLY_HGCD_CUTOFF 60        /* HGCD: Basecase -> Recursion */
-#define NMOD_POLY_GCD_CUTOFF 184        /* GCD:  Euclidean -> HGCD */
-#define NMOD_POLY_SMALL_GCD_CUTOFF 174  /* GCD (small n): Euclidean -> HGCD */
+#define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
+#define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
+#define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
 
 static __inline__
 long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
@@ -269,7 +269,7 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c);
 
 char * nmod_poly_get_str(const nmod_poly_t poly);
 
-int nmod_poly_set_str(const char * s, nmod_poly_t poly);
+int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
 static __inline__
 int nmod_poly_print(const nmod_poly_t a)
@@ -477,6 +477,19 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, mp_srcptr B, long lenA, nmod_t mod);
+
+void nmod_poly_divrem_q0(nmod_poly_t Q, nmod_poly_t R, 
+                         const nmod_poly_t A, const nmod_poly_t B);
+
+void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                          nmod_t mod);
+
+void nmod_poly_divrem_q1(nmod_poly_t Q, nmod_poly_t R, 
+                         const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                                            mp_srcptr B, long lenB, nmod_t mod);

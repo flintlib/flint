@@ -19,25 +19,27 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2007 David Howden
+    Copyright (C) 2007, 2008, 2009, 2010 William Hart
+    Copyright (C) 2008 Richard Howell-Peak
+    Copyright (C) 2011 Fredrik Johansson
     Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
+void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
 {
-    if (len > fac->alloc)
+    long i;
+
+    fmpz_print(&(fac->c));
+    printf("\n");
+    for (i = 0; i < fac->num; i++)
     {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * fac->alloc)
-            len = 2 * fac->alloc;
-        fmpz_poly_factor_realloc(fac, len);
+        fmpz_poly_print(fac->p + i);
+        printf(" ^ %ld\n", fac->exp[i]);
     }
 }
-

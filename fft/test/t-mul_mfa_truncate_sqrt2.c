@@ -28,48 +28,64 @@ or implied, of William Hart.
 
 */
 
-#include "mpir.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fft.h"
-      
-void fft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
-                   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
+
+int
+main(void)
 {
-   mp_size_t y;
-   mp_bitcnt_t b1;
+    mp_bitcnt_t depth, w;
+    
+    flint_rand_t state;
 
-   b1 = i*w;
-   y  = b1/FLINT_BITS;
-   b1 = b1%FLINT_BITS;
- 
-   butterfly_lshB(s, t, i1, i2, limbs, 0, y);
-   mpn_mul_2expmod_2expp1(t, t, limbs, b1);
-}
+    printf("mul_mfa_truncate_sqrt2....");
+    fflush(stdout);
 
-void fft_radix2(mp_limb_t ** ii, 
-      mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
-{
-   mp_size_t i;
-   mp_size_t limbs = (w*n)/GMP_LIMB_BITS;
+    flint_randinit(state);
+    _flint_rand_init_gmp(state);
+
+    for (depth = 6; depth <= 12; depth++)
+    {
+        for (w = 1; w <= 3; w++)
+        {
+            mp_size_t n = (1UL<<depth);
+            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+            mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
+            mp_bitcnt_t bits = (trunc/2)*bits1;
+            mp_size_t int_limbs = bits/FLINT_BITS;
+            mp_size_t j;
+            mp_limb_t * i1, *i2, *r1, *r2;
+        
+            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
+            i2 = i1 + int_limbs;
+            r1 = i2 + int_limbs;
+            r2 = r1 + 2*int_limbs;
    
-   if (n == 1) 
-   {
-      fft_butterfly(*t1, *t2, ii[0], ii[1], 0, limbs, w);
+            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
+            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+  
+            mpn_mul(r2, i1, int_limbs, i2, int_limbs);
+            mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
+            
+            for (j = 0; j < 2*int_limbs; j++)
+            {
+                if (r1[j] != r2[j]) 
+                {
+                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    abort();
+                }
+            }
 
-      SWAP_PTRS(ii[0], *t1);
-      SWAP_PTRS(ii[1], *t2);
-      
-      return;
-   }
+            free(i1);
+        }
+    }
 
-   for (i = 0; i < n; i++) 
-   {   
-      fft_butterfly(*t1, *t2, ii[i], ii[n+i], i, limbs, w);
-   
-      SWAP_PTRS(ii[i],   *t1);
-      SWAP_PTRS(ii[n+i], *t2);
-   }
-
-   fft_radix2(ii,     n/2, 2*w, t1, t2);
-   fft_radix2(ii + n, n/2, 2*w, t1, t2);
+    flint_randclear(state);
+    
+    printf("PASS\n");
+    return 0;
 }

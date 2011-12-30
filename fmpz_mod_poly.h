@@ -303,6 +303,9 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
 }
 
+void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+                            const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 static __inline__ 
 void _fmpz_mod_poly_rem(fmpz *R, 
                         const fmpz *A, long lenA, const fmpz *B, long lenB, 
@@ -346,6 +349,21 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
 void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G, 
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B);
+
+static __inline__ 
+long _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, long lenA, 
+                                 const fmpz *B, long lenB, 
+                                 const fmpz_t invB, const fmpz_t p)
+{
+    return _fmpz_mod_poly_gcd_euclidean(G, A, lenA, B, lenB, invB, p);
+}
+
+static __inline__ 
+void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+{
+    fmpz_mod_poly_gcd_euclidean(G, A, B);
+}
 
 /*  Derivative  **************************************************************/
 
