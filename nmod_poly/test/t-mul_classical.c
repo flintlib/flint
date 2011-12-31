@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("mul_clasical....");
+    printf("mul_classical....");
     fflush(stdout);
 
     /* Check aliasing of a and b */
