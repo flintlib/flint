@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -33,22 +33,32 @@
 void
 _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    _fmpz_poly_rem_basecase(R, A, lenA, B, lenB);
+    if (lenA < 100)
+    {
+        _fmpz_poly_rem_basecase(R, A, lenA, B, lenB);
+    }
+    else
+    {
+        fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
+
+        _fmpz_poly_divrem(Q, R, A, lenA, B, lenB);
+
+        _fmpz_vec_clear(Q, lenA - lenB + 1);
+    }
 }
 
-void
-fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
+void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    fmpz_poly_t tR;
+    const long lenA = A->length, lenB = B->length;
     fmpz *r;
 
-    if (B->length == 0)
+    if (lenB == 0)
     {
         printf("Exception: division by zero in fmpz_poly_rem\n");
         abort();
     }
 
-    if (A->length < B->length)
+    if (lenA < lenB)
     {
         fmpz_poly_set(R, A);
         return;
@@ -56,25 +66,22 @@ fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     if (R == A || R == B)
     {
-        fmpz_poly_init2(tR, A->length);
-        r = tR->coeffs;
+        r = _fmpz_vec_init(lenA);
     }
     else
     {
-        fmpz_poly_fit_length(R, A->length);
+        fmpz_poly_fit_length(R, lenA);
         r = R->coeffs;
     }
 
-    _fmpz_poly_rem(r, A->coeffs, A->length, B->coeffs, B->length);
+    _fmpz_poly_rem(r, A->coeffs, lenA, B->coeffs, lenB);
 
     if (R == A || R == B)
     {
-        _fmpz_poly_set_length(tR, A->length);
-        fmpz_poly_swap(tR, R);
-        fmpz_poly_clear(tR);
+        _fmpz_vec_clear(R->coeffs, R->alloc);
+        R->coeffs = r;
+        R->alloc  = lenB - 1;
     }
-    else
-        _fmpz_poly_set_length(R, A->length);
-
+    _fmpz_poly_set_length(R, lenA);
     _fmpz_poly_normalise(R);
 }

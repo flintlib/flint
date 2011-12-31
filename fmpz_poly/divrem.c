@@ -30,23 +30,17 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void
-_fmpz_poly_divrem(fmpz * Q, fmpz * R,
-                  const fmpz * A, long lenA, const fmpz * B, long lenB)
+void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
+                       const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
     _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
 }
 
-void
-fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
-                 const fmpz_poly_t A, const fmpz_poly_t B)
+void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
+                      const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenA, lenB;
-    fmpz_poly_t tQ, tR;
+    const long lenA = A->length, lenB = B->length;
     fmpz *q, *r;
-
-    lenA = A->length;
-    lenB = B->length;
 
     if (lenB == 0)
     {
@@ -63,8 +57,7 @@ fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (Q == A || Q == B)
     {
-        fmpz_poly_init2(tQ, lenA - lenB + 1);
-        q = tQ->coeffs;
+        q = _fmpz_vec_init(lenA - lenB + 1);
     }
     else
     {
@@ -74,8 +67,7 @@ fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (R == A || R == B)
     {
-        fmpz_poly_init2(tR, lenA);
-        r = tR->coeffs;
+        r = _fmpz_vec_init(lenA);
     }
     else
     {
@@ -87,22 +79,18 @@ fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (Q == A || Q == B)
     {
-        _fmpz_poly_set_length(tQ, lenA - lenB + 1);
-        fmpz_poly_swap(tQ, Q);
-        fmpz_poly_clear(tQ);
+        _fmpz_vec_clear(Q->coeffs, Q->alloc);
+        Q->coeffs = q;
+        Q->alloc  = lenA - lenB + 1;
     }
-    else
-        _fmpz_poly_set_length(Q, lenA - lenB + 1);
-
     if (R == A || R == B)
     {
-        _fmpz_poly_set_length(tR, lenA);
-        fmpz_poly_swap(tR, R);
-        fmpz_poly_clear(tR);
+        _fmpz_vec_clear(R->coeffs, R->alloc);
+        R->coeffs = r;
+        R->alloc  = lenB - 1;
     }
-    else
-        _fmpz_poly_set_length(R, lenA);
-
+    _fmpz_poly_set_length(Q, lenA - lenB + 1);
+    _fmpz_poly_set_length(R, lenA);
     _fmpz_poly_normalise(Q);
     _fmpz_poly_normalise(R);
 }
