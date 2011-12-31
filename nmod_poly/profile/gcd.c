@@ -41,18 +41,36 @@
     compute GCD(AC, BC) repeatedly, runs[i][k] times.
  */
 
+#define N 50
+
 int main(void)
 {
     flint_rand_t state;
 
-    clock_t c0, c1;
-    long double cpu[2];
-
     mp_limb_t p[] = {17ul, 2147483659ul, 9223372036854775837ul};
-    const long degs[]      = {    20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 220, 240, 260, 280, 300, 320, 340, 360, 380, 400, 420, 440, 460, 480, 500};
-    const long runs[3][25] = {{ 2000, 1000, 500, 300, 200, 200, 200, 180, 140, 140, 100,  80,  80,  80,  50,  50,  40,  30,  30,  20,  18,  16,  14,  12,  10},
-                              { 1400,  800, 400, 260, 160, 140, 120, 100,  60,  60,  50,  50,  40,  40,  30,  30,  20,  20,  20,  15,  14,  13,  12,  11,  10},
-                              { 1400,  800, 400, 260, 160, 120, 100,  80,  60,  50,  50,  40,  30,  20,  20,  20,  15,  15,  15,  12,  12,  11,  11,  10,  10}};
+    const long degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 
+                                220,  240, 260, 280, 300, 320, 340, 360, 380, 400, 
+                                420,  440, 460, 480, 500, 520, 540, 560, 580, 600, 
+                                620,  640, 660, 680, 700, 720, 740, 760, 780, 800, 
+                                820,  840, 860, 880, 900, 920, 940, 960, 980, 1000};
+    const long runs[3][N] = {{ 2000, 1000, 500, 300, 200, 200, 200, 180, 140, 140, 
+                                100,   80,  80,  80,  50,  50,  40,  30,  30,  20,  
+                                 18,   16,  14,  12,  10,  10,  10,  10,  10,  10,  
+                                  9,    9,   9,   9,   8,   8,   8,   8,   7,   7,
+                                  7,    7,   6,   6,   6,   6,   5,   5,   5,   5},
+                             { 1400,  800, 400, 260, 160, 140, 120, 100,  60,  60,  
+                                 50,   50,  40,  40,  30,  30,  20,  20,  20,  15,  
+                                 14,   13,  12,  11,  10,  10,  10,  10,  10,  10,  
+                                  9,    9,   8,   8,   8,   7,   7,   7,   6,   6,
+                                  6,    6,   6,   5,   5,   5,   5,   5,   4,   4},
+                             { 1400,  800, 400, 260, 160, 120, 100,  80,  60,  50,  
+                                 50,   40,  30,  20,  20,  20,  15,  15,  15,  12,  
+                                 12,   11,  11,  10,  10,  10,  10,  10,  10,  10,  
+                                  9,    9,   8,   8,   8,   7,   7,   7,   6,   6,
+                                  6,    6,   6,   5,   5,   5,   5,   5,   4,   4}};
+
+    clock_t c0, c1;
+    long double cpu[3][2][N];
     long i, k, c, n;
 
     nmod_poly_t A, B, C, G;
@@ -63,13 +81,13 @@ int main(void)
     {
         printf("---[Modulus %lu]---\n", p[i]), fflush(stdout);
 
-        for (k = 0; k < sizeof(degs)/sizeof(long); k++)
+        for (k = 0; k < N; k++)
         {
             const long d = degs[k];
             const long r = runs[i][k];
 
-            cpu[0] = 0;
-            cpu[1] = 0;
+            cpu[i][0][k] = 0;
+            cpu[i][1][k] = 0;
 
             nmod_poly_init(A, p[i]);
             nmod_poly_init(B, p[i]);
@@ -88,22 +106,22 @@ int main(void)
                 for (n = 0; n < r; n++)
                     nmod_poly_gcd_euclidean(G, A, B);
                 c1 = clock();
-                cpu[0] += (c1 - c0);
+                cpu[i][0][k] += (c1 - c0);
 
                 c0 = clock();
                 for (n = 0; n < r; n++)
                     nmod_poly_gcd_hgcd(G, A, B);
                 c1 = clock();
-                cpu[1] += (c1 - c0);
+                cpu[i][1][k] += (c1 - c0);
             }
 
-            cpu[0] = (long double) cpu[0] / (long double) CLOCKS_PER_SEC;
-            cpu[1] = (long double) cpu[1] / (long double) CLOCKS_PER_SEC;
+            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) CLOCKS_PER_SEC;
+            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) CLOCKS_PER_SEC;
 
-            cpu[0] = (long double) cpu[0] / (long double) (100*r);
-            cpu[1] = (long double) cpu[1] / (long double) (100*r);
+            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
+            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
 
-            printf ("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[0], cpu[1]);
+            printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);
 
             nmod_poly_clear(A);
@@ -111,6 +129,20 @@ int main(void)
             nmod_poly_clear(G);
         }
     }
+
+    printf("cpu = [");
+    for (i = 0; i < 3; i++)
+    {
+        printf("[[");
+        for (k = 0; k < N; k++)
+            printf("%.8Lf,", cpu[i][0][k]);
+        printf("],");
+        printf("[");
+        for (k = 0; k < N; k++)
+            printf("%.8Lf,", cpu[i][1][k]);
+        printf("]],");
+    }
+    printf("]\n");
 
     flint_randclear(state);
     return EXIT_SUCCESS;
