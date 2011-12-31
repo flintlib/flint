@@ -517,10 +517,15 @@ void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA,
 
 void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
+void _nmod_poly_rem_basecase(mp_ptr R, mp_ptr W, mp_srcptr A, long lenA, 
+                                       mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA, 
-                            mp_srcptr B, long lenB, nmod_t mod);
+                              mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                               mp_srcptr Q, long n, nmod_t mod);

@@ -30,36 +30,35 @@
 #include "nmod_poly.h"
 #include "mpn_extras.h"
 
-long
-_nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA, 
-                                  mp_srcptr B, long lenB, nmod_t mod)
+long _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA, 
+                                        mp_srcptr B, long lenB, nmod_t mod)
 {
-    int steps = 2;
-    long lenR1, lenR2 = 0, lenR3 = 0, len = 0;
+    long steps;
+    long lenR1, lenR2 = 0, lenG = 0;
 
-    mp_ptr F, T, Q, R3 = G, R2, R1;
+    mp_ptr F, R1, R2, R3 = G, T;
     
-    if (lenB == 1) /* if lenA == 1 then so does lenB */
+    if (lenB == 1)
     {
         G[0] = B[0];
         return 1;
     }
 
-    R1 = _nmod_vec_init(FLINT_MAX(lenA - lenB + 1, lenB - 1) + 2*lenB - 3);
+    F  = _nmod_vec_init(2*lenB - 3);
+    R1 = F;
     R2 = R1 + lenB - 1;
-    Q = R2 + lenB - 2;
-    F = R1;
 
-    _nmod_poly_divrem(Q, R1, A, lenA, B, lenB, mod);
+    _nmod_poly_rem(R1, A, lenA, B, lenB, mod);
     lenR1 = lenB - 1;
     MPN_NORM(R1, lenR1);
 
     if (lenR1 > 1)
     {
-        _nmod_poly_divrem(Q, R2, B, lenB, R1, lenR1, mod);
+        _nmod_poly_rem(R2, B, lenB, R1, lenR1, mod);
         lenR2 = lenR1 - 1;
         MPN_NORM(R2, lenR2);
-    } else
+    }
+    else
     {
         if (lenR1 == 0)
         {
@@ -75,57 +74,50 @@ _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
         }
     }
 
-    while (lenR2 > 1)
+    for (steps = 2; lenR2 > 1; steps++)
     {
-        _nmod_poly_divrem(Q, R3, R1, lenR1, R2, lenR2, mod);
-        lenR3 = lenR2 - 1;
-        MPN_NORM(R3, lenR3);
-        if (++steps == 3) steps = 0;
+        _nmod_poly_rem(R3, R1, lenR1, R2, lenR2, mod);
+        lenR1 = lenR2--;
+        MPN_NORM(R3, lenR2);
         T = R1; R1 = R2; R2 = R3; R3 = T;
-        lenR1 = lenR2; lenR2 = lenR3;
     }
 
     if (lenR2 == 1)
     {
-        len = 1;
-        if (steps) 
+        lenG = 1;
+        if (steps % 3) 
             G[0] = R2[0];
     }
     else
     {
-        len = lenR1;
-        if (steps != 1)
+        lenG = lenR1;
+        if (steps % 3 != 1)
             mpn_copyi(G, R1, lenR1);
     }
 
     _nmod_vec_clear(F);
-    return len;
+    return lenG;
 }
 
-void
-nmod_poly_gcd_euclidean(nmod_poly_t G, 
-                 const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_gcd_euclidean(nmod_poly_t G, 
+                             const nmod_poly_t A, const nmod_poly_t B)
 {
+    long lenA = A->length, lenB = B->length, lenG;
     nmod_poly_t tG;
     mp_ptr g;
-    long A_len, B_len, len;
 
-    B_len = B->length;
-    A_len = A->length;
-    
-    if (A_len == 0)
+    if (lenA == 0)
     {
-        if (B_len == 0) nmod_poly_zero(G);
+        if (lenB == 0) nmod_poly_zero(G);
         else nmod_poly_make_monic(G, B);
         return;
     } 
-    else if (B_len == 0)
+    else if (lenB == 0)
     {
         nmod_poly_make_monic(G, A);
         return;
     }
-
-    if (A_len == 1 || B_len == 1)
+    else if (lenA == 1 || lenB == 1)
     {
         nmod_poly_set_coeff_ui(G, 0, 1);
         G->length = 1;
@@ -134,29 +126,28 @@ nmod_poly_gcd_euclidean(nmod_poly_t G,
 
     if (G == A || G == B)
     {
-        nmod_poly_init2(tG, A->mod.n, FLINT_MIN(A_len, B_len));
+        nmod_poly_init2(tG, A->mod.n, FLINT_MIN(lenA, lenB));
         g = tG->coeffs;
     }
     else
     {
-        nmod_poly_fit_length(G, FLINT_MIN(A_len, B_len));
+        nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
         g = G->coeffs;
     }
 
-    if (A_len >= B_len)
-        len = _nmod_poly_gcd_euclidean(g, A->coeffs, A_len,
-                            B->coeffs, B_len, A->mod);
+    if (lenA >= lenB)
+        lenG = _nmod_poly_gcd_euclidean(g, A->coeffs, lenA,
+                                           B->coeffs, lenB, A->mod);
     else
-        len = _nmod_poly_gcd_euclidean(g, B->coeffs, B_len,
-                            A->coeffs, A_len, A->mod);
+        lenG = _nmod_poly_gcd_euclidean(g, B->coeffs, lenB,
+                                           A->coeffs, lenA, A->mod);
 
     if (G == A || G == B)
     {
         nmod_poly_swap(tG, G);
         nmod_poly_clear(tG);
     }
-    
-    G->length = len;
+    G->length = lenG;
 
     if (G->length == 1)
         G->coeffs[0] = 1;
