@@ -31,52 +31,48 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void
-_nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long Alen, 
-                      mp_srcptr B, long Blen, nmod_t mod)
+void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long lenA, 
+                                     mp_srcptr B, long lenB, nmod_t mod)
 {
-    long Qlen = Alen - Blen + 1;
+    const long lenQ = lenA - lenB + 1;
     mp_ptr Arev, Brev;
 
-    Arev = _nmod_vec_init(2 * Qlen);
-    Brev = Arev + Qlen;
+    Arev = _nmod_vec_init(2 * lenQ);
+    Brev = Arev + lenQ;
 
-    _nmod_poly_reverse(Arev, A + (Alen - Qlen), Qlen, Qlen);
+    _nmod_poly_reverse(Arev, A + (lenA - lenQ), lenQ, lenQ);
 
-    if (Blen >= Qlen)
+    if (lenB >= lenQ)
     {
-        _nmod_poly_reverse(Brev, B + (Blen - Qlen), Qlen, Qlen);
+        _nmod_poly_reverse(Brev, B + (lenB - lenQ), lenQ, lenQ);
     }
     else
     {
-        _nmod_poly_reverse(Brev, B, Blen, Blen);
-        mpn_zero(Brev + Blen, Qlen - Blen);
+        _nmod_poly_reverse(Brev, B, lenB, lenB);
+        mpn_zero(Brev + lenB, lenQ - lenB);
     }
 
-    _nmod_poly_div_series(Q, Arev, Brev, Qlen, mod);
+    _nmod_poly_div_series(Q, Arev, Brev, lenQ, mod);
 
-    _nmod_poly_reverse(Q, Q, Qlen, Qlen);
+    _nmod_poly_reverse(Q, Q, lenQ, lenQ);
 
     _nmod_vec_clear(Arev);
 }
 
-void
-nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
-                                    const nmod_poly_t B)
+void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
+                                         const nmod_poly_t B)
 {
-    const long Alen = A->length;
-    const long Blen = B->length;
-    const long Qlen = Alen - Blen + 1;
+    const long lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
 
     mp_ptr q;
 
-    if (Blen == 0)
+    if (lenB == 0)
     {
         printf("Exception: division by zero in nmod_poly_div_newton\n");
         abort();
     }
 
-    if (Alen < Blen)
+    if (lenA < lenB)
     {
         nmod_poly_zero(Q);
         return;
@@ -84,25 +80,21 @@ nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Q == A || Q == B)
     {
-        q = malloc(Qlen * sizeof(mp_limb_t));
+        q = malloc(lenQ * sizeof(mp_limb_t));
     }
     else
     {
-        nmod_poly_fit_length(Q, Qlen);
+        nmod_poly_fit_length(Q, lenQ);
         q = Q->coeffs;
     }
 
-    _nmod_poly_div_newton(q, A->coeffs, Alen, B->coeffs, Blen, B->mod);
+    _nmod_poly_div_newton(q, A->coeffs, lenA, B->coeffs, lenB, B->mod);
 
     if (Q == A || Q == B)
     {
         free(Q->coeffs);
         Q->coeffs = q;
-        Q->alloc  = Qlen;
-        Q->length = Qlen;
+        Q->alloc  = lenQ;
     }
-    else
-    {
-        Q->length = Qlen;
-    }
+    Q->length = lenQ;
 }
