@@ -198,7 +198,6 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
         fmpz_set_ui(&fac->c, 0);
         return;
     }
-
     if (lenG == 1)
     {
         fmpz_set(&fac->c, G->coeffs);
@@ -210,6 +209,8 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     if (lenG == 2)
     {
         fmpz_poly_content(&fac->c, G);
+        if (fmpz_sgn(fmpz_poly_lead(G)) < 0)
+            fmpz_neg(&fac->c, &fac->c);
         fmpz_poly_scalar_divexact_fmpz(g, G, &fac->c);
         fmpz_poly_factor_insert(fac, g, 1);
     }
@@ -237,6 +238,8 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
            maybe take advantage of the composition algorithm */
         fmpz_poly_factor_init(sq_fr_fac);
         fmpz_poly_factor_squarefree(sq_fr_fac, g);
+
+        fmpz_set(&fac->c, &sq_fr_fac->c);
 
         /* Factor each square-free part */
         for (j = 0; j < sq_fr_fac->num; j++)

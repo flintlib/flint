@@ -25,10 +25,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 int
 main(void)
@@ -43,20 +41,57 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        fmpz_poly_t A;
-        
-        fmpz_poly_init(A);
-        fmpz_poly_randtest(A, state, n_randint(state, 100), 100);
-        
-        result = 1;
+        fmpz_t c;
+        fmpz_poly_t f, g, h, t;
+        fmpz_poly_factor_t fac;
+        long j, n = n_randint(state, 5);
+
+        fmpz_init(c);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(h);
+        fmpz_poly_init(t);
+        fmpz_poly_factor_init(fac);
+
+        fmpz_randtest_not_zero(c, state, n_randint(state, 10) + 1);
+        fmpz_poly_set_fmpz(f, c);
+
+        for (j = 0; j < n; j++)
+        {
+            fmpz_poly_randtest(g, state, n_randint(state, 5) + 2, n_randint(state, 40));
+            fmpz_poly_mul(f, f, g);
+        }
+
+        fmpz_poly_factor_zassenhaus(fac, f);
+
+        fmpz_poly_set_fmpz(h, &fac->c);
+        for (j = 0; j < fac->num; j++)
+        {
+            if (fac->exp[j] == 1)
+                fmpz_poly_mul(h, h, fac->p + j);
+            else
+            {
+                fmpz_poly_pow(t, fac->p + j, fac->exp[j]);
+                fmpz_poly_mul(h, h, t);
+            }
+        }
+
+        result = fmpz_poly_equal(f, h);
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_poly_print(A), printf("\n\n");
+            printf("f = "), fmpz_poly_print(f), printf("\n\n");
+            printf("h = "), fmpz_poly_print(h), printf("\n\n");
+            printf("fac = "), fmpz_poly_factor_print(fac), printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(A);
+        fmpz_clear(c);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(h);
+        fmpz_poly_clear(t);
+        fmpz_poly_factor_clear(fac);
     }
 
     flint_randclear(state);
