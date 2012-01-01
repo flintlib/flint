@@ -106,8 +106,7 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
+    const long lenA = A->length, lenB = B->length;
     long lenG;
     fmpz *g;
     
@@ -121,7 +120,6 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
         fmpz_mod_poly_make_monic(G, A);
         return;
     }
-
     if (lenA == 1 || lenB == 1)
     {
         fmpz_mod_poly_fit_length(G, 1);
