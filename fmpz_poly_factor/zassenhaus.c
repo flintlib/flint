@@ -65,24 +65,24 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
         for ( ; i < 200 && check == 1; i++, p = n_nextprime(p, 0))
 	    {
-            nmod_poly_t F_d, F_sbo, F_tmp;
+            nmod_poly_t d, g, t;
 
-            nmod_poly_init(F_tmp, p);
-            nmod_poly_init(F_d, p);
-            nmod_poly_init(F_sbo, p);
+            nmod_poly_init(t, p);
+            nmod_poly_init(d, p);
+            nmod_poly_init(g, p);
 
-            fmpz_poly_get_nmod_poly(F_tmp, f);
-            if (F_tmp->length == lenF)
+            fmpz_poly_get_nmod_poly(t, f);
+            if (t->length == lenF)
 		    {
-                nmod_poly_derivative(F_d, F_tmp);
-                nmod_poly_gcd(F_sbo, F_tmp, F_d);
+                nmod_poly_derivative(d, t);
+                nmod_poly_gcd(g, t, d);
 
-                if (nmod_poly_is_one(F_sbo))
+                if (nmod_poly_is_one(g))
                 {
                     nmod_poly_factor_t temp_fac;
 
                     nmod_poly_factor_init(temp_fac);
-                    nmod_poly_factor(temp_fac, F_tmp);
+                    nmod_poly_factor(temp_fac, t);
 
                     if (temp_fac->num <= min_r)
                     {
@@ -96,22 +96,21 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
                     check = 0;
                 }
             }
-            nmod_poly_clear(F_d);
-            nmod_poly_clear(F_sbo);
-            nmod_poly_clear(F_tmp);
+            nmod_poly_clear(d);
+            nmod_poly_clear(g);
+            nmod_poly_clear(t);
         }
    
-	    if (i == 200)
+	    if (check)
 	    {
             printf("Warning (fmpz_poly_factor_zassenhaus): \n");
             printf("Polynomial was not square_free after 200 primes, \n");
             printf("maybe an error?\n");
 
             nmod_poly_factor_clear(fac);
-		    return;
+            abort();
         }
     }
-    p = min_p;
 
     /* Check various abort conditions */
     {
@@ -139,6 +138,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
     fmpz_poly_factor_init(lifted_fac);
 
+    p = min_p;
     a = M_bits / FLINT_CLOG2(p);
 
     /*
@@ -160,7 +160,6 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_init(w[i]);
         }
 
-        printf("Going with p = %lu to the a = %ld, r = %ld\n", p, a, r);
         _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, a);
 
         for (i = 0; i < 2*r - 2; i++)
