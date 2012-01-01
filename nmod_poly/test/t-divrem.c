@@ -233,6 +233,93 @@ main(void)
         nmod_poly_clear(r);
     }
 
+    /* Check result of divrem_q0 */
+    for (i = 0; i < 5000; i++)
+    {
+        nmod_poly_t a, b, q, r, prod;
+
+        mp_limb_t n = n_randprime(state, n_randint(state,FLINT_BITS-1)+2, 0);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(q, n);
+        nmod_poly_init(r, n);
+        nmod_poly_init(prod, n);
+
+        do nmod_poly_randtest(a, state, n_randint(state, 400));
+        while (a->length < 1);
+        nmod_poly_randtest(b, state, a->length);
+        do b->coeffs[a->length - 1] = n_randint(state, n);
+        while (b->coeffs[a->length - 1] == 0);
+        b->length = a->length;
+
+        nmod_poly_divrem(q, r, a, b);
+        nmod_poly_mul(prod, q, b);
+        nmod_poly_add(prod, prod, r);
+
+        result = (nmod_poly_equal(a, prod) && r->length < b->length);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(prod), printf("\n\n");
+            nmod_poly_print(q), printf("\n\n");
+            nmod_poly_print(r), printf("\n\n");
+            printf("n = %ld\n", n);
+            abort();
+        }
+        
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(q);
+        nmod_poly_clear(r);
+        nmod_poly_clear(prod);
+    }
+
+    /* Check result of divrem_q1 */
+    for (i = 0; i < 5000; i++)
+    {
+        nmod_poly_t a, b, q, r, prod;
+
+        mp_limb_t n = n_randprime(state, n_randint(state,FLINT_BITS-1)+2, 0);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(q, n);
+        nmod_poly_init(r, n);
+        nmod_poly_init(prod, n);
+        do nmod_poly_randtest(a, state, n_randint(state, 1000));
+        while (a->length < 2);
+        nmod_poly_fit_length(b, a->length - 1);
+        mpn_zero(b->coeffs, a->length - 1);
+        nmod_poly_randtest_not_zero(b, state, n_randint(state, 1000) + 1);
+        do b->coeffs[a->length - 2] = n_randint(state, n);
+        while (b->coeffs[a->length - 2] == 0);
+        b->length = a->length - 1;
+
+        nmod_poly_divrem(q, r, a, b);
+        nmod_poly_mul(prod, q, b);
+        nmod_poly_add(prod, prod, r);
+
+        result = (nmod_poly_equal(a, prod) && r->length < b->length);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(prod), printf("\n\n");
+            nmod_poly_print(q), printf("\n\n");
+            nmod_poly_print(r), printf("\n\n");
+            printf("n = %ld\n", n);
+            abort();
+        }
+        
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(q);
+        nmod_poly_clear(r);
+        nmod_poly_clear(prod);
+    }
+
     flint_randclear(state);
 
     printf("PASS\n");
