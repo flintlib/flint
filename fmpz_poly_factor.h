@@ -68,9 +68,9 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
 void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F);
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-								          ulong exp, fmpz_poly_t f, ulong cutoff);
+								  long exp, const fmpz_poly_t f, long cutoff);
 
-void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t G);
+void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G);
 
 #ifdef __cplusplus
 }
