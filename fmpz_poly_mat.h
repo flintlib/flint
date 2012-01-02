@@ -121,6 +121,10 @@ long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A);
 
 long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A);
 
+/* Truncation ****************************************************************/
+
+void fmpz_poly_mat_truncate(fmpz_poly_mat_t A, long len);
+
 /* Scalar arithmetic *********************************************************/
 
 void fmpz_poly_mat_scalar_mul_fmpz_poly(fmpz_poly_mat_t B,
@@ -148,13 +152,22 @@ void fmpz_poly_mat_mul_classical(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
 void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
                                             const fmpz_poly_mat_t B);
 
+void fmpz_poly_mat_mullow(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
+    const fmpz_poly_mat_t B, long len);
+
 void fmpz_poly_mat_sqr(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
 
 void fmpz_poly_mat_sqr_classical(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
 
 void fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
 
+void fmpz_poly_mat_sqrlow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, long len);
+
 void fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp);
+
+void
+fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
+                            long len);
 
 void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
                         fmpz_poly_mat_t * const factors, long n);
@@ -177,6 +190,10 @@ long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
 
 long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
                             const fmpz_poly_mat_t A);
+
+/* Trace *********************************************************************/
+
+void fmpz_poly_mat_trace(fmpz_poly_t trace, const fmpz_poly_mat_t mat);
 
 /* Determinant and rank ******************************************************/
 

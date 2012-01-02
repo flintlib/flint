@@ -208,6 +208,10 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
 
 long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A);
 
+/* Trace ********************************************************************/
+
+void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);
+
 /* Determinant **************************************************************/
 
 void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A);
@@ -275,6 +279,29 @@ void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
 void fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
                             const fmpz_t m1, const nmod_mat_t mat2);
+
+void
+fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
+    const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
+void
+fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres, const fmpz_mat_t mat);
+
+void
+fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
+    nmod_mat_t * const residues, long nres,
+    fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
+void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
+    long nres);
+
+void
+fmpz_mat_multi_CRT_ui_unsigned_precomp(fmpz_mat_t mat,
+    nmod_mat_t * const residues, long nres,
+    fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
+void fmpz_mat_multi_CRT_ui_unsigned(fmpz_mat_t mat, nmod_mat_t * const residues,
+    long nres);
 
 #ifdef __cplusplus
 }

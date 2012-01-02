@@ -23,58 +23,21 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
+#include "fmpz_poly.h"
+#include "fmpz_poly_mat.h"
 
-
-void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
+void
+fmpz_poly_mat_trace(fmpz_poly_t trace, const fmpz_poly_mat_t mat)
 {
-    long n = mat->r;
+    long i, n = fmpz_poly_mat_nrows(mat);
 
     if (n == 0)
-    {
-        fmpq_set_si(det, 1L, 1L);
-        return;
-    }
-    else if (n == 1)
-    {
-        fmpq_set(det, fmpq_mat_entry(mat, 0, 0));
-    }
-    else if (n == 2)
-    {
-        fmpq_t t;
-        fmpq_init(t);
-
-        fmpq_mul(t, fmpq_mat_entry(mat, 0, 0), fmpq_mat_entry(mat, 1, 1));
-        fmpq_submul(t, fmpq_mat_entry(mat, 0, 1), fmpq_mat_entry(mat, 1, 0));
-
-        fmpq_set(det, t);
-        fmpq_clear(t);
-    }
+        fmpz_poly_zero(trace);
     else
     {
-        fmpz_mat_t num;
-        fmpz * den;
-        long i;
-
-        fmpz_mat_init(num, mat->r, mat->c);
-        den = _fmpz_vec_init(mat->r);
-
-        fmpq_mat_get_fmpz_mat_rowwise(num, den, mat);
-        fmpz_mat_det(&det->num, num);
-
-        fmpz_one(&det->den);
-        for (i = 0; i < mat->r; i++)
-            fmpz_mul(&det->den, &det->den, den + i);
-
-        fmpq_canonicalise(det);
-
-        fmpz_mat_clear(num);
-        _fmpz_vec_clear(den, mat->r);
+        fmpz_poly_set(trace, fmpz_poly_mat_entry(mat, 0, 0));
+        for (i = 1; i < n; i++)
+            fmpz_poly_add(trace, trace, fmpz_poly_mat_entry(mat, i, i));
     }
 }

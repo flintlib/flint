@@ -23,58 +23,60 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <stdlib.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
+#include "fmpz_poly.h"
+#include "fmpz_poly_mat.h"
 
-
-void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
+void
+fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
+                            long len)
 {
-    long n = mat->r;
+    long d = fmpz_poly_mat_nrows(A);
 
-    if (n == 0)
+    if (len < 1)
     {
-        fmpq_set_si(det, 1L, 1L);
-        return;
+        fmpz_poly_mat_zero(B);
     }
-    else if (n == 1)
+    else if (exp == 0 || d == 0)
     {
-        fmpq_set(det, fmpq_mat_entry(mat, 0, 0));
+        fmpz_poly_mat_one(B);
     }
-    else if (n == 2)
+    else if (exp == 1)
     {
-        fmpq_t t;
-        fmpq_init(t);
-
-        fmpq_mul(t, fmpq_mat_entry(mat, 0, 0), fmpq_mat_entry(mat, 1, 1));
-        fmpq_submul(t, fmpq_mat_entry(mat, 0, 1), fmpq_mat_entry(mat, 1, 0));
-
-        fmpq_set(det, t);
-        fmpq_clear(t);
+        fmpz_poly_mat_set(B, A);
+        fmpz_poly_mat_truncate(B, len);
+    }
+    else if (exp == 2)
+    {
+        fmpz_poly_mat_sqrlow(B, A, len);
+    }
+    else if (d == 1)
+    {
+        fmpz_poly_pow_trunc(fmpz_poly_mat_entry(B, 0, 0),
+                        fmpz_poly_mat_entry(A, 0, 0), exp, len);
     }
     else
     {
-        fmpz_mat_t num;
-        fmpz * den;
+        fmpz_poly_mat_t T, U;
         long i;
 
-        fmpz_mat_init(num, mat->r, mat->c);
-        den = _fmpz_vec_init(mat->r);
+        fmpz_poly_mat_init_set(T, A);
+        fmpz_poly_mat_truncate(T, len);
+        fmpz_poly_mat_init(U, d, d);
 
-        fmpq_mat_get_fmpz_mat_rowwise(num, den, mat);
-        fmpz_mat_det(&det->num, num);
+        for (i = ((long) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        {
+            fmpz_poly_mat_sqrlow(U, T, len);
 
-        fmpz_one(&det->den);
-        for (i = 0; i < mat->r; i++)
-            fmpz_mul(&det->den, &det->den, den + i);
+            if (exp & (1L << i))
+                fmpz_poly_mat_mullow(T, U, A, len);
+            else
+                fmpz_poly_mat_swap(T, U);
+        }
 
-        fmpq_canonicalise(det);
-
-        fmpz_mat_clear(num);
-        _fmpz_vec_clear(den, mat->r);
+        fmpz_poly_mat_swap(B, T);
+        fmpz_poly_mat_clear(T);
+        fmpz_poly_mat_clear(U);
     }
 }

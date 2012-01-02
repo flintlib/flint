@@ -334,11 +334,22 @@ void fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A,
 
 *******************************************************************************
 
+    Trace
+
+*******************************************************************************
+
+void fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat)
+
+    Computes the trace of the matrix, i.e. the sum of the entries on
+    the main diagonal. The matrix is required to be square.
+
+*******************************************************************************
+
     Determinant
 
 *******************************************************************************
 
-void fmpq_mat_det(fmpq_t det, fmpq_mat_t mat)
+void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
 
     Sets \code{det} to the determinant of \code{mat}. In the general case,
     the determinant is computed by clearing denominators and computing a
