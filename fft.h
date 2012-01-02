@@ -199,6 +199,15 @@ void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
 void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                              mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp);
 
+void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, 
+                                                     mp_limb_t * jj, mp_size_t m);
+
+void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
+                             mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w);
+
+void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
+                                        mp_size_t n, mp_size_t w, mp_limb_t * tt);
+
 #ifdef __cplusplus
 }
 #endif
