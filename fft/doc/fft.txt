@@ -230,6 +230,9 @@ void fft_radix2(mp_limb_t ** ii,
          extra limbs being a "carry limb"). Outputs are written 
          in-place.
                
+    We require $nw$ to be at least 64 and the two temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
+
 void fft_truncate(mp_limb_t ** ii,  mp_size_t n, mp_bitcnt_t w, 
                                mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
 
@@ -285,6 +288,9 @@ void ifft_radix2(mp_limb_t ** ii,
         array of limbs of length \code{wn/GMP_LIMB_BITS + 1} (the
         extra limbs being a "carry limb"). Outputs are written 
         in-place.
+
+    We require $nw$ to be at least 64 and the two temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
 
 void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                                mp_limb_t ** t1, mp_limb_t ** t2, mp_size_t trunc)
@@ -365,6 +371,9 @@ void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
     of twiddles by powers of a square root of 2, not powers of 2 in the first 
     layer of the transform.  
 
+    We require $nw$ to be at least 64 and the three temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
+
 void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
 
@@ -372,6 +381,9 @@ void ifft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
     length, i.e. length $4n$ instead of $2n$. This is achieved by making use 
     of twiddles by powers of a square root of 2, not powers of 2 in the final 
     layer of the transform. 
+
+    We require $nw$ to be at least 64 and the three temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
 
 *******************************************************************************
 
@@ -475,6 +487,9 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     To improve performance, the extra twiddles by roots of unity are combined
     with the butterflies performed at the last layer of the column transforms.
 
+    We require $nw$ to be at least 64 and the three temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
+
 void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
                       mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
@@ -491,6 +506,37 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     column IFFTs for better cache locality and the extra twiddles that occur
     in the matrix fourier algorithm are combined with the butterflied performed
     at the first layer of the final column transforms.
+
+    We require $nw$ to be at least 64 and the three temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
+
+*******************************************************************************
+
+    Negacyclic multiplication
+
+*******************************************************************************
+
+void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
+
+    As per \code{fft_radix2) except that it performs a sqrt2 negacyclic 
+    transform of length $2n$. This is the same as the radix 2 transform except
+    that the $i$-th coefficient of the input is first multiplied by 
+    $\sqrt{2}^{iw}$.
+
+    We require $nw$ to be at least 64 and the two temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
+
+void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
+
+    As per \code{ifft_radix2) except that it performs a sqrt2 negacyclic 
+    inverse transform of length $2n$. This is the same as the radix 2 inverse
+    transform except that the $i$-th coefficient of the output is finally 
+    divided by $\sqrt{2}^{iw}$.
+
+    We require $nw$ to be at least 64 and the two temporary space pointers to
+    point to blocks of size \code{n*w + FLINT_BITS} bits.
 
 *******************************************************************************
 
@@ -512,8 +558,13 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
     coefficients and breaking the second integer results in \code{j2} chunks
     then \code{j1 + j2 - 1 <= 2^(depth + 2)}.
 
+    If \code{n = 2^depth} then we require $nw$ to be at least 64.
+
 void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 
     As for \code{mul_truncate_sqrt2} except that the cache friendly matrix
     fourier algorithm is used.
+
+    If \code{n = 2^depth} then we require $nw$ to be at least 64. Here we
+    also require $w$ to be $2^i$ for some $i \geq 0$. 

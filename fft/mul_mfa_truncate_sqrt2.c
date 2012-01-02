@@ -36,6 +36,7 @@ or implied, of William Hart.
 void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                         mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w)
 {
+   int k;
    mp_size_t n = (1UL<<depth);
    mp_bitcnt_t bits1 = (n*w - (depth+1))/2; 
    mp_size_t sqrt = (1UL<<(depth/2));
@@ -49,8 +50,8 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    
    mp_size_t i, j, s, t, u, trunc, trunc2;
 
-   mp_limb_t ** ii, ** jj, * t1, * t2, * s1, * tt, * ptr;
-   mp_limb_t c;
+   mp_limb_t ** ii, ** jj, * t1, * t2, * s1, * ptr;
+   /* mp_limb_t c, * tt; */
    
    ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
@@ -60,7 +61,7 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    t1 = ptr;
    t2 = t1 + size;
    s1 = t2 + size;
-   tt = s1 + size;
+   /*tt = s1 + size;*/
    
    jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
    for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
@@ -81,12 +82,15 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
       mpn_zero(jj[j], limbs + 1);
    fft_mfa_truncate_sqrt2(jj, n, w, &t1, &t2, &s1, sqrt, trunc);      
 
+   k = __gmpn_fft_best_k(limbs, 0);
+   
    for (j = 0; j < 2*n; j++)
    {
       mpn_normmod_2expp1(ii[j], limbs);
       mpn_normmod_2expp1(jj[j], limbs);
-      c = ii[j][limbs] + 2*jj[j][limbs];
-      ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
+      /*c = ii[j][limbs] + 2*jj[j][limbs];
+      ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);*/
+      ii[j][limbs] = mpn_mul_fft_aux(ii[j], limbs, ii[j], limbs, jj[j], limbs, k, 1);
    }
    
    trunc2 = (trunc - 2*n)/sqrt;
@@ -98,8 +102,9 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
          j = 2*n + t*sqrt + u;
          mpn_normmod_2expp1(ii[j], limbs);
          mpn_normmod_2expp1(jj[j], limbs);
-         c = ii[j][limbs] + 2*jj[j][limbs];
-         ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
+         /*c = ii[j][limbs] + 2*jj[j][limbs];
+         ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);*/
+         ii[j][limbs] = mpn_mul_fft_aux(ii[j], limbs, ii[j], limbs, jj[j], limbs, k, 1);
       }
    }
 
