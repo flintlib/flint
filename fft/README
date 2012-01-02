@@ -1,0 +1,122 @@
+FFT Integer Multiplication code
+===============================
+
+License: BSD
+
+Introduction
+------------
+
+Many bignum libraries and programming languages do not contain fast code for
+multiplication of huge integers. It is important to have this when computing
+millions of digits of Pi, multiplying polynomials using Kronecker segmentation
+(or the Schoenhage-Strassen technique using an FFT directly) and a variety of
+other problems.
+
+Here we introduce fast FFT code for multiplication of huge integers.
+
+Currently the code depends on GMP/MPIR, however, any sufficiently well 
+developed bignum library should have equivalent primitives for bignums. (There
+is also a dependence on the flint function n_revbin, which is found in the
+ulong_extras directory of flint -- I hereby license it under the BSD 
+license as per the remainder of the FFT implementation.)
+
+To use the FFT for multiplying large integers, one needs to use the functions
+mul_truncate_sqrt2 and mul_mfa_truncate_sqrt2 as documented in the doc 
+directory. A tuned wrapper would decide which values of n and w to use
+based on timings for the target architecture.
+
+
+Features:
+--------
+
+* Cache friendly up to huge transforms (integers of billions of bits)
+* Truncated -- no ugly performance jumps at power of 2 lengths and no problem
+  with unbalanced multiplications
+* Extremely fast
+* Easy to tune
+* Truncated FFT/IFFT functions can be used for polynomial multiplication
+
+Performance Data
+----------------
+
+Here are timings for multiplication of two integers of the given number of 
+bits, comparing MPIR 2.4.0, this code and GMP 5.0.2 respectively. The timings
+are for varying numbers of iterations as specified. The timings were done on
+a 2.2GHz AMD K10-2 Mangy Cours machine.
+
+The tuning values used are specified in the final two columns. 
+
+The first half of the table uses mul_truncate_sqrt2, the second half uses
+mul_mfa_truncate_sqrt2.
+
+bits          iters mpir   this   gmp     n w
+
+195840        1000  1.149s 1.105s 0.997s  7 16
+261120        1000  1.483s 1.415s 1.396s  7 16
+391296        100   0.261s 0.248s 0.282s  8 8  
+521728        100   0.344s 0.315s 0.411s  8 8  
+782592        100   0.577s 0.539s 0.628s  9 4  
+1043456       100   0.706s 0.688s 0.848s  9 4  
+1569024       100   1.229s 1.153s 1.317s  9 8  
+2092032       100   1.543s 1.462s 2.765s  9 8 
+3127296       10    0.283s 0.286s 0.408s 11 1 
+4169728       10    0.357s 0.350s 0.543s 11 1  
+6273024       10    0.621s 0.615s 0.843s 11 2  
+8364032       10    0.831s 0.799s 1.156s 11 2 
+12539904      10    1.441s 1.471s 1.798s 12 1  
+16719872      1     0.230s 0.209s 0.288s 12 1 
+25122816      1     0.379s 0.357s 0.434s 12 2 
+33497088      1     0.524s 0.462s 0.646s 12 2 
+50245632      1     0.833s 0.782s 1.035s 13 1 
+66994176      1     1.596s 0.967s 1.358s 13 1
+ 
+100577280     1     1.906s 1.684s 2.177s 13 2 
+134103040     1     2.784s 2.154s 2.984s 13 2 
+201129984     1     3.971s 3.349s 4.536s 14 1 
+268173312     1     5.146s 4.350s 5.781s 14 1 
+402456576     1     7.548s 6.717s 9.867s 14 2 
+536608768     1     9.841s 8.804s 12.71s 14 2 
+804913152     1     15.48s 13.92s 20.06s 15 1 
+1073217536    1     21.17s 17.96s 27.19s 15 1 
+1610219520    1     31.64s 29.64s 43.37s 15 2 
+2146959360    1     43.25s 39.07s 57.66s 15 2 
+3220340736    1     70.14s 61.17s 92.94s 16 1 
+4293787648    1     96.00s 79.13s 146.1s 16 1 
+6441566208    1     150.2s 132.9s 217.5s 16 2 
+8588754944    1     208.4s 177.2s 312.8s 16 2 
+12883132416   1     327.4s 281.8s 447.7s 17 1  
+17177509888   1     485.0s 372.6s 614.2s 17 1 
+
+
+Additional tuning
+-----------------
+
+Technically one should tune the values that appear at the top of the file
+mulmod_2expp1.c. The array entries correspond to (n, w) pairs starting at
+n = 12, w = 1. The values in the array should be nonnegative and less
+than 6. The length of the array is given by FFT_N_NUM. The cutoff
+FFT_MULMOD_2EXPP1_CUTOFF should also be tuned. It must be bigger than
+128. The function that these values tunes is at the bottom of that file.
+See the corresponding test function for an example of how to call it.
+
+Acknowledgements
+----------------
+
+"Matters Computational: ideas, algorithms and source code", by Jorg
+Arndt, see http://www.jjj.de/fxt/fxtbook.pdf
+
+"Primes numbers: a computational perspective", by Richard Crandall and
+Carl Pomerance, 2nd ed., 2005, Springer.
+
+"A GMP-based implementation of Schonhage-Strassen's Large Integer
+Multiplication Algorithm" by Pierrick Gaudry, Alexander Kruppa and
+Paul Zimmermann, ISAAC 2007 proceedings, pp 167-174. See
+http://www.loria.fr/~gaudry/publis/issac07.pdf
+
+"Multidigit multiplication for mathematicians" by Dan Bernstein (to
+appear). see http://cr.yp.to/papers/m3.pdf
+
+"A cache-friendly truncated FFT" by David Harvey, Theor. Comput. Sci. 410 (2009), 2649.2658. See http://web.maths.unsw.edu.au/~davidharvey/papers/cache-trunc-fft/
+
+"The truncated Fourier transform and applications" by Joris van der Hoeven, J. Gutierrez, editor, Proc. ISSAC 2004, pages 290.296, Univ. of Cantabria, Santander, Spain, July 4.7 2004.
+
