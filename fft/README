@@ -96,7 +96,7 @@ Additional tuning
 -----------------
 
 Technically one should tune the values that appear at the top of the file
-mulmod_2expp1.c. The array entries correspond to (n, w) pairs starting at
+mulmod_2expp1.c. The array indices correspond to (n, w) pairs starting at
 n = 12, w = 1. The values in the array should be nonnegative and less
 than 6. The length of the array is given by FFT_N_NUM. The cutoff
 FFT_MULMOD_2EXPP1_CUTOFF should also be tuned. It must be bigger than
