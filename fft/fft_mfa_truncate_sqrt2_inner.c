@@ -28,60 +28,64 @@ or implied, of William Hart.
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
+#include "mpir.h"
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fft.h"
 
-int
-main(void)
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n, 
+                   mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                  mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
 {
-    mp_bitcnt_t depth, w;
-    mp_size_t iters, j;
-    double truncation;
-
-    flint_rand_t state;
-
-    printf("mul_mfa_truncate_sqrt2....");
-    fflush(stdout);
-
-    flint_randinit(state);
-    _flint_rand_init_gmp(state);
-
-    depth = 17;
-    w = 1;
-    iters = 1;
-    truncation = 0.75;
-
-    {
-       mp_size_t n = (1UL<<depth);
-       mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-       mp_bitcnt_t bits = 2*n*bits1;
-       mp_size_t int_limbs = ((mp_size_t)(truncation*bits))/FLINT_BITS;
-       mp_size_t j;
-       mp_limb_t * i1, *i2, *r1, *r2;
-        
-       printf("bits = %ld\n", int_limbs*FLINT_BITS);
-       
-       i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
-       i2 = i1 + int_limbs;
-       r1 = i2 + int_limbs;
-       r2 = r1 + 2*int_limbs;
+   mp_size_t i, j, s;
+   mp_size_t n2 = (2*n)/n1;
+   mp_size_t trunc2 = (trunc - 2*n)/n1;
+   mp_size_t limbs = (n*w)/FLINT_BITS;
+   mp_bitcnt_t depth = 0;
+   mp_bitcnt_t depth2 = 0;
    
-       mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-       mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-       for (j = 0; j < iters; j++)
-          mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
-          //mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-       
-       free(i1);
-    }
+   while ((1UL<<depth) < n2) depth++;
+   while ((1UL<<depth2) < n1) depth2++;
 
-    flint_randclear(state);
-    
-    printf("done\n");
-    return 0;
+   ii += 2*n;
+   jj += 2*n;
+
+   /* convolutions on relevant rows */
+   for (s = 0; s < trunc2; s++)
+   {
+      i = n_revbin(s, depth);
+      fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
+      fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
+      
+      for (j = 0; j < n1; j++)
+      {
+         mp_size_t t = i*n1 + j;
+         mpn_normmod_2expp1(ii[t], limbs);
+         mpn_normmod_2expp1(jj[t], limbs);
+         fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
+      }      
+      
+      ifft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
+   }
+
+   ii -= 2*n;
+   jj -= 2*n;
+
+   /* convolutions on rows */
+   for (i = 0; i < n2; i++)
+   {
+      fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
+      fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
+
+      for (j = 0; j < n1; j++)
+      {
+         mp_size_t t = i*n1 + j;
+         mpn_normmod_2expp1(ii[t], limbs);
+         mpn_normmod_2expp1(jj[t], limbs);
+         fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
+      }      
+      
+      ifft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
+   }
 }
+

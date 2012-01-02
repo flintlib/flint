@@ -47,7 +47,7 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    mp_size_t j1 = (n1*FLINT_BITS - 1)/bits1 + 1;
    mp_size_t j2 = (n2*FLINT_BITS - 1)/bits1 + 1;
    
-   mp_size_t i, j, s, t, u, trunc, trunc2;
+   mp_size_t i, j, trunc;
 
    mp_limb_t ** ii, ** jj, * t1, * t2, * s1, * ptr;
    mp_limb_t * tt;
@@ -74,40 +74,17 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    for (j = j1 ; j < 4*n; j++)
       mpn_zero(ii[j], limbs + 1);
    
-   fft_mfa_truncate_sqrt2(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
-    
+   fft_mfa_truncate_sqrt2_outer(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
+   
    j2 = fft_split_bits(jj, i2, n2, bits1, limbs);
    for (j = j2 ; j < 4*n; j++)
       mpn_zero(jj[j], limbs + 1);
-   fft_mfa_truncate_sqrt2(jj, n, w, &t1, &t2, &s1, sqrt, trunc);      
 
-   for (j = 0; j < 2*n; j++)
-   {
-      mpn_normmod_2expp1(ii[j], limbs);
-      mpn_normmod_2expp1(jj[j], limbs);
-      fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, tt);
-   }
+   fft_mfa_truncate_sqrt2_outer(jj, n, w, &t1, &t2, &s1, sqrt, trunc);
    
-   trunc2 = (trunc - 2*n)/sqrt;
-   for (s = 0; s < trunc2; s++)
-   {
-      t = n_revbin(s, depth - depth/2 + 1);
-      for (u = 0; u < sqrt; u++)
-      {
-         j = 2*n + t*sqrt + u;
-         mpn_normmod_2expp1(ii[j], limbs);
-         mpn_normmod_2expp1(jj[j], limbs);
-         fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, tt);
-      }
-   }
-
-   ifft_mfa_truncate_sqrt2(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
-   for (j = 0; j < trunc; j++)
-   {
-      mpn_div_2expmod_2expp1(ii[j], ii[j], limbs, depth + 2);
-      mpn_normmod_2expp1(ii[j], limbs);
-   }
-   
+   fft_mfa_truncate_sqrt2_inner(ii, jj, n, w, &t1, &t2, &s1, sqrt, trunc, tt);
+   ifft_mfa_truncate_sqrt2_outer(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
+       
    mpn_zero(r1, r_limbs);
    fft_combine_bits(r1, ii, j1 + j2 - 1, bits1, limbs, r_limbs);
      

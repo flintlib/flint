@@ -510,6 +510,26 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     We require $nw$ to be at least 64 and the three temporary space pointers to
     point to blocks of size \code{n*w + FLINT_BITS} bits.
 
+void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+
+    Just the outer layers of \code{fft_mfa_truncate_sqrt2}.
+
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
+            mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
+
+    The inner layers of \code{fft_mfa_truncate_sqrt2} and 
+    \code{ifft_mfa_truncate_sqrt2} combined with pointwise mults.
+
+void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                        mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+
+    The outer layers of \code{ifft_mfa_truncate_sqrt2} combined with
+    normalisation.
+
 *******************************************************************************
 
     Negacyclic multiplication

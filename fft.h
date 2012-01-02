@@ -190,6 +190,18 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
 void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w);
 
+void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
+
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
+            mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt);
+
+void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                        mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
+
 void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                              mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp);
 
