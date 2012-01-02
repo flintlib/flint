@@ -51,9 +51,6 @@ or implied, of William Hart.
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
-extern int mpn_mul_fft_aux(mp_ptr op, mp_size_t pl, mp_srcptr n, 
-                   mp_size_t nl, mp_srcptr m, mp_size_t ml, mp_size_t k, int b);
-extern int __gmpn_fft_best_k(mp_size_t, int);
 
 #define SWAP_PTRS(xx, yy) \
    do { \
