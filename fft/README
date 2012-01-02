@@ -50,7 +50,7 @@ a 2.2GHz AMD K10-2 Mangy Cours machine.
 
 The tuning values used are specified in the final two columns. 
 
-The first half of the table uses mul_truncate_sqrt2, the second half uses
+The first part of the table uses mul_truncate_sqrt2, the second half uses
 mul_mfa_truncate_sqrt2.
 
 bits          iters mpir   this   gmp     n w
@@ -62,12 +62,12 @@ bits          iters mpir   this   gmp     n w
 782592        100   0.577s 0.539s 0.628s  9 4  
 1043456       100   0.706s 0.688s 0.848s  9 4  
 1569024       100   1.229s 1.153s 1.317s  9 8  
-2092032       100   1.543s 1.462s 2.765s  9 8 
-3127296       10    0.283s 0.286s 0.408s 11 1 
-4169728       10    0.357s 0.350s 0.543s 11 1  
-6273024       10    0.621s 0.615s 0.843s 11 2  
-8364032       10    0.831s 0.799s 1.156s 11 2 
 
+2092032       100   1.543s 1.440s 2.765s  9 8 
+3127296       10    0.283s 0.266s 0.408s 11 1 
+4169728       10    0.357s 0.335s 0.543s 11 1  
+6273024       10    0.621s 0.597s 0.843s 11 2  
+8364032       10    0.831s 0.742s 1.156s 11 2 
 12539904      10    1.441s 1.394s 1.798s 12 1  
 16719872      1     0.230s 0.205s 0.288s 12 1 
 25122816      1     0.379s 0.336s 0.434s 12 2 
