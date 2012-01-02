@@ -50,9 +50,9 @@ main(void)
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    depth = 17;
+    depth = 12;
     w = 1;
-    iters = 1;
+    iters = 10;
     truncation = 0.75;
 
     {
