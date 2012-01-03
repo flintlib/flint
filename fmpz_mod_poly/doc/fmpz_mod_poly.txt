@@ -415,6 +415,24 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
 
+void _fmpz_mod_poly_rem_basecase(fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$ but only sets \code{(R, lenA)}.
+
+    Allows aliasing only between $A$ and $R$.  Allows zero-padding 
+    in $A$ but not in $B$.  Assumes that the leading coefficient 
+    of $B$ is a unit modulo $p$.
+
+void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$ assuming that the leading term 
+    of $B$ is a unit.
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p)

@@ -277,6 +277,13 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+void _fmpz_mod_poly_rem_basecase(fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p);
