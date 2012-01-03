@@ -30,11 +30,12 @@
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
                                   long exp, const fmpz_poly_t f, long cutoff)
 {
+    fmpz_t temp;
+    
     const long lenF = f->length;
 
-    const long M_bits = fmpz_bits(fmpz_poly_lead(f)) 
-                        + FLINT_ABS(fmpz_poly_max_bits(f)) 
-                        + lenF + FLINT_CLOG2(lenF);
+    long M_bits;
+    
     long a;
 
     long i, num_primes;
@@ -138,8 +139,20 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
     fmpz_poly_factor_init(lifted_fac);
 
+    fmpz_init(temp);
+    fmpz_mul(temp, &final_fac->c, fmpz_poly_lead(f));
+
+    M_bits = fmpz_bits(temp) 
+                    + FLINT_ABS(fmpz_poly_max_bits(f)) 
+                    + lenF + FLINT_CLOG2(lenF) + 2;
+    fmpz_clear(temp);
+
     p = min_p;
     a = M_bits / FLINT_CLOG2(p);
+
+    printf("p = %ld, a = %ld\n", p, a);
+    nmod_poly_factor_print(fac);
+    printf(" was the nmod poly fac, pre hensel lift\n");
 
     /*
         Begin Hensel Lifting phase, make the tree in v, w, and link.
