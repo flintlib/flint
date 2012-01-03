@@ -25,9 +25,6 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
@@ -42,21 +39,23 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
     }
     else  /* lenA >= lenB > 1 */
     {
+        const long lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz_t invR3;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
-        long lenR1, lenR2, lenR3, lenW;
+        long lenR1, lenR2, lenR3;
 
-        lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
-        W    = _fmpz_vec_init(lenW);
-        Q    = W;
-        R1   = W + FLINT_MAX(lenA - lenB + 1, lenB);
+        W  = _fmpz_vec_init(lenW);
+        Q  = W;
+        R1 = W + FLINT_MAX(lenA - lenB + 1, lenB);
+        R2 = R1 + lenA;
+        R3 = R2 + lenB;
 
         _fmpz_mod_poly_divrem(Q, R1, A, lenA, B, lenB, invB, p);
 
-        lenR1 = lenB - 1;
-        FMPZ_VEC_NORM(R1, lenR1);
+        lenR3 = lenB - 1;
+        FMPZ_VEC_NORM(R1, lenR3);
 
-        if (lenR1 == 0)
+        if (lenR3 == 0)
         {
             _fmpz_vec_set(G, B, lenB);
             _fmpz_vec_clear(W, lenW);
@@ -65,31 +64,20 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
 
         fmpz_init(invR3);
 
-        R2 = R1 + lenA;
-        R3 = R2 + lenB;
         T  = R3;
         R3 = R1;
         R1 = T;
         _fmpz_vec_set(R2, B, lenB);
         lenR2 = lenB;
-        lenR3 = lenR1;
-        lenR1 = lenB;
 
         do
         {
             fmpz_invmod(invR3, R3 + (lenR3 - 1), p);
 
             _fmpz_mod_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, invR3, p);
-            lenR1 = lenR3 - 1;
-            FMPZ_VEC_NORM(R1, lenR1);
-
-            T  = R2;
-            R2 = R3;
-            R3 = R1;
-            R1 = T;
-
-            lenR2 = lenR3;
-            lenR3 = lenR1;
+            lenR2 = lenR3--;
+            FMPZ_VEC_NORM(R1, lenR3);
+            T = R2; R2 = R3; R3 = R1; R1 = T;
         } 
         while (lenR3 > 0);
 
