@@ -24,11 +24,25 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
+
+void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
+                             const fmpz *A, long lenA, 
+                             const fmpz *B, long lenB, const fmpz_t p)
+{
+    fmpz_t invB;
+
+    fmpz_init(invB);
+    fmpz_gcdinv(f, invB, B + lenB - 1, p);
+
+    if (fmpz_is_one(f))
+    {
+        _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
+    }
+
+    fmpz_clear(invB);
+}
 
 void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
