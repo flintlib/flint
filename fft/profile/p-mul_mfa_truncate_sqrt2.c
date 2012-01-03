@@ -39,7 +39,9 @@ int
 main(void)
 {
     mp_bitcnt_t depth, w;
-    
+    mp_size_t iters, j;
+    double truncation;
+
     flint_rand_t state;
 
     printf("mul_mfa_truncate_sqrt2....");
@@ -48,44 +50,38 @@ main(void)
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 14; depth++)
-    {
-        for (w = 1; w <= 3 - (depth >= 12); w++)
-        {
-            mp_size_t n = (1UL<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-            mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
-            mp_bitcnt_t bits = (trunc/2)*bits1;
-            mp_size_t int_limbs = bits/FLINT_BITS;
-            mp_size_t j;
-            mp_limb_t * i1, *i2, *r1, *r2;
-        
-            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
-            i2 = i1 + int_limbs;
-            r1 = i2 + int_limbs;
-            r2 = r1 + 2*int_limbs;
-   
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-            mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-            mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
-            
-            for (j = 0; j < 2*int_limbs; j++)
-            {
-                if (r1[j] != r2[j]) 
-                {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
-                    abort();
-                }
-            }
+    depth = 8;
+    w = 8;
+    iters = 100;
+    truncation = 0.75;
 
-            free(i1);
-        }
+    {
+       mp_size_t n = (1UL<<depth);
+       mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+       mp_bitcnt_t bits = 2*n*bits1;
+       mp_size_t int_limbs = ((mp_size_t)(truncation*bits))/FLINT_BITS;
+       mp_size_t j;
+       mp_limb_t * i1, *i2, *r1, *r2;
+        
+       printf("bits = %ld\n", int_limbs*FLINT_BITS);
+       
+       i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
+       i2 = i1 + int_limbs;
+       r1 = i2 + int_limbs;
+       r2 = r1 + 2*int_limbs;
+   
+       mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
+       mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+  
+       for (j = 0; j < iters; j++)
+          mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
+          //mpn_mul(r2, i1, int_limbs, i2, int_limbs);
+       
+       free(i1);
     }
 
     flint_randclear(state);
     
-    printf("PASS\n");
+    printf("done\n");
     return 0;
 }

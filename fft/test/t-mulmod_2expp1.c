@@ -39,51 +39,63 @@ int
 main(void)
 {
     mp_bitcnt_t depth, w;
-    
+    int iters;
+
     flint_rand_t state;
 
-    printf("mul_mfa_truncate_sqrt2....");
+    printf("mulmod_2expp1....");
     fflush(stdout);
 
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 14; depth++)
+    for (iters = 0; iters < 100; iters++)
     {
-        for (w = 1; w <= 3 - (depth >= 12); w++)
+        for (depth = 6; depth <= 18; depth++)
         {
-            mp_size_t n = (1UL<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-            mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
-            mp_bitcnt_t bits = (trunc/2)*bits1;
-            mp_size_t int_limbs = bits/FLINT_BITS;
-            mp_size_t j;
-            mp_limb_t * i1, *i2, *r1, *r2;
-        
-            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
-            i2 = i1 + int_limbs;
-            r1 = i2 + int_limbs;
-            r2 = r1 + 2*int_limbs;
-   
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-            mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-            mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
-            
-            for (j = 0; j < 2*int_limbs; j++)
+            for (w = 1; w <= 2; w++)
             {
-                if (r1[j] != r2[j]) 
+                mp_size_t n = (1UL<<depth);
+                mp_bitcnt_t bits = n*w;
+                mp_size_t int_limbs = bits/FLINT_BITS;
+                mp_size_t j;
+                mp_limb_t c, * i1, * i2, * r1, * r2, * tt;
+        
+                i1 = malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
+                i2 = i1 + int_limbs + 1;
+                r1 = i2 + int_limbs + 1;
+                r2 = r1 + int_limbs + 1;
+                tt = r2 + int_limbs + 1;
+
+                random_fermat(i1, state, int_limbs);
+                random_fermat(i2, state, int_limbs);
+                mpn_normmod_2expp1(i1, int_limbs);
+                mpn_normmod_2expp1(i2, int_limbs);
+
+                fft_mulmod_2expp1(r2, i1, i2, n, w, tt);
+                c = i1[int_limbs] + 2*i2[int_limbs];
+                c = mpn_mulmod_2expp1(r1, i1, i2, c, int_limbs*FLINT_BITS, tt);
+            
+                for (j = 0; j < int_limbs; j++)
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    if (r1[j] != r2[j]) 
+                    {
+                        printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                        abort();
+                    }
+                }
+
+                if (c != r2[int_limbs])
+                {
+                    printf("error in limb %ld, %lx != %lx\n", j, c, r2[j]);
                     abort();
                 }
-            }
 
-            free(i1);
+                free(i1);
+            }
         }
     }
-
+    
     flint_randclear(state);
     
     printf("PASS\n");
