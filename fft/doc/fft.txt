@@ -148,7 +148,7 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
 
     Set \code{r} to \code{i1} times $z^i$ modulo $B^\mbox{limbs} + 1$ where $z$ 
     corresponds to multiplication by $\sqrt{2}^w$. This can be thought of as part 
-    of a butterfly operation. We require $0 \leq i < 2*n$ where $nw =$ 
+    of a butterfly operation. We require $0 \leq i < 2*n$ and odd where $nw =$ 
     \code{limbs*FLINT_BITS}.
 
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1, 
@@ -333,7 +333,7 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
 
     Let $w = 2k + 1$, $i = 2j + 1$. Set \code{s = i1 + i2}, 
     \code{t = z1^i*(i1 - i2)} modulo $p = B^\mbox{limbs} + 1$ where 
-    \code{z1 = exp(Pi*I/n)} corresponds to multiplication by $2^w$. Requires 
+    \code{z1^2 = exp(Pi*I/n)} corresponds to multiplication by $2^w$. Requires 
     $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
 
     Here \code{z1} corresponds to multiplication by $2^k$ then multiplication by 
@@ -346,9 +346,9 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
 void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
    mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w, mp_limb_t * temp)
 
-    Let $w = 2k + 1$, $i = 2j + 1$. Set \code{s = i1 + z1*i2}, 
+    Let $w = 2k + 1$, $i = 2j + 1$. Set \code{s = i1 + z1^i*i2}, 
     \code{t = i1 - z1^i*i2} modulo $p = B^\mbox{limbs} + 1$ where 
-    \code{z1 = exp(-Pi*I/n)} corresponds to division by $2^w$. Requires 
+    \code{z1^2 = exp(-Pi*I/n)} corresponds to division by $2^w$. Requires 
     $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
 
     Here \code{z1} corresponds to division by $2^k$ then division by 
@@ -518,7 +518,7 @@ void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 
 void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
             mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
-                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
+               mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
 
     The inner layers of \code{fft_mfa_truncate_sqrt2} and 
     \code{ifft_mfa_truncate_sqrt2} combined with pointwise mults.

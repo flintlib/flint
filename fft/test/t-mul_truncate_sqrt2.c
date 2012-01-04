@@ -56,7 +56,7 @@ main(void)
             mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
             mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
             mp_bitcnt_t bits = (trunc/2)*bits1;
-            mp_size_t int_limbs = bits/FLINT_BITS;
+            mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
             mp_size_t j;
             mp_limb_t * i1, *i2, *r1, *r2;
         
