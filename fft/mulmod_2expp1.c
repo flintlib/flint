@@ -33,12 +33,9 @@ or implied, of William Hart.
 #include "fft.h"
 #include "longlong.h"
 #include "ulong_extras.h"
+#include "fft_tuning.h"
 
-#define FFT_MULMOD_2EXPP1_CUTOFF 250
-#define FFT_N_NUM 7
-
-static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM][2] = 
-{ { 3, 3 }, { 3, 3 }, { 3, 3 }, { 3, 2 }, { 2, 2 }, { 2, 2 }, { 1, 1 } };
+static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM][2] = MULMOD_TAB;
 
 void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_size_t m)
 {
