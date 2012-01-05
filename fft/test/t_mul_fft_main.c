@@ -42,45 +42,70 @@ main(void)
     
     flint_rand_t state;
 
-    printf("mul_truncate_sqrt2....");
+    printf("mul_fft_main....");
     fflush(stdout);
 
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 12; depth++)
+    for (depth = 6; depth <= 13; depth++)
     {
-        for (w = 1; w <= 5; w++)
+        for (w = 1; w <= 3 - (depth >= 12); w++)
         {
-            mp_size_t n = (1UL<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-            mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
-            mp_bitcnt_t bits = (trunc/2)*bits1;
-            mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
-            mp_size_t j;
-            mp_limb_t * i1, *i2, *r1, *r2;
-        
-            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
-            i2 = i1 + int_limbs;
-            r1 = i2 + int_limbs;
-            r2 = r1 + 2*int_limbs;
-   
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-            mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-            mul_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
+            int iter = 1 + 200*(depth <= 8) + 80*(depth <= 9) + 10*(depth <= 10), i;
             
-            for (j = 0; j < 2*int_limbs; j++)
+            for (i = 0; i < iter; i++)
             {
-                if (r1[j] != r2[j]) 
-                {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
-                    abort();
-                }
-            }
+               mp_size_t n = (1UL<<depth);
+               mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
+               mp_size_t len1 = 2*n + n_randint(state, 2*n) + 1;
+               mp_size_t len2 = 2*n + 2 - len1 + n_randint(state, 2*n);
 
-            free(i1);
+               mp_bitcnt_t b1 = len1*bits1, b2;
+               mp_size_t n1, n2;
+               mp_size_t j;
+               mp_limb_t * i1, *i2, *r1, *r2;
+
+               if (len2 <= 0)
+                  len2 = 2*n + n_randint(state, 2*n) + 1;
+               
+               b2 = len2*bits1;
+               
+               n1 = (b1 - 1)/FLINT_BITS + 1;
+               n2 = (b2 - 1)/FLINT_BITS + 1;
+                    
+               if (n1 < n2) /* ensure b1 >= b2 */
+               {
+                  mp_size_t t = n1;
+                  mp_bitcnt_t tb = b1;
+                  n1 = n2;
+                  b1 = b2;
+                  n2 = t;
+                  b2 = tb;
+               }
+
+               i1 = malloc(3*(n1 + n2)*sizeof(mp_limb_t));
+               i2 = i1 + n1;
+               r1 = i2 + n2;
+               r2 = r1 + n1 + n2;
+   
+               mpn_urandomb(i1, state->gmp_state, b1);
+               mpn_urandomb(i2, state->gmp_state, b2);
+  
+               mpn_mul(r2, i1, n1, i2, n2);
+               mpn_mul_fft_main(r1, i1, n1, i2, n2);
+           
+               for (j = 0; j < n1 + n2; j++)
+               {
+                   if (r1[j] != r2[j]) 
+                   {
+                       printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                       abort();
+                   }
+               }
+
+               free(i1);
+            }
         }
     }
 
