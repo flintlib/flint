@@ -42,7 +42,7 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
         const long lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz_t invR3;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
-        long lenR1, lenR2, lenR3;
+        long lenR2, lenR3;
 
         W  = _fmpz_vec_init(lenW);
         Q  = W;
@@ -106,13 +106,6 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     if (lenB == 0)
     {
         fmpz_mod_poly_make_monic(G, A);
-        return;
-    }
-    if (lenA == 1 || lenB == 1)
-    {
-        fmpz_mod_poly_fit_length(G, 1);
-        fmpz_one(G->coeffs);
-        _fmpz_mod_poly_set_length(G, 1);
         return;
     }
 
