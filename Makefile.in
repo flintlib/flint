@@ -23,11 +23,15 @@ TEST_SOURCES = $(wildcard test/*.c)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
+TUNE_SOURCES = $(wildcard tune/*.c)
+
 EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
+
+TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
 all: all-dirs $(OBJS) recursive library 
 
@@ -49,6 +53,11 @@ profile: all profiler.o
 	mkdir -p build/profile
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile;)
+
+tune: all
+	mkdir -p build/tune
+	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
 
 recursive:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 

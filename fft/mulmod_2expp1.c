@@ -172,7 +172,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
                            mp_size_t n, mp_size_t w, mp_limb_t * tt)
 {
    mp_size_t bits = n*w;
-   mp_size_t limbs = bits/GMP_LIMB_BITS;
+   mp_size_t limbs = bits/FLINT_BITS;
    mp_bitcnt_t depth1 = 1, depth = 1;
 
    mp_size_t w1, off;
@@ -194,5 +194,5 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
    depth1 -= off;
    w1 *= (1L<<(2*off));
 
-   _fft_mulmod_2expp1(r, i1, i2, bits/FLINT_BITS, depth1, w1);
+   _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
 }
