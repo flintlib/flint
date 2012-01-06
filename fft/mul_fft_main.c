@@ -73,7 +73,7 @@ void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    {
       mp_size_t wadj = 1;
       
-      off = fft_tuning_table[depth - 6][w]; /* adjust n and w */
+      off = fft_tuning_table[depth - 6][w - 1]; /* adjust n and w */
       depth -= off;
       n = ((mp_size_t) 1 << depth);
       w *= ((mp_size_t) 1 << (2*off));
