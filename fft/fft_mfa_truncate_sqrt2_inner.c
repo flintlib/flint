@@ -55,13 +55,13 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
    {
       i = n_revbin(s, depth);
       fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
-      fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
+      if (ii != jj) fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
       
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = i*n1 + j;
          mpn_normmod_2expp1(ii[t], limbs);
-         mpn_normmod_2expp1(jj[t], limbs);
+         if (ii != jj) mpn_normmod_2expp1(jj[t], limbs);
          fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
       }      
       
@@ -75,13 +75,13 @@ void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, mp_size_t n,
    for (i = 0; i < n2; i++)
    {
       fft_radix2(ii + i*n1, n1/2, w*n2, t1, t2);
-      fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
+      if (ii != jj) fft_radix2(jj + i*n1, n1/2, w*n2, t1, t2);
 
       for (j = 0; j < n1; j++)
       {
          mp_size_t t = i*n1 + j;
          mpn_normmod_2expp1(ii[t], limbs);
-         mpn_normmod_2expp1(jj[t], limbs);
+         if (ii != jj) mpn_normmod_2expp1(jj[t], limbs);
          fft_mulmod_2expp1(ii[t], ii[t], jj[t], n, w, tt);
       }      
       
