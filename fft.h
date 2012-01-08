@@ -50,7 +50,6 @@ or implied, of William Hart.
 #endif
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #define SWAP_PTRS(xx, yy) \
    do { \

@@ -116,7 +116,14 @@ void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
       ifft_truncate1_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs, trunc);
 
       for (i = 0; i < trunc; i++)
+      {
+#if HAVE_ADDSUB_N
          mpn_addsub_n(ii[i*is], ii[i*is], ii[i*is], ii[(n+i)*is], limbs + 1);
+#else
+         mpn_add_n(ii[i*is], ii[i*is], ii[i*is], limbs + 1);
+         mpn_sub_n(ii[i*is], ii[i*is], ii[(n+i)*is], limbs + 1);
+#endif
+      }
    } else
    {
       ifft_radix2_twiddle(ii, is, n/2, 2*w, t1, t2, ws, r, c, 2*rs);
