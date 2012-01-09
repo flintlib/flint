@@ -234,35 +234,10 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 #endif
 
         /*
-            Begin Hensel Lifting phase, make the tree in v, w, and link.
+            Hensel lifting phase.
             Later we'll do a check if use_Hoeij_Novocin (try for smaller a).
          */
-        {
-            const long r = fac->num;
-            long *link;
-            fmpz_poly_t *v, *w;
-
-            link = malloc((2*r-2) * sizeof(long));
-            v    = malloc((2*r-2) * sizeof(fmpz_poly_t));
-            w    = malloc((2*r-2) * sizeof(fmpz_poly_t));
-
-            for (i = 0; i < 2*r - 2; i++)
-            {
-                fmpz_poly_init(v[i]);
-                fmpz_poly_init(w[i]);
-            }
-
-            _fmpz_poly_hensel_start_lift(lifted_fac, link, v, w, f, fac, a);
-
-            for (i = 0; i < 2*r - 2; i++)
-            {
-                fmpz_poly_clear(v[i]);
-                fmpz_poly_clear(w[i]);
-            }
-            free(link);
-            free(v);
-            free(w);
-        }
+        fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
 
 #if TRACE == 1
         printf("|Post hensel lift factorisation (fmpz_poly):\n");
