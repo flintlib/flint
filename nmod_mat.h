@@ -136,6 +136,10 @@ void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
 void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
+/* Trace */
+
+mp_limb_t nmod_mat_trace(const nmod_mat_t mat);
+
 /* Determinant */
 
 mp_limb_t _nmod_mat_det(nmod_mat_t A);

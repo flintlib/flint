@@ -51,8 +51,6 @@ or implied, of William Hart.
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
-extern int mpn_mul_fft_aux (mp_ptr op, mp_size_t pl, mp_srcptr n, 
-                   mp_size_t nl, mp_srcptr m, mp_size_t ml, mp_size_t k, int b);
 
 #define SWAP_PTRS(xx, yy) \
    do { \
@@ -191,6 +189,33 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
 
 void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                   mp_limb_t * i2, mp_size_t n2, mp_bitcnt_t depth, mp_bitcnt_t w);
+
+void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
+
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
+            mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt);
+
+void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
+                        mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+                                mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc);
+
+void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp);
+
+void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+                             mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp);
+
+void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, 
+                                                     mp_limb_t * jj, mp_size_t m);
+
+void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
+                             mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w);
+
+void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
+                                        mp_size_t n, mp_size_t w, mp_limb_t * tt);
 
 #ifdef __cplusplus
 }

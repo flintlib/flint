@@ -328,6 +328,59 @@ void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
     with signed entries satisfying $0 <= c < mn$.
 
+void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
+    const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
+    Sets each of the \code{nres} matrices in \code{residues} to \code{mat}
+    reduced modulo the modulus of the respective matrix, given
+    precomputed \code{comb} and \code{comb_temp} structures.
+
+void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres,
+        const fmpz_mat_t mat)
+
+    Sets each of the \code{nres} matrices in \code{residues} to \code{mat}
+    reduced modulo the modulus of the respective matrix.
+
+    This function is provided for convenience purposes.
+    For reducing or reconstructing multiple integer matrices over the same
+    set of moduli, it is faster to use \code{fmpz_mat_multi_mod_precomp}.
+
+void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues,
+    long nres, fmpz_comb_t comb, fmpz_comb_temp_t temp);
+
+    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
+    in \code{residues}, given precomputed \code{comb} and \code{comb_temp}
+    structures.
+
+void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
+    long nres)
+
+    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
+    in \code{residues}.
+
+    This function is provided for convenience purposes.
+    For reducing or reconstructing multiple integer matrices over the same
+    set of moduli, it is faster to use \code{fmpz_mat_multi_CRT_ui_precomp}.
+
+void fmpz_mat_multi_CRT_ui_unsigned_precomp(fmpz_mat_t mat,
+    nmod_mat_t * const residues, long nres, fmpz_comb_t comb,
+    fmpz_comb_temp_t temp)
+
+    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
+    in \code{residues}, assuming that the entries are unsigned,
+    given precomputed \code{comb} and \code{comb_temp} structures.
+
+void fmpz_mat_multi_CRT_ui_unsigned(fmpz_mat_t mat,
+    nmod_mat_t * const residues, long nres)
+
+    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
+    in \code{residues}, assuming that the entries are unsigned.
+
+    This function is provided for convenience purposes.
+    For reducing or reconstructing multiple integer matrices over the same
+    set of moduli, it is faster to use
+    \code{fmpz_mat_multi_CRT_ui_unsigned_precomp}.
+
 *******************************************************************************
 
     Addition and subtraction
@@ -476,6 +529,18 @@ int fmpz_mat_inv(fmpz_mat_t Ainv, fmpz_t den, const fmpz_mat_t A)
     This function uses a direct formula for matrices of size two or less,
     and otherwise solves for the identity matrix using
     fraction-free LU decomposition.
+
+
+*******************************************************************************
+
+    Trace
+
+*******************************************************************************
+
+void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat)
+
+    Computes the trace of the matrix, i.e. the sum of the entries on
+    the main diagonal. The matrix is required to be square.
 
 
 *******************************************************************************

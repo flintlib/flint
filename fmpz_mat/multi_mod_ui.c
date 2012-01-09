@@ -25,56 +25,50 @@
 
 #include <mpir.h>
 #include "flint.h"
+#include "nmod_mat.h"
+#include "nmod_vec.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "fmpq.h"
-#include "fmpq_mat.h"
 
-
-void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
+void
+fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
+    const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
 {
-    long n = mat->r;
+    long i, j, k;
+    mp_ptr r;
 
-    if (n == 0)
+    r = _nmod_vec_init(nres);
+
+    for (i = 0; i < fmpz_mat_nrows(mat); i++)
     {
-        fmpq_set_si(det, 1L, 1L);
-        return;
+        for (j = 0; j < fmpz_mat_ncols(mat); j++)
+        {
+            fmpz_multi_mod_ui(r, fmpz_mat_entry(mat, i, j), comb, temp);
+            for (k = 0; k < nres; k++)
+                nmod_mat_entry(residues[k], i, j) = r[k];
+        }
     }
-    else if (n == 1)
-    {
-        fmpq_set(det, fmpq_mat_entry(mat, 0, 0));
-    }
-    else if (n == 2)
-    {
-        fmpq_t t;
-        fmpq_init(t);
 
-        fmpq_mul(t, fmpq_mat_entry(mat, 0, 0), fmpq_mat_entry(mat, 1, 1));
-        fmpq_submul(t, fmpq_mat_entry(mat, 0, 1), fmpq_mat_entry(mat, 1, 0));
+    _nmod_vec_clear(r);
+}
 
-        fmpq_set(det, t);
-        fmpq_clear(t);
-    }
-    else
-    {
-        fmpz_mat_t num;
-        fmpz * den;
-        long i;
+void
+fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres, const fmpz_mat_t mat)
+{
+    fmpz_comb_t comb;
+    fmpz_comb_temp_t temp;
+    mp_ptr primes;
+    long i;
 
-        fmpz_mat_init(num, mat->r, mat->c);
-        den = _fmpz_vec_init(mat->r);
+    primes = _nmod_vec_init(nres);
+    for (i = 0; i < nres; i++)
+        primes[i] = residues[i]->mod.n;
+    fmpz_comb_init(comb, primes, nres);
+    fmpz_comb_temp_init(temp, comb);
 
-        fmpq_mat_get_fmpz_mat_rowwise(num, den, mat);
-        fmpz_mat_det(&det->num, num);
+    fmpz_mat_multi_mod_ui_precomp(residues, nres, mat, comb, temp);
 
-        fmpz_one(&det->den);
-        for (i = 0; i < mat->r; i++)
-            fmpz_mul(&det->den, &det->den, den + i);
-
-        fmpq_canonicalise(det);
-
-        fmpz_mat_clear(num);
-        _fmpz_vec_clear(den, mat->r);
-    }
+    fmpz_comb_clear(comb);
+    fmpz_comb_temp_clear(temp);
+    _nmod_vec_clear(primes);
 }

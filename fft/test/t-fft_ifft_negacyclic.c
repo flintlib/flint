@@ -42,45 +42,63 @@ main(void)
     
     flint_rand_t state;
 
-    printf("mul_mfa_truncate_sqrt2....");
+    printf("fft/ifft_negacyclic....");
     fflush(stdout);
 
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    for (depth = 6; depth <= 14; depth++)
+    for (depth = 6; depth <= 12; depth++)
     {
-        for (w = 1; w <= 3 - (depth >= 12); w++)
+        for (w = 1; w <= 5; w++)
         {
             mp_size_t n = (1UL<<depth);
-            mp_bitcnt_t bits1 = (n*w - (depth + 1))/2; 
-            mp_size_t trunc = 2*n + 2*n_randint(state, n) + 2; /* trunc is even */
-            mp_bitcnt_t bits = (trunc/2)*bits1;
-            mp_size_t int_limbs = bits/FLINT_BITS;
-            mp_size_t j;
-            mp_limb_t * i1, *i2, *r1, *r2;
+            mp_size_t limbs = (n*w)/GMP_LIMB_BITS;
+            mp_size_t size = limbs + 1;
+            mp_size_t i;
+            mp_limb_t * ptr;
+            mp_limb_t ** ii, ** jj, * t1, * t2, * s1;
         
-            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
-            i2 = i1 + int_limbs;
-            r1 = i2 + int_limbs;
-            r2 = r1 + 2*int_limbs;
-   
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
-            mpn_mul(r2, i1, int_limbs, i2, int_limbs);
-            mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
-            
-            for (j = 0; j < 2*int_limbs; j++)
+            ii = malloc((2*(n + n*size) + 3*size)*sizeof(mp_limb_t));
+            for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
             {
-                if (r1[j] != r2[j]) 
+                ii[i] = ptr;
+                random_fermat(ii[i], state, limbs);
+            }
+            t1 = ptr;
+            t2 = t1 + size;
+            s1 = t2 + size;
+   
+            for (i = 0; i < 2*n; i++)
+               mpn_normmod_2expp1(ii[i], limbs);
+    
+            jj = malloc(2*(n + n*size)*sizeof(mp_limb_t));
+            for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+            {
+                jj[i] = ptr;
+                mpn_copyi(jj[i], ii[i], size);
+            }
+   
+            fft_negacyclic(ii, n, w, &t1, &t2, &s1);
+            ifft_negacyclic(ii, n, w, &t1, &t2, &s1);
+            for (i = 0; i < 2*n; i++)
+            {
+                mpn_div_2expmod_2expp1(ii[i], ii[i], limbs, depth + 1);
+                mpn_normmod_2expp1(ii[i], limbs);
+            }
+
+            for (i = 0; i < 2*n; i++)
+            {
+                if (mpn_cmp(ii[i], jj[i], size) != 0)
                 {
-                    printf("error in limb %ld, %lx != %lx\n", j, r1[j], r2[j]);
+                    printf("FAIL:\n");
+                    printf("Error in entry %ld\n", i);
                     abort();
                 }
             }
 
-            free(i1);
+            free(ii);
+            free(jj);
         }
     }
 

@@ -50,6 +50,8 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_init(tryme);
     fmpz_poly_set(f, F);
 
+    fmpz_poly_factor_print(lifted_fac); printf(" lifted_fac\n");
+
     leadF = fmpz_poly_lead(F);
 
     for (k = 1; k < r; k++)
@@ -88,6 +90,9 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
                 fmpz_poly_scalar_smod_fmpz(tryme, tryme, P);
                 fmpz_poly_primitive_part(tryme, tryme);
                 fmpz_poly_divrem(Q, R, f, tryme);
+                
+                fmpz_poly_print(tryme); printf(" is tryme\n");
+                fmpz_poly_print(R); printf(" is R\n");
 
                 if (fmpz_poly_is_zero(R))
                 {

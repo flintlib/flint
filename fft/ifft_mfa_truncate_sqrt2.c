@@ -256,3 +256,108 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
            mpn_add_n(ii[j - 2*n], ii[j - 2*n], ii[j - 2*n], limbs + 1);
    }
 }
+
+void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
+   mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
+{
+   mp_size_t i, j;
+   mp_size_t n2 = (2*n)/n1;
+   mp_size_t trunc2 = (trunc - 2*n)/n1;
+   mp_bitcnt_t depth = 0;
+   mp_bitcnt_t depth2 = 0;
+   mp_bitcnt_t limbs = (w*n)/FLINT_BITS;
+   
+   while ((1UL<<depth) < n2) depth++;
+   while ((1UL<<depth2) < n1) depth2++;
+
+   /* first half mfa IFFT : n2 rows, n1 cols */
+   
+   /* column IFFTs */
+   for (i = 0; i < n1; i++)
+   {   
+      for (j = 0; j < n2; j++)
+      {
+         mp_size_t s = n_revbin(j, depth);
+         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+      }
+      
+      /*
+         IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+         of 1 starting at row 0, where z => w bits
+      */
+      ifft_radix2_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1);
+   }
+   
+   /* second half IFFT : n2 rows, n1 cols */
+   ii += 2*n;
+
+   /* column IFFTs with relevant sqrt2 layer butterflies combined */
+   for (i = 0; i < n1; i++)
+   {   
+      for (j = 0; j < trunc2; j++)
+      {
+         mp_size_t s = n_revbin(j, depth);
+         if (j < s) SWAP_PTRS(ii[i+j*n1], ii[i+s*n1]);
+      }
+
+      for ( ; j < n2; j++)
+      {
+         mp_size_t u = i + j*n1;
+         if (w & 1)
+         {
+            if (i & 1)
+               fft_adjust_sqrt2(ii[i + j*n1], ii[u - 2*n], u, limbs, w, *temp); 
+            else
+               fft_adjust(ii[i + j*n1], ii[u - 2*n], u/2, limbs, w); 
+         } else
+            fft_adjust(ii[i + j*n1], ii[u - 2*n], u, limbs, w/2);
+      }
+
+      /* 
+         IFFT of length n2 on column i, applying z^{r*i} for rows going up in steps 
+         of 1 starting at row 0, where z => w bits
+      */
+      ifft_truncate1_twiddle(ii + i, n1, n2/2, w*n1, t1, t2, w, 0, i, 1, trunc2);
+      
+      /* relevant components of final sqrt2 layer of IFFT */
+      if (w & 1)
+      {
+         for (j = i; j < trunc - 2*n; j+=n1) 
+         {   
+            if (j & 1)
+               ifft_butterfly_sqrt2(*t1, *t2, ii[j - 2*n], ii[j], j, limbs, w, *temp); 
+            else
+               ifft_butterfly(*t1, *t2, ii[j - 2*n], ii[j], j/2, limbs, w);
+
+            SWAP_PTRS(ii[j-2*n], *t1);
+            SWAP_PTRS(ii[j],     *t2);
+         }
+      } else
+      {
+         for (j = i; j < trunc - 2*n; j+=n1) 
+         {   
+            ifft_butterfly(*t1, *t2, ii[j - 2*n], ii[j], j, limbs, w/2);
+   
+            SWAP_PTRS(ii[j-2*n], *t1);
+            SWAP_PTRS(ii[j],     *t2);
+         }
+      }
+
+      for (j = trunc + i - 2*n; j < 2*n; j+=n1)
+           mpn_add_n(ii[j - 2*n], ii[j - 2*n], ii[j - 2*n], limbs + 1);
+
+      for (j = 0; j < trunc2; j++)
+      {
+         mp_size_t t = j*n1 + i;
+         mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
+         mpn_normmod_2expp1(ii[t], limbs);
+      }
+
+      for (j = 0; j < n2; j++)
+      {
+         mp_size_t t = j*n1 + i - 2*n;
+         mpn_div_2expmod_2expp1(ii[t], ii[t], limbs, depth + depth2 + 1);
+         mpn_normmod_2expp1(ii[t], limbs);
+      }
+   }
+}
