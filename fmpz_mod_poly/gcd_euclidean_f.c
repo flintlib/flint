@@ -162,7 +162,10 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
         if (G == A || G == B)
             _fmpz_vec_clear(g, FLINT_MIN(lenA, lenB));
         else
-            fmpz_mod_poly_zero(G);
+        {
+            _fmpz_vec_zero(G->coeffs, FLINT_MIN(lenA, lenB));
+            _fmpz_mod_poly_set_length(G, 0);
+        }
     }
 }
 
