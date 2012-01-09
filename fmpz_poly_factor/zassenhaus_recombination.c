@@ -31,6 +31,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
+#define TRACE 0
+
 void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
 	const fmpz_poly_factor_t lifted_fac, 
     const fmpz_poly_t F, const fmpz_t P, long exp)
@@ -50,7 +52,9 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_init(tryme);
     fmpz_poly_set(f, F);
 
+#if TRACE == 1
     fmpz_poly_factor_print(lifted_fac); printf(" lifted_fac\n");
+#endif
 
     leadF = fmpz_poly_lead(F);
 
@@ -90,9 +94,11 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
                 fmpz_poly_scalar_smod_fmpz(tryme, tryme, P);
                 fmpz_poly_primitive_part(tryme, tryme);
                 fmpz_poly_divrem(Q, R, f, tryme);
-                
+
+#if TRACE == 1
                 fmpz_poly_print(tryme); printf(" is tryme\n");
                 fmpz_poly_print(R); printf(" is R\n");
+#endif
 
                 if (fmpz_poly_is_zero(R))
                 {
@@ -138,3 +144,6 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_clear(R);
     free(used_arr);
 }
+
+#undef TRACE
+
