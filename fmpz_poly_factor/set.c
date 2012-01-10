@@ -20,20 +20,39 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
+#include "flint.h"
 #include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
+void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 {
-    if (len > fac->alloc)
+    if (res != fac)
     {
-        /* At least double number of allocated coeffs */
-        if (len < 2 * fac->alloc)
-            len = 2 * fac->alloc;
-        fmpz_poly_factor_realloc(fac, len);
+        if (fac->num == 0)
+        {
+            fmpz_poly_factor_clear(res);
+            fmpz_poly_factor_init(res);
+        }
+        else
+        {
+            long i;
+
+            fmpz_poly_factor_fit_length(res, fac->num);
+            fmpz_set(&(res->c), &(fac->c));
+            for (i = 0; i < fac->num; i++)
+            {
+                fmpz_poly_set(res->p + i, fac->p + i);
+                res->exp[i] = fac->exp[i];
+            }
+            for ( ; i < res->num; i++)
+            {
+                fmpz_poly_zero(res->p + i);
+                res->exp[i] = 0;
+            }
+            res->num = fac->num;
+        }
     }
 }
 

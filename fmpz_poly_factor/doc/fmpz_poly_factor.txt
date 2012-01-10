@@ -61,6 +61,10 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 
 *******************************************************************************
 
+void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
+
+    Sets \code{res} to the same factorisation as \code{fac}.
+
 void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
                              const fmpz_poly_t p, long e)
 

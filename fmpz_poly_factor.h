@@ -53,6 +53,8 @@ void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len);
 
 void fmpz_poly_factor_clear(fmpz_poly_factor_t fac);
 
+void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac);
+
 void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
                              const fmpz_poly_t p, long exp);
 

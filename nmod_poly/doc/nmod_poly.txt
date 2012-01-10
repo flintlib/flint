@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 William Hart
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -1830,6 +1831,22 @@ void nmod_poly_factor_init(nmod_poly_factor_t fac)
 void nmod_poly_factor_clear(nmod_poly_factor_t fac)
 
     Frees all memory associated with \code{fac}.
+
+void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc)
+
+    Reallocates the factor structure to provide space for 
+    precisely \code{alloc} factors.
+
+void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, long len)
+
+    Ensures that the factor structure has space for at 
+    least \code{len} factors.  This functions takes care 
+    of the case of repeated calls by always at least 
+    doubling the number of factors the structure can hold.
+
+void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
+
+    Sets \code{res} to the same factorisation as \code{fac}.
 
 void nmod_poly_factor_print(const nmod_poly_factor_t fac)
 

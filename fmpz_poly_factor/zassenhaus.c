@@ -24,11 +24,10 @@
    
 ******************************************************************************/
 
-#include <assert.h>
 #include <stdlib.h>
 #include "fmpz_poly_factor.h"
 
-#define TRACE 1
+#define TRACE_ZASSENHAUS 0
 
 /*
     Let $f$ be a polynomial of degree $m = \deg(f) \geq 2$. 
@@ -71,10 +70,8 @@ static void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, long m)
 
     fmpz_abs(B, f + 0);
 
-    /* 
-        We have $b = \binom{m-1}{j-1}$ on loop entry and 
-        $b = \binom{m-1}{j}$ on exit.
-     */
+    /*  We have $b = \binom{m-1}{j-1}$ on loop entry and 
+        $b = \binom{m-1}{j}$ on exit. */
     fmpz_set_ui(b, m-1);
     for (j = 1; j < m; j++)
     {
@@ -109,13 +106,10 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 {
     const long lenF = f->length;
 
-    assert(lenF >= 2);
-
-#if TRACE == 1
+    #if TRACE_ZASSENHAUS == 1
     printf("\n[Zassenhaus]\n");
     printf("|f = "), fmpz_poly_print(f), printf("\n");
-    fflush(stdout);
-#endif
+    #endif
 
     if (lenF == 2)
     {
@@ -123,31 +117,27 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     }
     else
     {
-        long a;
-
-        long i, num_primes;
-
+        long i;
+        long r = lenF;
         mp_limb_t p = 2;
-        mp_limb_t min_p = p; 
+        nmod_poly_t d, g, t;
         nmod_poly_factor_t fac;
-        fmpz_poly_factor_t lifted_fac;
-        long min_r;
 
         nmod_poly_factor_init(fac);
-        min_r = lenF;
-        i = 0;
+        nmod_poly_init_preinv(t, 0, 0);
+        nmod_poly_init_preinv(d, 0, 0);
+        nmod_poly_init_preinv(g, 0, 0);
 
-        for (num_primes = 1; num_primes < 3; num_primes++)
+        for (i = 0; i < 3; i++)
         {
-            int check = 1;
-
-            for ( ; i < 200 && check == 1; i++, p = n_nextprime(p, 0))
+            for ( ; ; p = n_nextprime(p, 0))
             {
-                nmod_poly_t d, g, t;
+                nmod_t mod;
 
-                nmod_poly_init(t, p);
-                nmod_poly_init(d, p);
-                nmod_poly_init(g, p);
+                nmod_init(&mod, p);
+                d->mod = mod;
+                g->mod = mod;
+                t->mod = mod;
 
                 fmpz_poly_get_nmod_poly(t, f);
                 if (t->length == lenF)
@@ -162,102 +152,73 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
                         nmod_poly_factor_init(temp_fac);
                         nmod_poly_factor(temp_fac, t);
 
-                        if (temp_fac->num <= min_r)
+                        if (temp_fac->num <= r)
                         {
-                            min_r = temp_fac->num;
-                            min_p = p;
-                            nmod_poly_factor_clear(fac);
-                            nmod_poly_factor_init(fac);
-                            nmod_poly_factor_concat(fac, temp_fac);
+                            r = temp_fac->num;
+                            nmod_poly_factor_set(fac, temp_fac);
                         }
                         nmod_poly_factor_clear(temp_fac);
-                        check = 0;
+                        break;
                     }
                 }
-                nmod_poly_clear(d);
-                nmod_poly_clear(g);
-                nmod_poly_clear(t);
-            }
-       
-            if (check)
-            {
-                printf("Warning (fmpz_poly_factor_zassenhaus): \n");
-                printf("Polynomial was not square_free after 200 primes, \n");
-                printf("maybe an error?\n");
-
-                nmod_poly_factor_clear(fac);
-                abort();
             }
         }
+        nmod_poly_clear(d);
+        nmod_poly_clear(g);
+        nmod_poly_clear(t);
 
-        /* Check various abort conditions */
+        if (r > cutoff)
         {
-            const long r = fac->num;
-
-            if (r == 0)
-            {
-                printf("Exception (fmpz_poly_factor_zassenhaus): r = 0\n");
-                nmod_poly_factor_clear(fac);
-                abort();
-            }
-            if (r == 1)
-            {
-                fmpz_poly_factor_insert(final_fac, f, exp);
-                nmod_poly_factor_clear(fac);
-                return;
-            }
-            if (r > cutoff)
-            {
-                printf("Exception (fmpz_poly_factor_zassenhaus): r > cutoff\n");
-                nmod_poly_factor_clear(fac);
-                abort();
-            }
+            printf("Exception (fmpz_poly_factor_zassenhaus): r > cutoff\n");
+            nmod_poly_factor_clear(fac);
+            abort();
         }
-
-        fmpz_poly_factor_init(lifted_fac);
-
-        p = min_p;
+        else if (r == 1)
         {
-            fmpz_t B;
-            fmpz_init(B);
-            fmpz_poly_factor_mignotte(B, f);
-            fmpz_mul_ui(B, B, 2);
-            fmpz_add_ui(B, B, 1);
-            a = fmpz_clog_ui(B, p);
-            fmpz_clear(B);
+            fmpz_poly_factor_insert(final_fac, f, exp);
         }
-
-#if TRACE == 1
-        printf("|p = %ld, a = %ld\n", p, a);
-        printf("|Pre hensel lift factorisation (nmod_poly):\n");
-        nmod_poly_factor_print(fac);
-#endif
-
-        /*
-            Hensel lifting phase.
-            Later we'll do a check if use_Hoeij_Novocin (try for smaller a).
-         */
-        fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
-
-#if TRACE == 1
-        printf("|Post hensel lift factorisation (fmpz_poly):\n");
-        fmpz_poly_factor_print(lifted_fac);
-        fflush(stdout);
-#endif
-
-        /* Recombination */
+        else
         {
-            fmpz_t P;
-            fmpz_init(P);
-            fmpz_set_ui(P, p);
-            fmpz_pow_ui(P, P, a);
+            long a;
+            fmpz_poly_factor_t lifted_fac;
+            fmpz_poly_factor_init(lifted_fac);
 
-            fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac, f, P, exp);
+            p = fac->p[0]->mod.n;
+            {
+                fmpz_t B;
+                fmpz_init(B);
+                fmpz_poly_factor_mignotte(B, f);
+                fmpz_mul_ui(B, B, 2);
+                fmpz_add_ui(B, B, 1);
+                a = fmpz_clog_ui(B, p);
+                fmpz_clear(B);
+            }
 
-            fmpz_clear(P);
+            /* TODO: Check if use_Hoeij_Novocin and try smaller a. */
+            fmpz_poly_hensel_lift_once(lifted_fac, f, fac, a);
+
+            #if TRACE_ZASSENHAUS == 1
+            printf("|p = %ld, a = %ld\n", p, a);
+            printf("|Pre hensel lift factorisation (nmod_poly):\n");
+            nmod_poly_factor_print(fac);
+            printf("|Post hensel lift factorisation (fmpz_poly):\n");
+            fmpz_poly_factor_print(lifted_fac);
+            #endif
+
+            /* Recombination */
+            {
+                fmpz_t P;
+                fmpz_init(P);
+                fmpz_set_ui(P, p);
+                fmpz_pow_ui(P, P, a);
+
+                fmpz_poly_factor_zassenhaus_recombination(final_fac, lifted_fac, f, P, exp);
+
+                fmpz_clear(P);
+            }
+
+            fmpz_poly_factor_clear(lifted_fac);
         }
-
-        fmpz_poly_factor_clear(lifted_fac);
         nmod_poly_factor_clear(fac);
     }
 }
@@ -324,5 +285,5 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     fmpz_poly_clear(g);
 }
 
-#undef TRACE
+#undef TRACE_ZASSENHAUS
 

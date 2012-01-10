@@ -896,9 +896,15 @@ typedef struct
 
 typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
 
+void nmod_poly_factor_init(nmod_poly_factor_t fac);
+
 void nmod_poly_factor_clear(nmod_poly_factor_t fac);
 
-void nmod_poly_factor_init(nmod_poly_factor_t fac);
+void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc);
+
+void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, long len);
+
+void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac);
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
                              const nmod_poly_t poly, long exp);
