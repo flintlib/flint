@@ -62,11 +62,14 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    s1 = t2 + size;
    tt = s1 + size;
    
-   jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+   if (i1 != i2)
    {
-      jj[i] = ptr;
-   }
+      jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
+      for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+      {
+         jj[i] = ptr;
+      }
+   } else jj = ii;
    
    trunc = 2*sqrt*((j1 + j2 + 2*sqrt - 2)/(2*sqrt)); /* trunc must be divisible by 2*sqrt */
 
@@ -76,11 +79,14 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    
    fft_mfa_truncate_sqrt2_outer(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
    
-   j2 = fft_split_bits(jj, i2, n2, bits1, limbs);
-   for (j = j2 ; j < 4*n; j++)
-      mpn_zero(jj[j], limbs + 1);
+   if (i1 != i2)
+   {
+      j2 = fft_split_bits(jj, i2, n2, bits1, limbs);
+      for (j = j2 ; j < 4*n; j++)
+         mpn_zero(jj[j], limbs + 1);
 
-   fft_mfa_truncate_sqrt2_outer(jj, n, w, &t1, &t2, &s1, sqrt, trunc);
+      fft_mfa_truncate_sqrt2_outer(jj, n, w, &t1, &t2, &s1, sqrt, trunc);
+   } else j2 = j1;
    
    fft_mfa_truncate_sqrt2_inner(ii, jj, n, w, &t1, &t2, &s1, sqrt, trunc, tt);
    ifft_mfa_truncate_sqrt2_outer(ii, n, w, &t1, &t2, &s1, sqrt, trunc);
@@ -89,5 +95,6 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    fft_combine_bits(r1, ii, j1 + j2 - 1, bits1, limbs, r_limbs);
      
    free(ii);
-   free(jj);
+   if (i1 != i2)
+      free(jj);
 }

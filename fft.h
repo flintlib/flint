@@ -50,7 +50,6 @@ or implied, of William Hart.
 #endif
 
 extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
-extern int mpn_addsub_n(mp_ptr, mp_srcptr, mp_srcptr, mp_srcptr, mp_size_t);
 
 #define SWAP_PTRS(xx, yy) \
    do { \
@@ -219,6 +218,10 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
 void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                     mp_limb_t * i2, mp_size_t n2);
+
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
+                                 long limbs, long trunc, mp_limb_t ** t1, 
+                                mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt);
 
 #ifdef __cplusplus
 }

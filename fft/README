@@ -24,11 +24,9 @@ is also a dependence on the flint function n_revbin, which is found in the
 ulong_extras directory of flint -- I hereby license it under the BSD 
 license as per the remainder of the FFT implementation.)
 
-To use the FFT for multiplying large integers, one needs to use the functions
-mul_truncate_sqrt2 and mul_mfa_truncate_sqrt2 as documented in the doc 
-directory. A tuned wrapper would decide which values of n and w to use
-based on timings for the target architecture.
-
+To use the FFT for multiplying large integers, one needs to use the function
+mpn_mul_fft_full as documented in the doc directory. This relies on tuning
+values supplied in fft_tuning.h in the top level source directory.
 
 Features:
 --------
@@ -95,13 +93,20 @@ bits          iters mpir   this   gmp     n w
 Additional tuning
 -----------------
 
-Technically one should tune the values that appear at the top of the file
-mulmod_2expp1.c. The array indices correspond to (n, w) pairs starting at
-n = 12, w = 1. The values in the array should be nonnegative and less
+Technically one should tune the values that appear in fft_tuning.h. The 
+mulmod_2expp1 tuning array indices correspond to (n, w) pairs starting 
+at n = 12, w = 1. The values in the array should be nonnegative and less
 than 6. The length of the array is given by FFT_N_NUM. The cutoff
 FFT_MULMOD_2EXPP1_CUTOFF should also be tuned. It must be bigger than
-128. The function that these values tunes is at the bottom of that file.
+128. The function that these values tunes is in the file mulmod_2expp1.c.
 See the corresponding test function for an example of how to call it.
+
+The fft tuning array indices correspond to (n, w) pairs starting at
+n = 6, w = 1. The values in the array should be nonnegative and less
+than 6. The function that is tuned is in the file mpn_mul_fft_main.c.
+See the corresponding test function for an example of how to call it.
+The function implementation itself is the best reference for which 
+inputs will use which table entries.
 
 Acknowledgements
 ----------------

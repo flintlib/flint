@@ -51,7 +51,14 @@ void ifft_truncate1(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
         ifft_truncate1(ii, n/2, 2*w, t1, t2, trunc);
 
         for (i = 0; i < trunc; i++)
+        {
+#if HAVE_ADDSUB_N
             mpn_addsub_n(ii[i], ii[i], ii[i], ii[n+i], limbs + 1);
+#else
+            mpn_add_n(ii[i], ii[i], ii[i], limbs + 1);
+            mpn_sub_n(ii[i], ii[i], ii[n+i], limbs + 1);
+#endif
+        }
     } else
     {
         ifft_radix2(ii, n/2, 2*w, t1, t2);

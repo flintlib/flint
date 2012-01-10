@@ -65,10 +65,11 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
 
    /* multiply by 2^{wn/2} */
    y = limbs/2;
-   
+   cy = 0;
+
    mpn_copyi(temp + y, r, limbs - y);
    temp[limbs] = 0;
-   cy = mpn_neg_n(temp, r + limbs - y, y);
+   if (y) cy = mpn_neg_n(temp, r + limbs - y, y);
    mpn_addmod_2expp1_1(temp + y, limbs - y, -r[limbs]);
    mpn_sub_1(temp + y, temp + y, limbs - y + 1, cy); 
    

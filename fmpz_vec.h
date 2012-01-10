@@ -90,6 +90,12 @@ void _fmpz_vec_set_nmod_vec(fmpz * res,
 void _fmpz_vec_get_nmod_vec(mp_ptr res, 
                                     const fmpz * poly, long len, nmod_t mod);
 
+long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, long l,
+                                        long length, mp_bitcnt_t bits_known);
+
+void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
+                               mp_limb_t ** coeffs_f, long limbs, long sign);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void _fmpz_vec_set(fmpz * vec1, const fmpz * vec2, long len2);

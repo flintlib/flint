@@ -68,7 +68,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    mp_limb_t ** ii, ** jj, *tt, *t1, *t2, *s1, *r, *ii0, *jj0;
    mp_limb_t c;
    
-   ii = malloc((2*(n + n*size) + 4*n + 3*size)*sizeof(mp_limb_t));
+   ii = malloc((2*(n + n*size) + 4*n + 5*size)*sizeof(mp_limb_t));
    for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
    {
       ii[i] = ptr;
@@ -78,14 +78,21 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    t2 = t1 + size;
    s1 = t2 + size;
    r = s1 + size;
+   tt = r + 2*n;
    
-   jj = malloc((2*(n + n*size) + 2*n + 2*size)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+   if (i1 != i2)
    {
-      jj[i] = ptr;
+      jj = malloc((2*(n + n*size) + 2*n)*sizeof(mp_limb_t));
+      for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
+      {
+         jj[i] = ptr;
+      }
+      jj0 = ptr;
+   } else
+   {
+      jj = ii;
+      jj0 = ii0;
    }
-   jj0 = ptr;
-   tt = jj0 + 2*n;
    
    j = fft_split_bits(ii, i1, r_limbs, bits1, limbs);
    for ( ; j < 2*n; j++)
@@ -98,19 +105,22 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    for (j = 0; j < 2*n; j++)
       mpn_normmod_2expp1(ii[j], limbs);
 
-   j = fft_split_bits(jj, i2, r_limbs, bits1, limbs);
-   for ( ; j < 2*n; j++)
-      mpn_zero(jj[j], limbs + 1);
+   if (i1 != i2)
+   {
+      j = fft_split_bits(jj, i2, r_limbs, bits1, limbs);
+      for ( ; j < 2*n; j++)
+         mpn_zero(jj[j], limbs + 1);
    
-   for (i = 0; i < 2*n; i++)
-      jj0[i] = jj[i][0];
+      for (i = 0; i < 2*n; i++)
+         jj0[i] = jj[i][0];
    
-   fft_negacyclic(jj, n, w, &t1, &t2, &s1);
-      
+      fft_negacyclic(jj, n, w, &t1, &t2, &s1);
+   }
+
    for (j = 0; j < 2*n; j++)
    {
-      mpn_normmod_2expp1(jj[j], limbs);
-      c = ii[j][limbs] + 2*jj[j][limbs];
+      if (i1 != i2) mpn_normmod_2expp1(jj[j], limbs);
+      c = 2*ii[j][limbs] + jj[j][limbs];
       ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
    }
    
@@ -165,21 +175,21 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    mpn_normmod_2expp1(r1, r_limbs);
    
    free(ii);
-   free(jj);
+   if (i1 != i2) free(jj);
 }
 
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                            mp_size_t n, mp_size_t w, mp_limb_t * tt)
 {
    mp_size_t bits = n*w;
-   mp_size_t limbs = bits/GMP_LIMB_BITS;
+   mp_size_t limbs = bits/FLINT_BITS;
    mp_bitcnt_t depth1 = 1, depth = 1;
 
    mp_size_t w1, off;
 
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) 
    {
-      mp_limb_t c = i1[limbs] + 2*i2[limbs];
+      mp_limb_t c = 2*i1[limbs] + i2[limbs];
       r[limbs] = mpn_mulmod_2expp1(r, i1, i2, c, bits, tt);
       return;
    }
@@ -190,9 +200,10 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    w1 = bits/(1UL<<(2*depth1));
 
-   off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12][FLINT_MIN(w, 2) - 1];
+   if (depth < 12) off = 3;
+   else off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12][FLINT_MIN(w, 2) - 1];
    depth1 -= off;
    w1 *= (1L<<(2*off));
 
-   _fft_mulmod_2expp1(r, i1, i2, bits/FLINT_BITS, depth1, w1);
+   _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
 }

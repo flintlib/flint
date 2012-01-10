@@ -302,7 +302,7 @@ void ifft_truncate(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
     \code{trunc} must be divisible by 2.
 
     Although the implementation does not require it, we assume for simplicity
-    that \code{trunc} is at greater than $n$. The algorithm begins by computing 
+    that \code{trunc} is greater than $n$. The algorithm begins by computing 
     the inverse transform of the first $n$ coefficients of the input array. The
     unspecified coefficients of the second half of the array are then written:
     coefficient \code{trunc + i} is computed as a twist of coefficient \code{i}
@@ -618,3 +618,20 @@ void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 
    The main integer multiplication routine. Sets \code{(r1, n1 + n2)} to
    \code{(i1, n1)} times \code{(i2, n2)}. We require \code{n1 >= n2 > 0}.
+
+*******************************************************************************
+
+    Convolution
+
+*******************************************************************************
+
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
+                                 long limbs, long trunc, mp_limb_t ** t1, 
+                                 mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
+
+    Perform an FFT convolution of \code{ii} with \code{jj}, both of length 
+    \code{4*n} where \code{n = 2^depth}. Assume that all but the first 
+    \code{trunc} coefficients of the output (placed in \code{ii}) are zero.
+    Each coefficient is taken modulo \code{B^limbs + 1}. The temporary spaces
+    \code{t1}, \code{t2} and \code{s1} must have \code{limbs + 1} limbs of 
+    space and \code{tt} must have \code{2*(limbs + 1)} of free space.
