@@ -39,7 +39,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 10000; i++)
+/*    for (i = 0; i < 10000; i++)*/
     {
         fmpz_t c;
         fmpz_poly_t f, g, h, t;
@@ -53,14 +53,15 @@ main(void)
         fmpz_poly_init(t);
         fmpz_poly_factor_init(fac);
 
-        fmpz_randtest_not_zero(c, state, n_randint(state, 10) + 1);
+/*        fmpz_randtest_not_zero(c, state, n_randint(state, 10) + 1);
         fmpz_poly_set_fmpz(f, c);
 
         for (j = 0; j < n; j++)
         {
             fmpz_poly_randtest(g, state, n_randint(state, 5) + 2, n_randint(state, 40));
             fmpz_poly_mul(f, f, g);
-        }
+        }*/
+        fmpz_poly_set_str(f, "6  0 -1 0 0 0 1");
 
         fmpz_poly_factor_zassenhaus(fac, f);
 

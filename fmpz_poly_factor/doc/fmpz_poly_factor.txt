@@ -119,7 +119,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     \code{F^exp} to the factor structure \code{final_fac}.
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-                                  ulong exp, fmpz_poly_t f, ulong cutoff)
+                                  long exp, fmpz_poly_t f, long cutoff)
 
     This is the internal wrapper of Zassenhaus.
 
@@ -129,7 +129,15 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     precision to lift the factors to, hensel lifts, and finally calls 
     Zassenhaus recombination.
 
-void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t $F$)
+    Assumes that $\len(f) \geq 2$.
+
+    Assumes that $f$ is primitive.
+
+    Assumes that the constant coefficient of $f$ is non-zero.  Note that 
+    this can be easily achieved by taking out factors of the form $x^k$ 
+    before calling this routine.
+
+void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, fmpz_poly_t F)
 
     A wrapper of the Zassenhaus factoring algorithm, which takes as input 
     any polynomial $F$, and stores a factorization in \code{final_fac}.

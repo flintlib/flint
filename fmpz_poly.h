@@ -997,7 +997,8 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
     long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
     long prev, long curr, long N, const fmpz_t p);
 
-void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N);
 
 #ifdef __cplusplus

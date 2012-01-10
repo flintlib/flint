@@ -277,6 +277,13 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+void _fmpz_mod_poly_rem_basecase(fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p);
+
+void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p);
@@ -302,6 +309,10 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 {
     fmpz_mod_poly_divrem_divconquer(Q, R, A, B);
 }
+
+void _fmpz_mod_poly_divrem_f(fmpz_t f, fmpz *Q, fmpz *R, 
+                             const fmpz *A, long lenA, 
+                             const fmpz *B, long lenB, const fmpz_t p);
 
 void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
                             const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
@@ -364,6 +375,21 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G,
 {
     fmpz_mod_poly_gcd_euclidean(G, A, B);
 }
+
+long _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
+                                    const fmpz *A, long lenA, 
+                                    const fmpz *B, long lenB, const fmpz_t p);
+
+void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+                                   const fmpz_mod_poly_t A,
+                                   const fmpz_mod_poly_t B);
+
+long _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, 
+                          const fmpz *A, long lenA, 
+                          const fmpz *B, long lenB, const fmpz_t p);
+
+void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, 
+                         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
 /*  Derivative  **************************************************************/
 
