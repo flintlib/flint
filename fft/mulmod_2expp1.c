@@ -200,7 +200,8 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    w1 = bits/(1UL<<(2*depth1));
 
-   off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12][FLINT_MIN(w, 2) - 1];
+   if (depth < 12) off = 3;
+   else off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12][FLINT_MIN(w, 2) - 1];
    depth1 -= off;
    w1 *= (1L<<(2*off));
 

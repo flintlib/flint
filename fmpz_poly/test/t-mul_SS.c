@@ -156,6 +156,36 @@ main(void)
         fmpz_poly_clear(d);
     }
     
+    /* Compare with mul_KS large */
+    for (i = 0; i < 40; i++)
+    {
+        fmpz_poly_t a, b, c, d;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(c);
+        fmpz_poly_init(d);
+        fmpz_poly_randtest(b, state, n_randint(state, 300), n_randint(state, 20000) + 1);
+        fmpz_poly_randtest(c, state, n_randint(state, 300), n_randint(state, 20000) + 1);
+
+        fmpz_poly_mul_SS(a, b, c);
+        fmpz_poly_mul_KS(d, b, c);
+
+        result = (fmpz_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(d), printf("\n\n");
+            abort();
+        }
+        
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(d);
+    }
+    
     /* Compare with mul_KS unsigned */
     for (i = 0; i < 2000; i++)
     {

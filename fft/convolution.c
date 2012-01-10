@@ -40,7 +40,7 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth,
    long sqrt = (1L<<(depth/2));
    mp_limb_t c;
 
-   if (depth <= 12)
+   if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);
       
@@ -70,11 +70,12 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth,
       trunc = 2*sqrt*((trunc + 2*sqrt - 1)/(2*sqrt));
       
       fft_mfa_truncate_sqrt2_outer(ii, n, w, t1, t2, s1, sqrt, trunc);
-   
+      
       if (ii != jj)
          fft_mfa_truncate_sqrt2_outer(jj, n, w, t1, t2, s1, sqrt, trunc);
-   
+      
       fft_mfa_truncate_sqrt2_inner(ii, jj, n, w, t1, t2, s1, sqrt, trunc, tt);
+      
       ifft_mfa_truncate_sqrt2_outer(ii, n, w, t1, t2, s1, sqrt, trunc);
    }
 }

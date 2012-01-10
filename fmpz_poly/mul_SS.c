@@ -30,6 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
+#include "fft_tuning.h"
 
 void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1, 
                        const fmpz * input2, long length2, const long bits_in)
@@ -59,6 +60,13 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
    output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
    
    limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
+   if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* need power of 2 limbs in this case */
+   {
+      long log_len = 1L;
+      while ((1L<<log_len) < limbs) log_len++;
+      limbs = (1L<<log_len);
+   }
+
    size = limbs + 1;
    n = (1L<<(log_length - 2));
 
@@ -108,6 +116,13 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
       limbs = (output_bits - 1) / FLINT_BITS + 1;
 	} else if (bits_in < 0L) sign = 1;
            
+   if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* need limbs to be a power of 2 in this case*/
+   {
+      long log_len = 1L;
+      while ((1L<<log_len) < limbs) log_len++;
+      limbs = (1L<<log_len);
+   }
+
    fft_convolution(ii, jj, log_length - 2, limbs, len_out, &t1, &t2, &s1, tt); 
     
    _fmpz_vec_set_fft(output, len_out, ii, limbs, sign); /* write output */
