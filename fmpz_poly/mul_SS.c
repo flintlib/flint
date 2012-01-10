@@ -154,16 +154,6 @@ fmpz_poly_mul_SS(fmpz_poly_t res,
 
     rlen = len1 + len2 - 1;
 
-    if (res == poly1 || res == poly2)
-    {
-        fmpz_poly_t t;
-        fmpz_poly_init2(t, rlen);
-        fmpz_poly_mul_SS(t, poly1, poly2);
-        fmpz_poly_swap(res, t);
-        fmpz_poly_clear(t);
-        return;
-    }
-
     fmpz_poly_fit_length(res, rlen);
     if (len1 >= len2)
         _fmpz_poly_mul_SS(res->coeffs, poly1->coeffs, len1,
