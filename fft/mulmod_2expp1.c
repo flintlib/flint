@@ -213,16 +213,16 @@ long fft_adjust_limbs(mp_size_t limbs)
 
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) return limbs;
          
-   while ((1L<<depth)<limbs) depth++;
+   depth = FLINT_CLOG2(limbs);
    limbs2 = (1L<<depth); /* within a factor of 2 of limbs */
    bits2 = limbs2*FLINT_BITS;
 
-   while ((1UL<<depth1) < bits1) depth1++;
+   depth1 = FLINT_CLOG2(bits1);
    if (depth1 < 12) off1 = mulmod_2expp1_table_n[0];
    else off1 = mulmod_2expp1_table_n[FLINT_MIN(depth1, FFT_N_NUM + 11) - 12];
    depth1 = depth1/2 - off1;
    
-   while ((1UL<<depth2) < bits2) depth2++;
+   depth2 = FLINT_CLOG2(bits2);
    if (depth2 < 12) off2 = mulmod_2expp1_table_n[0];
    else off2 = mulmod_2expp1_table_n[FLINT_MIN(depth2, FFT_N_NUM + 11) - 12];
    depth2 = depth2/2 - off2;

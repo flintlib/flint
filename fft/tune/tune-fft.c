@@ -147,8 +147,7 @@ main(void)
             i1[int_limbs] = 0;
             i2[int_limbs] = 0;
 
-            depth1 = 1;
-            while ((1UL<<depth1) < bits) depth1++;
+            depth1 = FLINT_CLOG2(bits);
             depth1 = depth1/2;
 
             w1 = bits/(1UL<<(2*depth1));
