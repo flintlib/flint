@@ -35,6 +35,8 @@ fmpz_poly_mulhigh_n(fmpz_poly_t res,
 {
     mp_size_t limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
     mp_size_t limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);
+    mp_size_t len1 = poly1->length;
+    mp_size_t len2 = poly2->length;
     mp_size_t limbsx = FLINT_MAX(limbs1, limbs2);
 
     if (n == 0)
@@ -51,6 +53,12 @@ fmpz_poly_mulhigh_n(fmpz_poly_t res,
 
     if ((limbsx > 4) && (n < 16))
         fmpz_poly_mulhigh_karatsuba_n(res, poly1, poly2, n);
-    else
+    else if (limbs1 + limbs2 <= 8)
         fmpz_poly_mul_KS(res, poly1, poly2);
+    else if (((limbs1+limbs2)*(limbs1+limbs2))/16384 >= len1 + len2)
+        fmpz_poly_mul_KS(res, poly1, poly2);
+    else if (limbs1 + limbs2 < (FLINT_BITS/16)*(len1 + len2))
+       fmpz_poly_mul_KS(res, poly1, poly2);
+    else
+       fmpz_poly_mul_SS(res, poly1, poly2);
 }

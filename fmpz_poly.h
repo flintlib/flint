@@ -392,6 +392,12 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
 void fmpz_poly_mul_SS(fmpz_poly_t res,
                           const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
+void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long length1, 
+             const fmpz * input2, long length2, const long bits_in, long n);
+
+void fmpz_poly_mullow_SS(fmpz_poly_t res,
+                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, 
                                   long len1, const fmpz * poly2, long len2);
 
