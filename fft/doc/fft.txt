@@ -569,9 +569,16 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
                              mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w)
 
     Multiply \code{i1} by \code{i2} modulo \code{B^r_limbs + 1} where 
-    \code{r_limbs = nw/FLINT_BITS} with \code{n = 2^depth} and $w = 2^i$ for some
-    $i \geq 0$. Uses the negacyclic FFT convolution CRT'd with a 1 limb naive
-    convolution. We require $depth \geq 12$.
+    \code{r_limbs = nw/FLINT_BITS} with \code{n = 2^depth}. Uses the negacyclic 
+    FFT convolution CRT'd with a 1 limb naive convolution. We require that
+    \code{depth} and \code{w} have been selected as per the wrapper 
+    \code{fft_mulmod_2expp1} below.
+
+long fft_adjust_limbs(mp_size_t limbs)
+
+    Given a number of limbs, returns a new number of limbs (no more than the next
+    power of 2) which will work with the Nussbaumer code. It is only necessary 
+    to make this adjustment if \code{limbs > FFT_MULMOD_2EXPP1_CUTOFF}.
 
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt)
@@ -579,8 +586,9 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
     As per \code{_fft_mulmod_2expp1} but with a tuned cutoff below which more 
     classical methods are used for the convolution. The temporary space is 
     required to fit \code{n*w + FLINT_BITS} bits. There are no restrictions on
-    $n$, but $w$ must be as per \code{_fft_mulmod_2expp1} if 
-    \code{n*w*FLINT_BITS} exceeds \code{FFT_MULMOD_2EXPP1_CUTOFF}.
+    $n$, but if \code{limbs = n*w/FLINT_BITS} then if \code{limbs} exceeds 
+    \code{FFT_MULMOD_2EXPP1_CUTOFF} the function \code{fft_adjust_limbs} must
+    be called to increase the number of limbs to an appropriate value.
 
 *******************************************************************************
 

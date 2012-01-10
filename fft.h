@@ -213,6 +213,8 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii,
 void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
                              mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w);
 
+long fft_adjust_limbs(mp_size_t limbs);
+
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
 
