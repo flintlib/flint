@@ -35,7 +35,7 @@ or implied, of William Hart.
 #include "ulong_extras.h"
 #include "fft_tuning.h"
 
-static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM][2] = MULMOD_TAB;
+static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM] = MULMOD_TAB;
 
 void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii, mp_limb_t * jj, mp_size_t m)
 {
@@ -183,7 +183,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 {
    mp_size_t bits = n*w;
    mp_size_t limbs = bits/FLINT_BITS;
-   mp_bitcnt_t depth1 = 1, depth = 1;
+   mp_bitcnt_t depth1, depth = 1;
 
    mp_size_t w1, off;
 
@@ -194,16 +194,44 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
       return;
    }
    
-   while ((1UL<<depth) < n) depth++;
-   while ((1UL<<(2*depth1)) < bits) depth1++;
-   depth1--;
-
+   while ((1UL<<depth) < bits) depth++;
+   
+   if (depth < 12) off = 3;
+   else off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12];
+   depth1 = depth/2 - off;
+   
    w1 = bits/(1UL<<(2*depth1));
 
-   if (depth < 12) off = 3;
-   else off = mulmod_2expp1_table_n[FLINT_MIN(depth, FFT_N_NUM + 11) - 12][FLINT_MIN(w, 2) - 1];
-   depth1 -= off;
-   w1 *= (1L<<(2*off));
-
    _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
+}
+
+long fft_adjust_limbs(mp_size_t limbs)
+{
+   mp_size_t bits1 = limbs*FLINT_BITS, bits2;
+   mp_size_t depth = 1, limbs2, depth1 = 1, depth2 = 1, adj;
+   mp_size_t off1, off2;
+
+   while ((1L<<depth)<limbs) depth++;
+   limbs2 = (1L<<depth); /* within a factor of 2 of limbs */
+   bits2 = limbs2*FLINT_BITS;
+
+   while ((1UL<<depth1) < bits1) depth1++;
+   if (depth1 < 12) off1 = 3;
+   else off1 = mulmod_2expp1_table_n[FLINT_MIN(depth1, FFT_N_NUM + 11) - 12];
+   depth1 = depth1/2 - off1;
+   
+   while ((1UL<<depth2) < bits2) depth2++;
+   if (depth2 < 12) off2 = 3;
+   else off2 = mulmod_2expp1_table_n[FLINT_MIN(depth2, FFT_N_NUM + 11) - 12];
+   depth2 = depth2/2 - off2;
+   
+   depth1 = FLINT_MAX(depth1, depth2);
+   adj = (1L<<(depth1 + 1));
+   limbs2 = adj*((limbs + adj - 1)/adj); /* round up number of limbs */
+   bits1 = limbs2*FLINT_BITS;
+   bits2 = (1L<<(depth1*2));
+   bits1 = bits2*((bits1 + bits2 - 1)/bits2); /* round up bits */
+   limbs = bits1/FLINT_BITS;
+
+   return limbs;
 }
