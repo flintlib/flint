@@ -69,9 +69,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
    {
 		for (i = 0; i < length; i++)
       {
-         mpn_normmod_2expp1(coeffs_f[i], limbs);
-         
-			mpz_ptr = _fmpz_promote(coeffs_m);
+         mpz_ptr = _fmpz_promote(coeffs_m);
          if (mpz_ptr->_mp_alloc < limbs) _mpz_realloc(mpz_ptr, limbs);
 			data = mpz_ptr->_mp_d;
 			mpn_copyi(data, coeffs_f[i], limbs); 
