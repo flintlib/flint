@@ -114,15 +114,15 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
       output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
       
       limbs = (output_bits - 1) / FLINT_BITS + 1;
+
+      if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* need limbs to be a power of 2 in this case*/
+      {
+         long log_len = 1L;
+         while ((1L<<log_len) < limbs) log_len++;
+         limbs = (1L<<log_len);
+      }
 	} else if (bits_in < 0L) sign = 1;
            
-   if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* need limbs to be a power of 2 in this case*/
-   {
-      long log_len = 1L;
-      while ((1L<<log_len) < limbs) log_len++;
-      limbs = (1L<<log_len);
-   }
-
    fft_convolution(ii, jj, log_length - 2, limbs, len_out, &t1, &t2, &s1, tt); 
     
    _fmpz_vec_set_fft(output, len_out, ii, limbs, sign); /* write output */
