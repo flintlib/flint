@@ -120,7 +120,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    for (j = 0; j < 2*n; j++)
    {
       if (i1 != i2) mpn_normmod_2expp1(jj[j], limbs);
-      c = ii[j][limbs] + 2*jj[j][limbs];
+      c = 2*ii[j][limbs] + jj[j][limbs];
       ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
    }
    
@@ -189,7 +189,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) 
    {
-      mp_limb_t c = i1[limbs] + 2*i2[limbs];
+      mp_limb_t c = 2*i1[limbs] + i2[limbs];
       r[limbs] = mpn_mulmod_2expp1(r, i1, i2, c, bits, tt);
       return;
    }

@@ -52,7 +52,7 @@ void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
          if (t[limbs] == ~(mp_limb_signed_t) 0) /* if we now have -1 (very unlikely) */
          {
             t[limbs] = 0;
-            mpn_addmod_2expp1_1(t, limbs, 1);
+            mpn_addmod_2expp1_1(t, limbs, 1);            
          }
       }
    }

@@ -50,8 +50,8 @@ void ifft_radix2(mp_limb_t ** ii, mp_size_t n,
                  mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2)
 {
    mp_size_t i;
-   mp_size_t limbs = (w*n)/GMP_LIMB_BITS;
-   
+   mp_size_t limbs = (w*n)/FLINT_BITS;
+    
    if (n == 1) 
    {
       ifft_butterfly(*t1, *t2, ii[0], ii[1], 0, limbs, w);

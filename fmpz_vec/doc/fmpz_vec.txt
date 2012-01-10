@@ -161,6 +161,23 @@ void _fmpz_vec_set_nmod_vec(fmpz * res,
     coefficients modulo the given modulus $n$ to their signed integer
     representatives in the range $[-n/2, n/2)$.
 
+long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, 
+                               long l, long length, mp_bitcnt_t bits_known)
+
+    Convert the vector of coeffs \code{coeffs_m} to an fft vector 
+    \code{coeffs_f} of the given \code{length} with \code{l} limbs per
+    coefficient with an additional limb for overflow. If the number of 
+    bits per coefficient is known it may be specified, otherwise the 
+    maximum number of bits for a coefficient is returned (and made 
+    negative if any of the coefficients is negative).
+
+void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
+                              mp_limb_t ** coeffs_f, long limbs, long sign)
+
+    Convert an fft vector \code{coeffs_f} of the given \code{length} to a 
+    vector of \code{fmpz}'s. Each is assumed to be the given number of limbs 
+    long with an additional limb for overflow. If the output coefficients are 
+    to be signed then set \code{sign}, otherwise clear it. 
 
 *******************************************************************************
 
