@@ -37,6 +37,6 @@ fmpz_mat_set_nmod_mat(fmpz_mat_t A, const nmod_mat_t Amod)
 
     for (i = 0; i < Amod->r; i++)
         for (j = 0; j < Amod->c; j++)
-            fmpz_set_ui_mod(fmpz_mat_entry(A, i, j),
-                            nmod_mat_entry(Amod, i, j), Amod->mod.n);
+            fmpz_set_ui_smod(fmpz_mat_entry(A, i, j),
+                             nmod_mat_entry(Amod, i, j), Amod->mod.n);
 }

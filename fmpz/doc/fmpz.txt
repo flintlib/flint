@@ -174,11 +174,11 @@ int fmpz_set_str(fmpz_t f, char * str, int b)
     in base~$b$. The base~$b$ can vary between $2$ and $62$, inclusive. 
     Returns $0$ if the string contains a valid input and $-1$ otherwise.
 
-void fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
+void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 
     Sets $f$ to the signed remainder $y \equiv x \bmod m$ satisfying
-    $-m/2 \le y < m/2$, given $x$ which is assumed to satisfy
-    $0 \le x < m$.
+    $-m/2 < y \leq m/2$, given $x$ which is assumed to satisfy
+    $0 \leq x < m$.
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f)
 
