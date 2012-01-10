@@ -90,7 +90,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    {
       mpn_normmod_2expp1(ii[j], limbs);
       if (i1 != i2) mpn_normmod_2expp1(jj[j], limbs);
-      c = ii[j][limbs] + 2*jj[j][limbs];
+      c = 2*ii[j][limbs] + jj[j][limbs];
       ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
    }
 

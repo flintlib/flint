@@ -37,19 +37,19 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
 {
    long len_out = length1 + length2 - 1;
    long output_bits, n, limbs, size, i;
-	long log_length2 = 0, log_length = 0;
+	long log_length2, log_length;
    mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
    long bits1, bits2;
    int sign = 0;
 
-   while ((1L<<log_length) < len_out) log_length++;
+   log_length = FLINT_CLOG2(len_out);
    
 	if (!bits_in)
 	{
 		ulong size1 = _fmpz_vec_max_limbs(input1, length1); 
       ulong size2 = _fmpz_vec_max_limbs(input2, length2);
    
-      while ((1<<log_length2) < length2) log_length2++; 
+      log_length2 = FLINT_CLOG2(length2);
       
       /* Start with an upper bound on the number of bits needed */
       output_bits = FLINT_BITS * (size1 + size2) + log_length2 + 1; 
@@ -62,8 +62,7 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
    limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
    if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
    {
-      long log_len = 1L;
-      while ((1L<<log_len) < limbs) log_len++;
+      long log_len = FLINT_CLOG2(limbs);
       limbs = (1L<<log_len);
    }
    
@@ -114,8 +113,7 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
       output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
       
       limbs = (output_bits - 1) / FLINT_BITS + 1;
-      if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) 
-         limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
+      limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
 	} else if (bits_in < 0L) sign = 1;
            
    fft_convolution(ii, jj, log_length - 2, limbs, len_out, &t1, &t2, &s1, tt); 

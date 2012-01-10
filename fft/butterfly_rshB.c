@@ -41,7 +41,7 @@ void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
    {
       if (y == 0)
       {
-         mpn_sumdiff_n(t, u, i1, i2, limbs + 1);     
+         cy = mpn_sumdiff_n(t, u, i1, i2, limbs + 1);     
       } else /* y != 0 */
       {
          cy = mpn_sumdiff_n(t, u, i1, i2 + y, limbs - y);

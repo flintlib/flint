@@ -49,7 +49,10 @@ or implied, of William Hart.
  extern "C" {
 #endif
 
-extern mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#if !defined(mpn_sumdiff_n)
+#define mpn_sumdiff_n(t, u, r, s, n) \
+   (n == 0 ? (mp_limb_t) 0 : (mpn_add_n(t, r, s, n)<<1) + mpn_sub_n(u, r, s, n))
+#endif
 
 #define SWAP_PTRS(xx, yy) \
    do { \
