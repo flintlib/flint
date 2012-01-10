@@ -115,26 +115,28 @@ main(void)
     }
 
     printf("}\n\n");
-    printf("#define FFT_N_NUM 7\n\n");
     
     best_d = 12;
     best_w = 1;
-            
+    best_off = -1;
+
     printf("#define MULMOD_TAB \\\n");
     fflush(stdout);
     printf("   { "); fflush(stdout);
-    for (depth = 12; depth <= 18; depth++)
+    for (depth = 12; best_off != 1 ; depth++)
     {
-        printf("{ "); fflush(stdout);
         for (w = 1; w <= 2; w++)
         {
-            int iters = 100*((mp_size_t) 1 << (3*(18 - depth)/2)), i;
+            int iters, i;
             mp_size_t n = (1UL<<depth);
             mp_bitcnt_t bits = n*w;
             mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
             mp_size_t j;
             mp_limb_t c, * i1, * i2, * r1, * tt;
         
+            if (depth <= 21) iters = 32*((mp_size_t) 1 << (21 - depth));
+            else iters = FLINT_MAX(32/((mp_size_t) 1 << (depth - 21)), 1);
+
             i1 = malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
             i2 = i1 + int_limbs + 1;
             r1 = i2 + int_limbs + 1;
@@ -146,8 +148,8 @@ main(void)
             i2[int_limbs] = 0;
 
             depth1 = 1;
-            while ((1UL<<(2*depth1)) < bits) depth1++;
-            depth1--;
+            while ((1UL<<depth1) < bits) depth1++;
+            depth1 = depth1/2;
 
             w1 = bits/(1UL<<(2*depth1));
 
@@ -182,16 +184,15 @@ main(void)
             }
 
             printf("%ld", best_off); 
-            if (w != 2) printf(",");
-            printf(" "); fflush(stdout);
+            if (w != 2) printf(", "); fflush(stdout);
 
             free(i1);
         }
-        printf("}");
-        if (depth != 18) printf(",");
-        printf(" "); fflush(stdout);
+        printf(", "); fflush(stdout);
     }
-    printf("}\n\n");
+    printf("1 }\n\n");
+    
+    printf("#define FFT_N_NUM %ld\n\n", 2*(depth - 12) + 1);
     
     printf("#define FFT_MULMOD_2EXPP1_CUTOFF %ld\n\n", ((mp_limb_t) 1 << best_d)*best_w/(2*FLINT_BITS));
     

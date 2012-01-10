@@ -114,8 +114,7 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
       output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
       
       limbs = (output_bits - 1) / FLINT_BITS + 1;
-      if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) 
-         limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
+      limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
 	} else if (bits_in < 0L) sign = 1;
            
    fft_convolution(ii, jj, log_length - 2, limbs, len_out, &t1, &t2, &s1, tt); 
