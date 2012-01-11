@@ -24,105 +24,96 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
 #include "fft_tuning.h"
 
-void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long length1, 
-               const fmpz * input2, long length2, const long bits_in, long trunc)
+void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1, 
+               const fmpz * input2, long len2, const long bits_in, long trunc)
 {
-   long len_out = length1 + length2 - 1;
-   long output_bits, n, limbs, size, i;
-	long log_length2, log_length;
-   mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
-   long bits1, bits2;
-   int sign = 0;
+    const long len_out = len1 + len2 - 1;
+    const long loglen  = FLINT_CLOG2(len_out);
+    const long loglen2 = FLINT_CLOG2(len2);
+    const long n = (1L << (loglen - 2));
 
-   log_length = FLINT_CLOG2(len_out);
-   
-	if (!bits_in)
-	{
-		ulong size1 = _fmpz_vec_max_limbs(input1, length1); 
-      ulong size2 = _fmpz_vec_max_limbs(input2, length2);
-   
-      log_length2 = FLINT_CLOG2(length2);
-      
-      /* Start with an upper bound on the number of bits needed */
-      output_bits = FLINT_BITS * (size1 + size2) + log_length2 + 1; 
-	} else
-		output_bits = FLINT_ABS(bits_in);
-   
-	/* round up for sqrt2 trick */
-   output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
-   
-   limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
-   if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
-   {
-      long log_len = FLINT_CLOG2(limbs);
-      limbs = (1L<<log_len);
-   }
-   
-   size = limbs + 1;
-   n = (1L<<(log_length - 2));
+    long output_bits, limbs, size, i;
+    mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
+    long bits1, bits2;
+    int sign = 0;
 
-   ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
-   for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
-      ii[i] = ptr;
-   t1 = ptr;
-   t2 = t1 + size;
-   s1 = t2 + size;
-   tt = s1 + size;
-   
-   if (input1 != input2)
-   {
-      jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
-      for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
-         jj[i] = ptr;
-   } else jj = ii;
-   
-   /* put coefficients into FFT polys */
-   bits1 = _fmpz_vec_get_fft(ii, input1, limbs, length1, bits_in);
-   for (i = length1; i < 4*n; i++)
-      mpn_zero(ii[i], limbs + 1);
+    if (!bits_in)
+    {
+        ulong size1 = _fmpz_vec_max_limbs(input1, len1); 
+        ulong size2 = _fmpz_vec_max_limbs(input2, len2);
 
-   if (input1 != input2) 
-   {
-      bits2 = _fmpz_vec_get_fft(jj, input2, limbs, length2, bits_in);
-      for (i = length2; i < 4*n; i++)
-         mpn_zero(jj[i], limbs + 1);
-   }
-   else bits2 = bits1;
-   
-   if (!bits_in)
-	{
-		if (bits1 < 0L || bits2 < 0L) 
-      {
-         sign = 1;  
-         bits1 = FLINT_ABS(bits1);
-         bits2 = FLINT_ABS(bits2);
-      }
-   
-      /* Recompute the number of limbs now that we know how large everything really is */
-      output_bits = bits1 + bits2 + log_length2 + sign;
-      
-      /* round up output bits */
-      output_bits = (((output_bits - 1) >> (log_length - 2)) + 1) << (log_length - 2);
-      
-      limbs = (output_bits - 1) / FLINT_BITS + 1;
-      limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
-	} else if (bits_in < 0L) sign = 1;
-           
-   fft_convolution(ii, jj, log_length - 2, limbs, len_out, &t1, &t2, &s1, tt); 
-    
-   _fmpz_vec_set_fft(output, trunc, ii, limbs, sign); /* write output */
-   
-   free(ii); 
-   if (input1 != input2) 
-      free(jj);
+        /* Start with an upper bound on the number of bits needed */
+        output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
+    } else
+        output_bits = FLINT_ABS(bits_in);
+
+    /* round up for sqrt2 trick */
+    output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
+
+    limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
+    if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
+        limbs = (1L << FLINT_CLOG2(limbs));
+
+    size = limbs + 1;
+
+    ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
+    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
+        ii[i] = ptr;
+    t1 = ptr;
+    t2 = t1 + size;
+    s1 = t2 + size;
+    tt = s1 + size;
+
+    if (input1 != input2)
+    {
+        jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
+        for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
+            jj[i] = ptr;
+    } else jj = ii;
+
+    /* put coefficients into FFT polys */
+    bits1 = _fmpz_vec_get_fft(ii, input1, limbs, len1, bits_in);
+    for (i = len1; i < 4*n; i++)
+        mpn_zero(ii[i], limbs + 1);
+
+    if (input1 != input2) 
+    {
+        bits2 = _fmpz_vec_get_fft(jj, input2, limbs, len2, bits_in);
+        for (i = len2; i < 4*n; i++)
+            mpn_zero(jj[i], limbs + 1);
+    }
+    else bits2 = bits1;
+
+    if (!bits_in)
+    {
+        if (bits1 < 0L || bits2 < 0L) 
+        {
+            sign = 1;  
+            bits1 = FLINT_ABS(bits1);
+            bits2 = FLINT_ABS(bits2);
+        }
+
+        /* Recompute the number of limbs now that we know how large everything really is */
+        output_bits = bits1 + bits2 + loglen2 + sign;
+
+        /* round up output bits */
+        output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
+
+        limbs = (output_bits - 1) / FLINT_BITS + 1;
+        limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
+    } else if (bits_in < 0L) sign = 1;
+
+    fft_convolution(ii, jj, loglen - 2, limbs, len_out, &t1, &t2, &s1, tt); 
+
+    _fmpz_vec_set_fft(output, trunc, ii, limbs, sign); /* write output */
+
+    free(ii); 
+    if (input1 != input2) 
+        free(jj);
 }
 
 void
