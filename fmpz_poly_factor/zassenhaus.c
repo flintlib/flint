@@ -183,7 +183,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
             fmpz_poly_factor_t lifted_fac;
             fmpz_poly_factor_init(lifted_fac);
 
-            p = fac->p[0]->mod.n;
+            p = (fac->p + 0)->mod.n;
             {
                 fmpz_t B;
                 fmpz_init(B);
