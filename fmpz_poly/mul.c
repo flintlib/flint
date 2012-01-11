@@ -44,10 +44,16 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1,
     limbs1 = _fmpz_vec_max_limbs(poly1, len1);
     limbs2 = _fmpz_vec_max_limbs(poly2, len2);
 
-    if (len1 < 25 && (limbs1 > 12 || limbs2 > 12))
+    if (len1 < 16 && (limbs1 > 12 || limbs2 > 12))
         _fmpz_poly_mul_karatsuba(res, poly1, len1, poly2, len2);
-    else
+    else if (limbs1 + limbs2 <= 8)
         _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+    else if (((limbs1+limbs2)*(limbs1+limbs2))/16384 >= len1 + len2)
+        _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+    else if (limbs1 + limbs2 < (FLINT_BITS/16)*(len1 + len2))
+       _fmpz_poly_mul_KS(res, poly1, len1, poly2, len2);
+    else
+       _fmpz_poly_mul_SS(res, poly1, len1, poly2, len2, 0);
 }
 
 void
