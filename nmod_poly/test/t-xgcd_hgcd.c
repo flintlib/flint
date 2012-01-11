@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -69,7 +67,7 @@ main(void)
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
 
-        nmod_poly_gcd_euclidean(g1, a, b);
+        nmod_poly_gcd(g1, a, b);
         nmod_poly_xgcd_hgcd(g2, s, t, a, b);
         
         nmod_poly_mul(sum, s, a);

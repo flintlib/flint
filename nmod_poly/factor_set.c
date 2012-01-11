@@ -42,13 +42,13 @@ void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
             nmod_poly_factor_fit_length(res, fac->num);
             for (i = 0; i < fac->num; i++)
             {
-                nmod_poly_set(res->p[i], fac->p[i]);
-                res->p[i]->mod = fac->p[i]->mod;
+                nmod_poly_set(res->p + i, fac->p + i);
+                (res->p + i)->mod = (fac->p + i)->mod;
                 res->exp[i] = fac->exp[i];
             }
             for ( ; i < res->num; i++)
             {
-                nmod_poly_zero(res->p[i]);
+                nmod_poly_zero(res->p + i);
                 res->exp[i] = 0;
             }
             res->num = fac->num;

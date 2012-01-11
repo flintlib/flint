@@ -26,9 +26,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 

@@ -26,8 +26,6 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 
 void
@@ -38,7 +36,8 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 
     if (f->mod.n == 2)
     {
-        printf("Not implemented: Cantor-Zassenhaus mod 2\n");
+        printf("Exception (nmod_poly_factor_cantor_zassenhaus): \n");
+        printf("Not implemented for p = 2.\n");
         abort();
     }
 
@@ -69,7 +68,7 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
             nmod_poly_factor_equal_deg(res, g, i);
 
             for (j = num; j < res->num; j++)
-                res->exp[j] = nmod_poly_remove(v, res->p[j]);
+                res->exp[j] = nmod_poly_remove(v, res->p + j);
         }
     }
     while (v->length >= 2*i + 3);

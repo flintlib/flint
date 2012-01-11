@@ -130,7 +130,7 @@ main(void)
         nmod_poly_set_coeff_ui(product, 0, 1);
         for (i = 0; i < res->num; i++)
             for (j = 0; j < res->exp[i]; j++)
-                nmod_poly_mul(product, product, res->p[i]);
+                nmod_poly_mul(product, product, res->p + i);
         nmod_poly_scalar_mul_nmod(product, product, lead);
         result &= nmod_poly_equal(pol1, product);
         if (!result)
@@ -241,7 +241,7 @@ main(void)
             found = 0;
             for (j = 0; j < res2->num; j++)
             {
-                if (nmod_poly_equal(res->p[i], res2->p[j]) &&
+                if (nmod_poly_equal(res->p + i, res2->p + j) &&
                         res->exp[i] == res2->exp[j])
                 {
                     found = 1;

@@ -40,22 +40,22 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc)
             long i;
 
             for (i = alloc; i < fac->num; i++)
-                nmod_poly_clear(fac->p[i]);
+                nmod_poly_clear(fac->p + i);
 
-            fac->p   = realloc(fac->p, alloc * sizeof(nmod_poly_t));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
-            fac->alloc     = alloc;
+            fac->p     = realloc(fac->p, alloc * sizeof(nmod_poly_struct));
+            fac->exp   = realloc(fac->exp, alloc * sizeof(long));
+            fac->alloc = alloc;
         }
         else if (fac->alloc < alloc)
         {
             long i;
 
-            fac->p   = realloc(fac->p, alloc * sizeof(nmod_poly_t));
+            fac->p   = realloc(fac->p, alloc * sizeof(nmod_poly_struct));
             fac->exp = realloc(fac->exp, alloc * sizeof(long));
 
             for (i = fac->alloc; i < alloc; i++)
             {
-                nmod_poly_init_preinv(fac->p[i], 0, 0);
+                nmod_poly_init_preinv(fac->p + i, 0, 0);
                 fac->exp[i] = 0L;
             }
             fac->alloc = alloc;
@@ -65,11 +65,11 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc)
     {
         long i;
 
-        fac->p   = malloc(alloc * sizeof(nmod_poly_t));
+        fac->p   = malloc(alloc * sizeof(nmod_poly_struct));
         fac->exp = calloc(alloc, sizeof(long));
 
         for (i = 0; i < alloc; i++)
-            nmod_poly_init_preinv(fac->p[i], 0, 0);
+            nmod_poly_init_preinv(fac->p + i, 0, 0);
         fac->num   = 0;
         fac->alloc = alloc;
     }

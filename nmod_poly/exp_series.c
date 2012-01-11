@@ -29,9 +29,8 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-#define NMOD_NEWTON_EXP_CUTOFF 200
-#define NMOD_NEWTON_EXP_CUTOFF2 250
-
+#define NMOD_POLY_NEWTON_EXP_CUTOFF 200
+#define NMOD_POLY_NEWTON_EXP_CUTOFF2 250
 
 void
 __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
@@ -39,7 +38,7 @@ __nmod_poly_exp_series_prealloc(mp_ptr f, mp_ptr g, mp_srcptr h,
 {
     long m, m2, l;
 
-    if (n < NMOD_NEWTON_EXP_CUTOFF)
+    if (n < NMOD_POLY_NEWTON_EXP_CUTOFF)
     {
         _nmod_poly_exp_series_basecase(f, h, n, n, mod);
         _nmod_poly_inv_series_basecase(g, f, extend ? n : (n + 1) / 2, mod);
@@ -86,7 +85,7 @@ _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 {
     mp_ptr g, T, U, hprime;
 
-    if (n < NMOD_NEWTON_EXP_CUTOFF2)
+    if (n < NMOD_POLY_NEWTON_EXP_CUTOFF2)
     {
         _nmod_poly_exp_series_basecase(f, h, n, n, mod);
         return;
@@ -150,7 +149,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
         return;
     }
 
-    if (n < NMOD_NEWTON_EXP_CUTOFF2)
+    if (n < NMOD_POLY_NEWTON_EXP_CUTOFF2)
     {
         _nmod_poly_exp_series_basecase(f->coeffs, h->coeffs, hlen, n, f->mod);
         f->length = n;

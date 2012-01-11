@@ -27,8 +27,6 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 
 void

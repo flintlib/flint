@@ -83,7 +83,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
     for (i = 0; i < sqfree_factors->num; i++)
     {
         nmod_poly_factor_init(factors);
-        __nmod_poly_factor1(factors, sqfree_factors->p[i], algorithm);
+        __nmod_poly_factor1(factors, sqfree_factors->p + i, algorithm);
         nmod_poly_factor_pow(factors, sqfree_factors->exp[i]);
         nmod_poly_factor_concat(result, factors);
         nmod_poly_factor_clear(factors);
@@ -130,7 +130,7 @@ __nmod_poly_factor_deflation(nmod_poly_factor_t result,
             /* Inflate */
             nmod_poly_t pol;
             nmod_poly_init_preinv(pol, input->mod.n, input->mod.ninv);
-            nmod_poly_inflate(pol, def_res->p[i], deflation);
+            nmod_poly_inflate(pol, def_res->p + i, deflation);
 
             /* Factor inflation */
             if (def_res->exp[i] == 1)

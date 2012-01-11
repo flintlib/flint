@@ -19,85 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 William Hart
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "nmod_poly.h"
-#include "mpn_extras.h"
 
-long _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA, 
-                                        mp_srcptr B, long lenB, nmod_t mod)
+long _nmod_poly_gcd(mp_ptr G, mp_srcptr A, long lenA, 
+                              mp_srcptr B, long lenB, nmod_t mod)
 {
-    long steps;
-    long lenR1, lenR2 = 0, lenG = 0;
+    const long cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+                        NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    mp_ptr F, R1, R2, R3 = G, T;
-    
-    if (lenB == 1)
-    {
-        G[0] = B[0];
-        return 1;
-    }
-
-    F  = _nmod_vec_init(2*lenB - 3);
-    R1 = F;
-    R2 = R1 + lenB - 1;
-
-    _nmod_poly_rem(R1, A, lenA, B, lenB, mod);
-    lenR1 = lenB - 1;
-    MPN_NORM(R1, lenR1);
-
-    if (lenR1 > 1)
-    {
-        _nmod_poly_rem(R2, B, lenB, R1, lenR1, mod);
-        lenR2 = lenR1 - 1;
-        MPN_NORM(R2, lenR2);
-    }
+    if (lenA < cutoff)
+        return _nmod_poly_gcd_euclidean(G, A, lenA, B, lenB, mod);
     else
-    {
-        if (lenR1 == 0)
-        {
-            mpn_copyi(G, B, lenB);
-            _nmod_vec_clear(F);
-            return lenB;
-        }
-        else
-        {
-            G[0] = R1[0];
-            _nmod_vec_clear(F);
-            return 1;
-        }
-    }
-
-    for (steps = 2; lenR2 > 1; steps++)
-    {
-        _nmod_poly_rem(R3, R1, lenR1, R2, lenR2, mod);
-        lenR1 = lenR2--;
-        MPN_NORM(R3, lenR2);
-        T = R1; R1 = R2; R2 = R3; R3 = T;
-    }
-
-    if (lenR2 == 1)
-    {
-        lenG = 1;
-        if (steps % 3) 
-            G[0] = R2[0];
-    }
-    else
-    {
-        lenG = lenR1;
-        if (steps % 3 != 1)
-            mpn_copyi(G, R1, lenR1);
-    }
-
-    _nmod_vec_clear(F);
-    return lenG;
+        return _nmod_poly_gcd_hgcd(G, A, lenA, B, lenB, mod);
 }
 
-void nmod_poly_gcd_euclidean(nmod_poly_t G, 
-                             const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_gcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
 {
     long lenA = A->length, lenB = B->length, lenG;
     nmod_poly_t tG;
@@ -111,6 +51,10 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     else if (lenB == 0)
     {
         nmod_poly_make_monic(G, A);
+    }
+    else if (lenA == 1 || lenB == 1)
+    {
+        nmod_poly_one(G);
     }
     else
     {
@@ -126,11 +70,9 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
         }
 
         if (lenA >= lenB)
-            lenG = _nmod_poly_gcd_euclidean(g, A->coeffs, lenA,
-                                               B->coeffs, lenB, A->mod);
+            lenG = _nmod_poly_gcd(g, A->coeffs, lenA, B->coeffs, lenB, A->mod);
         else
-            lenG = _nmod_poly_gcd_euclidean(g, B->coeffs, lenB,
-                                               A->coeffs, lenA, A->mod);
+            lenG = _nmod_poly_gcd(g, B->coeffs, lenB, A->coeffs, lenA, A->mod);
 
         if (G == A || G == B)
         {

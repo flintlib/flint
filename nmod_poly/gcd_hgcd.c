@@ -20,16 +20,12 @@
 /******************************************************************************
 
     Copyright (C) 2011 William Hart
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
-#include "nmod_poly_mat.h"
 #include "mpn_extras.h"
 
 #define __set(B, lenB, A, lenA)      \
@@ -123,15 +119,11 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
         nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
 
         if (lenA >= lenB)
-        {
             G->length = _nmod_poly_gcd_hgcd(G->coeffs, A->coeffs, A->length, 
                                                        B->coeffs, B->length, A->mod);
-        }
         else
-        {
             G->length = _nmod_poly_gcd_hgcd(G->coeffs, B->coeffs, B->length, 
                                                        A->coeffs, A->length, A->mod);
-        }
 
         _nmod_poly_make_monic(G->coeffs, G->coeffs, G->length, G->mod);
     }

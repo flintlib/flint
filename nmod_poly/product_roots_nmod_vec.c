@@ -23,11 +23,8 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
+#include "ulong_extras.h"
 
 void
 _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
@@ -60,10 +57,8 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
     }
     else
     {
-        long m;
+        const long m = (n + 1) / 2;
         mp_ptr tmp;
-
-        m = (n + 1) / 2;
 
         tmp = _nmod_vec_init(n + 2);
 

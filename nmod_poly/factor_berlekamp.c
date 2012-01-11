@@ -27,17 +27,13 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "nmod_mat.h"
 #include "ulong_extras.h"
 #include "profiler.h"
 #include "perm.h"
 
-
-void
+static void
 nmod_poly_to_nmod_mat_col(nmod_mat_t mat, long col, nmod_poly_t poly)
 {
     long i;
@@ -49,19 +45,18 @@ nmod_poly_to_nmod_mat_col(nmod_mat_t mat, long col, nmod_poly_t poly)
         nmod_mat_entry(mat, i, col) = 0UL;
 }
 
-void
+static void
 nmod_mat_col_to_nmod_poly_shifted(nmod_poly_t poly, nmod_mat_t mat,
                                             long col, long * shift)
 {
-    long rows = mat->r;
-    long i, j;
+    long i, j, rows = mat->r;
 
-    nmod_poly_fit_length(poly, mat->r);
+    nmod_poly_fit_length(poly, rows);
 
     for (i = 0, j = 0; j < rows; j++)
     {
         if (shift[j])
-            poly->coeffs[j] = 0UL;
+            poly->coeffs[j] = 0;
         else
         {
             poly->coeffs[j] = nmod_mat_entry(mat, i, col);
@@ -73,30 +68,28 @@ nmod_mat_col_to_nmod_poly_shifted(nmod_poly_t poly, nmod_mat_t mat,
     _nmod_poly_normalise(poly);
 }
 
-
-void
+static void
 __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     flint_rand_t state, const nmod_poly_t f)
 {
+    const mp_limb_t p = nmod_poly_modulus(f);
+    const long n      = nmod_poly_degree(f);
+
     nmod_poly_factor_t fac1, fac2;
     nmod_poly_t x, x_p;
     nmod_poly_t x_pi, x_pi2;
     nmod_poly_t Q;
     nmod_mat_t matrix;
-    mp_limb_t p;
     mp_limb_t coeff;
-    long n, i, nullity, col, row, *shift;
-    long * perm;
-    nmod_poly_t * basis;
+    long i, nullity, col, row, *shift;
+    long *perm;
+    nmod_poly_t *basis;
 
     if (f->length <= 2)
     {
         nmod_poly_factor_insert(factors, f, 1);
         return;
     }
-
-    p = nmod_poly_modulus(f);
-    n = nmod_poly_degree(f);
 
     /* Step 1, we compute x^p mod f in F_p[X]/<f> */
     nmod_poly_init(x, p);

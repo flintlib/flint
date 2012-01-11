@@ -1140,7 +1140,7 @@ void nmod_poly_compose_mod(nmod_poly_t res,
 
 *******************************************************************************
 
-    GCD
+    Greatest common divisor
 
 *******************************************************************************
 
@@ -1234,6 +1234,34 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
 
 void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
                                     const nmod_poly_t A, const nmod_poly_t B)
+
+    Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic.
+
+    Polynomials \code{S} and \code{T} are computed such that 
+    \code{S*A + T*B = G}. The length of \code{S} will be at most 
+    \code{lenB} and the length of \code{T} will be at most \code{lenA}.
+
+long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+             mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
+
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
+    the length of $G$.
+
+    No attempt is made to make the GCD monic.
+
+    Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
+    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$, 
+    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
+    and $\len(T) \leq \len(A) - \len(G)$.
+
+    No aliasing of input and output operands is permitted.
+
+void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                         const nmod_poly_t A, const nmod_poly_t B)
 
     Computes the GCD of $A$ and $B$. The GCD of zero polynomials is
     defined to be zero, whereas the GCD of the zero polynomial and some other

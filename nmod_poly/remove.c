@@ -26,13 +26,9 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 
-ulong
-nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
+ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
 {
     nmod_poly_t q, r;
     ulong i = 0;
@@ -40,7 +36,7 @@ nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
     nmod_poly_init_preinv(q, p->mod.n, p->mod.ninv);
     nmod_poly_init_preinv(r, p->mod.n, p->mod.ninv);
 
-    do
+    while (1)
     {
         if (f->length < p->length)
             break;
@@ -51,7 +47,6 @@ nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p)
             break;
         i++;
     }
-    while (1);
 
     nmod_poly_clear(q);
     nmod_poly_clear(r);

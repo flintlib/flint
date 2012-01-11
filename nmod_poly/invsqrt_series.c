@@ -25,20 +25,16 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-
 static void 
 __nmod_poly_invsqrt_series_prealloc(mp_ptr g, 
-                                      mp_srcptr h, mp_ptr t, mp_ptr u,
-                                      long n, nmod_t mod)
+                                    mp_srcptr h, mp_ptr t, mp_ptr u,
+                                    long n, nmod_t mod)
 {
-    int alloc;
-    long m;
+    const int alloc = (t == NULL);
+    const long m    = (n + 1) / 2;
     mp_limb_t c;
 
     if (n == 1)
@@ -47,9 +43,6 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
         return;
     }
 
-    m = (n + 1)/2;
-
-    alloc = (t == NULL);
     if (alloc)
     {
         t = _nmod_vec_init(n);
@@ -77,23 +70,16 @@ __nmod_poly_invsqrt_series_prealloc(mp_ptr g,
     }
 }
 
-
-void
-_nmod_poly_invsqrt_series(mp_ptr g, 
-                                  mp_srcptr h, long n, nmod_t mod)
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 {
     __nmod_poly_invsqrt_series_prealloc(g, h, NULL, NULL, n, mod);
 }
 
-void
-nmod_poly_invsqrt_series(nmod_poly_t g, 
-                                 const nmod_poly_t h, long n)
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
 {
+    const long hlen = h->length;
     mp_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
-    long hlen;
-    
-    hlen = h->length;
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
     {
