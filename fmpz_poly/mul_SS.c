@@ -28,11 +28,11 @@
 #include "fft_tuning.h"
 
 void _fmpz_poly_mul_SS(fmpz *output, const fmpz *input1, long len1, 
-                       const fmpz *input2, long len2, const long bits_in)
+                       const fmpz *input2, long len2)
 {
     const long rlen = len1 + len2 - 1;
 
-    _fmpz_poly_mullow_SS(output, input1, len1, input2, len2, bits_in, rlen);
+    _fmpz_poly_mullow_SS(output, input1, len1, input2, len2, rlen);
 }
 
 void
@@ -58,9 +58,9 @@ fmpz_poly_mul_SS(fmpz_poly_t res,
     fmpz_poly_fit_length(res, rlen);
     if (len1 >= len2)
         _fmpz_poly_mullow_SS(res->coeffs, poly1->coeffs, len1,
-                          poly2->coeffs, len2, 0, rlen);
+                          poly2->coeffs, len2, rlen);
     else
         _fmpz_poly_mullow_SS(res->coeffs, poly2->coeffs, len2,
-                          poly1->coeffs, len1, 0, rlen);
+                          poly1->coeffs, len1, rlen);
     _fmpz_poly_set_length(res, rlen);
 }

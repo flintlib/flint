@@ -31,8 +31,8 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, long l,
-                                       long length, mp_bitcnt_t bits_known)
+long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+                       fmpz const * coeffs_m, long l, long length)
 {
    long size_f = l + 1;
    mp_limb_t * coeff;
@@ -70,26 +70,23 @@ long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, const fmpz * coeffs_m, long l,
 			coeff = mpz_ptr->_mp_d;
 		}
 
-		if (!bits_known)
-		{
-			if (signed_c) sign = -1;
+		if (signed_c) sign = -1;
       
-		   if (size_j > limbs + 1) /* coeff is at least 1 limb bigger */
+		if (size_j > limbs + 1) /* coeff is at least 1 limb bigger */
+      {
+         limbs = size_j - 1;
+         bits = FLINT_BIT_COUNT(coeff[size_j - 1]); 
+         if (bits == FLINT_BITS) mask = 0L;
+         else mask = -1L - ((1L<<bits) - 1);  
+      } else if (size_j == limbs + 1) /* coeff is same size as prev biggest */
+      {
+         if (coeff[size_j - 1] & mask) /* see if we have more bits than before */
          {
-            limbs = size_j - 1;
-            bits = FLINT_BIT_COUNT(coeff[size_j - 1]); 
+            bits = FLINT_BIT_COUNT(coeff[size_j - 1]);   
             if (bits == FLINT_BITS) mask = 0L;
-            else mask = -1L - ((1L<<bits) - 1);  
-         } else if (size_j == limbs + 1) /* coeff is same size as prev biggest */
-         {
-            if (coeff[size_j - 1] & mask) /* see if we have more bits than before */
-            {
-               bits = FLINT_BIT_COUNT(coeff[size_j - 1]);   
-               if (bits == FLINT_BITS) mask = 0L;
-               else mask = -1L - ((1L<<bits) - 1);
-            }
+            else mask = -1L - ((1L<<bits) - 1);
          }
-		}
+      }
       
       if (signed_c) /* write out FFT coefficient, ensuring sign is correct */
       {

@@ -29,37 +29,33 @@
 #include "fft_tuning.h"
 
 void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1, 
-               const fmpz * input2, long len2, const long bits_in, long trunc)
+               const fmpz * input2, long len2, long trunc)
 {
-    const long len_out = len1 + len2 - 1;
-    const long loglen  = FLINT_CLOG2(len_out);
-    const long loglen2 = FLINT_CLOG2(len2);
-    const long n = (1L << (loglen - 2));
+    long len_out = len1 + len2 - 1;
+    long loglen  = FLINT_CLOG2(len_out);
+    long loglen2 = FLINT_CLOG2(len2);
+    long n = (1L << (loglen - 2));
 
     long output_bits, limbs, size, i;
     mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
     long bits1, bits2;
     int sign = 0;
 
-    if (!bits_in)
-    {
-        ulong size1 = _fmpz_vec_max_limbs(input1, len1); 
-        ulong size2 = _fmpz_vec_max_limbs(input2, len2);
+    ulong size1 = _fmpz_vec_max_limbs(input1, len1); 
+    ulong size2 = _fmpz_vec_max_limbs(input2, len2);
 
-        /* Start with an upper bound on the number of bits needed */
-        output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
-    } else
-        output_bits = FLINT_ABS(bits_in);
-
+    /* Start with an upper bound on the number of bits needed */
+    output_bits = FLINT_BITS * (size1 + size2) + loglen2 + 1; 
+    
     /* round up for sqrt2 trick */
     output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
 
     limbs = (output_bits - 1) / FLINT_BITS + 1; /* initial size of FFT coeffs */
     if (limbs > FFT_MULMOD_2EXPP1_CUTOFF) /* can't be worse than next power of 2 limbs */
         limbs = (1L << FLINT_CLOG2(limbs));
-
     size = limbs + 1;
 
+    /* allocate space for ffts */
     ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
     for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
         ii[i] = ptr;
@@ -75,38 +71,35 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1,
             jj[i] = ptr;
     } else jj = ii;
 
-    /* put coefficients into FFT polys */
-    bits1 = _fmpz_vec_get_fft(ii, input1, limbs, len1, bits_in);
+    /* put coefficients into FFT vecs */
+    bits1 = _fmpz_vec_get_fft(ii, input1, limbs, len1);
     for (i = len1; i < 4*n; i++)
         mpn_zero(ii[i], limbs + 1);
 
     if (input1 != input2) 
     {
-        bits2 = _fmpz_vec_get_fft(jj, input2, limbs, len2, bits_in);
+        bits2 = _fmpz_vec_get_fft(jj, input2, limbs, len2);
         for (i = len2; i < 4*n; i++)
             mpn_zero(jj[i], limbs + 1);
     }
     else bits2 = bits1;
 
-    if (!bits_in)
+    if (bits1 < 0L || bits2 < 0L) 
     {
-        if (bits1 < 0L || bits2 < 0L) 
-        {
-            sign = 1;  
-            bits1 = FLINT_ABS(bits1);
-            bits2 = FLINT_ABS(bits2);
-        }
+        sign = 1;  
+        bits1 = FLINT_ABS(bits1);
+        bits2 = FLINT_ABS(bits2);
+    }
 
-        /* Recompute the number of limbs now that we know how large everything really is */
-        output_bits = bits1 + bits2 + loglen2 + sign;
+    /* Recompute the number of bits/limbs now that we know how large everything is */
+    output_bits = bits1 + bits2 + loglen2 + sign;
 
-        /* round up output bits */
-        output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
+    /* round up output bits for sqrt2 */
+    output_bits = (((output_bits - 1) >> (loglen - 2)) + 1) << (loglen - 2);
 
-        limbs = (output_bits - 1) / FLINT_BITS + 1;
-        limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
-    } else if (bits_in < 0L) sign = 1;
-
+    limbs = (output_bits - 1) / FLINT_BITS + 1;
+    limbs = fft_adjust_limbs(limbs); /* round up limbs for Nussbaumer */
+    
     fft_convolution(ii, jj, loglen - 2, limbs, len_out, &t1, &t2, &s1, tt); 
 
     _fmpz_vec_set_fft(output, trunc, ii, limbs, sign); /* write output */
@@ -139,10 +132,10 @@ fmpz_poly_mullow_SS(fmpz_poly_t res,
 
     if (len1 >= len2)
         _fmpz_poly_mullow_SS(res->coeffs, poly1->coeffs, len1,
-                                          poly2->coeffs, len2, 0, n);
+                                          poly2->coeffs, len2, n);
     else
         _fmpz_poly_mullow_SS(res->coeffs, poly2->coeffs, len2,
-                                          poly1->coeffs, len1, 0, n);
+                                          poly1->coeffs, len1, n);
 
     _fmpz_poly_set_length(res, n);
     _fmpz_poly_normalise(res);
