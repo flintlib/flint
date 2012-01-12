@@ -23,50 +23,47 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
+#include "ulong_extras.h"
 
-void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
+void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                          nmod_t mod)
 {
-    if (alloc == 0)             /* Clear up, reinitialise */
+    const mp_limb_t invL = (B[lenB-1] == 1) ? 1 : n_invmod(B[lenB-1], mod.n);
+
+    if (lenB == 1)
     {
-        fmpz_poly_factor_clear(fac);
-        fmpz_poly_factor_init(fac);
+        _nmod_vec_scalar_mul_nmod(Q, A, lenA, invL, mod);
     }
-    else if (fac->alloc)            /* Realloc */
+    else
     {
-        if (fac->alloc > alloc)
+        mp_limb_t t;
+
+        Q[1] = n_mulmod2_preinv(A[lenA-1], invL, mod.n, mod.ninv);
+        t = n_mulmod2_preinv(Q[1], B[lenB-2], mod.n, mod.ninv);
+        t = n_submod(A[lenA-2], t, mod.n);
+        Q[0] = n_mulmod2_preinv(t, invL, mod.n, mod.ninv);
+
+        if (FLINT_BITS + 2 <= 2 * mod.norm)
         {
-            long i;
-
-            for (i = alloc; i < fac->num; i++)
-                fmpz_poly_clear(fac->p + i);
-
-            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
-            fac->alloc     = alloc;
+            mpn_mul_1(R, B, lenB - 1, Q[0]);
+            if (lenB > 2) 
+                mpn_addmul_1(R + 1, B, lenB - 2, Q[1]);
+            _nmod_vec_reduce(R, R, lenB - 1, mod);
         }
-        else if (fac->alloc < alloc)
+        else
         {
-            long i;
-
-            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
-
-            for (i = fac->alloc; i < alloc; i++)
-            {
-                fmpz_poly_init(fac->p + i);
-                fac->exp[i] = 0L;
-            }
-            fac->alloc = alloc;
+            _nmod_vec_scalar_mul_nmod(R, B, lenB - 1, Q[0], mod);
+            if (lenB > 2)
+                _nmod_vec_scalar_addmul_nmod(R + 1, B, lenB - 2, Q[1], mod);
         }
-    }
-    else                        /* Nothing allocated already so do it now */
-    {
-        fmpz_poly_factor_init2(fac, alloc);
+
+        _nmod_vec_sub(R, A, R, lenB - 1, mod);
     }
 }
 

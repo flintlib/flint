@@ -36,5 +36,5 @@ _fmpz_vec_set_nmod_vec(fmpz * res, mp_srcptr poly, long len, nmod_t mod)
     long i;
         
     for (i = 0; i < len; i++)
-       fmpz_set_ui_mod(res + i, poly[i], mod.n);
+       fmpz_set_ui_smod(res + i, poly[i], mod.n);
 }

@@ -23,11 +23,8 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_vec.h"
-#include "mpn_extras.h"
 #include "nmod_poly.h"
+#include "mpn_extras.h"
 #include "ulong_extras.h"
 
 int

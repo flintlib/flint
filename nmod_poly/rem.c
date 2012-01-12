@@ -30,32 +30,40 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
-_nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA, 
-                            mp_srcptr B, long lenB, nmod_t mod)
+void _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA, 
+                              mp_srcptr B, long lenB, nmod_t mod)
 {
-    mp_ptr Q;
-    Q = _nmod_vec_init(lenA - lenB + 1);
-    _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
-    _nmod_vec_clear(Q);
+    if (lenA - lenB == 1)
+    {
+        _nmod_poly_rem_q1(R, A, lenA, B, lenB, mod);
+    }
+    else if (lenA < NMOD_DIVREM_DIVCONQUER_CUTOFF)
+    {
+        mp_ptr W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod));
+
+        _nmod_poly_rem_basecase(R, W, A, lenA, B, lenB, mod);
+        _nmod_vec_clear(W);
+    }
+    else
+    {
+        mp_ptr Q = _nmod_vec_init(lenA - lenB + 1);
+
+        _nmod_poly_divrem(Q, R, A, lenA, B, lenB, mod);
+        _nmod_vec_clear(Q);
+    }
 }
 
-void
-nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 {
+    const long lenA = A->length, lenB = B->length;
     nmod_poly_t tR;
     mp_ptr r;
-    long lenA, lenB;
 
-    lenA = A->length;
-    lenB = B->length;
-    
     if (lenB == 0)
     {
         printf("Exception: division by zero in nmod_poly_rem\n");
         abort();
     }
-
     if (lenA < lenB)
     {
         nmod_poly_set(R, A);

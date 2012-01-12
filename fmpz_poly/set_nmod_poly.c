@@ -44,7 +44,7 @@ fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly)
         long i;
         fmpz_poly_fit_length(res, len);
         for (i = 0; i < len; i++)
-            fmpz_set_ui_mod(res->coeffs + i, poly->coeffs[i], poly->mod.n);
+            fmpz_set_ui_smod(res->coeffs + i, poly->coeffs[i], poly->mod.n);
         _fmpz_poly_set_length(res, len);
     }
 }

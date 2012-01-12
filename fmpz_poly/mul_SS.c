@@ -23,29 +23,23 @@
     
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 #include "fft.h"
 #include "fft_tuning.h"
 
-void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1, 
-                       const fmpz * input2, long length2, const long bits_in)
+void _fmpz_poly_mul_SS(fmpz *output, const fmpz *input1, long len1, 
+                       const fmpz *input2, long len2, const long bits_in)
 {
-    long rlen = length1 + length2 - 1;
+    const long rlen = len1 + len2 - 1;
 
-    _fmpz_poly_mullow_SS(output, input1, length1, input2, length2, bits_in, rlen);
+    _fmpz_poly_mullow_SS(output, input1, len1, input2, len2, bits_in, rlen);
 }
 
 void
 fmpz_poly_mul_SS(fmpz_poly_t res,
                  const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const long len1 = poly1->length, len2 = poly2->length;
     long rlen;
 
     if (len1 == 0 || len2 == 0)
@@ -53,7 +47,6 @@ fmpz_poly_mul_SS(fmpz_poly_t res,
         fmpz_poly_zero(res);
         return;
     }
-
     if (len1 == 1 || len2 == 1)
     {
         fmpz_poly_mul_classical(res, poly1, poly2);

@@ -26,11 +26,8 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-
 
 static __inline__ void
 nmod_poly_powpowmod(nmod_poly_t res, const nmod_poly_t pol,
@@ -55,12 +52,9 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
 {
     if (nmod_poly_length(f) > 2)
     {
+        const mp_limb_t p = nmod_poly_modulus(f);
+        const long n      = nmod_poly_degree(f);
         nmod_poly_t a, x, x_p;
-        mp_limb_t p;
-        long n;
-
-        p = nmod_poly_modulus(f);
-        n = nmod_poly_degree(f);
 
         nmod_poly_init(a, p);
         nmod_poly_init(x, p);

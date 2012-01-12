@@ -2284,7 +2284,8 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
     Currently, supports the case when \code{prev} and \code{curr} 
     are equal.
 
-void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N)
 
     This function does a Hensel lift. 

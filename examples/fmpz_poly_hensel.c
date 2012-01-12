@@ -145,7 +145,7 @@ int main(void)
         else
             printf("hensel_lift_without_inverse failed\n");
 
-        fmpz_poly_hensel_lift_only_inverse(a, b, f, g, h, a, b, P, Q);
+        fmpz_poly_hensel_lift_only_inverse(a, b, g, h, a, b, P, Q);
 
         fmpz_poly_mul(temp, g, a);
         fmpz_poly_mul(temp1, h, b);

@@ -415,6 +415,24 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
 
+void _fmpz_mod_poly_rem_basecase(fmpz * R, 
+    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz_t invB, const fmpz_t p)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$ but only sets \code{(R, lenA)}.
+
+    Allows aliasing only between $A$ and $R$.  Allows zero-padding 
+    in $A$ but not in $B$.  Assumes that the leading coefficient 
+    of $B$ is a unit modulo $p$.
+
+void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$ assuming that the leading term 
+    of $B$ is a unit.
+
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     const fmpz * A, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p)
@@ -477,6 +495,19 @@ void fmpz_mod_poly_divrem(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
 
     Assumes that $B$ is non-zero and that the leading coefficient 
     of $B$ is invertible modulo $p$.
+
+void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
+                            const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either finds a non-trivial factor~$f$ of the modulus~$p$, or computes 
+    $Q$, $R$ such that $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
+
+    If the leading coefficient of $B$ is invertible in $\mathbf{Z}/(p)$, 
+    the division with remainder operation is carried out, $Q$ and $R$ are 
+    computed correctly, and $f$ is set to $1$.  Otherwise, $f$ is set to 
+    a non-trivial factor of $p$ and $Q$ and $R$ are not touched.
+
+    Assumes that $B$ is non-zero.
 
 void _fmpz_mod_poly_rem(fmpz *R, 
                         const fmpz *A, long lenA, const fmpz *B, long lenB, 
@@ -563,6 +594,76 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     In general, the greatest common divisor is defined in the polynomial 
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
+
+long _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, long lenA, 
+                                 const fmpz *B, long lenB, 
+                                 const fmpz_t invB, const fmpz_t p)
+
+    Sets $G$ to the greatest common divisor of $(A, \len(A))$ 
+    and $(B, \len(B))$ and returns its length.
+
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    space for sufficiently many coefficients.
+
+    Assumes that \code{invB} is the inverse of the leading coefficients 
+    of $B$ modulo the prime number $p$.
+
+void fmpz_mod_poly_gcd(fmpz_mod_poly_t G, 
+                       const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Sets $G$ to the greatest common divisor of $A$ and $B$.
+
+    In general, the greatest common divisor is defined in the polynomial 
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    number.  Thus, this function assumes that $p$ is prime.
+
+long _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
+    const fmpz *A, long lenA, const fmpz *B, long lenB, const fmpz_t p)
+
+    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
+    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and 
+    leaves the contents of the vector $(G, lenB)$ undefined.
+
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    space for sufficiently many coefficients.
+
+    Does not support aliasing of any of the input arguments 
+    with any of the output argument.
+
+void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G, 
+    const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
+
+    In general, the greatest common divisor is defined in the polynomial 
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    number.
+
+long _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, long lenA, 
+                          const fmpz *B, long lenB, const fmpz_t p)
+
+    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
+    or sets $f \in (1,p)$ to a non-trivial factor of $p$ and 
+    leaves the contents of the vector $(G, lenB)$ undefined.
+
+    Assumes that $\len(A) \geq \len(B) > 0$ and that the vector $G$ has 
+    space for sufficiently many coefficients.
+
+    Does not support aliasing of any of the input arguments 
+    with any of the output argument.
+
+void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G, 
+                         const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
+
+    Either sets $f = 1$ and $G$ to the greatest common divisor 
+    of $A$ and $B$, or $ \in (1,p)$ to a non-trivial factor of $p$.
+
+    In general, the greatest common divisor is defined in the polynomial 
+    ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
+    number.
 
 *******************************************************************************
 

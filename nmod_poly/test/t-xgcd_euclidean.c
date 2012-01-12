@@ -25,8 +25,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -61,7 +59,6 @@ main(void)
         
         nmod_poly_randtest(a, state, n_randint(state, 200));
         nmod_poly_randtest(b, state, n_randint(state, 200));
-
         nmod_poly_randtest(c, state, n_randint(state, 200));
         
         nmod_poly_mul(a, a, c);

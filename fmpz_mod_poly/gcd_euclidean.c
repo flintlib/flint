@@ -25,9 +25,6 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
@@ -38,24 +35,27 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
     if (lenB == 1)
     {
         fmpz_one(G);
+        return 1;
     }
     else  /* lenA >= lenB > 1 */
     {
+        const long lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz_t invR3;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
-        long lenR1, lenR2, lenR3, lenW;
+        long lenR2, lenR3;
 
-        lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
-        W    = _fmpz_vec_init(lenW);
-        Q    = W;
-        R1   = W + FLINT_MAX(lenA - lenB + 1, lenB);
+        W  = _fmpz_vec_init(lenW);
+        Q  = W;
+        R1 = W + FLINT_MAX(lenA - lenB + 1, lenB);
+        R2 = R1 + lenA;
+        R3 = R2 + lenB;
 
         _fmpz_mod_poly_divrem(Q, R1, A, lenA, B, lenB, invB, p);
 
-        lenR1 = lenB - 1;
-        FMPZ_VEC_NORM(R1, lenR1);
+        lenR3 = lenB - 1;
+        FMPZ_VEC_NORM(R1, lenR3);
 
-        if (lenR1 == 0)
+        if (lenR3 == 0)
         {
             _fmpz_vec_set(G, B, lenB);
             _fmpz_vec_clear(W, lenW);
@@ -64,31 +64,20 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
 
         fmpz_init(invR3);
 
-        R2 = R1 + lenA;
-        R3 = R2 + lenB;
         T  = R3;
         R3 = R1;
         R1 = T;
         _fmpz_vec_set(R2, B, lenB);
         lenR2 = lenB;
-        lenR3 = lenR1;
-        lenR1 = lenB;
 
         do
         {
             fmpz_invmod(invR3, R3 + (lenR3 - 1), p);
 
             _fmpz_mod_poly_divrem(Q, R1, R2, lenR2, R3, lenR3, invR3, p);
-            lenR1 = lenR3 - 1;
-            FMPZ_VEC_NORM(R1, lenR1);
-
-            T  = R2;
-            R2 = R3;
-            R3 = R1;
-            R1 = T;
-
-            lenR2 = lenR3;
-            lenR3 = lenR1;
+            lenR2 = lenR3--;
+            FMPZ_VEC_NORM(R1, lenR3);
+            T = R2; R2 = R3; R3 = R1; R1 = T;
         } 
         while (lenR3 > 0);
 
@@ -105,8 +94,7 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
+    const long lenA = A->length, lenB = B->length;
     long lenG;
     fmpz *g;
     
@@ -118,14 +106,6 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     if (lenB == 0)
     {
         fmpz_mod_poly_make_monic(G, A);
-        return;
-    }
-
-    if (lenA == 1 || lenB == 1)
-    {
-        fmpz_mod_poly_fit_length(G, 1);
-        fmpz_one(G->coeffs);
-        _fmpz_mod_poly_set_length(G, 1);
         return;
     }
 

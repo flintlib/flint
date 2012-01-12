@@ -45,7 +45,7 @@ void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
             alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
             fmpz_powm_ui(padic_unit(rop), padic_unit(op), e, pow);
         }
-        else if (e < 0)
+        else  /* e < 0 */
         {
             /* u^{-1} to precision ceil((N - v e) / -e) */
             _padic_inv(padic_unit(rop), padic_unit(op), 

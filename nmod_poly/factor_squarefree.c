@@ -26,12 +26,8 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-
 
 void
 nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
@@ -109,8 +105,8 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
             if (z->length > 1)
             {
                 nmod_poly_factor_insert(res, z, 1);
-                nmod_poly_make_monic(res->p[res->num - 1],
-                    res->p[res->num - 1]);
+                nmod_poly_make_monic(res->p + (res->num - 1),
+                                     res->p + (res->num - 1));
                 if (res->num)
                     res->exp[res->num - 1] *= i;
             }

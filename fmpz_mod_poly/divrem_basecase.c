@@ -25,11 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R, 
@@ -59,10 +55,7 @@ void _fmpz_mod_poly_divrem_basecase(fmpz *Q, fmpz *R,
 void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
-    const long lenQ = lenA - lenB + 1;
-
+    const long lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
     fmpz *q, *r;
     fmpz_t invB;
 
@@ -117,7 +110,6 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
         R->length = lenA;
     }
     _fmpz_mod_poly_set_length(R, lenB - 1);
-
     _fmpz_mod_poly_normalise(R);
 
     fmpz_clear(invB);

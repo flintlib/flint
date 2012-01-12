@@ -30,11 +30,17 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
+#include "mpn_extras.h"
+
 void
 _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                                   mp_srcptr B, long lenB, nmod_t mod)
 {
-    if (lenB < 6000)
+    if (lenA == lenB)
+        _nmod_poly_divrem_q0(Q, R, A, B, lenB, mod);
+    else if (lenA == lenB + 1)
+        _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, mod);
+    else if (lenB < 6000)
         _nmod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, mod);
     else
         _nmod_poly_divrem_newton(Q, R, A, lenA, B, lenB, mod);
@@ -43,12 +49,9 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
                       const nmod_poly_t A, const nmod_poly_t B)
 {
+    const long lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    long lenA, lenB;
-
-    lenA = A->length;
-    lenB = B->length;
     
     if (lenB == 0)
     {

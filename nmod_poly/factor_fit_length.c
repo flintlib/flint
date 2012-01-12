@@ -24,20 +24,16 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "nmod_poly.h"
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, long len)
+void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, long len)
 {
     if (len > fac->alloc)
     {
         /* At least double number of allocated coeffs */
         if (len < 2 * fac->alloc)
             len = 2 * fac->alloc;
-        fmpz_poly_factor_realloc(fac, len);
+        nmod_poly_factor_realloc(fac, len);
     }
 }
-

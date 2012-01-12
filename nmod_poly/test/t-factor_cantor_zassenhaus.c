@@ -26,11 +26,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "nmod_vec.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -113,7 +109,7 @@ main(void)
         nmod_poly_set_coeff_ui(product, 0, 1);
         for (i = 0; i < res->num; i++)
             for (j = 0; j < res->exp[i]; j++)
-                nmod_poly_mul(product, product, res->p[i]);
+                nmod_poly_mul(product, product, res->p + i);
 
         lead = pol1->coeffs[pol1->length - 1];
         nmod_poly_scalar_mul_nmod(product, product, lead);

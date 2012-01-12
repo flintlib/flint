@@ -585,10 +585,9 @@ void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
 void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-static __inline__ void
-fmpz_set_ui_mod(fmpz_t f, mp_limb_t x, mp_limb_t m)
+static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 {
-    if (x < m / 2)
+    if (x <= m / 2)
         fmpz_set_ui(f, x);
     else
         fmpz_set_si(f, x - m);

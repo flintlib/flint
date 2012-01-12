@@ -24,10 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
 long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
@@ -43,7 +40,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
     fmpz_init(P);
     fmpz_poly_init(monic_f);
 
-    fmpz_set_ui(p, (local_fac->p[0])->mod.n);
+    fmpz_set_ui(p, (local_fac->p + 0)->mod.n);
     fmpz_pow_ui(P, p, N);
 
     if (fmpz_is_one(fmpz_poly_lead(f)))
@@ -61,7 +58,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
         fmpz_init(t);
         fmpz_mod(t, fmpz_poly_lead(f), P);
 
-        if (fmpz_invmod(t, t, P))
+        if (fmpz_invmod(t, t, P) == 0)
         {
             printf("Exception in fmpz_poly_start_hensel_lift.\n");
             abort();

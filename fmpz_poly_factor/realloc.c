@@ -27,41 +27,54 @@
 #include <stdlib.h>
 #include "flint.h"
 #include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, long alloc)
 {
-    fmpz_init_set_ui(&(fac->c), 1);
-    fac->p     = NULL;
-    fac->exp   = NULL;
-    fac->num   = 0;
-    fac->alloc = 0;
-}
+    if (alloc == 0)             /* Clear up, reinitialise */
+    {
+        fmpz_poly_factor_clear(fac);
+        fmpz_poly_factor_init(fac);
+    }
+    else if (fac->alloc)            /* Realloc */
+    {
+        if (fac->alloc > alloc)
+        {
+            long i;
 
-void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
-{
-    fmpz_init_set_ui(&(fac->c), 1);
+            for (i = alloc; i < fac->num; i++)
+                fmpz_poly_clear(fac->p + i);
 
-    if (alloc)
+            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
+            fac->exp = realloc(fac->exp, alloc * sizeof(long));
+            fac->alloc     = alloc;
+        }
+        else if (fac->alloc < alloc)
+        {
+            long i;
+
+            fac->p   = realloc(fac->p, alloc * sizeof(fmpz_poly_struct));
+            fac->exp = realloc(fac->exp, alloc * sizeof(long));
+
+            for (i = fac->alloc; i < alloc; i++)
+            {
+                fmpz_poly_init(fac->p + i);
+                fac->exp[i] = 0L;
+            }
+            fac->alloc = alloc;
+        }
+    }
+    else                        /* Nothing allocated already so do it now */
     {
         long i;
 
         fac->p   = malloc(alloc * sizeof(fmpz_poly_struct));
-        fac->exp = malloc(alloc * sizeof(long));
+        fac->exp = calloc(alloc, sizeof(long));
 
         for (i = 0; i < alloc; i++)
-        {
             fmpz_poly_init(fac->p + i);
-            fac->exp[i] = 0L;
-        }
+        fac->num   = 0;
+        fac->alloc = alloc;
     }
-    else
-    {
-        fac->p   = NULL;
-        fac->exp = NULL;
-    }
-
-    fac->num   = 0;
-    fac->alloc = alloc;
 }
 

@@ -152,6 +152,50 @@ main(void)
         nmod_poly_clear(r);
     }
 
+    /* Check result of rem_q1 */
+    for (i = 0; i < 5000; i++)
+    {
+        nmod_poly_t a, b, q0, r0, r;
+
+        mp_limb_t n = n_randprime(state, n_randint(state,FLINT_BITS-1)+2, 0);
+
+        nmod_poly_init(a, n);
+        nmod_poly_init(b, n);
+        nmod_poly_init(q0, n);
+        nmod_poly_init(r0, n);
+        nmod_poly_init(r, n);
+        do nmod_poly_randtest(a, state, n_randint(state, 1000));
+        while (a->length < 2);
+        nmod_poly_fit_length(b, a->length - 1);
+        mpn_zero(b->coeffs, a->length - 1);
+        nmod_poly_randtest_not_zero(b, state, n_randint(state, 1000) + 1);
+        do b->coeffs[a->length - 2] = n_randint(state, n);
+        while (b->coeffs[a->length - 2] == 0);
+        b->length = a->length - 1;
+
+        nmod_poly_divrem(q0, r0, a, b);
+        nmod_poly_rem(r, a, b);
+
+        result = (nmod_poly_equal(r0, r));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            nmod_poly_print(a), printf("\n\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(q0), printf("\n\n");
+            nmod_poly_print(r0), printf("\n\n");
+            nmod_poly_print(r), printf("\n\n");
+            printf("n = %ld\n", n);
+            abort();
+        }
+        
+        nmod_poly_clear(a);
+        nmod_poly_clear(b);
+        nmod_poly_clear(q0);
+        nmod_poly_clear(r0);
+        nmod_poly_clear(r);
+    }
+
     flint_randclear(state);
 
     printf("PASS\n");

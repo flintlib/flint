@@ -214,6 +214,9 @@ fmpz_mod_poly
 * Replace fmpz_mod_poly_rem by a proper implementation which 
   actually saves work over divrem.  Then, also add test code.
 
+* Implement a faster GCD function then the euclidean one, then 
+  make the wrapping GCD function choose the appropriate algorithm, 
+  and add some test code
 
 fmpz_poly_mat
 -------------

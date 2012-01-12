@@ -34,7 +34,7 @@ void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
                                  const nmod_poly_factor_t fac)
 {
     const long r = fac->num;
-    const nmod_t mod = (fac->p[0])->mod;
+    const nmod_t mod = (fac->p + 0)->mod;
 
     long i, j;
 
@@ -52,7 +52,7 @@ void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
 
     for (i = 0; i < r; i++)
     {
-        nmod_poly_set(V[i], fac->p[i]);
+        nmod_poly_set(V[i], fac->p + i);
         link[i] = - i - 1;
     }
 

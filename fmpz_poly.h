@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2006, 2007, 2008, 2009, 2010 William Hart
-    Copyright (C) 2009 Andy Novocin
+    Copyright (C) 2009, 2011 Andy Novocin
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
 
@@ -54,15 +54,15 @@ typedef struct
 
 typedef fmpz_poly_struct fmpz_poly_t[1];
 
-#ifdef __cplusplus
-}
-#endif
+typedef struct {
+    fmpz c;
+    fmpz_poly_struct *p;
+    long *exp;
+    long num;
+    long alloc;
+} fmpz_poly_factor_struct;
 
-#include "fmpz_poly_factor.h" /* needs the fmpz_poly_struct to be defined first */
-
- #ifdef __cplusplus
- extern "C" {
-#endif
+typedef fmpz_poly_factor_struct fmpz_poly_factor_t[1];
 
 /*  Memory management ********************************************************/
 
@@ -1003,7 +1003,8 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
     long *link, fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
     long prev, long curr, long N, const fmpz_t p);
 
-void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N);
 
 #ifdef __cplusplus

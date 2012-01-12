@@ -24,40 +24,35 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
 void
 nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
 {
-    long i, j, res_length;
-
     if (input->length <= 1 || inflation == 1)
     {
         nmod_poly_set(result, input);
-        return;
     }
-
-    if (inflation == 0)
+    else if (inflation == 0)
     {
         mp_limb_t v = nmod_poly_evaluate_nmod(input, 1);
         nmod_poly_zero(result);
         nmod_poly_set_coeff_ui(result, 0, v);
-        return;
     }
-
-    res_length = (input->length - 1)*inflation + 1;
-    nmod_poly_fit_length(result, res_length);
-
-    for (i = input->length - 1; i >= 0; i--)
+    else
     {
-        result->coeffs[i * inflation] = input->coeffs[i];
-        if (i != 0)
-            for (j = i * inflation - 1; j > (i - 1) * inflation;  j--)
-                result->coeffs[j] = 0;
-    }
+        long i, j, res_length = (input->length - 1) * inflation + 1;
 
-    result->length = res_length;
+        nmod_poly_fit_length(result, res_length);
+
+        for (i = input->length - 1; i > 0; i--)
+        {
+            result->coeffs[i * inflation] = input->coeffs[i];
+            for (j = i * inflation - 1; j > (i - 1) * inflation; j--)
+                result->coeffs[j] = 0;
+        }
+        result->coeffs[0] = input->coeffs[0];
+        result->length = res_length;
+    }
 }

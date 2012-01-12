@@ -30,7 +30,8 @@
 #include "fmpz_poly.h"
 #include "nmod_poly.h"
 
-void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, fmpz_poly_t f, 
+void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
+                                const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N)
 {
     const long r = local_fac->num;

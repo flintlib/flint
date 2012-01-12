@@ -26,9 +26,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <mpir.h>
-#include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
@@ -42,8 +39,8 @@ nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
 
     if (pol->length <= 1)
     {
-        printf("Attempt to factor a linear polynomial "
-                "in nmod_poly_factor_equal_deg_prob\n");
+        printf("Exception (nmod_poly_factor_equal_deg_prob): \n");
+        printf("Input polynomial is linear.\n");
         abort();
     }
 

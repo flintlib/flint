@@ -33,35 +33,30 @@
 void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                               mp_srcptr B, long lenB, nmod_t mod)
 {
-    long len = lenA - lenB + 1;
+    const long lenQ = lenA - lenB + 1;
     
     _nmod_poly_div_newton(Q, A, lenA, B, lenB, mod);
 
     if (lenB > 1)
     {
-        if (len >= lenB - 1)
-            _nmod_poly_mullow(R, Q, len, B, lenB - 1, lenB - 1, mod);
+        if (lenQ >= lenB - 1)
+            _nmod_poly_mullow(R, Q, lenQ, B, lenB - 1, lenB - 1, mod);
         else
-            _nmod_poly_mullow(R, B, lenB - 1, Q, len, lenB - 1, mod);
+            _nmod_poly_mullow(R, B, lenB - 1, Q, lenQ, lenB - 1, mod);
 
         _nmod_vec_sub(R, A, R, lenB - 1, mod);
     }
 }
 
-void
-nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
-                        const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
+                             const nmod_poly_t A, const nmod_poly_t B)
 {
-    mp_ptr Q_coeffs, R_coeffs;
-    nmod_poly_t t1, t2;
-    long lenA, lenB;
-
-    lenA = A->length;
-    lenB = B->length;
+    const long lenA = A->length, lenB = B->length;
+    mp_ptr q, r;
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_div_newton\n");
+        printf("Exception: division by zero in nmod_poly_divrem_newton\n");
         abort();
     }
 
@@ -74,40 +69,38 @@ nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
 
     if (Q == A || Q == B)
     {
-        nmod_poly_init2_preinv(t1, B->mod.n, B->mod.ninv, lenA - lenB + 1);
-        Q_coeffs = t1->coeffs;
+        q = _nmod_vec_init(lenA - lenB + 1);
     }
     else
     {
         nmod_poly_fit_length(Q, lenA - lenB + 1);
-        Q_coeffs = Q->coeffs;
+        q = Q->coeffs;
     }
-
     if (R == A || R == B)
     {
-        nmod_poly_init2_preinv(t2, B->mod.n, B->mod.ninv, lenB - 1);
-        R_coeffs = t2->coeffs;
+        r = _nmod_vec_init(lenB - 1);
     }
     else
     {
         nmod_poly_fit_length(R, lenB - 1);
-        R_coeffs = R->coeffs;
+        r = R->coeffs;
     }
 
-    _nmod_poly_divrem_newton(Q_coeffs, R_coeffs, A->coeffs, lenA,
-                                                 B->coeffs, lenB, B->mod);
+    _nmod_poly_divrem_newton(q, r, A->coeffs, lenA,
+                                   B->coeffs, lenB, B->mod);
 
     if (Q == A || Q == B)
     {
-        nmod_poly_swap(Q, t1);
-        nmod_poly_clear(t1);
+        _nmod_vec_clear(Q->coeffs);
+        Q->coeffs = q;
+        Q->alloc  = lenA - lenB + 1;
     }
     if (R == A || R == B)
     {
-        nmod_poly_swap(R, t2);
-        nmod_poly_clear(t2);
+        _nmod_vec_clear(R->coeffs);
+        R->coeffs = r;
+        R->alloc  = lenB - 1;
     }
-    
     Q->length = lenA - lenB + 1;
     R->length = lenB - 1;
 

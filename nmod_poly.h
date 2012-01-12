@@ -19,8 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2007, David Howden.
+    Copyright (C) 2007, David Howden
     Copyright (C) 2010, 2011 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -31,25 +33,26 @@
 #include <stdio.h>
 #define ulong unsigned long
 
-#include <mpir.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
 #ifdef __cplusplus
- extern "C" {
+    extern "C" {
 #endif
 
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
 #define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
 
+#define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
+#define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
+#define NMOD_POLY_SMALL_GCD_CUTOFF 200  /* GCD (small n): Euclidean -> HGCD */
+
 static __inline__
 long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
 {
-    mp_bitcnt_t bits;
-
-    bits =
+    const mp_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -63,9 +66,7 @@ long NMOD_DIVREM_BC_ITCH(long lenA, long lenB, nmod_t mod)
 static __inline__
 long NMOD_DIV_BC_ITCH(long lenA, long lenB, nmod_t mod)
 {
-    mp_bitcnt_t bits;
-
-    bits =
+    const mp_bitcnt_t bits = 
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
     
     if (bits <= FLINT_BITS)
@@ -265,7 +266,7 @@ void nmod_poly_set_coeff_ui(nmod_poly_t poly, long j, ulong c);
 
 char * nmod_poly_get_str(const nmod_poly_t poly);
 
-int nmod_poly_set_str(const char * s, nmod_poly_t poly);
+int nmod_poly_set_str(nmod_poly_t poly, const char * s);
 
 static __inline__
 int nmod_poly_print(const nmod_poly_t a)
@@ -474,6 +475,13 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
+void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, mp_srcptr B, long lenA, nmod_t mod);
+
+void _nmod_poly_divrem_q1(mp_ptr Q, mp_ptr R, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                          nmod_t mod);
+
 void _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
                                            mp_srcptr B, long lenB, nmod_t mod);
 
@@ -500,10 +508,15 @@ void _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA,
 
 void nmod_poly_div(nmod_poly_t Q, const nmod_poly_t A, const nmod_poly_t B);
 
-void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
+void _nmod_poly_rem_basecase(mp_ptr R, mp_ptr W, mp_srcptr A, long lenA, 
+                                       mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_rem(mp_ptr R, mp_srcptr A, long lenA, 
-                            mp_srcptr B, long lenB, nmod_t mod);
+                              mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B);
 
 void _nmod_poly_inv_series_basecase(mp_ptr Qinv, 
                                               mp_srcptr Q, long n, nmod_t mod);
@@ -551,8 +564,7 @@ mp_limb_t
 _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len, mp_limb_t c, nmod_t mod);
 
 mp_limb_t
-nmod_poly_div_root(nmod_poly_t Q, 
-                 const nmod_poly_t A, mp_limb_t c);
+nmod_poly_div_root(nmod_poly_t Q, const nmod_poly_t A, mp_limb_t c);
 
 /* Derivative  ***************************************************************/
 
@@ -616,7 +628,7 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
-/* Modular composition */
+/* Modular composition  ******************************************************/
 
 void
 _nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr f, long lenf, 
@@ -708,7 +720,7 @@ void
 nmod_poly_compose_series_divconquer(nmod_poly_t res, 
     const nmod_poly_t poly1, const nmod_poly_t poly2, long N);
 
-/* GCD  **********************************************************************/
+/* Greatest common divisor  **************************************************/
 
 long _nmod_poly_gcd_euclidean(mp_ptr G, 
                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod);
@@ -716,18 +728,20 @@ long _nmod_poly_gcd_euclidean(mp_ptr G,
 void nmod_poly_gcd_euclidean(nmod_poly_t G, 
                                      const nmod_poly_t A, const nmod_poly_t B);
 
-static __inline__
-long _nmod_poly_gcd(mp_ptr G, 
-                    mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod)
-{
-    return _nmod_poly_gcd_euclidean(G, A, lenA, B, lenB, mod);
-}
+long _nmod_poly_hgcd(mp_ptr *M, long *lenM, 
+                     mp_ptr A, long *lenA, mp_ptr B, long *lenB, 
+                     mp_srcptr a, long lena, mp_srcptr b, long lenb, 
+                     nmod_t mod);
 
-static __inline__
-void nmod_poly_gcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
-{
-    nmod_poly_gcd_euclidean(G, A, B);
-}
+long _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, long lenA, 
+                                   mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_gcd_hgcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
+
+long _nmod_poly_gcd(mp_ptr G, mp_srcptr A, long lenA, 
+                              mp_srcptr B, long lenB, nmod_t mod);
+
+void nmod_poly_gcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B);
 
 long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t, 
            mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, nmod_t mod);
@@ -735,19 +749,18 @@ long _nmod_poly_xgcd_euclidean(mp_ptr res, mp_ptr s, mp_ptr t,
 void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
                                      const nmod_poly_t A, const nmod_poly_t B);
 
-static __inline__
-long _nmod_poly_xgcd(mp_ptr res, mp_ptr s, mp_ptr t, 
-            mp_srcptr poly1, long len1, mp_srcptr poly2, long len2, nmod_t mod)
-{
-    return _nmod_poly_xgcd_euclidean(res, s, t, poly1, len1, poly2, len2, mod);
-}
+long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+                          mp_srcptr A, long lenA, mp_srcptr B, long lenB, 
+                          nmod_t mod);
 
-static __inline__
+void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
+                         const nmod_poly_t A, const nmod_poly_t B);
+
+long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+            mp_srcptr A, long lenA, mp_srcptr B, long lenB, nmod_t mod);
+
 void nmod_poly_xgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
-                                      const nmod_poly_t A, const nmod_poly_t B)
-{
-    nmod_poly_xgcd_euclidean(G, S, T, A, B);
-}
+                                   const nmod_poly_t A, const nmod_poly_t B);
 
 mp_limb_t 
 _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1, 
@@ -836,7 +849,7 @@ void nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, long n);
 void _nmod_poly_exp_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod);
 void nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n);
 
-/* Products */
+/* Products  *****************************************************************/
 
 void
 nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n);
@@ -859,7 +872,7 @@ void nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input,
 
 typedef struct
 {
-    nmod_poly_t *p;
+    nmod_poly_struct *p;
     long *exp;
     long num;
     long alloc;
@@ -867,9 +880,15 @@ typedef struct
 
 typedef nmod_poly_factor_struct nmod_poly_factor_t[1];
 
+void nmod_poly_factor_init(nmod_poly_factor_t fac);
+
 void nmod_poly_factor_clear(nmod_poly_factor_t fac);
 
-void nmod_poly_factor_init(nmod_poly_factor_t fac);
+void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc);
+
+void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, long len);
+
+void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac);
 
 void nmod_poly_factor_insert(nmod_poly_factor_t fac,
                              const nmod_poly_t poly, long exp);
@@ -913,7 +932,7 @@ mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 #ifdef __cplusplus
-}
+    }
 #endif
 
 #endif

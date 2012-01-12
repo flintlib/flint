@@ -19,32 +19,56 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2011 Andy Novocin
     Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <stdlib.h>
+/*
+    Example program demonstrating the Zassenhaus factoring algorithm.
+*/
+
+#include <stdio.h>
+
 #include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
+#include "fmpz_poly_factor.h"
+#include "nmod_poly.h"
+#include "ulong_extras.h"
 
-void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
+int main(void)
 {
-    if (fac->alloc)
+    fmpz_poly_t f;
+    fmpz_poly_factor_t facs;
+
+    fmpz_poly_init(f);
+    fmpz_poly_factor_init(facs);
+
+    if (0)
     {
-        long i;
+        FILE *polyfile;
+        polyfile = fopen("examples/fmpz_poly_hensel_P1", "r");
 
-        for (i = 0; i < fac->alloc; i++)
+        if (!polyfile)
         {
-            fmpz_poly_clear(fac->p + i);
+            printf("Error.  Could not read P1 from file.\n");
+            abort();
         }
-
-        fmpz_clear(&(fac->c));
-        free(fac->p);
-        free(fac->exp);
-        fac->p   = NULL;
-        fac->exp = NULL;
+        fmpz_poly_fread(polyfile, f);
     }
+
+    fmpz_poly_set_str(f, "63  1 1 1 -4 -7 -2 -6 -3 -7 18 7 25 -11 95 36 21 16 69 56 35 36 32 33 26 -26 -15 -14 -53 -96 67 72 -67 40 -79 -116 -452 -312 -260 -29 -1393 327 69 -28 -241 230 -54 -309 -125 -74 -450 -69 -3 66 -27 73 68 50 -63 -1290 372 31 -16 2");
+
+    fmpz_poly_factor_zassenhaus(facs, f);
+
+    printf("Polynomial:\n");
+    fmpz_poly_print(f);
+    printf("\nFactorisation:\n");
+    fmpz_poly_factor_print(facs);
+
+    fmpz_poly_clear(f);
+    fmpz_poly_factor_clear(facs);
+
+    return EXIT_SUCCESS;
 }
 
