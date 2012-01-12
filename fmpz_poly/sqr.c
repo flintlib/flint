@@ -41,10 +41,16 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, long len)
 
     limbs = _fmpz_vec_max_limbs(poly, len);
 
-    if (len < 25 && limbs > 12)
+    if (len < 16 && limbs > 12)
         _fmpz_poly_sqr_karatsuba(res, poly, len);
-    else
+    else if (limbs <= 4)
         _fmpz_poly_sqr_KS(res, poly, len);
+    else if (limbs/2048 > len)
+        _fmpz_poly_sqr_KS(res, poly, len);
+    else if (limbs < (FLINT_BITS/16)*len)
+       _fmpz_poly_sqr_KS(res, poly, len);
+    else
+       _fmpz_poly_mul_SS(res, poly, len, poly, len, 0);
 }
 
 void fmpz_poly_sqr(fmpz_poly_t res, const fmpz_poly_t poly)

@@ -46,7 +46,7 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1,
     limbs1 = _fmpz_vec_max_limbs(poly1, len1);
     limbs2 = _fmpz_vec_max_limbs(poly2, len2);
 
-    if (n < 25 && (limbs1 > 12 || limbs2 > 12))
+    if (n < 16 && (limbs1 > 12 || limbs2 > 12))
     {
         int clear = 0, i;
         fmpz *copy1, *copy2;
