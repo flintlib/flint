@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     long N = 0;
 
     if (argc == 2)
-        N = atoi(argv[1]);
+        N = atol(argv[1]);
 
     if (argc != 2 || N < 1)
     {

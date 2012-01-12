@@ -57,7 +57,7 @@ fmpz_poly_mulhigh_n(fmpz_poly_t res,
         fmpz_poly_mul_KS(res, poly1, poly2);
     else if ((limbs1+limbs2)/2048 > len1 + len2)
         fmpz_poly_mul_KS(res, poly1, poly2);
-    else if (limbs1 + limbs2 < (FLINT_BITS/16)*(len1 + len2))
+    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
        fmpz_poly_mul_KS(res, poly1, poly2);
     else
        fmpz_poly_mul_SS(res, poly1, poly2);
