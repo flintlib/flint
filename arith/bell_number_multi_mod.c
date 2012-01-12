@@ -59,7 +59,7 @@ bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_init(comb, primes, num_primes);
     fmpz_comb_temp_init(temp, comb);
 
-    fmpz_multi_CRT_ui_unsigned(res, residues, comb, temp);
+    fmpz_multi_CRT_ui(res, residues, comb, temp, 0);
 
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(temp);

@@ -111,7 +111,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     {
         for (j = 0; j < num_primes; j++)
             residues[j] = mod_C[j]->entries[i];
-        fmpz_multi_CRT_ui(&C->entries[i], residues, comb, comb_temp);
+        fmpz_multi_CRT_ui(&C->entries[i], residues, comb, comb_temp, 1);
     }
 
     /* Cleanup */

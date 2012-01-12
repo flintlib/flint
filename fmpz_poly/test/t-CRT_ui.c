@@ -86,7 +86,7 @@ main(void)
             nmod_poly_clear(Amod);
             nmod_poly_init(Amod, primes[j]);
             fmpz_poly_get_nmod_poly(Amod, A);
-            fmpz_poly_CRT_ui(B, B, mod, Amod);
+            fmpz_poly_CRT_ui(B, B, mod, Amod, 1);
             fmpz_mul_ui(mod, mod, primes[j]);
         }
 

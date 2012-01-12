@@ -65,16 +65,18 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
     return;
 }
 
-void
-__fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
-    const fmpz_comb_t comb, int sign, fmpz ** comb_temp, fmpz_t temp,
-        fmpz_t temp2)
+void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+    const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 {
     long i, j;
     long n = comb->n;
     long num;
     long log_res;
     long num_primes = comb->num_primes;
+
+    fmpz ** comb_temp = ctemp->comb_temp;
+    fmpz * temp = ctemp->temp;
+    fmpz * temp2 = ctemp->temp2;
 
     /* The output is less than a single prime, so just output the result */
     if (num_primes == 1)
@@ -92,11 +94,11 @@ __fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
         {
             fmpz_set_ui(output, residues[0]);
         }
-		return;
+        return;
     }
 
     /* First layer of reconstruction */
-	num = (1L << n);
+    num = (1L << n);
 
     for (i = 0, j = 0; i + 2 <= num_primes; i += 2, j++)
     {
@@ -114,7 +116,7 @@ __fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
         fmpz_set_ui(comb_temp[0] + j, residues[i]);
 
     /* Compute other layers of reconstruction */
-	num /= 2;
+    num /= 2;
     log_res = 1;
 
     while (log_res < n)
@@ -143,22 +145,8 @@ __fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     }
 
     /* Write out the output */
-	if (sign)
+    if (sign)
         __fmpz_multi_CRT_ui_sign(output, comb_temp[log_res - 1], comb, temp);
-	else
+    else
         fmpz_set(output, comb_temp[log_res - 1]);
-}
-
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
-{
-    __fmpz_multi_CRT_ui(output, residues, comb, 0, temp->comb_temp,
-        temp->temp, temp->temp2);
-}
-
-void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp)
-{
-    __fmpz_multi_CRT_ui(output, residues, comb, 1, temp->comb_temp,
-        temp->temp, temp->temp2);
 }

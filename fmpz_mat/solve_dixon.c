@@ -190,7 +190,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
             }
             else
             {
-                fmpz_mat_CRT_ui(Ay, Ay, prod, Ay_mod);
+                fmpz_mat_CRT_ui(Ay, Ay, prod, Ay_mod, 1);
                 fmpz_mul_ui(prod, prod, crt_primes[i]);
             }
         }

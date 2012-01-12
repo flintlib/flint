@@ -91,7 +91,7 @@ bell_number_vec_multi_mod(fmpz * res, long n)
         num_primes_k = comb[i]->num_primes;
         for (j = 0; j < num_primes_k; j++)
             residues[j] = polys[j][k];
-        fmpz_multi_CRT_ui_unsigned(res + k, residues, comb[i], temp[i]);
+        fmpz_multi_CRT_ui(res + k, residues, comb[i], temp[i], 0);
     }
 
     /* Cleanup */

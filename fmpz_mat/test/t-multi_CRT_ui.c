@@ -81,7 +81,7 @@ main(void)
             nmod_mat_init(Amod[j], rows, cols, primes[j]);
 
         fmpz_mat_multi_mod_ui(Amod, num_primes, A);
-        fmpz_mat_multi_CRT_ui(B, Amod, num_primes);
+        fmpz_mat_multi_CRT_ui(B, Amod, num_primes, 1);
 
         if (!fmpz_mat_equal(B, A))
         {

@@ -75,7 +75,7 @@ _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
     fmpz_clear(tmp);
 }
 
-void _fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
+void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign)
 {
     mp_limb_t c;
@@ -97,17 +97,4 @@ void _fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
         m1m2, c, sign);
 
     fmpz_clear(m1m2);
-}
-
-void
-fmpz_CRT_ui_unsigned(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    ulong r2, ulong m2)
-{
-    _fmpz_CRT_ui(out, r1, m1, r2, m2, 0);
-}
-
-void
-fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2, ulong m2)
-{
-    _fmpz_CRT_ui(out, r1, m1, r2, m2, 1);
 }

@@ -87,7 +87,7 @@ main(void)
             nmod_mat_clear(Amod);
             nmod_mat_init(Amod, rows, cols, primes[j]);
             fmpz_mat_get_nmod_mat(Amod, A);
-            fmpz_mat_CRT_ui(B, B, mod, Amod);
+            fmpz_mat_CRT_ui(B, B, mod, Amod, 1);
             fmpz_mul_ui(mod, mod, primes[j]);
         }
 

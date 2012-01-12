@@ -32,7 +32,7 @@
 
 
 void
-__fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
+fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign)
 {
     long i, j;
@@ -62,18 +62,4 @@ __fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
     }
 
     fmpz_clear(m1m2);
-}
-
-void
-fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
-                        const fmpz_t m1, const nmod_mat_t mat2)
-{
-    __fmpz_mat_CRT_ui(res, mat1, m1, mat2, 1);
-}
-
-void
-fmpz_mat_CRT_ui_unsigned(fmpz_mat_t res, const fmpz_mat_t mat1,
-                            const fmpz_t m1, const nmod_mat_t mat2)
-{
-    __fmpz_mat_CRT_ui(res, mat1, m1, mat2, 0);
 }

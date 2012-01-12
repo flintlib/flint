@@ -91,7 +91,7 @@ _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
 
 void
 fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
-                        const fmpz_t m1, const nmod_poly_t poly2)
+                        const fmpz_t m1, const nmod_poly_t poly2, int sign)
 {
     long len1 = poly1->length;
     long len2 = poly2->length;
@@ -106,30 +106,7 @@ fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
     fmpz_poly_fit_length(res, len);
 
     _fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
-        poly2->coeffs, poly2->length, poly2->mod.n, poly2->mod.ninv, 1);
-
-    _fmpz_poly_set_length(res, len);
-    _fmpz_poly_normalise(res);
-}
-
-void
-fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
-                            const fmpz_t m1, const nmod_poly_t poly2)
-{
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len = FLINT_MAX(len1, len2);
-
-    if (len == 0)
-    {
-        fmpz_poly_zero(res);
-        return;
-    }
-
-    fmpz_poly_fit_length(res, len);
-
-    _fmpz_poly_CRT_ui(res->coeffs, poly1->coeffs, poly1->length, m1,
-        poly2->coeffs, poly2->length, poly2->mod.n, poly2->mod.ninv, 0);
+        poly2->coeffs, poly2->length, poly2->mod.n, poly2->mod.ninv, sign);
 
     _fmpz_poly_set_length(res, len);
     _fmpz_poly_normalise(res);
