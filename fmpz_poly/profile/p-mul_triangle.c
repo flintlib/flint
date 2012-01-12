@@ -54,13 +54,13 @@
    imgname  File name for image
  */
 
-#define lenlo    1
-#define lenhi    16777216
+#define lenlo    16
+#define lenhi    131072
 #define lenh     2
-#define bitslo   1
-#define bitshi   16777216
+#define bitslo   256
+#define bitshi   67108864
 #define bitsh    2
-#define cutoff   16777216
+#define cutoff   22000000000L
 #define cols     ((long)(log((double)lenhi/(double)lenlo)/log(lenh) + 1.5))
 #define rows     ((long)(log((double)bitshi/(double)bitslo)/log(bitsh) + 1.5))
 #define cpumin   100

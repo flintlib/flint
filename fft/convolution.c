@@ -38,8 +38,7 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth,
    long n = (1L<<depth), j;
    long w = (limbs*FLINT_BITS)/n;
    long sqrt = (1L<<(depth/2));
-   mp_limb_t c;
-
+   
    if (depth <= 6)
    {
       trunc = 2*((trunc + 1)/2);
@@ -53,9 +52,8 @@ void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth,
       {
          mpn_normmod_2expp1(ii[j], limbs);
          if (ii != jj) mpn_normmod_2expp1(jj[j], limbs);
-         c = 2*ii[j][limbs] + jj[j][limbs];
-   
-         ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
+         
+         fft_mulmod_2expp1(ii[j], ii[j], jj[j], n, w, tt);
       }
 
       ifft_truncate_sqrt2(ii, n, w, t1, t2, s1, trunc);

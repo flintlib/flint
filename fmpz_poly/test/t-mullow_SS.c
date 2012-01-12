@@ -107,7 +107,7 @@ main(void)
         fmpz_poly_clear(c);
     }
 
-    /* Compare with mul_basecase */
+    /* Compare with mul_KS */
     for (i = 0; i < 2000; i++)
     {
         fmpz_poly_t a, b, c, d;

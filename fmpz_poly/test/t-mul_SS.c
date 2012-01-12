@@ -127,7 +127,7 @@ main(void)
     }
     
     /* Compare with mul_KS */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 500; i++)
     {
         fmpz_poly_t a, b, c, d;
 
@@ -137,11 +137,11 @@ main(void)
         fmpz_poly_init(d);
         fmpz_poly_randtest(b, state, n_randint(state, 300), n_randint(state, 500) + 1);
         fmpz_poly_randtest(c, state, n_randint(state, 300), n_randint(state, 500) + 1);
-
+        
         fmpz_poly_mul_SS(a, b, c);
         fmpz_poly_mul_KS(d, b, c);
 
-        result = (fmpz_poly_equal(a, d));
+        result = fmpz_poly_equal(a, d);
         if (!result)
         {
             printf("FAIL:\n");
