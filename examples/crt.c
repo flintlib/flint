@@ -61,7 +61,7 @@ int main(int argc, char* argv[])
     {
         prime = n_nextprime(prime, 0);
         res = fmpz_fdiv_ui(x, prime);
-        fmpz_CRT_ui(y, y, prod, res, prime);
+        fmpz_CRT_ui(y, y, prod, res, prime, 1);
 
         printf("residue mod %lu = %lu; reconstruction = ", prime, res);
         fmpz_print(y);

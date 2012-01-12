@@ -539,10 +539,7 @@ void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
         int sign);
 
 void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    ulong r2, ulong m2);
-
-void fmpz_CRT_ui_unsigned(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
-    ulong r2, ulong m2);
+    ulong r2, ulong m2, int sign);
 
 
 #define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
@@ -579,11 +576,8 @@ void fmpz_comb_clear(fmpz_comb_t comb);
 void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
-
 void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
-    const fmpz_comb_t comb, fmpz_comb_temp_t temp);
+    const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
 static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
 {

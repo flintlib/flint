@@ -85,10 +85,7 @@ int main()
         fmpz_mod(r1, input, m1);
         r2 = fmpz_fdiv_ui(input, m2);
 
-        if (sign)
-            fmpz_CRT_ui(result, r1, m1, r2, m2);
-        else
-            fmpz_CRT_ui_unsigned(result, r1, m1, r2, m2);
+        fmpz_CRT_ui(result, r1, m1, r2, m2, sign);
 
         if (!fmpz_equal(result, input))
         {

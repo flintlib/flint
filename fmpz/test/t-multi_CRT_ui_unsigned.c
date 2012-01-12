@@ -95,7 +95,7 @@ int main()
      
         fmpz_init(temp);
 
-        fmpz_multi_CRT_ui_unsigned(temp, output, comb, comb_temp);
+        fmpz_multi_CRT_ui(temp, output, comb, comb_temp, 0);
         result &= fmpz_equal(temp, input);
 
         fmpz_comb_temp_clear(comb_temp);

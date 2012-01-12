@@ -931,10 +931,8 @@ void _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
                                                     mp_limb_t m2inv, int sign);
 
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
-                                     const fmpz_t m1, const nmod_poly_t poly2);
-
-void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
-                                     const fmpz_t m1, const nmod_poly_t poly2);
+                                     const fmpz_t m1, const nmod_poly_t poly2,
+                                        int sign);
 
 
 /* Products *****************************************************************/

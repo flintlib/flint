@@ -33,7 +33,7 @@
 void
 fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
     nmod_mat_t * const residues, long nres,
-    fmpz_comb_t comb, fmpz_comb_temp_t temp)
+    fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 {
     long i, j, k;
     mp_ptr r;
@@ -46,7 +46,7 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
         {
             for (k = 0; k < nres; k++)
                 r[k] = nmod_mat_entry(residues[k], i, j);
-            fmpz_multi_CRT_ui(fmpz_mat_entry(mat, i, j), r, comb, temp);
+            fmpz_multi_CRT_ui(fmpz_mat_entry(mat, i, j), r, comb, temp, sign);
         }
     }
 
@@ -54,7 +54,8 @@ fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat,
 }
 
 void
-fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues, long nres)
+fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
+    long nres, int sign)
 {
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;
@@ -68,7 +69,7 @@ fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues, long nres)
     fmpz_comb_init(comb, primes, nres);
     fmpz_comb_temp_init(temp, comb);
 
-    fmpz_mat_multi_CRT_ui_precomp(mat, residues, nres, comb, temp);
+    fmpz_mat_multi_CRT_ui_precomp(mat, residues, nres, comb, temp, sign);
 
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(temp);

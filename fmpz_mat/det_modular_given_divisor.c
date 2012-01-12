@@ -104,7 +104,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
         xmod = n_mulmod2_preinv(xmod,
             n_invmod(fmpz_fdiv_ui(d, p), p), Amod->mod.n, Amod->mod.ninv);
 
-        fmpz_CRT_ui(xnew, x, prod, xmod, p);
+        fmpz_CRT_ui(xnew, x, prod, xmod, p, 1);
 
         if (fmpz_equal(xnew, x))
         {

@@ -315,18 +315,12 @@ void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
 void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
-                        const fmpz_t m, const nmod_poly_t poly2)
+                        const fmpz_t m, const nmod_poly_t poly2, int sign)
 
     Given \code{mat1} with entries modulo \code{m} and \code{mat2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
-    with signed entries satisfying $-mn/2 <= c < mn/2$.
-
-void fmpz_poly_CRT_ui_unsigned(fmpz_poly_t res, const fmpz_poly_t poly1,
-                        const fmpz_t m1, const nmod_poly_t poly2)
-
-    Given \code{mat1} with entries modulo \code{m} and \code{mat2}
-    with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
-    with signed entries satisfying $0 <= c < mn$.
+    with entries satisfying $-mn/2 <= c < mn/2$ (if sign = 1)
+    or $0 <= c < mn$ (if sign = 0).
 
 void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
     const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp);
@@ -346,14 +340,14 @@ void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres,
     set of moduli, it is faster to use \code{fmpz_mat_multi_mod_precomp}.
 
 void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues,
-    long nres, fmpz_comb_t comb, fmpz_comb_temp_t temp);
+    long nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
     Reconstructs \code{mat} from its images modulo the \code{nres} matrices
     in \code{residues}, given precomputed \code{comb} and \code{comb_temp}
     structures.
 
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
-    long nres)
+    long nres, int sign)
 
     Reconstructs \code{mat} from its images modulo the \code{nres} matrices
     in \code{residues}.
@@ -361,25 +355,6 @@ void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
     set of moduli, it is faster to use \code{fmpz_mat_multi_CRT_ui_precomp}.
-
-void fmpz_mat_multi_CRT_ui_unsigned_precomp(fmpz_mat_t mat,
-    nmod_mat_t * const residues, long nres, fmpz_comb_t comb,
-    fmpz_comb_temp_t temp)
-
-    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
-    in \code{residues}, assuming that the entries are unsigned,
-    given precomputed \code{comb} and \code{comb_temp} structures.
-
-void fmpz_mat_multi_CRT_ui_unsigned(fmpz_mat_t mat,
-    nmod_mat_t * const residues, long nres)
-
-    Reconstructs \code{mat} from its images modulo the \code{nres} matrices
-    in \code{residues}, assuming that the entries are unsigned.
-
-    This function is provided for convenience purposes.
-    For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use
-    \code{fmpz_mat_multi_CRT_ui_unsigned_precomp}.
 
 *******************************************************************************
 

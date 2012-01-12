@@ -829,22 +829,18 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 
 *******************************************************************************
 
-void fmpz_CRT_ui_unsigned(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
-    $0 \le x < M$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
-    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
-    positive integers greater than $1$ and coprime, and that $0 \le r_1 < m_1$
-    and $0 \le r_2 < m_2$. The result $x$ is stored in \code{out}.
+    $0 \le x < M$ (if sign = 0) or $-M/2 \le x < M/2$ (if sign = 1)
+    congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
+    where where $M = m_1 \times m_2$. The result $x$ is stored in \code{out}.
 
-void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2)
+    It is assumed that $m_1$ and $m_2$ are positive integers greater
+    than $1$ and coprime.
 
-    Uses the Chinese Remainder Theorem to compute the unique integer
-    $-M/2 \le x < M/2$ congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
-    where $M = m_1 \times m_2$. It is assumed that $m_1$ and $m_2$ are
-    positive integers greater than $1$ and coprime, and that
-    $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
-    The result $x$ is stored in \code{out}.
+    If sign = 0, it is assumed that $0 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
+    Otherwise, it is assumed that $-m_1 \le r_1 < m_1$ and $0 \le r_2 < m_2$.
 
 void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp)
@@ -869,11 +865,13 @@ void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     This function takes a set of residues modulo the list of primes
-    contained in the \code{comb} structure and reconstructs a signed 
-    multiprecision integer modulo the product of the primes which has 
-    these residues modulo the corresponding primes. If $N$ is the 
-    product of all the primes then \code{out} is normalised to be in 
-    the range $[-(N-1)/2, N/2]$.  The array \code{temp} is temporary 
+    contained in the \code{comb} structure and reconstructs a multiprecision
+    integer modulo the product of the primes which has 
+    these residues modulo the corresponding primes.
+
+    If $N$ is the product of all the primes then \code{out} is normalised to
+    be in the range $[0, N)$ if sign = 0 and the range $[-(N-1)/2, N/2]$
+    if sign = 1. The array \code{temp} is temporary 
     space which must be provided by \code{fmpz_comb_temp_init} and 
     cleared by \code{fmpz_comb_temp_clear}.
 

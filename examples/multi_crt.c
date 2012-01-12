@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
     fmpz_multi_mod_ui(residues, x, comb, comb_temp);
 
     /* Reconstruct */
-    fmpz_multi_CRT_ui(y, residues, comb, comb_temp);
+    fmpz_multi_CRT_ui(y, residues, comb, comb_temp, 1);
 
     for (i = 0; i < num_primes; i++)
         printf("residue mod %lu = %lu\n", primes[i], residues[i]);
