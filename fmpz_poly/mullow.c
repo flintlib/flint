@@ -84,7 +84,7 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1,
         _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
     else if ((limbs1+limbs2)/2048 > len1 + len2)
         _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
-    else if (limbs1 + limbs2 < (FLINT_BITS/16)*(len1 + len2))
+    else if ((limbs1 + limbs2)*FLINT_BITS*4 < len1 + len2)
         _fmpz_poly_mullow_KS(res, poly1, len1, poly2, len2, n);
     else
         _fmpz_poly_mullow_SS(res, poly1, len1, poly2, len2, 0, n);

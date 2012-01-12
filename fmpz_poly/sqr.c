@@ -47,7 +47,7 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, long len)
         _fmpz_poly_sqr_KS(res, poly, len);
     else if (limbs/2048 > len)
         _fmpz_poly_sqr_KS(res, poly, len);
-    else if (limbs < (FLINT_BITS/16)*len)
+    else if (limbs*FLINT_BITS*4 < len)
        _fmpz_poly_sqr_KS(res, poly, len);
     else
        _fmpz_poly_mul_SS(res, poly, len, poly, len, 0);
