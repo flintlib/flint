@@ -137,7 +137,7 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
         num_primes_k = comb[i]->num_primes;
         for (j = 0; j < num_primes_k; j++)
             residues[j] = polys[j][k / 2];
-        fmpz_multi_CRT_ui(num + k, residues, comb[i], temp[i]);
+        fmpz_multi_CRT_ui(num + k, residues, comb[i], temp[i], 1);
     }
 
     /* Cleanup */
