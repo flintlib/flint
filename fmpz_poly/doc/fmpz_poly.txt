@@ -644,7 +644,7 @@ void fmpz_poly_mullow_KS(fmpz_poly_t res,
     \code{poly1} and \code{poly2}.
 
 void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1, 
-                      const fmpz * input2, long length2, const long bits_in)
+                                            const fmpz * input2, long length2)
 
     Sets \code{(output, length1 + length2 - 1)} to the product of 
     \code{(input1, length1)} and \code{(input2, length2)}. If the number of 
@@ -654,8 +654,14 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
     We must have \code{len1 > 1} and \code{len2 > 1}.  Allows zero-padding 
     of the two input polynomials.  Supports aliasing of inputs and outputs.
 
+void fmpz_poly_mul_SS(fmpz_poly_t res,
+                           const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+
+    Sets \code{res} to the product of \code{poly1} and \code{poly2}. Uses the
+    Sch\"{o}nhage-Strassen algorithm.
+
 void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long length1, 
-             const fmpz * input2, long length2, const long bits_in, long n);
+                                    const fmpz * input2, long length2, long n)
 
     Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
     \code{(poly1, len1)} and \code{(poly2, len2)}.
@@ -666,16 +672,10 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long length1,
     \code{res}, \code{poly1} and \code{poly2}.
 
 void fmpz_poly_mullow_SS(fmpz_poly_t res,
-                  const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n);
+                     const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
 
     Sets \code{res} to the lowest $n$ coefficients of the product of 
     \code{poly1} and \code{poly2}.
-
-void fmpz_poly_mul_SS(fmpz_poly_t res,
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2)
-
-    Sets \code{res} to the product of \code{poly1} and \code{poly2}. Uses the
-    Sch\"{o}nhage-Strassen algorithm.
 
 void _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1, 
                                                  const fmpz * poly2, long len2)

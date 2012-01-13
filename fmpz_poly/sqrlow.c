@@ -64,7 +64,7 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, long len, long n)
     else if (limbs*FLINT_BITS*4 < len)
        _fmpz_poly_sqrlow_KS(res, poly, len, n);
     else
-       _fmpz_poly_mullow_SS(res, poly, len, poly, len, 0, n);
+       _fmpz_poly_mullow_SS(res, poly, len, poly, len, n);
 }
 
 void fmpz_poly_sqrlow(fmpz_poly_t res, const fmpz_poly_t poly, long n)
