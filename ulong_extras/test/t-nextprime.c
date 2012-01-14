@@ -35,7 +35,6 @@ int main(void)
 {
     mp_limb_t n;
     mp_limb_t res1, res2;
-    int result;
     long i, rep;
     mpz_t mpz_n;
     flint_rand_t state;
@@ -59,8 +58,6 @@ int main(void)
 
     mpz_init(mpz_n);
 
-    result = 1;
-
     for (rep = 0; rep < 100000; rep++)
     {
         unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
@@ -75,7 +72,6 @@ int main(void)
 
         res1 = n;
         res2 = mpz_get_ui(mpz_n);
-        result = (res1 == res2);
 
         if (res1 != res2)
         {
