@@ -1219,7 +1219,7 @@ void nmod_poly_gcd(nmod_poly_t G,
 long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T, 
              mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 
-    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$, 
     together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
     the length of $G$.
 
@@ -1247,7 +1247,7 @@ void nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
 long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
              mp_srcptr A, long A_len, mp_srcptr B, long B_len, nmod_t mod)
 
-    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$, 
     together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
     the length of $G$.
 
@@ -1276,7 +1276,7 @@ long _nmod_poly_xgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                      mp_srcptr A, long lenA, mp_srcptr B, long lenB, 
                      nmod_t mod)
 
-    Computes the GCD of $A$ and $B$, where $\len(A) \geq $\len(B) > 0$, 
+    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$, 
     together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
     the length of $G$.
 
