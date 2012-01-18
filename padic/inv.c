@@ -39,7 +39,7 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
     n = i + 1;
 
     /* Compute sequence of exponents */
-    a = malloc(n * sizeof(long));
+    a = flint_malloc(n * sizeof(long));
     for (a[i = 0] = N; a[i] > 1; i++)
         a[i + 1] = (a[i] + 1) / 2;
 
@@ -72,7 +72,7 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
             fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
     }
 
-    free(a);
+    flint_free(a);
 
 #undef n
 #undef pow

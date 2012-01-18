@@ -50,14 +50,14 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
     limbs1 = (len1 * bits - 1) / FLINT_BITS + 1;
     limbs2 = (len2 * bits - 1) / FLINT_BITS + 1;
 
-    mpn1 = (mp_ptr) malloc(sizeof(mp_limb_t) * limbs1);
-    mpn2 = (in1 == in2) ? mpn1 : (mp_ptr) malloc(sizeof(mp_limb_t) * limbs2);
+    mpn1 = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * limbs1);
+    mpn2 = (in1 == in2) ? mpn1 : (mp_ptr) flint_malloc(sizeof(mp_limb_t) * limbs2);
 
     _nmod_poly_bit_pack(mpn1, in1, len1, bits);
     if (in1 != in2)
         _nmod_poly_bit_pack(mpn2, in2, len2, bits);
 
-    res = (mp_ptr) malloc(sizeof(mp_limb_t) * (limbs1 + limbs2));
+    res = (mp_ptr) flint_malloc(sizeof(mp_limb_t) * (limbs1 + limbs2));
 
     if (in1 != in2)
         mpn_mul(res, mpn1, limbs1, mpn2, limbs2);
@@ -66,11 +66,11 @@ _nmod_poly_mullow_KS(mp_ptr out, mp_srcptr in1, long len1,
 
     _nmod_poly_bit_unpack(out, n, res, bits, mod);
     
-    free(mpn2);
+    flint_free(mpn2);
     if (in1 != in2)
-        free(mpn1);
+        flint_free(mpn1);
 
-    free(res);
+    flint_free(res);
 }
 
 void

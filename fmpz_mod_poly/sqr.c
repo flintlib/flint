@@ -48,7 +48,7 @@ void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     if (res == poly)
     {
-        fmpz *t = calloc(2 * len - 1, sizeof(fmpz));
+        fmpz *t = flint_calloc(2 * len - 1, sizeof(fmpz));
 
         _fmpz_mod_poly_sqr(t, poly->coeffs, len, &(res->p));
 

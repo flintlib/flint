@@ -56,8 +56,8 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
     }
     else if (nullity)
     {
-        pivots = malloc(rank * sizeof(long));
-        nonpivots = malloc(nullity * sizeof(long));
+        pivots = flint_malloc(rank * sizeof(long));
+        nonpivots = flint_malloc(nullity * sizeof(long));
 
         for (i = j = k = 0; i < rank; i++)
         {
@@ -86,8 +86,8 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
             fmpz_neg(res->rows[nonpivots[i]] + i, den);
         }
 
-        free(pivots);
-        free(nonpivots);
+        flint_free(pivots);
+        flint_free(nonpivots);
     }
 
     fmpz_clear(den);

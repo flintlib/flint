@@ -37,7 +37,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
     {
         if (!str)
         {
-            str = malloc(2);
+            str = flint_malloc(2);
         }
         str[0] = '0';
         str[1] = '\0';
@@ -91,7 +91,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
                      + z_sizeinbase(FLINT_MAX(FLINT_ABS(v), FLINT_ABS(N)), 10) 
                      + 5) + 1;
 
-            str = malloc(b);
+            str = flint_malloc(b);
             if (!str)
             {
                 printf("ERROR (_padic_get_str).  Memory allocation failed.\n");
@@ -179,7 +179,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
             long b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(ctx->p, 10) 
                    + z_sizeinbase(v, 10) + 4;
 
-            str = malloc(b);
+            str = flint_malloc(b);
             if (!str)
             {
                 printf("ERROR (_padic_get_str).  Memory allocation failed.\n");

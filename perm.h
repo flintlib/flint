@@ -43,7 +43,7 @@ static __inline__ long * _perm_init(long n)
 {
     long i, *vec;
 
-    vec = malloc(n * sizeof(long));
+    vec = flint_malloc(n * sizeof(long));
 
     if (!vec)
     {
@@ -59,7 +59,7 @@ static __inline__ long * _perm_init(long n)
 
 static __inline__ void _perm_clear(long * vec)
 {
-    free(vec);
+    flint_free(vec);
 }
 
 /* Assignment ****************************************************************/
@@ -98,7 +98,7 @@ static __inline__ void
 
     if (res == vec)
     {
-        long *t = malloc(n * sizeof(long));
+        long *t = flint_malloc(n * sizeof(long));
 
         if (!t)
         {
@@ -111,7 +111,7 @@ static __inline__ void
         for (i = 0; i < n; i++)
             res[t[i]] = i;
 
-        free(t);
+        flint_free(t);
     }
     else
     {
@@ -129,14 +129,14 @@ _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
     if (res == vec1)
     {
-        long *t = malloc(n * sizeof(long));
+        long *t = flint_malloc(n * sizeof(long));
 
         for (i = 0; i < n; i++)
             t[i] = vec1[i];
         for (i = 0; i < n; i++)
             res[i] = t[vec2[i]];
 
-        free(t);
+        flint_free(t);
     }
     else
     {

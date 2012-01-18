@@ -57,7 +57,7 @@ main(void)
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
         
-        ii = malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
+        ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
         ptr = (mp_limb_t *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
            ii[i] = ptr;
@@ -97,7 +97,7 @@ main(void)
         len = n_randint(state, 300) + 1;
         limbs = 2*((bits - 1)/FLINT_BITS + 1);
         
-        ii = malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
+        ii = flint_malloc((len + len*(limbs + 1))*sizeof(mp_limb_t));
         ptr = (mp_limb_t *) ii + len;
         for (i = 0; i < len; i++, ptr += (limbs + 1))
            ii[i] = ptr;

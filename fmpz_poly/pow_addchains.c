@@ -41,7 +41,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
      */
     {
         int i;
-        b = (int *) malloc(n * sizeof(int));
+        b = (int *) flint_malloc(n * sizeof(int));
         b[0] = 0;
         for (i = 1; i < n; i++)
             b[i] = b[i-1] + a[i];

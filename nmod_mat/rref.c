@@ -60,8 +60,8 @@ nmod_mat_rref(long * P, nmod_mat_t A)
     nmod_mat_init(U, rank, rank, A->mod.n);
     nmod_mat_init(V, rank, n - rank, A->mod.n);
 
-    pivots = malloc(sizeof(long) * rank);
-    nonpivots = malloc(sizeof(long) * (n - rank));
+    pivots = flint_malloc(sizeof(long) * rank);
+    nonpivots = flint_malloc(sizeof(long) * (n - rank));
 
     for (i = j = k = 0; i < rank; i++)
     {
@@ -112,8 +112,8 @@ nmod_mat_rref(long * P, nmod_mat_t A)
     nmod_mat_clear(U);
     nmod_mat_clear(V);
 
-    free(pivots);
-    free(nonpivots);
+    flint_free(pivots);
+    flint_free(nonpivots);
 
     return rank;
 }

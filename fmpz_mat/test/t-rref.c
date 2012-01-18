@@ -89,7 +89,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = malloc(FLINT_MAX(1,m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -108,7 +108,7 @@ main(void)
             fmpz_mat_clear(A);
         }
 
-        free(perm);
+        flint_free(perm);
     }
 
     /* Dense */
@@ -116,7 +116,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = malloc(FLINT_MAX(1,m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -142,7 +142,7 @@ main(void)
             fmpz_mat_clear(A);
         }
 
-        free(perm);
+        flint_free(perm);
     }
 
     fmpz_clear(den);

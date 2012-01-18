@@ -152,7 +152,7 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
     {
         mp_ptr S, T;
 
-        S = malloc((lenA + 2 * (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod)) 
+        S = flint_malloc((lenA + 2 * (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod)) 
             * sizeof(mp_limb_t));
         T = S + lenA;
         mpn_copyi(S, A, lenA);
@@ -160,7 +160,7 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
         __nmod_poly_divrem_divconquer(Q, T, S, lenA, B, lenB, mod);
 
         mpn_copyi(R, T, lenB - 1);
-        free(S);
+        flint_free(S);
     }
 }
 

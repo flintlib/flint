@@ -38,8 +38,8 @@ _fmpz_factor_fit_length(fmpz_factor_t factor, long len)
         if (len < 2 * factor->alloc)
             len = 2 * factor->alloc;
 
-        factor->p = (fmpz *) realloc(factor->p, len * sizeof(fmpz));
-        factor->exp = (fmpz *) realloc(factor->exp, len * sizeof(fmpz));
+        factor->p = (fmpz *) flint_realloc(factor->p, len * sizeof(fmpz));
+        factor->exp = (fmpz *) flint_realloc(factor->exp, len * sizeof(fmpz));
 
         if (len > factor->alloc)
         {

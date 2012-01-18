@@ -87,7 +87,7 @@ fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     else
     {
         long i;
-        Qcopy = (fmpz *) malloc(n * sizeof(fmpz));
+        Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Qlen; i++)
             Qcopy[i] = Q->coeffs[i];
         for ( ; i < n; i++)
@@ -113,5 +113,5 @@ fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     _fmpz_poly_normalise(Qinv);
 
     if (Qalloc)
-        free(Qcopy);
+        flint_free(Qcopy);
 }

@@ -94,9 +94,9 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    primes = malloc(num_primes * sizeof(mp_limb_t));
-    residues = malloc(num_primes * sizeof(mp_limb_t));
-    polys = malloc(num_primes * sizeof(mp_ptr));
+    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
+    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
+    polys = flint_malloc(num_primes * sizeof(mp_ptr));
 
     /* Compute Bernoulli numbers mod p */
     primes[0] = n_nextprime(1UL<<prime_bits, 0);
@@ -150,7 +150,7 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
         fmpz_comb_clear(comb[i]);
     }
 
-    free(primes);
-    free(residues);
-    free(polys);
+    flint_free(primes);
+    flint_free(residues);
+    flint_free(polys);
 }

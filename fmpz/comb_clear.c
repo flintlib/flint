@@ -45,7 +45,7 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
         j /= 2;
     }
 
-	free(temp->comb_temp);
+	flint_free(temp->comb_temp);
 
     fmpz_clear(temp->temp);
     fmpz_clear(temp->temp2);
@@ -71,9 +71,9 @@ fmpz_comb_clear(fmpz_comb_t comb)
 	
 	if (n)
 	{
-        free(comb->comb);
-        free(comb->res);
+        flint_free(comb->comb);
+        flint_free(comb->res);
 	}
 
-    free(comb->mod);
+    flint_free(comb->mod);
 }

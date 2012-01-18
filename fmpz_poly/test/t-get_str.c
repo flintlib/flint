@@ -54,7 +54,7 @@ main(void)
         printf("str(a) = {%s}\n", str);
         abort();
     }
-    free(str);
+    flint_free(str);
 
     fmpz_poly_set_si(a, -2);
     str = fmpz_poly_get_str(a);
@@ -66,7 +66,7 @@ main(void)
         printf("str(a) = {%s}\n", str);
         abort();
     }
-    free(str);
+    flint_free(str);
 
     fmpz_poly_set_coeff_si(a, 3, 1);
     str = fmpz_poly_get_str(a);
@@ -78,7 +78,7 @@ main(void)
         printf("str(a) = {%s}\n", str);
         abort();
     }
-    free(str);
+    flint_free(str);
 
     printf("PASS\n");
     return 0;

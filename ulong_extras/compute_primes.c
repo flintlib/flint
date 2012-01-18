@@ -88,7 +88,7 @@ void n_compute_primes(ulong num)
     }
 
     sieve_size = primes_cutoff/2 - flint_primes_cutoff/2;
-    sieve = (unsigned int *) malloc(sizeof(unsigned int)*sieve_size);
+    sieve = (unsigned int *) flint_malloc(sizeof(unsigned int)*sieve_size);
    
     for (j = 0; j < sieve_size; j++)
       sieve[j] = 1;
@@ -137,13 +137,13 @@ void n_compute_primes(ulong num)
 
     if (!flint_num_primes) 
     {
-        flint_primes = (mp_limb_t *) malloc(sizeof(mp_limb_t)*num_primes);
-        flint_prime_inverses = (double *) malloc(sizeof(double)*num_primes);
+        flint_primes = (mp_limb_t *) flint_malloc(sizeof(mp_limb_t)*num_primes);
+        flint_prime_inverses = (double *) flint_malloc(sizeof(double)*num_primes);
     }
     else
     {
-        flint_primes = realloc(flint_primes, sizeof(mp_limb_t)*num_primes);
-        flint_prime_inverses = realloc(flint_prime_inverses, sizeof(double)*num_primes);
+        flint_primes = flint_realloc(flint_primes, sizeof(mp_limb_t)*num_primes);
+        flint_prime_inverses = flint_realloc(flint_prime_inverses, sizeof(double)*num_primes);
     }
 
     if (!flint_num_primes)
@@ -172,7 +172,7 @@ void n_compute_primes(ulong num)
 
     flint_num_primes = num_primes;
 
-    free(sieve);
+    flint_free(sieve);
 
     pthread_mutex_unlock(&flint_num_primes_mutex);
 }

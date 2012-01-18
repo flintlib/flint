@@ -52,7 +52,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
     len = mpz_get_si(t);
     mpz_clear(t);
 
-    a = malloc(len * sizeof(mpq_t));
+    a = flint_malloc(len * sizeof(mpq_t));
     for (i = 0; i < len; i++)
         mpq_init(a[i]);
 
@@ -64,7 +64,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);
-    free(a);
+    flint_free(a);
 
     return r;
 }

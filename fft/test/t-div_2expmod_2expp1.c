@@ -78,8 +78,8 @@ main(void)
                     w = j*k;
                     limbs = (n*w)/GMP_LIMB_BITS;
             
-                    nn = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r  = malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    r  = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     random_fermat(nn, state, limbs);
                     fermat_to_mpz(mn1, nn, limbs);
                     set_p(p, n, w);
@@ -102,8 +102,8 @@ main(void)
                     }
                 }
 
-                free(nn);
-                free(r);
+                flint_free(nn);
+                flint_free(r);
             }
         }
     }

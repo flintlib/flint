@@ -49,7 +49,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
     k = n;
     for (i = 1; (1L << i) < k; i++);
-    a = (long *) malloc(i * sizeof(long));
+    a = (long *) flint_malloc(i * sizeof(long));
     a[i = 0] = k;
     while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
         a[++i] = (k = (k + 1) / 2);
@@ -69,7 +69,7 @@ _nmod_poly_revert_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
         _nmod_vec_sub(Qinv, Qinv, U, k, mod);
     }
 
-    free(a);
+    flint_free(a);
     _nmod_vec_clear(T);
     _nmod_vec_clear(U);
     _nmod_vec_clear(V);

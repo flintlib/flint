@@ -67,7 +67,7 @@ int main()
 
         num_primes = ((bits + 1)*primes_per_limb)/FLINT_BITS + 1;
 
-        primes = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
+        primes = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
         prime = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);
 
         for (j = 0; j < num_primes; j++)
@@ -81,8 +81,8 @@ int main()
         fmpz_randtest(input, state, bits);
         fmpz_get_mpz(num1, input);
 
-        output = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
-        output2 = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
+        output = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
+        output2 = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
 
         fmpz_comb_init(comb, primes, num_primes);
         fmpz_comb_temp_init(comb_temp, comb);
@@ -120,9 +120,9 @@ int main()
         fmpz_comb_clear(comb);
         fmpz_clear(temp);
         fmpz_clear(input);
-        free(output);
-        free(output2);
-        free(primes);
+        flint_free(output);
+        flint_free(output2);
+        flint_free(primes);
     }
 
     flint_randclear(state);

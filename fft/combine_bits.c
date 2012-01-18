@@ -65,7 +65,7 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length,
    }
    
    coeff_limbs = (bits/FLINT_BITS) + 1;
-   temp = malloc((output_limbs + 1)*sizeof(mp_limb_t));
+   temp = flint_malloc((output_limbs + 1)*sizeof(mp_limb_t));
    shift_bits = 0;
    limb_ptr = res;
    end = res + total_limbs;
@@ -110,5 +110,5 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length,
       i++;    
    }
    
-   free(temp);     
+   flint_free(temp);     
 }

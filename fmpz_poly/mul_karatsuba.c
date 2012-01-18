@@ -151,7 +151,7 @@ _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
         loglen++;
     length = (1L << loglen);
 
-    rev1 = (fmpz *) calloc(4 * length, sizeof(fmpz *));
+    rev1 = (fmpz *) flint_calloc(4 * length, sizeof(fmpz *));
     rev2 = rev1 + length;
     out  = rev1 + 2 * length;
     temp = _fmpz_vec_init(2 * length);
@@ -165,7 +165,7 @@ _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
     revbin2(res, out, len1 + len2 - 1, loglen + 1);
 
     _fmpz_vec_clear(temp, 2 * length);
-    free(rev1);
+    flint_free(rev1);
 }
 
 void

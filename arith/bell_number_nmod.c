@@ -58,22 +58,22 @@ bell_number_nmod(ulong n, nmod_t mod)
 
     if (mod.n <= n)
     {
-        mp_ptr bvec = malloc(sizeof(mp_limb_t) * (n + 1));
+        mp_ptr bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));
         bell_number_nmod_vec_recursive(bvec, n + 1, mod);
         s = bvec[n];
-        free(bvec);
+        flint_free(bvec);
         return s;
     }
 
     /* Compute inverse factorials */
     /* We actually compute (n! / i!) and divide out (n!)^2 at the end */
-    facs = malloc(sizeof(mp_limb_t) * (n + 1));
+    facs = flint_malloc(sizeof(mp_limb_t) * (n + 1));
     facs[n] = 1;
     for (i = n - 1; i >= 0; i--)
         facs[i] = n_mulmod2_preinv(facs[i + 1], i + 1, mod.n, mod.ninv);
 
     /* Compute powers */
-    pows = calloc(n + 1, sizeof(mp_limb_t));
+    pows = flint_calloc(n + 1, sizeof(mp_limb_t));
     pows[0] = n_powmod2_preinv(0, n, mod.n, mod.ninv);
     pows[1] = n_powmod2_preinv(1, n, mod.n, mod.ninv);
 
@@ -106,8 +106,8 @@ bell_number_nmod(ulong n, nmod_t mod)
     u = n_mulmod2_preinv(u, u, mod.n, mod.ninv);
     s = n_mulmod2_preinv(s, u, mod.n, mod.ninv);
 
-    free(facs);
-    free(pows);
+    flint_free(facs);
+    flint_free(pows);
 
     return s;
 }

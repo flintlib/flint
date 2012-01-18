@@ -82,8 +82,8 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     fmpz_mul_2exp(one, one, prec);
 
     square_roots = _fmpz_vec_init(n);
-    tmp1 = malloc((N/2 + 1) * sizeof(fmpz));
-    tmp2 = malloc((N/2 + 1) * sizeof(fmpz));
+    tmp1 = flint_malloc((N/2 + 1) * sizeof(fmpz));
+    tmp2 = flint_malloc((N/2 + 1) * sizeof(fmpz));
     tmp3 = _fmpz_vec_init(N);
 
     for (i = 0; i < n; i++)
@@ -136,8 +136,8 @@ void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     _fmpz_poly_set_length(poly, N + 1);
 
     _fmpz_vec_clear(square_roots, n);
-    free(tmp1);
-    free(tmp2);
+    flint_free(tmp1);
+    flint_free(tmp2);
     _fmpz_vec_clear(tmp3, 1UL << n);
     fmpz_clear(one);
 }

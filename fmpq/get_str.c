@@ -34,7 +34,7 @@ char * _fmpq_get_str(char * str, int b, const fmpz_t num, const fmpz_t den)
 
     if (str == NULL)
     {
-        str = malloc(fmpz_sizeinbase(num, b) + fmpz_sizeinbase(den, b) + 3);
+        str = flint_malloc(fmpz_sizeinbase(num, b) + fmpz_sizeinbase(den, b) + 3);
 
         if (str == NULL)
         {

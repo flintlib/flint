@@ -34,7 +34,7 @@ void test_set(char * in, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_set_si(long x, char * out)
@@ -57,7 +57,7 @@ void test_set_si(long x, char * out)
     }
     
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_swap(char * in1, char * in2, char * out1, char * out2)
@@ -88,8 +88,8 @@ void test_swap(char * in1, char * in2, char * out1, char * out2)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res1);
-    free(res2);
+    flint_free(res1);
+    flint_free(res2);
 }
 
 void test_zero(char * in, char * out)
@@ -114,7 +114,7 @@ void test_zero(char * in, char * out)
     }
     
     fmpz_poly_q_clear(op);
-    free(res);
+    flint_free(res);
 }
 
 void test_neg(char * in, char * out)
@@ -141,7 +141,7 @@ void test_neg(char * in, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_inv(char * in, char * out)
@@ -167,7 +167,7 @@ void test_inv(char * in, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_inv_inplace(char * in, char * out)
@@ -191,7 +191,7 @@ void test_inv_inplace(char * in, char * out)
     }
     
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_is_zero(char * in, int out)
@@ -292,7 +292,7 @@ void test_add(char * in1, char * in2, char * out)
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs in1 = in1 + in2 */
@@ -322,7 +322,7 @@ void test_add_in_place1(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs in2 = in1 + in2 */
@@ -352,7 +352,7 @@ void test_add_in_place2(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs out = in + in */
@@ -380,7 +380,7 @@ void test_add_in_place3(char * in, char * out)
     
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op);
-    free(res);
+    flint_free(res);
 }
 
 void test_sub(char * in1, char * in2, char * out)
@@ -411,7 +411,7 @@ void test_sub(char * in1, char * in2, char * out)
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 /* in1 = in1 + in2 */
@@ -441,7 +441,7 @@ void test_sub_in_place1(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* in2 = in1 + in2 */
@@ -471,7 +471,7 @@ void test_sub_in_place2(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs out = in - in */
@@ -499,7 +499,7 @@ void test_sub_in_place3(char * in, char * out)
     
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_mul_si(char * in, long x, char * out)
@@ -526,7 +526,7 @@ void test_scalar_mul_si(char * in, long x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
@@ -553,7 +553,7 @@ void test_scalar_mul_mpz(char * in, mpz_t x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
@@ -580,7 +580,7 @@ void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_div_si(char * in, long x, char * out)
@@ -607,7 +607,7 @@ void test_scalar_div_si(char * in, long x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_div_mpz(char * in, mpz_t x, char * out)
@@ -634,7 +634,7 @@ void test_scalar_div_mpz(char * in, mpz_t x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_scalar_div_mpq(char * in, mpq_t x, char * out)
@@ -661,7 +661,7 @@ void test_scalar_div_mpq(char * in, mpq_t x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_mul(char * in1, char * in2, char * out)
@@ -692,7 +692,7 @@ void test_mul(char * in1, char * in2, char * out)
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 /* in1 = in1 * in2 */
@@ -722,7 +722,7 @@ void test_mul_in_place1(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* in2 = in1 * in2 */
@@ -752,7 +752,7 @@ void test_mul_in_place2(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs out = in * in */
@@ -780,7 +780,7 @@ void test_mul_in_place3(char * in, char * out)
     
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op);
-    free(res);
+    flint_free(res);
 }
 
 void test_div(char * in1, char * in2, char * out)
@@ -811,7 +811,7 @@ void test_div(char * in1, char * in2, char * out)
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 /* in1 = in1 / in2 */
@@ -841,7 +841,7 @@ void test_div_in_place1(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* in2 = in1 / in2 */
@@ -871,7 +871,7 @@ void test_div_in_place2(char * in1, char * in2, char * out)
     
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 /* Runs out = in / in */
@@ -899,7 +899,7 @@ void test_div_in_place3(char * in, char * out)
     
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op);
-    free(res);
+    flint_free(res);
 }
 
 void test_pow(char * in, unsigned long x, char * out)
@@ -926,7 +926,7 @@ void test_pow(char * in, unsigned long x, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_derivative(char * in, char * out)
@@ -953,7 +953,7 @@ void test_derivative(char * in, char * out)
     
     fmpz_poly_q_clear(op);
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_evaluate(char * in, int numa, int numb, char * out)
@@ -1000,7 +1000,7 @@ void test_evaluate(char * in, int numa, int numb, char * out)
     fmpz_poly_q_clear(op);
     mpq_clear(rop);
     mpq_clear(a);
-    free(res);
+    flint_free(res);
 }
 
 void test_get_str_pretty(char * in, char * out)
@@ -1022,7 +1022,7 @@ void test_get_str_pretty(char * in, char * out)
     }
     
     fmpz_poly_q_clear(rop);
-    free(res);
+    flint_free(res);
 }
 
 void test_addmul(char * in1, char * in2, char * in3, char * out)
@@ -1053,7 +1053,7 @@ void test_addmul(char * in1, char * in2, char * in3, char * out)
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 void test_submul(char * in1, char * in2, char * in3, char * out)
@@ -1084,7 +1084,7 @@ void test_submul(char * in1, char * in2, char * in3, char * out)
     fmpz_poly_q_clear(rop);
     fmpz_poly_q_clear(op1);
     fmpz_poly_q_clear(op2);
-    free(res);
+    flint_free(res);
 }
 
 int main(int argc, char *argv[])
@@ -1116,7 +1116,7 @@ int main(int argc, char *argv[])
         abort();
     }
     fmpz_poly_q_clear(qpoly1);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     fmpz_poly_q_set_str(qpoly1, "2  -1 1/2  0 1");
@@ -1130,7 +1130,7 @@ int main(int argc, char *argv[])
         abort();
     }
     fmpz_poly_q_clear(qpoly1);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     fmpz_poly_init(zpoly);
@@ -1147,7 +1147,7 @@ int main(int argc, char *argv[])
     }
     fmpz_poly_q_clear(qpoly1);
     fmpz_poly_clear(zpoly);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     fmpz_poly_init(zpoly);
@@ -1165,7 +1165,7 @@ int main(int argc, char *argv[])
     }
     fmpz_poly_q_clear(qpoly1);
     fmpz_poly_clear(zpoly);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     fmpz_poly_init(zpoly);
@@ -1183,7 +1183,7 @@ int main(int argc, char *argv[])
     }
     fmpz_poly_q_clear(qpoly1);
     fmpz_poly_clear(zpoly);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     fmpz_poly_init(zpoly);
@@ -1201,7 +1201,7 @@ int main(int argc, char *argv[])
     }
     fmpz_poly_q_clear(qpoly1);
     fmpz_poly_clear(zpoly);
-    free(strout);
+    flint_free(strout);
     
     /* Canonicalise **********************************************************/
     
@@ -1217,7 +1217,7 @@ int main(int argc, char *argv[])
         abort();
     }
     fmpz_poly_q_clear(qpoly1);
-    free(strout);
+    flint_free(strout);
     
     fmpz_poly_q_init(qpoly1);
     str = "2  -1 -1/2  0 1";
@@ -1230,7 +1230,7 @@ int main(int argc, char *argv[])
         printf("    Expected \"%s\", got \"%s\"\n", str, strout);
         abort();
     }
-    free(strout);
+    flint_free(strout);
     fmpz_poly_q_clear(qpoly1);
     
     /* Initialization, memory management and basic operations ****************/

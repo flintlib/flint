@@ -78,7 +78,7 @@ nmod_poly_mulmod(nmod_poly_t res,
     {
         if (f == res)
         {
-            fcoeffs = malloc(sizeof(mp_limb_t) * lenf);
+            fcoeffs = flint_malloc(sizeof(mp_limb_t) * lenf);
             _nmod_vec_set(fcoeffs, f->coeffs, lenf);
         }
         else
@@ -90,7 +90,7 @@ nmod_poly_mulmod(nmod_poly_t res,
                                        fcoeffs, lenf,
                                        res->mod);
         if (f == res)
-            free(fcoeffs);
+            flint_free(fcoeffs);
 
         res->length = lenf - 1;
         _nmod_poly_normalise(res);

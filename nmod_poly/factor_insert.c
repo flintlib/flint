@@ -51,8 +51,8 @@ nmod_poly_factor_insert(nmod_poly_factor_t fac,
     {
         long new_size = 2 * fac->alloc;
 
-        fac->p   = realloc(fac->p, sizeof(nmod_poly_struct) * new_size);
-        fac->exp = realloc(fac->exp, sizeof(long) * new_size);
+        fac->p   = flint_realloc(fac->p, sizeof(nmod_poly_struct) * new_size);
+        fac->exp = flint_realloc(fac->exp, sizeof(long) * new_size);
 
         for (i = fac->alloc; i < new_size; i++)
             nmod_poly_init_preinv(fac->p + i, 0, 0);

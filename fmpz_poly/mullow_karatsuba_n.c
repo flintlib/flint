@@ -132,7 +132,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
         copy1 = poly1->coeffs;
     else
     {
-        copy1 = (fmpz *) malloc(n * sizeof(fmpz));
+        copy1 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len1; i++)
             copy1[i] = poly1->coeffs[i];
         mpn_zero((mp_ptr) copy1 + len1, n - len1);
@@ -143,7 +143,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
         copy2 = poly2->coeffs;
     else
     {
-        copy2 = (fmpz *) malloc(n * sizeof(fmpz));
+        copy2 = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len2; i++)
             copy2[i] = poly2->coeffs[i];
         mpn_zero((mp_ptr) copy2 + len2, n - len2);
@@ -167,7 +167,7 @@ fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1,
     _fmpz_poly_normalise(res);
 
     if (clear & 1)
-        free(copy1);
+        flint_free(copy1);
     if (clear & 2)
-        free(copy2);
+        flint_free(copy2);
 }
