@@ -86,10 +86,10 @@ int main(void)
         while (r->length < 2);
 
         N = FLINT_MAX(0, fmpz_mod_poly_degree(f) / fmpz_mod_poly_degree(r));
-        b = malloc((N + 1) * sizeof(fmpz_mod_poly_struct *));
+        b = flint_malloc((N + 1) * sizeof(fmpz_mod_poly_struct *));
         for (j = 0; j <= N; j++)
         {
-            b[j] = malloc(sizeof(fmpz_mod_poly_struct));
+            b[j] = flint_malloc(sizeof(fmpz_mod_poly_struct));
             fmpz_mod_poly_init(b[j], p);
         }
 
@@ -134,9 +134,9 @@ int main(void)
         for (j = 0; j <= N; j++)
         {
             fmpz_mod_poly_clear(b[j]);
-            free(b[j]);
+            flint_free(b[j]);
         }
-        free(b);
+        flint_free(b);
         fmpz_clear(p);
     }
 

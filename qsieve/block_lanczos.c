@@ -92,7 +92,7 @@ void reduce_matrix(qs_t qs_inf, long *nrows, long *ncols, la_col_t *cols) {
 
 	/* count the number of nonzero entries in each row */
 
-	counts = (long *)calloc((size_t)*nrows, sizeof(long));
+	counts = (long *)flint_calloc((size_t)*nrows, sizeof(long));
 	for (i = 0; i < *ncols; i++) {
 		for (j = 0; j < cols[i].weight; j++)
 			counts[cols[i].data[j]]++;
@@ -178,7 +178,7 @@ void reduce_matrix(qs_t qs_inf, long *nrows, long *ncols, la_col_t *cols) {
 			reduced_rows, reduced_cols, passes);
 #endif
 
-	free(counts);
+	flint_free(counts);
     
 	/* record the final matrix size. Note that we can't touch
 	   nrows because all the column data (and the sieving relations
@@ -620,9 +620,9 @@ void combine_cols(long ncols,
 	col_words = (ncols + 63) / 64;
 
 	for (i = 0; i < num_deps; i++) {
-		matrix[i] = (uint64_t *)calloc((size_t)col_words, 
+		matrix[i] = (uint64_t *)flint_calloc((size_t)col_words, 
 					     sizeof(uint64_t));
-		amatrix[i] = (uint64_t *)calloc((size_t)col_words, 
+		amatrix[i] = (uint64_t *)flint_calloc((size_t)col_words, 
 					      sizeof(uint64_t));
 	}
 
@@ -699,8 +699,8 @@ void combine_cols(long ncols,
 	}
 
 	for (i = 0; i < num_deps; i++) {
-		free(matrix[i]);
-		free(amatrix[i]);
+		flint_free(matrix[i]);
+		flint_free(amatrix[i]);
 	}
 }
 
@@ -732,27 +732,27 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows,
 	   two numbers  */
 
 	vsize = FLINT_MAX(nrows, ncols);
-	v[0] = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	v[1] = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	v[2] = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	vnext = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	x = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	v0 = (uint64_t *)malloc(vsize * sizeof(uint64_t));
-	scratch = (uint64_t *)malloc(FLINT_MAX(vsize, 256 * 8) * sizeof(uint64_t));
+	v[0] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	v[1] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	v[2] = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	vnext = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	x = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	v0 = (uint64_t *)flint_malloc(vsize * sizeof(uint64_t));
+	scratch = (uint64_t *)flint_malloc(FLINT_MAX(vsize, 256 * 8) * sizeof(uint64_t));
 
 	/* allocate all the 64x64 variables */
 
-	winv[0] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	winv[1] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	winv[2] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	vt_a_v[0] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	vt_a_v[1] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	vt_a2_v[0] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	vt_a2_v[1] = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	d = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	e = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	f = (uint64_t *)malloc(64 * sizeof(uint64_t));
-	f2 = (uint64_t *)malloc(64 * sizeof(uint64_t));
+	winv[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	winv[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	winv[2] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	vt_a_v[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	vt_a_v[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	vt_a2_v[0] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	vt_a2_v[1] = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	d = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	e = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	f = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
+	f2 = (uint64_t *)flint_malloc(64 * sizeof(uint64_t));
 
 	/* The iterations computes v[0], vt_a_v[0],
 	   vt_a2_v[0], s[0] and winv[0]. Subscripts larger
@@ -908,20 +908,20 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows,
 	/* free unneeded storage */
 
     
-    free(vnext);
-	free(scratch);
-	free(v0);
-	free(vt_a_v[0]);
-	free(vt_a_v[1]);
-	free(vt_a2_v[0]);
-	free(vt_a2_v[1]);
-	free(winv[0]);
-	free(winv[1]);
-	free(winv[2]);
-	free(d);
-	free(e);
-	free(f);
-	free(f2);
+    flint_free(vnext);
+	flint_free(scratch);
+	flint_free(v0);
+	flint_free(vt_a_v[0]);
+	flint_free(vt_a_v[1]);
+	flint_free(vt_a2_v[0]);
+	flint_free(vt_a2_v[1]);
+	flint_free(winv[0]);
+	flint_free(winv[1]);
+	flint_free(winv[2]);
+	flint_free(d);
+	flint_free(e);
+	flint_free(f);
+	flint_free(f2);
 
 	/* if a recoverable failure occurred, start everything
 	   over again */
@@ -930,10 +930,10 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows,
 #if (QS_DEBUG & 128)
 		printf("linear algebra failed; retrying...\n");
 #endif
-		free(x);
-		free(v[0]);
-		free(v[1]);
-		free(v[2]);
+		flint_free(x);
+		flint_free(v[0]);
+		flint_free(v[1]);
+		flint_free(v[2]);
 		return NULL;
 	}
 
@@ -958,8 +958,8 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows,
 		abort();
 	}
 	
-	free(v[0]);
-	free(v[1]);
-	free(v[2]);
+	flint_free(v[0]);
+	flint_free(v[1]);
+	flint_free(v[2]);
 	return x;
 }

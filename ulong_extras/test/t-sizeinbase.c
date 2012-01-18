@@ -45,7 +45,7 @@ int main(void)
 
     flint_randinit(state);
     mpz_init(t);
-    str = malloc(60 * sizeof(char));
+    str = flint_malloc(60 * sizeof(char));
 
     for (rep = 0; rep < 10000; rep++)
     {
@@ -67,7 +67,7 @@ int main(void)
         }
     }
 
-    free(str);
+    flint_free(str);
     mpz_clear(t);
 
     flint_randclear(state);

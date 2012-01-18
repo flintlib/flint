@@ -59,7 +59,7 @@ main(void)
             mp_limb_t * ptr;
             mp_limb_t ** ii, ** jj, * t1, * t2, * s1;
         
-            ii = malloc((2*(n + n*size) + 3*size)*sizeof(mp_limb_t));
+            ii = flint_malloc((2*(n + n*size) + 3*size)*sizeof(mp_limb_t));
             for (i = 0, ptr = (mp_limb_t *) ii + 2*n; i < 2*n; i++, ptr += size) 
             {
                 ii[i] = ptr;
@@ -72,7 +72,7 @@ main(void)
             for (i = 0; i < 2*n; i++)
                mpn_normmod_2expp1(ii[i], limbs);
     
-            jj = malloc(2*(n + n*size)*sizeof(mp_limb_t));
+            jj = flint_malloc(2*(n + n*size)*sizeof(mp_limb_t));
             for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
             {
                 jj[i] = ptr;
@@ -97,8 +97,8 @@ main(void)
                 }
             }
 
-            free(ii);
-            free(jj);
+            flint_free(ii);
+            flint_free(jj);
         }
     }
 

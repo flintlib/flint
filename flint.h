@@ -47,6 +47,11 @@ extern char version[];
 
 #define ulong unsigned long
 
+void * flint_malloc(size_t size);
+void * flint_realloc(void * ptr, size_t size);
+void * flint_calloc(size_t num, size_t size);
+void flint_free(void * ptr);
+
 #if __GMP_BITS_PER_MP_LIMB == 64
     #define FLINT_BITS 64
     #define FLINT_D_BITS 53

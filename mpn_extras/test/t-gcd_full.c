@@ -70,7 +70,7 @@ int main(void)
        s1 = (mpz_sizeinbase(a, 2) - 1)/FLINT_BITS + 1;
        s2 = (mpz_sizeinbase(b, 2) - 1)/FLINT_BITS + 1;
 
-       g->_mp_d = malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
+       g->_mp_d = flint_malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
 
        g->_mp_size = mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
 
@@ -83,7 +83,7 @@ int main(void)
           abort();
        }
 
-       free(g->_mp_d);
+       flint_free(g->_mp_d);
     }
 
     mpz_clear(a);

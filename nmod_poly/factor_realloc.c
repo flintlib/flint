@@ -42,16 +42,16 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc)
             for (i = alloc; i < fac->num; i++)
                 nmod_poly_clear(fac->p + i);
 
-            fac->p     = realloc(fac->p, alloc * sizeof(nmod_poly_struct));
-            fac->exp   = realloc(fac->exp, alloc * sizeof(long));
+            fac->p     = flint_realloc(fac->p, alloc * sizeof(nmod_poly_struct));
+            fac->exp   = flint_realloc(fac->exp, alloc * sizeof(long));
             fac->alloc = alloc;
         }
         else if (fac->alloc < alloc)
         {
             long i;
 
-            fac->p   = realloc(fac->p, alloc * sizeof(nmod_poly_struct));
-            fac->exp = realloc(fac->exp, alloc * sizeof(long));
+            fac->p   = flint_realloc(fac->p, alloc * sizeof(nmod_poly_struct));
+            fac->exp = flint_realloc(fac->exp, alloc * sizeof(long));
 
             for (i = fac->alloc; i < alloc; i++)
             {
@@ -65,8 +65,8 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, long alloc)
     {
         long i;
 
-        fac->p   = malloc(alloc * sizeof(nmod_poly_struct));
-        fac->exp = calloc(alloc, sizeof(long));
+        fac->p   = flint_malloc(alloc * sizeof(nmod_poly_struct));
+        fac->exp = flint_calloc(alloc, sizeof(long));
 
         for (i = 0; i < alloc; i++)
             nmod_poly_init_preinv(fac->p + i, 0, 0);

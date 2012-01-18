@@ -155,13 +155,13 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 static __inline__
 mp_ptr _nmod_vec_init(long len)
 {
-   return (mp_ptr) malloc(len * sizeof(mp_limb_t));
+   return (mp_ptr) flint_malloc(len * sizeof(mp_limb_t));
 }
 
 static __inline__
 void _nmod_vec_clear(mp_ptr vec)
 {
-   free(vec);
+   flint_free(vec);
 }
 
 void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod);

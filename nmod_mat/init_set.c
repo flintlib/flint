@@ -38,8 +38,8 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
     if ((rows) && (cols))
     {
         long i;
-        mat->entries = malloc(rows * cols * sizeof(mp_limb_t));
-        mat->rows = malloc(rows * sizeof(mp_limb_t *));
+        mat->entries = flint_malloc(rows * cols * sizeof(mp_limb_t));
+        mat->rows = flint_malloc(rows * sizeof(mp_limb_t *));
 
         for (i = 0; i < rows; i++)
         {

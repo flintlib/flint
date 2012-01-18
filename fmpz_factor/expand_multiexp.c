@@ -50,7 +50,7 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, ulong * e, long len)
         return;
     }
 
-    q = malloc(sizeof(fmpz) * len);
+    q = flint_malloc(sizeof(fmpz) * len);
 
     emax = e[0];
     for (i = 1; i < len; i++)
@@ -74,7 +74,7 @@ _fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, ulong * e, long len)
     }
 
     fmpz_clear(tmp);
-    free(q);
+    flint_free(q);
 }
 
 void

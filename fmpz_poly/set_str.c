@@ -61,7 +61,7 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
                 max = cur;
         }
 
-        w = malloc(max + 1);
+        w = flint_malloc(max + 1);
     }
 
     for (i = 0; i < len; i++)
@@ -76,12 +76,12 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
         
         if (ans)
         {
-            free(w);
+            flint_free(w);
             return -1;
         }
     }
 
-    free(w);
+    flint_free(w);
     return 0;
 }
 

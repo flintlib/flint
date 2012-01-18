@@ -52,17 +52,17 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         mp_size_t total_limbs = n_randint(state, 1000) + 1;
-        mp_limb_t * in = malloc(total_limbs*sizeof(mp_limb_t));
-        mp_limb_t * out = calloc(total_limbs, sizeof(mp_limb_t));
+        mp_limb_t * in = flint_malloc(total_limbs*sizeof(mp_limb_t));
+        mp_limb_t * out = flint_calloc(total_limbs, sizeof(mp_limb_t));
         
         mp_bitcnt_t bits = n_randint(state, 200) + 1;
         mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
         long length = (total_limbs*FLINT_BITS - 1)/bits + 1;
         
         mp_limb_t ** poly;
-        poly = malloc(length*sizeof(mp_limb_t *));
+        poly = flint_malloc(length*sizeof(mp_limb_t *));
         for (j = 0; j < length; j++)
-           poly[j] = malloc((limbs + 1)*sizeof(mp_limb_t));
+           poly[j] = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
 
         mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
 
@@ -79,13 +79,13 @@ main(void)
            }
         }
 
-        free(in);
-        free(out);
+        flint_free(in);
+        flint_free(out);
 
         for (j = 0; j < length; j++)
-           free(poly[j]);
+           flint_free(poly[j]);
 
-        free(poly);
+        flint_free(poly);
     }
 
     flint_randclear(state);

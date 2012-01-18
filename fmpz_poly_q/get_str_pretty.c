@@ -52,7 +52,7 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
     numstr = fmpz_poly_get_str_pretty(op->num, x);
     denstr = fmpz_poly_get_str_pretty(op->den, x);
     
-    str = malloc(strlen(numstr) + strlen(denstr) + 6);
+    str = flint_malloc(strlen(numstr) + strlen(denstr) + 6);
     if (!str)
     {
         printf("ERROR (fmpz_poly_q_get_str_pretty).  Memory allocation failed.\n");
@@ -87,8 +87,8 @@ char * fmpz_poly_q_get_str_pretty(const fmpz_poly_q_t op, const char *x)
     }
     str[i] = '\0';
     
-    free(numstr);
-    free(denstr);
+    flint_free(numstr);
+    flint_free(denstr);
     
     return str;
 }

@@ -37,7 +37,7 @@ fmpz_mat_clear(fmpz_mat_t mat)
         long i;
         for (i = 0; i < mat->r * mat->c; i++)
             fmpz_clear(mat->entries + i);   /* Clear all coefficients */
-        free(mat->entries);     /* Clean up array of entries */
-        free(mat->rows);        /* Clean up row array */
+        flint_free(mat->entries);     /* Clean up array of entries */
+        flint_free(mat->rows);        /* Clean up row array */
     }
 }

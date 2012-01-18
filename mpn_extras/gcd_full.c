@@ -54,7 +54,7 @@ mp_size_t mpn_gcd_full(mp_ptr arrayg,
       in1 = array1 + s1;
    else
    {
-      in1 = malloc(len1*sizeof(mp_limb_t));
+      in1 = flint_malloc(len1*sizeof(mp_limb_t));
       mpn_rshift(in1, array1 + s1, len1, b1);
       len1 -= (in1[len1 - 1] == 0); 
    }
@@ -64,7 +64,7 @@ mp_size_t mpn_gcd_full(mp_ptr arrayg,
       in2 = array2 + s2;
    else
    {
-      in2 = malloc(len2*sizeof(mp_limb_t));
+      in2 = flint_malloc(len2*sizeof(mp_limb_t));
       mpn_rshift(in2, array2 + s2, len2, b2);
       len2 -= (in2[len2 - 1] == 0); 
    }
@@ -83,8 +83,8 @@ mp_size_t mpn_gcd_full(mp_ptr arrayg,
    }
 
    /* clean up */
-   if (b1) free(in1);
-   if (b2) free(in2);
+   if (b1) flint_free(in1);
+   if (b2) flint_free(in2);
 
    /* return total number of limbs in output */
    return m + leng;

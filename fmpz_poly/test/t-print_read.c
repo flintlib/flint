@@ -59,7 +59,7 @@ int main(void)
     {
         fmpz_poly_t *a;
 
-        a = malloc(n * sizeof(fmpz_poly_t));
+        a = flint_malloc(n * sizeof(fmpz_poly_t));
         for (i = 0; i < n; i++)
         {
             fmpz_poly_init(a[i]);
@@ -162,7 +162,7 @@ int main(void)
 
         for (i = 0; i < n; i++)
             fmpz_poly_clear(a[i]);
-        free(a);
+        flint_free(a);
     }
 
     /* Write bad data to a pipe and read it */

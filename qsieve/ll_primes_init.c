@@ -41,17 +41,17 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, long num_pr
     
     /* (re)allocate space for factor base */
     if (num == 0)
-        factor_base = (prime_t *) malloc(num_primes*sizeof(prime_t));
+        factor_base = (prime_t *) flint_malloc(num_primes*sizeof(prime_t));
     else
-        factor_base = (prime_t *) realloc(qs_inf->factor_base, 
+        factor_base = (prime_t *) flint_realloc(qs_inf->factor_base, 
                                           num_primes*sizeof(prime_t));
     qs_inf->factor_base = factor_base;
     
     /* allocate space for square roots kn mod factor base primes */
     if (num == 0)
-        sqrts = malloc(sizeof(int)*num_primes);
+        sqrts = flint_malloc(sizeof(int)*num_primes);
     else
-        sqrts = realloc(qs_inf->sqrts, sizeof(int)*num_primes);
+        sqrts = flint_realloc(qs_inf->sqrts, sizeof(int)*num_primes);
     qs_inf->sqrts = sqrts;
 
     qs_inf->num_primes = num_primes;

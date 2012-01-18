@@ -43,14 +43,14 @@ fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
     {
         fmpz_poly_truncate(poly, alloc);
 
-        poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
+        poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
             mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */
     {
-        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
+        poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
     }
 
     poly->alloc = alloc;

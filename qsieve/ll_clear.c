@@ -36,15 +36,15 @@ void qsieve_ll_clear(qs_t qs_inf)
     fmpz_clear(qs_inf->kn);
     fmpz_clear(qs_inf->C);
    
-    free(qs_inf->factor_base);
-    free(qs_inf->sqrts);
-    free(qs_inf->B_terms);
-    free(qs_inf->A_inv);
+    flint_free(qs_inf->factor_base);
+    flint_free(qs_inf->sqrts);
+    flint_free(qs_inf->B_terms);
+    flint_free(qs_inf->A_inv);
     
     if (qs_inf->A_inv2B != NULL)
-        free(qs_inf->A_inv2B[0]);
+        flint_free(qs_inf->A_inv2B[0]);
 
-    free(qs_inf->A_inv2B);
+    flint_free(qs_inf->A_inv2B);
     
     qs_inf->factor_base = NULL;
     qs_inf->sqrts       = NULL;
@@ -52,10 +52,10 @@ void qsieve_ll_clear(qs_t qs_inf)
     qs_inf->A_inv       = NULL;
     qs_inf->A_inv2B     = NULL;
 
-    free(qs_inf->small);
-    free(qs_inf->factor);
-    free(qs_inf->relation);
-    free(qs_inf->qsort_arr);
+    flint_free(qs_inf->small);
+    flint_free(qs_inf->factor);
+    flint_free(qs_inf->relation);
+    flint_free(qs_inf->qsort_arr);
     
     if (qs_inf->matrix != NULL)
     {
@@ -63,20 +63,20 @@ void qsieve_ll_clear(qs_t qs_inf)
         {
             la_col_t * col = qs_inf->matrix + i;
             if (col->weight)
-                free(col->data);
+                flint_free(col->data);
         }
 
-        free(qs_inf->matrix);
+        flint_free(qs_inf->matrix);
     }
     
     if (qs_inf->Y_arr != NULL)
     {
         for (i = 0; i < qs_inf->buffer_size; i++)
             fmpz_clear(qs_inf->Y_arr + i);    
-        free(qs_inf->Y_arr);
+        flint_free(qs_inf->Y_arr);
     }
 
-    free(qs_inf->prime_count);
+    flint_free(qs_inf->prime_count);
      
     qs_inf->small       = NULL;
     qs_inf->factor      = NULL;
@@ -90,7 +90,7 @@ void qsieve_ll_clear(qs_t qs_inf)
     qs_inf->A = 0;
 
 #if (QS_DEBUG & 16)
-    free(qs_inf->sieve_tally);
+    flint_free(qs_inf->sieve_tally);
     qs_inf->sieve_tally = NULL;
 #endif
 }

@@ -246,8 +246,8 @@ static __inline__ void insert_col_entry(la_col_t * col, long entry)
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
        if (col->weight != 0) col->data = 
-           (long *) realloc(col->data, (col->weight + 16)*sizeof(long));
-       else col->data = (long *) malloc(16*sizeof(long));
+           (long *) flint_realloc(col->data, (col->weight + 16)*sizeof(long));
+       else col->data = (long *) flint_malloc(16*sizeof(long));
    }
    
    col->data[col->weight] = entry;
@@ -285,7 +285,7 @@ static __inline__ void clear_col(la_col_t * col)
 
 static __inline__ void free_col(la_col_t * col)
 {
-   if (col->weight) free(col->data);
+   if (col->weight) flint_free(col->data);
 }
 
 uint64_t get_null_entry(uint64_t * nullrows, long i, long l);

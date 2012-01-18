@@ -49,12 +49,12 @@ __mpz_struct * _fmpz_new_mpz(void)
         ulong i;
 	    if (fmpz_allocated) /* realloc mpz_t's and unused array */
 		{
-			fmpz_arr = (__mpz_struct *) realloc(fmpz_arr, (fmpz_allocated + MPZ_BLOCK)*sizeof(__mpz_struct));
-			fmpz_unused_arr = (ulong *) realloc(fmpz_unused_arr, (fmpz_allocated + MPZ_BLOCK)*sizeof(ulong));
+			fmpz_arr = (__mpz_struct *) flint_realloc(fmpz_arr, (fmpz_allocated + MPZ_BLOCK)*sizeof(__mpz_struct));
+			fmpz_unused_arr = (ulong *) flint_realloc(fmpz_unused_arr, (fmpz_allocated + MPZ_BLOCK)*sizeof(ulong));
 		} else /* first time alloc of mpz_t's and unused array */
 		{
-			fmpz_arr = (__mpz_struct *) malloc(MPZ_BLOCK*sizeof(__mpz_struct));	
-			fmpz_unused_arr = (ulong *) malloc(MPZ_BLOCK*sizeof(ulong));
+			fmpz_arr = (__mpz_struct *) flint_malloc(MPZ_BLOCK*sizeof(__mpz_struct));	
+			fmpz_unused_arr = (ulong *) flint_malloc(MPZ_BLOCK*sizeof(ulong));
 		}
 		
 		/* initialise the new mpz_t's and unused array */
@@ -86,8 +86,8 @@ void _fmpz_cleanup(void)
 	for (i = 0; i < fmpz_num_unused; i++)
 		mpz_clear(fmpz_arr + fmpz_unused_arr[i]);
 	
-    if (fmpz_num_unused) free(fmpz_unused_arr);
-	if (fmpz_allocated) free(fmpz_arr);
+    if (fmpz_num_unused) flint_free(fmpz_unused_arr);
+	if (fmpz_allocated) flint_free(fmpz_arr);
 }
 
 __mpz_struct * _fmpz_promote(fmpz_t f)

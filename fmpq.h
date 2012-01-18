@@ -68,7 +68,7 @@ static __inline__ void fmpq_clear(fmpq_t x)
 
 static __inline__ fmpq * _fmpq_vec_init(long n)
 {
-    fmpq * v = (fmpq *) malloc(sizeof(fmpq) * n);
+    fmpq * v = (fmpq *) flint_malloc(sizeof(fmpq) * n);
     long i;
 
     for (i = 0; i < n; i++)

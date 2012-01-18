@@ -50,7 +50,7 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
         else size += 2;
     }
 
-    buf = (char *) malloc(size);  
+    buf = (char *) flint_malloc(size);  
     ptr = buf + sprintf(buf, "%ld %lu", poly->length, poly->mod.n);
    
     if (poly->length)

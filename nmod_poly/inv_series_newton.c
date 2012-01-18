@@ -48,7 +48,7 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 
         for (i = 1; (1L << i) < n; i++) ;
 
-        W = malloc(n * sizeof(mp_limb_t) + i * sizeof(long));
+        W = flint_malloc(n * sizeof(mp_limb_t) + i * sizeof(long));
         a = (long *) (W + n);
 
         a[i = 0] = n;
@@ -67,7 +67,7 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
             _nmod_vec_neg(Qinv + m, Qinv + m, n - m, mod);
         }
 
-        free(W);
+        flint_free(W);
     }
 }
 
@@ -110,7 +110,7 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     if (Q == Qinv && Qlen >= n)
     {
-        free(Qinv->coeffs);
+        flint_free(Qinv->coeffs);
         Qinv->coeffs = qinv;
         Qinv->alloc  = n;
         Qinv->length = n;

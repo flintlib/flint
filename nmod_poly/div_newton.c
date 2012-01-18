@@ -80,7 +80,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Q == A || Q == B)
     {
-        q = malloc(lenQ * sizeof(mp_limb_t));
+        q = flint_malloc(lenQ * sizeof(mp_limb_t));
     }
     else
     {
@@ -92,7 +92,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (Q == A || Q == B)
     {
-        free(Q->coeffs);
+        flint_free(Q->coeffs);
         Q->coeffs = q;
         Q->alloc  = lenQ;
     }

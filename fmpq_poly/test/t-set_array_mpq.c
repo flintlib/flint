@@ -50,7 +50,7 @@ main(void)
         fmpq_poly_t f, g;
         mpq_t * a;
 
-        a = (mpq_t *) malloc(n * sizeof(mpq_t));
+        a = (mpq_t *) flint_malloc(n * sizeof(mpq_t));
         for (j = 0; j < n; j++)
             mpq_init(a[j]);
 
@@ -77,7 +77,7 @@ main(void)
         fmpq_poly_clear(g);
         for (j = 0; j < n; j++)
             mpq_clear(a[j]);
-        free(a);
+        flint_free(a);
     }
 
     flint_randclear(state);

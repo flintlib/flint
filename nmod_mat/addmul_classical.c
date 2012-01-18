@@ -67,7 +67,7 @@ nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
     }
     else
     {
-        mp_ptr tmp = malloc(sizeof(mp_limb_t) * k * n);
+        mp_ptr tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
 
         for (i = 0; i < k; i++)
             for (j = 0; j < n; j++)
@@ -83,6 +83,6 @@ nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
             }
         }
 
-        free(tmp);
+        flint_free(tmp);
     }
 }

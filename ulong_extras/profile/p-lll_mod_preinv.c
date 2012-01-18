@@ -46,8 +46,8 @@ void sample(void * arg, ulong count)
    flint_rand_t state;
    flint_randinit(state);
       
-   mp_ptr arr  = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
-   mp_ptr arr2 = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
+   mp_ptr arr  = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
+   mp_ptr arr2 = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
       
    for (i = 0; i < count; i++)
    {
@@ -82,8 +82,8 @@ void sample(void * arg, ulong count)
    if (r == 9879875897UL) abort();
 
    flint_randclear(state);
-   free(arr);
-   free(arr2);
+   flint_free(arr);
+   flint_free(arr2);
 }
 
 int main(void)

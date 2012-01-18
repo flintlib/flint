@@ -74,7 +74,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
     {
         long *e, n = FLINT_CLOG2(N) + 1;
 
-        e = malloc(n * sizeof(long));
+        e = flint_malloc(n * sizeof(long));
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
@@ -91,7 +91,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
 
         preve = e[i+1];
 
-        free(e);
+        flint_free(e);
     }
 
     /*

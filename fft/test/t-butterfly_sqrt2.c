@@ -107,11 +107,11 @@ main(void)
 
                 for (c = 1; c < 2*n; c+=2)
                 {
-                    nn1 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    nn2 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    temp = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r1 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r2 = malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    temp = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
                      
@@ -148,11 +148,11 @@ main(void)
                         abort();
                     }
                     
-                    free(temp);
-                    free(nn1);
-                    free(nn2);
-                    free(r1);
-                    free(r2);
+                    flint_free(temp);
+                    flint_free(nn1);
+                    flint_free(nn2);
+                    flint_free(r1);
+                    flint_free(r2);
                 }
             }
         }
@@ -172,11 +172,11 @@ main(void)
 
                 for (c = 1; c < 2*n; c+=2)
                 {
-                    nn1 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    nn2 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    temp = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r1 = malloc((limbs + 1)*sizeof(mp_limb_t));
-                    r2 = malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    temp = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
+                    r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
                      
@@ -212,11 +212,11 @@ main(void)
                         gmp_printf("got  %Zx\n", m2b);
                         abort();
                     }
-                    free(temp);
-                    free(nn1);
-                    free(nn2);
-                    free(r1);
-                    free(r2);
+                    flint_free(temp);
+                    flint_free(nn1);
+                    flint_free(nn2);
+                    flint_free(r1);
+                    flint_free(r2);
                 }
             }
         }

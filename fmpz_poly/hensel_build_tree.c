@@ -39,8 +39,8 @@ void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
     long i, j;
 
     nmod_poly_t d;
-    nmod_poly_t *V = malloc((2*r - 2)*sizeof(nmod_poly_t));
-    nmod_poly_t *W = malloc((2*r - 2)*sizeof(nmod_poly_t));
+    nmod_poly_t *V = flint_malloc((2*r - 2)*sizeof(nmod_poly_t));
+    nmod_poly_t *W = flint_malloc((2*r - 2)*sizeof(nmod_poly_t));
 
     nmod_poly_init_preinv(d, mod.n, mod.ninv);
 
@@ -122,7 +122,7 @@ void fmpz_poly_hensel_build_tree(long *link, fmpz_poly_t *v, fmpz_poly_t *w,
     }
 
     nmod_poly_clear(d);
-    free(V);
-    free(W);
+    flint_free(V);
+    flint_free(W);
 }
 

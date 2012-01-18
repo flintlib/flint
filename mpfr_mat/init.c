@@ -37,8 +37,8 @@ mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec)
     {
         long i;
         mat->entries =
-            (__mpfr_struct *) malloc(rows * cols * sizeof(__mpfr_struct));
-        mat->rows = (__mpfr_struct **) malloc(rows * sizeof(__mpfr_struct *));  /* Initialise rows */
+            (__mpfr_struct *) flint_malloc(rows * cols * sizeof(__mpfr_struct));
+        mat->rows = (__mpfr_struct **) flint_malloc(rows * sizeof(__mpfr_struct *));  /* Initialise rows */
 
         for (i = 0; i < rows * cols; i++)
             mpfr_init2(mat->entries + i, prec);

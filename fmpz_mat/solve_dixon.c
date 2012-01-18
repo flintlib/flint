@@ -88,7 +88,7 @@ mp_limb_t * get_crt_primes(long * num_primes, const fmpz_mat_t A, mp_limb_t p)
     fmpz_mul_ui(bound, bound, A->r);
     fmpz_mul_ui(bound, bound, 2UL);  /* signs */
 
-    primes = malloc(sizeof(mp_limb_t) * (fmpz_bits(bound) /
+    primes = flint_malloc(sizeof(mp_limb_t) * (fmpz_bits(bound) /
                                             (FLINT_BIT_COUNT(p) - 1) + 2));
     primes[0] = p;
     fmpz_set_ui(prod, p);
@@ -146,7 +146,7 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     fmpz_mul_ui(bound, bound, 2UL);  /* signs */
 
     crt_primes = get_crt_primes(&num_primes, A, p);
-    A_mod = malloc(sizeof(nmod_mat_t) * num_primes);
+    A_mod = flint_malloc(sizeof(nmod_mat_t) * num_primes);
     for (i = 0; i < num_primes; i++)
     {
         nmod_mat_init(A_mod[i], n, n, crt_primes[i]);
@@ -211,8 +211,8 @@ _fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t mod,
     for (i = 0; i < num_primes; i++)
         nmod_mat_clear(A_mod[i]);
 
-    free(A_mod);
-    free(crt_primes);
+    flint_free(A_mod);
+    flint_free(crt_primes);
 
     fmpz_clear(bound);
     fmpz_clear(ppow);

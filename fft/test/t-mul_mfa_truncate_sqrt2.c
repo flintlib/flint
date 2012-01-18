@@ -60,7 +60,7 @@ main(void)
             mp_size_t j;
             mp_limb_t * i1, *i2, *r1, *r2;
         
-            i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
+            i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
             i2 = i1 + int_limbs;
             r1 = i2 + int_limbs;
             r2 = r1 + 2*int_limbs;
@@ -80,7 +80,7 @@ main(void)
                 }
             }
 
-            free(i1);
+            flint_free(i1);
         }
     }
 
@@ -97,7 +97,7 @@ main(void)
             mp_size_t j;
             mp_limb_t * i1, *r1, *r2;
         
-            i1 = malloc(5*int_limbs*sizeof(mp_limb_t));
+            i1 = flint_malloc(5*int_limbs*sizeof(mp_limb_t));
             r1 = i1 + int_limbs;
             r2 = r1 + 2*int_limbs;
    
@@ -115,7 +115,7 @@ main(void)
                 }
             }
 
-            free(i1);
+            flint_free(i1);
         }
     }
 

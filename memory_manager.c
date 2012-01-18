@@ -19,26 +19,52 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include <mpfr.h>
+#include <stdio.h>
 #include "flint.h"
-#include "mpfr_vec.h"
 
-__mpfr_struct *
-_mpfr_vec_init(long length, mp_bitcnt_t prec)
+static void flint_memory_error()
 {
-    long i;
-
-    __mpfr_struct *vec =
-        (__mpfr_struct *) flint_malloc(length * sizeof(__mpfr_struct));
-
-    for (i = 0; i < length; i++)
-        mpfr_init2(vec + i, prec);
-
-    return vec;
+    printf("FLINT error: unable to allocate memory\n");
+    abort();
 }
+
+void * flint_malloc(size_t size)
+{
+    void * ptr = malloc(size);
+
+    if (ptr == NULL)
+        flint_memory_error();
+
+    return ptr;
+}
+
+void * flint_realloc(void * ptr, size_t size)
+{
+    void * ptr2 = realloc(ptr, size);
+
+    if (ptr2 == NULL)
+        flint_memory_error();
+
+    return ptr2;
+}
+
+void * flint_calloc(size_t num, size_t size)
+{
+    void * ptr = calloc(num, size);
+
+    if (ptr == NULL)
+        flint_memory_error();
+
+    return ptr;
+}
+
+void flint_free(void * ptr)
+{
+    free(ptr);
+}
+

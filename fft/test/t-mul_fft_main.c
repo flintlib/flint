@@ -84,7 +84,7 @@ main(void)
                   b2 = tb;
                }
 
-               i1 = malloc(3*(n1 + n2)*sizeof(mp_limb_t));
+               i1 = flint_malloc(3*(n1 + n2)*sizeof(mp_limb_t));
                i2 = i1 + n1;
                r1 = i2 + n2;
                r2 = r1 + n1 + n2;
@@ -104,7 +104,7 @@ main(void)
                    }
                }
 
-               free(i1);
+               flint_free(i1);
             }
         }
     }

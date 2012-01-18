@@ -48,14 +48,14 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, long len, long n)
         int i;
         fmpz *copy;
 
-        copy = malloc(n * sizeof(fmpz));
+        copy = flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < len; i++)
             copy[i] = poly[i];
         mpn_zero((mp_ptr) copy + len, n - len);
 
         _fmpz_poly_sqrlow_karatsuba_n(res, copy, n);
 
-        free(copy);
+        flint_free(copy);
     }
     else if (limbs <= 4)
         _fmpz_poly_sqrlow_KS(res, poly, len, n);

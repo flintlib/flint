@@ -88,7 +88,7 @@ int main(void)
    int i;
    flint_randinit(state);
 
-   params.composites = malloc(1024*sizeof(ulong));
+   params.composites = flint_malloc(1024*sizeof(ulong));
 
    printf("factor_one_line:\n");
    
@@ -102,6 +102,6 @@ int main(void)
    }
 
    flint_randclear(state);
-   free(params.composites);
+   flint_free(params.composites);
    return 0;
 }

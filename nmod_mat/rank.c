@@ -44,11 +44,11 @@ nmod_mat_rank(const nmod_mat_t A)
         return 0;
 
     nmod_mat_init_set(tmp, A);
-    perm = malloc(sizeof(long) * m);
+    perm = flint_malloc(sizeof(long) * m);
 
     rank = nmod_mat_lu(perm, tmp, 0);
 
-    free(perm);
+    flint_free(perm);
     nmod_mat_clear(tmp);
     return rank;
 }

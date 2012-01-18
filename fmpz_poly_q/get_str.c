@@ -62,7 +62,7 @@ char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
     if (denstr[i] == ' ')
         denstr[i] = '\0';
     
-    str = malloc(strlen(numstr) + strlen(denstr) + 2);
+    str = flint_malloc(strlen(numstr) + strlen(denstr) + 2);
     if (str == NULL)
     {
         printf("ERROR (fmpz_poly_q_get_str).  Memory allocation failed.\n");
@@ -76,8 +76,8 @@ char * fmpz_poly_q_get_str(const fmpz_poly_q_t op)
         str[i++] = denstr[j];
     str[i] = '\0';
     
-    free(numstr);
-    free(denstr);
+    flint_free(numstr);
+    flint_free(denstr);
     
     return str;
 }

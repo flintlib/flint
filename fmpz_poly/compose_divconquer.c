@@ -114,7 +114,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
 
     /* Initialisation */
     
-    hlen = (long *) malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
     
     for (k = 1; (2 << k) < len1; k++) ;
     
@@ -132,7 +132,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
         alloc += hlen[i];
 
     v = _fmpz_vec_init(alloc +  2 * powlen);
-    h = (fmpz **) malloc(((len1 + 1) / 2) * sizeof(fmpz *));
+    h = (fmpz **) flint_malloc(((len1 + 1) / 2) * sizeof(fmpz *));
     h[0] = v;
     for (i = 0; i < (len1 - 1) / 2; i++)
     {
@@ -211,8 +211,8 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     _fmpz_vec_add(res, res, h[0], hlen[0]);
     
     _fmpz_vec_clear(v, alloc + 2 * powlen);
-    free(h);
-    free(hlen);
+    flint_free(h);
+    flint_free(hlen);
 }
 
 void

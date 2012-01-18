@@ -36,7 +36,7 @@ int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
     
     str = fmpq_poly_get_str_pretty(poly, var);
     r = printf("%s", str);
-    free(str);
+    flint_free(str);
 
     return r;
 }

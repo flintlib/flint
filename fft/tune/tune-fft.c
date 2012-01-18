@@ -78,7 +78,7 @@ main(void)
             n1 = (b1 - 1)/FLINT_BITS + 1;
             n2 = (b2 - 1)/FLINT_BITS + 1;
                     
-            i1 = malloc(2*(n1 + n2)*sizeof(mp_limb_t));
+            i1 = flint_malloc(2*(n1 + n2)*sizeof(mp_limb_t));
             i2 = i1 + n1;
             r1 = i2 + n2;
    
@@ -107,7 +107,7 @@ main(void)
             if (w != 2) printf(",");
             printf(" "); fflush(stdout);
 
-            free(i1);
+            flint_free(i1);
         }
         printf("}");
         if (depth != 10) printf(",");
@@ -137,7 +137,7 @@ main(void)
             if (depth <= 21) iters = 32*((mp_size_t) 1 << (21 - depth));
             else iters = FLINT_MAX(32/((mp_size_t) 1 << (depth - 21)), 1);
 
-            i1 = malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
+            i1 = flint_malloc(6*(int_limbs+1)*sizeof(mp_limb_t));
             i2 = i1 + int_limbs + 1;
             r1 = i2 + int_limbs + 1;
             tt = r1 + 2*(int_limbs + 1);
@@ -185,7 +185,7 @@ main(void)
             printf("%ld", best_off); 
             if (w != 2) printf(", "); fflush(stdout);
 
-            free(i1);
+            flint_free(i1);
         }
         printf(", "); fflush(stdout);
     }

@@ -197,7 +197,7 @@ main(void)
         unsigned char * PIXELS;
         int k;
         
-        PIXELS = (unsigned char *) malloc(3 * rows * cols * sizeof(unsigned char));
+        PIXELS = (unsigned char *) flint_malloc(3 * rows * cols * sizeof(unsigned char));
         k = 0;
         for (i = 0; i < rows; i++)
         {
@@ -223,7 +223,7 @@ main(void)
         }
 
         k = write_rgb_ppm(imgname, PIXELS, cols, rows);
-        free(PIXELS);
+        flint_free(PIXELS);
         
         if (k)
         {

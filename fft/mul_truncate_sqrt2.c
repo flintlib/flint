@@ -50,7 +50,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    mp_limb_t ** ii, ** jj, * t1, * t2, * s1, * tt, * ptr;
    mp_limb_t c;
    
-   ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
+   ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
    for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
    {
       ii[i] = ptr;
@@ -62,7 +62,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    
    if (i1 != i2)
    {
-      jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
+      jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
       for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
       {
          jj[i] = ptr;
@@ -104,6 +104,6 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    mpn_zero(r1, r_limbs);
    fft_combine_bits(r1, ii, j1 + j2 - 1, bits1, limbs, r_limbs);
      
-   free(ii);
-   if (i1 != i2) free(jj);
+   flint_free(ii);
+   if (i1 != i2) flint_free(jj);
 }

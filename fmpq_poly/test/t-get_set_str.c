@@ -71,7 +71,7 @@ main(void)
 
         fmpq_poly_clear(f);
         fmpq_poly_clear(g);
-        free(str);
+        flint_free(str);
     }
     
     flint_randclear(state);

@@ -40,7 +40,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
     m = A->r;
     n = A->c;
 
-    p = malloc(sizeof(long) * FLINT_MAX(m, n));
+    p = flint_malloc(sizeof(long) * FLINT_MAX(m, n));
 
     nmod_mat_init_set(tmp, A);
     rank = nmod_mat_rref(p, tmp);
@@ -88,7 +88,7 @@ nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
         }
     }
 
-    free(p);
+    flint_free(p);
     nmod_mat_clear(tmp);
 
     return nullity;

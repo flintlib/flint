@@ -67,7 +67,7 @@ main(void)
 
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
-        free(str);
+        flint_free(str);
     }
 
     flint_randclear(state);

@@ -35,8 +35,8 @@ void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols)
     if ((rows) && (cols))
     {
         long i;
-        mat->entries = (fmpq *) calloc(rows * cols, sizeof(fmpq));
-        mat->rows = (fmpq **) malloc(rows * sizeof(fmpq *));
+        mat->entries = (fmpq *) flint_calloc(rows * cols, sizeof(fmpq));
+        mat->rows = (fmpq **) flint_malloc(rows * sizeof(fmpq *));
 
         /* Set denominators */
         for (i = 0; i < rows * cols; i++)

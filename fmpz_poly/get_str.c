@@ -39,7 +39,7 @@ _fmpz_poly_get_str(const fmpz * poly, long len)
 
     if (len == 0)
     {
-        str = (char *) malloc(2 * sizeof(char));
+        str = (char *) flint_malloc(2 * sizeof(char));
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -50,7 +50,7 @@ _fmpz_poly_get_str(const fmpz * poly, long len)
         bound += fmpz_sizeinbase(poly + i, 10) + 1;
     bound += len + 2;
 
-    strbase = (char *) malloc(bound * sizeof(char));
+    strbase = (char *) flint_malloc(bound * sizeof(char));
     str = strbase;
 
     str += sprintf(str, "%li ", len);

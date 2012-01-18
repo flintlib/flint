@@ -34,5 +34,5 @@ void
 nmod_poly_clear(nmod_poly_t poly)
 {
     if (poly->coeffs)
-        free(poly->coeffs);
+        flint_free(poly->coeffs);
 }

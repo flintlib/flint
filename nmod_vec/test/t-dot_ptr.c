@@ -58,7 +58,7 @@ main(void)
 
         x = _nmod_vec_init(len);
         y = _nmod_vec_init(len);
-        z = malloc(sizeof(mp_ptr) * len);
+        z = flint_malloc(sizeof(mp_ptr) * len);
 
         _nmod_vec_randtest(x, state, len, mod);
         _nmod_vec_randtest(y, state, len, mod);
@@ -82,7 +82,7 @@ main(void)
 
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);
-        free(z);
+        flint_free(z);
     }
 
     flint_randclear(state);
