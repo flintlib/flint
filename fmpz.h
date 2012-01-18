@@ -439,6 +439,8 @@ void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h);
 
+ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
+
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
 double fmpz_get_d_2exp(long * exp, const fmpz_t f);

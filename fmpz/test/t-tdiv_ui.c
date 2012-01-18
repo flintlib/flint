@@ -19,9 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2007, 2008 William Hart
-    Copyright (C) 2008 Peter Shrimpton
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
@@ -30,61 +28,51 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-int main(void)
+int
+main(void)
 {
-    mp_limb_t n;
-    mp_limb_t res1, res2;
-    long i, rep;
-    mpz_t mpz_n;
+    int i, result;
     flint_rand_t state;
-    
-    printf("nextprime....");
+
+    printf("tdiv_ui....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    if (n_nextprime(0, 0) != 2)
+    for (i = 0; i < 100000; i++)
     {
-        printf("FAIL: expected n_nextprime(0) = 2");
-        abort();
-    }
+        fmpz_t a;
+        mpz_t b;
+        ulong x, r1, r2;
 
-    if (n_nextprime(ULONG_MAX_PRIME - 1, 0) != ULONG_MAX_PRIME)
-    {
-        printf("FAIL: expected n_nextprime(ULONG_MAX_PRIME-1) = ULONG_MAX_PRIME");
-        abort();
-    }
+        fmpz_init(a);
+        mpz_init(b);
 
-    mpz_init(mpz_n);
+        fmpz_randtest(a, state, 200);
 
-    for (rep = 0; rep < 100000; rep++)
-    {
-        unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
-        n = n_randint(state, (1UL<<bits) - 1UL) + 1; 
-        mpz_set_ui(mpz_n, n);
+        fmpz_get_mpz(b, a);
+        x = n_randtest_not_zero(state);
 
-        for (i = 0; i < 1; i++)
-        {
-            mpz_nextprime(mpz_n, mpz_n);
-            n = n_nextprime(n, 0);
-        }
+        r1 = fmpz_tdiv_ui(a, x);
+        r2 = mpz_tdiv_ui(b, x);
 
-        res1 = n;
-        res2 = mpz_get_ui(mpz_n);
-
-        if (res1 != res2)
+        result = (r1 == r2);
+        if (!result)
         {
             printf("FAIL:\n");
-            printf("%lu, %lu\n", res1, res2); 
+            gmp_printf
+                ("b = %Zd, x = %lu, r1 = %lu, r2 = %lu\n", b, x, r1, r2);
             abort();
         }
+
+        fmpz_clear(a);
+        mpz_clear(b);
     }
 
-    mpz_clear(mpz_n); 
-
     flint_randclear(state);
-
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

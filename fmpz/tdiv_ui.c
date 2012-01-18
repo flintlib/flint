@@ -27,45 +27,30 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
+#include "fmpz.h"
 
-int main(void)
+ulong
+fmpz_tdiv_ui(const fmpz_t g, ulong h)
 {
-   int i, result;
-   flint_rand_t state;
-   
-   printf("lll_mod_preinv....");
-   fflush(stdout);
+    fmpz c1 = *g;
 
-   flint_randinit(state);
+    if (h == 0UL)
+    {
+        printf("Exception: division by 0 in fmpz_tdiv_ui\n");
+        abort();
+    }
 
-   for (i = 0; i < 1000000; i++)
-   {
-      mp_limb_t d, dinv, nh, nm, nl, r1, r2, m;
-
-      d = n_randtest_not_zero(state);
-      nh = n_randint(state, d);
-      nm = n_randtest(state);
-      nl = n_randtest(state);
-      
-      dinv = n_preinvert_limb(d);
-
-      r2 = n_lll_mod_preinv(nh, nm, nl, d, dinv);
-      nm = n_ll_mod_preinv(nh, nm, d, dinv);
-	  r1 = n_ll_mod_preinv(nm, nl, d, dinv);
-
-      result = (r1 == r2);
-      if (!result)
-      {
-         printf("FAIL:\n");
-         printf("nh = %lu, nm = %ld, nl = %lu, d = %lu, dinv = %lu\n", nh, nm, nl, d, dinv); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
-         abort();
-      }
-   }
-
-   flint_randclear(state);
-
-   printf("PASS\n");
-   return 0;
+    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    {
+		/* We need the absolut value of the remainder and
+		   C 90 guarantees truncation towards zero. */
+		if (c1 < 0L)
+			return -c1 % h;
+		else
+			return c1 % h;
+    }
+    else                        /* g is large */
+    {
+        return mpz_tdiv_ui(COEFF_TO_PTR(c1), h);
+    }
 }

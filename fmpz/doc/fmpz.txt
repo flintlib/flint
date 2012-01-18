@@ -559,6 +559,12 @@ void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
 
+ulong fmpz_tdiv_ui(const fmpz_t g, ulong h)
+
+    Returns the absolute value of the remainder from dividing $g$
+    by $h$, rounding towards zero. If $h$ is $0$ an exception is
+    raised.
+
 void fmpz_tdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp)
 
     Sets $f$ to $g$ divided by \code{2^exp}, rounding down towards
