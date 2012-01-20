@@ -71,7 +71,9 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
       }
    } else jj = ii;
    
-   trunc = 2*sqrt*((j1 + j2 + 2*sqrt - 2)/(2*sqrt)); /* trunc must be divisible by 2*sqrt */
+   trunc = j1 + j2 - 1;
+   if (trunc <= 2*n) trunc = 2*n + 1;
+   trunc = 2*sqrt*((trunc + 2*sqrt - 1)/(2*sqrt)); /* trunc must be divisible by 2*sqrt */
 
    j1 = fft_split_bits(ii, i1, n1, bits1, limbs);
    for (j = j1 ; j < 4*n; j++)

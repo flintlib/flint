@@ -32,17 +32,16 @@
 #include "fft.h"
 
 long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
-                       fmpz const * coeffs_m, long l, long length)
+                       const fmpz * coeffs_m, long l, long length)
 {
    long size_f = l + 1;
    mp_limb_t * coeff;
-	mp_limb_t temp;
 
    mp_limb_t mask = -1L;
    long bits = 0, limbs = 0, size_j, i, c;
    int sign = 1, signed_c;
    
-   for (i = 0; i < length; i++)
+   for (i = 0; i < length; i++, coeffs_m++)
    {
       c = *coeffs_m;
 		signed_c = 0;
@@ -54,10 +53,10 @@ long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
 			if (c < 0) 
 			{
 				signed_c = 1;
-				temp = -c;
-				coeff = &temp;
+				c = -c;
+				coeff = (mp_limb_t *) &c;
 			} else
-				coeff = coeffs_m;
+				coeff = (mp_limb_t *) coeffs_m;
 		} else /* coeff is an mpz_t */
 		{
 			__mpz_struct * mpz_ptr = COEFF_TO_PTR(c);
