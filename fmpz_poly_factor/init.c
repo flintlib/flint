@@ -46,8 +46,8 @@ void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, long alloc)
     {
         long i;
 
-        fac->p   = malloc(alloc * sizeof(fmpz_poly_struct));
-        fac->exp = malloc(alloc * sizeof(long));
+        fac->p   = flint_malloc(alloc * sizeof(fmpz_poly_struct));
+        fac->exp = flint_malloc(alloc * sizeof(long));
 
         for (i = 0; i < alloc; i++)
         {

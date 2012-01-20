@@ -159,7 +159,7 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
     }
     else
     {
-        copy = (fmpz *) malloc(n * sizeof(fmpz));
+        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];
         mpn_zero((mp_ptr) copy + poly->length, n - poly->length);
@@ -183,6 +183,6 @@ fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
     _fmpz_poly_normalise(res);
 
     if (clear)
-        free(copy);
+        flint_free(copy);
 }
 

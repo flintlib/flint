@@ -60,7 +60,7 @@ int main(void)
         fmpz_poly_t *a;
         char *var = "x";
 
-        a = malloc(n * sizeof(fmpz_poly_t));
+        a = flint_malloc(n * sizeof(fmpz_poly_t));
         for (i = 0; i < n; i++)
         {
             fmpz_poly_init(a[i]);
@@ -148,7 +148,7 @@ int main(void)
                     printf("rvar = %s\n", rvar);
                     abort();
                 }
-                free(rvar);
+                flint_free(rvar);
 
                 ++i;
             }
@@ -166,7 +166,7 @@ int main(void)
 
         for (i = 0; i < n; i++)
             fmpz_poly_clear(a[i]);
-        free(a);
+        flint_free(a);
     }
 
     /* Write "blah" to the pipe and see it read as a variable */
@@ -244,7 +244,7 @@ int main(void)
                     abort();
                 }
                 if (rvar)
-                    free(rvar);
+                    flint_free(rvar);
             }
 
             fmpz_poly_clear(t);

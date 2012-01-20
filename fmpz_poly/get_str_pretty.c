@@ -40,7 +40,7 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
 
     if (len == 0)
     {
-        str = malloc(2);
+        str = flint_malloc(2);
         str[0] = '0';
         str[1] = '\0';
         return str;
@@ -62,7 +62,7 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
         }
     bound += nz * (3 + strlen(x) + (long) (ceil(log10(len))));
 
-    str = malloc(bound);
+    str = flint_malloc(bound);
     off = 0;
     i = len - 1;
 

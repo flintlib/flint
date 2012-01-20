@@ -36,7 +36,7 @@ _perm_parity(const long *vec, long n)
         return 0;
 
     parity = 0;
-    encountered = calloc(n, sizeof(int));
+    encountered = flint_calloc(n, sizeof(int));
 
     for (i = 0; i < n; i++)
     {
@@ -56,6 +56,6 @@ _perm_parity(const long *vec, long n)
         }
     }
 
-    free(encountered);
+    flint_free(encountered);
     return parity;
 }

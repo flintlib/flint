@@ -167,7 +167,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
     printf("\nSieve:\n");
 #endif
 
-    sieve = malloc(qs_inf->sieve_size + sizeof(ulong));
+    sieve = flint_malloc(qs_inf->sieve_size + sizeof(ulong));
 
     while (rels_found < qs_inf->num_primes + qs_inf->extra_rels)
     {
@@ -178,7 +178,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 #endif
     }
 
-    free(sieve);
+    flint_free(sieve);
 
     /************************************************************************
         REDUCE MATRIX:

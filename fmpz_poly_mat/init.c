@@ -35,8 +35,8 @@ fmpz_poly_mat_init(fmpz_poly_mat_t A, long rows, long cols)
     {
         long i;
 
-        A->entries = (fmpz_poly_struct *) malloc(rows * cols * sizeof(fmpz_poly_struct));
-        A->rows = (fmpz_poly_struct **) malloc(rows * sizeof(fmpz_poly_struct *));
+        A->entries = (fmpz_poly_struct *) flint_malloc(rows * cols * sizeof(fmpz_poly_struct));
+        A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));
 
         for (i = 0; i < rows * cols; i++)
             fmpz_poly_init(A->entries + i);

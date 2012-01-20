@@ -35,8 +35,8 @@ nmod_poly_mat_init(nmod_poly_mat_t A, long rows, long cols, mp_limb_t n)
     {
         long i;
 
-        A->entries = (nmod_poly_struct *) malloc(rows * cols * sizeof(nmod_poly_struct));
-        A->rows = (nmod_poly_struct **) malloc(rows * sizeof(nmod_poly_struct *));
+        A->entries = (nmod_poly_struct *) flint_malloc(rows * cols * sizeof(nmod_poly_struct));
+        A->rows = (nmod_poly_struct **) flint_malloc(rows * sizeof(nmod_poly_struct *));
 
         for (i = 0; i < rows * cols; i++)
             nmod_poly_init(A->entries + i, n);

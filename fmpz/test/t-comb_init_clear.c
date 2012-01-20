@@ -50,7 +50,7 @@ int main()
     {
         n = n_randint(state, 10);
         num_primes = (1L << n);
-        primes = (mp_limb_t *) malloc(num_primes * sizeof(mp_limb_t));
+        primes = (mp_limb_t *) flint_malloc(num_primes * sizeof(mp_limb_t));
         p = n_nextprime((1UL << (FLINT_BITS-1)) - 10000000L, 0);
 
         for (j = 0; j < num_primes; j++)
@@ -61,7 +61,7 @@ int main()
 
         fmpz_comb_init(comb, primes, num_primes);
         fmpz_comb_clear(comb);
-        free(primes);
+        flint_free(primes);
     }
 
     flint_randclear(state);

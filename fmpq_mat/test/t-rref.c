@@ -50,7 +50,7 @@ main(void)
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = malloc(FLINT_MAX(1,m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         fmpz_init(den);
 
@@ -111,7 +111,7 @@ main(void)
 
         fmpz_clear(den);
 
-        free(perm);
+        flint_free(perm);
     }
 
     flint_randclear(state);

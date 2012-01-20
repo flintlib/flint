@@ -42,7 +42,7 @@ nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
         return 1;
 
     nmod_mat_init_set(LU, A);
-    perm = malloc(sizeof(long) * A->r);
+    perm = flint_malloc(sizeof(long) * A->r);
     for (i = 0; i < A->r; i++)
         perm[i] = i;
 
@@ -67,7 +67,7 @@ nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
     }
 
     nmod_mat_clear(LU);
-    free(perm);
+    flint_free(perm);
 
     return result;
 }

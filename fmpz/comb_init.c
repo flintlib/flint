@@ -38,7 +38,7 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 
     /* Allocate space for comb_temp */
     temp->n = n = comb->n;
-    temp->comb_temp = (fmpz **) malloc(n * sizeof(fmpz *));
+    temp->comb_temp = (fmpz **) flint_malloc(n * sizeof(fmpz *));
 
     j = (1L << (n - 1));
     for (i = 0; i < n; i++)
@@ -66,7 +66,7 @@ fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
     comb->n = n;
 
     /* Create nmod_poly modulus information */
-	comb->mod = (nmod_t *) malloc(sizeof(nmod_t) * num_primes);
+	comb->mod = (nmod_t *) flint_malloc(sizeof(nmod_t) * num_primes);
     for (i = 0; i < num_primes; i++)
         nmod_init(&comb->mod[i], primes[i]);
 
@@ -75,8 +75,8 @@ fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
         return;
 
 	/* Allocate space for comb and res */
-    comb->comb = (fmpz **) malloc(n * sizeof(fmpz *));
-    comb->res = (fmpz **) malloc(n * sizeof(fmpz *));
+    comb->comb = (fmpz **) flint_malloc(n * sizeof(fmpz *));
+    comb->res = (fmpz **) flint_malloc(n * sizeof(fmpz *));
 
     /* Size of top level */
     j = (1L << (n - 1));

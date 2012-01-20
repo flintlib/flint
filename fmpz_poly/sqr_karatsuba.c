@@ -84,7 +84,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, long len)
         loglen++;
     length = (1L << loglen);
 
-    rev  = calloc(3 * length, sizeof(fmpz *));
+    rev  = flint_calloc(3 * length, sizeof(fmpz *));
     out  = rev + length;
     temp = _fmpz_vec_init(2 * length);
 
@@ -96,7 +96,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, long len)
     revbin2(res, out, 2 * len - 1, loglen + 1);
 
     _fmpz_vec_clear(temp, 2 * length);
-    free(rev);
+    flint_free(rev);
 }
 
 void fmpz_poly_sqr_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly)

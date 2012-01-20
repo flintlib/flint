@@ -38,7 +38,7 @@ fmpz_poly_mat_clear(fmpz_poly_mat_t A)
         for (i = 0; i < A->r * A->c; i++)
             fmpz_poly_clear(A->entries + i);
 
-        free(A->entries);
-        free(A->rows);
+        flint_free(A->entries);
+        flint_free(A->rows);
     }
 }

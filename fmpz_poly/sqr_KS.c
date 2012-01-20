@@ -62,11 +62,11 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, long len)
     bits   = 2 * bits + loglen + sign;
     limbs  = (bits * len - 1) / FLINT_BITS + 1;
 
-    arr = (mp_limb_t *) calloc(limbs, sizeof(mp_limb_t));
+    arr = (mp_limb_t *) flint_calloc(limbs, sizeof(mp_limb_t));
 
     _fmpz_poly_bit_pack(arr, op, len, bits, neg);
 
-    arr3 = (mp_limb_t *) malloc((2 * limbs) * sizeof(mp_limb_t));
+    arr3 = (mp_limb_t *) flint_malloc((2 * limbs) * sizeof(mp_limb_t));
 
     mpn_sqr(arr3, arr, limbs);
 
@@ -78,8 +78,8 @@ _fmpz_poly_sqr_KS(fmpz *rop, const fmpz *op, long len)
     if (len < in_len)
         _fmpz_vec_zero(rop + (2 * len - 1), 2 * (in_len - len));
 
-    free(arr);
-    free(arr3);
+    flint_free(arr);
+    flint_free(arr3);
 }
 
 void fmpz_poly_sqr_KS(fmpz_poly_t rop, const fmpz_poly_t op)

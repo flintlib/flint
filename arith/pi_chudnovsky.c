@@ -220,7 +220,7 @@ fac_init_size(fac_t f, long int s)
     if (s < INIT_FACS)
         s = INIT_FACS;
 
-    f[0].fac  = malloc(s*sizeof(unsigned long)*2);
+    f[0].fac  = flint_malloc(s*sizeof(unsigned long)*2);
     f[0].pow  = f[0].fac + s;
     f[0].max_facs = s;
 
@@ -236,7 +236,7 @@ fac_init(fac_t f)
 static __inline__ void
 fac_clear(fac_t f)
 {
-    free(f[0].fac);
+    flint_free(f[0].fac);
 }
 
 static __inline__ void
@@ -556,15 +556,15 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
 
     state->top = 0;
     state->sieve_size = max(3*5*23*29+1, terms*6);
-    state->sieve = (sieve_t *)malloc(sizeof(sieve_t)*(state->sieve_size)/2);
+    state->sieve = (sieve_t *)flint_malloc(sizeof(sieve_t)*(state->sieve_size)/2);
     build_sieve(state, state->sieve_size, state->sieve);
 
     /* allocate stacks */
-    state->pstack = malloc(sizeof(mpz_t)*depth);
-    state->qstack = malloc(sizeof(mpz_t)*depth);
-    state->gstack = malloc(sizeof(mpz_t)*depth);
-    state->fpstack = malloc(sizeof(fac_t)*depth);
-    state->fgstack = malloc(sizeof(fac_t)*depth);
+    state->pstack = flint_malloc(sizeof(mpz_t)*depth);
+    state->qstack = flint_malloc(sizeof(mpz_t)*depth);
+    state->gstack = flint_malloc(sizeof(mpz_t)*depth);
+    state->fpstack = flint_malloc(sizeof(fac_t)*depth);
+    state->fgstack = flint_malloc(sizeof(fac_t)*depth);
     for (i=0; i<depth; i++)
     {
         mpz_init(state->pstack[i]);
@@ -591,7 +591,7 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
     }
 
     /* free some resources */
-    free(state->sieve);
+    flint_free(state->sieve);
 
     mpz_clear(state->gcd);
     fac_clear(state->ftmp);
@@ -610,9 +610,9 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
     fac_clear(state->fpstack[0]);
     fac_clear(state->fgstack[0]);
 
-    free(state->gstack);
-    free(state->fpstack);
-    free(state->fgstack);
+    flint_free(state->gstack);
+    flint_free(state->fpstack);
+    flint_free(state->fgstack);
 
       /*
         p*(C/D)*sqrt(C)
@@ -634,8 +634,8 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
     mpf_set_z(qi, q1);
     mpz_clear(q1);
 
-    free(state->pstack);
-    free(state->qstack);
+    flint_free(state->pstack);
+    flint_free(state->qstack);
 
     /* initialize temp float variables for sqrt & div */
     mpf_init2(t1, prec);

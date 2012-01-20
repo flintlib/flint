@@ -46,7 +46,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len,
     
     if (len == 0)  /* Zero polynomial */
     {
-        str = malloc(2);
+        str = flint_malloc(2);
         if (!str)
         {
             printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
@@ -86,7 +86,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len,
         size1 = mpz_sizeinbase(mpq_numref(a1), 10) 
               + mpz_sizeinbase(mpq_denref(a1), 10) + 1;
         size  = size0 + 1 + strlen(var) + 1 + size1 + 1;
-        str   = malloc(size);
+        str   = flint_malloc(size);
         if (!str)
         {
             printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
@@ -154,7 +154,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len,
     }
     
     mpq_init(q);
-    str = malloc(size);
+    str = flint_malloc(size);
     if (!str)
     {
         printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");

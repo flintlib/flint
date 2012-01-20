@@ -35,5 +35,5 @@ _fmpz_vec_clear(fmpz * vec, long len)
     long i;
     for (i = 0; i < len; i++)
         fmpz_clear(vec + i);
-    free(vec);
+    flint_free(vec);
 }

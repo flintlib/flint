@@ -72,7 +72,7 @@ void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     else
     {
         long i;
-        copy = (fmpz *) malloc(n * sizeof(fmpz));
+        copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];
         for ( ; i < n; i++)
@@ -98,5 +98,5 @@ void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     fmpq_poly_canonicalise(res);
 
     if (alloc)
-        free(copy);
+        flint_free(copy);
 }

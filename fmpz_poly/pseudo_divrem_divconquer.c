@@ -61,7 +61,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                Shift A right by n1, zero the bottom n2 - 1 coeffs; call this p1
              */
 
-            p1 = (fmpz *) malloc((lenA - n1) * sizeof(fmpz));
+            p1 = (fmpz *) flint_malloc((lenA - n1) * sizeof(fmpz));
             {
                 long i;
                 mpn_zero((mp_ptr) p1, n2 - 1);
@@ -77,7 +77,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             r1 = R + n1;
             _fmpz_poly_pseudo_divrem_divconquer(Q, r1, d, p1, lenA - n1, d3, n2);
 
-            free(p1);
+            flint_free(p1);
 
             /*
                Push the relevant {n2 - 1} terms of the remainder to the 
@@ -133,7 +133,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                zero the bottom lenB - 1 coeffs
              */
 
-            p1 = (fmpz *) malloc((2 * lenB - 1) * sizeof(fmpz));
+            p1 = (fmpz *) flint_malloc((2 * lenB - 1) * sizeof(fmpz));
             {
                 long i;
                 mpn_zero((mp_ptr) p1, lenB - 1);
@@ -148,7 +148,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, 2 * lenB - 1, B, lenB);
 
-            free(p1);
+            flint_free(p1);
 
             /*
                Compute t = L^s1 a2 + r1 x^shift, which ends up being of length at 
@@ -204,7 +204,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                n1 - 1 coeffs
              */
 
-            p1 = (fmpz *) malloc((lenA - 2 * n2) * sizeof(fmpz));
+            p1 = (fmpz *) flint_malloc((lenA - 2 * n2) * sizeof(fmpz));
             {
                 long i;
                 mpn_zero((mp_ptr) p1, n1 - 1);
@@ -219,7 +219,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             _fmpz_poly_pseudo_divrem_divconquer(q1, r1, &s1, p1, lenA - 2 * n2, d1, n1);
 
-            free(p1);
+            flint_free(p1);
 
             /*
                Compute d2q1 = d2q1, of length lenA - lenB

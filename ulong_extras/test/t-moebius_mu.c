@@ -52,18 +52,18 @@ int main(void)
 
     for (n = 1; n < 100; n++)
     {
-        mu = malloc(sizeof(int) * n);
+        mu = flint_malloc(sizeof(int) * n);
         n_moebius_mu_vec(mu, n);
         for (k = 0; k < n; k++)
             check(k, mu[k], n_moebius_mu(k));
-        free(mu);
+        flint_free(mu);
     }
 
-    mu = malloc(sizeof(int) * 10000);
+    mu = flint_malloc(sizeof(int) * 10000);
     n_moebius_mu_vec(mu, 10000);
     for (k = 0; k < n; k++)
         check(k, mu[k], n_moebius_mu(k));
-    free(mu);
+    flint_free(mu);
 
     check(10000, n_moebius_mu(10000), 0);
     check(10001, n_moebius_mu(10001), 1);

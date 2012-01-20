@@ -48,7 +48,7 @@ main(void)
 
         long length = n_randint(state, 100) + 1;
         mp_bitcnt_t bits = n_randint(state, 300) + 2;
-        mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+        mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
         int negate;
 
@@ -76,7 +76,7 @@ main(void)
             abort();
         }
 
-        free(arr);
+        flint_free(arr);
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
     }
@@ -87,7 +87,7 @@ main(void)
 
         long length = n_randint(state, 100) + 1;
         mp_bitcnt_t bits = n_randint(state, 300) + 1;
-        mp_ptr arr = (mp_ptr) calloc((length * bits - 1) / FLINT_BITS + 1,
+        mp_ptr arr = (mp_ptr) flint_calloc((length * bits - 1) / FLINT_BITS + 1,
                                      sizeof(mp_limb_t));
 
         fmpz_poly_init(a);
@@ -111,7 +111,7 @@ main(void)
             abort();
         }
 
-        free(arr);
+        flint_free(arr);
         fmpz_poly_clear(a);
         fmpz_poly_clear(b);
     }

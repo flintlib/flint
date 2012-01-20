@@ -58,7 +58,7 @@ fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     else
     {
         long i;
-        Qcopy = (fmpz *) malloc(n * sizeof(fmpz));
+        Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Qlen; i++)
             Qcopy[i] = Q->coeffs[i];
         for ( ; i < n; i++)
@@ -84,5 +84,5 @@ fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     _fmpz_poly_normalise(Qinv);
 
     if (Qalloc)
-        free(Qcopy);
+        flint_free(Qcopy);
 }

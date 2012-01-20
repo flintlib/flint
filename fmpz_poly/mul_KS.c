@@ -82,19 +82,19 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
 
     if (poly1 == poly2)
     {
-        arr1 = (mp_limb_t *) calloc(limbs1, sizeof(mp_limb_t));
+        arr1 = (mp_limb_t *) flint_calloc(limbs1, sizeof(mp_limb_t));
         arr2 = arr1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
     }
     else
     {
-        arr1 = (mp_limb_t *) calloc(limbs1 + limbs2, sizeof(mp_limb_t));
+        arr1 = (mp_limb_t *) flint_calloc(limbs1 + limbs2, sizeof(mp_limb_t));
         arr2 = arr1 + limbs1;
         _fmpz_poly_bit_pack(arr1, poly1, len1, bits, neg1);
         _fmpz_poly_bit_pack(arr2, poly2, len2, bits, neg2);
     }
 
-    arr3 = (mp_limb_t *) malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
+    arr3 = (mp_limb_t *) flint_malloc((limbs1 + limbs2) * sizeof(mp_limb_t));
 
     if (limbs1 == limbs2)
         mpn_mul_n(arr3, arr1, arr2, limbs1);
@@ -111,8 +111,8 @@ _fmpz_poly_mul_KS(fmpz * res, const fmpz * poly1, long len1,
     if ((len1 < in1_len) | (len2 < in2_len))
         _fmpz_vec_zero(res + (len1 + len2 - 1), (in1_len - len1) + (in2_len - len2));
 
-    free(arr1);
-    free(arr3);
+    flint_free(arr1);
+    flint_free(arr3);
 }
 
 void

@@ -120,9 +120,9 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
 
     limbs = (n * bits - 1)/FLINT_BITS + 2; 
 
-    scratch = malloc(sizeof(mp_limb_t) * limbs);
+    scratch = flint_malloc(sizeof(mp_limb_t) * limbs);
     len = mpn_prod_limbs_balanced(result, scratch, factors, n, bits);
-    free(scratch);
+    flint_free(scratch);
     
     return len;
 }

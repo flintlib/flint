@@ -32,5 +32,5 @@
 fmpz *
 _fmpz_vec_init(long len)
 {
-    return (fmpz *) calloc(len, sizeof(fmpz));
+    return (fmpz *) flint_calloc(len, sizeof(fmpz));
 }

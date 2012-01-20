@@ -63,7 +63,7 @@ main(void)
         } while (a->length == 0);
 
         mpn =
-            malloc(sizeof(mp_limb_t) *
+            flint_malloc(sizeof(mp_limb_t) *
                    ((bits * a->length - 1) / FLINT_BITS + 1));
 
         _nmod_poly_bit_pack(mpn, a->coeffs, a->length, bits);

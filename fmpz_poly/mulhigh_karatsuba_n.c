@@ -124,7 +124,7 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
 
     if (poly1->length != len)
     {
-        pol1 = (fmpz *) calloc(len, sizeof(fmpz));
+        pol1 = (fmpz *) flint_calloc(len, sizeof(fmpz));
         memcpy(pol1, poly1->coeffs, poly1->length * sizeof(fmpz));
         clear1 = 1;
     }
@@ -133,7 +133,7 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
 
     if (poly2->length != len)
     {
-        pol2 = (fmpz *) calloc(len, sizeof(fmpz));
+        pol2 = (fmpz *) flint_calloc(len, sizeof(fmpz));
         memcpy(pol2, poly2->coeffs, poly2->length * sizeof(fmpz));
         clear2 = 1;
     }
@@ -159,7 +159,7 @@ fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
     }
 
     if (clear1)
-        free(pol1);
+        flint_free(pol1);
     if (clear2)
-        free(pol2);
+        flint_free(pol2);
 }
