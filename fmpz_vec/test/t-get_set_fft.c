@@ -106,7 +106,7 @@ main(void)
         b = _fmpz_vec_init(len);
         _fmpz_vec_randtest_unsigned(a, state, len, bits);
 
-        bt = _fmpz_vec_get_fft(ii, a, limbs, len, 0);
+        bt = _fmpz_vec_get_fft(ii, a, limbs, len);
         _fmpz_vec_set_fft(b, len, ii, limbs, bt < 0);
         
         result = (_fmpz_vec_equal(a, b, len));
