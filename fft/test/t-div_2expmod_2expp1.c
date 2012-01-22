@@ -100,10 +100,10 @@ main(void)
                         gmp_printf("got  %Zx\n", m2);
                         abort();
                     }
-                }
 
-                flint_free(nn);
-                flint_free(r);
+                    flint_free(nn);
+                    flint_free(r);
+                }
             }
         }
     }
