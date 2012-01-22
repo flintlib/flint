@@ -128,7 +128,7 @@ int main(void)
     }
 
     flint_randclear(state);
-
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
