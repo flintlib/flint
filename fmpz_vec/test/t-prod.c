@@ -56,6 +56,10 @@ main(void)
 
         _fmpz_vec_randtest(a, state, len1 + len2, 200);
 
+        fmpz_init(x);
+        fmpz_init(y);
+        fmpz_init(z);
+
         _fmpz_vec_prod(x, a, len1);
         _fmpz_vec_prod(y, b, len2);
         fmpz_mul(x, x, y);
@@ -71,6 +75,10 @@ main(void)
         }
 
         _fmpz_vec_clear(a, len1 + len2);
+
+        fmpz_clear(x);
+        fmpz_clear(y);
+        fmpz_clear(z);
     }
 
     flint_randclear(state);
