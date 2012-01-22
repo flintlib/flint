@@ -47,6 +47,7 @@ int main(void)
         fmpq_t f;
         mpq_t z;
 
+        fmpq_init(f);
         fmpq_randtest(f, state, FLINT_BITS - 2);
 
         flint_mpq_init_set_readonly(z, f);
