@@ -96,8 +96,6 @@ long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
          mpn_copyi(coeffs_f[i], coeff, size_j); 
          mpn_zero(coeffs_f[i] + size_j, size_f - size_j); 
       }
-      
-		coeffs_m++;
    }
 
    return sign*(FLINT_BITS*limbs + bits);  

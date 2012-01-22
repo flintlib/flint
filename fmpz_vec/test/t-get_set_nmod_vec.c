@@ -71,7 +71,7 @@ main(void)
         {
             fmpz_mod_ui(a + i, a + i, n);
             t = fmpz_get_ui(a + i);
-            if (t >= n/2)
+            if (t > n / 2)
                 fmpz_sub_ui(a + i, a + i, n);
         }
 
