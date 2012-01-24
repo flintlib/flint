@@ -77,6 +77,11 @@ main(void)
             abort();
         }
 
+        fmpq_poly_clear(f);
+        fmpq_poly_clear(g);
+        fmpq_clear(a);
+        fmpq_clear(b);
+        fmpq_clear(c);
     }
 
     flint_randclear(state);

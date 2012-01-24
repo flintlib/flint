@@ -35,6 +35,9 @@ bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
     mp_ptr tmp;
     long k;
 
+    if (n < 1)
+        return;
+
     tmp = flint_malloc(sizeof(mp_limb_t) * n);
 
     /* Divide by factorials */

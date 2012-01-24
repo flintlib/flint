@@ -45,7 +45,7 @@ int main(void)
 
     flint_randinit(state);
     mpz_init(t);
-    str = flint_malloc(60 * sizeof(char));
+    str = flint_malloc((FLINT_BITS + 1) * sizeof(char));
 
     for (rep = 0; rep < 10000; rep++)
     {

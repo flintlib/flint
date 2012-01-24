@@ -33,9 +33,10 @@
 void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, 
                                                           const int * a, int n)
 {
-    int *b, lenm1 = len - 1;
+    int *b;
+    long lenm1 = len - 1, lenv;
     fmpz *v;
-    
+
     /*
        Compute partial sums
      */
@@ -50,7 +51,8 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
     /*
        Allocate memory for the polynomials f^{a[1]}, ..., f^{a[n-1]}
      */
-    v = _fmpz_vec_init(lenm1 * b[n-1] + n - 1);
+    lenv = lenm1 * b[n-1] + n - 1;
+    v = _fmpz_vec_init(lenv);
     
     /* 
        Compute f^{a[1]}, ..., f^{a[n-1]}
@@ -99,8 +101,9 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
         }
         
     }
-    
-    _fmpz_vec_clear(v, b[n-1]);
+
+    flint_free(b);
+    _fmpz_vec_clear(v, lenv);
 }
 
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)

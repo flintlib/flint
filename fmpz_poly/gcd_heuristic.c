@@ -273,7 +273,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    /* we found the gcd, so multiply by content */
    if (divides)
    {
-	   mpn_zero(res + glen, len2 - glen);
+	   _fmpz_vec_zero(res + glen, len2 - glen);
       _fmpz_vec_scalar_mul_fmpz(res, G, glen, d);
    }
 		

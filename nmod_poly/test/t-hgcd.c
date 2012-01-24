@@ -143,10 +143,10 @@ main(void)
         nmod_poly_clear(b);
         nmod_poly_clear(c);
         nmod_poly_clear(d);
-        nmod_poly_init(c1, n);
-        nmod_poly_init(d1, n);
-        nmod_poly_init(s, n);
-        nmod_poly_init(t, n);
+        nmod_poly_clear(c1);
+        nmod_poly_clear(d1);
+        nmod_poly_clear(s);
+        nmod_poly_clear(t);
 
         _nmod_vec_clear(M[0]);
         _nmod_vec_clear(M[1]);

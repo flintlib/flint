@@ -137,7 +137,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    h = _nmod_vec_init(len2);
 
    /* zero entire output */
-   mpn_zero(res, len2);
+   _fmpz_vec_zero(res, len2);
 
    n = len2; /* current bound on length of result */
    bound = len2 + FLINT_MIN(nb1, nb2) + gbits + 1; /* initialise bound */

@@ -195,25 +195,29 @@ main(void)
 
     /* Sebastian's test case */
     {
-       fmpz_poly_t a, b, d;
+        fmpz_poly_t a, b, d;
 
-       fmpz_poly_init(a);
-       fmpz_poly_init(b);
-       fmpz_poly_init(d);
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_poly_init(d);
 
-       fmpz_poly_set_coeff_ui(b, 2, 1);
-       fmpz_poly_set_coeff_si(a, 0, -32);
-       fmpz_poly_set_coeff_si(a, 1, 24);
+        fmpz_poly_set_coeff_ui(b, 2, 1);
+        fmpz_poly_set_coeff_si(a, 0, -32);
+        fmpz_poly_set_coeff_si(a, 1, 24);
 
-       fmpz_poly_gcd_modular(d, a, b);
+        fmpz_poly_gcd_modular(d, a, b);
 
-       result = (d->length == 1 && fmpz_is_one(d->coeffs));
-       if (!result)
-       {
-          printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
-          fmpz_poly_print(d); printf("\n"); 
-          abort();
-       }
+        result = (d->length == 1 && fmpz_is_one(d->coeffs));
+        if (!result)
+        {
+            printf("FAIL (check 1 == gcd(x^2, 24*x - 32):\n");
+            fmpz_poly_print(d); printf("\n"); 
+            abort();
+        }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_poly_clear(d);
     }
 
     flint_randclear(state);

@@ -70,7 +70,10 @@ main(void)
         fmpq_poly_init(a);
         fmpq_poly_randtest_not_zero(a, state, n_randint(state, 20) + 1, 40);
         if (a->length < 2)
+        {
+            fmpq_poly_clear(a);
             continue;
+        }
         fmpq_poly_init(f);
         fmpq_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1, 40);
 
