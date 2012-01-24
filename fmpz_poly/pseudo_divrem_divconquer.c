@@ -27,9 +27,45 @@
 #include <stdlib.h>
 #include "fmpz_poly.h"
 
-void 
-_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                          const fmpz * A, long lenA, const fmpz * B, long lenB)
+/*
+    A brief analysis...
+
+    Case 1:  lenA <= lenB + n2 - 1
+
+    Recursive call is to (lenA - n1, n2), which falls into Cases (1) or (3).
+    Allocates lenA - n1.
+
+    This reduces lenA to about 2/3 lenA, so recursively allocation is not 
+    a problem for the time being.
+
+    Case 2: lenA > 2 * lenB - 1
+
+    Recursive calls to (2 lenB - 1, lenB) and (lenA - lenB, lenB), which 
+    fall into Cases (3) and (2), respectively.
+    Allocates 2*lenB-1.
+
+    The first recursive call is no problem.  The second call is the 
+    main problem, but this is just the problem with unbalanced division. 
+    At least I got rid of the allocation in this case, by passing in a 
+    modifiable copy of A.
+
+    Case 3:
+
+    Recursive calls to (lenA - 2 n2, n1) and (lenB + n2 - 1, lenB), 
+    which fall into Case (1).
+    Allocates lenA - 2 n2 and n1 + 2 n2 - 1.
+
+    The first call reduces lenA to about 1/2 lenA, so here recursive 
+    allocation is not a problem.  The second call might still be of 
+    size about lenA, ouch.  But we are saved as this lands in Case (1) 
+    so in the worst case every other call drops the length from lenA 
+    to 2/3 lenA.  Not great, but good enough for now?
+ */
+
+static void 
+__fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                                     const fmpz * A, long lenA, 
+                                     const fmpz * B, long lenB)
 {
     if (lenB <= 16 || (lenA > 2 * lenB - 1 && lenA < 128))
     {
@@ -109,6 +145,10 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
         }
         else if (lenA > 2 * lenB - 1)
         {
+            /*
+               XXX:  In this case, we expect A to be modifiable
+             */
+
             ulong s1, s2;
             const long shift = lenA - 2 * lenB + 1;
 
@@ -149,7 +189,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
                of A after the first lenR coefficients are removed
              */
 
-            t = _fmpz_vec_init(lenA - lenB);
+            t = (fmpz *) A;
 
             fmpz_pow_ui(f, B + (lenB - 1), s1);
 
@@ -162,8 +202,6 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
              */
 
             _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenA - lenB, B, lenB);
-
-            _fmpz_vec_clear(t, lenA - lenB);
 
             /*
                Write out Q = L^s2 q1 x^shift + q2, of length at most 
@@ -264,6 +302,27 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             fmpz_clear(f);
         }
+    }
+}
+
+void 
+_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                                    const fmpz * A, long lenA, 
+                                    const fmpz * B, long lenB)
+{
+    if (lenA <= 2 * lenB - 1)
+    {
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, lenA, B, lenB);
+    }
+    else  /* lenA > 2 * lenB - 1 */
+    {
+        fmpz *S = _fmpz_vec_init(lenA);
+
+        _fmpz_vec_set(S, A, lenA);
+
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, S, lenA, B, lenB);
+
+        _fmpz_vec_clear(S, lenA);
     }
 }
 
