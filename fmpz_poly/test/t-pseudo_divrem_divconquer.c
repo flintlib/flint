@@ -55,7 +55,7 @@ main(void)
         fmpz_poly_init(q);
         fmpz_poly_init(r);
         fmpz_poly_init(prod);
-        fmpz_poly_randtest(a, state, n_randint(state, 100), 50);
+        fmpz_poly_randtest(a, state, n_randint(state, 200), 50);
         fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 50);
 
         fmpz_poly_pseudo_divrem_divconquer(q, r, &d, a, b);
@@ -68,10 +68,10 @@ main(void)
         if (!result)
         {
             printf("FAIL (check qb + r = l(b)^d a):\n");
-            fmpz_poly_print(a), printf("\n\n");
-            fmpz_poly_print(prod), printf("\n\n");
-            fmpz_poly_print(q), printf("\n\n");
-            fmpz_poly_print(r), printf("\n\n");
+            printf("l^d a = "), fmpz_poly_print(a), printf("\n\n");
+            printf("qb + r = "), fmpz_poly_print(prod), printf("\n\n");
+            printf("q = "), fmpz_poly_print(q), printf("\n\n");
+            printf("r = "), fmpz_poly_print(r), printf("\n\n");
             abort();
         }
 

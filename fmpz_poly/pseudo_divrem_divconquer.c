@@ -25,20 +25,49 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void 
-_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
-                          const fmpz * A, long lenA, const fmpz * B, long lenB)
-{
-    const long crossover1 = (lenB <= 12) ? 8 : 16;
-    const long crossover2 = 128;
+/*
+    A brief analysis...
 
-    if (lenB <= crossover1 || (lenA > 2 * lenB - 1 && lenA < crossover2))
+    Case 1:  lenA <= lenB + n2 - 1
+
+    Recursive call is to (lenA - n1, n2), which falls into Cases (1) or (3).
+    Allocates lenA - n1.
+
+    This reduces lenA to about 2/3 lenA, so recursively allocation is not 
+    a problem for the time being.
+
+    Case 2: lenA > 2 * lenB - 1
+
+    Recursive calls to (2 lenB - 1, lenB) and (lenA - lenB, lenB), which 
+    fall into Cases (3) and (2), respectively.
+    Allocates 2*lenB-1.
+
+    The first recursive call is no problem.  The second call is the 
+    main problem, but this is just the problem with unbalanced division. 
+    At least I got rid of the allocation in this case, by passing in a 
+    modifiable copy of A.
+
+    Case 3:
+
+    Recursive calls to (lenA - 2 n2, n1) and (lenB + n2 - 1, lenB), 
+    which fall into Case (1).
+    Allocates lenA - 2 n2 and n1 + 2 n2 - 1.
+
+    The first call reduces lenA to about 1/2 lenA, so here recursive 
+    allocation is not a problem.  The second call might still be of 
+    size about lenA, ouch.  But we are saved as this lands in Case (1) 
+    so in the worst case every other call drops the length from lenA 
+    to 2/3 lenA.  Not great, but good enough for now?
+ */
+
+static void 
+__fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                                     const fmpz * A, long lenA, 
+                                     const fmpz * B, long lenB)
+{
+    if (lenB <= 16 || (lenA > 2 * lenB - 1 && lenA < 128))
     {
         _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, lenA, B, lenB);
     }
@@ -116,6 +145,10 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
         }
         else if (lenA > 2 * lenB - 1)
         {
+            /*
+               XXX:  In this case, we expect A to be modifiable
+             */
+
             ulong s1, s2;
             const long shift = lenA - 2 * lenB + 1;
 
@@ -137,7 +170,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             {
                 long i;
                 mpn_zero((mp_ptr) p1, lenB - 1);
-                for (i = lenB - 1; i < lenB; i++)
+                for (i = lenB - 1; i < 2*lenB - 1; i++)
                     p1[i] = (A + shift)[i];
             }
 
@@ -151,12 +184,12 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             flint_free(p1);
 
             /*
-               Compute t = L^s1 a2 + r1 x^shift, which ends up being of length at 
-               most lenA - lenB since r1 is of length at most lenB - 1.  Here a2 
-               is what remains of A after the first lenR coefficients are removed
+               Compute t = L^s1 a2 + r1 x^shift, of length at most lenA - lenB 
+               since r1 is of length at most lenB - 1.  Here a2 is what remains
+               of A after the first lenR coefficients are removed
              */
 
-            t = _fmpz_vec_init(lenA - lenB);
+            t = (fmpz *) A;
 
             fmpz_pow_ui(f, B + (lenB - 1), s1);
 
@@ -170,13 +203,11 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             _fmpz_poly_pseudo_divrem_divconquer(q2, R, &s2, t, lenA - lenB, B, lenB);
 
-            _fmpz_vec_clear(t, lenA - lenB);
-
             /*
-               Write out Q = L^s2 q1 x^shift + q2, of length at most lenB + shift. 
-               Note q2 has length at most shift since it is at most an lenA - lenB 
-               by lenB division; q1 cannot have length zero since we are doing 
-               pseudo division
+               Write out Q = L^s2 q1 x^shift + q2, of length at most 
+               lenB + shift.  Note q2 has length at most shift since it is at 
+               most an lenA - lenB by lenB division; q1 cannot have length zero
+               since we are doing pseudo division
              */
 
             fmpz_pow_ui(f, B + (lenB - 1), s2);
@@ -235,7 +266,8 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             /*
                Compute
-                   t = L^s1 * (a2 x^{n1 + n2 - 1} + a3) + r1 x^{2 n2} - d2q1 x^n2
+                   t = L^s1 * (a2 x^{n1 + n2 - 1} + a3) 
+                       + r1 x^{2 n2} - d2q1 x^n2
                of length at most lenB + n2 - 1, since r1 is of length at most 
                n1 - 1 and d2q1 is of length at most n1 + n2 - 1
              */
@@ -270,6 +302,27 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             fmpz_clear(f);
         }
+    }
+}
+
+void 
+_fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
+                                    const fmpz * A, long lenA, 
+                                    const fmpz * B, long lenB)
+{
+    if (lenA <= 2 * lenB - 1)
+    {
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, lenA, B, lenB);
+    }
+    else  /* lenA > 2 * lenB - 1 */
+    {
+        fmpz *S = _fmpz_vec_init(lenA);
+
+        _fmpz_vec_set(S, A, lenA);
+
+        __fmpz_poly_pseudo_divrem_divconquer(Q, R, d, S, lenA, B, lenB);
+
+        _fmpz_vec_clear(S, lenA);
     }
 }
 
@@ -318,10 +371,10 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     
     _fmpz_poly_pseudo_divrem_divconquer(q, r, d, A->coeffs, A->length, 
                                                  B->coeffs, B->length);
-    
-    for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;
-    lenr++;
-    
+
+    lenr = B->length - 1;
+    FMPZ_VEC_NORM(r, lenr);
+
     if (Q == A || Q == B)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
