@@ -25,20 +25,13 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
 void 
 _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
                           const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    const long crossover1 = (lenB <= 12) ? 8 : 16;
-    const long crossover2 = 128;
-
-    if (lenB <= crossover1 || (lenA > 2 * lenB - 1 && lenA < crossover2))
+    if (lenB <= 16 || (lenA > 2 * lenB - 1 && lenA < 128))
     {
         _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, lenA, B, lenB);
     }
@@ -137,7 +130,7 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             {
                 long i;
                 mpn_zero((mp_ptr) p1, lenB - 1);
-                for (i = lenB - 1; i < lenB; i++)
+                for (i = lenB - 1; i < 2*lenB - 1; i++)
                     p1[i] = (A + shift)[i];
             }
 
@@ -151,9 +144,9 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             free(p1);
 
             /*
-               Compute t = L^s1 a2 + r1 x^shift, which ends up being of length at 
-               most lenA - lenB since r1 is of length at most lenB - 1.  Here a2 
-               is what remains of A after the first lenR coefficients are removed
+               Compute t = L^s1 a2 + r1 x^shift, of length at most lenA - lenB 
+               since r1 is of length at most lenB - 1.  Here a2 is what remains
+               of A after the first lenR coefficients are removed
              */
 
             t = _fmpz_vec_init(lenA - lenB);
@@ -173,10 +166,10 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             _fmpz_vec_clear(t, lenA - lenB);
 
             /*
-               Write out Q = L^s2 q1 x^shift + q2, of length at most lenB + shift. 
-               Note q2 has length at most shift since it is at most an lenA - lenB 
-               by lenB division; q1 cannot have length zero since we are doing 
-               pseudo division
+               Write out Q = L^s2 q1 x^shift + q2, of length at most 
+               lenB + shift.  Note q2 has length at most shift since it is at 
+               most an lenA - lenB by lenB division; q1 cannot have length zero
+               since we are doing pseudo division
              */
 
             fmpz_pow_ui(f, B + (lenB - 1), s2);
@@ -235,7 +228,8 @@ _fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
 
             /*
                Compute
-                   t = L^s1 * (a2 x^{n1 + n2 - 1} + a3) + r1 x^{2 n2} - d2q1 x^n2
+                   t = L^s1 * (a2 x^{n1 + n2 - 1} + a3) 
+                       + r1 x^{2 n2} - d2q1 x^n2
                of length at most lenB + n2 - 1, since r1 is of length at most 
                n1 - 1 and d2q1 is of length at most n1 + n2 - 1
              */
@@ -318,10 +312,10 @@ fmpz_poly_pseudo_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
     
     _fmpz_poly_pseudo_divrem_divconquer(q, r, d, A->coeffs, A->length, 
                                                  B->coeffs, B->length);
-    
-    for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;
-    lenr++;
-    
+
+    lenr = B->length - 1;
+    FMPZ_VEC_NORM(r, lenr);
+
     if (Q == A || Q == B)
     {
         _fmpz_vec_clear(Q->coeffs, Q->alloc);
