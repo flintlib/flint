@@ -52,7 +52,6 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
         R = Q + lenA;
 
         _fmpz_mod_poly_divrem(Q, R, A, lenA, B, lenB, invB, p);
-        lenQ = lenA - lenB + 1;
         lenR = lenB - 1;
         FMPZ_VEC_NORM(R, lenR);
 
