@@ -35,8 +35,7 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
     long *a, i;
     fmpz *t;
 
-    for (i = 1; (1L << i) < N; i++) ;
-    n = i + 1;
+    n = FLINT_CLOG2(N) + 1;
 
     /* Compute sequence of exponents */
     a = flint_malloc(n * sizeof(long));

@@ -27,41 +27,6 @@
 #include <stdlib.h>
 #include "fmpz_poly.h"
 
-/*
-    A brief analysis...
-
-    Case 1:  lenA <= lenB + n2 - 1
-
-    Recursive call is to (lenA - n1, n2), which falls into Cases (1) or (3).
-    Allocates lenA - n1.
-
-    This reduces lenA to about 2/3 lenA, so recursively allocation is not 
-    a problem for the time being.
-
-    Case 2: lenA > 2 * lenB - 1
-
-    Recursive calls to (2 lenB - 1, lenB) and (lenA - lenB, lenB), which 
-    fall into Cases (3) and (2), respectively.
-    Allocates 2*lenB-1.
-
-    The first recursive call is no problem.  The second call is the 
-    main problem, but this is just the problem with unbalanced division. 
-    At least I got rid of the allocation in this case, by passing in a 
-    modifiable copy of A.
-
-    Case 3:
-
-    Recursive calls to (lenA - 2 n2, n1) and (lenB + n2 - 1, lenB), 
-    which fall into Case (1).
-    Allocates lenA - 2 n2 and n1 + 2 n2 - 1.
-
-    The first call reduces lenA to about 1/2 lenA, so here recursive 
-    allocation is not a problem.  The second call might still be of 
-    size about lenA, ouch.  But we are saved as this lands in Case (1) 
-    so in the worst case every other call drops the length from lenA 
-    to 2/3 lenA.  Not great, but good enough for now?
- */
-
 static void 
 __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d, 
                                      const fmpz * A, long lenA, 

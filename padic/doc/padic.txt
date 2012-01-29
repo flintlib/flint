@@ -463,6 +463,14 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 
 *******************************************************************************
 
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+
+    Computes the Teichmuller lift of the $p$-adic unit \code{op}.
+
+    Assumes that $p$ is a prime and $N \geq 1$.
+
+    Supports aliasing between \code{rop} and \code{op}.
+
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Computes the Teichmuller lift of the $p$-adic unit \code{op}.

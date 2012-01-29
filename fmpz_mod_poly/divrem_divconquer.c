@@ -165,7 +165,7 @@ void _fmpz_mod_poly_divrem_divconquer(fmpz *Q, fmpz *R,
 
         __fmpz_mod_poly_divrem_divconquer(Q, T, S, lenA, B, lenB, invB, p);
 
-        _fmpz_vec_set(R, T, lenA);
+        _fmpz_vec_set(R, T, lenB - 1);
         _fmpz_vec_clear(S, 2 * lenA + 2 * (2 * lenB - 1));
     }
 }

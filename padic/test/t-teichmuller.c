@@ -69,7 +69,7 @@ main(void)
         result = (padic_equal(b, c, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (aliasing):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");
@@ -113,7 +113,7 @@ main(void)
         result = (padic_is_zero(c, ctx));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (correctness):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");

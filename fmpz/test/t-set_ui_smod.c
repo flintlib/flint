@@ -36,7 +36,7 @@ main(void)
     int i;
     flint_rand_t state;
 
-    printf("set_ui_mod....");
+    printf("set_ui_smod....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -54,10 +54,12 @@ main(void)
 
         fmpz_set_ui(mz, m);
         fmpz_randtest_mod_signed(a, state, mz);
+        if (m % 2UL == 0 && fmpz_cmp_si(a, - (long) (m / 2UL)) == 0)
+            fmpz_neg(a, a);
 
         r = fmpz_fdiv_ui(a, m);
 
-        fmpz_set_ui_mod(b, r, m);
+        fmpz_set_ui_smod(b, r, m);
 
         if (!fmpz_equal(a, b))
         {
