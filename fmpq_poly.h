@@ -635,6 +635,13 @@ int _fmpq_poly_fprint(FILE * file,
 
 int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly);
 
+int _fmpq_poly_fprint_pretty(FILE * file, 
+                             const fmpz *poly, const fmpz_t den, long len, 
+                             const char * x);
+
+int fmpq_poly_fprint_pretty(FILE * file, 
+                            const fmpq_poly_t poly, const char * var);
+
 static __inline__
 int _fmpq_poly_print(const fmpz * poly, const fmpz_t den, long len)
 {
@@ -647,7 +654,18 @@ int fmpq_poly_print(const fmpq_poly_t poly)
     return fmpq_poly_fprint(stdout, poly);
 }
 
-int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var);
+static __inline__ 
+int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, long len, 
+                            const char * x)
+{
+    return _fmpq_poly_fprint_pretty(stdout, poly, den, len, x);
+}
+
+static __inline__ 
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+{
+    return fmpq_poly_fprint_pretty(stdout, poly, var);
+}
 
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly);
 
