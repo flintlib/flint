@@ -43,7 +43,7 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    ulong type = info->type;
    ulong i;
-   mp_ptr arr = (mp_ptr) malloc(1024*sizeof(mp_limb_t));
+   mp_ptr arr = (mp_ptr) flint_malloc(1024*sizeof(mp_limb_t));
    flint_rand_t state;
    flint_randinit(state);
       
@@ -124,7 +124,7 @@ void sample(void * arg, ulong count)
    if (r == 9879875897UL) abort();
 
    flint_randclear(state);
-   free(arr);
+   flint_free(arr);
 }
 
 int main(void)

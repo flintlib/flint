@@ -40,7 +40,7 @@ void fmpq_mat_clear(fmpq_mat_t mat)
         for (i = 0; i < mat->r * mat->c; i++)
             fmpq_clear(mat->entries + i);
 
-        free(mat->entries);
-        free(mat->rows);
+        flint_free(mat->entries);
+        flint_free(mat->rows);
     }
 }

@@ -128,8 +128,8 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     _perm_clear(perm);
 
     /* Find a basis for the nullspace */
-    basis = (nmod_poly_t *) malloc(nullity * sizeof(nmod_poly_t));
-    shift = (long *) calloc(n, sizeof(long));
+    basis = (nmod_poly_t *) flint_malloc(nullity * sizeof(nmod_poly_t));
+    shift = (long *) flint_calloc(n, sizeof(long));
 
     col = 1;  /* first column is always zero */
     row = 0;
@@ -149,14 +149,14 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
         col++;
     }
 
-    free(shift);
+    flint_free(shift);
     nmod_mat_clear(matrix);
 
     /* we are done */
     if (nullity == 1)
     {
         nmod_poly_factor_insert(factors, f, 1);
-        free(basis);
+        flint_free(basis);
     }
     else
     {
@@ -204,7 +204,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
         for (i = 1; i < nullity; i++)
             nmod_poly_clear(basis[i]);
 
-        free(basis);
+        flint_free(basis);
         nmod_poly_clear(power);
         nmod_poly_clear(factor);
         nmod_poly_clear(b);

@@ -166,10 +166,10 @@ mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
     m = (a + b) / 2;
 
     tmpsize = sizeof(mp_limb_t) * FLINT_BIT_COUNT(n) * (b-a+2) / FLINT_BITS;
-    p = malloc(tmpsize);  /* Twice because we re-use it for q*r */
-    q = malloc(tmpsize / 2 + 1);
-    r = malloc(tmpsize / 2 + 1);
-    s = malloc(tmpsize / 2 + 1);
+    p = flint_malloc(tmpsize);  /* Twice because we re-use it for q*r */
+    q = flint_malloc(tmpsize / 2 + 1);
+    r = flint_malloc(tmpsize / 2 + 1);
+    s = flint_malloc(tmpsize / 2 + 1);
 
     mpn_harmonic_odd_balanced(p, &ps, q, &qs, a, m, n, d + (a == 1));
     mpn_harmonic_odd_balanced(r, &rs, s, &ss, m, b, n, d);
@@ -183,8 +183,8 @@ mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
     *tsize = ts;
     *vsize = vs;
 
-    free(p);
-    free(q);
-    free(r);
-    free(s);
+    flint_free(p);
+    flint_free(q);
+    flint_free(r);
+    flint_free(s);
 }

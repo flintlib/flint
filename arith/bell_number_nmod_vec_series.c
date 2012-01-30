@@ -35,7 +35,7 @@ bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
     mp_ptr tmp;
     long k;
 
-    tmp = malloc(sizeof(mp_limb_t) * n);
+    tmp = flint_malloc(sizeof(mp_limb_t) * n);
 
     /* Divide by factorials */
     fac = n_factorial_mod2_preinv(n-1, mod.n, mod.ninv);
@@ -58,5 +58,5 @@ bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
         res[k] = n_mulmod2_preinv(res[k], c, mod.n, mod.ninv);
     }
 
-    free(tmp);
+    flint_free(tmp);
 }

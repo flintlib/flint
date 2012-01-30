@@ -65,7 +65,7 @@ main(void)
         
        printf("bits = %ld\n", int_limbs*FLINT_BITS);
        
-       i1 = malloc(6*int_limbs*sizeof(mp_limb_t));
+       i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
        i2 = i1 + int_limbs;
        r1 = i2 + int_limbs;
        r2 = r1 + 2*int_limbs;
@@ -77,7 +77,7 @@ main(void)
        for (j = 0; j < iters; j++)
           mul_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
 
-       free(i1);
+       flint_free(i1);
     }
 
     flint_randclear(state);

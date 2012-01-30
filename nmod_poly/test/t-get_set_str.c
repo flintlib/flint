@@ -65,7 +65,7 @@ main(void)
             abort();
         }
 
-        free(str);
+        flint_free(str);
         nmod_poly_clear(a);
         nmod_poly_clear(b);
     }

@@ -43,8 +43,8 @@ bell_number_multi_mod(fmpz_t res, ulong n)
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
-    primes = malloc(num_primes * sizeof(mp_limb_t));
-    residues = malloc(num_primes * sizeof(mp_limb_t));
+    primes = flint_malloc(num_primes * sizeof(mp_limb_t));
+    residues = flint_malloc(num_primes * sizeof(mp_limb_t));
 
     primes[0] = n_nextprime(1UL << prime_bits, 0);
     for (k = 1; k < num_primes; k++)
@@ -64,6 +64,6 @@ bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_clear(comb);
     fmpz_comb_temp_clear(temp);
 
-    free(primes);
-    free(residues);
+    flint_free(primes);
+    flint_free(residues);
 }

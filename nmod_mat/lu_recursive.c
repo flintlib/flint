@@ -44,8 +44,8 @@ _apply_permutation(long * AP, nmod_mat_t A, long * P,
         long * APtmp;
         long i;
 
-        Atmp = malloc(sizeof(mp_ptr) * n);
-        APtmp = malloc(sizeof(long) * n);
+        Atmp = flint_malloc(sizeof(mp_ptr) * n);
+        APtmp = flint_malloc(sizeof(long) * n);
 
         for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
         for (i = 0; i < n; i++) A->rows[i + offset] = Atmp[i];
@@ -53,8 +53,8 @@ _apply_permutation(long * AP, nmod_mat_t A, long * P,
         for (i = 0; i < n; i++) APtmp[i] = AP[P[i] + offset];
         for (i = 0; i < n; i++) AP[i + offset] = APtmp[i];
 
-        free(Atmp);
-        free(APtmp);
+        flint_free(Atmp);
+        flint_free(APtmp);
     }
 }
 
@@ -80,7 +80,7 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
     for (i = 0; i < m; i++)
         P[i] = i;
 
-    P1 = malloc(sizeof(long) * m);
+    P1 = flint_malloc(sizeof(long) * m);
     nmod_mat_window_init(A0, A, 0, 0, m, n1);
     nmod_mat_window_init(A1, A, 0, n1, m, n);
 
@@ -88,7 +88,7 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
 
     if (rank_check && (r1 != n1))
     {
-        free(P1);
+        flint_free(P1);
         nmod_mat_window_clear(A0);
         nmod_mat_window_clear(A1);
         return 0;
@@ -135,7 +135,7 @@ nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
         }
     }
 
-    free(P1);
+    flint_free(P1);
     nmod_mat_window_clear(A00);
     nmod_mat_window_clear(A01);
     nmod_mat_window_clear(A10);

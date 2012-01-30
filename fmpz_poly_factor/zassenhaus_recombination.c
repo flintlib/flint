@@ -40,7 +40,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_t f, Q, R, tryme;
     fmpz *leadF;
 
-    used_arr = calloc(2 * r, sizeof(long));
+    used_arr = flint_calloc(2 * r, sizeof(long));
     sub_arr  = used_arr + r;
 
     fmpz_poly_init(f);
@@ -139,7 +139,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     fmpz_poly_clear(tryme);
     fmpz_poly_clear(Q);
     fmpz_poly_clear(R);
-    free(used_arr);
+    flint_free(used_arr);
 }
 
 #undef TRACE

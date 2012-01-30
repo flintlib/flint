@@ -90,9 +90,9 @@ main(void)
                 {
                     set_p(p, n, w);
                     
-                    nn1 = malloc((limbs+1)*sizeof(mp_limb_t));
-                    r1 = malloc((limbs+1)*sizeof(mp_limb_t));
-                    temp = malloc((limbs+1)*sizeof(mp_limb_t));
+                    nn1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
+                    r1 = flint_malloc((limbs+1)*sizeof(mp_limb_t));
+                    temp = flint_malloc((limbs+1)*sizeof(mp_limb_t));
 
                     random_fermat(nn1, state, limbs); 
                     fermat_to_mpz(mn1, nn1, limbs);
@@ -115,9 +115,9 @@ main(void)
                         abort();
                     }
                     
-                    free(temp);
-                    free(nn1);
-                    free(r1);
+                    flint_free(temp);
+                    flint_free(nn1);
+                    flint_free(r1);
                 }
             }
         }

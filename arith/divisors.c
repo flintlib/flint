@@ -66,8 +66,8 @@ void
 _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
-    long *exp = malloc(sizeof(long) * factors->num);
-    long *exp_max = malloc(sizeof(long) * factors->num);
+    long *exp = flint_malloc(sizeof(long) * factors->num);
+    long *exp_max = flint_malloc(sizeof(long) * factors->num);
     fmpz *powers = _fmpz_vec_init(factors->num);
     fmpz_t d;
 
@@ -111,8 +111,8 @@ _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 
     all_done:
     fmpz_clear(d);
-    free(exp);
-    free(exp_max);
+    flint_free(exp);
+    flint_free(exp_max);
     _fmpz_vec_clear(powers, factors->num);
 }
 

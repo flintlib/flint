@@ -34,7 +34,7 @@ nmod_mat_clear(nmod_mat_t mat)
 {
     if (mat->entries)
     {
-        free(mat->entries);
-        free(mat->rows);
+        flint_free(mat->entries);
+        flint_free(mat->rows);
     }
 }

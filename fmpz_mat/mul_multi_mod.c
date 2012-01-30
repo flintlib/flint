@@ -64,16 +64,16 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     }
 
     /* Initialize */
-    primes = malloc(sizeof(mp_limb_t) * num_primes);
+    primes = flint_malloc(sizeof(mp_limb_t) * num_primes);
     primes[0] = n_nextprime(1UL << primes_bits, 0);
     for (i = 1; i < num_primes; i++)
         primes[i] = n_nextprime(primes[i-1], 0);
 
-    residues = malloc(sizeof(mp_limb_t) * num_primes);
+    residues = flint_malloc(sizeof(mp_limb_t) * num_primes);
 
-    mod_A = malloc(sizeof(nmod_mat_t) * num_primes);
-    mod_B = malloc(sizeof(nmod_mat_t) * num_primes);
-    mod_C = malloc(sizeof(nmod_mat_t) * num_primes);
+    mod_A = flint_malloc(sizeof(nmod_mat_t) * num_primes);
+    mod_B = flint_malloc(sizeof(nmod_mat_t) * num_primes);
+    mod_C = flint_malloc(sizeof(nmod_mat_t) * num_primes);
     for (i = 0; i < num_primes; i++)
     {
         nmod_mat_init(mod_A[i], A->r, A->c, primes[i]);
@@ -122,15 +122,15 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
         nmod_mat_clear(mod_C[i]);
     }
 
-    free(mod_A);
-    free(mod_B);
-    free(mod_C);
+    flint_free(mod_A);
+    flint_free(mod_B);
+    flint_free(mod_C);
 
     fmpz_comb_temp_clear(comb_temp);
     fmpz_comb_clear(comb);
 
-    free(residues);
-    free(primes);
+    flint_free(residues);
+    flint_free(primes);
 }
 
 void

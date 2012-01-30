@@ -58,7 +58,7 @@ nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     }
     else
     {
-        mp_ptr tmp = malloc(sizeof(mp_limb_t) * k * n);
+        mp_ptr tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
 
         for (i = 0; i < k; i++)
             for (j = 0; j < n; j++)
@@ -69,6 +69,6 @@ nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
                 nmod_mat_entry(C, i, j) = _nmod_vec_dot(A->rows[i],
                     tmp + j*k, k, C->mod, nlimbs);
 
-        free(tmp);
+        flint_free(tmp);
     }
 }

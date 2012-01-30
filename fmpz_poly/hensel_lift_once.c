@@ -40,8 +40,8 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
     long *link;
     fmpz_poly_t *v, *w;
 
-    link = malloc((2*r - 2) * sizeof(long));
-    v    = malloc(2*(2*r - 2) * sizeof(fmpz_poly_t));
+    link = flint_malloc((2*r - 2) * sizeof(long));
+    v    = flint_malloc(2*(2*r - 2) * sizeof(fmpz_poly_t));
     w    = v + (2*r - 2);
 
     for(i = 0; i < 2*r - 2; i++)
@@ -57,7 +57,7 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
         fmpz_poly_clear(v[i]);
         fmpz_poly_clear(w[i]);
     }
-    free(link);
-    free(v);
+    flint_free(link);
+    flint_free(v);
 }
 

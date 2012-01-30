@@ -106,9 +106,9 @@ main(void)
         }
 
         r = f_fac->num;
-        v = malloc((2*r - 2)*sizeof(fmpz_poly_t));
-        w = malloc((2*r - 2)*sizeof(fmpz_poly_t));
-        link = malloc((2*r - 2)*sizeof(long));
+        v = flint_malloc((2*r - 2)*sizeof(fmpz_poly_t));
+        w = flint_malloc((2*r - 2)*sizeof(fmpz_poly_t));
+        link = flint_malloc((2*r - 2)*sizeof(long));
 
         for (j = 0; j < 2*r - 2; j++)
         {
@@ -147,9 +147,9 @@ main(void)
             fmpz_poly_clear(w[j]);
         }
 
-        free(link);
-        free(v);
-        free(w);
+        flint_free(link);
+        flint_free(v);
+        flint_free(w);
 
         if (!result) 
         {

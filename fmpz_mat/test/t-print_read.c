@@ -59,7 +59,7 @@ int main(void)
     {
         fmpz_mat_t *M;
 
-        M = malloc(k * sizeof(fmpz_mat_t));
+        M = flint_malloc(k * sizeof(fmpz_mat_t));
         for (i = 0; i < k; i++)
         {
             m = n_randint(state, 10);
@@ -165,7 +165,7 @@ int main(void)
 
         for (i = 0; i < k; i++)
             fmpz_mat_clear(M[i]);
-        free(M);
+        flint_free(M);
     }
 
     /* Write bad data to a pipe and read it */

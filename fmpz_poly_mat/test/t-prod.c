@@ -57,7 +57,7 @@ main(void)
         fmpz_poly_mat_init(A, m, m);
         fmpz_poly_mat_init(B, m, m);
 
-        V = malloc(sizeof(fmpz_poly_mat_t) * count);
+        V = flint_malloc(sizeof(fmpz_poly_mat_t) * count);
         for (j = 0; j < count; j++)
         {
             fmpz_poly_mat_init(V[j], m, m);
@@ -85,7 +85,7 @@ main(void)
         fmpz_poly_mat_clear(B);
         for (j = 0; j < count; j++)
             fmpz_poly_mat_clear(V[j]);
-        free(V);
+        flint_free(V);
     }
 
     flint_randclear(state);

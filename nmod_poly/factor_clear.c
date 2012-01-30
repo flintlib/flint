@@ -38,6 +38,6 @@ nmod_poly_factor_clear(nmod_poly_factor_t fac)
     for (i = 0; i < fac->alloc; i++)
         nmod_poly_clear(fac->p + i);
 
-    free(fac->p);
-    free(fac->exp);
+    flint_free(fac->p);
+    flint_free(fac->exp);
 }

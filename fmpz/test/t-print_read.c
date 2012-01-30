@@ -58,7 +58,7 @@ int main(void)
     {
         fmpz *a;
 
-        a = calloc(n, sizeof(fmpz));
+        a = flint_calloc(n, sizeof(fmpz));
         for (i = 0; i < n; i++)
             fmpz_randtest(a + i, state, 200);
 
@@ -158,7 +158,7 @@ int main(void)
 
         for (i = 0; i < n; i++)
             fmpz_clear(a + i);
-        free(a);
+        flint_free(a);
     }
 
     /* Write bad data to a pipe and read it */

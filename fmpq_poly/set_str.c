@@ -49,7 +49,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
         return 0;
     }
 
-    a = (mpq_t *) malloc(len * sizeof(mpq_t));
+    a = (mpq_t *) flint_malloc(len * sizeof(mpq_t));
 
     while (*str++ != ' ') ;
 
@@ -65,7 +65,7 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
                 max = cur;
         }
 
-        w = (char *) malloc((max + 1) * sizeof(char));
+        w = (char *) flint_malloc((max + 1) * sizeof(char));
     }
 
     for (i = 0; i < len; i++)
@@ -85,8 +85,8 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
             int j;
             for (j = 0; j <= i; j++)
                 mpq_clear(a[j]);
-            free(a);
-            free(w);
+            flint_free(a);
+            flint_free(w);
             return -1;
         }
     }
@@ -95,8 +95,8 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 
     for (i = 0; i < len; i++)
         mpq_clear(a[i]);
-    free(a);
-    free(w);
+    flint_free(a);
+    flint_free(w);
 
     return 0;
 }

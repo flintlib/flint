@@ -35,5 +35,5 @@ _mpfr_vec_clear(__mpfr_struct * vec, long length)
     long i;
     for (i = 0; i < length; i++)
         mpfr_clear(vec + i);
-    free(vec);
+    flint_free(vec);
 }

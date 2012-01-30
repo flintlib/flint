@@ -93,7 +93,7 @@ void _fmpz_mod_poly_compose_divconquer(fmpz *res,
 
         v    = _fmpz_vec_init(lenV + lenW);
         w    = v + lenV;
-        pow2 = malloc(k * sizeof(fmpz *));
+        pow2 = flint_malloc(k * sizeof(fmpz *));
 
         for (i = 0; i < k; i++)
         {
@@ -111,7 +111,7 @@ void _fmpz_mod_poly_compose_divconquer(fmpz *res,
                                                          pow2, len2, w, p);
 
         _fmpz_vec_clear(v, lenV + lenW);
-        free(pow2);
+        flint_free(pow2);
     }
 }
 

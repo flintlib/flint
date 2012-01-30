@@ -51,8 +51,8 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
 
     /* Most likely less memory will be needed, but this way we
        avoid reallocations */
-    div = malloc(sizeof(mp_limb_t) * xsize);
-    rem = malloc(sizeof(mp_limb_t) * xsize);
+    div = flint_malloc(sizeof(mp_limb_t) * xsize);
+    rem = flint_malloc(sizeof(mp_limb_t) * xsize);
 
     /* Remove ascending powers */
     for (i = 0; i < FLINT_BITS && xsize >= square_size[i]; i++)
@@ -75,7 +75,7 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
         if (sqsize - 1 > xsize)
             break;
         maxi = i + 1;
-        square[i + 1] = malloc(sizeof(mp_limb_t) * sqsize);
+        square[i + 1] = flint_malloc(sizeof(mp_limb_t) * sqsize);
         mpn_sqr(square[i + 1], square[i], square_size[i]);
         if (square[i + 1][sqsize - 1] == 0)
             sqsize -= 1;
@@ -100,8 +100,8 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     }
 
     for (i = 1; i <= maxi; i++)
-        free(square[i]);
-    free(div);
-    free(rem);
+        flint_free(square[i]);
+    flint_free(div);
+    flint_free(rem);
     return xsize;
 }

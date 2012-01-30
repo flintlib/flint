@@ -185,7 +185,7 @@ char * nmod_poly_get_str(const nmod_poly_t poly)
 
     Writes \code{poly} to a string representation. The format is as 
     described for \code{nmod_poly_print()}. The string must be freed by the 
-    user when finished. For this it is sufficient to call \code{free()}.
+    user when finished. For this it is sufficient to call \code{flint_free()}.
 
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 

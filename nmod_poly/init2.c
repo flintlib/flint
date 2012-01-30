@@ -35,7 +35,7 @@ nmod_poly_init2_preinv(nmod_poly_t poly,
                        mp_limb_t n, mp_limb_t ninv, long alloc)
 {
     if (alloc)
-        poly->coeffs = (mp_ptr) malloc(alloc * sizeof(mp_limb_t));
+        poly->coeffs = (mp_ptr) flint_malloc(alloc * sizeof(mp_limb_t));
     else
         poly->coeffs = NULL;
 

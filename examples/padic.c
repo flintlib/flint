@@ -58,19 +58,19 @@ int main(void)
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     _padic_clear(x);
 
@@ -91,19 +91,19 @@ int main(void)
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     _padic_clear(x);
 
@@ -124,13 +124,13 @@ int main(void)
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
     printf("print:   "), _padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
-    free(str);
+    flint_free(str);
 
     _padic_clear(x);
 

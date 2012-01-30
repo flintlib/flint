@@ -56,7 +56,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1,
     size = limbs + 1;
 
     /* allocate space for ffts */
-    ii = malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
+    ii = flint_malloc((4*(n + n*size) + 5*size)*sizeof(mp_limb_t));
     for (i = 0, ptr = (mp_limb_t *) ii + 4*n; i < 4*n; i++, ptr += size) 
         ii[i] = ptr;
     t1 = ptr;
@@ -66,7 +66,7 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1,
 
     if (input1 != input2)
     {
-        jj = malloc(4*(n + n*size)*sizeof(mp_limb_t));
+        jj = flint_malloc(4*(n + n*size)*sizeof(mp_limb_t));
         for (i = 0, ptr = (mp_limb_t *) jj + 4*n; i < 4*n; i++, ptr += size) 
             jj[i] = ptr;
     } else jj = ii;
@@ -104,9 +104,9 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1,
 
     _fmpz_vec_set_fft(output, trunc, ii, limbs, sign); /* write output */
 
-    free(ii); 
+    flint_free(ii); 
     if (input1 != input2) 
-        free(jj);
+        flint_free(jj);
 }
 
 void

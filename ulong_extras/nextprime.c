@@ -84,7 +84,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
         return n;
     }
 
-    moduli = (mp_limb_t *) malloc(NEXTPRIME_PRIMES * sizeof(mp_limb_t));
+    moduli = (mp_limb_t *) flint_malloc(NEXTPRIME_PRIMES * sizeof(mp_limb_t));
 
     for (i = 3; i < NEXTPRIME_PRIMES; i++)
         moduli[i] = (n % flint_primes_small[i]);
@@ -123,6 +123,6 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
         }
     }
 
-    free(moduli);
+    flint_free(moduli);
     return n;
 }

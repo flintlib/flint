@@ -39,7 +39,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     fmpz *W;
 
     fmpz_init_set(invLP, invL);
-    W = malloc((1L << (k - 1)) * degR * sizeof(fmpz));
+    W = flint_malloc((1L << (k - 1)) * degR * sizeof(fmpz));
 
     _fmpz_vec_set(Rpow[0], R, lenR);
     for (i = 1; i < k; i++)
@@ -69,7 +69,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     }
 
     fmpz_clear(invLP);
-    free(W);
+    flint_free(W);
 }
 
 void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
@@ -93,8 +93,8 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
         D->V = _fmpz_vec_init(lenV + lenW);
         D->W = D->V + lenV;
 
-        D->Rpow = malloc(k * sizeof(fmpz *));
-        D->Rinv = malloc(k * sizeof(fmpz *));
+        D->Rpow = flint_malloc(k * sizeof(fmpz *));
+        D->Rinv = flint_malloc(k * sizeof(fmpz *));
 
         for (i = 0; i < k; i++)
         {
@@ -123,8 +123,8 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
         const long lenW = degR * ((1L << k) - 1);
 
         _fmpz_vec_clear(D->V, lenV + lenW);
-        free(D->Rpow);
-        free(D->Rinv);
+        flint_free(D->Rpow);
+        flint_free(D->Rinv);
         fmpz_clear(&(D->invL));
     }
 }
@@ -185,7 +185,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
 
         if (lenF < lenG)
         {
-            G = malloc(lenG * sizeof(fmpz));
+            G = flint_malloc(lenG * sizeof(fmpz));
             for (i = 0; i < lenF; i++)
                 G[i] = F->coeffs[i];
             mpn_zero((mp_ptr) G + lenF, lenG - lenF);
@@ -198,7 +198,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
             T = NULL;
         }
 
-        C = malloc((N + 1 + t) * sizeof(fmpz *));
+        C = flint_malloc((N + 1 + t) * sizeof(fmpz *));
         for (i = 0; i <= N; i++)
         {
             fmpz_mod_poly_fit_length(B[i], degR);
@@ -220,10 +220,10 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
             _fmpz_mod_poly_set_length(B[i], degR);
             _fmpz_mod_poly_normalise(B[i]);
         }
-        free(C);
+        flint_free(C);
         if (lenF < lenG)
         {
-            free(G);
+            flint_free(G);
         }
         if (t) 
         {

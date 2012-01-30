@@ -298,7 +298,7 @@ int nmod_poly_fprint(FILE * f, const nmod_poly_t poly)
 
     s = nmod_poly_get_str(poly);
     r = fputs(s, f);
-    free(s);
+    flint_free(s);
 
     return (r < 0) ? r : 1;
 }

@@ -37,7 +37,7 @@ _nmod_poly_is_squarefree(mp_srcptr f, long len, nmod_t mod)
     if (len <= 2)
         return len != 0;
 
-    fd = malloc(sizeof(mp_limb_t) * 2 * (len - 1));
+    fd = flint_malloc(sizeof(mp_limb_t) * 2 * (len - 1));
     g = fd + len - 1;
 
     _nmod_poly_derivative(fd, f, len, mod);
@@ -49,7 +49,7 @@ _nmod_poly_is_squarefree(mp_srcptr f, long len, nmod_t mod)
     else
         res = 0;   /* gcd(f, 0) = f, and len(f) > 2 */
 
-    free(fd);
+    flint_free(fd);
     return res;
 }
 

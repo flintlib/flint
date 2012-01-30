@@ -42,7 +42,7 @@ _nmod_mat_det(nmod_mat_t A)
     long rank;
     long i;
 
-    P = malloc(sizeof(long) * m);
+    P = flint_malloc(sizeof(long) * m);
     rank = nmod_mat_lu(P, A, 1);
 
     det = 0UL;
@@ -58,7 +58,7 @@ _nmod_mat_det(nmod_mat_t A)
     if (_perm_parity(P, m) == 1)
         det = nmod_neg(det, A->mod);
 
-    free(P);
+    flint_free(P);
     return det;
 }
 

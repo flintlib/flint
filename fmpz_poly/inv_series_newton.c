@@ -49,7 +49,7 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
 
         for (i = 1; (1L << i) < n; i++) ;
 
-        a = (long *) malloc(i * sizeof(long));
+        a = (long *) flint_malloc(i * sizeof(long));
         a[i = 0] = n;
         while (n >= FMPZ_POLY_INV_NEWTON_CUTOFF)
             a[++i] = (n = (n + 1) / 2);
@@ -76,7 +76,7 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n)
         }
 
         _fmpz_vec_clear(W, alloc);
-        free(a);
+        flint_free(a);
     }
 }
 
@@ -93,7 +93,7 @@ void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     else
     {
         long i;
-        Qcopy = (fmpz *) malloc(n * sizeof(fmpz));
+        Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];
         mpn_zero((mp_ptr) Qcopy + i, n - i);
@@ -118,6 +118,6 @@ void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     _fmpz_poly_normalise(Qinv);
 
     if (Qalloc)
-        free(Qcopy);
+        flint_free(Qcopy);
 }
 

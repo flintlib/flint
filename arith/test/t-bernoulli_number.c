@@ -84,7 +84,7 @@ int main()
         fmpq_t t;
 
         fmpq_init(t);
-        x = malloc(sizeof(fmpq) * N);
+        x = flint_malloc(sizeof(fmpq) * N);
 
         for (n = 0; n < N; n++)
             fmpq_init(x + n);
@@ -102,7 +102,7 @@ int main()
 
         for (n = 0; n < N; n++)
             fmpq_clear(x + n);
-        free(x);
+        flint_free(x);
         fmpq_clear(t);
 
     } while (0);

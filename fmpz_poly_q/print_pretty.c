@@ -34,7 +34,7 @@ int fmpz_poly_q_print_pretty(const fmpz_poly_q_t op, const char *x)
 
     str = fmpz_poly_q_get_str_pretty(op, x);
     printf("%s", str);
-    free(str);
+    flint_free(str);
 
     return 1;
 }

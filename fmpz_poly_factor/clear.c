@@ -41,8 +41,8 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
         }
 
         fmpz_clear(&(fac->c));
-        free(fac->p);
-        free(fac->exp);
+        flint_free(fac->p);
+        flint_free(fac->exp);
         fac->p   = NULL;
         fac->exp = NULL;
     }

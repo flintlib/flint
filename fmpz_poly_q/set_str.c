@@ -69,7 +69,7 @@ int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
     }
     else
     {
-        numstr = malloc(m + 1);
+        numstr = flint_malloc(m + 1);
         if (!numstr)
         {
             printf("ERROR (fmpz_poly_q_set_str).  Memory allocation failed.\n");
@@ -86,7 +86,7 @@ int fmpz_poly_q_set_str(fmpz_poly_q_t rop, const char *s)
             fmpz_poly_q_canonicalise(rop);
         else
             fmpz_poly_q_zero(rop);
-        free(numstr);
+        flint_free(numstr);
         return ans;
     }
 }

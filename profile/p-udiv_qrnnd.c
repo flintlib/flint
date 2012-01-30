@@ -33,7 +33,7 @@
 void sample(void * arg, ulong count)
 {
    mp_limb_t d;
-   mp_ptr array = (mp_ptr) malloc(200 * sizeof(mp_limb_t));
+   mp_ptr array = (mp_ptr) flint_malloc(200 * sizeof(mp_limb_t));
    flint_rand_t state;
    ulong i;
    int j;
@@ -65,7 +65,7 @@ void sample(void * arg, ulong count)
    }
 
    flint_randclear(state);
-   free(array);
+   flint_free(array);
 }
 
 int main(void)

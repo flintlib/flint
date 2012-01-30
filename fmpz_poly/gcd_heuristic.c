@@ -46,14 +46,14 @@ mp_size_t mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
       mp_size_t tlimbs;
       __mpz_struct * mpz_ptr = COEFF_TO_PTR(*gc);
       
-      mp_ptr temp = malloc(limbsg*sizeof(mp_limb_t));
+      mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
       mpn_copyi(temp, arrayg, limbsg);
       
       mpn_tdiv_q(arrayg, temp, limbsg, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
       tlimbs = limbsg - mpz_ptr->_mp_size + 1;
       tlimbs -= (arrayg[tlimbs - 1] == 0);
       
-      free(temp);
+      flint_free(temp);
       return tlimbs;
    } 
 }
@@ -167,9 +167,9 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    /* allocate space to pack into */
    limbs1 = (pack_bits*len1 - 1)/FLINT_BITS + 1;
    limbs2 = (pack_bits*len2 - 1)/FLINT_BITS + 1;
-	array1 = calloc(limbs1, sizeof(mp_limb_t));
-   array2 = calloc(limbs2, sizeof(mp_limb_t));
-   arrayg = calloc(limbs2, sizeof(mp_limb_t));
+	array1 = flint_calloc(limbs1, sizeof(mp_limb_t));
+   array2 = flint_calloc(limbs2, sizeof(mp_limb_t));
+   arrayg = flint_calloc(limbs2, sizeof(mp_limb_t));
    
    /* pack first poly and normalise */
    sign1 = (long) fmpz_sgn(A + len1 - 1);
@@ -206,8 +206,8 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    qlimbs = limbs1 - limbsg + 1;
    qlen = FLINT_MIN(len1, (qlimbs*FLINT_BITS)/pack_bits + 1);
    qlimbs = (qlen*pack_bits - 1)/FLINT_BITS + 1;
-   q = calloc(qlimbs, sizeof(mp_limb_t));
-   temp = malloc(limbsg*sizeof(mp_limb_t));
+   q = flint_calloc(qlimbs, sizeof(mp_limb_t));
+   temp = flint_malloc(limbsg*sizeof(mp_limb_t));
    
 	divides = 0;
 
@@ -260,11 +260,11 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
       _fmpz_vec_clear(Q, len1);
 	}
 
-   free(q); 
-	free(temp); 
-	free(arrayg); 
-	free(array1); 
-	free(array2); 
+   flint_free(q); 
+	flint_free(temp); 
+	flint_free(arrayg); 
+	flint_free(array1); 
+	flint_free(array2); 
 	fmpz_clear(gc); 
 	
 	_fmpz_vec_clear(A, len1);

@@ -50,9 +50,9 @@ int main(int argc, char* argv[])
     fmpz_poly_q_mul(f, f, g);
     str  = fmpz_poly_q_get_str_pretty(f, "t");
     printf("%s * %s = %s\n", strf, strg, str);
-    free(str);
-    free(strf);
-    free(strg);
+    flint_free(str);
+    flint_free(strf);
+    flint_free(strg);
     fmpz_poly_q_clear(f);
     fmpz_poly_q_clear(g);
 

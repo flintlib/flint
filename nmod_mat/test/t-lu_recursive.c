@@ -39,12 +39,12 @@ void perm(nmod_mat_t A, long * P)
     if (A->c == 0 || A->r == 0)
         return;
 
-    tmp = malloc(sizeof(mp_ptr) * A->r);
+    tmp = flint_malloc(sizeof(mp_ptr) * A->r);
 
     for (i = 0; i < A->r; i++) tmp[P[i]] = A->rows[i];
     for (i = 0; i < A->r; i++) A->rows[i] = tmp[i];
 
-    free(tmp);
+    flint_free(tmp);
 }
 
 void check(long * P, nmod_mat_t LU, const nmod_mat_t A, long rank)
@@ -139,7 +139,7 @@ main(void)
             }
 
             nmod_mat_init_set(LU, A);
-            P = malloc(sizeof(long) * m);
+            P = flint_malloc(sizeof(long) * m);
 
             rank = nmod_mat_lu_recursive(P, LU, 0);
 
@@ -158,7 +158,7 @@ main(void)
 
             nmod_mat_clear(A);
             nmod_mat_clear(LU);
-            free(P);
+            flint_free(P);
         }
     }
 

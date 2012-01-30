@@ -46,9 +46,9 @@ int main(int argc, char* argv[])
     fmpq_poly_mul(f, f, g);
     str  = fmpq_poly_get_str_pretty(f, "t");
     printf("(%s) * (%s) = %s\n", strf, strg, str);
-    free(str);
-    free(strf);
-    free(strg);
+    flint_free(str);
+    flint_free(strf);
+    flint_free(strg);
     fmpq_poly_clear(f);
     fmpq_poly_clear(g);
 
