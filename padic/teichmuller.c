@@ -91,9 +91,8 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         {
             fmpz_mod(rop, op, pow + i);
 
-            fmpz_powm(s, rop, pm2, pow + i);
-            fmpz_mul(r, pm1, s);
-            fmpz_invmod(inv, r, pow + i);
+            /* {(p-1) x^{p-2}}^{-1} */
+            fmpz_sub(inv, p, rop);
         }
         for (i--; i >= 0; i--)
         {
