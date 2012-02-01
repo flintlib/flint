@@ -62,7 +62,7 @@ void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2);
 void fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2);
 void fmpz_mat_clear(fmpz_mat_t mat);
 
-int fmpz_mat_equal(fmpz_mat_t mat1, fmpz_mat_t mat2);
+int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2);
 int fmpz_mat_is_zero(const fmpz_mat_t mat);
 
 static __inline__ int
