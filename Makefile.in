@@ -114,10 +114,10 @@ install: library
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(PREFIX)/lib; 
+		cp $(FLINT_LIB) $(PREFIX)/lib; \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(PREFIX)/lib;
+		cp libflint.a $(PREFIX)/lib; \
 	fi
 	cp *.h $(PREFIX)/include
 
