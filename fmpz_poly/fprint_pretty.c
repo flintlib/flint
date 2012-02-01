@@ -25,10 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
 
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_poly.h"
 
 int _fmpz_poly_fprint_pretty(FILE * file, 
@@ -36,6 +33,8 @@ int _fmpz_poly_fprint_pretty(FILE * file,
 {
     int r;
     long i;
+
+    FMPZ_VEC_NORM(poly, len);
 
     if (len == 0)
     {
