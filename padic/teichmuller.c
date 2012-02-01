@@ -19,65 +19,130 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+{
+    if (*p == 2L)
+    {
+        fmpz_one(rop);
+    }
+    else if (N == 1)
+    {
+        fmpz_mod(rop, op, p);
+    }
+    else
+    {
+        long *a, i, n;
+        fmpz *pow;
+        fmpz_t r, s, t;
+        fmpz_t inv;
+        fmpz_t pm1, pm2;
+
+        n = FLINT_CLOG2(N) + 1;
+
+        a = malloc(n * sizeof(long));
+        for (a[i = 0] = N; a[i] > 1; i++)
+            a[i + 1] = (a[i] + 1) / 2;
+
+        pow = _fmpz_vec_init(n);
+
+        fmpz_init(r);
+        fmpz_init(s);
+        fmpz_init(t);
+        fmpz_init(inv);
+        fmpz_init(pm1);
+        fmpz_init(pm2);
+
+        fmpz_sub_ui(pm1, p, 1);
+        fmpz_sub_ui(pm2, p, 2);
+
+        /* Compute powers of p */
+        {
+            fmpz_one(t);
+            fmpz_set(pow + i, p);
+        }
+        for (i--; i >= 1; i--)
+        {
+            if (a[i] & 1L)
+            {
+                fmpz_mul(pow + i, t, pow + (i + 1));
+                fmpz_mul(t, t, t);
+            }
+            else
+            {
+                fmpz_mul(t, t, pow + (i + 1));
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+            }
+        }
+        {
+            if (a[i] & 1L)
+                fmpz_mul(pow + i, t, pow + (i + 1));
+            else
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+        }
+
+        /* Run Newton iteration */
+        i = n - 1;
+        {
+            fmpz_mod(rop, op, pow + i);
+
+            fmpz_powm(s, rop, pm2, pow + i);
+            fmpz_mul(r, pm1, s);
+            fmpz_invmod(inv, r, pow + i);
+        }
+        for (i--; i >= 0; i--)
+        {
+            /* Lift rop */
+            fmpz_powm(t, rop, pm1, pow + i);
+            fmpz_sub_ui(t, t, 1);
+            fmpz_mul(s, t, inv);
+            fmpz_sub(rop, rop, s);
+            fmpz_mod(rop, rop, pow + i);
+
+            /* Lift inv */
+            if (i > 0)
+            {
+                fmpz_powm(s, rop, pm2, pow + i);
+                fmpz_mul(t, inv, pm1);
+                fmpz_mul(r, s, t);
+                fmpz_sub_ui(r, r, 2);
+                fmpz_neg(r, r);
+                fmpz_mul(inv, inv, r);
+                fmpz_mod(inv, inv, pow + i);
+            }
+        }
+
+        _fmpz_vec_clear(pow, n);
+
+        fmpz_clear(r);
+        fmpz_clear(s);
+        fmpz_clear(t);
+        fmpz_clear(inv);
+        fmpz_clear(pm1);
+        fmpz_clear(pm2);
+    }
+}
+
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    int alloc;
-    fmpz_t u, x, ppow;
-
     if (padic_val(op) < 0)
     {
         printf("ERROR (padic_teichmuller).  op is not a p-adic integer.\n");
         abort();
     }
 
-    if (_padic_is_zero(op) || (padic_val(op) > 0))
+    if (_padic_is_zero(op) || padic_val(op) > 0 || ctx->N <= 0)
     {
         padic_zero(rop);
         return;
     }
 
-    fmpz_init(x);
-    fmpz_init(u);
-
-    alloc = _padic_ctx_pow_ui(ppow, ctx->N, ctx);
-
-    /* Set x = op mod p^N */
-    fmpz_mod(x, padic_unit(op), ppow);
-    
-    /* Let u be the inverse of 1-p mod p^N */
-    fmpz_sub(u, ppow, ctx->p);
-    fmpz_add_ui(u, u, 1);
-    _padic_inv(u, u, ctx->p, ctx->N);
-
-    /* Let rop = x + u * (x^p - x) mod p^N */
-    fmpz_powm(padic_unit(rop), x, ctx->p, ppow);
-    fmpz_sub(padic_unit(rop), padic_unit(rop), x);
-    fmpz_mul(padic_unit(rop), u, padic_unit(rop));
-    fmpz_add(padic_unit(rop), x, padic_unit(rop));
-    fmpz_mod(padic_unit(rop), padic_unit(rop), ppow);
-    
-    /* Repeat this until rop == x mod p^N */
-    while (!fmpz_equal(padic_unit(rop), x))
-    {
-        fmpz_swap(x, padic_unit(rop));
-        fmpz_powm(padic_unit(rop), x, ctx->p, ppow);
-        fmpz_sub(padic_unit(rop), padic_unit(rop), x);
-        fmpz_mul(padic_unit(rop), u, padic_unit(rop));
-        fmpz_add(padic_unit(rop), x, padic_unit(rop));
-        fmpz_mod(padic_unit(rop), padic_unit(rop), ppow);
-    }
-    
+    _padic_teichmuller(padic_unit(rop), padic_unit(op), ctx->p, ctx->N);
     padic_val(rop) = 0;
-    
-    fmpz_clear(x);
-    fmpz_clear(u);
-    if (alloc)
-        fmpz_clear(ppow);
 }
 

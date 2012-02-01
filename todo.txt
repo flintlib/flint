@@ -384,8 +384,6 @@ fmpq_mat
 padic
 -----
 
-* Improve the implementation of "padic_teichmuller"
-
 * Add test code for the various output formats; 
   perhaps in the form of examples?
 

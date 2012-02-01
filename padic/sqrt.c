@@ -52,13 +52,13 @@ static int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         long *a, i, len;
         fmpz *W, *pow, *u;
 
-        for (i = 1; (1L << i) < N; i++) ;
+        len = FLINT_CLOG2(N) + 1;
 
         /* Compute sequence of exponents */
-        a = flint_malloc((i + 1) * sizeof(long));
+        a = flint_malloc(len * sizeof(long));
+
         for (a[i = 0] = N; a[i] > 1; i++)
             a[i + 1] = (a[i] + 1) / 2;
-        len = i + 1;
 
         W      = _fmpz_vec_init(2 + 2 * len);
         pow    = W + 2;
@@ -159,7 +159,7 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
         long *a, i, len;
         fmpz *W, *pow, *u;
 
-        for (i = 1; (1L << i) < N; i++) ;
+        i = FLINT_CLOG2(N);
 
         /* Compute sequence of exponents */
         a = flint_malloc((i + 2) * sizeof(long));

@@ -38,18 +38,20 @@
 
 void fmpz_set_ZZ(fmpz_t rop, const ZZ& op)
 
-   Converts an NTL ZZ to an fmpz_t.
+    Converts an NTL \code{ZZ} to an \code{fmpz_t}.
 
-   Assumes the fmpz_t has already been allocated to have sufficient space.
+    Assumes the \code{fmpz_t} has already been allocated to have sufficient
+    space.
 
 void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 
-   Converts an fmpz_t to an NTL ZZ. Allocation is automatically handled.
+    Converts an \code{fmpz_t} to an NTL \code{ZZ}. Allocation is automatically
+    handled.
 
 void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 
-   Converts an fmpz_poly_t to an NTL ZZX.
+    Converts an \code{fmpz_poly_t} to an NTL \code{ZZX}.
 
 void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
 
-   Converts an NTL ZZX to an fmpz_poly_t.
+    Converts an NTL \code{ZZX} to an \code{fmpz_poly_t}.

@@ -191,7 +191,7 @@ mp_limb_t bell_number_nmod(ulong n, nmod_t mod)
     After handling special cases, we use the formula
 
     $$B_n = \sum_{k=0}^n \frac{(n-k)^n}{(n-k)!}
-        \sum_{k=0}^{n-k} \frac{(-1)^j}{j!}.$$
+        \sum_{j=0}^k \frac{(-1)^j}{j!}.$$
 
     We arrange the operations in such a way that we only have to
     multiply (and not divide) in the main loop. As a further optimisation,
@@ -222,7 +222,7 @@ void bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod)
     Sets $b$ to the vector of Bell numbers $B_0, B_1, \ldots, B_{n-1}$
     inclusive modulo a prime $p$ given by \code{mod}. This function
     expands the exponential generating function
-    $$\sum_{k=0}^{\infty} \frac{B_n}{n!} x^n = \exp(e^x-1)$$.
+    $$\sum_{k=0}^{\infty} \frac{B_n}{n!} x^n = \exp(e^x-1).$$
     We require that $p \ge n$.
 
 double bell_number_size(ulong n)
@@ -477,18 +477,17 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
 
     Sets \code{res} to the polynomial with coefficients 
     $\tau(0),\tau(1), \dotsc, \tau(n-1)$, giving the initial $n$ terms 
-    in the series expansion of 
+    in the series expansion of
     $f(q) = q \prod_{k \geq 1} \bigl(1-q^k\bigr)^{24}$.
 
-    The algorithm is borrowed from the \code{delta_qexp()} function in 
-    Sage, written by William Stein and David Harvey, and consists of 
-    expanding the series of the equivalent representation 
+    We use the theta function identity
+
     \begin{equation*}
-    f(q) = q  \Biggl( \sum_{k \geq 0} (-1)^k (2k+1) q^{k(k+1)/2} \Biggr)^8.
+    f(q) = q  \Biggl( \sum_{k \geq 0} (-1)^k (2k+1) q^{k(k+1)/2} \Biggr)^8
     \end{equation*}
 
-    The first squaring is done directly since the polynomial is very 
-    sparse at this point.
+    which is evaluated using three squarings. The first squaring is done
+    directly since the polynomial is very sparse at this point.
 
 
 *******************************************************************************
@@ -536,7 +535,7 @@ void _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     exactly two prime factors, so in this case machine arithmetic can be
     used as well.
 
-    Finally, we handle two special cases: if there exactly one prime
+    Finally, we handle two special cases: if there is exactly one prime
     factor $n = p$, then $\Phi_n(x) = 1 + x + x^2 + \ldots + x^{n-1}$,
     and if $n = 2m$, we use $\Phi_n(x) = \Phi_m(-x)$ to fall back
     to the case when $n$ is odd.
@@ -571,7 +570,7 @@ void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
     coefficient in the binomial expansion of $(x+1)^d$.
 
     When $n$ is an odd prime, we use a direct formula for the coefficients
-    (\url{http://mathworld.wolfram.com/TrigonometricAngles.html}).
+    (\url{http://mathworld.wolfram.com/TrigonometryAngles.html}).
 
 void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n)
 
@@ -904,7 +903,7 @@ void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd)
     polynomial (Q1), powers (Q2), and their product (Q3),
     separately.
 
-    The complexity is quasilinear complexity with respect to the
+    The complexity is quasilinear with respect to the
     precision and roughly linear with respect to $s$. Especially for
     large $s$, this function may require extremely
     high precision (10000s of digits or more) to overtake the default

@@ -40,6 +40,18 @@ do {                                   \
         (i)--;                         \
 } while (0)
 
+#define FMPZ_VEC_SWAP(vec1, len1, vec2, len2) \
+do {                                          \
+    fmpz *__t;                                \
+    long __tn;                                \
+    __t    = (vec1);                          \
+    (vec1) = (vec2);                          \
+    (vec2) = __t;                             \
+    __tn   = (len1);                          \
+    (len1) = (len2);                          \
+    (len2) = __tn;                            \
+} while (0);
+
 /*  Memory management  *******************************************************/
 
 fmpz * _fmpz_vec_init(long len);
