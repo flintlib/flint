@@ -61,25 +61,26 @@ main(void)
         fmpz_mod_poly_init(t, p);
         fmpz_mod_poly_init(u, p);
 
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 100));
         do 
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 2);
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, b->length - 1) + 1);
 
         fmpz_mod_poly_gcdinv(d, u, a, b);
         fmpz_mod_poly_xgcd(g, s, t, a, b);
 
-        result = (fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(u, s));
+        result = ((fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(u, s))
+                  || (fmpz_mod_poly_is_zero(d)));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(d), printf("\n\n");
-            fmpz_mod_poly_print(g), printf("\n\n");
-            fmpz_mod_poly_print(s), printf("\n\n");
-            fmpz_mod_poly_print(t), printf("\n\n");
-            fmpz_mod_poly_print(u), printf("\n\n");
+            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
+            printf("d = "), fmpz_mod_poly_print(d), printf("\n\n");
+            printf("g = "), fmpz_mod_poly_print(g), printf("\n\n");
+            printf("s = "), fmpz_mod_poly_print(s), printf("\n\n");
+            printf("t = "), fmpz_mod_poly_print(t), printf("\n\n");
+            printf("u = "), fmpz_mod_poly_print(u), printf("\n\n");
             abort();
         }
 
@@ -113,10 +114,10 @@ main(void)
         fmpz_mod_poly_init(t, p);
         fmpz_mod_poly_init(u, p);
 
+        fmpz_mod_poly_randtest(a, state, n_randint(state, 100));
         do 
             fmpz_mod_poly_randtest(b, state, n_randint(state, 100));
         while (b->length < 2);
-        fmpz_mod_poly_randtest_not_zero(a, state, n_randint(state, b->length - 1) + 1);
         fmpz_mod_poly_randtest_not_zero(f, state, n_randint(state, 20) + 1);
         fmpz_mod_poly_mul(a, f, a);
         fmpz_mod_poly_mul(b, f, b);
@@ -124,18 +125,19 @@ main(void)
         fmpz_mod_poly_gcdinv(d, u, a, b);
         fmpz_mod_poly_xgcd(g, s, t, a, b);
 
-        result = (fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(u, s));
+        result = ((fmpz_mod_poly_equal(d, g) && fmpz_mod_poly_equal(u, s))
+                  || (fmpz_mod_poly_is_zero(d)));
         if (!result)
         {
             printf("FAIL:\n");
-            fmpz_mod_poly_print(a), printf("\n\n");
-            fmpz_mod_poly_print(b), printf("\n\n");
-            fmpz_mod_poly_print(d), printf("\n\n");
-            fmpz_mod_poly_print(f), printf("\n\n");
-            fmpz_mod_poly_print(g), printf("\n\n");
-            fmpz_mod_poly_print(s), printf("\n\n");
-            fmpz_mod_poly_print(t), printf("\n\n");
-            fmpz_mod_poly_print(u), printf("\n\n");
+            printf("a = "), fmpz_mod_poly_print(a), printf("\n\n");
+            printf("b = "), fmpz_mod_poly_print(b), printf("\n\n");
+            printf("d = "), fmpz_mod_poly_print(d), printf("\n\n");
+            printf("f = "), fmpz_mod_poly_print(f), printf("\n\n");
+            printf("g = "), fmpz_mod_poly_print(g), printf("\n\n");
+            printf("s = "), fmpz_mod_poly_print(s), printf("\n\n");
+            printf("t = "), fmpz_mod_poly_print(t), printf("\n\n");
+            printf("u = "), fmpz_mod_poly_print(u), printf("\n\n");
             abort();
         }
 

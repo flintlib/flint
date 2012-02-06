@@ -60,8 +60,13 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     }
     if (lenA >= lenB)
     {
-        printf("Exception (fmpz_mod_poly_gcdinv).  lenA >= lenB.\n");
-        abort();
+        fmpz_mod_poly_t T;
+
+        fmpz_mod_poly_init(T, &A->p);
+        fmpz_mod_poly_rem(T, A, B);
+        fmpz_mod_poly_gcdinv(G, S, T, B);
+        fmpz_mod_poly_clear(T);
+        return;
     }
 
     if (lenA == 0)
