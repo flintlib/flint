@@ -29,15 +29,16 @@
 void padic_poly_neg(padic_poly_t f, const padic_poly_t g, 
                     const padic_ctx_t ctx)
 {
-    if (padic_poly_is_zero(g))
+    const long len = g->length;
+
+    if (len == 0 || g->val >= ctx->N)
     {
         padic_poly_zero(f);
     }
     else
     {
-        const long len = g->length;
-        int alloc;
         fmpz_t pow;
+        int alloc;
 
         padic_poly_fit_length(f, len);
         _padic_poly_set_length(f, len);
