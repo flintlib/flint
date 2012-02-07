@@ -298,9 +298,9 @@ void _padic_poly_add(fmpz *rop, long *rval,
     context and guarantees that that this is also the case for 
     the output.
 
-    Assumes that $\ell_1 \geq \ell_2 \geq 0$ and $\min\{v_1, v_2} < N$.
+    Assumes that $\min\{v_1, v_2} < N$.
 
-    Does not support aliasing between the output and input arguments.
+    Supports aliasing between the output and input arguments.
 
 void padic_poly_add(padic_poly_t f, 
                     const padic_poly_t g, const padic_poly_t h, 
@@ -320,9 +320,9 @@ void _padic_poly_sub(fmpz *rop, long *rval,
     context and guarantees that that this is also the case for 
     the output.
 
-    Assumes that $\ell_1 \geq \ell_2 \geq 0$ and $\min\{v_1, v_2} < N$.
+    Assumes that $\min\{v_1, v_2} < N$.
 
-    Does not support aliasing between the output and input arguments.
+    Support aliasing between the output and input arguments.
 
 void padic_poly_sub(padic_poly_t f, 
                     const padic_poly_t g, const padic_poly_t h, 

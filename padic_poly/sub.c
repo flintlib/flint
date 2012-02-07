@@ -31,8 +31,9 @@ void _padic_poly_sub(fmpz *rop, long *val,
                      const fmpz *op2, long val2, long len2, 
                      const padic_ctx_t ctx)
 {
-    int alloc;
+    const long len = FLINT_MAX(len1, len2);
     fmpz_t pow;
+    int alloc;
 
     *val = FLINT_MIN(val1, val2);
 
@@ -40,7 +41,7 @@ void _padic_poly_sub(fmpz *rop, long *val,
 
     if (val1 == val2)
     {
-        _fmpz_mod_poly_add(rop, op1, len1, op2, len2, pow);
+        _fmpz_mod_poly_sub(rop, op1, len1, op2, len2, pow);
     }
     else
     {
@@ -54,14 +55,14 @@ void _padic_poly_sub(fmpz *rop, long *val,
 
             if (rop == op1)
             {
+                _fmpz_vec_zero(rop + len1, len2 - len1);
                 _fmpz_vec_scalar_submul_fmpz(rop, op2, len2, x);
             }
             else
             {
                 _fmpz_vec_scalar_mul_fmpz(rop, op2, len2, x);
                 _fmpz_vec_neg(rop, rop, len2);
-                _fmpz_vec_add(rop, op1, rop, len2);
-                _fmpz_vec_set(rop + len2, op1 + len2, len1 - len2);
+                _fmpz_poly_add(rop, op1, len1, rop, len2);
             }
         }
         else  /* F := p^h (p^(g-h) G - H) */
@@ -70,19 +71,19 @@ void _padic_poly_sub(fmpz *rop, long *val,
 
             if (rop == op2)
             {
-                _fmpz_vec_neg(rop, rop, len2);
+                _fmpz_vec_neg(rop, op2, len2);
                 _fmpz_vec_zero(rop + len2, len1 - len2);
                 _fmpz_vec_scalar_addmul_fmpz(rop, op1, len1, x);
             }
             else
             {
                 _fmpz_vec_scalar_mul_fmpz(rop, op1, len1, x);
-                _fmpz_vec_sub(rop, rop, op2, len2);
+                _fmpz_poly_sub(rop, rop, len1, op2, len2);
             }
         }
         fmpz_clear(x);
 
-        for (i = 0; i < len1; i++)
+        for (i = 0; i < len; i++)
         {
             if (fmpz_sgn(rop + i) < 0)
                 fmpz_add(rop + i, rop + i, pow);
@@ -92,7 +93,7 @@ void _padic_poly_sub(fmpz *rop, long *val,
     if (alloc)
         fmpz_clear(pow);
 
-    _padic_poly_canonicalise(rop, val, len1, ctx->p);
+    _padic_poly_canonicalise(rop, val, len, ctx->p);
 }
 
 void padic_poly_sub(padic_poly_t f, 
@@ -111,12 +112,8 @@ void padic_poly_sub(padic_poly_t f,
 
     padic_poly_fit_length(f, lenF);
 
-    if (lenG >= lenH)
-        _padic_poly_sub(f->coeffs, &(f->val), g->coeffs, g->val, lenG, 
-                                              h->coeffs, h->val, lenH, ctx);
-    else
-        _padic_poly_sub(f->coeffs, &(f->val), h->coeffs, h->val, lenH, 
-                                              g->coeffs, g->val, lenG, ctx);
+    _padic_poly_sub(f->coeffs, &(f->val), g->coeffs, g->val, lenG, 
+                                          h->coeffs, h->val, lenH, ctx);
 
     _padic_poly_set_length(f, lenF);
     _padic_poly_normalise(f);
