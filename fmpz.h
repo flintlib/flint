@@ -367,6 +367,8 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
 
+int fmpz_tstbit(const fmpz_t f, ulong i);
+
 double fmpz_dlog(const fmpz_t x);
 long fmpz_flog(const fmpz_t x, const fmpz_t b);
 long fmpz_flog_ui(const fmpz_t x, ulong b);

@@ -19,25 +19,39 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
+/*
+    Simple example demonstrating the use of the fmpq_poly module.
+ */
+
 #include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpz.h"
+#include <stdio.h>
+
 #include "fmpq_poly.h"
 
-int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+int main(int argc, char* argv[])
 {
-    char *str;
-    int r;
-    
-    str = fmpq_poly_get_str_pretty(poly, var);
-    r = printf("%s", str);
-    flint_free(str);
+    char *str, *strf, *strg;
+    fmpq_poly_t f, g;
 
-    return r;
+    fmpq_poly_init(f);
+    fmpq_poly_init(g);
+    fmpq_poly_set_str(f, "2  1/2 3/5");
+    fmpq_poly_set_str(g, "4  1/3 2 3/2 -1/2");
+    strf = fmpq_poly_get_str_pretty(f, "t");
+    strg = fmpq_poly_get_str_pretty(g, "t");
+    fmpq_poly_mul(f, f, g);
+    str  = fmpq_poly_get_str_pretty(f, "t");
+    printf("(%s) * (%s) = %s\n", strf, strg, str);
+    flint_free(str);
+    flint_free(strf);
+    flint_free(strg);
+    fmpq_poly_clear(f);
+    fmpq_poly_clear(g);
+
+    return EXIT_SUCCESS;
 }
 

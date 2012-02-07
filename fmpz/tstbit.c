@@ -19,35 +19,28 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+   Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
 
-int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+int fmpz_tstbit(const fmpz_t f, ulong i)
 {
-    long j;
-
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
+    if (!COEFF_IS_MPZ(*f))
     {
-        return 0;
-    }
-
-    if (mat1->r == 0 || mat1->c == 0)
-        return 1;
-
-    for (j = 0; j < mat1->r; j++)
-    {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        if (i < FLINT_BITS)
         {
-            return 0;
+            return ((1L << i) & *f) != 0;
+        }
+        else  /* i >= FLINT_BITS */
+        {
+            return *f < 0;
         }
     }
-
-    return 1;
+    else
+    {
+        return mpz_tstbit(COEFF_TO_PTR(*f), i);
+    }
 }
+

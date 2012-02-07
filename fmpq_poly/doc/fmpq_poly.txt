@@ -1500,14 +1500,16 @@ int fmpq_poly_print(const fmpq_poly_t poly)
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
 
+int _fmpq_poly_print_pretty(const fmpz *poly, const fmpz_t den, long len, 
+                            const char * x)
+
 int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
 
     Prints the pretty representation of \code{poly} to \code{stdout}, using 
     the null-terminated string \code{var} not equal to \code{"\0"} as the 
     variable name.
 
-    In case of success, returns a positive value.  In case of failure, 
-    returns a non-positive value.
+    In the current implementation always returns~$1$.
 
 int _fmpq_poly_fprint(FILE * file, 
                       const fmpz * poly, const fmpz_t den, long len)
@@ -1523,6 +1525,18 @@ int fmpq_poly_fprint(FILE * file, const fmpq_poly_t poly)
 
     In case of success, returns a positive value.  In case of failure, 
     returns a non-positive value.
+
+int _fmpq_poly_fprint_pretty(FILE * file, 
+                             const fmpz *poly, const fmpz_t den, long len, 
+                             const char * x)
+
+int fmpq_poly_print_pretty(const fmpq_poly_t poly, const char * var)
+
+    Prints the pretty representation of \code{poly} to \code{stdout}, using 
+    the null-terminated string \code{var} not equal to \code{"\0"} as the 
+    variable name.
+
+    In the current implementation, always returns~$1$.
 
 int fmpq_poly_read(fmpq_poly_t poly)
 

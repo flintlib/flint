@@ -131,11 +131,11 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
             }
 
             _fmpz_vec_clear(W, FLINT_MAX(5 * lenB, lenA + lenB));
+            _fmpz_vec_clear(Q, 2 * lenA);
             fmpz_clear(inv);
 
             return lenD;
         }
-        _fmpz_vec_clear(Q, 2 * lenA);
     }
 }
 

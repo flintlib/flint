@@ -369,6 +369,10 @@ int fmpz_fits_si(const fmpz_t f)
 
     Returns whether the value of $f$ fits into a \code{long}.
 
+int fmpz_tstbit(const fmpz_t f, ulong i)
+
+    Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
+
 *******************************************************************************
 
     Comparison

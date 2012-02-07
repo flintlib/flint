@@ -278,6 +278,8 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx);
 
 /* Special functions *********************************************************/
 
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
+
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);

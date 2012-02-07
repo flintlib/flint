@@ -415,6 +415,20 @@ fmpz_mod_poly_xgcd(fmpz_mod_poly_t G, fmpz_mod_poly_t S, fmpz_mod_poly_t T,
     fmpz_mod_poly_xgcd_euclidean(G, S, T, A, B);
 }
 
+long _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
+                           const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                           const fmpz_t p);
+
+void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
+                          const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+int _fmpz_mod_poly_invmod(fmpz *A, 
+                          const fmpz *B, long lenB, 
+                          const fmpz *P, long lenP, const fmpz_t p);
+
+int fmpz_mod_poly_invmod(fmpz_mod_poly_t A, 
+                         const fmpz_mod_poly_t B, const fmpz_mod_poly_t P);
+
 /*  Derivative  **************************************************************/
 
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 

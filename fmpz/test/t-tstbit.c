@@ -19,35 +19,61 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
 
-int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
+int
+main(void)
 {
-    long j;
+    int i, result;
+    flint_rand_t state;
 
-    if (mat1->r != mat2->r || mat1->c != mat2->c)
+    printf("tstbit....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    for (i = 0; i < 100000; i++)
     {
-        return 0;
-    }
+        int k, l;
+        ulong j;
+        fmpz_t a;
+        mpz_t b;
 
-    if (mat1->r == 0 || mat1->c == 0)
-        return 1;
+        fmpz_init(a);
+        mpz_init(b);
 
-    for (j = 0; j < mat1->r; j++)
-    {
-        if (!_fmpz_vec_equal(mat1->rows[j], mat2->rows[j], mat1->c))
+        fmpz_randtest(a, state, 2 * FLINT_BITS);
+        fmpz_get_mpz(b, a);
+        j = n_randint(state, 3 * FLINT_BITS);
+
+        k = fmpz_tstbit(a, j);
+        l = mpz_tstbit(b, j);
+
+        result = (k == l);
+
+        if (!result)
         {
-            return 0;
+            printf("FAIL:\n");
+            gmp_printf("b = %Zd, j = %lu k = %d, l = %d\n", b, j, k, l);
+            abort();
         }
+
+        fmpz_clear(a);
+        mpz_clear(b);
     }
 
-    return 1;
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
