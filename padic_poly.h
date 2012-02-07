@@ -154,6 +154,9 @@ void padic_poly_randtest(padic_poly_t f, flint_rand_t state,
 void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
                                   long len, const padic_ctx_t ctx);
 
+void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
+                             long val, long len, const padic_ctx_t ctx);
+
 /*  Assignment and basic manipulation  ***************************************/
 
 void padic_poly_set(padic_poly_t f, const padic_poly_t g);

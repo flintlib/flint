@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
     Copyright (C) 2009 William Hart
 
 ******************************************************************************/
@@ -30,12 +30,46 @@
 #include "flint.h"
 #include "padic_poly.h"
 
-void
-padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
-                    long len, const padic_ctx_t ctx)
+void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
+                             long val, long len, const padic_ctx_t ctx)
 {
-    long i, min, max;
-    fmpz_t pow;
+    if (len == 0)
+        return;
+
+    if (val >= ctx->N)
+    {
+        padic_poly_zero(f);
+    }
+    else
+    {
+        long i;
+        fmpz_t pow;
+        int alloc;
+
+        f->val = val;
+
+        padic_poly_fit_length(f, len);
+
+        alloc = _padic_ctx_pow_ui(pow, ctx->N - f->val, ctx);
+
+        for (i = 0; i < len; i++)
+            fmpz_randm(f->coeffs + i, state, pow);
+
+        if (alloc)
+            fmpz_clear(pow);
+
+        _padic_poly_set_length(f, len);
+        _padic_poly_normalise(f);
+
+        padic_poly_canonicalise(f, ctx->p);
+        padic_poly_reduce(f, ctx);
+    }
+}
+
+void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
+                         long len, const padic_ctx_t ctx)
+{
+    long min, max, val;
 
     if (ctx->N > 0)
     {
@@ -53,23 +87,9 @@ padic_poly_randtest(padic_poly_t f, flint_rand_t state,
         max = 0;
     }
 
-    f->val = n_randint(state, max - min) + min;
+    val = n_randint(state, max - min) + min;
 
-    padic_poly_fit_length(f, len);
-
-    fmpz_init(pow);
-    fmpz_pow_ui(pow, ctx->p, ctx->N - f->val);
-    for (i = 0; i < len; i++)
-    {
-        fmpz_randm(f->coeffs + i, state, pow);
-    }
-    fmpz_clear(pow);
-
-    _padic_poly_set_length(f, len);
-    _padic_poly_normalise(f);
-
-    padic_poly_canonicalise(f, ctx->p);
-    padic_poly_reduce(f, ctx);
+    padic_poly_randtest_val(f, state, val, len, ctx);
 }
 
 void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state, 
@@ -79,7 +99,7 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
 
     if (len == 0)
     {
-        printf("Exception: 0 passed to padic_poly_randtest_not_zero.\n");
+        printf("Exception (padic_poly_randtest_not_zero).  len == 0.\n");
         abort();
     }
 

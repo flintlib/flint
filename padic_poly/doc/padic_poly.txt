@@ -148,14 +148,21 @@ long padic_poly_val(padic_poly_t poly)
 void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
                          long len, const padic_ctx_t ctx)
 
-    Sets $f$ to a random polynomial of length \code{len} 
+    Sets $f$ to a random polynomial of length at most \code{len} 
     with entries reduced modulo $p^N$.
 
 void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
                                   long len, const padic_ctx_t ctx)
 
-    Sets $f$ to be a non-zero random polynomial of length \code{len} 
+    Sets $f$ to a non-zero random polynomial of length at most \code{len} 
     with entries reduced modulo $p^N$.
+
+void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
+                             long val, long len, const padic_ctx_t ctx)
+
+    Sets $f$ to a random polynomial of length at most \code{len} 
+    with the prescribed valuation \code{val} and entries reduced 
+    modulo $p^N$.
 
 *******************************************************************************
 
