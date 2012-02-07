@@ -22,10 +22,11 @@
 
 link/fmpz_single.c <-- fmpz.c
 
-   The file fmpz.c is a symbolic link and if it points to fmpz_single.c
-   then the fmpz module is not threadsafe, though a little faster when 
-   using integers which are larger than FLINT_BITS - 2 bits. It stores
-   a growing cache of unused mpz's which can be rationed out as needed.
+   By default, this version of fmpz.c is used (it is copied into place
+   by configure). In this case the fmpz module is not threadsafe, though 
+   a little faster when using integers which are larger than 
+   \code{FLINT_BITS - 2} bits. It stores a growing cache of unused mpz's 
+   which can be rationed out as needed.
 
 fmpz
 
