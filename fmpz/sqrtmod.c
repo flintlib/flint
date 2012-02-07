@@ -155,8 +155,8 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         int ans;
         mpz_t t;
         __mpz_struct *bptr;
-
-        bptr = _fmpz_promote(b);
+        
+        bptr = _fmpz_promote_val(b);
 
         mpz_init(t);
         ans = _fmpz_sqrtmod(t, bptr, COEFF_TO_PTR(*p));
