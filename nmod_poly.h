@@ -43,7 +43,7 @@
 #endif
 
 #define NMOD_DIVREM_DIVCONQUER_CUTOFF  300
-#define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIV_DIVCONQUER_CUTOFF */
+#define NMOD_DIV_DIVCONQUER_CUTOFF     300 /* Must be <= NMOD_DIVREM_DIVCONQUER_CUTOFF */
 
 #define NMOD_POLY_HGCD_CUTOFF  100      /* HGCD: Basecase -> Recursion      */
 #define NMOD_POLY_GCD_CUTOFF  340       /* GCD:  Euclidean -> HGCD          */
