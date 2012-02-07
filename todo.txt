@@ -65,6 +65,13 @@ ulong_extras
 * factor out some common code between n_is_perfect_power235 and
   n_factor_power235
 
+* n_mod2_preinv may be slower than the chip on Core2 due to the fact that it can
+  pipeline 2 divisions. Check all occurrences of this function and replace with
+  divisions where it will speed things up on Core2. Beware, this will slow things
+  down on AMD, so it is necessary to do this per architecture. The macros in 
+  nmod_vec will also be faster than the functions in ulong_extras, thus they should
+  be tried first.
+
 * add profile code for factor_trial, factor_one_line, factor_SQUFOF
 
 * [maybe] make n_factor_t an array of length 1 so it can be passed by reference
