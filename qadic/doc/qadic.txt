@@ -1,0 +1,87 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2011 Sebastian Pancratz
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Data structures
+
+    We represent an element of the extension 
+    $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$ as 
+    a polynomial of degree less than $\deg(f)$.
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Context
+
+    We represent an unramified extension of $\mathbf{Q}_p$ 
+    via $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$, 
+    where $f \in \mathbf{Q}_p[X]$ is a monic, irreducible 
+    polynomial which we assume to actually be in $\mathbf{Z}[X]$.
+
+    The first field in the context structure is a $p$-adic 
+    context struct \code{pctx}, which contains data about 
+    the $p$-adic precision, the printing mode etc.
+
+    The polynomial $f$ is represented as a sparse polynomial 
+    using two arrays $j$ and $a$ of length \code{len}, where 
+    $f(X) = \sum_{i} a_{i} X^{j_{i}}$.  We also assume that 
+    the array $j$ is sorted in ascending order.
+
+    We choose this data structure to improve reduction 
+    modulo $f(X)$ in $\mathbf{Q}_p[X]$, assuming a sparse 
+    polynomial $f(X)$ is chosen.
+
+    The field \code{var} contains the name of a generator 
+    of the extension, which is used when printing the 
+    elements.
+
+*******************************************************************************
+
+void qadic_ctx_init_conway(qadic_ctx_t ctx, 
+                           const fmpz_t p, long d, long N, 
+                           enum padic_print_mode mode)
+
+    Initialises the context \code{ctx} with prime $p$, precision $N$, 
+    extension degree $d$ and printing mode \code{mode}.
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the printing mode is one of \code{PADIC_TERSE}, 
+    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
+
+    This function also carries out some relevant precomputation for 
+    arithmetic in $\mathbf{Q}_p / (p^N)$ such as powers of $p$ close 
+    to $p^N$.
+
+void qadic_ctx_clear(qadic_ctx_t ctx);
+
+    Clears all memory that has been allocated as part of the context.
+
+qadic_ctx_degree(const qadic_ctx_t ctx)
+
+    Returns the extension degree.
+
