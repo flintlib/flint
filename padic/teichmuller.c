@@ -45,7 +45,7 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
         n = FLINT_CLOG2(N) + 1;
 
-        a = malloc(n * sizeof(long));
+        a = flint_malloc(n * sizeof(long));
         for (a[i = 0] = N; a[i] > 1; i++)
             a[i + 1] = (a[i] + 1) / 2;
 
@@ -116,14 +116,14 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
             }
         }
 
-        _fmpz_vec_clear(pow, n);
-
         fmpz_clear(r);
         fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(inv);
         fmpz_clear(pm1);
         fmpz_clear(pm2);
+        _fmpz_vec_clear(pow, n);
+        flint_free(a);
     }
 }
 
