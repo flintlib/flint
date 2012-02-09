@@ -62,7 +62,7 @@ qadic_ctx_struct;
 typedef qadic_ctx_struct qadic_ctx_t[1];
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx, 
-                           const fmpz_t p, long d, long N, 
+                           const fmpz_t p, long d, long N, const char *var, 
                            enum padic_print_mode mode);
 
 void qadic_ctx_clear(qadic_ctx_t ctx);
@@ -83,17 +83,6 @@ static __inline__ void qadic_clear(qadic_t x)
 {
     padic_poly_clear(x);
 }
-
-/*
-    Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
-    polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
-    least~$2$ in $\mathbf{Z}/(p)$.
-
-    Assumes that the array $j$ of positive length \code{len} is 
-    sorted in ascending order.
-
-    Allows zero-padding in \code{(R, lenR)}.
- */
 
 static __inline__ void
 _fmpz_mod_poly_reduce(fmpz *R, long lenR, 
@@ -252,6 +241,10 @@ qadic_mul(qadic_t x, const qadic_t y, const qadic_t z, const qadic_ctx_t ctx)
     qadic_reduce(x, ctx);
 }
 
+void _qadic_inv(fmpz *rop, const fmpz *op, long len, 
+                const fmpz *a, const long *j, long lena, 
+                const fmpz_t p, long N);
+
 void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
 
 void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
@@ -263,6 +256,10 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
 /* Special functions *********************************************************/
 
 void qadic_sigma(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
+void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
+                        const fmpz *a, const long *j, long lena, 
+                        const fmpz_t p, long N);
 
 void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 

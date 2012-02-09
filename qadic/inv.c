@@ -23,17 +23,10 @@
  
 ******************************************************************************/
 
-#include <stdio.h>
 #include <string.h>
 
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
-#include "padic.h"
 #include "qadic.h"
-
-/*
-    N >= 1.  Sets (rop, d).  Does not support aliasing.
- */
 
 void _qadic_inv(fmpz *rop, const fmpz *op, long len, 
                 const fmpz *a, const long *j, long lena, 

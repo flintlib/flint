@@ -33,7 +33,7 @@
 #define FLINT_CPIMPORT "/home/user/FLINT/flint-2/qadic/CPimport.txt"
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
-                           const fmpz_t p, long d, long N, 
+                           const fmpz_t p, long d, long N, const char *var, 
                            enum padic_print_mode mode)
 {
     char *buf;
@@ -46,14 +46,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
         abort();
     }
 
-    buf = malloc(832);
-
-    if (!buf)
-    {
-        printf("Exception (qadic_ctx_init_conway).  Memory allocation.\n");
-        abort();
-    }
-
+    buf  = flint_malloc(832);
     file = fopen(FLINT_CPIMPORT, "r");
 
     if (!file)
@@ -91,7 +84,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             }
 
             ctx->a = _fmpz_vec_init(ctx->len);
-            ctx->j = malloc(ctx->len * sizeof(long));
+            ctx->j = flint_malloc(ctx->len * sizeof(long));
 
             /* Copy the polynomial */
             j = 0;
@@ -119,9 +112,8 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             /* Complete the initialisation of the context */
             padic_ctx_init(&ctx->pctx, p, N, mode);
 
-            ctx->var = malloc(2);
-            ctx->var[0] = 'a';
-            ctx->var[1] = '\0';
+            ctx->var = flint_malloc(strlen(var));
+            strcpy(ctx->var, var);
 
             fclose(file);
             free(buf);
@@ -130,7 +122,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
     }
 
     fclose(file);
-    free(buf);
+    flint_free(buf);
 
     printf("Exception (qadic_ctx_init_conway).  The polynomial for \n");
     printf("(p,d) = (%ld,%ld) is not present in the database.\n", *p, d);

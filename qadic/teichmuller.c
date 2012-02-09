@@ -27,10 +27,6 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-/*
-    Sets \code{(rop, d)}.
- */
-
 void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
                         const fmpz *a, const long *j, long lena, 
                         const fmpz_t p, long N)
@@ -149,7 +145,7 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     if (op->val < 0)
     {
-        printf("ERROR (qadic_teichmuller).  val(op) is negative.\n");
+        printf("Exception (qadic_teichmuller).  val(op) is negative.\n");
         abort();
     }
 

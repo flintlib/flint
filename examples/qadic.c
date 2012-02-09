@@ -41,7 +41,7 @@ int main(void)
     fmpz nine[1] = {9L};
 
     fmpz_init_set_ui(p, 3);
-    qadic_ctx_init_conway(ctx, p, 2, 5, PADIC_SERIES);
+    qadic_ctx_init_conway(ctx, p, 2, 5, "a", PADIC_SERIES);
 
     qadic_init(a);
     qadic_init(b);

@@ -23,7 +23,6 @@
  
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
@@ -89,15 +88,6 @@ _fmpz_mod_poly_compose_mod(fmpz *rop,
         _fmpz_vec_clear(t, 2*d - 1);
     }
 }
-
-/*
-    Computes $\sigma(X) \bmod{p^N}$ where $X$ is such that 
-    $\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))$.
-
-    Assumes that the precision $N$ is at least~$2$.
-
-    Sets \code{(rop, 2*d - 1)}.
- */
 
 void _qadic_sigma_a(fmpz *rop, 
                     const fmpz *a, const long *j, long lena, 
@@ -186,11 +176,6 @@ void _qadic_sigma_a(fmpz *rop,
     _fmpz_vec_clear(t, 2*d - 1);
     flint_free(e);
 }
-
-/*
-    Sets \code{(rop, d)} but requires \code{rop} to be an array of 
-    length at least $2d - 1$.
- */
 
 void _qadic_sigma(fmpz *rop, const fmpz *op, long len, 
                   const fmpz *a, const long *j, long lena, 

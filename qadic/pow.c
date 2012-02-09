@@ -19,28 +19,12 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
-#include <stdio.h>
-#include <string.h>
-
-#include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
-#include "padic.h"
 #include "qadic.h"
-
-/*
-    e > 1.
-    len > 0.
-
-    Assumes that rop is big enough to hold op^2, so 
-    if op is of length d then we need rop to 
-    hold at least (2d - 1) coefficients.
-
-    Does not support aliasing.
- */
 
 void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
                    const fmpz *a, const long *j, long lena, 

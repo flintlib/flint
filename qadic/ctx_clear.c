@@ -31,7 +31,7 @@ void qadic_ctx_clear(qadic_ctx_t ctx)
 {
     padic_ctx_clear(&ctx->pctx);
     _fmpz_vec_clear(ctx->a, ctx->len);
-    free(ctx->j);
-    free(ctx->var);
+    flint_free(ctx->j);
+    flint_free(ctx->var);
 }
 
