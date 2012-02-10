@@ -1835,6 +1835,33 @@ void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 
 *******************************************************************************
 
+    Newton basis
+
+*******************************************************************************
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
+
+    Converts \code{(poly, n)} in-place from its coefficients given
+    in the standard monomial basis to the Newton basis
+    for the roots $r_0, r_1, \ldots, r_{n-2}$.
+    In other words, this determines output coefficients $c_i$ such that
+    $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+    is equal to the input polynomial.
+    Uses repeated polynomial division.
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
+
+    Converts \code{(poly, n)} in-place from its coefficients given
+    in the Newton basis for the roots $r_0, r_1, \ldots, r_{n-2}$
+    to the standard monomial basis. In other words, this evaluates
+    $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+    where $c_i$ are the input coefficients for \code{poly}.
+    Uses Horner's rule.
+
+*******************************************************************************
+
     Interpolation
 
 *******************************************************************************

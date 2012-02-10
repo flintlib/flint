@@ -943,6 +943,13 @@ void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, long n);
 
+/* Newton basis *************************************************************/
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n);
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n);
+
+
 /* Multipoint evaluation and interpolation *********************************/
 
 void
