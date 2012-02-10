@@ -33,7 +33,7 @@ _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
 {
     long i, j;
 
-    for (i = 1; i < n; i++)
-        for (j = n - 2; j > i - 2; j--)
-            fmpz_addmul(poly + j, poly + j + 1, roots + i - 1);
+    for (i = 0; i < n - 1; i++)
+        for (j = n - 2; j >= i; j--)
+            fmpz_addmul(poly + j, poly + j + 1, roots + i);
 }
