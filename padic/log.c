@@ -69,12 +69,12 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         k = n_flog(i, p);
 
-        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
-
         fmpz_init(m);
         fmpz_init(s);
         fmpz_init(t);
         q = _fmpz_vec_init(k + 1);
+
+        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
 
         fmpz_pow_ui(m, ctx->p, ctx->N + k);
         fmpz_one(q + 0);
@@ -98,6 +98,7 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         fmpz_divexact(z, z, q + k);
         fmpz_mul(z, z, y);
+
         fmpz_clear(m);
         fmpz_clear(s);
         fmpz_clear(t);
