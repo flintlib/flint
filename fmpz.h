@@ -496,48 +496,6 @@ int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
 void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
                               mp_bitcnt_t shift, mp_bitcnt_t bits);
 
-static __inline__
-void fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, 
-                             ulong r2, ulong m2, ulong c, double pre)
-{  
-   ulong r1mod, s;
-   fmpz_t r1modd, sm1; 
-   
-   fmpz_init(sm1);
-   fmpz_init(r1modd);
-   
-   r1mod = fmpz_mod_ui(r1modd, r1, m2); 
-   s = n_submod(r2, r1mod, m2);
-   s = n_mulmod_precomp(s, c, m2, pre);
-   
-   fmpz_mul_ui(sm1, m1, s);
-   fmpz_add(out, r1, sm1);
-   
-   fmpz_clear(sm1);
-   fmpz_clear(r1modd);
-}
-
-static __inline__
-void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, 
-                              ulong r2, ulong m2, ulong c, mp_limb_t pre)
-{
-   ulong r1mod, s;
-   fmpz_t r1modd, sm1;
-
-   fmpz_init(sm1);
-   fmpz_init(r1modd);
-   
-   r1mod = fmpz_mod_ui(r1modd, r1, m2); 
-   s = n_submod(r2, r1mod, m2);
-   s = n_mulmod2_preinv(s, c, m2, pre); 
-   
-   fmpz_mul_ui(sm1, m1, s);
-   fmpz_add(out, r1, sm1);
-
-   fmpz_clear(sm1);
-   fmpz_clear(r1modd);
-}
-
 void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,
         int sign);
