@@ -278,20 +278,22 @@ void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e,
 
 *******************************************************************************
 
-void _qadic_sigma_a(fmpz *rop, 
+void _qadic_sigma_a(fmpz *rop, long e, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
 
-    Computes $\sigma(X) \bmod{p^N}$ where $X$ is such that 
+    Computes $\sigma^e(X) \bmod{p^N}$ where $X$ is such that 
     $\mathbf{Q}_q \cong \mathbf{Q}_p[X]/(f(X))$.
 
     Assumes that the precision $N$ is at least~$2$ and that the 
     extension is non-trivial, i.e.\ $d \geq 2$.
 
+    Assumes that $0 < e < d$.
+
     Sets \code{(rop, 2*d-1)}, although the actual length of the 
     output will be at most~$d$.
 
-void _qadic_sigma(fmpz *rop, const fmpz *op, long len, 
+void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e, 
                   const fmpz *a, const long *j, long lena, 
                   const fmpz_t p, long N)
 
@@ -299,17 +301,22 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len,
 
     Assumes that \code{len} is positive but at most~$d$.
 
+    Assumes that $0 < e < d$.
+
     Does not support aliasing.
 
-void qadic_sigma(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
 
-    Evaluates the $\Sigma$ homomorphism at \code{op}.
+    Evaluates the homomorphism $\Sigma^e$ at \code{op}.
 
     Recall that $\mathbf{Q}_q / \mathbf{Q}_p$ is Galois with Galois group 
-    $\langle \Sigma \rangle \cong \langle \sigma \rangle$, where 
+    $\langle \Sigma \rangle \cong \langle \sigma \rangle$, which is also 
+    isomorphic to $\mathbf{Z}/d\mathbf{Z}$, where 
     $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element 
     $\sigma \colon x \mapsto x^p$ and $\Sigma$ is its lift to 
     $\Gal(\mathbf{Q}_q/\mathbf{Q}_p)$.
+
+    This functionality is implemented as \code{GaloisImage()} in Magma.
 
 void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
                         const fmpz *a, const long *j, long lena, 

@@ -89,7 +89,7 @@ _fmpz_mod_poly_compose_mod(fmpz *rop,
     }
 }
 
-void _qadic_sigma_a(fmpz *rop, 
+void _qadic_sigma_a(fmpz *rop, long exp, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
 {
@@ -152,12 +152,12 @@ void _qadic_sigma_a(fmpz *rop,
     {
         fmpz op[2] = {0L, 1L};
 
-        _qadic_pow(rop, op, 2, p, a, j, lena, pow + i);
+        fmpz_pow_ui(t, p, exp);
+        _qadic_pow(rop, op, 2, t, a, j, lena, pow + i);
     }
     for (i--; i >= 0; i--)
     {
         /* z' := z - f(z) / f'(z) */
-
         _fmpz_mod_poly_compose_mod(num, f1, d + 1, rop, d, a, j, lena, pow + i);
         _fmpz_mod_poly_compose_mod(den, f2, d, rop, d, a, j, lena, pow + i);
 
@@ -177,7 +177,7 @@ void _qadic_sigma_a(fmpz *rop,
     flint_free(e);
 }
 
-void _qadic_sigma(fmpz *rop, const fmpz *op, long len, 
+void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e, 
                   const fmpz *a, const long *j, long lena, 
                   const fmpz_t p, long N)
 {
@@ -190,7 +190,12 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len,
     }
     else if (N == 1)
     {
-        _qadic_pow(rop, op, len, p, a, j, lena, p);
+        fmpz_t t;
+
+        fmpz_init(t);
+        fmpz_pow_ui(t, p, e);
+        _qadic_pow(rop, op, len, t, a, j, lena, p);
+        fmpz_clear(t);
     }
     else
     {
@@ -201,7 +206,7 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len,
         fmpz_init(pow);
         fmpz_pow_ui(pow, p, N);
 
-        _qadic_sigma_a(t, a, j, lena, p, N);
+        _qadic_sigma_a(t, e, a, j, lena, p, N);
 
         _fmpz_mod_poly_compose_mod(rop, op, len, t, d, a, j, lena, pow);
         _fmpz_vec_zero(rop + d, d - 1);
@@ -211,17 +216,26 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len,
     }
 }
 
-void qadic_sigma(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
 {
     const long N = (&ctx->pctx)->N;
+    const long d = qadic_ctx_degree(ctx);
+
+    e = e % d;
+    if (e < 0)
+        e += d;
 
     if (qadic_is_zero(op) || op->val >= N)
     {
         qadic_zero(rop);
     }
+    else if (e == 0)
+    {
+        padic_poly_set(rop, op);
+        padic_poly_reduce(rop, &ctx->pctx);
+    }
     else
     {
-        const long d = qadic_ctx_degree(ctx);
         fmpz *t;
 
         if (rop == op)
@@ -234,7 +248,7 @@ void qadic_sigma(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _qadic_sigma(t, op->coeffs, op->length, 
+        _qadic_sigma(t, op->coeffs, op->length, e, 
                      ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, N - op->val);
 
         if (rop == op)

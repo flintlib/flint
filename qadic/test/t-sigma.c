@@ -49,6 +49,7 @@ main(void)
         qadic_ctx_t ctx;
 
         qadic_t a, b, c;
+        long e;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -62,9 +63,10 @@ main(void)
 
         qadic_randtest(a, state, ctx);
         qadic_set(b, a);
+        e = n_randint(state, 10) % d;
 
-        qadic_sigma(c, b, ctx);
-        qadic_sigma(b, b, ctx);
+        qadic_sigma(c, b, e, ctx);
+        qadic_sigma(b, b, e, ctx);
 
         result = (qadic_equal(b, c));
         if (!result)
@@ -73,6 +75,7 @@ main(void)
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
             printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
             printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("e = %ld\n", e);
             abort();
         }
 
@@ -84,7 +87,7 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    /* Check sigma(x) == x^p mod p for integral values */
+    /* Check sigma^e(x) == x^{p^e} mod p for integral values */
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
@@ -92,6 +95,7 @@ main(void)
         qadic_ctx_t ctx;
 
         qadic_t a, b, c, lhs, rhs;
+        long e;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -106,21 +110,30 @@ main(void)
         qadic_init(rhs);
 
         qadic_randtest_int(a, state, ctx);
+        e = n_randint(state, 10) % d;
 
-        qadic_sigma(b, a, ctx);
-        qadic_pow(c, a, p, ctx);
+        qadic_sigma(b, a, e, ctx);
+        {
+            fmpz_t t;
+
+            fmpz_init(t);
+            fmpz_pow_ui(t, p, e);
+            qadic_pow(c, a, t, ctx);
+            fmpz_clear(t);
+        }
         qadic_scalar_mod_ppow(lhs, b, 1, ctx);
         qadic_scalar_mod_ppow(rhs, c, 1, ctx);
 
         result = (qadic_equal(lhs, rhs));
         if (!result)
         {
-            printf("FAIL (sigma(x) = x^p mod p):\n\n");
+            printf("FAIL (sigma^e(x) = x^{p^e} mod p):\n\n");
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
             printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
             printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
             printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
             printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
+            printf("e = %ld\n", e);
             abort();
         }
 
@@ -134,7 +147,7 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    /* Check sigma(x + y) = sigma(x) + sigma(y) on Zq */
+    /* Check sigma^e(x + y) = sigma^e(x) + sigma^e(y) on Zq */
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
@@ -142,6 +155,7 @@ main(void)
         qadic_ctx_t ctx;
 
         qadic_t a, b, s, s1, s2, lhs, rhs;
+        long e;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -159,11 +173,12 @@ main(void)
 
         qadic_randtest_int(a, state, ctx);
         qadic_randtest_int(b, state, ctx);
+        e = n_randint(state, 10) % d;
 
         qadic_add(s, a, b, ctx);
-        qadic_sigma(lhs, s, ctx);
-        qadic_sigma(s1, a, ctx);
-        qadic_sigma(s2, b, ctx);
+        qadic_sigma(lhs, s, e, ctx);
+        qadic_sigma(s1, a, e, ctx);
+        qadic_sigma(s2, b, e, ctx);
         qadic_add(rhs, s1, s2, ctx);
 
         result = (qadic_equal(lhs, rhs));
@@ -177,6 +192,7 @@ main(void)
             printf("s2 = "), qadic_print_pretty(s2, ctx), printf("\n");
             printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
             printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
+            printf("e = %ld\n", e);
             abort();
         }
 
@@ -192,7 +208,7 @@ main(void)
         qadic_ctx_clear(ctx);
     }
 
-    /* Check sigma(x * y) = sigma(x) * sigma(y) on Zq */
+    /* Check sigma^e(x * y) = sigma^e(x) * sigma^e(y) on Zq */
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
@@ -200,6 +216,7 @@ main(void)
         qadic_ctx_t ctx;
 
         qadic_t a, b, s, s1, s2, lhs, rhs;
+        long e;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -217,11 +234,12 @@ main(void)
 
         qadic_randtest_int(a, state, ctx);
         qadic_randtest_int(b, state, ctx);
+        e = n_randint(state, 10) % d;
 
         qadic_mul(s, a, b, ctx);
-        qadic_sigma(lhs, s, ctx);
-        qadic_sigma(s1, a, ctx);
-        qadic_sigma(s2, b, ctx);
+        qadic_sigma(lhs, s, e, ctx);
+        qadic_sigma(s1, a, e, ctx);
+        qadic_sigma(s2, b, e, ctx);
         qadic_mul(rhs, s1, s2, ctx);
 
         result = (qadic_equal(lhs, rhs));
@@ -235,6 +253,7 @@ main(void)
             printf("s2 = "), qadic_print_pretty(s2, ctx), printf("\n");
             printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
             printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
+            printf("e = %ld\n", e);
             abort();
         }
 
