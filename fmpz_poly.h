@@ -799,6 +799,22 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Taylor shift  ************************************************************/
+
+void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_horner(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
+
 /*  Power series composition and compositional inverse  **********************/
 
 void
