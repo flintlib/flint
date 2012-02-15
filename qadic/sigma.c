@@ -96,7 +96,7 @@ void _qadic_sigma_a(fmpz *rop, long exp,
     const long d = j[lena - 1];
 
     long *e, i, n;
-    fmpz *pow, *f1, *f2, *num, *den, *t;
+    fmpz *pow, *f1, *f2, *inv, *s, *t;
 
     n = FLINT_CLOG2(N) + 1;
 
@@ -105,10 +105,10 @@ void _qadic_sigma_a(fmpz *rop, long exp,
         e[i + 1] = (e[i] + 1) / 2;
 
     pow = _fmpz_vec_init(n);
-    num = _fmpz_vec_init(d);
-    den = _fmpz_vec_init(d);
     f1  = _fmpz_vec_init(d + 1);
     f2  = _fmpz_vec_init(d);
+    inv = _fmpz_vec_init(2*d - 1);
+    s   = _fmpz_vec_init(2*d - 1);
     t   = _fmpz_vec_init(2*d - 1);
 
     /* Compute powers of p */
@@ -142,9 +142,8 @@ void _qadic_sigma_a(fmpz *rop, long exp,
 
         for (k = 0; k < lena; k++)
             fmpz_set(f1 + j[k], a + k);
-        for (k = 0; k < lena; k++)
-            if (j[k] >= 1)
-                fmpz_mul_ui(f2 + (j[k] - 1), a + k, j[k]);
+        for (k = 1; k < lena; k++)
+            fmpz_mul_ui(f2 + (j[k] - 1), a + k, j[k]);
     }
 
     /* Run Newton iteration */
@@ -154,25 +153,45 @@ void _qadic_sigma_a(fmpz *rop, long exp,
 
         fmpz_pow_ui(t, p, exp);
         _qadic_pow(rop, op, 2, t, a, j, lena, pow + i);
+
+        _fmpz_mod_poly_compose_mod(t, f2, d, rop, d, a, j, lena, pow + i);
+        _qadic_inv(inv, t, d, a, j, lena, p, 1);
     }
     for (i--; i >= 0; i--)
     {
-        /* z' := z - f(z) / f'(z) */
-        _fmpz_mod_poly_compose_mod(num, f1, d + 1, rop, d, a, j, lena, pow + i);
-        _fmpz_mod_poly_compose_mod(den, f2, d, rop, d, a, j, lena, pow + i);
-
-        _qadic_inv(den, den, d, a, j, lena, p, e[i]);
-
-        _fmpz_mod_poly_mul(t, num, d, den, d, pow + i);
-        _fmpz_mod_poly_reduce(t, 2*d - 1, a,j, lena, pow + i);
+        _fmpz_mod_poly_compose_mod(s, f1, d + 1, rop, d, a, j, lena, pow + i);
+        _fmpz_mod_poly_mul(t, s, d, inv, d, pow + i);
+        _fmpz_mod_poly_reduce(t, 2*d - 1, a, j, lena, pow + i);
         _fmpz_mod_poly_sub(rop, rop, d, t, d, pow + i);
+
+        if (i > 0)
+        {
+            _fmpz_mod_poly_compose_mod(s, f2, d, rop, d, a, j, lena, pow + i);
+            _fmpz_mod_poly_mul(t, inv, d, s, d, pow + i);
+            _fmpz_mod_poly_reduce(t, 2*d - 1, a, j, lena, pow + i);
+            fmpz_sub_ui(t, t, 2);
+            if (fmpz_sgn(t) < 0)
+                fmpz_add(t, t, pow + i);
+            _fmpz_mod_poly_neg(t, t, d, pow + i);
+            _fmpz_mod_poly_mul(s, inv, d, t, d, pow + i);
+            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, pow + i);
+
+            /* SWAP(inv, s).  Requires the arrays to be of the same size. */
+            {
+                fmpz *__t;
+
+                __t = inv;
+                inv = s;
+                s   = __t;
+            }
+        }
     }
 
     _fmpz_vec_clear(pow, n);
-    _fmpz_vec_clear(num, d);
-    _fmpz_vec_clear(den, d);
     _fmpz_vec_clear(f1, d + 1);
     _fmpz_vec_clear(f2, d);
+    _fmpz_vec_clear(inv, 2*d - 1);
+    _fmpz_vec_clear(s, 2*d - 1);
     _fmpz_vec_clear(t, 2*d - 1);
     flint_free(e);
 }
