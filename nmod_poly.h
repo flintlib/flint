@@ -632,6 +632,24 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
 
+/* Taylor shift  *************************************************************/
+
+void _nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod);
+
+void nmod_poly_taylor_shift_horner(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c);
+
+void _nmod_poly_taylor_shift_convolution(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod);
+
+void nmod_poly_taylor_shift_convolution(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c);
+
+void _nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, long len, nmod_t mod);
+
+void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c);
+
 /* Modular composition  ******************************************************/
 
 void
