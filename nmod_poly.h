@@ -593,6 +593,28 @@ void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
 void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
         const nmod_poly_t poly, mp_srcptr xs, long n);
 
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
+        mp_srcptr xs, long n);
+
+void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void
+_nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
+    long plen, mp_ptr * tree, long len, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
+        const nmod_poly_t poly, mp_srcptr xs, long n);
+
+/* Subproduct tree  **********************************************************/
+
+mp_ptr * _nmod_poly_tree_alloc(long len);
+
+void _nmod_poly_tree_free(mp_ptr * tree, long len);
+
+void _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots,
+    long len, nmod_t mod);
+
 /* Interpolation  ************************************************************/
 
 void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
@@ -612,6 +634,19 @@ void _nmod_poly_interpolate_nmod_vec(mp_ptr poly, mp_srcptr xs,
 
 void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
                         mp_srcptr xs, mp_srcptr ys, long n);
+
+void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long len, nmod_t mod);
+
+void
+_nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
+    mp_ptr * tree, mp_srcptr weights, long len, nmod_t mod);
+
+void _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree,
+    long len, nmod_t mod);
 
 /* Composition  **************************************************************/
 

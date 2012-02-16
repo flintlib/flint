@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("interpolate_nmod_vec....");
+    printf("interpolate_nmod_vec_fast....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
@@ -62,8 +62,8 @@ main(void)
         for (j = 0; j < npoints; j++)
             x[j] = j;
 
-        nmod_poly_evaluate_nmod_vec(y, P, x, npoints);
-        nmod_poly_interpolate_nmod_vec(Q, x, y, npoints);
+        nmod_poly_evaluate_nmod_vec_fast(y, P, x, npoints);
+        nmod_poly_interpolate_nmod_vec_fast(Q, x, y, npoints);
 
         result = nmod_poly_equal(P, Q);
 
