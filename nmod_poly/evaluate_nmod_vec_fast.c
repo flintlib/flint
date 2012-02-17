@@ -28,6 +28,16 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
+/* This gives some speedup for small lengths. */
+static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, long al,
+    mp_srcptr b, long bl, nmod_t mod)
+{
+    if (al == 2)
+        r[0] = nmod_sub(a[0], nmod_mul(a[1], b[0], mod), mod);
+    else
+        _nmod_poly_rem(r, a, al, b, bl, mod);
+}
+
 void
 _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
     long plen, mp_ptr * tree, long len, nmod_t mod)
@@ -80,8 +90,8 @@ _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
 
         while (left >= 2 * pow)
         {
-            _nmod_poly_rem(pc, pb, 2 * pow, pa, pow + 1, mod);
-            _nmod_poly_rem(pc + pow, pb, 2 * pow, pa + pow + 1, pow + 1, mod);
+            _nmod_poly_rem_2(pc, pb, 2 * pow, pa, pow + 1, mod);
+            _nmod_poly_rem_2(pc + pow, pb, 2 * pow, pa + pow + 1, pow + 1, mod);
 
             pa += 2 * pow + 2;
             pb += 2 * pow;
