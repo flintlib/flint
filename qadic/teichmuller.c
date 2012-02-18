@@ -27,6 +27,18 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
+/*
+    Uses Hensel lifting along the polynomial $X^q - X$, which yields 
+    the formula $z' = z - (z^q - z) / (q z^{q-1} - 1)$.
+
+    We observe that the denominator is $p$-adically close to $q - 1$ 
+    since $z^{q-1}$ is close to~$1$.  This allows us to use the formula 
+    $z = z + (1-q)^{-1} (z^q - z)$, during the iteration where the 
+    $p$-adic inverse of $(1-q)$ is updated at each step, too.
+
+    Supports aliasing between \code{rop} and \code{op}.
+ */
+
 void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
                         const fmpz *a, const long *j, long lena, 
                         const fmpz_t p, long N)
@@ -45,8 +57,8 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
     else
     {
         long *e, i, n;
-        fmpz *pow, *inv, *r, *s, *t;
-        fmpz_t qm1, qm2;
+        fmpz *pow, *u, *t, *w;
+        fmpz_t inv, q, qm1;
 
         n = FLINT_CLOG2(N) + 1;
 
@@ -54,18 +66,18 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
-        pow = _fmpz_vec_init(n);
-        inv = _fmpz_vec_init(2 * d - 1);
-        r   = _fmpz_vec_init(2 * d - 1);
-        s   = _fmpz_vec_init(2 * d - 1);
-        t   = _fmpz_vec_init(2 * d - 1);
+        w   = _fmpz_vec_init(n + n + 2 * d - 1);
+        pow = w;
+        u   = w + n;
+        t   = w + 2 * n;
 
+        fmpz_init(inv);
+        fmpz_init(q);
         fmpz_init(qm1);
-        fmpz_init(qm2);
 
-        fmpz_pow_ui(qm1, p, d);
-        fmpz_sub_ui(qm1, qm1, 1);
-        fmpz_sub_ui(qm2, qm1, 1);
+        fmpz_pow_ui(q, p, d);
+        fmpz_sub_ui(qm1, q, 1);
+        fmpz_neg(qm1, qm1);
 
         /* Compute powers of p */
         {
@@ -92,49 +104,43 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
         }
 
+        /* Compute reduced units for (1-q) */
+        {
+            fmpz_mod(u + 0, qm1, pow + 0);
+        }
+        for (i = 1; i < n; i++)
+        {
+            fmpz_mod(u + i, u + (i - 1), pow + i);
+        }
+
         /* Run Newton iteration */
         i = n - 1;
         {
+            fmpz_one(inv);
+
             _fmpz_vec_scalar_mod_fmpz(rop, op, len, pow + i);
             _fmpz_vec_zero(rop + len, d - len);
-
-            /* {(q-1) x^{q-2}}^{-1} */
-            _fmpz_mod_poly_neg(inv, rop, d, pow + i);
         }
         for (i--; i >= 0; i--)
         {
-            /* Lift rop */
-            _qadic_pow(t, rop, d, qm1, a, j, lena, pow + i);
+            /* Lift u := (1-q)^{-1} */
+            fmpz_mul(t, u + i, inv);
             fmpz_sub_ui(t, t, 1);
-            _fmpz_mod_poly_mul(s, t, d, inv, d, pow + i);
-            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, pow + i);
-            _fmpz_mod_poly_sub(rop, rop, d, s, d, pow + i);
-            
-            /* Lift inv */
-            if (i > 0)
-            {
-                _qadic_pow(s, rop, d, qm2, a, j, lena, pow + i);
-                _fmpz_mod_poly_scalar_mul_fmpz(t, inv, d, qm1, pow + i);
-                _fmpz_mod_poly_mul(r, s, d, t, d, pow + i);
-                _fmpz_mod_poly_reduce(r, 2*d - 1, a, j, lena, pow + i);
-                fmpz_sub_ui(r, r, 2);
-                _fmpz_mod_poly_neg(r, r, d, pow + i);
-                _fmpz_mod_poly_mul(s, inv, d, r, d, pow + i);
-                _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, pow + i);
-                {
-                    fmpz *__t;
-                    __t = s; s = inv; inv = __t;
-                }
-            }
+            fmpz_mul(t + 1, t, inv);
+            fmpz_sub(inv, inv, t + 1);
+            fmpz_mod(inv, inv, pow + i);
+
+            /* Lift rop */
+            _qadic_pow(t, rop, d, q, a, j, lena, pow + i);
+            _fmpz_mod_poly_sub(t, t, d, rop, d, pow + i);
+            _fmpz_mod_poly_scalar_mul_fmpz(t, t, d, inv, pow + i);
+            _fmpz_mod_poly_add(rop, rop, d, t, d, pow + i);
         }
 
-        _fmpz_vec_clear(pow, n);
-        _fmpz_vec_clear(inv, 2 * d - 1);
-        _fmpz_vec_clear(r, 2 * d - 1);
-        _fmpz_vec_clear(s, 2 * d - 1);
-        _fmpz_vec_clear(t, 2 * d - 1);
+        _fmpz_vec_clear(w, n + n + 2 * d - 1);
+        fmpz_clear(inv);
+        fmpz_clear(q);
         fmpz_clear(qm1);
-        fmpz_clear(qm2);
         flint_free(e);
     }
 }
