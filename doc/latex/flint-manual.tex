@@ -336,6 +336,14 @@ you can specify where they should be placed by passing
 under which the \code{lib} and \code{include} directories exist into
 which you wish to place the FLINT files when it is installed.
 
+If you wish to use FLINT on a single core machine then it will be
+configured by default for single mode. This is slightly faster, but
+is not threadsafe. (This mode can also be explicitly selected by 
+passing the \code{--single} option to configure). If you wish to 
+build a threadsafe version of FLINT, you must pass the 
+\code{--reentrant} option to configure. This will be slower on 
+single core machines, but threadsafe.
+
 Once FLINT is configured, in the main directory of the FLINT directory 
 tree simply type:
 \begin{lstlisting}[language=bash]

@@ -77,6 +77,9 @@ main(void)
             abort();
         }
 
+        flint_free(str1);
+        free(str2);
+
         fmpq_clear(a);
         mpq_clear(b);
     }

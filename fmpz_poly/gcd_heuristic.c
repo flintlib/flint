@@ -241,7 +241,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 	      {
             /* unpack quotient of second poly by gcd */
             qlimbs = limbs2 - limbsg + 1;
-            qlen = FLINT_MIN(len2, (qlimbs*FLINT_BITS)/pack_bits + 1);
+            qlen = FLINT_MIN(len2, (qlimbs*FLINT_BITS - 1)/pack_bits + 1);
             _fmpz_poly_bit_unpack(Q, qlen, q, pack_bits, 0);
             while (Q[qlen - 1] == 0) qlen--;
             
@@ -273,7 +273,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    /* we found the gcd, so multiply by content */
    if (divides)
    {
-	   mpn_zero(res + glen, len2 - glen);
+	   _fmpz_vec_zero(res + glen, len2 - glen);
       _fmpz_vec_scalar_mul_fmpz(res, G, glen, d);
    }
 		

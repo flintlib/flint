@@ -104,7 +104,7 @@ void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
 void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
-    Generates a random integer in the range $[-m/2, m/2)$, with an
+    Generates a random integer in the range $(-m/2, m/2]$, with an
     increased probability of generating values close to the
     endpoints or close to zero.
 
@@ -842,7 +842,7 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
-    $0 \le x < M$ (if sign = 0) or $-M/2 \le x < M/2$ (if sign = 1)
+    $0 \le x < M$ (if sign = 0) or $-M/2 < x \le M/2$ (if sign = 1)
     congruent to $r_1$ modulo $m_1$ and $r_2$ modulo $m_2$,
     where where $M = m_1 \times m_2$. The result $x$ is stored in \code{out}.
 

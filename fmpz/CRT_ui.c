@@ -64,7 +64,7 @@ _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1, ulong r2,
     if (sign)
     {
         fmpz_sub(out, tmp, m1m2);
-        if (fmpz_cmpabs(tmp, out) < 0)
+        if (fmpz_cmpabs(tmp, out) <= 0)
             fmpz_set(out, tmp);
     }
     else

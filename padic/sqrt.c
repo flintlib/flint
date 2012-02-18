@@ -56,6 +56,7 @@ static int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
         /* Compute sequence of exponents */
         a = flint_malloc(len * sizeof(long));
+
         for (a[i = 0] = N; a[i] > 1; i++)
             a[i + 1] = (a[i] + 1) / 2;
 

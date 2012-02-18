@@ -222,6 +222,10 @@ main(void)
           fmpz_poly_print(d); printf("\n"); 
           abort();
        }
+
+       fmpz_poly_clear(a);
+       fmpz_poly_clear(b);
+       fmpz_poly_clear(d);
     }
 
     flint_randclear(state);

@@ -134,7 +134,8 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
         if (fmpz_is_zero(den))
             return 0;
 
-        _fmpz_vec_set(X->rows[0], B->rows[0], fmpz_mat_ncols(B));
+        if (!fmpz_mat_is_empty(B))
+            _fmpz_vec_set(X->rows[0], B->rows[0], fmpz_mat_ncols(B));
         return 1;
     }
     else if (dim == 2)

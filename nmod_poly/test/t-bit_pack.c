@@ -82,6 +82,7 @@ main(void)
 
         nmod_poly_clear(a);
         nmod_poly_clear(b);
+        flint_free(mpn);
     }
 
     for (i = 0; i < 20000; i++)

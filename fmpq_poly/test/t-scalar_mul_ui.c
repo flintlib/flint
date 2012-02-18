@@ -109,6 +109,8 @@ main(void)
 
         fmpq_poly_clear(a);
         fmpq_poly_clear(b);
+        fmpq_poly_clear(lhs);
+        fmpq_poly_clear(rhs);
     }
 
     /* Check (a * n1) * n2 = a * (n1 * n2) */

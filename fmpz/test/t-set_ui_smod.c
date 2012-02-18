@@ -54,8 +54,6 @@ main(void)
 
         fmpz_set_ui(mz, m);
         fmpz_randtest_mod_signed(a, state, mz);
-        if (m % 2UL == 0 && fmpz_cmp_si(a, - (long) (m / 2UL)) == 0)
-            fmpz_neg(a, a);
 
         r = fmpz_fdiv_ui(a, m);
 

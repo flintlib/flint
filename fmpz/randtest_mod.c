@@ -52,11 +52,10 @@ fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m)
 void
 fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 {
-    /* Randomly generate -m/2 when included in the range */
+    /* Randomly generate m/2 when included in the range */
     if ((n_randlimb(state) % 32 == 1) && (fmpz_fdiv_ui(m, 2) == 0))
     {
-        fmpz_neg(f, m);
-        fmpz_fdiv_q_ui(f, f, 2UL);
+        fmpz_fdiv_q_ui(f, m, 2UL);
     }
     else
     {

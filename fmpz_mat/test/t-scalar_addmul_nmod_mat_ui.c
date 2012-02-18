@@ -79,6 +79,7 @@ main(void)
         fmpz_mat_clear(A);
         fmpz_mat_clear(B);
         fmpz_mat_clear(C);
+        nmod_mat_clear(M);
     }
 
     flint_randclear(state);

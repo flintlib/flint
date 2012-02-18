@@ -22,9 +22,10 @@
 
 link/fmpz_reentrant.c <-- fmpz.c
 
-   The file fmpz.c is a symbolic link and if it points to fmpz_reentrant.c
-   then the fmpz module is threadsafe, though a little slower when using
-   integers which are larger than FLINT_BITS - 2 bits.
+   If this version of fmpz.c is used (e.g. if the configure option 
+   \code{--reentrant} is used), then the fmpz module is threadsafe, though 
+   a little slower when using integers which are larger than 
+   \code{FLINT_BITS - 2} bits.
 
 fmpz
 
