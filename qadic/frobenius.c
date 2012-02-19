@@ -24,23 +24,127 @@
 ******************************************************************************/
 
 #include "fmpz_mod_poly.h"
+#include "ulong_extras.h"
 #include "qadic.h"
 
-/* 
-    Computes the composition $f(g(X))$ modulo the sparse polynomial 
-    given by the data \code{(a, j, lena)}, which is assumed to be 
-    of degree~$d \geq 2$.
-
-    Sets the vector \code{(rop, d)}.
-
+/*
     Assumes that \code{len1} and \code{len2} are positive but at 
-    most~$d$.
+    most~$d$, and also that \code{len1} is at least $6$.
 
-    Does not support aliasing.
+    The latter assumption guarantees that $\ceil{n/B} \geq 2$, 
+    i.e.\ $n \geq 2B$ so $n \geq 2 \ceil{\sqrt{n}}$.
+
  */
 
 static void 
-_fmpz_mod_poly_compose_mod(fmpz *rop, 
+_fmpz_mod_poly_compose_mod_paterson_stockmeyer(fmpz *rop, 
+                           const fmpz *op1, long len1, 
+                           const fmpz *op2, long len2, 
+                           const fmpz *a, const long *j, long lena, 
+                           const fmpz_t p)
+{
+    const long d = j[lena - 1];
+
+    if (len2 == 1)
+    {
+        _fmpz_mod_poly_evaluate_fmpz(rop, op1, len1, op2, p);
+        _fmpz_vec_zero(rop + 1, d - 1);
+    }
+    else
+    {
+        long B, i, k;
+        fmpz *c, *m, *s, *t;
+
+        B = n_sqrt(len1);
+        if (B*B < len1)
+            B++;
+
+        /*
+            {t + i*d, d} is op2^{i+1}, for 0 <= i < B.
+            We have one extra block of d-1 coefficients in t 
+            to allow for the computation of products.
+         */
+        t = _fmpz_vec_init(B * d + d - 1);
+
+        _fmpz_vec_set(t, op2, len2);
+        _fmpz_vec_zero(t + len2, d - len2);
+
+        for (i = 1; i < B; i++)
+        {
+            _fmpz_mod_poly_mul(t + i*d, t + (i-1)*d, d, op2, len2, p);
+            _fmpz_mod_poly_reduce(t + i*d, d + len2 - 1, a, j, lena, p);
+        }
+
+        c = _fmpz_vec_init(d);
+        m = _fmpz_vec_init(2*d - 1);
+        s = _fmpz_vec_init(2*d - 1);
+
+        /* Compute the bottom coefficient directly in rop */
+        k = 0;
+        {
+            _fmpz_vec_zero(rop, d);
+            fmpz_set(rop + 0, op1 + 0);
+            for (i = 1; i < B; i++)
+            {
+                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
+                _fmpz_mod_poly_add(rop, rop, d, s, d, p);
+            }
+        }
+
+        _fmpz_vec_set(m, t + (B-1)*d, d);
+
+        for (k = 1; k < (len1 + (B - 1)) / B - 1; k++)
+        {
+            /* Compute the coefficient polynomial in c */
+            _fmpz_vec_zero(c, d);
+            fmpz_set(c + 0, op1 + (0 + B*k));
+            for (i = 1; i < B; i++)
+            {
+                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
+                _fmpz_mod_poly_add(c, c, d, s, d, p);
+            }
+
+            /* Compute the product of the coeffient and the monomial in s */
+            _fmpz_mod_poly_mul(s, c, d, m, d, p);
+            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
+
+            /* Update the sum */
+            _fmpz_mod_poly_add(rop, rop, d, s, d, p);
+
+            /* Update the monomial to (t^B)^{j+1} */
+            _fmpz_mod_poly_mul(s, m, d, t + (B-1)*d, d, p);
+            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
+            _fmpz_vec_set(m, s, d);
+        }
+
+        /* Last step, j = \ceil{len1/B}.  Possibly fewer terms.. */
+        {
+            /* Compute the coefficient polynomial in c */
+            _fmpz_vec_zero(c, d);
+            fmpz_set(c + 0, op1 + (0 + B*k));
+            for (i = 1; i + B*k < len1; i++)
+            {
+                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
+                _fmpz_mod_poly_add(c, c, d, s, d, p);
+            }
+
+            /* Compute the product of the coeffient and the monomial in s */
+            _fmpz_mod_poly_mul(s, c, d, m, d, p);
+            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
+
+            /* Update the sum */
+            _fmpz_mod_poly_add(rop, rop, d, s, d, p);
+        }
+
+        _fmpz_vec_clear(t, B * d + d - 1);
+        _fmpz_vec_clear(c, d);
+        _fmpz_vec_clear(m, 2*d - 1);
+        _fmpz_vec_clear(s, 2*d - 1);
+    }
+}
+
+static void 
+_fmpz_mod_poly_compose_mod_horner(fmpz *rop, 
                            const fmpz *op1, long len1, 
                            const fmpz *op2, long len2, 
                            const fmpz *a, const long *j, long lena, 
@@ -86,6 +190,36 @@ _fmpz_mod_poly_compose_mod(fmpz *rop,
         }
 
         _fmpz_vec_clear(t, 2*d - 1);
+    }
+}
+
+/* 
+    Computes the composition $f(g(X))$ modulo the sparse polynomial 
+    given by the data \code{(a, j, lena)}, which is assumed to be 
+    of degree~$d \geq 2$.
+
+    Sets the vector \code{(rop, d)}.
+
+    Assumes that \code{len1} and \code{len2} are positive but at 
+    most~$d$.
+
+    Does not support aliasing.
+ */
+
+static void 
+_fmpz_mod_poly_compose_mod(fmpz *rop, 
+                           const fmpz *op1, long len1, 
+                           const fmpz *op2, long len2, 
+                           const fmpz *a, const long *j, long lena, 
+                           const fmpz_t p)
+{
+    if (len1 < 6)
+    {
+        _fmpz_mod_poly_compose_mod_horner(rop, op1, len1, op2, len2, a, j, lena, p);
+    }
+    else
+    {
+        _fmpz_mod_poly_compose_mod_paterson_stockmeyer(rop, op1, len1, op2, len2, a, j, lena, p);
     }
 }
 
@@ -153,7 +287,6 @@ void _qadic_frobenius_a(fmpz *rop, long exp,
 
         fmpz_pow_ui(t, p, exp);
         _qadic_pow(rop, op, 2, t, a, j, lena, pow + i);
-
         _fmpz_mod_poly_compose_mod(t, f2, d, rop, d, a, j, lena, pow + i);
         _qadic_inv(inv, t, d, a, j, lena, p, 1);
     }
