@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("sigma... ");
+    printf("frobenius... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -65,8 +65,8 @@ main(void)
         qadic_set(b, a);
         e = n_randint(state, 10) % d;
 
-        qadic_sigma(c, b, e, ctx);
-        qadic_sigma(b, b, e, ctx);
+        qadic_frobenius(c, b, e, ctx);
+        qadic_frobenius(b, b, e, ctx);
 
         result = (qadic_equal(b, c));
         if (!result)
@@ -112,7 +112,7 @@ main(void)
         qadic_randtest_int(a, state, ctx);
         e = n_randint(state, 10) % d;
 
-        qadic_sigma(b, a, e, ctx);
+        qadic_frobenius(b, a, e, ctx);
         {
             fmpz_t t;
 
@@ -176,9 +176,9 @@ main(void)
         e = n_randint(state, 10) % d;
 
         qadic_add(s, a, b, ctx);
-        qadic_sigma(lhs, s, e, ctx);
-        qadic_sigma(s1, a, e, ctx);
-        qadic_sigma(s2, b, e, ctx);
+        qadic_frobenius(lhs, s, e, ctx);
+        qadic_frobenius(s1, a, e, ctx);
+        qadic_frobenius(s2, b, e, ctx);
         qadic_add(rhs, s1, s2, ctx);
 
         result = (qadic_equal(lhs, rhs));
@@ -237,9 +237,9 @@ main(void)
         e = n_randint(state, 10) % d;
 
         qadic_mul(s, a, b, ctx);
-        qadic_sigma(lhs, s, e, ctx);
-        qadic_sigma(s1, a, e, ctx);
-        qadic_sigma(s2, b, e, ctx);
+        qadic_frobenius(lhs, s, e, ctx);
+        qadic_frobenius(s1, a, e, ctx);
+        qadic_frobenius(s2, b, e, ctx);
         qadic_mul(rhs, s1, s2, ctx);
 
         result = (qadic_equal(lhs, rhs));

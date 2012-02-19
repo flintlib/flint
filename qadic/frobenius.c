@@ -89,7 +89,7 @@ _fmpz_mod_poly_compose_mod(fmpz *rop,
     }
 }
 
-void _qadic_sigma_a(fmpz *rop, long exp, 
+void _qadic_frobenius_a(fmpz *rop, long exp, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
 {
@@ -196,7 +196,7 @@ void _qadic_sigma_a(fmpz *rop, long exp,
     flint_free(e);
 }
 
-void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e, 
+void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
                   const fmpz *a, const long *j, long lena, 
                   const fmpz_t p, long N)
 {
@@ -225,7 +225,7 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e,
         fmpz_init(pow);
         fmpz_pow_ui(pow, p, N);
 
-        _qadic_sigma_a(t, e, a, j, lena, p, N);
+        _qadic_frobenius_a(t, e, a, j, lena, p, N);
 
         _fmpz_mod_poly_compose_mod(rop, op, len, t, d, a, j, lena, pow);
         _fmpz_vec_zero(rop + d, d - 1);
@@ -235,7 +235,7 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e,
     }
 }
 
-void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
+void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
 {
     const long N = (&ctx->pctx)->N;
     const long d = qadic_ctx_degree(ctx);
@@ -267,7 +267,7 @@ void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
             t = rop->coeffs;
         }
 
-        _qadic_sigma(t, op->coeffs, op->length, e, 
+        _qadic_frobenius(t, op->coeffs, op->length, e, 
                      ctx->a, ctx->j, ctx->len, (&ctx->pctx)->p, N - op->val);
 
         if (rop == op)

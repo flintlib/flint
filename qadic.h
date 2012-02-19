@@ -255,7 +255,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
 
 /* Special functions *********************************************************/
 
-void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx);
+void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx);
 
 void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len, 
                         const fmpz *a, const long *j, long lena, 

@@ -278,7 +278,7 @@ void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e,
 
 *******************************************************************************
 
-void _qadic_sigma_a(fmpz *rop, long e, 
+void _qadic_frobenius_a(fmpz *rop, long e, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
 
@@ -293,7 +293,7 @@ void _qadic_sigma_a(fmpz *rop, long e,
     Sets \code{(rop, 2*d-1)}, although the actual length of the 
     output will be at most~$d$.
 
-void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e, 
+void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
                   const fmpz *a, const long *j, long lena, 
                   const fmpz_t p, long N)
 
@@ -305,7 +305,7 @@ void _qadic_sigma(fmpz *rop, const fmpz *op, long len, long e,
 
     Does not support aliasing.
 
-void qadic_sigma(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
+void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx)
 
     Evaluates the homomorphism $\Sigma^e$ at \code{op}.
 
