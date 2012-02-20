@@ -53,7 +53,10 @@ static long _padic_exp_bound(long v, long N, const fmpz_t p)
         fmpz_sub_ui(n, n, 1);
         fmpz_mul_ui(d, f, v);
         fmpz_sub_ui(d, d, 1); 
-
+if (fmpz_is_zero(d))
+{
+printf("v N p %ld %ld %ld\n", v, N, *p);
+}
         fmpz_cdiv_q(f, n, d);
         i = fmpz_get_si(f);
 
@@ -111,12 +114,7 @@ padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
     }
 }
 
-/*
-    Assumes that exponential series converges at $x$.  In particular, 
-    this implies that $\ord_p(x) \geq 1$.
- */
-
-void
+static void
 padic_exp_bsplit(padic_t y, const padic_t x, const padic_ctx_t ctx)
 {
     const long n = _padic_exp_bound(padic_val(x), ctx->N, ctx->p);
@@ -140,11 +138,11 @@ padic_exp_bsplit(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
         fmpz_add(T, T, Q);  /* (T,Q) := (T,Q) + 1 */
 
-        /* As exp(x) is a unit, ord_p(T) == ord_p(Q) */
+        /* Note exp(x) is a unit so val(T) == val(Q). */
         if (_fmpz_remove(T, ctx->p, ctx->pinv))
             _fmpz_remove(Q, ctx->p, ctx->pinv);
 
-        _padic_inv(Q, Q, ctx->p, ctx->N);  /* XXX: Aliasing */
+        _padic_inv(Q, Q, ctx->p, ctx->N);
         fmpz_mul(padic_unit(y), T, Q);
         padic_val(y) = 0;
         _padic_reduce(y, ctx);
@@ -157,8 +155,13 @@ padic_exp_bsplit(padic_t y, const padic_t x, const padic_ctx_t ctx)
 }
 
 /*
-    XXX:  Assumes that $\ord_p(x) = 1$.
+    Assumes that the exponential series converges at $x$.
+
+    TODO:  Take advantage of additional factors of $p$ in $x$.
+
+    FIXME:  Case $p = 2$.
  */
+
 void
 padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
 {
@@ -166,9 +169,26 @@ padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
     padic_t r;
     long v, w;
 
-    fmpz_init_set(ppow, ctx->p);
-    fmpz_init_set(t, padic_unit(x));
+    if (*(ctx->p) == 2L)
+    {
+        _padic_exp(y, x, ctx);
+        return;
+    }
+
+    fmpz_init(ppow);
+    fmpz_init(t);
     padic_init(r, ctx);
+
+    fmpz_set(ppow, ctx->p);
+    if (padic_val(x) == 1)
+    {
+        fmpz_set(t, padic_unit(x));
+    }
+    else
+    {
+        fmpz_pow_ui(t, ctx->p, padic_val(x) - 1);
+        fmpz_mul(t, t, padic_unit(x));
+    }
 
     padic_one(y, ctx);
 
@@ -188,120 +208,117 @@ padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
 }
 
 /*
-    TODO:  This implementation is currently broken and does not pass
-    the test code for the exponential function.
+    Assumes that the exponential series converges at $x$.
+
+    Assumes that $\ord_p(x) < N$.
  */
 
-void
+static void 
 padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
 {
-    long i, j, u, m, workprec, nterms, nxpow, nsums;
+    const long nterms = _padic_exp_bound(padic_val(x), ctx->N, ctx->p);
 
-    fmpz * xpow;
-    fmpz_t sum, c, f, s, t;
-    fmpz_t mod;
-    int alloc;
-
-    /* XXX: Check precisions */
-    i = _padic_exp_bound(padic_val(x), ctx->N, ctx->p);
-    j = fmpz_fits_si(ctx->p) ? (i - 1) / (fmpz_get_si(ctx->p) - 1) : 0;
-    nterms = i + 1;
-    workprec = ctx->N + j;
-
-    alloc = _padic_ctx_pow_ui(mod, workprec, ctx);
-
-    nxpow = n_sqrt(nterms);
-    nsums = (nterms + (nxpow - 1)) / nxpow;
-    u     = nterms - 1;
-
-    /*
-        printf("N=%ld nterms=%d workprec=%d nxpow=%d nsums=%d\n", ctx->N,
-                nterms, workprec, nxpow, nsums);
-     */
-
-    fmpz_init(sum);
-    fmpz_init(c);
-    fmpz_init(f);
-    fmpz_init(s);
-    fmpz_init(t);
-
-    /* Compute powers: xpow[i] == x^i */
-    xpow = _fmpz_vec_init(nxpow);
-    padic_get_fmpz(xpow + 1, x, ctx);
-    for (i = 2; i < nxpow; i++)
+    if (nterms <= 3)
     {
-        fmpz_mul(xpow + i, xpow + i - 1, xpow + 1);
-        fmpz_mod(xpow + i, xpow + i, mod);
+        _padic_exp(res, x, ctx);
     }
-
-    /* Compute x^nxpow */
-    fmpz_mul(xpow, xpow + nxpow - 1, xpow + 1);
-    fmpz_mod(xpow, xpow, mod);
-
-    for (i = nsums - 1; i >= 0; i--)
+    else
     {
-        /*
-            Special case: only 1 term in last row;
-            TODO: Handle more cleanly
-         */
-        if (i * nxpow == nterms - 1)
+        long i, j, npows, nsums;
+
+        fmpz_t mod;
+        int alloc;
+
+        fmpz_t c, f, s, t, sum;
+        fmpz *pows;
+
+        i = nterms - 1;
+        j = fmpz_fits_si(ctx->p) ? (i - 1) / (fmpz_get_si(ctx->p) - 1) : 0;
+
+        alloc = _padic_ctx_pow_ui(mod, ctx->N + j, ctx);
+
+        npows = n_sqrt(nterms);
+        nsums = (nterms + npows - 1) / npows;
+
+        fmpz_init(c);
+        fmpz_init(f);
+        fmpz_init(s);
+        fmpz_init(t);
+        fmpz_init(sum);
+
+        /* Compute pows */
+        pows = _fmpz_vec_init(npows);
+        padic_get_fmpz(pows + 1, x, ctx);
+        for (i = 2; i < npows; i++)
         {
-            fmpz_set(sum, xpow);
-            fmpz_set_ui(f, nterms - 1);
-            u--;
+            fmpz_mul(pows + i, pows + i - 1, pows + 1);
+            fmpz_mod(pows + i, pows + i, mod);
         }
-        else
+
+        /* Compute x^npows */
+        fmpz_mul(pows, pows + npows - 1, pows + 1);
+        fmpz_mod(pows, pows, mod);
+
+        fmpz_zero(sum);
+        fmpz_set_ui(f, 1);
+
+        for (i = nsums - 1; i >= 0; i--)
         {
-            const long bot = i * nxpow + 1;
+            long bot = i * npows;
+            long top = FLINT_MIN(nterms - 1, bot + npows - 1);
 
-            fmpz_set(s, xpow + nxpow - 1);
-            fmpz_set_ui(c, u);
-
-            while (u > bot)
-            {
-                fmpz_addmul(s, xpow + u - bot, c);
-                u--;
-                fmpz_mul_ui(c, c, u);
-            }
-
-            u -= 2;
-            fmpz_add(s, s, c);
-
-            if (i == nsums - 1)
-            {
-                fmpz_set(f, c);
-                fmpz_set(sum, s);
-            }
+            if (top - bot == 0)
+                fmpz_set_ui(s, 1);
             else
+                fmpz_set(s, pows + top - bot);
+
+            fmpz_set_ui(c, top);
+            top--;
+
+            while (top > bot)
             {
-                fmpz_mul_ui(f, f, (i + 1) * nxpow);
-                fmpz_mul(s, s, f);
-                fmpz_mul(f, f, c);
-                fmpz_mul(t, sum, xpow);
-                fmpz_add(sum, t, s);
-                fmpz_mod(sum, sum, mod);
+                fmpz_addmul(s, pows + top - bot, c);
+                fmpz_mul_ui(c, c, top);
+                top--;
             }
+
+            if (top == bot)
+            {
+                fmpz_add(s, s, c);
+                if (top != 0)
+                    fmpz_mul_ui(c, c, top);
+            }
+
+            fmpz_mul(t, pows, sum);
+            fmpz_mul(s, s, f);
+            fmpz_add(sum, t, s);
+            fmpz_mod(sum, sum, mod);
+
+            fmpz_mul(f, f, c);
         }
+
+        /* Divide by factorial, TODO: Improve */
+
+        /* Note exp(x) is a unit so val(sum) == val(f). */
+        if (_fmpz_remove(sum, ctx->p, ctx->pinv))
+            _fmpz_remove(f,   ctx->p, ctx->pinv);
+
+        _padic_inv(f, f, ctx->p, ctx->N);
+        fmpz_mul(padic_unit(res), sum, f);
+        padic_val(res) = 0;
+        _padic_reduce(res, ctx);
+
+        _fmpz_vec_clear(pows, npows);
+        fmpz_clear(c);
+        fmpz_clear(f);
+        fmpz_clear(s);
+        fmpz_clear(t);
+        fmpz_clear(sum);
+        if (alloc)
+            fmpz_clear(mod);
     }
-
-    /* Divide by factorial, XXX: Improve */
-    {
-        fmpq_t q;
-        (q->num) = *sum;
-        (q->den) = *f;
-        padic_set_fmpq(res, q, ctx);
-    }
-
-    _fmpz_vec_clear(xpow, nxpow);
-    fmpz_clear(c);
-    fmpz_clear(s);
-    fmpz_clear(t);
-    fmpz_clear(f);
-    fmpz_clear(sum);
-
-    if (alloc)
-        fmpz_clear(mod);
 }
+
 
 /*
     Sets \code{rop} to the exponential of \code{op}, reduced 
@@ -395,8 +412,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         }
         else if (v < N)
         {
-            /*_padic_exp(rop, op, ctx);*/
-            padic_exp_bsplit(rop, op, ctx);
+            padic_exp_rectangular(rop, op, ctx);
             return 1;
         }
         else
@@ -413,8 +429,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         }
         else if (v < N)
         {
-            /*_padic_exp(rop, op, ctx);*/
-            padic_exp_bsplit(rop, op, ctx);
+            padic_exp_rectangular(rop, op, ctx);
             return 1;
         }
         else
