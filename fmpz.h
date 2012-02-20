@@ -487,6 +487,12 @@ void fmpz_fib_ui(fmpz_t f, ulong n);
 
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
 
+void _fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong a, ulong b);
+
+void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong n);
+
+void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong n);
+
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
 
