@@ -52,12 +52,9 @@ _fmpz_mod_poly_compose_mod_paterson_stockmeyer(fmpz *rop,
     }
     else
     {
-        long B, i, k;
+        const long B = n_sqrt(len1);
+        long i, k;
         fmpz *c, *m, *s, *t;
-
-        B = n_sqrt(len1);
-        if (B*B < len1)
-            B++;
 
         /*
             {t + i*d, d} is op2^{i+1}, for 0 <= i < B.
@@ -117,7 +114,7 @@ _fmpz_mod_poly_compose_mod_paterson_stockmeyer(fmpz *rop,
             _fmpz_vec_set(m, s, d);
         }
 
-        /* Last step, j = \ceil{len1/B}.  Possibly fewer terms.. */
+        /* Last step, j = \ceil{len1/B} - 1.  Possibly fewer terms.. */
         {
             /* Compute the coefficient polynomial in c */
             _fmpz_vec_zero(c, d);
