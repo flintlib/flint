@@ -481,11 +481,31 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     If \code{op} has negative valuation, raises an abort signal.
 
-int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_exp_naive(padic_t y, const padic_t x, const padic_ctx_t ctx)
+
+    Returns the $p$-exponential function evaluatet at \code{op}, 
+    reduced modulo $p^N$.
+
+    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
+
+void _padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx)
+
+    Returns the $p$-exponential function evaluatet at \code{op}, 
+    reduced modulo $p^N$.
+
+    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
+
+void _padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
+
+    Returns the $p$-exponential function evaluatet at \code{op}, 
+    reduced modulo $p^N$.
+
+    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
+
+int padic_exp(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
     Returns whether the $p$-adic exponential function converges at 
-    the $p$-adic number \code{op}, and if so sets \code{rop} to its 
-    value.
+    the $p$-adic number $x$, and if so sets $y$ to its value.
 
     The $p$-adic exponential function is defined by the usual series 
     \begin{equation*}
@@ -494,6 +514,23 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     but this only converges only when $\ord_p(x) > 1 / (p - 1)$.  For 
     elements $x \in \mathbf{Q}_p$, this means that $\ord_p(x) \geq 1$ 
     when $p \geq 3$ and $\ord_2(x) \geq 2$ when $p = 2$.
+
+int padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic exponential function converges at 
+    the $p$-adic number $x$, and if so sets $y$ to its value.
+
+    Uses a rectangular splitting algorithm to evaluate the series 
+    expression of $\exp(x) \bmod{p^N}$.
+
+int padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic exponential function converges at 
+    the $p$-adic number $x$, and if so sets $y$ to its value.
+
+    Uses a balanced approach, balancing the size of chunks of $x$ 
+    with the valuation and hence the rate of convergence, which 
+    results in a quasi-linear algorithm in $N$, for fixed $p$.
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 

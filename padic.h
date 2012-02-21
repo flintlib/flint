@@ -282,7 +282,13 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
+void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
