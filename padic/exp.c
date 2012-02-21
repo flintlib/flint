@@ -141,7 +141,10 @@ void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
 void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    _padic_exp_naive(rop, op, ctx);
+    if (ctx->N < 1024)
+        _padic_exp_rectangular(rop, op, ctx);
+    else
+        _padic_exp_balanced(rop, op, ctx);
 }
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
