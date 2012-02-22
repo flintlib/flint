@@ -52,23 +52,21 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
     {
         const long b = n_sqrt(n);
         const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
+        const long l = padic_val_fac_ui(b, p);
 
         long i, j;
-        fmpz_t c, f, t, P1;
-        fmpz *ppow, *ypow;
+        fmpz_t c, f, t, Pl, P1;
+        fmpz *ypow;
 
-        ppow = _fmpz_vec_init(k + 1);
         ypow = _fmpz_vec_init(b + 1);
         fmpz_init(c);
         fmpz_init(f);
         fmpz_init(t);
+        fmpz_init(Pl);
         fmpz_init(P1);
 
+        fmpz_pow_ui(Pl, p, l);
         fmpz_pow_ui(P1, p, N + k);
-
-        fmpz_one(ppow + 0);
-        for (i = 1; i <= k; i++)
-            fmpz_mul(ppow + i, ppow + (i - 1), p);
 
         fmpz_one(ypow + 0);
         for (i = 1; i <= b; i++)
@@ -93,12 +91,13 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
             fmpz_mod(c, c, P1);
 
             i = fmpz_remove(f, f, p);
-            _padic_inv(f, f, p, N + k);
-            fmpz_mul(c, c, ppow + (k - i));
+            _padic_inv(f, f, p, N);
+            fmpz_pow_ui(t, p, i);
+            fmpz_divexact(c, c, t);
             fmpz_mul(c, c, f);
 
             /* Set z */
-            fmpz_mod(z, c, P1);
+            fmpz_mod(z, c, P0);
         }
 
         for (j--; j >= 0; j--)
@@ -117,23 +116,23 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
             fmpz_mod(c, c, P1);
 
             i = fmpz_remove(f, f, p);
-            _padic_inv(f, f, p, N + k);
-            fmpz_mul(c, c, ppow + (k - i));
+            _padic_inv(f, f, p, N);
+            fmpz_pow_ui(t, p, i - l);  /* t := p^i */
+            fmpz_mul(t, t, Pl);
+            fmpz_divexact(c, c, t);
             fmpz_mul(c, c, f);
 
             /* Set z = z y^b + c */
             fmpz_mul(t, z, ypow + b);
             fmpz_add(z, c, t);
-            fmpz_mod(z, z, P1);
+            fmpz_mod(z, z, P0);
         }
-
-        fmpz_divexact(z, z, ppow + k);
 
         fmpz_clear(c);
         fmpz_clear(f);
         fmpz_clear(t);
+        fmpz_clear(Pl);
         fmpz_clear(P1);
-        _fmpz_vec_clear(ppow, k + 1);
         _fmpz_vec_clear(ypow, b + 1);
     }
 
