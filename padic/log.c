@@ -16,7 +16,7 @@
     Assumes that $b v$, and $N + e$ do not overflow, 
     where $e = \floor{\log_{p}{b}}$.
  */
-static long bound(long v, long N, long p)
+long _padic_log_bound(long v, long N, long p)
 {
     long e, i = (N - 1) / v;
     mp_limb_t j;
@@ -65,7 +65,7 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
         padic_inv_t pre;
 
         p = fmpz_get_si(ctx->p);
-        i = bound(v, ctx->N, p) - 1;
+        i = _padic_log_bound(v, ctx->N, p) - 1;
 
         k = n_flog(i, p);
 
