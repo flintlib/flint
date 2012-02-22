@@ -707,6 +707,14 @@ void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 
     Sets $f$ to the binomial coefficient ${n \choose k}$.
 
+void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong k)
+
+    Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
+
+void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong k)
+
+    Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
+
 *******************************************************************************
 
     Greatest common divisor
