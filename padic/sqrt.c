@@ -157,7 +157,7 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
     else
     {
         long *a, i, len;
-        fmpz *W, *pow, *u;
+        fmpz *W, *u;
 
         i = FLINT_CLOG2(N);
 
@@ -167,49 +167,16 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
             a[i + 1] = (a[i] + 3) / 2;
         len = i + 1;
 
-        W      = _fmpz_vec_init(2 + 2 * len);
-        pow    = W + 2;
-        u      = W + (2 + len);
-
-        /* Compute powers of p */
-        {
-            fmpz_one(W);
-            fmpz_set_ui(pow + i, 8);
-        }
-        for (i--; i >= 1; i--)
-        {
-            if (a[i] & 1L)
-            {
-                fmpz_mul(pow + i, W, pow + (i + 1));
-                fmpz_mul(W, W, W);
-            }
-            else
-            {
-                fmpz_mul(pow + i, W, pow + (i + 1));
-                fmpz_mul_ui(pow + i, pow + i, 2);
-                fmpz_mul(W, W, W);
-                fmpz_mul_ui(W, W, 2);
-            }
-        }
-        {
-            if (a[i] & 1L)
-            {
-                fmpz_mul(pow + i, W, pow + (i + 1));
-            }
-            else
-            {
-                fmpz_mul(pow + i, W, pow + (i + 1));
-                fmpz_mul_ui(pow + i, pow + i, 2);
-            }
-        }
+        W      = _fmpz_vec_init(2 + len);
+        u      = W + 2;
 
         /* Compute reduced units */
         {
-            fmpz_mod(u, op, pow);
+            fmpz_fdiv_r_2exp(u, op, a[0]);
         }
         for (i = 1; i < len; i++)
         {
-            fmpz_mod(u + i, u + (i - 1), pow + i);
+            fmpz_fdiv_r_2exp(u + i, u + (i - 1), a[i]);
         }
 
         /* Run Newton iteration */
@@ -223,15 +190,15 @@ static int _padic_sqrt2(fmpz_t rop, const fmpz_t op, long N)
             fmpz_fdiv_q_2exp(W + 1, W + 1, 1);
             fmpz_mul(W, W + 1, rop);
             fmpz_sub(rop, rop, W);
-            fmpz_mod(rop, rop, pow + i);
+            fmpz_fdiv_r_2exp(rop, rop, a[i]);
         }
 
         /* Invert modulo p^N */
         fmpz_mul(rop, rop, u);
-        fmpz_mod(rop, rop, pow);
+        fmpz_fdiv_r_2exp(rop, rop, a[0]);
 
         flint_free(a);
-        _fmpz_vec_clear(W, 2 + 2 * len);
+        _fmpz_vec_clear(W, 2 + len);
 
     }
     return 1;
