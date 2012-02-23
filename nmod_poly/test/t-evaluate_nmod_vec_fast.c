@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011, 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -38,41 +38,41 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
     
-    printf("interpolate_nmod_vec....");
+    printf("evaluate_nmod_vec_fast....");
     fflush(stdout);
 
     for (i = 0; i < 10000; i++)
     {
         nmod_poly_t P, Q;
-        mp_ptr x, y;
+        mp_ptr x, y, z;
         mp_limb_t mod;
         long j, n, npoints;
 
         mod = n_randtest_prime(state, 0);
-        npoints = n_randint(state, FLINT_MIN(100, mod));
-        n = n_randint(state, npoints + 1);
+        npoints = n_randint(state, 100);
+        n = n_randint(state, 100);
 
         nmod_poly_init(P, mod);
         nmod_poly_init(Q, mod);
         x = _nmod_vec_init(npoints);
         y = _nmod_vec_init(npoints);
+        z = _nmod_vec_init(npoints);
 
         nmod_poly_randtest(P, state, n);
 
         for (j = 0; j < npoints; j++)
-            x[j] = j;
+            x[j] = n_randint(state, mod);
 
-        nmod_poly_evaluate_nmod_vec(y, P, x, npoints);
-        nmod_poly_interpolate_nmod_vec(Q, x, y, npoints);
+        nmod_poly_evaluate_nmod_vec_iter(y, P, x, npoints);
+        nmod_poly_evaluate_nmod_vec_fast(z, P, x, npoints);
 
-        result = nmod_poly_equal(P, Q);
+        result = _nmod_vec_equal(y, z, npoints);
 
         if (!result)
         {
             printf("FAIL:\n");
             printf("mod=%lu, n=%ld, npoints=%ld\n\n", mod, n, npoints);
-            nmod_poly_print(P), printf("\n\n");
-            nmod_poly_print(Q), printf("\n\n");
+            printf("P: "); nmod_poly_print(P); printf("\n\n");
             abort();
         }
 
@@ -80,6 +80,7 @@ main(void)
         nmod_poly_clear(Q);
         _nmod_vec_clear(x);
         _nmod_vec_clear(y);
+        _nmod_vec_clear(z);
     }
 
     flint_randclear(state);

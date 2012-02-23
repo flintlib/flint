@@ -799,6 +799,22 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Taylor shift  ************************************************************/
+
+void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_horner(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
+
 /*  Power series composition and compositional inverse  **********************/
 
 void
@@ -942,6 +958,13 @@ void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 
 void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, long n);
+
+/* Newton basis *************************************************************/
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n);
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n);
+
 
 /* Multipoint evaluation and interpolation *********************************/
 

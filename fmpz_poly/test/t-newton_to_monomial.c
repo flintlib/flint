@@ -19,8 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,62 +27,59 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 #include "ulong_extras.h"
 
 int
 main(void)
 {
-    int i, result = 1;
+    int i;
     flint_rand_t state;
-    flint_randinit(state);
-    
-    printf("interpolate_nmod_vec....");
+
+    printf("newton_to_monomial....");
     fflush(stdout);
+
+    flint_randinit(state);
 
     for (i = 0; i < 10000; i++)
     {
-        nmod_poly_t P, Q;
-        mp_ptr x, y;
-        mp_limb_t mod;
-        long j, n, npoints;
+        fmpz_poly_t f, g;
+        fmpz * r;
+        long k, n;
 
-        mod = n_randtest_prime(state, 0);
-        npoints = n_randint(state, FLINT_MIN(100, mod));
-        n = n_randint(state, npoints + 1);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
 
-        nmod_poly_init(P, mod);
-        nmod_poly_init(Q, mod);
-        x = _nmod_vec_init(npoints);
-        y = _nmod_vec_init(npoints);
+        fmpz_poly_randtest(f, state, 1 + n_randint(state, 20),
+                                     1 + n_randint(state, 200));
 
-        nmod_poly_randtest(P, state, n);
+        n = fmpz_poly_length(f);
+        r = _fmpz_vec_init(n);
 
-        for (j = 0; j < npoints; j++)
-            x[j] = j;
+        for (k = 0; k < n; k++)
+            fmpz_randtest(r + k, state, n_randint(state, 200));
 
-        nmod_poly_evaluate_nmod_vec(y, P, x, npoints);
-        nmod_poly_interpolate_nmod_vec(Q, x, y, npoints);
+        fmpz_poly_set(g, f);
 
-        result = nmod_poly_equal(P, Q);
+        _fmpz_poly_newton_to_monomial(g->coeffs, r, n);
+        _fmpz_poly_monomial_to_newton(g->coeffs, r, n);
 
-        if (!result)
+        if (!fmpz_poly_equal(f, g))
         {
-            printf("FAIL:\n");
-            printf("mod=%lu, n=%ld, npoints=%ld\n\n", mod, n, npoints);
-            nmod_poly_print(P), printf("\n\n");
-            nmod_poly_print(Q), printf("\n\n");
+            printf("FAIL: roundtrip\n");
+            fmpz_poly_print(f); printf("\n");
+            fmpz_poly_print(g); printf("\n");
             abort();
         }
 
-        nmod_poly_clear(P);
-        nmod_poly_clear(Q);
-        _nmod_vec_clear(x);
-        _nmod_vec_clear(y);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        _fmpz_vec_clear(r, n);
     }
 
     flint_randclear(state);
-
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

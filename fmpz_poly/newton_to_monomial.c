@@ -19,29 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "fmpz.h"
+#include "fmpz_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
-    mp_srcptr xs, long n, nmod_t mod)
+_fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
 {
-    if (len < 32)
-        _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
-    else
-        _nmod_poly_evaluate_nmod_vec_fast(ys, coeffs, len, xs, n, mod);
-}
+    long i, j;
 
-void
-nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, long n)
-{
-    _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
-                                        poly->length, xs, n, poly->mod);
+    for (i = n - 2; i >= 0; i--)
+        for (j = i; j < n - 1; j++)
+            fmpz_submul(poly + j, poly + j + 1, roots + i);
 }

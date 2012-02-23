@@ -19,29 +19,29 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
-    mp_srcptr xs, long n, nmod_t mod)
+_nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, long len, nmod_t mod)
 {
-    if (len < 32)
-        _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
+    if (len < 100 || len > mod.n)
+        _nmod_poly_taylor_shift_horner(poly, c, len, mod);
+    else if ((c == 1 || c == mod.n - 1) && len < 1000)
+        _nmod_poly_taylor_shift_horner(poly, c, len, mod);
     else
-        _nmod_poly_evaluate_nmod_vec_fast(ys, coeffs, len, xs, n, mod);
+        _nmod_poly_taylor_shift_convolution(poly, c, len, mod);
 }
 
 void
-nmod_poly_evaluate_nmod_vec(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, long n)
+nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c)
 {
-    _nmod_poly_evaluate_nmod_vec(ys, poly->coeffs,
-                                        poly->length, xs, n, poly->mod);
+    if (f != g)
+        nmod_poly_set(g, f);
+
+    _nmod_poly_taylor_shift(g->coeffs, c, g->length, g->mod);
 }
