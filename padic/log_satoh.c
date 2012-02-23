@@ -57,7 +57,9 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
         fmpz_pow_ui(pk, p, k);
         fmpz_pow_ui(pNk, p, N + k);
 
-        fmpz_powm(t, y, pk, pNk);
+        fmpz_sub_ui(t, y, 1);
+        fmpz_neg(t, t);
+        fmpz_powm(t, t, pk, pNk);
         fmpz_sub_ui(t, t, 1);
         fmpz_neg(t, t);
 
