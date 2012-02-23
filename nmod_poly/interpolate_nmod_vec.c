@@ -36,8 +36,10 @@ _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
 {
     if (n < 6)
         _nmod_poly_interpolate_nmod_vec_newton(poly, xs, ys, n, mod);
-    else
+    else if (n < 16)
         _nmod_poly_interpolate_nmod_vec_barycentric(poly, xs, ys, n, mod);
+    else
+        _nmod_poly_interpolate_nmod_vec_fast(poly, xs, ys, n, mod);
 }
 
 void

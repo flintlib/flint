@@ -63,7 +63,7 @@ main(void)
         for (j = 0; j < npoints; j++)
             x[j] = n_randint(state, mod);
 
-        nmod_poly_evaluate_nmod_vec(y, P, x, npoints);
+        nmod_poly_evaluate_nmod_vec_iter(y, P, x, npoints);
         nmod_poly_evaluate_nmod_vec_fast(z, P, x, npoints);
 
         result = _nmod_vec_equal(y, z, npoints);

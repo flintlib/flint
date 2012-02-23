@@ -596,6 +596,12 @@ void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
 void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
         mp_srcptr xs, long n);
 
+void _nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
+    const nmod_poly_t poly, mp_srcptr xs, long n);
+
 void
 _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
     long plen, mp_ptr * tree, long len, nmod_t mod);
