@@ -1,3 +1,28 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2012 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -142,7 +167,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
 /*
     Computes 
     \begin{equation*}
-    z = \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
     \end{equation*}
 
     Note that this can be used to compute the $p$-adic logarithm 
@@ -160,14 +185,15 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
 
     Does not support aliasing between $y$ and $z$.
  */
-static void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
+void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
-    if (fmpz_fits_si(ctx->p))
+    if (fmpz_fits_si(p))
     {
-        const long p = fmpz_get_si(ctx->p);
-        const long i = _padic_log_bound(v, ctx->N, p) - 1;
+        const long q = fmpz_get_si(p);
+        const long i = _padic_log_bound(v, N, q) - 1;
 
-        _padic_log_rectangular_series(z, y, i, ctx->p, ctx->N);
+        _padic_log_rectangular_series(z, y, i, p, N);
+        fmpz_neg(z, z);
     }
     else
     {
@@ -183,12 +209,12 @@ static void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const padic
         long i;
         fmpz_t m, t;
 
-        i = (ctx->N - 1) / v;
+        i = (N - 1) / v;
 
         fmpz_init(m);
         fmpz_init(t);
 
-        fmpz_pow_ui(m, ctx->p, ctx->N);
+        fmpz_pow_ui(m, p, N);
 
         fmpz_zero(z);
 
@@ -196,13 +222,14 @@ static void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const padic
         {
             fmpz_mul(t, z, y);
 
-            _padic_inv(z, (fmpz *) &i, ctx->p, ctx->N);
+            _padic_inv(z, (fmpz *) &i, p, N);
 
             fmpz_add(z, z, t);
             fmpz_mod(z, z, m);
         }
 
         fmpz_mul(z, z, y);
+        fmpz_neg(z, z);
 
         fmpz_clear(m);
         fmpz_clear(t);
@@ -248,8 +275,7 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    _padic_log_rectangular(padic_unit(rop), x, v, ctx);
-                    fmpz_neg(padic_unit(rop), padic_unit(rop));
+                    _padic_log_rectangular(padic_unit(rop), x, v, ctx->p, ctx->N);
                     padic_val(rop) = 0;
                     padic_reduce(rop, ctx);
                 }

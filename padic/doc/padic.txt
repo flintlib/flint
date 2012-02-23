@@ -545,14 +545,27 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     but this only converges when $\ord_p(x)$ is at least $2$ or $1$ 
     when $p = 2$ or $p > 2$, respectively.
 
-int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Returns whether the $p$-adic logarithm function converges at 
     the $p$-adic number \code{op}, and if so sets \code{rop} to its 
     value.
 
-    Uses a rectangular splitting algorithmt to evaluate the series 
+    Uses a rectangular splitting algorithm to evaluate the series 
     expression of $\log(x) \bmod{p^N}$.
+
+int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    the $p$-adic number \code{op}, and if so sets \code{rop} to its 
+    value.
+
+    Uses an algorithm based on a result of Satoh, Skjernaa and Taguchi 
+    that $\ord_p\bigl(a^{p^k} - 1\bigr) > k$, which implies that 
+    \begin{equation*}
+    \log(a) \equiv p^{-k} \Bigl( \log\bigl(a^{p^k}\bigr) \pmod{p^{N+k}} 
+                                                      \Bigr) \pmod{p^N}.
+    \end{equation*}
 
 ulong padic_val_fac_ui2(ulong N)
 
