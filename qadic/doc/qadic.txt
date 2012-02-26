@@ -278,6 +278,22 @@ void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e,
 
 *******************************************************************************
 
+void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len, 
+                const fmpz *a, const long *j, long lena, 
+                const fmpz_t p, long N)
+
+    Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
+    The exponential series converges if the valuation of \code{op} 
+    is at least~$2$ or $1$ when $p$ is even or odd, respectively.
+
 void _qadic_frobenius_a(fmpz *rop, long e, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
