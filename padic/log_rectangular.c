@@ -80,12 +80,13 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
         const long l = padic_val_fac_ui(b, p);
 
         long i, j;
-        fmpz_t c, f, t, Pl, P1;
+        fmpz_t c, f, s, t, Pl, P1;
         fmpz *ypow;
 
         ypow = _fmpz_vec_init(b + 1);
         fmpz_init(c);
         fmpz_init(f);
+        fmpz_init(s);
         fmpz_init(t);
         fmpz_init(Pl);
         fmpz_init(P1);
@@ -100,7 +101,9 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
             fmpz_mod(ypow + i, ypow + i, P1);
         }
 
-        j = (n + (b-1)) / b - 1;
+        fmpz_zero(z);
+
+        for (j = (n + (b - 1)) / b - 1; j >= 0; j--)
         {
             const long hi = FLINT_MIN(b, n - j*b);
 
@@ -110,40 +113,22 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
             fmpz_zero(c);
             for (i = 1; i <= hi; i++)
             {
-                fmpz_divexact_ui(t, f, i+j*b);
+                fmpz_divexact_ui(t, f, i + j*b);
                 fmpz_addmul(c, t, ypow + i);
             }
             fmpz_mod(c, c, P1);
 
             i = fmpz_remove(f, f, p);
             _padic_inv(f, f, p, N);
-            fmpz_pow_ui(t, p, i);
-            fmpz_divexact(c, c, t);
-            fmpz_mul(c, c, f);
-
-            /* Set z */
-            fmpz_mod(z, c, P0);
-        }
-
-        for (j--; j >= 0; j--)
-        {
-            const long hi = FLINT_MIN(b, n - j*b);
-
-            /* Compute inner sum in c */
-            fmpz_rfac_uiui(f, 1 + j*b, hi);
-
-            fmpz_zero(c);
-            for (i = 1; i <= hi; i++)
+            if (i >= l)  /* t := p^i */
             {
-                fmpz_divexact_ui(t, f, i+j*b);
-                fmpz_addmul(c, t, ypow + i);
+                fmpz_pow_ui(t, p, i - l);
+                fmpz_mul(t, t, Pl);
             }
-            fmpz_mod(c, c, P1);
-
-            i = fmpz_remove(f, f, p);
-            _padic_inv(f, f, p, N);
-            fmpz_pow_ui(t, p, i - l);  /* t := p^i */
-            fmpz_mul(t, t, Pl);
+            else
+            {
+                fmpz_pow_ui(t, p, i);
+            }
             fmpz_divexact(c, c, t);
             fmpz_mul(c, c, f);
 
@@ -155,6 +140,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
 
         fmpz_clear(c);
         fmpz_clear(f);
+        fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(Pl);
         fmpz_clear(P1);
