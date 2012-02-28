@@ -19,17 +19,25 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
 #include "padic.h"
 
 /*
-    Returns an integer $i$ such that for all $j \geq i$ 
+    Returns an integer $i$ such that for all $j \geq i$ we have 
     $\ord_p(x^j / j!) \geq N$, where $\ord_p(x) = v$.
+
+    When $p$ is a word-sized prime, 
+    returns $\ceil{\frac{(p-1)N - 1}{(p-1)v - 1}}$.
+    Otherwise, returns $\ceil{N/v}$.
+
+    Assumes that $v < N$.  Moreover, $v$ has to be at least $2$ or $1$, 
+    depending on whether $p$ is $2$ or odd.
  */
-static long bound(long v, long N, const fmpz_t p)
+long _padic_exp_bound(long v, long N, const fmpz_t p)
 {
     if (fmpz_fits_si(p))
     {
@@ -44,8 +52,7 @@ static long bound(long v, long N, const fmpz_t p)
         fmpz_mul_ui(n, f, N);
         fmpz_sub_ui(n, n, 1);
         fmpz_mul_ui(d, f, v);
-        fmpz_sub_ui(d, d, 1);
-
+        fmpz_sub_ui(d, d, 1); 
         fmpz_cdiv_q(f, n, d);
         i = fmpz_get_si(f);
 
@@ -62,12 +69,15 @@ static long bound(long v, long N, const fmpz_t p)
 }
 
 /*
-    Assumptions:
+    Sets \code{rop} to the exponential of \code{op}, reduced 
+    in the given context.
 
-        - The $p$-adic valuation of \code{op} is positive.
-        - \code{op} is not zero modulo $p^N$.
+    Assumes that the exponential series converges at $x \neq 0$, 
+    and that $\ord_p(x) < N$.
+
+    Supports aliasing.
  */
-void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (ctx->N == 1)
     {
@@ -79,7 +89,8 @@ void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         _padic_init(one);
         _padic_one(one);
-        padic_add(rop, op, one, ctx);
+        padic_set(rop, op, ctx);
+        padic_add(rop, rop, one, ctx);
         _padic_clear(one);
     }
     else
@@ -94,7 +105,7 @@ void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         padic_get_fmpz(x, op, ctx);
 
-        i = bound(padic_val(op), ctx->N, ctx->p) - 1;
+        i = _padic_exp_bound(padic_val(op), ctx->N, ctx->p) - 1;
         k = fmpz_fits_si(ctx->p) ? (i - 1) / (fmpz_get_si(ctx->p) - 1) : 0;
 
         fmpz_pow_ui(m, ctx->p, ctx->N + k);
@@ -128,37 +139,37 @@ void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
 }
 
+void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+{
+    if (ctx->N < 1024)
+        _padic_exp_rectangular(rop, op, ctx);
+    else
+        _padic_exp_balanced(rop, op, ctx);
+}
+
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    if (padic_is_zero(op, ctx))
+    const long N  = ctx->N;
+    const long v  = padic_val(op);
+    const fmpz *p = ctx->p;
+
+    if (fmpz_is_zero(padic_unit(op)))
     {
         padic_one(rop, ctx);
         return 1;
     }
 
-    if (*(ctx->p) == 2L)
+    if ((*p == 2L && v <= 1) || (v <= 0))
     {
-        if (padic_val(op) > 1)
-        {
-            _padic_exp(rop, op, ctx);
-            return 1;
-        }
-        else
-        {
-            return 0;
-        }
+        return 0;
     }
     else
     {
-        if (padic_val(op) > 0)
-        {
+        if (v < N)
             _padic_exp(rop, op, ctx);
-            return 1;
-        }
         else
-        {
-            return 0;
-        }
+            padic_one(rop, ctx);
+        return 1;
     }
 }
 
