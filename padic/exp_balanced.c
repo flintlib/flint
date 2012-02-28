@@ -176,6 +176,7 @@ _padic_exp_balanced_2(padic_t y, const padic_t x, const padic_ctx_t ctx)
     fmpz_clear(pN);
 }
 
+void
 _padic_exp_balanced_p(padic_t y, const padic_t x, const padic_ctx_t ctx)
 {
     fmpz_t r, t, pv, pw, pN;
