@@ -77,21 +77,17 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
     {
         const long b = n_sqrt(n);
         const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
-        const long l = padic_val_fac_ui(b, p);
 
         long i, j;
-        fmpz_t c, f, s, t, Pl, P1;
+        fmpz_t c, f, t, Pl, P1;
         fmpz *ypow;
 
         ypow = _fmpz_vec_init(b + 1);
         fmpz_init(c);
         fmpz_init(f);
-        fmpz_init(s);
         fmpz_init(t);
-        fmpz_init(Pl);
         fmpz_init(P1);
 
-        fmpz_pow_ui(Pl, p, l);
         fmpz_pow_ui(P1, p, N + k);
 
         fmpz_one(ypow + 0);
@@ -106,6 +102,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
         for (j = (n + (b - 1)) / b - 1; j >= 0; j--)
         {
             const long hi = FLINT_MIN(b, n - j*b);
+            long w;
 
             /* Compute inner sum in c */
             fmpz_rfac_uiui(f, 1 + j*b, hi);
@@ -118,31 +115,33 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
             }
             fmpz_mod(c, c, P1);
 
-            i = fmpz_remove(f, f, p);
+            /* Multiply c by p^k f */
+            w = fmpz_remove(f, f, p);
             _padic_inv(f, f, p, N);
-            if (i >= l)  /* t := p^i */
+            if (w > k)
             {
-                fmpz_pow_ui(t, p, i - l);
-                fmpz_mul(t, t, Pl);
+                fmpz_pow_ui(t, p, w - k);
+                fmpz_divexact(c, c, t);
             }
             else
             {
-                fmpz_pow_ui(t, p, i);
+                fmpz_pow_ui(t, p, k - w);
+                fmpz_mul(c, c, t);
             }
-            fmpz_divexact(c, c, t);
             fmpz_mul(c, c, f);
 
             /* Set z = z y^b + c */
             fmpz_mul(t, z, ypow + b);
             fmpz_add(z, c, t);
-            fmpz_mod(z, z, P0);
+            fmpz_mod(z, z, P1);
         }
+
+        fmpz_pow_ui(f, p, k);
+        fmpz_divexact(z, z, f);
 
         fmpz_clear(c);
         fmpz_clear(f);
-        fmpz_clear(s);
         fmpz_clear(t);
-        fmpz_clear(Pl);
         fmpz_clear(P1);
         _fmpz_vec_clear(ypow, b + 1);
     }
@@ -253,7 +252,7 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, ctx->p);
             fmpz_clear(t);
 
-            if ((*(ctx->p) == 2L && v >= 2) || v >= 1)
+            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
             {
                 if (v >= ctx->N)
                 {

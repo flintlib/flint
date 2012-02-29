@@ -62,9 +62,14 @@ main(void)
         _padic_init(a);
         _padic_init(b);
 
-        padic_randtest_not_zero(a, state, ctx);
-        if (padic_val(a) < 1)
-            padic_val(a) = 1;
+        padic_randtest(a, state, ctx);
+
+        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
+        {
+            padic_val(a) = (*p == 2L) + 1;
+            padic_reduce(a, ctx);
+        }
+
         _padic_one(b);
         _padic_add(a, a, b, ctx);
 
@@ -109,13 +114,25 @@ main(void)
         _padic_init(f);
         _padic_init(g);
 
-        padic_randtest_not_zero(a, state, ctx);
-        if (padic_val(a) < 1) padic_val(a) = 1;
+        padic_randtest(a, state, ctx);
+
+        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
+        {
+            padic_val(a) = (*p == 2L) + 1;
+            padic_reduce(a, ctx);
+        }
+
         _padic_one(c);
         _padic_add(a, a, c, ctx);
 
-        padic_randtest_not_zero(b, state, ctx);
-        if (padic_val(b) < 1) padic_val(b) = 1;
+        padic_randtest(b, state, ctx);
+
+        if (!_padic_is_zero(b) && (padic_val(b) < 1 || (*p == 2L && padic_val(b) < 2)))
+        {
+            padic_val(b) = (*p == 2L) + 1;
+            padic_reduce(b, ctx);
+        }
+
         _padic_one(c);
         _padic_add(b, b, c, ctx);
 
@@ -172,9 +189,10 @@ main(void)
         _padic_init(c);
 
         padic_randtest(a, state, ctx);
-        if (!_padic_is_zero(a) && padic_val(a) < 1)
+
+        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
         {
-            padic_val(a) = 1;
+            padic_val(a) = (*p == 2L) + 1;
             padic_reduce(a, ctx);
         }
 
