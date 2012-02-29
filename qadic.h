@@ -194,6 +194,30 @@ static __inline__ void qadic_one(qadic_t x, const qadic_ctx_t ctx)
     padic_poly_one(x, &ctx->pctx);
 }
 
+static __inline__ int 
+qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+{
+    if (op->length > 0)
+    {
+        if (_fmpz_vec_is_zero(op->coeffs + 1, op->length - 1))
+        {
+            fmpz_set(padic_unit(rop), op->coeffs + 0);
+            padic_val(rop) = op->val;
+            _padic_canonicalise(rop, &ctx->pctx);
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    else
+    {
+        padic_zero(rop);
+        return 1;
+    }
+}
+
 /* Comparison ****************************************************************/
 
 static __inline__ int 
@@ -280,6 +304,11 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
                         const fmpz_t p, long N);
 
 void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
+void _qadic_trace(fmpz_t rop, const fmpz *op, long len, 
+                  const fmpz *a, const long *j, long lena, const fmpz_t pN);
+
+void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
