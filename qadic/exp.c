@@ -40,11 +40,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
     fmpz_init(pN);
     fmpz_pow_ui(pN, p, N);
 
-    if (d == 1)
-    {
-        /* FIXME:  Rewrite _padic_exp signature without ctx, call from here */
-    }
-    else if (n < 4)
+    if (n < 4)
     {
         if (n == 1)  /* y := 1 */
         {
@@ -82,6 +78,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
             }
             _fmpz_vec_scalar_fdiv_q_2exp(rop, rop, 2 * len - 1, 1);
             _fmpz_mod_poly_reduce(rop, 2 * len - 1, a, j, lena, pN);
+            _fmpz_vec_zero(rop + (2 * len - 1), d - (2 * len - 1));
             _fmpz_mod_poly_add(rop, rop, d, x, len, pN);
             fmpz_add_ui(rop, rop, 1);
             if (fmpz_equal(rop, pN))
@@ -90,7 +87,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
             _fmpz_vec_clear(x, len + 1);
         }
     }
-    else  /* d >= 1, n >= 4 */
+    else  /* n >= 4 */
     {
         const long k = fmpz_fits_si(p) ? 
                        (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;

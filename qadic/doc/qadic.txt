@@ -294,6 +294,44 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     The exponential series converges if the valuation of \code{op} 
     is at least~$2$ or $1$ when $p$ is even or odd, respectively.
 
+void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len, 
+                            const fmpz *a, const long *j, long lena, 
+                            const fmpz_t p, long N, const fmpz_t pN)
+
+    Computes 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $y$ is reduced modulo $p^N$.
+
+    Assumes that $v < N$.
+
+    Does not support aliasing between $y$ and $z$.
+
+int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+    The $p$-adic logarithm function is defined by the usual series 
+    \begin{equation*}
+    \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
+    \end{equation*}
+    but this only converges when $\ord_p(x)$ is at least $2$ or $1$ 
+    when $p = 2$ or $p > 2$, respectively.
+
 void _qadic_frobenius_a(fmpz *rop, long e, 
                     const fmpz *a, const long *j, long lena, 
                     const fmpz_t p, long N)
@@ -354,6 +392,19 @@ void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     Sets \code{rop} to zero if \code{op} is zero in the given context.
 
     Raises an exception if the valuation of \code{op} is negative.
+
+void _qadic_trace(fmpz_t rop, const fmpz *op, long len, 
+                  const fmpz *a, const long *j, long lena, const fmpz_t pN)
+
+void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the trace of \code{op}.
+
+    For an element $a \in \mathbf{Q}_q$, multiplication by $a$ defines 
+    a $\mathbf{Q}_p$-linear map on $\mathbf{Q}_q$.  We define the trace 
+    of $a$ as the trace of this map.  Equivalently, if $\Sigma$ generates 
+    $\Gal(\mathbf{Q}_q / \mathbf{Q}_p)$ then the trace of $a$ is equal to 
+    $\sum_{i=0}^{d-1} \Sigma^i (a)$.
 
 *******************************************************************************
 

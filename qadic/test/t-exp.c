@@ -24,11 +24,9 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "qadic.h"
 #include "ulong_extras.h"
-#include "long_extras.h"
 
 int
 main(void)
