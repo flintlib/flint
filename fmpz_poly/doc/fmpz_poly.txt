@@ -2146,6 +2146,39 @@ void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     This implementation defaults to the fast version of
     Lagrange interpolation.
 
+*******************************************************************************
+
+    Square root
+
+*******************************************************************************
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len)
+
+    If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
+    to the square root of \code{poly} with positive leading coefficient
+    and returns 1. Otherwise returns 0.
+
+    This function first uses various tests to detect nonsquares quickly.
+    Then, it computes the square root iteratively from top to bottom,
+    requiring $O(n^2)$ coefficient operations.
+
+int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
+
+int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len)
+
+    If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
+    to the square root of \code{poly} with positive leading coefficient
+    and returns 1. Otherwise returns 0.
+
+int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
 
 *******************************************************************************
 

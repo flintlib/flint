@@ -866,6 +866,16 @@ _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, long n);
 void
 fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
 
+/*  Square root  *************************************************************/
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a);
+
+int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a);
+
 
 /*  Signature  ***************************************************************/
 
