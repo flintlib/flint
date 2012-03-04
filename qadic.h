@@ -72,6 +72,14 @@ static __inline__ long qadic_ctx_degree(const qadic_ctx_t ctx)
     return ctx->j[ctx->len - 1];
 }
 
+static __inline__ void 
+qadic_ctx_print(const qadic_ctx_t ctx)
+{
+    printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
+    printf("d = %ld\n", ctx->j[ctx->len - 1]);
+    printf("N = %ld\n", (&ctx->pctx)->N);
+}
+
 /* Memory management *********************************************************/
 
 static __inline__ void qadic_init(qadic_t x)
@@ -82,6 +90,25 @@ static __inline__ void qadic_init(qadic_t x)
 static __inline__ void qadic_clear(qadic_t x)
 {
     padic_poly_clear(x);
+}
+
+static __inline__ void
+_fmpz_poly_reduce(fmpz *R, long lenR, 
+                  const fmpz *a, const long *j, long len)
+{
+    const long d = j[len - 1];
+    long i, k;
+
+    FMPZ_VEC_NORM(R, lenR);
+
+    for (i = lenR - 1; i >= d; i--)
+    {
+        for (k = len - 2; k >= 0; k--)
+        {
+            fmpz_submul(R + j[k] + i - d, R + i, a + k);
+        }
+        fmpz_zero(R + i);
+    }
 }
 
 static __inline__ void
@@ -309,6 +336,8 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, long len,
                   const fmpz *a, const long *j, long lena, const fmpz_t pN);
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
+int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/
 
