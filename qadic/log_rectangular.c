@@ -124,7 +124,6 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
                 fmpz_divexact_ui(t, f, i + h*b);
                 _fmpz_vec_scalar_addmul_fmpz(c, ypow + i * d, d, t);
             }
-            _fmpz_vec_scalar_mod_fmpz(c, c, d, pNk);
 
             /* Multiply c by p^k f */
             w = fmpz_remove(f, f, p);
