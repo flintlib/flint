@@ -567,6 +567,12 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                                                       \Bigr) \pmod{p^N}.
     \end{equation*}
 
+int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    the $p$-adic number \code{op}, and if so sets \code{rop} to its 
+    value.
+
 ulong padic_val_fac_ui2(ulong N)
 
     Computes the $2$-adic valuation of $n!$.
