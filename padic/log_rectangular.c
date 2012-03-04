@@ -113,7 +113,6 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
                 fmpz_divexact_ui(t, f, i + j*b);
                 fmpz_addmul(c, t, ypow + i);
             }
-            fmpz_mod(c, c, P1);
 
             /* Multiply c by p^k f */
             w = fmpz_remove(f, f, p);
