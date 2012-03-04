@@ -259,7 +259,7 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
     reduced modulo $f(X)$ given by \code{(a, j, lena)} and $p$, which 
     is expected to be a prime power.
 
-    Assumes that $e > 1$ and that \code{len} is positive and at most~$d$.
+    Assumes that $e \geq 0$ and that \code{len} is positive and at most~$d$.
 
     Although we require that \code{rop} provides space for 
     $2d - 1$ coefficients, the output will be reduces modulo 

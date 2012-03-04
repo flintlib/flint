@@ -32,80 +32,93 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
 {
     const long d = j[lena - 1];
 
-    ulong bit;
-    fmpz *v = _fmpz_vec_init(2 * d - 1);
-    fmpz *R, *S, *T;
-
-    _fmpz_vec_zero(rop, 2 * d - 1);
-
-    /*
-       Set bits to the bitmask with a 1 one place lower than the msb of e
-     */
-
-    bit = fmpz_bits(e) - 2;
-
-    /*
-       Trial run without any polynomial arithmetic to determine the parity 
-       of the number of swaps;  then set R and S accordingly
-     */
-    
+    if (fmpz_is_zero(e))
     {
-        unsigned int swaps = 0U;
-        ulong bit2 = bit;
-        if (fmpz_tstbit(e, bit2))
-            swaps = ~swaps;
-        while (bit2--)
-            if (!fmpz_tstbit(e, bit2))
-                swaps = ~swaps;
+        fmpz_one(rop);
+        _fmpz_vec_zero(rop + 1, 2 * d - 1 - 1);
+    }
+    else if (fmpz_is_one(e))
+    {
+        _fmpz_vec_set(rop, op, len);
+        _fmpz_vec_zero(rop + len, 2 * d - 1 - len);
+    }
+    else
+    {
+        ulong bit;
+        fmpz *v = _fmpz_vec_init(2 * d - 1);
+        fmpz *R, *S, *T;
+
+        _fmpz_vec_zero(rop, 2 * d - 1);
+
+        /*
+           Set bits to the bitmask with a 1 one place lower than the msb of e
+         */
+
+        bit = fmpz_bits(e) - 2;
+
+        /*
+           Trial run without any polynomial arithmetic to determine the parity 
+           of the number of swaps;  then set R and S accordingly
+         */
         
-        if (swaps == 0U)
         {
-            R = rop;
-            S = v;
+            unsigned int swaps = 0U;
+            ulong bit2 = bit;
+            if (fmpz_tstbit(e, bit2))
+                swaps = ~swaps;
+            while (bit2--)
+                if (!fmpz_tstbit(e, bit2))
+                    swaps = ~swaps;
+            
+            if (swaps == 0U)
+            {
+                R = rop;
+                S = v;
+            }
+            else
+            {
+                R = v;
+                S = rop;
+            }
         }
-        else
-        {
-            R = v;
-            S = rop;
-        }
-    }
-    
-    /*
-       We unroll the first step of the loop, referring to {op, len}
-     */
+        
+        /*
+           We unroll the first step of the loop, referring to {op, len}
+         */
 
-    _fmpz_mod_poly_sqr(R, op, len, p);
-    _fmpz_mod_poly_reduce(R, 2 * len - 1, a, j, lena, p);
+        _fmpz_mod_poly_sqr(R, op, len, p);
+        _fmpz_mod_poly_reduce(R, 2 * len - 1, a, j, lena, p);
 
-    if (fmpz_tstbit(e, bit))
-    {
-        _fmpz_mod_poly_mul(S, R, d, op, len, p);
-        _fmpz_mod_poly_reduce(S, d + len - 1, a, j, lena, p);
-        T = R;
-        R = S;
-        S = T;
-    }
-
-    while (bit--)
-    {
         if (fmpz_tstbit(e, bit))
         {
-            _fmpz_mod_poly_sqr(S, R, d, p);
-            _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
-            _fmpz_mod_poly_mul(R, S, d, op, len, p);
-            _fmpz_mod_poly_reduce(R, d + len - 1, a, j, lena, p);
-        }
-        else
-        {
-            _fmpz_mod_poly_sqr(S, R, d, p);
-            _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
+            _fmpz_mod_poly_mul(S, R, d, op, len, p);
+            _fmpz_mod_poly_reduce(S, d + len - 1, a, j, lena, p);
             T = R;
             R = S;
             S = T;
         }
-    }
 
-    _fmpz_vec_clear(v, 2 * d - 1);
+        while (bit--)
+        {
+            if (fmpz_tstbit(e, bit))
+            {
+                _fmpz_mod_poly_sqr(S, R, d, p);
+                _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
+                _fmpz_mod_poly_mul(R, S, d, op, len, p);
+                _fmpz_mod_poly_reduce(R, d + len - 1, a, j, lena, p);
+            }
+            else
+            {
+                _fmpz_mod_poly_sqr(S, R, d, p);
+                _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
+                T = R;
+                R = S;
+                S = T;
+            }
+        }
+
+        _fmpz_vec_clear(v, 2 * d - 1);
+    }
 }
 
 void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx)
