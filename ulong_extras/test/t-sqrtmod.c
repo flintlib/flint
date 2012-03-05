@@ -43,8 +43,7 @@ int main(void)
     {
         mp_limb_t a, b, p, pinv;
 
-        p = n_randint(state, 1UL << (FLINT_BITS - 1));
-        p = n_nextprime(p, 1);
+        p = n_randtest_prime(state, 0);
         a = n_randint(state, p);
 
         b = n_sqrtmod(a, p);
@@ -66,8 +65,7 @@ int main(void)
     {
         mp_limb_t a, b, p, pinv;
 
-        p = n_randint(state, 1UL << (FLINT_BITS - 1));
-        p = n_nextprime(p, 1);
+        p = n_randtest_prime(state, 0);
 
         do 
             b = n_randint(state, p);

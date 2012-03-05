@@ -360,6 +360,10 @@ int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     reciprocity. For performance, divisions are replaced with some 
     comparisons and subtractions where possible.
 
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+
+    Computes the Jacobi symbol, allowing $x$ to go up to a full limb.
+
 *******************************************************************************
 
     Modular Arithmetic

@@ -190,6 +190,8 @@ ulong n_revbin(ulong in, ulong bits);
 
 int n_jacobi(mp_limb_signed_t x, mp_limb_t y);
 
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y);
+
 mp_limb_t n_sqrt(mp_limb_t a);
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a);
