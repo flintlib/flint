@@ -855,6 +855,10 @@ void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
 
 void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
 
+int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long len, nmod_t mod);
+
+int nmod_poly_sqrt(nmod_poly_t b, const nmod_poly_t a);
+
 /* Transcendental functions **************************************************/
 
 void _nmod_poly_atan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);

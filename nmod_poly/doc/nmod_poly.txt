@@ -1723,6 +1723,16 @@ void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
     Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
     It is assumed that $h$ has constant term 1.
 
+void _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long n, nmod_t mod)
+
+    If \code{(p, len)} is a perfect square, sets \code{(s, n / 2 + 1)}
+    to a square root of $p$ and returns 1. Otherwise returns 0.
+
+void nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p, long n)
+
+    If $p$ is a perfect square, sets $s$ to a square root of $a$
+    and returns 1. Otherwise returns 0.
+
 *******************************************************************************
 
     Transcendental functions
