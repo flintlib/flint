@@ -161,7 +161,7 @@ trigprod_mul_prime_power(trig_prod_t prod, mp_limb_t k, mp_limb_t n,
         m = n_sqrtmod_ppow(m, p, exp + 1, mod, inv);
         m = n_mulmod2_preinv(m, n_invmod(8, mod), mod, inv);
 
-        prod->prefactor *= (2 * n_jacobi(m, 3));
+        prod->prefactor *= (2 * n_jacobi_unsigned(m, 3));
         if (exp % 2 == 0)
             prod->prefactor *= -1;
         prod->sqrt_p *= k;
