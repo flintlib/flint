@@ -20,11 +20,10 @@
 /******************************************************************************
 
     Copyright (C) 2011 Jan Tuitman
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <assert.h>
 #include "padic.h"
 
 /*
@@ -39,8 +38,6 @@
 static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
     int ans;
-
-    assert(fmpz_is_odd(p));
 
     if (N == 1)
     {
@@ -98,7 +95,15 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
             fmpz_mod(u + i, u + (i - 1), pow + i);
         }
 
-        /* Run Newton iteration */
+        /*
+            Run Newton iteration for the inverse square root, 
+            using the update formula 
+                z := z - z (u z^2 - 1) / 2
+            for all but the last step.  The last step is 
+            replaced with 
+                b := u z                  mod p^{N'}
+                z := b + z (u - b^2) / 2  mod p^{N}.
+         */
         i = n - 1;
         {
             ans = fmpz_sqrtmod(rop, u + i, p);
@@ -106,7 +111,7 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
                 goto exit;
             fmpz_invmod(rop, rop, p);
         }
-        for (i--; i >= 0; i--)  /* z := z - z (a z^2 - 1) / 2 */
+        for (i--; i >= 1; i--)
         {
             fmpz_mul(W, rop, rop);
             fmpz_mul(W + 1, u + i, W);
@@ -120,10 +125,17 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
             fmpz_sub(rop, rop, W);
             fmpz_mod(rop, rop, pow + i);
         }
-
-        /* Invert modulo p^N */
-        fmpz_mul(rop, rop, u);
-        fmpz_mod(rop, rop, pow);
+        {
+            fmpz_mul(W, u + 1, rop);
+            fmpz_mul(W + 1, W, W);
+            fmpz_sub(W + 1, u + 0, W + 1);
+            if (fmpz_is_odd(W + 1))
+                fmpz_add(W + 1, W + 1, pow + 0);
+            fmpz_fdiv_q_2exp(W + 1, W + 1, 1);
+            fmpz_mul(rop, rop, W + 1);
+            fmpz_add(rop, W, rop);
+            fmpz_mod(rop, rop, pow + 0);
+        }
 
       exit:
 
@@ -144,8 +156,6 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
  */
 static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
 {
-    assert(fmpz_is_odd(op));
-
     if (fmpz_fdiv_ui(op, 8) != 1)
         return 0;
 
@@ -180,7 +190,7 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
 
         /* Run Newton iteration */
         fmpz_one(rop);
-        for (i = n - 2; i >= 0; i--)  /* z := z - z (a z^2 - 1) / 2 */
+        for (i = n - 2; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
         {
             fmpz_mul(W, rop, rop);
             fmpz_mul(W + 1, u + i, W);
@@ -190,9 +200,14 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
             fmpz_sub(rop, rop, W);
             fmpz_fdiv_r_2exp(rop, rop, e[i]);
         }
-
-        /* Invert modulo p^N */
-        fmpz_mul(rop, rop, u);
+        {
+            fmpz_mul(W, u + 1, rop);
+            fmpz_mul(W + 1, W, W);
+            fmpz_sub(W + 1, u + 0, W + 1);
+            fmpz_fdiv_q_2exp(W + 1, W + 1, 1);
+            fmpz_mul(rop, rop, W + 1);
+            fmpz_add(rop, W, rop);
+        }
         fmpz_fdiv_r_2exp(rop, rop, e[0]);
 
         flint_free(e);
