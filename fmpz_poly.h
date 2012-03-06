@@ -199,6 +199,13 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 #define fmpz_poly_is_zero(poly) \
     ((poly)->length == 0)
 
+static __inline__ 
+int _fmpz_poly_is_one(const fmpz *poly, long len)
+{
+    return (len > 0 && fmpz_is_one(poly) 
+                    && _fmpz_vec_is_zero(poly + 1, len - 1));
+}
+
 static __inline__
 int fmpz_poly_is_one(const fmpz_poly_t op)
 {

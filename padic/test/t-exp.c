@@ -84,7 +84,7 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Check aliasing: exp(a + b) == exp(a) exp(b) */
+    /* Functional equation: exp(a + b) == exp(a) exp(b) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -186,7 +186,7 @@ main(void)
         padic_ctx_clear(ctx);
     }
 
-    /* Check aliasing: exp(a + b) == exp(a) exp(b) */
+    /* Functional equation: exp(a + b) == exp(a) exp(b) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;

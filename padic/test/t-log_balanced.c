@@ -36,7 +36,7 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("log... ");
+    printf("log_balanced... ");
     fflush(stdout);
 
     flint_randinit(state);
@@ -73,8 +73,8 @@ main(void)
         _padic_one(b);
         _padic_add(a, a, b, ctx);
 
-        padic_log(b, a, ctx);
-        padic_log(a, a, ctx);
+        padic_log_balanced(b, a, ctx);
+        padic_log_balanced(a, a, ctx);
 
         result = (padic_equal(a, b, ctx));
         if (!result)
@@ -138,11 +138,11 @@ main(void)
 
         padic_mul(c, a, b, ctx);
 
-        padic_log(d, a, ctx);
-        padic_log(e, b, ctx);
+        padic_log_balanced(d, a, ctx);
+        padic_log_balanced(e, b, ctx);
         padic_add(f, d, e, ctx);
 
-        padic_log(g, c, ctx);
+        padic_log_balanced(g, c, ctx);
 
         result = (padic_equal(f, g, ctx));
         if (!result)
@@ -196,7 +196,7 @@ main(void)
         }
 
         padic_exp(b, a, ctx);
-        padic_log(c, b, ctx);
+        padic_log_balanced(c, b, ctx);
 
         result = (padic_equal(a, c, ctx));
         if (!result)

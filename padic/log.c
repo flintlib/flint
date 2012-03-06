@@ -199,7 +199,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, ctx->p);
             fmpz_clear(t);
 
-            if ((*(ctx->p) == 2L && v >= 2) || v >= 1)
+            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
             {
                 if (v >= ctx->N)
                 {

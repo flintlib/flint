@@ -77,7 +77,7 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
         }
 
         fmpz_zero(sum);
-        fmpz_set_ui(f, 1);
+        fmpz_one(f);
 
         for (i = nsums - 1; i >= 0; i--)
         {
@@ -102,8 +102,8 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
             }
 
             fmpz_mul(t, pows + npows, sum);
-            fmpz_mul(s, s, f);
-            fmpz_add(sum, t, s);
+            fmpz_mul(sum, s, f);
+            fmpz_add(sum, sum, t);
             fmpz_mod(sum, sum, mod);
 
             fmpz_mul(f, f, c);
