@@ -47,9 +47,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     b = A->c;
     c = B->c;
 
-    if (a <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF ||
-        b <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF ||
-        c <= NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF)
+    if (a <= 4 || b <= 4 || c <= 4)
     {
         nmod_mat_mul(C, A, B);
         return;
@@ -89,21 +87,21 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 
     nmod_mat_sub(X1, A11, A21);
     nmod_mat_sub(X2, B22, B12);
-    nmod_mat_mul_strassen(C21, X1, X2);
+    nmod_mat_mul(C21, X1, X2);
 
     nmod_mat_add(X1, A21, A22);
     nmod_mat_sub(X2, B12, B11);
-    nmod_mat_mul_strassen(C22, X1, X2);
+    nmod_mat_mul(C22, X1, X2);
 
     nmod_mat_sub(X1, X1, A11);
     nmod_mat_sub(X2, B22, X2);
-    nmod_mat_mul_strassen(C12, X1, X2);
+    nmod_mat_mul(C12, X1, X2);
 
     nmod_mat_sub(X1, A12, X1);
-    nmod_mat_mul_strassen(C11, X1, B22);
+    nmod_mat_mul(C11, X1, B22);
 
     X1->c = bnc;
-    nmod_mat_mul_strassen(X1, A11, B11);
+    nmod_mat_mul(X1, A11, B11);
 
     nmod_mat_add(C12, X1, C12);
     nmod_mat_add(C21, C12, C21);
@@ -111,12 +109,12 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
     nmod_mat_add(C22, C21, C22);
     nmod_mat_add(C12, C12, C11);
     nmod_mat_sub(X2, X2, B21);
-    nmod_mat_mul_strassen(C11, A22, X2);
+    nmod_mat_mul(C11, A22, X2);
 
     nmod_mat_clear(X2);
 
     nmod_mat_sub(C21, C21, C11);
-    nmod_mat_mul_strassen(C11, A12, B21);
+    nmod_mat_mul(C11, A12, B21);
 
     nmod_mat_add(C11, X1, C11);
 
