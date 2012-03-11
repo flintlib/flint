@@ -140,7 +140,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_t Bc, Cc;
         nmod_mat_window_init(Bc, B, 0, 2*bnc, b, c);
         nmod_mat_window_init(Cc, C, 0, 2*bnc, a, c);
-        nmod_mat_mul_classical(Cc, A, Bc);
+        nmod_mat_mul(Cc, A, Bc);
         nmod_mat_window_clear(Bc);
         nmod_mat_window_clear(Cc);
     }
@@ -150,7 +150,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_t Ar, Cr;
         nmod_mat_window_init(Ar, A, 2*anr, 0, a, b);
         nmod_mat_window_init(Cr, C, 2*anr, 0, a, c);
-        nmod_mat_mul_classical(Cr, Ar, B);
+        nmod_mat_mul(Cr, Ar, B);
         nmod_mat_window_clear(Ar);
         nmod_mat_window_clear(Cr);
     }
@@ -161,7 +161,7 @@ nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
         nmod_mat_window_init(Ac, A, 0, 2*anc, 2*anr, b);
         nmod_mat_window_init(Br, B, 2*bnr, 0, b, 2*bnc);
         nmod_mat_window_init(Cb, C, 0, 0, 2*anr, 2*bnc);
-        nmod_mat_addmul_classical(Cb, Cb, Ac, Br);
+        nmod_mat_addmul(Cb, Cb, Ac, Br);
         nmod_mat_window_clear(Ac);
         nmod_mat_window_clear(Br);
         nmod_mat_window_clear(Cb);

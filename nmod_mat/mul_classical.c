@@ -98,7 +98,7 @@ _nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
     long i, j, k;
     long Kpack;
     int pack, pack_bits;
-    mp_limb_t c, mask;
+    mp_limb_t c, d, mask;
     mp_ptr tmp;
     mp_ptr Aptr, Tptr;
 
@@ -154,15 +154,15 @@ _nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
             /* unpack and reduce */
             for (k = 0; k < pack && j * pack + k < K; k++)
             {
-                c = (c >> (k * pack_bits)) & mask;
-                NMOD_RED(c, c, mod);
+                d = (c >> (k * pack_bits)) & mask;
+                NMOD_RED(d, d, mod);
 
                 if (op == 1)
-                    c = nmod_add(C[i][j * pack + k], c, mod);
+                    d = nmod_add(C[i][j * pack + k], d, mod);
                 else if (op == -1)
-                    c = nmod_sub(C[i][j * pack + k], c, mod);
+                    d = nmod_sub(C[i][j * pack + k], d, mod);
 
-                D[i][j * pack + k] = c;
+                D[i][j * pack + k] = d;
             }
         }
     }
