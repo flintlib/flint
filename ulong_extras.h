@@ -284,6 +284,8 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
+mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
+
 #ifdef __cplusplus
 }
 #endif

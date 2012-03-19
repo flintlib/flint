@@ -50,7 +50,7 @@ int main(void)
     int j;
     flint_randinit(state);
 
-    printf("factorial_mod2_preinv....");
+    printf("factorial_fast_mod2_preinv....");
     fflush(stdout);
 
     for (n = 0; n < 1000; n++)
@@ -59,9 +59,9 @@ int main(void)
 
         for (j = 0; j < 10; j++)
         {
-            p = n_randtest_not_zero(state);
+            p = n_randtest_not_zero(state, 0);
             pinv = n_preinvert_limb(p);
-            x = n_factorial_mod2_preinv(n, p, pinv);
+            x = n_factorial_fast_mod2_preinv(n, p, pinv);
             y = n_factorial_mod2_foolproof(n, p, pinv);
 
             if (x != y)

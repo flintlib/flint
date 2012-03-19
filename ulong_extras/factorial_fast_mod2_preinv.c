@@ -19,61 +19,59 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "nmod_vec.h"
+#include "nmod_poly.h"
 
-
-static mp_limb_t
-n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
+mp_limb_t
+n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    mp_limb_t prod = 1UL % p;
+    long i, m;
+    nmod_t mod;
+    mp_ptr t, u, v;
+    mp_limb_t r, s;
 
-    while (n)
-    {
-        prod = n_mulmod2_preinv(prod, n, p, pinv);
-        n--;
-    }
+    if (p == 1UL)
+        return 0UL;
 
-    return prod;
-}
+    if (n <= 1)
+        return 1UL;
 
-int main(void)
-{
-    flint_rand_t state;
-    mp_limb_t n;
-    int j;
-    flint_randinit(state);
+    nmod_init(&mod, p);
 
-    printf("factorial_mod2_preinv....");
-    fflush(stdout);
+    m = n_sqrt(n);
 
-    for (n = 0; n < 1000; n++)
-    {
-        mp_limb_t p, pinv, x, y;
+    t = _nmod_vec_init(m + 1);
+    u = _nmod_vec_init(m + 1);
+    v = _nmod_vec_init(m + 1);
 
-        for (j = 0; j < 10; j++)
-        {
-            p = n_randtest_not_zero(state);
-            pinv = n_preinvert_limb(p);
-            x = n_factorial_mod2_preinv(n, p, pinv);
-            y = n_factorial_mod2_foolproof(n, p, pinv);
+    t[0] = 0UL;
+    for (i = 1; i < m; i++)
+        t[i] = n_submod(t[i-1], 1UL, p);
 
-            if (x != y)
-            {
-                printf("FAIL:\n");
-                printf("n = %lu\np = %lu\nx = %lu\ny = %lu\n", n, p, x, y);
-                abort();
-            }
-        }
-    }
+    _nmod_poly_product_roots_nmod_vec(u, t, m, mod);
 
-    flint_randclear(state);
-    printf("PASS\n");
-    return 0;
+    for (i = 0; i < m; i++)
+        t[i] = n_mod2_preinv(i * m + 1, p, pinv);
+
+    _nmod_poly_evaluate_nmod_vec_fast(v, u, m + 1, t, m, mod);
+
+    r = 1;
+    for (i = 0; i < m; i++)
+        r = n_mulmod2_preinv(r, v[i], mod.n, mod.ninv);
+
+    for (s = m * m + 1; s <= n; s++)
+        r = n_mulmod2_preinv(r, s, mod.n, mod.ninv);
+
+    _nmod_vec_clear(t);
+    _nmod_vec_clear(u);
+    _nmod_vec_clear(v);
+
+    return r;
 }
