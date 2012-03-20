@@ -37,7 +37,7 @@ n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     mp_ptr t, u, v;
     mp_limb_t r, s;
 
-    if (p == 1UL)
+    if (p == 1UL || n >= p)
         return 0UL;
 
     if (n <= 1)
