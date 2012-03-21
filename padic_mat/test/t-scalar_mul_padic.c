@@ -72,7 +72,7 @@ main(void)
         padic_mat_scalar_mul_padic(b, a, x, ctx);
         padic_mat_scalar_mul_padic(a, a, x, ctx);
 
-        result = (padic_mat_equal(a, b));
+        result = (padic_mat_equal(a, b) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");

@@ -75,7 +75,7 @@ main(void)
         padic_mat_set_entry_padic(a, r, c, x, ctx);
         padic_mat_get_entry_padic(y, a, r, c, ctx);
 
-        result = (_padic_equal(x, y));
+        result = (_padic_equal(x, y) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");

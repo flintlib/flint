@@ -69,7 +69,7 @@ main(void)
         padic_mat_neg(b, a, ctx);
         padic_mat_neg(a, a, ctx);
 
-        result = (padic_mat_equal(a, b));
+        result = (padic_mat_equal(a, b) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -112,7 +112,7 @@ main(void)
         padic_mat_neg(b, a, ctx);
         padic_mat_add(c, a, b, ctx);
 
-        result = (padic_mat_is_zero(c));
+        result = (padic_mat_is_zero(c) && _padic_mat_is_canonical(c, p));
         if (!result)
         {
             printf("FAIL:\n\n");

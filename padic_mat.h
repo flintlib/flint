@@ -71,6 +71,27 @@ padic_mat_is_square(const padic_mat_t A)
     return fmpz_mat_is_square(padic_mat(A));
 }
 
+static __inline__ int 
+_padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
+{
+    if (fmpz_mat_is_zero(padic_mat(A)))
+    {
+        return (padic_mat_val(A) == 0);
+    }
+    else
+    {
+        long i, j;
+        int canonical = 0;
+
+        for (i = 0; i < padic_mat(A)->r; i++)
+            for (j = 0; j < padic_mat(A)->c; j++)
+                if (!fmpz_divisible(padic_mat_unit(A, i, j), p))
+                    canonical = 1;
+
+        return canonical;
+    }
+}
+
 /* Basic assignment **********************************************************/
 
 void padic_mat_set(padic_mat_t B, const padic_mat_t A);

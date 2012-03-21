@@ -71,7 +71,7 @@ main(void)
         padic_mat_add(d, a, b, ctx);
         padic_mat_add(a, a, b, ctx);
 
-        result = (padic_mat_equal(a, d));
+        result = (padic_mat_equal(a, d) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -117,7 +117,7 @@ main(void)
         padic_mat_add(d, a, b, ctx);
         padic_mat_add(b, a, b, ctx);
 
-        result = (padic_mat_equal(b, d));
+        result = (padic_mat_equal(b, d) && _padic_mat_is_canonical(b, p));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -161,7 +161,7 @@ main(void)
         padic_mat_add(d, a, a, ctx);
         padic_mat_add(a, a, a, ctx);
 
-        result = (padic_mat_equal(a, d));
+        result = (padic_mat_equal(a, d) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -206,7 +206,7 @@ main(void)
         padic_mat_add(c, a, b, ctx);
         padic_mat_add(d, b, a, ctx);
 
-        result = (padic_mat_equal(c, d));
+        result = (padic_mat_equal(c, d) && _padic_mat_is_canonical(c, p));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -251,7 +251,7 @@ main(void)
 
         padic_mat_add(b, a, b, ctx);
 
-        result = (padic_mat_equal(a, b));
+        result = (padic_mat_equal(a, b) && _padic_mat_is_canonical(a, p));
         if (!result)
         {
             printf("FAIL:\n\n");
