@@ -719,6 +719,17 @@ void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong k)
 
     Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
 
+void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
+
+    Sets $f$ to the product $g$ and $h$ divided by \code{2^exp}, rounding
+    down towards zero.
+
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp)
+
+    Sets $f$ to the product $g$ and $x$ divided by \code{2^exp}, rounding
+    down towards zero.
+
+
 *******************************************************************************
 
     Greatest common divisor
