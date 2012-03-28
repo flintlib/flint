@@ -379,6 +379,10 @@ void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
 
+void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong exp)
+
+    Sets \code{poly1} to \code{poly2} times \code{2^exp}.
+
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
                                                                 const fmpz_t x)
 
@@ -405,6 +409,11 @@ void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
     rounding coefficients down toward~$- \infty$.
 
+void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by \code{2^x}, 
+    rounding coefficients down toward~$- \infty$.
+
 void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
@@ -419,6 +428,11 @@ void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients toward~$0$.
+
+void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by \code{2^x}, 
     rounding coefficients toward~$0$.
 
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
