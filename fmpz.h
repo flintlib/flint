@@ -483,6 +483,10 @@ fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
     }
 }
 
+void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp);
+
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp);
+
 void fmpz_fac_ui(fmpz_t f, ulong n);
 
 void fmpz_fib_ui(fmpz_t f, ulong n);

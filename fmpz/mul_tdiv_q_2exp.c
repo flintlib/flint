@@ -19,6 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2009 William Hart
     Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
@@ -26,52 +27,37 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
+#include "fmpz.h"
 
-mp_limb_t
-n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+void
+fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
 {
-    long i, m;
-    nmod_t mod;
-    mp_ptr t, u, v;
-    mp_limb_t r, s;
+    fmpz c1, c2;
+    __mpz_struct *mpz_ptr;
 
-    if (p == 1UL || n >= p)
-        return 0UL;
+    c1 = *g;
 
-    if (n <= 1)
-        return 1UL;
+    if (!COEFF_IS_MPZ(c1))      /* g is small */
+    {
+        fmpz_mul_si_tdiv_q_2exp(f, h, c1, exp);
+        return;
+    }
 
-    nmod_init(&mod, p);
+    c2 = *h;                    /* save h in case it is aliased with f */
 
-    m = n_sqrt(n);
+    if (c2 == 0L)               /* special case, h = 0  */
+    {
+        fmpz_zero(f);
+        return;
+    }
 
-    t = _nmod_vec_init(m + 1);
-    u = _nmod_vec_init(m + 1);
-    v = _nmod_vec_init(m + 1);
+    mpz_ptr = _fmpz_promote(f); /* h is saved, g is already large */
 
-    t[0] = 0UL;
-    for (i = 1; i < m; i++)
-        t[i] = n_submod(t[i-1], 1UL, p);
+    if (!COEFF_IS_MPZ(c2))      /* g is large, h is small */
+        mpz_mul_si(mpz_ptr, COEFF_TO_PTR(c1), c2);
+    else                        /* c1 and c2 are large */
+        mpz_mul(mpz_ptr, COEFF_TO_PTR(c1), COEFF_TO_PTR(c2));
 
-    _nmod_poly_product_roots_nmod_vec(u, t, m, mod);
-
-    for (i = 0; i < m; i++)
-        t[i] = n_mod2_preinv(i * m + 1, p, pinv);
-
-    _nmod_poly_evaluate_nmod_vec_fast(v, u, m + 1, t, m, mod);
-
-    r = 1;
-    for (i = 0; i < m; i++)
-        r = n_mulmod2_preinv(r, v[i], mod.n, mod.ninv);
-
-    for (s = m * m + 1; s <= n; s++)
-        r = n_mulmod2_preinv(r, s, mod.n, mod.ninv);
-
-    _nmod_vec_clear(t);
-    _nmod_vec_clear(u);
-    _nmod_vec_clear(v);
-
-    return r;
+    mpz_tdiv_q_2exp(mpz_ptr, mpz_ptr, exp);
+    _fmpz_demote_val(f);  /* division may make value small */
 }

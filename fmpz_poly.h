@@ -281,6 +281,15 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1,
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);
 
+void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
 static __inline__ 
 void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
                                const fmpz_poly_t poly2, const fmpz_t x)
