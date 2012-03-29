@@ -80,8 +80,8 @@ main(void)
         {
             printf("FAIL:\n\n");
             printf("a = "), padic_mat_print(a, ctx), printf("\n");
-            printf("x = "), _padic_print(x, ctx), printf("\n");
-            printf("y = "), _padic_print(y, ctx), printf("\n");
+            printf("x = "), padic_print(x, ctx), printf("\n");
+            printf("y = "), padic_print(y, ctx), printf("\n");
             abort();
         }
 

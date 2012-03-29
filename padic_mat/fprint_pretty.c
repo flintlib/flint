@@ -45,7 +45,7 @@ int padic_mat_fprint_pretty(FILE * file,
         {
             v = A->val + fmpz_remove(u, padic_mat_unit(A, i, j), ctx->p);
 
-            __padic_fprint(file, u, v, ctx);
+            _padic_fprint(file, u, v, ctx);
 
             if (j != c - 1)
                 fputc(' ', file);

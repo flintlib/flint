@@ -44,7 +44,7 @@ int _padic_poly_fprint_pretty(FILE *file,
         fmpz_set(padic_unit(x), poly);
         padic_val(x) = val;
 
-        _padic_fprint(file, x, ctx);
+        padic_fprint(file, x, ctx);
     }
     else if (len == 2)
     {
@@ -63,7 +63,7 @@ int _padic_poly_fprint_pretty(FILE *file,
         else
         {
             fputc('(', file);
-            _padic_fprint(file, x, ctx);
+            padic_fprint(file, x, ctx);
             fputc(')', file);
             fprintf(file, "*%s", var);
         }
@@ -81,7 +81,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             fputc('-', file);
         }
         fputc('(', file);
-        _padic_fprint(file, x, ctx);
+        padic_fprint(file, x, ctx);
         fputc(')', file);
     }
     else  /* len >= 3 */
@@ -99,7 +99,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             else
             {
                 fputc('(', file);
-                _padic_fprint(file, x, ctx);
+                padic_fprint(file, x, ctx);
                 fputc(')', file);
                fprintf(file, "*%s^%ld", var, i);
             }
@@ -125,7 +125,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             else
             {
                 fputc('(', file);
-                _padic_fprint(file, x, ctx);
+                padic_fprint(file, x, ctx);
                 fputc(')', file);
                 fprintf(file, "*%s^%ld", var, i);
             }
@@ -144,7 +144,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             else
             {
                 fputc('(', file);
-                _padic_fprint(file, x, ctx);
+                padic_fprint(file, x, ctx);
                 fputc(')', file);
                 fputc('*', file);
                 fputs(var, file);
@@ -158,7 +158,7 @@ int _padic_poly_fprint_pretty(FILE *file,
 
             fputc(fmpz_sgn(poly) > 0 ? '+' : '-', file);
             fputc('(', file);
-            _padic_fprint(file, x, ctx);
+            padic_fprint(file, x, ctx);
             fputc(')', file);
         }
     }

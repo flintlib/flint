@@ -56,7 +56,7 @@ int _padic_poly_fprint(FILE *file, const fmpz *poly, long val, long len,
         {
             v = val + fmpz_remove(u, poly + i, ctx->p);
 
-            __padic_fprint(file, u, v, ctx);
+            _padic_fprint(file, u, v, ctx);
         }
     }
 
