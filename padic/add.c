@@ -111,6 +111,9 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
             if (fmpz_cmpabs(padic_unit(rop), pow) >= 0)
                 fmpz_sub(padic_unit(rop), padic_unit(rop), pow);
 
+            if (alloc)
+                fmpz_clear(pow);
+
             _padic_canonicalise(rop, ctx);
         }
         else if (padic_val(op1) < padic_val(op2))

@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 
 int
-n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
 {
     mp_limb_t a, b, temp;
     int s, exp;
@@ -37,13 +37,6 @@ n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     a = x;
     b = y;
     s = 1;
-
-    if (x < 0L)
-    {
-        if (((b - 1) / 2) % 2 == 1UL)
-            s = -s;
-        a = -x;
-    }
 
     if ((a < b) && (b != 1UL))
     {
@@ -102,4 +95,18 @@ n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     }
 
     return s;
+}
+
+int
+n_jacobi(mp_limb_signed_t x, mp_limb_t y)
+{
+    if (x < 0L)
+    {
+        if (((y - 1) / 2) % 2 == 1UL)
+            return -n_jacobi_unsigned(-x, y);
+        else
+            return n_jacobi_unsigned(-x, y);
+    }
+    else
+        return n_jacobi_unsigned(x, y);
 }

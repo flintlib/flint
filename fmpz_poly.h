@@ -199,6 +199,13 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2);
 #define fmpz_poly_is_zero(poly) \
     ((poly)->length == 0)
 
+static __inline__ 
+int _fmpz_poly_is_one(const fmpz *poly, long len)
+{
+    return (len > 0 && fmpz_is_one(poly) 
+                    && _fmpz_vec_is_zero(poly + 1, len - 1));
+}
+
 static __inline__
 int fmpz_poly_is_one(const fmpz_poly_t op)
 {
@@ -273,6 +280,15 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1,
 
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);
+
+void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
 
 static __inline__ 
 void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
@@ -799,6 +815,22 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Taylor shift  ************************************************************/
+
+void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_horner(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
+
 /*  Power series composition and compositional inverse  **********************/
 
 void
@@ -849,6 +881,16 @@ _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, long n);
 
 void
 fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+/*  Square root  *************************************************************/
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a);
+
+int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a);
 
 
 /*  Signature  ***************************************************************/
@@ -942,6 +984,13 @@ void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 
 void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, long n);
+
+/* Newton basis *************************************************************/
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n);
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n);
+
 
 /* Multipoint evaluation and interpolation *********************************/
 

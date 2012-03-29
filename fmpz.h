@@ -367,6 +367,8 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong exp, const fmpz_t m);
 
 void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m);
 
+void fmpz_setbit(fmpz_t f, ulong i);
+
 int fmpz_tstbit(const fmpz_t f, ulong i);
 
 double fmpz_dlog(const fmpz_t x);
@@ -481,11 +483,21 @@ fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
     }
 }
 
+void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp);
+
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp);
+
 void fmpz_fac_ui(fmpz_t f, ulong n);
 
 void fmpz_fib_ui(fmpz_t f, ulong n);
 
 void fmpz_bin_uiui(fmpz_t res, ulong n, ulong k);
+
+void _fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong a, ulong b);
+
+void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong n);
+
+void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong n);
 
 int fmpz_bit_pack(mp_ptr arr, mp_bitcnt_t shift, mp_bitcnt_t bits, 
                   const fmpz_t coeff, int negate, int borrow);
@@ -495,48 +507,6 @@ int fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
 
 void fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr, 
                               mp_bitcnt_t shift, mp_bitcnt_t bits);
-
-static __inline__
-void fmpz_CRT_ui_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, 
-                             ulong r2, ulong m2, ulong c, double pre)
-{  
-   ulong r1mod, s;
-   fmpz_t r1modd, sm1; 
-   
-   fmpz_init(sm1);
-   fmpz_init(r1modd);
-   
-   r1mod = fmpz_mod_ui(r1modd, r1, m2); 
-   s = n_submod(r2, r1mod, m2);
-   s = n_mulmod_precomp(s, c, m2, pre);
-   
-   fmpz_mul_ui(sm1, m1, s);
-   fmpz_add(out, r1, sm1);
-   
-   fmpz_clear(sm1);
-   fmpz_clear(r1modd);
-}
-
-static __inline__
-void fmpz_CRT_ui2_precomp(fmpz_t out, fmpz_t r1, fmpz_t m1, 
-                              ulong r2, ulong m2, ulong c, mp_limb_t pre)
-{
-   ulong r1mod, s;
-   fmpz_t r1modd, sm1;
-
-   fmpz_init(sm1);
-   fmpz_init(r1modd);
-   
-   r1mod = fmpz_mod_ui(r1modd, r1, m2); 
-   s = n_submod(r2, r1mod, m2);
-   s = n_mulmod2_preinv(s, c, m2, pre); 
-   
-   fmpz_mul_ui(sm1, m1, s);
-   fmpz_add(out, r1, sm1);
-
-   fmpz_clear(sm1);
-   fmpz_clear(r1modd);
-}
 
 void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, mp_limb_t m2inv, const fmpz_t m1m2, mp_limb_t c,

@@ -268,9 +268,6 @@ arith
 * Implement multimodular computation of large Bernoulli numbers
   (e.g. porting bernmm)
 
-* (Maybe) add separate functions for computing the scaled Bernoulli numbers
-  B_2k/(2k)! directly.
-
 * Implement rising factorials and falling factorials (x)_n, (x)^n
   as fmpz_poly functions, and add fmpz functions for their
   direct evaluation.
@@ -312,7 +309,7 @@ fmpz_mat
 * Write multiplication functions optimised for sparse matrices by changing
   the loop order and discarding zero multipliers.
 
-* Implement fmpz_mat_pow_ui.
+* Implement fmpz_mat_pow.
 
 * Implement fast null space computation.
 
@@ -344,11 +341,29 @@ fmpz_mat
 nmod_mat
 --------
 
-* Add element getter and setter methods.
+* Support BLAS and use this for multiplication when entries fit in a double
+  before reduction. Even for large moduli, it might be faster to use
+  repeated BLAS multiplications modulo a few small primes followed by CRT.
+  Linear algebra operations would benefit from BLAS versions of triangular
+  solving as well.
 
-* Implement methods for setting the zero matrix, identity matrix, etc.
+* Improve multiplication with packed entries using SSE. Maybe also write
+  a Strassen for packed entries that does additions faster.
 
-* Implement nmod_mat_pow_ui.
+* Investigate why the constant of solving/rref/inverse compared to
+  multiplication appears to be worse than in theory (recent paper by Jeannerod,
+  Pernet and Storjohann).
+
+* See if Strassen can be improved using combined addmul operations.
+
+* Consider getting rid of the row pointer array, using offsets instead of
+  window matrices. The row pointer is only useful for Gaussian elimination,
+  but there we end up working with a separate permutation array anyway.
+
+* Add element getter and setter methods, more convenience functions
+  for setting the zero matrix, identity matrix, etc.
+
+* Implement nmod_mat_pow.
 
 * Add functions for computing A*B^T and A^T*B, using transpose
   multiplications directly to avoid creating a temporary copy.
@@ -367,17 +382,13 @@ nmod_mat
 fmpq
 ----
 
-* Write a more general version of fmpq_reconstruct_fmpz that accepts
-  separate bounds for the numerator and denominator.
-  Also optimise detection of integers: 
-
-* Add CRT functions.
-
-* Add more random functions.
+* Add more functions for generating random numbers.
 
 * Write a subquadratic fmpq_get_cfrac
 
-* Implement subquadratic rational reconstruction
+* Implement subquadratic rational reconstruction. Also improve detection
+  of integers, etc. and perhaps add CRT functions to hide the intermediate
+  step going from residues -> integer -> rational.
 
 
 fmpq_mat
@@ -387,6 +398,7 @@ fmpq_mat
 
 * Add a user-friendly function for LUP decomposition.
 
+* Add a nullspace function.
 
 padic
 -----

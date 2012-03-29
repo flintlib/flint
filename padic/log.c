@@ -1,3 +1,28 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2012 Sebastian Pancratz
+ 
+******************************************************************************/
+
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -16,7 +41,7 @@
     Assumes that $b v$, and $N + e$ do not overflow, 
     where $e = \floor{\log_{p}{b}}$.
  */
-static long bound(long v, long N, long p)
+long _padic_log_bound(long v, long N, long p)
 {
     long e, i = (N - 1) / v;
     mp_limb_t j;
@@ -65,16 +90,16 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
         padic_inv_t pre;
 
         p = fmpz_get_si(ctx->p);
-        i = bound(v, ctx->N, p) - 1;
+        i = _padic_log_bound(v, ctx->N, p) - 1;
 
         k = n_flog(i, p);
-
-        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
 
         fmpz_init(m);
         fmpz_init(s);
         fmpz_init(t);
         q = _fmpz_vec_init(k + 1);
+
+        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
 
         fmpz_pow_ui(m, ctx->p, ctx->N + k);
         fmpz_one(q + 0);
@@ -98,6 +123,7 @@ static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
 
         fmpz_divexact(z, z, q + k);
         fmpz_mul(z, z, y);
+
         fmpz_clear(m);
         fmpz_clear(s);
         fmpz_clear(t);
@@ -173,7 +199,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, x, ctx->p);
             fmpz_clear(t);
 
-            if ((*(ctx->p) == 2L && v >= 2) || v >= 1)
+            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
             {
                 if (v >= ctx->N)
                 {

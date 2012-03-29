@@ -360,6 +360,10 @@ int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     reciprocity. For performance, divisions are replaced with some 
     comparisons and subtractions where possible.
 
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+
+    Computes the Jacobi symbol, allowing $x$ to go up to a full limb.
+
 *******************************************************************************
 
     Modular Arithmetic
@@ -1030,8 +1034,19 @@ mp_limb_t n_euler_phi(mp_limb_t n)
 
 *******************************************************************************
 
+mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+
+    Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
+    by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
+    no special optimisations are made for composite $p$.
+    Uses fast multipoint evaluation, running in about $O(n^{1/2})$ time.
+
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
     Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
-    by \code{n_preinvert_limb()}.
+    by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
+    no special optimisations are made for composite $p$.
 
+    Uses a lookup table for small $n$, otherwise computes the product
+    if $n$ is not too large, and calls the fast algorithm for extremely
+    large $n$.

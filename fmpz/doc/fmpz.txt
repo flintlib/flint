@@ -369,6 +369,10 @@ int fmpz_fits_si(const fmpz_t f)
 
     Returns whether the value of $f$ fits into a \code{long}.
 
+void fmpz_setbit(fmpz_t f, ulong i)
+
+    Sets bit index~$i$ of $f$.
+
 int fmpz_tstbit(const fmpz_t f, ulong i)
 
     Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
@@ -706,6 +710,25 @@ void fmpz_fib_ui(fmpz_t f, ulong n)
 void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 
     Sets $f$ to the binomial coefficient ${n \choose k}$.
+
+void fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong k)
+
+    Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
+
+void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong k)
+
+    Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
+
+void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
+
+    Sets $f$ to the product $g$ and $h$ divided by \code{2^exp}, rounding
+    down towards zero.
+
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp)
+
+    Sets $f$ to the product $g$ and $x$ divided by \code{2^exp}, rounding
+    down towards zero.
+
 
 *******************************************************************************
 

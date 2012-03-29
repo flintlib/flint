@@ -41,7 +41,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     pinv = n_preinvert_limb(p);
 
-    if (n_jacobi(a, p) == -1)
+    if (n_jacobi_unsigned(a, p) == -1)
         return 0;
 
     if ((p & 3UL) == 3)
@@ -61,7 +61,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     for (k = 2; ; k++)
     {
-        if (n_jacobi(k, p) == -1) break;
+        if (n_jacobi_unsigned(k, p) == -1) break;
     }
 
     g = n_powmod2_preinv(k, p1, p, pinv);

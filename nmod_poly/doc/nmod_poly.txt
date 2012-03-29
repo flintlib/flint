@@ -962,6 +962,57 @@ mp_limb_t nmod_poly_evaluate_nmod(nmod_poly_t poly, mp_limb_t c)
     modulus of \code{poly}. The value~\code{c} should be reduced modulo
     the modulus. The algorithm used is Horner's method.
 
+*******************************************************************************
+
+    Multipoint evaluation
+
+*******************************************************************************
+
+void _nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr poly, long len,
+                                    mp_srcptr xs, long n, nmod_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+void nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, const nmod_poly_t poly,
+                                    mp_srcptr xs, long n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+    Uses Horner's method iteratively.
+
+void _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
+    long plen, mp_ptr * tree, long len, nmod_t mod)
+
+    Evaluates (\code{poly}, \code{plen}) at the \code{len} values given
+    by the precomputed subproduct tree \code{tree}.
+
+void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly,
+        long len, mp_srcptr xs, long n, nmod_t mod)
+
+    Evaluates (\code{coeffs}, \code{len}) at the \code{n} values
+    given in the vector \code{xs}, writing the output values
+    to \code{ys}. The values in \code{xs} should be reduced
+    modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, const nmod_poly_t poly,
+                                    mp_srcptr xs, long n)
+
+    Evaluates \code{poly} at the \code{n} values given in the vector
+    \code{xs}, writing the output values to \code{ys}. The values in
+    \code{xs} should be reduced modulo the modulus.
+
+    Uses fast multipoint evaluation, building a temporary subproduct tree.
+
+
 void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr poly, long len,
                                     mp_srcptr xs, long n, nmod_t mod)
 
@@ -1003,11 +1054,38 @@ void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     values \code{ys}. The values in \code{xs} and \code{ys} should be
     reduced modulo the modulus, and all \code{xs} must be distinct.
 
+void _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, long len,
+        nmod_t mod)
+
+    Sets \code{w} to the barycentric interpolation weights for fast
+    Lagrange interpolation with respect to a given subproduct tree.
+
+void _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
+    mp_ptr * tree, mp_srcptr weights, long len, nmod_t mod)
+
+    Performs interpolation using the fast Lagrange interpolation
+    algorithm, generating a temporary subproduct tree.
+
+    The function values are given as \code{ys}. The function takes
+    a precomputed subproduct tree \code{tree} and barycentric
+    interpolation weights \code{weights} corresponding to the
+    roots.
+
+void _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+
+    Performs interpolation using the fast Lagrange interpolation
+    algorithm, generating a temporary subproduct tree.
+
+void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n)
+
+    Performs interpolation using the fast Lagrange interpolation algorithm,
+    generating a temporary subproduct tree.
+
 void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
                             mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
 
-    The interface specification for this function is identical to
-    that of \code{_nmod_poly_interpolate_nmod_vec}.
     Forms the interpolating polynomial in the Newton basis using
     the method of divided differences and then converts it to
     monomial form.
@@ -1015,8 +1093,6 @@ void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly,
 void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 
-    The interface specification for this function is identical to
-    that of \code{nmod_poly_interpolate_nmod_vec}.
     Forms the interpolating polynomial in the Newton basis using
     the method of divided differences and then converts it to
     monomial form.
@@ -1024,18 +1100,14 @@ void nmod_poly_interpolate_nmod_vec_newton(nmod_poly_t poly,
 void _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
                             mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
 
-    The interface specification for this function is identical to
-    that of \code{_nmod_poly_interpolate_nmod_vec}.
-    Forms the interpolating polynomial using the barycentric form
-    of Lagrange interpolation.
+    Forms the interpolating polynomial using a naive implementation
+    of the barycentric form of Lagrange interpolation.
 
 void nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
                                     mp_srcptr xs, mp_srcptr ys, long n)
 
-    The interface specification for this function is identical to
-    that of \code{nmod_poly_interpolate_nmod_vec}.
-    Forms the interpolating polynomial using the barycentric form
-    of Lagrange interpolation.
+    Forms the interpolating polynomial using a naive implementation
+    of the barycentric form of Lagrange interpolation.
 
 
 *******************************************************************************
@@ -1091,6 +1163,47 @@ void nmod_poly_compose(nmod_poly_t res,
 
     Composes \code{poly1} with \code{poly2} and sets \code{res} to the result,
     that is, evaluates \code{poly1} at \code{poly2}.
+
+*******************************************************************************
+
+    Taylor shift
+
+*******************************************************************************
+
+void _nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    Uses an efficient version Horner's rule.
+
+void nmod_poly_taylor_shift_horner(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+
+void _nmod_poly_taylor_shift_convolution(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    Writes the composition as a single convolution with cost $O(M(n))$.
+    We require that the modulus is a prime at least as large as the length.
+
+void nmod_poly_taylor_shift_convolution(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+    Writes the composition as a single convolution with cost $O(M(n))$.
+    We require that the modulus is a prime at least as large as the length.
+
+void _nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, long len, nmod_t mod)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    We require that the modulus is a prime.
+
+void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+    We require that the modulus is a prime.
 
 *******************************************************************************
 
@@ -1610,6 +1723,16 @@ void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
     Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
     It is assumed that $h$ has constant term 1.
 
+void _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long n, nmod_t mod)
+
+    If \code{(p, len)} is a perfect square, sets \code{(s, n / 2 + 1)}
+    to a square root of $p$ and returns 1. Otherwise returns 0.
+
+void nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p, long n)
+
+    If $p$ is a perfect square, sets $s$ to a square root of $a$
+    and returns 1. Otherwise returns 0.
+
 *******************************************************************************
 
     Transcendental functions
@@ -1831,6 +1954,45 @@ void nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n)
     Sets \code{poly} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}.
+
+*******************************************************************************
+
+    Subproduct trees
+
+*******************************************************************************
+
+mp_ptr * _nmod_poly_tree_alloc(long len)
+
+    Allocates space for a subproduct tree of the given length, having
+    linear factors at the lowest level.
+
+    Entry $i$ in the tree is a pointer to a single array of limbs,
+    capable of storing $\lfloor n / 2^i \rfloor$ subproducts of
+    degree $2^i$ adjacently, plus a trailing entry if $n / 2^i$ is
+    not an integer.
+
+    For example, a tree of length 7 built from monic linear factors has
+    the following structure, where spaces have been inserted
+    for illustrative purposes:
+
+    \begin{verbatim}
+       X1 X1 X1 X1 X1 X1 X1
+       XX1   XX1   XX1   X1
+       XXXX1       XX1   X1
+       XXXXXXX1
+    \end{verbatim}
+
+void _nmod_poly_tree_free(mp_ptr * tree, long len)
+
+    Free the allocated space for the subproduct.
+
+void _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, long len,
+    nmod_t mod)
+
+    Builds a subproduct tree in the preallocated space from
+    the \code{len} monic linear factors $(x-r_i)$. The top level
+    product is not computed.
+
 
 *******************************************************************************
 

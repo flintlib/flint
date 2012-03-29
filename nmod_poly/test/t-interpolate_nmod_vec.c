@@ -30,8 +30,6 @@
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
-
 
 int
 main(void)
