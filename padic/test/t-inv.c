@@ -70,8 +70,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -163,8 +163,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 

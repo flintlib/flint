@@ -73,7 +73,7 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("x = "), _padic_print(x, ctx), printf("\n");
+            printf("x = "), padic_print(x, ctx), printf("\n");
             printf("y = "), fmpq_clear(y), printf("\n");
             abort();
         }
