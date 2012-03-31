@@ -227,8 +227,8 @@ int main(void)
             fmpz_mod_poly_init(t,two);
 
             i = 0;
-            // Only four junk bytes are sent and our read
-            // doesn't consume invalid bytes, so eof is never reached
+            /* Only four junk bytes are sent and our read
+               doesn't consume invalid bytes, so eof is never reached */
             for(i=0; i<500; i++)
             {
                 r = fmpz_mod_poly_fread(in, t);
