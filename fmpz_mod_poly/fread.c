@@ -27,31 +27,43 @@
 #include <mpir.h>
 #include <stdio.h>
 #include "flint.h"
-#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
+#include "fmpz.h"
 
-int nmod_poly_fread(FILE * f, nmod_poly_t poly)
+int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
 {
     long i, length;
-    mp_limb_t n;
+    fmpz_t coeff;
+    unsigned long res;
 
-    if (fscanf(f, "%ld %lu", &length, &n) != 2)
+    fmpz_init(coeff);
+    if (fscanf(f, "%ld", &length) != 1) {
+        fmpz_clear(coeff);
         return 0;
-    
-    nmod_poly_clear(poly);
-    nmod_poly_init(poly,n); 
-    nmod_poly_fit_length(poly, length);
+    }
+
+    fmpz_fread(f,coeff);
+    fmpz_mod_poly_clear(poly);
+    fmpz_mod_poly_init(poly, coeff);
+    fmpz_mod_poly_fit_length(poly, length);
     poly->length = length;
-    
+
     for (i = 0; i < length; i++)
     {
-        if (!fscanf(f, "%lu", &poly->coeffs[i]))
+        res = fmpz_fread(f, coeff);
+        fmpz_mod_poly_set_coeff_fmpz(poly,i,coeff);
+
+        if (!res)
         {
             poly->length = i;
+            fmpz_clear(coeff);
             return 0;
         }
     }
-   
-    _nmod_poly_normalise(poly);
-   
+
+    fmpz_clear(coeff);
+    _fmpz_mod_poly_normalise(poly);
+
     return 1;
 }
+

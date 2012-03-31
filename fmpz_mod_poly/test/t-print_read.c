@@ -1,0 +1,253 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2010 Sebastian Pancratz
+
+******************************************************************************/
+
+
+#include <sys/types.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <mpir.h>
+
+#include "flint.h"
+#include "fmpz.h"
+#include "fmpz_mod_poly.h"
+
+/*
+    The function fdopen is declared in stdio.h.  It is POSIX.1 compliant, 
+    but not ANSI compliant.  The following line enables compilation with 
+    the "-ansi" flag.
+ */
+extern FILE * fdopen(int fildes, const char *mode);
+
+int main(void)
+{
+    int i, j, n = 1000, result;
+    flint_rand_t state;
+
+    FILE *in, *out;
+    int fd[2];
+    pid_t childpid;
+    fmpz_t two;
+    fmpz_init(two);
+    fmpz_set_ui(two,2);
+
+    printf("print/ read....");
+    fflush(stdout);
+
+    flint_randinit(state);
+
+    /* Randomise n polynomials, write to and read from a pipe */
+    {
+        fmpz_mod_poly_t *a;
+
+        a = malloc(n * sizeof(fmpz_mod_poly_t));
+        for (i = 0; i < n; i++)
+        {
+            fmpz_mod_poly_init(a[i],two);
+            fmpz_mod_poly_randtest(a[i], state, n_randint(state, 100));
+        }
+
+        if (pipe(fd))
+        {
+            printf("FAIL:\n");
+            printf("Failed to set-up the pipe.\n");
+            abort();
+        }
+
+        if((childpid = fork()) == -1)
+        {
+            printf("FAIL:\n");
+            printf("Failed to fork the process.\n");
+            abort();
+        }
+
+        if(childpid == 0)  /* Child process */
+        {
+            int r;
+
+            close(fd[0]);
+            out = fdopen(fd[1], "w");
+            if (out == NULL)
+            {
+                printf("FAIL:\n");
+                printf("Could not open output file at the pipe.\n");
+                abort();
+            }
+
+            for (j = 0; j < n; j++)
+            {
+                r = fmpz_mod_poly_fprint(out, a[j]);
+                if ((j < n - 1) && (r > 0))
+                    r = fprintf(out, "\n");
+
+                if (r <= 0)
+                {
+                    printf("FAIL:\n");
+                    printf("Write error.\n");
+                    abort();
+                }
+            }
+
+            fclose(out);
+            exit(0);
+        }
+        else  /* Parent process */
+        {
+            int r;
+            fmpz_mod_poly_t t;
+
+            close(fd[1]);
+            in = fdopen(fd[0], "r");
+            if (in == NULL)
+            {
+                printf("FAIL:\n");
+                printf("Could not open input file at the pipe.\n");
+                abort();
+            }
+
+            fmpz_mod_poly_init(t,two);
+
+            i = 0;
+            while (!feof(in))
+            {
+                r = fmpz_mod_poly_fread(in, t);
+                if (r <= 0)
+                {
+                    printf("FAIL:\n");
+                    printf("Read error.\n");
+                    abort();
+                }
+
+                result = fmpz_mod_poly_equal(t, a[i]);
+                if (!result)
+                {
+                    printf("FAIL:\n");
+                    printf("a[i] = "), fmpz_mod_poly_print(a[i]), printf("\n");
+                    printf("t    = "), fmpz_mod_poly_print(t), printf("\n");
+                    abort();
+                }
+
+                ++i;
+            }
+
+            fmpz_mod_poly_clear(t);
+            fclose(in);
+        }
+
+        if (i != n)
+        {
+            printf("FAIL:\n");
+            printf("Only %d out of %d objects were processed.\n", i, n);
+            abort();
+        }
+
+        for (i = 0; i < n; i++)
+            fmpz_mod_poly_clear(a[i]);
+        free(a);
+    }
+
+    /* Write bad data to a pipe and read it */
+    {
+        char str[5] = {'b', 'l', 'a', 'h', '\0'};
+
+        if (pipe(fd))
+        {
+            printf("FAIL:\n");
+            printf("Failed to set-up the pipe.\n");
+            abort();
+        }
+
+        if((childpid = fork()) == -1)
+        {
+            printf("FAIL:\n");
+            printf("Failed to fork the process.\n");
+            abort();
+        }
+
+        if(childpid == 0)  /* Child process */
+        {
+            int r;
+
+            close(fd[0]);
+            out = fdopen(fd[1], "w");
+            if (out == NULL)
+            {
+                printf("FAIL:\n");
+                printf("Could not open output file at the pipe.\n");
+                abort();
+            }
+
+            r = fprintf(out, "blah");
+            if (r <= 0)
+            {
+                printf("FAIL:\n");
+                printf("Write error.\n");
+                abort();
+            }
+
+            fclose(out);
+            exit(0);
+        }
+        else  /* Parent process */
+        {
+            int r;
+            fmpz_mod_poly_t t;
+
+            close(fd[1]);
+            in = fdopen(fd[0], "r");
+            if (in == NULL)
+            {
+                printf("FAIL:\n");
+                printf("Could not open input file at the pipe.\n");
+                abort();
+            }
+
+            fmpz_mod_poly_init(t,two);
+
+            i = 0;
+            // Only four junk bytes are sent and our read
+            // doesn't consume invalid bytes, so eof is never reached
+            for(i=0; i<500; i++)
+            {
+                r = fmpz_mod_poly_fread(in, t);
+                if (r > 0)
+                {
+                    printf("FAIL:\n");
+                    printf("r = %d\n", r);
+                    abort();
+                }
+            }
+
+            fmpz_mod_poly_clear(t);
+            fclose(in);
+        }
+    }
+
+    fmpz_clear(two);
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return EXIT_SUCCESS;
+}
