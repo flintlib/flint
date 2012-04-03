@@ -162,6 +162,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
                     }
                 }
             }
+            p = n_nextprime(p, 0);
         }
         nmod_poly_clear(d);
         nmod_poly_clear(g);
