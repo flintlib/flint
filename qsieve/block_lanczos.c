@@ -780,7 +780,11 @@ uint64_t * block_lanczos(flint_rand_t state, long nrows,
 	   of v[0] must be saved off separately */
 
 	for (i = 0; i < n; i++)
+#if FLINT_BITS==64
 		v[0][i] = (uint64_t) n_randlimb(state);
+#else
+		v[0][i] = (uint64_t) n_randlimb(state) + ((uint64_t) n_randlimb(state) << 32);
+#endif
 
 	memcpy(x, v[0], vsize * sizeof(uint64_t));
 	mul_MxN_Nx64(vsize, dense_rows, ncols, B, v[0], scratch);
