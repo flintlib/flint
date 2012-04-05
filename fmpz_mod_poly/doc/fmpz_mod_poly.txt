@@ -110,6 +110,11 @@ void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 
 *******************************************************************************
 
+fmpz * fmpz_mod_poly_modulus(const fmpz_mod_poly_t poly)
+
+    Returns the modulus of this polynomial.  This function is 
+    implemented as a macro.
+
 long fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
 
     Returns the degree of the polynomial.  The degree of the zero 

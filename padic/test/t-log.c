@@ -80,8 +80,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("b = "), _padic_print(b, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
             abort();
         }
 

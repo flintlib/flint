@@ -41,6 +41,7 @@ void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, long n, ulong x)
     }
 
     fmpz_set_ui(poly->coeffs + n, x);
+    fmpz_mod(poly->coeffs + n, poly->coeffs + n, &(poly->p));
     _fmpz_mod_poly_normalise(poly);
 }
 

@@ -72,8 +72,8 @@ int main(void)
         {
             printf("FAIL (aliasing):\n\n");
             printf("p = "), fmpz_print(p), printf("\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -278,8 +278,8 @@ int main(void)
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 

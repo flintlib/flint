@@ -70,9 +70,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("b = "), _padic_print(b, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -112,9 +112,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("b = "), _padic_print(b, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -152,8 +152,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -193,10 +193,10 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("b = "), _padic_print(b, ctx), printf("\n");
-            printf("c = "), _padic_print(c, ctx), printf("\n");
-            printf("d = "), _padic_print(d, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             abort();
         }
 
@@ -257,11 +257,11 @@ main(void)
             if (!result)
             {
                 printf("FAIL:\n\n");
-                printf("a = "), _padic_print(a, ctx), printf("\n");
-                printf("b = "), _padic_print(b, ctx), printf("\n");
-                printf("c = "), _padic_print(c, ctx), printf("\n");
-                printf("d = "), _padic_print(d, ctx2), printf("\n");
-                printf("e = "), _padic_print(e, ctx2), printf("\n");
+                printf("a = "), padic_print(a, ctx), printf("\n");
+                printf("b = "), padic_print(b, ctx), printf("\n");
+                printf("c = "), padic_print(c, ctx), printf("\n");
+                printf("d = "), padic_print(d, ctx2), printf("\n");
+                printf("e = "), padic_print(e, ctx2), printf("\n");
                 abort();
             }
             padic_ctx_clear(ctx2);
@@ -303,8 +303,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), _padic_print(a, ctx), printf("\n");
-            printf("b = "), _padic_print(b, ctx), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
             abort();
         }
 
