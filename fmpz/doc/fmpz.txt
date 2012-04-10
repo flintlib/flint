@@ -377,6 +377,22 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
 
     Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
 
+mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits)
+
+    For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits and
+    sets \code{exp} to an exponent $e$, such that $|x| \ge m 2^e$. The number
+    of bits must be between 1 and \code{FLINT_BITS} inclusive.
+    The mantissa is guaranteed to be correctly rounded.
+
+mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits)
+
+    For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits
+    and sets \code{exp} to an exponent $e$, such that $|x| \le m 2^e$.
+    The number of bits must be between 1 and \code{FLINT_BITS} inclusive.
+    The mantissa is either correctly rounded or one unit too large
+    (possibly meaning that the exponent is one too large,
+    if the mantissa is a power of two).
+
 *******************************************************************************
 
     Comparison

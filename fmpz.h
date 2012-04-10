@@ -561,6 +561,11 @@ static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
         fmpz_set_si(f, x - m);
 }
 
+mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits);
+
+mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits);
+
+
 #ifdef __cplusplus
 }
 #endif
