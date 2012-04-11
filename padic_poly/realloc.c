@@ -43,14 +43,14 @@ void padic_poly_realloc(padic_poly_t poly, long alloc, const fmpz_t p)
     {
         padic_poly_truncate(poly, alloc, p);
 
-        poly->coeffs = (fmpz *) realloc(poly->coeffs, alloc * sizeof(fmpz));
+        poly->coeffs = (fmpz *) flint_realloc(poly->coeffs, alloc * sizeof(fmpz));
         if (alloc > poly->alloc)
             mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
                      alloc - poly->alloc);
     }
     else                        /* Nothing allocated already so do it now */
     {
-        poly->coeffs = (fmpz *) calloc(alloc, sizeof(fmpz));
+        poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));
     }
 
     poly->alloc = alloc;

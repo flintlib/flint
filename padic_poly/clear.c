@@ -37,6 +37,6 @@ void padic_poly_clear(padic_poly_t poly)
 
         for (i = 0; i < poly->alloc; i++)
             _fmpz_demote(poly->coeffs + i);
-        free(poly->coeffs);
+        flint_free(poly->coeffs);
     }
 }
