@@ -157,7 +157,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
             {
                 fputc('+', file);
             }
-            fmpz_fprint(file, poly);
+            __fmpq_fprint(poly + 0, den);
         }
     }
 
