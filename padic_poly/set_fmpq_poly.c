@@ -30,35 +30,29 @@
 void padic_poly_set_fmpq_poly(padic_poly_t f, 
                               const fmpq_poly_t g, const padic_ctx_t ctx)
 {
-    if (fmpq_poly_is_zero(g))
+    const long len = g->length;
+
+    if (len == 0)
     {
         padic_poly_zero(f);
     }
     else
     {
-        fmpz_t den;
+        fmpz_t t;
 
-        fmpz_init(den);
+        fmpz_init(t);
 
-        f->val = - fmpz_remove(den, g->den, ctx->p);
+        f->val = - fmpz_remove(t, g->den, ctx->p);
 
         if (f->val < ctx->N)
         {
-            const long len = g->length;
-
             padic_poly_fit_length(f, len);
             _padic_poly_set_length(f, len);
 
-            if (f->val >= 0)
-            {
-                _fmpz_vec_set(f->coeffs, g->coeffs, len);
+            _padic_inv(t, t, ctx->p, ctx->N - f->val);
+            _fmpz_vec_scalar_mul_fmpz(f->coeffs, g->coeffs, len, t);
+            if (f->val == 0)
                 padic_poly_canonicalise(f, ctx->p);
-            }
-            else
-            {
-                _padic_inv(den, den, ctx->p, ctx->N - f->val);
-                _fmpz_vec_scalar_mul_fmpz(f->coeffs, g->coeffs, len, den);
-            }
 
             padic_poly_reduce(f, ctx);
         }
@@ -67,7 +61,7 @@ void padic_poly_set_fmpq_poly(padic_poly_t f,
             padic_poly_zero(f);
         }
 
-        fmpz_clear(den);
+        fmpz_clear(t);
     }
 }
 
