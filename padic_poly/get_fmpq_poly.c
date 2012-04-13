@@ -26,46 +26,58 @@
 #include "fmpq_poly.h"
 #include "padic_poly.h"
 
+/*
+    Assumes that len > 0.
+ */
+
+void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den, 
+                               const fmpz *op, long val, long len, 
+                               const fmpz_t p)
+{
+    if (val == 0)
+    {
+        _fmpz_vec_set(rop, op, len);
+        fmpz_one(den);
+    }
+    else if (val == 1)
+    {
+        _fmpz_vec_scalar_mul_fmpz(rop, op, len, p);
+        fmpz_one(den);
+    }
+    else if (val > 1)
+    {
+        fmpz_t t;
+
+        fmpz_init(t);
+        fmpz_pow_ui(t, p, val);
+
+        _fmpz_vec_scalar_mul_fmpz(rop, op, len, t);
+        fmpz_one(den);
+
+        fmpz_clear(t);
+    }
+    else
+    {
+        _fmpz_vec_set(rop, op, len);
+        fmpz_pow_ui(den, p, -val);
+    }
+}
+
 void padic_poly_get_fmpq_poly(fmpq_poly_t rop, 
                               const padic_poly_t op, const padic_ctx_t ctx)
 {
     const long len = op->length;
 
-    if (padic_poly_is_zero(op))
+    if (len == 0)
     {
         fmpq_poly_zero(rop);
-        return;
-    }
-
-    fmpq_poly_fit_length(rop, len);
-    _fmpq_poly_set_length(rop, len);
-
-    if (op->val == 0)
-    {
-        _fmpz_vec_set(rop->coeffs, op->coeffs, len);
-        fmpz_set_ui(rop->den, 1);
-    }
-    else if (op->val == 1)
-    {
-        _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, len, ctx->p);
-        fmpz_set_ui(rop->den, 1);
-    }
-    else if (op->val > 1)
-    {
-        fmpz_t x;
-
-        fmpz_init(x);
-        fmpz_pow_ui(x, ctx->p, op->val);
-
-        _fmpz_vec_scalar_mul_fmpz(rop->coeffs, op->coeffs, len, x);
-        fmpz_set_ui(rop->den, 1);
-
-        fmpz_clear(x);
     }
     else
     {
-        _fmpz_vec_set(rop->coeffs, op->coeffs, len);
-        fmpz_pow_ui(rop->den, ctx->p, - ((ulong) op->val));
+        fmpq_poly_fit_length(rop, len);
+        _padic_poly_get_fmpq_poly(rop->coeffs, rop->den, 
+                                  op->coeffs, op->val, op->length, ctx->p);
+        _fmpq_poly_set_length(rop, len);
     }
 }
 
