@@ -92,6 +92,49 @@ main(void)
         fmpz_clear(p);
     }
 
+    /* Compare with Q */
+    for (i = 0; i < 10000; i++)
+    {
+        padic_poly_t a;
+        fmpq_poly_t b, c;
+        long n;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = z_randint(state, 50);
+        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+
+        padic_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_init(c);
+
+        padic_poly_randtest(a, state, n_randint(state, 100), ctx);
+
+        n = n_randint(state, 100);
+
+        padic_poly_get_fmpq_poly(b, a, ctx);
+        fmpq_poly_truncate(b, n);
+        padic_poly_truncate(a, n, ctx->p);
+        padic_poly_get_fmpq_poly(c, a, ctx);
+
+        result = (fmpq_poly_equal(b, c));
+        if (!result)
+        {
+            printf("FAIL:\n");
+            padic_poly_print(a, ctx), printf("\n\n");
+            fmpq_poly_print(b), printf("\n\n");
+            fmpq_poly_print(c), printf("\n\n");
+            abort();
+        }
+
+        padic_poly_clear(a);
+        fmpq_poly_clear(b);
+        fmpq_poly_clear(c);
+
+        padic_ctx_clear(ctx);
+        fmpz_clear(p);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");

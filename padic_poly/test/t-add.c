@@ -124,6 +124,60 @@ main(void)
         fmpz_clear(p);
     }
 
+    /* Compare with Q */
+    for (i = 0; i < 10000; i++)
+    {
+        padic_poly_t a, b, c, d;
+        fmpq_poly_t x, y, z;
+
+        fmpz_init(p);
+        fmpz_set_ui(p, n_randprime(state, 5, 1));
+        N = z_randint(state, 50);
+        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+
+        padic_poly_init(a);
+        padic_poly_init(b);
+        padic_poly_init(c);
+        padic_poly_init(d);
+
+        fmpq_poly_init(x);
+        fmpq_poly_init(y);
+        fmpq_poly_init(z);
+
+        padic_poly_randtest(b, state, n_randint(state, 50), ctx);
+        padic_poly_randtest(c, state, n_randint(state, 50), ctx);
+
+        padic_poly_add(a, b, c, ctx);
+
+        padic_poly_get_fmpq_poly(y, b, ctx);
+        padic_poly_get_fmpq_poly(z, c, ctx);
+
+        fmpq_poly_add(x, y, z);
+        padic_poly_set_fmpq_poly(d, x, ctx);
+
+        result = (padic_poly_equal(a, d));
+        if (!result)
+        {
+            printf("FAIL (cmp with Q):\n");
+            printf("N = %ld, val(b) = %ld, val(c) = %ld\n", N, b->val, c->val);
+            padic_poly_print(c, ctx), printf("\n\n");
+            padic_poly_print(d, ctx), printf("\n\n");
+            abort();
+        }
+
+        padic_poly_clear(a);
+        padic_poly_clear(b);
+        padic_poly_clear(c);
+        padic_poly_clear(d);
+
+        fmpq_poly_clear(x);
+        fmpq_poly_clear(y);
+        fmpq_poly_clear(z);
+
+        padic_ctx_clear(ctx);
+        fmpz_clear(p);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
