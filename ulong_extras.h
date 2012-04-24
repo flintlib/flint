@@ -178,6 +178,11 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
 
+long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp); 
+
+long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
+                                              mp_limb_t p, long exp);
+
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 
 mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y);
