@@ -158,6 +158,56 @@ int main(void)
         free(sqrt);
     }
 
+    for (i = 0; i < 5000; i++) /* Test random nonsquares */
+    {
+        mp_limb_t a, b, p, pow, pinv;
+        long exp, maxexp;
+        mp_bitcnt_t bits;
+        mp_limb_t * sqrt;
+        
+        bits = n_randint(state, 18) + 2;
+        p = n_randprime(state, bits, 0);
+        maxexp = 20/bits;
+        exp = n_randint(state, maxexp) + 1 + (p == 2);
+        pow = n_pow(p, exp);
+        
+        pinv = n_preinvert_limb(pow);
+        
+        a = n_randtest(state) % pow;
+        while (n_sqrtmod_primepow(&sqrt, a, p, exp))
+        {
+            if (n_mulmod2_preinv(sqrt[0], sqrt[0], pow, pinv) != a)
+            {
+                printf("FAIL:\n");
+                printf("%lu^2 is not %lu mod %lu\n", sqrt[0], a, pow);
+                abort();
+            }
+            
+            free(sqrt);
+            a = n_randtest(state) % pow;
+        }
+        
+        for (b = 0; b < pow; b++)
+        {
+            if (n_mulmod2_preinv(b, b, pow, pinv) == a)
+                break;
+        }
+
+        result = (b == pow);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("p = %lu\n", p);
+            printf("exp = %ld\n", exp);
+            printf("a = %lu\n", a);
+            printf("b = %lu\n", b);
+
+            abort();
+        }
+
+        free(sqrt);
+    }
+
     flint_randclear(state);
 
     printf("PASS\n");

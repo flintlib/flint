@@ -232,6 +232,12 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
     {
         r = n_sqrtmod(a, p);
         
+        if (r == 0 && a != 0)
+        {
+            *sqrt = NULL;
+            return 0;
+        }
+
         *sqrt = flint_malloc(sizeof(mp_limb_t)*(1 + (r != 0)));
         (*sqrt)[0] = r;
         if (r) (*sqrt)[1] = p - r;
@@ -240,7 +246,14 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
     }
 
     pinv = n_preinvert_limb(p);
-    r = n_sqrtmod(n_mod2_preinv(a, p, pinv), p);
+    a1 = n_mod2_preinv(a, p, pinv);
+    r = n_sqrtmod(a1, p);
+
+    if (r == 0 && a1 != 0)
+    {
+        *sqrt = NULL;
+        return 0;
+    }
     
     if (r) /* gcd(a, p) = 1, p is odd, lift r and p - r */
     {
@@ -301,7 +314,14 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
         exp -= k;
         a /= pow;
 
-        n_sqrtmod_primepow(&s, a, p, exp); /* divide through by p^k and recurse */
+        num = n_sqrtmod_primepow(&s, a, p, exp); /* divide through by p^k and recurse */
+
+        if (num == 0)
+        {
+            *sqrt = NULL;
+            return 0;
+        }
+
         a = n_pow(p, k/2);
         r = a*n_pow(p, exp);
         
