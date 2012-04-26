@@ -93,7 +93,7 @@ int main(void)
             abort();
         }
 
-        free(sqrt);
+        flint_free(sqrt);
     }
     
     for (i = 0; i < 10000; i++) /* Test random squares mod other prime powers */
@@ -155,7 +155,7 @@ int main(void)
             abort();
         }
 
-        free(sqrt);
+        flint_free(sqrt);
     }
 
     for (i = 0; i < 5000; i++) /* Test random nonsquares */
@@ -183,7 +183,7 @@ int main(void)
                 abort();
             }
             
-            free(sqrt);
+            flint_free(sqrt);
             a = n_randtest(state) % pow;
         }
         
@@ -205,7 +205,7 @@ int main(void)
             abort();
         }
 
-        free(sqrt);
+        flint_free(sqrt);
     }
 
     flint_randclear(state);
