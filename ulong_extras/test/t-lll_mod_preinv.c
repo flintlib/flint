@@ -41,7 +41,7 @@ int main(void)
 
    for (i = 0; i < 1000000; i++)
    {
-      mp_limb_t d, dinv, nh, nm, nl, r1, r2, m;
+      mp_limb_t d, dinv, nh, nm, nl, r1, r2;
 
       d = n_randtest_not_zero(state);
       nh = n_randint(state, d);
