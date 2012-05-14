@@ -29,6 +29,7 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "longlong.h"
+#include "config.h"
 
 #ifdef __cplusplus
  extern "C" {

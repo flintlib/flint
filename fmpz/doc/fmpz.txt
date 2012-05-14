@@ -857,6 +857,36 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
 
 *******************************************************************************
 
+    Logic Operations
+
+*******************************************************************************
+
+void fmpz_complement(fmpz_t r, const fmpz_t f)
+
+    The variable \code{r} is set to the ones-complement of \code{f}.
+
+void fmpz_clrbit(fmpz_t f, ulong i)
+
+    Sets the \code{i}th bit in \code{f} to zero.
+
+void fmpz_combit(fmpz_t f, ulong i)
+
+    Complements the \code{i}th bit in \code{f}.
+
+void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical \code{and} of \code{a} and \code{b}.
+
+void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of \code{a} and \code{b}.
+
+void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical exclusive \code{or} of \code{a} and \code{b}.
+
+*******************************************************************************
+
     Chinese remaindering
 
     The following functions can be used to reconstruct an integer from its
