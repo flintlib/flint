@@ -383,6 +383,8 @@ void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b);
 
 void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b);
 
+mp_bitcnt_t fmpz_popcnt(const fmpz_t c);
+
 double fmpz_dlog(const fmpz_t x);
 long fmpz_flog(const fmpz_t x, const fmpz_t b);
 long fmpz_flog_ui(const fmpz_t x, ulong b);
