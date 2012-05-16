@@ -27,10 +27,12 @@ mp_bitcnt_t fmpz_popcnt(const fmpz_t c)
         c1 = *c;
         if(!COEFF_IS_MPZ(c1))
         {
-                return shortCount(*c);
+                if(*c < 0) return 0;
+                else return shortCount(*c);
         } else
         {
                 __mpz_struct *t = COEFF_TO_PTR(c1);
-                return mpz_popcount(t);
+		if(mpz_cmp_si(t,0) < 0) return 0;
+                else return mpz_popcount(t);
         }
 }

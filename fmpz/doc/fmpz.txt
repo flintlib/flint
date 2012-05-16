@@ -885,6 +885,11 @@ void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
     Sets \code{r} to the bit-wise logical exclusive \code{or} of \code{a} and \code{b}.
 
+int fmpz_popcnt(const fmpz_t a)
+
+    Returns the number of '1' bits in the given Z (aka Hamming weight or population count).
+    The return value is undefined if the input is negative.
+
 *******************************************************************************
 
     Chinese remaindering
