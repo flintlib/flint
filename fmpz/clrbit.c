@@ -40,7 +40,7 @@ void fmpz_clrbit(fmpz_t f, ulong i)
         __mpz_struct *ptr = COEFF_TO_PTR(*f);
 
         mpz_clrbit(ptr, i);
-	_fmpz_demote_val(f);
+        _fmpz_demote_val(f);
     }
 }
 
