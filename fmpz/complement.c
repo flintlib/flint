@@ -41,8 +41,8 @@ void fmpz_complement(fmpz_t r, const fmpz_t f)
             _fmpz_demote_val(r);
         } else { /* alaised */
             fmpz_t tmp;
-            fmpz_init(tmp);
             __mpz_struct *ptr, *ptr2;
+            fmpz_init(tmp);
             ptr = _fmpz_promote(tmp);
             ptr2 = COEFF_TO_PTR(*f);
             mpz_com(ptr, ptr2);

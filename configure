@@ -150,9 +150,9 @@ fi
 # Test for popcnt flag and set needed CFLAGS
 mkdir -p build
 rm -f build/test-popcnt > /dev/null 2>&1
-MSG="Testing __builtin_popcountll..."
+MSG="Testing __builtin_popcountl..."
 ([ -x /bin/echo ] && /bin/echo -n $MSG) || echo $MSG
-echo "int main() {return __builtin_popcountll(0x0);}" >> build/test-popcnt.c
+echo "int main() {return __builtin_popcountl(0x0);}" > build/test-popcnt.c
 $CC build/test-popcnt.c -o ./build/test-popcnt > /dev/null 2>&1
 if [ $? -eq 0 ]; then
         echo "Success"
