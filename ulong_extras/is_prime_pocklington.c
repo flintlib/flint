@@ -19,12 +19,13 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, Peter Shrimpton
+    Copyright (C) 2008 Peter Shrimpton
     Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
 #include <mpir.h>
+#include <stdlib.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -47,13 +48,28 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
     limit = n_sqrt(n1);
     cofactor = n_factor_partial(&factors, n1, limit, 1);
 
+    if (cofactor != 1) /* check that cofactor is coprime to factors found */
+    {
+        for (i = 0; i < factors.num; i++)
+        {
+            if (factors.p[i] > flint_primes[FLINT_FACTOR_TRIAL_PRIMES - 1])
+            {
+                while (cofactor >= factors.p[i] && (cofactor % factors.p[i]) == 0)
+                {
+                    factors.exp[i]++;
+                    cofactor /= factors.p[i];
+                }
+            }
+        }
+    }
+
     ninv = n_preinvert_limb(n);
 
+    c = 1;
     for (i = factors.num - 1; i >= 0; i--)
     {
         mp_limb_t exp = n1 / factors.p[i];
         pass = 0;
-        c = 1;
 
         for (j = 2; j < iterations && pass == 0; j++)
         {
