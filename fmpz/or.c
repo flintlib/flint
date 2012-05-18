@@ -31,43 +31,38 @@
 void fmpz_or(fmpz_t f, const fmpz_t g, const fmpz_t h)
 {
         fmpz c1,c2;
-        fmpz_t tmp;
-        fmpz_init(tmp);
         c1 = *g;
         c2 = *h;
         if(!COEFF_IS_MPZ(c1))
         {
             if(!COEFF_IS_MPZ(c2)) /* both inputs are small */
             {
-                fmpz_set_si(tmp, c1 | c2);
+                fmpz_set_si(f, c1 | c2);
             } else /* g is small, h is large */
             {
-                __mpz_struct * mpz3 = _fmpz_promote(tmp);
-                __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
-                mpz_t g2;
-                mpz_init_set_si(g2,c1);
-                mpz_ior(mpz3, mpz2, g2);
-                mpz_clear(g2);
+                mpz_t tmp;
+                __mpz_struct * mpz3 = _fmpz_promote(f);
+                mpz_init_set_si(tmp,c1);
+                mpz_ior(mpz3, COEFF_TO_PTR(c2), tmp);
+                _fmpz_demote_val(f);
+                mpz_clear(tmp);
             }
         } else
         {
             if(!COEFF_IS_MPZ(c2)) /* g is large, h is small */
             {
-                __mpz_struct *mpz3 = _fmpz_promote(tmp);
-                __mpz_struct *mpz1 = COEFF_TO_PTR(c1);
-                mpz_t h2;
-                mpz_init_set_si(h2,c2);
-                mpz_ior(mpz3, mpz1, h2);
-                mpz_clear(h2);
+                mpz_t tmp;
+                __mpz_struct *mpz3 = _fmpz_promote(f);
+                mpz_init_set_si(tmp,c2);
+                mpz_ior(mpz3, COEFF_TO_PTR(c1), tmp);
+                mpz_clear(tmp);
             } else /* g and h are large */
             {
-                __mpz_struct * mpz3 = _fmpz_promote(tmp);
+                __mpz_struct * mpz3 = _fmpz_promote(f);
                 __mpz_struct * mpz1 = COEFF_TO_PTR(c1);
                 __mpz_struct * mpz2 = COEFF_TO_PTR(c2);
                 mpz_ior(mpz3, mpz1, mpz2);
             }
         }
-        fmpz_set(f,tmp);
-        fmpz_clear(tmp);
 }
 
