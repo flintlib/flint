@@ -31,13 +31,12 @@
 long
 nmod_mat_rref(long * P, nmod_mat_t A)
 {
-    long i, j, k, m, n, rank;
+    long i, j, k, n, rank;
     long * pivots;
     long * nonpivots;
 
     nmod_mat_t U, V;
 
-    m = A->r;
     n = A->c;
 
     rank = nmod_mat_lu(P, A, 0);

@@ -30,13 +30,12 @@
 long
 nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
 {
-    long i, j, k, m, n, rank, nullity;
+    long i, j, k, n, rank, nullity;
     long * pivots;
     long * nonpivots;
     nmod_poly_mat_t tmp;
     nmod_poly_t den;
 
-    m = mat->r;
     n = mat->c;
 
     nmod_poly_init(den, nmod_poly_mat_modulus(mat));
