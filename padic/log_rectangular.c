@@ -79,7 +79,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
         const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
 
         long i, j;
-        fmpz_t c, f, t, Pl, P1;
+        fmpz_t c, f, t, P1;
         fmpz *ypow;
 
         ypow = _fmpz_vec_init(b + 1);

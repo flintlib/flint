@@ -435,6 +435,39 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
 
+long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
+
+    Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
+    are stored in an array which is created and whose address is stored in 
+    the location pointed to by \code{sqrt}. The array of roots is allocated 
+    by the function but must be cleaned up by the user by calling 
+    \code{flint_free}. The number of roots is returned by the function. If 
+    \code{a} is not a quadratic residue modulo \code{2^exp} then 0 is 
+    returned by the function and the location \code{sqrt} points to is set to 
+    NULL. 
+
+long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
+
+    Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
+    are stored in an array which is created and whose address is stored in 
+    the location pointed to by \code{sqrt}. The array of roots is allocated 
+    by the function but must be cleaned up by the user by calling 
+    \code{flint_free}. The number of roots is returned by the function. If 
+    \code{a} is not a quadratic residue modulo \code{p^exp} then 0 is 
+    returned by the function and the location \code{sqrt} points to is set to 
+    NULL. 
+
+long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+
+    Computes all the square roots of \code{a} modulo \code{m} given the 
+    factorisation of \code{m} in \code{fac}. The roots are stored in an array 
+    which is created and whose address is stored in the location pointed to by 
+    \code{sqrt}. The array of roots is allocated by the function but must be 
+    cleaned up by the user by calling \code{flint_free}. The number of roots 
+    is returned by the function. If \code{a} is not a quadratic residue modulo 
+    \code{m} then 0 is returned by the function and the location \code{sqrt} 
+    points to is set to NULL. 
+
 *******************************************************************************
 
     Prime number generation and counting

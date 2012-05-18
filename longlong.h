@@ -162,10 +162,10 @@
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
   do {                                                              \
-    mp_limb_t __x, __y;                                             \
-    add_ssaaaa(__x, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
-    add_ssaaaa(__y, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
-    add_ssaaaa(sh, sm, sh, sm, __y, __x);                           \
+    mp_limb_t __t, __u;                                             \
+    add_ssaaaa(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
+    add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
+    add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \

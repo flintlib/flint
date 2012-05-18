@@ -19,61 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#include <stdio.h>
+#undef ulong /* prevent clash with stdlib */
 #include <stdlib.h>
+#define ulong unsigned long
+#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "fmpz.h"
 
-
-static mp_limb_t
-n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
+fmpz * __new_fmpz()
 {
-    mp_limb_t prod = 1UL % p;
-
-    while (n)
-    {
-        prod = n_mulmod2_preinv(prod, n, p, pinv);
-        n--;
-    }
-
-    return prod;
+    return calloc(sizeof(fmpz), 1);
 }
 
-int main(void)
+void __free_fmpz(fmpz * f)
 {
-    flint_rand_t state;
-    mp_limb_t n;
-    int j;
-    flint_randinit(state);
+   _fmpz_demote(f);
+   free(f);
+}   
 
-    printf("factorial_fast_mod2_preinv....");
-    fflush(stdout);
-
-    for (n = 0; n < 1000; n++)
+void __fmpz_set_si(fmpz_t f, long val)
+{
+    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
-        mp_limb_t p, pinv, x, y;
-
-        for (j = 0; j < 10; j++)
-        {
-            p = n_randtest_not_zero(state);
-            pinv = n_preinvert_limb(p);
-            x = n_factorial_fast_mod2_preinv(n, p, pinv);
-            y = n_factorial_mod2_foolproof(n, p, pinv);
-
-            if (x != y)
-            {
-                printf("FAIL:\n");
-                printf("n = %lu\np = %lu\nx = %lu\ny = %lu\n", n, p, x, y);
-                abort();
-            }
-        }
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_si(mpz_coeff, val);
     }
-
-    flint_randclear(state);
-    printf("PASS\n");
-    return 0;
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
 }
+
+void __fmpz_set_ui(fmpz_t f, ulong val)
+{
+    if (val > COEFF_MAX)        /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_ui(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
+}
+
+

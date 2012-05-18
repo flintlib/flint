@@ -64,8 +64,9 @@ main(void)
 
         do
         {
-            nmod_poly_randtest(poly, state, length); 
-            nmod_poly_make_monic(poly, poly);
+            nmod_poly_randtest(poly, state, length);
+            if(!nmod_poly_is_zero(poly))
+                nmod_poly_make_monic(poly, poly);
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
 
@@ -81,8 +82,9 @@ main(void)
             do 
             {
                 length = n_randint(state, 7) + 2;
-                nmod_poly_randtest(poly, state, length); 
-                nmod_poly_make_monic(poly, poly);
+                nmod_poly_randtest(poly, state, length);
+                if(!nmod_poly_is_zero(poly))
+                    nmod_poly_make_monic(poly, poly);
                 if (poly->length)
                     nmod_poly_divrem(quot, rem, pol1, poly);
             }

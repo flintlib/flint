@@ -34,8 +34,12 @@
  extern "C" {
 #endif
 
-#ifndef uint64_t
-#define uint64_t unsigned long
+#if FLINT_BITS==64
+   #ifndef uint64_t
+   #define uint64_t unsigned long
+   #endif
+#else
+   #include <stdint.h>
 #endif
 
 /* 
