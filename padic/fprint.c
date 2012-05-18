@@ -27,7 +27,7 @@
 
 #include "padic.h"
 
-int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
+int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
 {
     if (fmpz_is_zero(u))
     {
@@ -69,7 +69,7 @@ int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
 
         if (fmpz_sgn(u) < 0)
         {
-            printf("ERROR (__padic_fprint).  u < 0 in SERIES mode.\n");
+            printf("ERROR (_padic_fprint).  u < 0 in SERIES mode.\n");
             abort();
         }
 
@@ -152,31 +152,15 @@ int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
     }
     else
     {
-        printf("Exception (__padic_fprint).  Unknown print mode.\n");
+        printf("Exception (_padic_fprint).  Unknown print mode.\n");
         abort();
     }
 
     return 1;
 }
 
-int _padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
-{
-    return __padic_fprint(file, padic_unit(op), padic_val(op), ctx);
-}
-
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 {
-    long ans;
-    padic_t t;
-
-    _padic_init(t);
-    padic_set(t, op, ctx);
-    ans = _padic_fprint(file, op, ctx);
-    fprintf(file, " + O(");
-    fmpz_fprint(file, ctx->p);
-    fprintf(file, "^%ld)", ctx->N);
-    _padic_clear(t);
-
-    return ans;
+    return _padic_fprint(file, padic_unit(op), padic_val(op), ctx);
 }
 
