@@ -38,9 +38,12 @@
 
 #define DOUBLE_PREC 53
 #define PI 3.141592653589793238462643
+#define INV_LOG2 (1.44269504088896340735992468 + 1e-12)
 #define HRR_A (1.1143183348516376904 + 1e-12)  /* 44*pi^2/(225*sqrt(3)) */
 #define HRR_B (0.0592384391754448833 + 1e-12)  /* pi*sqrt(2)/75 */
 #define HRR_C (2.5650996603237281911 + 1e-12)  /* pi*sqrt(2/3) */
+#define HRR_D (1.2424533248940001551 + 1e-12)  /* log(2) + log(3)/2 */
+
 
 #define PI_USE_CHUDNOVSKY 1
 #define PI_CHUDNOVSKY_CUTOFF 1000000
@@ -73,7 +76,7 @@ partitions_remainder_bound_log2(double n, double N)
     t1 = log(HRR_A) - 0.5*log(N);
     t2 = log(HRR_B) + 0.5*(log(N) - log(n-1)) + log_sinh(HRR_C * sqrt(n)/N);
 
-    return (FLINT_MAX(t1, t2) + 1) * 1.4426950408889634074;
+    return (FLINT_MAX(t1, t2) + 1) * INV_LOG2;
 }
 
 long
@@ -83,6 +86,12 @@ partitions_needed_terms(ulong n)
     for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
     for ( ; partitions_remainder_bound(n, N) > (n > 1500 ? 0.25 : 1); N++);
     return N;
+}
+
+static double
+partitions_term_bound(double n, double k)
+{
+    return ((PI*sqrt(24*n-1) / (6.0*k)) + HRR_D - log(24.0*n-1) + 0.5*log(k)) * INV_LOG2;
 }
 
 /* Bound number of prime factors in k */
@@ -120,7 +129,7 @@ partitions_prec_bound(ulong n, long k, long N)
 {
     long prec;
 
-    prec = partitions_remainder_bound_log2(n, k);
+    prec = partitions_term_bound(n, k);
     prec += log2_ceil(8 * N * (26 * (sqrt(n) / k) + 7 * bound_primes(k) + 22));
 
     return prec;
@@ -473,6 +482,7 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
             if (prec > DOUBLE_PREC)
             {
                 prec = partitions_prec_bound(n, k, N);
+
                 mpfr_set_prec(t1, prec);
                 mpfr_set_prec(t2, prec);
                 mpfr_set_prec(t3, prec);

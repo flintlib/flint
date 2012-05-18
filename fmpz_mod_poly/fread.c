@@ -19,24 +19,51 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2007, David Howden.
+    Copyright (C) 2010 William Hart
 
 ******************************************************************************/
 
 #include <mpir.h>
+#include <stdio.h>
 #include "flint.h"
+#include "fmpz_mod_poly.h"
 #include "fmpz.h"
-#include "fmpz_vec.h"
 
-void
-_fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
+int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
 {
-    if (len)
-    {
-        long pos = _fmpz_vec_height_index(vec, len);
+    long i, length;
+    fmpz_t coeff;
+    unsigned long res;
 
-        fmpz_abs(height, vec + pos);
+    fmpz_init(coeff);
+    if (fscanf(f, "%ld", &length) != 1) {
+        fmpz_clear(coeff);
+        return 0;
     }
-    else
-        fmpz_zero(height);
+
+    fmpz_fread(f,coeff);
+    fmpz_mod_poly_clear(poly);
+    fmpz_mod_poly_init(poly, coeff);
+    fmpz_mod_poly_fit_length(poly, length);
+    poly->length = length;
+
+    for (i = 0; i < length; i++)
+    {
+        res = fmpz_fread(f, coeff);
+        fmpz_mod_poly_set_coeff_fmpz(poly,i,coeff);
+
+        if (!res)
+        {
+            poly->length = i;
+            fmpz_clear(coeff);
+            return 0;
+        }
+    }
+
+    fmpz_clear(coeff);
+    _fmpz_mod_poly_normalise(poly);
+
+    return 1;
 }
+
