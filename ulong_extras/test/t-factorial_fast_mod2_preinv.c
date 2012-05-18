@@ -59,7 +59,7 @@ int main(void)
 
         for (j = 0; j < 10; j++)
         {
-            p = n_randtest_not_zero(state, 0);
+            p = n_randtest_not_zero(state);
             pinv = n_preinvert_limb(p);
             x = n_factorial_fast_mod2_preinv(n, p, pinv);
             y = n_factorial_mod2_foolproof(n, p, pinv);
