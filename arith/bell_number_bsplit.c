@@ -38,7 +38,7 @@ _bell_series_cutoff(long n)
     double N, log_N, log_pow, log_fac;
 
     N = n;
-    log_N = log(N);
+    log_N = (N==0 ? 0 : log(N));
     log_pow = n * log_N;
     log_fac = N*log_N - N;
     while (log_pow - log_fac >= -2)

@@ -5,7 +5,7 @@ of the library was taken over solely by William Hart.
 The main authors of FLINT to date have been William Hart, David Harvey (no
 longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
 
-Other significant contributions to FLINT have been made byi:
+Other significant contributions to FLINT have been made by:
 
 Jason Papadopoulos : Block Lanczos code and multiprecision complex root finding
 Gonzalo Tornaria : Theta function module, Montgomery multiplication and modular

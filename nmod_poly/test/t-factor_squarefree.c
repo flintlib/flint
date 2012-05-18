@@ -68,7 +68,8 @@ main(void)
         do 
         {
             nmod_poly_randtest(poly, state, length); 
-            nmod_poly_make_monic(poly, poly);
+            if(!nmod_poly_is_zero(poly))
+                nmod_poly_make_monic(poly, poly);
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
         exp[0] = n_randprime(state, 5, 0);
