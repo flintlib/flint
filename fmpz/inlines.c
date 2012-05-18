@@ -19,29 +19,55 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
-#include <mpir.h>
+#undef ulong /* prevent clash with stdlib */
 #include <stdlib.h>
+#define ulong unsigned long
+#include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
-#include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, long n, ulong x)
+fmpz * __new_fmpz()
 {
-    fmpz_mod_poly_fit_length(poly, n + 1);
-
-    if (n + 1 > poly->length)
-    {
-        mpn_zero((mp_ptr) (poly->coeffs + poly->length), n - poly->length);
-        poly->length = n + 1;
-    }
-
-    fmpz_set_ui(poly->coeffs + n, x);
-    fmpz_mod(poly->coeffs + n, poly->coeffs + n, &(poly->p));
-    _fmpz_mod_poly_normalise(poly);
+    return calloc(sizeof(fmpz), 1);
 }
+
+void __free_fmpz(fmpz * f)
+{
+   _fmpz_demote(f);
+   free(f);
+}   
+
+void __fmpz_set_si(fmpz_t f, long val)
+{
+    if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_si(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
+}
+
+void __fmpz_set_ui(fmpz_t f, ulong val)
+{
+    if (val > COEFF_MAX)        /* val is large */
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_ui(mpz_coeff, val);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = val;               /* val is small */
+    }
+}
+
 

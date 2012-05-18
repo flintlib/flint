@@ -310,21 +310,16 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
 char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx);
 
-int __padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx);
+int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx);
 
-int _padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
+int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx);
 
 static __inline__ int 
-__padic_print(const fmpz_t u, long v, const padic_ctx_t ctx)
+_padic_print(const fmpz_t u, long v, const padic_ctx_t ctx)
 {
-    return __padic_fprint(stdout, u, v, ctx);
-}
-
-static __inline__ int _padic_print(const padic_t op, const padic_ctx_t ctx)
-{
-    return _padic_fprint(stdout, op, ctx);
+    return _padic_fprint(stdout, u, v, ctx);
 }
 
 static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)

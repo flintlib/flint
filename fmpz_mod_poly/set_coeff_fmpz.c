@@ -41,7 +41,7 @@ fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, long n, const fmpz_t x)
         poly->length = n + 1;
     }
 
-    fmpz_set(poly->coeffs + n, x);
+    fmpz_mod(poly->coeffs + n, x, &(poly->p));
     _fmpz_mod_poly_normalise(poly);
 }
 
