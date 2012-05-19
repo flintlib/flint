@@ -46,7 +46,7 @@ void fmpz_setbit(fmpz_t f, ulong i)
         __mpz_struct *ptr = COEFF_TO_PTR(*f);
 
         mpz_setbit(ptr, i);
-            
+
         _fmpz_demote_val(f);
     }
 }

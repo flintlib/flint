@@ -42,39 +42,43 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 1000000; i++)
     {
         ulong j;
-        fmpz_t a, c;
-        mpz_t b;
+        fmpz_t a, b, c;
+        mpz_t z;
 
         fmpz_init(a);
+        fmpz_init(b);
         fmpz_init(c);
-        mpz_init(b);
+        mpz_init(z);
 
         fmpz_randtest(a, state, 2 * FLINT_BITS);
-        fmpz_get_mpz(b, a);
+        fmpz_set(b, a);
+        fmpz_get_mpz(z, b);
         j = n_randint(state, 3 * FLINT_BITS);
 
-        fmpz_setbit(a, j);
-        mpz_setbit(b, j);
-        fmpz_set_mpz(c, b);
+        fmpz_setbit(b, j);
+        mpz_setbit(z, j);
+        fmpz_set_mpz(c, z);
 
-        result = (fmpz_equal(a, c));
+        result = (fmpz_equal(b, c));
 
         if (!result)
         {
             printf("FAIL:\n");
             printf("a = "), fmpz_print(a), printf("\n");
-            gmp_printf("b = %Zd\n", b);
+            printf("b = "), fmpz_print(b), printf("\n");
             printf("c = "), fmpz_print(c), printf("\n");
+            gmp_printf("z = %Zd\n", z);
             printf("j = %ld\n", j);
             abort();
         }
 
         fmpz_clear(a);
+        fmpz_clear(b);
         fmpz_clear(c);
-        mpz_clear(b);
+        mpz_clear(z);
     }
 
     flint_randclear(state);
