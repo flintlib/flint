@@ -1,0 +1,33 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2012 William Hart
+
+******************************************************************************/
+
+long qfb_reduced_forms(qfb ** forms, long d)
+
+    Given a discriminant $d$ (negative for negative definite forms), compute
+    all the reduced binary quadratic forms of that discriminant. The function
+    allocates space for these and returns it in the variable \code{forms} 
+    (the user is responsible for cleaning this up by a single call to 
+    \code{flint_free} on the array pointed to by \code{forms}, after use. The
+    function returns the number of forms generated (the form class number).
