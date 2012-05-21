@@ -32,31 +32,6 @@
 #include "fmpz.h"
 #include "qfb.h"
 
-long compute_c(long a, long b, long d)
-{
-    fmpz_t fb;
-
-    fmpz_init(fb);
-
-    fmpz_set_si(fb, b);
-
-    fmpz_mul_si(fb, fb, b);
-    
-    if (d > 0) 
-        fmpz_sub_ui(fb, fb, d);
-    else
-        fmpz_add_ui(fb, fb, -d);
-    
-    fmpz_fdiv_q_ui(fb, fb, a);
-    fmpz_fdiv_q_2exp(fb, fb, 2);
-    
-    b = fmpz_get_si(fb);
-    
-    fmpz_clear(fb);
-
-    return b;
-}
-
 int pow_incr(int * pows, int * exp, int n)
 {
     int i;
@@ -76,7 +51,7 @@ int pow_incr(int * pows, int * exp, int n)
 long qfb_reduced_forms(qfb ** forms, long d)
 {
     long a, b, c, p, blim, alloc, num, sqrt, i, prod, prime_i;
-    mp_limb_t b2, ppow, exp;
+    mp_limb_t b2, exp;
     n_factor_t * fac;
     mp_limb_t * s;
 
@@ -102,42 +77,21 @@ long qfb_reduced_forms(qfb ** forms, long d)
     prime_i = 1;
     while ((p = flint_primes[prime_i]) <= sqrt) /* sieve for factors of p^exp */
     {
-        ppow = p;
-        exp = 1;
-        while (ppow <= blim*blim - d) /* loop through powers of p */
+        num = n_sqrtmod_primepow(&s, n_negmod((-d) % p, p), p, 1);
+            
+        for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
         {
-            num = n_sqrtmod_primepow(&s, n_negmod((-d) % ppow, ppow), p, exp);
-
-            if (exp == 1)
+            long off = s[i];
+            while (off <= blim)
             {
-                for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
-                {
-                     long off = s[i];
-                     while (off <= blim)
-                     {
-                         fac[off].p[fac[off].num] = p;
-                         fac[off].exp[fac[off].num] = 1;
-                         fac[off].num++;
-                         off += ppow;
-                     }
-                }
-            } else /* exp > 1 */
-            {
-                for (i = 0; i < num; i++) /* sieve with each sqrt mod p^exp */
-                {
-                     long off = s[i];
-                     while (off <= blim)
-                     {
-                         fac[off].exp[fac[off].num - 1]++;
-                         off += ppow;
-                     }
-                }
+                b2 = (off*off - d)/4;
+                         
+                fac[off].p[fac[off].num] = p;
+                fac[off].exp[fac[off].num] = n_remove2_precomp(&b2, p, flint_prime_inverses[prime_i]);
+                fac[off].num++;
+                         
+                off += p;
             }
-
-            free(s);
-
-            exp++;
-            ppow *= p;
         }
 
         prime_i++;
