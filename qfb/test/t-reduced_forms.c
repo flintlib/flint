@@ -43,26 +43,24 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 1; i < 1000000; i++) 
+    for (i = 1; i < 1000; i++) 
     {
         num = qfb_reduced_forms(&forms, -i);
         
-        /*if (num)
+        if (num)
         {
             printf("d = %ld: \n", -i);
             for (j = 0; j < num; j++)
                 printf("  (%ld, %ld, %ld)\n", forms[j].a, forms[j].b, forms[j].c);
-        }*/
-        if ((i & 1023) == 0)
-           printf("%ld\n", i + 1);
-
+        }
+        
         result = 1;
         if (!result)
         {
             abort();
         }
 
-        free(forms);
+        flint_free(forms);
     }
 
     flint_randclear(state);
