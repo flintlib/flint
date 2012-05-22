@@ -95,6 +95,8 @@ long qfb_reduced_forms(qfb ** forms, long d)
         }
 
         prime_i++;
+
+        flint_free(s);
     }
 
     for (b = (d & 1); b <= blim; b += 2) /* write any remaining factors, including 2^exp */
