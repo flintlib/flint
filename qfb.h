@@ -44,6 +44,8 @@ typedef qfb qfb_t[1];
 
 long qfb_reduced_forms(qfb ** forms, long d);
 
+long qfb_reduced_forms_large(qfb ** forms, long d);
+
 #ifdef __cplusplus
 }
 #endif

@@ -31,3 +31,10 @@ long qfb_reduced_forms(qfb ** forms, long d)
     (the user is responsible for cleaning this up by a single call to 
     \code{flint_free} on the array pointed to by \code{forms}, after use. The
     function returns the number of forms generated (the form class number).
+
+long qfb_reduced_forms_large(qfb ** forms, long d)
+
+    As for \code{qfb_reduced_forms}. However, for small \code{|d|} it requires 
+    fewer primes to be computed at a small cost in speed. It is called 
+    automatically by \code{qfb_reduced_forms} for large \code{|d|} so that 
+    \code{flint_primes} is not exhausted.

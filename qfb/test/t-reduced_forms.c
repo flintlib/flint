@@ -36,31 +36,48 @@ int main(void)
     int result;
     flint_rand_t state;
     qfb * forms;
-    long i, j, num;
+    qfb * forms2;
+    long i, j, k, num, num2;
 
     printf("reduced_forms....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 1; i < 1000; i++) 
+    for (i = 1; i < 30000; i++) 
     {
         num = qfb_reduced_forms(&forms, -i);
+        num2 = qfb_reduced_forms_large(&forms2, -i);
         
-        if (num)
+        result = (num == num2);
+        for (j = 0; result == 1 && j < num; j++)
         {
-            printf("d = %ld: \n", -i);
-            for (j = 0; j < num; j++)
-                printf("  (%ld, %ld, %ld)\n", forms[j].a, forms[j].b, forms[j].c);
+            for (k = 0; k < num; k++)
+            {
+               if (forms[j].a == forms2[k].a && forms[j].b == forms2[k].b
+                    && forms[j].c == forms2[k].c);
+                   break;
+            }
+            result &= (k != num);
+
+            if (!result) break;
         }
         
-        result = 1;
         if (!result)
         {
+            printf("FAIL:\n");
+            
+            if (num == num2)
+                printf("(%ld, %ld, %ld) != (%ld, %ld, %ld)\n", forms[j].a, forms[j].b, 
+                    forms[j].c, forms2[j].a, forms2[j].b, forms2[j].c);
+            else
+                printf("%ld != %ld\n", num, num2);
+            
             abort();
         }
 
         flint_free(forms);
+        flint_free(forms2);
     }
 
     flint_randclear(state);
