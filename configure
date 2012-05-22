@@ -80,6 +80,9 @@ done
 if [ -d "${MPIR_DIR}/lib" ]; then
    MPIR_LIB_DIR="${MPIR_DIR}/lib"
    MPIR_INCLUDE_DIR="${MPIR_DIR}/include"
+elif [ -d "${MPIR_DIR}/lib64" ]; then
+   MPIR_LIB_DIR="${MPIR_DIR}/lib64"
+   MPIR_INCLUDE_DIR="${MPIR_DIR}/include"
 elif [ -d "${MPIR_DIR}/.libs" ]; then
    MPIR_LIB_DIR="${MPIR_DIR}/.libs"
    MPIR_INCLUDE_DIR="${MPIR_DIR}"
@@ -91,6 +94,9 @@ fi
 if [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
    MPFR_INCLUDE_DIR="${MPFR_DIR}/include"
+elif [ -d "${MPFR_DIR}/lib64" ]; then
+   MPFR_LIB_DIR="${MPFR_DIR}/lib64"
+   MPFR_INCLUDE_DIR="${MPFR_DIR}/include"
 elif [ -d "${MPFR_DIR}/.libs" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/.libs"
    MPFR_INCLUDE_DIR="${MPFR_DIR}"
@@ -101,6 +107,9 @@ fi
 
 if [ -d "${NTL_DIR}/lib" ]; then
    NTL_LIB_DIR="${NTL_DIR}/lib"
+   NTL_INCLUDE_DIR="${NTL_DIR}/include"
+elif [ -d "${NTL_DIR}/lib64" ]; then
+   NTL_LIB_DIR="${NTL_DIR}/lib64"
    NTL_INCLUDE_DIR="${NTL_DIR}/include"
 else
    echo "Invalid NTL directory"
