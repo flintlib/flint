@@ -48,31 +48,6 @@ int pow_incr(int * pows, int * exp, int n)
     return 0;
 }
 
-long compute_c(long a, long b, long d)
-{
-    fmpz_t fb;
-
-    fmpz_init(fb);
-
-    fmpz_set_si(fb, b);
-
-    fmpz_mul_si(fb, fb, b);
-    
-    if (d > 0) 
-        fmpz_sub_ui(fb, fb, d);
-    else
-        fmpz_add_ui(fb, fb, -d);
-    
-    fmpz_fdiv_q_ui(fb, fb, a);
-    fmpz_fdiv_q_2exp(fb, fb, 2);
-    
-    b = fmpz_get_si(fb);
-    
-    fmpz_clear(fb);
-
-    return b;
-}
-
 long qfb_reduced_forms_large(qfb ** forms, long d)
 {
     long a, j, p, alim, alloc, num, roots, sqrt, i, prod, prime_i;
@@ -158,9 +133,14 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
            
            if (-a < b && b <= a) /* we may have a form */
            {
-               mp_limb_t c = compute_c(a, b, d);
+               /* 
+                  let B = FLINT_BITS
+                  -sqrt(2^(B-1)) < b < sqrt(2^(B-1)) 
+                  0 < -d < 2^(B-1)
+               */
+               mp_limb_t c = ((mp_limb_t) (b*b) + (mp_limb_t) (-d))/(4*(mp_limb_t) a); 
                
-               if (c >= a && (b >= 0 || a != c)) /* we have a form */
+               if (c >= (mp_limb_t) a && (b >= 0 || a != c)) /* we have a form */
                {
                    mp_limb_t g;
                    
