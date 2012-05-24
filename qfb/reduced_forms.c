@@ -135,7 +135,7 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
            {
                /* 
                   let B = FLINT_BITS
-                  -sqrt(2^(B-1)) < b < sqrt(2^(B-1)) 
+                  -sqrt(2^(B-1)/3) < b < sqrt(2^(B-1)/3) 
                   0 < -d < 2^(B-1)
                */
                mp_limb_t c = ((mp_limb_t) (b*b) + (mp_limb_t) (-d))/(4*(mp_limb_t) a); 
@@ -178,7 +178,7 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
 long qfb_reduced_forms(qfb ** forms, long d)
 {
     long a, b, c, p, blim, alloc, num, sqrt, i, prod, prime_i;
-    mp_limb_t b2, exp, primes_cutoff;
+    mp_limb_t b2, exp, primes_cutoff = 0;
     n_factor_t * fac;
     mp_limb_t * s;
 
@@ -212,10 +212,10 @@ long qfb_reduced_forms(qfb ** forms, long d)
             
         for (i = 0; i < num; i++) /* sieve with each sqrt mod p */
         {
-            long off = s[i];
+            mp_limb_t off = s[i];
             while (off <= blim)
             {
-                b2 = (off*off - d)/4;
+                b2 = (off*off - (mp_limb_t) d)/4;
                          
                 fac[off].p[fac[off].num] = p;
                 fac[off].exp[fac[off].num] = n_remove2_precomp(&b2, p, flint_prime_inverses[prime_i]);
@@ -232,7 +232,7 @@ long qfb_reduced_forms(qfb ** forms, long d)
 
     for (b = (d & 1); b <= blim; b += 2) /* write any remaining factors, including 2^exp */
     {
-        b2 = (b*b - d)/4;
+        b2 = ((mp_limb_t)(b*b - d))/4;
 
         count_trailing_zeros(exp, b2); /* powers of 2 */
         if (exp)
@@ -262,7 +262,7 @@ long qfb_reduced_forms(qfb ** forms, long d)
          int pows[FLINT_MAX_FACTORS_IN_LIMB];
          int n = fac[b].num;
 
-         b2 = (b*b - d)/4;
+         b2 = ((mp_limb_t)(b*b - d))/4;
 
          for (i = 0; i < n; i++)
              pows[i] = 0;
