@@ -35,6 +35,7 @@
 
 #include "flint.h"
 #include "nmod_vec.h"
+#include "fmpz-conversions.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -53,24 +54,6 @@ extern gmp_randstate_t fmpz_randstate;
 
 /* minimum negative value a small coefficient can have */
 #define COEFF_MIN (-((1L << (FLINT_BITS - 2)) - 1L))
-
-#if FLINT_REENTRANT
-
-/* turn a pointer to an __mpz_struct into a fmpz_t */
-#define PTR_TO_COEFF(x) (((ulong) (x) >> 2) | (1L << (FLINT_BITS - 2)))
-
-/* turns an fmpz into a pointer to an mpz */
-#define COEFF_TO_PTR(x) ((__mpz_struct *) ((x) << 2))
-
-#else
-
-/* turn a pointer to an __mpz_struct into a fmpz_t */
-#define PTR_TO_COEFF(x) ((ulong) ((x) - fmpz_arr) | (1L << (FLINT_BITS - 2))) 
-
-/* turns an fmpz into a pointer to an mpz */
-#define COEFF_TO_PTR(x) ((__mpz_struct *) (((x) ^ (1L << (FLINT_BITS - 2))) + fmpz_arr))
-
-#endif  /* FLINT_REENTRANT */
 
 #define COEFF_IS_MPZ(x) (((x) >> (FLINT_BITS - 2)) == 1L)  /* is x a pointer not an integer */
 
@@ -371,6 +354,20 @@ void fmpz_setbit(fmpz_t f, ulong i);
 
 int fmpz_tstbit(const fmpz_t f, ulong i);
 
+void fmpz_clrbit(fmpz_t f, ulong i);
+
+void fmpz_complement(fmpz_t r, const fmpz_t f);
+
+void fmpz_combit(fmpz_t f, ulong i);
+
+void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b);
+
+void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b);
+
+void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b);
+
+mp_bitcnt_t fmpz_popcnt(const fmpz_t c);
+
 double fmpz_dlog(const fmpz_t x);
 long fmpz_flog(const fmpz_t x, const fmpz_t b);
 long fmpz_flog_ui(const fmpz_t x, ulong b);
@@ -514,7 +511,6 @@ void _fmpz_CRT_ui_precomp(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
 
 void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
     ulong r2, ulong m2, int sign);
-
 
 #define FLINT_FMPZ_LOG_MULTI_MOD_CUTOFF 2
 

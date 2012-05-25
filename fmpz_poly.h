@@ -1054,6 +1054,53 @@ void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac,
                                 const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N);
 
+/* Some functions for backwards compatibility */
+
+static __inline__ void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_mul_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_divexact_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_fdiv_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_set_coeff_mpz(fmpz_poly_t poly, long n,
+    const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_set_coeff_fmpz(poly, n, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, fmpz_poly_t poly, long n)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_poly_get_coeff_fmpz(t, poly, n);
+    fmpz_get_mpz(x, t);
+    fmpz_clear(t);
+}
+
 #ifdef __cplusplus
 }
 #endif
