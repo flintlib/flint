@@ -35,50 +35,41 @@ int
 main(void)
 {
     int i, result;
+    mp_bitcnt_t r1, r2;
     flint_rand_t state;
 
-    printf("setbit....");
+    printf("popcnt....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000; i++)
     {
-        ulong j;
-        fmpz_t a, b, c;
-        mpz_t z;
+        fmpz_t a;
+        mpz_t b;
 
         fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        mpz_init(z);
+        mpz_init(b);
 
         fmpz_randtest(a, state, 2 * FLINT_BITS);
-        fmpz_set(b, a);
-        fmpz_get_mpz(z, b);
-        j = n_randint(state, 3 * FLINT_BITS);
+        fmpz_get_mpz(b, a);
 
-        fmpz_setbit(b, j);
-        mpz_setbit(z, j);
-        fmpz_set_mpz(c, z);
+        r1 = fmpz_popcnt(a);
+        r2 = mpz_popcount(b);
 
-        result = (fmpz_equal(b, c));
+        result = r1 == r2;
 
-        if (!result)
+        if (!result && fmpz_cmp_si(a,0) >= 0)
         {
             printf("FAIL:\n");
             printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            gmp_printf("z = %Zd\n", z);
-            printf("j = %ld\n", j);
+            gmp_printf("b = %Zd\n", b);
+            printf("r1 = %lu  r2 = %lu\n", r1, r2);
             abort();
         }
 
         fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        mpz_clear(z);
+        mpz_clear(b);
     }
 
     flint_randclear(state);

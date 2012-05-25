@@ -19,8 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -28,61 +27,67 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpq.h"
 
 int
 main(void)
 {
-    int i, result;
+    int i;
     flint_rand_t state;
-
-    printf("setbit....");
-    fflush(stdout);
-
     flint_randinit(state);
 
-    for (i = 0; i < 1000000; i++)
+    printf("cmp....");
+    fflush(stdout);
+
+    for (i = 0; i < 10000; i++)
     {
-        ulong j;
-        fmpz_t a, b, c;
-        mpz_t z;
+        fmpq_t x, y;
+        mpq_t X, Y;
+        int c1, c2;
 
-        fmpz_init(a);
-        fmpz_init(b);
-        fmpz_init(c);
-        mpz_init(z);
+        fmpq_init(x);
+        fmpq_init(y);
+        mpq_init(X);
+        mpq_init(Y);
 
-        fmpz_randtest(a, state, 2 * FLINT_BITS);
-        fmpz_set(b, a);
-        fmpz_get_mpz(z, b);
-        j = n_randint(state, 3 * FLINT_BITS);
+        fmpq_randtest(x, state, 200);
+        fmpq_randtest(y, state, 200);
 
-        fmpz_setbit(b, j);
-        mpz_setbit(z, j);
-        fmpz_set_mpz(c, z);
+        fmpq_get_mpq(X, x);
+        fmpq_get_mpq(Y, y);
 
-        result = (fmpz_equal(b, c));
+        c1 = fmpq_cmp(x, y);
+        c2 = mpq_cmp(X, Y);
 
-        if (!result)
+        if (c1 < 0) c1 = -1;
+        if (c1 > 0) c1 = 1;
+
+        if (c2 < 0) c2 = -1;
+        if (c2 > 0) c2 = 1;
+
+        if (c1 != c2)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            gmp_printf("z = %Zd\n", z);
-            printf("j = %ld\n", j);
+            printf("FAIL\n");
+            printf("x = ");
+            fmpq_print(x);
+            printf("\ny = ");
+            fmpq_print(y);
+            printf("\ncmp(x,y) = %d, cmp(X,Y) = %d\n", c1, c2);
             abort();
         }
 
-        fmpz_clear(a);
-        fmpz_clear(b);
-        fmpz_clear(c);
-        mpz_clear(z);
+        fmpq_clear(x);
+        fmpq_clear(y);
+
+        mpq_clear(X);
+        mpq_clear(Y);
     }
 
     flint_randclear(state);
+
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }
+

@@ -19,35 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2012 Sebastian Pancratz
+   Copyright (C) 2012 Thomas M. DuBuisson
 
 ******************************************************************************/
 
 #include "fmpz.h"
 
-void fmpz_setbit(fmpz_t f, ulong i)
+void fmpz_complement(fmpz_t r, const fmpz_t f)
 {
-    if (!COEFF_IS_MPZ(*f))
+    if (!COEFF_IS_MPZ(*f)) /* f is small */
     {
-        if (i < FLINT_BITS - 2)
-        {
-            *f |= (1L << i);
-        }
-        else  /* i >= FLINT_BITS - 2 */
-        {
-            __mpz_struct *ptr = _fmpz_promote_val(f);
-
-            mpz_setbit(ptr, i);
-            _fmpz_demote_val(f);
-        }
-    }
-    else
+	long res = ~(*f);
+	fmpz_set_si(r, res);
+    } else /* f is big */
     {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
-
-        mpz_setbit(ptr, i);
-
-        _fmpz_demote_val(f);
+        if(r != f) { /* not aliased */
+            __mpz_struct *ptr, *ptr2;
+            ptr = _fmpz_promote(r);
+            ptr2 = COEFF_TO_PTR(*f);
+            mpz_com(ptr, ptr2);
+            _fmpz_demote_val(r);
+        } else { /* alaised */
+            fmpz_t tmp;
+            __mpz_struct *ptr, *ptr2;
+            fmpz_init(tmp);
+            ptr = _fmpz_promote(tmp);
+            ptr2 = COEFF_TO_PTR(*f);
+            mpz_com(ptr, ptr2);
+            _fmpz_demote_val(tmp);
+            fmpz_set(r,tmp);
+            fmpz_clear(tmp);
+        }
     }
 }
 

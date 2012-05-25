@@ -23,7 +23,6 @@
    
 ******************************************************************************/
 
-#include <string.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
@@ -196,7 +195,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
       clear bits after g in arrayg so they are not inadvertently
       pulled into G after bit unpacking
    */
-   memset(&arrayg[limbsg], 0, (limbs2-limbsg)*sizeof(mp_limb_t));
+   mpn_zero(arrayg + limbsg, limbs2-limbsg);
 
    /* unpack gcd */
    _fmpz_poly_bit_unpack(G, glen, arrayg, pack_bits, 0);

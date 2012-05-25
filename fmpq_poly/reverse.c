@@ -19,35 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2011 Sebastian Pancratz
 
 ******************************************************************************/
 
+#include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpz_vec.h"
+#include "fmpq_poly.h"
 
-void fmpz_setbit(fmpz_t f, ulong i)
+void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 {
-    if (!COEFF_IS_MPZ(*f))
+    long len = FLINT_MIN(n, poly->length);
+
+    if (len == 0)
     {
-        if (i < FLINT_BITS - 2)
-        {
-            *f |= (1L << i);
-        }
-        else  /* i >= FLINT_BITS - 2 */
-        {
-            __mpz_struct *ptr = _fmpz_promote_val(f);
-
-            mpz_setbit(ptr, i);
-            _fmpz_demote_val(f);
-        }
+        fmpq_poly_zero(res);
+        return;
     }
-    else
-    {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
 
-        mpz_setbit(ptr, i);
+    fmpq_poly_fit_length(res, n);
+    _fmpz_poly_reverse(res->coeffs, poly->coeffs, len, n);
+    fmpz_set(res->den, poly->den);
+    _fmpq_poly_set_length(res, n);
 
-        _fmpz_demote_val(f);
-    }
+    fmpq_poly_canonicalise(res);
 }
 

@@ -19,35 +19,66 @@
 =============================================================================*/
 /******************************************************************************
 
-   Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
+#include <mpir.h>
+#include "flint.h"
 #include "fmpz.h"
+#include "fmpq.h"
 
-void fmpz_setbit(fmpz_t f, ulong i)
+int
+_fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s)
 {
-    if (!COEFF_IS_MPZ(*f))
-    {
-        if (i < FLINT_BITS - 2)
-        {
-            *f |= (1L << i);
-        }
-        else  /* i >= FLINT_BITS - 2 */
-        {
-            __mpz_struct *ptr = _fmpz_promote_val(f);
+    int s1, s2, res;
+    mp_bitcnt_t bp, bq, br, bs;
+    fmpz_t t, u;
 
-            mpz_setbit(ptr, i);
-            _fmpz_demote_val(f);
-        }
-    }
-    else
-    {
-        __mpz_struct *ptr = COEFF_TO_PTR(*f);
+    if (fmpz_equal(q, s))
+        return fmpz_cmp(p, r);
 
-        mpz_setbit(ptr, i);
+    s1 = fmpz_sgn(p);
+    s2 = fmpz_sgn(r);
 
-        _fmpz_demote_val(f);
-    }
+    if (s1 != s2)
+        return s1 < s2 ? -1 : 1;
+
+    if (s1 == 0)
+        return -s2;
+
+    if (s2 == 0)
+        return -s1;
+
+    bp = fmpz_bits(p);
+    bq = fmpz_bits(q);
+    br = fmpz_bits(r);
+    bs = fmpz_bits(s);
+
+    if (bp + bs + 1 < br + bq)
+        return -s1;
+
+    if (bp + bs > br + bq + 1)
+        return s1;
+
+    fmpz_init(t);
+    fmpz_init(u);
+
+    fmpz_mul(t, p, s);
+    fmpz_mul(u, q, r);
+
+    res = fmpz_cmp(t, u);
+
+    fmpz_clear(t);
+    fmpz_clear(u);
+
+    return res;
+}
+
+int
+fmpq_cmp(const fmpq_t x, const fmpq_t y)
+{
+    return _fmpq_cmp(fmpq_numref(x), fmpq_denref(x),
+                     fmpq_numref(y), fmpq_denref(y));
 }
 

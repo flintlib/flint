@@ -20,7 +20,6 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
-    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -37,48 +36,78 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("setbit....");
+    printf("complement....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000; i++)
     {
-        ulong j;
-        fmpz_t a, b, c;
-        mpz_t z;
+        fmpz_t a, b;
+        mpz_t c, d;
 
         fmpz_init(a);
         fmpz_init(b);
-        fmpz_init(c);
-        mpz_init(z);
 
-        fmpz_randtest(a, state, 2 * FLINT_BITS);
-        fmpz_set(b, a);
-        fmpz_get_mpz(z, b);
-        j = n_randint(state, 3 * FLINT_BITS);
+        mpz_init(c);
+        mpz_init(d);
 
-        fmpz_setbit(b, j);
-        mpz_setbit(z, j);
-        fmpz_set_mpz(c, z);
+        fmpz_randtest(a, state, 200);
 
-        result = (fmpz_equal(b, c));
+        fmpz_get_mpz(c, a);
 
+        fmpz_complement(b, a);
+        mpz_com(c, c);
+
+        fmpz_get_mpz(d, b);
+
+        result = (mpz_cmp(c, d) == 0);
         if (!result)
         {
-            printf("FAIL:\n");
-            printf("a = "), fmpz_print(a), printf("\n");
-            printf("b = "), fmpz_print(b), printf("\n");
-            printf("c = "), fmpz_print(c), printf("\n");
-            gmp_printf("z = %Zd\n", z);
-            printf("j = %ld\n", j);
+            printf("FAIL (no alias):\n");
+            gmp_printf("c = %Zd, d = %Zd\n", c, d);
             abort();
         }
 
         fmpz_clear(a);
         fmpz_clear(b);
-        fmpz_clear(c);
-        mpz_clear(z);
+
+        mpz_clear(c);
+        mpz_clear(d);
+    }
+
+    /* Check aliasing */
+    for (i = 0; i < 100000; i++)
+    {
+        fmpz_t a;
+        mpz_t c, d;
+
+        fmpz_init(a);
+
+        mpz_init(c);
+        mpz_init(d);
+
+        fmpz_randtest(a, state, 200);
+
+        fmpz_get_mpz(c, a);
+
+        fmpz_complement(a, a);
+        mpz_com(c, c);
+
+        fmpz_get_mpz(d, a);
+
+        result = (mpz_cmp(c, d) == 0);
+        if (!result)
+        {
+            printf("FAIL (aliased):\n");
+            gmp_printf("c = %Zd, d = %Zd\n", c, d);
+            abort();
+        }
+
+        fmpz_clear(a);
+
+        mpz_clear(c);
+        mpz_clear(d);
     }
 
     flint_randclear(state);

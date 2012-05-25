@@ -28,8 +28,7 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
+#include "fmpq_poly.h"
 #include "ulong_extras.h"
 
 int
@@ -46,67 +45,67 @@ main(void)
     /* Aliasing */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_poly_t a, b;
+        fmpq_poly_t a, b;
         long n;
 
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(b, state, n_randint(state, 100), 200);
         n = n_randint(state, 150);
 
-        fmpz_poly_reverse(a, b, n);
-        fmpz_poly_reverse(b, b, n);
+        fmpq_poly_reverse(a, b, n);
+        fmpq_poly_reverse(b, b, n);
 
-        result = (fmpz_poly_equal(a, b));
+        result = (fmpq_poly_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n");
             printf("n = %ld\n", n);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            printf("a = "), fmpq_poly_print(a), printf("\n\n");
+            printf("b = "), fmpq_poly_print(b), printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
     }
 
     /* Correctness (?) */
     for (i = 0; i < 2000; i++)
     {
-        fmpz_poly_t a, b;
+        fmpq_poly_t a, b;
         long j, len, n;
 
-        fmpz_poly_init(a);
-        fmpz_poly_init(b);
-        fmpz_poly_randtest(b, state, n_randint(state, 100), 200);
+        fmpq_poly_init(a);
+        fmpq_poly_init(b);
+        fmpq_poly_randtest(b, state, n_randint(state, 100), 200);
         n = n_randint(state, 150);
 
         len = FLINT_MIN(n, b->length);
         if (len)
         {
-            fmpz_poly_fit_length(a, n);
+            fmpq_poly_fit_length(a, n);
             for (j = 0; j < len; j++)
                 fmpz_set(a->coeffs + (n - len) + j, b->coeffs + (len - 1 - j));
             fmpz_set(a->den, b->den);
-            _fmpz_poly_set_length(a, n);
-            _fmpz_poly_normalise(a);
+            _fmpq_poly_set_length(a, n);
+            fmpq_poly_canonicalise(a);
         }
 
-        fmpz_poly_reverse(b, b, n);
+        fmpq_poly_reverse(b, b, n);
 
-        result = (fmpz_poly_equal(a, b));
+        result = (fmpq_poly_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n");
             printf("n = %ld\n", n);
-            printf("a = "), fmpz_poly_print(a), printf("\n\n");
-            printf("b = "), fmpz_poly_print(b), printf("\n\n");
+            printf("a = "), fmpq_poly_print(a), printf("\n\n");
+            printf("b = "), fmpq_poly_print(b), printf("\n\n");
             abort();
         }
 
-        fmpz_poly_clear(a);
-        fmpz_poly_clear(b);
+        fmpq_poly_clear(a);
+        fmpq_poly_clear(b);
     }
 
     flint_randclear(state);

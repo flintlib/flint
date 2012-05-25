@@ -25,28 +25,25 @@
 
 #include "fmpz.h"
 
-void fmpz_setbit(fmpz_t f, ulong i)
+void fmpz_combit(fmpz_t f, ulong i)
 {
     if (!COEFF_IS_MPZ(*f))
     {
         if (i < FLINT_BITS - 2)
         {
-            *f |= (1L << i);
+            *f ^= (1L << i);
         }
-        else  /* i >= FLINT_BITS - 2 */
+        else  /* i >= FLINT_BITS */
         {
             __mpz_struct *ptr = _fmpz_promote_val(f);
-
-            mpz_setbit(ptr, i);
+            mpz_combit(ptr, i);
             _fmpz_demote_val(f);
         }
     }
     else
     {
         __mpz_struct *ptr = COEFF_TO_PTR(*f);
-
-        mpz_setbit(ptr, i);
-
+        mpz_combit(ptr, i);
         _fmpz_demote_val(f);
     }
 }

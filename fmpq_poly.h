@@ -80,6 +80,14 @@ int fmpq_poly_is_canonical(const fmpq_poly_t poly);
 
 #define fmpq_poly_denref(poly)  ((poly)->den)
 
+static __inline__ void
+fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
+{
+    fmpz_poly_fit_length(res, poly->length);
+    _fmpz_vec_set(res->coeffs, poly->coeffs, poly->length);
+    _fmpz_poly_set_length(res, poly->length);
+}
+
 /*  Polynomial parameters  ***************************************************/
 
 static __inline__
@@ -166,6 +174,8 @@ void fmpq_poly_truncate(fmpq_poly_t poly, long n)
 
 void fmpq_poly_get_slice(fmpq_poly_t rop, 
                          const fmpq_poly_t op, long i, long j);
+
+void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, long n);
 
 /*  Getting and setting coefficients  ****************************************/
 
