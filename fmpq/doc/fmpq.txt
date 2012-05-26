@@ -137,6 +137,10 @@ int fmpq_sgn(const fmpq_t x)
 
     Returns the sign of the rational number $x$.
 
+int fmpq_cmp(const fmpq_t x, const fmpq_t y)
+
+    Returns negative if $x < y$, zero if $x = y$, and positive if $x > y$.
+
 void fmpq_height(fmpz_t height, const fmpq_t x)
 
     Sets \code{height} to the height of $x$, defined as the larger of
