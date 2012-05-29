@@ -88,7 +88,6 @@ main(void)
             fmpz_poly_fit_length(a, n);
             for (j = 0; j < len; j++)
                 fmpz_set(a->coeffs + (n - len) + j, b->coeffs + (len - 1 - j));
-            fmpz_set(a->den, b->den);
             _fmpz_poly_set_length(a, n);
             _fmpz_poly_normalise(a);
         }
