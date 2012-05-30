@@ -1,0 +1,81 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2009, 2008 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011 Fredrik Johansson
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Factorisation
+
+*******************************************************************************
+
+void fmpz_mod_poly_factor_init(fmpz_mod_poly_factor_t fac)
+
+    Initialises \code{fac} for use. An \code{fmpz_mod_poly_factor_t}
+    represents a polynomial in factorised form as a product of
+    polynomials with associated exponents.
+
+void fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
+
+    Frees all memory associated with \code{fac}.
+
+void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
+
+    Reallocates the factor structure to provide space for
+    precisely \code{alloc} factors.
+
+void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, long len)
+
+    Ensures that the factor structure has space for at
+    least \code{len} factors.  This functions takes care
+    of the case of repeated calls by always at least
+    doubling the number of factors the structure can hold.
+
+void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac)
+
+    Sets \code{res} to the same factorisation as \code{fac}.
+
+void fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
+
+    Prints the entries of \code{fac} to standard output.
+
+void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
+				 const fmpz_mod_poly_t poly, long exp)
+
+    Inserts the factor \code{poly} with multiplicity \code{exp} into
+    the factorisation \code{fac}.
+
+    If \code{fac} already contains \code{poly}, then \code{exp} simply
+    gets added to the exponent of the existing entry.
+
+void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
+				 const fmpz_mod_poly_factor_t fac)
+
+    Concatenates two factorisations.
+
+    This is equivalent to calling \code{fmpz_mod_poly_factor_insert()}
+    repeatedly with the individual factors of \code{fac}.
+
+    Does not support aliasing between \code{res} and \code{fac}.
