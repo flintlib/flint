@@ -123,6 +123,8 @@ install: library
 		cp libflint.a $(PREFIX)/lib; \
 	fi
 	cp *.h $(PREFIX)/include/flint
+	mkdir -p $(FLINT_CPIMPORT_DIR)
+	cp qadic/CPimport.txt $(FLINT_CPIMPORT_DIR)
 
 .PHONY: profile library library-recursive recursive clean check check-recursive all
 
