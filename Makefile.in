@@ -87,18 +87,21 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
+			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
+			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS) $(LINKLIBS); \
 		fi; \
 	fi
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	if [ "$(WANT_NTL)" -ne "1" ]; then \
+		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+			$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+		fi; \
+		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+			$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
+		fi; \
 	fi
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
-	fi
-
 
 library-recursive:
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
