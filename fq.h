@@ -27,7 +27,7 @@
 #ifndef FQ_H
 #define FQ_H
 
-#undef ulong /* interferes with system includes */
+#undef ulong                    /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
 #define ulong unsigned long
@@ -52,22 +52,25 @@
 
 typedef qadic_t fq_t;
 typedef qadic_struct fq_struct;
+typedef qadic_ctx_struct fq_ctx_t[1];
 
-void fq_ctx_init_conway(qadic_ctx_t ctx, 
-                           const fmpz_t p, long d, const char *var, 
-			enum padic_print_mode mode); 
+void fq_ctx_init_conway(fq_ctx_t ctx,
+                        const fmpz_t p, long d, const char *var,
+                        enum padic_print_mode mode);
 
 void fq_ctx_clear(fq_ctx_t ctx);
 
-static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
+static __inline__ long
+fq_ctx_degree(const fq_ctx_t ctx)
 {
     return ctx->j[ctx->len - 1];
 }
 
-static __inline__ void 
-fq_ctx_print(const qadic_ctx_t ctx)
+static __inline__ void
+fq_ctx_print(const fq_ctx_t ctx)
 {
     printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
     printf("d = %ld\n", ctx->j[ctx->len - 1]);
 }
 
+#endif

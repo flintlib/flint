@@ -29,13 +29,14 @@
 #include "fmpz_vec.h"
 #include "padic.h"
 #include "qadic.h"
- /* I'm not sure if I should include all these above(I copied them from the qadic code), as I am including fq.h which should include them anyway*/
+ /* I'm not sure if I should include all these above(I copied them from the qadic code), as I am including fq.h which should include them anyway */
 
 #include "fq.h"
 
-void fq_ctx_init_conway(qadic_ctx_t ctx, 
-								const fmpz_t p, long d, const char *var, 
-								enum padic_print_mode mode)
+void
+fq_ctx_init_conway(qadic_ctx_t ctx,
+                   const fmpz_t p, long d, const char *var,
+                   enum padic_print_mode mode)
 {
-  return qadic_ctx_init_conway(ctx,p,d,1,*var,mode);
+    return qadic_ctx_init_conway(ctx, p, d, 1, *var, mode);
 }

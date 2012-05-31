@@ -29,11 +29,12 @@
 #include "fmpz_vec.h"
 #include "padic.h"
 #include "qadic.h"
- /* I'm not sure if I should include all these above(I copied them from the qadic code), as I am including fq.h which should include them anyway*/
+ /* I'm not sure if I should include all these above(I copied them from the qadic code), as I am including fq.h which should include them anyway */
 
 #include "fq.h"
 
-void fq_ctx_clear(fq_ctx_t ctx)
+void
+fq_ctx_clear(fq_ctx_t ctx)
 {
-  qadic_ctx_clear(ctx);
+    return qadic_ctx_clear(ctx);
 }
