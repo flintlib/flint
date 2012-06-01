@@ -59,3 +59,4 @@ nmod_poly_evaluate_nmod(const nmod_poly_t poly, mp_limb_t c)
 {
     return _nmod_poly_evaluate_nmod(poly->coeffs, poly->length, c, poly->mod);
 }
+
