@@ -45,7 +45,7 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
     else
     {
         mp_ptr Q, R;
-        long lenQ, lenR;
+        long lenQ, lenR, lenG;
 
         Q = _nmod_vec_init(2 * lenA);
         R = Q + lenA;
@@ -58,9 +58,7 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
         {
             _nmod_vec_set(G, B, lenB);
             T[0] = 1;
-
-            _nmod_vec_clear(Q);
-            return lenB;
+            lenG = lenB;
         }
         else
         {
@@ -116,6 +114,7 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
 
             _nmod_vec_set(G, D, lenD);
             _nmod_vec_set(S, U, lenU);
+
             {
                 lenQ = lenA + lenU - 1;
 
@@ -127,10 +126,11 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
             }
 
             _nmod_vec_clear(W);
-
-            return lenD;
+            lenG = lenD;
         }
+
         _nmod_vec_clear(Q);
+        return lenG;
     }
 }
 
@@ -182,20 +182,20 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         if (S == A || S == B)
         {
-            s = _nmod_vec_init(lenB - 1);
+            s = _nmod_vec_init(lenB);
         }
         else
         {
-            nmod_poly_fit_length(S, lenB - 1);
+            nmod_poly_fit_length(S, lenB);
             s = S->coeffs;
         }
         if (T == A || T == B)
         {
-            t = _nmod_vec_init(lenA - 1);
+            t = _nmod_vec_init(lenA);
         }
         else
         {
-            nmod_poly_fit_length(T, lenA - 1);
+            nmod_poly_fit_length(T, lenA);
             t = T->coeffs;
         }
 
@@ -216,13 +216,13 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         {
             free(S->coeffs);
             S->coeffs = s;
-            S->alloc  = lenB - 1;
+            S->alloc  = lenB;
         }
         if (T == A || T == B)
         {
             free(T->coeffs);
             T->coeffs = t;
-            T->alloc  = lenA - 1;
+            T->alloc  = lenA;
         }
         
         G->length = lenG;

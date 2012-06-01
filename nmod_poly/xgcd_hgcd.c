@@ -290,22 +290,22 @@ void nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         if (S == A || S == B)
         {
-            nmod_poly_init2(tS, A->mod.n, lenB - 1);
+            nmod_poly_init2(tS, A->mod.n, lenB);
             s = tS->coeffs;
         }
         else
         {
-            nmod_poly_fit_length(S, lenB - 1);
+            nmod_poly_fit_length(S, lenB);
             s = S->coeffs;
         }
         if (T == A || T == B)
         {
-            nmod_poly_init2(tT, A->mod.n, lenA - 1);
+            nmod_poly_init2(tT, A->mod.n, lenA);
             t = tT->coeffs;
         }
         else
         {
-            nmod_poly_fit_length(T, lenA - 1);
+            nmod_poly_fit_length(T, lenA);
             t = T->coeffs;
         }
 
