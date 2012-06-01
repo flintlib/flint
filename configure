@@ -102,7 +102,7 @@ elif [ -d "${MPFR_DIR}/.libs" ]; then
    MPFR_INCLUDE_DIR="${MPFR_DIR}"
 elif [ -d "${MPFR_DIR}/src/.libs" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/src/.libs"
-   MPFR_INCLUDE_DIR="${MPFR_DIR}"
+   MPFR_INCLUDE_DIR="${MPFR_DIR}/src"
 else
    echo "Invalid MPFR directory"
    exit 1
