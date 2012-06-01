@@ -175,7 +175,64 @@
 	     : "=&f" (ph), "=f" (pl)				                       	\
 	     : "f" (m0), "f" (m1))
 
-#endif
+#endif /* Itanium */
+
+/* ARM */
+#if (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)                \
+  __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
+	   : "=r" (sh), "=&r" (sl)					                \
+	   : "r" (ah), "rI" (bh), "%r" (al), "rI" (bl) : "cc")
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                    \
+  do {									                             \
+    if (__builtin_constant_p (al))					              \
+      {									                             \
+	if (__builtin_constant_p (ah))					              \
+	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("rsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "r" (ah), "rI" (bh), "rI" (al), "r" (bl) : "cc");  \
+      }									                             \
+    else if (__builtin_constant_p (ah))					        \
+      {									                             \
+	if (__builtin_constant_p (bl))					              \
+	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
+      }									                             \
+    else if (__builtin_constant_p (bl))					        \
+      {									                             \
+	if (__builtin_constant_p (bh))					              \
+	  __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
+      }									                             \
+    else /* only bh might be a constant */				        \
+      __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"			  \
+	       : "=r" (sh), "=&r" (sl)					              \
+	       : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc"); \
+    } while (0)
+
+#define umul_ppmm(xh, xl, a, b) \
+  __asm__ ("umull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define smul_ppmm(xh, xl, a, b) \
+  __asm__ ("smull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#endif /* ARM */
 
 /* fallback code */
 #if !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
@@ -188,6 +245,8 @@
 
 #define NEED_CLZ_TAB
 
+#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
   do {									          \
     mp_limb_t __x;								 \
@@ -195,6 +254,8 @@
     (sh) = (ah) + (bh) + (__x < (al));		 \
     (sl) = __x;								    \
   } while (0)
+
+#endif
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
   do {                                                              \
@@ -204,7 +265,8 @@
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
-#if !(__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64))
+#if !((__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64)) ||
+      (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
   do {									          \
@@ -369,6 +431,8 @@
 
 #endif /* non x86 fallback code */
 
+#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
     mp_limb_t __w1;                                     \
@@ -377,6 +441,8 @@
     (w1) = __w1 - (-(__xm0 >> (FLINT_BITS-1)) & __xm1)  \
         - (-(__xm1 >> (FLINT_BITS-1)) & __xm0);         \
   } while (0)
+
+#endif
 
 #define invert_limb(invxl, xl)                      \
    do {                                             \
