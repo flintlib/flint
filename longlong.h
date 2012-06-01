@@ -89,7 +89,8 @@
 #endif /* x86_64 */
 
 /* x86 : 32 bit */
-#if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) || defined (__i486__) || defined(__amd64__)))
+#if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) \
+   || defined (__i486__) || defined(__amd64__)))
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
@@ -265,7 +266,7 @@
     add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
 
-#if !((__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64)) ||
+#if !((__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64)) || \
       (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
