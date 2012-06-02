@@ -31,7 +31,7 @@ mp_limb_t
 n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
 {
     mp_limb_t x, y;
-    mp_limb_signed_t e;
+    mp_limb_t e;
     
     if (n == 1UL) return 0UL;
 
