@@ -49,10 +49,9 @@ main(void)
         fmpq_poly_t P;
         fmpz *x, *y, *z;
         fmpq_t q;
-        long j, n, l, bits;
+        long j, n, bits;
 
         n = n_randint(state, 50);
-        l = n_randint(state, n + 1);
         bits = n_randint(state, 100);
 
         x = _fmpz_vec_init(n);
