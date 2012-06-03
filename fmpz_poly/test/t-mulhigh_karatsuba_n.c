@@ -120,6 +120,7 @@ main(void)
         fmpz_poly_mul_classical(a, b, c);
         if (len)
             _fmpz_vec_zero(a->coeffs, FLINT_MIN(len - 1, a->length));
+        _fmpz_poly_normalise(a);
         fmpz_poly_mulhigh_karatsuba_n(d, b, c, len);
 
         result = (fmpz_poly_equal(a, d));
