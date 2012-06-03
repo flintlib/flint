@@ -49,6 +49,10 @@ int main(void)
       if (bits <= (FLINT_BITS/2)) n = n_randint(state, d*d);
       else n = n_randtest(state);
 
+      /* must have n < 2^(FLINT_BITS - 1) */
+      if (FLINT_BIT_COUNT(n) == FLINT_BITS)
+         n >>= 1;
+
       dpre = n_precompute_inverse(d);
 
       r1 = n_mod_precomp(n, d, dpre);
