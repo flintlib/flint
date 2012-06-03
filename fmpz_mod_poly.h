@@ -279,6 +279,8 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
 
+ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t p);
+
 void _fmpz_mod_poly_rem_basecase(fmpz * R, 
     const fmpz * A, long lenA, const fmpz * B, long lenB, 
     const fmpz_t invB, const fmpz_t p);
