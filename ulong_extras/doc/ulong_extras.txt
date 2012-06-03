@@ -149,7 +149,7 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
     by \code{n_precompute_inverse()}. We require $n < 2^{53}$ and 
-    \code{n < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
+    \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
