@@ -118,7 +118,7 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         nmod_poly_t a, b, c, d;
-        long len, start;
+        long j, len, start;
         mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
@@ -135,14 +135,24 @@ main(void)
             start = n_randint(state, b->length + c->length - 1);
 
         nmod_poly_mul_classical(a, b, c);
-        if (a->length >= start)
-            _nmod_vec_zero(a->coeffs, start);
         nmod_poly_mulhigh_classical(d, b, c, start);
+
+        for (j = 0; j < start; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < d->length)
+                d->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(d);
 
         result = (nmod_poly_equal(a, d));
         if (!result)
         {
             printf("FAIL:\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(d), printf("\n\n");
             abort();
