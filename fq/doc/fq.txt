@@ -32,9 +32,90 @@
 	 where $f(X) \in \mathbb{F}_p[X]$ is a monic, irreducible
 	 polynomial from degree $n$ (default is a conway polynomial)
     as a polynomial in $\mathbb{F}_p[X]$ of degree less 
-    than $n$.
+    than $n$. This is done by using the \code{qadic} libraries:
+	 \code{fq_t} is just a \code{qadic_t}, and the same for \code{fq_ctx_t},
+	 it is just a typedef for \code{qadic_ctx_t}, where $N = 1$ is always assumed.
+
 
 
 *******************************************************************************
 
+    Memory management
+
 *******************************************************************************
+
+void fq_ctx_init_conway(fq_ctx_t ctx, 
+                           const fmpz_t p, long d, const char *var, 
+                           enum padic_print_mode mode)
+
+    Initialises the context \code{ctx} as a \code{qadic_ctx_t} with fixed 
+    precision $N = 1$, prime $p$, extension degree $d$, 
+    variable name \code{var} and printing mode \code{mode}
+
+    Assumes that $p$ is a prime.
+
+    Assumes that the string \code{var} is a null-terminated string 
+    of length at least one.
+
+    Assumes that the printing mode is one of \code{PADIC_TERSE}, 
+    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
+
+
+void fq_ctx_clear(fq_ctx_t ctx);
+
+    Clears all memory that has been allocated as part of the context.
+
+fq_ctx_dim(const fq_ctx_t ctx)
+
+    Returns the $F_p$ (prime field) dimension of the field associated 
+    with \code{ctx}.
+
+
+*******************************************************************************
+
+    Basic arithmetic
+
+*******************************************************************************
+
+void fq_add(fq_t rop, const fq_t op1, const fq_t op2, 
+               const fq_ctx_t ctx)
+
+    Sets \code{rop} to the sum of \code{op1} and \code{op2}.
+
+    Assumes that both \code{op1} and \code{op2} are reduced in the 
+    given context and ensures that \code{rop} is, too.
+
+void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, 
+               const fq_ctx_t ctx)
+
+    Sets \code{rop} to the difference of \code{op1} and \code{op2}.
+
+    Assumes that both \code{op1} and \code{op2} are reduced in the 
+    given context and ensures that \code{rop} is, too.
+
+void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the negative of \code{op}.
+
+    Assumes that \code{op} is reduced in the given context and 
+    ensures that \code{rop} is, too.
+
+void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, 
+               const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}, 
+    reducing the output in the given context.
+
+void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the inverse of \code{op}, reduced in the given context.
+
+void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, 
+               const fq_ctx_t ctx)
+
+    Sets \code{rop} the \code{op} raised to the power~$e$.
+
+    Currently assumes that $e \geq 0$.
+
+    Note that for any input \code{op}, \code{rop} is set to one in the 
+    given context whenever $e = 0$.

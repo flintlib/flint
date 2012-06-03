@@ -61,7 +61,7 @@ void fq_ctx_init_conway(fq_ctx_t ctx,
 void fq_ctx_clear(fq_ctx_t ctx);
 
 static __inline__ long
-fq_ctx_degree(const fq_ctx_t ctx)
+fq_ctx_dim(const fq_ctx_t ctx)
 {
     return ctx->j[ctx->len - 1];
 }
@@ -72,5 +72,87 @@ fq_ctx_print(const fq_ctx_t ctx)
     printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
     printf("d = %ld\n", ctx->j[ctx->len - 1]);
 }
+
+/* Basic arithmetic **********************************************************/
+
+void fq_add(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+
+void fq_sub(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+
+void fq_neg(fq_t x, const fq_t y, const fq_ctx_t ctx);
+
+void fq_mul(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+
+void fq_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
+
+void fq_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx);
+
+/* Memory managment  *********************************************************/
+
+static __inline__ void
+fq_init(fq_t x)
+{
+    padic_poly_init(x);
+}
+
+static __inline__ void
+fq_clear(fq_t x)
+{
+    padic_poly_clear(x);
+}
+
+/* Randomisation *************************************************************/
+
+void fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
+
+
+void fq_randtest_not_zero(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
+
+
+void fq_randtest_val(fq_t x, flint_rand_t state, long val, const fq_ctx_t ctx);
+
+void fq_randtest_int(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
+
+
+/* Comparison ****************************************************************/
+
+int fq_equal(const fq_t x, const fq_t y);
+
+static __inline__ int
+fq_is_zero(const fq_t poly)
+{
+    return poly->length == 0;
+}
+
+static __inline__ int
+fq_is_one(const fq_t poly)
+{
+    return (poly->length == 1 && fmpz_is_one(poly->coeffs));
+}
+
+
+/* Assignments and conversions ***********************************************/
+
+void fq_set(fq_t x, const fq_t y);
+
+static __inline__ void
+fq_zero(fq_t x)
+{
+    padic_poly_zero(x);
+}
+
+static __inline__ void
+fq_one(fq_t x, const fq_ctx_t ctx)
+{
+    padic_poly_one(x, &ctx->pctx);
+}
+
+
+/* Output ********************************************************************/
+
+int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx);
+
+int fq_print_pretty(const fq_t op, const fq_ctx_t ctx);
+
 
 #endif
