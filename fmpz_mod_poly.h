@@ -256,6 +256,13 @@ void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p);
 
 void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
 
+void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, long len1,
+                           const fmpz * poly2, long len2, const fmpz * f,
+                           long lenf, const fmpz_t p);
+
+void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                    const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f);
+
 /*  Powering *****************************************************************/
 
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
