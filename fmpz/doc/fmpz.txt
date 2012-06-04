@@ -320,7 +320,7 @@ int fmpz_fprint(FILE * file, fmpz_t x)
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b)
 
-    Returns the size of the absolute value of $f$ in base~$b$, measured in 
+    Returns the size of the absolute value of $f$ in base~$b$, measured in
     numbers of digits. The base~$b$ can be between $2$ and $62$, inclusive.
 
 mp_bitcnt_t fmpz_bits(const fmpz_t f)
@@ -335,7 +335,7 @@ mp_size_t fmpz_size(const fmpz_t f)
 
 int fmpz_sgn(const fmpz_t f)
 
-    Returns $-1$ is the sign of $f$ is negative, $+1$ if it is positive,
+    Returns $-1$ if the sign of $f$ is negative, $+1$ if it is positive,
     otherwise returns $0$.
 
 mp_bitcnt_t fmpz_val2(const fmpz_t f)
