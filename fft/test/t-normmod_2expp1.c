@@ -75,7 +75,7 @@ main(void)
                 limbs = (n*w)/GMP_LIMB_BITS;
             
                 nn = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                mpn_rrandom(nn, state->gmp_state, limbs + 1);
+                random_fermat(nn, state, limbs);
                 fermat_to_mpz(m1, nn, limbs);
                 set_p(p, n, w);
             
