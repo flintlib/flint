@@ -41,6 +41,10 @@ void _fmpz_clear_mpz(fmpz f)
     flint_free(COEFF_TO_PTR(f));  
 }
 
+void _fmpz_cleanup_mpz_content(void)
+{
+}
+
 void _fmpz_cleanup(void)
 {
 }

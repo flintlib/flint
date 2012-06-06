@@ -75,6 +75,10 @@ void _fmpz_clear_mpz(fmpz f)
 
    clears the mpz_t "pointed to" by the fmpz f. This is only used internally.
 
+void _fmpz_cleanup_mpz_content()
+
+   this function does nothing in the reentrant version of fmpz.
+
 void _fmpz_cleanup()
 
    this function does nothing in the reentrant version of fmpz.
