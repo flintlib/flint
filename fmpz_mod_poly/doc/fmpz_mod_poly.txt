@@ -391,6 +391,24 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
     Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
     so that in particular \code{0^0 = 1}.
 
+void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+				     ulong e, long trunc, const fmpz_t p)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that
+    \code{e > 1}. Aliasing is not permitted. Uses the binary
+    exponentiation method.
+
+void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
+			      const fmpz_mod_poly_t poly, ulong e, long trunc)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering
+    followed by a truncation. Uses the binary exponentiation method.
+
 *******************************************************************************
 
     Division
