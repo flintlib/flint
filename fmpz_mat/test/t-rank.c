@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
 
     /* Maximally sparse matrices of given rank */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -68,7 +68,7 @@ main(void)
     }
 
     /* Dense */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);

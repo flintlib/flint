@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of the first argument */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h;
         long n;
@@ -76,7 +76,7 @@ main(void)
     }
 
     /* Check aliasing of the second argument */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h;
         long n;
@@ -107,7 +107,7 @@ main(void)
     }
 
     /* Compare with compose */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h, s, t;
         long n;

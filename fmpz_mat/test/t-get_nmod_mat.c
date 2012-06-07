@@ -42,7 +42,7 @@ main(void)
     printf("get/set_nmod_mat....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A;
         nmod_mat_t M, M2;

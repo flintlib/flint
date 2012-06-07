@@ -40,7 +40,7 @@ main(void)
     printf("is_integral....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A;
         fmpz_mat_t B;

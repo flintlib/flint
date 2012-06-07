@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check log(AB) = log(A) + log(B) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B, AB, logA, logB, logAB, S;
         long n;
@@ -104,7 +104,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
         long n;

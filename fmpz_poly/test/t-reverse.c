@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long n;
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Correctness (?) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long j, len, n;

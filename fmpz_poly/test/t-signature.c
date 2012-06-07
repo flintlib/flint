@@ -43,7 +43,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t poly, linear, quadratic, rem;
         fmpz_t lhs, rhs;

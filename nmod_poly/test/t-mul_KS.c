@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -100,7 +100,7 @@ main(void)
     }
 
     /* Compare with mul_classical */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a1, a2, b, c;
         mp_limb_t n = n_randtest_not_zero(state);

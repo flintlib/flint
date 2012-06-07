@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         fmpz_t n;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that n (a + b) == na + nb */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, lhs, rhs;
         fmpz_t n;
@@ -128,7 +128,7 @@ main(void)
     }
 
     /* Compare with fmpq_poly_scalar_mul_si */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         mpz_t n1;

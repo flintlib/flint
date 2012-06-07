@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = z_randtest(state);
@@ -75,7 +75,7 @@ main(void)
     }
 
     /* Compare with fmpq_poly_scalar_mul_ui */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         ulong n = n_randbits(state, FLINT_BITS - 1);
@@ -104,7 +104,7 @@ main(void)
     }
 
     /* Check n2 * (n1 a) == (n1*n2) a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
         long n1, n2;

@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of the first argument */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h;
 
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Check aliasing of the second argument */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h;
 
@@ -100,7 +100,7 @@ main(void)
     }
 
     /* Compare with the naive method for g(h(t)) */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h, s, t;
         long k;

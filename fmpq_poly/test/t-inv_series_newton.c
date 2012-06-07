@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = n_randint(state, 50) + 1;
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c, one;
         long n = n_randint(state, 80) + 1;

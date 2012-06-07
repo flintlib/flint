@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -73,7 +73,7 @@ main(void)
     }
     
     /* Aliasing */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -104,7 +104,7 @@ main(void)
     }
     
     /* Compare with compose */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, r1, r2;
         mp_limb_t n = n_randtest_not_zero(state);

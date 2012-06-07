@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing, B = B^t */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C;
 
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* ((B^t)^t) == B */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B;
 

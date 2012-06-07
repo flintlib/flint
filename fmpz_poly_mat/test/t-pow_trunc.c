@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with pow */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
         long n, exp, bits, deg, len;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
         long n, exp, bits, deg, len;

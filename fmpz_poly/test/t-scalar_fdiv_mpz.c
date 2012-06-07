@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with fmpz_poly_scalar_fdiv_fmpz */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         fmpz_t n;

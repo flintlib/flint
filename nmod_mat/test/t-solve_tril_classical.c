@@ -41,7 +41,7 @@ main(void)
     printf("solve_tril_classical....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, X, B, Y;
         mp_limb_t m;

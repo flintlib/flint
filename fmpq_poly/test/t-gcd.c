@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -75,7 +75,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -109,7 +109,7 @@ main(void)
     /* Generic case when a, b are most likely co-prime ***********************/
 
     /* Verify commutativity and that c is monic */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
 
@@ -142,7 +142,7 @@ main(void)
     }
 
     /* Verify that GCD(a, b) divides a, b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c, r1, r2;
 
@@ -182,7 +182,7 @@ main(void)
     /* Case when a, b are not co-prime ***************************************/
 
     /* Verify commutativity and that c is monic */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c, t;
 
@@ -220,7 +220,7 @@ main(void)
     }
 
     /* Verify that GCD(a, b) divides a, b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c, r1, r2, t;
 

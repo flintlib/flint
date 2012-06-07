@@ -42,7 +42,7 @@ main(void)
     /* 
        Compare with result from gcd and check a*s + b*t = g
     */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, g1, g2, s, t, sum, temp;
 
@@ -103,7 +103,7 @@ main(void)
     }
 
     /* Check aliasing of a and g */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -141,7 +141,7 @@ main(void)
     }
 
     /* Check aliasing of b and g */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -179,7 +179,7 @@ main(void)
     }
 
     /* Check aliasing of s and a */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -216,7 +216,7 @@ main(void)
     }
 
     /* Check aliasing of s and b */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -253,7 +253,7 @@ main(void)
     }
 
     /* Check aliasing of t and a */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -290,7 +290,7 @@ main(void)
     }
 
     /* Check aliasing of t and b */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 

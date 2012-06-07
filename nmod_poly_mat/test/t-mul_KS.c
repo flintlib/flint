@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B, C, D;
         long m, n, k, deg;
@@ -88,7 +88,7 @@ main(void)
     }
 
     /* Check aliasing C and A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B, C;
         long m, n, deg;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check aliasing C and B */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B, C;
         long m, n, deg;

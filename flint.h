@@ -64,6 +64,8 @@ void flint_free(void * ptr);
 
 #define mp_bitcnt_t unsigned long
 
+int flint_test_multiplier();
+
 typedef struct
 {
     gmp_randstate_t gmp_state;

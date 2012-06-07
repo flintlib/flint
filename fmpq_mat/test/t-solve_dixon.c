@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Solve nonsingular systems */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, X, AX;
         fmpq_t d;
@@ -92,7 +92,7 @@ main(void)
     }
 
     /* Check singular systems */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, X;
         fmpz_mat_t M;

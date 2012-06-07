@@ -43,7 +43,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing of res and a */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
         mp_limb_t n;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Aliasing of res and f */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, t, f;
         mp_limb_t n;
@@ -123,7 +123,7 @@ main(void)
     }
 
     /* No aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, res1, res2, t, f;
         mp_limb_t n;

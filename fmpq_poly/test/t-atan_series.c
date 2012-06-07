@@ -47,7 +47,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = n_randint(state, 50) + 1;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check 2*atan(A) = atan(2*A/(1-A^2)) */
-    for (i = 0; i < 400; i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t A, B, atanA, atanB;
         long n = n_randint(state, 80) + 1;

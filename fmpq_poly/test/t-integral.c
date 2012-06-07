@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
 
@@ -74,7 +74,7 @@ main(void)
     }
 
     /* Check inverse of fmpq_poly_derivative */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
 

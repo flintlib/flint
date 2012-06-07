@@ -45,7 +45,7 @@ main(void)
     fmpz_init(t);
 
     /* Check derivative by hand */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -85,7 +85,7 @@ main(void)
     fmpz_clear(t);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);

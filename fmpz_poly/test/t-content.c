@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check that content(a f) = abs(a) content(f) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c, d;
         fmpz_poly_t f;

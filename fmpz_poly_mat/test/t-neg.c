@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check evaluation homomorphism */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
         fmpz_mat_t a, b, c;
@@ -95,7 +95,7 @@ main(void)
     }
 
     /* Check aliasing B and A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
         long m, n, bits, deg;

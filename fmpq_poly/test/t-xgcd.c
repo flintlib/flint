@@ -45,7 +45,7 @@ main(void)
     /* Generic case, where a and b are coprime *******************************/
 
     /* Verify d == s a + t b */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, d, e, f, s, t;
 
@@ -90,7 +90,7 @@ main(void)
     }
 
     /* Verify consistency with GCD */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, d, s, t;
 
@@ -131,7 +131,7 @@ main(void)
     /* Generic case when a, b are most likely co-prime ***********************/
 
     /* Verify d == s a + t b */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, d, s, t, z;
 
@@ -177,7 +177,7 @@ main(void)
     }
 
     /* Verify consistency with GCD */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, d, s, t, z;
 

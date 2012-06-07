@@ -48,7 +48,7 @@ main(void)
 
     mpq_init(n_mpq);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
         long coeff, len;

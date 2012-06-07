@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n;
@@ -85,7 +85,7 @@ main(void)
         flint_free(mpn);
     }
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         nmod_poly_t A, B;

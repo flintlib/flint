@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check atan(tan(A)) = A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, tanA, B;
         long n;
@@ -82,7 +82,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
         long n;
