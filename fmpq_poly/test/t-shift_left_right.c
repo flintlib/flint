@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b for left shift */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long shift = (long) n_randint(state, 100);
@@ -74,7 +74,7 @@ main(void)
     }
 
     /* Check aliasing of a and b for right shift */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long shift;
@@ -105,7 +105,7 @@ main(void)
     }
 
     /* Check shift left then right does nothing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
         long shift = (long) n_randint(state, 100);

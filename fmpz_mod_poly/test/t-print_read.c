@@ -170,8 +170,6 @@ int main(void)
 
     /* Write bad data to a pipe and read it */
     {
-        char str[5] = {'b', 'l', 'a', 'h', '\0'};
-
         if (pipe(fd))
         {
             printf("FAIL:\n");

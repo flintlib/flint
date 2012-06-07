@@ -75,3 +75,4 @@ n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
     return r;
 }
+

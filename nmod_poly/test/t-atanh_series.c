@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check 2*atanh(A) = atanh(2*A/(1+A^2)) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B, atanhA, atanhB;
         long n;
@@ -89,7 +89,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
         long n;

@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long n;
@@ -76,7 +76,7 @@ main(void)
     }
 
     /* Compare with powering followed truncating */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         long n;

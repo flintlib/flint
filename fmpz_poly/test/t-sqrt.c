@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Test aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         int square1, square2;
@@ -74,7 +74,7 @@ main(void)
     }
 
     /* Test random squares */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         int square;
@@ -123,7 +123,7 @@ main(void)
     }
 
     /* Test "almost" squares */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         fmpz_t t;

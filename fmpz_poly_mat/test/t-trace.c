@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Test trace(AB) = trace(BA) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, AB, BA;
         fmpz_poly_t trab, trba;

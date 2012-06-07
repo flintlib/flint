@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check evaluation at 1 gives sum of coeffs */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Check a(c) + b(c) = (a + b)(c) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);

@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check that polynomials of degree <= 1 are square-free */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f;
 
@@ -63,7 +63,7 @@ main(void)
     }
 
     /* Check that a^2 f is not square-free */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, f;
 

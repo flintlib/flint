@@ -138,3 +138,4 @@ mp_limb_t qsieve_ll_knuth_schroeppel(qs_t qs_inf)
 
     return 0; /* we didn't find any small factors */
 }
+

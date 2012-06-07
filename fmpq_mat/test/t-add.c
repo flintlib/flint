@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing, B = B + C */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C;
 
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Aliasing, C = B + C */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C;
 
@@ -121,7 +121,7 @@ main(void)
     }
 
     /* A + B == B + A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C, D;
 

@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check res(f, g) == (-1)^(deg f deg g) res(g, f) */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g;
         fmpq_t x, y;
@@ -79,7 +79,7 @@ main(void)
     }
     
     /* Check res(f h, g) == res(f, g) res(h, g) */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h;
         fmpq_t x, y, z;

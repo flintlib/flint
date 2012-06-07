@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long n;
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Correctness (?) */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long j, len, n;
@@ -88,7 +88,6 @@ main(void)
             fmpz_poly_fit_length(a, n);
             for (j = 0; j < len; j++)
                 fmpz_set(a->coeffs + (n - len) + j, b->coeffs + (len - 1 - j));
-            fmpz_set(a->den, b->den);
             _fmpz_poly_set_length(a, n);
             _fmpz_poly_normalise(a);
         }

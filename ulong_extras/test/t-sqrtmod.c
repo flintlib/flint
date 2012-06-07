@@ -47,7 +47,6 @@ int main(void)
         a = n_randint(state, p);
 
         b = n_sqrtmod(a, p);
-
         pinv = n_preinvert_limb(p);
 
         result = (b == 0 || n_mulmod2_preinv(b, b, p, pinv) == a);

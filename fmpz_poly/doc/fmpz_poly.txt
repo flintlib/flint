@@ -371,6 +371,11 @@ void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1,
 
     Sets \code{poly1} to \code{poly2} times $x$.
 
+void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} times the \code{mpz_t} $x$.
+
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 
     Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
@@ -397,6 +402,12 @@ void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1,
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    rounding coefficients down toward~$- \infty$.
+
+void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
     rounding coefficients down toward~$- \infty$.
 
 void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
@@ -439,6 +450,12 @@ void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1,
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
     assuming the coefficient is exact for every coefficient.
 
 void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
@@ -661,9 +678,7 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
                                             const fmpz * input2, long length2)
 
     Sets \code{(output, length1 + length2 - 1)} to the product of 
-    \code{(input1, length1)} and \code{(input2, length2)}. If the number of 
-    bits per output coefficient (made negative if any of the input 
-    coefficients are negative) is know it may be specified as \code{bits_in}.
+    \code{(input1, length1)} and \code{(input2, length2)}.
 
     We must have \code{len1 > 1} and \code{len2 > 1}.  Allows zero-padding 
     of the two input polynomials.  Supports aliasing of inputs and outputs.

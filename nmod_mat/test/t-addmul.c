@@ -41,7 +41,7 @@ main(void)
     printf("addmul....");
     fflush(stdout);
 
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D, T, E;
         mp_limb_t mod = n_randtest_not_zero(state);

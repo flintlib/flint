@@ -118,7 +118,7 @@ fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
     {
         fmpz_poly_t tmp;
         fmpz_poly_init(tmp);
-        result = fmpz_poly_sqrt(tmp, a);
+        result = fmpz_poly_sqrt_classical(tmp, a);
         fmpz_poly_swap(b, tmp);
         fmpz_poly_clear(tmp);
         return result;

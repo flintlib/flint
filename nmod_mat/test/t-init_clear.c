@@ -41,7 +41,7 @@ main(void)
     printf("init/clear....");
     fflush(stdout);
 
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A;
 

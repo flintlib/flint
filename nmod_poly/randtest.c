@@ -32,13 +32,8 @@
 void
 nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 {
-    long i;
-
     nmod_poly_fit_length(poly, len);
-
-    for (i = 0; i < len; i++)
-        poly->coeffs[i] = n_randint(state, poly->mod.n);
-
+    _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
     poly->length = len;
     _nmod_poly_normalise(poly);
 }

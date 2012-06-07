@@ -61,6 +61,8 @@ __mpz_struct * _fmpz_new_mpz(void);
 
 void _fmpz_clear_mpz(fmpz f);
 
+void _fmpz_cleanup_mpz_content(void);
+
 void _fmpz_cleanup(void);
 
 __mpz_struct * _fmpz_promote(fmpz_t f);

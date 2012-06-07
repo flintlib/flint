@@ -41,7 +41,7 @@ main(void)
     printf("deflate....");
     fflush(stdout);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly1, poly2, poly3;
         mp_limb_t modulus;

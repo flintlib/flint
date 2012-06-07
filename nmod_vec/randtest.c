@@ -31,7 +31,23 @@
 
 void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod)
 {
-   long i;
-   for (i = 0 ; i < len; i++)
-      vec[i] = (n_randtest(state) % mod.n);
+    long i, sparseness;
+
+    if (n_randint(state, 2))
+    {
+        for (i = 0; i < len; i++)
+            vec[i] = n_randtest(state) % mod.n;
+    }
+    else
+    {
+        sparseness = 1 + n_randint(state, FLINT_MAX(2, len));
+
+        for (i = 0; i < len; i++)
+        {
+            if (n_randint(state, sparseness))
+                vec[i] = 0;
+            else
+                vec[i] = n_randtest(state) % mod.n;
+        }
+    }
 }

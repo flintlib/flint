@@ -42,10 +42,10 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
-        long len, start;
+        long j, start;
 
         mp_limb_t n = n_randtest_not_zero(state);
 
@@ -54,15 +54,20 @@ main(void)
         nmod_poly_init(c, n);
         nmod_poly_randtest(b, state, n_randint(state, 50));
         nmod_poly_randtest(c, state, n_randint(state, 50));
-
-        len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(state, b->length + c->length);
+        start = n_randint(state, 50);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(b, b, c, start);
+
+        for (j = 0; j < start; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < b->length)
+                b->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(b);
 
         result = (nmod_poly_equal(a, b));
         if (!result)
@@ -79,10 +84,10 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
-        long len, start;
+        long j, start;
         mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
@@ -90,15 +95,20 @@ main(void)
         nmod_poly_init(c, n);
         nmod_poly_randtest(b, state, n_randint(state, 50));
         nmod_poly_randtest(c, state, n_randint(state, 50));
-
-        len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(state, b->length + c->length - 1);
+        start = n_randint(state, 50);
 
         nmod_poly_mulhigh_classical(a, b, c, start);
         nmod_poly_mulhigh_classical(c, b, c, start);
+
+        for (j = 0; j < start; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < c->length)
+                c->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(c);
 
         result = (nmod_poly_equal(a, c));
         if (!result)
@@ -115,10 +125,10 @@ main(void)
     }
 
     /* Compare with mul_basecase */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
-        long len, start;
+        long j, start;
         mp_limb_t n = n_randtest_not_zero(state);
 
         nmod_poly_init(a, n);
@@ -127,22 +137,27 @@ main(void)
         nmod_poly_init(d, n);
         nmod_poly_randtest(b, state, n_randint(state, 50));
         nmod_poly_randtest(c, state, n_randint(state, 50));
-
-        len = b->length + c->length - 1;
-        if (len <= 0)
-            start = 0;
-        else
-            start = n_randint(state, b->length + c->length - 1);
+        start = n_randint(state, 50);
 
         nmod_poly_mul_classical(a, b, c);
-        if (a->length >= start)
-            _nmod_vec_zero(a->coeffs, start);
         nmod_poly_mulhigh_classical(d, b, c, start);
+
+        for (j = 0; j < start; j++)
+        {
+            if (j < a->length)
+                a->coeffs[j] = 0;
+            if (j < d->length)
+                d->coeffs[j] = 0;
+        }
+        _nmod_poly_normalise(a);
+        _nmod_poly_normalise(d);
 
         result = (nmod_poly_equal(a, d));
         if (!result)
         {
             printf("FAIL:\n");
+            nmod_poly_print(b), printf("\n\n");
+            nmod_poly_print(c), printf("\n\n");
             nmod_poly_print(a), printf("\n\n");
             nmod_poly_print(d), printf("\n\n");
             abort();

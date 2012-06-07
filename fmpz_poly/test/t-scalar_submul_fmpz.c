@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         fmpz_t x;
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check that b += x*a is the same as c = b + x*a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         fmpz_t x;

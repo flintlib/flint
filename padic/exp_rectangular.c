@@ -84,19 +84,12 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
             long lo = i * npows;
             long hi = FLINT_MIN(nterms - 1, lo + npows - 1);
 
-            fmpz_set(s, pows + hi - lo);
-            fmpz_set_ui(c, hi);
-            hi--;
+            fmpz_zero(s);
+            fmpz_one(c);
 
-            for ( ; hi > lo; hi--)
+            for ( ; hi >= lo; hi--)
             {
                 fmpz_addmul(s, pows + hi - lo, c);
-                fmpz_mul_ui(c, c, hi);
-            }
-
-            if (hi == lo)
-            {
-                fmpz_add(s, s, c);
                 if (hi != 0)
                     fmpz_mul_ui(c, c, hi);
             }

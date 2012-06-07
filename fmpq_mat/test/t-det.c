@@ -40,7 +40,7 @@ main(void)
     printf("det....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C;
         fmpq_t a, b, ab, c;
@@ -103,3 +103,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+

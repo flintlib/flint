@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         nmod_poly_mat_t A;
         long m, n;

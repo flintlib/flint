@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* 1 * A == A * 1 == A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C, I;
 

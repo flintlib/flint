@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with standard divrem */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t P, Q, D, DQ;
         fmpz_t c;
@@ -88,7 +88,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t P, Q1, Q2;
         fmpz_t c;

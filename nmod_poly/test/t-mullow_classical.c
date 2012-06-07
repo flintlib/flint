@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         long len, trunc;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         long len, trunc;
@@ -114,7 +114,7 @@ main(void)
     }
 
     /* Compare with mul_basecase */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
         long len, trunc;

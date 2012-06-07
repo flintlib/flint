@@ -41,7 +41,7 @@ main(void)
     printf("exp_series_monomial_ui....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, expA, res;
         long n;

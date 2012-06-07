@@ -52,3 +52,4 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
                             input->coeffs, input->length, input->mod);
     output->length = input->length;
 }
+

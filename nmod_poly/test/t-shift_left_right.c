@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check a << shift >> shift == a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -70,7 +70,7 @@ main(void)
     }
     
     /* Check a << shift >> shift == a aliasing the other way */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);

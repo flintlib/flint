@@ -29,17 +29,14 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
+#include "ulong_extras.h"
 
 void
 fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
                    long len, mp_bitcnt_t bits)
 {
-    long i;
     fmpz_poly_fit_length(f, len);
-
-    for (i = 0; i < len; i++)
-        fmpz_randtest(f->coeffs + i, state, bits);
-
+    _fmpz_vec_randtest(f->coeffs, state, len, bits);
     _fmpz_poly_set_length(f, len);
     _fmpz_poly_normalise(f);
 }
@@ -48,12 +45,8 @@ void
 fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
                             long len, mp_bitcnt_t bits)
 {
-    long i;
     fmpz_poly_fit_length(f, len);
-
-    for (i = 0; i < len; i++)
-        fmpz_randtest_unsigned(f->coeffs + i, state, bits);
-
+    _fmpz_vec_randtest_unsigned(f->coeffs, state, len, bits);
     _fmpz_poly_set_length(f, len);
     _fmpz_poly_normalise(f);
 }

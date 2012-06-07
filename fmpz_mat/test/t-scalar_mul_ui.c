@@ -42,7 +42,7 @@ main(void)
     printf("scalar_mul/divexact_ui....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t C, B, A;
         long rows, cols;

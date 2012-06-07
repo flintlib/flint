@@ -61,7 +61,7 @@ main(void)
             vec2[j] = n_mod2_preinv(vec2[j], mod.n, mod.ninv);
 
         result = _nmod_vec_equal(vec, vec2, len);
-        if (!_nmod_vec_equal(vec, vec2, len))
+        if (!result)
         {
             printf("FAIL:\n");
             printf("len = %ld, n = %ld\n", len, n);

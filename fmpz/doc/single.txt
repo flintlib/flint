@@ -83,6 +83,13 @@ void _fmpz_cleanup()
 
    cleans up the internal stack of mpz's, clearing any unused mpz's.
 
+void _fmpz_cleanup_mpz_content()
+
+   Cleans up the internal stack of mpz's, freeing all allocated limb data,
+   but does not free the main arrays of mpz structs. Unlike _fmpz_cleanup,
+   it is safe to use fmpz_clear on any remaining fmpz's after
+   this function has been called.
+
 __mpz_struct * _fmpz_promote(fmpz_t f)
 
    if f doesn't represent an mpz_t, initialise one and associate it to f.
