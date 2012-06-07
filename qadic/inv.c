@@ -116,13 +116,14 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
         for (i--; i >= 0; i--)  /* z' := 2 z - a z^2 */
         {
             _fmpz_poly_sqr(s, rop, d);
-            _fmpz_mod_poly_reduce(s, 2 * d - 1, a, j, lena, pow + i);
+            _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
 
-            _fmpz_mod_poly_mul(t, s, d, u + i * len, len, pow + i);
-            _fmpz_mod_poly_reduce(t, d + len - 1, a, j, lena, pow + i);
+            _fmpz_poly_mul(t, s, d, u + i * len, len);
+            _fmpz_poly_reduce(t, d + len - 1, a, j, lena);
 
             _fmpz_vec_scalar_mul_2exp(rop, rop, d, 1);
-            _fmpz_mod_poly_sub(rop, rop, d, t, d, pow + i);
+            _fmpz_poly_sub(rop, rop, d, t, d);
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, d, pow + i);
         }
 
         _fmpz_vec_clear(pow, n);
