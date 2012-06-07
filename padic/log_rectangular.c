@@ -114,7 +114,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
                 fmpz_addmul(c, t, ypow + i);
             }
 
-            /* Multiply c by p^k f */
+            /* Multiply c by p^k f^{-1} */
             w = fmpz_remove(f, f, p);
             _padic_inv(f, f, p, N);
             if (w > k)
