@@ -33,11 +33,10 @@
 
     The latter assumption guarantees that $\ceil{n/B} \geq 2$, 
     i.e.\ $n \geq 2B$ so $n \geq 2 \ceil{\sqrt{n}}$.
-
  */
 
 static void 
-_fmpz_mod_poly_compose_mod_paterson_stockmeyer(fmpz *rop, 
+_fmpz_mod_poly_compose_mod_rectangular(fmpz *rop, 
                            const fmpz *op1, long len1, 
                            const fmpz *op2, long len2, 
                            const fmpz *a, const long *j, long lena, 
@@ -54,89 +53,39 @@ _fmpz_mod_poly_compose_mod_paterson_stockmeyer(fmpz *rop,
     {
         const long B = n_sqrt(len1);
         long i, k;
-        fmpz *c, *m, *s, *t;
+        fmpz *pows, *t;
 
-        /*
-            {t + i*d, d} is op2^{i+1}, for 0 <= i < B.
-            We have one extra block of d-1 coefficients in t 
-            to allow for the computation of products.
-         */
-        t = _fmpz_vec_init(B * d + d - 1);
+        pows = _fmpz_vec_init((B + 2) * d);
+        t    = _fmpz_vec_init(2 * d - 1);
 
-        _fmpz_vec_set(t, op2, len2);
-        _fmpz_vec_zero(t + len2, d - len2);
-
-        for (i = 1; i < B; i++)
+        fmpz_one(pows + 0 * d + 0);
+        _fmpz_vec_set(pows + 1 * d, op2, len2);
+        for (i = 2; i <= B; i++)
         {
-            _fmpz_mod_poly_mul(t + i*d, t + (i-1)*d, d, op2, len2, p);
-            _fmpz_mod_poly_reduce(t + i*d, d + len2 - 1, a, j, lena, p);
+            _fmpz_poly_mul(pows + i * d, pows + (i - 1) * d, d, op2, len2);
+            _fmpz_poly_reduce(pows + i * d, d + len2 - 1, a, j, lena);
+            _fmpz_vec_scalar_mod_fmpz(pows + i * d, pows + i * d, d, p);
         }
 
-        c = _fmpz_vec_init(d);
-        m = _fmpz_vec_init(2*d - 1);
-        s = _fmpz_vec_init(2*d - 1);
+        _fmpz_vec_zero(rop, d);
 
-        /* Compute the bottom coefficient directly in rop */
-        k = 0;
+        for (i = (len1 + B - 1) / B - 1; i >= 0; i--)
         {
-            _fmpz_vec_zero(rop, d);
-            fmpz_set(rop + 0, op1 + 0);
-            for (i = 1; i < B; i++)
-            {
-                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
-                _fmpz_mod_poly_add(rop, rop, d, s, d, p);
-            }
-        }
+            _fmpz_poly_mul(t, rop, d, pows + B * d, d);
+            _fmpz_poly_reduce(t, 2 * d - 1, a, j, lena);
 
-        _fmpz_vec_set(m, t + (B-1)*d, d);
-
-        for (k = 1; k < (len1 + (B - 1)) / B - 1; k++)
-        {
-            /* Compute the coefficient polynomial in c */
-            _fmpz_vec_zero(c, d);
-            fmpz_set(c + 0, op1 + (0 + B*k));
-            for (i = 1; i < B; i++)
+            _fmpz_vec_set(rop, t, d);
+            fmpz_add(rop + 0, rop + 0, op1 + i*B);
+            for (k = FLINT_MIN(B, len1 - i*B) - 1; k > 0; k--)
             {
-                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
-                _fmpz_mod_poly_add(c, c, d, s, d, p);
+                _fmpz_vec_scalar_addmul_fmpz(rop, pows + k * d, d, op1 + (i*B + k));
             }
 
-            /* Compute the product of the coeffient and the monomial in s */
-            _fmpz_mod_poly_mul(s, c, d, m, d, p);
-            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
-
-            /* Update the sum */
-            _fmpz_mod_poly_add(rop, rop, d, s, d, p);
-
-            /* Update the monomial to (t^B)^{j+1} */
-            _fmpz_mod_poly_mul(s, m, d, t + (B-1)*d, d, p);
-            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
-            _fmpz_vec_set(m, s, d);
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, d, p);
         }
 
-        /* Last step, j = \ceil{len1/B} - 1.  Possibly fewer terms.. */
-        {
-            /* Compute the coefficient polynomial in c */
-            _fmpz_vec_zero(c, d);
-            fmpz_set(c + 0, op1 + (0 + B*k));
-            for (i = 1; i + B*k < len1; i++)
-            {
-                _fmpz_mod_poly_scalar_mul_fmpz(s, t + (i-1) * d, d, op1 + (i + B*k), p);
-                _fmpz_mod_poly_add(c, c, d, s, d, p);
-            }
-
-            /* Compute the product of the coeffient and the monomial in s */
-            _fmpz_mod_poly_mul(s, c, d, m, d, p);
-            _fmpz_mod_poly_reduce(s, 2*d - 1, a, j, lena, p);
-
-            /* Update the sum */
-            _fmpz_mod_poly_add(rop, rop, d, s, d, p);
-        }
-
-        _fmpz_vec_clear(t, B * d + d - 1);
-        _fmpz_vec_clear(c, d);
-        _fmpz_vec_clear(m, 2*d - 1);
-        _fmpz_vec_clear(s, 2*d - 1);
+        _fmpz_vec_clear(pows, (B + 2) * d);
+        _fmpz_vec_clear(t, 2 * d - 1);
     }
 }
 
@@ -166,24 +115,14 @@ _fmpz_mod_poly_compose_mod_horner(fmpz *rop,
 
         t = _fmpz_vec_init(2*d - 1);
 
-        i = len1 - 1;
+        _fmpz_vec_zero(rop, d);
 
-        _fmpz_mod_poly_scalar_mul_fmpz(rop, op2, len2, op1 + i, p);
-        _fmpz_vec_zero(rop + len2, d - len2);
-        i--;
-        if (i >= 0)
+        for (i = len1 - 1; i >= 0; i--)
         {
-            fmpz_add(rop, rop, op1 + i);
-            if (fmpz_cmpabs(rop, p) >= 0)
-                fmpz_sub(rop, rop, p);
-        }
-
-        while (i > 0)
-        {
-            i--;
-            _fmpz_mod_poly_mul(t, rop, d, op2, len2, p);
-            _fmpz_mod_poly_reduce(t, d + len2 - 1, a, j, lena, p);
-            _fmpz_mod_poly_add(rop, t, d, op1 + i, 1, p);
+            _fmpz_poly_mul(t, rop, d, op2, len2);
+            _fmpz_poly_reduce(t, d + len2 - 1, a, j, lena);
+            _fmpz_poly_add(rop, t, d, op1 + i, 1);
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, d, p);
         }
 
         _fmpz_vec_clear(t, 2*d - 1);
@@ -216,7 +155,7 @@ _fmpz_mod_poly_compose_mod(fmpz *rop,
     }
     else
     {
-        _fmpz_mod_poly_compose_mod_paterson_stockmeyer(rop, op1, len1, op2, len2, a, j, lena, p);
+        _fmpz_mod_poly_compose_mod_rectangular(rop, op1, len1, op2, len2, a, j, lena, p);
     }
 }
 

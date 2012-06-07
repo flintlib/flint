@@ -31,10 +31,9 @@
     Uses Hensel lifting along the polynomial $X^q - X$, which yields 
     the formula $z' = z - (z^q - z) / (q z^{q-1} - 1)$.
 
-    We observe that the denominator is $p$-adically close to $q - 1$ 
-    since $z^{q-1}$ is close to~$1$.  This allows us to use the formula 
-    $z = z + (1-q)^{-1} (z^q - z)$, during the iteration where the 
-    $p$-adic inverse of $(1-q)$ is updated at each step, too.
+    We observe that the denominator is an approximation to $q - 1$, 
+    which allows us to use the formula $z' = z - (q-1)^{-1} (z^q - z)$ 
+    during the iteration.
 
     Supports aliasing between \code{rop} and \code{op}.
  */
@@ -54,7 +53,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
         _fmpz_vec_scalar_mod_fmpz(rop, op, len, p);
         _fmpz_vec_zero(rop + len, d - len);
     }
-    else
+    else  /* d, N >= 2 */
     {
         long *e, i, n;
         fmpz *pow, *u, *t, *w;
@@ -66,7 +65,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 
-        w   = _fmpz_vec_init(n + n + 2 * d - 1);
+        w   = _fmpz_vec_init(n + n + (2 * d - 1));
         pow = w;
         u   = w + n;
         t   = w + 2 * n;
@@ -77,7 +76,6 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
 
         fmpz_pow_ui(q, p, d);
         fmpz_sub_ui(qm1, q, 1);
-        fmpz_neg(qm1, qm1);
 
         /* Compute powers of p */
         {
@@ -104,7 +102,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
         }
 
-        /* Compute reduced units for (1-q) */
+        /* Compute reduced units for (q-1) */
         {
             fmpz_mod(u + 0, qm1, pow + 0);
         }
@@ -116,28 +114,31 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
         /* Run Newton iteration */
         i = n - 1;
         {
-            fmpz_one(inv);
-
             _fmpz_vec_scalar_mod_fmpz(rop, op, len, pow + i);
             _fmpz_vec_zero(rop + len, d - len);
+
+            fmpz_sub_ui(inv, p, 1);
         }
         for (i--; i >= 0; i--)
         {
-            /* Lift u := (1-q)^{-1} */
-            fmpz_mul(t, u + i, inv);
-            fmpz_sub_ui(t, t, 1);
-            fmpz_mul(t + 1, t, inv);
-            fmpz_sub(inv, inv, t + 1);
-            fmpz_mod(inv, inv, pow + i);
-
             /* Lift rop */
             _qadic_pow(t, rop, d, q, a, j, lena, pow + i);
-            _fmpz_mod_poly_sub(t, t, d, rop, d, pow + i);
-            _fmpz_mod_poly_scalar_mul_fmpz(t, t, d, inv, pow + i);
-            _fmpz_mod_poly_add(rop, rop, d, t, d, pow + i);
+            _fmpz_poly_sub(t, t, d, rop, d);
+            _fmpz_vec_scalar_submul_fmpz(rop, t, d, inv);
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, d, pow + i);
+
+            /* Lift inv */
+            if (i > 0)
+            {
+                fmpz_mul(t, inv, inv);
+                fmpz_mul(t + 1, u + i, t);
+                fmpz_mul_2exp(inv, inv, 1);
+                fmpz_sub(inv, inv, t + 1);
+                fmpz_mod(inv, inv, pow + i);
+            }
         }
 
-        _fmpz_vec_clear(w, n + n + 2 * d - 1);
+        _fmpz_vec_clear(w, n + n + (2 * d - 1));
         fmpz_clear(inv);
         fmpz_clear(q);
         fmpz_clear(qm1);
