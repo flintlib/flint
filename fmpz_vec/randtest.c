@@ -35,16 +35,48 @@ void
 _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
                    long len, mp_bitcnt_t bits)
 {
-    long i;
-    for (i = 0; i < len; i++)
-        fmpz_randtest(f + i, state, bits);
+    long i, sparseness;
+
+    if (n_randint(state, 2))
+    {
+        for (i = 0; i < len; i++)
+            fmpz_randtest(f + i, state, bits);
+    }
+    else
+    {
+        sparseness = 1 + n_randint(state, FLINT_MAX(2, len));
+
+        for (i = 0; i < len; i++)
+        {
+            if (n_randint(state, sparseness))
+                fmpz_zero(f + i);
+            else
+                fmpz_randtest(f + i, state, bits);
+        }
+    }
 }
 
 void
 _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
                             long len, mp_bitcnt_t bits)
 {
-    long i;
-    for (i = 0; i < len; i++)
-        fmpz_randtest_unsigned(f + i, state, bits);
+    long i, sparseness;
+
+    if (n_randint(state, 2))
+    {
+        for (i = 0; i < len; i++)
+            fmpz_randtest_unsigned(f + i, state, bits);
+    }
+    else
+    {
+        sparseness = 1 + n_randint(state, FLINT_MAX(2, len));
+
+        for (i = 0; i < len; i++)
+        {
+            if (n_randint(state, sparseness))
+                fmpz_zero(f + i);
+            else
+                fmpz_randtest_unsigned(f + i, state, bits);
+        }
+    }
 }

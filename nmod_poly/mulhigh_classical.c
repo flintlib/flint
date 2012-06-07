@@ -61,6 +61,7 @@ _nmod_poly_mulhigh_classical(mp_ptr res, mp_srcptr poly1,
             {
                 /* Set res[i+len1-1] = in1[len1-1]*in2[i] */
                 m = FLINT_MAX(len1 - 1, start);
+
                 mpn_mul_1(res + m, poly2 + m - len1 + 1, len2 - 1 + len1 - m,
                           poly1[len1 - 1]);
 
