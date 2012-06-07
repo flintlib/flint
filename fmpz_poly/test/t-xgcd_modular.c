@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check s*f + t*g == r */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -87,7 +87,7 @@ main(void)
     }
 
     /* Check aliasing of s and f */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -126,7 +126,7 @@ main(void)
     }
 
     /* Check aliasing of s and g */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -165,7 +165,7 @@ main(void)
     }
 
     /* Check aliasing of t and f */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -204,7 +204,7 @@ main(void)
     }
 
     /* Check aliasing of t and g */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;

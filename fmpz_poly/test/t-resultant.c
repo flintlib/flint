@@ -73,7 +73,7 @@ main(void)
     }
 
     /* Check that R(fg, h) = R(f, h) R(g, h) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, d;
         fmpz_poly_t f, g, h, p;

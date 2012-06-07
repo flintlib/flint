@@ -41,7 +41,7 @@ main(void)
     flint_randinit(state);
 
     /* Check that b divides a*b and that the quotient is a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
         
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Check aliasing of q with a */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p;
         
@@ -98,7 +98,7 @@ main(void)
     }
 
     /* Check aliasing of q with b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p;
         
@@ -125,7 +125,7 @@ main(void)
     }
 
     /* Check when not divisible */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q, s;
         

@@ -42,7 +42,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
 
@@ -81,7 +81,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
 
@@ -117,7 +117,7 @@ main(void)
     }
 
     /* Test fmpz functions */
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         fmpz_poly_t A, B;
@@ -158,7 +158,7 @@ main(void)
         fmpz_poly_clear(B);
     }
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         fmpz_poly_t A, B;
