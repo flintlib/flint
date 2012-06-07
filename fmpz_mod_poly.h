@@ -446,6 +446,13 @@ void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len,
 void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
                                  const fmpz_mod_poly_t poly, const fmpz_t a);
 
+fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len);
+
+void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len);
+
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree,
+                               const fmpz * roots, long len, const fmpz_t mod);
+
 /*  Composition  *************************************************************/
 
 void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
