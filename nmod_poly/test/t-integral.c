@@ -43,7 +43,7 @@ main(void)
     fflush(stdout);
 
     /* Check with derivative */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
         ulong len;
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_prime(state, 0);

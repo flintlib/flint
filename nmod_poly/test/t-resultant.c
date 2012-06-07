@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check res(f, g) == (-1)^(deg f deg g) res(g, f) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g;
         mp_limb_t x, y;
@@ -79,7 +79,7 @@ main(void)
     }
 
     /* Check res(f h, g) == res(f, g) res(h, g) */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h;
         mp_limb_t x, y, z;

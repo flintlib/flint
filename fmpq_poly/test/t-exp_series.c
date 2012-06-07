@@ -47,7 +47,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = n_randint(state, 50) + 1;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check exp(a+b) = exp(a) * exp(b) */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, ab, expa, expb, expab, expa_expb;
         long n = n_randint(state, 80) + 1;

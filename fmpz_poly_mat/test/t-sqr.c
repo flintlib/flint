@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check evaluation homomorphism */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, C;
         fmpz_mat_t a, c, d;

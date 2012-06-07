@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B;
         fmpz_t x;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* (A + B) * x == A * x + B * x */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C, D;
         fmpz_t x;

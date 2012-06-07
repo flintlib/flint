@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Rectangular transpose, same modulus */
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, B, C;
 
@@ -73,7 +73,7 @@ main(void)
     }
 
     /* Rectangular transpose, different modulus */
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, AT, B, BT, AT2;
 
@@ -111,7 +111,7 @@ main(void)
     }
 
     /* Self-transpose */
-    for (rep = 0; rep < 1000; rep++)
+    for (rep = 0; rep < 100 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, B;
 

@@ -116,7 +116,7 @@ main(void)
     printf("lu_classical....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, LU;
         mp_limb_t mod;

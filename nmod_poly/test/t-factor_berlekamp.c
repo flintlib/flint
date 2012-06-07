@@ -44,7 +44,7 @@ main(void)
     printf("factor_berlekamp....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 20 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem;

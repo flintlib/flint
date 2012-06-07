@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Test aliasing */
-    for (i = 0; i < 400; i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, Ainv;
         fmpz_poly_t den1, den2;
@@ -89,7 +89,7 @@ main(void)
     }
 
     /* Check A^(-1) = A = 1 */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, Ainv, B, Iden;
         fmpz_poly_t den, det;

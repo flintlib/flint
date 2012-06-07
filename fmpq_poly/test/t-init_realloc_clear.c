@@ -42,7 +42,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
 
@@ -50,7 +50,7 @@ main(void)
         fmpq_poly_clear(a);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
 
@@ -59,7 +59,7 @@ main(void)
         fmpq_poly_clear(a);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
 

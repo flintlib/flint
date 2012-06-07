@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g;
         mp_limb_t c, mod;
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Compare with composition */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h1, h2;
         mp_limb_t mod, c;
@@ -109,7 +109,7 @@ main(void)
     }
 
     /* Check some large cases */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g, h1, h2;
         mp_limb_t mod, c;

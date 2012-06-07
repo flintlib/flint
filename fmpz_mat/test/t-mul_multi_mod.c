@@ -43,7 +43,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         long m, n, k;
 

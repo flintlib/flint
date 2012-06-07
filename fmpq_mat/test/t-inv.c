@@ -40,7 +40,7 @@ main(void)
     printf("inv....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B, C;
         fmpq_t d;
@@ -95,7 +95,7 @@ main(void)
     }
 
     /* Test aliasing */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpq_mat_t A, B;
         fmpq_t d;
@@ -137,7 +137,7 @@ main(void)
     }
 
     /* Test singular matrices */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         long n, r, b, d;
         fmpq_mat_t A, B;

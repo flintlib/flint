@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check new leading coeff = gcd old leading coeff and modulus */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* test aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a;
         mp_limb_t n = n_randtest_not_zero(state);

@@ -45,7 +45,7 @@ main(void)
     printf("solve_vec....");
     fflush(stdout);
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 20);
         mod = n_randtest_prime(state, 0);
@@ -88,7 +88,7 @@ main(void)
     }
 
     /* Test singular systems */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = 1 + n_randint(state, 20);
         r = n_randint(state, m);
