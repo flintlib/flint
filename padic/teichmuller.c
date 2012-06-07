@@ -38,10 +38,10 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
     else
     {
         long *a, i, n;
-        fmpz *pow;
-        fmpz_t r, s, t;
+        fmpz *pow, *u;
+        fmpz_t s, t;
         fmpz_t inv;
-        fmpz_t pm1, pm2;
+        fmpz_t pm1;
 
         n = FLINT_CLOG2(N) + 1;
 
@@ -49,17 +49,15 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         for (a[i = 0] = N; a[i] > 1; i++)
             a[i + 1] = (a[i] + 1) / 2;
 
-        pow = _fmpz_vec_init(n);
+        pow = _fmpz_vec_init(2 * n);
+        u   = pow + n;
 
-        fmpz_init(r);
         fmpz_init(s);
         fmpz_init(t);
         fmpz_init(inv);
         fmpz_init(pm1);
-        fmpz_init(pm2);
 
         fmpz_sub_ui(pm1, p, 1);
-        fmpz_sub_ui(pm2, p, 2);
 
         /* Compute powers of p */
         {
@@ -86,43 +84,47 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
                 fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
         }
 
+        /* Compute reduced units for (p-1) */
+        {
+            fmpz_mod(u + 0, pm1, pow + 0);
+        }
+        for (i = 1; i < n; i++)
+        {
+            fmpz_mod(u + i, u + (i - 1), pow + i);
+        }
+
         /* Run Newton iteration */
         i = n - 1;
         {
             fmpz_mod(rop, op, pow + i);
 
-            /* {(p-1) x^{p-2}}^{-1} */
-            fmpz_sub(inv, p, rop);
+            fmpz_set(inv, pm1);
         }
         for (i--; i >= 0; i--)
         {
             /* Lift rop */
-            fmpz_powm(t, rop, pm1, pow + i);
-            fmpz_sub_ui(t, t, 1);
-            fmpz_mul(s, t, inv);
-            fmpz_sub(rop, rop, s);
+            fmpz_powm(s, rop, p, pow + i);
+            fmpz_sub(s, s, rop);
+            fmpz_mul(t, s, inv);
+            fmpz_sub(rop, rop, t);
             fmpz_mod(rop, rop, pow + i);
 
             /* Lift inv */
             if (i > 0)
             {
-                fmpz_powm(s, rop, pm2, pow + i);
-                fmpz_mul(t, inv, pm1);
-                fmpz_mul(r, s, t);
-                fmpz_sub_ui(r, r, 2);
-                fmpz_neg(r, r);
-                fmpz_mul(inv, inv, r);
+                fmpz_mul(s, inv, inv);
+                fmpz_mul(t, u + i, s);
+                fmpz_mul_2exp(inv, inv, 1);
+                fmpz_sub(inv, inv, t);
                 fmpz_mod(inv, inv, pow + i);
             }
         }
 
-        fmpz_clear(r);
         fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(inv);
         fmpz_clear(pm1);
-        fmpz_clear(pm2);
-        _fmpz_vec_clear(pow, n);
+        _fmpz_vec_clear(pow, 2 * n);
         flint_free(a);
     }
 }
