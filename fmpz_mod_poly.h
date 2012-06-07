@@ -270,6 +270,12 @@ void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e,
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e);
 
+void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+                              ulong e, long trunc, const fmpz_t p);
+
+void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly, ulong e, long trunc);
+
 void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
                                      ulong e, long trunc, const fmpz_t p);
 
