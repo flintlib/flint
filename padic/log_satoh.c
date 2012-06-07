@@ -52,6 +52,7 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
         fmpz_t t, pk, pNk;
 
+        fmpz_init(t);
         fmpz_init(pk);
         fmpz_init(pNk);
         fmpz_pow_ui(pk, p, k);

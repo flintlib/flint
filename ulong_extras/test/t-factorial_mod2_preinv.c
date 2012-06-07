@@ -32,7 +32,7 @@
 static mp_limb_t
 n_factorial_mod2_foolproof(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    mp_limb_t prod = 1UL;
+    mp_limb_t prod = 1UL % p;
 
     while (n)
     {
@@ -59,7 +59,7 @@ int main(void)
 
         for (j = 0; j < 10; j++)
         {
-            p = n_randtest_prime(state, 0);
+            p = n_randtest_not_zero(state);
             pinv = n_preinvert_limb(p);
             x = n_factorial_mod2_preinv(n, p, pinv);
             y = n_factorial_mod2_foolproof(n, p, pinv);

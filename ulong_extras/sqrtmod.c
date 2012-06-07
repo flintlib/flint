@@ -30,7 +30,7 @@
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p) 
 {
-    long i, r, m;
+    long i, j, r, m;
     mp_limb_t p1, k, b, g, bpow, gpow, res;
     mp_limb_t pinv;
 
@@ -41,7 +41,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     pinv = n_preinvert_limb(p);
 
-    if (n_jacobi(a, p) == -1)
+    if (n_jacobi_unsigned(a, p) == -1)
         return 0;
 
     if ((p & 3UL) == 3)
@@ -61,27 +61,30 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     for (k = 2; ; k++)
     {
-        if (n_jacobi(k, p) == -1) break;
+        if (n_jacobi_unsigned(k, p) == -1) break;
     }
 
     g = n_powmod2_preinv(k, p1, p, pinv);
     res = n_powmod2_preinv(a, (p1 + 1) / 2, p, pinv);
 
+    j = 0;
     while (b != 1)
     {
         bpow = b;
-        for (m = 1; (m < r) && (bpow != 1); m++)
+        m = 0;
+        do
         {
             bpow = n_mulmod2_preinv(bpow, bpow, p, pinv);
-        }
+            m++;
+        } while (m < r && bpow != 1);
         gpow = g;
         for (i = 1; i < r - m; i++)
         {
             gpow = n_mulmod2_preinv(gpow, gpow, p, pinv);
         }
         res = n_mulmod2_preinv(res, gpow, p, pinv);
-        gpow = n_mulmod2_preinv(gpow, gpow, p, pinv);
-        b = n_mulmod2_preinv(b, gpow, p, pinv);
+        g = n_mulmod2_preinv(gpow, gpow, p, pinv);
+        b = n_mulmod2_preinv(b, g, p, pinv);
         r = m;
     }
 

@@ -516,6 +516,8 @@ int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, long len,
 
 int fmpz_mod_poly_fprint(FILE * file, const fmpz_mod_poly_t poly);
 
+int fmpz_mod_poly_fread(FILE * file, fmpz_mod_poly_t poly);
+
 static __inline__ 
 int fmpz_mod_poly_fprint_pretty(FILE * file, 
                                 const fmpz_mod_poly_t poly, const char * x)

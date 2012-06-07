@@ -138,6 +138,10 @@ static __inline__ void fmpq_abs(fmpq_t dest, const fmpq_t src)
     fmpz_abs(fmpq_numref(dest), fmpq_numref(src));
 }
 
+int _fmpq_cmp(const fmpz_t p, const fmpz_t q, const fmpz_t r, const fmpz_t s);
+
+int fmpq_cmp(const fmpq_t x, const fmpq_t y);
+
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den);
 
 void fmpq_canonicalise(fmpq_t res);

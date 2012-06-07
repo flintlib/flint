@@ -39,16 +39,11 @@ nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
     k = A->c;
     n = B->c;
 
-    /*
-    if (A->c != B->r || D->r != C->r || D->c != C->c || D->r != m || D->c != n)
-        abort();
-    */
-
-    if (m < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        n < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF ||
-        k < NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF)
+    if (m < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
+        n < NMOD_MAT_MUL_STRASSEN_CUTOFF ||
+        k < NMOD_MAT_MUL_STRASSEN_CUTOFF)
     {
-        nmod_mat_submul_classical(D, C, A, B);
+        _nmod_mat_mul_classical(D, C, A, B, -1);
     }
     else
     {

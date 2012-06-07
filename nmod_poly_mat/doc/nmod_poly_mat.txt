@@ -230,7 +230,7 @@ void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     Sets \code{C} to the matrix product of \code{A} and \code{B}.
     The matrices must have compatible dimensions for matrix multiplication.
     Aliasing is allowed. This function automatically chooses between
-    classical and KS multiplication.
+    classical, KS and evaluation-interpolation multiplication.
 
 void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B)
@@ -245,6 +245,16 @@ void nmod_poly_mat_mul_KS(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     Sets \code{C} to the matrix product of \code{A} and \code{B}, 
     computed using Kronecker segmentation. The matrices must have 
     compatible dimensions for matrix multiplication. Aliasing is allowed.
+
+void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+    const nmod_poly_mat_t B)
+
+    Sets \code{C} to the matrix product of \code{A} and \code{B},
+    computed through evaluation and interpolation. The matrices must have
+    compatible dimensions for matrix multiplication. For interpolation
+    to be well-defined, we require that the modulus is a prime at least as
+    large as $m + n - 1$ where $m$ and $n$ are the maximum lengths of
+    polynomials in the input matrices. Aliasing is allowed.
 
 void nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 
@@ -262,6 +272,14 @@ void nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 
     Sets \code{B} to the square of \code{A}, which must be a square matrix.
     Aliasing is allowed. This function uses Kronecker segmentation.
+
+void nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+
+    Sets \code{B} to the square of \code{A}, which must be a square matrix,
+    computed through evaluation and interpolation. For interpolation
+    to be well-defined, we require that the modulus is a prime at least as
+    large as $2n - 1$ where $n$ is the maximum length of
+    polynomials in the input matrix. Aliasing is allowed.
 
 void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
 

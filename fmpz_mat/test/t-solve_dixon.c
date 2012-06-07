@@ -75,7 +75,7 @@ main(void)
         fmpz_mat_scalar_mod_fmpz(AXm, AX, mod);
         fmpz_mat_scalar_mod_fmpz(Bm, B, mod);
 
-        if (!fmpz_mat_equal(AXm, Bm))
+        if (!fmpz_mat_equal(AXm, Bm) || !success)
         {
             printf("FAIL:\n");
             printf("AX != B!\n");

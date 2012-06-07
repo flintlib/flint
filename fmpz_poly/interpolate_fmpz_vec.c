@@ -57,33 +57,6 @@ _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
     fmpz_clear(t);
 }
 
-static void
-_fmpz_poly_newton_to_monomial(fmpz * ys, const fmpz * xs, long n)
-{
-    fmpz_t t;
-    long i, j;
-
-    fmpz_init(t);
-
-    for (i = n - 2; i >= 0; i--)
-    {
-        fmpz_set(t, ys + i);
-        fmpz_set(ys + i, ys + i + 1);
-
-        for (j = i + 1; j < n - 1; j++)
-        {
-            fmpz_mul(ys + j, ys + j, xs + i);
-            fmpz_sub(ys + j, ys + j + 1, ys + j);
-        }
-
-        fmpz_mul(ys + n - 1, ys + n - 1, xs + i);
-        fmpz_sub(ys + n - 1, t, ys + n - 1);
-    }
-
-    _fmpz_poly_reverse(ys, ys, n, n);
-    fmpz_clear(t);
-}
-
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
                                     const fmpz * xs, const fmpz * ys, long n)

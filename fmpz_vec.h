@@ -76,6 +76,8 @@ mp_size_t _fmpz_vec_max_limbs(const fmpz * vec, long len);
 
 void _fmpz_vec_height(fmpz_t height, const fmpz * vec, long len);
 
+long _fmpz_vec_height_index(const fmpz * vec, long len);
+
 /*  Input and output  ********************************************************/
 
 int _fmpz_vec_fprint(FILE * file, const fmpz * vec, long len);
@@ -179,6 +181,9 @@ void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1,
 
 void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, 
                                       const fmpz * vec2, long len2, ulong c);
+
+void _fmpz_vec_scalar_tdiv_q_2exp(fmpz * vec1, const fmpz * vec2, 
+                                                       long len2, ulong exp);
 
 void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
                                        const fmpz * vec2, long len2, long c);

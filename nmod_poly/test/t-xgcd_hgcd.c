@@ -41,7 +41,7 @@ main(void)
     /* 
        Compare with result from gcd and check a*s + b*t = g
     */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 10000; i++)
     {
         nmod_poly_t a, b, c, g1, g2, s, t, sum, temp;
 
@@ -59,10 +59,9 @@ main(void)
         nmod_poly_init(sum, n);
         nmod_poly_init(temp, n);
         
-        nmod_poly_randtest(a, state, n_randint(state, 600));
-        nmod_poly_randtest(b, state, n_randint(state, 600));
-
-        nmod_poly_randtest(c, state, n_randint(state, 400));
+        nmod_poly_randtest(a, state, n_randtest(state) % 600);
+        nmod_poly_randtest(b, state, n_randtest(state) % 600);
+        nmod_poly_randtest(c, state, n_randtest(state) % 400);
         
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
@@ -116,8 +115,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
         
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(a, s, t, a, b);
@@ -154,8 +153,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(b, s, t, a, b);
@@ -192,8 +191,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, a, t, a, b);
@@ -229,8 +228,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, b, t, a, b);
@@ -266,8 +265,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, s, a, a, b);
@@ -303,8 +302,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_hgcd(g, s, t, a, b);
         nmod_poly_xgcd_hgcd(g, s, b, a, b);

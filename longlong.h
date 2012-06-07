@@ -89,7 +89,8 @@
 #endif /* x86_64 */
 
 /* x86 : 32 bit */
-#if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) || defined (__i486__) || defined(__amd64__)))
+#if (__GMP_BITS_PER_MP_LIMB == 32 && (defined (__i386__) \
+   || defined (__i486__) || defined(__amd64__)))
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)  \
   __asm__ ("addl %8,%k2\n\tadcl %6,%k1\n\tadcl %4,%k0"     \
@@ -141,7 +142,100 @@
 
 #endif /* x86 */
 
-/* non x86 fallback code */
+/* Itanium */
+#if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64))
+
+/* This form encourages gcc (pre-release 3.4 at least) to emit predicated
+   "sub r=r,r" and "sub r=r,r,1", giving a 2 cycle latency.  The generic
+   code using "al<bl" arithmetically comes out making an actual 0 or 1 in a
+   register, which takes an extra cycle.  */
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)      \
+  do {                                          \
+    mp_limb_t __x;                              \
+    __x = (al) - (bl);                          \
+    if ((al) < (bl))                            \
+      (sh) = (ah) - (bh) - 1;                   \
+    else                                        \
+      (sh) = (ah) - (bh);                       \
+    (sl) = __x;                                 \
+  } while (0)
+
+#define count_trailing_zeros(count, x)			   \
+  do {									               \
+    mp_limb_t __ctz_x = (x);		   		      \
+    __asm__ ("popcnt %0 = %1"						   \
+	     : "=r" (count)						         \
+	     : "r" ((__ctz_x-1) & ~__ctz_x));		   \
+  } while (0)
+
+/* Do both product parts in assembly, since that gives better code with
+   all gcc versions.  Some callers will just use the upper part, and in
+   that situation we waste an instruction, but not any cycles.  */
+#define umul_ppmm(ph, pl, m0, m1)                                 \
+    __asm__ ("xma.hu %0 = %2, %3, f0\n\txma.l %1 = %2, %3, f0"		\
+	     : "=&f" (ph), "=f" (pl)				                       	\
+	     : "f" (m0), "f" (m1))
+
+#endif /* Itanium */
+
+/* ARM */
+#if (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+
+#define add_ssaaaa(sh, sl, ah, al, bh, bl)                \
+  __asm__ ("adds\t%1, %4, %5\n\tadc\t%0, %2, %3"			 \
+	   : "=r" (sh), "=&r" (sl)					                \
+	   : "r" (ah), "rI" (bh), "%r" (al), "rI" (bl) : "cc")
+
+#define sub_ddmmss(sh, sl, ah, al, bh, bl)                    \
+  do {									                             \
+    if (__builtin_constant_p (al))					              \
+      {									                             \
+	if (__builtin_constant_p (ah))					              \
+	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("rsbs\t%1, %5, %4\n\tsbc\t%0, %2, %3"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "r" (ah), "rI" (bh), "rI" (al), "r" (bl) : "cc");  \
+      }									                             \
+    else if (__builtin_constant_p (ah))					        \
+      {									                             \
+	if (__builtin_constant_p (bl))					              \
+	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("rsbs\t%1, %5, %4\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "rI" (al), "r" (bl) : "cc");  \
+      }									                             \
+    else if (__builtin_constant_p (bl))					        \
+      {									                             \
+	if (__builtin_constant_p (bh))					              \
+	  __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc");  \
+	else								                                \
+	  __asm__ ("subs\t%1, %4, %5\n\trsc\t%0, %3, %2"		     \
+		   : "=r" (sh), "=&r" (sl)				                    \
+		   : "rI" (ah), "r" (bh), "r" (al), "rI" (bl) : "cc");  \
+      }									                             \
+    else /* only bh might be a constant */				        \
+      __asm__ ("subs\t%1, %4, %5\n\tsbc\t%0, %2, %3"			  \
+	       : "=r" (sh), "=&r" (sl)					              \
+	       : "r" (ah), "rI" (bh), "r" (al), "rI" (bl) : "cc"); \
+    } while (0)
+
+#define umul_ppmm(xh, xl, a, b) \
+  __asm__ ("umull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#define smul_ppmm(xh, xl, a, b) \
+  __asm__ ("smull %0,%1,%2,%3" : "=&r" (xl), "=&r" (xh) : "r" (a), "r" (b))
+
+#endif /* ARM */
+
+/* fallback code */
 #if !(defined (__i386__) || defined (__i486__) || defined(__amd64__))
 
 #define __BITS4 (__GMP_BITS_PER_MP_LIMB/4)
@@ -152,178 +246,193 @@
 
 #define NEED_CLZ_TAB
 
+#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
+
 #define add_ssaaaa(sh, sl, ah, al, bh, bl) \
-  do {									\
-    mp_limb_t __x;								\
-    __x = (al) + (bl);							\
-    (sh) = (ah) + (bh) + (__x < (al));					\
-    (sl) = __x;								\
+  do {									          \
+    mp_limb_t __x;								 \
+    __x = (al) + (bl);							 \
+    (sh) = (ah) + (bh) + (__x < (al));		 \
+    (sl) = __x;								    \
   } while (0)
+
+#endif
 
 #define add_sssaaaaaa(sh, sm, sl, ah, am, al, bh, bm, bl)           \
   do {                                                              \
-    mp_limb_t __x, __y;                                             \
-    add_ssaaaa(__x, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
-    add_ssaaaa(__y, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
-    add_ssaaaa(sh, sm, sh, sm, __y, __x);                           \
+    mp_limb_t __t, __u;                                             \
+    add_ssaaaa(__t, sl, (mp_limb_t) 0, al, (mp_limb_t) 0, bl);      \
+    add_ssaaaa(__u, sm, (mp_limb_t) 0, am, (mp_limb_t) 0, bm);      \
+    add_ssaaaa(sh, sm, ah + bh, sm, __u, __t);                      \
   } while (0)
+
+#if !((__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64)) || \
+      (__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__)))
 
 #define sub_ddmmss(sh, sl, ah, al, bh, bl) \
-  do {									\
-    mp_limb_t __x;								\
-    __x = (al) - (bl);							\
-    (sh) = (ah) - (bh) - ((al) < (bl));                                 \
-    (sl) = __x;								\
+  do {									          \
+    mp_limb_t __x;								 \
+    __x = (al) - (bl);							 \
+    (sh) = (ah) - (bh) - ((al) < (bl));    \
+    (sl) = __x;								    \
   } while (0)
 
-#define umul_ppmm(w1, w0, u, v)						\
-  do {									\
-    mp_limb_t __x0, __x1, __x2, __x3;					\
-    mp_limb_t __ul, __vl, __uh, __vh;					\
-    mp_limb_t __u = (u), __v = (v);					\
-									\
-    __ul = __ll_lowpart (__u);						\
-    __uh = __ll_highpart (__u);						\
-    __vl = __ll_lowpart (__v);						\
-    __vh = __ll_highpart (__v);						\
-									\
-    __x0 = (mp_limb_t) __ul * __vl;					\
-    __x1 = (mp_limb_t) __ul * __vh;					\
-    __x2 = (mp_limb_t) __uh * __vl;					\
-    __x3 = (mp_limb_t) __uh * __vh;					\
-									\
-    __x1 += __ll_highpart (__x0);/* this can't give carry */		\
-    __x1 += __x2;		/* but this indeed can */		\
-    if (__x1 < __x2)		/* did we get it? */			\
-      __x3 += __ll_B;		/* yes, add it in the proper pos. */	\
-									\
-    (w1) = __x3 + __ll_highpart (__x1);					\
+#define umul_ppmm(w1, w0, u, v)				 \
+  do {									          \
+    mp_limb_t __x0, __x1, __x2, __x3;		 \
+    mp_limb_t __ul, __vl, __uh, __vh;		 \
+    mp_limb_t __u = (u), __v = (v);			 \
+									                \
+    __ul = __ll_lowpart (__u);				 \
+    __uh = __ll_highpart (__u);				 \
+    __vl = __ll_lowpart (__v);				 \
+    __vh = __ll_highpart (__v);				 \
+									                \
+    __x0 = (mp_limb_t) __ul * __vl;			 \
+    __x1 = (mp_limb_t) __ul * __vh;			 \
+    __x2 = (mp_limb_t) __uh * __vl;			 \
+    __x3 = (mp_limb_t) __uh * __vh;			 \
+									                \
+    __x1 += __ll_highpart (__x0);/* this can't give carry */            \
+    __x1 += __x2;		/* but this indeed can */		                     \
+    if (__x1 < __x2)		/* did we get it? */			                     \
+      __x3 += __ll_B;		/* yes, add it in the proper pos. */         \
+									                                             \
+    (w1) = __x3 + __ll_highpart (__x1);					                  \
     (w0) = (__x1 << __GMP_BITS_PER_MP_LIMB/2) + __ll_lowpart (__x0);		\
   } while (0)
 
-#define udiv_qrnnd_int(q, r, n1, n0, d) \
-  do {									\
-    mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			\
-									\
-    FLINT_ASSERT ((d) != 0);							\
-    FLINT_ASSERT ((n1) < (d));						\
-    						\
-    __d1 = __ll_highpart (d);						\
-    __d0 = __ll_lowpart (d);						\
-					\
-    __q1 = (n1) / __d1;							\
-    __r1 = (n1) - __q1 * __d1;						\
-    __m = __q1 * __d0;							\
-    __r1 = __r1 * __ll_B | __ll_highpart (n0);				\
-    if (__r1 < __m)							\
-      {									\
-	__q1--, __r1 += (d);						\
-	if (__r1 >= (d)) /* i.e. we didn't get carry when adding to __r1 */\
-	  if (__r1 < __m)						\
-	    __q1--, __r1 += (d);					\
-      }									\
-    __r1 -= __m;							\
-									\
-    __q0 = __r1 / __d1;							\
-    __r0 = __r1  - __q0 * __d1;						\
-    __m = __q0 * __d0;							\
-    __r0 = __r0 * __ll_B | __ll_lowpart (n0);				\
-    if (__r0 < __m)							\
-      {									\
-	__q0--, __r0 += (d);						\
-	if (__r0 >= (d))						\
-	  if (__r0 < __m)						\
-	    __q0--, __r0 += (d);					\
-      }									\
-    __r0 -= __m;							\
-									\
-    (q) = __q1 * __ll_B | __q0;						\
-    (r) = __r0;								\
+#endif
+
+#define udiv_qrnnd_int(q, r, n1, n0, d)                                \
+  do {									                                      \
+    mp_limb_t __d1, __d0, __q1, __q0, __r1, __r0, __m;			        \
+									                                            \
+    FLINT_ASSERT ((d) != 0);							                       \
+    FLINT_ASSERT ((n1) < (d));						                       \
+    						                                                  \
+    __d1 = __ll_highpart (d);						                          \
+    __d0 = __ll_lowpart (d);						                          \
+					                                                        \
+    __q1 = (n1) / __d1;							                             \
+    __r1 = (n1) - __q1 * __d1;						                       \
+    __m = __q1 * __d0;							                             \
+    __r1 = __r1 * __ll_B | __ll_highpart (n0);				              \
+    if (__r1 < __m)							                                \
+      {									                                      \
+	__q1--, __r1 += (d);						                                \
+	if (__r1 >= (d)) /* i.e. we didn't get carry when adding to __r1 */ \
+	  if (__r1 < __m)						                                   \
+	    __q1--, __r1 += (d);					                             \
+      }									                                      \
+    __r1 -= __m;							                                   \
+									                                            \
+    __q0 = __r1 / __d1;							                             \
+    __r0 = __r1  - __q0 * __d1;						                       \
+    __m = __q0 * __d0;							                             \
+    __r0 = __r0 * __ll_B | __ll_lowpart (n0);				              \
+    if (__r0 < __m)							                                \
+      {									                                      \
+	__q0--, __r0 += (d);						                                \
+	if (__r0 >= (d))						                                   \
+	  if (__r0 < __m)						                                   \
+	    __q0--, __r0 += (d);					                             \
+      }									                                      \
+    __r0 -= __m;							                                   \
+									                                            \
+    (q) = __q1 * __ll_B | __q0;						                       \
+    (r) = __r0;								                                \
   } while (0)
 
-#define count_leading_zeros(count, x) \
-  do {									\
-    mp_limb_t __xr = (x);							\
-    mp_limb_t __a;								\
-									\
-    if (__GMP_BITS_PER_MP_LIMB == 32)						\
-      {									\
-	__a = __xr < ((mp_limb_t) 1 << 2*__BITS4)				\
-	  ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1)		\
-	  : (__xr < ((mp_limb_t) 1 << 3*__BITS4) ? 2*__BITS4 + 1		\
-	  : 3*__BITS4 + 1);						\
-      }									\
-    else								\
-      {									\
-	for (__a = __GMP_BITS_PER_MP_LIMB - 8; __a > 0; __a -= 8)			\
-	  if (((__xr >> __a) & 0xff) != 0)				\
-	    break;							\
-	++__a;								\
-      }									\
-									\
-    (count) = __GMP_BITS_PER_MP_LIMB + 1 - __a - __flint_clz_tab[__xr >> __a];		\
+#define count_leading_zeros(count, x)                        \
+  do {									                            \
+    mp_limb_t __xr = (x);							                \
+    mp_limb_t __a;								                   \
+									                                  \
+    if (__GMP_BITS_PER_MP_LIMB == 32)						       \
+      {									                            \
+	__a = __xr < ((mp_limb_t) 1 << 2*__BITS4)				       \
+	  ? (__xr < ((mp_limb_t) 1 << __BITS4) ? 1 : __BITS4 + 1) \
+	  : (__xr < ((mp_limb_t) 1 << 3*__BITS4) ? 2*__BITS4 + 1	 \
+	  : 3*__BITS4 + 1);						                      \
+      }									                            \
+    else								                               \
+      {									                            \
+	for (__a = __GMP_BITS_PER_MP_LIMB - 8; __a > 0; __a -= 8) \
+	  if (((__xr >> __a) & 0xff) != 0)				             \
+	    break;							                            \
+	++__a;								                            \
+      }									                            \
+									                                  \
+    (count) = __GMP_BITS_PER_MP_LIMB + 1 - __a - __flint_clz_tab[__xr >> __a]; \
   } while (0)
 
-#define count_trailing_zeros(count, x) \
-  do {									\
-    mp_limb_t __ctz_x = (x);						\
-    mp_limb_t __ctz_c;							\
-    FLINT_ASSERT (__ctz_x != 0);						\
-    count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x);			\
-    (count) = __GMP_BITS_PER_MP_LIMB - 1 - __ctz_c;				\
+#if !(__GMP_BITS_PER_MP_LIMB == 64 && defined (__ia64))
+
+#define count_trailing_zeros(count, x)                 \
+  do {									                      \
+    mp_limb_t __ctz_x = (x);						          \
+    mp_limb_t __ctz_c;							             \
+    FLINT_ASSERT (__ctz_x != 0);						       \
+    count_leading_zeros (__ctz_c, __ctz_x & -__ctz_x); \
+    (count) = __GMP_BITS_PER_MP_LIMB - 1 - __ctz_c;	 \
   } while (0)
 
-#define udiv_qrnnd(q, r, n1, n0, d) \
-    do { \
-       mp_limb_t __norm; \
-       count_leading_zeros(__norm, (d)); \
-       if (__norm) \
-       { \
+#endif
+
+#define udiv_qrnnd(q, r, n1, n0, d)                  \
+    do {                                             \
+       mp_limb_t __norm;                             \
+       count_leading_zeros(__norm, (d));             \
+       if (__norm)                                   \
+       {                                             \
            udiv_qrnnd_int((q), (r), ((n1) << __norm) + ((n0) >> (__GMP_BITS_PER_MP_LIMB - __norm)), (n0) << __norm, (d) << __norm); \
-          (r) = ((mp_limb_t) (r) >> __norm); \
-       } else \
+          (r) = ((mp_limb_t) (r) >> __norm);         \
+       } else                                        \
           udiv_qrnnd_int((q), (r), (n1), (n0), (d)); \
     } while (0)
 
 #define sdiv_qrnnd(q, r, n1, n0, d) \
-  do { \
-    mp_limb_t __n1, __n0, __d; \
-    int __sgn1 = 0, __sgn2 = 0; \
-    if ((n1) & __highbit) \
-    { \
-       __n0 = -(n0); \
-       __n1 = ~(n1) + (__n0 == 0); \
-       __sgn1 = ~__sgn1; \
-    } else \
-    { \
-      __n0 = (n0); \
-      __n1 = (n1); \
-    } \
-    if ((d) & __highbit) \
-    { \
-        __d = -(d); \
-        __sgn2 = ~__sgn2; \
-    } else \
-    { \
-        __d = (d); \
-    } \
+  do {                              \
+    mp_limb_t __n1, __n0, __d;      \
+    int __sgn1 = 0, __sgn2 = 0;     \
+    if ((n1) & __highbit)           \
+    {                               \
+       __n0 = -(n0);                \
+       __n1 = ~(n1) + (__n0 == 0);  \
+       __sgn1 = ~__sgn1;            \
+    } else                          \
+    {                               \
+      __n0 = (n0);                  \
+      __n1 = (n1);                  \
+    }                               \
+    if ((d) & __highbit)            \
+    {                               \
+        __d = -(d);                 \
+        __sgn2 = ~__sgn2;           \
+    } else                          \
+    {                               \
+        __d = (d);                  \
+    }                               \
     udiv_qrnnd((q), (r), (mp_limb_t) __n1, (mp_limb_t) __n0, (mp_limb_t) __d); \
-    if (__sgn1 ^ __sgn2) \
-    { \
-        (q) = -(q); \
-        if (!__sgn2) \
-        { \
-            (q)--; \
-            (r) = (__d) - (r); \
-        } \
-    } else if (__sgn1 && __sgn2) \
-    { \
-       (q)++; \
-       (r) = (__d) - (r); \
-    } \
+    if (__sgn1 ^ __sgn2)            \
+    {                               \
+        (q) = -(q);                 \
+        if (!__sgn2)                \
+        {                           \
+            (q)--;                  \
+            (r) = (__d) - (r);      \
+        }                           \
+    } else if (__sgn1 && __sgn2)    \
+    {                               \
+       (q)++;                       \
+       (r) = (__d) - (r);           \
+    }                               \
   } while (0)
 
 #endif /* non x86 fallback code */
+
+#if !(__GMP_BITS_PER_MP_LIMB == 32 && defined (__arm__))
 
 #define smul_ppmm(w1, w0, u, v)                         \
   do {                                                  \
@@ -333,6 +442,8 @@
     (w1) = __w1 - (-(__xm0 >> (FLINT_BITS-1)) & __xm1)  \
         - (-(__xm1 >> (FLINT_BITS-1)) & __xm0);         \
   } while (0)
+
+#endif
 
 #define invert_limb(invxl, xl)                      \
    do {                                             \

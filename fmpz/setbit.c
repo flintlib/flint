@@ -33,7 +33,7 @@ void fmpz_setbit(fmpz_t f, ulong i)
         {
             *f |= (1L << i);
         }
-        else  /* i >= FLINT_BITS */
+        else  /* i >= FLINT_BITS - 2 */
         {
             __mpz_struct *ptr = _fmpz_promote_val(f);
 
@@ -46,6 +46,8 @@ void fmpz_setbit(fmpz_t f, ulong i)
         __mpz_struct *ptr = COEFF_TO_PTR(*f);
 
         mpz_setbit(ptr, i);
+
+        _fmpz_demote_val(f);
     }
 }
 

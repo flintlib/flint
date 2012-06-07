@@ -79,12 +79,17 @@ void _fmpz_clear_mpz(fmpz f)
     fmpz_num_unused++;   
 }
 
-void _fmpz_cleanup(void)
+void _fmpz_cleanup_mpz_content(void)
 {
     long i;
     for (i = 0; i < fmpz_num_unused; i++)
         mpz_clear(fmpz_arr + fmpz_unused_arr[i]);
-    
+}
+
+void _fmpz_cleanup(void)
+{
+    _fmpz_cleanup_mpz_content();
+
     if (fmpz_num_unused) flint_free(fmpz_unused_arr);
     if (fmpz_allocated) flint_free(fmpz_arr);
 }

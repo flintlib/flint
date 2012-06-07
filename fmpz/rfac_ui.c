@@ -53,7 +53,7 @@ _fmpz_rfac_ui(fmpz_t r, const fmpz_t x, ulong a, ulong b)
     else if ((*x <= COEFF_MAX) && (b - a < 60))
     {
         ulong step, bits, factors_per_limb;
-        long y = *x;
+        ulong y = *x;
 
         /* Bound size of largest factor */
         bits = FLINT_BIT_COUNT(y + a + b - 1);

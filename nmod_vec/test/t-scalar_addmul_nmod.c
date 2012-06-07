@@ -64,7 +64,7 @@ main(void)
         _nmod_vec_scalar_addmul_nmod(vec2, vec, len, c, mod);
 
         result = _nmod_vec_equal(vec2, vec3, len);
-        if (!_nmod_vec_equal(vec2, vec3, len))
+        if (!result)
         {
             printf("FAIL:\n");
             printf("len = %ld, n = %ld\n", len, n);

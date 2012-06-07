@@ -126,14 +126,14 @@ void nmod_mat_mul(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_classical(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 void nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B);
 
+void
+_nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
+                                const nmod_mat_t A, const nmod_mat_t B, int op);
+
 void nmod_mat_addmul(nmod_mat_t D, const nmod_mat_t C,
-                                const nmod_mat_t A, const nmod_mat_t B);
-void nmod_mat_addmul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
 void nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
-                                const nmod_mat_t A, const nmod_mat_t B);
-void nmod_mat_submul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B);
 
 /* Trace */
@@ -188,9 +188,8 @@ long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 /* Size at which pre-transposing becomes faster in classical multiplication */
 #define NMOD_MAT_MUL_TRANSPOSE_CUTOFF 20
 
-/* It is questionable whether we need two different parameters */
-#define NMOD_MAT_MUL_STRASSEN_OUTER_CUTOFF 256
-#define NMOD_MAT_MUL_STRASSEN_INNER_CUTOFF 64
+/* Strassen multiplication */
+#define NMOD_MAT_MUL_STRASSEN_CUTOFF 256
 
 /* Cutoff between classical and recursive triangular solving */
 #define NMOD_MAT_SOLVE_TRI_ROWS_CUTOFF 64
@@ -213,3 +212,4 @@ long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 #endif
 
 #endif
+

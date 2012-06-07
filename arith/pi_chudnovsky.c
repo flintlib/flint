@@ -545,7 +545,6 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
     mpf_t  pi, qi, t1, t2;
     mpfr_prec_t prec;
     long int i, depth=1, terms;
-    unsigned long psize, qsize;
     pi_state state;
 
     prec = mpfr_get_prec(res) + 64;
@@ -619,9 +618,6 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
         pi = -----------------
         (q+A*p)
       */
-
-    psize = mpz_sizeinbase(p1,10);
-    qsize = mpz_sizeinbase(q1,10);
 
     mpz_addmul_ui(q1, p1, A);
     mpz_mul_ui(p1, p1, C/D);

@@ -377,6 +377,22 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
 
     Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
 
+mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits)
+
+    For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits and
+    sets \code{exp} to an exponent $e$, such that $|x| \ge m 2^e$. The number
+    of bits must be between 1 and \code{FLINT_BITS} inclusive.
+    The mantissa is guaranteed to be correctly rounded.
+
+mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits)
+
+    For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits
+    and sets \code{exp} to an exponent $e$, such that $|x| \le m 2^e$.
+    The number of bits must be between 1 and \code{FLINT_BITS} inclusive.
+    The mantissa is either correctly rounded or one unit too large
+    (possibly meaning that the exponent is one too large,
+    if the mantissa is a power of two).
+
 *******************************************************************************
 
     Comparison
@@ -719,6 +735,17 @@ void fmpz_rfac_uiui(fmpz_t r, ulong x, ulong k)
 
     Sets $r$ to the rising factorial $x (x+1) (x+2) \cdots (x+k-1)$.
 
+void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
+
+    Sets $f$ to the product $g$ and $h$ divided by \code{2^exp}, rounding
+    down towards zero.
+
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp)
+
+    Sets $f$ to the product $g$ and $x$ divided by \code{2^exp}, rounding
+    down towards zero.
+
+
 *******************************************************************************
 
     Greatest common divisor
@@ -827,6 +854,41 @@ void fmpz_bit_unpack_unsigned(fmpz_t coeff,
     starting after \code{shift} bits, and placed into \code{coeff}.
 
     The value of \code{shift} is expected to be less than \code{FLINT_BITS}.
+
+*******************************************************************************
+
+    Logic Operations
+
+*******************************************************************************
+
+void fmpz_complement(fmpz_t r, const fmpz_t f)
+
+    The variable \code{r} is set to the ones-complement of \code{f}.
+
+void fmpz_clrbit(fmpz_t f, ulong i)
+
+    Sets the \code{i}th bit in \code{f} to zero.
+
+void fmpz_combit(fmpz_t f, ulong i)
+
+    Complements the \code{i}th bit in \code{f}.
+
+void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical \code{and} of \code{a} and \code{b}.
+
+void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of \code{a} and \code{b}.
+
+void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b)
+
+    Sets \code{r} to the bit-wise logical exclusive \code{or} of \code{a} and \code{b}.
+
+int fmpz_popcnt(const fmpz_t a)
+
+    Returns the number of '1' bits in the given Z (aka Hamming weight or population count).
+    The return value is undefined if the input is negative.
 
 *******************************************************************************
 

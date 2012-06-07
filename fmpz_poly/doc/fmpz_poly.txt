@@ -371,6 +371,11 @@ void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1,
 
     Sets \code{poly1} to \code{poly2} times $x$.
 
+void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} times the \code{mpz_t} $x$.
+
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 
     Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
@@ -378,6 +383,10 @@ void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
+
+void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong exp)
+
+    Sets \code{poly1} to \code{poly2} times \code{2^exp}.
 
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, const fmpz_poly_t poly2, 
                                                                 const fmpz_t x)
@@ -395,6 +404,12 @@ void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
     rounding coefficients down toward~$- \infty$.
 
+void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
+    rounding coefficients down toward~$- \infty$.
+
 void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
@@ -403,6 +418,11 @@ void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
 void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    rounding coefficients down toward~$- \infty$.
+
+void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by \code{2^x}, 
     rounding coefficients down toward~$- \infty$.
 
 void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
@@ -421,10 +441,21 @@ void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
     Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
     rounding coefficients toward~$0$.
 
+void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
+
+    Sets \code{poly1} to \code{poly2} divided by \code{2^x}, 
+    rounding coefficients toward~$0$.
+
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
+    assuming the coefficient is exact for every coefficient.
+
+void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, 
+                                       const fmpz_poly_t poly2, const mpz_t x)
+
+    Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
     assuming the coefficient is exact for every coefficient.
 
 void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
@@ -647,9 +678,7 @@ void _fmpz_poly_mul_SS(fmpz * output, const fmpz * input1, long length1,
                                             const fmpz * input2, long length2)
 
     Sets \code{(output, length1 + length2 - 1)} to the product of 
-    \code{(input1, length1)} and \code{(input2, length2)}. If the number of 
-    bits per output coefficient (made negative if any of the input 
-    coefficients are negative) is know it may be specified as \code{bits_in}.
+    \code{(input1, length1)} and \code{(input2, length2)}.
 
     We must have \code{len1 > 1} and \code{len2 > 1}.  Allows zero-padding 
     of the two input polynomials.  Supports aliasing of inputs and outputs.
@@ -1835,6 +1864,33 @@ void fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
 
 *******************************************************************************
 
+    Newton basis
+
+*******************************************************************************
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
+
+    Converts \code{(poly, n)} in-place from its coefficients given
+    in the standard monomial basis to the Newton basis
+    for the roots $r_0, r_1, \ldots, r_{n-2}$.
+    In other words, this determines output coefficients $c_i$ such that
+    $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+    is equal to the input polynomial.
+    Uses repeated polynomial division.
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
+
+    Converts \code{(poly, n)} in-place from its coefficients given
+    in the Newton basis for the roots $r_0, r_1, \ldots, r_{n-2}$
+    to the standard monomial basis. In other words, this evaluates
+    $$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+    where $c_i$ are the input coefficients for \code{poly}.
+    Uses Horner's rule.
+
+*******************************************************************************
+
     Interpolation
 
 *******************************************************************************
@@ -1916,6 +1972,41 @@ void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1,
     To be precise about the order of composition, denoting \code{res}, 
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
+
+*******************************************************************************
+
+    Taylor shift
+
+*******************************************************************************
+
+void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    Uses an efficient version Horner's rule.
+
+void fmpz_poly_taylor_shift_horner(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long n)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+    Uses the divide-and-conquer polynomial composition algorithm.
+
+void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
+    Uses the divide-and-conquer polynomial composition algorithm.
+
+void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n)
+
+    Performs the Taylor shift composing \code{poly} by $x+c$ in-place.
+
+void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c)
+
+    Performs the Taylor shift composing \code{f} by $x+c$.
 
 *******************************************************************************
 
@@ -2084,6 +2175,39 @@ void fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n)
     This implementation defaults to the fast version of
     Lagrange interpolation.
 
+*******************************************************************************
+
+    Square root
+
+*******************************************************************************
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len)
+
+    If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
+    to the square root of \code{poly} with positive leading coefficient
+    and returns 1. Otherwise returns 0.
+
+    This function first uses various tests to detect nonsquares quickly.
+    Then, it computes the square root iteratively from top to bottom,
+    requiring $O(n^2)$ coefficient operations.
+
+int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
+
+int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len)
+
+    If \code{(poly, len)} is a perfect square, sets \code{(res, len / 2 + 1)}
+    to the square root of \code{poly} with positive leading coefficient
+    and returns 1. Otherwise returns 0.
+
+int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
+
+    If \code{a} is a perfect square, sets \code{b} to the square root of
+    \code{a} with positive leading coefficient and returns 1.
+    Otherwise returns 0.
 
 *******************************************************************************
 
@@ -2542,3 +2666,21 @@ void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
     Sets \code{poly} to the monic polynomial which is the product
     of $(x - x_0)(x - x_1) \cdots (x - x_{n-1})$, the roots $x_i$ being
     given by \code{xs}.
+
+*******************************************************************************
+
+    Newton basis conversion
+
+*******************************************************************************
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
+
+    Converts the polynomial in-place from its coefficients in the
+    monomial basis to the Newton basis $1, (x-r_0), (x-r_0)(x-r_1), \ldots$.
+    Uses Horner's rule, requiring $O(n^2)$ operations.
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
+
+    Converts the polynomial in-place from its coefficients in the
+    Newton basis $1, (x-r_0), (x-r_0)(x-r_1), \ldots$ to the monomial
+    basis. Uses repeated polynomial division, requiring $O(n^2)$ operations.

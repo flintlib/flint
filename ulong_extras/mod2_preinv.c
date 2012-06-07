@@ -26,7 +26,6 @@
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
-#include <stdio.h>
 
 /*
 

@@ -675,16 +675,18 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
                                    const fmpz *B, long lenB, 
                                    const fmpz_t invB, const fmpz_t p)
 
-    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$, 
-    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
-    the length of $G$.
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
+    such that $S A + T B = G$.  Returns the length of $G$.
+
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and 
+    $(\len(A),\len(B)) \neq (1,1)$.
 
     No attempt is made to make the GCD monic.
 
     Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
-    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$, 
-    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
-    and $\len(T) \leq \len(A) - \len(G)$.
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively. 
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and 
+    $\len(T) \leq \max(\len(A) - \len(G), 1)$.
 
     No aliasing of input and output operands is permitted.
 
@@ -706,16 +708,18 @@ long _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T,
                          const fmpz *B, long lenB, 
                          const fmpz_t invB, const fmpz_t p)
 
-    Computes the GCD of $A$ and $B$, where $\len(A) \geq \len(B) > 0$, 
-    together with cofactors $S$ and $T$ such that $S A + T B = G$. Returns 
-    the length of $G$.
+    Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
+    such that $S A + T B = G$.  Returns the length of $G$.
+
+    Assumes that $\len(A) \geq \len(B) \geq 1$ and 
+    $(\len(A),\len(B)) \neq (1,1)$.
 
     No attempt is made to make the GCD monic.
 
     Requires that $G$ have space for $\len(B)$ coefficients.  Writes 
-    $\len(B) - 1$ and $\len(A) - 1$ coefficients to $S$ and $T$, 
-    respectively.  Note that, in fact, $\len(S) \leq \len(B) - \len(G)$ 
-    and $\len(T) \leq \len(A) - \len(G)$.
+    $\len(B)-1$ and $\len(A)-1$ coefficients to $S$ and $T$, respectively. 
+    Note that, in fact, $\len(S) \leq \max(\len(B) - \len(G), 1)$ and 
+    $\len(T) \leq \max(\len(A) - \len(G), 1)$.
 
     No aliasing of input and output operands is permitted.
 
@@ -754,7 +758,7 @@ int _fmpz_mod_poly_invmod(fmpz *A,
                           const fmpz *B, long lenB, 
                           const fmpz *P, long lenP, const fmpz_t p)
 
-    Attempts to set \code{(A, lenP - 1)} to the inverse of \code{(B, lenB)} 
+    Attempts to set \code{(A, lenP-1)} to the inverse of \code{(B, lenB)} 
     modulo the polynomial \code{(P, lenP)}.  Returns $1$ if \code{(B, lenB)} 
     is invertible and $0$ otherwise.
 

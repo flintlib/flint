@@ -190,7 +190,13 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    */
    glen = FLINT_MIN((limbsg*FLINT_BITS)/pack_bits + 1, len2); 
    G = _fmpz_vec_init(glen);
-   
+
+   /* 
+      clear bits after g in arrayg so they are not inadvertently
+      pulled into G after bit unpacking
+   */
+   mpn_zero(arrayg + limbsg, limbs2-limbsg);
+
    /* unpack gcd */
    _fmpz_poly_bit_unpack(G, glen, arrayg, pack_bits, 0);
    while (G[glen - 1] == 0) glen--;

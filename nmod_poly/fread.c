@@ -36,7 +36,9 @@ int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 
     if (fscanf(f, "%ld %lu", &length, &n) != 2)
         return 0;
-      
+    
+    nmod_poly_clear(poly);
+    nmod_poly_init(poly,n); 
     nmod_poly_fit_length(poly, length);
     poly->length = length;
     
