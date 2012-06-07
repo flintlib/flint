@@ -283,7 +283,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
     {
         long *e, i, k, n;
         fmpz *pow, *u;
-        fmpz *s, *t;
+        fmpz *r, *s, *t;
 
         n = FLINT_CLOG2(N) + 1;
 
@@ -294,6 +294,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
 
         pow = _fmpz_vec_init(n);
         u   = _fmpz_vec_init(len * n);
+        r   = _fmpz_vec_init(2 * d - 1);
         s   = _fmpz_vec_init(2 * d - 1);
         t   = _fmpz_vec_init(2 * d - 1);
 
@@ -343,7 +344,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
                 fmpz_set(s + j[k], a + k);
             _fmpz_mod_poly_invmod(rop, t, d, s, d + 1, p);
         }
-        for (i--; i >= 0; i--)  /* z := z - z (a z^2 - 1) / 2 */
+        for (i--; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
         {
             _fmpz_poly_sqr(s, rop, d);
             _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
@@ -363,17 +364,31 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
             _fmpz_poly_sub(rop, rop, d, s, d);
             _fmpz_vec_scalar_mod_fmpz(rop, rop, d, pow + i);
         }
+        {
+            _fmpz_poly_mul(s, rop, d, u + 1 * len, len);
+            _fmpz_poly_reduce(s, d + len - 1, a, j, lena);
+            _fmpz_poly_sqr(t, s, d);
+            _fmpz_poly_reduce(t, 2 * d - 1, a, j, lena);
+            _fmpz_poly_sub(t, u + 0 * len, len, t, d);
 
-        /* Invert modulo p^N */
-        _fmpz_poly_mul(s, rop, d, u + 0, len);
-        _fmpz_poly_reduce(s, d + len - 1, a, j, lena);
-        _fmpz_vec_scalar_mod_fmpz(rop, s, d, pow + 0);
-        _fmpz_vec_zero(rop + d, d - 1);
+            for (k = 0; k < d; k++)
+            {
+                if (fmpz_is_odd(t + k))
+                    fmpz_add(t + k, t + k, pow + 0);
+                fmpz_fdiv_q_2exp(t + k, t + k, 1);
+            }
+
+            _fmpz_poly_mul(r, rop, d, t, d);
+            _fmpz_poly_reduce(r, 2 * d - 1, a, j, lena);
+            _fmpz_poly_add(rop, r, d, s, d);
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, d, pow + 0);
+        }
 
       exit:
 
         _fmpz_vec_clear(pow, n);
         _fmpz_vec_clear(u, len * n);
+        _fmpz_vec_clear(r, 2 * d - 1);
         _fmpz_vec_clear(s, 2 * d - 1);
         _fmpz_vec_clear(t, 2 * d - 1);
         flint_free(e);
