@@ -220,6 +220,11 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile
+if [ "$WANT_NTL" = "1" ]; then
+	echo "EXTRA_LIBS=-lntl" >> Makefile
+else
+	echo "EXTRA_LIBS=" >> Makefile
+fi
 echo "FLINT_MPIR_LIB_DIR=$MPIR_LIB_DIR" >> Makefile
 echo "FLINT_MPIR_INCLUDE_DIR=$MPIR_INCLUDE_DIR" >> Makefile
 echo "FLINT_MPFR_LIB_DIR=$MPFR_LIB_DIR" >> Makefile
