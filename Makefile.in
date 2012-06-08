@@ -1,7 +1,6 @@
-LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lpthread -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lpthread -lmpir -lmpfr -lm
+LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
+LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lmpfr -lmpir -lm -lpthread
 INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
-LINKLIBS=
 
 LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -11,9 +10,9 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, build/%.o, $(LIB_SOURCES))
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, build/%.lo, $(LIB_SOURCES))
+LIB_OBJS = $(patsubst %.c, build/%.lo, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
 LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
@@ -33,14 +32,11 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: all-dirs $(OBJS) recursive library 
-
-all-dirs:
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir);)
+all: library 
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LIB_LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
 distclean: clean
@@ -59,18 +55,13 @@ tune: all
 	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
 
-recursive:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 
-
-examples: all $(LOBJS) library
+examples: all
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 
-check: $(FLINT_LIB)
+check: tests 
 ifndef MOD
-	mkdir -p build/test
 	mkdir -p build/interfaces/test
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 	$(foreach prog, $(TESTS), build/$(prog);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
@@ -81,53 +72,66 @@ else
 	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
 endif
 
+tests: $(TEST_SOURCES) $(FLINT_LIB)
+	mkdir -p build/test
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c  -o build/$(prog) $(LIBS);)
+
 library: library-recursive $(OBJS) $(LIB_OBJS)
 	mkdir -p build
 	mkdir -p build/interfaces
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
+			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
+			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS); \
+			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o;) \
 		fi; \
 	fi
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	if [ "$(WANT_NTL)" -ne "1" ]; then \
+		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+			$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+		fi; \
+		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+			$(AR) rcs libflint.a $(OBJS); \
+			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o;) \
+		fi; \
 	fi
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
-	fi
-
 
 library-recursive:
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) \
 	fi
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library;) \
 	fi
 
 $(FLINT_LIB): library
 
 install: library
 	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include
+	mkdir -p $(PREFIX)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) $(PREFIX)/lib; \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a $(PREFIX)/lib; \
 	fi
-	cp *.h $(PREFIX)/include
+	cp *.h $(PREFIX)/include/flint
 
-.PHONY: profile library library-recursive recursive clean check check-recursive all
+.PHONY: profile library library-recursive clean check all
 
 build/%.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
+	fi
 
 build/%.o: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
+	fi
 
 BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
