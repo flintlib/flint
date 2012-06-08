@@ -46,7 +46,7 @@ static __inline__ void __legendre_denom(fmpz_t den, ulong n)
     fmpz_mul_2exp(den, den, d);
 }
 
-void _legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
+void _arith_legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
 {
     fmpz * r;
     int odd;
@@ -80,7 +80,7 @@ void _legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
         fmpz_zero(coeffs + k);
 }
 
-void legendre_polynomial(fmpq_poly_t poly, ulong n)
+void arith_legendre_polynomial(fmpq_poly_t poly, ulong n)
 {
     if (n == 0)
     {
@@ -97,7 +97,7 @@ void legendre_polynomial(fmpq_poly_t poly, ulong n)
         fmpz_one(poly->den);
     }
     else
-        _legendre_polynomial(poly->coeffs, poly->den, n);
+        _arith_legendre_polynomial(poly->coeffs, poly->den, n);
 
     _fmpq_poly_set_length(poly, n + 1);
 }

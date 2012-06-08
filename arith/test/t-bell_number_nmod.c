@@ -55,11 +55,11 @@ int main(void)
         nmod_init(&mod, p);
 
         b = _nmod_vec_init(n + 1);
-        bell_number_nmod_vec(b, n + 1, mod);
+        arith_bell_number_nmod_vec(b, n + 1, mod);
 
         for (j = 0; j <= n; j++)
         {
-            mp_limb_t u = bell_number_nmod(j, mod);
+            mp_limb_t u = arith_bell_number_nmod(j, mod);
 
             if (u != b[j])
             {

@@ -243,11 +243,11 @@ arith
 
 * Write profiling code.
 
-* Write a faster fmpz_divisors using the merge sort algorithm
+* Write a faster arith_divisors using the merge sort algorithm
   (see Sage's implementation). Alternatively (or as a complement)
   write a supernaturally fast _fmpz_vec_sort.
 
-* Improve fmpz_divisors by using long and longlong arithmetic
+* Improve arith_divisors by using long and longlong arithmetic
   for divisors that fit in 1 or 2 limbs.
 
 * Optimise memory management in mpq_harmonic.
@@ -256,9 +256,6 @@ arith
   module.
 
 * Implement computation of generalised harmonic numbers.
-
-* Consider renaming fmpz_poly_ramanujan_tau to fmpz_poly_delta_qexp
-  or something similar.
 
 * Maybe: move Stirling number matrix functions to the fmpz_mat module.
 
@@ -289,7 +286,7 @@ arith
   the full precision). This should be a simple modification (some care
   is needed to get all conditionals right and to write proper tests).
 
-* Write tests for the dedekind_cosine_sum functions.
+* Write tests for the arith_hrr_expsum_factored functions.
 
 fmpz_mat
 --------

@@ -233,7 +233,7 @@ solve_n1(mp_limb_t n, mp_limb_t k1, mp_limb_t k2,
 
 
 void
-dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
+arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
 {
     n_factor_t fac;
     int i;

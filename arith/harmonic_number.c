@@ -107,7 +107,7 @@ _mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
     _fmpq_canonicalise(num, den);
 }
 
-void _harmonic_number(fmpz_t num, fmpz_t den, long n)
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
 {
     n = FLINT_MAX(n, 0);
 
@@ -122,7 +122,7 @@ void _harmonic_number(fmpz_t num, fmpz_t den, long n)
     }
 }
 
-void harmonic_number(fmpq_t x, long n)
+void arith_harmonic_number(fmpq_t x, long n)
 {
-    _harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
+    _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
 }

@@ -46,8 +46,8 @@ int main()
 
     for (n = 0; n <= 500; n++)
     {
-        chebyshev_u_polynomial(U, n);
-        chebyshev_t_polynomial(T, n + 1);
+        arith_chebyshev_u_polynomial(U, n);
+        arith_chebyshev_t_polynomial(T, n + 1);
         fmpz_poly_derivative(T, T);
         fmpz_poly_scalar_divexact_ui(T, T, n + 1);
 

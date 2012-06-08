@@ -53,11 +53,11 @@ int main()
     fmpz_init(num2);
     fmpz_init(den2);
 
-    _bernoulli_number_vec_multi_mod(num1, den1, N);
+    _arith_bernoulli_number_vec_multi_mod(num1, den1, N);
 
     for (n = 0; n < N; n++)
     {
-        _bernoulli_number(num2, den2, n);
+        _arith_bernoulli_number(num2, den2, n);
 
         if (!fmpz_equal(num1 + n, num2))
         {
@@ -89,10 +89,10 @@ int main()
         for (n = 0; n < N; n++)
             fmpq_init(x + n);
 
-        bernoulli_number_vec(x, N);
+        arith_bernoulli_number_vec(x, N);
         for (n = 0; n < N; n++)
         {
-            bernoulli_number(t, n);
+            arith_bernoulli_number(t, n);
             if (!fmpq_equal(x + n, t))
             {
                 printf("FAIL!: n = %ld\n", n);

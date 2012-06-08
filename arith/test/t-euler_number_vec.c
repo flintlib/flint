@@ -50,7 +50,7 @@ int main()
         fmpz_init(s);
         fmpz_init(t);
 
-        euler_number_vec(r, n + 1);
+        arith_euler_number_vec(r, n + 1);
 
         /* sum binomial(n,k) E_k = 0 */
         fmpz_set_ui(t, 1UL);

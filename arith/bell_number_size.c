@@ -27,7 +27,7 @@
 #include "flint.h"
 
 double
-bell_number_size(ulong n)
+arith_bell_number_size(ulong n)
 {
     if (n == 0)
         return 2;

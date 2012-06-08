@@ -89,7 +89,7 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, long a, long b, long n, long bmax)
 }
 
 void
-bell_number_bsplit(fmpz_t b, ulong n)
+arith_bell_number_bsplit(fmpz_t b, ulong n)
 {
     long N, prec;
     mpz_t P, Q;

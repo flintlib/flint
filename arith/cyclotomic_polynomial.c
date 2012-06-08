@@ -33,7 +33,7 @@
 
 
 void
-_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
+_arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
                                         long num_factors, ulong phi)
 {
     long i, k;
@@ -53,7 +53,8 @@ _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
     /* Phi_{2n}(x) = Phi_n(-x)*/
     if (factors[0] == 2UL)
     {
-        _cyclotomic_polynomial(a, n / 2, factors + 1, num_factors - 1, phi);
+        _arith_cyclotomic_polynomial(a, n / 2, factors + 1,
+            num_factors - 1, phi);
         for (i = 1; i <= D; i += 2)
             fmpz_neg(a + i, a + i);
         return;
@@ -104,7 +105,7 @@ _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
 }
 
 void
-cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
+arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
 {
     n_factor_t factors;
     long i, j;
@@ -144,7 +145,8 @@ cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
     fmpz_poly_fit_length(poly, phi * s + 1);
 
     /* Evaluate lower half of Phi_s(x) */
-    _cyclotomic_polynomial(poly->coeffs, n / s, factors.p, factors.num, phi);
+    _arith_cyclotomic_polynomial(poly->coeffs, n / s,
+        factors.p, factors.num, phi);
 
     /* Palindromic extension */
     for (i = 0; i < (phi + 1) / 2; i++)

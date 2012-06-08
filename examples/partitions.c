@@ -21,7 +21,7 @@ main(int argc, char * argv[])
     printf("p(%lu) = \n", n);
 
     fmpz_init(x);
-    number_of_partitions(x, n);
+    arith_number_of_partitions(x, n);
     fmpz_print(x);
     printf("\n");
     fmpz_clear(x);

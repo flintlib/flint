@@ -57,14 +57,14 @@ int main(void)
         for (nn = 0; nn < maxn; nn++)
         {
             fmpz_mat_init(mat, mm, nn);
-            stirling_number_1u_mat(mat);
+            arith_stirling_matrix_1u(mat);
 
             for (n = 0; n < mm; n++)
             {
                 for (k = 0; k < nn; k++)
                 {
                     row = _fmpz_vec_init(k);
-                    stirling_number_1u_vec(row, n, k);
+                    arith_stirling_number_1u_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
                         printf("stirling1u mat != vec ");
@@ -77,7 +77,7 @@ int main(void)
                     }
                     _fmpz_vec_clear(row, k);
 
-                    stirling_number_1u(s, n, k);
+                    arith_stirling_number_1u(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
                         printf("stirling1u mat != single ");
@@ -98,14 +98,14 @@ int main(void)
         for (nn = 0; nn < maxn; nn++)
         {
             fmpz_mat_init(mat, mm, nn);
-            stirling_number_1_mat(mat);
+            arith_stirling_matrix_1(mat);
 
             for (n = 0; n < mm; n++)
             {
                 for (k = 0; k < nn; k++)
                 {
                     row = _fmpz_vec_init(k);
-                    stirling_number_1_vec(row, n, k);
+                    arith_stirling_number_1_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
                         printf("stirling1 mat != vec ");
@@ -118,7 +118,7 @@ int main(void)
                     }
                     _fmpz_vec_clear(row, k);
 
-                    stirling_number_1(s, n, k);
+                    arith_stirling_number_1(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
                         printf("stirling1 mat != single ");
@@ -139,14 +139,14 @@ int main(void)
         for (nn = 0; nn < maxn; nn++)
         {
             fmpz_mat_init(mat, mm, nn);
-            stirling_number_2_mat(mat);
+            arith_stirling_matrix_2(mat);
 
             for (n = 0; n < mm; n++)
             {
                 for (k = 0; k < nn; k++)
                 {
                     row = _fmpz_vec_init(k);
-                    stirling_number_2_vec(row, n, k);
+                    arith_stirling_number_2_vec(row, n, k);
                     if (!_fmpz_vec_equal(row, mat->rows[n], k))
                     {
                         printf("stirling2 mat != vec ");
@@ -159,7 +159,7 @@ int main(void)
                     }
                     _fmpz_vec_clear(row, k);
 
-                    stirling_number_2(s, n, k);
+                    arith_stirling_number_2(s, n, k);
                     if (!fmpz_equal(mat->rows[n]+k, s))
                     {
                         printf("stirling2 mat != single ");
@@ -185,8 +185,8 @@ int main(void)
         fmpz_mat_init(mat2, nn, nn);
         fmpz_mat_init(mat3, nn, nn);
 
-        stirling_number_1_mat(mat);
-        stirling_number_2_mat(mat2);
+        arith_stirling_matrix_1(mat);
+        arith_stirling_matrix_2(mat2);
         fmpz_mat_mul(mat3, mat, mat2);
 
         for (n = 0; n < nn; n++)

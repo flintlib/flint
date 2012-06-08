@@ -29,12 +29,12 @@
 #include "arith.h"
 
 void
-bell_number(fmpz_t b, ulong n)
+arith_bell_number(fmpz_t b, ulong n)
 {
     if (n < BELL_NUMBER_TAB_SIZE)
         fmpz_set_ui(b, bell_number_tab[n]);
     else if (n < 5000)
-        bell_number_bsplit(b, n);
+        arith_bell_number_bsplit(b, n);
     else
-        bell_number_multi_mod(b, n);
+        arith_bell_number_multi_mod(b, n);
 }

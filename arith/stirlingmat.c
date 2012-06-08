@@ -29,7 +29,7 @@
 
 
 void
-_fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
+_arith_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
 {
     long k;
     fmpz_t t, u;
@@ -73,7 +73,7 @@ _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
 }
 
 static void
-_fmpz_stirling_mat(fmpz ** rows, long r, long c, int kind)
+_arith_stirling_mat(fmpz ** rows, long r, long c, int kind)
 {
     long i, j;
 
@@ -86,42 +86,42 @@ _fmpz_stirling_mat(fmpz ** rows, long r, long c, int kind)
 
     for (i = 1; i < r; i++)
     {
-        _fmpz_stirling_next_row(rows[i], rows[i-1], i, FLINT_MIN(c,i+1), kind);
+        _arith_stirling_next_row(rows[i], rows[i-1], i, FLINT_MIN(c,i+1), kind);
 
         for (j = i + 1; j < c; j++)
             fmpz_zero(rows[i] + j);
     }
 }
 
-void stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
-    _fmpz_stirling_next_row(row, prev, n, klen, 0);
+    _arith_stirling_next_row(row, prev, n, klen, 0);
 }
 
-void stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
-    _fmpz_stirling_next_row(row, prev, n, klen, 1);
+    _arith_stirling_next_row(row, prev, n, klen, 1);
 }
 
-void stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
 {
-    _fmpz_stirling_next_row(row, prev, n, klen, 2);
-}
-
-void
-stirling_number_1u_mat(fmpz_mat_t mat)
-{
-    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 0);
+    _arith_stirling_next_row(row, prev, n, klen, 2);
 }
 
 void
-stirling_number_1_mat(fmpz_mat_t mat)
+arith_stirling_matrix_1u(fmpz_mat_t mat)
 {
-    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 1);
+    _arith_stirling_mat(mat->rows, mat->r, mat->c, 0);
 }
 
 void
-stirling_number_2_mat(fmpz_mat_t mat)
+arith_stirling_matrix_1(fmpz_mat_t mat)
 {
-    _fmpz_stirling_mat(mat->rows, mat->r, mat->c, 2);
+    _arith_stirling_mat(mat->rows, mat->r, mat->c, 1);
+}
+
+void
+arith_stirling_matrix_2(fmpz_mat_t mat)
+{
+    _arith_stirling_mat(mat->rows, mat->r, mat->c, 2);
 }

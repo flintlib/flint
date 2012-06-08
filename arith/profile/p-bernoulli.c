@@ -59,15 +59,15 @@ void sample(void * arg, ulong count)
     {
         if (algorithm == 0)
         {
-            _bernoulli_number_vec_recursive(num, den, n);
+            _arith_bernoulli_number_vec_recursive(num, den, n);
         }
         else if (algorithm == 1)
         {
-            _bernoulli_number_vec_multi_mod(num, den, n);
+            _arith_bernoulli_number_vec_multi_mod(num, den, n);
         }
         else if (algorithm == 2)
         {
-            _bernoulli_number_vec_zeta(num, den, n);
+            _arith_bernoulli_number_vec_zeta(num, den, n);
             mpfr_free_cache();
         }
     }

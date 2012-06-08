@@ -55,8 +55,8 @@ int main(void)
                 fmpz_set_si(hh, h);
                 fmpz_set_si(kk, k);
 
-                s1 = dedekind_sum_coprime_d(h, k);
-                dedekind_sum_naive(s2, hh, kk);
+                s1 = arith_dedekind_sum_coprime_d(h, k);
+                arith_dedekind_sum_naive(s2, hh, kk);
 
                 s2f = ((double)fmpz_get_si(fmpq_numref(s2))) /
                         fmpz_get_si(fmpq_denref(s2));

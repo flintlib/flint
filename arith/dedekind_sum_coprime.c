@@ -34,13 +34,13 @@
 #define DOUBLE_CUTOFF (1UL << 21)
 
 void
-dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
+arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
     if (fmpz_cmp_ui(k, DOUBLE_CUTOFF) < 0)
     {
         double t;
 
-        t = dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
+        t = arith_dedekind_sum_coprime_d(*h, *k) * (6 * (*k));
 
         /* Round to nearest after truncation */
         if (t > 0)
@@ -54,6 +54,6 @@ dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k)
     }
     else
     {
-        dedekind_sum_coprime_large(s, h, k);
+        arith_dedekind_sum_coprime_large(s, h, k);
     }
 }

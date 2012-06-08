@@ -59,9 +59,9 @@ int main()
 
     for (n = 0; n < N; n += (n<100) ? 1 : n/3)
     {
-        _bernoulli_number_vec_recursive(num1, den1, n);
-        _bernoulli_number_vec_multi_mod(num2, den2, n);
-        _bernoulli_number_vec_zeta(num3, den3, n);
+        _arith_bernoulli_number_vec_recursive(num1, den1, n);
+        _arith_bernoulli_number_vec_multi_mod(num2, den2, n);
+        _arith_bernoulli_number_vec_zeta(num3, den3, n);
 
         for (i = 0; i < n; i++)
         {
