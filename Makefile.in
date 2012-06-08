@@ -11,9 +11,9 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, build/%.o, $(LIB_SOURCES))
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/$(dir).a)
 
-LIB_OBJS = $(patsubst %.c, build/%.lo, $(LIB_SOURCES))
+LIB_OBJS = $(patsubst %.c, build/%.lo, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
 LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
@@ -60,17 +60,15 @@ tune: all
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
 
 recursive:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) 
 
 examples: all $(LOBJS) library
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 
-check: $(FLINT_LIB)
+check: tests 
 ifndef MOD
-	mkdir -p build/test
 	mkdir -p build/interfaces/test
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 	$(foreach prog, $(TESTS), build/$(prog);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
@@ -80,6 +78,10 @@ ifndef MOD
 else
 	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
 endif
+
+tests: $(TEST_SOURCES) $(FLINT_LIB)
+	mkdir -p build/test
+	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c  -o build/$(prog) $(LIBS);)
 
 library: library-recursive $(OBJS) $(LIB_OBJS)
 	mkdir -p build
@@ -105,10 +107,10 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 
 library-recursive:
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) \
 	fi
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library;) \
 	fi
 
 $(FLINT_LIB): library
