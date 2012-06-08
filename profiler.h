@@ -30,13 +30,13 @@
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
-      long long ns100; 
+      long ns100; 
       FILETIME ft;
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(long)((now.ns100 / 10LL) % 1000000LL );
-    p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
+    p->tv_usec=(long)((now.ns100 / 10L) % 1000000L );
+    p->tv_sec= (long)((now.ns100-(116444736000000000L))/10000000L);
 	
     return 0;
 }
