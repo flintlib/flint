@@ -10,7 +10,7 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, build/%.o, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/$(dir).a)
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.o)
 
 LIB_OBJS = $(patsubst %.c, build/%.lo, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
