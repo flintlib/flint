@@ -30,7 +30,7 @@
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p) 
 {
-    long i, j, r, m;
+    long i, r, m;
     mp_limb_t p1, k, b, g, bpow, gpow, res;
     mp_limb_t pinv;
 
@@ -67,7 +67,6 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     g = n_powmod2_preinv(k, p1, p, pinv);
     res = n_powmod2_preinv(a, (p1 + 1) / 2, p, pinv);
 
-    j = 0;
     while (b != 1)
     {
         bpow = b;
