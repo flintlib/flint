@@ -10,7 +10,7 @@ SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard *.h)
 
-OBJS = $(patsubst %.c, build/%.o, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.o)
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
 LIB_OBJS = $(patsubst %.c, build/%.lo, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
@@ -101,6 +101,7 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(AR) rcs libflint.a $(OBJS); \
+			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o;) \
 		fi; \
 	fi
 
