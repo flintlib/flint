@@ -1,7 +1,6 @@
 LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lflint -lmpfr -lmpir -lm -lpthread
 LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lmpfr -lmpir -lm -lpthread
 INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
-LINKLIBS=
 
 LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}:${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH
@@ -93,7 +92,7 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
-			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS) $(LINKLIBS); \
+			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS); \
 		fi; \
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
@@ -101,7 +100,7 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 			$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
+			$(AR) rcs libflint.a $(OBJS); \
 		fi; \
 	fi
 
