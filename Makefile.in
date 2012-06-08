@@ -32,11 +32,11 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: recursive library 
+all: library 
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
-	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LIB_LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
 distclean: clean
@@ -55,10 +55,7 @@ tune: all
 	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
 
-recursive:
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) 
-
-examples: all $(LOBJS) library
+examples: all
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 
@@ -123,7 +120,7 @@ install: library
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-.PHONY: profile library library-recursive recursive clean check check-recursive all
+.PHONY: profile library library-recursive clean check all
 
 build/%.lo: %.c
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
