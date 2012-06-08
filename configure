@@ -139,6 +139,10 @@ else
    FLINT_LIB="libflint.so"
 fi
 
+if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
+   SHARED=0
+fi
+   
 if [ -z "$CFLAGS" ]; then
    CFLAGS="-O2 -g -ansi -pedantic -Wall"
 fi
