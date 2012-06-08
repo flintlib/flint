@@ -1,6 +1,6 @@
 SOURCES = $(wildcard *.c)
 
-OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)%.o, $(SOURCES))
+OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
 LIB_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 
@@ -26,7 +26,7 @@ profile:
 tune: $(TUNE_SOURCES)
 	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS);)
 
-$(BUILD_DIR)/$(MOD_DIR)%.o: %.c
+$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
 $(BUILD_DIR)/%.lo: %.c
