@@ -61,19 +61,21 @@ main(void)
             fmpz_poly_randtest(g, state, n_randint(state, 50), 150);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_mul(s, s, f);
         fmpz_poly_mul(t, t, g);
         fmpz_poly_add(s, s, t);
 
-        result = (s->length == 1 && fmpz_equal(s->coeffs, r));
+        result = fmpz_poly_equal_fmpz(s, r);
         if (!result)
         {
            printf("FAIL (check s*f + t*g == r):\n");
            printf("f = "), fmpz_poly_print(f), printf("\n");
            printf("g = "), fmpz_poly_print(g), printf("\n");
-           printf("s = "), fmpz_print(s->coeffs); printf("\n");
+           printf("s = "), fmpz_poly_print(s); printf("\n");
+           printf("t = "), fmpz_poly_print(t); printf("\n");
+           printf("d = "), fmpz_poly_print(d); printf("\n");
            printf("r = "), fmpz_print(r); printf("\n");
            abort();
         }
