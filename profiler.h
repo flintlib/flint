@@ -27,6 +27,8 @@
 #include <time.h>
 #include <sys/time.h>
 #if defined (__WIN32) && !defined(__CYGWIN__)
+void  GetSystemTimeAsFileTime(FILETIME*);
+
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
