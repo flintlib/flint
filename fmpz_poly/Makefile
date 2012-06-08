@@ -35,7 +35,7 @@ $(BUILD_DIR)/%.lo: %.c
 clean:
 	rm -rf $(BUILD_DIR)	
 
-check: library $(TESTS)
+check: $(TESTS)
 	$(foreach prog, $(TESTS), $(prog);)
 
 $(BUILD_DIR)/test/%: test/%.c
