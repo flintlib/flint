@@ -27,21 +27,25 @@
 #include <time.h>
 #include <sys/time.h>
 #if defined (__WIN32) && !defined(__CYGWIN__)
+#ifdef __cplusplus
 void  GetSystemTimeAsFileTime(FILETIME*);
 
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
-      long ns100; 
+      long long ns100; 
       FILETIME ft;
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(long)((now.ns100 / 10L) % 1000000L );
-    p->tv_sec= (long)((now.ns100-(116444736000000000L))/10000000L);
+    p->tv_usec=(long)((now.ns100 / 10LL) % 1000000LL );
+    p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
 	
     return 0;
 }
+#else
+int gettimeofday(struct timeval * p, void * tz);
+#endif
 #else
 #include <sys/resource.h>
 #endif
