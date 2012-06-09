@@ -62,7 +62,7 @@ examples: all
 check: $(TESTS) 
 ifndef MOD
 	mkdir -p build/interfaces/test
-	$(foreach prog, $(TESTS), build/$(prog);)
+	$(foreach prog, $(TESTS), $(prog);)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(CXX) $(CFLAGS) $(INCS) interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o -o build/interfaces/test/t-NTL-interface $(LIBS) -lntl; \
