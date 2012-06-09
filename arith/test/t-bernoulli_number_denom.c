@@ -44,7 +44,7 @@ int main()
 
     for (n = 0; n < 1000; n++)
     {
-        bernoulli_number_denom(t, n);
+        arith_bernoulli_number_denom(t, n);
         fmpz_addmul_ui(s, t, n_nth_prime(n+1));
     }
 

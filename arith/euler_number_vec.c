@@ -83,7 +83,7 @@ void __euler_number_vec_multi_mod(fmpz * res, long n)
 
     resolution = FLINT_MAX(1, FLINT_MIN(CRT_MAX_RESOLUTION, m / 16));
 
-    size = euler_number_size(n);
+    size = arith_euler_number_size(n);
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
@@ -117,7 +117,7 @@ void __euler_number_vec_multi_mod(fmpz * res, long n)
     /* Reconstruction */
     for (k = 0; k < n; k += 2)
     {
-        size = euler_number_size(k);
+        size = arith_euler_number_size(k);
         /* Use only as large a comb as needed */
         num_primes_k = (size + prime_bits - 1) / prime_bits;
         for (i = 0; i < resolution; i++)
@@ -148,7 +148,7 @@ void __euler_number_vec_multi_mod(fmpz * res, long n)
     flint_free(polys);
 }
 
-void euler_number_vec(fmpz * res, long n)
+void arith_euler_number_vec(fmpz * res, long n)
 {
     __euler_number_vec_multi_mod(res, n);
 }

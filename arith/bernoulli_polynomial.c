@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 #include "arith.h"
 
-void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
+void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
     fmpz * den;
@@ -48,7 +48,7 @@ void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     fmpz_init(t);
     den = _fmpz_vec_init(n + 1);
 
-    _bernoulli_number_vec(poly->coeffs, den, n + 1);
+    _arith_bernoulli_number_vec(poly->coeffs, den, n + 1);
 
     /* Multiply the odd term by binomial(n,1) = n */
     fmpz_mul_ui(poly->coeffs + 1, poly->coeffs + 1, n);
@@ -63,7 +63,7 @@ void bernoulli_polynomial(fmpq_poly_t poly, ulong n)
     }
 
     /* Convert to common denominator */
-    fmpz_primorial(poly->den, n + 2);
+    arith_primorial(poly->den, n + 2);
     for (k = 0; k <= n; k++)
     {
         fmpz_mul(poly->coeffs + k, poly->coeffs+k, poly->den);

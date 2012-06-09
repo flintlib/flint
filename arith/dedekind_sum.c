@@ -31,7 +31,7 @@
 #include "arith.h"
 
 void
-dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
+arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
     if (fmpz_cmp_ui(k, 2UL) <= 0 || fmpz_is_zero(h) || fmpz_equal(h, k))
     {
@@ -42,7 +42,7 @@ dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
         fmpz_t t;
         fmpz_init(t);
         fmpz_neg(t, h);
-        dedekind_sum(s, t, k);
+        arith_dedekind_sum(s, t, k);
         fmpq_neg(s, s);
         fmpz_clear(t);
     }
@@ -72,14 +72,14 @@ dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k)
             fmpz_mul(fmpq_denref(r), t, u);
             fmpz_mul_ui(fmpq_denref(r), fmpq_denref(r), 12UL);
             fmpq_canonicalise(r);
-            dedekind_sum_coprime(s, u, t);
+            arith_dedekind_sum_coprime(s, u, t);
             fmpq_sub(s, r, s);
 
             fmpq_clear(r);
         }
         else
         {
-            dedekind_sum_coprime(s, t, u);
+            arith_dedekind_sum_coprime(s, t, u);
         }
 
         fmpz_clear(t);

@@ -47,7 +47,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
     fmpz_init(cden);
 
     /* Common denominator */
-    fmpz_primorial(cden, n + 1);
+    arith_primorial(cden, n + 1);
 
     start += start % 2;
 
@@ -134,7 +134,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
     /* Convert to separate denominators */
     for (k = 0; k < n; k += 2)
     {
-        bernoulli_number_denom(den + k, k);
+        arith_bernoulli_number_denom(den + k, k);
         fmpz_divexact(t, cden, den + k);
         fmpz_divexact(num + k, num + k, t);
     }
@@ -145,7 +145,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
     fmpz_clear(cden);
 }
 
-void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
 {
     long i, start;
     fmpz_t t;
@@ -158,13 +158,13 @@ void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
 
     /* Initial values */
     for (i = 0; i < start; i += 2)
-        _bernoulli_number(num + i, den + i, i);
+        _arith_bernoulli_number(num + i, den + i, i);
 
     __ramanujan_even_common_denom(num, den, start, n);
 
     /* Odd values */
     for (i = 1; i < n; i += 2)
-        _bernoulli_number(num + i, den + i, i);
+        _arith_bernoulli_number(num + i, den + i, i);
 
     fmpz_clear(d);
     fmpz_clear(t);

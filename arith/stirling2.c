@@ -31,7 +31,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void _fmpz_stirling_next_row(fmpz * new, fmpz * prev, long n, 
+void _arith_stirling_next_row(fmpz * new, fmpz * prev, long n, 
                                                long klen, int kind);
 
 static __inline__ void
@@ -91,7 +91,7 @@ _fmpz_stirling2_powsum(fmpz_t s, long n, long k)
 }
 
 void
-stirling_number_2(fmpz_t s, long n, long k)
+arith_stirling_number_2(fmpz_t s, long n, long k)
 {
     if (n < 0 || k < 0 || k > n)
     {
@@ -133,7 +133,7 @@ stirling_number_2(fmpz_t s, long n, long k)
 }
 
 void
-stirling_number_2_vec(fmpz * row, long n, long klen)
+arith_stirling_number_2_vec(fmpz * row, long n, long klen)
 {
     long m;
 
@@ -144,5 +144,5 @@ stirling_number_2_vec(fmpz * row, long n, long klen)
 
     fmpz_one(row);
     for (m = 1; m <= n; m++)
-        _fmpz_stirling_next_row(row, row, m, klen, 2);
+        _arith_stirling_next_row(row, row, m, klen, 2);
 }

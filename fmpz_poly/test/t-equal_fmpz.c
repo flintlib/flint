@@ -19,65 +19,63 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2009 William Hart
+    Copyright (C) 2010 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <mpir.h>
 #include "flint.h"
+#include "fmpz.h"
 #include "fmpz_poly.h"
-#include "arith.h"
 #include "ulong_extras.h"
 
-void arith_divisors_naive(fmpz_poly_t p, long n)
+int
+main(void)
 {
-    long k;
-    long i = 0;
+    int i, result;
+    flint_rand_t state;
 
-    n = FLINT_ABS(n);
-
-    fmpz_poly_zero(p);
-    for (k = 1; k <= n; k++)
-    {
-        if (n % k == 0)
-        {
-            fmpz_poly_set_coeff_si(p, i, k);
-            i++;
-        }
-    }
-}
-
-int main(void)
-{
-    fmpz_t t;
-    fmpz_poly_t a, b;
-    long n;
-
-    printf("divisors....");
+    printf("equal_fmpz....");
     fflush(stdout);
 
-    fmpz_init(t);
-    fmpz_poly_init(a);
-    fmpz_poly_init(b);
+    flint_randinit(state);
 
-    for (n = -1000; n < 1000; n++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        fmpz_set_si(t, n);
-        arith_divisors(a, t);
-        arith_divisors_naive(b, n);
-        if (!fmpz_poly_equal(a, b))
+        fmpz_poly_t a, b;
+        fmpz_t c;
+
+        fmpz_poly_init(a);
+        fmpz_poly_init(b);
+        fmpz_init(c);
+
+        fmpz_randtest(c, state, 1 + n_randint(state, 200));
+        fmpz_poly_set_fmpz(b, c);
+
+        fmpz_poly_randtest(a, state, n_randint(state, 6),
+            1 + n_randint(state, 200));
+        if (n_randint(state, 2))
+            fmpz_poly_set_coeff_fmpz(a, 0, c);
+
+        result = fmpz_poly_equal(a, b) == fmpz_poly_equal_fmpz(a, c);
+        if (!result)
         {
             printf("FAIL:\n");
-            printf("wrong value for n=%ld\n", n);
+            fmpz_poly_print(a), printf("\n\n");
+            fmpz_poly_print(b), printf("\n\n");
+            fmpz_print(c), printf("\n\n");
             abort();
         }
+
+        fmpz_poly_clear(a);
+        fmpz_poly_clear(b);
+        fmpz_clear(c);
     }
 
-    fmpz_clear(t);
-    fmpz_poly_clear(a);
-    fmpz_poly_clear(b);
-
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

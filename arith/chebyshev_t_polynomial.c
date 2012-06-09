@@ -31,7 +31,7 @@
 #include "arith.h"
 
 void
-_chebyshev_t_polynomial(fmpz * coeffs, ulong n)
+_arith_chebyshev_t_polynomial(fmpz * coeffs, ulong n)
 {
     long k, i, d, m;
 
@@ -55,7 +55,7 @@ _chebyshev_t_polynomial(fmpz * coeffs, ulong n)
 }
 
 void
-chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
+arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
 {
     if (n == 0)
     {
@@ -71,7 +71,7 @@ chebyshev_t_polynomial(fmpz_poly_t poly, ulong n)
         fmpz_one(poly->coeffs + 1);
     }
     else
-        _chebyshev_t_polynomial(poly->coeffs, n);
+        _arith_chebyshev_t_polynomial(poly->coeffs, n);
 
     _fmpz_poly_set_length(poly, n + 1);
 }

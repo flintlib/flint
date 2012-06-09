@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
     fmpz_init(n);
 
     fmpz_set_si(n, N);
-    fmpz_ramanujan_tau(c, n);
+    arith_ramanujan_tau(c, n);
 
     printf("Coefficient of q^%ld is ", N);
     fmpz_print(c);

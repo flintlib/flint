@@ -311,6 +311,11 @@ int fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
     Returns $1$ if \code{poly1} is equal to \code{poly2}, otherwise 
     returns $0$.  The polynomials are assumed to be normalised.
 
+int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
+
+    Returns $1$ if \code{poly} is equal to the \code{fmpz_t c}, otherwise 
+    returns $0$.
+
 int fmpz_poly_is_zero(const fmpz_poly_t poly)
 
     Returns $1$ if the polynomial is zero and $0$ otherwise.

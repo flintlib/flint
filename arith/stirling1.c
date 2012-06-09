@@ -113,7 +113,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
 }
 
 void
-stirling_number_1u(fmpz_t s, long n, long k)
+arith_stirling_number_1u(fmpz_t s, long n, long k)
 {
     fmpz * tmp;
 
@@ -137,15 +137,15 @@ stirling_number_1u(fmpz_t s, long n, long k)
 }
 
 void
-stirling_number_1(fmpz_t s, long n, long k)
+arith_stirling_number_1(fmpz_t s, long n, long k)
 {
-    stirling_number_1u(s, n, k);
+    arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
         fmpz_neg(s, s);
 }
 
 void
-stirling_number_1u_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1u_vec(fmpz * row, long n, long klen)
 {
     if (klen < 1)
         return;
@@ -153,11 +153,11 @@ stirling_number_1u_vec(fmpz * row, long n, long klen)
 }
 
 void
-stirling_number_1_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1_vec(fmpz * row, long n, long klen)
 {
     long k;
 
-    stirling_number_1u_vec(row, n, klen);
+    arith_stirling_number_1u_vec(row, n, klen);
 
     for (k = (n + 1) % 2; k < klen; k += 2)
         fmpz_neg(row + k, row + k);

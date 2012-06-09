@@ -34,7 +34,7 @@
 #include "ulong_extras.h"
 
 
-void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
+void arith_ramanujan_tau_series(fmpz_poly_t res, long n)
 {
     long j, k, jv, kv;
     fmpz_t tmp;
@@ -59,7 +59,7 @@ void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n)
     fmpz_clear(tmp);
 }
 
-void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
+void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
 {
     fmpz_poly_t poly;
     fmpz_t tau_p, p_11, next, this, prev;
@@ -74,7 +74,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     }
 
     fmpz_poly_init(poly);
-    fmpz_poly_ramanujan_tau(poly, max_prime + 1);
+    arith_ramanujan_tau_series(poly, max_prime + 1);
 
     fmpz_one(res);
     fmpz_init(tau_p);
@@ -111,7 +111,7 @@ void _fmpz_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
     fmpz_poly_clear(poly);
 }
 
-void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
+void arith_ramanujan_tau(fmpz_t res, const fmpz_t n)
 {
     fmpz_factor_t factors;
 
@@ -123,6 +123,6 @@ void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n)
 
     fmpz_factor_init(factors);
     fmpz_factor(factors, n);
-    _fmpz_ramanujan_tau(res, factors);
+    _arith_ramanujan_tau(res, factors);
     fmpz_factor_clear(factors);
 }
