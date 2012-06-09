@@ -16,7 +16,7 @@ LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
 LIB_OBJS = $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
-LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
+LIB_SOURCES = $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -80,7 +80,7 @@ build/test/%: test/%.c $(FLINT_LIB) | build/test
 build/test:
 	mkdir -p build/test
 
-$(FLINT_LIB): $(OBJS) $(LOBJS) $(LIB_OBJS) | build build/interfaces 
+$(FLINT_LIB): $(OBJS) $(LOBJS) library_recursive | build build/interfaces 
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
@@ -102,13 +102,10 @@ $(FLINT_LIB): $(OBJS) $(LOBJS) $(LIB_OBJS) | build build/interfaces
 		fi; \
 	fi
 
-build:
-	mkdir -p build
-
 build/interfaces:
 	mkdir -p build/interfaces
 
-$(LIB_OBJS):
+library_recursive: $(LIB_SOURCES)
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) \
 	fi
@@ -129,7 +126,7 @@ install: $(FLINT_LIB)
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-.PHONY: profile library clean check all
+.PHONY: profile library library_recursive clean check all
 
 build/%.lo: %.c | build
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
