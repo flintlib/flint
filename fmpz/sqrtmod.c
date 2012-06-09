@@ -148,7 +148,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         ans = n_sqrtmod(*b, *p);
         if (ans)
             fmpz_set_ui(b, ans);
-        return ans;
+        return ans != 0;
     }
     else  /* p is large */
     {
