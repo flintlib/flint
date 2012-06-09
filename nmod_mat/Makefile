@@ -16,7 +16,7 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: $(OBJS)
+all: $(OBJS) 
 
 library: $(LIB_OBJS)
 
