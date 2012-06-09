@@ -12,7 +12,9 @@ HEADERS = $(wildcard *.h)
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, build/%.lo, $(SOURCES)) $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
+LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
+
+LIB_OBJS = $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
 
 LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
 
@@ -78,11 +80,11 @@ build/test/%: test/%.c $(FLINT_LIB) | build/test
 build/test:
 	mkdir -p build/test
 
-$(FLINT_LIB): $(OBJS) $(LIB_OBJS) | build build/interfaces 
+$(FLINT_LIB): $(OBJS) $(LOBJS) $(LIB_OBJS) | build build/interfaces 
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
-			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
@@ -92,7 +94,7 @@ $(FLINT_LIB): $(OBJS) $(LIB_OBJS) | build build/interfaces
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+			$(CC) -fPIC -shared $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(AR) rcs libflint.a $(OBJS); \
