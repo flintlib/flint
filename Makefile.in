@@ -26,13 +26,13 @@ TUNE_SOURCES = $(wildcard tune/*.c)
 
 EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
-TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
+TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: library 
+all: $(FLINT_LIB) 
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
@@ -59,7 +59,7 @@ examples: all
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
 
-check: tests 
+check: $(TESTS) 
 ifndef MOD
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), build/$(prog);)
@@ -72,13 +72,13 @@ else
 	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
 endif
 
-tests: $(TEST_SOURCES) $(FLINT_LIB)
-	mkdir -p build/test
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c  -o build/$(prog) $(LIBS);)
+build/test/%: test/%.c $(FLINT_LIB) | build/test
+	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
-library: library-recursive $(OBJS) $(LIB_OBJS)
-	mkdir -p build
-	mkdir -p build/interfaces
+build/test:
+	mkdir -p build/test
+
+$(FLINT_LIB): $(OBJS) $(LIB_OBJS) | build build/interfaces 
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
@@ -100,7 +100,13 @@ library: library-recursive $(OBJS) $(LIB_OBJS)
 		fi; \
 	fi
 
-library-recursive:
+build:
+	mkdir -p build
+
+build/interfaces:
+	mkdir -p build/interfaces
+
+$(LIB_OBJS):
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) \
 	fi
@@ -108,9 +114,9 @@ library-recursive:
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library;) \
 	fi
 
-$(FLINT_LIB): library
+library: $(FLINT_LIB)
 
-install: library
+install: $(FLINT_LIB)
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
@@ -121,7 +127,7 @@ install: library
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-.PHONY: profile library library-recursive clean check all
+.PHONY: profile library clean check all
 
 build/%.lo: %.c
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
