@@ -59,6 +59,8 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 150);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 150);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
 
@@ -104,13 +106,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, f, t, f, g);
         
-        result = fmpz_poly_equal(s, f);
+        result = (fmpz_poly_equal(s, f) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias s and f):\n");
@@ -143,13 +147,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, g, t, f, g);
         
-        result = fmpz_poly_equal(s, g);
+        result = (fmpz_poly_equal(s, g) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias s and g):\n");
@@ -182,13 +188,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, f, f, g);
         
-        result = fmpz_poly_equal(t, f);
+        result = (fmpz_poly_equal(t, f) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias t and f):\n");
@@ -221,13 +229,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, g, f, g);
         
-        result = fmpz_poly_equal(t, g);
+        result = (fmpz_poly_equal(t, g) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias t and g):\n");
