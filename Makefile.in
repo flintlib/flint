@@ -129,15 +129,18 @@ install: $(FLINT_LIB)
 
 .PHONY: profile library clean check all
 
-build/%.lo: %.c
+build/%.lo: %.c | build
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
 	fi
 
-build/%.o: %.c
+build/%.o: %.c | build
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
 	fi
+
+build:
+	mkdir -p build
 
 BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
