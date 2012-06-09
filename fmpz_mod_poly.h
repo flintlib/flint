@@ -282,6 +282,15 @@ void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
 void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
                               const fmpz_mod_poly_t poly, ulong e, long trunc);
 
+void
+_fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
+                                ulong e, const fmpz * f, long lenf, const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
+                         const fmpz_mod_poly_t poly, ulong e,
+                         const fmpz_mod_poly_t f);
+
 /*  Division *****************************************************************/
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 

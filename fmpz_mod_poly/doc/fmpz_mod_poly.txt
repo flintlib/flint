@@ -426,6 +426,25 @@ void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
     to the power \code{e}. This is equivalent to doing a powering
     followed by a truncation. Uses the binary exponentiation method.
 
+void _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
+				     ulong e, const fmpz * f,
+				     long lenf, const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
+			      const fmpz_mod_poly_t poly, ulong e,
+			      const fmpz_mod_poly_t f)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+
 *******************************************************************************
 
     Division
