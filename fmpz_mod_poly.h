@@ -291,6 +291,16 @@ fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
                          const fmpz_mod_poly_t poly, ulong e,
                          const fmpz_mod_poly_t f);
 
+void
+_fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
+                                  const fmpz_t e, const fmpz * f,
+                                  long lenf, const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, const fmpz_t e,
+                           const fmpz_mod_poly_t f);
+
 /*  Division *****************************************************************/
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
