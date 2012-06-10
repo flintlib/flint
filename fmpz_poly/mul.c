@@ -35,7 +35,7 @@ _fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1,
 {
     mp_size_t limbs1, limbs2;
 
-    if (len1 < 7)
+    if (len2 < 7)
     {
         _fmpz_poly_mul_classical(res, poly1, len1, poly2, len2);
         return;
