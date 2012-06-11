@@ -337,6 +337,14 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
+void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
+                 const fmpz *a, const long *j, long lena, 
+                 const fmpz_t p, long N);
+
+void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
 int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 /* Output ********************************************************************/

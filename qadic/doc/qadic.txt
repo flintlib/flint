@@ -411,6 +411,56 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     $\Gal(\mathbf{Q}_q / \mathbf{Q}_p)$ then the trace of $a$ is equal to 
     $\sum_{i=0}^{d-1} \Sigma^i (a)$.
 
+void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
+                 const fmpz *a, const long *j, long lena, 
+                 const fmpz_t p, long N)
+
+    Sets \code{rop} to the norm of the element \code{(op,len)} 
+    in $\mathbf{Z}_q$ to precision $N$, where \code{len} is at 
+    least one.
+
+    The result will be reduced modulo $p^N$.
+
+    Note that whenever \code{(op,len)} is a unit, so is its norm. 
+    Thus, the output \code{rop} of this function will typically 
+    not have to be canonicalised or reduced by the caller.
+
+void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Computes the norm of \code{op} to the given precision.
+
+    Algorithm selection is automatic depending on the input.
+
+void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Whenever \code{op} has valuation greater than $(p-1)^{-1}$, this 
+    routine computes its norm \code{rop} via 
+    \begin{equation*}
+    \Norm (x) = \exp \Bigl( \bigl( \Trace \log (x) \bigr) \Bigr).
+    \end{equation*}
+
+    In the special case that \code{op} lies in $\mathbf{Q}_p$, returns 
+    its norm as $\Norm(x) = x^d$, where $d$ is the extension degree.
+
+    Otherwise, raises an \code{abort} signal.
+
+    The complexity of this implementation is quasi-linear in $d$ and $N$, 
+    and polynomial in $\log p$.
+
+void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the norm of \code{op}, using the formula 
+    \begin{equation*}
+    \Norm(x) = \ell(f)^{-\deg(a)} \Res(f(X), a(X)),
+    \end{equation*}
+    where $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$, $\ell(f)$ is the 
+    leading coefficient of $f(X)$, and $a(X) \in mathbf{Q}_p[X]$ denotes 
+    the same polynomial as $x$.
+
+    The complexity of the current implementation is given by 
+    $\mathcal{O}(d^4 M(N \log p))$, where $M(n)$ denotes the 
+    complexity of multiplying to $n$-bit integers.
+
 *******************************************************************************
 
     Output
