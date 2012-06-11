@@ -28,9 +28,9 @@
 
 extern long _padic_exp_bound(long v, long N, const fmpz_t p);
 
-void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len, 
-                const fmpz *a, const long *j, long lena, 
-                const fmpz_t p, long N)
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len, 
+                            const fmpz *a, const long *j, long lena, 
+                            const fmpz_t p, long N)
 {
     const long d = j[lena - 1];
     const long n = _padic_exp_bound(v, N, p);
@@ -126,19 +126,12 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
             long lo = i * b;
             long hi = FLINT_MIN(n - 1, lo + b - 1);
 
-            _fmpz_vec_set(s, x + (hi - lo) * d, d);
-            fmpz_set_ui(c, hi);
-            hi--;
+            _fmpz_vec_zero(s, d);
+            fmpz_one(c);
 
-            for ( ; hi > lo; hi--)
+            for ( ; hi >= lo; hi--)
             {
                 _fmpz_vec_scalar_addmul_fmpz(s, x + (hi - lo) * d, d, c);
-                fmpz_mul_ui(c, c, hi);
-            }
-
-            if (hi == lo)
-            {
-                fmpz_add(s, s, c);
                 if (hi != 0)
                     fmpz_mul_ui(c, c, hi);
             }
@@ -175,7 +168,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
     fmpz_clear(pN);
 }
 
-int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const long N  = (&ctx->pctx)->N;
     const long v  = op->val;
@@ -208,8 +201,8 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                 t = _fmpz_vec_init(2 * d - 1);
             }
 
-            _qadic_exp(t, op->coeffs, v, op->length, 
-                       ctx->a, ctx->j, ctx->len, p, N);
+            _qadic_exp_rectangular(t, op->coeffs, v, op->length, 
+                                   ctx->a, ctx->j, ctx->len, p, N);
             rop->val = 0;
 
             if (rop == op)
