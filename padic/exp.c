@@ -69,29 +69,32 @@ long _padic_exp_bound(long v, long N, const fmpz_t p)
 }
 
 /*
-    Sets \code{rop} to the exponential of \code{op}, reduced 
-    in the given context.
+    Sets \code{rop} to the exponential of \code{op}, 
+    not necessarily reduced modulo $p^N$.
 
     Assumes that the exponential series converges at $x \neq 0$, 
-    and that $\ord_p(x) < N$.
+    where $x = p^v u$, and that $v = \ord_p(x) < N$.
 
     Supports aliasing.
  */
-void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_exp_naive(fmpz_t rop, const fmpz_t u, long v, 
+                                  const fmpz_t p, long N)
 {
-    if (ctx->N == 1)
-    {
-        padic_one(rop, ctx);
-    }
-    else if (ctx->N == 2)
-    {
-        padic_t one;
+    const long n = _padic_exp_bound(v, N, p); 
 
-        _padic_init(one);
-        _padic_one(one);
-        padic_set(rop, op, ctx);
-        padic_add(rop, rop, one, ctx);
-        _padic_clear(one);
+    if (n == 1)
+    {
+        fmpz_one(rop);
+    }
+    else if (n == 2)
+    {
+        fmpz_t f;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, p, v);
+        fmpz_mul(rop, f, u);
+        fmpz_add_ui(rop, rop, 1);
+        fmpz_clear(f);
     }
     else
     {
@@ -103,34 +106,33 @@ void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         fmpz_init(t);
         fmpz_init(x);
 
-        padic_get_fmpz(x, op, ctx);
+        fmpz_pow_ui(f, p, v);
+        fmpz_mul(x, f, u);
 
-        i = _padic_exp_bound(padic_val(op), ctx->N, ctx->p) - 1;
-        k = fmpz_fits_si(ctx->p) ? (i - 1) / (fmpz_get_si(ctx->p) - 1) : 0;
+        i = n - 1;
+        k = fmpz_fits_si(p) ? (i - 1) / (fmpz_get_si(p) - 1) : 0;
 
-        fmpz_pow_ui(m, ctx->p, ctx->N + k);
+        fmpz_pow_ui(m, p, N + k);
 
-        fmpz_one(padic_unit(rop));
+        fmpz_one(rop);
         fmpz_one(f);
 
         for (i--; i >= 0; i--)
         {
             fmpz_mul_ui(f, f, i + 1);
-            fmpz_mul(t, padic_unit(rop), x);
-            fmpz_add(padic_unit(rop), f, t);
+            fmpz_mul(t, rop, x);
+            fmpz_add(rop, f, t);
 
             fmpz_mod(f, f, m);
-            fmpz_mod(padic_unit(rop), padic_unit(rop), m);
+            fmpz_mod(rop, rop, m);
         }
 
-        k = fmpz_remove(t, f, ctx->p);
-        _padic_inv(f, t, ctx->p, ctx->N);
-        fmpz_pow_ui(t, ctx->p, k);
+        k = fmpz_remove(t, f, p);
+        _padic_inv(f, t, p, N);
+        fmpz_pow_ui(t, p, k);
 
-        fmpz_divexact(padic_unit(rop), padic_unit(rop), t);
-        fmpz_mul(padic_unit(rop), padic_unit(rop), f);
-        padic_val(rop) = 0;
-        padic_reduce(rop, ctx);
+        fmpz_divexact(rop, rop, t);
+        fmpz_mul(rop, rop, f);
 
         fmpz_clear(f);
         fmpz_clear(m);
@@ -139,12 +141,12 @@ void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
 }
 
-void _padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
 {
-    if (ctx->N < 1024)
-        _padic_exp_rectangular(rop, op, ctx);
+    if (N < 1024)
+        _padic_exp_rectangular(rop, u, v, p, N);
     else
-        _padic_exp_balanced(rop, op, ctx);
+        _padic_exp_balanced(rop, u, v, p, N);
 }
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -166,9 +168,15 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     else
     {
         if (v < N)
-            _padic_exp(rop, op, ctx);
+        {
+            _padic_exp(padic_unit(rop), padic_unit(op), padic_val(op), p, N);
+            padic_val(rop) = 0;
+            _padic_reduce(rop, ctx);
+        }
         else
+        {
             padic_one(rop, ctx);
+        }
         return 1;
     }
 }

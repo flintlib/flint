@@ -30,35 +30,33 @@ extern long _padic_exp_bound(long v, long N, const fmpz_t p);
 
 /*
     Assumes that the exponential series converges at $x \neq 0$, 
-    and that $\ord_p(x) < N$.
+    where $x = p^v u$, and that $v = \ord_p(x) < N$.
  */
 
 void 
-_padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
+_padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
 {
-    const long nterms = _padic_exp_bound(padic_val(x), ctx->N, ctx->p);
+    const long n = _padic_exp_bound(v, N, p);
 
-    if (nterms <= 3)
+    if (n <= 3)
     {
-        _padic_exp_naive(res, x, ctx);
+        _padic_exp_naive(rop, u, v, p, N);
     }
     else
     {
-        const long k = fmpz_fits_si(ctx->p) ? 
-                       (nterms - 1 - 1) / (fmpz_get_si(ctx->p) - 1) : 0;
+        const long k = fmpz_fits_si(p) ? 
+                       (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;
 
         long i, npows, nsums;
 
-        fmpz_t mod;
-        int alloc;
-
-        fmpz_t c, f, s, t, sum;
+        fmpz_t c, f, s, t, sum, mod;
         fmpz *pows;
 
-        alloc = _padic_ctx_pow_ui(mod, ctx->N + k, ctx);
+        fmpz_init(mod);
+        fmpz_pow_ui(mod, p, N + k);
 
-        npows = n_sqrt(nterms);
-        nsums = (nterms + npows - 1) / npows;
+        npows = n_sqrt(n);
+        nsums = (n + npows - 1) / npows;
 
         fmpz_init(c);
         fmpz_init(f);
@@ -69,7 +67,8 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
         /* Compute pows;  pows[i] = x^i. */
         pows = _fmpz_vec_init(npows + 1);
         fmpz_one(pows + 0);
-        padic_get_fmpz(pows + 1, x, ctx);
+        fmpz_pow_ui(f, p, v);
+        fmpz_mul(pows + 1, f, u);
         for (i = 2; i <= npows; i++)
         {
             fmpz_mul(pows + i, pows + i - 1, pows + 1);
@@ -82,7 +81,7 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
         for (i = nsums - 1; i >= 0; i--)
         {
             long lo = i * npows;
-            long hi = FLINT_MIN(nterms - 1, lo + npows - 1);
+            long hi = FLINT_MIN(n - 1, lo + npows - 1);
 
             fmpz_zero(s);
             fmpz_one(c);
@@ -105,13 +104,11 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
         /* Divide by factorial, TODO: Improve */
 
         /* Note exp(x) is a unit so val(sum) == val(f). */
-        if (_fmpz_remove(sum, ctx->p, ctx->pinv))
-            _fmpz_remove(f,   ctx->p, ctx->pinv);
+        if (fmpz_remove(sum, sum, p))
+            fmpz_remove(f, f, p);
 
-        _padic_inv(f, f, ctx->p, ctx->N);
-        fmpz_mul(padic_unit(res), sum, f);
-        padic_val(res) = 0;
-        _padic_reduce(res, ctx);
+        _padic_inv(f, f, p, N);
+        fmpz_mul(rop, sum, f);
 
         _fmpz_vec_clear(pows, npows + 1);
         fmpz_clear(c);
@@ -119,8 +116,7 @@ _padic_exp_rectangular(padic_t res, const padic_t x, const padic_ctx_t ctx)
         fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(sum);
-        if (alloc)
-            fmpz_clear(mod);
+        fmpz_clear(mod);
     }
 }
 
@@ -143,9 +139,15 @@ int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     else
     {
         if (v < N)
-            _padic_exp_rectangular(rop, op, ctx);
+        {
+            _padic_exp(padic_unit(rop), padic_unit(op), padic_val(op), p, N);
+            padic_val(rop) = 0;
+            _padic_reduce(rop, ctx);
+        }
         else
+        {
             padic_one(rop, ctx);
+        }
         return 1;
     }
 }
