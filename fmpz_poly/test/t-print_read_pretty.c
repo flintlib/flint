@@ -140,7 +140,7 @@ int main(void)
                 }
 
                 result = fmpz_poly_equal(t, a[i]) &&
-                    (fmpz_poly_is_zero(t) || (strcmp(var, rvar) == 0));
+                    (t->length <= 1 || (strcmp(var, rvar) == 0));
                 if (!result)
                 {
                     printf("FAIL:\n");
