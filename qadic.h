@@ -321,6 +321,7 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
     _qadic_exp_rectangular(rop, op, v, len, a, j, lena, p, N);
 }
 
+static __inline__ 
 int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     return qadic_exp_rectangular(rop, op, ctx);
