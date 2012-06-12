@@ -100,3 +100,12 @@ void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
     Assuming \code{pol} is a product of irreducible factors all of
     degree \code{d}, finds all those factors and places them in factors.
     Requires that \code{pol} be monic, non-constant and squarefree.
+
+
+void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
+				      const fmpz_mod_poly_t f)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the Cantor-Zassenhaus algorithm.
+
+    The modulus must be a prime greater than 2.

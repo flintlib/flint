@@ -81,6 +81,9 @@ void
 fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
                          const fmpz_mod_poly_t pol, long d);
 
+void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
+                                      const fmpz_mod_poly_t f);
+
 #ifdef __cplusplus
 }
 #endif
