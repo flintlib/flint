@@ -166,7 +166,8 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N)
         if (!fmpz_is_zero(t))
         {
             fmpz_mul(t, t, pv);
-            fmpz_add_ui(u, r, 1);
+            fmpz_sub_ui(u, r, 1);
+            fmpz_neg(u, u);
             _padic_inv_precomp(u, u, S);
             fmpz_mul(t, t, u);
             fmpz_mod(t, t, pN);
@@ -174,12 +175,13 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N)
 
         if (!fmpz_is_zero(r))
         {
-            fmpz_neg(r, r);
             _padic_log_bsplit(r, r, w, p, N);
             fmpz_sub(z, z, r);
         }
         w *= 2;
     }
+
+    fmpz_mod(z, z, pN);
 
     fmpz_clear(pv);
     fmpz_clear(pN);
@@ -204,6 +206,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         padic_get_fmpz(x, op, ctx);
         fmpz_sub_ui(x, x, 1);
+        fmpz_neg(x, x);
 
         if (fmpz_is_zero(x))
         {
@@ -229,7 +232,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 {
                     _padic_log_balanced(padic_unit(rop), x, ctx->p, ctx->N);
                     padic_val(rop) = 0;
-                    padic_reduce(rop, ctx);
+                    _padic_canonicalise(rop, ctx);
                 }
                 ans = 1;
             }

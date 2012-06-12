@@ -483,21 +483,21 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
 void _padic_exp_naive(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
-    Returns the $p$-exponential function evaluatet at \code{op}, 
+    Returns the $p$-exponential function evaluated at \code{op}, 
     reduced modulo $p^N$.
 
     Assumes that $x \neq 0$ and that $\exp(x)$ converges.
 
 void _padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
-    Returns the $p$-exponential function evaluatet at \code{op}, 
+    Returns the $p$-exponential function evaluated at \code{op}, 
     reduced modulo $p^N$.
 
     Assumes that $x \neq 0$ and that $\exp(x)$ converges.
 
 void _padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
-    Returns the $p$-exponential function evaluatet at \code{op}, 
+    Returns the $p$-exponential function evaluated at \code{op}, 
     reduced modulo $p^N$.
 
     Assumes that $x \neq 0$ and that $\exp(x)$ converges.

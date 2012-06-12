@@ -38,6 +38,11 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
 {
     const long n = _padic_exp_bound(v, N, p);
 
+    fmpz_t pN;
+
+    fmpz_init(pN);
+    fmpz_pow_ui(pN, p, N);
+
     if (n <= 3)
     {
         _padic_exp_naive(rop, u, v, p, N);
@@ -49,11 +54,11 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
 
         long i, npows, nsums;
 
-        fmpz_t c, f, s, t, sum, mod;
+        fmpz_t c, f, s, t, sum, pNk;
         fmpz *pows;
 
-        fmpz_init(mod);
-        fmpz_pow_ui(mod, p, N + k);
+        fmpz_init(pNk);
+        fmpz_pow_ui(pNk, p, N + k);
 
         npows = n_sqrt(n);
         nsums = (n + npows - 1) / npows;
@@ -72,7 +77,7 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
         for (i = 2; i <= npows; i++)
         {
             fmpz_mul(pows + i, pows + i - 1, pows + 1);
-            fmpz_mod(pows + i, pows + i, mod);
+            fmpz_mod(pows + i, pows + i, pNk);
         }
 
         fmpz_zero(sum);
@@ -96,7 +101,7 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
             fmpz_mul(t, pows + npows, sum);
             fmpz_mul(sum, s, f);
             fmpz_add(sum, sum, t);
-            fmpz_mod(sum, sum, mod);
+            fmpz_mod(sum, sum, pNk);
 
             fmpz_mul(f, f, c);
         }
@@ -116,8 +121,11 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
         fmpz_clear(s);
         fmpz_clear(t);
         fmpz_clear(sum);
-        fmpz_clear(mod);
+        fmpz_clear(pNk);
     }
+
+    fmpz_mod(rop, rop, pN);
+    fmpz_clear(pN);
 }
 
 int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -142,7 +150,6 @@ int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         {
             _padic_exp(padic_unit(rop), padic_unit(op), padic_val(op), p, N);
             padic_val(rop) = 0;
-            _padic_reduce(rop, ctx);
         }
         else
         {
