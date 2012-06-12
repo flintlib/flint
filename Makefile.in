@@ -43,7 +43,7 @@ TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 all: $(FLINT_LIB) 
 
 clean:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean || exit $$?;)
 	rm -f $(OBJS) $(LIB_LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
@@ -55,24 +55,24 @@ dist:
 
 profile: $(FLINT_LIB) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile;)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile || exit $$?;)
 
 tune: $(FLINT_LIB)
 	mkdir -p build/tune
-	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
+	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune || exit $$?;)
 
 examples: $(FLINT_LIB)
 	mkdir -p build/examples
-	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
+	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
 $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interfaces 
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir);) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) || exit $$?;) \
 	fi
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library;) \
+		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library || exit $$?;) \
 	fi
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
@@ -82,7 +82,7 @@ $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interface
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
 			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS); \
-			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o;) \
+			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;) \
 		fi; \
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
@@ -91,7 +91,7 @@ $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interface
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 			$(AR) rcs libflint.a $(OBJS); \
-			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o;) \
+			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;) \
 		fi; \
 	fi
 
@@ -103,14 +103,14 @@ build/interfaces:
 check: $(TESTS)
 ifndef MOD
 	mkdir -p build/interfaces/test
-	$(foreach prog, $(TESTS), $(prog);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
+	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(CXX) $(CFLAGS) $(INCS) interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o -o build/interfaces/test/t-NTL-interface $(LIBS); \
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
+	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
 endif
 
 install: $(FLINT_LIB)

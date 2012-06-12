@@ -21,10 +21,10 @@ all: $(OBJS)
 library: $(LIB_OBJS)
 
 profile:
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS);)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
         
 tune: $(TUNE_SOURCES)
-	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS);)
+	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
 $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
@@ -36,7 +36,7 @@ clean:
 	rm -rf $(BUILD_DIR)	
 
 check: $(TESTS)
-	$(foreach prog, $(TESTS), $(prog);)
+	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 
 $(BUILD_DIR)/test/%: test/%.c
 	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
