@@ -75,9 +75,34 @@ static __inline__ long qadic_ctx_degree(const qadic_ctx_t ctx)
 static __inline__ void 
 qadic_ctx_print(const qadic_ctx_t ctx)
 {
-    printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
-    printf("d = %ld\n", ctx->j[ctx->len - 1]);
-    printf("N = %ld\n", (&ctx->pctx)->N);
+    long i, k;
+
+    printf("p    = "), fmpz_print((&ctx->pctx)->p), printf("\n");
+    printf("d    = %ld\n", ctx->j[ctx->len - 1]);
+    printf("N    = %ld\n", (&ctx->pctx)->N);
+    printf("f(X) = ");
+    fmpz_print(ctx->a + 0);
+    for (k = 1; k < ctx->len; k++)
+    {
+        i = ctx->j[k];
+        printf(" + ");
+        if (fmpz_is_one(ctx->a + k))
+        {
+            if (i == 1)
+                printf("X");
+            else
+                printf("X^%ld", i);
+        }
+        else
+        {
+            fmpz_print(ctx->a + k);
+            if (i == 1)
+                printf("*X");
+            else
+                printf("*X^%ld", i);
+        }
+    }
+    printf("\n");
 }
 
 /* Memory management *********************************************************/
@@ -332,6 +357,12 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len,
                             const fmpz_t p, long N, const fmpz_t pN);
 
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
+
+void _qadic_log_balanced(fmpz *z, const fmpz *y, long len, 
+                         const fmpz *a, const long *j, long lena, 
+                         const fmpz_t p, long N, const fmpz_t pN);
+
+int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 static __inline__ 
 int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)

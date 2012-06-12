@@ -354,6 +354,32 @@ int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
     Returns whether the $p$-adic logarithm function converges at 
     \code{op}, and if so sets \code{rop} to its value.
 
+void _qadic_log_balanced(fmpz *z, const fmpz *y, long len, 
+                         const fmpz *a, const long *j, long lena, 
+                         const fmpz_t p, long N, const fmpz_t pN)
+
+    Computes 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Assumes that $v = \ord_p(y)$ is at least $1$ when $p$ is odd and 
+    at least $2$ when $p = 2$ so that the series converges.
+
+    Sets $(z, d)$.
+
+    Supports aliasing between $z$ and $y$.
+
+int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
     The $p$-adic logarithm function is defined by the usual series 
     \begin{equation*}
     \log_p(x) = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i}
