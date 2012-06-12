@@ -37,23 +37,29 @@
     where $v \geq 1$.
 
     Assumes that $1 \leq v < N$.
-
-    Assumes that $b v$, and $N + e$ do not overflow, 
-    where $e = \floor{\log_{p}{b}}$.
  */
 long _padic_log_bound(long v, long N, long p)
 {
-    long e, i = (N - 1) / v;
-    mp_limb_t j;
+    long b, c;
 
-    do 
+    c = N - n_flog(v, p);
+    b = c + n_clog(c, p) + 1;
+
+    /*
+        Now $i v - \ord_p(i) \geq N$ for all $i \geq b$.  We work 
+        backwards to find the first $i$ such that this fails, then 
+        using that the function is strictly increasing for $i \geq 2$.
+     */
+
+    while (--b >= 2)
     {
-        j = ++i;
-        e = n_remove(&j, p);
-    }
-    while (i * v < N + e);
+        long t = b * v - n_clog(b, p) - N;
 
-    return i;
+        if (t < 0)
+            return b + 1;
+    }
+
+    return 2;
 }
 
 /*
