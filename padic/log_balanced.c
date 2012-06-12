@@ -139,10 +139,10 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
  */
 
 void 
-_padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+_padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N)
 {
     fmpz_t pv, pN, r, t, u;
-    long val;
+    long w;
     padic_inv_t S;
 
     fmpz_init(pv);
@@ -152,16 +152,12 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
     fmpz_init(u);
     _padic_inv_precompute(S, p, N);
 
-    fmpz_set(t, y);
     fmpz_set(pv, p);
     fmpz_pow_ui(pN, p, N);
+    fmpz_mod(t, y, pN);
     fmpz_zero(z);
-    val = 1;
+    w = 1;
 
-    /*
-        TODO:  Abort earlier if larger than $p^N$, possible
-        with variable precision?
-     */
     while (!fmpz_is_zero(t))
     {
         fmpz_mul(pv, pv, pv);
@@ -179,10 +175,10 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
         if (!fmpz_is_zero(r))
         {
             fmpz_neg(r, r);
-            _padic_log_bsplit(r, r, val, p, N);
+            _padic_log_bsplit(r, r, w, p, N);
             fmpz_sub(z, z, r);
         }
-        val *= 2;
+        w *= 2;
     }
 
     fmpz_clear(pv);
@@ -231,7 +227,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    _padic_log_balanced(padic_unit(rop), x, v, ctx->p, ctx->N);
+                    _padic_log_balanced(padic_unit(rop), x, ctx->p, ctx->N);
                     padic_val(rop) = 0;
                     padic_reduce(rop, ctx);
                 }
