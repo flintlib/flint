@@ -30,15 +30,10 @@ extern long _padic_exp_bound(long v, long N, const fmpz_t p);
 
 void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len, 
                             const fmpz *a, const long *j, long lena, 
-                            const fmpz_t p, long N)
+                            const fmpz_t p, long N, const fmpz_t pN)
 {
     const long d = j[lena - 1];
     const long n = _padic_exp_bound(v, N, p);
-
-    fmpz_t pN;
-
-    fmpz_init(pN);
-    fmpz_pow_ui(pN, p, N);
 
     if (n < 4)
     {
@@ -164,8 +159,6 @@ void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len,
         fmpz_clear(f);
         fmpz_clear(pNk);
     }
-
-    fmpz_clear(pN);
 }
 
 int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
@@ -189,7 +182,12 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         if (v < N)
         {
             const long d = qadic_ctx_degree(ctx);
+
             fmpz *t;
+            fmpz_t pN;
+            int alloc;
+
+            alloc = _padic_ctx_pow_ui(pN, N, &ctx->pctx);
 
             if (rop != op)
             {
@@ -202,7 +200,7 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
             }
 
             _qadic_exp_rectangular(t, op->coeffs, v, op->length, 
-                                   ctx->a, ctx->j, ctx->len, p, N);
+                                   ctx->a, ctx->j, ctx->len, p, N, pN);
             rop->val = 0;
 
             if (rop == op)
@@ -214,9 +212,14 @@ int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
             }
             _padic_poly_set_length(rop, d);
             _padic_poly_normalise(rop);
+
+            if (alloc)
+                fmpz_clear(pN);
         }
         else
+        {
             padic_poly_one(rop, &ctx->pctx);
+        }
         return 1;
     }
 }
