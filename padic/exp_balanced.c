@@ -138,81 +138,78 @@ void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, long xv, long N)
 {
     const fmpz_t p = {2L};
 
-    fmpz_t r, t, pv, pw, pN;
-    long v;
+    fmpz_t r, t;
+    long w;
 
     fmpz_init(r);
     fmpz_init(t);
-    fmpz_init(pv);
-    fmpz_init(pw);
-    fmpz_init(pN);
 
-    fmpz_setbit(t, xv - 2);
-    fmpz_mul(t, t, xu);
+    w = 1;
 
-    fmpz_set_ui(pv, 4);
-    fmpz_set_ui(pw, 2);
-    fmpz_setbit(pN, N);
+    fmpz_mul_2exp(t, xu, xv);
+    fmpz_fdiv_r_2exp(t, t, N);
 
     fmpz_one(rop);
 
-    for (v = 3; v < (2 * N); v *= 2)
+    while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pw, pw, pv);       /* pw = p^w, w = v - 1 */
-        fmpz_mul(pv, pv, pv);       /* pv = p^v            */
+        fmpz_fdiv_r_2exp(r, t, 2*w);
+        fmpz_sub(t, t, r);
 
-        fmpz_fdiv_qr(t, r, t, pv);  /* r = p^w (t % p^v)   */
-        fmpz_mul(r, r, pw);
+        if (!fmpz_is_zero(r))
+        {
+            _padic_exp_bsplit(r, r, w, p, N);
+            fmpz_mul(rop, rop, r);
+            fmpz_fdiv_r_2exp(rop, rop, N);
+        }
 
-        _padic_exp_bsplit(r, r, v - 1, p, N);
-        fmpz_mul(rop, rop, r);
-        fmpz_mod(rop, rop, pN);
+        w *= 2;
     }
 
     fmpz_clear(r);
     fmpz_clear(t);
-    fmpz_clear(pv);
-    fmpz_clear(pw);
-    fmpz_clear(pN);
 }
 
 void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, long xv, 
                                        const fmpz_t p, long N)
 {
-    fmpz_t r, t, pv, pw, pN;
-    long v;
+    fmpz_t r, t, pw, pN;
+    long w;
 
     fmpz_init(r);
     fmpz_init(t);
-    fmpz_init(pv);
     fmpz_init(pw);
     fmpz_init(pN);
 
-    fmpz_pow_ui(t, p, xv - 1);
-    fmpz_mul(t, t, xu);
-
-    fmpz_set(pv, p);
-    fmpz_one(pw);
+    fmpz_set(pw, p);
     fmpz_pow_ui(pN, p, N);
+    w = 1;
+
+    fmpz_pow_ui(t, p, xv);
+    fmpz_mul(t, t, xu);
+    fmpz_mod(t, t, pN);
 
     fmpz_one(rop);
 
-    for (v = 2; v < (2 * N); v *= 2)
+    while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pw, pw, pv);       /* pw = p^w, w = v - 1 */
-        fmpz_mul(pv, pv, pv);       /* pv = p^v            */
+        fmpz_mul(pw, pw, pw);
 
-        fmpz_fdiv_qr(t, r, t, pv);  /* r = p^w (t % p^v)   */
-        fmpz_mul(r, r, pw);
+        fmpz_fdiv_r(r, t, pw);
+        fmpz_sub(t, t, r);
 
-        _padic_exp_bsplit(r, r, v - 1, p, N);
-        fmpz_mul(rop, rop, r);
-        fmpz_mod(rop, rop, pN);
+        if (!fmpz_is_zero(r))
+        {
+            _padic_exp_bsplit(r, r, w, p, N);
+            fmpz_mul(rop, rop, r);
+            fmpz_mod(rop, rop, pN);
+        }
+
+        w *= 2;
     }
 
     fmpz_clear(r);
     fmpz_clear(t);
-    fmpz_clear(pv);
     fmpz_clear(pw);
     fmpz_clear(pN);
 }
