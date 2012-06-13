@@ -72,8 +72,7 @@ static __inline__ long qadic_ctx_degree(const qadic_ctx_t ctx)
     return ctx->j[ctx->len - 1];
 }
 
-static __inline__ void 
-qadic_ctx_print(const qadic_ctx_t ctx)
+static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 {
     long i, k;
 
@@ -118,8 +117,7 @@ static __inline__ void qadic_clear(qadic_t x)
 }
 
 static __inline__ void
-_fmpz_poly_reduce(fmpz *R, long lenR, 
-                  const fmpz *a, const long *j, long len)
+_fmpz_poly_reduce(fmpz *R, long lenR, const fmpz *a, const long *j, long len)
 {
     const long d = j[len - 1];
     long i, k;
@@ -136,40 +134,27 @@ _fmpz_poly_reduce(fmpz *R, long lenR,
     }
 }
 
-static __inline__ void
+static __inline__ void 
 _fmpz_mod_poly_reduce(fmpz *R, long lenR, 
                       const fmpz *a, const long *j, long len, const fmpz_t p)
 {
     const long d = j[len - 1];
-    long i, k;
 
-    FMPZ_VEC_NORM(R, lenR);
-
-    _fmpz_vec_scalar_mod_fmpz(R, R, lenR, p);
-
-    for (i = lenR - 1; i >= d; i--)
-    {
-        for (k = len - 2; k >= 0; k--)
-        {
-            const long t = j[k] + i - d;
-
-            fmpz_submul(R + t, R + i, a + k);
-            fmpz_mod(R + t, R + t, p);
-        }
-        fmpz_zero(R + i);
-    }
+    _fmpz_poly_reduce(R, lenR, a, j, len);
+    _fmpz_vec_scalar_mod_fmpz(R, R, d, p);
 }
 
 static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
 {
-    if (x->val >= (&ctx->pctx)->N)
+    const long N = (&ctx->pctx)->N;
+    const long d = ctx->j[ctx->len - 1];
+
+    if (x->val >= N)
     {
         padic_poly_zero(x);
     }
     else
     {
-        const long d = ctx->j[ctx->len - 1];
-
         if (x->length > d)
         {
             fmpz_t pow;
