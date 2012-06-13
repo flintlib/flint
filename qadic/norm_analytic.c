@@ -30,9 +30,9 @@
 
         $\Norm(x) = \exp \Trace \log (x)$
 
-    whenever $1-x$ has valuation at least $x > (p-1)^{-1}$.
+    whenever $y = 1-x$ has valuation $v$ greater than $(p-1)^{-1}$.
 
-    Assumes that the input is $y = 1 - x$, and $v = \ord_p(y)$.
+    Assumes that $y$ is non-zero.
  */
 
 void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len, 
@@ -50,7 +50,7 @@ void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len,
 
     fmpz_pow_ui(pN, p, N);
 
-    _qadic_log_rectangular(lg, y, v, len, a, j, lena, p, N, pN);
+    _qadic_log(lg, y, v, len, a, j, lena, p, N, pN);
 
     _qadic_trace(tru, lg, d, a, j, lena, pN);
 

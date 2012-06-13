@@ -380,9 +380,9 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len,
 
     Assumes that $y$ is reduced modulo $p^N$.
 
-    Assumes that $v < N$.
+    Assumes that $v < N$, and in particular $N \geq 2$.
 
-    Does not support aliasing between $y$ and $z$.
+    Supports aliasing between $y$ and $z$.
 
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
 
@@ -393,7 +393,7 @@ void _qadic_log_balanced(fmpz *z, const fmpz *y, long len,
                          const fmpz *a, const long *j, long lena, 
                          const fmpz_t p, long N, const fmpz_t pN)
 
-    Computes 
+    Computes $(z, d)$ as 
     \begin{equation*}
     z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
     \end{equation*}
@@ -401,14 +401,38 @@ void _qadic_log_balanced(fmpz *z, const fmpz *y, long len,
     Assumes that $v = \ord_p(y)$ is at least $1$ when $p$ is odd and 
     at least $2$ when $p = 2$ so that the series converges.
 
-    Sets $(z, d)$.
-
     Supports aliasing between $z$ and $y$.
 
 int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Returns whether the $p$-adic logarithm function converges at 
     \code{op}, and if so sets \code{rop} to its value.
+
+void _qadic_log(fmpz *z, const fmpz *y, long v, long len, 
+                const fmpz *a, const long *j, long lena, 
+                const fmpz_t p, long N, const fmpz_t pN)
+
+    Computes $(z, d)$ as 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $(y, d)$ is reduced modulo $p^N$.
+
+    Assumes that $v < N$, and hence in particular $N \geq 2$.
+
+    Supports aliasing between $z$ and $y$.
 
 int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 

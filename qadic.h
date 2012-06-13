@@ -348,11 +348,11 @@ void _qadic_log_balanced(fmpz *z, const fmpz *y, long len,
 
 int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
-static __inline__ 
-int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
-{
-    return qadic_log_rectangular(rop, op, ctx);
-}
+void _qadic_log(fmpz *z, const fmpz *y, long v, long len, 
+                const fmpz *a, const long *j, long lena, 
+                const fmpz_t p, long N, const fmpz_t pN);
+
+int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
 void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx);
 
