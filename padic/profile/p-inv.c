@@ -57,6 +57,7 @@ main(void)
         1024, 1L << 11, 1L << 12, 1L << 13, 1L << 14, 
         1L << 15, 1L << 16, 1L << 17, 1L << 18, 1L << 19
     };
+    long T[20] = {0};
 
     printf("Benchmark for p-adic inversion.\n");
     fflush(stdout);
@@ -101,8 +102,10 @@ for (l = 0; l < len; l++)
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;
 
+    T[l] = (long) (cputime * (1000000000 / runs[l]));
+
     printf("%2ld, %4LG, %8ld, %ld\n", 
-        l, cputime, runs[l], (long) (cputime * (1000000000 / runs[l])));
+        l, cputime, runs[l], T[l]);
 
     padic_clear(a, ctx);
     padic_clear(z, ctx);
@@ -111,5 +114,10 @@ for (l = 0; l < len; l++)
     padic_ctx_clear(ctx);
     flint_randclear(state);
 }
+
+    printf("Output as a list:\n");
+    for (l = 0; l < len; l++)
+        printf("%ld, ", T[l]);
+    printf("\n");
 }
 
