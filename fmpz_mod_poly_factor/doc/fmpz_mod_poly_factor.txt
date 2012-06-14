@@ -79,3 +79,8 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
     repeatedly with the individual factors of \code{fac}.
 
     Does not support aliasing between \code{res} and \code{fac}.
+
+
+int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
+
+    Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
