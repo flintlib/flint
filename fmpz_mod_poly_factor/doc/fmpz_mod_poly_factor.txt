@@ -93,3 +93,10 @@ int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
     the value of factor is undetermined.
 
     Requires that \code{pol} be monic, non-constant and squarefree.
+
+void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
+			      const fmpz_mod_poly_t pol, long d)
+
+    Assuming \code{pol} is a product of irreducible factors all of
+    degree \code{d}, finds all those factors and places them in factors.
+    Requires that \code{pol} be monic, non-constant and squarefree.
