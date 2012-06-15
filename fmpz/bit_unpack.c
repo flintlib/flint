@@ -66,7 +66,11 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
         {
             (*coeff)++;
             if ((*coeff) > COEFF_MAX)
-                fmpz_set_ui(coeff, *coeff);
+            {
+                fmpz v = *coeff;
+                *coeff = 0;
+                fmpz_set_ui(coeff, v);
+            }
         }
 
         /* negate the coeff if necessary */
