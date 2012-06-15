@@ -80,7 +80,16 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
 
     Does not support aliasing between \code{res} and \code{fac}.
 
-
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
 
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
+
+int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
+	      flint_rand_t state, const fmpz_mod_poly_t pol, long d)
+
+    Probabilistic equal degree factorisation of \code{pol} into
+    irreducible factors of degree \code{d}. If it passes, a factor is
+    placed in factor and 1 is returned, otherwise 0 is returned and
+    the value of factor is undetermined.
+
+    Requires that \code{pol} be monic, non-constant and squarefree.
