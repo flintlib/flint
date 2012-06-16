@@ -293,6 +293,7 @@ int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N);
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N);
+void _padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N);
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
