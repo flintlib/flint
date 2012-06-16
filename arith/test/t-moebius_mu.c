@@ -37,7 +37,7 @@ void check(fmpz_t n, int expected)
 {
     int mu;
 
-    mu = fmpz_moebius_mu(n);
+    mu = arith_moebius_mu(n);
     if (mu != expected)
     {
         printf("FAIL:");

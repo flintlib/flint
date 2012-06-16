@@ -40,7 +40,7 @@ void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
     fmpz_init(t);
     fmpz_poly_init(p);
     fmpz_set_ui(t, n);
-    fmpz_divisors(p, t);
+    arith_divisors(p, t);
 
     fmpz_zero(x);
     for (i = 0; i < p->length; i++)
@@ -71,7 +71,7 @@ int main(void)
         for (k = 0; k < 10; k++)
         {
             fmpz_set_ui(m, n);
-            fmpz_divisor_sigma(a, m, k);
+            arith_divisor_sigma(a, m, k);
             fmpz_sigma_naive(b, n, k);
             if (!fmpz_equal(a, b))
             {

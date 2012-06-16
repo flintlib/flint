@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with left truncated product of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         long j, n;

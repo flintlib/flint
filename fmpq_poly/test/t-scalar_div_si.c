@@ -48,7 +48,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Compare with fmpq_poly_scalar_div_ui */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         ulong n;
@@ -111,7 +111,7 @@ main(void)
     }
 
     /* Check (a / n1) / n2 == a / (n1 * n2) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
         long n1, n2;

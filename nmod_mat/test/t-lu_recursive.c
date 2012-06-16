@@ -116,7 +116,7 @@ main(void)
     printf("lu_recursive....");
     fflush(stdout);
 
-    for (i = 0; i < 20000; i++)
+    for (i = 0; i < 2000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, LU;
         mp_limb_t mod;

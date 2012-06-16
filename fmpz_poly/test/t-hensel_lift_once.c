@@ -46,7 +46,7 @@ main(void)
     flint_randinit(state);
    
     /* We check that lifting local factors of F yields factors */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t F, G, H, R;
         fmpz_poly_factor_t F_fac;

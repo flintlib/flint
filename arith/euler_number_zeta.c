@@ -30,7 +30,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void _euler_number_zeta(fmpz_t res, ulong n)
+void _arith_euler_number_zeta(fmpz_t res, ulong n)
 {
     mpz_t r;
     mpfr_t t, z, pi;
@@ -50,7 +50,7 @@ void _euler_number_zeta(fmpz_t res, ulong n)
         return;
     }
 
-    prec = euler_number_size(n) + 10;
+    prec = arith_euler_number_size(n) + 10;
     pi_prec = prec + FLINT_BIT_COUNT(n);
 
     mpz_init(r);
@@ -63,7 +63,7 @@ void _euler_number_zeta(fmpz_t res, ulong n)
     mpfr_mul_2exp(t, t, n + 2, GMP_RNDN);
 
     /* pi^(n + 1) * L(n+1) */
-    _zeta_inv_euler_product(z, n + 1, 1);
+    mpfr_zeta_inv_euler_product(z, n + 1, 1);
     mpfr_const_pi(pi, GMP_RNDN);
     mpfr_pow_ui(pi, pi, n + 1, GMP_RNDN);
     mpfr_mul(z, z, pi, GMP_RNDN);

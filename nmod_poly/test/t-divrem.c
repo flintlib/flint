@@ -40,7 +40,7 @@ main(void)
     fflush(stdout);
 
     /* Check result of divrem */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r, prod;
 
@@ -82,7 +82,7 @@ main(void)
     }
 
     /* Check aliasing of a and q */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r;
 
@@ -120,7 +120,7 @@ main(void)
     }
 
     /* Check aliasing of b and q */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r;
 
@@ -158,7 +158,7 @@ main(void)
     }
 
     /* Check aliasing of a and r */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r;
 
@@ -196,7 +196,7 @@ main(void)
     }
 
     /* Check aliasing of b and r */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r;
 
@@ -234,7 +234,7 @@ main(void)
     }
 
     /* Check result of divrem_q0 */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r, prod;
 
@@ -277,7 +277,7 @@ main(void)
     }
 
     /* Check result of divrem_q1 */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, q, r, prod;
 

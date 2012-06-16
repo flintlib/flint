@@ -41,7 +41,7 @@ main(void)
     printf("add/sub....");
     fflush(stdout);
 
-    for (rep = 0; rep < 10000; rep++)
+    for (rep = 0; rep < 1000 * flint_test_multiplier(); rep++)
     {
         nmod_mat_t A, B, C, D;
 

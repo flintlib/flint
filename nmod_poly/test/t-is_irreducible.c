@@ -41,7 +41,7 @@ main(void)
     printf("is_irreducible....");
     fflush(stdout);
 
-    for (iter = 0; iter < 200; iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly, poly2, poly3;
         nmod_poly_factor_t factors;

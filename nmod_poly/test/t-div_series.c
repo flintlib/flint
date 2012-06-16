@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check A/B * B = A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, a, b, prod;
         long m;
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Check aliasing of q and a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, a, b;
         long m;
@@ -123,7 +123,7 @@ main(void)
     }
 
     /* Check aliasing of q and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, a, b;
         long m;

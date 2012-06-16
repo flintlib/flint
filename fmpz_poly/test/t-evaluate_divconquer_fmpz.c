@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         fmpz_poly_t f;
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Check that the result agrees with Horner's method */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         fmpz_poly_t f;

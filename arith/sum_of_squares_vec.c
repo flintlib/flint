@@ -62,7 +62,7 @@ theta3_qexp_squared(fmpz * r, long n)
 }
 
 void
-sum_of_squares_vec(fmpz * r, ulong k, long n)
+arith_sum_of_squares_vec(fmpz * r, ulong k, long n)
 {
     if (k == 0 || n <= 1)
     {

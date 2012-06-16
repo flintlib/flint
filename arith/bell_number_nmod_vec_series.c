@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 
 void
-bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
+arith_bell_number_nmod_vec_series(mp_ptr res, long n, nmod_t mod)
 {
     mp_limb_t fac, c;
     mp_ptr tmp;

@@ -45,7 +45,7 @@ main(void)
        Find coprime polys, multiply by another poly 
        and check the GCD is that poly 
     */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, g;
 
@@ -93,7 +93,7 @@ main(void)
     }
 
     /* Check aliasing of a and g */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g;
 
@@ -127,7 +127,7 @@ main(void)
     }
 
     /* Check aliasing of b and g */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g;
 

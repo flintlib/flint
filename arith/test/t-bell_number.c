@@ -50,12 +50,12 @@ int main(void)
 
     /* Consistency test */
     for (n = 0; n < maxn; n++)
-        bell_number(b1 + n, n);
+        arith_bell_number(b1 + n, n);
 
     for (n = 0; n < maxn; n++)
     {
         b2 = _fmpz_vec_init(n);
-        bell_number_vec(b2, n);
+        arith_bell_number_vec(b2, n);
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {
@@ -72,12 +72,12 @@ int main(void)
     {
         b2 = _fmpz_vec_init(n+1);
 
-        stirling_number_2_vec(b2, n, n+1);
+        arith_stirling_number_2_vec(b2, n, n+1);
 
         for (k = 1; k <= n; k++)
             fmpz_add(b2, b2, b2 + k);
 
-        bell_number(b1, n);
+        arith_bell_number(b1, n);
 
         if (!fmpz_equal(b1, b2))
         {
@@ -96,7 +96,7 @@ int main(void)
             mp_limb_t bb;
 
             nmod_init(&mod, n_randtest_prime(state, 0));
-            bb = bell_number_nmod(n, mod);
+            bb = arith_bell_number_nmod(n, mod);
 
             if (fmpz_fdiv_ui(b1, mod.n) != bb)
             {

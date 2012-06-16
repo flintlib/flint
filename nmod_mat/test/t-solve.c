@@ -45,7 +45,7 @@ main(void)
     printf("solve....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -90,7 +90,7 @@ main(void)
     }
 
     /* Test singular systems */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = 1 + n_randint(state, 20);
         n = 1 + n_randint(state, 20);

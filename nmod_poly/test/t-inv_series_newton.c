@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check Q * Qinv = 1 mod x^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv, prod;
         long m;
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Check aliasing of q and qinv */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv;
         long m;

@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         ulong n = n_randtest(state);
@@ -69,7 +69,7 @@ main(void)
     }
 
     /* Check (a*n1)*n2 = a*(n1*n2) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         ulong n1 = n_randbits(state, FLINT_BITS / 2);

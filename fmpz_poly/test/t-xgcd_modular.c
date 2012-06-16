@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check s*f + t*g == r */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -59,21 +59,25 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 150);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 150);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
-        
+
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_mul(s, s, f);
         fmpz_poly_mul(t, t, g);
         fmpz_poly_add(s, s, t);
 
-        result = (s->length == 1 && fmpz_equal(s->coeffs, r));
+        result = fmpz_poly_equal_fmpz(s, r);
         if (!result)
         {
            printf("FAIL (check s*f + t*g == r):\n");
            printf("f = "), fmpz_poly_print(f), printf("\n");
            printf("g = "), fmpz_poly_print(g), printf("\n");
-           printf("s = "), fmpz_print(s->coeffs); printf("\n");
+           printf("s = "), fmpz_poly_print(s); printf("\n");
+           printf("t = "), fmpz_poly_print(t); printf("\n");
+           printf("d = "), fmpz_poly_print(d); printf("\n");
            printf("r = "), fmpz_print(r); printf("\n");
            abort();
         }
@@ -87,7 +91,7 @@ main(void)
     }
 
     /* Check aliasing of s and f */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -102,13 +106,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, f, t, f, g);
         
-        result = fmpz_poly_equal(s, f);
+        result = (fmpz_poly_equal(s, f) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias s and f):\n");
@@ -126,7 +132,7 @@ main(void)
     }
 
     /* Check aliasing of s and g */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -141,13 +147,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, g, t, f, g);
         
-        result = fmpz_poly_equal(s, g);
+        result = (fmpz_poly_equal(s, g) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias s and g):\n");
@@ -165,7 +173,7 @@ main(void)
     }
 
     /* Check aliasing of t and f */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -180,13 +188,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, f, f, g);
         
-        result = fmpz_poly_equal(t, f);
+        result = (fmpz_poly_equal(t, f) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias t and f):\n");
@@ -204,7 +214,7 @@ main(void)
     }
 
     /* Check aliasing of t and g */
-    for (i = 0; i < 50; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -219,13 +229,15 @@ main(void)
         do {
             fmpz_poly_randtest(f, state, n_randint(state, 50), 100);
             fmpz_poly_randtest(g, state, n_randint(state, 50), 100);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
             fmpz_poly_gcd_modular(d, f, g);
         } while (d->length != 1);
         
         fmpz_poly_xgcd_modular(r, s, t, f, g);
         fmpz_poly_xgcd_modular(r, s, g, f, g);
         
-        result = fmpz_poly_equal(t, g);
+        result = (fmpz_poly_equal(t, g) || fmpz_is_zero(r));
         if (!result)
         {
            printf("FAIL (alias t and g):\n");

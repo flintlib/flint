@@ -47,13 +47,13 @@ int main()
     N = 3000;
 
     ress = _fmpz_vec_init(N);
-    euler_number_vec(ress, N);
+    arith_euler_number_vec(ress, N);
 
     for (n = 0; n < N; n++)
     {
         fmpz_init(res);
 
-        euler_number(res, n);
+        arith_euler_number(res, n);
         if (!fmpz_equal(res, ress + n))
         {
             printf("FAIL: n = %ld\n", n);

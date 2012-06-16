@@ -29,7 +29,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-double bernoulli_number_size(ulong n)
+double arith_bernoulli_number_size(ulong n)
 {
     double x;
 

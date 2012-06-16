@@ -62,7 +62,7 @@ main(void)
        Find coprime polys, multiply by another poly 
        and check the GCD is that poly 
     */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d, c1, d1, s, t;
 

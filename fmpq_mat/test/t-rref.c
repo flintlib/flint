@@ -40,7 +40,7 @@ main(void)
     printf("rref....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         long m, n, r, rank, b, d;
         long * perm;

@@ -19,7 +19,7 @@
 ===============================================================================*/
 /******************************************************************************
 
- Copyright (C) 2010-2011 Fredrik Johansson
+ Copyright (C) 2010-2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -39,41 +39,47 @@
  extern "C" {
 #endif
 
-void fmpz_primorial(fmpz_t res, long n);
+/* MPFR extras ***************************************************************/
 
-void fmpz_poly_ramanujan_tau(fmpz_poly_t res, long n);
+void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
+void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
+void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
 
-void fmpz_ramanujan_tau(fmpz_t res, const fmpz_t n);
+/* Various arithmetic functions **********************************************/
 
-void fmpz_divisors(fmpz_poly_t res, const fmpz_t n);
+void arith_primorial(fmpz_t res, long n);
 
-void fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n);
+void arith_harmonic_number(fmpq_t x, long n);
 
-int fmpz_moebius_mu(const fmpz_t n);
+void arith_ramanujan_tau(fmpz_t res, const fmpz_t n);
+void arith_ramanujan_tau_series(fmpz_poly_t res, long n);
 
-void fmpz_euler_phi(fmpz_t res, const fmpz_t n);
+void arith_divisors(fmpz_poly_t res, const fmpz_t n);
+void arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k);
 
-void _harmonic_number(fmpz_t num, fmpz_t den, long n);
+int arith_moebius_mu(const fmpz_t n);
 
-void harmonic_number(fmpq_t x, long n);
+void arith_euler_phi(fmpz_t res, const fmpz_t n);
 
 /* Stirling numbers **********************************************************/
 
-void stirling_number_1u(fmpz_t s, long n, long k);
-void stirling_number_1(fmpz_t s, long n, long k);
-void stirling_number_2(fmpz_t s, long n, long k);
+void arith_stirling_number_1u(fmpz_t s, long n, long k);
+void arith_stirling_number_1(fmpz_t s, long n, long k);
+void arith_stirling_number_2(fmpz_t s, long n, long k);
 
-void stirling_number_1u_vec(fmpz * row, long n, long klen);
-void stirling_number_1_vec(fmpz * row, long n, long klen);
-void stirling_number_2_vec(fmpz * row, long n, long klen);
+void arith_stirling_number_1u_vec(fmpz * row, long n, long klen);
+void arith_stirling_number_1_vec(fmpz * row, long n, long klen);
+void arith_stirling_number_2_vec(fmpz * row, long n, long klen);
 
-void stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen);
-void stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen);
-void stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen);
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen);
 
-void stirling_number_1u_mat(fmpz_mat_t mat);
-void stirling_number_1_mat(fmpz_mat_t mat);
-void stirling_number_2_mat(fmpz_mat_t mat);
+void arith_stirling_matrix_1u(fmpz_mat_t mat);
+void arith_stirling_matrix_1(fmpz_mat_t mat);
+void arith_stirling_matrix_2(fmpz_mat_t mat);
 
 /* Bell numbers **************************************************************/
 
@@ -85,32 +91,21 @@ void stirling_number_2_mat(fmpz_mat_t mat);
 
 extern const mp_limb_t bell_number_tab[];
 
-double bell_number_size(ulong n);
+double arith_bell_number_size(ulong n);
 
-void bell_number(fmpz_t b, ulong n);
+void arith_bell_number(fmpz_t b, ulong n);
+void arith_bell_number_bsplit(fmpz_t res, ulong n);
+void arith_bell_number_multi_mod(fmpz_t res, ulong n);
 
-void bell_number_bsplit(fmpz_t res, ulong n);
+void arith_bell_number_vec(fmpz * b, long n);
+void arith_bell_number_vec_recursive(fmpz * b, long n);
+void arith_bell_number_vec_multi_mod(fmpz * b, long n);
 
-void bell_number_multi_mod(fmpz_t res, ulong n);
+mp_limb_t arith_bell_number_nmod(ulong n, nmod_t mod);
 
-void bell_number_vec(fmpz * b, long n);
-
-void bell_number_vec_recursive(fmpz * b, long n);
-
-void bell_number_vec_multi_mod(fmpz * b, long n);
-
-mp_limb_t bell_number_nmod(ulong n, nmod_t mod);
-
-void bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod);
-
-void bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod);
-
-void bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod);
-
-
-/* Zeta Euler product ********************************************************/
-
-void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4);
+void arith_bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod);
+void arith_bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod);
+void arith_bell_number_nmod_vec_series(mp_ptr b, long n, nmod_t mod);
 
 
 /* Euler numbers *************************************************************/
@@ -130,15 +125,14 @@ static const mp_limb_t euler_number_small[] = {
 #endif
 };
 
-double euler_number_size(ulong n);
+double arith_euler_number_size(ulong n);
 
-void euler_number_vec(fmpz * res, long n);
+void arith_euler_number_vec(fmpz * res, long n);
 
-void _euler_number_zeta(fmpz_t res, ulong n);
+void _arith_euler_number_zeta(fmpz_t res, ulong n);
+void arith_euler_number(fmpz_t res, ulong n);
 
-void euler_number(fmpz_t res, ulong n);
-
-void euler_polynomial(fmpq_poly_t poly, ulong n);
+void arith_euler_polynomial(fmpq_poly_t poly, ulong n);
 
 /* Bernoulli numbers *********************************************************/
 
@@ -156,68 +150,52 @@ static const long _bernoulli_numer_small[] = {
 #endif
 };
 
-void _bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
+void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n);
+void arith_bernoulli_number(fmpq_t x, ulong n);
 
-void bernoulli_number(fmpq_t x, ulong n);
+void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+void arith_bernoulli_number_vec(fmpq * num, long n);
 
-void _bernoulli_number_vec(fmpz * num, fmpz * den, long n);
+void arith_bernoulli_number_denom(fmpz_t den, ulong n);
+double arith_bernoulli_number_size(ulong n);
 
-void bernoulli_number_vec(fmpq * num, long n);
+void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n);
 
-void bernoulli_number_denom(fmpz_t den, ulong n);
-
-double bernoulli_number_size(ulong n);
-
-void bernoulli_polynomial(fmpq_poly_t poly, ulong n);
-
-void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
-
-void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n);
-
-void _bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
-
-void _bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
+void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n);
+void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n);
+void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n);
+void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n);
 
 /* Cyclotomic polynomials ****************************************************/
 
-void _cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
+void _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
                                         long num_factors, ulong phi);
+void arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
 
-void cyclotomic_polynomial(fmpz_poly_t poly, ulong n);
+void _arith_cos_minpoly(fmpz * coeffs, long d, ulong n);
+void arith_cos_minpoly(fmpz_poly_t poly, ulong n);
 
-void _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n);
+/* Hypergeometric polynomials ************************************************/
 
-void cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n);
-
-/* Legendre polynomials ******************************************************/
-
-void legendre_polynomial(fmpq_poly_t poly, ulong n);
-
-/* Chebyshev polynomials *****************************************************/
-
-void chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
-
-void chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
+void arith_legendre_polynomial(fmpq_poly_t poly, ulong n);
+void arith_chebyshev_t_polynomial(fmpz_poly_t poly, ulong n);
+void arith_chebyshev_u_polynomial(fmpz_poly_t poly, ulong n);
 
 /* Swinnerton-Dyer polynomials ***********************************************/
 
-void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
+void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n);
 
 /* Landau function ***********************************************************/
 
-void landau_function_vec(fmpz * res, long len);
+void arith_landau_function_vec(fmpz * res, long len);
 
 /* Dedekind sums *************************************************************/
 
-void dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
-
-double dedekind_sum_coprime_d(double h, double k);
-
-void dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
-
-void dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
-
-void dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k);
+double arith_dedekind_sum_coprime_d(double h, double k);
+void arith_dedekind_sum_coprime_large(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void arith_dedekind_sum_coprime(fmpq_t s, const fmpz_t h, const fmpz_t k);
+void arith_dedekind_sum(fmpq_t s, const fmpz_t h, const fmpz_t k);
 
 /* Exponential sums **********************************************************/
 
@@ -242,35 +220,19 @@ void trig_prod_init(trig_prod_t sum)
     sum->sqrt_q = 1;
 }
 
-void dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
+void arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n);
 
 /* Number of partitions ******************************************************/
 
-void number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
-
-void number_of_partitions_vec(fmpz * res, long len);
-
-void number_of_partitions_mpfr(mpfr_t x, ulong n);
-
-void number_of_partitions(fmpz_t x, ulong n);
-
-void number_of_distinct_partitions_vec(fmpz * res, long len);
-
-void number_of_distinct_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
+void arith_number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod);
+void arith_number_of_partitions_vec(fmpz * res, long len);
+void arith_number_of_partitions_mpfr(mpfr_t x, ulong n);
+void arith_number_of_partitions(fmpz_t x, ulong n);
 
 /* Number of sums of squares representations *********************************/
 
-void sum_of_squares(fmpz_t r, ulong k, const fmpz_t n);
-
-void sum_of_squares_vec(fmpz * r, ulong k, long n);
-
-/* MPFR extras ***************************************************************/
-
-void mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd);
-
-void mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd);
-
-void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
+void arith_sum_of_squares(fmpz_t r, ulong k, const fmpz_t n);
+void arith_sum_of_squares_vec(fmpz * r, ulong k, long n);
 
 #ifdef __cplusplus
 }

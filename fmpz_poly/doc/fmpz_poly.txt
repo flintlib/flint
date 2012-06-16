@@ -1166,6 +1166,9 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     It is assumed that \code{len1 >= len2 > 0}. No aliasing of inputs and 
     outputs is permitted.
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     Uses a multimodular algorithm. The resultant is first computed and 
     extended GCD's modulo various primes $p$ are computed and combined using
     CRT. When the CRT stabilises the resulting polynomials are simply reduced
@@ -1178,6 +1181,9 @@ void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     Uses the multimodular algorithm.
 
 void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t, 
@@ -1189,6 +1195,9 @@ void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t,
     of $s$ will be no greater than \code{len2} and the length of $t$ will be
     no greater than \code{len1} (both are zero padded if necessary).
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     It is assumed that \code{len1 >= len2 > 0}. No aliasing of inputs and 
     outputs is permitted.
 
@@ -1198,6 +1207,9 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
+
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
 
 void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
                                               const fmpz * poly2, long len2)

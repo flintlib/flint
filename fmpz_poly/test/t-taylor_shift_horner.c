@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g;
         fmpz_t c;
@@ -74,7 +74,7 @@ main(void)
     }
 
     /* Compare with composition */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h1, h2;
         fmpz_t c;

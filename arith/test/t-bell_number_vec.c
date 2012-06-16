@@ -47,8 +47,8 @@ int main(void)
 
     for (n = 0; n < maxn; n += (n < 50) ? + 1 : n/4)
     {
-        bell_number_vec_recursive(b1, n);
-        bell_number_vec_multi_mod(b2, n);
+        arith_bell_number_vec_recursive(b1, n);
+        arith_bell_number_vec_multi_mod(b2, n);
 
         if (!_fmpz_vec_equal(b1, b2, n))
         {
