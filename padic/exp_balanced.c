@@ -134,86 +134,82 @@ _padic_exp_bsplit(fmpz_t y, const fmpz_t x, long v, const fmpz_t p, long N)
     }
 }
 
-void 
-_padic_exp_balanced_2(padic_t y, const padic_t x, const padic_ctx_t ctx)
+void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, long xv, long N)
 {
-    fmpz_t r, t, pv, pw, pN;
-    long v;
+    const fmpz_t p = {2L};
+
+    fmpz_t r, t;
+    long w;
 
     fmpz_init(r);
     fmpz_init(t);
-    fmpz_init(pv);
-    fmpz_init(pw);
-    fmpz_init(pN);
 
-    fmpz_pow_ui(t, ctx->p, padic_val(x) - 2);
-    fmpz_mul(t, t, padic_unit(x));
+    w = 1;
 
-    fmpz_set_ui(pv, 4);
-    fmpz_set_ui(pw, 2);
-    fmpz_pow_ui(pN, ctx->p, ctx->N);
+    fmpz_mul_2exp(t, xu, xv);
+    fmpz_fdiv_r_2exp(t, t, N);
 
-    fmpz_one(padic_unit(y));
-    padic_val(y) = 0L;
+    fmpz_one(rop);
 
-    for (v = 3; v < (2 * ctx->N); v *= 2)
+    while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pw, pw, pv);       /* pw = p^w, w = v - 1 */
-        fmpz_mul(pv, pv, pv);       /* pv = p^v            */
+        fmpz_fdiv_r_2exp(r, t, 2*w);
+        fmpz_sub(t, t, r);
 
-        fmpz_fdiv_qr(t, r, t, pv);  /* r = p^w (t % p^v)   */
-        fmpz_mul(r, r, pw);
+        if (!fmpz_is_zero(r))
+        {
+            _padic_exp_bsplit(r, r, w, p, N);
+            fmpz_mul(rop, rop, r);
+            fmpz_fdiv_r_2exp(rop, rop, N);
+        }
 
-        _padic_exp_bsplit(r, r, v - 1, ctx->p, ctx->N);
-        fmpz_mul(padic_unit(y), padic_unit(y), r);
-        fmpz_mod(padic_unit(y), padic_unit(y), pN);
+        w *= 2;
     }
 
     fmpz_clear(r);
     fmpz_clear(t);
-    fmpz_clear(pv);
-    fmpz_clear(pw);
-    fmpz_clear(pN);
 }
 
-void
-_padic_exp_balanced_p(padic_t y, const padic_t x, const padic_ctx_t ctx)
+void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, long xv, 
+                                       const fmpz_t p, long N)
 {
-    fmpz_t r, t, pv, pw, pN;
-    long v;
+    fmpz_t r, t, pw, pN;
+    long w;
 
     fmpz_init(r);
     fmpz_init(t);
-    fmpz_init(pv);
     fmpz_init(pw);
     fmpz_init(pN);
 
-    fmpz_pow_ui(t, ctx->p, padic_val(x) - 1);
-    fmpz_mul(t, t, padic_unit(x));
+    fmpz_set(pw, p);
+    fmpz_pow_ui(pN, p, N);
+    w = 1;
 
-    fmpz_set(pv, ctx->p);
-    fmpz_one(pw);
-    fmpz_pow_ui(pN, ctx->p, ctx->N);
+    fmpz_pow_ui(t, p, xv);
+    fmpz_mul(t, t, xu);
+    fmpz_mod(t, t, pN);
 
-    fmpz_one(padic_unit(y));
-    padic_val(y) = 0L;
+    fmpz_one(rop);
 
-    for (v = 2; v < (2 * ctx->N); v *= 2)
+    while (!fmpz_is_zero(t))
     {
-        fmpz_mul(pw, pw, pv);       /* pw = p^w, w = v - 1 */
-        fmpz_mul(pv, pv, pv);       /* pv = p^v            */
+        fmpz_mul(pw, pw, pw);
 
-        fmpz_fdiv_qr(t, r, t, pv);  /* r = p^w (t % p^v)   */
-        fmpz_mul(r, r, pw);
+        fmpz_fdiv_r(r, t, pw);
+        fmpz_sub(t, t, r);
 
-        _padic_exp_bsplit(r, r, v - 1, ctx->p, ctx->N);
-        fmpz_mul(padic_unit(y), padic_unit(y), r);
-        fmpz_mod(padic_unit(y), padic_unit(y), pN);
+        if (!fmpz_is_zero(r))
+        {
+            _padic_exp_bsplit(r, r, w, p, N);
+            fmpz_mul(rop, rop, r);
+            fmpz_mod(rop, rop, pN);
+        }
+
+        w *= 2;
     }
 
     fmpz_clear(r);
     fmpz_clear(t);
-    fmpz_clear(pv);
     fmpz_clear(pw);
     fmpz_clear(pN);
 }
@@ -227,12 +223,13 @@ _padic_exp_balanced_p(padic_t y, const padic_t x, const padic_ctx_t ctx)
     TODO:  Take advantage of additional factors of $p$ in $x$.
  */
 
-void _padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, 
+                                     const fmpz_t p, long N)
 {
-    if (*(ctx->p) == 2L)
-        _padic_exp_balanced_2(rop, op, ctx);
+    if (*p == 2L)
+        _padic_exp_balanced_2(rop, u, v, N);
     else
-        _padic_exp_balanced_p(rop, op, ctx);
+        _padic_exp_balanced_p(rop, u, v, p, N);
 }
 
 int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -254,9 +251,14 @@ int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     else
     {
         if (v < N)
-            _padic_exp_balanced(rop, op, ctx);
+        {
+            _padic_exp_balanced(padic_unit(rop), padic_unit(op), padic_val(op), p, N);
+            padic_val(rop) = 0;
+        }
         else
+        {
             padic_one(rop, ctx);
+        }
         return 1;
     }
 }
