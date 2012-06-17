@@ -11,6 +11,7 @@ WANT_NTL=0
 SHARED=1
 STATIC=1
 REENTRANT=0
+BUILD=
 
 usage()
 {
@@ -21,6 +22,7 @@ usage()
    echo "     --with-mpir=<path> Specify location of MPIR"
    echo "     --with-mpfr=<path> Specify location of MPFR"
    echo "     --with-ntl=<path>  Specify location of NTL and build NTL interface"
+   echo "     --build=arch-os    Specify architecture/OS combination rather than use values from uname -m/-s"
    echo "     --prefix=<path>    Specify path to installation location"
    echo "     --disable-shared   Do not build a shared library"
    echo "     --disable-static   Do not build a static library"
@@ -46,6 +48,9 @@ until [ -z "$1" ]; do
          NTL_DIR=`expr substr "$1" 12 length "$1"`
 	 WANT_NTL=1
          ;;
+      "--build="*)
+	 BUILD=`expr substr "$1" 9 length "$1"`
+	 ;;
       "--prefix="*)
          PREFIX=`expr substr "$1" 10 length "$1"`
 	 ;;
@@ -169,8 +174,13 @@ fi
 
 # Architecture handler
 
+if [ -z $BUILD ]; then
 ARCH=`uname -m`
 OS=`uname -s`
+else
+ARCH=`echo "$BUILD" | cut -d- -f1`
+OS=`echo "$BUILD" | cut -d- -f2`
+fi
 
 if [ "$(uname | cut -d_ -f1)" = "MINGW32" ]; then
    OS="MINGW32"
