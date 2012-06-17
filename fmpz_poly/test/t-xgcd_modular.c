@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check s*f + t*g == r */
-    for (i = 0; i < 200 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -90,8 +90,55 @@ main(void)
         fmpz_poly_clear(t);
     }
 
-    /* Check aliasing of s and f */
+    /* Check s*f + t*g == r with smaller polynomials */
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    {
+        fmpz_poly_t d, f, g, s, t;
+        fmpz_t r;
+
+        fmpz_poly_init(d);
+        fmpz_poly_init(f);
+        fmpz_poly_init(g);
+        fmpz_poly_init(s);
+        fmpz_poly_init(t);
+        fmpz_init(r);
+
+        do {
+            fmpz_poly_randtest(f, state, n_randint(state, 30), 50);
+            fmpz_poly_randtest(g, state, n_randint(state, 30), 50);
+            fmpz_poly_primitive_part(f, f);
+            fmpz_poly_primitive_part(g, g);
+            fmpz_poly_gcd_modular(d, f, g);
+        } while (d->length != 1);
+
+        fmpz_poly_xgcd_modular(r, s, t, f, g);
+        fmpz_poly_mul(s, s, f);
+        fmpz_poly_mul(t, t, g);
+        fmpz_poly_add(s, s, t);
+
+        result = fmpz_poly_equal_fmpz(s, r);
+        if (!result)
+        {
+           printf("FAIL (check small s*f + t*g == r):\n");
+           printf("f = "), fmpz_poly_print(f), printf("\n");
+           printf("g = "), fmpz_poly_print(g), printf("\n");
+           printf("s = "), fmpz_poly_print(s); printf("\n");
+           printf("t = "), fmpz_poly_print(t); printf("\n");
+           printf("d = "), fmpz_poly_print(d); printf("\n");
+           printf("r = "), fmpz_print(r); printf("\n");
+           abort();
+        }
+
+        fmpz_clear(r);
+        fmpz_poly_clear(d);
+        fmpz_poly_clear(f);
+        fmpz_poly_clear(g);
+        fmpz_poly_clear(s);
+        fmpz_poly_clear(t);
+    }
+
+    /* Check aliasing of s and f */
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -132,7 +179,7 @@ main(void)
     }
 
     /* Check aliasing of s and g */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -173,7 +220,7 @@ main(void)
     }
 
     /* Check aliasing of t and f */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
@@ -214,7 +261,7 @@ main(void)
     }
 
     /* Check aliasing of t and g */
-    for (i = 0; i < 50 * flint_test_multiplier(); i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t d, f, g, s, t;
         fmpz_t r;
