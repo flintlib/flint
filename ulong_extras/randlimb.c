@@ -44,7 +44,7 @@ mp_limb_t n_randlimb(flint_rand_t state)
     state->__randval = (state->__randval*1543932465UL +  1626832771UL);
     state->__randval2 = (state->__randval2*2495927737UL +  1626832771UL);
 
-    return (state->__randval>>16) + ((state->__randval2>>16) << 32);
+    return (state->__randval>>16) + ((state->__randval2>>16) << 16);
 }
 
 #endif

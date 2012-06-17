@@ -137,7 +137,7 @@ build/%.lo: %.c | build
 
 build/%.o: %.c | build
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
+		$(CC) $(CFLAGS) $(INCS) -c $< -o $@; \
 	fi
 
 build:

@@ -127,19 +127,23 @@ main(void)
     /* Check when not divisible */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        fmpz_poly_t a, b, p, q, s;
+        fmpz_poly_t a, b, p, q, g, s;
         
         fmpz_poly_init(a);
         fmpz_poly_init(b);
         fmpz_poly_init(p);
         fmpz_poly_init(q);
         fmpz_poly_init(s);
+        fmpz_poly_init(g);
         fmpz_poly_randtest(a, state, n_randint(state, 100), 200);
         do {
            fmpz_poly_randtest_not_zero(b, state, n_randint(state, 100) + 1, 200);
         } while (b->length < 2);
         fmpz_poly_mul(p, a, b);
-        fmpz_poly_randtest_not_zero(s, state, b->length, 200);
+        do {
+           fmpz_poly_randtest_not_zero(s, state, b->length, 200);
+           fmpz_poly_gcd(g, s, b);
+        } while (g->length == b->length);
         fmpz_poly_add(p, p, s);
 
         result = (!fmpz_poly_divides(q, p, b));
@@ -158,6 +162,7 @@ main(void)
         fmpz_poly_clear(p);
         fmpz_poly_clear(q);
         fmpz_poly_clear(s);
+        fmpz_poly_clear(g);
     }
 
     
