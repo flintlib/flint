@@ -128,6 +128,7 @@ fi
 
 #various tuning parameters
 
+if [ -z "$FLINT_TUNE" ]; then
 if [ "`uname`" = "Linux" -a "`uname -m`" = "x86_64" ]; then
    FLINT_TUNE="-funroll-loops "
 elif [ "`uname`" = "Darwin" -a "`uname -m`" = "Power Macintosh" ]; then
@@ -141,11 +142,14 @@ elif [ "`uname -m`" = "ia64" ]; then
 else
    FLINT_TUNE="-funroll-loops "
 fi
+fi
 
+if [ -z "$FLINT_LIB" ]; then
 if [ "`uname`" = "Darwin" ]; then
    FLINT_LIB="libflint.dylib"
 else
    FLINT_LIB="libflint.so"
+fi
 fi
 
 #defaults for CFLAGS, CC and CXX
