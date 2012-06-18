@@ -59,6 +59,7 @@ main(void)
         1024, 1L << 11, 1L << 12, 1L << 13, 1L << 14, 
         1L << 15, 1L << 16, 1L << 17, 1L << 18, 1L << 19
     };
+    long T[20] = {0};
 
     printf("Benchmark for q-adic exponential (balanced).\n");
     fflush(stdout);
@@ -122,5 +123,10 @@ for (l = 0; l < len; l++)
     qadic_ctx_clear(ctx);
     flint_randclear(state);
 }
+
+    printf("Output as a list:\n");
+    for (l = 0; l < len; l++)
+        printf("%ld, ", T[l]);
+    printf("\n");
 }
 
