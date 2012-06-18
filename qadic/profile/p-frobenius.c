@@ -113,8 +113,10 @@ for (l = 0; l < FLINT_MIN(16, len); l++)
 
     cputime = (long double) (c1 - c0) / (long double) CLOCKS_PER_SEC;
 
+    T[l] = (long) (cputime * (1000000000 / runs[l]));
+
     printf("%2ld, %6LG, %5ld, %ld\n", 
-        l, cputime, runs[l], (long) (cputime * (1000000000 / runs[l])));
+        l, cputime, runs[l], T[l]);
 
     qadic_clear(a);
     qadic_clear(z);
