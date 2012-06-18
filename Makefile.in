@@ -48,6 +48,9 @@ clean:
 	rm -rf build
 
 distclean: clean
+	rm -f config.h
+	rm -f fft_tuning.h
+	rm -f fmpz-conversions.h
 	rm -f Makefile
 
 dist:
