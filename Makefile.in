@@ -2,7 +2,8 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_factor fmpz_poly_factor \
-   fft qsieve padic padic_poly padic_mat qadic
+   fft qsieve \
+   padic_poly padic_mat qadic
  
 LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
 LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
