@@ -59,8 +59,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 
       fmpz_clear(ac);
       fmpz_clear(bc);
-	   fmpz_clear(d);
-
+      fmpz_clear(d);
       return;
    }
    
@@ -280,10 +279,15 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    _nmod_vec_clear(b);
    _nmod_vec_clear(h); 
         
+   while (res[hlen - 1] == 0) hlen--;
+
    /* finally multiply by content */
    _fmpz_vec_scalar_mul_fmpz(res, res, hlen, d);
-   fmpz_clear(d);
 
+   if (fmpz_sgn(res + hlen - 1) < 0)
+        _fmpz_vec_neg(res, res, hlen);
+
+   fmpz_clear(d);
    _fmpz_vec_clear(A, len1);
    _fmpz_vec_clear(B, len2);
    _fmpz_vec_clear(Q, len1);
