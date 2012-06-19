@@ -126,6 +126,7 @@ main(void)
             printf("FAIL (check a | gcd(af, ag)):\n");
             fmpz_poly_print(f), printf("\n");
             fmpz_poly_print(g), printf("\n");
+            fmpz_poly_print(a), printf("\n");
             fmpz_poly_print(d), printf("\n");
             abort();
         }
