@@ -208,8 +208,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
             if (g_pm1)
             {
                 /* are we done? */
-                if (_fmpz_poly_divides(Q, A, len1, res, hlen) &&
-                    _fmpz_poly_divides(Q, B, len2, res, hlen)) 
+                if (_fmpz_poly_divides(Q, B, len2, res, hlen) &&
+                    _fmpz_poly_divides(Q, A, len1, res, hlen))
                 break;
             }
             else
@@ -235,8 +235,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
                     _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);
 
                     /* are we done? */
-                    if (_fmpz_poly_divides(Q, A, len1, res, hlen) &&
-                        _fmpz_poly_divides(Q, B, len2, res, hlen)) 
+                    if (_fmpz_poly_divides(Q, B, len2, res, hlen) &&
+                        _fmpz_poly_divides(Q, A, len1, res, hlen))
                         break;
 
                     /* no, so multiply by content again */
@@ -274,8 +274,8 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
                 break;
 
             /* are we done? */
-            if (_fmpz_poly_divides(Q, A, len1, res, hlen) &&
-                _fmpz_poly_divides(Q, B, len2, res, hlen)) 
+            if (_fmpz_poly_divides(Q, B, len2, res, hlen) &&
+                _fmpz_poly_divides(Q, A, len1, res, hlen))
                 break;
 
             if (!g_pm1) 
