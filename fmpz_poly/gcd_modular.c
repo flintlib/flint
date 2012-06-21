@@ -35,12 +35,12 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
                                         const fmpz * poly2, long len2)
 {
    mp_bitcnt_t bits1, bits2, nb1, nb2, gbits, bits_small, pbits, curr_bits = 0, new_bits;   
-   fmpz_t ac, bc, hc, d, g, eval_A, eval_B, eval_GCD, modulus;
+   fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
    fmpz * A, * B, * Q, * lead_A, * lead_B;
    mp_ptr a, b, h;
    mp_limb_t p, h_inv, g_mod;
    nmod_t mod;
-   long i, n, hlen, bound;
+   long i, n, n0, unlucky, hlen, bound;
    int g_pm1;
    
    fmpz_init(ac);
@@ -79,19 +79,29 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 	bits1 = FLINT_ABS(_fmpz_vec_max_bits(A, len1));
 	bits2 = FLINT_ABS(_fmpz_vec_max_bits(B, len2));
 
-	if (len1 < 64 && len2 < 64)
+	fmpz_init(l);
+   
+   if (len1 < 64 && len2 < 64) /* compute the squares of the 2-norms */
 	{
-		nb1 = _fmpz_poly_2norm_normalised_bits(A, len1);
-		nb2 = _fmpz_poly_2norm_normalised_bits(B, len2);
+	   fmpz_set_ui(l, 0);
+      for (i = 0; i < len1; i++)
+         fmpz_addmul(l, A + i, A + i);
+      nb1 = fmpz_bits(l);
+      fmpz_set_ui(l, 0);
+      for (i = 0; i < len2; i++)
+         fmpz_addmul(l, B + i, B + i);
+      nb2 = fmpz_bits(l);
 	} else /* approximate to save time */
 	{
-		nb1 = (2*bits1 + FLINT_BIT_COUNT(len1) + 1)/2 - fmpz_bits(lead_A) + 1;
-		nb2 = (2*bits2 + FLINT_BIT_COUNT(len2) + 1)/2 - fmpz_bits(lead_B) + 1;
+		nb1 = 2*bits1 + FLINT_BIT_COUNT(len1);
+		nb2 = 2*bits2 + FLINT_BIT_COUNT(len2);
 	}
    
    /* get gcd of leading coefficients */
    fmpz_init(g);
    fmpz_gcd(g, lead_A, lead_B);
+   fmpz_mul(l, lead_A, lead_B);
+   
    gbits = fmpz_bits(g);
    g_pm1 = fmpz_is_pm1(g);
    
@@ -125,7 +135,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    
    /* set size of first prime */
    pbits = FLINT_BITS - 1;
-   p = (1UL<<(FLINT_BITS - 1));
+   p = (1UL<<pbits);
 
    fmpz_init(modulus);
    
@@ -139,14 +149,24 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    /* zero entire output */
    _fmpz_vec_zero(res, len2);
 
-   n = len2; /* current bound on length of result */
-   bound = len2 + FLINT_MIN(nb1, nb2) + gbits + 1; /* initialise bound */
+   n = len2; 
+   /* current bound on length of result 
+      the bound we use is from section 6 of 
+      http://cs.nyu.edu/~yap/book/alge/ftpSite/l4.ps.gz 
+   */
+   n0 = len1 - 1;
+   bound = (n0 + 3)*FLINT_MAX(nb1, nb2) + (n0 + 1); /* initialise bound */
+   unlucky = 0;
 
    for (;;)
    {
       /* get new prime and initialise modulus */
-      do { p = n_nextprime(p, 0); }
-      while (!fmpz_fdiv_ui(g, p));
+      p = n_nextprime(p, 0);
+      if (fmpz_fdiv_ui(l, p) == 0)
+      {
+          unlucky += pbits;
+          continue;
+      }
       nmod_init(&mod, p);
 		
       /* reduce polynomials modulo p */
@@ -159,12 +179,16 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
       if (hlen == 1) /* gcd is 1 */
       {
          fmpz_one(res);
+         _fmpz_vec_zero(res + 1, len2 - 1);
          break; 
       }
       
       if (hlen > n + 1) /* discard this prime */
+      {
+         unlucky += pbits;
          continue;      
-      
+      }
+
       /* scale new polynomial mod p appropriately */
       if (g_pm1) _nmod_poly_make_monic(h, h, hlen, mod);
       else
@@ -177,8 +201,10 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
       
       if (hlen <= n) /* we have a new bound on size of result */
       {
+         unlucky += fmpz_bits(modulus);
          _fmpz_vec_set_nmod_vec(res, h, hlen, mod);
-         
+         _fmpz_vec_zero(res + hlen, len2 - hlen);
+
          if (g_pm1)
          {
             /* are we done? */
@@ -186,14 +212,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 				   break;
          } else
          {
-            /*
-				   Bound is easily derived from Thm 5.3 and Cor 5.4 of 
-				   http://compalg.inf.elte.hu/~tony/Informatikai-Konyvtar/03-Algorithms%20of%20Informatics%201,%202,%203/CompAlg29May.pdf
-					The + 1 is to allow for signed coefficients after Chinese Remaindering
-				*/
-				bound = hlen + FLINT_MIN(nb1, nb2) + gbits + 1;
-
-            if (pbits >= bound) /* if we reach the bound with one prime */
+            if (pbits + unlucky >= bound) /* if we reach the bound with one prime */
             { 
                fmpz_t hc;
                fmpz_init(hc);
@@ -213,6 +232,11 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
                
                /* divide by content */
                _fmpz_vec_content(hc, res, hlen);
+               
+               /* correct sign of leading term */
+               if (fmpz_sgn(res + hlen - 1) < 0)
+                  fmpz_neg(hc, hc);
+            
                _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);
                
                /* are we done? */
@@ -244,12 +268,16 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
          {
             fmpz_init(hc);
             _fmpz_vec_content(hc, res, hlen);
-               
+            
+            /* correct sign of leading term */
+            if (fmpz_sgn(res + hlen - 1) < 0)
+               fmpz_neg(hc, hc);
+            
             /* divide by content */
             _fmpz_vec_scalar_divexact_fmpz(res, res, hlen, hc);      
          }
 
-         if (fmpz_bits(modulus) > bound)
+         if (fmpz_bits(modulus) + unlucky >= bound)
          {
             if (!g_pm1) fmpz_clear(hc);
             break;
@@ -275,11 +303,12 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
    
    fmpz_clear(modulus);
    fmpz_clear(g); 
+   fmpz_clear(l); 
 
    _nmod_vec_clear(a);
    _nmod_vec_clear(b);
    _nmod_vec_clear(h); 
-        
+
    /* finally multiply by content */
    _fmpz_vec_scalar_mul_fmpz(res, res, hlen, d);
    fmpz_clear(d);
@@ -323,30 +352,15 @@ fmpz_poly_gcd_modular(fmpz_poly_t res,
 
     rlen = FLINT_MIN(len1, len2);
 
-    if (res == poly1 || res == poly2)
-    {
-       fmpz_poly_t temp;
-       fmpz_poly_init2(temp, rlen);
-       if (len1 >= len2)
-          _fmpz_poly_gcd_modular(temp->coeffs, poly1->coeffs, len1,
+    /* underscore function automatically takes care of aliasing */
+    fmpz_poly_fit_length(res, rlen);
+
+    if (len1 >= len2)
+       _fmpz_poly_gcd_modular(res->coeffs, poly1->coeffs, len1,
                                     poly2->coeffs, len2);
-       else
-          _fmpz_poly_gcd_modular(temp->coeffs, poly2->coeffs, len2,
-                                    poly1->coeffs, len1);
-       fmpz_poly_swap(temp, res);
-       fmpz_poly_clear(temp);
-    }
     else
-    {
-       fmpz_poly_fit_length(res, rlen);
-       if (len1 >= len2)
-          _fmpz_poly_gcd_modular(res->coeffs, poly1->coeffs, len1,
-                                    poly2->coeffs, len2);
-       else
-          _fmpz_poly_gcd_modular(res->coeffs, poly2->coeffs, len2,
+       _fmpz_poly_gcd_modular(res->coeffs, poly2->coeffs, len2,
                                     poly1->coeffs, len1);
-    }
-    
     _fmpz_poly_set_length(res, rlen);
     _fmpz_poly_normalise(res);
 }

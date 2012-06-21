@@ -1269,7 +1269,7 @@ int main(int argc, char *argv[])
     
     test_is_one("0", 0);
     test_is_one("0/1  1", 0);
-    test_is_one("1", 0);
+    test_is_one("1  1/1  1", 1);
     test_is_one("2  1 1/2  1 1", 1);
     test_is_one("3  -1 0 1/2  0 1", 0);
     
