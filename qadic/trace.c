@@ -81,7 +81,7 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
                      ctx->a, ctx->j, ctx->len, pN);
         padic_val(rop) = op->val;
 
-        _padic_canonicalise(rop, (&ctx->pctx)->p);
+        _padic_canonicalise(rop, &ctx->pctx);
 
         if (alloc)
             fmpz_clear(pN);
