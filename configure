@@ -137,7 +137,7 @@ if [ "$WANT_NTL" = "1" ]; then
     EXTRA_LIBS="$EXTRA_LIBS -lntl"
 fi
 
-#name for FLINT library shared library
+#name for FLINT shared library
 
 if [ -z "$FLINT_LIB" ]; then
    if [ "`uname`" = "Darwin" ]; then
@@ -202,7 +202,6 @@ echo "Configuring...${MACHINE}-${OS}"
 #no shared library on mingw
 
 if [ "$OS" = "MINGW32" ]; then
-   echo
    SHARED=0
 fi
 
