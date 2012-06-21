@@ -64,8 +64,16 @@ or implied, of William Hart.
 /* used for generating random values mod p in test code */
 #define random_fermat(nn, state, limbs) \
    do { \
-      mpn_rrandom(nn, state->gmp_state, limbs); \
-      nn[limbs] = n_randint(state, 1024); \
+      if (n_randint(state, 10) == 0) { \
+         mpn_zero(nn, limbs); \
+         nn[limbs] = 1; \
+      } else { \
+         if (n_randint(state, 2) == 0) \
+            mpn_rrandom(nn, state->gmp_state, limbs); \
+         else \
+            mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
+         nn[limbs] = n_randint(state, 1024); \
+      } \
       if (n_randint(state, 2)) \
          nn[limbs] = -nn[limbs]; \
    } while (0)

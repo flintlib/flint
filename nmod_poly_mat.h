@@ -148,6 +148,9 @@ void nmod_poly_mat_neg(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 void nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
+void nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
+    const nmod_poly_mat_t B);
+
 void nmod_poly_mat_mul_classical(nmod_poly_mat_t C, const nmod_poly_mat_t A,
                                             const nmod_poly_mat_t B);
 
@@ -159,6 +162,8 @@ void nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 void nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
 void nmod_poly_mat_sqr_KS(nmod_poly_mat_t B, const nmod_poly_mat_t A);
+
+void nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t B, const nmod_poly_mat_t A);
 
 void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp);
 

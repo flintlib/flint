@@ -149,7 +149,7 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
     by \code{n_precompute_inverse()}. We require $n < 2^{53}$ and 
-    \code{n < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
+    \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
@@ -360,6 +360,10 @@ int n_jacobi(mp_limb_signed_t x, mp_limb_t y)
     reciprocity. For performance, divisions are replaced with some 
     comparisons and subtractions where possible.
 
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y)
+
+    Computes the Jacobi symbol, allowing $x$ to go up to a full limb.
+
 *******************************************************************************
 
     Modular Arithmetic
@@ -430,6 +434,39 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
+
+long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
+
+    Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
+    are stored in an array which is created and whose address is stored in 
+    the location pointed to by \code{sqrt}. The array of roots is allocated 
+    by the function but must be cleaned up by the user by calling 
+    \code{flint_free}. The number of roots is returned by the function. If 
+    \code{a} is not a quadratic residue modulo \code{2^exp} then 0 is 
+    returned by the function and the location \code{sqrt} points to is set to 
+    NULL. 
+
+long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
+
+    Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
+    are stored in an array which is created and whose address is stored in 
+    the location pointed to by \code{sqrt}. The array of roots is allocated 
+    by the function but must be cleaned up by the user by calling 
+    \code{flint_free}. The number of roots is returned by the function. If 
+    \code{a} is not a quadratic residue modulo \code{p^exp} then 0 is 
+    returned by the function and the location \code{sqrt} points to is set to 
+    NULL. 
+
+long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+
+    Computes all the square roots of \code{a} modulo \code{m} given the 
+    factorisation of \code{m} in \code{fac}. The roots are stored in an array 
+    which is created and whose address is stored in the location pointed to by 
+    \code{sqrt}. The array of roots is allocated by the function but must be 
+    cleaned up by the user by calling \code{flint_free}. The number of roots 
+    is returned by the function. If \code{a} is not a quadratic residue modulo 
+    \code{m} then 0 is returned by the function and the location \code{sqrt} 
+    points to is set to NULL. 
 
 *******************************************************************************
 
@@ -1030,8 +1067,19 @@ mp_limb_t n_euler_phi(mp_limb_t n)
 
 *******************************************************************************
 
+mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
+
+    Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
+    by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
+    no special optimisations are made for composite $p$.
+    Uses fast multipoint evaluation, running in about $O(n^{1/2})$ time.
+
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 
     Returns $n! \bmod p$ given a precomputed inverse of $p$ as computed
-    by \code{n_preinvert_limb()}.
+    by \code{n_preinvert_limb()}. $p$ is not required to be a prime, but
+    no special optimisations are made for composite $p$.
 
+    Uses a lookup table for small $n$, otherwise computes the product
+    if $n$ is not too large, and calls the fast algorithm for extremely
+    large $n$.

@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long len, trunc;
@@ -73,7 +73,7 @@ main(void)
     }
 
     /* Compare with sqr_KS */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         long len, trunc;

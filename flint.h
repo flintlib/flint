@@ -29,6 +29,7 @@
 #include <mpir.h>
 #include <mpfr.h>
 #include "longlong.h"
+#include "config.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -62,6 +63,8 @@ void flint_free(void * ptr);
 #endif
 
 #define mp_bitcnt_t unsigned long
+
+int flint_test_multiplier();
 
 typedef struct
 {

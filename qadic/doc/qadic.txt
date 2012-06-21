@@ -90,9 +90,13 @@ void qadic_ctx_clear(qadic_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
 
-qadic_ctx_degree(const qadic_ctx_t ctx)
+long qadic_ctx_degree(const qadic_ctx_t ctx)
 
     Returns the extension degree.
+
+static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
+
+    Prints the data from the given context.
 
 *******************************************************************************
 
@@ -102,10 +106,26 @@ qadic_ctx_degree(const qadic_ctx_t ctx)
 
 void qadic_init(qadic_t rop)
 
+    Initialises the element \code{rop}, setting its value to~$0$.
+
 void qadic_clear(qadic_t rop)
 
+    Clears the element \code{rop}.
+
+void _fmpz_poly_reduce(fmpz *R, long lenR, 
+                       const fmpz *a, const long *j, long len)
+
+    Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
+    polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
+    least~$2$.
+
+    Assumes that the array $j$ of positive length \code{len} is 
+    sorted in ascending order.
+
+    Allows zero-padding in \code{(R, lenR)}.
+
 void _fmpz_mod_poly_reduce(fmpz *R, long lenR, 
-                      const fmpz *a, const long *j, long len, const fmpz_t p)
+    const fmpz *a, const long *j, long len, const fmpz_t p)
 
     Reduces a polynomial \code{(R, lenR)} modulo a sparse monic 
     polynomial $f(X) = \sum_{i} a_{i} X^{j_{i}}$ of degree at 
@@ -283,12 +303,51 @@ void qadic_pow(qadic_t rop, const qadic_t op, const fmpz_t e,
 
 *******************************************************************************
 
+void _qadic_exp_rectangular(fmpz *rop, const fmpz *op, long v, long len, 
+                            const fmpz *a, const long *j, long lena, 
+                            const fmpz_t p, long N, const fmpz_t pN)
+
+    Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{(op, v, len)} is non-zero.
+
+    Does not support aliasing.
+
+int qadic_exp_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
+void _qadic_exp_balanced(fmpz *rop, const fmpz *x, long v, long len, 
+                         const fmpz *a, const long *j, long lena, 
+                         const fmpz_t p, long N, const fmpz_t pN)
+
+    Sets \code{(rop, d)} to the exponential of \code{(op, v, len)} 
+    reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{len} is in $[1,d)$ but supports zero padding, 
+    including the special case when \code{(op, len)} is zero.
+
+    Supports aliasing between \code{rop} and \code{op}.
+
+int qadic_exp_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the exponential series converges at \code{op} 
+    and sets \code{rop} to its value reduced modulo in the given 
+    context.
+
 void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len, 
                 const fmpz *a, const long *j, long lena, 
                 const fmpz_t p, long N)
 
     Sets \code{(rop, 2*d - 1)} to the exponential of \code{(op, v, len)} 
     reduced modulo $p^N$, assuming that the series converges.
+
+    Assumes that \code{(op, v, len)} is non-zero.
+
+    Does not support aliasing.
 
 int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
@@ -321,11 +380,61 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len,
 
     Assumes that $y$ is reduced modulo $p^N$.
 
-    Assumes that $v < N$.
+    Assumes that $v < N$, and in particular $N \geq 2$.
 
-    Does not support aliasing between $y$ and $z$.
+    Supports aliasing between $y$ and $z$.
 
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const padic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+void _qadic_log_balanced(fmpz *z, const fmpz *y, long len, 
+                         const fmpz *a, const long *j, long lena, 
+                         const fmpz_t p, long N, const fmpz_t pN)
+
+    Computes $(z, d)$ as 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Assumes that $v = \ord_p(y)$ is at least $1$ when $p$ is odd and 
+    at least $2$ when $p = 2$ so that the series converges.
+
+    Supports aliasing between $z$ and $y$.
+
+int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Returns whether the $p$-adic logarithm function converges at 
+    \code{op}, and if so sets \code{rop} to its value.
+
+void _qadic_log(fmpz *z, const fmpz *y, long v, long len, 
+                const fmpz *a, const long *j, long lena, 
+                const fmpz_t p, long N, const fmpz_t pN)
+
+    Computes $(z, d)$ as 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    \end{equation*}
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $(y, d)$ is reduced modulo $p^N$.
+
+    Assumes that $v < N$, and hence in particular $N \geq 2$.
+
+    Supports aliasing between $z$ and $y$.
+
+int qadic_log(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
     Returns whether the $p$-adic logarithm function converges at 
     \code{op}, and if so sets \code{rop} to its value.
@@ -410,6 +519,56 @@ void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     of $a$ as the trace of this map.  Equivalently, if $\Sigma$ generates 
     $\Gal(\mathbf{Q}_q / \mathbf{Q}_p)$ then the trace of $a$ is equal to 
     $\sum_{i=0}^{d-1} \Sigma^i (a)$.
+
+void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
+                 const fmpz *a, const long *j, long lena, 
+                 const fmpz_t p, long N)
+
+    Sets \code{rop} to the norm of the element \code{(op,len)} 
+    in $\mathbf{Z}_q$ to precision $N$, where \code{len} is at 
+    least one.
+
+    The result will be reduced modulo $p^N$.
+
+    Note that whenever \code{(op,len)} is a unit, so is its norm. 
+    Thus, the output \code{rop} of this function will typically 
+    not have to be canonicalised or reduced by the caller.
+
+void qadic_norm(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Computes the norm of \code{op} to the given precision.
+
+    Algorithm selection is automatic depending on the input.
+
+void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Whenever \code{op} has valuation greater than $(p-1)^{-1}$, this 
+    routine computes its norm \code{rop} via 
+    \begin{equation*}
+    \Norm (x) = \exp \Bigl( \bigl( \Trace \log (x) \bigr) \Bigr).
+    \end{equation*}
+
+    In the special case that \code{op} lies in $\mathbf{Q}_p$, returns 
+    its norm as $\Norm(x) = x^d$, where $d$ is the extension degree.
+
+    Otherwise, raises an \code{abort} signal.
+
+    The complexity of this implementation is quasi-linear in $d$ and $N$, 
+    and polynomial in $\log p$.
+
+void qadic_norm_resultant(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the norm of \code{op}, using the formula 
+    \begin{equation*}
+    \Norm(x) = \ell(f)^{-\deg(a)} \Res(f(X), a(X)),
+    \end{equation*}
+    where $\mathbf{Q}_q \cong \mathbf{Q}_p[X] / (f(X))$, $\ell(f)$ is the 
+    leading coefficient of $f(X)$, and $a(X) \in mathbf{Q}_p[X]$ denotes 
+    the same polynomial as $x$.
+
+    The complexity of the current implementation is given by 
+    $\mathcal{O}(d^4 M(N \log p))$, where $M(n)$ denotes the 
+    complexity of multiplying to $n$-bit integers.
 
 *******************************************************************************
 

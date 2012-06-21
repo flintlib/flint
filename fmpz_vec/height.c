@@ -31,14 +31,11 @@
 void
 _fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
 {
-    long i;
-
     if (len)
     {
-        fmpz_abs(height, vec);
-        for (i = 1; i < len; i++)
-            if (fmpz_cmpabs(vec + i, height) > 0)
-                fmpz_abs(height, vec + i);
+        long pos = _fmpz_vec_height_index(vec, len);
+
+        fmpz_abs(height, vec + pos);
     }
     else
         fmpz_zero(height);

@@ -56,7 +56,7 @@ partitions_lookup[NUMBER_OF_SMALL_PARTITIONS] =
 };
 
 void
-number_of_partitions(fmpz_t x, ulong n)
+arith_number_of_partitions(fmpz_t x, ulong n)
 {
     if (n < NUMBER_OF_SMALL_PARTITIONS)
     {
@@ -66,7 +66,7 @@ number_of_partitions(fmpz_t x, ulong n)
     {
         mpfr_t t;
         mpfr_init(t);
-        number_of_partitions_mpfr(t, n);
+        arith_number_of_partitions_mpfr(t, n);
         mpfr_get_z(_fmpz_promote(x), t, MPFR_RNDN);
         _fmpz_demote_val(x);
         mpfr_clear(t);

@@ -218,6 +218,13 @@ int fmpz_poly_is_unit(const fmpz_poly_t op)
     return (op->length == 1) && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
 }
 
+static __inline__
+int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
+{
+	return ((poly->length == 0) && fmpz_is_zero(c)) ||
+        ((poly->length == 1) && fmpz_equal(poly->coeffs, c));
+}
+
 /*  Addition and subtraction  ************************************************/
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, long len1, 
@@ -248,9 +255,6 @@ void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1,
 void fmpz_poly_scalar_addmul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 
-void _fmpz_poly_scalar_submul_fmpz(fmpz * poly1, 
-                             const fmpz * poly2, long len2, const fmpz_t x);
-
 void fmpz_poly_scalar_submul_fmpz(fmpz_poly_t poly1, 
                                    const fmpz_poly_t poly2, const fmpz_t x);
 
@@ -280,6 +284,15 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1,
 
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);
+
+void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
+
+void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, const fmpz_poly_t poly2,
+                           ulong exp);
 
 static __inline__ 
 void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 
@@ -806,6 +819,22 @@ void _fmpz_poly_compose(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_compose(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                       const fmpz_poly_t poly2);
 
+/*  Taylor shift  ************************************************************/
+
+void _fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_horner(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift_divconquer(fmpz_poly_t g, const fmpz_poly_t f,
+    const fmpz_t c);
+
+void _fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n);
+
+void fmpz_poly_taylor_shift(fmpz_poly_t g, const fmpz_poly_t f, const fmpz_t c);
+
 /*  Power series composition and compositional inverse  **********************/
 
 void
@@ -856,6 +885,16 @@ _fmpz_poly_revert_series(fmpz * Qinv, const fmpz * Q, long n);
 
 void
 fmpz_poly_revert_series(fmpz_poly_t Qinv, const fmpz_poly_t Q, long n);
+
+/*  Square root  *************************************************************/
+
+int _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a);
+
+int _fmpz_poly_sqrt(fmpz * res, const fmpz * poly, long len);
+
+int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a);
 
 
 /*  Signature  ***************************************************************/
@@ -950,6 +989,13 @@ void _fmpz_poly_product_roots_fmpz_vec(fmpz * poly,
 void fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly,
                                         const fmpz * xs, long n);
 
+/* Newton basis *************************************************************/
+
+void _fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n);
+
+void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n);
+
+
 /* Multipoint evaluation and interpolation *********************************/
 
 void
@@ -1011,6 +1057,53 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
                                 const fmpz_poly_t f, 
                                 const nmod_poly_factor_t local_fac, long N);
+
+/* Some functions for backwards compatibility */
+
+static __inline__ void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_mul_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_divexact_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1,
+                               const fmpz_poly_t poly2, const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_scalar_fdiv_fmpz(poly1, poly2, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_set_coeff_mpz(fmpz_poly_t poly, long n,
+    const mpz_t x)
+{
+    fmpz_t t;
+    fmpz_init_set_readonly(t, x);
+    fmpz_poly_set_coeff_fmpz(poly, n, t);
+    fmpz_clear_readonly(t);
+}
+
+static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, fmpz_poly_t poly, long n)
+{
+    fmpz_t t;
+    fmpz_init(t);
+    fmpz_poly_get_coeff_fmpz(t, poly, n);
+    fmpz_get_mpz(x, t);
+    fmpz_clear(t);
+}
 
 #ifdef __cplusplus
 }

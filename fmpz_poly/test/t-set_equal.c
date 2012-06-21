@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* equal polynomials */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
 
@@ -66,7 +66,7 @@ main(void)
         fmpz_poly_clear(b);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         long coeff = n_randint(state, 100);

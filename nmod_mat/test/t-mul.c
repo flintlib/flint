@@ -68,7 +68,7 @@ main(void)
     printf("mul....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
         mp_limb_t mod;

@@ -45,7 +45,7 @@ main(void)
     fflush(stdout);
 
     /* Default algorithm */
-    for (iter = 0; iter < 100; iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem, product;
@@ -150,7 +150,7 @@ main(void)
     }
 
     /* Test deflation trick */
-    for (iter = 0; iter < 100; iter++)
+    for (iter = 0; iter < 10 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;

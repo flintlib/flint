@@ -31,7 +31,7 @@
 #include "arith.h"
 
 void
-bell_number_multi_mod(fmpz_t res, ulong n)
+arith_bell_number_multi_mod(fmpz_t res, ulong n)
 {
     fmpz_comb_temp_t temp;
     fmpz_comb_t comb;
@@ -39,7 +39,7 @@ bell_number_multi_mod(fmpz_t res, ulong n)
     mp_ptr primes, residues;
     long k, size, prime_bits, num_primes;
 
-    size = bell_number_size(n);
+    size = arith_bell_number_size(n);
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
@@ -53,7 +53,7 @@ bell_number_multi_mod(fmpz_t res, ulong n)
     for (k = 0; k < num_primes; k++)
     {
         nmod_init(&mod, primes[k]);
-        residues[k] = bell_number_nmod(n, mod);
+        residues[k] = arith_bell_number_nmod(n, mod);
     }
 
     fmpz_comb_init(comb, primes, num_primes);

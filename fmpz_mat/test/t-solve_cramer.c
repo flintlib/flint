@@ -47,7 +47,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 4);
         n = n_randint(state, 10);
@@ -90,7 +90,7 @@ main(void)
     }
 
     /* Test singular systems */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         m = 1 + n_randint(state, 3);
         n = 1 + n_randint(state, 10);

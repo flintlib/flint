@@ -52,7 +52,7 @@ static const __u32 __bernoulli_denom_small[] =
     1074UL,
 };
 
-void bernoulli_number_denom(fmpz_t den, ulong n)
+void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
     long i;
     mp_limb_t p;

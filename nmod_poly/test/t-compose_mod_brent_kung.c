@@ -39,7 +39,7 @@ main(void)
     printf("compose_mod_brent_kung....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d, e;
         mp_limb_t m = n_randtest_prime(state, 0);
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Test aliasing of res and a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
         mp_limb_t m = n_randtest_prime(state, 0);
@@ -113,7 +113,7 @@ main(void)
     }
 
     /* Test aliasing of res and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
         mp_limb_t m = n_randtest_prime(state, 0);
@@ -148,7 +148,7 @@ main(void)
     }
 
     /* Test aliasing of res and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, d;
         mp_limb_t m = n_randtest_prime(state, 0);

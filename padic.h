@@ -282,9 +282,10 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
 
 void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-void _padic_exp_naive(padic_t rop, const padic_t op, const padic_ctx_t ctx);
-void _padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
-void _padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
+void _padic_exp_naive(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
@@ -292,6 +293,7 @@ int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N);
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N);
+void _padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N);
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);

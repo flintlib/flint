@@ -25,11 +25,13 @@
 
 ******************************************************************************/
 
+#undef ulong /* prevent clash with standard library */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <mpir.h>
 #include <pthread.h>
+#define ulong unsigned long
+#include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -55,7 +57,15 @@ mp_limb_t flint_primes_cutoff = 0;
 double * flint_prime_inverses;
 
 ulong flint_num_primes = 0;
+
+#if defined (__WIN32) && !defined(__CYGWIN__)
+#define work_lock(x) 
+#define work_unlock(x) 
+#else
 pthread_mutex_t flint_num_primes_mutex;
+#define work_lock(x) pthread_mutex_lock(x)
+#define work_unlock(x) pthread_mutex_unlock(x)
+#endif
 
 void n_compute_primes(ulong num)
 {
@@ -65,10 +75,10 @@ void n_compute_primes(ulong num)
 
     if (flint_num_primes >= num) return;
 
-    pthread_mutex_lock(&flint_num_primes_mutex);
+    work_lock(&flint_num_primes_mutex);
     if (flint_num_primes >= num) /* someone may have changed this before we locked */
     {
-        pthread_mutex_unlock(&flint_num_primes_mutex);
+        work_unlock(&flint_num_primes_mutex);
         return; 
     }
 
@@ -174,5 +184,5 @@ void n_compute_primes(ulong num)
 
     flint_free(sieve);
 
-    pthread_mutex_unlock(&flint_num_primes_mutex);
+    work_unlock(&flint_num_primes_mutex);
 }

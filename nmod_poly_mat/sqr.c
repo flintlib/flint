@@ -29,19 +29,33 @@
 #include "nmod_poly_mat.h"
 
 #define KS_MIN_DIM 10
+#define INTERPOLATE_MIN_DIM 80
 #define KS_MAX_LENGTH 128
 
 void
-nmod_poly_mat_sqr(nmod_poly_mat_t B, const nmod_poly_mat_t A)
+nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 {
-    long n = A->r;
+    long dim = A->r;
 
-    if (n < KS_MIN_DIM || nmod_poly_mat_max_length(A) > KS_MAX_LENGTH)
+    if (dim < KS_MIN_DIM)
     {
-        nmod_poly_mat_sqr_classical(B, A);
+        nmod_poly_mat_sqr_classical(C, A);
     }
     else
     {
-        nmod_poly_mat_sqr_KS(B, A);
+        long Alen;
+        mp_limb_t mod = nmod_poly_mat_modulus(A);
+
+        Alen = nmod_poly_mat_max_length(A);
+
+        if ((FLINT_BIT_COUNT(mod) > FLINT_BITS / 4)
+            && (dim > INTERPOLATE_MIN_DIM + n_sqrt(Alen))
+            && (mod >= 2 * Alen - 1) && n_is_prime(mod))
+            nmod_poly_mat_sqr_interpolate(C, A);
+
+        if (Alen > KS_MAX_LENGTH)
+            nmod_poly_mat_sqr_classical(C, A);
+        else
+            nmod_poly_mat_sqr_KS(C, A);
     }
 }

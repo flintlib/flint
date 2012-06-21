@@ -28,10 +28,10 @@
 #include "arith.h"
 
 void
-bell_number_vec(fmpz * res, long n)
+arith_bell_number_vec(fmpz * res, long n)
 {
     if (n < 5000)
-        bell_number_vec_recursive(res, n);
+        arith_bell_number_vec_recursive(res, n);
     else
-        bell_number_vec_multi_mod(res, n);
+        arith_bell_number_vec_multi_mod(res, n);
 }

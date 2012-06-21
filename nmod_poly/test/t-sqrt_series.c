@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check g^2 = h mod x^m */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t h, g, r;
         long m;
@@ -82,7 +82,7 @@ main(void)
     }
 
     /* Check aliasing of h and g */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t g, h;
         long m;

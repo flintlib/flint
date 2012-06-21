@@ -31,7 +31,7 @@ mp_limb_t
 n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
 {
     mp_limb_t x, y;
-    mp_limb_signed_t e;
+    mp_limb_t e;
 
     if (n == 1UL)
         return 0L;

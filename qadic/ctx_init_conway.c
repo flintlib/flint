@@ -30,7 +30,9 @@
 #include "padic.h"
 #include "qadic.h"
 
+#ifndef FLINT_CPIMPORT
 #define FLINT_CPIMPORT "/home/user/FLINT/flint-2/qadic/CPimport.txt"
+#endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
                            const fmpz_t p, long d, long N, const char *var, 
@@ -116,7 +118,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             strcpy(ctx->var, var);
 
             fclose(file);
-            free(buf);
+            flint_free(buf);
             return;
         }
     }

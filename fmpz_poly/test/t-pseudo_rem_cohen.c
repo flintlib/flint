@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with q*b + r = a, no aliasing */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, q, r1, r2;
 
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check r and a alias */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, r;
 
@@ -105,7 +105,7 @@ main(void)
     }
 
     /* Check r and b alias */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, r;
 

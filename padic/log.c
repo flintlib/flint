@@ -37,30 +37,37 @@
     where $v \geq 1$.
 
     Assumes that $1 \leq v < N$.
-
-    Assumes that $b v$, and $N + e$ do not overflow, 
-    where $e = \floor{\log_{p}{b}}$.
  */
 long _padic_log_bound(long v, long N, long p)
 {
-    long e, i = (N - 1) / v;
-    mp_limb_t j;
+    long b, c;
 
-    do 
+    c = N - n_flog(v, p);
+    b = c + n_clog(c, p) + 1;
+
+    /*
+        Now $i v - \ord_p(i) \geq N$ for all $i \geq b$.  We work 
+        backwards to find the first $i$ such that this fails, then 
+        using that the function is strictly increasing for $i \geq 2$.
+     */
+
+    while (--b >= 2)
     {
-        j = ++i;
-        e = n_remove(&j, p);
-    }
-    while (i * v < N + e);
+        long t = b * v - n_clog(b, p) - N;
 
-    return i;
+        if (t < 0)
+            return b + 1;
+    }
+
+    return 2;
 }
 
 /*
     Computes 
     \begin{equation*}
-    z = \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N},
     \end{equation*}
+    reduced modulo $p^N$.
 
     Note that this can be used to compute the $p$-adic logarithm 
     via the equation 
@@ -73,98 +80,19 @@ long _padic_log_bound(long v, long N, long p)
     is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
     so that the series converges.
 
-    Assumes that $v < N$.
+    Assumes that $v < N$, and hence in particular $N \geq 2$.
 
     Does not support aliasing between $y$ and $z$.
  */
-static void _padic_log(fmpz_t z, const fmpz_t y, long v, const padic_ctx_t ctx)
+void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
-    if (fmpz_fits_si(ctx->p))
+    if (N < (1L << 9) / (long) fmpz_bits(p))
     {
-        /*
-            Assumes that the index i fits into a small fmpz.
-         */
-        long e, i, j, k, p;
-        fmpz_t m, s, t;
-        fmpz *q;
-        padic_inv_t pre;
-
-        p = fmpz_get_si(ctx->p);
-        i = _padic_log_bound(v, ctx->N, p) - 1;
-
-        k = n_flog(i, p);
-
-        fmpz_init(m);
-        fmpz_init(s);
-        fmpz_init(t);
-        q = _fmpz_vec_init(k + 1);
-
-        _padic_inv_precompute(pre, ctx->p, ctx->N + k);
-
-        fmpz_pow_ui(m, ctx->p, ctx->N + k);
-        fmpz_one(q + 0);
-        for (j = 1; j <= k; j++)
-            fmpz_mul_ui(q + j, q + (j - 1), p);
-
-        fmpz_zero(z);
-
-        for ( ; i > 0; i--)
-        {
-            fmpz_mul(t, z, y);
-
-            j = i;
-            e = n_remove((mp_limb_t *) &j, p);
-            _padic_inv_precomp(s, (fmpz *) &j, pre);
-            fmpz_mul(z, s, q + (k - e));
-
-            fmpz_add(z, z, t);
-            fmpz_mod(z, z, m);
-        }
-
-        fmpz_divexact(z, z, q + k);
-        fmpz_mul(z, z, y);
-
-        fmpz_clear(m);
-        fmpz_clear(s);
-        fmpz_clear(t);
-        _fmpz_vec_clear(q, k + 1);
-        _padic_inv_clear(pre);
+        _padic_log_rectangular(z, y, v, p, N);
     }
     else
     {
-        /*
-            When p does not fit into a signed long, 
-            p does not divide the index i.
-
-            Assumes that (N - 1) / v is a small 
-            fmpz integer.
-         */
-        long i;
-        fmpz_t m, t;
-
-        i = (ctx->N - 1) / v;
-
-        fmpz_init(m);
-        fmpz_init(t);
-
-        fmpz_pow_ui(m, ctx->p, ctx->N);
-
-        fmpz_zero(z);
-
-        for ( ; i > 0; i--)
-        {
-            fmpz_mul(t, z, y);
-
-            _padic_inv(z, (fmpz *) &i, ctx->p, ctx->N);
-
-            fmpz_add(z, z, t);
-            fmpz_mod(z, z, m);
-        }
-
-        fmpz_mul(z, z, y);
-
-        fmpz_clear(m);
-        fmpz_clear(t);
+        _padic_log_balanced(z, y, v, p, N);
     }
 }
 
@@ -207,10 +135,9 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    _padic_log(padic_unit(rop), x, v, ctx);
-                    fmpz_neg(padic_unit(rop), padic_unit(rop));
+                    _padic_log(padic_unit(rop), x, v, ctx->p, ctx->N);
                     padic_val(rop) = 0;
-                    padic_reduce(rop, ctx);
+                    _padic_canonicalise(rop, ctx);
                 }
                 ans = 1;
             }

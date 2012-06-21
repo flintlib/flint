@@ -107,7 +107,7 @@ int main()
     for (n = 0; testdata[n] != -1; n++)
     {
         mp_limb_t y;
-        cyclotomic_cos_polynomial(p, n);
+        arith_cos_minpoly(p, n);
         y = fmpz_poly_evaluate_mod(p, 1337, 31337);
 
         if (y != testdata[n])

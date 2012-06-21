@@ -30,8 +30,6 @@
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
-
 
 int
 main(void)
@@ -43,7 +41,7 @@ main(void)
     printf("interpolate_nmod_vec....");
     fflush(stdout);
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t P, Q;
         mp_ptr x, y;

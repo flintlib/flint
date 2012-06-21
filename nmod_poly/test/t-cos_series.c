@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check 1-cos(A)^2 = sin(A)^2 */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, cosA, sinA, B, C, one;
         long n;
@@ -91,7 +91,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
         long n;

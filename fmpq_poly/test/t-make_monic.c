@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g;
 
@@ -73,7 +73,7 @@ main(void)
     }
 
     /* Check that the result of "monic" has "is_monic" return 1 */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f;
 

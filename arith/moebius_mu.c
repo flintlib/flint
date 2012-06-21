@@ -32,7 +32,7 @@
 #include "ulong_extras.h"
 
 
-int fmpz_moebius_mu(const fmpz_t n)
+int arith_moebius_mu(const fmpz_t n)
 {
     fmpz_factor_t factors;
     long i;

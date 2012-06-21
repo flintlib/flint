@@ -41,7 +41,7 @@ main(void)
     printf("is_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 2000; iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
         nmod_poly_t poly, Q, R, t;
         mp_limb_t modulus;

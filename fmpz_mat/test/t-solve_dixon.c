@@ -46,7 +46,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -75,7 +75,7 @@ main(void)
         fmpz_mat_scalar_mod_fmpz(AXm, AX, mod);
         fmpz_mat_scalar_mod_fmpz(Bm, B, mod);
 
-        if (!fmpz_mat_equal(AXm, Bm))
+        if (!fmpz_mat_equal(AXm, Bm) || !success)
         {
             printf("FAIL:\n");
             printf("AX != B!\n");
@@ -97,7 +97,7 @@ main(void)
     }
 
     /* Test singular systems */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         m = 1 + n_randint(state, 10);
         n = 1 + n_randint(state, 10);

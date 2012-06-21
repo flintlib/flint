@@ -82,7 +82,7 @@ n_sqrtmod_ppow(mp_limb_t a, mp_limb_t p, int k, mp_limb_t pk, mp_limb_t pkinv)
     {
         t = n_mulmod2_preinv(r, r, pk, pkinv);
         t = n_submod(t, a, pk);
-        t = n_mulmod2_preinv(t, n_invmod((2*r) % pk, pk), pk, pkinv);
+        t = n_mulmod2_preinv(t, n_invmod(n_addmod(r, r, pk), pk), pk, pkinv);
         r = n_submod(r, t, pk);
         i *= 2;
     }
@@ -161,7 +161,7 @@ trigprod_mul_prime_power(trig_prod_t prod, mp_limb_t k, mp_limb_t n,
         m = n_sqrtmod_ppow(m, p, exp + 1, mod, inv);
         m = n_mulmod2_preinv(m, n_invmod(8, mod), mod, inv);
 
-        prod->prefactor *= (2 * n_jacobi(m, 3));
+        prod->prefactor *= (2 * n_jacobi_unsigned(m, 3));
         if (exp % 2 == 0)
             prod->prefactor *= -1;
         prod->sqrt_p *= k;
@@ -233,7 +233,7 @@ solve_n1(mp_limb_t n, mp_limb_t k1, mp_limb_t k2,
 
 
 void
-dedekind_cosine_sum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
+arith_hrr_expsum_factored(trig_prod_t prod, mp_limb_t k, mp_limb_t n)
 {
     n_factor_t fac;
     int i;

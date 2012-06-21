@@ -32,7 +32,7 @@
 #include "ulong_extras.h"
 
 
-void fmpz_euler_phi(fmpz_t res, const fmpz_t n)
+void arith_euler_phi(fmpz_t res, const fmpz_t n)
 {
     fmpz_factor_t factors;
     fmpz_t t;

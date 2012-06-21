@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing q and a */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, q;
         long n = n_randint(state, 50) + 1;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check aliasing q and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, q;
         long n = n_randint(state, 50) + 1;
@@ -115,7 +115,7 @@ main(void)
     }
 
     /* Check that Q * B == A */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, p, q;
         long n = n_randint(state, 50) + 1;

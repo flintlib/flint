@@ -56,6 +56,9 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
     if (n >= p)
         return 0UL;
 
+    if (n >= 1000000UL)
+        return n_factorial_fast_mod2_preinv(n, p, pinv);
+
     prod = small_factorials[MAX_SMALL_FACTORIAL];
     lo = n;
     n--;

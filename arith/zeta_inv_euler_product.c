@@ -31,11 +31,11 @@
 #include "ulong_extras.h"
 
 
-void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
+void mpfr_zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
 {
     mpz_t z, x, y, r;
     mp_limb_t p;
-    long prec, powprec, xexp, yexp, shift;
+    long prec, powprec, yexp, shift;
 
     mpz_init(x);
     mpz_init(y);
@@ -69,7 +69,6 @@ void _zeta_inv_euler_product(mpfr_t res, ulong s, int char_4)
         mpz_set_ui(x, p);
         mpz_set_ui(y, 1UL);
         yexp = 0;
-        xexp = 0;
 
         /* Slow equivalent: mpz_pow_ui(y, x, s) */
         mpz_set_ui(y, p);

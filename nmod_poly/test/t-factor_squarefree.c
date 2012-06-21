@@ -44,7 +44,7 @@ main(void)
     printf("factor_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 300; iter++)
+    for (iter = 0; iter < 30 * flint_test_multiplier(); iter++)
     {
         int result = 1;
         nmod_poly_t pol1, poly, quot, rem;
@@ -68,7 +68,8 @@ main(void)
         do 
         {
             nmod_poly_randtest(poly, state, length); 
-            nmod_poly_make_monic(poly, poly);
+            if(!nmod_poly_is_zero(poly))
+                nmod_poly_make_monic(poly, poly);
         }
         while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
         exp[0] = n_randprime(state, 5, 0);

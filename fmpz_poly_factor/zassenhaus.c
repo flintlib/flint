@@ -37,14 +37,14 @@
     \abs{b_j} \leq \binom{n-1}{j} \abs{f} + \binom{n-1}{j-1} \abs{a_m}
     \end{equation*}
     where $\abs{f}$ denotes the $2$-norm of $f$.  This bound 
-    is due to Mignotte, see e.g. Cohen p. 134.
+    is due to Mignotte, see e.g., Cohen p.\ 134.
 
     This function sets $B$ such that, for all $0 \leq j \leq \deg(g)$, 
     $\abs{b_j} \leq B$.
 
     Consequently, when proceeding with Hensel lifting, we 
     proceed to choose an $a$ such that $p^a \geq 2 B + 1$, 
-    e.g.\ $a = \ceil{\log_p(2B + 1)}$.
+    e.g., $a = \ceil{\log_p(2B + 1)}$.
 
     Note that the formula degenerates for $j = 0$ and $j = n$ 
     and so in this case we use that the leading (resp.\ constant) 
@@ -162,6 +162,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
                     }
                 }
             }
+            p = n_nextprime(p, 0);
         }
         nmod_poly_clear(d);
         nmod_poly_clear(g);

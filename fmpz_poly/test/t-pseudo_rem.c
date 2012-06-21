@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with divrem */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, q, r, r2;
         ulong d, d2;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Check r and a alias */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, r;
         ulong d;
@@ -108,7 +108,7 @@ main(void)
     }
 
     /* Check r and b alias */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, r;
         ulong d;

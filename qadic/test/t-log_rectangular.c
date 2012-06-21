@@ -43,11 +43,12 @@ main(void)
 
 /** p > 2 ********************************************************************/
 
-    /* Check aliasing: a = log_rectangular(a) */
+    /* Check aliasing: a = log(a) */
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
         long d, N;
+        long ans1, ans2;
         qadic_ctx_t ctx;
 
         qadic_t a, b;
@@ -68,10 +69,10 @@ main(void)
         qadic_one(b, ctx);
         qadic_add(a, a, b, ctx);
 
-        qadic_log_rectangular(b, a, ctx);
-        qadic_log_rectangular(a, a, ctx);
+        ans1 = qadic_log_rectangular(b, a, ctx);
+        ans2 = qadic_log_rectangular(a, a, ctx);
 
-        result = (qadic_equal(a, b));
+        result = (ans1 == ans2) && (!ans1 || qadic_equal(a, b));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");

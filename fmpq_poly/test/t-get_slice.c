@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
         long j1, j2;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check slice with i >= j is zero */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long j1, j2;
@@ -110,7 +110,7 @@ main(void)
     }
 
     /* Check transitivity when j1 <= k1 <= k2 <= j2 */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c, d;
         long j1, j2, k1, k2;

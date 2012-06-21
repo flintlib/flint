@@ -44,13 +44,8 @@ extern long _padic_log_bound(long v, long N, long p);
  */
 static void 
 _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n, 
-                              const fmpz_t p, long N)
+                              const fmpz_t p, long N, const fmpz_t P0)
 {
-    fmpz_t P0;
-
-    fmpz_init(P0);
-    fmpz_pow_ui(P0, p, N);
-
     if (n <= 2)
     {
         if (n == 1)
@@ -79,7 +74,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
         const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
 
         long i, j;
-        fmpz_t c, f, t, Pl, P1;
+        fmpz_t c, f, t, P1;
         fmpz *ypow;
 
         ypow = _fmpz_vec_init(b + 1);
@@ -114,7 +109,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
                 fmpz_addmul(c, t, ypow + i);
             }
 
-            /* Multiply c by p^k f */
+            /* Multiply c by p^k f^{-1} */
             w = fmpz_remove(f, f, p);
             _padic_inv(f, f, p, N);
             if (w > k)
@@ -144,8 +139,6 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
         fmpz_clear(P1);
         _fmpz_vec_clear(ypow, b + 1);
     }
-
-    fmpz_clear(P0);
 }
 
 /*
@@ -171,53 +164,17 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
  */
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
-    if (fmpz_fits_si(p))
-    {
-        const long q = fmpz_get_si(p);
-        const long i = _padic_log_bound(v, N, q) - 1;
+    const long q = fmpz_get_si(p);
+    const long n = _padic_log_bound(v, N, q) - 1;
+    fmpz_t pN;
 
-        _padic_log_rectangular_series(z, y, i, p, N);
-        fmpz_neg(z, z);
-    }
-    else
-    {
-        /*
-            When p does not fit into a signed long, 
-            p does not divide the index i.
+    fmpz_init(pN);
+    fmpz_pow_ui(pN, p, N);
 
-            Assumes that (N - 1) / v is a small 
-            fmpz integer.
+    _padic_log_rectangular_series(z, y, n, p, N, pN);
 
-            TODO:  Fix this part.
-         */
-        long i;
-        fmpz_t m, t;
-
-        i = (N - 1) / v;
-
-        fmpz_init(m);
-        fmpz_init(t);
-
-        fmpz_pow_ui(m, p, N);
-
-        fmpz_zero(z);
-
-        for ( ; i > 0; i--)
-        {
-            fmpz_mul(t, z, y);
-
-            _padic_inv(z, (fmpz *) &i, p, N);
-
-            fmpz_add(z, z, t);
-            fmpz_mod(z, z, m);
-        }
-
-        fmpz_mul(z, z, y);
-        fmpz_neg(z, z);
-
-        fmpz_clear(m);
-        fmpz_clear(t);
-    }
+    fmpz_sub(z, pN, z);
+    fmpz_clear(pN);
 }
 
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
@@ -261,7 +218,7 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 {
                     _padic_log_rectangular(padic_unit(rop), x, v, ctx->p, ctx->N);
                     padic_val(rop) = 0;
-                    padic_reduce(rop, ctx);
+                    _padic_canonicalise(rop, ctx);
                 }
                 ans = 1;
             }

@@ -44,7 +44,7 @@ main(void)
     gmp_randseed_ui(state, 23);
 
     /* equal polynomials */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         mpz_t n;
@@ -72,7 +72,7 @@ main(void)
         mpz_clear(n);
     }
 
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
         mpz_t m, n;

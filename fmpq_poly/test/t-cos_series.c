@@ -47,7 +47,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = n_randint(state, 50) + 1;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check 1-cos(A)^2 = sin(A)^2 */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t A, cosA, sinA, B, C, one;
         long n = n_randint(state, 80) + 1;

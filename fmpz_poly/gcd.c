@@ -33,8 +33,28 @@ void
 _fmpz_poly_gcd(fmpz * res, const fmpz * poly1, long len1,
                const fmpz * poly2, long len2)
 {
-    if (!_fmpz_poly_gcd_heuristic(res, poly1, len1, poly2, len2))
+
+    if (len1 < 6)
+    {
+        _fmpz_poly_gcd_subresultant(res, poly1, len1, poly2, len2);
+    }
+    else
+    {
+        long b1, b2;
+
+        b1 = _fmpz_vec_max_bits(poly1, len1);
+        b2 = _fmpz_vec_max_bits(poly2, len2);
+        b1 = FLINT_ABS(b1);
+        b2 = FLINT_ABS(b2);
+
+        if (b1 + b2 < 2 * FLINT_BITS)
+        {
+            if (_fmpz_poly_gcd_heuristic(res, poly1, len1, poly2, len2))
+                return;
+        }
+
         _fmpz_poly_gcd_modular(res, poly1, len1, poly2, len2);
+    }
 }
 
 void

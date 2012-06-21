@@ -32,10 +32,10 @@ void
 _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
     mp_srcptr xs, long n, nmod_t mod)
 {
-    long i;
-
-    for (i = 0; i < n; i++)
-        ys[i] = _nmod_poly_evaluate_nmod(coeffs, len, xs[i], mod);
+    if (len < 32)
+        _nmod_poly_evaluate_nmod_vec_iter(ys, coeffs, len, xs, n, mod);
+    else
+        _nmod_poly_evaluate_nmod_vec_fast(ys, coeffs, len, xs, n, mod);
 }
 
 void

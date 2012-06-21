@@ -139,7 +139,8 @@ int main(void)
                     abort();
                 }
 
-                result = fmpz_poly_equal(t, a[i]) && (strcmp(var, rvar) == 0);
+                result = fmpz_poly_equal(t, a[i]) &&
+                    (t->length <= 1 || (strcmp(var, rvar) == 0));
                 if (!result)
                 {
                     printf("FAIL:\n");

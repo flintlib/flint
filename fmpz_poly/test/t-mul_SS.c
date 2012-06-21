@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
     
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -71,7 +71,7 @@ main(void)
     }
     
     /* Check aliasing of a and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -99,7 +99,7 @@ main(void)
     }
     
     /* Check aliasing of b and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -127,7 +127,7 @@ main(void)
     }
     
     /* Compare with mul_KS */
-    for (i = 0; i < 500; i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
 
@@ -157,7 +157,7 @@ main(void)
     }
     
     /* Compare with mul_KS large */
-    for (i = 0; i < 40; i++)
+    for (i = 0; i < 40 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
 
@@ -187,7 +187,7 @@ main(void)
     }
     
     /* Compare with mul_KS unsigned */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
 

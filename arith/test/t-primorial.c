@@ -45,7 +45,7 @@ int main(void)
 
     for (k = 0; k < 10000; k++)
     {
-       fmpz_primorial(x, k);
+       arith_primorial(x, k);
        if (n_is_prime(k))
           fmpz_mul_ui(y, y, k);
        if (!fmpz_equal(x, y))

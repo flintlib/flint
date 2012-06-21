@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check Q^{-1} * Q is congruent 1 mod t^n */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, one;
         long n = n_randint(state, 80) + 1;

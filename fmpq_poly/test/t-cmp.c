@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f;
 
@@ -66,7 +66,7 @@ main(void)
        Check transitivity, i.e. f <= g <= h implies f <= h, that is 
        NOT (f <= g <= h) OR f <= h
      */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g, h;
 
@@ -94,7 +94,7 @@ main(void)
     }
 
     /* Check that <, ==, or > */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g;
 

@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g;
         long n;
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check f(f^(-1)) = id */
-    for (i = 0; i < 100; i++)
+    for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t f, g, h;
         long n;

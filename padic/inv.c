@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2011 Jan Tuitman
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -110,12 +110,14 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
     }
     for (i--; i >= 0; i--)
     {
-        fmpz_mul(t, u + i, rop);
-        fmpz_sub_ui(t, t, 1);
-        fmpz_mul(t + 1, t, rop);
+        fmpz_mul(t, rop, rop);
+        fmpz_mul(t + 1, u + i, t);
+        fmpz_mul_2exp(rop, rop, 1);
         fmpz_sub(rop, rop, t + 1);
         fmpz_mod(rop, rop, pow + i);
     }
+
+    fmpz_mod(rop, rop, pow + 0);
 
 #undef n
 #undef pow

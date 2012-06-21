@@ -50,21 +50,17 @@ void _nmod_poly_mulhigh(mp_ptr res, mp_srcptr poly1, long len1,
 }
 
 void nmod_poly_mulhigh(nmod_poly_t res, 
-                   const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+                   const nmod_poly_t poly1, const nmod_poly_t poly2, long start)
 {
     long len1, len2, len_out;
     
     len1 = poly1->length;
     len2 = poly2->length;
+    len_out = len1 + len2 - 1;
 
-    len_out = poly1->length + poly2->length - 1;
-    if (n > len_out)
-        n = len_out;
-    
-    if (len1 == 0 || len2 == 0 || n == 0)
+    if (len1 == 0 || len2 == 0 || start >= len_out)
     {
         nmod_poly_zero(res);
-
         return;
     }
 
@@ -76,10 +72,10 @@ void nmod_poly_mulhigh(nmod_poly_t res,
 
         if (len1 >= len2)
             _nmod_poly_mulhigh(temp->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2, n, poly1->mod);
+                           poly2->coeffs, len2, start, poly1->mod);
         else
             _nmod_poly_mulhigh(temp->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1, n, poly1->mod);
+                           poly1->coeffs, len1, start, poly1->mod);
         
         nmod_poly_swap(temp, res);
         nmod_poly_clear(temp);
@@ -89,10 +85,10 @@ void nmod_poly_mulhigh(nmod_poly_t res,
         
         if (len1 >= len2)
             _nmod_poly_mulhigh(res->coeffs, poly1->coeffs, len1,
-                           poly2->coeffs, len2, n, poly1->mod);
+                           poly2->coeffs, len2, start, poly1->mod);
         else
             _nmod_poly_mulhigh(res->coeffs, poly2->coeffs, len2,
-                           poly1->coeffs, len1, n, poly1->mod);
+                           poly1->coeffs, len1, start, poly1->mod);
     }
 
     res->length = len_out;

@@ -55,7 +55,6 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-
         fq_init(a);
         fq_init(b);
         fq_init(c);

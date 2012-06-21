@@ -90,7 +90,7 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
     }
     else
     {
-        t = _fmpz_vec_init(lenP - 1);
+        t = _fmpz_vec_init(lenP);
     }
 
     ans = _fmpz_mod_poly_invmod(t, B->coeffs, lenB, P->coeffs, lenP, &B->p);

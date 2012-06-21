@@ -30,7 +30,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void fmpz_divisors_naive(fmpz_poly_t p, long n)
+void arith_divisors_naive(fmpz_poly_t p, long n)
 {
     long k;
     long i = 0;
@@ -64,8 +64,8 @@ int main(void)
     for (n = -1000; n < 1000; n++)
     {
         fmpz_set_si(t, n);
-        fmpz_divisors(a, t);
-        fmpz_divisors_naive(b, n);
+        arith_divisors(a, t);
+        arith_divisors_naive(b, n);
         if (!fmpz_poly_equal(a, b))
         {
             printf("FAIL:\n");

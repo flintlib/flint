@@ -43,7 +43,7 @@ main(void)
     printf("scalar_add/submul_nmod_mat_fmpz....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C;
         nmod_mat_t M;

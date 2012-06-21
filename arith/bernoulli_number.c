@@ -30,12 +30,12 @@
 #include "arith.h"
 #include "fmpq.h"
 
-void _bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
+void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 {
-    _bernoulli_number_zeta(num, den, n);
+    _arith_bernoulli_number_zeta(num, den, n);
 }
 
-void bernoulli_number(fmpq_t x, ulong n)
+void arith_bernoulli_number(fmpq_t x, ulong n)
 {
-    _bernoulli_number(fmpq_numref(x), fmpq_denref(x), n);
+    _arith_bernoulli_number(fmpq_numref(x), fmpq_denref(x), n);
 }

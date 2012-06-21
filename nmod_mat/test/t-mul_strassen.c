@@ -41,16 +41,16 @@ main(void)
     printf("mul_strassen....");
     fflush(stdout);
 
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_mat_t A, B, C, D;
         mp_limb_t mod = n_randtest_not_zero(state);
 
         long m, k, n;
 
-        m = n_randint(state, 200);
-        k = n_randint(state, 200);
-        n = n_randint(state, 200);
+        m = n_randint(state, 400);
+        k = n_randint(state, 400);
+        n = n_randint(state, 400);
 
         nmod_mat_init(A, m, n, mod);
         nmod_mat_init(B, n, k, mod);

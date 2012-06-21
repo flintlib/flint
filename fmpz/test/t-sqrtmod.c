@@ -102,6 +102,13 @@ int main(void)
         fmpz_mul(a, b, b);
         fmpz_mod(a, a, p);
 
+        /* check a special case */
+        if (i == 0)
+        {
+            fmpz_set_str(p, "15951355998396157", 10);
+            fmpz_set_str(a, "7009303413761286", 10);
+        }
+
         ans = fmpz_sqrtmod(c, a, p);
 
         fmpz_mul(d, c, c);

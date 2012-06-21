@@ -40,7 +40,7 @@ void padic_poly_init(padic_poly_t poly)
 
 void padic_poly_init2(padic_poly_t poly, long alloc)
 {
-    poly->coeffs = alloc ? (fmpz *) calloc(alloc, sizeof(fmpz)) : NULL;
+    poly->coeffs = alloc ? (fmpz *) flint_calloc(alloc, sizeof(fmpz)) : NULL;
     poly->alloc  = alloc;
     poly->length = 0;
     poly->val    = 0;

@@ -42,7 +42,7 @@ main(void)
     fflush(stdout);
 
     /* Check exp(A+B) = exp(A) * exp(B) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
         long n;
@@ -110,7 +110,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
         long n;

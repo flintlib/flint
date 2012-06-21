@@ -56,7 +56,7 @@ static long __bound_prec(ulong n)
     return u;
 }
 
-void swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
+void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 {
     fmpz *square_roots, *T, *tmp1, *tmp2, *tmp3;
     fmpz_t one;

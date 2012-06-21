@@ -593,6 +593,34 @@ void _nmod_poly_evaluate_nmod_vec(mp_ptr ys, mp_srcptr coeffs, long len,
 void nmod_poly_evaluate_nmod_vec(mp_ptr ys,
         const nmod_poly_t poly, mp_srcptr xs, long n);
 
+void nmod_poly_evaluate_nmod_vec(mp_ptr ys, const nmod_poly_t poly,
+        mp_srcptr xs, long n);
+
+void _nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
+    const nmod_poly_t poly, mp_srcptr xs, long n);
+
+void
+_nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
+    long plen, mp_ptr * tree, long len, nmod_t mod);
+
+void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr coeffs, long len,
+    mp_srcptr xs, long n, nmod_t mod);
+
+void nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
+        const nmod_poly_t poly, mp_srcptr xs, long n);
+
+/* Subproduct tree  **********************************************************/
+
+mp_ptr * _nmod_poly_tree_alloc(long len);
+
+void _nmod_poly_tree_free(mp_ptr * tree, long len);
+
+void _nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots,
+    long len, nmod_t mod);
+
 /* Interpolation  ************************************************************/
 
 void _nmod_poly_interpolate_nmod_vec_newton(mp_ptr poly, mp_srcptr xs,
@@ -613,6 +641,19 @@ void _nmod_poly_interpolate_nmod_vec(mp_ptr poly, mp_srcptr xs,
 void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
                         mp_srcptr xs, mp_srcptr ys, long n);
 
+void nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
+                                    mp_srcptr xs, mp_srcptr ys, long n);
+
+void _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
+                            mp_srcptr xs, mp_srcptr ys, long len, nmod_t mod);
+
+void
+_nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
+    mp_ptr * tree, mp_srcptr weights, long len, nmod_t mod);
+
+void _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree,
+    long len, nmod_t mod);
+
 /* Composition  **************************************************************/
 
 void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
@@ -631,6 +672,24 @@ void _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, long len1,
 
 void nmod_poly_compose(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2);
+
+/* Taylor shift  *************************************************************/
+
+void _nmod_poly_taylor_shift_horner(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod);
+
+void nmod_poly_taylor_shift_horner(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c);
+
+void _nmod_poly_taylor_shift_convolution(mp_ptr poly, mp_limb_t c,
+    long len, nmod_t mod);
+
+void nmod_poly_taylor_shift_convolution(nmod_poly_t g,
+    const nmod_poly_t f, mp_limb_t c);
+
+void _nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, long len, nmod_t mod);
+
+void nmod_poly_taylor_shift(nmod_poly_t g, const nmod_poly_t f, mp_limb_t c);
 
 /* Modular composition  ******************************************************/
 
@@ -795,6 +854,10 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
 void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod);
 
 void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n);
+
+int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long len, nmod_t mod);
+
+int nmod_poly_sqrt(nmod_poly_t b, const nmod_poly_t a);
 
 /* Transcendental functions **************************************************/
 

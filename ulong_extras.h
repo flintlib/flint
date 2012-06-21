@@ -178,6 +178,13 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
 
+long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp); 
+
+long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
+                                              mp_limb_t p, long exp);
+
+long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
+
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 
 mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y);
@@ -189,6 +196,8 @@ mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y);
 ulong n_revbin(ulong in, ulong bits);
 
 int n_jacobi(mp_limb_signed_t x, mp_limb_t y);
+
+int n_jacobi_unsigned(mp_limb_t x, mp_limb_t y);
 
 mp_limb_t n_sqrt(mp_limb_t a);
 
@@ -281,6 +290,8 @@ int n_sizeinbase(mp_limb_t n, int base);
 mp_limb_t n_nextprime(mp_limb_t n, int proved);
 
 mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
+
+mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
 #ifdef __cplusplus
 }

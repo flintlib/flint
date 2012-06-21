@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         long len;
@@ -74,7 +74,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
         long len;
@@ -104,7 +104,7 @@ main(void)
     }
 
     /* Compare with mul_basecase */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, d;
         long len;
@@ -120,6 +120,7 @@ main(void)
         fmpz_poly_mul_classical(a, b, c);
         if (len)
             _fmpz_vec_zero(a->coeffs, FLINT_MIN(len - 1, a->length));
+        _fmpz_poly_normalise(a);
         fmpz_poly_mulhigh_karatsuba_n(d, b, c, len);
 
         result = (fmpz_poly_equal(a, d));

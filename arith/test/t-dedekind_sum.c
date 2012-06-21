@@ -56,7 +56,6 @@ static const long testdata[][4] =
     {-4278761L, 239321L, 791947L, 239321L},
     {9414763L, 30776409L, -93285463L, 92329227L},
     {4872687L, 2199L, 146L, 733L},
-    {61247L, 81381215L, 3622491319L, 32552486L},
     {-22349505L, 60581653L, 27694241L, 60581653L},
     {85739724L, 9289L, 961L, 2654L},
     {-5616L, 124023L, -31447L, 41341L},
@@ -83,6 +82,7 @@ static const long testdata[][4] =
     {27649424L, 57014291L, 731583513L, 114028582L},
     {3275043L, 436410815L, 2018428417L, 174564326L},
 #if FLINT64  /* skip on 32 bit only because of the literals */
+    {61247L, 81381215L, 3622491319L, 32552486L},
     {-52118L, 125095621L, -24931204413L, 125095621L},
     {201446493L, 951783261L, 2467429915L, 634522174L},
     {176112L, 72187934L, 2692844825L, 72187934L},
@@ -114,8 +114,8 @@ int main(void)
             fmpz_set_si(hh, h);
             fmpz_set_si(kk, k);
 
-            dedekind_sum(s1, hh, kk);
-            dedekind_sum_naive(s2, hh, kk);
+            arith_dedekind_sum(s1, hh, kk);
+            arith_dedekind_sum_naive(s2, hh, kk);
 
             if (!fmpq_equal(s1, s2))
             {
@@ -137,7 +137,7 @@ int main(void)
         fmpz_set_si(hh, h);
         fmpz_set_si(kk, k);
 
-        dedekind_sum(s1, hh, kk);
+        arith_dedekind_sum(s1, hh, kk);
 
         fmpz_set_si(fmpq_numref(s2), testdata[i][2]);
         fmpz_set_si(fmpq_denref(s2), testdata[i][3]);
@@ -160,7 +160,7 @@ int main(void)
     fmpz_mul_2exp(kk, kk, 1001);
     fmpz_add_ui(kk, kk, 1);
 
-    dedekind_sum(s1, hh, kk);
+    arith_dedekind_sum(s1, hh, kk);
     if ((fmpz_fdiv_ui(fmpq_numref(s1), 1000000000) != 906445312) ||
         (fmpz_fdiv_ui(fmpq_denref(s1), 1000000000) != 8416259))
     {
@@ -177,7 +177,7 @@ int main(void)
         fmpz_randtest(hh, state, 300);
         fmpz_randtest(kk, state, 300);
 
-        dedekind_sum(s1, hh, kk);
+        arith_dedekind_sum(s1, hh, kk);
     }
 
     fmpz_clear(hh);

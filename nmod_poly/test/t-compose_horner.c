@@ -41,7 +41,7 @@ main(void)
     fflush(stdout);
 
     /* Check (f(x-1))(x+1) == f */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, r, xp1, xm1;
         mp_limb_t n = n_randtest_not_zero(state);
@@ -77,7 +77,7 @@ main(void)
     }
 
     /* Check a(c) + b(c) = (a + b)(c) */
-    for (i = 0; i < 5000; i++)
+    for (i = 0; i < 500 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, r1, r2;
         mp_limb_t n = n_randtest_not_zero(state);

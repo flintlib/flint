@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         fmpq_t x, y;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check that (f+g)(a) = f(a) + g(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         fmpq_t x, y, z;
@@ -129,7 +129,7 @@ main(void)
     }
 
     /* Check that (f*g)(a) = f(a) * g(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         fmpq_t x, y, z;

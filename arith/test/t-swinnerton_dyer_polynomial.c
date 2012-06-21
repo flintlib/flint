@@ -60,7 +60,7 @@ int main()
     for (n = 0; n <= 10; n++)
     {
         fmpz_poly_init(S);
-        swinnerton_dyer_polynomial(S, n);
+        arith_swinnerton_dyer_polynomial(S, n);
         r = fmpz_poly_evaluate_mod(S, 2147483629UL, 4294967291UL);
 
         if (r != known_values[n])

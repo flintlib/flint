@@ -60,3 +60,4 @@ void nmod_poly_derivative(nmod_poly_t x_prime, const nmod_poly_t x)
 	x_prime->length = x->length - 1;
 	_nmod_poly_normalise(x_prime); 
 }
+

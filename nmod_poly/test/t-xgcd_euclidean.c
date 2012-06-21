@@ -41,7 +41,7 @@ main(void)
     /* 
        Compare with result from gcd and check a*s + b*t = g
     */
-    for (i = 0; i < 800; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c, g1, s, t, g2;
 
@@ -57,9 +57,9 @@ main(void)
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
         
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
-        nmod_poly_randtest(c, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
+        nmod_poly_randtest(c, state, n_randtest(state) % 200);
         
         nmod_poly_mul(a, a, c);
         nmod_poly_mul(b, b, c);
@@ -97,7 +97,7 @@ main(void)
     }
 
     /* Check aliasing of a and g */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -110,8 +110,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
         
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(a, s, t, a, b);
@@ -135,7 +135,7 @@ main(void)
     }
 
     /* Check aliasing of b and g */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -148,8 +148,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(b, s, t, a, b);
@@ -173,7 +173,7 @@ main(void)
     }
 
     /* Check aliasing of s and a */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -186,8 +186,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(g, a, t, a, b);
@@ -210,7 +210,7 @@ main(void)
     }
 
     /* Check aliasing of s and b */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -223,8 +223,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(g, b, t, a, b);
@@ -247,7 +247,7 @@ main(void)
     }
 
     /* Check aliasing of t and a */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -260,8 +260,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(g, s, a, a, b);
@@ -284,7 +284,7 @@ main(void)
     }
 
     /* Check aliasing of t and b */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, g, s, t;
 
@@ -297,8 +297,8 @@ main(void)
         nmod_poly_init(g, n);
         nmod_poly_init(s, n);
         nmod_poly_init(t, n);
-        nmod_poly_randtest(a, state, n_randint(state, 200));
-        nmod_poly_randtest(b, state, n_randint(state, 200));
+        nmod_poly_randtest(a, state, n_randtest(state) % 200);
+        nmod_poly_randtest(b, state, n_randtest(state) % 200);
        
         nmod_poly_xgcd_euclidean(g, s, t, a, b);
         nmod_poly_xgcd_euclidean(g, s, b, a, b);

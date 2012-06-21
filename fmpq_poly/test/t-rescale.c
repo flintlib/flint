@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g;
         fmpq_t a;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Check that rescaling by a and then by 1/a is the identity */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t f, g;
         fmpq_t a;

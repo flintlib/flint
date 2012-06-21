@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Compare with mul_classical */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -100,7 +100,7 @@ main(void)
     }
 
     /* Compare with mul_classical unsigned */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
 
@@ -128,7 +128,7 @@ main(void)
     }
 
     /* Check _fmpz_poly_sqr_KS directly */
-    for (i = 0; i < 2000; i++)
+    for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         long len;
         fmpz_poly_t a, out1, out2;

@@ -47,7 +47,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
         long n = n_randint(state, 50) + 1;
@@ -80,7 +80,7 @@ main(void)
     }
 
     /* Check asin(sin(a)) = a */
-    for (i = 0; i < 200; i++)
+    for (i = 0; i < 20 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, sina, asinsina;
         long n = n_randint(state, 80) + 1;

@@ -65,9 +65,9 @@ main(void)
             r1 = i2 + int_limbs;
             r2 = r1 + 2*int_limbs;
    
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
-  
+            random_fermat(i1, state, int_limbs);
+            random_fermat(i2, state, int_limbs);
+           
             mpn_mul(r2, i1, int_limbs, i2, int_limbs);
             mul_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);
             
@@ -101,7 +101,7 @@ main(void)
             r1 = i1 + int_limbs;
             r2 = r1 + 2*int_limbs;
    
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
+            random_fermat(i1, state, int_limbs);
             
             mpn_mul(r2, i1, int_limbs, i1, int_limbs);
             mul_truncate_sqrt2(r1, i1, int_limbs, i1, int_limbs, depth, w);

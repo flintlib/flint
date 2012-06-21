@@ -31,7 +31,7 @@
 #include "arith.h"
 
 void
-bell_number_vec_recursive(fmpz * b, long n)
+arith_bell_number_vec_recursive(fmpz * b, long n)
 {
     long i, k;
     fmpz * t;
