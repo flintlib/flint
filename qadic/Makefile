@@ -1,6 +1,6 @@
 SOURCES = $(wildcard *.c)
 
-OBJS = $(patsubst %.c, $(BUILD_DIR)/%.o, $(SOURCES))
+OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
 LIB_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
 
@@ -8,18 +8,25 @@ TEST_SOURCES = $(wildcard test/*.c)
 
 PROF_SOURCES = $(wildcard profile/*.c)
 
-TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
+TUNE_SOURCES = $(wildcard tune/*.c)
+
+TESTS = $(patsubst %.c, $(BUILD_DIR)/%, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
-all: $(OBJS)
+TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
+
+all: $(OBJS) 
 
 library: $(LIB_OBJS)
 
 profile:
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
+	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
         
-$(BUILD_DIR)/%.o: %.c
+tune: $(TUNE_SOURCES)
+	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+
+$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
 $(BUILD_DIR)/%.lo: %.c
@@ -28,8 +35,10 @@ $(BUILD_DIR)/%.lo: %.c
 clean:
 	rm -rf $(BUILD_DIR)	
 
-check: library
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) -lflint;)
-	$(foreach prog, $(TESTS), $(BUILD_DIR)/$(prog);)
+check: $(TESTS)
+	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+
+$(BUILD_DIR)/test/%: test/%.c
+	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
 .PHONY: profile clean check all
