@@ -25,13 +25,32 @@
 
 #include "qadic.h"
 
+/*
+    Discussion on the choice of the norm algorithm.
+
+    When the logarithm function does not converge for x, 
+    the only choice is the resultant method.
+
+    However, when the logarithm function converges, we 
+    can choose between the analytic method and the resultant 
+    method.  Roughly speaking, we postulate that the analytic 
+    method has runtime A (log N)^2 mu(p,d,N), where mu(p,d,N) 
+    is (d log d) M(N log p).  The resultant method has runtime 
+    B d^4 M(N log p).  Experimentally, we find that A/B is 
+    somewhere around 4.
+
+    TODO:  Repeat the experiments with p=2, which is an 
+    important special case.
+ */
+
 void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
                  const fmpz *a, const long *j, long lena, 
                  const fmpz_t p, long N)
 {
+    const long d = j[lena - 1];
+
     if (len == 1)
     {
-        const long d = j[lena - 1];
         fmpz_t pN;
 
         fmpz_init(pN);
@@ -54,7 +73,14 @@ void _qadic_norm(fmpz_t rop, const fmpz *op, long len,
 
         if (w >= 2 || (*p != 2L && w >= 1))
         {
-            _qadic_norm_analytic(rop, y, w, len, a, j, lena, p, N);
+            if (4 * FLINT_FLOG2(N) * FLINT_FLOG2(N) * FLINT_FLOG2(d) < d*d*d)
+            {
+                _qadic_norm_analytic(rop, y, w, len, a, j, lena, p, N);
+            }
+            else
+            {
+                _qadic_norm_resultant(rop, op, len, a, j, lena, p, N);
+            }
         }
         else
         {
