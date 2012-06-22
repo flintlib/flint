@@ -87,7 +87,7 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
         const long b = n_sqrt(n);
         const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
 
-        long i, h, zden;
+        long i, h;
         fmpz_t f, pNk;
         fmpz *c, *t, *ypow;
 
@@ -108,7 +108,6 @@ _qadic_log_rectangular_series(fmpz *z, const fmpz *y, long len, long n,
         }
 
         _fmpz_vec_zero(z, d);
-        zden = 0;
 
         for (h = (n + (b - 1)) / b - 1; h >= 0; h--)
         {
