@@ -523,6 +523,13 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 /* Modular composition  ******************************************************/
 
 void
+_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+                                       const fmpz * h, long lenh, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                  const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
+
 void
 _fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
                                               const fmpz * h, long lenh, const fmpz_t p);
