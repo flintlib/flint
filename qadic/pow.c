@@ -86,12 +86,12 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
            We unroll the first step of the loop, referring to {op, len}
          */
 
-        _fmpz_mod_poly_sqr(R, op, len, p);
+        _fmpz_poly_sqr(R, op, len);
         _fmpz_mod_poly_reduce(R, 2 * len - 1, a, j, lena, p);
 
         if (fmpz_tstbit(e, bit))
         {
-            _fmpz_mod_poly_mul(S, R, d, op, len, p);
+            _fmpz_poly_mul(S, R, d, op, len);
             _fmpz_mod_poly_reduce(S, d + len - 1, a, j, lena, p);
             T = R;
             R = S;
@@ -102,14 +102,14 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
         {
             if (fmpz_tstbit(e, bit))
             {
-                _fmpz_mod_poly_sqr(S, R, d, p);
+                _fmpz_poly_sqr(S, R, d);
                 _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
-                _fmpz_mod_poly_mul(R, S, d, op, len, p);
+                _fmpz_poly_mul(R, S, d, op, len);
                 _fmpz_mod_poly_reduce(R, d + len - 1, a, j, lena, p);
             }
             else
             {
-                _fmpz_mod_poly_sqr(S, R, d, p);
+                _fmpz_poly_sqr(S, R, d);
                 _fmpz_mod_poly_reduce(S, 2 * d - 1, a, j, lena, p);
                 T = R;
                 R = S;
@@ -127,7 +127,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
 
     if (fmpz_sgn(e) < 0)
     {
-        printf("Exception (qadic_pow_ui).  e < 0.\n");
+        printf("Exception (qadic_pow).  e < 0.\n");
         abort();
     }
 
