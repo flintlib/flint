@@ -1001,6 +1001,31 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 *******************************************************************************
 
+    Modular composition
+
+*******************************************************************************
+
+void
+void
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+					      const fmpz * h, long lenh, const fmpz_t p);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+    The algorithm used is Horner's rule.
+
+void
+fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
+			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. The algorithm used is Horner's rule.
+
+*******************************************************************************
+
     Radix conversion
 
     The following functions provide the functionality to solve the 
