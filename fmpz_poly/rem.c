@@ -33,7 +33,7 @@
 void
 _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    if (lenA < 100)
+    if (lenA < 15)
     {
         _fmpz_poly_rem_basecase(R, A, lenA, B, lenB);
     }
