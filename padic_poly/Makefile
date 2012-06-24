@@ -12,11 +12,13 @@ TUNE_SOURCES = $(wildcard tune/*.c)
 
 TESTS = $(patsubst %.c, $(BUILD_DIR)/%, $(TEST_SOURCES))
 
+TESTS_RUN = $(foreach file, $(TESTS), $(file)_RUN)
+
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: $(OBJS) 
+all: $(OBJS)
 
 library: $(LIB_OBJS)
 
@@ -35,10 +37,12 @@ $(BUILD_DIR)/%.lo: %.c
 clean:
 	rm -rf $(BUILD_DIR)	
 
-check: $(TESTS)
-	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+check: $(TESTS_RUN)
+
+%_RUN: %
+	@$<
 
 $(BUILD_DIR)/test/%: test/%.c
 	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
-.PHONY: profile clean check all
+.PHONY: profile clean check all %_RUN
