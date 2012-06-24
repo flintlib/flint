@@ -189,6 +189,18 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    mp_limb_t c = 2*i1[limbs] + i2[limbs];
       
+   if (c & 1)
+   {
+      mpn_neg_n(r, i1, limbs + 1);
+      mpn_normmod_2expp1(r, limbs);
+      return;
+   } else if (c & 2)
+   {
+      mpn_neg_n(r, i2, limbs + 1);
+      mpn_normmod_2expp1(r, limbs);
+      return;
+   }
+
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) 
    {
       r[limbs] = mpn_mulmod_2expp1(r, i1, i2, c, bits, tt);
@@ -204,16 +216,6 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
    w1 = bits/(1UL<<(2*depth1));
 
    _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
-
-   if (c & 1)
-   {
-      mpn_neg_n(r, i1, limbs + 1);
-      mpn_normmod_2expp1(r, limbs);
-   } else if (c & 2)
-   {
-      mpn_neg_n(r, i2, limbs + 1);
-      mpn_normmod_2expp1(r, limbs);
-   }
 }
 
 long fft_adjust_limbs(mp_size_t limbs)
