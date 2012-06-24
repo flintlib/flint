@@ -120,6 +120,11 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     Requires that \code{degs} have enough space for irreducible polynomials'
     powers (maximum space required is ${n * sizeof(long)}).
 
+void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
+				      const fmpz_mod_poly_t f)
+
+    Sets \code{res} to a squarefree factorization of \code{f}.
+
 void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
 				      const fmpz_mod_poly_t f)
 
