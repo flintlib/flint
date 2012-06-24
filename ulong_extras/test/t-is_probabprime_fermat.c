@@ -94,7 +94,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   result = (count < 1000UL);
+   result = (count < 2000UL);
    if (!result)
    {
       printf("FAIL:\n");

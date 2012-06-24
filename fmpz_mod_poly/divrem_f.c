@@ -67,6 +67,7 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     {
         fmpz_mod_poly_set(R, A);
         fmpz_mod_poly_zero(Q);
+        fmpz_clear(invB);
         return;
     }
 

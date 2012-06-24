@@ -60,7 +60,7 @@ main(void)
         fmpz_init(x2);
         len = (long) (n_randint(state, 100) + 1);
 
-        for (j = 0; j < 1000; j++)
+        for (j = 0; j < 100; j++)
         {
             fmpz_randtest(x1, state, 200);
             fmpz_get_mpz(mpq_numref(n1), x1);

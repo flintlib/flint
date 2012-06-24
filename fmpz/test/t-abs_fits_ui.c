@@ -72,7 +72,7 @@ main(void)
     fmpz_neg(x, x);
     check(x, 0);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_set_ui(x, 1UL);
         fmpz_mul_2exp(x, x, i);

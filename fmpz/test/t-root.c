@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Comparison with mpz routines */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f, g;
         mpz_t mf, mf2, mg;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check aliasing of f and g */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         mpz_t mf, mf2;

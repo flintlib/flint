@@ -41,7 +41,7 @@ int main(void)
     flint_randinit(state);
 
     /* Create some small fmpz integers, clear the mpz_t */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         mpz_t z;
@@ -53,7 +53,7 @@ int main(void)
     }
 
     /* Create some large fmpz integers, do not clear the mpz_t */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         mpz_t z;
@@ -70,7 +70,7 @@ int main(void)
     }
 
     /* Create some more fmpz integers */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f, g;
         mpz_t z;

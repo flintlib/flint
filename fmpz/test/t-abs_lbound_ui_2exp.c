@@ -66,7 +66,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 100000; iter++)
+    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_t x;
         long bits;

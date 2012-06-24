@@ -43,7 +43,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         mpz_t b;
@@ -75,6 +75,9 @@ main(void)
             printf("str1 = %s\n, str2 = %s\n", str1, str2);
             abort();
         }
+
+        flint_free(str1);
+        flint_free(str2);
 
         fmpz_clear(a);
         mpz_clear(b);
