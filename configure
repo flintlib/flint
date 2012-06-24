@@ -199,9 +199,13 @@ esac
 
 echo "Configuring...${MACHINE}-${OS}"
 
-#no shared library on mingw
+#no shared library on mingw or cygwin
 
 if [ "$OS" = "MINGW32" ]; then
+   SHARED=0
+fi
+
+if [ "$OS" = "CYGWIN" ]; then
    SHARED=0
 fi
 
