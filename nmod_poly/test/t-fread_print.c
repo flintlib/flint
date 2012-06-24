@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-#if !defined (__WIN32)
+#if !defined (__WIN32) && !defined (__CYGWIN__)
 
 int
 main(void)
