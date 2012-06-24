@@ -76,6 +76,9 @@ main(void)
             abort();
         }
 
+        flint_free(str1);
+        flint_free(str2);
+
         fmpz_clear(a);
         mpz_clear(b);
     }
