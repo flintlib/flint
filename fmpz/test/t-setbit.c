@@ -42,7 +42,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000000; i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
         ulong j;
         fmpz_t a, b, c;

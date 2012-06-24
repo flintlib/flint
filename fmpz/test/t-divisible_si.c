@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with MPIR:  random */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         long a;
         fmpz_t b;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Compare with MPIR:  b a multiple of a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         long a;
         fmpz_t b;

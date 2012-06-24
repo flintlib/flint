@@ -79,6 +79,7 @@ main(void)
         abort();
     }
     flint_free(str);
+    fmpz_poly_clear(a);
 
     printf("PASS\n");
     return 0;

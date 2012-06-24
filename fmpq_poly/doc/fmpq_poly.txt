@@ -1106,7 +1106,8 @@ void _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly,
     Evaluates the polynomial \code{(poly, den, len)} at the integer $a$ and 
     sets \code{(rnum, rden)} to the result in lowest terms.
 
-void fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly, const fmpz_t a)
+void fmpq_poly_evaluate_fmpz(fmpq_t res, const fmpq_poly_t poly,
+                               const fmpz_t a)
 
     Evaluates the polynomial \code{poly} at the integer $a$ and sets 
     \code{res} to the result.

@@ -3,7 +3,7 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_factor fmpz_poly_factor \
    fft qsieve
- 
+
 LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
 LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
 INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
@@ -40,7 +40,7 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: $(FLINT_LIB) 
+all: $(FLINT_LIB)
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean || exit $$?;)
@@ -48,6 +48,9 @@ clean:
 	rm -rf build
 
 distclean: clean
+	rm -f config.h
+	rm -f fft_tuning.h
+	rm -f fmpz-conversions.h
 	rm -f Makefile
 
 dist:
@@ -76,11 +79,11 @@ $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interface
 	fi
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
+			$(CXX) -fPIC $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
 			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 		fi; \
 		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
+			$(CXX) -fPIC $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
 			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS); \
 			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;) \
 		fi; \

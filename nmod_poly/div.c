@@ -34,7 +34,13 @@ void
 _nmod_poly_div(mp_ptr Q, mp_srcptr A, long lenA, 
                                   mp_srcptr B, long lenB, nmod_t mod)
 {
-    if (lenB < 6000)
+    if (lenB < 15)
+    {
+        mp_ptr W = _nmod_vec_init(NMOD_DIV_BC_ITCH(lenA, lenB, mod));
+        _nmod_poly_div_basecase(Q, W, A, lenA, B, lenB, mod);
+        _nmod_vec_clear(W);
+    }
+    else if (lenB < 6000)
         _nmod_poly_div_divconquer(Q, A, lenA, B, lenB, mod);
     else
         _nmod_poly_div_newton(Q, A, lenA, B, lenB, mod);

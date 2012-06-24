@@ -40,6 +40,12 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
         _nmod_poly_divrem_q0(Q, R, A, B, lenB, mod);
     else if (lenA == lenB + 1)
         _nmod_poly_divrem_q1(Q, R, A, lenA, B, lenB, mod);
+    else if (lenB < 15)
+    {
+        mp_ptr W = _nmod_vec_init(NMOD_DIVREM_BC_ITCH(lenA, lenB, mod));
+        _nmod_poly_divrem_basecase(Q, R, W, A, lenA, B, lenB, mod);
+        _nmod_vec_clear(W);
+    }
     else if (lenB < 6000)
         _nmod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, mod);
     else
