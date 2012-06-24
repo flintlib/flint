@@ -262,6 +262,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 
     fmpz_clear(X);
     fmpz_clear(Y);
+    flint_free(nullrows);
 
     /************************************************************************
         CLEAN UP:
