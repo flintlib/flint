@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         fmpz_t n;
@@ -76,7 +76,7 @@ main(void)
     }
 
     /* Check that n (a + b) == na + nb */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b, *lhs, *rhs;
         fmpz_t n;
@@ -118,7 +118,7 @@ main(void)
     }
 
     /* Check that n2 * (n1 a) == (n1 * n2) a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         fmpz_t n1, n2, n;

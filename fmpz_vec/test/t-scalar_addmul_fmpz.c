@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with fmpz_vec_scalar_addmul_si */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b, *c;
         fmpz_t n1;
@@ -81,7 +81,7 @@ main(void)
     }
 
     /* Compute a different way */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b, *c, *d;
         long len = n_randint(state, 100);
