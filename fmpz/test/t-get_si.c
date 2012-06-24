@@ -76,7 +76,7 @@ main(void)
 
     fmpz_clear(x);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         long b, c;

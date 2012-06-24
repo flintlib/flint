@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         mpz_t g;
@@ -65,7 +65,7 @@ main(void)
         mpz_clear(g);
     }
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t f;
         mpz_t g;

@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mpz_t d, e, f;
@@ -83,7 +83,7 @@ main(void)
     }
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         mpz_t d, e, f;

@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Test aliasing of d and f, a and g */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, f, g, F, G;
 
@@ -84,7 +84,7 @@ main(void)
     }
 
     /* Test aliasing of a and f, d and g */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, f, g, F, G;
 
@@ -126,7 +126,7 @@ main(void)
     }
 
     /* Test a f == d mod g (generically d == 1) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, f, g, t;
 
@@ -165,7 +165,7 @@ main(void)
     }
 
     /* Test a f == d mod g (specifically d > 1) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t d, a, f, g, t, x;
 

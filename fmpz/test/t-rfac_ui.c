@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t x, r;
         ulong a;
@@ -72,7 +72,7 @@ main(void)
     }
 
     /* Check rf(x,a) * rf(x+a,b) = rf(x,a+b) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t x, xa, r1, r2, r1r2, r3;
         ulong a, b;

@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
@@ -85,7 +85,7 @@ main(void)
     }
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c;
         mpz_t d, f, g;
@@ -123,7 +123,7 @@ main(void)
     }
 
     /* Test aliasing of a and c */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mpz_t d, e, f, g;
@@ -166,7 +166,7 @@ main(void)
     }
 
     /* Test aliasing of b and c */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mpz_t d, e, f, g;
