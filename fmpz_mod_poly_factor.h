@@ -71,6 +71,8 @@ void fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac);
 void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
                                  const fmpz_mod_poly_factor_t fac);
 
+void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp);
+
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f);
 
 int
