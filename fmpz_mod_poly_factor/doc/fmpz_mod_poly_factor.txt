@@ -22,6 +22,7 @@
     Copyright (C) 2009, 2008 William Hart
     Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
@@ -130,5 +131,14 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Cantor-Zassenhaus algorithm.
+
+    The modulus must be a prime greater than 2.
+
+void fmpz_mod_poly_factor_fast_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
+					   const fmpz_mod_poly_t poly, double beta)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the fast Cantor-Zassenhaus algorithm. This algorithm uses
+    a “baby step/giant step” strategy for the distinct-degree factorization step.
 
     The modulus must be a prime greater than 2.
