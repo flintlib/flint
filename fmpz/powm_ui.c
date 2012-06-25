@@ -62,12 +62,12 @@ void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
                 if (g2 >= 0)
                 {
                     g2 = n_mod2_preinv(g2, m2, minv);
-                    *f = n_powmod2_preinv(g2, e, m2, minv);
+                    *f = n_powmod2_ui_preinv(g2, e, m2, minv);
                 }
                 else
                 {
                     g2 = n_mod2_preinv(-g2, m2, minv);
-                    *f = n_powmod2_preinv(g2, e, m2, minv);
+                    *f = n_powmod2_ui_preinv(g2, e, m2, minv);
                     if ((e & 1UL))
                         *f = n_negmod(*f, m2);
                 }

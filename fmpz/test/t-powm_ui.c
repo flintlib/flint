@@ -64,7 +64,7 @@ main(void)
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(m, c);
-        x = n_randint(state, 20);
+        x = n_randtest(state);
 
         fmpz_powm_ui(b, a, x, c);
         mpz_powm_ui(e, d, x, m);
@@ -102,7 +102,7 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, b, n, c);
         fmpz_powm_ui(b, b, n, c);
@@ -136,7 +136,7 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, b, n, c);
         fmpz_powm_ui(c, b, n, c);
@@ -168,7 +168,7 @@ main(void)
 
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, c, n, c);
         fmpz_powm_ui(c, c, n, c);
