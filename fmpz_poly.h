@@ -725,14 +725,14 @@ static __inline__
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, 
                     const fmpz * A, long A_len, const fmpz * B, long B_len)
 {
-    _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, A_len, B, B_len);
+    _fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, A_len, B, B_len);
 }
 
 static __inline__
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, 
                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, B);
+    fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, B);
 }
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, long lenA, 

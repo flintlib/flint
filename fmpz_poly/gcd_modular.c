@@ -34,7 +34,7 @@
 void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1, 
                                         const fmpz * poly2, long len2)
 {
-    mp_bitcnt_t bits1, bits2, nb1, nb2, gbits, bits_small, pbits, curr_bits = 0, new_bits;   
+    mp_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;   
     fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
     fmpz * A, * B, * Q, * lead_A, * lead_B;
     mp_ptr a, b, h;
@@ -101,7 +101,6 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
     fmpz_gcd(g, lead_A, lead_B);
     fmpz_mul(l, lead_A, lead_B);
 
-    gbits = fmpz_bits(g);
     g_pm1 = fmpz_is_pm1(g);
    
     /* evaluate -A at -1 */
@@ -299,9 +298,6 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 
     /* finally multiply by content */
     _fmpz_vec_scalar_mul_fmpz(res, res, hlen, d);
-
-    if (fmpz_sgn(res + hlen - 1) < 0)
-        _fmpz_vec_neg(res, res, hlen);
 
     fmpz_clear(d);
     _fmpz_vec_clear(A, len1);
