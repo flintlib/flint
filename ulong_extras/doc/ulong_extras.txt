@@ -401,6 +401,17 @@ mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp,
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
+mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, 
+                                                      mp_limb_t n, double npre)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ 
+    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
+    and $0 \leq a < n$. The exponent \code{exp} is unsigned and so
+    can be larger than allowed by \code{n_powmod_precomp}.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
+
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     Returns \code{(a^exp) % n}. We require \code{n < 2^FLINT_D_BITS} 
@@ -427,6 +438,17 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
+
+mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+                                                                mp_limb_t ninv)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
+    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
+    restrictions on $n$. The exponent \code{exp} is unsigned and so can be
+    larger than allowed by \code{n_powmod2_preinv}.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 

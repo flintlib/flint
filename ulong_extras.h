@@ -136,6 +136,9 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
 mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
                                         mp_limb_t n, mp_limb_t ninv);
 
+mp_limb_t
+n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
+
 mp_limb_t n_powmod_precomp(mp_limb_t a, 
                      mp_limb_signed_t exp, mp_limb_t n, double npre);
 
@@ -149,6 +152,9 @@ mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
 mp_limb_t n_powmod2_preinv(mp_limb_t a, 
                   mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv);
+
+mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp,
+                                            mp_limb_t n, mp_limb_t ninv);
 
 static __inline__
 mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)

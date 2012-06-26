@@ -19,33 +19,67 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, Peter Shrimpton
     Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
-int
-n_is_strong_probabprime_precomp(mp_limb_t n, double npre, mp_limb_t a,
-                                mp_limb_t d)
+int main(void)
 {
-    mp_limb_t t = d;
-    mp_limb_t y;
+   int i, result;
+   flint_rand_t state;
+   
+   printf("powmod2_ui_preinv....");
+   fflush(stdout);
 
-    y = n_powmod_ui_precomp(a, t, n, npre);
+   flint_randinit(state);
 
-    if (y == 1UL)
-        return 1;
-    t <<= 1;
+   for (i = 0; i < 100000; i++)
+   {
+      mp_limb_t a, d, r1, r2, dinv;
+      mpz_t a_m, d_m, r2_m;
+      mp_limb_t exp;
 
-    while ((t != n - 1) && (y != n - 1))
-    {
-        y = n_mulmod_precomp(y, y, n, npre);
-        t <<= 1;
-    }
+      mpz_init(a_m);
+      mpz_init(d_m);
+      mpz_init(r2_m);
+      
+      d = n_randtest_not_zero(state);
+      do
+      {
+         a = n_randint(state, d);
+      } while (n_gcd(d, a) != 1UL);
+      exp = n_randtest(state);
+      
+      dinv = n_preinvert_limb(d);
+      r1 = n_powmod2_ui_preinv(a, exp, d, dinv);
 
-    return (y == n - 1);
+      mpz_set_ui(a_m, a);
+      mpz_set_ui(d_m, d);
+      mpz_powm_ui(r2_m, a_m, exp, d_m);      
+      r2 = mpz_get_ui(r2_m);
+      
+      result = (r1 == r2);
+      if (!result)
+      {
+         printf("FAIL:\n");
+         printf("a = %lu, exp = %lu, d = %lu\n", a, exp, d); 
+         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         abort();
+      }
+
+      mpz_clear(a_m);
+      mpz_clear(d_m);
+      mpz_clear(r2_m);
+   }
+
+   flint_randclear(state);
+
+   printf("PASS\n");
+   return 0;
 }

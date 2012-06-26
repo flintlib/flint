@@ -21,6 +21,7 @@
 
     Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -86,6 +87,8 @@ void _fmpz_poly_div_divconquer(fmpz *Q,
         S = _fmpz_vec_init(2 * n);
         T = S + n;
 
+        /* To avoid copying all of A, we let S be a window of the
+           remainder, taking up to n coefficients at a time */
         shift = lenA - n;
         _fmpz_vec_set(S, A + shift, n);
 

@@ -42,11 +42,7 @@ _nmod_poly_powmod_ui_binexp(mp_ptr res, mp_srcptr poly,
 
     if (lenf == 2)
     {
-        /* XXX */
-        if (((mp_limb_signed_t) e) < 0)
-            _nmod_poly_pow_trunc(res, poly, e, 1, mod);
-        else
-            res[0] = n_powmod2_preinv(poly[0], e, mod.n, mod.ninv);
+        res[0] = n_powmod2_ui_preinv(poly[0], e, mod.n, mod.ninv);
         return;
     }
 

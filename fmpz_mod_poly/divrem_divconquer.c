@@ -77,63 +77,6 @@ __fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 
         _fmpz_vec_clear(W, (2 * n1 - 1) + lenB - 1);
     }
-    else if (lenA > 2 * lenB - 1)
-    {
-        /*
-           We shift A right until it is of length 2 lenB - 1, call this p1
-         */
-
-        const long shift = lenA - 2 * lenB + 1;
-        const fmpz * p1 = A + shift;
-
-        fmpz * q1   = Q + shift;
-        fmpz * q2   = Q;
-        fmpz * W    = R + lenA;
-        fmpz * d1q1 = W + (2 * lenB - 1);
-
-        /*
-           XXX:  In this case, we expect R to be of length 
-           lenA + 2 * (2 * lenB - 1) and A to be modifiable
-         */
-
-        /* 
-           Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
-           being of length lenB; set d1q1 = d1 * q1 of length 2 lenB - 1
-         */
-
-        _fmpz_mod_poly_divrem_divconquer_recursive(q1, d1q1, W, p1, B, lenB, 
-                                                   invB, p);
-
-        /* 
-           We have dq1 = d1 * q1 * x^shift, of length lenA
-
-           Compute R = A - dq1; the first lenB coeffs represent remainder 
-           terms (zero if division is exact), leaving lenA - lenB significant 
-           terms which we use in the division
-         */
-
-        _fmpz_mod_poly_sub((fmpz *) A + shift, 
-                           A + shift, lenB - 1, d1q1, lenB - 1, p);
-
-        /*
-           Compute q2 = trunc(R) div B; it is a smaller division than the 
-           original since len(trunc(R)) = lenA - lenB
-         */
-
-        __fmpz_mod_poly_divrem_divconquer(q2, R, 
-                                          A, lenA - lenB, B, lenB, invB, p);
-
-        _fmpz_mod_poly_sub(R + lenA - lenB, 
-                           A + lenA - lenB, lenB, d1q1 + lenB - 1, lenB, p);
-
-        /*
-           We have Q = q1 * x^shift + q2; Q has length lenB + shift; 
-           note q2 has length shift since the above division is 
-           lenA - lenB by lenB
-
-           We've also written the remainder in place
-         */
-    }
     else  /* lenA = 2 * lenB - 1 */
     {
         fmpz * W = _fmpz_vec_init(lenA);
@@ -157,16 +100,29 @@ void _fmpz_mod_poly_divrem_divconquer(fmpz *Q, fmpz *R,
     }
     else  /* lenA > 2 * lenB - 1 */
     {
-        fmpz *S, *T;
+        long shift, n = 2 * lenB - 1;
+        fmpz *QB, *W;
 
-        S = _fmpz_vec_init(2 * lenA + 2 * (2 * lenB - 1));
-        T = S + lenA;
-        _fmpz_vec_set(S, A, lenA);
+        _fmpz_vec_set(R, A, lenA);
+        W = _fmpz_vec_init(2 * n);
+        QB = W + n;
 
-        __fmpz_mod_poly_divrem_divconquer(Q, T, S, lenA, B, lenB, invB, p);
+        while (lenA >= n)
+        {
+            shift = lenA - n;
+            _fmpz_mod_poly_divrem_divconquer_recursive(Q + shift, QB,
+                W, R + shift, B, lenB, invB, p);
+            _fmpz_mod_poly_sub(R + shift, R + shift, n, QB, n, p);
+            lenA -= lenB;
+        }
 
-        _fmpz_vec_set(R, T, lenB - 1);
-        _fmpz_vec_clear(S, 2 * lenA + 2 * (2 * lenB - 1));
+        if (lenA >= lenB)
+        {
+            __fmpz_mod_poly_divrem_divconquer(Q, W, R, lenA, B, lenB, invB, p);
+            _fmpz_vec_swap(W, R, lenA);
+        }
+
+        _fmpz_vec_clear(W, 2 * n);
     }
 }
 
