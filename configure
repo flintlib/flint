@@ -35,50 +35,52 @@ usage()
    echo "     ABI=[32|64]        Tell the compiler to use given ABI"
 }
 
-until [ -z "$1" ]; do
-   case $1 in
-      "-h") usage
+while [ "$1" != "" ]; do
+   PARAM=`echo $1 | awk -F= '{print $1}'`
+   VALUE=`echo $1 | awk -F= '{print $2}'`
+   case $PARAM in
+      -h) usage
          exit 0
          ;;
-      "--with-mpir="*)
-         MPIR_DIR=`expr substr "$1" 13 length "$1"`
+      --with-mpir)
+         MPIR_DIR=$VALUE
          ;;
-      "--with-mpfr="*)
-         MPFR_DIR=`expr substr "$1" 13 length "$1"`
+      --with-mpfr)
+         MPFR_DIR=$VALUE
          ;;
-      "--with-ntl="*)
-         NTL_DIR=`expr substr "$1" 12 length "$1"`
+      --with-ntl)
+         NTL_DIR=$VALUE
          WANT_NTL=1
          ;;
-      "--build="*)
-         BUILD=`expr substr "$1" 9 length "$1"`
+      --build)
+         BUILD=$VALUE
          ;;
-      "--prefix="*)
-         PREFIX=`expr substr "$1" 10 length "$1"`
+      --prefix)
+         PREFIX=$VALUE
          ;;
-      "--disable-shared")
+      --disable-shared)
          SHARED=0
          ;;
-      "--disable-static")
+      --disable-static)
          STATIC=0
          ;;
-      "--reentrant")
+      --reentrant)
          REENTRANT=1
          ;;
-      "--single")
+      --single)
          REENTRANT=0
          ;;
-      "AR="*)
-         AR=`expr substr "$1" 4 length "$1"`
+      AR)
+         AR=$VALUE
          ;;
-      "CC="*)
-         CC=`expr substr "$1" 4 length "$1"`
+      CC)
+         CC=$VALUE
          ;;
-      "CFLAGS="*)
-         CFLAGS=`expr substr "$1" 8 length "$1"`
+      CFLAGS)
+         CFLAGS=$VALUE
          ;;
-      "ABI="*)
-         ABI=`expr substr "$1" 5 length "$1"`
+      ABI)
+         ABI=$VALUE
          ;;
       *) usage
          exit 1
