@@ -243,6 +243,16 @@ if [ -z "$FLINT_TUNE" ]; then
    fi
 fi
 
+# defaults for CC and CXX
+
+if [ -z "$CC" ]; then
+   CC=gcc
+fi
+
+if [ -z "$CXX" ]; then
+   CXX=g++
+fi
+
 # Test for popcnt flag and set needed CFLAGS
 
 mkdir -p build
@@ -279,14 +289,6 @@ fi
 
 if [ -z "$CFLAGS" ]; then
    CFLAGS="-O2 -g -ansi -pedantic -Wall $POPCNT_FLAG $ABI_FLAG"
-fi
-
-if [ -z "$CC" ]; then
-   CC=gcc
-fi
-
-if [ -z "$CXX" ]; then
-   CXX=g++
 fi
 
 #add tuning parameters to CFLAGS
