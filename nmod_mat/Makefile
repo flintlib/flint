@@ -22,7 +22,7 @@ all: $(OBJS)
 
 library: $(LIB_OBJS)
 
-profile:
+profile: $(PROF_SOURCES)
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
         
 tune: $(TUNE_SOURCES)
