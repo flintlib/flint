@@ -74,13 +74,13 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
 
     /* Compute powers */
     pows = flint_calloc(n + 1, sizeof(mp_limb_t));
-    pows[0] = n_powmod2_preinv(0, n, mod.n, mod.ninv);
-    pows[1] = n_powmod2_preinv(1, n, mod.n, mod.ninv);
+    pows[0] = n_powmod2_ui_preinv(0, n, mod.n, mod.ninv);
+    pows[1] = n_powmod2_ui_preinv(1, n, mod.n, mod.ninv);
 
     for (i = 2; i <= n; i++)
     {
         if (pows[i] == 0)
-            pows[i] = n_powmod2_preinv(i, n, mod.n, mod.ninv);
+            pows[i] = n_powmod2_ui_preinv(i, n, mod.n, mod.ninv);
 
         for (j = 2; j <= i && i * j <= n; j++)
             if (pows[i * j] == 0)

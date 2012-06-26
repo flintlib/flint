@@ -57,7 +57,7 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
     }
 
     lenr = A->length;
-    if (R == B)
+    if (R == B || R == A)
         r = _fmpz_vec_init(lenr);
     else
     {
@@ -71,7 +71,7 @@ void fmpz_poly_pseudo_rem(fmpz_poly_t R, ulong * d, const fmpz_poly_t A,
     for (lenr = B->length - 2; (lenr >= 0) && !r[lenr]; lenr--) ;
     lenr++;
 
-    if (R == B)
+    if (R == B || R == A)
     {
         _fmpz_vec_clear(R->coeffs, R->alloc);
         R->coeffs = r;
