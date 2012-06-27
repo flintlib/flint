@@ -56,19 +56,19 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
@@ -89,19 +89,19 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
@@ -122,13 +122,13 @@ int main(void)
 
     ctx->mode = PADIC_TERSE;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
     str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
