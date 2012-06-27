@@ -18,6 +18,8 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
+.SECONDARY:
+
 all: $(OBJS)
 
 library: $(LIB_OBJS)
@@ -37,7 +39,7 @@ $(BUILD_DIR)/%.lo: %.c
 clean:
 	rm -rf $(BUILD_DIR)	
 
-check: $(TESTS_RUN)
+check: $(TESTS) $(TESTS_RUN)
 
 %_RUN: %
 	@$<
