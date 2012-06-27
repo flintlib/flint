@@ -146,5 +146,5 @@ build/%.o: %.c | build
 build:
 	mkdir -p build
 
-.PHONY: profile library clean check all
+.PHONY: profile library clean examples tune check distclean dist install all
 
