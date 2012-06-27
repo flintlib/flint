@@ -203,8 +203,6 @@ case $ARCH in
       MACHINE="unknown";;
 esac
 
-echo "Configuring...${MACHINE}-${OS}"
-
 #no shared library on mingw or cygwin
 
 if [ "$OS" = "MINGW32" ]; then
@@ -215,6 +213,25 @@ if [ "$OS" = "CYGWIN" ]; then
    SHARED=0
 fi
 
+#ABI flag
+if [ "$ABI" = "32" ]; then
+   ABI_FLAG="-m32"
+   case $MACHINE in
+      x86_64)
+         MACHINE="x86";;
+      sparc64)
+         MACHINE="sparc";;
+      ppc64)
+         MACHINE="ppc";;
+      *)
+         ;;
+   esac
+elif [ "$ABI" = "64" ]; then
+   ABI_FLAG="-m64"
+fi
+
+echo "Configuring...${MACHINE}-${OS}"
+
 #select fft_tuning parameters
 
 case $MACHINE in
@@ -223,13 +240,6 @@ case $MACHINE in
    *)
       cp fft_tuning32.in fft_tuning.h;;
 esac
-
-#ABI flag
-if [ "$ABI" = "32" ]; then
-   ABI_FLAG="-m32"
-elif [ "$ABI" = "64" ]; then
-   ABI_FLAG="-m64"
-fi
 
 #various tuning parameters
 
