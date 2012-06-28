@@ -306,48 +306,41 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
 }
 
 void
-fmpz_poly_gcd_modular(fmpz_poly_t res,
-                           const fmpz_poly_t poly1, const fmpz_poly_t poly2)
+fmpz_poly_gcd_modular(fmpz_poly_t res, const fmpz_poly_t poly1,
+              const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long rlen;
-    
-    if (len1 == 0)
+    if (poly1->length < poly2->length)
     {
-        if (len2 == 0)
-            fmpz_poly_zero(res);
-        else
+        fmpz_poly_gcd_modular(res, poly2, poly1);
+    }
+    else /* len1 >= len2 >= 0 */
+    {
+        const long len1 = poly1->length;
+        const long len2 = poly2->length;
+        
+        if (len1 == 0) /* len1 = len2 = 0 */
         {
-            if (fmpz_sgn(poly2->coeffs + (len2 - 1)) > 0)
-                fmpz_poly_set(res, poly2);
+            fmpz_poly_zero(res);
+        } 
+        else if (len2 == 0) /* len1 >= len2 = 0 */
+        {
+            if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
+                fmpz_poly_set(res, poly1);
             else
-                fmpz_poly_neg(res, poly2);
+                fmpz_poly_neg(res, poly1);
         }
-
-        return;
-    }
-    else if (len2 == 0)
-    {
-        if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
-            fmpz_poly_set(res, poly1);
-        else
-            fmpz_poly_neg(res, poly1);
-
-        return;
-    }
-
-    rlen = FLINT_MIN(len1, len2);
-
-    /* underscore function automatically takes care of aliasing */
-    fmpz_poly_fit_length(res, rlen);
-
-    if (len1 >= len2)
-        _fmpz_poly_gcd_modular(res->coeffs, poly1->coeffs, len1,
+        else /* len1 >= len2 >= 1 */
+        {
+            /* underscore function automatically aliases */
+            fmpz_poly_fit_length(res, len2);
+                
+            _fmpz_poly_gcd_modular(res->coeffs, poly1->coeffs, len1,
                                     poly2->coeffs, len2);
-    else
-     _fmpz_poly_gcd_modular(res->coeffs, poly2->coeffs, len2,
-                                    poly1->coeffs, len1);
-    _fmpz_poly_set_length(res, rlen);
-    _fmpz_poly_normalise(res);
+     
+    
+            _fmpz_poly_set_length(res, len2);
+            _fmpz_poly_normalise(res);
+        }
+    }
 }
+
