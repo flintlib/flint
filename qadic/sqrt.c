@@ -38,6 +38,61 @@
     Does not support aliasing.
  */
 
+static void _find_nonresidue(fmpz *rop, 
+                             const fmpz *a, const long *j, long lena, 
+                             const fmpz_t p)
+{
+    const long d = j[lena - 1];
+
+    fmpz *w;
+    fmpz_t pm1, z;
+    long i;
+
+    w = _fmpz_vec_init(2 * d - 1);
+    fmpz_init(pm1);
+    fmpz_init(z);
+
+    fmpz_sub_ui(pm1, p, 1);
+    fmpz_pow_ui(z, p, d);
+    fmpz_sub_ui(z, z, 1);
+    fmpz_fdiv_q_2exp(z, z, 1);
+
+    /*
+        Find a non-residue g; 
+        uses stack-based depth first traversal starting from [0,...,0,1]
+     */
+    _fmpz_vec_zero(rop, d);
+    fmpz_one(rop + (d - 1));
+
+    for (i = d; i > 0; )
+    {
+        if (i == d)
+        {
+            /* Consider this element, g^{(q-1)/2} == -1 ? */
+            _qadic_pow(w, rop, d, z, a, j, lena, p);
+            if (fmpz_equal(w + 0, pm1))
+                break;
+
+            /* Backtrace, find the next element */
+            for (i--; i >= 0 && fmpz_equal(rop + i, pm1); i--) ;
+            if (i >= 0)
+            {
+                fmpz_add_ui(rop + i, rop + i, 1);
+                i++;
+            }
+        }
+        else
+        {
+            _fmpz_vec_zero(rop + i, d - i);
+            i = d;
+        }
+    }
+
+    _fmpz_vec_clear(w, 2 * d - 1);
+    fmpz_clear(pm1);
+    fmpz_clear(z);
+}
+
 static int 
 _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len, 
                          const fmpz *a, const long *j, long lena, 
@@ -125,39 +180,8 @@ _fmpz_mod_poly_sqrtmod_p(fmpz *rop, const fmpz *op, long len,
         if (!ans)
             goto exit;
 
-        /*
-            Find a non-residue g; 
-            uses stack-based depth first traversal starting from [0,...,0,1]
-         */
-        fmpz_fdiv_q_2exp(z, qm1, 1);
-        {
-            fmpz_one(g + (d - 1));
-            i = d;
-
-            while (i > 0)
-            {
-                if (i == d)
-                {
-                    /* Consider this element, g^{(q-1)/2} == -1 ? */
-                    _qadic_pow(w, g, d, z, a, j, lena, p);
-                    if (fmpz_equal(w + 0, pm1))
-                        break;
-
-                    /* Backtrace, find the next element */
-                    for (i--; i >= 0 && fmpz_equal(g + i, pm1); i--) ;
-                    if (i >= 0)
-                    {
-                        fmpz_add_ui(g + i, g + i, 1);
-                        i++;
-                    }
-                }
-                else
-                {
-                    _fmpz_vec_zero(g + i, d - i);
-                    i = d;
-                }
-            }
-        }
+        /* Find a non-residue g */
+        _find_nonresidue(g, a, j, lena, p);
 
         /* Write q - 1 = 2^s t */
         for (s = 0, fmpz_set(t, qm1); fmpz_is_even(t); s++)
