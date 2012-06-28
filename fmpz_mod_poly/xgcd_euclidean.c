@@ -191,20 +191,20 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
             }
             if (S == A || S == B)
             {
-                s = _fmpz_vec_init(lenB - 1);
+                s = _fmpz_vec_init(lenB);
             }
             else
             {
-                fmpz_mod_poly_fit_length(S, lenB - 1);
+                fmpz_mod_poly_fit_length(S, lenB);
                 s = S->coeffs;
             }
             if (T == A || T == B)
             {
-                t = _fmpz_vec_init(lenA - 1);
+                t = _fmpz_vec_init(lenA);
             }
             else
             {
-                fmpz_mod_poly_fit_length(T, lenA - 1);
+                fmpz_mod_poly_fit_length(T, lenA);
                 t = T->coeffs;
             }
 
@@ -231,13 +231,13 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
             {
                 _fmpz_vec_clear(S->coeffs, S->alloc);
                 S->coeffs = s;
-                S->alloc  = lenB - 1;
+                S->alloc  = lenB;
             }
             if (T == A || T == B)
             {
                 _fmpz_vec_clear(T->coeffs, T->alloc);
                 T->coeffs = t;
-                T->alloc  = lenA - 1;
+                T->alloc  = lenA;
             }
 
             _fmpz_mod_poly_set_length(G, lenG);
