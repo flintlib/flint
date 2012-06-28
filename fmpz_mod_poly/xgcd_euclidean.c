@@ -167,14 +167,6 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
             fmpz_mod_poly_zero(T);
             fmpz_mod_poly_set_fmpz(S, inv);
         }
-        else if (lenB == 1)  /* lenA >= lenB = 1 */
-        {
-            fmpz_mod_poly_set_ui(G, 1);
-            fmpz_mod_poly_zero(S);
-            fmpz_mod_poly_fit_length(T, 1);
-            _fmpz_mod_poly_set_length(T, 1);
-            fmpz_invmod(T->coeffs, B->coeffs, &A->p);
-        }
         else  /* lenA >= lenB >= 2 */
         {
             fmpz *g, *s, *t;
