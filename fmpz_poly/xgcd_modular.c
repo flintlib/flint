@@ -176,62 +176,65 @@ void
 fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
                        const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    fmpz *S, *T;
-    fmpz_poly_t temp1, temp2;
+    if (poly1->length < poly2->length)
+    {
+        fmpz_poly_xgcd_modular(r, t, s, poly2, poly1);
+    } else /* len1 >= len2 >= 0 */
+    {
+        const long len1 = poly1->length;
+        const long len2 = poly2->length;
+        fmpz *S, *T;
+        fmpz_poly_t temp1, temp2;
 
-    if (len1 == 0 || len2 == 0)
-    {
-        fmpz_zero(r);
-        return;
-    }
-
-    if (s == poly1 || s == poly2)
-    {
-       fmpz_poly_init2(temp1, len2);
-       S = temp1->coeffs;
-    }
-    else
-    {
-       fmpz_poly_fit_length(s, len2);
-       S = s->coeffs;
-    }
+        if (len1 == 0 || len2 == 0) 
+        {
+            fmpz_zero(r);
+        } 
+        else /* len1 >= len2 >= 1 */
+        {
+            if (s == poly1 || s == poly2)
+            {
+                fmpz_poly_init2(temp1, len2);
+                S = temp1->coeffs;
+            }
+            else
+            {
+                fmpz_poly_fit_length(s, len2);
+                S = s->coeffs;
+            }
     
-    if (t == poly1 || t == poly2)
-    {
-       fmpz_poly_init2(temp2, len1);
-       T = temp2->coeffs;
-    }
-    else
-    {
-       fmpz_poly_fit_length(t, len1);
-       T = t->coeffs;
-    }
-    
-    if (len1 >= len2)
-       _fmpz_poly_xgcd_modular(r, S, T, poly1->coeffs, len1,
+            if (t == poly1 || t == poly2)
+            {
+                fmpz_poly_init2(temp2, len1);
+                T = temp2->coeffs;
+            }
+            else
+            {
+                fmpz_poly_fit_length(t, len1);
+                T = t->coeffs;
+            }
+     
+            _fmpz_poly_xgcd_modular(r, S, T, poly1->coeffs, len1,
                                         poly2->coeffs, len2);
-    else
-       _fmpz_poly_xgcd_modular(r, T, S, poly2->coeffs, len2,
-                                        poly1->coeffs, len1);
+            
+            if (s == poly1 || s == poly2)
+            {
+                fmpz_poly_swap(s, temp1);
+                fmpz_poly_clear(temp1);
+            }
 
-    if (s == poly1 || s == poly2)
-    {
-       fmpz_poly_swap(s, temp1);
-       fmpz_poly_clear(temp1);
+            if (t == poly1 || t == poly2)
+            {
+                fmpz_poly_swap(t, temp2);
+                fmpz_poly_clear(temp2);
+            }
+ 
+            _fmpz_poly_set_length(s, len2);
+            _fmpz_poly_normalise(s);
+ 
+            _fmpz_poly_set_length(t, len1);
+            _fmpz_poly_normalise(t);
+        }
     }
-
-    if (t == poly1 || t == poly2)
-    {
-       fmpz_poly_swap(t, temp2);
-       fmpz_poly_clear(temp2);
-    }
-
-    _fmpz_poly_set_length(s, len2);
-    _fmpz_poly_normalise(s);
-
-    _fmpz_poly_set_length(t, len1);
-    _fmpz_poly_normalise(t);
 }
 
