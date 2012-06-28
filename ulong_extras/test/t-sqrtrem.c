@@ -79,8 +79,8 @@ int main(void)
       mpz_init(r2_m);
       mpz_init(s2_m);
       
-      bits = n_randint(state, 33);
-      a = n_randbits(state, bits);
+      bits = n_randint(state, FLINT_BITS/2 + 1);
+      a = n_randtest_bits(state, bits);
       a = a*a;
       a += (n_randint(state, 100) - 50);
       s1 = n_sqrtrem(&r1, a);

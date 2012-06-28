@@ -43,9 +43,8 @@ int main(void)
       mp_limb_t d, n, r1, r2;
       double dpre;
 
-      d = n_randtest(state);
-      if (d == 0UL) d++;
-  
+      d = n_randtest_not_zero(state);
+      
       n = n_randtest(state);
       
       dpre = n_precompute_inverse(d);

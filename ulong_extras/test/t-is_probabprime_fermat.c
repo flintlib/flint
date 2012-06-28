@@ -57,7 +57,7 @@ int main(void)
 
       do
       {
-         j = n_randint(state, d);
+         j = n_randtest(state) % d;
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -78,14 +78,14 @@ int main(void)
 
       do
       {
-         d = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         d = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
          if (d < 2UL) d = 2;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       do
       {
-         j = n_randint(state, d);
+         j = n_randtest(state) % d;
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 

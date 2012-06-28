@@ -44,7 +44,7 @@ int main(void)
 
       do
       {
-         n1 = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
       } while (n_is_prime(n1) || (n1 < 2UL)
 #if FLINT64 /* cannot compute enough primes */
          || (n1 >= 10000000000000000UL)
@@ -72,8 +72,8 @@ int main(void)
       limit = 65535UL;
 #endif
 
-      n1 = n_randint(state, limit + 1);
-      n2 = n_randint(state, limit + 1);
+      n1 = n_randtest(state) % (limit + 1);
+      n2 = n_randtest(state) % (limit + 1);
       
       n1 = n_nextprime(n1, 1);
       n2 = n_nextprime(n2, 1);

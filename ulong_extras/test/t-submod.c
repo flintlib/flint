@@ -43,9 +43,9 @@ int main(void)
    {
       mp_limb_t a, b, d, r1, r2, s1;
       
-      d = n_randtest(state);
-      a = n_randint(state, d);
-      b = n_randint(state, d);
+      d = n_randtest_not_zero(state);
+      a = n_randtest(state)%d;
+      b = n_randtest(state)%d;
       
       r1 = n_submod(a, b, d);
 

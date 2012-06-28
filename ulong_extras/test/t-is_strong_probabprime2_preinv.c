@@ -59,7 +59,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(state, d);
+         do a = n_randtest(state) % d;
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -94,7 +94,7 @@ int main(void)
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(state, d);
+         do a = n_randtest(state) % d;
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -107,7 +107,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 2000) 
+   if (count > 2200) 
    {
       printf("FAIL:\n");
       printf("count = %lu\n", count);

@@ -45,7 +45,7 @@ int main(void)
 
       do
       {
-         n1 = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
       } while (n_is_prime(n1) || (n1 < 2UL));
 
 #if FLINT64
