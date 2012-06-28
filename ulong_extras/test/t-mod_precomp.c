@@ -45,8 +45,8 @@ int main(void)
       double dpre;
 
       bits = n_randint(state, FLINT_D_BITS) + 1;
-      d = n_randbits(state, bits);
-      if (bits <= (FLINT_BITS/2)) n = n_randint(state, d*d);
+      d = n_randtest_bits(state, bits);
+      if (bits <= (FLINT_BITS/2)) n = n_randtest(state) % (d*d);
       else n = n_randtest(state);
 
       /* must have n < 2^(FLINT_BITS - 1) */

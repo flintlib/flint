@@ -44,8 +44,8 @@ int main(void)
       mp_limb_t a, s, bits;
       
       bits = n_randint(state, FLINT_BITS/2) + 1;
-      a = n_randbits(state, bits);
-      s = a*a + n_randint(state, 2*a) + 1;
+      a = n_randtest_bits(state, bits);
+      s = a*a + n_randtest(state) % (2*a) + 1;
 
       result = !n_is_square(s);
       if (!result)
@@ -61,7 +61,7 @@ int main(void)
       mp_limb_t a, s, bits;
       
       bits = n_randint(state, FLINT_BITS/2);
-      a = n_randbits(state, bits);
+      a = n_randtest_bits(state, bits);
       s = a*a;
 
       result = n_is_square(s);

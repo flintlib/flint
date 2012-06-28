@@ -44,7 +44,7 @@ int main(void)
         mp_limb_t a, b, p, pinv;
 
         p = n_randtest_prime(state, 0);
-        a = n_randint(state, p);
+        a = n_randtest(state) % p;
 
         b = n_sqrtmod(a, p);
         pinv = n_preinvert_limb(p);
@@ -67,7 +67,7 @@ int main(void)
         p = n_randtest_prime(state, 0);
 
         do 
-            b = n_randint(state, p);
+            b = n_randtest(state) % p;
         while (b == 0);
 
         pinv = n_preinvert_limb(p);

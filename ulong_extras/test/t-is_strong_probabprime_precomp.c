@@ -108,7 +108,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 2000) 
+   if (count > 2200) 
    {
       printf("FAIL:\n");
       printf("count = %lu\n", count);
