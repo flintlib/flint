@@ -140,116 +140,109 @@ void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG,
 void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T, 
                     const fmpq_poly_t A, const fmpq_poly_t B)
 {
-    long lenA = A->length, lenB = B->length, lenG = FLINT_MIN(lenA, lenB);
-
     if (G == S || G == T || S == T)
     {
         printf("Exception (fmpq_poly_xgcd).  Output arguments aliased.\n");
         abort();
     }
 
-    /* Aliasing */
-    if (G == A || G == B)
+    if (A->length < B->length)
     {
-        fmpq_poly_t tG;
-
-        fmpq_poly_init2(tG, lenG);
-        fmpq_poly_xgcd(tG, S, T, A, B);
-        fmpq_poly_swap(tG, G);
-        fmpq_poly_clear(tG);
-        return;
-    }
-    if (S == A || S == B)
+       fmpq_poly_xgcd(G, T, S, B, A);
+    } else
     {
-        fmpq_poly_t tS;
+       long lenA = A->length, lenB = B->length, lenG = lenB;
 
-        fmpq_poly_init2(tS, lenB);
-        fmpq_poly_xgcd(G, tS, T, A, B);
-        fmpq_poly_swap(tS, S);
-        fmpq_poly_clear(tS);
-        return;
+       if (lenA == 0)  /* lenA = lenB = 0 */
+       {
+           fmpq_poly_zero(G);
+           fmpq_poly_zero(S);
+           fmpq_poly_zero(T);
+       }
+       else if (lenB == 0)  /* lenA > lenB = 0 */
+       {
+           fmpq_poly_make_monic(G, A);
+           fmpq_poly_zero(T);
+           fmpq_poly_fit_length(S, 1);
+           _fmpq_poly_set_length(S, 1);
+           if (fmpz_sgn(A->coeffs + (lenA - 1)) > 0)
+           {
+              fmpz_set(S->coeffs, A->den);
+              fmpz_set(S->den, A->coeffs + (lenA - 1));
+           }
+           else
+           {
+              fmpz_neg(S->coeffs, A->den);
+              fmpz_neg(S->den, A->coeffs + (lenA - 1));
+           }
+           fmpq_poly_canonicalise(S);
+       }
+       else if (lenB == 1) /* lenA >= lenB = 1 */
+       {
+           fmpq_poly_set_ui(G, 1);
+           fmpq_poly_zero(S);
+           fmpq_poly_fit_length(T, 1);
+           _fmpq_poly_set_length(T, 1);
+           if (fmpz_sgn(B->coeffs) > 0)
+           {
+               fmpz_set(T->coeffs, B->den);
+               fmpz_set(T->den, B->coeffs);
+           }
+           else
+           {
+               fmpz_neg(T->coeffs, B->den);
+               fmpz_neg(T->den, B->coeffs);
+           }
+       }
+       else /* lenA >= lenB >= 2 */
+       {
+           /* Aliasing */
+           if (G == A || G == B)
+           {
+               fmpq_poly_t tG;
+
+               fmpq_poly_init2(tG, lenG);
+               fmpq_poly_xgcd(tG, S, T, A, B);
+               fmpq_poly_swap(tG, G);
+               fmpq_poly_clear(tG);
+           } 
+           else if (S == A || S == B)
+           {
+               fmpq_poly_t tS;
+
+               fmpq_poly_init2(tS, lenB);
+               fmpq_poly_xgcd(G, tS, T, A, B);
+               fmpq_poly_swap(tS, S);
+               fmpq_poly_clear(tS);
+           }
+           else if (T == A || T == B)
+           {
+               fmpq_poly_t tT;
+
+               fmpq_poly_init2(tT, lenA);
+               fmpq_poly_xgcd(G, S, tT, A, B);
+               fmpq_poly_swap(tT, T);
+               fmpq_poly_clear(tT);
+           }
+           else /* no aliasing */
+           {
+
+               fmpq_poly_fit_length(G, lenG);
+               fmpq_poly_fit_length(S, lenB);
+               fmpq_poly_fit_length(T, lenA);
+
+               _fmpq_poly_xgcd(G->coeffs, G->den, S->coeffs, S->den, T->coeffs, T->den, 
+                    A->coeffs, A->den, lenA, B->coeffs, B->den, lenB);
+               
+               _fmpq_poly_set_length(G, lenG);
+               _fmpq_poly_set_length(S, lenB);
+               _fmpq_poly_set_length(T, lenA);
+
+               _fmpq_poly_normalise(G);
+               _fmpq_poly_normalise(S);
+               _fmpq_poly_normalise(T);
+           }
+       }
     }
-    if (T == A || T == B)
-    {
-        fmpq_poly_t tT;
-
-        fmpq_poly_init2(tT, lenA);
-        fmpq_poly_xgcd(G, S, tT, A, B);
-        fmpq_poly_swap(tT, T);
-        fmpq_poly_clear(tT);
-        return;
-    }
-
-    /* Corner cases */
-    if (lenA == 0)
-    {
-        if (lenB == 0)  /* A == B == 0 */
-        {
-            fmpq_poly_zero(G);
-            fmpq_poly_zero(S);
-            fmpq_poly_zero(T);
-        }
-        else  /* A == 0, B != 0 */
-        {
-            fmpq_poly_make_monic(G, B);
-            fmpq_poly_zero(S);
-            fmpq_poly_fit_length(T, 1);
-            _fmpq_poly_set_length(T, 1);
-            if (fmpz_sgn(B->coeffs + (lenB - 1)) > 0)
-            {
-                fmpz_set(T->coeffs, B->den);
-                fmpz_set(T->den, B->coeffs + (lenB - 1));
-            }
-            else
-            {
-                fmpz_neg(T->coeffs, B->den);
-                fmpz_neg(T->den, B->coeffs + (lenB - 1));
-            }
-            fmpq_poly_canonicalise(T);
-        }
-        return;
-    }
-    else if (lenB == 0)  /* A != 0, B == 0 */
-    {
-        fmpq_poly_make_monic(G, A);
-        fmpq_poly_zero(T);
-        fmpq_poly_fit_length(S, 1);
-        _fmpq_poly_set_length(S, 1);
-        if (fmpz_sgn(A->coeffs + (lenA - 1)) > 0)
-        {
-            fmpz_set(S->coeffs, A->den);
-            fmpz_set(S->den, A->coeffs + (lenA - 1));
-        }
-        else
-        {
-            fmpz_neg(S->coeffs, A->den);
-            fmpz_neg(S->den, A->coeffs + (lenA - 1));
-        }
-        fmpq_poly_canonicalise(S);
-        return;
-    }
-
-    fmpq_poly_fit_length(G, lenG);
-    fmpq_poly_fit_length(S, lenB);
-    fmpq_poly_fit_length(T, lenA);
-
-    if (lenA >= lenB)
-    {
-        _fmpq_poly_xgcd(G->coeffs, G->den, S->coeffs, S->den, T->coeffs, T->den, 
-                        A->coeffs, A->den, lenA, B->coeffs, B->den, lenB);
-    }
-    else
-    {
-        _fmpq_poly_xgcd(G->coeffs, G->den, T->coeffs, T->den, S->coeffs, S->den, 
-                        B->coeffs, B->den, lenB, A->coeffs, A->den, lenA);
-    }
-
-    _fmpq_poly_set_length(G, lenG);
-    _fmpq_poly_set_length(S, lenB);
-    _fmpq_poly_set_length(T, lenA);
-
-    _fmpq_poly_normalise(G);
-    _fmpq_poly_normalise(S);
-    _fmpq_poly_normalise(T);
 }
 
