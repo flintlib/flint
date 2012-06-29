@@ -107,7 +107,7 @@ library: $(FLINT_LIB)
 build/interfaces:
 	mkdir -p build/interfaces
 
-check: tests 
+check: $(TESTS) 
 ifndef MOD
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
@@ -132,8 +132,6 @@ install: $(FLINT_LIB)
 	cp *.h $(PREFIX)/include/flint
 	mkdir -p $(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(FLINT_CPIMPORT_DIR)
-
-tests: $(TESTS)
 
 build/test/%: test/%.c $(FLINT_LIB) | build/test
 	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
