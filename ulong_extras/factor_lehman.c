@@ -57,8 +57,9 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
 
     for (k = 1; k <= cuberoot + 1; k++)
     {
-        mp_limb_t x = (mp_limb_t) ceil(2.0*sqrt((double) k)*sqrt((double) n));
-        mp_limb_t end = x + (mp_limb_t) floor(1.0 + pow(n, 1.0/6.0)/((double) 4.0*sqrt((double) k))) + 1;
+        double low = 2.0*sqrt((double) k)*sqrt((double) n);
+        mp_limb_t x = (mp_limb_t) ceil(low - 0.0001);
+        mp_limb_t end = (mp_limb_t) floor(0.0001 + low + pow(n, 1.0/6.0)/((double) 4.0*sqrt((double) k)));
         mp_limb_t sub = k*n*4;
 
         for ( ; x <= end; x++)
