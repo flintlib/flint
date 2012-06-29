@@ -147,7 +147,7 @@ fmpz_poly_gcd_subresultant(fmpz_poly_t res, const fmpz_poly_t poly1,
         {
             fmpz_poly_zero(res);
         } 
-        else if (len2 == 0) /* len1 >= len2 = 0 */
+        else if (len2 == 0) /* len1 > len2 = 0 */
         {
             if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
                 fmpz_poly_set(res, poly1);

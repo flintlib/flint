@@ -54,7 +54,7 @@ void nmod_poly_gcd(nmod_poly_t G,
         {
             nmod_poly_zero(G);
         } 
-        else if (lenB == 0) /* lenA >= lenB = 0 */
+        else if (lenB == 0) /* lenA > lenB = 0 */
         {
             nmod_poly_make_monic(G, A);
         }

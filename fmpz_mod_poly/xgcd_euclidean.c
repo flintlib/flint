@@ -200,18 +200,9 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
                 t = T->coeffs;
             }
 
-            if (lenA >= lenB)
-            {
-                fmpz_invmod(inv, fmpz_mod_poly_lead(B), &B->p);
-                lenG = _fmpz_mod_poly_xgcd_euclidean(g, s, t, 
-                    A->coeffs, lenA, B->coeffs, lenB, inv, &B->p);
-            }
-            else
-            {
-                fmpz_invmod(inv, fmpz_mod_poly_lead(A), &A->p);
-                lenG = _fmpz_mod_poly_xgcd_euclidean(g, t, s, 
-                    B->coeffs, lenB, A->coeffs, lenA, inv, &A->p);
-            }
+            fmpz_invmod(inv, fmpz_mod_poly_lead(B), &B->p);
+            lenG = _fmpz_mod_poly_xgcd_euclidean(g, s, t, 
+                 A->coeffs, lenA, B->coeffs, lenB, inv, &B->p);
 
             if (G == A || G == B)
             {
