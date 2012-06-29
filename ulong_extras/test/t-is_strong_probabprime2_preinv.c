@@ -107,7 +107,11 @@ int main(void)
       mpz_clear(d_m);
    }
 
+#if FLINT64
    if (count > 2200) 
+#else
+   if (count > 4300)
+#endif
    {
       printf("FAIL:\n");
       printf("count = %lu\n", count);
