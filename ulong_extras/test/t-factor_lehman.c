@@ -78,6 +78,15 @@ int main(void)
       n1 = n_nextprime(n1, 1);
       n2 = n_nextprime(n2, 1);
 
+      /* test a specific bug */
+#if FLINT64
+      if (i == 0)
+      {
+           n1 = 72528697;
+           n2 = 73339073;
+      }
+#endif
+
       n = n1*n2;
 
       n3 = n_factor_lehman(n);
