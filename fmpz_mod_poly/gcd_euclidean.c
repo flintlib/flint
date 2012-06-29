@@ -108,11 +108,11 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
         {
             fmpz_mod_poly_zero(G);
         } 
-        else if (lenB == 0)
+        else if (lenB == 0) /* lenA > lenB = 0 */
         {
             fmpz_mod_poly_make_monic(G, A);
         }
-        else
+        else /* lenA >= lenB >= 1 */
         {
             fmpz_t invB;
 
