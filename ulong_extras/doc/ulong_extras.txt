@@ -150,8 +150,8 @@ int n_sizeinbase(mp_limb_t n, int base)
 mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
-    by \code{n_precompute_inverse()}. We require $n < 2^{53}$ and 
-    \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
+    by \code{n_precompute_inverse()}. We require \code{n < 2^FLINT_D_BITS}
+    and \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
@@ -260,14 +260,14 @@ mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi,
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
-    and $0 \leq a, b < n$.
+    computed by \code{n_precompute_inverse()}. We require 
+    \code{n < 2^FLINT_D_BITS} and $0 \leq a, b < n$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
     significant bit of which we shall call a place, and can be at most half 
     a place out. The product of $a$ and $b$ is computed with error at most 
-    half a place. When \code{a * b} is multiplied by $n$ we find that the 
+    half a place. When \code{a * b} is multiplied by $ninv$ we find that the 
     exact quotient and computed quotient differ by less than two places. As 
     the quotient is less than $n$ this means that the exact quotient is at 
     most $1$ away from the computed quotient. We truncate this quotient to 
