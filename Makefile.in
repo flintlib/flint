@@ -73,6 +73,10 @@ examples: $(FLINT_LIB) $(EXMP_SOURCES)
 $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interfaces 
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) || exit $$?;) \
+		if [ "$(FLINT_SHARED)" -eq "0" ]; then \
+			touch test/t-*.c \
+			$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
+		fi \
 	fi
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library || exit $$?;) \
@@ -103,7 +107,7 @@ library: $(FLINT_LIB)
 build/interfaces:
 	mkdir -p build/interfaces
 
-check: $(TESTS)
+check: tests 
 ifndef MOD
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
@@ -129,6 +133,8 @@ install: $(FLINT_LIB)
 	mkdir -p $(FLINT_CPIMPORT_DIR)
 	cp qadic/CPimport.txt $(FLINT_CPIMPORT_DIR)
 
+tests: $(TESTS)
+
 build/test/%: test/%.c $(FLINT_LIB) | build/test
 	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
@@ -148,5 +154,5 @@ build/%.o: %.c | build
 build:
 	mkdir -p build
 
-.PHONY: profile library clean examples tune check distclean dist install all
+.PHONY: profile library clean examples tune check distclean dist tests install all
 
