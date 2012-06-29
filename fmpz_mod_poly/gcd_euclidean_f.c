@@ -119,13 +119,12 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
             fmpz_mod_poly_zero(G);
             fmpz_one(f);
         }
-        else if (lenB == 0) /* lenA >= lenB = 0 */
+        else if (lenB == 0) /* lenA > lenB = 0 */
         {
             fmpz_mod_poly_make_monic(G, A);
             fmpz_one(f);
-            return;
         }
-        else
+        else /* lenA >= lenB >= 1 */
         {
             if (G == A || G == B)
             {
