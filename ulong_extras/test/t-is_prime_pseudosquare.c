@@ -40,7 +40,7 @@ int main(void)
    printf("is_prime_pseudosquare....");
    fflush(stdout);
    
-   for (i = 0; i < 10000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
 
@@ -63,7 +63,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 10000; i++) /* Test that composites don't pass */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that composites don't pass */
    {
       mpz_init(d_m);
 

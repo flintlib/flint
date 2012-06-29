@@ -39,7 +39,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++) /* Test random integers */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random integers */
     {
         mp_limb_t a, b, p, pinv;
 
@@ -60,7 +60,7 @@ int main(void)
         }
     }
 
-    for (i = 0; i < 1000; i++) /* Test random squares */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
     {
         mp_limb_t a, b, p, pinv;
 

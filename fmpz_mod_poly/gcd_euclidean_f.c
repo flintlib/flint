@@ -121,8 +121,14 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
         }
         else if (lenB == 0) /* lenA > lenB = 0 */
         {
-            fmpz_mod_poly_make_monic(G, A);
-            fmpz_one(f);
+            fmpz_t invA;
+            fmpz_init(invA);
+            fmpz_gcdinv(f, invA, A->coeffs + lenA - 1, &B->p);
+            if (fmpz_is_one(f))
+                fmpz_mod_poly_scalar_mul_fmpz(G, A, invA);
+            else
+                fmpz_mod_poly_zero(G);
+            fmpz_clear(invA);
         }
         else /* lenA >= lenB >= 1 */
         {

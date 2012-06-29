@@ -39,7 +39,7 @@ int main(void)
 
     flint_randinit(state);
     
-    for (i = 0; i < 10000; i++) /* Test random squares mod n */
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod n */
     {
         mp_limb_t a, b, n, ninv;
         long num, i;
@@ -90,7 +90,7 @@ int main(void)
         flint_free(sqrt);
     }
     
-    for (i = 0; i < 5000; i++) /* test random nonsquares */
+    for (i = 0; i < 500 * flint_test_multiplier(); i++) /* test random nonsquares */
     {
         mp_limb_t a, b, n, ninv;
         mp_bitcnt_t bits;

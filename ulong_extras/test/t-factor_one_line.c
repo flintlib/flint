@@ -40,7 +40,7 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 5000; i++) /* Test random numbers */
+   for (i = 0; i < 500 * flint_test_multiplier(); i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, bits;
       
@@ -70,10 +70,10 @@ int main(void)
       }
    }
    
-   if (count < 4500)
+   if (count < 450 * flint_test_multiplier())
    {
       printf("FAIL:\n");
-      printf("Only %lu of 10000 numbers factored\n", count); 
+      printf("Only %lu numbers factored\n", count);
       abort();
    }
 
