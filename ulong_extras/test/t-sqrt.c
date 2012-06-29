@@ -39,7 +39,7 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, s1, s2;
       mpz_t a_m, s2_m;
@@ -67,7 +67,7 @@ int main(void)
       mpz_clear(s2_m);
    }
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, s1, s2, bits;
       mpz_t a_m, s2_m;

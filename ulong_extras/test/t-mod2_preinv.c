@@ -38,7 +38,7 @@ int main(void)
    printf("mod2_preinv....");
    fflush(stdout);
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d, dinv, n, r1, r2;
 

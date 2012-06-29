@@ -39,7 +39,7 @@ int main(void)
     fflush(stdout);
 
     /* Test random numbers */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         mp_limb_t n1, n2;
         n_factor_t factors;

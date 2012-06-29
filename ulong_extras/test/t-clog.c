@@ -39,7 +39,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         mp_limb_t a = 0, b = 0, k, x;
 

@@ -52,7 +52,7 @@ int main(void)
     printf("nth_prime_bounds....");
     fflush(stdout);
 
-    for (n=6; n<75000; n++)
+    for (n=6; n<7500 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
         check(n, n_nth_prime(n));
     }

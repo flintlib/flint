@@ -39,7 +39,7 @@ int main(void)
    
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++) /* Test that non-squares pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non-squares pass */
    {
       mp_limb_t a, s, bits;
       
@@ -56,7 +56,7 @@ int main(void)
       }
    }
          
-   for (i = 0; i < 100000; i++) /* Test that squares pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that squares pass */
    {
       mp_limb_t a, s, bits;
       

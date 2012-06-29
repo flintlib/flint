@@ -39,7 +39,7 @@ int main(void)
  
    flint_randinit(state);
 
-   for (i = 0; i < 10000; i++) /* Test a^e1 * a^e2 = a^(e1 + e2) */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test a^e1 * a^e2 = a^(e1 + e2) */
    {
       mp_limb_t exp1, exp2, n, bits, r1, r2;
       

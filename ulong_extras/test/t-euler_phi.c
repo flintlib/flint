@@ -35,7 +35,7 @@ int main(void)
     printf("euler_phi....");
     fflush(stdout);
 
-    for (n = 0; n < 200; n++)
+    for (n = 0; n < 20 * flint_test_multiplier(); n++)
     {
         t = 0;
         for (k = 1; k <= n; k++)

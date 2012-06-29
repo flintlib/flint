@@ -52,7 +52,7 @@ int main(void)
     printf("prime_pi_bounds....");
     fflush(stdout);
 
-    for (n=17; n<100000; n++)
+    for (n=17; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
         check(n, n_prime_pi(n));
     }
