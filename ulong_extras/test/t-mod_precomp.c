@@ -62,7 +62,7 @@ int main(void)
       if (!result)
       {
          printf("FAIL:\n");
-         printf("n = %lu, d = %lu, dinv = %f\n", n, d, dpre); 
+         printf("n = %lu, d = %lu, dinv = %g\n", n, d, dpre); 
          printf("r1 = %lu, r2 = %lu\n", r1, r2);
          abort();
       }
