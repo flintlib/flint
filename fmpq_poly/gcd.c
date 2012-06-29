@@ -113,7 +113,7 @@ void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
         {
             fmpq_poly_zero(G);
         }
-        else if (lenB == 0) /* lenA >= lenB = 0 */
+        else if (lenB == 0) /* lenA > lenB = 0 */
         {
             fmpq_poly_make_monic(G, A);
         }
