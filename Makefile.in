@@ -107,7 +107,7 @@ library: $(FLINT_LIB)
 build/interfaces:
 	mkdir -p build/interfaces
 
-check: tests 
+check: $(TESTS) 
 ifndef MOD
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
@@ -130,8 +130,6 @@ install: $(FLINT_LIB)
 		cp libflint.a $(PREFIX)/lib; \
 	fi
 	cp *.h $(PREFIX)/include/flint
-
-tests: $(TESTS)
 
 build/test/%: test/%.c $(FLINT_LIB) | build/test
 	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
