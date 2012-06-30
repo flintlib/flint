@@ -33,6 +33,8 @@
 #include "flint.h"
 #include "fmpz.h"
 
+#if !defined (__WIN32) || defined(__CYGWIN__)
+
 /*
     The function fdopen is declared in stdio.h.  It is POSIX.1 compliant, 
     but not ANSI compliant.  The following line enables compilation with 
@@ -250,3 +252,15 @@ int main(void)
     printf("PASS\n");
     return EXIT_SUCCESS;
 }
+
+#else
+
+int main(void)
+{
+    printf("print/ read....");
+    fflush(stdout);
+    printf("SKIPPED\n");
+    return EXIT_SUCCESS;
+}
+
+#endif

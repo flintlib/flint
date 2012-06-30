@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Sebastian Pancratz, 2012 Andres Goens
 
 ******************************************************************************/
 
@@ -208,7 +208,7 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    /* Check that (a * b) * c == a * (b * c) for integral values */
+    /* Check that (a * b) * c == a * (b * c) */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -228,9 +228,9 @@ main(void)
         fq_init(lhs);
         fq_init(rhs);
 
-        fq_randtest_int(a, state, ctx);
-        fq_randtest_int(b, state, ctx);
-        fq_randtest_int(c, state, ctx);
+        fq_randtest(a, state, ctx);
+        fq_randtest(b, state, ctx);
+        fq_randtest(c, state, ctx);
 
         fq_mul(lhs, a, b, ctx);
         fq_mul(lhs, lhs, c, ctx);

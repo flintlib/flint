@@ -51,7 +51,9 @@ int main(void)
       mp_limb_t hi = 0, lo;
       
       fac1 = n_randprime(state, n_randint(state, FLINT_BITS - 2) + 2, 0);
-      fac2 = n_randprime(state, n_randint(state, FLINT_BITS - 2) + 2, 0);
+      do {
+         fac2 = n_randprime(state, n_randint(state, FLINT_BITS - 2) + 2, 0);
+      } while (fac1 == fac2);
 
       fmpz_set_ui(n, fac1);
       fmpz_mul_ui(n, n, fac2);

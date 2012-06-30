@@ -116,6 +116,10 @@ static __inline__ void qadic_clear(qadic_t x)
     padic_poly_clear(x);
 }
 
+/*
+    TODO:  Consider renaming this function, prefix for the "qadic" module.
+ */
+
 static __inline__ void
 _fmpz_poly_reduce(fmpz *R, long lenR, const fmpz *a, const long *j, long len)
 {
@@ -134,14 +138,25 @@ _fmpz_poly_reduce(fmpz *R, long lenR, const fmpz *a, const long *j, long len)
     }
 }
 
+/*
+    TODO:  Consider renaming this function, prefix for the "qadic" module.
+ */
+
 static __inline__ void 
 _fmpz_mod_poly_reduce(fmpz *R, long lenR, 
                       const fmpz *a, const long *j, long len, const fmpz_t p)
 {
     const long d = j[len - 1];
 
-    _fmpz_poly_reduce(R, lenR, a, j, len);
-    _fmpz_vec_scalar_mod_fmpz(R, R, d, p);
+    if (lenR > d)
+    {
+        _fmpz_poly_reduce(R, lenR, a, j, len);
+        _fmpz_vec_scalar_mod_fmpz(R, R, d, p);
+    }
+    else
+    {
+        _fmpz_vec_scalar_mod_fmpz(R, R, lenR, p);
+    }
 }
 
 static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
@@ -149,27 +164,24 @@ static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
     const long N = (&ctx->pctx)->N;
     const long d = ctx->j[ctx->len - 1];
 
-    if (x->val >= N)
+    if (x->length == 0 || x->val >= N)
     {
         padic_poly_zero(x);
     }
     else
     {
-        if (x->length > d)
-        {
-            fmpz_t pow;
-            int alloc;
+        fmpz_t pow;
+        int alloc;
 
-            alloc = _padic_ctx_pow_ui(pow, (&ctx->pctx)->N - x->val, &ctx->pctx);
+        alloc = _padic_ctx_pow_ui(pow, (&ctx->pctx)->N - x->val, &ctx->pctx);
 
-            _fmpz_mod_poly_reduce(x->coeffs, x->length, ctx->a, ctx->j, ctx->len, pow);
-            _padic_poly_set_length(x, d);
-            _padic_poly_normalise(x);
-            padic_poly_canonicalise(x, (&ctx->pctx)->p);
+        _fmpz_mod_poly_reduce(x->coeffs, x->length, ctx->a, ctx->j, ctx->len, pow);
+        _padic_poly_set_length(x, FLINT_MIN(x->length, d));
+        _padic_poly_normalise(x);
+        padic_poly_canonicalise(x, (&ctx->pctx)->p);
 
-            if (alloc)
-                fmpz_clear(pow);
-        }
+        if (alloc)
+            fmpz_clear(pow);
     }
 }
 
@@ -295,12 +307,8 @@ qadic_neg(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
     padic_poly_neg(x, y, &ctx->pctx);
 }
 
-static __inline__ void 
-qadic_mul(qadic_t x, const qadic_t y, const qadic_t z, const qadic_ctx_t ctx)
-{
-    padic_poly_mul(x, y, z, &ctx->pctx);
-    qadic_reduce(x, ctx);
-}
+void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
+                          const qadic_ctx_t ctx);
 
 void _qadic_inv(fmpz *rop, const fmpz *op, long len, 
                 const fmpz *a, const long *j, long lena, 

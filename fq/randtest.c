@@ -36,25 +36,3 @@ fq_randtest_not_zero(fq_t x, flint_rand_t state, const fq_ctx_t ctx)
 {
     padic_poly_randtest_not_zero(x, state, fq_ctx_dim(ctx), &ctx->pctx);
 }
-
-void
-fq_randtest_val(fq_t x, flint_rand_t state, long val, const fq_ctx_t ctx)
-{
-    padic_poly_randtest_val(x, state, val, fq_ctx_dim(ctx), &ctx->pctx);
-}
-
-void
-fq_randtest_int(fq_t x, flint_rand_t state, const fq_ctx_t ctx)
-{
-    const long N = (&ctx->pctx)->N;
-
-    if (N <= 0)
-    {
-        padic_poly_zero(x);
-    }
-    else
-    {
-        padic_poly_randtest_val(x, state, n_randint(state, N),
-                                fq_ctx_dim(ctx), &ctx->pctx);
-    }
-}

@@ -139,7 +139,7 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
  */
 
 void 
-_padic_log_balanced(fmpz_t z, const fmpz_t y, const fmpz_t p, long N)
+_padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     fmpz_t pv, pN, r, t, u;
     long w;
@@ -230,7 +230,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
                 }
                 else
                 {
-                    _padic_log_balanced(padic_unit(rop), x, ctx->p, ctx->N);
+                    _padic_log_balanced(padic_unit(rop), x, v, ctx->p, ctx->N);
                     padic_val(rop) = 0;
                     _padic_canonicalise(rop, ctx);
                 }

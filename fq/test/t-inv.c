@@ -100,7 +100,7 @@ main(void)
         fq_init(a);
         fq_init(b);
 
-        do fq_randtest_val(a, state, 0, ctx);
+        do fq_randtest(a, state, ctx);
         while (fq_is_zero(a));
 
         fq_inv(b, a, ctx);

@@ -19,15 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz, 2012 Andres Goens
+    Copyright (C) 2012 Andres Goens
  
 ******************************************************************************/
 
 #include "fmpz_mod_poly.h"
+#include "padic_poly.h"
 #include "fq.h"
 
 void
-fq_inv(fq_t x, const fq_t y, const fq_ctx_t ctx)
+fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
-    qadic_inv(x, y, ctx);
+    padic_t res;
+    padic_init(res,&(ctx->pctx));
+    qadic_trace(res, op, ctx);
+    padic_poly_set_padic(rop,res);
 }

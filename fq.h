@@ -69,8 +69,33 @@ fq_ctx_dim(const fq_ctx_t ctx)
 static __inline__ void
 fq_ctx_print(const fq_ctx_t ctx)
 {
+    long i, k;
     printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
     printf("d = %ld\n", ctx->j[ctx->len - 1]);
+    printf("f(X) = ");
+    fmpz_print(ctx->a + 0);
+    for (k = 1; k < ctx->len; k++)
+    {
+        i = ctx->j[k];
+        printf(" + ");
+        if (fmpz_is_one(ctx->a + k))
+        {
+            if (i == 1)
+                printf("X");
+            else
+                printf("X^%ld", i);
+        }
+        else
+        {
+            fmpz_print(ctx->a + k);
+            if (i == 1)
+                printf("*X");
+            else
+                printf("*X^%ld", i);
+        }
+    }
+    printf("\n");
+
 }
 
 /* Basic arithmetic **********************************************************/
@@ -83,9 +108,9 @@ void fq_neg(fq_t x, const fq_t y, const fq_ctx_t ctx);
 
 void fq_mul(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
 
-void fq_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx);
+void fq_inv(fq_t x, const fq_t y, const fq_ctx_t ctx);
 
-void fq_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx);
+void fq_pow(fq_t x, const fq_t y, const fmpz_t e, const fq_ctx_t ctx);
 
 /* Memory managment  *********************************************************/
 
@@ -101,6 +126,12 @@ fq_clear(fq_t x)
     padic_poly_clear(x);
 }
 
+static __inline__ void
+fq_reduce(fq_t x, const fq_ctx_t ctx)
+{
+    qadic_reduce(x,ctx);
+}
+
 /* Randomisation *************************************************************/
 
 void fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
@@ -108,10 +139,6 @@ void fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
 
 void fq_randtest_not_zero(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
 
-
-void fq_randtest_val(fq_t x, flint_rand_t state, long val, const fq_ctx_t ctx);
-
-void fq_randtest_int(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
 
 
 /* Comparison ****************************************************************/
@@ -153,6 +180,11 @@ fq_one(fq_t x, const fq_ctx_t ctx)
 int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx);
 
 int fq_print_pretty(const fq_t op, const fq_ctx_t ctx);
+
+/* Special functions *********************************************************/
+
+void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+/* void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx); */
 
 
 #endif

@@ -31,24 +31,20 @@
 
 mp_limb_t n_randlimb(flint_rand_t state) 
 {   
-    state->__randval = (state->__randval*1025416097UL + 286824428UL)
-        % 4294967311UL;
-    state->__randval2 = (state->__randval2*1647637699UL + 286824428UL)
-        % 4294967357UL;
+    state->__randval = (state->__randval*13282407956253574709UL + 286824421UL);
+    state->__randval2 = (state->__randval2*7557322358563246341UL + 286824421UL);
 
-    return state->__randval + (state->__randval2 << 32);
+    return (state->__randval>>32) + ((state->__randval2>>32) << 32);
 }
 
 #else
 
 mp_limb_t n_randlimb(flint_rand_t state) 
 {   
-    state->__randval = (state->__randval*1573677563UL +  1626832774UL)
-        % 65537UL;
-    state->__randval2 = (state->__randval2*897228705UL +  1626832774UL)
-        % 65539UL;
+    state->__randval = (state->__randval*1543932465UL +  1626832771UL);
+    state->__randval2 = (state->__randval2*2495927737UL +  1626832771UL);
 
-    return state->__randval + (state->__randval2 << 16);
+    return (state->__randval>>16) + ((state->__randval2>>16) << 16);
 }
 
 #endif

@@ -27,7 +27,7 @@
 #include "fq.h"
 
 void
-fq_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx)
+fq_pow(fq_t x, const fq_t y, const fmpz_t e, const fq_ctx_t ctx)
 {
     qadic_pow(x, y, e, ctx);
 }

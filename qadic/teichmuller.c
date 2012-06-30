@@ -44,9 +44,10 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
 {
     const long d = j[lena - 1];
 
-    if (d == 1)
+    if (len == 1)
     {
         _padic_teichmuller(rop, op, p, N);
+        _fmpz_vec_zero(rop + 1, d - 1);
     }
     else if (N == 1)
     {

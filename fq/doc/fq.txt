@@ -40,10 +40,6 @@
 
 *******************************************************************************
 
-    Memory management
-
-*******************************************************************************
-
 void fq_ctx_init_conway(fq_ctx_t ctx, 
                            const fmpz_t p, long d, const char *var, 
                            enum padic_print_mode mode)
@@ -69,6 +65,20 @@ fq_ctx_dim(const fq_ctx_t ctx)
 
     Returns the $F_p$ (prime field) dimension of the field associated 
     with \code{ctx}.
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fq_init(fq_t rop)
+
+    Initialises the element \code{rop}, setting its value to~$0$.
+
+void fq_clear(fq_t rop)
+
+    Clears the element \code{rop}.
 
 
 *******************************************************************************
@@ -119,3 +129,94 @@ void fq_pow(fq_t rop, const fq_t op, const fmpz_t e,
 
     Note that for any input \code{op}, \code{rop} is set to one in the 
     given context whenever $e = 0$.
+
+*******************************************************************************
+
+    Output
+
+*******************************************************************************
+
+int fq_fprint_pretty(FILE *file, const fq_t op, const fq_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{file}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+
+int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
+
+    Prints a pretty representation of \code{op} to \code{stdout}.
+
+    In the current implementation, always returns~$1$.  The return code is 
+    part of the function's signature to allow for a later implementation to 
+    return the number of characters printed or a non-positive error code.
+
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
+
+    Generates a random element of $\mathbb{F}_q$.
+
+void fq_randtest_not_zero(fq_t rop, flint_rand_t state, 
+                             const fq_ctx_t ctx)
+
+    Generates a random non-zero element of $\mathbb{F}_q$.
+
+*******************************************************************************
+
+    Assignments and conversions
+
+*******************************************************************************
+
+void fq_set(fq_t rop, const fq_t op)
+
+    Sets \code{rop} to \code{op}.
+
+void fq_zero(fq_t rop)
+
+    Sets \code{rop} to zero.
+
+void fq_one(fq_t rop, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to one, reduced in the given context.
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fq_is_zero(const fq_t op)
+
+    Returns whether \code{op} is equal to zero.
+
+int fq_is_one(const fq_t op)
+
+    Returns whether \code{op} is equal to one.
+
+int fq_equal(const fq_t op1, const fq_t op2)
+
+    Returns whether \code{op1} and \code{op2} are equal.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the trace of \code{op}.
+
+    For an element $a \in \mathbb{F}_q$, multiplication by $a$ defines 
+    a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the trace 
+    of $a$ as the trace of this map.  Equivalently, if $\Sigma$ generates 
+    $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of $a$ is equal to 
+    $\sum_{i=0}^{d-1} \Sigma^i (a)$, where
+    $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
