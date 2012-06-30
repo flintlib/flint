@@ -36,6 +36,8 @@ EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
 
+TEST_PROGS = $(patsubst %.c, %, $(TEST_SOURCES))
+
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
@@ -74,7 +76,6 @@ $(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interface
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) || exit $$?;) \
 		if [ "$(FLINT_SHARED)" -eq "0" ]; then \
-			touch test/t-*.c \
 			$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
 		fi \
 	fi
@@ -109,6 +110,9 @@ build/interfaces:
 
 check: $(TESTS) 
 ifndef MOD
+	if [ "$(FLINT_STATIC)" -eq "1" -a "$(FLINT_SHARED)" -eq "0" ]; then \
+		$(foreach prog, $(TEST_PROGS), $(CC) $(CFLAGS) $(INCS) $(LIBS) $(prog).c -o build/$(prog);) \
+	fi
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
@@ -131,8 +135,10 @@ install: $(FLINT_LIB)
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-build/test/%: test/%.c $(FLINT_LIB) | build/test
-	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+build/test/%: test/%.c $(FLINT_LIB) | build/test 
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		$(CC) $(CFLAGS) $(INCS) $(LIBS) $< -o $@; \
+	fi
 
 build/test:
 	mkdir -p build/test
@@ -150,5 +156,5 @@ build/%.o: %.c | build
 build:
 	mkdir -p build
 
-.PHONY: profile library clean examples tune check distclean dist tests install all
+.PHONY: profile library clean examples tune check distclean dist install all
 
