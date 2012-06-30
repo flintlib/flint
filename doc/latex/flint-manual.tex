@@ -279,7 +279,8 @@
 FLINT is a C library of functions for doing number theory. It is highly 
 optimised and can be compiled on numerous platforms.  FLINT also has the 
 aim of providing support for multicore and multiprocessor computer 
-architectures, though we do not yet provide this facility.
+architectures. To this end, the library is threadsafe, with few exceptions
+noted in the appropriate place.
 
 FLINT is currently maintained by William Hart of Warwick University in 
 the UK. Its main authors are William Hart, Sebastian Pancratz, Fredrik
@@ -287,8 +288,11 @@ Johansson, Andy Novocin and David Harvey (no longer active).
 
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
-machines. As of version 2.0, FLINT required GCC version 2.96 or later, 
-MPIR 2.1.1 or later and MPFR 3.0.0 or later.
+machines. There is also limited optimisation for ARM and ia64 machines. As 
+of version 2.0, FLINT required GCC version 2.96 or later, MPIR 2.1.1 or 
+later and MPFR 3.0.0 or later. It is also required that the platform 
+provide a \code{uint64_t} type if a native 64 bit type is not available. 
+Full C99 compliance is \textbf{not} required.
 
 FLINT is supplied as a set of modules, \code{fmpz}, \code{fmpz_poly}, etc., 
 each of which can be linked to a C program making use of their functionality.
@@ -303,7 +307,10 @@ file \code{fmpz_poly/test/t-add.c}.
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
 
-FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later.
+FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later and
+a pthread implementation. Some of the input/output tests require 
+\code{fork} and \code{pipe}, however these are disabled on MinGW which
+does not provide a posix implementation.
 
 To configure FLINT you must specify where MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
@@ -324,11 +331,10 @@ pass the directories as parameters to FLINT's configure, e.g.\
 If no directories are specified, FLINT assumes it will find the
 libraries it needs in \code{/usr}.
 
-Note that FLINT builds static and shared libraries by default. If
-you do not require one of these then you may pass 
-\code{--disable-static} or \code{--disable-shared} to 
-\code{configure}. When running \code{make check} a shared library
-is required.
+Note that FLINT builds static and shared libraries by default, except
+on platforms where this is not supported. If you do not require either
+a shared or static library then you may pass \code{--disable-static} 
+or \code{--disable-shared} to \code{configure}. 
 
 If you intend to install the FLINT library and header files, 
 you can specify where they should be placed by passing 
@@ -339,10 +345,29 @@ which you wish to place the FLINT files when it is installed.
 If you wish to use FLINT on a single core machine then it will be
 configured by default for single mode. This is slightly faster, but
 is not threadsafe. (This mode can also be explicitly selected by 
-passing the \code{--single} option to configure). If you wish to 
+passing the \code{--single} option to configure.) If you wish to 
 build a threadsafe version of FLINT, you must pass the 
 \code{--reentrant} option to configure. This will be slower on 
 single core machines, but threadsafe.
+
+On some systems, e.g. Sparc and some Macs, more than one ABI is 
+available. FLINT chooses the ABI based on the CPU type available,
+however its default choice can be overridden by passing either
+\code{ABI=64} or \code{ABI=32} to configure.
+
+In some cases, it is necessary to override the entire CPU/OS
+defaults. This can be done by passing \code{--build=cpu-os} to
+configure. The available choices for CPU include \code{x86_64},
+\code{x86}, \code{ia64}, \code{sparc}, \code{sparc64}, \code{ppc},
+\code{ppc64}. Other CPU types are unrecognised and FLINT will
+build with generic code on those machines. The choices for OS
+include \code{Linux}, \code{MINGW32}, \code{CYGWIN}, 
+\code{Darwin}, \code{FreeBSD}, \code{SunOS} and numerous other
+operating systems.
+ 
+It is also possible to override the default CC, AR and CFLAGS used
+by FLINT by passing \code{CC=full_path_to_compiler}, etc., to 
+FLINT's configure.
 
 Once FLINT is configured, in the main directory of the FLINT directory 
 tree simply type:
@@ -351,6 +376,10 @@ make
 make check
 \end{lstlisting}
 
+GNU make is required to build FLINT. This is simply \code{make} on 
+Linux, Darwin, MinGW and Cygwin systems. However, on some unixes the 
+command is \code{gmake}.
+
 If you wish to install FLINT, simply type:
 \begin{lstlisting}[language=bash]
 make install
@@ -358,8 +387,8 @@ make install
 
 Now to use FLINT, simply include the appropriate header files for 
 the FLINT modules you wish to use in your C program.  Then compile 
-your program, linking against the FLINT library and MPIR and MPFR 
-with the options \code{-lflint -lmpfr -lgmp}.
+your program, linking against the FLINT library, MPIR, MPFR and
+pthreads with the options \code{-lflint -lmpfr -lgmp -lpthread}.
 
 Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
 for your system to let the linker know where to find these libraries.
@@ -402,6 +431,9 @@ e.g:
 make -j4 check 
 \end{lstlisting}
 
+Note that on some systems, most notably MinGW, parallel make is 
+supported but can be problematic.
+
 \chapter{Test code}
 
 Each module of FLINT has an extensive associated test module.  We 
@@ -440,7 +472,9 @@ longer active), Fredrik Johansson, Sebastian Pancratz and Andy Novocin.
 
 Other significant contributions to FLINT have been made by Jason Papadopoulos,
 Gonzalo Tornaria, David Howden, Burcin Erocal, Tom Boothby, Daniel Woodhouse, 
-Tomasz Lechowski, Richard Howell-Peak and Peter Shrimpton.
+Tomasz Lechowski, Richard Howell-Peak, Peter Shrimpton, Andrés Goens, Lina
+Kulakova, Thomas de Buisson, Jean-Pierre Flori, Frithjof Schulze, Curtis 
+Bright.
 
 Jan Tuitman contributed to the design of the padics module.
 
@@ -448,7 +482,15 @@ Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
-Kedlaya, William Stein, Robert Bradshaw, Serge Torres and many others.
+Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
+Grayson, Martin Lee, Bob Smith, Antony Vennard, Frédéric Chyzak, Julien
+Puydt and many others.
+
+Ralph Hemmecke made available an autotools build for FLINT.
+
+Numerous people have contributed to wrapping FLINT in Sage and debugging, 
+including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
+Martin Albrecht, Sebastian Pancratz, Fredrik Johansson,
 
 Some code (\code{longlong.h} and \code{clz_tab.c}) has been used from
 an LGPL v2+ version of the GMP library. The main author of the GMP 
@@ -456,6 +498,20 @@ library is Torbjorn Granlund.
 
 FLINT 2 was a complete rewrite from scratch which began in about 2010.
  
+\chapter{Tuning FLINT}
+
+FLINT uses a highly optimised Fast Fourier Transform routine for 
+polynomial multiplication and some integer multiplication routines. This
+can be tuned by first typing \code{make tune} and then running the 
+program \code{build/fft/tune/tune_fft}. 
+
+The output of the program can be pasted into  \code{fft_tuning64.in} or 
+\code{fft_tuning32.in} depending on the ABI of the current platform. FLINT 
+must then be configured again and a clean build initiated. 
+
+Tuning is only necessary if you suspect that very large polynomial and 
+integer operations (millions of bits) are taking longer than they should.
+
 \chapter{Example programs}
 
 FLINT comes with example programs to demonstrate current and future FLINT 
@@ -472,24 +528,45 @@ set this.
 
 The current example programs are:
 
-\code{delta_qexp}  Computes the first $n$ terms of the delta function, e.g.\ 
-\code{build/examples/delta_qexp 1000000} will compute the first one million terms of the 
-$q$-expansion of delta.
+\code{partitions} Demonstrates the partition counting code, e.g.\
+\code{build/examples/partitions 1000000000} will compute the number of 
+partitions of \code{10^9}.
+
+\code{delta_qexp}  Computes the $n$-th term of the delta function, e.g.\ 
+\code{build/examples/delta_qexp 1000000} will compute the one million-th 
+term of the $q$-expansion of delta.
 
 \code{crt}  Demonstrates the integer Chinese Remainder code, e.g.\ 
-\code{build/examples/crt 10382788} will build up the given integer from its value mod various
-primes.
+\code{build/examples/crt 10382788} will build up the given integer from 
+its value mod various primes.
 
-\code{multi_crt}  Demonstrates the fast tree version of the integer Chinese Remainder 
-code, e.g.\ 
-\code{build/examples/multi_crt 100493287498239 13} will build up the given integer from 
-its value mod the given number of primes.
+\code{multi_crt}  Demonstrates the fast tree version of the integer Chinese 
+Remainder code, e.g.\ 
+\code{build/examples/multi_crt 100493287498239 13} will build up the given 
+integer from its value mod the given number of primes.
 
 \code{stirling_matrix}  Generates Stirling number matrices of the first
 and second kind and computes their product, which should come out as the
 identity matrix. The matrices are printed to standard output.
 For example \code{build/examples/stirling_matrix 10} does this
 with 10 by 10 matrices.
+
+\code{fmpz_poly_factor_zassenhaus} Demonstrates the factorisation of a
+small polynomial. A larger polynomials is also provided on disk and a
+small (obvious) change to the example program will read this file instead
+of using the hard coded polynomial.
+
+\code{padic} Gives examples of the usage of many functions in the padic
+module.
+
+\code{fmpz_poly_q} Gives a very simple example of the \code{fmpz_poly_q}
+module.
+
+\code{fmpz_poly} Gives a very simple example of the \code{fmpz_poly}
+module.
+
+\code{fmpq_poly} Gives a very simple example of the \code{fmpq_poly}
+module.
 
 \chapter{FLINT macros}
 
