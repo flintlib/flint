@@ -34,7 +34,10 @@ void
 _fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
                                        const fmpz * h, long lenh, const fmpz_t p)
 {
-    _fmpz_mod_poly_compose_mod_horner(res, f, lenf, g, h, lenh, p);
+    if (lenh < 12 || lenf >= lenh)
+        _fmpz_mod_poly_compose_mod_horner(res, f, lenf, g, h, lenh, p);
+    else
+        _fmpz_mod_poly_compose_mod_brent_kung(res, f, lenf, g, h, lenh, p);
 }
 
 void
