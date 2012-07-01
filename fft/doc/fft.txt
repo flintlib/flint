@@ -192,7 +192,7 @@ void ifft_butterfly(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
                   mp_limb_t * i2, mp_size_t i, mp_size_t limbs, mp_bitcnt_t w)
 
     Set \code{s = i1 + z1^i*i2}, \code{t = i1 -  z1^i*i2} modulo
-    \code{B^limbs + 1} where \code{z1 = exp(-Pi*I/n)} corresponds to
+    \code{B^limbs + 1} where\\ \code{z1 = exp(-Pi*I/n)} corresponds to
     division by $2^w$. Requires $0 \leq i < 2n$ where $nw =$
     \code{limbs*FLINT_BITS}.
 
@@ -203,22 +203,22 @@ void fft_radix2(mp_limb_t ** ii,
 
     Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
-    Output: \code{[r0, r1, ..., r(m-1)] = FFT[i0, i1, ..., i(m-1)]}.
+    Output: \code{[r0, r1, ..., r(m-1)]}\\ \code{ = FFT[i0, i1, ..., i(m-1)]}.
 
     Algorithm:
 
-    $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r(m-2)]}
+    $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r(m-2)]}\\
          \code{= FFT[i0+i(m/2), i1+i(m/2+1), ..., i(m/2-1)+i(m-1)]}
 
-    $\bullet$ Let \code{[t0, t1, ..., t(m/2-1)]}
+    $\bullet$ Let \code{[t0, t1, ..., t(m/2-1)]}\\
          \code{= [i0-i(m/2), i1-i(m/2+1), ..., i(m/2-1)-i(m-1)]}
 
-    $\bullet$ Let \code{[u0, u1, ..., u(m/2-1)]}
+    $\bullet$ Let \code{[u0, u1, ..., u(m/2-1)]}\\
          \code{= [z1^0*t0, z1^1*t1, ..., z1^(m/2-1)*t(m/2-1)]}
          where \code{z1 = exp(2*Pi*I/m)} corresponds to multiplication
          by $2^w$.
 
-    $\bullet$ Recursively compute \code{[r1, r3, ..., r(m-1)]}
+    $\bullet$ Recursively compute \code{[r1, r3, ..., r(m-1)]}\\
          \code{= FFT[u0, u1, ..., u(m/2-1)]}
 
     The parameters are as follows:
@@ -263,21 +263,22 @@ void ifft_radix2(mp_limb_t ** ii,
 
     Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
-    Output: \code{[r0, r1, ..., r(m-1)] = IFFT[i0, i1, ..., i(m-1)]}.
+    Output: \code{[r0, r1, ..., r(m-1)]}\\
+            \code{ = IFFT[i0, i1, ..., i(m-1)]}.
 
     Algorithm:
 
-    $\bullet$ Recursively compute \code{[s0, s1, ...., s(m/2-1)]}
+    $\bullet$ Recursively compute \code{[s0, s1, ...., s(m/2-1)]}\\
          \code{= IFFT[i0, i2, ..., i(m-2)]}
 
-    $\bullet$ Recursively compute \code{[t(m/2), t(m/2+1), ..., t(m-1)]}
+    $\bullet$ Recursively compute \code{[t(m/2), t(m/2+1), ..., t(m-1)]}\\
          \code{= IFFT[i1, i3, ..., i(m-1)]}
 
-    $\bullet$ Let \code{[r0, r1, ..., r(m/2-1)]}
+    $\bullet$ Let \code{[r0, r1, ..., r(m/2-1)]}\\
          \code{= [s0+z1^0*t0, s1+z1^1*t1, ..., s(m/2-1)+z1^(m/2-1)*t(m/2-1)]}
          where \code{z1 = exp(-2*Pi*I/m)} corresponds to division by $2^w$.
 
-    $\bullet$ Let \code{[r(m/2), r(m/2+1), ..., r(m-1)]}
+    $\bullet$ Let \code{[r(m/2), r(m/2+1), ..., r(m-1)]}\\
         \code{= [s0-z1^0*t0, s1-z1^1*t1, ..., s(m/2-1)-z1^(m/2-1)*t(m/2-1)]}
 
     The parameters are as follows:
@@ -343,7 +344,7 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
     $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
 
     Here \code{z1} corresponds to multiplication by $2^k$ then multiplication
-    by \code{(2^(3nw/4) - 2^(nw/4))}. We see \code{z1^i} corresponds to
+    by\\ \code{(2^(3nw/4) - 2^(nw/4))}. We see \code{z1^i} corresponds to
     multiplication by \code{(2^(3nw/4) - 2^(nw/4))*2^(j+ik)}.
 
     We first multiply by \code{2^(j + ik + wn/4)} then multiply by an
@@ -405,7 +406,7 @@ void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 
     Set \code{u = 2^b1*(s + t)}, \code{v = 2^b2*(s - t)} modulo 
     \code{B^limbs + 1}. This is used to compute 
-    \code{u = 2^(ws*tw1)*(s + t)}, \code{v = 2^(w+ws*tw2)*(s - t)} in the 
+    \code{u = 2^(ws*tw1)*(s + t)},\\ \code{v = 2^(w+ws*tw2)*(s - t)} in the 
     matrix fourier algorithm, i.e. effectively computing an ordinary butterfly 
     with additional twiddles by \code{z1^rc} for row $r$ and column $c$ of the 
     matrix of coefficients. Aliasing is not allowed.
@@ -416,7 +417,7 @@ void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 
     Set \code{u = s/2^b1 + t/2^b1)}, \code{v = s/2^b1 - t/2^b1} modulo 
     \code{B^limbs + 1}. This is used to compute 
-    \code{u = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)}, 
+    \code{u = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)},\\
     \code{v = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)} in the matrix fourier algorithm, 
     i.e. effectively computing an ordinary butterfly with additional twiddles 
     by \code{z1^(-rc)} for row $r$ and column $c$ of the matrix of 
@@ -447,14 +448,14 @@ void fft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
         mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per \code{fft_radix2_twiddle} except that the transform is truncated 
-    as per \code{fft_truncate1}.
+    as per\\ \code{fft_truncate1}.
 
 void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
      mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
         mp_size_t ws, mp_size_t r, mp_size_t c, mp_size_t rs, mp_size_t trunc)
 
     As per \code{ifft_radix2_twiddle} except that the transform is truncated
-    as per \code{ifft_truncate1}.
+    as per\\ \code{ifft_truncate1}.
 
 void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
