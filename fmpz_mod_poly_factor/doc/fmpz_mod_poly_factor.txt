@@ -143,3 +143,9 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     “baby step/giant step” strategy for the distinct-degree factorization step.
 
     The modulus must be a prime greater than 2.
+
+void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
+				     const fmpz_mod_poly_t f)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the Berlekamp algorithm.

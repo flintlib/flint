@@ -95,6 +95,9 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
 void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
                                           const fmpz_mod_poly_t poly, double beta);
 
+void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
+                                     const fmpz_mod_poly_t f);
+
 #ifdef __cplusplus
 }
 #endif
