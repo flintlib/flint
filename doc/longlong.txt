@@ -46,7 +46,7 @@ smul_ppmm(high_prod, low_prod, multipler, multiplicand)
 udiv_qrnnd(quotient, remainder, high_numerator, low_numerator, denominator) 
 
     Divides an unsigned integer, composed by the limb integers 
-    \code{HIGH_NUMERATOR} and \code{LOW_NUMERATOR}, by \code{DENOMINATOR} 
+    \code{HIGH_NUMERATOR} and\\ \code{LOW_NUMERATOR}, by \code{DENOMINATOR} 
     and places the quotient in \code{QUOTIENT} and the remainder in 
     \code{REMAINDER}.  \code{HIGH_NUMERATOR} must be less than 
     \code{DENOMINATOR} for correct operation. 
@@ -73,7 +73,7 @@ add_ssaaaa(high_sum, low_sum, high_addend_1, low_addend_1,
                                                high_addend_2, low_addend_2) 
 
     Adds two limb integers, composed by \code{HIGH_ADDEND_1} and 
-    \code{LOW_ADDEND_1}, and \code{HIGH_ADDEND_2} and \code{LOW_ADDEND_2}, 
+    \code{LOW_ADDEND_1}, and\\ \code{HIGH_ADDEND_2} and \code{LOW_ADDEND_2}, 
     respectively.  The result is placed in \code{HIGH_SUM} and 
     \code{LOW_SUM}.  Overflow, i.e.\ carry out, is not stored anywhere, 
     and is lost.
@@ -88,7 +88,7 @@ sub_ddmmss(high_difference, low_difference, high_minuend, low_minuend,
 
     Subtracts two limb integers, composed by \code{HIGH_MINUEND_1} and 
     \code{LOW_MINUEND_1}, and \code{HIGH_SUBTRAHEND_2} and 
-    \code{LOW_SUBTRAHEND_2}, respectively.  The result is placed in 
+    \code{LOW_SUBTRAHEND_2}, respectively.  The result is placed in\\ 
     \code{HIGH_DIFFERENCE} and \code{LOW_DIFFERENCE}.  Overflow, i.e.\ 
     carry out is not stored anywhere, and is lost.
 
