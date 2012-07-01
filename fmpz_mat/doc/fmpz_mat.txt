@@ -752,7 +752,7 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den,
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den,
                             const fmpz_mat_t A)
 
     Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
