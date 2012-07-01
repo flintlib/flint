@@ -30,8 +30,8 @@
 
 static char * docsin[] = {
     "../../fmpz/doc/fmpz.txt", 
-    "../../fmpz_factor/doc/fmpz_factor.txt", 
     "../../fmpz_vec/doc/fmpz_vec.txt", 
+    "../../fmpz_factor/doc/fmpz_factor.txt", 
     "../../fmpz_mat/doc/fmpz_mat.txt", 
     "../../fmpz_poly/doc/fmpz_poly.txt", 
     "../../fmpz_poly_factor/doc/fmpz_poly_factor.txt", 
