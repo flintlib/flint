@@ -103,6 +103,7 @@ void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
 *******************************************************************************
 
 void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
+
     Adds the signed limb \code{c} to the generalised fermat number \code{r}
     modulo \code{B^limbs + 1}. The compiler should be able to inline
     this for the case that there is no overflow from the first limb.
@@ -115,7 +116,7 @@ void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
     \code{B = 2^FLINT_BITS}.
 
 void mpn_mul_2expmod_2expp1(mp_limb_t * t,
-                              mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+                               mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
 
     Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos
     complement format reduced modulo \code{B^limbs + 1} up to some
@@ -158,20 +159,20 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                     mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
-   We are given two integers \code{i1} and \code{i2} modulo
-   \code{B^limbs + 1} which are not necessarily normalised. We compute
-   \code{t = (i1 + i2)*B^x} and \code{u = (i1 - i2)*B^y} modulo $p$. Aliasing
-   between inputs and outputs is not permitted. We require \code{x} and
-   \code{y} to be less than \code{limbs} and nonnegative.
+    We are given two integers \code{i1} and \code{i2} modulo
+    \code{B^limbs + 1} which are not necessarily normalised. We compute
+    \code{t = (i1 + i2)*B^x} and \code{u = (i1 - i2)*B^y} modulo $p$. Aliasing
+    between inputs and outputs is not permitted. We require \code{x} and
+    \code{y} to be less than \code{limbs} and nonnegative.
 
 void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                     mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
-   We are given two integers \code{i1} and \code{i2} modulo
-   \code{B^limbs + 1} which are not necessarily normalised. We compute
-   \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing
-   between inputs and outputs is not permitted. We require \code{x} and
-   \code{y} to be less than \code{limbs} and nonnegative.
+    We are given two integers \code{i1} and \code{i2} modulo
+    \code{B^limbs + 1} which are not necessarily normalised. We compute
+    \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing
+    between inputs and outputs is not permitted. We require \code{x} and
+    \code{y} to be less than \code{limbs} and nonnegative.
 
 *******************************************************************************
 
