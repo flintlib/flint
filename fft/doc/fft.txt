@@ -201,25 +201,25 @@ void fft_radix2(mp_limb_t ** ii,
 
     The radix 2 DIF FFT works as follows:
 
-    Input: \code{[i0, i1, ..., i{m-1}]}, for $m = 2n$ a power of $2$.
+    Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
-    Output: \code{[r0, r1, ..., r{m-1}] = FFT[i0, i1, ..., i{m-1}]}.
+    Output: \code{[r0, r1, ..., r(m-1)] = FFT[i0, i1, ..., i(m-1)]}.
    
     Algorithm:
 
-    $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r{m-2}]}
-         \code{= FFT[i0+i{m/2}, i1+i{m/2+1}, ..., i{m/2-1}+i{m-1}]}
+    $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r(m-2)]}
+         \code{= FFT[i0+i(m/2), i1+i(m/2+1), ..., i(m/2-1)+i(m-1)]}
 
-    $\bullet$ Let \code{[t0, t1, ..., t{m/2-1}]}
-         \code{= [i0-i{m/2}, i1-i{m/2+1}, ..., i{m/2-1}-i{m-1}]}
+    $\bullet$ Let \code{[t0, t1, ..., t(m/2-1)]}
+         \code{= [i0-i(m/2), i1-i(m/2+1), ..., i(m/2-1)-i(m-1)]}
 
-    $\bullet$ Let \code{[u0, u1, ..., u{m/2-1}]}
-         \code{= [z1^0*t0, z1^1*t1, ..., z1^{m/2-1}*t{m/2-1}]}
+    $\bullet$ Let \code{[u0, u1, ..., u(m/2-1)]}
+         \code{= [z1^0*t0, z1^1*t1, ..., z1^(m/2-1)*t(m/2-1)]}
          where \code{z1 = exp(2*Pi*I/m)} corresponds to multiplication
          by $2^w$.
 
-    $\bullet$ Recursively compute \code{[r1, r3, ..., r{m-1}]}
-         \code{= FFT[u0, u1, ..., u{m/2-1}]}
+    $\bullet$ Recursively compute \code{[r1, r3, ..., r(m-1)]}
+         \code{= FFT[u0, u1, ..., u(m/2-1)]}
               
     The parameters are as follows:
 
@@ -261,25 +261,25 @@ void ifft_radix2(mp_limb_t ** ii,
 
     The radix 2 DIF IFFT works as follows:
 
-    Input: \code{[i0, i1, ..., i{m-1}]}, for $m = 2n$ a power of $2$.
+    Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
-    Output: \code{[r0, r1, ..., r{m-1}] = IFFT[i0, i1, ..., i{m-1}]}.
+    Output: \code{[r0, r1, ..., r(m-1)] = IFFT[i0, i1, ..., i(m-1)}.
    
     Algorithm:
 
-    $\bullet$ Recursively compute \code{[s0, s1, ...., s{m/2-1}]}
-         \code{= IFFT[i0, i2, ..., i{m-2}]}
+    $\bullet$ Recursively compute \code{[s0, s1, ...., s(m/2-1)]}
+         \code{= IFFT[i0, i2, ..., i(m-2)]}
 
 
-    $\bullet$ Recursively compute \code{[t{m/2}, t{m/2+1}, ..., t{m-1}]}
-         \code{= IFFT[i1, i3, ..., i{m-1}]}
+    $\bullet$ Recursively compute \code{[t(m/2), t(m/2+1), ..., t(m-1)]}
+         \code{= IFFT[i1, i3, ..., i(m-1)]}
 
-    $\bullet$ Let \code{[r0, r1, ..., r{m/2-1}]}
-         \code{= [s0+z1^0*t0, s1+z1^1*t1, ..., s{m/2-1}+z1^{m/2-1}*t{m/2-1}]}
+    $\bullet$ Let \code{[r0, r1, ..., r(m/2-1)]}
+         \code{= [s0+z1^0*t0, s1+z1^1*t1, ..., s(m/2-1)+z1^(m/2-1)*t(m/2-1)]}
          where \code{z1 = exp(-2*Pi*I/m)} corresponds to division by $2^w$.
 
-    $\bullet$ Let \code{[r{m/2}, r{m/2+1}, ..., r{m-1}]}
-        \code{= [s0-z1^0*t0, s1-z1^1*t1, ..., s{m/2-1}-z1^{m/2-1}*t{m/2-1}]}
+    $\bullet$ Let \code{[r(m/2), r(m/2+1), ..., r(m-1)]}
+        \code{= [s0-z1^0*t0, s1-z1^1*t1, ..., s(m/2-1)-z1^(m/2-1)*t(m/2-1)]}
               
     The parameters are as follows:
 
