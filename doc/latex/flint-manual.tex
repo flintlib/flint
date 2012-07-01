@@ -299,7 +299,7 @@ each of which can be linked to a C program making use of their functionality.
 
 All of the functions in FLINT have a corresponding test function provided 
 in an appropriately named test file.  For example, the function 
-\code{fmpz_poly_add} located in \code{fmpz_poly/add.c} has test code in the 
+\code{fmpz_poly_add} located in\\ \code{fmpz_poly/add.c} has test code in the 
 file \code{fmpz_poly/test/t-add.c}.
 
 \chapter{Building and using FLINT}
@@ -528,11 +528,11 @@ set this.
 
 The current example programs are:
 
-\code{partitions} Demonstrates the partition counting code, e.g.\
+\code{partitions} Demonstrates the partition counting code, e.g.\\
 \code{build/examples/partitions 1000000000} will compute the number of 
 partitions of \code{10^9}.
 
-\code{delta_qexp}  Computes the $n$-th term of the delta function, e.g.\ 
+\code{delta_qexp}  Computes the $n$-th term of the delta function, e.g.\\ 
 \code{build/examples/delta_qexp 1000000} will compute the one million-th 
 term of the $q$-expansion of delta.
 
@@ -698,6 +698,15 @@ We now describe the functions available in the \code{fmpz} module.
 \input{input/fmpz_vec.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integer factorisation                                                        %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_factor}
+\epigraph{Factorisation in $\Z$}{}
+
+\input{input/fmpz_factor.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Integer matrices                                                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -844,6 +853,15 @@ independently of the other coefficients.
 We now describe the functions available in \code{fmpz_poly}.
 
 \input{input/fmpz_poly.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Integer polynomial factorisation                                             %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fmpz\_poly\_factor}
+\epigraph{Factorisation of polynomials over $\Z$}{}
+
+\input{input/fmpz_poly_factor.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Rational numbers                                                             %
@@ -1318,7 +1336,7 @@ The output is:
 
 \section{Definition of the fmpz\_mod\_poly\_t type}
 
-The \code{fmpz_mod_poly_t} type is a typedef for an array of length~1 of 
+The \code{fmpz_mod_poly_t} type is a typedef for an array of length~1 of\\ 
 \code{fmpz_mod_poly_struct}'s.  This permits passing parameters of type 
 \code{fmpz_mod_poly_t} by reference. 
 
@@ -1466,6 +1484,24 @@ The output is:
 \input{input/long_extras.tex}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Fast Fourier Transforms                                                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{fft}
+\epigraph{Fast Fourier Transforms}{}
+
+\input{input/fft.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Quadratic Sieve                                                              %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\chapter{qsieve}
+\epigraph{Quadratic sieve}{}
+
+\input{input/qsieve.tex}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % longlong.h                                                                   %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -1473,10 +1509,6 @@ The output is:
 \epigraph{$64$-bit arithmetic}
 
 \input{input/longlong.tex}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% profiler                                                                     %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % mpn_extras                                                                   %
