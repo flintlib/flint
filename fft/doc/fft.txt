@@ -121,7 +121,7 @@ void mpn_mul_2expmod_2expp1(mp_limb_t * t,
     complement format reduced modulo \code{B^limbs + 1} up to some
     overflow, compute \code{t = i1*2^d} modulo $p$. The result will not
     necessarily be fully reduced. The number of bits \code{d} must be
-    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.\
+    nonnegative and less than \code{FLINT_BITS}. Aliasing is permitted.
 
 void mpn_div_2expmod_2expp1(mp_limb_t * t,
                               mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
