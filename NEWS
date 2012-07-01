@@ -787,7 +787,7 @@ build fixes
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
 
-2.3 -- ?, 2012
+2.3 -- 1 Jul 2012
 
 general
 -------
