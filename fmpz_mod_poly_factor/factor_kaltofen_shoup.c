@@ -26,8 +26,8 @@
 #include <math.h>
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_fast_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
-                                           const fmpz_mod_poly_t poly, double beta)
+void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
+                                          const fmpz_mod_poly_t poly, double beta)
 {
     fmpz_mod_poly_t v;
     fmpz_mod_poly_factor_t sq_free, dist_deg;
@@ -36,13 +36,13 @@ void fmpz_mod_poly_factor_fast_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
 
     if (poly->p == 2)
     {
-        printf("Exception (fmpz_mod_poly_factor_fast_cantor_zassenhaus): \n");
+        printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
         printf("Not implemented for p = 2.\n");
         abort();
     }
     if (!(degs = flint_malloc(fmpz_mod_poly_degree(poly) * sizeof(long))))
     {
-        printf("Exception (fmpz_mod_poly_factor_fast_cantor_zassenhaus): \n");
+        printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
         printf("Not enough memory.\n");
         abort();
     }

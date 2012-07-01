@@ -38,7 +38,7 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("factor_fast_cantor_zassenhaus....");
+    printf("factor_kaltofen_shoup....");
     fflush(stdout);
 
     for (iter = 0; iter < 200; iter++)
@@ -98,7 +98,7 @@ main(void)
         beta = 1. / beta;
 
         fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_fast_cantor_zassenhaus(res, poly1, beta);
+        fmpz_mod_poly_factor_kaltofen_shoup(res, poly1, beta);
 
         if (res->num != num)
         {
