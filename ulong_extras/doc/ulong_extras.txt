@@ -150,7 +150,7 @@ int n_sizeinbase(mp_limb_t n, int base)
 mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
-    by \code{n_precompute_inverse()}. We require \code{n < 2^FLINT_D_BITS}
+    by\\ \code{n_precompute_inverse()}. We require \code{n < 2^FLINT_D_BITS}
     and \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
 
     We assume the processor is in the standard round to nearest
@@ -179,7 +179,7 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
 mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
-    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_precompute_inverse()}. There are no restrictions on $a$ or 
     on $n$.
 
@@ -199,7 +199,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
     \code{n_preinvert_limb()}. There are no restrictions on $a$ or on $n$. 
 
     The old version of this function was implemented simply by 
-    making use of \code{udiv_qrnnd_preinv()}.
+    making use of\\ \code{udiv_qrnnd_preinv()}.
 
     The new version uses the new algorithm of Granlund and 
     M\"oller~\citep{GraMol2010}. First $n$ is normalised and a 
@@ -213,7 +213,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, 
                                                                    double npre)
 
-    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_precompute_inverse()} and sets $q$ to the quotient. There 
     are no restrictions on $a$ or on $n$.
 
@@ -260,7 +260,7 @@ mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi,
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require 
+    computed by\\ \code{n_precompute_inverse()}. We require 
     \code{n < 2^FLINT_D_BITS} and $0 \leq a, b < n$.
 
     We assume the processor is in the standard round to nearest
@@ -281,7 +281,7 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
 
 n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
 
-    Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, $b$ or 
     on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
     then reducing using \code{n_ll_mod_preinv()}.
@@ -395,8 +395,8 @@ mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y)
 mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, 
                                                       mp_limb_t n, double npre)
 
-    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
+    Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
+    computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
     and $0 \leq a < n$. There are no restrictions on \code{exp}, i.e.\ 
     it can be negative.
 
@@ -406,8 +406,8 @@ mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp,
 mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, 
                                                       mp_limb_t n, double npre)
 
-    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
+    Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
+    computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
     and $0 \leq a < n$. The exponent \code{exp} is unsigned and so
     can be larger than allowed by \code{n_powmod_precomp}.
 
@@ -416,7 +416,7 @@ mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp,
 
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
-    Returns \code{(a^exp) % n}. We require \code{n < 2^FLINT_D_BITS} 
+    Returns \code{a^exp} modulo $n$. We require \code{n < 2^FLINT_D_BITS} 
     and $0 \leq a < n$. There are no restrictions on \code{exp}, i.e.\ 
     it can be negative.
 
