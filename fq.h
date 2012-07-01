@@ -184,7 +184,7 @@ int fq_print_pretty(const fq_t op, const fq_ctx_t ctx);
 /* Special functions *********************************************************/
 
 void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx);
-/* void qadic_frobenius(qadic_t rop, const qadic_t op, long e, const qadic_ctx_t ctx); */
-
+void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx);
+void fq_norm(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 #endif
