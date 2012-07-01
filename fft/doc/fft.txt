@@ -103,6 +103,7 @@ void fermat_to_mpz(mpz_t m, mp_limb_t * i, mp_size_t limbs)
 *******************************************************************************
 
 void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
+
     Adds the signed limb \code{c} to the generalised fermat number \code{r}
     modulo \code{B^limbs + 1}. The compiler should be able to inline
     this for the case that there is no overflow from the first limb.
@@ -115,7 +116,7 @@ void mpn_normmod_2expp1(mp_limb_t * t, mp_size_t limbs)
     \code{B = 2^FLINT_BITS}.
 
 void mpn_mul_2expmod_2expp1(mp_limb_t * t,
-                              mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
+                               mp_limb_t * i1, mp_size_t limbs, mp_bitcnt_t d)
 
     Given \code{i1} a signed integer of \code{limbs + 1} limbs in twos
     complement format reduced modulo \code{B^limbs + 1} up to some
@@ -158,20 +159,20 @@ void fft_adjust_sqrt2(mp_limb_t * r, mp_limb_t * i1,
 void butterfly_lshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                     mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
-   We are given two integers \code{i1} and \code{i2} modulo
-   \code{B^limbs + 1} which are not necessarily normalised. We compute
-   \code{t = (i1 + i2)*B^x} and \code{u = (i1 - i2)*B^y} modulo $p$. Aliasing
-   between inputs and outputs is not permitted. We require \code{x} and
-   \code{y} to be less than \code{limbs} and nonnegative.
+    We are given two integers \code{i1} and \code{i2} modulo
+    \code{B^limbs + 1} which are not necessarily normalised. We compute
+    \code{t = (i1 + i2)*B^x} and \code{u = (i1 - i2)*B^y} modulo $p$. Aliasing
+    between inputs and outputs is not permitted. We require \code{x} and
+    \code{y} to be less than \code{limbs} and nonnegative.
 
 void butterfly_rshB(mp_limb_t * t, mp_limb_t * u, mp_limb_t * i1,
                     mp_limb_t * i2, mp_size_t limbs, mp_size_t x, mp_size_t y)
 
-   We are given two integers \code{i1} and \code{i2} modulo
-   \code{B^limbs + 1} which are not necessarily normalised. We compute
-   \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing
-   between inputs and outputs is not permitted. We require \code{x} and
-   \code{y} to be less than \code{limbs} and nonnegative.
+    We are given two integers \code{i1} and \code{i2} modulo
+    \code{B^limbs + 1} which are not necessarily normalised. We compute
+    \code{t = (i1 + i2)/B^x} and \code{u = (i1 - i2)/B^y} modulo $p$. Aliasing
+    between inputs and outputs is not permitted. We require \code{x} and
+    \code{y} to be less than \code{limbs} and nonnegative.
 
 *******************************************************************************
 
@@ -203,7 +204,7 @@ void fft_radix2(mp_limb_t ** ii,
     Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
     Output: \code{[r0, r1, ..., r(m-1)] = FFT[i0, i1, ..., i(m-1)]}.
-   
+
     Algorithm:
 
     $\bullet$ Recursively compute \code{[r0, r2, r4, ...., r(m-2)]}
@@ -219,7 +220,7 @@ void fft_radix2(mp_limb_t ** ii,
 
     $\bullet$ Recursively compute \code{[r1, r3, ..., r(m-1)]}
          \code{= FFT[u0, u1, ..., u(m/2-1)]}
-              
+
     The parameters are as follows:
 
     $\bullet$ \code{2*n} is the length of the input and output
@@ -234,7 +235,7 @@ void fft_radix2(mp_limb_t ** ii,
          array of limbs of length \code{wn/GMP_LIMB_BITS + 1} (the
          extra limbs being a "carry limb"). Outputs are written
          in-place.
-               
+
     We require $nw$ to be at least 64 and the two temporary space pointers to
     point to blocks of size \code{n*w + FLINT_BITS} bits.
 
@@ -262,13 +263,12 @@ void ifft_radix2(mp_limb_t ** ii,
 
     Input: \code{[i0, i1, ..., i(m-1)]}, for $m = 2n$ a power of $2$.
 
-    Output: \code{[r0, r1, ..., r(m-1)] = IFFT[i0, i1, ..., i(m-1)}.
-   
+    Output: \code{[r0, r1, ..., r(m-1)] = IFFT[i0, i1, ..., i(m-1)]}.
+
     Algorithm:
 
     $\bullet$ Recursively compute \code{[s0, s1, ...., s(m/2-1)]}
          \code{= IFFT[i0, i2, ..., i(m-2)]}
-
 
     $\bullet$ Recursively compute \code{[t(m/2), t(m/2+1), ..., t(m-1)]}
          \code{= IFFT[i1, i3, ..., i(m-1)]}
@@ -279,7 +279,7 @@ void ifft_radix2(mp_limb_t ** ii,
 
     $\bullet$ Let \code{[r(m/2), r(m/2+1), ..., r(m-1)]}
         \code{= [s0-z1^0*t0, s1-z1^1*t1, ..., s(m/2-1)-z1^(m/2-1)*t(m/2-1)]}
-              
+
     The parameters are as follows:
 
     $\bullet$ \code{2*n} is the length of the input and output
@@ -343,11 +343,11 @@ void fft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t,
     $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
 
     Here \code{z1} corresponds to multiplication by $2^k$ then multiplication
-    by \code{(2^{3nw/4} - 2^{nw/4})}. We see \code{z1^i} corresponds to
-    multiplication by \code{(2^{3nw/4} - 2^{nw/4})*2^{j+ik}}.
+    by \code{(2^(3nw/4) - 2^(nw/4))}. We see \code{z1^i} corresponds to
+    multiplication by \code{(2^(3nw/4) - 2^(nw/4))*2^(j+ik)}.
 
-    We first multiply by \code{2^{j + ik + wn/4}} then multiply by an
-    additional \code{2^{nw/2}} and subtract.
+    We first multiply by \code{2^(j + ik + wn/4)} then multiply by an
+    additional \code{2^(nw/2)} and subtract.
 
 void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1, 
                               mp_limb_t * i2, mp_size_t i, mp_size_t limbs, 
@@ -359,17 +359,17 @@ void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
     $0 \leq i < 2n$ where $nw =$ \code{limbs*FLINT_BITS}.
 
     Here \code{z1} corresponds to division by $2^k$ then division by 
-    \code{(2^{3nw/4} - 2^{nw/4})}. We see \code{z1^i} corresponds to division 
-    by \code{(2^{3nw/4} - 2^{nw/4})*2^{j+ik}} which is the same as division 
-    by \code{2^{j+ik + 1}} then multiplication by 
-    \code{(2^{3nw/4} - 2^{nw/4})}.
+    \code{(2^(3nw/4) - 2^(nw/4))}. We see \code{z1^i} corresponds to division 
+    by \code{(2^(3nw/4) - 2^(nw/4))*2^(j+ik)} which is the same as division 
+    by \code{2^(j+ik + 1)} then multiplication by 
+    \code{(2^(3nw/4) - 2^(nw/4))}.
 
-    Of course, division by \code{2^{j+ik + 1}} is the same as multiplication 
-    by \code{2^{2*wn - j - ik - 1}}. The exponent is positive as 
+    Of course, division by \code{2^(j+ik + 1)} is the same as multiplication 
+    by \code{2^(2*wn - j - ik - 1)}. The exponent is positive as 
     $i \leq 2*n$, $j < n$, $k < w/2$.
 
-    We first multiply by \code{2^{2*wn - j - ik - 1 + wn/4}} then multiply by 
-    an additional \code{2^{nw/2}} and subtract.
+    We first multiply by \code{2^(2*wn - j - ik - 1 + wn/4)} then multiply by 
+    an additional \code{2^(nw/2)} and subtract.
 
 void fft_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
          mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp, mp_size_t trunc)
@@ -405,7 +405,7 @@ void fft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 
     Set \code{u = 2^b1*(s + t)}, \code{v = 2^b2*(s - t)} modulo 
     \code{B^limbs + 1}. This is used to compute 
-    \code{u = 2^{ws*tw1}*(s + t)}, \code{v = 2^{w+ws*tw2}*(s - t)} in the 
+    \code{u = 2^(ws*tw1)*(s + t)}, \code{v = 2^(w+ws*tw2)*(s - t)} in the 
     matrix fourier algorithm, i.e. effectively computing an ordinary butterfly 
     with additional twiddles by \code{z1^rc} for row $r$ and column $c$ of the 
     matrix of coefficients. Aliasing is not allowed.
@@ -416,8 +416,8 @@ void ifft_butterfly_twiddle(mp_limb_t * u, mp_limb_t * v,
 
     Set \code{u = s/2^b1 + t/2^b1)}, \code{v = s/2^b1 - t/2^b1} modulo 
     \code{B^limbs + 1}. This is used to compute 
-    \code{u = 2^{-ws*tw1}*s + 2^{-ws*tw2}*t)}, 
-    \code{v = 2^{-ws*tw1}*s + 2^{-ws*tw2}*t)} in the matrix fourier algorithm, 
+    \code{u = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)}, 
+    \code{v = 2^(-ws*tw1)*s + 2^(-ws*tw2)*t)} in the matrix fourier algorithm, 
     i.e. effectively computing an ordinary butterfly with additional twiddles 
     by \code{z1^(-rc)} for row $r$ and column $c$ of the matrix of 
     coefficients. Aliasing is not allowed.
@@ -455,9 +455,9 @@ void ifft_truncate1_twiddle(mp_limb_t ** ii, mp_size_t is,
 
     As per \code{ifft_radix2_twiddle} except that the transform is truncated
     as per \code{ifft_truncate1}.
- 
-void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
-                     mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+
+void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
+                     mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
     This is as per the \code{fft_truncate_sqrt2} function except that the 
@@ -500,7 +500,7 @@ void fft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     We require $nw$ to be at least 64 and the three temporary space pointers 
     to point to blocks of size \code{n*w + FLINT_BITS} bits.
 
-void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n, 
+void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
                       mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
@@ -509,7 +509,7 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     transform length is $4n$ where \code{n = 2^depth} so that the left and
     right transforms are both length $2n$. We require \code{trunc > 2*n} and
     that \code{trunc} is divisible by \code{2*n1}.
- 
+
     We set \code{n1} to a power of 2 about the square root of $n$.
 
     As per the matrix fourier FFT the sqrt2 layer is folded into the the 
@@ -520,21 +520,21 @@ void ifft_mfa_truncate_sqrt2(mp_limb_t ** ii, mp_size_t n,
     We require $nw$ to be at least 64 and the three temporary space pointers 
     to point to blocks of size \code{n*w + FLINT_BITS} bits.
 
-void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
-                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void fft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
     Just the outer layers of \code{fft_mfa_truncate_sqrt2}.
 
-void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj, 
-          mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void fft_mfa_truncate_sqrt2_inner(mp_limb_t ** ii, mp_limb_t ** jj,
+          mp_size_t n, mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc, mp_limb_t * tt)
 
     The inner layers of \code{fft_mfa_truncate_sqrt2} and 
     \code{ifft_mfa_truncate_sqrt2} combined with pointwise mults.
 
-void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n, 
-                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2, 
+void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
+                      mp_bitcnt_t w, mp_limb_t ** t1, mp_limb_t ** t2,
                              mp_limb_t ** temp, mp_size_t n1, mp_size_t trunc)
 
     The outer layers of \code{ifft_mfa_truncate_sqrt2} combined with
@@ -549,7 +549,7 @@ void ifft_mfa_truncate_sqrt2_outer(mp_limb_t ** ii, mp_size_t n,
 void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                           mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
 
-    As per \code{fft_radix2) except that it performs a sqrt2 negacyclic 
+    As per \code{fft_radix2} except that it performs a sqrt2 negacyclic 
     transform of length $2n$. This is the same as the radix 2 transform 
     except that the $i$-th coefficient of the input is first multiplied by 
     $\sqrt{2}^{iw}$.
@@ -560,7 +560,7 @@ void fft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w,
 void ifft_negacyclic(mp_limb_t ** ii, mp_size_t n, mp_bitcnt_t w, 
                           mp_limb_t ** t1, mp_limb_t ** t2, mp_limb_t ** temp)
 
-    As per \code{ifft_radix2) except that it performs a sqrt2 negacyclic 
+    As per \code{ifft_radix2} except that it performs a sqrt2 negacyclic 
     inverse transform of length $2n$. This is the same as the radix 2 inverse
     transform except that the $i$-th coefficient of the output is finally 
     divided by $\sqrt{2}^{iw}$.
@@ -635,8 +635,8 @@ void mul_mfa_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                 mp_limb_t * i2, mp_size_t n2)
 
-   The main integer multiplication routine. Sets \code{(r1, n1 + n2)} to
-   \code{(i1, n1)} times \code{(i2, n2)}. We require \code{n1 >= n2 > 0}.
+    The main integer multiplication routine. Sets \code{(r1, n1 + n2)} to
+    \code{(i1, n1)} times \code{(i2, n2)}. We require \code{n1 >= n2 > 0}.
 
 *******************************************************************************
 
