@@ -42,6 +42,57 @@ int main(void)
 
 /* PRIME p = 2 ***************************************************************/
 
+    /* Check Artin Schreier preimages */
+    for (i = 0; i < 1000; i++)
+    {
+        fmpz_t p = {2L};
+        long d;
+        qadic_ctx_t ctx;
+
+        int ans;
+        qadic_t a, b, c;
+
+        d = n_randint(state, 10) + 1;
+        qadic_ctx_init_conway(ctx, p, d, 1, "X", PADIC_SERIES);
+
+        qadic_init(a);
+        qadic_init(b);
+        qadic_init(c);
+
+        qadic_randtest_val(a, state, 0, ctx);
+        padic_poly_fit_length(b, d);
+
+        ans = _artin_schreier_preimage(b->coeffs, a->coeffs, a->length, 
+                                       ctx->a, ctx->j, ctx->len);
+
+        b->val = 0;
+        _padic_poly_set_length(b, d);
+        _padic_poly_normalise(b);
+
+        if (ans)
+        {
+            qadic_mul(c, b, b, ctx);
+            qadic_add(c, c, b, ctx);
+
+            result = qadic_equal(a, c);
+
+            if (!result)
+            {
+                printf("FAIL (Artin Schreier preimages):\n\n");
+                printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
+                printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+                printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+                qadic_ctx_print(ctx);
+                abort();
+            }
+        }
+        qadic_clear(a);
+        qadic_clear(b);
+        qadic_clear(c);
+
+        qadic_ctx_clear(ctx);
+    }
+
 /* PRIME p > 2 ***************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
