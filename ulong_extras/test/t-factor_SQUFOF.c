@@ -39,13 +39,13 @@ int main(void)
    printf("factor_SQUFOF....");
    fflush(stdout);
 
-   for (i = 0; i < 3000; i++) /* Test random numbers */
+   for (i = 0; i < 300 * flint_test_multiplier(); i++) /* Test random numbers */
    {
       mp_limb_t n1, n2;
 
       do
       {
-         n1 = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         n1 = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
       } while (n_is_prime(n1) || (n1 < 2UL));
 
 #if FLINT64
@@ -67,10 +67,10 @@ int main(void)
       }
    }
    
-   if (count < 2800)
+   if (count < 280 * flint_test_multiplier())
    {
       printf("FAIL:\n");
-      printf("Only %lu of 10000 numbers factored\n", count); 
+      printf("Only %lu numbers factored\n", count); 
       abort();
    }
 

@@ -61,62 +61,38 @@ void
 fmpz_poly_gcd(fmpz_poly_t res, const fmpz_poly_t poly1,
               const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long rlen;
-    
-    if (len1 == 0)
+    if (poly1->length < poly2->length)
     {
-        if (len2 == 0)
-            fmpz_poly_zero(res);
-        else
-        {
-            if (fmpz_sgn(poly2->coeffs + (len2 - 1)) > 0)
-                fmpz_poly_set(res, poly2);
-            else
-                fmpz_poly_neg(res, poly2);
-        }
-        return;
+        fmpz_poly_gcd(res, poly2, poly1);
     }
-    else
+    else /* len1 >= len2 >= 0 */
     {
-        if (len2 == 0)
+        const long len1 = poly1->length;
+        const long len2 = poly2->length;
+        
+        if (len1 == 0) /* len1 = len2 = 0 */
+        {
+            fmpz_poly_zero(res);
+        } 
+        else if (len2 == 0) /* len1 > len2 = 0 */
         {
             if (fmpz_sgn(poly1->coeffs + (len1 - 1)) > 0)
                 fmpz_poly_set(res, poly1);
             else
                 fmpz_poly_neg(res, poly1);
-            return;
+        }
+        else /* len1 >= len2 >= 1 */
+        {
+            /* all current gcd functions automatically handle aliasing */
+           
+            fmpz_poly_fit_length(res, len2);
+                
+            _fmpz_poly_gcd(res->coeffs, poly1->coeffs, len1,
+                                    poly2->coeffs, len2);
+    
+            _fmpz_poly_set_length(res, len2);
+            _fmpz_poly_normalise(res);
         }
     }
-
-    rlen = FLINT_MIN(len1, len2);
-
-    if (res == poly1 || res == poly2)
-    {
-       fmpz_poly_t temp;
-       fmpz_poly_init2(temp, rlen);
-       if (len1 >= len2)
-          _fmpz_poly_gcd(temp->coeffs, poly1->coeffs, len1,
-                                    poly2->coeffs, len2);
-       else
-          _fmpz_poly_gcd(temp->coeffs, poly2->coeffs, len2,
-                                    poly1->coeffs, len1);
-       fmpz_poly_swap(temp, res);
-       fmpz_poly_clear(temp);
-    }
-    else
-    {
-       fmpz_poly_fit_length(res, rlen);
-       if (len1 >= len2)
-          _fmpz_poly_gcd(res->coeffs, poly1->coeffs, len1,
-                                    poly2->coeffs, len2);
-       else
-          _fmpz_poly_gcd(res->coeffs, poly2->coeffs, len2,
-                                    poly1->coeffs, len1);
-    }
-    
-    _fmpz_poly_set_length(res, rlen);
-    _fmpz_poly_normalise(res);
 }
 

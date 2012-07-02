@@ -787,7 +787,7 @@ build fixes
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
 
-2.3 -- ?, 2012
+2.3 -- 1 Jul 2012
 
 general
 -------
@@ -797,6 +797,8 @@ general
   * in addition to the entries below, fixed a large number of memory leaks,
     problems with the test code, and bugs in corner cases of various functions
   * added _fmpz_cleanup_mpz_content as an alternative to _fmpz_cleanup
+  * support MinGW32
+  * support Cygwin
 
 ulong_extras
 ------------
@@ -810,6 +812,8 @@ ulong_extras
   * fixed bugs in n_is_prime_pocklington
   * fixed ULONG_MAX case in powmod and powmod2
   * fixed problems with the random number generators
+  * fixed rare bug in n_mod_precomp
+  * fixed rare bug in n_is_prime_pseudosquare
 
 long_extras
 -----------
@@ -996,6 +1000,7 @@ nmod_poly
   * added nmod_poly_sqrt
   * made fread read the modulus from the file
   * made randtest produce sparse output
+  * fixed bug in xgcd_euclidean with scalar inputs
 
 nmod_vec
 --------

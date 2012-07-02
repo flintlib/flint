@@ -35,7 +35,7 @@ int main(void)
     printf("prime_pi....");
     fflush(stdout);
 
-    for (n=1; n<100000; n++)
+    for (n=1; n<10000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
         if ((n_prime_pi(n-1)+1 == n_prime_pi(n)) != n_is_prime(n))
         {
@@ -45,7 +45,7 @@ int main(void)
         }
     }
 
-    for (n=1; n<50000; n++)
+    for (n=1; n<5000 * FLINT_MIN(10, flint_test_multiplier()); n++)
     {
         if (n_prime_pi(n_nth_prime(n)) != n)
         {

@@ -39,7 +39,7 @@ int main(void)
  
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++) /* Test random numbers */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
       mp_limb_t n1, n2, orig_n;
       mpz_t d_n2, d_n1, d_p;
@@ -75,7 +75,7 @@ int main(void)
       mpz_clear(d_p);
    }
          
-   for (i = 0; i < 100000; i++) /* Test perfect powers */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test perfect powers */
    {
       mp_limb_t n1, n2, orig_n, base;
       mpz_t d_n2, d_n1, d_p;

@@ -261,7 +261,7 @@ int fmpz_poly_q_evaluate(mpq_t rop, const fmpz_poly_q_t f, const mpq_t a)
 
     Input and output
 
-    The following three methods enable users to construct elements of type 
+    The following three methods enable users to construct elements of type\\ 
     \code{fmpz_poly_q_t} from strings or to obtain string representations of 
     such elements.
 

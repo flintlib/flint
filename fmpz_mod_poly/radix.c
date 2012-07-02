@@ -80,6 +80,7 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
     if (degF < degR)
     {
         D->k = 0;
+        D->degR = degR;
     }
     else
     {

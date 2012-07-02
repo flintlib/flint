@@ -314,8 +314,8 @@ void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
     Sets the entries of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
-void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
-                        const fmpz_t m, const nmod_poly_t poly2, int sign)
+void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
+                        const fmpz_t m1, const nmod_mat_t mat2, int sign)
 
     Given \code{mat1} with entries modulo \code{m} and \code{mat2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
@@ -337,7 +337,7 @@ void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres,
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use \code{fmpz_mat_multi_mod_precomp}.
+    set of moduli, it is faster to use\\ \code{fmpz_mat_multi_mod_precomp}.
 
 void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues,
     long nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
@@ -354,7 +354,7 @@ void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use \code{fmpz_mat_multi_CRT_ui_precomp}.
+    set of moduli, it is faster to use\\ \code{fmpz_mat_multi_CRT_ui_precomp}.
 
 *******************************************************************************
 
@@ -529,8 +529,8 @@ void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
     Sets \code{det} to the determinant of the square matrix $A$.
     The matrix of dimension $0 \times 0$ is defined to have determinant 1.
 
-    This function automatically chooses between \code{fmpz_mat_det_cofactor},
-    \code{fmpz_mat_det_bareiss}, \code{fmpz_mat_det_modular} and
+    This function automatically chooses between \code{fmpz_mat_det_cofactor},\\
+    \code{fmpz_mat_det_bareiss}, \code{fmpz_mat_det_modular} and\\
     \code{fmpz_mat_det_modular_accelerated}
     (with \code{proved} = 1), depending on the size of the matrix
     and its entries.

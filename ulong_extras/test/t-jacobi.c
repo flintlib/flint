@@ -38,7 +38,7 @@ int main(void)
    printf("jacobi....");
    fflush(stdout);
 
-   for (i = 0; i < 100000; i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
       mp_limb_t d;
       mpz_t a_m, d_m;

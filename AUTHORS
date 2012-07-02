@@ -22,14 +22,27 @@ Richard Howell-Peak : Polynomial factorisation and irreducibility testing for
                       polys over Z/pZ
 Peter Shrimpton : Basic prime sieve, Pocklingtom-Lehmer, Lucas, BPSW and n-1
                   primality tests and a Weiferich prime search program
-
+Andres Goens: Fq module and polynomials over Fq
+Lina Kulakova: Factorisation for polynomials over F_p for large p.
+Thomas DuBuisson: Logical ops for fmpz module, patches to the build system.
+Jean-Pierre Flori: Many build system patches and Sage integration.
+Frithjof Schulze: Some fmpz functions and various patches.
+Curtis Bright: Numerous patches including 32 bit support
 Jan Tuitman : contributed to the design of the padics module.
 
 Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
-Kedlaya, William Stein, Robert Bradshaw, Serge Torres and many others.
+Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
+Grayson, Martin Lee, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
+Puydt and many others.
+
+Ralph Hemmecke made available an autotools build for FLINT.
+
+Numerous people have contributed to wrapping FLINT in Sage and debugging, 
+including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
+Martin Albrecht, Sebastian Pancratz, Fredrik Johansson,
 
 Some code (longlong.h and clz_tab.c) has been used from the GMP library, 
 whose main author is Torbjorn Granlund.

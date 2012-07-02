@@ -34,7 +34,7 @@
 void fmpz_poly_init(fmpz_poly_t poly)
 
     Initialises \code{poly} for use, setting its length to zero.  
-    A corresponding call to \code{fmpz_poly_clear()} must be made after 
+    A corresponding call to\\ \code{fmpz_poly_clear()} must be made after 
     finishing with the \code{fmpz_poly_t} to free the memory used by 
     the polynomial.
 
@@ -2034,7 +2034,7 @@ void _fmpz_poly_compose_series_horner(fmpz * res,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2057,7 +2057,7 @@ void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2080,7 +2080,7 @@ void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2392,7 +2392,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
     this function so that you can keep them for restarting Hensel lifting 
     later. The product of local factors must be squarefree.
 
-    The return value is an exponent which must be passed to the function 
+    The return value is an exponent which must be passed to the function\\ 
     \code{_fmpz_poly_hensel_continue_lift()} as \code{prev_exp} if the 
     Hensel lifting is to be resumed.
 
@@ -2409,7 +2409,7 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 
     It lifts from \code{curr} to $N$. It also requires \code{prev} 
     (to lift the cofactors) given as the return value of the function 
-    \code{_fmpz_poly_hensel_start_lift()} or the function 
+    \code{_fmpz_poly_hensel_start_lift()} or the function\\ 
     \code{_fmpz_poly_hensel_continue_lift()}. The current lifted factors 
     are supplied in \code{lifted_fac} and upon return are updated
     there. As usual \code{link}, \code{v}, and \code{w} describe the 

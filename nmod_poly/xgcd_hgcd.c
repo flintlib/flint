@@ -270,11 +270,11 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else if (lenB == 1)  /* lenA >= lenB = 1 */
         {
-            nmod_poly_one(G);
-            nmod_poly_zero(S);
             nmod_poly_fit_length(T, 1);
             T->length = 1;
             T->coeffs[0] = n_invmod(B->coeffs[0], A->mod.n);
+            nmod_poly_one(G);
+            nmod_poly_zero(S);
         }
         else  /* lenA >= lenB >= 2 */
         {

@@ -31,8 +31,10 @@
 static char * docsin[] = {
     "../../fmpz/doc/fmpz.txt", 
     "../../fmpz_vec/doc/fmpz_vec.txt", 
+    "../../fmpz_factor/doc/fmpz_factor.txt", 
     "../../fmpz_mat/doc/fmpz_mat.txt", 
     "../../fmpz_poly/doc/fmpz_poly.txt", 
+    "../../fmpz_poly_factor/doc/fmpz_poly_factor.txt", 
     "../../fmpq/doc/fmpq.txt", 
     "../../fmpq_mat/doc/fmpq_mat.txt", 
     "../../fmpq_poly/doc/fmpq_poly.txt", 
@@ -51,13 +53,18 @@ static char * docsin[] = {
     "../../mpn_extras/doc/mpn_extras.txt",
     "../../doc/profiler.txt", 
     "../../interfaces/doc/interfaces.txt",
+    "../../fft/doc/fft.txt",
+    "../../qsieve/doc/qsieve.txt",
+    "../../perm/doc/perm.txt",
 };
 
 static char * docsout[] = {
     "input/fmpz.tex", 
     "input/fmpz_vec.tex", 
+    "input/fmpz_factor.tex", 
     "input/fmpz_mat.tex",
     "input/fmpz_poly.tex", 
+    "input/fmpz_poly_factor.tex", 
     "input/fmpq.tex", 
     "input/fmpq_mat.tex", 
     "input/fmpq_poly.tex", 
@@ -76,6 +83,9 @@ static char * docsout[] = {
     "input/mpn_extras.tex",
     "input/profiler.tex", 
     "input/interfaces.tex",
+    "input/fft.tex",
+    "input/qsieve.tex",
+    "input/perm.tex",
 };
 
 static const int ndocs = sizeof(docsin) / sizeof(char *);

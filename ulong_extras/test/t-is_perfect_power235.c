@@ -41,10 +41,10 @@ int main(void)
    
    flint_randinit(state);
 
-   for (i = 0; i < 10000; i++) /* Test that square pass the test */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that square pass the test */
    {
       bits = n_randint(state, FLINT_BITS/2) + 1;
-      d = n_randbits(state, bits);
+      d = n_randtest_bits(state, bits);
 
       result = n_is_perfect_power235(n_pow(d, 2));
       if (!result)
@@ -56,10 +56,10 @@ int main(void)
 
    }
          
-   for (i = 0; i < 10000; i++) /* Test that cubes pass the test */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that cubes pass the test */
    {
       bits = n_randint(state, FLINT_BITS/3) + 1;
-      d = n_randbits(state, bits);
+      d = n_randtest_bits(state, bits);
 
       result = n_is_perfect_power235(n_pow(d, 3));
       
@@ -72,10 +72,10 @@ int main(void)
 
    }
          
-   for (i = 0; i < 10000; i++) /* Test that fifth powers pass the test */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that fifth powers pass the test */
    {
       bits = n_randint(state, FLINT_BITS/5) + 1;
-      d = n_randbits(state, bits);
+      d = n_randtest_bits(state, bits);
 
       result = n_is_perfect_power235(n_pow(d, 5));
       
@@ -88,7 +88,7 @@ int main(void)
 
    }
          
-   for (i = 0; i < 100000; i++) /* Test that non prefect powers fail */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non prefect powers fail */
    {
       mpz_t d_m;
       mpz_init(d_m);

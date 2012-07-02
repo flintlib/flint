@@ -39,13 +39,13 @@ int main(void)
    
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++) /* Test that non-squares pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that non-squares pass */
    {
       mp_limb_t a, s, bits;
       
       bits = n_randint(state, FLINT_BITS/2) + 1;
-      a = n_randbits(state, bits);
-      s = a*a + n_randint(state, 2*a) + 1;
+      a = n_randtest_bits(state, bits);
+      s = a*a + n_randtest(state) % (2*a) + 1;
 
       result = !n_is_square(s);
       if (!result)
@@ -56,12 +56,12 @@ int main(void)
       }
    }
          
-   for (i = 0; i < 100000; i++) /* Test that squares pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that squares pass */
    {
       mp_limb_t a, s, bits;
       
       bits = n_randint(state, FLINT_BITS/2);
-      a = n_randbits(state, bits);
+      a = n_randtest_bits(state, bits);
       s = a*a;
 
       result = n_is_square(s);

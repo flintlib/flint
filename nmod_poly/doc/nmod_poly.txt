@@ -1516,7 +1516,7 @@ void _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -1562,7 +1562,7 @@ void _nmod_poly_compose_series(mp_ptr res, mp_srcptr poly1, long len1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 

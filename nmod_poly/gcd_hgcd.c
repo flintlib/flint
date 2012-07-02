@@ -99,33 +99,55 @@ long _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, long lenA,
     return lenG;
 }
 
-void nmod_poly_gcd_hgcd(nmod_poly_t G, const nmod_poly_t A, const nmod_poly_t B)
+void nmod_poly_gcd_hgcd(nmod_poly_t G, 
+                             const nmod_poly_t A, const nmod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
-
-    if (lenA == 0)
+    if (A->length < B->length)
     {
-        if (lenB == 0) 
+        nmod_poly_gcd_hgcd(G, B, A);
+    }
+    else /* lenA >= lenB >= 0 */
+    {
+        long lenA = A->length, lenB = B->length, lenG;
+        nmod_poly_t tG;
+        mp_ptr g;
+
+        if (lenA == 0) /* lenA = lenB = 0 */
+        {
             nmod_poly_zero(G);
-        else 
-            nmod_poly_make_monic(G, B);
-    }
-    else if (lenB == 0)
-    {
-        nmod_poly_make_monic(G, A);
-    }
-    else
-    {
-        nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+        } 
+        else if (lenB == 0) /* lenA > lenB = 0 */
+        {
+            nmod_poly_make_monic(G, A);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            if (G == A || G == B)
+            {
+                nmod_poly_init2(tG, A->mod.n, FLINT_MIN(lenA, lenB));
+                g = tG->coeffs;
+            }
+            else
+            {
+                nmod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+                g = G->coeffs;
+            }
 
-        if (lenA >= lenB)
-            G->length = _nmod_poly_gcd_hgcd(G->coeffs, A->coeffs, A->length, 
-                                                       B->coeffs, B->length, A->mod);
-        else
-            G->length = _nmod_poly_gcd_hgcd(G->coeffs, B->coeffs, B->length, 
-                                                       A->coeffs, A->length, A->mod);
+            lenG = _nmod_poly_gcd_hgcd(g, A->coeffs, lenA,
+                                               B->coeffs, lenB, A->mod);
 
-        _nmod_poly_make_monic(G->coeffs, G->coeffs, G->length, G->mod);
+            if (G == A || G == B)
+            {
+                nmod_poly_swap(tG, G);
+                nmod_poly_clear(tG);
+            }
+            G->length = lenG;
+
+            if (G->length == 1)
+                G->coeffs[0] = 1;
+            else
+                nmod_poly_make_monic(G, G);
+        }
     }
 }
 
