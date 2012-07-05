@@ -132,8 +132,6 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Cantor-Zassenhaus algorithm.
 
-    The modulus must be a prime greater than 2.
-
 void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 					  const fmpz_mod_poly_t poly, double beta)
 
@@ -141,8 +139,6 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by
     Kaltofen and Shoup (1998). More precisely this algorithm uses a
     “baby step/giant step” strategy for the distinct-degree factorization step.
-
-    The modulus must be a prime greater than 2.
 
 void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
 				     const fmpz_mod_poly_t f)

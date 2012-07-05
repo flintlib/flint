@@ -34,12 +34,6 @@ void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     long i, j, k, l, res_num, dist_deg_num;
     long *degs;
 
-    if (poly->p == 2)
-    {
-        printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
-        printf("Not implemented for p = 2.\n");
-        abort();
-    }
     if (!(degs = flint_malloc(fmpz_mod_poly_degree(poly) * sizeof(long))))
     {
         printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");

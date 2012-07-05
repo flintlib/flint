@@ -41,11 +41,10 @@ main(void)
     {
         fmpz_mod_poly_t poly1, poly2, q, r;
         fmpz_t modulus;
-        long length, test_modulus;
+        long length;
         int i, num;
 
-        do { test_modulus = n_randtest_prime(state, 0); } while (test_modulus <= 2);
-        fmpz_init_set_ui(modulus, test_modulus);
+        fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
 
         fmpz_mod_poly_init(q, modulus);
         fmpz_mod_poly_init(r, modulus);
@@ -56,9 +55,10 @@ main(void)
         do
         {
             fmpz_mod_poly_randtest(poly1, state, length);
-            fmpz_mod_poly_make_monic(poly1, poly1);
+            if (poly1->length)
+                fmpz_mod_poly_make_monic(poly1, poly1);
         }
-        while ((!fmpz_mod_poly_is_irreducible(poly1)) || (poly1->length < 2));
+        while ((poly1->length < 2) || (!fmpz_mod_poly_is_irreducible(poly1)));
 
         num = n_randint(state, 5) + 1;
 
@@ -67,9 +67,10 @@ main(void)
             do
             {
                 fmpz_mod_poly_randtest(poly2, state, length);
-                fmpz_mod_poly_make_monic(poly2, poly2);
+                if (poly2->length)
+                    fmpz_mod_poly_make_monic(poly2, poly2);
             }
-            while ((!fmpz_mod_poly_is_irreducible(poly2)) || (poly2->length < 2));
+            while ((poly2->length < 2) || (!fmpz_mod_poly_is_irreducible(poly2)));
 
             fmpz_mod_poly_mul(poly1, poly1, poly2);
         }

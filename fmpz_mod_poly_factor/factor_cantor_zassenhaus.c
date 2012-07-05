@@ -35,13 +35,6 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
     fmpz_mod_poly_t h, v, g, x;
     long i, j, num;
 
-    if (f->p == 2)
-    {
-        printf("Exception (fmpz_mod_poly_factor_cantor_zassenhaus): \n");
-        printf("Not implemented for p = 2.\n");
-        abort();
-    }
-
     fmpz_mod_poly_init(h, &f->p);
     fmpz_mod_poly_init(g, &f->p);
     fmpz_mod_poly_init(v, &f->p);
