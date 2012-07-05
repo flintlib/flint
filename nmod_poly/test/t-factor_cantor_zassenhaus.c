@@ -50,7 +50,7 @@ main(void)
         long i, j, length, num;
         long prod1, exp[5];
 
-        do { modulus = n_randtest_prime(state, 0); } while (modulus <= 2);
+        modulus = n_randtest_prime(state, 0);
 
         nmod_poly_init(pol1, modulus);
         nmod_poly_init(poly, modulus);
@@ -68,7 +68,7 @@ main(void)
             if(!nmod_poly_is_zero(poly))
                 nmod_poly_make_monic(poly, poly);
         }
-        while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2));
+        while ((poly->length < 2) || (!nmod_poly_is_irreducible(poly)));
 
         exp[0] = n_randint(state, 30) + 1;
         prod1 = exp[0];
@@ -84,9 +84,10 @@ main(void)
                 length = n_randint(state, 7) + 2;
                 nmod_poly_randtest(poly, state, length);
                 if(!nmod_poly_is_zero(poly))
+                {
                     nmod_poly_make_monic(poly, poly);
-                if (poly->length)
                     nmod_poly_divrem(quot, rem, pol1, poly);
+                }
             }
             while ((!nmod_poly_is_irreducible(poly)) || (poly->length < 2) ||
                 (rem->length == 0));

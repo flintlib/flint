@@ -2138,8 +2138,6 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Cantor-Zassenhaus algorithm.
 
-    The modulus must be a prime greater than 2.
-
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a non-constant, squarefree polynomial \code{f} into monic
