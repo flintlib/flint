@@ -4,9 +4,9 @@
 # (C) 2011, William Hart
 
 PREFIX="/usr/local"
-MPIR_DIR="/usr"
-MPFR_DIR="/usr"
-NTL_DIR="/usr"
+MPIR_DIR="/usr/local"
+MPFR_DIR="/usr/local"
+NTL_DIR="/usr/local"
 FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
 FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
 WANT_NTL=0
