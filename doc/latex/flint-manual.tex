@@ -314,22 +314,22 @@ does not provide a posix implementation.
 
 To configure FLINT you must specify where MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
-e.g. in \code{/usr} or it can work with the libraries built
+e.g. in \code{/usr/local} or it can work with the libraries built
 from source in their standard source trees. 
 
-In the case that a library is installed in say \code{/usr/local}
+In the case that a library is installed in say \code{/usr}
 in the \code{lib} and \code{include} directories as usual, simply
-specify the top level location, e.g. \code{/usr/local} when 
+specify the top level location, e.g. \code{/usr} when 
 configuring FLINT. If a library is built in its source tree,
 specify the top level source directory, e.g. \code{/home/user1/mpir/}.
 
 To specify the directories where the libraries reside, you must
 pass the directories as parameters to FLINT's configure, e.g.\ 
 \begin{lstlisting}[language=bash]
-./configure --with-mpir=/usr/local/ --with-mpfr=/home/user1/mpfr/
+./configure --with-mpir=/usr --with-mpfr=/home/user1/mpfr/
 \end{lstlisting}
 If no directories are specified, FLINT assumes it will find the
-libraries it needs in \code{/usr}.
+libraries it needs in \code{/usr/local}.
 
 Note that FLINT builds static and shared libraries by default, except
 on platforms where this is not supported. If you do not require either
