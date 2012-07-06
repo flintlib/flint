@@ -81,6 +81,10 @@ void _fmpz_demote(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f);
 
+void _fmpz_init_readonly_mpz(fmpz_t f, mpz_t z);
+
+void _fmpz_clear_readonly_mpz(mpz_t);
+
 static __inline__
 void fmpz_init(fmpz_t f)
 {
