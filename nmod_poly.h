@@ -973,6 +973,9 @@ void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, long d);
 
+void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
+                             const nmod_poly_t poly, double beta, long **degs);
+
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 int nmod_poly_is_irreducible(const nmod_poly_t f);
