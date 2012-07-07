@@ -990,6 +990,9 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     const nmod_poly_t f);
 
+void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
+                               const nmod_poly_t poly, double beta);
+
 void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,

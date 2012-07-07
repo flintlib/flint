@@ -2147,6 +2147,14 @@ void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
     Factorises a non-constant, squarefree polynomial \code{f} into monic
     irreducible factors using the Berlekamp algorithm.
 
+void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
+			       const nmod_poly_t poly, double beta)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the fast version of Cantor-Zassenhaus algorithm proposed by
+    Kaltofen and Shoup (1998). More precisely this algorithm uses a
+    “baby step/giant step” strategy for the distinct-degree factorization step.
+
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
                                           const nmod_poly_t f)
 
