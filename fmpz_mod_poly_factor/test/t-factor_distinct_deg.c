@@ -65,9 +65,10 @@ main(void)
         do
         {
             fmpz_mod_poly_randtest(poly, state, length);
-            fmpz_mod_poly_make_monic(poly, poly);
+            if (poly->length)
+                fmpz_mod_poly_make_monic(poly, poly);
         }
-        while ((!fmpz_mod_poly_is_irreducible(poly)) || (poly->length < 2));
+        while ((poly->length < 2) || (!fmpz_mod_poly_is_irreducible(poly)));
 
         fmpz_mod_poly_mul(poly1, poly1, poly);
 
@@ -79,11 +80,13 @@ main(void)
             {
                 length = n_randint(state, 7) + 2;
                 fmpz_mod_poly_randtest(poly, state, length);
-                fmpz_mod_poly_make_monic(poly, poly);
                 if (poly->length)
+                {
+                    fmpz_mod_poly_make_monic(poly, poly);
                     fmpz_mod_poly_divrem(q, r, poly1, poly);
+                }
             }
-            while ((!fmpz_mod_poly_is_irreducible(poly)) || (poly->length < 2) ||
+            while ((poly->length < 2) || (!fmpz_mod_poly_is_irreducible(poly)) ||
                 (r->length == 0));
 
             fmpz_mod_poly_mul(poly1, poly1, poly);
