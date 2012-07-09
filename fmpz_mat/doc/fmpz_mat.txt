@@ -610,6 +610,22 @@ void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 
 *******************************************************************************
 
+    Charactersitic polynomial
+
+*******************************************************************************
+
+void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
+
+    Sets \code{(cp, n+1)} to the characteristic polynomial of 
+    an $n \times n$ square matrix.
+
+void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+
+    Computes the characteristic polynomial of length $n + 1$ of 
+    an $n \times n$ square matrix.
+
+*******************************************************************************
+
     Rank
 
 *******************************************************************************
