@@ -29,8 +29,9 @@
 
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
-                                      const fmpz_mod_poly_t f)
+void
+fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
+                                       const fmpz_mod_poly_t f)
 {
     fmpz_mod_poly_t h, v, g, x;
     long i, j, num;

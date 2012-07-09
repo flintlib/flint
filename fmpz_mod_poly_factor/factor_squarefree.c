@@ -30,14 +30,15 @@
 #include "fmpz_mod_poly_factor.h"
 #include "ulong_extras.h"
 
-void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
-                                      const fmpz_mod_poly_t f)
+void
+fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
+                                const fmpz_mod_poly_t f)
 {
     fmpz_mod_poly_t f_d, g, g_1, r;
     fmpz_t p, x;
     long deg, i, p_ui;
 
-    if (f->length <= 1) 
+    if (f->length <= 1)
     {
         res->num = 0;
         return;
@@ -53,7 +54,7 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
     fmpz_set(p, &f->p);
     p_ui = fmpz_get_ui(p);
     deg = fmpz_mod_poly_degree(f);
-    
+
     /* Step 1, look at f', if it is zero then we are done since f = h(x)^p
        for some particular h(x), clearly f(x) = sum a_k x^kp, k <= deg(f) */
 
@@ -71,12 +72,12 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
 
         fmpz_mod_poly_init(h, p);
 
-        for (i = 0; i <= deg / p_ui; i++) /* this will be an integer since f'=0 */
+        for (i = 0; i <= deg / p_ui; i++)   /* this will be an integer since f'=0 */
         {
             fmpz_mod_poly_get_coeff_fmpz(x, f, i * p_ui);
             fmpz_mod_poly_set_coeff_fmpz(h, i, x);
         }
-        
+
         /* Now run squarefree on h, and return it to the pth power */
         fmpz_mod_poly_factor_init(new_res);
 
@@ -86,9 +87,9 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
         fmpz_mod_poly_factor_concat(res, new_res);
         fmpz_mod_poly_clear(h);
         fmpz_mod_poly_factor_clear(new_res);
-   }
-   else 
-   { 
+    }
+    else
+    {
         fmpz_mod_poly_t h, z;
 
         fmpz_mod_poly_init(r, p);
@@ -125,13 +126,13 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
         fmpz_mod_poly_clear(h);
         fmpz_mod_poly_clear(z);
         fmpz_mod_poly_clear(r);
-        
+
         fmpz_mod_poly_make_monic(g, g);
 
         if (g->length > 1)
         {
             /* so now we multiply res with squarefree(g^1/p) ^ p  */
-            fmpz_mod_poly_t g_p; /* g^(1/p) */
+            fmpz_mod_poly_t g_p;    /* g^(1/p) */
             fmpz_mod_poly_factor_t new_res_2;
 
             fmpz_mod_poly_init(g_p, p);
@@ -152,7 +153,7 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
             fmpz_mod_poly_clear(g_p);
             fmpz_mod_poly_factor_clear(new_res_2);
         }
-   }
+    }
 
     fmpz_clear(p);
     fmpz_clear(x);

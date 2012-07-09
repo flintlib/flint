@@ -50,7 +50,10 @@ main(void)
         int result = 1;
         int i, num;
 
-        do { test_modulus = n_randtest_prime(state, 0); } while (test_modulus <= 2);
+        do
+        {
+            test_modulus = n_randtest_prime(state, 0);
+        } while (test_modulus <= 2);
         fmpz_init_set_ui(modulus, test_modulus);
 
         fmpz_mod_poly_init(poly1, modulus);
@@ -73,7 +76,8 @@ main(void)
                 fmpz_mod_poly_randtest(poly2, state, length);
                 fmpz_mod_poly_make_monic(poly2, poly2);
             }
-            while ((!fmpz_mod_poly_is_irreducible(poly2)) || (poly2->length < 2));
+            while ((!fmpz_mod_poly_is_irreducible(poly2))
+                   || (poly2->length < 2));
 
             fmpz_mod_poly_mul(poly1, poly1, poly2);
         }
@@ -82,7 +86,9 @@ main(void)
         if (!result)
         {
             printf("Error: reducible polynomial declared irreducible!\n");
-            printf("poly:\n"); fmpz_mod_poly_print(poly1); printf("\n");
+            printf("poly:\n");
+            fmpz_mod_poly_print(poly1);
+            printf("\n");
             abort();
         }
 

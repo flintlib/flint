@@ -30,7 +30,8 @@
 #include <stdlib.h>
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp)
+void
+fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp)
 {
     long i;
 

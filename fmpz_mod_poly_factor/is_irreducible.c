@@ -49,7 +49,8 @@ fmpz_mod_poly_powpowmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t pol,
     fmpz_mod_poly_clear(pow);
 }
 
-int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
+int
+fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
 {
     if (fmpz_mod_poly_length(f) > 2)
     {

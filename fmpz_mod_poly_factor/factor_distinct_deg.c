@@ -26,8 +26,10 @@
 #include <math.h>
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-              const fmpz_mod_poly_t poly, double beta, long **degs)
+void
+fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
+                                  const fmpz_mod_poly_t poly, double beta,
+                                  long **degs)
 {
     fmpz_mod_poly_t f, g, s, v, tmp;
     fmpz_mod_poly_t *h, *H, *I;
@@ -35,7 +37,7 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     fmpz_t p;
 
     n = fmpz_mod_poly_degree(poly);
-    l = ceil(pow (n, beta));
+    l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
 
     /* initialization */
@@ -76,7 +78,7 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     for (j = 1; j < m; j++)
         fmpz_mod_poly_compose_mod(H[j], H[j - 1], H[0], v);
 
-    /* compute interval polynomials I[j] = (H_j-h_0)*...*(H_j-h_{l-1})*/
+    /* compute interval polynomials I[j] = (H_j-h_0)*...*(H_j-h_{l-1}) */
     for (j = 0; j < m; j++)
     {
         fmpz_mod_poly_set_coeff_ui(I[j], 0, 1);

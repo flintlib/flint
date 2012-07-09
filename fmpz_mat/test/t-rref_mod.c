@@ -33,8 +33,8 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-static
-void check_rref(fmpz_mat_t A)
+static void
+check_rref(fmpz_mat_t A)
 {
     long i, j, prev_pivot, prev_row_zero;
 
@@ -64,7 +64,7 @@ void check_rref(fmpz_mat_t A)
                 break;
             }
 
-            prev_row_zero = (j+1 == A->c);
+            prev_row_zero = (j + 1 == A->c);
         }
     }
 }
@@ -77,7 +77,7 @@ main(void)
     fmpz_t p;
     flint_rand_t state;
     long i, j, k, m, n, b, d, r, rank;
-    long * perm;
+    long *perm;
 
     printf("rref_mod....");
     fflush(stdout);
@@ -89,11 +89,11 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(long));
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        for (r = 0; r <= FLINT_MIN(m,n); r++)
+        for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
             b = 1 + n_randint(state, 10) * n_randint(state, 10);
 
@@ -103,7 +103,8 @@ main(void)
 
             for (j = 0; j < m; j++)
                 for (k = 0; k < n; k++)
-                    fmpz_mod(fmpz_mat_entry(A, j, k), fmpz_mat_entry(A, j, k), p);
+                    fmpz_mod(fmpz_mat_entry(A, j, k), fmpz_mat_entry(A, j, k),
+                             p);
 
             rank = fmpz_mat_rref_mod(perm, A, p);
 
@@ -128,14 +129,14 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(long));
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        for (r = 0; r <= FLINT_MIN(m,n); r++)
+        for (r = 0; r <= FLINT_MIN(m, n); r++)
         {
             b = 1 + n_randint(state, 10) * n_randint(state, 10);
-            d = n_randint(state, 2*m*n + 1);
+            d = n_randint(state, 2 * m * n + 1);
 
             fmpz_mat_init(A, m, n);
             fmpz_mat_randrank(A, state, r, b);
@@ -144,7 +145,8 @@ main(void)
 
             for (j = 0; j < m; j++)
                 for (k = 0; k < n; k++)
-                    fmpz_mod(fmpz_mat_entry(A, j, k), fmpz_mat_entry(A, j, k), p);
+                    fmpz_mod(fmpz_mat_entry(A, j, k), fmpz_mat_entry(A, j, k),
+                             p);
 
             rank = fmpz_mat_rref_mod(perm, A, p);
 

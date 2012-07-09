@@ -70,19 +70,27 @@ main(void)
                 if (poly2->length)
                     fmpz_mod_poly_make_monic(poly2, poly2);
             }
-            while ((poly2->length < 2) || (!fmpz_mod_poly_is_irreducible(poly2)));
+            while ((poly2->length < 2)
+                   || (!fmpz_mod_poly_is_irreducible(poly2)));
 
             fmpz_mod_poly_mul(poly1, poly1, poly2);
         }
 
-        while (!fmpz_mod_poly_factor_equal_deg_prob(poly2, state, poly1, length - 1)) {};
+        while (!fmpz_mod_poly_factor_equal_deg_prob
+               (poly2, state, poly1, length - 1))
+        {
+        };
         fmpz_mod_poly_divrem(q, r, poly1, poly2);
         if (!fmpz_mod_poly_is_zero(r))
         {
             printf("FAIL:\n");
             printf("Error: factor does not divide original polynomial\n");
-            printf("factor:\n"); fmpz_mod_poly_print(poly2); printf("\n\n");
-            printf("polynomial:\n"); fmpz_mod_poly_print(poly1); printf("\n\n");
+            printf("factor:\n");
+            fmpz_mod_poly_print(poly2);
+            printf("\n\n");
+            printf("polynomial:\n");
+            fmpz_mod_poly_print(poly1);
+            printf("\n\n");
             abort();
         }
 

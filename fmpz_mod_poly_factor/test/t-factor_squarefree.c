@@ -55,18 +55,18 @@ main(void)
         long length, i, j, num;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
-      
+
         fmpz_mod_poly_init(pol1, modulus);
         fmpz_mod_poly_init(poly, modulus);
         fmpz_mod_poly_init(quot, modulus);
         fmpz_mod_poly_init(rem, modulus);
-     
+
         fmpz_mod_poly_zero(pol1);
         fmpz_mod_poly_set_coeff_ui(pol1, 0, 1);
 
         length = n_randint(state, 7) + 2;
 
-        do 
+        do
         {
             fmpz_mod_poly_randtest(poly, state, length);
             fmpz_mod_poly_make_monic(poly, poly);
@@ -81,7 +81,7 @@ main(void)
         num = n_randint(state, 5) + 1;
         for (i = 1; i < num; i++)
         {
-            do 
+            do
             {
                 length = n_randint(state, 7) + 2;
                 fmpz_mod_poly_randtest(poly, state, length);
@@ -92,16 +92,17 @@ main(void)
                 }
             }
             while ((!fmpz_mod_poly_is_irreducible(poly)) ||
-                (poly->length < 2) || (rem->length == 0));
+                   (poly->length < 2) || (rem->length == 0));
 
-            do exp[i] = n_randprime(state, 5, 0);
+            do
+                exp[i] = n_randprime(state, 5, 0);
             while (prod1 % exp[i] == 0);
 
             prod1 *= exp[i];
             for (j = 0; j < exp[i]; j++)
                 fmpz_mod_poly_mul(pol1, pol1, poly);
         }
-     
+
         fmpz_mod_poly_factor_init(res);
         fmpz_mod_poly_factor_squarefree(res, pol1);
 
@@ -116,7 +117,9 @@ main(void)
 
         if (!result)
         {
-            printf("Error: exp don't match. Modulus = "); fmpz_print(modulus); printf("\n");
+            printf("Error: exp don't match. Modulus = ");
+            fmpz_print(modulus);
+            printf("\n");
             for (i = 0; i < res->num; i++)
                 printf("%ld ", res->exp[i]);
             printf("\n");

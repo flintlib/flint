@@ -2148,7 +2148,7 @@ void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
     irreducible factors using the Berlekamp algorithm.
 
 void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
-			       const nmod_poly_t poly, double beta)
+				     const nmod_poly_t poly, double beta)
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by

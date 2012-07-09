@@ -87,8 +87,8 @@ main(void)
                     fmpz_mod_poly_divrem(q, r, poly1, poly);
                 }
             }
-            while ((poly->length < 2) || (!fmpz_mod_poly_is_irreducible(poly)) ||
-                (r->length == 0));
+            while ((poly->length < 2) || (!fmpz_mod_poly_is_irreducible(poly))
+                   || (r->length == 0));
 
             exp[i] = n_randint(state, 30) + 1;
             for (j = 0; j < exp[i]; j++)
@@ -103,7 +103,8 @@ main(void)
 
         if (res->num != num)
         {
-            printf("Error: number of factors incorrect: %ld != %ld\n", res->num, num);
+            printf("Error: number of factors incorrect: %ld != %ld\n",
+                   res->num, num);
             abort();
         }
 
@@ -113,13 +114,19 @@ main(void)
             for (j = 0; j < res->exp[i]; j++)
                 fmpz_mod_poly_mul(product, product, res->poly + i);
 
-        fmpz_mod_poly_scalar_mul_fmpz(product, product, &(poly1->coeffs[poly1->length - 1]));
+        fmpz_mod_poly_scalar_mul_fmpz(product, product,
+                                      &(poly1->coeffs[poly1->length - 1]));
 
         if (!fmpz_mod_poly_equal(poly1, product))
         {
-            printf("Error: product of factors does not equal to the original polynomial\n");
-            printf("poly:\n"); fmpz_mod_poly_print(poly1); printf("\n");
-            printf("product:\n"); fmpz_mod_poly_print(product); printf("\n");
+            printf
+                ("Error: product of factors does not equal to the original polynomial\n");
+            printf("poly:\n");
+            fmpz_mod_poly_print(poly1);
+            printf("\n");
+            printf("product:\n");
+            fmpz_mod_poly_print(product);
+            printf("\n");
             printf("beta: %f\n", beta);
             abort();
         }

@@ -32,7 +32,8 @@
 
 int
 fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
-          flint_rand_t state, const fmpz_mod_poly_t pol, long d)
+                                    flint_rand_t state,
+                                    const fmpz_mod_poly_t pol, long d)
 {
     fmpz_mod_poly_t a, b, c;
     fmpz_t exp, t, p;
@@ -50,7 +51,8 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 
     fmpz_mod_poly_init(a, p);
 
-    do {
+    do
+    {
         fmpz_mod_poly_randtest(a, state, pol->length - 1);
     } while (a->length <= 1);
 
@@ -99,7 +101,8 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 
     fmpz_mod_poly_gcd(factor, b, pol);
 
-    if ((factor->length <= 1) || (factor->length == pol->length)) res = 0;
+    if ((factor->length <= 1) || (factor->length == pol->length))
+        res = 0;
 
     fmpz_mod_poly_clear(a);
     fmpz_mod_poly_clear(b);

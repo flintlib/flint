@@ -32,7 +32,7 @@
 
 void
 fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
-                         const fmpz_mod_poly_t pol, long d)
+                               const fmpz_mod_poly_t pol, long d)
 {
     if (pol->length == d + 1)
     {
@@ -47,7 +47,9 @@ fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
 
         flint_randinit(state);
 
-        while (!fmpz_mod_poly_factor_equal_deg_prob(f, state, pol, d)) {};
+        while (!fmpz_mod_poly_factor_equal_deg_prob(f, state, pol, d))
+        {
+        };
 
         flint_randclear(state);
 

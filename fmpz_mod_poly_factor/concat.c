@@ -33,7 +33,8 @@
 #include "fmpz_mod_poly_factor.h"
 
 void
-fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac)
+fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
+                            const fmpz_mod_poly_factor_t fac)
 {
     long i;
 

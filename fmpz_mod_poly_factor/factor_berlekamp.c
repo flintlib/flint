@@ -42,14 +42,14 @@ fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, long col, fmpz_mod_poly_t poly)
     for (i = 0; i < poly->length; i++)
         fmpz_set(fmpz_mat_entry(mat, i, col), poly->coeffs + i);
 
-    for ( ; i < mat->r; i++)
+    for (; i < mat->r; i++)
         fmpz_zero(fmpz_mat_entry(mat, i, col));
 
 }
 
 static void
 fmpz_mat_col_to_fmpz_mod_poly_shifted(fmpz_mod_poly_t poly, fmpz_mat_t mat,
-                                                    long col, long * shift)
+                                      long col, long *shift)
 {
     long i, j, rows = mat->r;
 
@@ -72,7 +72,7 @@ fmpz_mat_col_to_fmpz_mod_poly_shifted(fmpz_mod_poly_t poly, fmpz_mat_t mat,
 
 static void
 __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
-                    flint_rand_t state, const fmpz_mod_poly_t f)
+                                 flint_rand_t state, const fmpz_mod_poly_t f)
 {
     const long n = fmpz_mod_poly_degree(f);
 
@@ -153,10 +153,11 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     _perm_clear(perm);
 
     /* Find a basis for the nullspace */
-    basis = (fmpz_mod_poly_t *) flint_malloc(nullity * sizeof(fmpz_mod_poly_t));
+    basis =
+        (fmpz_mod_poly_t *) flint_malloc(nullity * sizeof(fmpz_mod_poly_t));
     shift = (long *) flint_calloc(n, sizeof(long));
 
-    col = 1;  /* first column is always zero */
+    col = 1;                    /* first column is always zero */
     row = 0;
     shift[0] = 1;
 
@@ -213,7 +214,8 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
 
             fmpz_mod_poly_gcd(g, f, factor);
 
-            if (fmpz_mod_poly_length(g) != 1) break;
+            if (fmpz_mod_poly_length(g) != 1)
+                break;
 
             if (fmpz_cmp_ui(p, 3) > 0)
                 fmpz_mod_poly_powmod_fmpz_binexp(power, factor, pow, f);
@@ -267,7 +269,9 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     fmpz_clear(pow);
 }
 
-void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors, const fmpz_mod_poly_t f)
+void
+fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
+                               const fmpz_mod_poly_t f)
 {
     long i;
     flint_rand_t r;
@@ -282,7 +286,7 @@ void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors, const fmpz_m
     fmpz_mod_poly_factor_init(sq_free);
     fmpz_mod_poly_factor_squarefree(sq_free, v);
 
-    /* run Berlekamp algorithm for all squarefree factors*/
+    /* run Berlekamp algorithm for all squarefree factors */
     flint_randinit(r);
     for (i = 0; i < sq_free->num; i++)
     {

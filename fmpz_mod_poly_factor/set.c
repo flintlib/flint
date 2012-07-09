@@ -27,7 +27,9 @@
 #include "flint.h"
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_factor_t fac)
+void
+fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
+                         const fmpz_mod_poly_factor_t fac)
 {
     if (res != fac)
     {
@@ -46,7 +48,7 @@ void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_fa
                 fmpz_mod_poly_set(res->poly + i, fac->poly + i);
                 res->exp[i] = fac->exp[i];
             }
-            for ( ; i < res->num; i++)
+            for (; i < res->num; i++)
             {
                 fmpz_mod_poly_zero(res->poly + i);
                 res->exp[i] = 0;
@@ -55,4 +57,3 @@ void fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res, const fmpz_mod_poly_fa
         }
     }
 }
-

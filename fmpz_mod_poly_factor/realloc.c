@@ -27,7 +27,8 @@
 #include <stdlib.h>
 #include "fmpz_mod_poly_factor.h"
 
-void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
+void
+fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
 {
     fmpz_t p;
     fmpz_init_set_ui(p, 5);
@@ -37,7 +38,7 @@ void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
         fmpz_mod_poly_factor_clear(fac);
         fmpz_mod_poly_factor_init(fac);
     }
-    else if (fac->alloc)            /* Realloc */
+    else if (fac->alloc)        /* Realloc */
     {
         if (fac->alloc > alloc)
         {
@@ -46,16 +47,18 @@ void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
             for (i = alloc; i < fac->num; i++)
                 fmpz_mod_poly_clear(fac->poly + i);
 
-            fac->poly  = flint_realloc(fac->poly, alloc * sizeof(fmpz_mod_poly_struct));
-            fac->exp   = flint_realloc(fac->exp, alloc * sizeof(long));
+            fac->poly =
+                flint_realloc(fac->poly, alloc * sizeof(fmpz_mod_poly_struct));
+            fac->exp = flint_realloc(fac->exp, alloc * sizeof(long));
             fac->alloc = alloc;
         }
         else if (fac->alloc < alloc)
         {
             long i;
 
-            fac->poly = flint_realloc(fac->poly, alloc * sizeof(fmpz_mod_poly_struct));
-            fac->exp  = flint_realloc(fac->exp, alloc * sizeof(long));
+            fac->poly =
+                flint_realloc(fac->poly, alloc * sizeof(fmpz_mod_poly_struct));
+            fac->exp = flint_realloc(fac->exp, alloc * sizeof(long));
 
             for (i = fac->alloc; i < alloc; i++)
             {
@@ -70,13 +73,12 @@ void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
         long i;
 
         fac->poly = flint_malloc(alloc * sizeof(fmpz_mod_poly_struct));
-        fac->exp  = flint_calloc(alloc, sizeof(long));
+        fac->exp = flint_calloc(alloc, sizeof(long));
 
         for (i = 0; i < alloc; i++)
             fmpz_mod_poly_init(fac->poly + i, p);
-        fac->num   = 0;
+        fac->num = 0;
         fac->alloc = alloc;
     }
     fmpz_clear(p);
 }
-
