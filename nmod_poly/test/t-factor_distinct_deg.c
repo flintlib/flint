@@ -48,7 +48,6 @@ main(void)
         mp_limb_t modulus, lead;
         long i, length, num;
         long *degs;
-        double beta;
 
         modulus = n_randtest_prime(state, 0);
 
@@ -91,16 +90,13 @@ main(void)
             nmod_poly_mul(poly1, poly1, poly);
         }
 
-        beta = n_randint(state, 100) + 1;
-        beta = 1. / beta;
-
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(long))))
         {
             printf("Fatal error: not enough memory.");
             abort();
         }
         nmod_poly_factor_init(res);
-        nmod_poly_factor_distinct_deg(res, poly1, beta, &degs);
+        nmod_poly_factor_distinct_deg(res, poly1, &degs);
 
         nmod_poly_init_preinv(product, poly1->mod.n, poly1->mod.ninv);
         nmod_poly_set_coeff_ui(product, 0, 1);
@@ -115,7 +111,6 @@ main(void)
             printf("Error: product of factors does not equal to the original polynomial\n");
             printf("poly:\n"); nmod_poly_print(poly1); printf("\n");
             printf("product:\n"); nmod_poly_print(product); printf("\n");
-            printf("beta: %f\n", beta);
             abort();
         }
 

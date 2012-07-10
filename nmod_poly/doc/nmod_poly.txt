@@ -2122,7 +2122,7 @@ void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-		const nmod_poly_t poly, double beta, long **degs)
+		const nmod_poly_t poly, long **degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
     of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}
@@ -2130,8 +2130,6 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     of degree ${d}. Factors are stored in \code{res}, assotiated powers
     of irreducible polynomials are stored in \code{degs} in the same order
     as factors.
-
-    \code{beta} is a parameter, ${0 \leq \beta \leq 1}.
 
     Requires that \code{degs} have enough space for irreducible polynomials'
     powers (maximum space required is ${n * sizeof(long)}).
@@ -2148,7 +2146,7 @@ void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
     irreducible factors using the Berlekamp algorithm.
 
 void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
-				     const nmod_poly_t poly, double beta)
+				     const nmod_poly_t poly)
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the fast version of Cantor-Zassenhaus algorithm proposed by

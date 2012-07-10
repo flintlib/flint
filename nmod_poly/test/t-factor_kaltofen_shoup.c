@@ -48,7 +48,6 @@ main(void)
         mp_limb_t modulus, lead;
         long i, j, length, num;
         long exp[5];
-        double beta;
 
         modulus = n_randtest_prime(state, 0);
 
@@ -95,11 +94,8 @@ main(void)
                 nmod_poly_mul(poly1, poly1, poly);
         }
 
-        beta = n_randint(state, 100) + 1;
-        beta = 1. / beta;
-
         nmod_poly_factor_init(res);
-        nmod_poly_factor_kaltofen_shoup(res, poly1, beta);
+        nmod_poly_factor_kaltofen_shoup(res, poly1);
 
         if (res->num != num)
         {
@@ -121,7 +117,6 @@ main(void)
             printf("Error: product of factors does not equal to the original polynomial\n");
             printf("poly:\n"); nmod_poly_print(poly1); printf("\n");
             printf("product:\n"); nmod_poly_print(product); printf("\n");
-            printf("beta: %f\n", beta);
             abort();
         }
 

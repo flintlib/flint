@@ -27,13 +27,15 @@
 #include "nmod_poly.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                             const nmod_poly_t poly, double beta, long **degs)
+                                   const nmod_poly_t poly, long **degs)
 {
     nmod_poly_t f, g, s, v, tmp;
     nmod_poly_t *h, *H, *I;
     long i, j, l, m, n, index;
+    double beta;
 
     n = nmod_poly_degree(poly);
+    beta = 0.5 * log (0.5 * n) / log (n);
     l = ceil(pow (n, beta));
     m = ceil(0.5 * n / l);
 
