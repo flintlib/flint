@@ -28,15 +28,16 @@
 
 void
 fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-                                  const fmpz_mod_poly_t poly, double beta,
-                                  long **degs)
+                                  const fmpz_mod_poly_t poly, long **degs)
 {
     fmpz_mod_poly_t f, g, s, v, tmp;
     fmpz_mod_poly_t *h, *H, *I;
     long i, j, l, m, n, index;
     fmpz_t p;
+    double beta;
 
     n = fmpz_mod_poly_degree(poly);
+    beta = 0.5 * log(0.5 * n) / log(n);
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
 

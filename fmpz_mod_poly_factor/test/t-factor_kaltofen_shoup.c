@@ -48,7 +48,6 @@ main(void)
         fmpz_t modulus;
         long i, j, length, num;
         long exp[5];
-        double beta;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
 
@@ -95,11 +94,8 @@ main(void)
                 fmpz_mod_poly_mul(poly1, poly1, poly);
         }
 
-        beta = n_randint(state, 100) + 1;
-        beta = 1. / beta;
-
         fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_kaltofen_shoup(res, poly1, beta);
+        fmpz_mod_poly_factor_kaltofen_shoup(res, poly1);
 
         if (res->num != num)
         {
@@ -127,7 +123,6 @@ main(void)
             printf("product:\n");
             fmpz_mod_poly_print(product);
             printf("\n");
-            printf("beta: %f\n", beta);
             abort();
         }
 

@@ -48,7 +48,6 @@ main(void)
         fmpz_t modulus;
         long i, length, num;
         long *degs;
-        double beta;
 
         fmpz_init(modulus);
         fmpz_set_ui(modulus, n_randtest_prime(state, 0));
@@ -92,16 +91,13 @@ main(void)
             fmpz_mod_poly_mul(poly1, poly1, poly);
         }
 
-        beta = n_randint(state, 100) + 1;
-        beta = 1. / beta;
-
         if (!(degs = flint_malloc((poly1->length - 1) * sizeof(long))))
         {
             printf("Fatal error: not enough memory.");
             abort();
         }
         fmpz_mod_poly_factor_init(res);
-        fmpz_mod_poly_factor_distinct_deg(res, poly1, beta, &degs);
+        fmpz_mod_poly_factor_distinct_deg(res, poly1, &degs);
 
         fmpz_mod_poly_init(product, &poly1->p);
         fmpz_mod_poly_set_coeff_ui(product, 0, 1);
@@ -121,7 +117,6 @@ main(void)
             printf("product:\n");
             fmpz_mod_poly_print(product);
             printf("\n");
-            printf("beta: %f\n", beta);
             abort();
         }
 

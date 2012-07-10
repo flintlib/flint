@@ -81,10 +81,10 @@ fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 
 void
 fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
-                         const fmpz_mod_poly_t pol, long d);
+                               const fmpz_mod_poly_t pol, long d);
 
 void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-                const fmpz_mod_poly_t poly, double beta, long **degs);
+                                       const fmpz_mod_poly_t poly, long **degs);
 
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
@@ -93,7 +93,7 @@ void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
 
 void fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
-                                          const fmpz_mod_poly_t poly, double beta);
+                                          const fmpz_mod_poly_t poly);
 
 void fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                      const fmpz_mod_poly_t f);

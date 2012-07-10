@@ -28,7 +28,7 @@
 
 void
 fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
-                                    const fmpz_mod_poly_t poly, double beta)
+                                    const fmpz_mod_poly_t poly)
 {
     fmpz_mod_poly_t v;
     fmpz_mod_poly_factor_t sq_free, dist_deg;
@@ -56,8 +56,7 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
     {
         dist_deg_num = dist_deg->num;
 
-        fmpz_mod_poly_factor_distinct_deg(dist_deg, sq_free->poly + i, beta,
-                                          &degs);
+        fmpz_mod_poly_factor_distinct_deg(dist_deg, sq_free->poly + i, &degs);
 
         /* compute equal-degree factorisation */
         for (j = dist_deg_num, l = 0; j < dist_deg->num; j++, l++)
