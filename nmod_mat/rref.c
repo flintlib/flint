@@ -98,7 +98,7 @@ nmod_mat_rref(long * P, nmod_mat_t A)
     for (i = 0; i < rank; i++)
     {
         for (j = 0; j <= i; j++)
-            nmod_mat_entry(A, i, pivots[i]) = (i == j);
+            nmod_mat_entry(A, j, pivots[i]) = (i == j);
     }
 
     /* Write back the actual content */
