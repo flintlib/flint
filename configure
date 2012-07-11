@@ -4,10 +4,10 @@
 # (C) 2011, William Hart
 
 PREFIX="/usr/local"
-MPIR_DIR="/usr"
-MPFR_DIR="/usr"
-NTL_DIR="/usr"
-BLAS_DIR="/usr"
+MPIR_DIR="/usr/local"
+MPFR_DIR="/usr/local"
+NTL_DIR="/usr/local"
+BLAS_DIR="/usr/local"
 WANT_NTL=0
 WANT_BLAS=0
 SHARED=1

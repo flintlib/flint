@@ -39,12 +39,7 @@ void fmpz_init_set_readonly(fmpz_t f, const mpz_t z)
     }
     else if (z->_mp_size)
     {
-        __mpz_struct *ptr;
-        *f = 0L;
-        ptr = _fmpz_promote(f);
-
-        mpz_clear(ptr);
-        *ptr = *z;
+        _fmpz_init_readonly_mpz(f, z);
     }
     else
     {
