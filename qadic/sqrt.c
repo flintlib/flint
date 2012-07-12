@@ -646,9 +646,18 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
 
     for (k = 0; k < lena; k++)                        /* Dense copy of f    */
         fmpz_set(f + j[k], a + k);
-    _fmpz_mod_poly_invmod(r, op, len, f, d + 1, p8);  /* 1/u mod 8          */
+
+    _fmpz_vec_scalar_mod_fmpz(t, op, len, p8);
+    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);   /* 1/u mod 8          */
+
+printf("op = "), _fmpz_vec_print(op, len), printf("\n");
+printf("t = "), _fmpz_vec_print(t, len), printf("\n");
+printf("r = "), _fmpz_vec_print(r, d), printf("\n");
     _fmpz_vec_scalar_mod_fmpz(t, r, d, p);
     _fmpz_mod_poly_sqrtmod_2(s, t, d, a, j, lena);    /* invsqrt(u) mod 2   */
+printf("t = "), _fmpz_vec_print(t, d), printf("\n");
+printf("s = "), _fmpz_vec_print(s, d), printf("\n");
+
     _fmpz_poly_sqr(c, s, d);
     _fmpz_poly_reduce(c, 2 * d - 1, a, j, lena);
     _fmpz_poly_add(c, c, d, r, d);
@@ -713,7 +722,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
             }
             for (i = 1; i < n; i++)
             {
-                _fmpz_vec_scalar_r_2exp(u + i * len, u + (i - 1) * len, len, e[i]);
+                _fmpz_vec_scalar_fdiv_r_2exp(u + i * len, u + (i - 1) * len, len, e[i]);
             }
 
             /* Run Newton iteration */
@@ -774,8 +783,7 @@ int _qadic_sqrt(fmpz *rop, const fmpz *op, long len,
 {
     if (*p == 2L)
     {
-        printf("Exception (_qadic_sqrt).  Case p = 2.\n");
-        abort();
+        return _qadic_sqrt_2(rop, op, len, a, j, lena, N);
     }
     else
     {
