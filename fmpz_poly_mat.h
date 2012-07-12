@@ -188,7 +188,7 @@ long fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
 long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
                             const fmpz_poly_mat_t A, int rank_check);
 
-long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
                             const fmpz_poly_mat_t A);
 
 /* Trace *********************************************************************/

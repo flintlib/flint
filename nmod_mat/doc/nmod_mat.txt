@@ -442,10 +442,9 @@ long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
 
 *******************************************************************************
 
-long nmod_mat_rref(long * P, nmod_mat_t A)
+long nmod_mat_rref(nmod_mat_t A)
 
-    Puts $A$ in reduced row echelon form, stores the row permutations
-    in $P$ and returns the rank of $A$.
+    Puts $A$ in reduced row echelon form and returns the rank of $A$.
 
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional

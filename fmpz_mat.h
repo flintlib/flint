@@ -206,7 +206,7 @@ long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
 long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
                             const fmpz_mat_t A, int rank_check);
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A);
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
 /* Trace ********************************************************************/
 

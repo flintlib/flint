@@ -30,7 +30,7 @@
 #define E(j,k) fmpz_mat_entry(B,j,k)
 
 long
-fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A)
+fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 {
     fmpz_t t;
     long m, n, j, k, rank, r, pivot_row, pivot_col;
@@ -61,7 +61,7 @@ fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, long * perm, const fmpz_mat_t A)
         }
         else if (r != pivot_row)
         {
-            fmpz_mat_swap_rows(B, perm, pivot_row, r);
+            fmpz_mat_swap_rows(B, NULL, pivot_row, r);
             sign = -sign;
         }
         rank++;
