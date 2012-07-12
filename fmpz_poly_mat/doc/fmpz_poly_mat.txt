@@ -351,7 +351,7 @@ long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
     the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
-long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
                             const fmpz_poly_mat_t A)
 
     Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
@@ -359,12 +359,9 @@ long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
     rank of \code{A}. Aliasing of \code{A} and \code{B} is allowed.
 
     Pivot elements are chosen with \code{fmpz_poly_mat_find_pivot_partial}.
-    If \code{perm} is non-\code{NULL}, the permutation of
-    rows in the matrix will also be applied to \code{perm}.
 
-    The denominator \code{den} is set to $\pm \operatorname{det}(A)$, where
-    the sign is decided by the parity of the permutation. Note that the
-    determinant is not generally the minimal denominator.
+    The denominator \code{den} is set to $\pm \operatorname{det}(A)$.
+    Note that the determinant is not generally the minimal denominator.
 
 *******************************************************************************
 
