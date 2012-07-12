@@ -32,7 +32,7 @@
 #include "fmpz_mat.h"
 #include "ulong_extras.h"
 
-void check_rref(long * perm, fmpz_mat_t A)
+void check_rref(fmpz_mat_t A)
 {
     long i, j, prev_pivot, prev_row_zero;
 
@@ -75,7 +75,6 @@ main(void)
     fmpz_t den;
     flint_rand_t state;
     long i, m, n, b, d, r, rank;
-    long * perm;
 
     printf("rref....");
     fflush(stdout);
@@ -89,7 +88,6 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -97,18 +95,16 @@ main(void)
             d = n_randint(state, 2*m*n + 1);
             fmpz_mat_init(A, m, n);
             fmpz_mat_randrank(A, state, r, b);
-            rank = fmpz_mat_rref(A, den, perm, A);
+            rank = fmpz_mat_rref(A, den, A);
             if (r != rank)
             {
                 printf("FAIL:\n");
                 printf("wrong rank!\n");
                 abort();
             }
-            check_rref(perm, A);
+            check_rref(A);
             fmpz_mat_clear(A);
         }
-
-        flint_free(perm);
     }
 
     /* Dense */
@@ -116,7 +112,6 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         for (r = 0; r <= FLINT_MIN(m,n); r++)
         {
@@ -128,7 +123,7 @@ main(void)
 
             fmpz_mat_randops(A, state, d);
 
-            rank = fmpz_mat_rref(A, den, perm, A);
+            rank = fmpz_mat_rref(A, den, A);
 
             if (r != rank)
             {
@@ -137,12 +132,10 @@ main(void)
                 abort();
             }
 
-            check_rref(perm, A);
+            check_rref(A);
 
             fmpz_mat_clear(A);
         }
-
-        flint_free(perm);
     }
 
     fmpz_clear(den);

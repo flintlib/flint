@@ -82,7 +82,6 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     nmod_mat_t matrix;
     mp_limb_t coeff;
     long i, nullity, col, row, *shift;
-    long *perm;
     nmod_poly_t *basis;
 
     if (f->length <= 2)
@@ -123,9 +122,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     nmod_poly_clear(x_pi2);
 
     /* Row reduce Q - I */
-    perm = _perm_init(n);
-    nullity = n - nmod_mat_rref(perm, matrix);
-    _perm_clear(perm);
+    nullity = n - nmod_mat_rref(matrix);
 
     /* Find a basis for the nullspace */
     basis = (nmod_poly_t *) flint_malloc(nullity * sizeof(nmod_poly_t));

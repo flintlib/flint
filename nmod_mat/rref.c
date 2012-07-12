@@ -27,19 +27,23 @@
 #include <mpir.h>
 #include "flint.h"
 #include "nmod_mat.h"
+#include "perm.h"
 
 long
-nmod_mat_rref(long * P, nmod_mat_t A)
+nmod_mat_rref(nmod_mat_t A)
 {
     long i, j, k, n, rank;
     long * pivots;
     long * nonpivots;
+    long * P;
 
     nmod_mat_t U, V;
 
     n = A->c;
 
+    P = _perm_init(nmod_mat_nrows(A));
     rank = nmod_mat_lu(P, A, 0);
+    _perm_clear(P);
 
     if (rank == 0)
         return rank;

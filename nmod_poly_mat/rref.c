@@ -51,7 +51,7 @@ nmod_poly_mat_swap_rows(nmod_poly_mat_t mat, long * perm, long r, long s)
 }
 
 long
-nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
+nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
     const nmod_poly_mat_t A)
 {
     nmod_poly_t t;
@@ -83,7 +83,7 @@ nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
         }
         else if (r != pivot_row)
         {
-            nmod_poly_mat_swap_rows(B, perm, pivot_row, r);
+            nmod_poly_mat_swap_rows(B, NULL, pivot_row, r);
             sign = -sign;
         }
         rank++;

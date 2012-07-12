@@ -51,7 +51,7 @@ fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, long * perm, long r, long s)
 }
 
 long
-fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
     const fmpz_poly_mat_t A)
 {
     fmpz_poly_t t;
@@ -83,7 +83,7 @@ fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
         }
         else if (r != pivot_row)
         {
-            fmpz_poly_mat_swap_rows(B, perm, pivot_row, r);
+            fmpz_poly_mat_swap_rows(B, NULL, pivot_row, r);
             sign = -sign;
         }
         rank++;
