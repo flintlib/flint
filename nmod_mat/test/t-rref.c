@@ -101,7 +101,7 @@ main(void)
         nmod_mat_init_set(B, A);
         nmod_mat_init_set(C, A);
 
-        rank1 = nmod_mat_rref(perm, B);
+        rank1 = nmod_mat_rref(B);
 
         if (!check_rref_form(perm, B, rank1))
         {
@@ -131,7 +131,7 @@ main(void)
                     nmod_mul(nmod_mat_entry(B, j, k), c, A->mod);
         }
 
-        rank2 = nmod_mat_rref(perm, D);
+        rank2 = nmod_mat_rref(D);
         equal = (rank1 == rank2);
 
         if (equal)
