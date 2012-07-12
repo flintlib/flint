@@ -36,26 +36,24 @@ fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     if (B->r != A->c || B->c != A->r)
     {
-        printf("exception: fmpz_mat_transpose: incompatible dimensions\n");
+        printf("Exception (fmpz_mat_transpose):  Incompatible dimensions.\n");
         abort();
     }
 
-    /* In-place, guaranteed to be square */
-    if (A == B)
+    if (A == B)  /* In-place, guaranteed to be square */
     {
         for (i = 0; i < A->r - 1; i++)
-        {
-            for (j = i + 1; j < i; j++)
+            for (j = i + 1; j < A->c; j++)
             {
                 tmp = A->rows[i][j];
                 A->rows[i][j] = A->rows[j][i];
                 A->rows[j][i] = tmp;
             }
-        }
     }
-
-    /* Not aliased; general case */
-    for (i = 0; i < B->r; i++)
-        for (j = 0; j < B->c; j++)
-            fmpz_set(&B->rows[i][j], &A->rows[j][i]);
+    else  /* Not aliased; general case */
+    {
+        for (i = 0; i < B->r; i++)
+            for (j = 0; j < B->c; j++)
+                fmpz_set(&B->rows[i][j], &A->rows[j][i]);
+    }
 }
