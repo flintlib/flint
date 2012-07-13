@@ -25,9 +25,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
+#include "fmpz_poly_mat.h"
 
 void
 fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
