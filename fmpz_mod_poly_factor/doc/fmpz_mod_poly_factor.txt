@@ -89,6 +89,11 @@ int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
 
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
 
+int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f)
+
+    Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
+    Uses fast distinct-degree factorisation.
+
 int _fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p)
 
     Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
