@@ -73,9 +73,11 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
 
 void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp);
 
+int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f);
+
 int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f);
 
-int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f);
+int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f);
 
 int
 _fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p);
