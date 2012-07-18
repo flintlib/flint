@@ -37,7 +37,7 @@ fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     double beta;
 
     n = fmpz_mod_poly_degree(poly);
-    beta = 0.5 * log(0.5 * n) / log(n);
+    beta = 0.5 * (1. - (log(2) / log(n)));
     l = ceil(pow(n, beta));
     m = ceil(0.5 * n / l);
 
