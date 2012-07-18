@@ -89,6 +89,17 @@ int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f)
 
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
 
+int _fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p)
+
+    Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
+    special case, the zero polynomial is not considered squarefree.
+    There are no restrictions on the length.
+
+int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f)
+
+    Returns 1 if \code{f} is squarefree, and 0 otherwise. As a special
+    case, the zero polynomial is not considered squarefree.
+
 int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
 	      flint_rand_t state, const fmpz_mod_poly_t pol, long d)
 

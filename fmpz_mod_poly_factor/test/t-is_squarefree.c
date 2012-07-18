@@ -39,57 +39,66 @@ main(void)
     flint_rand_t state;
     flint_randinit(state);
 
-    printf("is_irreducible....");
+    printf("is_squarefree....");
     fflush(stdout);
 
-    for (iter = 0; iter < 100; iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        fmpz_mod_poly_t poly1, poly2;
+        fmpz_mod_poly_t poly, Q, R, t;
         fmpz_t modulus;
-        long length;
-        int i, num;
+        long i, num_factors, exp, max_exp;
+        int v, result;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
 
-        fmpz_mod_poly_init(poly1, modulus);
-        fmpz_mod_poly_init(poly2, modulus);
+        fmpz_mod_poly_init(poly, modulus);
+        fmpz_mod_poly_init(t, modulus);
+        fmpz_mod_poly_init(Q, modulus);
+        fmpz_mod_poly_init(R, modulus);
 
-        length = n_randint(state, 10) + 2;
-        do
+        fmpz_mod_poly_set_coeff_ui(poly, 0, n_randint(state, modulus));
+        num_factors = n_randint(state, 5);
+
+        max_exp = 0;
+        for (i = 0; i < num_factors; i++)
         {
-            fmpz_mod_poly_randtest(poly1, state, length);
-            if (!fmpz_mod_poly_is_zero(poly1))
-                fmpz_mod_poly_make_monic(poly1, poly1);
-        }
-        while ((!fmpz_mod_poly_is_irreducible(poly1)) || (poly1->length < 2));
+            do {
+                fmpz_mod_poly_randtest(t, state, n_randint(state, 10));
+            } while (!fmpz_mod_poly_is_irreducible(t) ||
+                    (fmpz_mod_poly_length(t) < 2));
 
-        num = n_randint(state, 5) + 1;
+            exp = n_randint(state, 4) + 1;
+            if (n_randint(state, 2) == 0)
+                exp = 1;
 
-        for (i = 0; i < num; i++)
-        {
-            do
+            fmpz_mod_poly_divrem(Q, R, poly, t);
+            if (!fmpz_mod_poly_is_zero(R))
             {
-                fmpz_mod_poly_randtest(poly2, state, length);
-                if (!fmpz_mod_poly_is_zero(poly1))
-                    fmpz_mod_poly_make_monic(poly2, poly2);
+                fmpz_mod_poly_pow(t, t, exp);
+                fmpz_mod_poly_mul(poly, poly, t);
+                max_exp = FLINT_MAX(exp, max_exp);
             }
-            while ((!fmpz_mod_poly_is_irreducible(poly2)) || (poly2->length < 2));
-
-            fmpz_mod_poly_mul(poly1, poly1, poly2);
         }
 
-        if (fmpz_mod_poly_is_irreducible(poly1))
+        v = fmpz_mod_poly_is_squarefree(poly);
+
+        if (v == 1)
+            result = (max_exp <= 1 && !fmpz_mod_poly_is_zero(poly));
+        else
+            result = (max_exp > 1 || fmpz_mod_poly_is_zero(poly));
+
+        if (!result)
         {
-            printf("Error: reducible polynomial declared irreducible!\n");
-            printf("poly:\n");
-            fmpz_mod_poly_print(poly1);
-            printf("\n");
+            printf("FAIL: %lu, %ld, %d\n", modulus, max_exp, v);
+            fmpz_mod_poly_print(poly); printf("\n");
             abort();
         }
 
         fmpz_clear(modulus);
-        fmpz_mod_poly_clear(poly1);
-        fmpz_mod_poly_clear(poly2);
+        fmpz_mod_poly_clear(poly);
+        fmpz_mod_poly_clear(t);
+        fmpz_mod_poly_clear(Q);
+        fmpz_mod_poly_clear(R);
     }
 
     flint_randclear(state);

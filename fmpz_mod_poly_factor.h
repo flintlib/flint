@@ -76,6 +76,11 @@ void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp);
 int fmpz_mod_poly_is_irreducible(const fmpz_mod_poly_t f);
 
 int
+_fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p);
+
+int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f);
+
+int
 fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
           flint_rand_t state, const fmpz_mod_poly_t pol, long d);
 
