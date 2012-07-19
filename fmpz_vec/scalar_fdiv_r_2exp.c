@@ -19,44 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2010 William Hart
+    Copyright (C) 2010, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
+#include "fmpz.h"
+#include "fmpz_vec.h"
 
 void
-nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
+_fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, long len2,
+                             ulong exp)
 {
-    mp_limb_t tmp;
-
-    long i, j;
-
-    if (B->r != A->c || B->c != A->r)
-    {
-        printf("exception: nmod_mat_transpose: incompatible dimensions\n");
-        abort();
-    }
-
-    if (A == B) /* In-place, guaranteed to be square */
-    {
-        for (i = 0; i < A->r - 1; i++)
-            for (j = i + 1; j < A->c; j++)
-            {
-                tmp = A->rows[i][j];
-                A->rows[i][j] = A->rows[j][i];
-                A->rows[j][i] = tmp;
-            }
-    }
-    else /* Not aliased; general case */
-    {
-        for (i = 0; i < B->r; i++)
-            for (j = 0; j < B->c; j++)
-                B->rows[i][j] = A->rows[j][i];
-    }
+    long i;
+    for (i = 0; i < len2; i++)
+        fmpz_fdiv_r_2exp(vec1 + i, vec2 + i, exp);
 }
+

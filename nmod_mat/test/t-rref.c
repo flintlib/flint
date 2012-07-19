@@ -90,8 +90,8 @@ main(void)
 
         mod = n_randtest_prime(state, 0);
 
-        m = n_randint(state, 5);
-        n = n_randint(state, 5);
+        m = n_randint(state, 20);
+        n = n_randint(state, 20);
         perm = _perm_init(2*m);
 
         nmod_mat_init(A, m, n, mod);
