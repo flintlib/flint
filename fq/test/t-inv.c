@@ -72,6 +72,7 @@ main(void)
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
             printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
             printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            fq_ctx_print(ctx);
             abort();
         }
 
@@ -90,33 +91,37 @@ main(void)
         long d;
         fq_ctx_t ctx;
 
-        fq_t a, b;
+        fq_t a, b, c;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a", PADIC_SERIES);
+        fq_ctx_init_conway(ctx, p, d, "a", PADIC_TERSE);
 
         fq_init(a);
         fq_init(b);
+        fq_init(c);
 
         do fq_randtest(a, state, ctx);
         while (fq_is_zero(a));
 
         fq_inv(b, a, ctx);
-        fq_mul(b, a, b, ctx);
+        fq_mul(c, a, b, ctx);
 
-        result = (fq_is_one(b));
+        result = (fq_is_one(c));
         if (!result)
         {
             printf("FAIL:\n\n");
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
             printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            fq_ctx_print(ctx);
             abort();
         }
 
         fq_clear(a);
         fq_clear(b);
+        fq_clear(c);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

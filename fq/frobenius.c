@@ -29,5 +29,5 @@
 void
 fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
 {
-    qadic_frobeinus(rop,op,e,ctx);
+    qadic_frobenius(rop,op,e,ctx);
 }
