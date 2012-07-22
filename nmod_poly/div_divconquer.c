@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009, 2011 William Hart
+    Copyright (C) 2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -29,8 +30,8 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void
-_nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
+static void
+__nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA, 
                              mp_srcptr B, long lenB, nmod_t mod)
 {
     if (lenA < 2 * lenB - 1)
@@ -52,57 +53,6 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
 
         _nmod_vec_clear(V);
     }
-    else if (lenA > 2 * lenB - 1)
-    {
-        /*
-           We shift A right until it is of length 2 lenB - 1, call this p1
-         */
-
-        const long shift = lenA - 2 * lenB + 1;
-        mp_srcptr p1 = A + shift;
-
-        mp_ptr V = _nmod_vec_init(lenA + (3 * lenB - 2) + NMOD_DIVREM_DC_ITCH(lenB, mod));
-        mp_ptr R = V + NMOD_DIVREM_DC_ITCH(lenB, mod);
-        mp_ptr W = R + lenB - 1;
-
-        mp_ptr q1   = Q + shift;
-        mp_ptr q2   = Q;
-        mp_ptr dq1  = W;
-        mp_ptr d1q1 = dq1 + shift;
-
-        /* 
-           Set q1 to p1 div B, a 2 lenB - 1 by lenB division, so q1 ends up 
-           being of length lenB; set d1q1 = d1 * q1 of length 2 lenB - 1
-         */
-
-        _nmod_poly_divrem_divconquer_recursive(q1, d1q1, R, V, p1, B, lenB, mod);
-
-        /* 
-           We have dq1 = d1 * q1 * x^shift, of length lenA
-
-           Compute R = A - dq1; the first lenB coeffs represent remainder 
-           terms (zero if division is exact), leaving lenA - lenB significant 
-           terms which we use in the division
-         */
-
-        mpn_copyi(dq1, A, shift);
-        _nmod_vec_sub(dq1 + shift, A + shift, dq1 + shift, lenB - 1, mod);
-        
-        /*
-           Compute q2 = trunc(R) div B; it is a smaller division than the 
-           original since len(trunc(R)) = lenA - lenB
-         */
-
-        _nmod_poly_div_divconquer(q2, dq1, lenA - lenB, B, lenB, mod);
-
-        /*
-           We have Q = q1 * x^shift + q2; Q has length lenB + shift; 
-           note q2 has length shift since the above division is 
-           lenA - lenB by lenB
-         */
-
-        _nmod_vec_clear(V);
-    }
     else  /* lenA = 2 * lenB - 1 */
     {
         mp_ptr V = _nmod_vec_init(lenB - 1 + NMOD_DIVREM_DC_ITCH(lenB, mod));
@@ -113,6 +63,56 @@ _nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
         _nmod_vec_clear(V);
     }
 }
+
+
+/* needed due to partial overlap */
+static void
+_nmod_vec_sub_dec(mp_ptr a, mp_srcptr b, mp_srcptr c, long n, nmod_t mod)
+{
+    long i;
+
+    for (i = n - 1; i >= 0; i--)
+        a[i] = n_submod(b[i], c[i], mod.n);
+}
+
+void
+_nmod_poly_div_divconquer(mp_ptr Q, mp_srcptr A, long lenA,
+                             mp_srcptr B, long lenB, nmod_t mod)
+{
+    if (lenA <= 2 * lenB - 1)
+    {
+        __nmod_poly_div_divconquer(Q, A, lenA, B, lenB, mod);
+    }
+    else  /* lenA > 2 * lenB - 1 */
+    {
+        mp_ptr S, T, V, R;
+        long shift, next, n = 2 * lenB - 1;
+
+        S = _nmod_vec_init(2 * n + (lenB - 1) + NMOD_DIVREM_DC_ITCH(lenB, mod));
+        T = S + n;
+        R = T + n;
+        V = R + (lenB - 1);
+
+        shift = lenA - n;
+        _nmod_vec_set(S, A + shift, n);
+
+        while (lenA >= n)
+        {
+            shift = lenA - n;
+            _nmod_poly_divrem_divconquer_recursive(Q + shift, T, R, V, S, B, lenB, mod);
+            next = FLINT_MIN(lenB, shift);
+            _nmod_vec_sub_dec(S + next, S, T, lenB - 1, mod);
+            _nmod_vec_set(S, A + shift - next, next);
+            lenA -= lenB;
+        }
+
+        if (lenA >= lenB)
+            __nmod_poly_div_divconquer(Q, S, lenA, B, lenB, mod);
+
+        _nmod_vec_clear(S);
+    }
+}
+
 
 void
 nmod_poly_div_divconquer(nmod_poly_t Q,

@@ -38,7 +38,7 @@ int main(void)
    printf("invmod....");
    fflush(stdout);
    
-   for (i = 0; i < 100000; i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
       mp_limb_t a, b, t, r, binv, ph, pl;
       

@@ -78,7 +78,7 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N,
     Assumes that $p$ is a prime.
 
     Assumes that the printing mode is one of \code{PADIC_TERSE}, 
-    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.  Using the example 
+    \code{PADIC_SERIES}, or\\ \code{PADIC_VAL_UNIT}.  Using the example 
     $x = 7^{-1} 12$ in $\mathbf{Q}_7$, these behave as follows:
     \begin{itemize}
     \item In \code{PADIC_TERSE} mode, a $p$-adic number is printed 
@@ -375,7 +375,7 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
     change in future versions.
 
     Uses some pre-computed data $S$ that can be computed by 
-    calling the function \code{_padic_inv_precompute()}. 
+    calling the function\\ \code{_padic_inv_precompute()}. 
     Note that this object is not declared \code{const} 
     and in fact it carries a field providing temporary 
     work space.  This allows repeated calls of this function 

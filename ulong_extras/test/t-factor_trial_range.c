@@ -38,7 +38,7 @@ int main(void)
    printf("factor_trial_range....");
    fflush(stdout);
  
-   for (i = 0; i < 10000; i++) /* Test random numbers */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random numbers */
    {
       mp_limb_t n1, n2;
       n_factor_t factors;

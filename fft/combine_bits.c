@@ -38,7 +38,7 @@ void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length,
 {
    mp_size_t skip, i;
    
-   for (skip = 0, i = 0; i < length && skip + output_limbs <= total_limbs; i++, skip += coeff_limbs) 
+   for (skip = 0, i = 0; i < length && skip + output_limbs + 1 <= total_limbs; i++, skip += coeff_limbs) 
       mpn_add(res + skip, res + skip, output_limbs + 1, poly[i], output_limbs); 
 
    while ((skip < total_limbs) && (i < length))
@@ -70,7 +70,7 @@ void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length,
    limb_ptr = res;
    end = res + total_limbs;
    
-   for (i = 0; i < length && limb_ptr + output_limbs < end; i++)
+   for (i = 0; i < length && limb_ptr + output_limbs + 1 < end; i++)
    { 
       if (shift_bits)
       {

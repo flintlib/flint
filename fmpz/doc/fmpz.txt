@@ -879,15 +879,18 @@ void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
 void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
-    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of \code{a} and \code{b}.
+    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of
+    \code{a} and \code{b}.
 
 void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
-    Sets \code{r} to the bit-wise logical exclusive \code{or} of \code{a} and \code{b}.
+    Sets \code{r} to the bit-wise logical exclusive \code{or} of
+    \code{a} and \code{b}.
 
 int fmpz_popcnt(const fmpz_t a)
 
-    Returns the number of '1' bits in the given Z (aka Hamming weight or population count).
+    Returns the number of '1' bits in the given Z (aka Hamming weight or
+    population count).
     The return value is undefined if the input is negative.
 
 *******************************************************************************
@@ -913,7 +916,8 @@ int fmpz_popcnt(const fmpz_t a)
 
 *******************************************************************************
 
-void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2,
+                     int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
     $0 \le x < M$ (if sign = 0) or $-M/2 < x \le M/2$ (if sign = 1)

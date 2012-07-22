@@ -51,7 +51,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
         fmpz_t xnum, xden;
@@ -62,7 +62,7 @@ main(void)
         fmpz_init(xden);
         len = (long) (n_randint(state, 100) + 1);
 
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < 50; j++)
         {
             fmpz_randtest(xnum, state, 200);
             fmpz_randtest_not_zero(xden, state, 200);

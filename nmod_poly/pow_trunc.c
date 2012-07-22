@@ -51,7 +51,8 @@ nmod_poly_pow_trunc(nmod_poly_t res,
         else if (len == 1)
         {
             nmod_poly_fit_length(res, 1);
-            res->coeffs[0] = n_powmod2_preinv(poly->coeffs[0], e, poly->mod.n, poly->mod.ninv);
+            res->coeffs[0] = n_powmod2_ui_preinv(poly->coeffs[0], e,
+                poly->mod.n, poly->mod.ninv);
             res->length = 1;
             _nmod_poly_normalise(res);
         }

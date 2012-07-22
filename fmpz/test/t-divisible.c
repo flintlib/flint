@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with MPIR:  random */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mpz_t c, d;
@@ -78,7 +78,7 @@ main(void)
     }
 
     /* Compare with MPIR:  b a multiple of a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mpz_t c, d;
@@ -115,7 +115,7 @@ main(void)
     }
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         int b;

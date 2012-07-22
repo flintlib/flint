@@ -85,7 +85,7 @@ int main()
         fmpz_poly_init(B);
 
         arith_cyclotomic_polynomial(A, n);
-        arith_cyclotomic_polynomial(B, n);
+        cyclotomic_naive(B, n);
 
         if (!fmpz_poly_equal(A, B))
         {

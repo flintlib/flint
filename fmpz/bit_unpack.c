@@ -41,7 +41,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
     else
         sign = ((((mp_limb_t) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
 
-    if (bits <= FLINT_BITS - 1)  /* fits into a small coeff */
+    if (bits <= FLINT_BITS - 2)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 

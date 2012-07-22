@@ -104,67 +104,72 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
                                    const fmpz_mod_poly_t A,
                                    const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
-    long lenG;
-    fmpz *g;
+    if (A->length < B->length)
+    {
+        fmpz_mod_poly_gcd_euclidean_f(f, G, B, A);
+    }
+    else /* lenA >= lenB >= 0 */
+    {
+        const long lenA = A->length, lenB = B->length;
+        long lenG;
+        fmpz *g;
 
-    if (lenA == 0)
-    {
-        fmpz_mod_poly_make_monic(G, B);
-        fmpz_one(f);
-        return;
-    }
-    if (lenB == 0)
-    {
-        fmpz_mod_poly_make_monic(G, A);
-        fmpz_one(f);
-        return;
-    }
-
-    if (G == A || G == B)
-    {
-        g = _fmpz_vec_init(FLINT_MIN(lenA, lenB));
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
-        g = G->coeffs;
-    }
-
-    if (lenA >= lenB)
-    {
-        lenG = _fmpz_mod_poly_gcd_euclidean_f(f, g, A->coeffs, lenA,
-                                                    B->coeffs, lenB, &(B->p));
-    }
-    else
-    {
-        lenG = _fmpz_mod_poly_gcd_euclidean_f(f, g, B->coeffs, lenB,
-                                                    A->coeffs, lenA, &(A->p));
-    }
-
-    if (fmpz_is_one(f))
-    {
-        if (G == A || G == B)
+        if (lenA == 0) /* lenA = lenB = 0 */
         {
-            _fmpz_vec_clear(G->coeffs, G->alloc);
-            G->coeffs = g;
-            G->alloc  = FLINT_MIN(lenA, lenB);
-            G->length = FLINT_MIN(lenA, lenB);
+            fmpz_mod_poly_zero(G);
+            fmpz_one(f);
         }
-        _fmpz_mod_poly_set_length(G, lenG);
-        if (lenG == 1)
-            fmpz_one(G->coeffs);
-        else
-            fmpz_mod_poly_make_monic(G, G);
-    }
-    else  /* Factor found, ensure G is normalised */
-    {
-        if (G == A || G == B)
-            _fmpz_vec_clear(g, FLINT_MIN(lenA, lenB));
-        else
+        else if (lenB == 0) /* lenA > lenB = 0 */
         {
-            _fmpz_vec_zero(G->coeffs, FLINT_MIN(lenA, lenB));
-            _fmpz_mod_poly_set_length(G, 0);
+            fmpz_t invA;
+            fmpz_init(invA);
+            fmpz_gcdinv(f, invA, A->coeffs + lenA - 1, &B->p);
+            if (fmpz_is_one(f))
+                fmpz_mod_poly_scalar_mul_fmpz(G, A, invA);
+            else
+                fmpz_mod_poly_zero(G);
+            fmpz_clear(invA);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            if (G == A || G == B)
+            {
+                g = _fmpz_vec_init(FLINT_MIN(lenA, lenB));
+            }
+            else
+            {
+                fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+                g = G->coeffs;
+            }
+
+            lenG = _fmpz_mod_poly_gcd_euclidean_f(f, g, A->coeffs, lenA,
+                                                    B->coeffs, lenB, &(B->p));
+
+            if (fmpz_is_one(f))
+            {
+                if (G == A || G == B)
+                {
+                    _fmpz_vec_clear(G->coeffs, G->alloc);
+                    G->coeffs = g;
+                    G->alloc  = FLINT_MIN(lenA, lenB);
+                    G->length = FLINT_MIN(lenA, lenB);
+                }
+                _fmpz_mod_poly_set_length(G, lenG);
+                if (lenG == 1)
+                    fmpz_one(G->coeffs);
+                else
+                    fmpz_mod_poly_make_monic(G, G);
+            }
+            else  /* Factor found, ensure G is normalised */
+            {
+                if (G == A || G == B)
+                    _fmpz_vec_clear(g, FLINT_MIN(lenA, lenB));
+                else
+                {
+                    _fmpz_vec_zero(G->coeffs, FLINT_MIN(lenA, lenB));
+                    _fmpz_mod_poly_set_length(G, 0);
+                }
+            }
         }
     }
 }

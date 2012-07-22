@@ -46,7 +46,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 100 * flint_test_multiplier(); i++)
+    for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
         fmpq_t x, y;
@@ -57,7 +57,7 @@ main(void)
         fmpq_init(y);
         len = (long) (n_randint(state, 100) + 1);
 
-        for (j = 0; j < 100; j++)
+        for (j = 0; j < 50; j++)
         {
             fmpq_randtest(x, state, 200);
             coeff = (long) n_randint(state, len);

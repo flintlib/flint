@@ -110,6 +110,6 @@ void prof_repeat(double *min, double *max, profile_target_t target,
     \code{NULL}, that value is not stored.
 
     One may set the minimum time in microseconds for a timing run by 
-    adjusting \code{DURATION_THRESHOLD} and one may set a target duration 
+    adjusting\\ \code{DURATION_THRESHOLD} and one may set a target duration 
     in microseconds by adjusting \code{DURATION_TARGET} in \code{profiler.h}.
 

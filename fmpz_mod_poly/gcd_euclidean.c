@@ -94,64 +94,58 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
                                  const fmpz_mod_poly_t A,
                                  const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
-    long lenG;
-    fmpz *g;
+    if (A->length < B->length)
+    {
+        fmpz_mod_poly_gcd_euclidean(G, B, A);
+    }
+    else /* lenA >= lenB >= 0 */
+    {
+        const long lenA = A->length, lenB = B->length;
+        long lenG;
+        fmpz *g;
     
-    if (lenA == 0)
-    {
-        fmpz_mod_poly_make_monic(G, B);
-        return;
-    } 
-    if (lenB == 0)
-    {
-        fmpz_mod_poly_make_monic(G, A);
-        return;
-    }
+        if (lenA == 0) /* lenA = lenB = 0 */
+        {
+            fmpz_mod_poly_zero(G);
+        } 
+        else if (lenB == 0) /* lenA > lenB = 0 */
+        {
+            fmpz_mod_poly_make_monic(G, A);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            fmpz_t invB;
 
-    if (G == A || G == B)
-    {
-        g = _fmpz_vec_init(FLINT_MIN(lenA, lenB));
-    }
-    else
-    {
-        fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
-        g = G->coeffs;
-    }
+            if (G == A || G == B)
+            {
+                g = _fmpz_vec_init(FLINT_MIN(lenA, lenB));
+            }
+            else
+            {
+                fmpz_mod_poly_fit_length(G, FLINT_MIN(lenA, lenB));
+                g = G->coeffs;
+            }
 
-    if (lenA >= lenB)
-    {
-        fmpz_t invB;
-
-        fmpz_init(invB);
-        fmpz_invmod(invB, fmpz_mod_poly_lead(B), &(B->p));
-        lenG = _fmpz_mod_poly_gcd_euclidean(g, A->coeffs, lenA,
+            fmpz_init(invB);
+            fmpz_invmod(invB, fmpz_mod_poly_lead(B), &(B->p));
+            lenG = _fmpz_mod_poly_gcd_euclidean(g, A->coeffs, lenA,
                                                B->coeffs, lenB, invB, &(B->p));
-        fmpz_clear(invB);
-    }
-    else
-    {
-        fmpz_t invA;
+            fmpz_clear(invB);
 
-        fmpz_init(invA);
-        fmpz_invmod(invA, fmpz_mod_poly_lead(A), &(A->p));
-        lenG = _fmpz_mod_poly_gcd_euclidean(g, B->coeffs, lenB,
-                                               A->coeffs, lenA, invA, &(A->p));
-        fmpz_clear(invA);
-    }
-
-    if (G == A || G == B)
-    {
-        _fmpz_vec_clear(G->coeffs, G->alloc);
-        G->coeffs = g;
-        G->alloc  = FLINT_MIN(lenA, lenB);
-        G->length = FLINT_MIN(lenA, lenB);
-    }
-    _fmpz_mod_poly_set_length(G, lenG);
+            if (G == A || G == B)
+            {
+                _fmpz_vec_clear(G->coeffs, G->alloc);
+                G->coeffs = g;
+                G->alloc  = FLINT_MIN(lenA, lenB);
+                G->length = FLINT_MIN(lenA, lenB);
+            }
+            _fmpz_mod_poly_set_length(G, lenG);
     
-    if (lenG == 1)
-        fmpz_one(G->coeffs);
-    else
-        fmpz_mod_poly_make_monic(G, G);
+            if (lenG == 1)
+                fmpz_one(G->coeffs);
+            else
+                fmpz_mod_poly_make_monic(G, G);
+        }
+    }
 }
 

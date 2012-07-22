@@ -39,7 +39,9 @@ main(void)
     printf("fmpz....");
     fflush(stdout);
 
-    for (i = 0; i < 100000; i++)
+    flint_randinit(state);
+
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
 
@@ -61,6 +63,7 @@ main(void)
         }
     }
 
+    flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
     return 0;

@@ -39,7 +39,7 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, d, r1, r2, dinv;
       mpz_t a_m, d_m, r2_m;
@@ -52,7 +52,7 @@ int main(void)
       d = n_randtest_not_zero(state);
       do
       {
-         a = n_randint(state, d);
+         a = n_randtest(state) % d;
       } while (n_gcd(d, a) != 1UL);
       exp = n_randtest(state);
       

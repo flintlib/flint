@@ -28,27 +28,36 @@
 #include "ulong_extras.h"
 
 mp_limb_t
-n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
+n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre)
 {
     mp_limb_t x, y;
-    mp_limb_t e;
 
     if (n == 1UL)
         return 0L;
 
-    e = (exp < 0L ? -exp : exp);
-
     x = 1UL;
     y = a;
 
-    while (e)
+    while (exp)
     {
-        if (e & 1L)
+        if (exp & 1L)
             x = n_mulmod_precomp(x, y, n, npre);
-        e >>= 1;
-        if (e)
+        exp >>= 1;
+        if (exp)
             y = n_mulmod_precomp(y, y, n, npre);
     }
 
-    return (exp < 0L ? n_invmod(x, n) : x);
+    return x;
+}
+
+mp_limb_t
+n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, double npre)
+{
+    if (exp < 0)
+    {
+        a = n_invmod(a, n);
+        exp = -exp;
+    }
+
+    return n_powmod_ui_precomp(a, exp, n, npre);
 }

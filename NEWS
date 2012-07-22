@@ -787,6 +787,278 @@ build fixes
   * -L use /usr instead of /usr/local by default (reported by Serge Torres)
   * guards for system headers because of flint's use of ulong
 
-2.3 -- 16 Dec 2011
+2.3 -- 1 Jul 2012
 
-  * Watch this space....
+general
+-------
+  * many changes to the build system
+  * added NTL interface
+  * switched to custom memory allocation functions flint_malloc etc
+  * in addition to the entries below, fixed a large number of memory leaks,
+    problems with the test code, and bugs in corner cases of various functions
+  * added _fmpz_cleanup_mpz_content as an alternative to _fmpz_cleanup
+  * support MinGW32
+  * support Cygwin
+
+ulong_extras
+------------
+  * implemented the improved Lehman algorithm
+  * added n_jacobi_unsigned to allow n > LONG_MAX
+  * fixed n_sqrtmod for n > LONG_MAX
+  * fixed bug causing n_sqrtmod to hang
+  * added sublinear algorithm for computing factorials mod p
+  * added n_sqrtmod_primepow, n_sqrtmodn and associated functions for
+    computing square roots modulo composite integers
+  * fixed bugs in n_is_prime_pocklington
+  * fixed ULONG_MAX case in powmod and powmod2
+  * fixed problems with the random number generators
+  * fixed rare bug in n_mod_precomp
+  * fixed rare bug in n_is_prime_pseudosquare
+
+long_extras
+-----------
+  * added z_sizeinbase
+
+qsieve
+------
+  * new module implementing a quadratic sieve for numbers up to two limbs
+
+fft
+---
+  * new module providing an efficient Schoenhage-Strassen FFT
+
+longlong
+--------
+  * added assembly code for ia64 and ARM
+  * fixed bug in fallback version of add_sssaaaaaa
+
+fmpz
+----
+  * added fmpz_fib_ui
+  * added double precision natural logarithm
+  * added fmpz_val2 for 2-valuation
+  * added mul_2exp, div_2exp, cdiv_q_2exp, tdiv_q_2exp, fdiv_r, fdiv_r_2exp,
+    tdiv_ui, mul_tdiv_q_2exp
+  * added get_d/set_d
+  * added fmpz_divisible, divisible_si
+  * optimised fmpz_powm and fmpz_powm_ui
+  * added clog, clog_ui, flog, flog_ui for computing logarithms
+  * added abs_lbound_ui_2exp, ubound_ui_2exp
+  * added fmpz_rfac_ui and fmpz_rfac_uiui for rising factorials
+  * added functions to obtain read-only fmpz_t's from mpz_t's
+  * added fmpz_init_set, init_set_ui
+  * added fmpz_gcdinv
+  * added fmpz_is_square
+  * added fmpz_tstbit, setbit, clrbit, complement, combit, and, or, xor, popcnt
+  * added a sign flag for CRT instead of using separate methods
+  * fixed bugs in fmpz_sqrtmod
+  * fixed a bug in fmpz_bit_unpack that could cause corruption of the global
+    fmpz array when compiled in single mode
+  * fixed a bug in fmpz_sub_ui that could cause memory corruption
+
+fmpz_vec
+--------
+  * added functions for obtaining the largest absolute value coefficient
+  * added functions for computing the sum and product of an integer vector
+  * made max_bits much faster
+  * added _fmpz_vec_mod_fmpz
+  * made randtest produce sparse output
+
+fmpz_poly
+---------
+  * added fmpz_poly_sqr, fmpz_poly_sqrlow for squaring a polynomial
+  * added fmpz_poly_lcm
+  * made multipoint interpolation faster by using the Newton basis
+  * added a function for fast division by a linear polynomial
+  * added power series composition (classical and Brent-Kung)
+  * added power series reversion (classical, Newton, fast Lagrange)
+  * added a function for obtaining the largest absolute value coefficient
+  * fixed quadratic memory usage and stack overflow when performing
+    unbalanced division or pseudo division using the divconquer algorithm
+  * fixed a bug in poly_zero_coeffs
+  * fixed a bug in xgcd_modular
+  * allowing +/-1 in the constant term of power series inversion
+  * fixed aliasing bug in divrem
+  * added restartable Hensel lifting and associated utility functions
+  * fixed rem, which used to only call the basecase algorithm
+  * fixed pseudo_divrem, which used to only call the basecase algorithm
+  * implemented Schoenhage-Strassen multiplication (mul_SS, mullow_SS)
+    and enabled this by default
+  * fixed a bug in the heuristic GCD algorithm
+  * added functions for Newton basis conversion
+  * added functions for fast Taylor shift
+  * added fmpz_poly_sqrt implementing a basecase algorithm
+  * added scalar mul_2exp, fdiv_2exp, tdiv_2exp
+  * made randtest produce sparse output
+  * added fmpz_poly_equal_fmpz
+  * improved performance by always using basecase multiplicatio
+    when one polynomial is short
+  * improved algorithm selection for fmpz_poly_gcd
+  * fixed several bugs in gcd_modular
+  * improved performance of gcd_modular
+
+fmpz_poly_factor
+----------------
+  * new module for factorisation of fmpz_polys
+  * added a naive implementation of the Zassenhaus algorithm
+
+fmpz_mod_poly
+-------------
+  * new module for polynomials modulo over Z/nZ for arbitrary-precision n
+  * multiplication, powering
+  * classical and divconquer division
+  * series inversion
+  * Euclidean GCD and XGCD
+  * invmod
+  * radix conversion
+  * divconquer composition
+  * GCD and division functions that test invertibility of the
+    leading coefficient
+
+fmpz_mat
+--------
+  * added det_divisor for computing a random divisor of the determinant
+  * faster determinant computation using divisor trick
+  * faster determinant computation by using multimodular updates
+  * fixed n x 0 x m product not zeroing the result
+  * various interface improvements
+  * faster implementation of Cramer's rule for multiple right hand sides
+  * added fmpz_mat_fread and read
+  * added multi CRT/mod functions
+  * added trace
+
+fmpz_poly_mat
+-------------
+  * fixed n x 0 x m product not zeroing the result
+  * added inverse
+  * added rank computation
+  * added reduced row echelon form and nullspace computation
+  * added more utility functions
+  * added squaring and exponentiation
+  * added balanced product of a sequence of matrices
+  * added truncate, mullow, sqrlow, pow_trunc
+  * added trace
+
+fmpz_factor
+-----------
+  * new module providing interface for integer factorisation
+  * fast expansion of a factored integer
+
+fmpq
+----
+  * cleaned up and improved performance of rational reconstruction code
+  * allow separate numerator and denominator bounds for rational
+    reconstruction
+  * added continued fraction expansion
+  * added functions for summation using binary splitting
+  * added fmpq_swap
+  * added fmpq_print, fmpq_get_str
+  * added fmpq_pow_si
+  * added functions to obtain read-only fmpq_t's from mpq_t's
+  * added fmpq_cmp
+
+fmpq_mat
+--------
+  * fixed n x 0 x m product not zeroing the result
+  * added fmpq_mat_transpose
+  * added trace
+
+fmpq_poly
+---------
+  * improved speed of multipoint interpolation using _fmpz_poly_div_root
+  * fmpq_poly: added power series composition (classical and Brent-Kung)
+  * fmpq_poly: added power series reversion (classical, Newton, fast Lagrange)
+  * fixed bug wherein set_array_mpq modified the input
+  * added gcd, xgcd, lcm, resultant
+  * added fmpq_poly_set_fmpq
+  * added fmpq_poly_get_slice, fmpq_poly_reverse
+  * fixed aliasing bug in divrem
+  * changed some functions to use FLINT scalar types instead of MPIR data types
+  * added fmpq_poly_get_numerator
+
+nmod_poly
+---------
+  * implemented the half gcd algorithm for subquadratic gcd and xgcd
+  * added multipoint evaluation and interpolation
+  * added asymptotically fast multipoint evaluation and interpolation
+  * added a function for forming the product of linear factors
+  * added a function for fast division by a linear polynomial
+  * added power series composition (classical and Brent-Kung)
+  * added power series reversion (classical, Newton, fast Lagrange)
+  * added nmod_poly_mulmod, powmod and related functions
+    (ported from flint1)
+  * added squarefree, irreducibility tests (ported from flint1)
+  * added Berlekamp and Cantor-Zassenhaus factoring (ported from flint1)
+  * fixed quadratic memory usage and stack overflow when performing
+    unbalanced division using the divconquer algorithm
+  * added compose_series_divconquer
+  * added resultant
+  * fixed aliasing bug in divrem
+  * added rem functions
+  * added divrem_q0, q1 for special cases of division
+  * added functions for fast Taylor shift
+  * added nmod_poly_sqrt
+  * made fread read the modulus from the file
+  * made randtest produce sparse output
+  * fixed bug in xgcd_euclidean with scalar inputs
+
+nmod_vec
+--------
+  * added functions and macros for computing dot products
+  * made randtest produce sparse output
+
+nmod_mat
+--------
+  * added addmul/submul functions
+  * asymptotically fast solving of triangular systems
+  * asymptotically fast LUP decomposition
+  * asymptotically fast determinant and rank computation
+  * asymptotically fast reduced row echelon form and nullspace
+  * asymptotically fast nonsingular solving
+  * asymptotically fast inverse
+  * tidied some interfaces
+  * fixed n x 0 x m product not zeroing the result
+  * added trace
+  * made multiplication faster for tiny moduli by means of bit packing
+
+nmod_poly_mat
+-------------
+  * new module for matrices over Z/nZ[x], with similar
+    functionality as the fmpz_poly_mat module
+  * determinant, rank, solving, reduced echelon form, nullspace
+  * fraction-free Gaussian elimination
+  * multiplication using bit packing
+  * multiplication using evaluation-interpolation
+  * determinant using evaluation-interpolation
+
+padic
+-----
+  * restructured and improved much of the code
+  * added padic_log
+  * improved log and exp using rectangular splitting
+  * added asymptotically fast log and exp based on binary splitting
+
+perm
+----
+  * added the perm module for permutation matrices
+  * computing the parity of a permutation
+  * inverting a permutation
+
+arith
+-----
+  * added generation of cyclotomic polynomials
+  * added functions for evaluating Dedekind sums
+  * fast computation of the partition function
+  * added a function for factoring a Hardy-Ramanujan-Rademacher
+    type exponential sum
+  * added Chebyshev polynomials T and U
+  * added computation of the minimal polynomial of cos(2pi/n)
+  * added asymptotically fast high-precision approximation of zeta(n)
+  * added asymptotically fast computation of Euler's constant
+  * added new algorithms and functions for computing Bell numbers
+  * fast computation of pi (adapting code written by Hanhong Xue)
+  * added functions for computing the number of sum of squares
+    representations of an integer
+  * renamed functions to have an arith_ prefix
+
+

@@ -41,7 +41,7 @@ int main(void)
 
    n_compute_primes(10000);
 
-   for (i = 0; i < 100000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mp_limb_t d;
       mpz_t d_m;
@@ -69,7 +69,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 100000; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
       mp_limb_t d;
       mpz_t d_m;

@@ -39,13 +39,13 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, b, d, r1, r2, q, p1, p2, dinv;
       
       d = n_randtest_not_zero(state);
-      a = n_randint(state, d);
-      b = n_randint(state, d);
+      a = n_randtest(state) % d;
+      b = n_randtest(state) % d;
       
       dinv = n_preinvert_limb(d);
 

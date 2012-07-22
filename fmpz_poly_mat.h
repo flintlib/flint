@@ -121,6 +121,10 @@ long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A);
 
 long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A);
 
+/* Transpose *****************************************************************/
+
+void fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
+
 /* Truncation ****************************************************************/
 
 void fmpz_poly_mat_truncate(fmpz_poly_mat_t A, long len);

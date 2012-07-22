@@ -44,7 +44,7 @@ main(void)
     flint_randinit(state);
 
     /* Check zero vector */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
         long len = n_randint(state, 100);
@@ -65,7 +65,7 @@ main(void)
     }
 
     /* Check non-zero vector */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
         long len = n_randint(state, 100) + 1;

@@ -34,6 +34,7 @@
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"
+#include "fmpq_mat.h"
 #include "padic.h"
 
 typedef struct
@@ -49,6 +50,9 @@ typedef padic_mat_struct padic_mat_t[1];
 #define padic_mat(A)             (&((A)->mat))
 #define padic_mat_unit(A, i, j)  ((A)->mat.rows[i] + (j))
 #define padic_mat_val(A)         ((A)->val)
+
+#define padic_mat_nrows(A)       (((A)->mat).r)
+#define padic_mat_ncols(A)       (((A)->mat).c)
 
 /* Memory management  ********************************************************/
 
@@ -103,6 +107,14 @@ void padic_mat_zero(padic_mat_t A);
 void _padic_mat_one(padic_mat_t A);
 
 void padic_mat_one(padic_mat_t A, const padic_ctx_t ctx);
+
+/* Conversions ***************************************************************/
+
+void padic_mat_set_fmpq_mat(padic_mat_t B, 
+                            const fmpq_mat_t A, const padic_ctx_t ctx);
+
+void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
+                            const padic_mat_t A, const padic_ctx_t ctx);
 
 /* Entries *******************************************************************/
 

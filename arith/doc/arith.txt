@@ -161,7 +161,7 @@ void arith_bell_number_multi_mod(fmpz_t res, ulong n)
     Computes the Bell number $B_n$ using a multimodular algorithm.
 
     This function evaluates the Bell number modulo several limb-size
-    primes using \code{arith_bell_number_nmod} and reconstructs the integer
+    primes using\\ \code{arith_bell_number_nmod} and reconstructs the integer
     value using the fast Chinese remainder algorithm.
     A bound for the number of needed primes is computed using
     \code{arith_bell_number_size}.
@@ -184,8 +184,8 @@ void arith_bell_number_vec_multi_mod(fmpz * b, long n)
     inclusive.
 
     This function evaluates the Bell numbers modulo several limb-size
-    primes \code{arith_bell_number_nmod_vec} and reconstructs the integer
-    values using the fast Chinese remainder algorithm.
+    primes using\\ \code{arith_bell_number_nmod_vec} and reconstructs the 
+    integer values using the fast Chinese remainder algorithm.
     A bound for the number of needed primes is computed using
     \code{arith_bell_number_size}.
 
@@ -204,7 +204,7 @@ mp_limb_t bell_number_nmod(ulong n, nmod_t mod)
     evaluated. This results in $O(n)$ memory usage.
 
     The divisions by factorials require $n > p$, so we fall back to
-    calling \code{bell_number_nmod_vec_recursive} and reading off the
+    calling\\ \code{bell_number_nmod_vec_recursive} and reading off the
     last entry when $p \le n$.
 
 void arith_bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
@@ -246,12 +246,12 @@ void _arith_bernoulli_number(fmpz_t num, fmpz_t den, ulong n)
 
     Sets \code{(num, den)} to the reduced numerator and denominator
     of the $n$-th Bernoulli number. As presently implemented,
-    this function simply calls \code{_arith_bernoulli_number_zeta}.
+    this function simply calls\\ \code{_arith_bernoulli_number_zeta}.
 
 void arith_bernoulli_number(fmpq_t x, ulong n)
 
     Sets \code{x} to the $n$-th Bernoulli number. This function is
-    equivalent to \code{_barith_ernoulli_number} apart from the output
+    equivalent to\\ \code{_arith_bernoulli_number} apart from the output
     being a single \code{fmpq_t} variable.
 
 void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, long n)
@@ -329,7 +329,7 @@ void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, long n)
 
     Sets the elements of \code{num} and \code{den} to the reduced
     numerators and denominators of $B_0, B_1, B_2, \ldots, B_{n-1}$
-    inclusive. Uses repeated direct calls to
+    inclusive. Uses repeated direct calls to\\
     \code{_arith_bernoulli_number_zeta}.
 
 void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)

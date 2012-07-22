@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         long l;
@@ -67,7 +67,7 @@ main(void)
     }
 
     /* Check correctness */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, x, y;
         long k;
@@ -106,7 +106,7 @@ main(void)
     }
 
     /* Check correctness:  exact powers */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         long k, l;

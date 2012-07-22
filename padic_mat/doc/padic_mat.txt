@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -67,6 +67,14 @@ long padic_mat_val(const padic_mat_t A)
 
     This is implemented as a macro and can be used as an \emph{lvalue} 
     as well as an \emph{rvalue}.
+
+long padic_mat_nrows(const padic_mat_t A)
+
+    Returns the number of rows of the matrix $A$.
+
+long padic_mat_ncols(const padic_mat_t A)
+
+    Returns the number of columns of the matrix $A$.
 
 *******************************************************************************
 
@@ -135,6 +143,24 @@ void padic_mat_one(padic_mat_t A, const padic_ctx_t ctx)
     Sets the matrix $A$ to the identity matrix, reduced 
     according to the context.  If the precision in the context 
     is negative then the matrix will in fact be the zero matrix.
+
+*******************************************************************************
+
+    Conversions
+
+*******************************************************************************
+
+void padic_mat_set_fmpq_mat(padic_mat_t B, 
+                            const fmpq_mat_t A, const padic_ctx_t ctx)
+
+    Sets the $p$-adic matrix $B$ to the rational matrix $A$, reduced 
+    according to the given context.
+
+void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
+                            const padic_mat_t A, const padic_ctx_t ctx)
+
+    Sets the rational matrix $B$ to the $p$-adic matrices $A$;  
+    no reduction takes place.
 
 *******************************************************************************
 

@@ -39,7 +39,7 @@ int main(void)
    printf("divrem2_precomp....");
    fflush(stdout);
 
-   for (i = 0; i < 1000000UL; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d, n, r1, r2, q1, q2;
       double dpre;

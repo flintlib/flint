@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         long len = n_randint(state, 100);
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Check aliasing of (a*2^e1)*2^e2 equals a*2^(e1+e2) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         long len = n_randint(state, 100);

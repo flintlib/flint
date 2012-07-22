@@ -38,14 +38,13 @@ int main(void)
    printf("mod2_precomp....");
    fflush(stdout);
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d, n, r1, r2;
       double dpre;
 
-      d = n_randtest(state);
-      if (d == 0UL) d++;
-  
+      d = n_randtest_not_zero(state);
+      
       n = n_randtest(state);
       
       dpre = n_precompute_inverse(d);

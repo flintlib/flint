@@ -39,13 +39,13 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d, dinv, nh, nl, r1, r2, m;
 
       d = n_randtest_not_zero(state);
       m = n_randtest(state);
-      r1 = n_randint(state, d);
+      r1 = n_randtest(state) % d;
       umul_ppmm(nh, nl, m, d);
       add_ssaaaa(nh, nl, nh, nl, 0UL, r1);
 

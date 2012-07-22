@@ -39,12 +39,12 @@ int main(void)
  
    flint_randinit(state);
 
-   for (i = 0; i < 10000; i++) /* Test random squares */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
       bits = n_randint(state, FLINT_BITS/2) + 1;
-      n1 = n_randbits(state, bits);
+      n1 = n_randtest_bits(state, bits);
       factor = n_factor_power235(&exp, n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -58,12 +58,12 @@ int main(void)
       }
    }
    
-   for (i = 0; i < 10000; i++) /* Test random cubes */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random cubes */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
       bits = n_randint(state, FLINT_BITS/3) + 1;
-      n1 = n_randbits(state, bits);
+      n1 = n_randtest_bits(state, bits);
       factor = n_factor_power235(&exp, n1*n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -77,12 +77,12 @@ int main(void)
       }
    }
    
-   for (i = 0; i < 10000; i++) /* Test random fifth powers */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random fifth powers */
    {
       mp_limb_t factor, exp, n1, n2, bits;
       
       bits = n_randint(state, FLINT_BITS/5) + 1;
-      n1 = n_randbits(state, bits);
+      n1 = n_randtest_bits(state, bits);
       factor = n_factor_power235(&exp, n1*n1*n1*n1*n1);
 
       n2 = n_pow(factor, exp);
@@ -96,7 +96,7 @@ int main(void)
       }
    }
    
-   for (i = 0; i < 10000; i++) /* Test non 235-powers */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test non 235-powers */
    {
       mp_limb_t exp, n1;
       

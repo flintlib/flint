@@ -45,7 +45,7 @@ main(void)
     flint_randinit(state);
     
      /* convert back and forth and compare */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
@@ -80,12 +80,13 @@ main(void)
             abort();
         }
 
+        flint_free(ii);
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
     }
         
      /* convert back and forth unsigned and compare */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
@@ -118,6 +119,7 @@ main(void)
             abort();
         }
 
+        flint_free(ii);
         _fmpz_vec_clear(a, len);
         _fmpz_vec_clear(b, len);
     }
