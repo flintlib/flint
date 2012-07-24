@@ -28,11 +28,31 @@
 void
 fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx)
 {
-    padic_poly_randtest(x, state, fq_ctx_dim(ctx), &ctx->pctx);
+    padic_poly_randtest_val(x, state, 0, fq_ctx_dim(ctx), &ctx->pctx);
 }
 
 void
-fq_randtest_not_zero(fq_t x, flint_rand_t state, const fq_ctx_t ctx)
+fq_randtest_not_zero(fq_t f, flint_rand_t state,
+                             const fq_ctx_t ctx)
 {
-    padic_poly_randtest_not_zero(x, state, fq_ctx_dim(ctx), &ctx->pctx);
+    long i;
+
+    if (fq_ctx_dim(ctx) == 0)
+    {
+        printf("Exception (fq_randtest_not_zero).  dim == 0.\n");
+        abort();
+    }
+
+    fq_randtest(f, state, ctx);
+    for (i = 0; !fq_is_zero(f) && (i < 10); i++)
+        fq_randtest(f, state, ctx);
+
+    if (fq_is_zero(f))
+    {
+        padic_poly_fit_length(f, 1);
+        _padic_poly_set_length(f, 1);
+        fmpz_set_ui(f->coeffs + 0, 1);
+        f->val = 0;
+    }
 }
+
