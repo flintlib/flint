@@ -19,12 +19,11 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Sebastian Pancratz, 2012 Andres Goens
 
 ******************************************************************************/
 
 #include <stdio.h>
-#include <stdlib.h>
 
 #include "fq.h"
 #include "ulong_extras.h"
@@ -36,62 +35,20 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("inv... ");
+    printf("norm... ");
     fflush(stdout);
 
     flint_randinit(state);
 
-    /* Check aliasing: a = ~a */
+    /* Compare with product of Galois conjugates */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
         long d;
         fq_ctx_t ctx;
 
-        fq_t a, b, c;
-
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a", PADIC_SERIES);
-
-        fq_init(a);
-        fq_init(b);
-        fq_init(c);
-
-        fq_randtest_not_zero(a, state, ctx);
-        fq_set(b, a);
-
-        fq_inv(c, b, ctx);
-        fq_inv(b, b, ctx);
-
-        result = (fq_equal(b, c));
-        if (!result)
-        {
-            printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
-            fq_ctx_print(ctx);
-            abort();
-        }
-
-        fq_clear(a);
-        fq_clear(b);
-        fq_clear(c);
-
-        fmpz_clear(p);
-        fq_ctx_clear(ctx);
-    }
-
-    /* Check a * ~a == 1 for units*/
-    for (i = 0; i < 2000; i++)
-    {
-        fmpz_t p;
-        long d;
-        fq_ctx_t ctx;
-
-        fq_t a, b, c;
+        fq_t a, b, c, x;
+        long j;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
@@ -101,26 +58,39 @@ main(void)
         fq_init(a);
         fq_init(b);
         fq_init(c);
+        fq_init(x);
 
-        do fq_randtest(a, state, ctx);
-        while (fq_is_zero(a));
+        fq_randtest(a, state, ctx);
+        fq_reduce(a, ctx);
 
-        fq_inv(b, a, ctx);
-        fq_mul(c, a, b, ctx);
+        fq_norm(x, a, ctx);
 
-        result = (fq_is_one(c));
+        fq_one(b, ctx);
+        for (j = 0; j < d; j++)
+        {
+            fq_frobenius(c, a, j, ctx);
+            fq_mul(b, b, c, ctx);
+        }
+
+        result = fq_equal(x, b);
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("x = "), fq_print_pretty(x, ctx), printf("\n");
+            for (j = 0; j < d; j++)
+            {
+                fq_frobenius(c, a, j, ctx);
+                printf("sigma^%ld = ", j), fq_print_pretty(c, ctx), printf("\n");
+            }
             abort();
         }
 
         fq_clear(a);
         fq_clear(b);
         fq_clear(c);
+        fq_clear(x);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);
@@ -131,4 +101,3 @@ main(void)
     printf("PASS\n");
     return EXIT_SUCCESS;
 }
-
