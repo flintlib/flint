@@ -98,6 +98,9 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
 
+void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
+                          const fmpz_mod_poly_t f);
+
 void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
                                       const fmpz_mod_poly_t f);
 

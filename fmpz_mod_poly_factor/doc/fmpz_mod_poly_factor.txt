@@ -145,6 +145,13 @@ void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
 
     Sets \code{res} to a squarefree factorization of \code{f}.
 
+void fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
+			  const fmpz_mod_poly_t f)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors choosing the best algorithm for given modulo and degree.
+    Choise is based on heuristic measurments.
+
 void fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
 				      const fmpz_mod_poly_t f)
 
