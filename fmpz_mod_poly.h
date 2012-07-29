@@ -101,6 +101,10 @@ void
 fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len);
 
 void
+fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+                                   flint_rand_t state, long len);
+
+void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, long len);
 

@@ -98,6 +98,12 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len)
 
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
 
+void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+					flint_rand_t state, long len)
+
+    Sets the polynomial~$f$ to a random irreducible polynomial of length
+    up~\code{len}, assuming \code{len} is positive.
+
 void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                      flint_rand_t state, long len)
 
