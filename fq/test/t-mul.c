@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz, 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz 
+    Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
@@ -69,9 +70,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
             abort();
         }
 
@@ -111,9 +112,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
             abort();
         }
 
@@ -151,8 +152,8 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
             abort();
         }
 
@@ -192,10 +193,10 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a  = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b  = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c1 = "), qadic_print_pretty(c1, ctx), printf("\n");
-            printf("c2 = "), qadic_print_pretty(c2, ctx), printf("\n");
+            printf("a  = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b  = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c1 = "), fq_print_pretty(c1, ctx), printf("\n");
+            printf("c2 = "), fq_print_pretty(c2, ctx), printf("\n");
             abort();
         }
 
@@ -241,11 +242,11 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a   = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b   = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c   = "), qadic_print_pretty(c, ctx), printf("\n");
-            printf("lhs = "), qadic_print_pretty(lhs, ctx), printf("\n");
-            printf("rhs = "), qadic_print_pretty(rhs, ctx), printf("\n");
+            printf("a   = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b   = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c   = "), fq_print_pretty(c, ctx), printf("\n");
+            printf("lhs = "), fq_print_pretty(lhs, ctx), printf("\n");
+            printf("rhs = "), fq_print_pretty(rhs, ctx), printf("\n");
             abort();
         }
 

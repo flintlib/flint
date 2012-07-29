@@ -20,16 +20,9 @@
 /******************************************************************************
 
     Copyright (C) 2011 Sebastian Pancratz
- 
+    Copyright (C) 2012 Andres Goens
+
 ******************************************************************************/
-
-#include <stdio.h>
-#include <string.h>
-
-#include "fmpz_vec.h"
-#include "padic.h"
-#include "qadic.h"
- /* I'm not sure if I should include all these above(I copied them from the qadic code), as I am including fq.h which should include them anyway */
 
 #include "fq.h"
 

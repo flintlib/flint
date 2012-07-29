@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
@@ -69,9 +70,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
             fq_ctx_print(ctx);
             abort();
         }
@@ -112,9 +113,9 @@ main(void)
         if (!result)
         {
             printf("FAIL:\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
             abort();
         }
 

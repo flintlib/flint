@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
@@ -71,8 +72,8 @@ main(void)
         if (!result)
         {
             printf("FAIL (alias):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
             abort();
         }
 
@@ -120,9 +121,9 @@ main(void)
         if (!result)
         {
             printf("FAIL (cmp with mul):\n\n");
-            printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
-            printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
-            printf("c = "), qadic_print_pretty(b, ctx), printf("\n");
+            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
+            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
+            printf("c = "), fq_print_pretty(b, ctx), printf("\n");
             printf("e = "), fmpz_print(e), printf("\n");
             abort();
         }
