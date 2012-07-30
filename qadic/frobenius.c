@@ -142,7 +142,7 @@ _fmpz_mod_poly_compose_mod_horner(fmpz *rop,
     Does not support aliasing.
  */
 
-static void 
+void 
 _fmpz_mod_poly_compose_mod(fmpz *rop, 
                            const fmpz *op1, long len1, 
                            const fmpz *op2, long len2, 
@@ -265,6 +265,11 @@ void _qadic_frobenius_a(fmpz *rop, long exp,
     flint_free(e);
 }
 
+/*
+    Sets (rop, 2d-1) to the image of (op, len) under the Frobenius operator 
+    raised to the e-th power.
+ */
+
 void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
                   const fmpz *a, const long *j, long lena, 
                   const fmpz_t p, long N)
@@ -274,7 +279,7 @@ void _qadic_frobenius(fmpz *rop, const fmpz *op, long len, long e,
     if (len == 1)  /* op is in Zp, not just Zq */
     {
         _fmpz_vec_set(rop, op, len);
-        _fmpz_vec_zero(rop + len, d - len);
+        _fmpz_vec_zero(rop + len, (2*d - 1)  - len);
     }
     else if (N == 1)
     {

@@ -114,7 +114,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             /* Complete the initialisation of the context */
             padic_ctx_init(&ctx->pctx, p, N, mode);
 
-            ctx->var = flint_malloc(strlen(var));
+            ctx->var = flint_malloc(strlen(var) + 1);
             strcpy(ctx->var, var);
 
             fclose(file);
