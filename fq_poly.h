@@ -93,6 +93,8 @@ void fq_poly_zero_coeffs(fq_poly_t poly, long i, long j);
 
 void fq_poly_swap(fq_poly_t poly1, fq_poly_t poly2);
 
+void fq_poly_change_ctx(fq_poly_t poly, const fq_ctx_t ctx);
+
 /*  Randomisation  ***********************************************************/
 
 void fq_poly_randtest(fq_poly_t f, const fq_ctx_t ctx,
