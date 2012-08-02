@@ -38,7 +38,7 @@ main()
 
     long i;
     fmpz_t p;
-    long d;
+    long d,cpu,wall;
     fq_ctx_t ctx;
     fq_t a,b,c;
 
@@ -62,15 +62,22 @@ main()
     printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
 
     printf("random multiplications: \n");
-    timeit_start(t0);
+
+    cpu = 0;
+    wall = 0;
     for(i=0;i<REPS;i++)
     {
     fq_randtest(a,state,ctx);
     fq_randtest(b,state,ctx);
+
+    timeit_start(t0);
     fq_mul(c,a,b,ctx);
-    }
     timeit_stop(t0);
-    printf ( " cpu = %ld ms, wall = %ld ms \n " , t0->cpu , t0->wall );
+    cpu = cpu + t0->cpu;
+    wall = wall + t0->wall;
+    }
+
+    printf ( " cpu = %ld ms, wall = %ld ms \n " , cpu , wall );
 
 
     return 0;
