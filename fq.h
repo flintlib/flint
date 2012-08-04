@@ -98,6 +98,12 @@ fq_ctx_print(const fq_ctx_t ctx)
 
 }
 
+static __inline__ int
+fq_ctx_equal(fq_ctx_t ctx1, fq_ctx_t ctx2)
+{
+    return qadic_ctx_equal(ctx1, ctx2);
+}
+
 /* Basic arithmetic **********************************************************/
 
 void fq_add(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
@@ -118,6 +124,12 @@ static __inline__ void
 fq_init(fq_t x)
 {
     padic_poly_init(x);
+}
+
+static __inline__ void
+fq_init2(fq_t x, fq_ctx_t ctx)
+{
+    padic_poly_init2(x,fq_ctx_dim(ctx));
 }
 
 static __inline__ void

@@ -19,15 +19,17 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+_fq_poly_normalise(fq_poly_t poly)
 {
-    qadic_ctx_clear(ctx);
+    long i;
+    for (i = poly->length - 1; (i >= 0) && !fq_is_zero(poly->coeffs + i); i--) ;
+    poly->length = i + 1;
 }

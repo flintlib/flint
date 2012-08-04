@@ -19,15 +19,38 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+fq_poly_add(fq_poly_t res, const fq_poly_t poly1,
+            const fq_poly_t poly2)
 {
-    qadic_ctx_clear(ctx);
+    long len,i;
+    fq_t s;
+
+    fq_init(s);
+
+    if(!fq_ctx_equal(poly1->ctx,poly2->ctx))
+    {
+        printf("Exception (fq_poly_add) polynomials with different fq_ctx.\n");
+        abort();
+    }
+
+    len = (poly1->length < poly2->length ? poly2->length : poly1->length); /* max(poly1->len,poly2->len) */
+    _fq_poly_set_length(res,len);
+
+    for(i=0;i<len;i++)
+    {
+        if(i>poly1->length) fq_set(res->coeffs +i,poly2->coeffs + i); /*defn of len assures then that poly2->coefs + i points to something */
+        if(i>poly2->length) fq_set(res->coeffs +i,poly1->coeffs + i); 
+        else
+        {
+            fq_add(s,poly1->coeffs +i, poly2->coeffs + i,poly1->ctx);
+            fq_set(res->coeffs+i, s);
+        }
+    }
 }

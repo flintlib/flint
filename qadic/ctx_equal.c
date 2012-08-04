@@ -19,15 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
-#include "fq.h"
+#include "qadic.h"
 
-void
-fq_ctx_clear(fq_ctx_t ctx)
+int
+qadic_ctx_equal(qadic_ctx_t ctx1, qadic_ctx_t ctx2)
 {
-    qadic_ctx_clear(ctx);
+    if(!padic_ctx_equal(&ctx1->pctx,&ctx2->pctx)) return 0;
+    if(!fmpz_equal(ctx1->a,ctx2->a)) return 0;
+    if(*(ctx1->j) != *(ctx2->j)) return 0;
+    if(*(ctx1->var) != *(ctx2->var)) return 0;
+    if(ctx1->len != ctx2->len) return 0;
+    return 1;
 }

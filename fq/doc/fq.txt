@@ -76,6 +76,11 @@ void fq_init(fq_t rop)
 
     Initialises the element \code{rop}, setting its value to~$0$.
 
+void fq_init_2(fq_t rop, long alloc)
+
+    Initialises \code{poly} with at least enough space for it to be an element
+    of \code{ctx} and sets it to 0.
+
 void fq_clear(fq_t rop)
 
     Clears the element \code{rop}.

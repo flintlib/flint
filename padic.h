@@ -108,6 +108,8 @@ _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
     }
 }
 
+int padic_ctx_equal(padic_ctx_t ctx1, padic_ctx_t ctx2);
+
 /* Memory management *********************************************************/
 
 void _padic_init(padic_t rop);

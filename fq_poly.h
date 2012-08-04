@@ -49,8 +49,6 @@ typedef fq_poly_struct fq_poly_t[1];
 
 void fq_poly_init(fq_poly_t poly, fq_ctx_t ctx);
 
-void fq_poly_clear(fq_poly_t);
-
 void fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc);
 
 void fq_poly_realloc(fq_poly_t poly, long alloc);
@@ -61,7 +59,17 @@ void fq_poly_clear(fq_poly_t poly);
 
 void _fq_poly_normalise(fq_poly_t poly);
 
+static __inline__
 void _fq_poly_set_length(fq_poly_t poly, long newlen)
+{
+    if (poly->length > newlen)
+    {
+        long i;
+        for (i = newlen; i < poly->length; i++)
+            fq_clear(poly->coeffs + i);
+    }
+    poly->length = newlen;
+}
 
 /*  Polynomial parameters  ***************************************************/
 
@@ -86,6 +94,8 @@ void fq_poly_zero(fq_poly_t poly)
 {
    _fq_poly_set_length(poly, 0);
 }
+
+void fmpz_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c);
 
 void fq_poly_one(fq_poly_t poly);
 

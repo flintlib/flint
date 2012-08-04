@@ -19,15 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
-
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+fq_poly_clear(fq_poly_t poly)
 {
-    qadic_ctx_clear(ctx);
+    if (poly->coeffs)
+    {
+        long i;
+        for (i = 0; i < poly->alloc; i++)
+            fq_clear(poly->coeffs + i);
+        flint_free(poly->coeffs);
+    }
 }

@@ -19,15 +19,27 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
-
+   
 ******************************************************************************/
 
-#include "fq.h"
+#include "fq_poly.h"
 
-void
-fq_ctx_clear(fq_ctx_t ctx)
+int
+fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2)
 {
-    qadic_ctx_clear(ctx);
+    long i;
+
+    if (poly1 == poly2)
+        return 1;               /* pointer to same polynomial */
+
+    if (poly1->length != poly2->length)
+        return 0;               /* check if lengths the same */
+
+    for (i = 0; i < poly1->length; i++) /* check if coefficients the same */
+        if (!fq_equal(poly1->coeffs + i, poly2->coeffs + i))
+            return 0;
+
+    return 1;
 }

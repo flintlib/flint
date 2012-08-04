@@ -19,15 +19,35 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+fq_poly_init(fq_poly_t poly, fq_ctx_t ctx)
 {
-    qadic_ctx_clear(ctx);
+    poly->coeffs=NULL;
+    fq_ctx_init_conway(poly->ctx,ctx->pctx.p,fq_ctx_dim(ctx),ctx->var,ctx->pctx.mode);
+    poly->alloc =0;
+    poly->length=0;
+}
+
+void
+fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc)
+{
+    fq_ctx_init_conway(poly->ctx,ctx->pctx.p,fq_ctx_dim(ctx),ctx->var,ctx->pctx.mode);
+    if (alloc != 0)
+    {
+        long i;
+        for(i=0;i<alloc;i++)
+            fq_init2((poly->coeffs) + i,ctx);
+    }
+    else
+        poly->coeffs = NULL;
+
+    poly->alloc = alloc;
+    poly->length = 0;
+
 }

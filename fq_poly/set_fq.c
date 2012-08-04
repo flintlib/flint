@@ -19,15 +19,21 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
-
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+fq_poly_set_fq(fmpz_poly_t poly, fq_ctx_t ctx, const fq_t c)
 {
-    qadic_ctx_clear(ctx);
+    if( fq_is_zero(c))
+        fq_poly_zero(poly);
+    else
+    {
+        fmpz_poly_fit_length(poly, 1);
+        flint_calloc(1,sizeof(fq_struct));
+        fmpz_set_ui(poly->coeffs, c);
+        _fmpz_poly_set_length(poly, 1);
+    }
 }

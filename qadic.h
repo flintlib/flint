@@ -104,6 +104,8 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
     printf("\n");
 }
 
+int qadic_ctx_equal(qadic_ctx_t ctx1, qadic_ctx_t ctx2);
+
 /* Memory management *********************************************************/
 
 static __inline__ void qadic_init(qadic_t x)

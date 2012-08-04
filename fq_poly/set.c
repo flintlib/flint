@@ -19,15 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
-#include "fq.h"
+#include "fq_poly.h"
 
 void
-fq_ctx_clear(fq_ctx_t ctx)
+fq_poly_set(fq_poly_t poly1, const fq_poly_t poly2)
 {
-    qadic_ctx_clear(ctx);
+    if (poly1 != poly2)         /* Aliasing is trivial */
+    {
+        long i, len = poly2->length;
+
+        _fq_poly_set_length(poly1, len);
+
+        for (i = 0; i < len; i++)
+            fq_set(poly1->coeffs + i, poly2->coeffs + i);
+    }
 }

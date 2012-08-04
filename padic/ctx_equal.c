@@ -19,15 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
-
+ 
 ******************************************************************************/
 
-#include "fq.h"
+#include "padic.h"
+#include "fmpz.h"
 
-void
-fq_ctx_clear(fq_ctx_t ctx)
+int
+padic_ctx_equal(padic_ctx_t ctx1, padic_ctx_t ctx2)
 {
-    qadic_ctx_clear(ctx);
+    if(ctx1->p != ctx2->p) return 0;
+    if(ctx1->N != ctx2->N) return 0;
+    if(ctx1->p != ctx2->p) return 0;
+    if(ctx1->min != ctx2->min) return 0;
+    if(ctx1->max != ctx2->max) return 0;
+    if(ctx1->mode != ctx2->mode) return 0;
+    if(!fmpz_equal(ctx1->pow,ctx2->pow)) return 0;
+    return 1;
 }
