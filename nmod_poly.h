@@ -252,6 +252,9 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, long len)
     } while (nmod_poly_is_zero(poly));
 }
 
+void
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len);
+
 /* Getting and setting coefficients  *****************************************/
 
 static __inline__

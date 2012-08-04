@@ -153,6 +153,10 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 
     Generates a random polynomial with up to the given length.
 
+void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
+
+    Generates a random irreducible polynomial with up to the given length.
+
 *******************************************************************************
 
     Getting and setting coefficients
