@@ -1004,6 +1004,9 @@ mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
 mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
+mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
+    const nmod_poly_t input);
+
 mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,
     const nmod_poly_t input);
 

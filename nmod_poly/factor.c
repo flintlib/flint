@@ -28,17 +28,21 @@
 
 #include <stdio.h>
 #include <mpir.h>
+#include <math.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
 #define ZASSENHAUS 0
 #define BERLEKAMP 1
+#define KALTOFEN 2
 
 static __inline__ void
 __nmod_poly_factor1(nmod_poly_factor_t res, const nmod_poly_t f, int algorithm)
 {
-    if (algorithm == ZASSENHAUS)
+    if (algorithm == KALTOFEN)
+        nmod_poly_factor_kaltofen_shoup(res, f);
+    else if (algorithm == ZASSENHAUS)
         nmod_poly_factor_cantor_zassenhaus(res, f);
     else
         nmod_poly_factor_berlekamp(res, f);
@@ -167,10 +171,21 @@ nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
 }
 
 mp_limb_t
+nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
+    const nmod_poly_t input)
+{
+    return __nmod_poly_factor_deflation(result, input, KALTOFEN);
+}
+
+mp_limb_t
 nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
 {
-    if (input->mod.n == 2)
+    unsigned int bits = FLINT_BIT_COUNT (input->mod.n);
+    long n = nmod_poly_degree(input);
+
+    if ((bits < 5) && (n > 128))
         return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
-    else
-        return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
+    else if ((bits >= 5) && (n + 2 * bits > 74))
+        return __nmod_poly_factor_deflation(result, input, KALTOFEN);
+    return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
 }
