@@ -51,7 +51,9 @@ void fq_poly_init(fq_poly_t poly, fq_ctx_t ctx);
 
 void fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc);
 
-void fq_poly_realloc(fq_poly_t poly, long alloc);
+void fq_poly_realloc(fq_poly_t poly, fq_ctx_t ctx, long alloc);
+
+void fq_poly_truncate(fq_poly_t poly, long newlen);
 
 void fq_poly_fit_length(fq_poly_t poly, long len);
 

@@ -41,6 +41,7 @@ fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc)
     if (alloc != 0)
     {
         long i;
+        poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_t));
         for(i=0;i<alloc;i++)
             fq_init2((poly->coeffs) + i,ctx);
     }

@@ -27,7 +27,7 @@
 #include "fmpz.h"
 
 int
-padic_ctx_equal(padic_ctx_t ctx1, padic_ctx_t ctx2)
+padic_ctx_equal(const padic_ctx_t ctx1,const padic_ctx_t ctx2)
 {
     if(ctx1->p != ctx2->p) return 0;
     if(ctx1->N != ctx2->N) return 0;

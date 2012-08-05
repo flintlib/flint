@@ -35,8 +35,8 @@ fq_poly_randtest(fq_poly_t f, const fq_ctx_t ctx,
                       flint_rand_t state, long len)
 {
     long i;
-
-    _fq_poly_set_length(f, len);
+    
+    fq_poly_fit_length(f, len);
     for(i=0;i<len;i++)
     {
         fq_randtest(f->coeffs + i,state,ctx);
@@ -56,6 +56,6 @@ void fq_poly_randtest_not_zero(fq_poly_t f, const fq_ctx_t ctx,
 
     for(i = 0; (i < MAXTRIES) && fq_poly_is_zero(f); i++)
         fq_poly_randtest(f,ctx, state, len);
-    if (fmpz_poly_is_zero(f))
-        fmpz_poly_one(f);
+    if (fq_poly_is_zero(f))
+        fq_poly_one(f);
 }

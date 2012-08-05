@@ -19,19 +19,41 @@
 =============================================================================*/
 /******************************************************************************
 
+    Copyright (C) 2008, 2009 William Hart
     Copyright (C) 2012 Andres Goens
-
+   
 ******************************************************************************/
 
-#include "qadic.h"
+#include "fq_poly.h"
 
-int
-qadic_ctx_equal(const qadic_ctx_t ctx1,const qadic_ctx_t ctx2)
+void
+fq_poly_realloc(fq_poly_t poly, fq_ctx_t ctx, long alloc)
 {
-    if(!padic_ctx_equal(&ctx1->pctx,&ctx2->pctx)) return 0;
-    if(!fmpz_equal(ctx1->a,ctx2->a)) return 0;
-    if(*(ctx1->j) != *(ctx2->j)) return 0;
-    if(*(ctx1->var) != *(ctx2->var)) return 0;
-    if(ctx1->len != ctx2->len) return 0;
-    return 1;
+
+    if (alloc == 0)             /* Clear up, reinitialise */
+    {
+        fq_poly_clear(poly);
+        fq_poly_init(poly,ctx);
+        return;
+    }
+
+    if (poly->alloc)            /* Realloc */
+    {
+        fq_poly_truncate(poly, alloc);
+        if( !fq_ctx_equal(poly->ctx,ctx)) fq_poly_change_ctx(poly,ctx);
+        poly->coeffs = (fq_struct *) flint_realloc(poly->coeffs, alloc * sizeof(fq_t));
+        if (alloc > poly->alloc)
+            mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
+                     alloc - poly->alloc);
+    }
+    else                        /* Nothing allocated already so do it now */
+    {
+        long i;
+        if( !fq_ctx_equal(poly->ctx,ctx)) fq_poly_change_ctx(poly,ctx);
+        poly->coeffs = (fq_struct *) flint_realloc(poly->coeffs, alloc * sizeof(fq_t));
+        for(i=0;i<alloc;i++)
+            fq_init2((poly->coeffs) + i,ctx);
+    }
+
+    poly->alloc = alloc;
 }

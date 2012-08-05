@@ -99,7 +99,7 @@ fq_ctx_print(const fq_ctx_t ctx)
 }
 
 static __inline__ int
-fq_ctx_equal(fq_ctx_t ctx1, fq_ctx_t ctx2)
+fq_ctx_equal(const fq_ctx_t ctx1,const fq_ctx_t ctx2)
 {
     return qadic_ctx_equal(ctx1, ctx2);
 }
