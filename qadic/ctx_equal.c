@@ -28,10 +28,14 @@
 int
 qadic_ctx_equal(const qadic_ctx_t ctx1,const qadic_ctx_t ctx2)
 {
-    if(!padic_ctx_equal(&ctx1->pctx,&ctx2->pctx)) return 0;
-    if(!fmpz_equal(ctx1->a,ctx2->a)) return 0;
-    if(*(ctx1->j) != *(ctx2->j)) return 0;
-    if(*(ctx1->var) != *(ctx2->var)) return 0;
-    if(ctx1->len != ctx2->len) return 0;
-    return 1;
+    
+    int r;
+    /*   if(ctx1 == ctx2) r = 1; */ /* trivially equal */
+    if(!padic_ctx_equal(&ctx1->pctx,&ctx2->pctx)) r = 0;
+    if(!fmpz_equal(ctx1->a,ctx2->a)) r = 0;
+    if(*(ctx1->j) != *(ctx2->j)) r = 0;
+    if(*(ctx1->var) != *(ctx2->var)) r = 0;
+    if(ctx1->len != ctx2->len) r = 0;
+    r = 1;
+    return r;
 }

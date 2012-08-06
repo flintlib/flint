@@ -29,12 +29,14 @@
 int
 padic_ctx_equal(const padic_ctx_t ctx1,const padic_ctx_t ctx2)
 {
-    if(ctx1->p != ctx2->p) return 0;
-    if(ctx1->N != ctx2->N) return 0;
-    if(ctx1->p != ctx2->p) return 0;
-    if(ctx1->min != ctx2->min) return 0;
-    if(ctx1->max != ctx2->max) return 0;
-    if(ctx1->mode != ctx2->mode) return 0;
-    if(!fmpz_equal(ctx1->pow,ctx2->pow)) return 0;
-    return 1;
+    int r; /*debugging */
+    if(ctx1 == ctx2) r = 1; /* trivially equal */
+    if(ctx1->p != ctx2->p) r = 0;
+    if(ctx1->N != ctx2->N) r = 0;
+    if(ctx1->min != ctx2->min) r = 0;
+    if(ctx1->max != ctx2->max) r = 0;
+    if(ctx1->mode != ctx2->mode) r = 0;
+    if(!fmpz_equal(ctx1->pow,ctx2->pow)) r = 0;
+    r = 1;
+    return r;
 }
