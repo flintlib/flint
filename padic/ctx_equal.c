@@ -29,8 +29,8 @@
 int
 padic_ctx_equal(const padic_ctx_t ctx1,const padic_ctx_t ctx2)
 {
-    int r; /*debugging */
-    if(ctx1 == ctx2) r = 1; /* trivially equal */
+    int r = 1; /*debugging */
+    if(ctx1 == ctx2) return r; /* trivially equal */
     if(ctx1->p != ctx2->p) r = 0;
     if(ctx1->N != ctx2->N) r = 0;
     if(ctx1->min != ctx2->min) r = 0;
