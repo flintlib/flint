@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -228,11 +228,6 @@ qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 
 /* Assignments and conversions ***********************************************/
 
-static __inline__ void qadic_set(qadic_t x, const qadic_t y)
-{
-    padic_poly_set(x, y);
-}
-
 static __inline__ void qadic_zero(qadic_t x)
 {
     padic_poly_zero(x);
@@ -266,6 +261,14 @@ qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 }
+
+static __inline__ void qadic_set(qadic_t x, const qadic_t y)
+{
+    padic_poly_set(x, y);
+}
+
+void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
+                         const qadic_ctx_t ctx);
 
 /* Comparison ****************************************************************/
 
