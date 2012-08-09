@@ -46,17 +46,19 @@ main(void)
     {
         fmpz_mod_poly_t poly, Q, R, t;
         fmpz_t modulus;
+        mp_limb_t mod;
         long i, num_factors, exp, max_exp;
         int v, result;
 
-        fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
+        mod = n_randtest_prime(state, 0);
+        fmpz_init_set_ui(modulus, mod);
 
         fmpz_mod_poly_init(poly, modulus);
         fmpz_mod_poly_init(t, modulus);
         fmpz_mod_poly_init(Q, modulus);
         fmpz_mod_poly_init(R, modulus);
 
-        fmpz_mod_poly_set_coeff_ui(poly, 0, n_randint(state, modulus));
+        fmpz_mod_poly_set_coeff_ui(poly, 0, n_randint(state, mod));
         num_factors = n_randint(state, 5);
 
         max_exp = 0;
@@ -89,7 +91,9 @@ main(void)
 
         if (!result)
         {
-            printf("FAIL: %lu, %ld, %d\n", modulus, max_exp, v);
+            printf("FAIL: ");
+            fmpz_print(modulus);
+            printf(" %ld, %d\n", max_exp, v);
             fmpz_mod_poly_print(poly); printf("\n");
             abort();
         }
