@@ -180,12 +180,15 @@ nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
 mp_limb_t
 nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
 {
-    unsigned int bits = FLINT_BIT_COUNT (input->mod.n);
+    mp_limb_t p = input->mod.n;
+    unsigned int bits = FLINT_BIT_COUNT (p);
     long n = nmod_poly_degree(input);
 
-    if ((bits < 5) && (n > 128))
-        return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
-    else if ((bits >= 5) && (n + 2 * bits > 74))
+    if ((7 <= p && p < 32) && (n + 136 * p >= 5952) ||
+        (bits >= 5) && (n + 2 * bits >= 74))
         return __nmod_poly_factor_deflation(result, input, KALTOFEN);
+    else if ((128 < n) && ((p < 7 && n < 4000) ||
+                           ((7 <= p && p < 32) && n + 136 * p < 5952)))
+        return __nmod_poly_factor_deflation(result, input, BERLEKAMP);
     return __nmod_poly_factor_deflation(result, input, ZASSENHAUS);
 }
