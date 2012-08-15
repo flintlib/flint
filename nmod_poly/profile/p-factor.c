@@ -33,8 +33,8 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-#define NP 100  /* number of moduli */
-#define ND 8   /* number of degrees */
+#define NP 20  /* number of moduli */
+#define ND 10   /* number of degrees */
 
 /*
     Benchmarking code for factorisation in nmod_poly.
@@ -53,15 +53,18 @@ int main(void)
     int i, j, k, n, num;
     double t, T1, T2, T3, T4;
 
-    const long degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
-    const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
+    const long degs[] = {8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096};
+    const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20, 15, 10};
 
     flint_randinit(state);
-
+#if 0
     printf("Random polynomials\n");
     for (i = 0; i < NP; i++)
     {
-        modulus = n_randtest_prime(state, 0);
+        do
+        {
+            modulus = n_randtest_prime(state, 0);
+        } while (modulus > 31);
         printf("========== p: %lu\n", modulus);
         fflush(stdout);
 
@@ -105,13 +108,13 @@ int main(void)
 
             printf("CZ: %.2lf B: %.2lf KS: %.2lf\n", T1, T2, T3);
             fflush(stdout);
-
+/*
             if (T1 > T3 + 1)
                 break;
-
+*/
         }
     }
-
+#endif
     /* This code checks whether nmod_poly_factor
        made a correct choice between CZ, B and KS */
 
@@ -170,13 +173,13 @@ int main(void)
 
             printf("CZ: %.2lf B: %.2lf KS: %.2lf F: %.2lf\n", T1, T2, T3, T4);
             fflush(stdout);
-
+/*
             if (T1 > T3 + 1)
                 break;
-
+*/
         }
     }
-
+#if 0
     printf("Irreducible polynomials\n");
     for (i = 0; i < NP; i++)
     {
@@ -346,7 +349,7 @@ int main(void)
                 break;
         }
     }
-
+#endif
     flint_randclear(state);
     return EXIT_SUCCESS;
 }
