@@ -1,0 +1,205 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2012 Andres Goens
+
+******************************************************************************/
+
+*******************************************************************************
+
+    Module documentation
+
+    We represent a polynomial in $\mathbb{F}_q[x]$ as a struct
+    which includes an array \code{coeffs} with the coefficients, as
+    well the length \code{len}, the number of coefficients for which
+    memory has been allocated \code{alloc} and the  $\mathbb{F}_q$-context
+     \code{fq_ctx_t}
+
+    As a data structure, we call this polynomial \emph{normalised} 
+    if the polynomial $f(x)$ is \emph{normalised}, that is, if the top 
+    coefficient is non-zero. We call it  monic, if the top coefficient
+    is one.
+
+    Unless otherwise stated here, all functions that deal with polynomials assume
+    the $\mathbb{F}_q$ context of said polynomials are compatible, i.e., it assumes
+    that the fields are the same (not only isomorphic, although at this time this
+    is irrelevant since the only way of generatic an \mathbb{F}_q ctx is with a conway
+    polynomial).
+
+*******************************************************************************
+
+*******************************************************************************
+
+    Memory management
+
+*******************************************************************************
+
+void fq_poly_init(fq_poly_t poly, fq_ctx_t ctx)
+
+    Initialises \code{poly} for use, with context ctx, and setting 
+    its length to zero. A corresponding call to \code{fq_poly_clear()} 
+    must be made after finishing with the \code{fq_poly_t} to free the memory 
+    used by the polynomial.
+
+void fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc)
+
+    Initialises \code{poly} with space for at least \code{alloc} coefficients 
+    and sets the length to zero.  The allocated coefficients are all set to 
+    zero.
+
+void fq_poly_realloc(fq_poly_t poly, fq_ctx_t ctx, long alloc)
+
+    Reallocates the given polynomial to have space for \code{alloc} 
+    coefficients.  If \code{alloc} is zero the polynomial is cleared 
+    and then reinitialised.  If the current length is greater than 
+    \code{alloc} the polynomial is first truncated to length \code{alloc}.
+
+void fq_poly_fit_length(fq_poly_t poly, long len);
+
+    If \code{len} is greater than the number of coefficients currently 
+    allocated, then the polynomial is reallocated to have space for at 
+    least \code{len} coefficients.  No data is lost when calling this 
+    function.
+
+    The function efficiently deals with the case where \code{fit_length} is 
+    called many times in small increments by at least doubling the number 
+    of allocated coefficients when length is larger than the number of 
+    coefficients currently allocated.
+
+void _fq_poly_set_length(fq_poly_t poly, long newlen)
+
+    Clears the coefficients of \code{poly} beyond \code{len} and sets 
+    the length of \code{poly} to \code{len}.
+
+void fq_poly_clear(fq_poly_t poly)
+
+    Clears the given polynomial, releasing any memory used.  It must 
+    be reinitialised in order to be used again.
+
+void _fq_poly_normalise(fq_poly_t poly)
+
+    Sets the length of \code{poly} so that the top coefficient is non-zero. 
+    If all coefficients are zero, the length is set to zero.  This function 
+    is mainly used internally, as all functions guarantee normalisation.
+
+void fq_poly_truncate(fq_poly_t poly, long newlen)
+
+    Truncates the polynomial to length at most~$n$.
+
+*******************************************************************************
+
+    Polynomial parameters
+
+*******************************************************************************
+
+long fq_poly_degree(fq_poly_t poly)
+
+    Returns the degree of the polynomial \code{poly}.
+
+long fq_poly_length(fq_poly_t poly)
+
+    Returns the length of the polynomial \code{poly}.
+
+
+*******************************************************************************
+
+    Randomisation
+
+*******************************************************************************
+
+void fq_poly_randtest(fq_poly_t f, const fq_ctx_t ctx,
+                      flint_rand_t state, long len)
+
+    Sets $f$ to a random polynomial of length at most \code{len} 
+    with entries in the field described by \code{ctx}.
+
+void fq_poly_randtest_not_zero(fq_poly_t f, const fq_ctx_t ctx,
+                               flint_rand_t state, long len)
+
+    Same as \code{fq_poly_randtest} but guarantees that the polynomial
+    is not zero.
+
+*******************************************************************************
+
+    Assignment and basic manipulation
+
+*******************************************************************************
+
+void fq_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c)
+
+    Sets the polynomial \code{poly} to \code{c}.
+
+void fq_poly_set(fq_poly_t poly1, const fq_poly_t poly2)
+
+    Sets the polynomial \code{poly1} to the polynomial \code{poly2}.
+
+
+void fq_poly_zero(fq_poly_t poly)
+
+    Sets \code{poly} to the zero polynomial.
+
+void void fq_poly_one(fq_poly_t poly)
+
+    Sets \code{poly} to the constant polynomial $1$, 
+    Assumes an $\mathbb{F}_q$-context is already given on the polynomial.
+
+
+*******************************************************************************
+
+    Comparison
+
+*******************************************************************************
+
+int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2)
+
+    Returns whether the two polynomials \code{poly1} and \code{poly2} 
+    are equal.
+
+int fq_poly_is_zero(fq_poly_t poly)
+
+    Returns whether the polynomial \code{poly} is the zero polynomial.
+
+int fq_poly_is_one(const fq_poly_t op)
+
+    Returns whether the polynomial \code{poly} is equal 
+    to the constant polynomial~$1$.
+
+int fq_poly_is_unit(const fq_poly_t op)
+    Returns whether the polynomial \code{poly} is a unit in the polynomial
+    ring $\mathbb{F_q}[X]$, i.e. if it has degree 0 and is non-zero.
+
+int fq_poly_equal_fq(const fq_poly_t poly, const fq_t c)
+    Returns whether the polynomial \code{poly} is equal the (constant)
+    $\mathbb{F}_q$ element \code{c}. Assumes the same context for 
+    \code{poly} and \code{c}.
+    
+
+*******************************************************************************
+
+    Addition and subtraction
+
+*******************************************************************************
+
+void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, 
+                                                   const fq_poly_t poly2)
+
+    Sets $res$ to the sum $poly1 + poly2$.
+

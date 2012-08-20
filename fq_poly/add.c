@@ -34,12 +34,6 @@ fq_poly_add(fq_poly_t res, const fq_poly_t poly1,
 
     fq_init(s);
 
-    if(!fq_ctx_equal(poly1->ctx,poly2->ctx))
-    {
-        printf("Exception (fq_poly_add) polynomials with different fq_ctx.\n");
-        abort();
-    }
-
     len = (poly1->length < poly2->length ? poly2->length : poly1->length); /* max(poly1->len,poly2->len) */
     _fq_poly_set_length(res,len);
 
