@@ -94,6 +94,35 @@ int main(void)
     qadic_ctx_clear(ctx);
     fmpz_clear(p);
 
+    /*************************************************************************/
+
+    printf("Compute a Frobenius image\n");
+
+    fmpz_init_set_ui(p, 3);
+    qadic_ctx_init_conway(ctx, p, 2, 5, "X", PADIC_TERSE);
+
+    qadic_init(a);
+    qadic_init(b);
+
+    padic_poly_fit_length(a, 2);
+    a->coeffs[0] = 78L;
+    a->coeffs[1] = 45L;
+    a->val = 0;
+    _padic_poly_set_length(a, 2);
+
+    qadic_frobenius(b, a, 1, ctx);
+
+    printf("Context:\n"), qadic_ctx_print(ctx), printf("\n");
+
+    printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
+    printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+
+    qadic_clear(a);
+    qadic_clear(b);
+
+    qadic_ctx_clear(ctx);
+    fmpz_clear(p);
+
     return EXIT_SUCCESS;
 }
 

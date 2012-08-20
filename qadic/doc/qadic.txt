@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -148,6 +148,18 @@ void qadic_scalar_mod_ppow(qadic_t rop, const qadic_t op, long e,
 
 *******************************************************************************
 
+    Properties
+
+*******************************************************************************
+
+long qadic_val(const qadic_t op)
+
+    Returns the valuation of \code{op}.
+
+    This function is implemented as a macro.
+
+*******************************************************************************
+
     Randomisation
 
 *******************************************************************************
@@ -193,6 +205,17 @@ void qadic_one(qadic_t rop, const qadic_ctx_t ctx)
 
     Note that if the precision $N$ is non-positive then \code{rop} 
     is actually set to zero.
+
+void qadic_gen(qadic_t rop, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the generator $X$ for the extension 
+    when $N > 0$, and zero otherwise.  If the extension degree 
+    is one, raises an abort signal.
+
+void qadic_set_ui(qadic_t rop, ulong op, const qadic_ctx_t ctx)
+
+    Sets \code{rop} to the integer \code{op}, reduced in the 
+    context.
 
 int qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
