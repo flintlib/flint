@@ -203,3 +203,11 @@ void fq_poly_add(fq_poly_t res, const fq_poly_t poly1,
 
     Sets $res$ to the sum $poly1 + poly2$.
 
+void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, 
+                                                   const fq_poly_t poly2)
+
+    Sets $res$ to the difference $poly1 - poly2$.
+
+void fq_poly_neg(fq_poly_t res, const fq_poly_t poly)
+
+    Sets $res$ to the negative $-poly1$.
