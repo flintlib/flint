@@ -95,9 +95,9 @@ static __inline__
 void fq_poly_zero(fq_poly_t poly)
 {
    _fq_poly_set_length(poly, 0);
-}
 
-void fmpz_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c);
+}
+void fq_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c);
 
 void fq_poly_one(fq_poly_t poly);
 
@@ -119,7 +119,7 @@ void fq_poly_randtest_not_zero(fq_poly_t f, const fq_ctx_t ctx,
 
 void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n);
 
-void fq_poly_set_coeff(fq_poly_t poly, long n, fq_t x);
+void fq_poly_set_coeff(fq_poly_t poly, long n,const fq_t x);
 
 /*  Comparison  **************************************************************/
 

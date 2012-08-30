@@ -98,12 +98,6 @@ fq_ctx_print(const fq_ctx_t ctx)
 
 }
 
-static __inline__ int
-fq_ctx_equal(const fq_ctx_t ctx1,const fq_ctx_t ctx2)
-{
-    return qadic_ctx_equal(ctx1, ctx2);
-}
-
 /* Basic arithmetic **********************************************************/
 
 void fq_add(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
