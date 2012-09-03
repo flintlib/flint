@@ -23,54 +23,56 @@
     Copyright (C) 2007, 2008, 2009, 2010 William Hart
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
-#include "nmod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
-nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
+fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
+                                       const fmpz_mod_poly_t f)
 {
-    nmod_poly_t h, v, g, x;
+    fmpz_mod_poly_t h, v, g, x;
     long i, j, num;
 
-    nmod_poly_init_preinv(h, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(g, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(v, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(x, f->mod.n, f->mod.ninv);
+    fmpz_mod_poly_init(h, &f->p);
+    fmpz_mod_poly_init(g, &f->p);
+    fmpz_mod_poly_init(v, &f->p);
+    fmpz_mod_poly_init(x, &f->p);
 
-    nmod_poly_set_coeff_ui(h, 1, 1);
-    nmod_poly_set_coeff_ui(x, 1, 1);
+    fmpz_mod_poly_set_coeff_ui(h, 1, 1);
+    fmpz_mod_poly_set_coeff_ui(x, 1, 1);
 
-    nmod_poly_make_monic(v, f);
+    fmpz_mod_poly_make_monic(v, f);
 
     i = 0;
     do
     {
         i++;
-        nmod_poly_powmod_ui_binexp(h, h, f->mod.n, v);
+        fmpz_mod_poly_powmod_fmpz_binexp(h, h, &f->p, v);
 
-        nmod_poly_sub(h, h, x);
-        nmod_poly_gcd(g, h, v);
-        nmod_poly_add(h, h, x);
+        fmpz_mod_poly_sub(h, h, x);
+        fmpz_mod_poly_gcd(g, h, v);
+        fmpz_mod_poly_add(h, h, x);
 
         if (g->length != 1)
         {
-            nmod_poly_make_monic(g, g);
+            fmpz_mod_poly_make_monic(g, g);
             num = res->num;
-            nmod_poly_factor_equal_deg(res, g, i);
 
+            fmpz_mod_poly_factor_equal_deg(res, g, i);
             for (j = num; j < res->num; j++)
-                res->exp[j] = nmod_poly_remove(v, res->p + j);
+                res->exp[j] = fmpz_mod_poly_remove(v, res->poly + j);
         }
     }
-    while (v->length >= 2*i + 3);
+    while (v->length >= 2 * i + 3);
 
     if (v->length > 1)
-        nmod_poly_factor_insert(res, v, 1);
+        fmpz_mod_poly_factor_insert(res, v, 1);
 
-    nmod_poly_clear(g);
-    nmod_poly_clear(h);
-    nmod_poly_clear(v);
-    nmod_poly_clear(x);
+    fmpz_mod_poly_clear(g);
+    fmpz_mod_poly_clear(h);
+    fmpz_mod_poly_clear(v);
+    fmpz_mod_poly_clear(x);
 }

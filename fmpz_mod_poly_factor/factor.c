@@ -19,29 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include <math.h>
+#include "fmpz_mod_poly_factor.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
+fmpz_mod_poly_factor(fmpz_mod_poly_factor_t res,
+                     const fmpz_mod_poly_t f)
 {
-    nmod_poly_fit_length(poly, len);
-    _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
-    poly->length = len;
-    _nmod_poly_normalise(poly);
-}
+    long n = fmpz_mod_poly_degree(f);
+    mp_bitcnt_t bits = fmpz_bits(&f->p);
 
-void
-nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
-{
-    do {
-        nmod_poly_randtest(poly, state, len);
-    } while (nmod_poly_is_zero(poly) || !(nmod_poly_is_irreducible(poly)));
+    if (5 * bits + n > 75)
+        fmpz_mod_poly_factor_kaltofen_shoup(res, f);
+    else
+        fmpz_mod_poly_factor_cantor_zassenhaus(res, f);
 }

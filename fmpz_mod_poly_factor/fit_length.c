@@ -19,29 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2012 Lina Kulakova
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2008, 2009 William Hart
 
 ******************************************************************************/
 
-#include <mpir.h>
 #include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
+fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, long len)
 {
-    nmod_poly_fit_length(poly, len);
-    _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
-    poly->length = len;
-    _nmod_poly_normalise(poly);
-}
-
-void
-nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
-{
-    do {
-        nmod_poly_randtest(poly, state, len);
-    } while (nmod_poly_is_zero(poly) || !(nmod_poly_is_irreducible(poly)));
+    if (len > fac->alloc)
+    {
+        /* At least double number of allocated coeffs */
+        if (len < 2 * fac->alloc)
+            len = 2 * fac->alloc;
+        fmpz_mod_poly_factor_realloc(fac, len);
+    }
 }

@@ -768,7 +768,7 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den,
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den,
                             const fmpz_mat_t A)
 
     Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
@@ -783,6 +783,22 @@ long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den,
 
     The fraction-free Gauss-Jordan algorithm is given
     in \citep{NakTurWil1997}.
+
+*******************************************************************************
+
+    Modular gaussian elimination
+
+*******************************************************************************
+
+long fmpz_mat_rref(long * perm, fmpz_mat_t A, const fmpz_t p)
+
+    Uses fraction-free Gauss-Jordan elimination to set \code{A}
+    to it's reduced row echelon form and returns the rank of \code{A}.
+    All computations are done modulo p.
+
+    Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.
+    If \code{perm} is non-\code{NULL}, the permutation of
+    rows in the matrix will also be applied to \code{perm}.
 
 *******************************************************************************
 

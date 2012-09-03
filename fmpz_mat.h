@@ -209,6 +209,11 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
 
 long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A);
 
+/* Modular gaussian elimination *********************************************/
+
+long
+fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p);
+
 /* Trace ********************************************************************/
 
 void fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat);

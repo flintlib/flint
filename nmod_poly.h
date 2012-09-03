@@ -252,6 +252,9 @@ nmod_poly_randtest_not_zero(nmod_poly_t poly, flint_rand_t state, long len)
     } while (nmod_poly_is_zero(poly));
 }
 
+void
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len);
+
 /* Getting and setting coefficients  *****************************************/
 
 static __inline__
@@ -973,6 +976,9 @@ void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
 int nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
     flint_rand_t state, const nmod_poly_t pol, long d);
 
+void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
+                                   const nmod_poly_t poly, long **degs);
+
 ulong nmod_poly_remove(nmod_poly_t f, const nmod_poly_t p);
 
 int nmod_poly_is_irreducible(const nmod_poly_t f);
@@ -987,12 +993,18 @@ void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     const nmod_poly_t f);
 
+void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
+                                     const nmod_poly_t poly);
+
 void nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f);
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t result,
+    const nmod_poly_t input);
+
+mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t result,
     const nmod_poly_t input);
 
 mp_limb_t nmod_poly_factor(nmod_poly_factor_t result,

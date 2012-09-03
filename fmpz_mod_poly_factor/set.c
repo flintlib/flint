@@ -19,29 +19,41 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
+    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include <stdlib.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "nmod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
-nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
+fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
+                         const fmpz_mod_poly_factor_t fac)
 {
-    nmod_poly_fit_length(poly, len);
-    _nmod_vec_randtest(poly->coeffs, state, len, poly->mod);
-    poly->length = len;
-    _nmod_poly_normalise(poly);
-}
+    if (res != fac)
+    {
+        if (fac->num == 0)
+        {
+            fmpz_mod_poly_factor_clear(res);
+            fmpz_mod_poly_factor_init(res);
+        }
+        else
+        {
+            long i;
 
-void
-nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
-{
-    do {
-        nmod_poly_randtest(poly, state, len);
-    } while (nmod_poly_is_zero(poly) || !(nmod_poly_is_irreducible(poly)));
+            fmpz_mod_poly_factor_fit_length(res, fac->num);
+            for (i = 0; i < fac->num; i++)
+            {
+                fmpz_mod_poly_set(res->poly + i, fac->poly + i);
+                res->exp[i] = fac->exp[i];
+            }
+            for (; i < res->num; i++)
+            {
+                fmpz_mod_poly_zero(res->poly + i);
+                res->exp[i] = 0;
+            }
+            res->num = fac->num;
+        }
+    }
 }

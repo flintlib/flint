@@ -98,6 +98,12 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len)
 
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
 
+void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+					flint_rand_t state, long len)
+
+    Sets the polynomial~$f$ to a random irreducible polynomial of length
+    up~\code{len}, assuming \code{len} is positive.
+
 void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                      flint_rand_t state, long len)
 
@@ -202,6 +208,11 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, long n, const fmpz_t x)
 
     Sets the coefficient of $X^n$ in the polynomial to $x$, 
+    assuming $n \geq 0$.
+
+void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, long n, ulong x)
+
+    Sets the coefficient of $X^n$ in the polynomial to $x$,
     assuming $n \geq 0$.
 
 void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, long n)
@@ -354,6 +365,25 @@ void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Computes \code{res} as the square of \code{poly}.
 
+void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, long len1,
+			   const fmpz * poly2, long len2, const fmpz * f,
+			   long lenf, const fmpz_t p)
+
+    Sets \code{res, len1 + len2 - 1} to the remainder of the product of
+    \code{poly1} and \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{len1 + len2 - lenf > 0}, which is equivalent
+    to requiring that the result will actually be reduced. Otherwise, simply
+    use \code{_fmpz_mod_poly_mul} instead.
+
+    Aliasing of \code{f} and \code{res} is not permitted.
+
+void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+		    const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}.
+
 *******************************************************************************
 
     Powering
@@ -371,6 +401,79 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 
     Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
     so that in particular \code{0^0 = 1}.
+
+void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+			      ulong e, long trunc, const fmpz_t p)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that
+    \code{e > 1}. Aliasing is not permitted.
+
+void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
+		       const fmpz_mod_poly_t poly, ulong e, long trunc)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering
+    followed by a truncation.
+
+void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+				     ulong e, long trunc, const fmpz_t p)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    (assumed to be zero padded if necessary to length \code{trunc}) to
+    the power \code{e}. This is equivalent to doing a powering followed
+    by a truncation. We require that \code{res} has enough space for
+    \code{trunc} coefficients, that \code{trunc > 0} and that
+    \code{e > 1}. Aliasing is not permitted. Uses the binary
+    exponentiation method.
+
+void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
+			      const fmpz_mod_poly_t poly, ulong e, long trunc)
+
+    Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
+    to the power \code{e}. This is equivalent to doing a powering
+    followed by a truncation. Uses the binary exponentiation method.
+
+void _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
+				     ulong e, const fmpz * f,
+				     long lenf, const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
+			      const fmpz_mod_poly_t poly, ulong e,
+			      const fmpz_mod_poly_t f)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+
+void _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
+				       const fmpz_t e, const fmpz * f,
+				       long lenf, const fmpz_t p)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
+				const fmpz_mod_poly_t poly, const fmpz_t e,
+				const fmpz_mod_poly_t f)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
 
 *******************************************************************************
 
@@ -419,6 +522,11 @@ void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q,
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
     $0 \leq \len(R) < \len(B)$ assuming that the leading term 
     of $B$ is a unit.
+
+ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
+
+    Removes the highest possible power of \code{g} from \code{f} and
+    returns the exponent.
 
 void _fmpz_mod_poly_rem_basecase(fmpz * R, 
     const fmpz * A, long lenA, const fmpz * B, long lenB, 
@@ -901,6 +1009,66 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
     To be precise about the order of composition, denoting \code{res}, 
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
+
+*******************************************************************************
+
+    Modular composition
+
+*******************************************************************************
+
+void
+_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+				       const fmpz * h, long lenh, const fmpz_t p);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+void
+fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
+		    const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero.
+
+void
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+					      const fmpz * h, long lenh, const fmpz_t p);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). The output is not allowed
+    to be aliased with any of the inputs.
+
+    The algorithm used is Horner's rule.
+
+void
+fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
+			   const fmpz_mod_poly_t g, const fmpz_mod_poly_t h);
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero. The algorithm used is Horner's rule.
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * f, long len1,
+				  const fmpz * g, const fmpz * h, long len3, const fmpz_t p)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. The output is not allowed
+    to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void
+fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
+			       const fmpz_mod_poly_t g, const fmpz_mod_poly_t h)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$.
+    The algorithm used is the Brent-Kung matrix algorithm.
 
 *******************************************************************************
 

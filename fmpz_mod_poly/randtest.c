@@ -46,7 +46,22 @@ fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len)
 }
 
 void
-fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
+fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+                                   flint_rand_t state, long len)
+{
+    if (len == 0)
+    {
+        printf("Exception (fmpz_mod_poly_randtest_irreducible). len == 0.\n");
+        abort();
+    }
+
+    fmpz_mod_poly_randtest(f, state, len);
+    while (fmpz_mod_poly_is_zero(f) || !fmpz_mod_poly_is_irreducible(f))
+        fmpz_mod_poly_randtest(f, state, len);
+}
+
+void
+fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
                                 flint_rand_t state, long len)
 {
     if (len == 0)

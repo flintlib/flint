@@ -27,76 +27,86 @@
 
 ******************************************************************************/
 
-#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
 
 int
-nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, long d)
+fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
+                                    flint_rand_t state,
+                                    const fmpz_mod_poly_t pol, long d)
 {
-    nmod_poly_t a, b, c;
-    mpz_t exp;
+    fmpz_mod_poly_t a, b, c;
+    fmpz_t exp, t, p;
     int res = 1;
     long i;
 
     if (pol->length <= 1)
     {
-        printf("Exception (nmod_poly_factor_equal_deg_prob): \n");
+        printf("Exception (fmpz_mod_poly_factor_equal_deg_prob): \n");
         printf("Input polynomial is linear.\n");
         abort();
     }
 
-    nmod_poly_init_preinv(a, pol->mod.n, pol->mod.ninv);
+    fmpz_init_set(p, &pol->p);
 
-    do {
-        nmod_poly_randtest(a, state, pol->length - 1);
+    fmpz_mod_poly_init(a, p);
+
+    do
+    {
+        fmpz_mod_poly_randtest(a, state, pol->length - 1);
     } while (a->length <= 1);
 
-    nmod_poly_gcd(factor, a, pol);
+    fmpz_mod_poly_gcd(factor, a, pol);
 
     if (factor->length != 1)
     {
-        nmod_poly_clear(a);
+        fmpz_mod_poly_clear(a);
         return 1;
     }
 
-    nmod_poly_init_preinv(b, pol->mod.n, pol->mod.ninv);
+    fmpz_mod_poly_init(b, p);
 
-    mpz_init(exp);
-    if (pol->mod.n > 2)
+    fmpz_init(exp);
+    if (fmpz_cmp_ui(p, 2) > 0)
     {
         /* compute a^{(p^d-1)/2} rem pol */
-        mpz_ui_pow_ui(exp, pol->mod.n, d);
-        mpz_sub_ui(exp, exp, 1);
-        mpz_tdiv_q_2exp(exp, exp, 1);
+        fmpz_pow_ui(exp, p, d);
+        fmpz_sub_ui(exp, exp, 1);
+        fmpz_fdiv_q_2exp(exp, exp, 1);
 
-        nmod_poly_powmod_mpz_binexp(b, a, exp, pol);
+        fmpz_mod_poly_powmod_fmpz_binexp(b, a, exp, pol);
     }
     else
     {
         /* compute b = (a^{2^{d-1}}+a^{2^{d-2}}+...+a^4+a^2+a) rem pol */
-        nmod_poly_rem(b, a, pol);
-        nmod_poly_init_preinv(c, pol->mod.n, pol->mod.ninv);
-        nmod_poly_set(c, b);
+        fmpz_mod_poly_rem(b, a, pol);
+        fmpz_mod_poly_init(c, p);
+        fmpz_mod_poly_set(c, b);
         for (i = 1; i < d; i++)
         {
             /* c = a^{2^i} = (a^{2^{i-1}})^2 */
-            nmod_poly_powmod_ui_binexp(c, c, 2, pol);
-            nmod_poly_add(b, b, c);
+            fmpz_mod_poly_powmod_ui_binexp(c, c, 2, pol);
+            fmpz_mod_poly_add(b, b, c);
         }
-        nmod_poly_rem(b, b, pol);
-        nmod_poly_clear(c);
+        fmpz_mod_poly_rem(b, b, pol);
+        fmpz_mod_poly_clear(c);
     }
-    mpz_clear(exp);
+    fmpz_clear(exp);
 
-    b->coeffs[0] = n_submod(b->coeffs[0], 1, pol->mod.n);
+    fmpz_init(t);
+    fmpz_sub_ui(t, &(b->coeffs[0]), 1);
+    fmpz_mod(t, t, p);
+    fmpz_mod_poly_set_coeff_fmpz(b, 0, t);
+    fmpz_clear(t);
 
-    nmod_poly_gcd(factor, b, pol);
+    fmpz_mod_poly_gcd(factor, b, pol);
 
-    if ((factor->length <= 1) || (factor->length == pol->length)) res = 0;
+    if ((factor->length <= 1) || (factor->length == pol->length))
+        res = 0;
 
-    nmod_poly_clear(a);
-    nmod_poly_clear(b);
+    fmpz_mod_poly_clear(a);
+    fmpz_mod_poly_clear(b);
+    fmpz_clear(p);
 
     return res;
 }

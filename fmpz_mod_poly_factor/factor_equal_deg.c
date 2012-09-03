@@ -23,54 +23,44 @@
     Copyright (C) 2007, 2008, 2009, 2010 William Hart
     Copyright (C) 2008 Richard Howell-Peak
     Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 Lina Kulakova
 
 ******************************************************************************/
 
-#include "nmod_poly.h"
+#include "fmpz_mod_poly_factor.h"
+#include "ulong_extras.h"
 
 void
-nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
+fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
+                               const fmpz_mod_poly_t pol, long d)
 {
-    nmod_poly_t h, v, g, x;
-    long i, j, num;
-
-    nmod_poly_init_preinv(h, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(g, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(v, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(x, f->mod.n, f->mod.ninv);
-
-    nmod_poly_set_coeff_ui(h, 1, 1);
-    nmod_poly_set_coeff_ui(x, 1, 1);
-
-    nmod_poly_make_monic(v, f);
-
-    i = 0;
-    do
+    if (pol->length == d + 1)
     {
-        i++;
-        nmod_poly_powmod_ui_binexp(h, h, f->mod.n, v);
-
-        nmod_poly_sub(h, h, x);
-        nmod_poly_gcd(g, h, v);
-        nmod_poly_add(h, h, x);
-
-        if (g->length != 1)
-        {
-            nmod_poly_make_monic(g, g);
-            num = res->num;
-            nmod_poly_factor_equal_deg(res, g, i);
-
-            for (j = num; j < res->num; j++)
-                res->exp[j] = nmod_poly_remove(v, res->p + j);
-        }
+        fmpz_mod_poly_factor_insert(factors, pol, 1);
     }
-    while (v->length >= 2*i + 3);
+    else
+    {
+        fmpz_mod_poly_t f, g, r;
+        flint_rand_t state;
 
-    if (v->length > 1)
-        nmod_poly_factor_insert(res, v, 1);
+        fmpz_mod_poly_init(f, &pol->p);
 
-    nmod_poly_clear(g);
-    nmod_poly_clear(h);
-    nmod_poly_clear(v);
-    nmod_poly_clear(x);
+        flint_randinit(state);
+
+        while (!fmpz_mod_poly_factor_equal_deg_prob(f, state, pol, d))
+        {
+        };
+
+        flint_randclear(state);
+
+        fmpz_mod_poly_init(g, &pol->p);
+        fmpz_mod_poly_init(r, &pol->p);
+        fmpz_mod_poly_divrem(g, r, pol, f);
+        fmpz_mod_poly_clear(r);
+
+        fmpz_mod_poly_factor_equal_deg(factors, f, d);
+        fmpz_mod_poly_clear(f);
+        fmpz_mod_poly_factor_equal_deg(factors, g, d);
+        fmpz_mod_poly_clear(g);
+    }
 }

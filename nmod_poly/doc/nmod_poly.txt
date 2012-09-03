@@ -153,6 +153,10 @@ void nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
 
     Generates a random polynomial with up to the given length.
 
+void nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
+
+    Generates a random irreducible polynomial with up to the given length.
+
 *******************************************************************************
 
     Getting and setting coefficients
@@ -2121,18 +2125,37 @@ void nmod_poly_factor_equal_deg(nmod_poly_factor_t factors,
     degree \code{d}, finds all those factors and places them in factors.
     Requires that \code{pol} be monic, non-constant and squarefree.
 
+void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
+		const nmod_poly_t poly, long **degs)
+
+    Factorises a monic non-constant squarefree polymnomial \code{poly}
+    of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}
+    ${f[d]} is the product of the monic irreducible factors of \code{poly}
+    of degree ${d}. Factors are stored in \code{res}, assotiated powers
+    of irreducible polynomials are stored in \code{degs} in the same order
+    as factors.
+
+    Requires that \code{degs} have enough space for irreducible polynomials'
+    powers (maximum space required is ${n * sizeof(long)}).
+
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
                                         const nmod_poly_t f)
 
     Factorises a non-constant polynomial \code{f} into monic irreducible
     factors using the Cantor-Zassenhaus algorithm.
 
-    The modulus must be a prime greater than 2.
-
 void nmod_poly_factor_berlekamp(nmod_poly_factor_t res, const nmod_poly_t f)
 
     Factorises a non-constant, squarefree polynomial \code{f} into monic
     irreducible factors using the Berlekamp algorithm.
+
+void nmod_poly_factor_kaltofen_shoup(nmod_poly_factor_t res,
+				     const nmod_poly_t poly)
+
+    Factorises a non-constant polynomial \code{f} into monic irreducible
+    factors using the fast version of Cantor-Zassenhaus algorithm proposed by
+    Kaltofen and Shoup (1998). More precisely this algorithm uses a
+    “baby step/giant step” strategy for the distinct-degree factorization step.
 
 mp_limb_t nmod_poly_factor_with_berlekamp(nmod_poly_factor_t res,
                                           const nmod_poly_t f)
@@ -2156,6 +2179,18 @@ mp_limb_t nmod_poly_factor_with_cantor_zassenhaus(nmod_poly_factor_t res,
     This function first checks for small special cases, deflates \code{f}
     if it is of the form $p(x^m)$ for some $m > 1$, then performs a
     square-free factorisation, and finally runs Cantor-Zassenhaus on all the
+    individual square-free factors.
+
+mp_limb_t nmod_poly_factor_with_kaltofen_shoup(nmod_poly_factor_t res,
+					       const nmod_poly_t f)
+
+    Factorises a general polynomial \code{f} into monic irreducible factors
+    and returns the leading coefficient of \code{f}, or 0 if \code{f}
+    is the zero polynomial.
+
+    This function first checks for small special cases, deflates \code{f}
+    if it is of the form $p(x^m)$ for some $m > 1$, then performs a
+    square-free factorisation, and finally runs Kaltofen-Shoup on all the
     individual square-free factors.
 
 mp_limb_t nmod_poly_factor(nmod_poly_factor_t res, const nmod_poly_t f)

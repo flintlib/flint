@@ -26,51 +26,30 @@
 
 ******************************************************************************/
 
-#include "nmod_poly.h"
+#include "fmpz_mod_poly.h"
 
-void
-nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
+ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
 {
-    nmod_poly_t h, v, g, x;
-    long i, j, num;
+    fmpz_mod_poly_t q, r;
+    ulong i = 0;
 
-    nmod_poly_init_preinv(h, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(g, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(v, f->mod.n, f->mod.ninv);
-    nmod_poly_init_preinv(x, f->mod.n, f->mod.ninv);
+    fmpz_mod_poly_init(q, &g->p);
+    fmpz_mod_poly_init(r, &g->p);
 
-    nmod_poly_set_coeff_ui(h, 1, 1);
-    nmod_poly_set_coeff_ui(x, 1, 1);
-
-    nmod_poly_make_monic(v, f);
-
-    i = 0;
-    do
+    while (1)
     {
+        if (f->length < g->length)
+            break;
+        fmpz_mod_poly_divrem(q, r, f, g);
+        if (r->length == 0)
+            fmpz_mod_poly_swap(q, f);
+        else
+            break;
         i++;
-        nmod_poly_powmod_ui_binexp(h, h, f->mod.n, v);
-
-        nmod_poly_sub(h, h, x);
-        nmod_poly_gcd(g, h, v);
-        nmod_poly_add(h, h, x);
-
-        if (g->length != 1)
-        {
-            nmod_poly_make_monic(g, g);
-            num = res->num;
-            nmod_poly_factor_equal_deg(res, g, i);
-
-            for (j = num; j < res->num; j++)
-                res->exp[j] = nmod_poly_remove(v, res->p + j);
-        }
     }
-    while (v->length >= 2*i + 3);
 
-    if (v->length > 1)
-        nmod_poly_factor_insert(res, v, 1);
+    fmpz_mod_poly_clear(q);
+    fmpz_mod_poly_clear(r);
 
-    nmod_poly_clear(g);
-    nmod_poly_clear(h);
-    nmod_poly_clear(v);
-    nmod_poly_clear(x);
+    return i;
 }
