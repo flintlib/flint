@@ -40,7 +40,7 @@ fq_poly_realloc(fq_poly_t poly, fq_ctx_t ctx, long alloc)
     if (poly->alloc)            /* Realloc */
     {
         fq_poly_truncate(poly, alloc);
-        if( !fq_ctx_equal(poly->ctx,ctx)) fq_poly_change_ctx(poly,ctx);
+	fq_poly_change_ctx(poly,ctx);
         poly->coeffs = (fq_struct *) flint_realloc(poly->coeffs, alloc * sizeof(fq_t));
         if (alloc > poly->alloc)
             mpn_zero((mp_ptr) (poly->coeffs + poly->alloc),
@@ -49,7 +49,7 @@ fq_poly_realloc(fq_poly_t poly, fq_ctx_t ctx, long alloc)
     else                        /* Nothing allocated already so do it now */
     {
         long i;
-        if( !fq_ctx_equal(poly->ctx,ctx)) fq_poly_change_ctx(poly,ctx);
+	fq_poly_change_ctx(poly,ctx);
         poly->coeffs = (fq_struct *) flint_realloc(poly->coeffs, alloc * sizeof(fq_t));
         for(i=0;i<alloc;i++)
             fq_init2((poly->coeffs) + i,ctx);

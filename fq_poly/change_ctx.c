@@ -28,9 +28,6 @@
 void
 fq_poly_change_ctx(fq_poly_t poly, const fq_ctx_t ctx)
 {
-    if(!fq_ctx_equal(poly->ctx,ctx))
-    {
         fq_ctx_clear(poly->ctx);
         fq_ctx_init_conway(poly->ctx,ctx->pctx.p,fq_ctx_dim(ctx),ctx->var,ctx->pctx.mode);
-    }
 }

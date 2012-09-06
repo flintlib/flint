@@ -25,15 +25,14 @@
 #include "fq_poly.h"
 
 void
-fq_poly_set_fq(fmpz_poly_t poly, fq_ctx_t ctx, const fq_t c)
+fq_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c)
 {
     if( fq_is_zero(c))
         fq_poly_zero(poly);
     else
     {
-        fmpz_poly_fit_length(poly, 1);
-        flint_calloc(1,sizeof(fq_struct));
-        fmpz_set_ui(poly->coeffs, c);
-        _fmpz_poly_set_length(poly, 1);
+        fq_poly_fit_length(poly, 1);
+        fq_set(poly->coeffs, c);
+        _fq_poly_set_length(poly, 1);
     }
 }
