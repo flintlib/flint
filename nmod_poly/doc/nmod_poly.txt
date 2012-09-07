@@ -1828,6 +1828,17 @@ void _nmod_poly_exp_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
     Uses Newton iteration (the version given in \cite{HanZim2004}).
     For small $n$, falls back to the basecase algorithm.
 
+void  _nmod_poly_exp_expinv_series(mp_ptr f, mp_ptr g, mp_srcptr h,
+        long n, nmod_t mod)
+
+    Set $f = \exp(h) + O(x^n)$ and $g = \exp(-h) + O(x^n)$, more efficiently
+    for large $n$ than performing a separate inversion to obtain $g$.
+    Assumes $n > 0$ and that $h$ is zero-padded
+    as necessary to length $n$. Aliasing is not allowed.
+
+    Uses Newton iteration (the version given in \cite{HanZim2004}).
+    For small $n$, falls back to the basecase algorithm.
+
 void nmod_poly_exp_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     Set $g = \exp(h) + O(x^n)$. The case $h = cx^r$ is automatically
