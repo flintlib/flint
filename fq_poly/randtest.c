@@ -38,13 +38,6 @@ void fq_poly_randtest(fq_poly_t f, flint_rand_t state,
     }
     _fq_poly_set_length(f, len);
     _fq_poly_normalise(f);
-
-    if (f->length > 0)
-        if (fq_is_zero(fq_poly_lead(f)))
-        {
-            printf("XXX YYY\n");
-            abort();
-        }
 }
 
 void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
@@ -59,7 +52,7 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
     }
 
     for(i = 0; (i < 10) && fq_poly_is_zero(f); i++)
-        fq_poly_randtest(f, ctx, state, len);
+        fq_poly_randtest(f, state, len, ctx);
     if (fq_poly_is_zero(f))
         fq_poly_one(f);
 }

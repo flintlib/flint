@@ -157,6 +157,9 @@ void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
+void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
+             const fmpz *a, const long *j, long lena, const fmpz_t p);
+
 void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
 /* Randomisation *************************************************************/

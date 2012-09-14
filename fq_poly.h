@@ -28,6 +28,7 @@
 #define FQ_POLY_H
 
 #undef ulong                /* interferes with system includes */
+#include <stdlib.h>
 #include <stdio.h>
 #define ulong unsigned long
 
@@ -123,7 +124,7 @@ void fq_poly_set_coeff(fq_poly_t poly, long n, const fq_t x);
 
 int fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2);
 
-static __inline__ int fq_poly_is_zero(fq_poly_t poly)
+static __inline__ int fq_poly_is_zero(const fq_poly_t poly)
 {
     return (poly->length == 0);
 }
@@ -146,30 +147,53 @@ static __inline__ int fq_poly_equal_fq(const fq_poly_t poly, const fq_t c)
 
 /*  Addition and subtraction  ************************************************/
 
+void _fq_poly_add(fq_struct *res, 
+                  const fq_struct *poly1, long len1, 
+                  const fq_struct *poly2, long len2, 
+                  const fq_ctx_t ctx);
+
 void fq_poly_add(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                  const fq_ctx_t ctx);
 
+void _fq_poly_sub(fq_struct *res, 
+                  const fq_struct *poly1, long len1, 
+                  const fq_struct *poly2, long len2, 
+                  const fq_ctx_t ctx);
 
 void fq_poly_sub(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                  const fq_ctx_t ctx);
+
+void _fq_poly_neg(fq_struct *rop, const fq_struct *op, long len, 
+                  const fq_ctx_t ctx);
 
 void fq_poly_neg(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Scalar multiplication and division  **************************************/
 
-void fq_poly_scalar_mul_fq(fq_poly_t poly1, 
-                               const fq_poly_t poly2, const fq_t x);
+void _fq_poly_scalar_mul_fq(fq_struct *rop, 
+    const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx);
 
-void fq_poly_scalar_addmul_fq(fq_poly_t poly1, 
-                                   const fq_poly_t poly2, const fq_t x);
+void fq_poly_scalar_mul_fq(fq_poly_t rop, 
+    const fq_poly_t op, const fq_t x, const fq_ctx_t ctx);
 
-void fq_poly_scalar_submul_fq(fq_poly_t poly1, 
-                                   const fq_poly_t poly2, const fq_t x);
+void _fq_poly_scalar_addmul_fq(fq_struct *rop, 
+    const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx);
 
-void fq_poly_scalar_divexact_fq(fq_poly_t poly1, 
-                                    const fq_poly_t poly2, const fq_t x);
+void fq_poly_scalar_addmul_fq(fq_poly_t rop, 
+    const fq_poly_t op, const fq_t x, const fq_ctx_t ctx);
+
+void _fq_poly_scalar_submul_fq(fq_struct *rop, 
+    const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx);
+
+void fq_poly_scalar_submul_fq(fq_poly_t rop, 
+    const fq_poly_t op, const fq_t x, const fq_ctx_t ctx);
 
 /*  Multiplication  **********************************************************/
+
+void _fq_poly_mul_classical(fq_struct *rop, 
+                            const fq_struct *op1, long len1, 
+                            const fq_struct *op2, long len2, 
+                            const fq_ctx_t ctx);
 
 void fq_poly_mul_classical(fq_poly_t rop, 
                            const fq_poly_t op1, const fq_poly_t op2, 
@@ -177,51 +201,61 @@ void fq_poly_mul_classical(fq_poly_t rop,
 
 /* Squaring ******************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_sqr(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Powering  ****************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, 
                  const fq_ctx_t ctx);
 
 /*  Shifting  ****************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n);
 
+/* TODO:  Implement */
 void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n);
 
 /*  Norms  *******************************************************************/
 
+/* TODO:  Implement */
 long fq_poly_hamming_wt(fq_poly_t poly);
 
 /*  Greatest common divisor  *************************************************/
 
-
+/* TODO:  Implement */
 void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                  const fq_ctx_t ctx);
 
 /*  Euclidean division  ******************************************************/
 
+/* TODO:  Implement */
 void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, 
                              const fq_poly_t A, const fq_poly_t B, 
                              const fq_ctx_t ctx);
 
 /*  Divisibility testing  ***************************************************/
 
+/* TODO:  Implement */
 int fq_poly_divides(fq_poly_t q, const fq_poly_t a, const fq_poly_t b, 
                     const fq_ctx_t ctx);
 
 /*  Derivative  **************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_derivative(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Evaluation  **************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_evaluate_fq(fq_t res, const fq_poly_t f, const fq_t a, 
                          const fq_ctx_t ctx);
 
 /*  Composition  *************************************************************/
 
+/* TODO:  Implement */
 void fq_poly_compose(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                      const fq_ctx_t ctx);
 

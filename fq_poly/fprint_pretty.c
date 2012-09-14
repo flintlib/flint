@@ -81,7 +81,7 @@ void _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
             if (fq_is_zero(poly + i))
                 continue;
 
-            if (fq_poly_is_one(poly + i))
+            if (fq_is_one(poly + i))
                 fprintf(file, "+%s^%ld", x, i);
             else
             {
