@@ -23,13 +23,11 @@
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2012 Andres Goens
 
-
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n)
+void fq_poly_get_coeff(fq_t x, const fq_poly_t poly, long n)
 {
     if (n < poly->length)
         fq_set(x, poly->coeffs + n);

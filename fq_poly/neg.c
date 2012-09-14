@@ -19,20 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_neg(fq_poly_t res, const fq_poly_t poly1)
+void fq_poly_neg(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
     long i;
-    fq_t s;
-    for(i=0;i<poly1->length;i++)
-    {
-        fq_neg(s,poly1->coeffs +i,poly1->ctx);
-        fq_set(res->coeffs+i, s);
-    }
+
+    fq_poly_fit_length(rop, op->length);
+
+    for (i = 0; i < op->length; i++)
+        fq_neg(rop->coeffs + i, op->coeffs + i, ctx);
+
+    _fq_poly_set_length(rop, op->length);
 }

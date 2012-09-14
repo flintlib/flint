@@ -26,14 +26,13 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_fit_length(fq_poly_t poly, long len)
+void fq_poly_fit_length(fq_poly_t poly, long len)
 {
     if (len > poly->alloc)
     {
         /* At least double number of allocated coeffs */
         if (len < 2 * poly->alloc)
             len = 2 * poly->alloc;
-        fq_poly_realloc(poly, poly->ctx, len);
+        fq_poly_realloc(poly, len);
     }
 }

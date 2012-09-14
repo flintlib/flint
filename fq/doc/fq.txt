@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz, 2012 Andres Goens
+    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
@@ -28,43 +29,44 @@
     Data structures
 
     We represent an element of the finite field 
-	 $\mathbb{F}_{p^n} \cong \mathbb{F}_p[X]/(f(X))$,
-	 where $f(X) \in \mathbb{F}_p[X]$ is a monic, irreducible
-	 polynomial from degree $n$ (default is a conway polynomial)
-    as a polynomial in $\mathbb{F}_p[X]$ of degree less 
-    than $n$. This is done by using the \code{qadic} libraries:
-	 \code{fq_t} is just a \code{qadic_t}, and the same for \code{fq_ctx_t},
-	 it is just a typedef for \code{qadic_ctx_t}, where $N = 1$ is always assumed.
+    $\mathbb{F}_{p^n} \cong \mathbb{F}_p[X]/(f(X))$,
+    where $f(X) \in \mathbb{F}_p[X]$ is a monic, irreducible polynomial 
+    of degree~$n$, as a polynomial in $\mathbb{F}_p[X]$ of degree less 
+    than $n$.
 
-
+    The default choice for $f(X)$ is the Conway polynomial 
+    for the pair $(p,n)$.  Frank Luebeck's data base of 
+    Conway polynomials is made available in the file \code{CP.txt}.
 
 *******************************************************************************
 
-void fq_ctx_init_conway(fq_ctx_t ctx, 
-                           const fmpz_t p, long d, const char *var, 
-                           enum padic_print_mode mode)
+void fq_ctx_init_conway(fq_ctx_t ctx, const fmpz_t p, long d, const char *var)
 
-    Initialises the context \code{ctx} as a \code{qadic_ctx_t} with fixed 
-    precision $N = 1$, prime $p$, extension degree $d$, 
-    variable name \code{var} and printing mode \code{mode}
+    Initialises the context for prime~$p$ and extension degree~$d$, 
+    with name \code{var} for the generator.
 
     Assumes that $p$ is a prime.
 
     Assumes that the string \code{var} is a null-terminated string 
     of length at least one.
 
-    Assumes that the printing mode is one of \code{PADIC_TERSE}, 
-    \code{PADIC_SERIES}, or \code{PADIC_VAL_UNIT}.
-
-
 void fq_ctx_clear(fq_ctx_t ctx);
 
     Clears all memory that has been allocated as part of the context.
 
-fq_ctx_dim(const fq_ctx_t ctx)
+long fq_ctx_degree(const fq_ctx_t ctx)
 
-    Returns the $F_p$ (prime field) dimension of the field associated 
-    with \code{ctx}.
+    Returns the degree of the field extension 
+    $[\mathbf{F}_{q} : \mathbf{F}_{p}]$, which 
+    is equal to $\log_{p} q$.
+
+fmpz * fq_ctx_prime(const fq_ctx_t ctx)
+
+    Returns a pointer to the prime $p$ in the context.
+
+void fq_ctx_print(const fq_ctx_t ctx)
+
+    Prints the context information to {\tt{stdout}}.
 
 *******************************************************************************
 
@@ -76,15 +78,26 @@ void fq_init(fq_t rop)
 
     Initialises the element \code{rop}, setting its value to~$0$.
 
-void fq_init_2(fq_t rop, long alloc)
+void fq_init_2(fq_t rop, const fq_ctx_t ctx)
 
     Initialises \code{poly} with at least enough space for it to be an element
-    of \code{ctx} and sets it to 0.
+    of \code{ctx} and sets it to~$0$.
 
 void fq_clear(fq_t rop)
 
     Clears the element \code{rop}.
 
+void _fq_reduce(fmpz *R, long lenR, 
+                const fmpz *a, const long *j, long len, const fmpz_t p)
+
+    Reduces \code{(R, lenR)} modulo the polynomial $f$ given 
+    by the triple \code{(a, j, len)} and the integer $p$.  
+    This does not depend on p being prime.
+
+void fq_reduce(fq_t rop, const fq_ctx_t ctx)
+
+    Reduces the polynomial \code{rop} as an element of 
+    $\mathbf{F}_p[X] / (f(X))$.
 
 *******************************************************************************
 
@@ -92,48 +105,62 @@ void fq_clear(fq_t rop)
 
 *******************************************************************************
 
-void fq_add(fq_t rop, const fq_t op1, const fq_t op2, 
-               const fq_ctx_t ctx)
+void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 
     Sets \code{rop} to the sum of \code{op1} and \code{op2}.
 
-    Assumes that both \code{op1} and \code{op2} are reduced in the 
-    given context and ensures that \code{rop} is, too.
-
-void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, 
-               const fq_ctx_t ctx)
+void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 
     Sets \code{rop} to the difference of \code{op1} and \code{op2}.
-
-    Assumes that both \code{op1} and \code{op2} are reduced in the 
-    given context and ensures that \code{rop} is, too.
 
 void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 
     Sets \code{rop} to the negative of \code{op}.
 
-    Assumes that \code{op} is reduced in the given context and 
-    ensures that \code{rop} is, too.
-
-void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, 
-               const fq_ctx_t ctx)
+void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 
     Sets \code{rop} to the product of \code{op1} and \code{op2}, 
     reducing the output in the given context.
 
+void _fq_inv(fmpz *rop, const fmpz *op, long len, 
+             const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{(rop, d)} to the inverse of the non-zero element 
+    \code{(op, len)}.
+
+    N.B.  The integer $p \geq 2$ does not necessarily have to 
+    be a prime.  That is to say, this function could be used 
+    from the module for $\mathbf{Q}_{q}$ modulo a prime power $p^N$. 
+    However, this function would not make use of $p$-adic 
+    lifting techniques.
+
 void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 
-    Sets \code{rop} to the inverse of \code{op}, reduced in the given context.
+    Sets \code{rop} to the inverse of the non-zero element \code{op}.
 
-void fq_pow(fq_t rop, const fq_t op, const fmpz_t e, 
-               const fq_ctx_t ctx)
+void _fq_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e, 
+             const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{(rop, 2*d-1)} to \code{(op,len)} raised to the power~$e$, 
+    reduced modulo $f(X)$ given by \code{(a, j, lena)} and the integer 
+    $p \geq 2$, which is not expected to be a prime.
+
+    Assumes that $e \geq 0$ and that \code{len} is positive and at most~$d$.
+
+    Although we require that \code{rop} provides space for 
+    $2d - 1$ coefficients, the output will be reduces modulo 
+    $f(X)$, which is a polynomial of degree~$d$.
+
+    Does not support aliasing.
+
+void fq_pow(qadic_t rop, const qadic_t op, const fmpz_t e, const fq_ctx_t ctx)
 
     Sets \code{rop} the \code{op} raised to the power~$e$.
 
     Currently assumes that $e \geq 0$.
 
-    Note that for any input \code{op}, \code{rop} is set to one in the 
-    given context whenever $e = 0$.
+    Note that for any input \code{op}, \code{rop} is set to~$1$ 
+    whenever $e = 0$.
 
 *******************************************************************************
 
@@ -215,6 +242,16 @@ int fq_equal(const fq_t op1, const fq_t op2)
 
 *******************************************************************************
 
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
+               const fmpz *a, const long *j, long lena, const fmpz_t p)
+
+    Sets \code{rop} to the trace of the non-zero element \code{(op, len)} 
+    in $\mathbf{F}_{q}$.
+
+    We note that the same code may also be called to compute the 
+    trace of a non-zero element of $\mathbf{Z}_p$ represented as 
+    an integer polynomial modulo~$p^N$.
+
 void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 
     Sets \code{rop} to the trace of \code{op}.
@@ -223,9 +260,7 @@ void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx)
     a $\mathbb{F}_p$-linear map on $\mathbb{F}_q$.  We define the trace 
     of $a$ as the trace of this map.  Equivalently, if $\Sigma$ generates 
     $\Gal(\mathbb{F}_q / \mathbb{F}_p)$ then the trace of $a$ is equal to 
-    $\sum_{i=0}^{d-1} \Sigma^i (a)$, where
-    $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
-
+    $\sum_{i=0}^{d-1} \Sigma^i (a)$, where $d = \log_{p} q$.
 
 void fq_norm(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 
@@ -238,9 +273,7 @@ void fq_norm(fq_t rop, const fq_t op, const fq_ctx_t ctx)
     $\prod_{i=0}^{d-1} \Sigma^i (a)$, where
     $d = \text{dim}_{\mathbb{F}_p}(\mathbb{F}_q)$.
 
-
     Algorithm selection is automatic depending on the input.
-
 
 void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
 
@@ -251,3 +284,4 @@ void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx)
     $\mathbf{Z}/d\mathbf{Z}$, where 
     $\sigma \in \Gal(\mathbf{F}_q/\mathbf{F}_p)$ is the Frobenius element 
     $\sigma \colon x \mapsto x^p$.
+

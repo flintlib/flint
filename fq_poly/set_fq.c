@@ -24,15 +24,16 @@
 ******************************************************************************/
 #include "fq_poly.h"
 
-void
-fq_poly_set_fq(fq_poly_t poly, fq_ctx_t ctx, const fq_t c)
+void fq_poly_set_fq(fq_poly_t poly, const fq_t c)
 {
-    if( fq_is_zero(c))
+    if(fq_is_zero(c))
+    {
         fq_poly_zero(poly);
+    }
     else
     {
         fq_poly_fit_length(poly, 1);
-        fq_set(poly->coeffs, c);
+        fq_set(poly->coeffs + 0, c);
         _fq_poly_set_length(poly, 1);
     }
 }

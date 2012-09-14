@@ -19,41 +19,49 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz 
+    Copyright (C) 2011, 2012 Sebastian Pancratz 
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
 #include "fq.h"
 
-void
-fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx)
+void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
-    padic_poly_randtest_val(x, state, 0, fq_ctx_dim(ctx), &ctx->pctx);
+    const long d = fq_ctx_degree(ctx);
+    long i, sparse;
+
+    fmpz_poly_fit_length(rop, d);
+
+    if (n_randint(state, 2))
+    {
+        for (i = 0; i < d; i++)
+            fmpz_randm(rop->coeffs + i, state, fq_ctx_prime(ctx));
+    }
+    else
+    {
+        sparse = 1 + n_randint(state, FLINT_MAX(2, d));
+
+        for (i = 0; i < d; i++)
+            if (n_randint(state, sparse))
+                fmpz_zero(rop->coeffs + i);
+            else
+                fmpz_randm(rop->coeffs + i, state, fq_ctx_prime(ctx));
+    }
+
+    _fmpz_poly_set_length(rop, d);
+    _fmpz_poly_normalise(rop);
 }
 
-void
-fq_randtest_not_zero(fq_t f, flint_rand_t state,
-                             const fq_ctx_t ctx)
+void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx)
 {
     long i;
 
-    if (fq_ctx_dim(ctx) == 0)
-    {
-        printf("Exception (fq_randtest_not_zero).  dim == 0.\n");
-        abort();
-    }
+    fq_randtest(rop, state, ctx);
+    for (i = 0; fq_is_zero(rop) && (i < 10); i++)
+        fq_randtest(rop, state, ctx);
 
-    fq_randtest(f, state, ctx);
-    for (i = 0; !fq_is_zero(f) && (i < 10); i++)
-        fq_randtest(f, state, ctx);
-
-    if (fq_is_zero(f))
-    {
-        padic_poly_fit_length(f, 1);
-        _padic_poly_set_length(f, 1);
-        fmpz_set_ui(f->coeffs + 0, 1);
-        f->val = 0;
-    }
+    if (fq_is_zero(rop))
+        fq_one(rop);
 }
 

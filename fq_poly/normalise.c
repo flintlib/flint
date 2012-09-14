@@ -26,10 +26,10 @@
 
 #include "fq_poly.h"
 
-void
-_fq_poly_normalise(fq_poly_t poly)
+void _fq_poly_normalise(fq_poly_t poly)
 {
     long i;
-    for (i = poly->length - 1; (i >= 0) && !fq_is_zero(poly->coeffs + i); i--) ;
+
+    for (i = poly->length - 1; (i >= 0) && fq_is_zero(poly->coeffs + i); i--) ;
     poly->length = i + 1;
 }

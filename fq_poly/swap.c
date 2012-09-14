@@ -19,16 +19,30 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz 
-    Copyright (C) 2012 Andres Goens
- 
+    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2012 Sebastian Pancratz
+   
 ******************************************************************************/
 
-#include "fq.h"
-#include "qadic.h"
+#include "fq_poly.h"
 
-int
-fq_equal(const qadic_t x, const qadic_t y)
+void fq_poly_swap(fq_poly_t op1, fq_poly_t op2)
 {
-    return qadic_equal(x, y);
+    if (op1 != op2)
+    {
+        long temp;
+        fq_struct *temp_c;
+
+        temp = op1->length;
+        op1->length = op2->length;
+        op2->length = temp;
+
+        temp = op1->alloc;
+        op1->alloc = op2->alloc;
+        op2->alloc = temp;
+
+        temp_c = op1->coeffs;
+        op1->coeffs = op2->coeffs;
+        op2->coeffs = temp_c;
+    }
 }

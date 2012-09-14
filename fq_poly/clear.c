@@ -22,14 +22,15 @@
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
+
 #include "fq_poly.h"
 
-void
-fq_poly_clear(fq_poly_t poly)
+void fq_poly_clear(fq_poly_t poly)
 {
     if (poly->coeffs)
     {
         long i;
+
         for (i = 0; i < poly->alloc; i++)
             fq_clear(poly->coeffs + i);
         flint_free(poly->coeffs);

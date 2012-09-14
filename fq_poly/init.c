@@ -20,35 +20,33 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_init(fq_poly_t poly, fq_ctx_t ctx)
+void fq_poly_init(fq_poly_t poly)
 {
-    poly->coeffs=NULL;
-    fq_ctx_init_conway(poly->ctx,ctx->pctx.p,fq_ctx_dim(ctx),ctx->var,ctx->pctx.mode);
-    poly->alloc =0;
-    poly->length=0;
+    poly->coeffs = NULL;
+    poly->alloc  = 0;
+    poly->length = 0;
 }
 
-void
-fq_poly_init2(fq_poly_t poly, fq_ctx_t ctx, long alloc)
+void fq_poly_init2(fq_poly_t poly, long alloc)
 {
-    fq_ctx_init_conway(poly->ctx,ctx->pctx.p,fq_ctx_dim(ctx),ctx->var,ctx->pctx.mode);
-    if (alloc != 0)
+    if (alloc)
     {
         long i;
-        poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_t));
-        for(i=0;i<alloc;i++)
-            fq_init2((poly->coeffs) + i,ctx);
+
+        poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_struct));
+
+        for(i = 0; i < alloc; i++)
+            fq_init(poly->coeffs + i);
     }
     else
         poly->coeffs = NULL;
 
-    poly->alloc = alloc;
+    poly->alloc  = alloc;
     poly->length = 0;
-
 }

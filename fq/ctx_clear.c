@@ -26,8 +26,10 @@
 
 #include "fq.h"
 
-void
-fq_ctx_clear(fq_ctx_t ctx)
+void fq_ctx_clear(fq_ctx_t ctx)
 {
-    qadic_ctx_clear(ctx);
+    fmpz_clear(fq_ctx_prime(ctx));
+    _fmpz_vec_clear(ctx->a, ctx->len);
+    flint_free(ctx->j);
+    flint_free(ctx->var);
 }

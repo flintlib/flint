@@ -26,19 +26,18 @@
 
 #include "fq_poly.h"
 
-int
-fq_poly_equal(const fq_poly_t poly1, const fq_poly_t poly2)
+int fq_poly_equal(const fq_poly_t op1, const fq_poly_t op2)
 {
     long i;
 
-    if (poly1 == poly2)
-        return 1;               /* pointer to same polynomial */
+    if (op1 == op2)
+        return 1;
 
-    if (poly1->length != poly2->length)
-        return 0;               /* check if lengths the same */
+    if (op1->length != op2->length)
+        return 0;
 
-    for (i = 0; i < poly1->length; i++) /* check if coefficients the same */
-        if (!fq_equal(poly1->coeffs + i, poly2->coeffs + i))
+    for (i = 0; i < op1->length; i++)
+        if (!fq_equal(op1->coeffs + i, op2->coeffs + i))
             return 0;
 
     return 1;

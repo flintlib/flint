@@ -19,19 +19,59 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
-#include "fmpz_mod_poly.h"
-#include "padic_poly.h"
 #include "fq.h"
 
-void
-fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx)
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
+               const fmpz *a, const long *j, long lena, const fmpz_t pN)
 {
-    padic_t res;
-    padic_init(res,&(ctx->pctx));
-    qadic_trace(res, op, ctx);
-    padic_poly_set_padic(rop,res);
+    const long d = j[lena - 1];
+
+    long i, l;
+    fmpz *t;
+
+    t = _fmpz_vec_init(d);
+
+    fmpz_set_ui(t + 0, d);
+    for (i = 1; i < d; i++)
+    {
+        for (l = lena - 2; l >= 0 && j[l] >= d - (i - 1); l--)
+        {
+            fmpz_addmul(t + i, t + (j[l] + i - d), a + l);
+        }
+
+        if (l >= 0 && j[l] == d - i)
+        {
+            fmpz_addmul_ui(t + i, a + l, i);
+        }
+
+        fmpz_neg(t + i, t + i);
+        fmpz_mod(t + i, t + i, pN);
+    }
+
+    fmpz_zero(rop);
+    for (i = 0; i < d; i++)
+    {
+        fmpz_addmul(rop, op + i, t + i);
+    }
+    fmpz_mod(rop, rop, pN);
+
+    _fmpz_vec_clear(t, d);
 }
+
+void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx)
+{
+    if (fq_is_zero(op))
+    {
+        fmpz_zero(rop);
+    }
+    else
+    {
+        _fq_trace(rop, op->coeffs, op->length, 
+                  ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+    }
+}
+

@@ -20,19 +20,21 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
    
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void fq_poly_truncate(fq_poly_t poly, long newlen)
+void fq_poly_truncate(fq_poly_t poly, long len)
 {
-    if (poly->length > newlen)
+    if (poly->length > len)
     {
         long i;
-        for (i = newlen; i < poly->length; i++)
-            fq_clear(poly->coeffs + i);
-        poly->length = newlen;
+
+        for (i = len; i < poly->length; i++)
+            fq_zero(poly->coeffs + i);
+        poly->length = len;
         _fq_poly_normalise(poly);
     }  
 }

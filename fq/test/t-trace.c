@@ -48,18 +48,20 @@ main(void)
         long d;
         fq_ctx_t ctx;
 
-        fq_t a, b, c, x;
+        fq_t a, b, c;
+        fmpz_t x, y;
         long j;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a", PADIC_TERSE);
+        fq_ctx_init_conway(ctx, p, d, "a");
 
         fq_init(a);
         fq_init(b);
         fq_init(c);
-        fq_init(x);
+        fmpz_init(x);
+        fmpz_init(y);
 
         fq_randtest(a, state, ctx);
 
@@ -71,14 +73,16 @@ main(void)
             fq_frobenius(c, a, j, ctx);
             fq_add(b, b, c, ctx);
         }
+        fmpz_poly_get_coeff_fmpz(y, b, 0);
 
-        result = fq_equal(x, b);
+        result = fmpz_equal(x, y);
         if (!result)
         {
             printf("FAIL:\n\n");
             printf("a = "), fq_print_pretty(a, ctx), printf("\n");
             printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("x = "), fq_print_pretty(x,ctx), printf("\n");
+            printf("x = "), fmpz_print(x), printf("\n");
+            printf("y = "), fmpz_print(y), printf("\n");
             for (j = 0; j < d; j++)
             {
                 fq_frobenius(c, a, j, ctx);
@@ -90,8 +94,8 @@ main(void)
         fq_clear(a);
         fq_clear(b);
         fq_clear(c);
-        fq_clear(x);
-
+        fmpz_clear(x);
+        fmpz_clear(y);
 
         fmpz_clear(p);
         fq_ctx_clear(ctx);

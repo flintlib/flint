@@ -31,7 +31,7 @@
 #include "qadic.h"
 
 #ifndef FLINT_CPIMPORT
-#define FLINT_CPIMPORT "/home/user/FLINT/flint-2/qadic/CPimport.txt"
+#define FLINT_CPIMPORT "/home/user/FLINT/flint-2/fq/CP.txt"
 #endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,

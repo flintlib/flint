@@ -8,7 +8,7 @@ MPIR_DIR="/usr"
 MPFR_DIR="/usr"
 NTL_DIR="/usr"
 FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
-FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
+FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CP.txt"
 WANT_NTL=0
 SHARED=1
 STATIC=1
@@ -60,7 +60,7 @@ while [ "$1" != "" ]; do
       --prefix)
          PREFIX=$VALUE
          FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
-         FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
+         FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CP.txt"
          ;;
       --disable-shared)
          SHARED=0

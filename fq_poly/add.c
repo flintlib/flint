@@ -19,32 +19,42 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void
-fq_poly_add(fq_poly_t res, const fq_poly_t poly1,
-            const fq_poly_t poly2)
+void _fq_poly_add(fq_struct *res, 
+                  const fq_struct *poly1, long len1, 
+                  const fq_struct *poly2, long len2, 
+                  const fq_ctx_t ctx)
 {
-    long len,i;
-    fq_t s;
+    const long min  = FLINT_MIN(len1, len2);
+    long i;
 
-    fq_init(s);
+    for (i = 0; i < min; i++)
+        fq_add(res + i, poly1 + i, poly2 + i, ctx);
 
-    len = (poly1->length < poly2->length ? poly2->length : poly1->length); /* max(poly1->len,poly2->len) */
-    _fq_poly_set_length(res,len);
+    if (poly1 != res)
+        for (i = min; i < len1; i++)
+            fq_set(res + i, poly1 + i);
 
-    for(i=0;i<len;i++)
-    {
-        if(i>poly1->length) fq_set(res->coeffs +i,poly2->coeffs + i); /*defn of len assures then that poly2->coefs + i points to something */
-        if(i>poly2->length) fq_set(res->coeffs +i,poly1->coeffs + i); 
-        else
-        {
-            fq_add(s,poly1->coeffs +i, poly2->coeffs + i,poly1->ctx);
-            fq_set(res->coeffs+i, s);
-        }
-    }
+    if (poly2 != res)
+        for (i = min; i < len2; i++)
+            fq_set(res + i, poly2 + i);
+}
+
+void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, 
+                 const fq_ctx_t ctx)
+{
+    const long max  = FLINT_MAX(poly1->length, poly2->length);
+
+    fq_poly_fit_length(res, max);
+
+    _fq_poly_add(res->coeffs, poly1->coeffs, poly1->length, 
+                              poly2->coeffs, poly2->length, ctx);
+
+    _fq_poly_set_length(res, max);
+    _fq_poly_normalise(res);
 }

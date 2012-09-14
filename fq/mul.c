@@ -24,11 +24,11 @@
  
 ******************************************************************************/
 
-#include "fmpz_mod_poly.h"
 #include "fq.h"
 
-void
-fq_mul(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx)
+void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx)
 {
-    qadic_mul(x, y, z, ctx);
+    fmpz_poly_mul(rop, op1, op2);
+
+    fq_reduce(rop, ctx);
 }

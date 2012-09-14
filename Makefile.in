@@ -136,7 +136,7 @@ install: $(FLINT_LIB)
 	fi
 	cp *.h $(PREFIX)/include/flint
 	mkdir -p $(FLINT_CPIMPORT_DIR)
-	cp qadic/CPimport.txt $(FLINT_CPIMPORT_DIR)
+	cp fq/CP.txt $(FLINT_CPIMPORT_DIR)
 
 build/test/%: test/%.c $(FLINT_LIB) | build/test 
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \

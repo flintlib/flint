@@ -23,54 +23,53 @@
  
 ******************************************************************************/
 
-
 #ifndef FQ_H
 #define FQ_H
 
-#undef ulong                    /* interferes with system includes */
+#undef ulong                /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
 #define ulong unsigned long
 
-#include <mpir.h>
-
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "fmpz_vec.h"
+#include "fmpz_mod_poly.h"
 #include "ulong_extras.h"
-#include "padic.h"
-#include "padic_poly.h"
-#include "qadic.h"
 
 /* Data types and context ****************************************************/
 
-/*
-#define fq_t padic_poly_t
-#define fq_struct padic_poly_struct
-*/
+typedef fmpz_poly_t fq_t;
+typedef fmpz_poly_struct fq_struct;
 
-typedef qadic_t fq_t;
-typedef qadic_struct fq_struct;
-typedef qadic_ctx_struct fq_ctx_t[1];
+typedef struct
+{
+    fmpz p;
+
+    fmpz *a;
+    long *j;
+    long len;
+
+    char *var;
+}
+fq_ctx_struct;
+
+typedef fq_ctx_struct fq_ctx_t[1];
 
 void fq_ctx_init_conway(fq_ctx_t ctx,
-                        const fmpz_t p, long d, const char *var,
-                        enum padic_print_mode mode);
+                        const fmpz_t p, long d, const char *var);
 
 void fq_ctx_clear(fq_ctx_t ctx);
 
-static __inline__ long
-fq_ctx_dim(const fq_ctx_t ctx)
+static __inline__ long fq_ctx_degree(const fq_ctx_t ctx)
 {
     return ctx->j[ctx->len - 1];
 }
 
-static __inline__ void
-fq_ctx_print(const fq_ctx_t ctx)
+#define fq_ctx_prime(ctx)  (&((ctx)->p))
+
+static __inline__ void fq_ctx_print(const fq_ctx_t ctx)
 {
     long i, k;
-    printf("p = "), fmpz_print((&ctx->pctx)->p), printf("\n");
+
+    printf("p = "), fmpz_print(fq_ctx_prime(ctx)), printf("\n");
     printf("d = %ld\n", ctx->j[ctx->len - 1]);
     printf("f(X) = ");
     fmpz_print(ctx->a + 0);
@@ -95,102 +94,143 @@ fq_ctx_print(const fq_ctx_t ctx)
         }
     }
     printf("\n");
+}
 
+/* Memory managment  *********************************************************/
+
+static __inline__ void fq_init(fq_t rop)
+{
+    fmpz_poly_init(rop);
+}
+
+static __inline__ void fq_init2(fq_t rop, const fq_ctx_t ctx)
+{
+    fmpz_poly_init2(rop, fq_ctx_degree(ctx));
+}
+
+static __inline__ void fq_clear(fq_t rop)
+{
+    fmpz_poly_clear(rop);
+}
+
+static __inline__ 
+void _fq_reduce(fmpz *R, long lenR, 
+                const fmpz *a, const long *j, long len, const fmpz_t p)
+{
+    const long d = j[len - 1];
+
+    FMPZ_VEC_NORM(R, lenR);
+
+    if (lenR > d)
+    {
+        long i, k;
+
+        for (i = lenR - 1; i >= d; i--)
+        {
+            for (k = len - 2; k >= 0; k--)
+            {
+                fmpz_submul(R + j[k] + i - d, R + i, a + k);
+            }
+            fmpz_zero(R + i);
+        }
+    }
+
+    _fmpz_vec_scalar_mod_fmpz(R, R, lenR, p);
+}
+
+static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
+{
+    _fq_reduce(rop->coeffs, rop->length, 
+               ctx->a, ctx->j, ctx->len, fq_ctx_prime(ctx));
+    _fmpz_poly_normalise(rop);
 }
 
 /* Basic arithmetic **********************************************************/
 
-void fq_add(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+void fq_add(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_sub(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+void fq_sub(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_neg(fq_t x, const fq_t y, const fq_ctx_t ctx);
+void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void fq_mul(fq_t x, const fq_t y, const fq_t z, const fq_ctx_t ctx);
+void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
-void fq_inv(fq_t x, const fq_t y, const fq_ctx_t ctx);
+void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
-void fq_pow(fq_t x, const fq_t y, const fmpz_t e, const fq_ctx_t ctx);
-
-/* Memory managment  *********************************************************/
-
-static __inline__ void
-fq_init(fq_t x)
-{
-    padic_poly_init(x);
-}
-
-static __inline__ void
-fq_init2(fq_t x, fq_ctx_t ctx)
-{
-    padic_poly_init2(x,fq_ctx_dim(ctx));
-}
-
-static __inline__ void
-fq_clear(fq_t x)
-{
-    padic_poly_clear(x);
-}
-
-static __inline__ void
-fq_reduce(fq_t x, const fq_ctx_t ctx)
-{
-    qadic_reduce(x,ctx);
-}
+void fq_pow(fq_t rop, const fq_t op1, const fmpz_t e, const fq_ctx_t ctx);
 
 /* Randomisation *************************************************************/
 
-void fq_randtest(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
+void fq_randtest(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
-
-void fq_randtest_not_zero(fq_t x, flint_rand_t state, const fq_ctx_t ctx);
-
-
+void fq_randtest_not_zero(fq_t rop, flint_rand_t state, const fq_ctx_t ctx);
 
 /* Comparison ****************************************************************/
 
-int fq_equal(const fq_t x, const fq_t y);
-
-static __inline__ int
-fq_is_zero(const fq_t poly)
+static __inline__ int fq_equal(const fq_t op1, const fq_t op2)
 {
-    return poly->length == 0;
+    return fmpz_poly_equal(op1, op2);
 }
 
-static __inline__ int
-fq_is_one(const fq_t poly)
+static __inline__ int fq_is_zero(const fq_t op)
 {
-    return (poly->length == 1 && fmpz_is_one(poly->coeffs));
+    return fmpz_poly_is_zero(op);
 }
 
+static __inline__ int fq_is_one(const fq_t op)
+{
+    return fmpz_poly_is_one(op);
+}
 
 /* Assignments and conversions ***********************************************/
 
-void fq_set(fq_t x, const fq_t y);
-
-static __inline__ void
-fq_zero(fq_t x)
+static __inline__ void fq_set(fq_t rop, const fq_t op)
 {
-    padic_poly_zero(x);
+    fmpz_poly_set(rop, op);
 }
 
-static __inline__ void
-fq_one(fq_t x, const fq_ctx_t ctx)
+static __inline__ void fq_zero(fq_t rop)
 {
-    padic_poly_one(x, &ctx->pctx);
+    fmpz_poly_zero(rop);
 }
 
+static __inline__ void fq_one(fq_t rop)
+{
+    fmpz_poly_one(rop);
+}
 
 /* Output ********************************************************************/
 
-int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx);
+static __inline__ 
+int fq_fprint_pretty(FILE * file, const fq_t op, const fq_ctx_t ctx)
+{
+    return fmpz_poly_fprint_pretty(file, op, ctx->var);
+}
 
-int fq_print_pretty(const fq_t op, const fq_ctx_t ctx);
+static __inline__ 
+int fq_print_pretty(const fq_t op, const fq_ctx_t ctx)
+{
+    return fmpz_poly_print_pretty(op, ctx->var);
+}
 
 /* Special functions *********************************************************/
 
-void fq_trace(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+void _fq_trace(fmpz_t rop, const fmpz *op, long len, 
+               const fmpz *a, const long *j, long lena, const fmpz_t p);
+
+void fq_trace(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
+
+void _fq_frobenius(fmpz *rop, const fmpz *op, long len, long e, 
+                   const fmpz *a, const long *j, long lena, 
+                   const fmpz_t p);
+
 void fq_frobenius(fq_t rop, const fq_t op, long e, const fq_ctx_t ctx);
-void fq_norm(fq_t rop, const fq_t op, const fq_ctx_t ctx);
+
+void _fq_norm(fmpz_t rop, const fmpz *op, long len, 
+                          const fmpz *a, const long *j, long lena, 
+                          const fmpz_t p, long N);
+
+void fq_norm(fmpz_t rop, const fq_t op, const fq_ctx_t ctx);
 
 #endif
+

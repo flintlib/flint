@@ -54,7 +54,7 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a", PADIC_SERIES);
+        fq_ctx_init_conway(ctx, p, d, "a");
 
         fq_init(a);
         fq_init(b);
@@ -69,7 +69,7 @@ main(void)
         result = (fq_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (aliasing):\n\n");
             printf("a = "), fq_print_pretty(a, ctx), printf("\n");
             printf("b = "), fq_print_pretty(b, ctx), printf("\n");
             printf("c = "), fq_print_pretty(c, ctx), printf("\n");
@@ -97,14 +97,13 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
-        fq_ctx_init_conway(ctx, p, d, "a", PADIC_TERSE);
+        fq_ctx_init_conway(ctx, p, d, "a");
 
         fq_init(a);
         fq_init(b);
         fq_init(c);
 
-        do fq_randtest(a, state, ctx);
-        while (fq_is_zero(a));
+        fq_randtest_not_zero(a, state, ctx);
 
         fq_inv(b, a, ctx);
         fq_mul(c, a, b, ctx);
@@ -112,7 +111,7 @@ main(void)
         result = (fq_is_one(c));
         if (!result)
         {
-            printf("FAIL:\n\n");
+            printf("FAIL (a * (~a) == 1):\n\n");
             printf("a = "), fq_print_pretty(a, ctx), printf("\n");
             printf("b = "), fq_print_pretty(b, ctx), printf("\n");
             printf("c = "), fq_print_pretty(c, ctx), printf("\n");

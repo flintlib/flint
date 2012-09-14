@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "fq.h"
 #include "fq_poly.h"
 
 #include "ulong_extras.h"
@@ -44,7 +43,7 @@ main(void)
 
     flint_randinit(state);
 
-    /* Check aliasing: a = a + b */
+    /* Check aliasing: a = a - b */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -57,26 +56,24 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-        fq_poly_init(a,ctx);
-        fq_poly_init(b,ctx);
-        fq_poly_init(c,ctx);
+        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_poly_init(a);
+        fq_poly_init(b);
+        fq_poly_init(c);
 
-        fq_poly_randtest(a, ctx, state,len);
-        fq_poly_randtest(b, ctx, state,len);
+        fq_poly_randtest(a, state, len, ctx);
+        fq_poly_randtest(b, state, len, ctx);
 
-        fq_poly_sub(c, a, b);
-        fq_poly_sub(a, a, b);
+        fq_poly_sub(c, a, b, ctx);
+        fq_poly_sub(a, a, b, ctx);
 
         result = (fq_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            /*
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            */
+            printf("FAIL (aliasing a = a - b):\n\n");
+            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
+            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
             abort();
         }
 
@@ -88,7 +85,7 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    /* Check aliasing: b = a + b */
+    /* Check aliasing: b = a - b */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -101,26 +98,24 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-        fq_poly_init(a,ctx);
-        fq_poly_init(b,ctx);
-        fq_poly_init(c,ctx);
+        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_poly_init(a);
+        fq_poly_init(b);
+        fq_poly_init(c);
 
-        fq_poly_randtest(a, ctx, state,len);
-        fq_poly_randtest(b, ctx, state,len);
+        fq_poly_randtest(a, state, len, ctx);
+        fq_poly_randtest(b, state, len, ctx);
 
-        fq_poly_sub(c, a, b);
-        fq_poly_sub(b, a, b);
+        fq_poly_sub(c, a, b, ctx);
+        fq_poly_sub(b, a, b, ctx);
 
         result = (fq_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            /*
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            */
+            printf("FAIL (b = a - b):\n\n");
+            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
+            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
             abort();
         }
 
@@ -132,7 +127,7 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    /* Check aliasing: a = a + a */
+    /* Check aliasing: a = a - a */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -145,24 +140,21 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-        fq_poly_init(a,ctx);
-        fq_poly_init(c,ctx);
+        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_poly_init(a);
+        fq_poly_init(c);
 
-        fq_poly_randtest(a, ctx, state,len);
+        fq_poly_randtest(a, state, len, ctx);
 
-        fq_poly_sub(c, a, a);
-        fq_poly_sub(a, a, a);
+        fq_poly_sub(c, a, a, ctx);
+        fq_poly_sub(a, a, a, ctx);
 
         result = (fq_poly_equal(a, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            /*
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            */
+            printf("FAIL (a = a - a):\n\n");
+            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
+            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
             abort();
         }
 
@@ -173,7 +165,7 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    /* Check that a + b == b + a */
+    /* Check that a - b == -(b - a) */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -186,27 +178,27 @@ main(void)
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-        fq_poly_init(a,ctx);
-        fq_poly_init(b,ctx);
-        fq_poly_init(c,ctx);
-        fq_poly_init(e,ctx);
+        fq_ctx_init_conway(ctx, p, d, "a");
+        fq_poly_init(a);
+        fq_poly_init(b);
+        fq_poly_init(c);
+        fq_poly_init(e);
 
-        fq_poly_randtest(a, ctx, state,len);
-        fq_poly_randtest(b, ctx, state,len);
+        fq_poly_randtest(a, state, len, ctx);
+        fq_poly_randtest(b, state, len, ctx);
 
-        fq_poly_sub(c, a, b);
-        fq_poly_sub(e, b, a);
+        fq_poly_sub(c, a, b, ctx);
+        fq_poly_sub(e, b, a, ctx);
+        fq_poly_neg(e, e, ctx);
 
         result = (fq_poly_equal(e, c));
         if (!result)
         {
-            printf("FAIL:\n\n");
-            /*
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            */
+            printf("FAIL (a - b == -(b - a)):\n\n");
+            printf("a = "), fq_poly_print_pretty(a, "X", ctx), printf("\n");
+            printf("b = "), fq_poly_print_pretty(b, "X", ctx), printf("\n");
+            printf("c = "), fq_poly_print_pretty(c, "X", ctx), printf("\n");
+            printf("e = "), fq_poly_print_pretty(e, "X", ctx), printf("\n");
             abort();
         }
 
@@ -218,61 +210,6 @@ main(void)
         fmpz_clear(p);
         fq_ctx_clear(ctx);
     }
-
-
-    /* Check that (a + b) + c == a + (b + c) */
-    for (i = 0; i < 2000; i++)
-    {
-        fmpz_t p;
-        long d,len;
-        fq_ctx_t ctx;
-
-        fq_poly_t a, b, c, lhs,rhs;
-
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
-        fq_ctx_init_conway(ctx, p, d,"a", PADIC_SERIES);
-        fq_poly_init(a,ctx);
-        fq_poly_init(b,ctx);
-        fq_poly_init(c,ctx);
-        fq_poly_init(lhs,ctx);
-        fq_poly_init(rhs,ctx);
-
-        fq_poly_randtest(a, ctx, state,len);
-        fq_poly_randtest(b, ctx, state,len);
-        fq_poly_randtest(c, ctx, state,len);
-
-        fq_poly_sub(lhs, a, b);
-        fq_poly_sub(lhs, c, lhs);
-
-        fq_poly_sub(rhs, b, c);
-        fq_poly_sub(rhs, a, rhs);
-
-
-        result = (fq_poly_equal(lhs, rhs));
-        if (!result)
-        {
-            printf("FAIL:\n\n");
-            /*
-            printf("a = "), fq_print_pretty(a, ctx), printf("\n");
-            printf("b = "), fq_print_pretty(b, ctx), printf("\n");
-            printf("c = "), fq_print_pretty(c, ctx), printf("\n");
-            */
-            abort();
-        }
-
-        fq_poly_clear(a);
-        fq_poly_clear(b);
-        fq_poly_clear(c);
-        fq_poly_clear(lhs);
-        fq_poly_clear(rhs);
-
-        fmpz_clear(p);
-        fq_ctx_clear(ctx);
-    }
-
 
     flint_randclear(state);
     _fmpz_cleanup();

@@ -24,11 +24,14 @@
  
 ******************************************************************************/
 
-#include "fmpz_mod_poly.h"
 #include "fq.h"
 
-void
-fq_neg(fq_t x, const fq_t y, const fq_ctx_t ctx)
+void fq_neg(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
-    qadic_neg(x, y, ctx);
+    long len = op->length;
+
+    fmpz_poly_fit_length(rop, len);
+    _fmpz_poly_set_length(rop, len);
+
+    _fmpz_mod_poly_neg(rop->coeffs, op->coeffs, op->length, fq_ctx_prime(ctx));
 }

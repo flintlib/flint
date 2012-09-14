@@ -26,16 +26,16 @@
 
 #include "fq_poly.h"
 
-void
-fq_poly_set(fq_poly_t poly1, const fq_poly_t poly2)
+void fq_poly_set(fq_poly_t rop, const fq_poly_t op)
 {
-    if (poly1 != poly2)         /* Aliasing is trivial */
+    if (rop != op)         /* Aliasing is trivial */
     {
-        long i, len = poly2->length;
+        long i, len = op->length;
 
-        _fq_poly_set_length(poly1, len);
+        fq_poly_fit_length(rop, len);
+        _fq_poly_set_length(rop, len);
 
         for (i = 0; i < len; i++)
-            fq_set(poly1->coeffs + i, poly2->coeffs + i);
+            fq_set(rop->coeffs + i, op->coeffs + i);
     }
 }

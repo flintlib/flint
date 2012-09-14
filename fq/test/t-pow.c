@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "qadic.h"
+#include "fq.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
 
@@ -47,28 +47,28 @@ main(void)
     {
         fmpz_t p;
         long d, N;
-        qadic_ctx_t ctx;
+        fq_ctx_t ctx;
 
-        qadic_t a, b;
+        fq_t a, b;
         fmpz_t e;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "a", PADIC_SERIES);
+        fq_ctx_init_conway(ctx, p, d, "a");
 
-        qadic_init(a);
-        qadic_init(b);
+        fq_init(a);
+        fq_init(b);
         fmpz_init(e);
 
-        qadic_randtest(a, state, ctx);
+        fq_randtest(a, state, ctx);
         fmpz_randtest_unsigned(e, state, 6);
 
-        qadic_pow(b, a, e, ctx);
-        qadic_pow(a, a, e, ctx);
+        fq_pow(b, a, e, ctx);
+        fq_pow(a, a, e, ctx);
 
-        result = (qadic_equal(a, b));
+        result = (fq_equal(a, b));
         if (!result)
         {
             printf("FAIL (alias):\n\n");
@@ -77,12 +77,12 @@ main(void)
             abort();
         }
 
-        qadic_clear(a);
-        qadic_clear(b);
+        fq_clear(a);
+        fq_clear(b);
         fmpz_clear(e);
 
         fmpz_clear(p);
-        qadic_ctx_clear(ctx);
+        fq_ctx_clear(ctx);
     }
 
     /* Compare with multiplication, for integral values */
@@ -90,34 +90,34 @@ main(void)
     {
         fmpz_t p;
         long d, N;
-        qadic_ctx_t ctx;
+        fq_ctx_t ctx;
 
-        qadic_t a, b, c;
+        fq_t a, b, c;
         fmpz_t e, f;
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "a", PADIC_SERIES);
+        fq_ctx_init_conway(ctx, p, d, "a");
 
-        qadic_init(a);
-        qadic_init(b);
-        qadic_init(c);
+        fq_init(a);
+        fq_init(b);
+        fq_init(c);
         fmpz_init(f);
         fmpz_init(e);
 
-        qadic_randtest_int(a, state, ctx);
+        fq_randtest(a, state, ctx);
         fmpz_randtest_unsigned(e, state, 6);
 
-        qadic_pow(b, a, e, ctx);
-        qadic_one(c, ctx);
+        fq_pow(b, a, e, ctx);
+        fq_one(c);
         for (fmpz_one(f); fmpz_cmp(f, e) <= 0; fmpz_add_ui(f, f, 1))
         {
-            qadic_mul(c, c, a, ctx);
+            fq_mul(c, c, a, ctx);
         }
 
-        result = (qadic_equal(b, c));
+        result = (fq_equal(b, c));
         if (!result)
         {
             printf("FAIL (cmp with mul):\n\n");
@@ -128,14 +128,14 @@ main(void)
             abort();
         }
 
-        qadic_clear(a);
-        qadic_clear(b);
-        qadic_clear(c);
+        fq_clear(a);
+        fq_clear(b);
+        fq_clear(c);
         fmpz_clear(e);
         fmpz_clear(f);
 
         fmpz_clear(p);
-        qadic_ctx_clear(ctx);
+        fq_ctx_clear(ctx);
     }
 
     flint_randclear(state);

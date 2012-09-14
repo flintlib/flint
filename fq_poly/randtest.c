@@ -22,40 +22,44 @@
     Copyright (C) 2009 William Hart
     Copyright (C) 2012 Andres Goens
 
-
 ******************************************************************************/
 
 #include "fq_poly.h"
-#ifndef MAXTRIES
-#define MAXTRIES 10
-#endif
 
-void
-fq_poly_randtest(fq_poly_t f, const fq_ctx_t ctx,
-                      flint_rand_t state, long len)
+void fq_poly_randtest(fq_poly_t f, flint_rand_t state, 
+                      long len, const fq_ctx_t ctx)
 {
     long i;
     
     fq_poly_fit_length(f, len);
-    for(i=0;i<len;i++)
+    for(i = 0; i < len; i++)
     {
-        fq_randtest(f->coeffs + i,state,ctx);
+        fq_randtest(f->coeffs + i, state, ctx);
     }
+    _fq_poly_set_length(f, len);
     _fq_poly_normalise(f);
+
+    if (f->length > 0)
+        if (fq_is_zero(fq_poly_lead(f)))
+        {
+            printf("XXX YYY\n");
+            abort();
+        }
 }
 
-void fq_poly_randtest_not_zero(fq_poly_t f, const fq_ctx_t ctx,
-                               flint_rand_t state, long len)
+void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state, 
+                               long len, const fq_ctx_t ctx)
 {
-    int i;
-    if ((len == 0))
+    long i;
+
+    if (len == 0)
     {
-        printf("Exception: len = 0 passed to fq_poly_randtest_not_zero\n");
+        printf("Exception (fq_poly_randtest_not_zero).  len = 0.\n");
         abort();
     }
 
-    for(i = 0; (i < MAXTRIES) && fq_poly_is_zero(f); i++)
-        fq_poly_randtest(f,ctx, state, len);
+    for(i = 0; (i < 10) && fq_poly_is_zero(f); i++)
+        fq_poly_randtest(f, ctx, state, len);
     if (fq_poly_is_zero(f))
         fq_poly_one(f);
 }
