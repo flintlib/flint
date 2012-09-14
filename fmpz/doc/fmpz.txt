@@ -92,7 +92,7 @@ void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     As per \code{fmpz_randtest}, but the result will not be $0$. 
     If \code{bits} is set to $0$, an exception will result.
 
-void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
+void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
     Generates a random integer in the range $0$ to $m - 1$ inclusive.
 
