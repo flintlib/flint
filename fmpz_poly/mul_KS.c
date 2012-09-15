@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -121,32 +121,21 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
-    long rlen;
+    const long rlen = len1 + len2 - 1;
 
     if (len1 == 0 || len2 == 0)
     {
         fmpz_poly_zero(res);
-        return;
     }
-
-    rlen = len1 + len2 - 1;
-
-    if (res == poly1 || res == poly2)
-    {
-        fmpz_poly_t t;
-        fmpz_poly_init2(t, rlen);
-        fmpz_poly_mul_KS(t, poly1, poly2);
-        fmpz_poly_swap(res, t);
-        fmpz_poly_clear(t);
-        return;
-    }
-
-    fmpz_poly_fit_length(res, rlen);
-    if (len1 >= len2)
-        _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1,
-                          poly2->coeffs, len2);
     else
-        _fmpz_poly_mul_KS(res->coeffs, poly2->coeffs, len2,
-                          poly1->coeffs, len1);
-    _fmpz_poly_set_length(res, rlen);
+    {
+        fmpz_poly_fit_length(res, rlen);
+        if (len1 >= len2)
+            _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1,
+                              poly2->coeffs, len2);
+        else
+            _fmpz_poly_mul_KS(res->coeffs, poly2->coeffs, len2,
+                              poly1->coeffs, len1);
+        _fmpz_poly_set_length(res, rlen);
+    }
 }
