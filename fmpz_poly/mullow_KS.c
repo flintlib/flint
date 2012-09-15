@@ -126,28 +126,19 @@ fmpz_poly_mullow_KS(fmpz_poly_t res,
     if (len1 == 0 || len2 == 0 || n == 0)
     {
         fmpz_poly_zero(res);
-        return;
     }
-
-    if (res == poly1 || res == poly2)
-    {
-        fmpz_poly_t t;
-        fmpz_poly_init2(t, n);
-        fmpz_poly_mullow_KS(t, poly1, poly2, n);
-        fmpz_poly_swap(res, t);
-        fmpz_poly_clear(t);
-        return;
-    }
-
-    fmpz_poly_fit_length(res, n);
-
-    if (len1 >= len2)
-        _fmpz_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
-                                          poly2->coeffs, len2, n);
     else
-        _fmpz_poly_mullow_KS(res->coeffs, poly2->coeffs, len2,
-                                          poly1->coeffs, len1, n);
+    {
+        fmpz_poly_fit_length(res, n);
 
-    _fmpz_poly_set_length(res, n);
-    _fmpz_poly_normalise(res);
+        if (len1 >= len2)
+            _fmpz_poly_mullow_KS(res->coeffs, poly1->coeffs, len1,
+                                              poly2->coeffs, len2, n);
+        else
+            _fmpz_poly_mullow_KS(res->coeffs, poly2->coeffs, len2,
+                                              poly1->coeffs, len1, n);
+
+        _fmpz_poly_set_length(res, n);
+        _fmpz_poly_normalise(res);
+    }
 }
