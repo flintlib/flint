@@ -74,6 +74,12 @@ static __inline__ void _fq_poly_set_length(fq_poly_t poly, long len)
     poly->length = len;
 }
 
+#define FQ_VEC_NORM(vec, i)                     \
+do {                                            \
+    while ((i) && fq_is_zero((vec) + (i) - 1))  \
+        (i)--;                                  \
+} while (0)
+
 /*  Polynomial parameters  ***************************************************/
 
 static __inline__ long fq_poly_length(const fq_poly_t poly)
@@ -106,6 +112,14 @@ void fq_poly_set(fq_poly_t rop, const fq_poly_t op);
 void fq_poly_set_fq(fq_poly_t poly, const fq_t c);
 
 void fq_poly_swap(fq_poly_t op1, fq_poly_t op2);
+
+static __inline__ void _fq_poly_zero(fq_struct *rop, long len)
+{
+    long i;
+
+    for (i = 0; i < len; i++)
+        fq_zero(rop + i);
+}
 
 static __inline__ void fq_poly_zero(fq_poly_t poly)
 {
@@ -199,6 +213,22 @@ void fq_poly_mul_classical(fq_poly_t rop,
                            const fq_poly_t op1, const fq_poly_t op2, 
                            const fq_ctx_t ctx);
 
+void _fq_poly_mul_reorder(fq_struct *rop, 
+                           const fq_struct *op1, long len1, 
+                           const fq_struct *op2, long len2, 
+                           const fq_ctx_t ctx);
+
+void fq_poly_mul_reorder(fq_poly_t rop, 
+    const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx);
+
+void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1, 
+                                     const fq_struct *op2, long len2, 
+                                     const fq_ctx_t ctx);
+
+void fq_poly_mul_KS(fq_poly_t rop, 
+                    const fq_poly_t op1, const fq_poly_t op2, 
+                    const fq_ctx_t ctx);
+
 /* Squaring ******************************************************************/
 
 /* TODO:  Implement */
@@ -261,8 +291,18 @@ void fq_poly_compose(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
 
 /*  Input and output  ********************************************************/
 
+int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
+                            const char *x, const fq_ctx_t ctx);
+
 int fq_poly_fprint_pretty(FILE * file, const fq_poly_t poly, const char *x, 
                           const fq_ctx_t ctx);
+
+static __inline__ 
+int _fq_poly_print_pretty(const fq_struct *poly, long len, 
+                          const char *x, const fq_ctx_t ctx)
+{
+    return _fq_poly_fprint_pretty(stdout, poly, len, x, ctx);
+}
 
 static __inline__ 
 int fq_poly_print_pretty(const fq_poly_t poly, const char *x, 

@@ -155,6 +155,10 @@ void fq_poly_swap(fq_poly_t op1, fq_poly_t op2)
 
     Swaps the two polynomials \code{op1} and \code{op2}.
 
+void _fq_poly_zero(fq_struct *rop, long len)
+
+    Sets \code{(rop, len)} to the zero polynomial.
+
 void fq_poly_zero(fq_poly_t poly)
 
     Sets \code{poly} to the zero polynomial.
@@ -279,7 +283,8 @@ void _fq_poly_mul_classical(fq_struct *rop,
     and \code{(op2, len2)}, assuming that \code{len1} is at least \code{len2} 
     and neither is zero.
 
-    Permits zero padding.
+    Permits zero padding.  Does not support aliasing of \code{rop} 
+    with either \code{op1} or \code{op2}.
 
 void fq_poly_mul_classical(fq_poly_t rop, 
                            const fq_poly_t op1, const fq_poly_t op2, 
@@ -287,4 +292,57 @@ void fq_poly_mul_classical(fq_poly_t rop,
 
     Sets \code{rop} to the product of \code{op1} and \code{op2} 
     using classical polynomial multiplication.
+
+void _fq_poly_mul_reorder(fq_struct *rop, 
+                           const fq_struct *op1, long len1, 
+                           const fq_struct *op2, long len2, 
+                           const fq_ctx_t ctx)
+
+    Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)} 
+    and \code{(op2, len2)}, assuming that \code{len1} and \code{len2} are 
+    non-zero.
+
+    Permits zero padding.  Supports aliasing.
+
+void fq_poly_mul_reorder(fq_poly_t rop, 
+    const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2}, 
+    reordering the two indeterminates $X$ and $Y$ when viewing 
+    the polynomials as elements of $\mathbf{F}_p[X,Y]$.
+
+    Suppose $\mathbf{F}_q = \mathbf{F}_p[X]/ (f(X))$ and recall 
+    that elements of $\mathbf{F}_q$ are internally represented 
+    by elements of type \code{fmpz_poly}.  For small degree extensions 
+    but polynomials in $\mathbf{F}_q[Y]$ of large degree~$n$, we 
+    change the representation to 
+    \begin{equation*}
+    \begin{split}
+    g(Y) & = \sum_{i=0}^{n} a_i(X) Y^i \\
+         & = \sum_{j=0}^{d} \sum_{i=0}^{n} \text{Coeff}(a_i(X), j) Y^i.
+    \end{split}
+    \end{equation*}
+    This allows us to use a poor algorithm (such as classical multiplication) 
+    in the $X$-direction and leverage the existing fast integer 
+    multiplication routines in the $Y$-direction where the polynomial 
+    degree~$n$ is large.
+
+void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1, 
+                                     const fq_struct *op2, long len2, 
+                                     const fq_ctx_t ctx)
+
+    Sets \code{(rop, len1 + len2 - 1)} to the product of \code{(op1, len1)} 
+    and \code{(op2, len2)}.
+
+    Permits zero padding and places no assumptions on the 
+    lengths \code{len1} and \code{len2}.  Supports aliasing.
+
+void fq_poly_mul_KS(fq_poly_t rop, 
+                    const fq_poly_t op1, const fq_poly_t op2, 
+                    const fq_ctx_t ctx)
+
+    Sets \code{rop} to the product of \code{op1} and \code{op2} 
+    using Kronecker substitution, that is, by encoding each 
+    coefficient in $\mathbf{F}_{q}$ as an integer and reducing 
+    this problem to multiplying two polynomials over the integers.
 

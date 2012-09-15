@@ -37,8 +37,8 @@ static void __fq_print(FILE *file, const fq_struct *op, const fq_ctx_t ctx)
     fputc(')', file);
 }
 
-void _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
-                            const char *x, const fq_ctx_t ctx)
+int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
+                           const char *x, const fq_ctx_t ctx)
 {
     if (len == 0)
     {
@@ -57,9 +57,11 @@ void _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
             __fq_print(file, poly + 1, ctx);
             fprintf(file, "*%s", x);
         }
-
-        fputc('+', file);
-        __fq_print(file, poly + 0, ctx);
+        if (!fq_is_zero(poly + 0))
+        {
+            fputc('+', file);
+            __fq_print(file, poly + 0, ctx);
+        }
     }
     else
     {
@@ -70,7 +72,7 @@ void _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
                 fprintf(file, "%s^%ld", x, i);
             else
             {
-                fq_fprint_pretty(file, poly + i, ctx);
+                __fq_print(file, poly + i, ctx);
                 fprintf(file, "*%s^%ld", x, i);
             }
             --i;
@@ -112,13 +114,13 @@ void _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len,
             __fq_print(file, poly + 0, ctx);
         }
     }
+
+    return 1;
 }
 
 int fq_poly_fprint_pretty(FILE *file, const fq_poly_t poly, const char *x, 
                           const fq_ctx_t ctx)
 {
-    _fq_poly_fprint_pretty(file, poly->coeffs, poly->length, x, ctx);
-
-    return 1;
+    return _fq_poly_fprint_pretty(file, poly->coeffs, poly->length, x, ctx);
 }
 
