@@ -135,7 +135,7 @@ void _fq_reduce(fmpz *R, long lenR,
         }
     }
 
-    _fmpz_vec_scalar_mod_fmpz(R, R, lenR, p);
+    _fmpz_vec_scalar_mod_fmpz(R, R, FLINT_MIN(d, lenR), p);
 }
 
 static __inline__ void fq_reduce(fq_t rop, const fq_ctx_t ctx)
