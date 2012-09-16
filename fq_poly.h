@@ -229,6 +229,13 @@ void fq_poly_mul_KS(fq_poly_t rop,
                     const fq_poly_t op1, const fq_poly_t op2, 
                     const fq_ctx_t ctx);
 
+void _fq_poly_mul(fq_struct *rop, const fq_struct *op1, long len1, 
+                                  const fq_struct *op2, long len2, 
+                                  const fq_ctx_t ctx);
+
+void fq_poly_mul(fq_poly_t rop, 
+                 const fq_poly_t op1, const fq_poly_t op2, const fq_ctx_t ctx);
+
 /* Squaring ******************************************************************/
 
 /* TODO:  Implement */
