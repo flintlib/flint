@@ -32,8 +32,7 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
 {
     const long in1_len = len1, in2_len = len2;
     const long d = fq_ctx_degree(ctx);
-    long bits, limbs;
-    long i;
+    long bits, i;
     fmpz *f, *g, *h;
 
     FQ_VEC_NORM(op1, len1);
@@ -48,8 +47,6 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
 
     bits  = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
             + FLINT_BIT_COUNT(d + FLINT_MIN(len1, len2));
-
-    limbs = (bits * d - 1) / FLINT_BITS + 1;
 
     f = _fmpz_vec_init((len1 + len2 - 1) + (len1) + (len2));
     g = f + (len1 + len2 - 1);
