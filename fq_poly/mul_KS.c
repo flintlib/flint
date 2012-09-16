@@ -61,7 +61,10 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
         fmpz_poly_bit_pack(h + i, op2 + i, bits);
     }
 
-    _fmpz_poly_mul(f, g, len1, h, len2);
+    if (len1 >= len2)
+        _fmpz_poly_mul(f, g, len1, h, len2);
+    else
+        _fmpz_poly_mul(f, h, len2, g, len1);
 
     for (i = 0; i < len1 + len2 - 1; i++)
     {
@@ -89,12 +92,8 @@ void fq_poly_mul_KS(fq_poly_t rop,
     else
     {
         fq_poly_fit_length(rop, rlen);
-        if (len1 >= len2)
-            _fq_poly_mul_KS(rop->coeffs, op1->coeffs, len1, 
-                                         op2->coeffs, len2, ctx);
-        else
-            _fq_poly_mul_KS(rop->coeffs, op2->coeffs, len2, 
-                                         op1->coeffs, len1, ctx);
+        _fq_poly_mul_KS(rop->coeffs, op1->coeffs, len1, 
+                                     op2->coeffs, len2, ctx);
         _fq_poly_set_length(rop, rlen);
     }
 }
