@@ -84,7 +84,6 @@ int main(void)
         fq_ctx_clear(ctx);
         fmpz_clear(p);
     }
-
     {
         printf("2)  Two length-500 polynomials over GF(3^263)\n");
 
@@ -113,6 +112,40 @@ int main(void)
         c1 = clock();
         c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
         printf("KS: %fms\n", 10 * c);
+
+        fq_ctx_clear(ctx);
+        fmpz_clear(p);
+    }
+    {
+        printf("3)  Two length-5 polynomials over GF(109987^4)\n");
+
+        fmpz_init_set_ui(p, 109987);
+        d = 4;
+        fq_ctx_init_conway(ctx, p, d, "X");
+
+        fq_poly_randtest(g, state, 4, ctx);
+        fq_poly_randtest(h, state, 4, ctx);
+
+        c0 = clock();
+        for (i = 0; i < 1000 * 100; i++)
+            fq_poly_mul_classical(f, g, h, ctx);
+        c1 = clock();
+        c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+        printf("Classical: %f\xb5s\n", 10 * c);
+
+        c0 = clock();
+        for (i = 0; i < 1000 * 100; i++)
+            fq_poly_mul_reorder(f, g, h, ctx);
+        c1 = clock();
+        c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+        printf("Reorder: %f\xb5s\n", 10 * c);
+
+        c0 = clock();
+        for (i = 0; i < 1000 * 100; i++)
+            fq_poly_mul_KS(f, g, h, ctx);
+        c1 = clock();
+        c  = (double) (c1 - c0) / CLOCKS_PER_SEC;
+        printf("KS: %f\xb5s\n", 10 * c);
 
         fq_ctx_clear(ctx);
         fmpz_clear(p);
