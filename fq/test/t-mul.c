@@ -126,7 +126,7 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-    /* Check aliasing: a = a + a */
+    /* Check aliasing: a = a * a */
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
@@ -145,8 +145,8 @@ main(void)
 
         fq_randtest(a, state, ctx);
 
-        fq_add(c, a, a, ctx);
-        fq_add(a, a, a, ctx);
+        fq_mul(c, a, a, ctx);
+        fq_mul(a, a, a, ctx);
 
         result = (fq_equal(a, c));
         if (!result)
