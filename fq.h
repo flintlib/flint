@@ -194,6 +194,11 @@ static __inline__ void fq_set(fq_t rop, const fq_t op)
     fmpz_poly_set(rop, op);
 }
 
+static __inline__ void fq_swap(fq_t op1, fq_t op2)
+{
+    fmpz_poly_swap(op1, op2);
+}
+
 static __inline__ void fq_zero(fq_t rop)
 {
     fmpz_poly_zero(rop);
