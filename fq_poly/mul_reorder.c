@@ -148,12 +148,12 @@ void _fq_poly_mul_reorder(fq_struct *rop,
 
     /* Convert (op1, len1) to (g, d) */
     for (i = 0; i < len1; i++)
-        for (j = 0; j < d; j++)
+        for (j = 0; j < fmpz_poly_length(op1 + i); j++)
             fmpz_set( (g + j)->coeffs + i, (op1 + i)->coeffs + j );
 
     /* Convert (op2, len2) to (h, d) */
     for (i = 0; i < len2; i++)
-        for (j = 0; j < d; j++)
+        for (j = 0; j < fmpz_poly_length(op2 + i); j++)
             fmpz_set( (h + j)->coeffs + i, (op2 + i)->coeffs + j );
 
     for (j = 0; j < d; j++)
