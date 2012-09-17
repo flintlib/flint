@@ -155,6 +155,12 @@ void fq_neg(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
 
 void fq_mul(fq_t rop, const fq_t op1, const fq_t op2, const fq_ctx_t ctx);
 
+void fq_mul_fmpz(fq_t rop, const fq_t op, const fmpz_t x, const fq_ctx_t ctx);
+
+void fq_mul_si(fq_t rop, const fq_t op, long x, const fq_ctx_t ctx);
+
+void fq_mul_ui(fq_t rop, const fq_t op, ulong x, const fq_ctx_t ctx);
+
 void fq_sqr(fq_t rop, const fq_t op, const fq_ctx_t ctx);
 
 void fq_inv(fq_t rop, const fq_t op1, const fq_ctx_t ctx);
