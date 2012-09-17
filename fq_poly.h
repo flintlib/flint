@@ -263,7 +263,9 @@ void fq_poly_sqr(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Powering  ****************************************************************/
 
-/* TODO:  Implement */
+void _fq_poly_pow(fq_struct *rop, const fq_struct *op, long len, ulong e, 
+                                  const fq_ctx_t ctx);
+
 void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e, 
                  const fq_ctx_t ctx);
 
