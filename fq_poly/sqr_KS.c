@@ -43,8 +43,8 @@ void _fq_poly_sqr_KS(fq_struct *rop, const fq_struct *op, long len,
         return;
     }
 
-    bits  = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
-            + FLINT_BIT_COUNT(d + len);
+    bits = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
+           + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(len);
 
     f = _fmpz_vec_init((2 * len - 1) + len);
     g = f + (2 * len - 1);

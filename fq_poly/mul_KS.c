@@ -45,8 +45,8 @@ void _fq_poly_mul_KS(fq_struct *rop, const fq_struct *op1, long len1,
         return;
     }
 
-    bits  = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
-            + FLINT_BIT_COUNT(d + FLINT_MIN(len1, len2));
+    bits = 2 * fmpz_bits(fq_ctx_prime(ctx)) 
+           + FLINT_BIT_COUNT(d) + FLINT_BIT_COUNT(FLINT_MIN(len1, len2));
 
     f = _fmpz_vec_init((len1 + len2 - 1) + (len1) + (len2));
     g = f + (len1 + len2 - 1);
