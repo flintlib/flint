@@ -54,8 +54,8 @@ main(void)
 
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
-        d = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
+        d   = n_randint(state, 10) + 1;
+        len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, d, "a");
         fq_poly_init(a);
         fq_poly_init(c);
@@ -93,7 +93,7 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         deg = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
+        len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
         fq_poly_init(a);
         fq_poly_init(b);
@@ -140,7 +140,7 @@ main(void)
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         deg = n_randint(state, 10) + 1;
-        len = n_randint(state, 15) + 1;
+        len = n_randint(state, 50) + 1;
         fq_ctx_init_conway(ctx, p, deg, "a");
         fq_poly_init(a);
         fq_poly_init(b);
