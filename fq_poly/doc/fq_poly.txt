@@ -363,6 +363,44 @@ void fq_poly_mul(fq_poly_t rop,
 
 *******************************************************************************
 
+    Shifting
+
+*******************************************************************************
+
+void _fq_poly_shift_left(fq_struct *rop, 
+                         const fq_struct *op, long len, long n)
+
+    Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by 
+    $n$ coefficients.  
+
+    Inserts zero coefficients at the lower end.  Assumes that \code{len} 
+    and $n$ are positive, and that \code{res} fits \code{len + n} elements.
+    Supports aliasing between \code{res} and \code{poly}.
+
+void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n)
+
+    Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero 
+    coefficients are inserted.
+
+void _fq_poly_shift_right(fq_struct *rop, 
+                          const fq_struct *op, long len, long n)
+
+    Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by 
+    $n$ coefficients.  
+
+    Assumes that \code{len} and $n$ are positive, that \code{len > n}, 
+    and that \code{res} fits \code{len - n} elements.  Supports aliasing 
+    between \code{res} and \code{poly}, although in this case the top 
+    coefficients of \code{poly} are not set to zero.
+
+void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n)
+
+    Sets \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$ 
+    is equal to or greater than the current length of \code{poly}, \code{res} 
+    is set to the zero polynomial.
+
+*******************************************************************************
+
     Evaluation
 
 *******************************************************************************

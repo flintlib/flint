@@ -269,10 +269,12 @@ void fq_poly_pow(fq_poly_t rop, const fq_poly_t op, ulong e,
 
 /*  Shifting  ****************************************************************/
 
-/* TODO:  Implement */
+void _fq_poly_shift_left(fq_struct *rop, const fq_struct *op, long len, long n);
+
 void fq_poly_shift_left(fq_poly_t rop, const fq_poly_t op, long n);
 
-/* TODO:  Implement */
+void _fq_poly_shift_right(fq_struct *rop, const fq_struct *op, long len, long n);
+
 void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n);
 
 /*  Norms  *******************************************************************/
