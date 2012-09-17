@@ -279,8 +279,9 @@ void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n);
 
 /*  Norms  *******************************************************************/
 
-/* TODO:  Implement */
-long fq_poly_hamming_wt(fq_poly_t poly);
+long _fq_poly_hamming_weight(const fq_struct *op, long len);
+
+long fq_poly_hamming_weight(const fq_poly_t op);
 
 /*  Greatest common divisor  *************************************************/
 

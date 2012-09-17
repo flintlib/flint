@@ -401,6 +401,20 @@ void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n)
 
 *******************************************************************************
 
+    Norms
+
+*******************************************************************************
+
+long _fq_poly_hamming_weight(const fq_poly *op, long len)
+
+    Returns the number of non-zero entries in \code{(op, len)}.
+
+long fq_poly_hamming_weight(const fq_poly_t op)
+
+    Returns the number of non-zero entries in the polynomial \code{op}.
+
+*******************************************************************************
+
     Derivative
 
 *******************************************************************************
