@@ -306,7 +306,9 @@ void fq_poly_derivative(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Evaluation  **************************************************************/
 
-/* TODO:  Implement */
+void _fq_poly_evaluate_fq(fq_t rop, const fq_struct *op, long len, 
+                                    const fq_t a, const fq_ctx_t ctx);
+
 void fq_poly_evaluate_fq(fq_t res, const fq_poly_t f, const fq_t a, 
                          const fq_ctx_t ctx);
 
