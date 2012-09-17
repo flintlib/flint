@@ -168,7 +168,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
         }
     }
     
-    _fmpz_poly_mul(pow, poly2, len2, poly2, len2);
+    _fmpz_poly_sqr(pow, poly2, len2);
     powlen = 2 * len2 - 1;
     
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
@@ -198,7 +198,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
             hlen[i] = hlen[2*i];
         }
         
-        _fmpz_poly_mul(temp, pow, powlen, pow, powlen);
+        _fmpz_poly_sqr(temp, pow, powlen);
         powlen += powlen - 1;
         {
             fmpz * t = pow;
