@@ -401,6 +401,23 @@ void fq_poly_shift_right(fq_poly_t rop, const fq_poly_t op, long n)
 
 *******************************************************************************
 
+    Derivative
+
+*******************************************************************************
+
+void _fq_poly_derivative(fq_struct *rop, const fq_struct *op, long len, 
+                                         const fq_ctx_t ctx)
+
+    Sets \code{(rpoly, len - 1)} to the derivative of \code{(poly, len)}.  
+    Also handles the cases where \code{len} is $0$ or $1$ correctly. 
+    Supports aliasing of \code{rpoly} and \code{poly}.
+
+void fq_poly_derivative(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+
+    Sets \code{res} to the derivative of \code{poly}.
+
+*******************************************************************************
+
     Evaluation
 
 *******************************************************************************
