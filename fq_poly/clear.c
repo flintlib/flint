@@ -20,19 +20,26 @@
 /******************************************************************************
 
     Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
+void _fq_poly_clear(fq_struct *v, long len)
+{
+    long i;
+
+    for (i = 0; i < len; i++)
+        fq_clear(v + i);
+
+    flint_free(v);
+}
+
 void fq_poly_clear(fq_poly_t poly)
 {
     if (poly->coeffs)
     {
-        long i;
-
-        for (i = 0; i < poly->alloc; i++)
-            fq_clear(poly->coeffs + i);
-        flint_free(poly->coeffs);
+        _fq_poly_clear(poly->coeffs, poly->alloc);
     }
 }

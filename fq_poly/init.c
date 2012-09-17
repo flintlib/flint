@@ -26,6 +26,19 @@
 
 #include "fq_poly.h"
 
+fq_struct * _fq_poly_init(long len)
+{
+    long i;
+    fq_struct *v;
+
+    v = flint_malloc(len * sizeof (fq_struct));
+
+    for (i = 0; i < len; i++)
+        fq_init(v + i);
+
+    return v;
+}
+
 void fq_poly_init(fq_poly_t poly)
 {
     poly->coeffs = NULL;
@@ -35,18 +48,7 @@ void fq_poly_init(fq_poly_t poly)
 
 void fq_poly_init2(fq_poly_t poly, long alloc)
 {
-    if (alloc)
-    {
-        long i;
-
-        poly->coeffs = (fq_struct *) flint_malloc(alloc * sizeof(fq_struct));
-
-        for(i = 0; i < alloc; i++)
-            fq_init(poly->coeffs + i);
-    }
-    else
-        poly->coeffs = NULL;
-
+    poly->coeffs = (alloc) ? _fq_poly_init(alloc) : NULL;
     poly->alloc  = alloc;
     poly->length = 0;
 }

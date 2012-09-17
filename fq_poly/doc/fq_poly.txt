@@ -143,6 +143,10 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
 
 *******************************************************************************
 
+void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len)
+
+    Sets \code{(rop, len}) to \code{(op, len)}.
+
 void fq_poly_set(fq_poly_t poly1, const fq_poly_t poly2)
 
     Sets the polynomial \code{poly1} to the polynomial \code{poly2}.
@@ -460,6 +464,62 @@ long _fq_poly_hamming_weight(const fq_poly *op, long len)
 long fq_poly_hamming_weight(const fq_poly_t op)
 
     Returns the number of non-zero entries in the polynomial \code{op}.
+
+*******************************************************************************
+
+    Euclidean division
+
+*******************************************************************************
+
+void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, 
+    const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
+    const fq_t invB, const fq_ctx_t ctx)
+
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    $A = B Q + R$ with $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    and that \code{invB} is its inverse.
+
+    Assumes that $\len(A), \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  $R$ and $A$ may be aliased, but apart from 
+    this no aliasing of input and output operands is allowed.
+
+void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, 
+                             const fq_poly_t A, const fq_poly_t B, 
+                             const fq_ctx_t ctx)
+
+    Computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible.  This can 
+    be taken for granted the context is for a finite field, that is, when 
+    $p$ is prime and $f(X)$ is irreducible.
+
+void _fq_poly_divrem(fq_struct *Q, fq_struct *R, 
+    const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
+    const fq_t invB, const fq_ctx_t ctx)
+
+    Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
+    $A = B Q + R$ with $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible 
+    and that \code{invB} is its inverse.
+
+    Assumes that $\len(A), \len(B) > 0$.  Allows zero-padding in 
+    \code{(A, lenA)}.  $R$ and $A$ may be aliased, but apart from 
+    this no aliasing of input and output operands is allowed.
+
+void fq_poly_divrem(fq_poly_t Q, fq_poly_t R, 
+                    const fq_poly_t A, const fq_poly_t B, 
+                    const fq_ctx_t ctx)
+
+    Computes $Q$, $R$ such that $A = B Q + R$ with 
+    $0 \leq \len(R) < \len(B)$.
+
+    Assumes that the leading coefficient of $B$ is invertible.  This can 
+    be taken for granted the context is for a finite field, that is, when 
+    $p$ is prime and $f(X)$ is irreducible.
 
 *******************************************************************************
 

@@ -48,6 +48,8 @@ typedef fq_poly_struct fq_poly_t[1];
 
 /*  Memory management ********************************************************/
 
+fq_struct * _fq_poly_init(long len);
+
 void fq_poly_init(fq_poly_t poly);
 
 void fq_poly_init2(fq_poly_t poly, long alloc);
@@ -57,6 +59,8 @@ void fq_poly_realloc(fq_poly_t poly, long alloc);
 void fq_poly_truncate(fq_poly_t poly, long len);
 
 void fq_poly_fit_length(fq_poly_t poly, long len);
+
+void _fq_poly_clear(fq_struct *v, long len);
 
 void fq_poly_clear(fq_poly_t poly);
 
@@ -106,6 +110,8 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
                                long len, const fq_ctx_t ctx);
 
 /*  Assignment and basic manipulation  ***************************************/
+
+void _fq_poly_set(fq_struct *rop, const fq_struct *op, long len);
 
 void fq_poly_set(fq_poly_t rop, const fq_poly_t op);
 
@@ -293,10 +299,29 @@ void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
 
 /*  Euclidean division  ******************************************************/
 
-/* TODO:  Implement */
+void _fq_poly_divrem_basecase(fq_struct *Q, fq_struct *R, 
+    const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
+    const fq_t invB, const fq_ctx_t ctx);
+
 void fq_poly_divrem_basecase(fq_poly_t Q, fq_poly_t R, 
                              const fq_poly_t A, const fq_poly_t B, 
                              const fq_ctx_t ctx);
+
+static __inline__ 
+void _fq_poly_divrem(fq_struct *Q, fq_struct *R, 
+    const fq_struct *A, long lenA, const fq_struct *B, long lenB, 
+    const fq_t invB, const fq_ctx_t ctx)
+{
+    _fq_poly_divrem_basecase(Q, R, A, lenA, B, lenB, invB, ctx);
+}
+
+static __inline__ 
+void fq_poly_divrem(fq_poly_t Q, fq_poly_t R, 
+                    const fq_poly_t A, const fq_poly_t B, 
+                    const fq_ctx_t ctx)
+{
+    fq_poly_divrem_basecase(Q, R, A, B, ctx);
+}
 
 /*  Divisibility testing  ***************************************************/
 
