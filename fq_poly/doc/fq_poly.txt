@@ -523,6 +523,38 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
 
 *******************************************************************************
 
+    Divisibility testing
+
+*******************************************************************************
+
+int _fq_poly_divides(fq_struct *Q, 
+                     const fq_struct *A, long lenA, 
+                     const fq_struct *B, long lenB, const fq_t invB, 
+                     const fq_ctx_t ctx)
+
+    Returns $1$ if \code{(B, lenB)} divides \code{(A, lenA)} exactly and
+    sets $Q$ to the quotient, otherwise returns $0$.
+
+    It is assumed that $\len(A) \geq \len(B) > 0$ and that $Q$ has space
+    for $\len(A) - \len(B) + 1$ coefficients.
+
+    Aliasing of $Q$ with either of the inputs is not permitted.
+
+    This function is currently unoptimised and provided for convenience
+    only.
+
+int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, 
+                                 const fq_ctx_t ctx)
+
+
+    Returns $1$ if $B$ divides $A$ exactly and sets $Q$ to the quotient,
+    otherwise returns $0$.
+
+    This function is currently unoptimised and provided for convenience
+    only.
+
+*******************************************************************************
+
     Derivative
 
 *******************************************************************************
