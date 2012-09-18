@@ -346,7 +346,27 @@ void fq_poly_evaluate_fq(fq_t res, const fq_poly_t f, const fq_t a,
 
 /*  Composition  *************************************************************/
 
-/* TODO:  Implement */
+void _fq_poly_compose_divconquer(fq_struct *rop, 
+                                 const fq_struct *op1, long len1, 
+                                 const fq_struct *op2, long len2, 
+                                 const fq_ctx_t ctx);
+
+void fq_poly_compose_divconquer(fq_poly_t rop, 
+                                const fq_poly_t op1, const fq_poly_t op2, 
+                                const fq_ctx_t ctx);
+
+void _fq_poly_compose_horner(fq_struct *rop, const fq_struct *op1, long len1, 
+                                             const fq_struct *op2, long len2, 
+                                             const fq_ctx_t ctx);
+
+void fq_poly_compose_horner(fq_poly_t rop, 
+                            const fq_poly_t op1, const fq_poly_t op2, 
+                            const fq_ctx_t ctx);
+
+void _fq_poly_compose(fq_struct *rop, const fq_struct *op1, long len1, 
+                                      const fq_struct *op2, long len2, 
+                                      const fq_ctx_t ctx);
+
 void fq_poly_compose(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                      const fq_ctx_t ctx);
 
