@@ -450,7 +450,7 @@ void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1,
                                        const fmpz_poly_t poly2, const fmpz_t x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
-    assuming the coefficient is exact for every coefficient.
+    assuming the division is exact for every coefficient.
 
 void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1, 
                                        const fmpz_poly_t poly2, const mpz_t x)
