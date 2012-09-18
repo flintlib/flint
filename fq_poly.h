@@ -325,9 +325,13 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
 
 /*  Divisibility testing  ***************************************************/
 
-/* TODO:  Implement */
-int fq_poly_divides(fq_poly_t q, const fq_poly_t a, const fq_poly_t b, 
-                    const fq_ctx_t ctx);
+int _fq_poly_divides(fq_struct *Q, 
+                     const fq_struct *A, long lenA, 
+                     const fq_struct *B, long lenB, const fq_t invB, 
+                     const fq_ctx_t ctx);
+
+int fq_poly_divides(fq_poly_t Q, const fq_poly_t A, const fq_poly_t B, 
+                                 const fq_ctx_t ctx);
 
 /*  Derivative  **************************************************************/
 
