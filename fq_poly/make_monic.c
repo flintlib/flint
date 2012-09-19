@@ -19,25 +19,36 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2008, 2009 William Hart
+    Copyright (C) 2007, David Howden.
+    Copyright (C) 2010 William Hart
     Copyright (C) 2012 Andres Goens
 
 ******************************************************************************/
 
 #include "fq_poly.h"
 
-void _fq_poly_normalise(fq_poly_t poly)
+void
+_fq_poly_make_monic(fq_struct *rop, 
+                    const fq_struct *op, long length, const fq_ctx_t ctx)
 {
-    long i;
-
-    for (i = poly->length - 1; (i >= 0) && fq_is_zero(poly->coeffs + i); i--) ;
-    poly->length = i + 1;
+    fq_t inv;
+    
+    fq_inv(inv, &op[length - 1], ctx);
+    _fq_poly_scalar_mul_fq(rop, op, length, inv, ctx);
 }
 
-void _fq_poly_normalise2(fq_struct *poly, long length)
+void
+fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
 {
-    long i;
+    if (op->length == 0)
+    {
+        printf("Exception: division by zero in nmod_poly_invert\n");
+        abort();
+    }
 
-    for (i = length - 1; (i >= 0) && fq_is_zero(poly + i); i--) ;
-    length = i + 1;
+    fq_poly_fit_length(rop, op->length);
+    _fq_poly_make_monic(rop->coeffs, 
+                            op->coeffs, op->length, ctx);
+    _fq_poly_set_length(rop, op->length);
 }
+

@@ -66,6 +66,8 @@ void fq_poly_clear(fq_poly_t poly);
 
 void _fq_poly_normalise(fq_poly_t poly);
 
+void _fq_poly_normalise2(fq_struct *poly, long length);
+
 static __inline__ void _fq_poly_set_length(fq_poly_t poly, long len)
 {
     if (poly->length > len)
@@ -133,6 +135,10 @@ static __inline__ void fq_poly_zero(fq_poly_t poly)
 }
 
 void fq_poly_one(fq_poly_t poly);
+
+void _fq_poly_make_monic(fq_struct *rop, const fq_struct *op, long length, const fq_ctx_t ctx);
+
+void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx);
 
 /*  Getting and setting coefficients  ****************************************/
 
@@ -293,9 +299,18 @@ long fq_poly_hamming_weight(const fq_poly_t op);
 
 /*  Greatest common divisor  *************************************************/
 
-/* TODO:  Implement */
+static __inline__
 void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
+                 const fq_ctx_t ctx)
+{
+    fq_poly_gcd_euclidean(rop,op1,op2,ctx);
+}
+void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                  const fq_ctx_t ctx);
+
+long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
+                            const fq_struct* B, long lenB, const fq_ctx_t ctx);
+
 
 /*  Euclidean division  ******************************************************/
 
@@ -322,6 +337,30 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
 {
     fq_poly_divrem_basecase(Q, R, A, B, ctx);
 }
+
+static __inline__ 
+void _fq_poly_rem(fq_struct *R, const fq_struct *A, long lenA,
+                  const fq_struct *B, long lenB, const fq_t invB,
+                  const fq_ctx_t ctx)
+{
+    fq_struct *Q = _fq_poly_init(lenA + lenB); /*TODO: smaller bound */
+    _fq_poly_divrem(Q, R, A, lenA, B, lenB, invB, ctx);
+    _fq_poly_clear(Q,lenA+lenB);
+}
+
+
+
+static __inline__ 
+void fq_poly_rem(fq_poly_t R, 
+                    const fq_poly_t A, const fq_poly_t B, 
+                    const fq_ctx_t ctx)
+{
+    fq_poly_t Q;
+    fq_poly_init2(Q,A->length+B->length);/*TDOO: smaller bound*/
+    fq_poly_divrem_basecase(Q, R, A, B, ctx);
+    fq_poly_clear(Q);
+}
+
 
 /*  Divisibility testing  ***************************************************/
 
