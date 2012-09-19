@@ -171,6 +171,18 @@ void void fq_poly_one(fq_poly_t poly)
 
     Sets \code{poly} to the constant polynomial~$1$.
 
+
+void fq_poly_make_monic(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+
+     Sets \code{rop} to \code{op}, normed to have leading coefficient 1.
+
+void _fq_poly_make_monic(fq_struct *rop, const fq_struct *op, long length,
+      const fq_ctx_t ctx);
+
+     Sets \code{rop} to \code{(op,length)}, normed to have leading coefficient 1.
+     Assumes that \code{rop} has enough space for the polynomial, assumes that
+     \code{op} is not zero (and thus has an invertible leading coefficient). 
+
 *******************************************************************************
 
     Getting and setting coefficients
@@ -520,6 +532,40 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible.  This can 
     be taken for granted the context is for a finite field, that is, when 
     $p$ is prime and $f(X)$ is irreducible.
+
+*******************************************************************************
+
+    Greatest common divisor
+
+*******************************************************************************
+
+
+
+void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
+                                     const fq_ctx_t ctx)
+
+    Sets \code{rop} to the greatest common divisor of \code{op1} and \code{op2}, 
+    using the euclidean algorithm. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic. 
+
+long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
+                            const fq_struct* B, long lenB, const fq_ctx_t ctx);
+
+    Computes the GCD of $A$ of length \code{lenA} and $B$ of length
+    \code{lenB}, where \code{lenA >= lenB > 0} and sets $G$ to it. The length of
+    the GCD $G$ is returned by the function. No attempt is made to make the GCD 
+    monic. It is required that $G$ have space for \code{lenB} coefficients.
+
+void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
+                 const fq_ctx_t ctx)
+
+    Sets \code{rop} to the greatest common divisor of \code{op1} and \code{op2}, 
+    using the euclidean algorithm at the moment. The GCD of zero polynomials is
+    defined to be zero, whereas the GCD of the zero polynomial and some other
+    polynomial $P$ is defined to be $P$. Except in the case where
+    the GCD is zero, the GCD $G$ is made monic. 
 
 *******************************************************************************
 

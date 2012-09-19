@@ -299,17 +299,18 @@ long fq_poly_hamming_weight(const fq_poly_t op);
 
 /*  Greatest common divisor  *************************************************/
 
+void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
+                 const fq_ctx_t ctx);
+
+long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
+                            const fq_struct* B, long lenB, const fq_ctx_t ctx);
+
 static __inline__
 void fq_poly_gcd(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
                  const fq_ctx_t ctx)
 {
     fq_poly_gcd_euclidean(rop,op1,op2,ctx);
 }
-void fq_poly_gcd_euclidean(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2, 
-                 const fq_ctx_t ctx);
-
-long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
-                            const fq_struct* B, long lenB, const fq_ctx_t ctx);
 
 
 /*  Euclidean division  ******************************************************/
