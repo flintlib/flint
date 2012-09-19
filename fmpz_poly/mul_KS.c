@@ -130,12 +130,8 @@ fmpz_poly_mul_KS(fmpz_poly_t res,
     else
     {
         fmpz_poly_fit_length(res, rlen);
-        if (len1 >= len2)
-            _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1,
-                              poly2->coeffs, len2);
-        else
-            _fmpz_poly_mul_KS(res->coeffs, poly2->coeffs, len2,
-                              poly1->coeffs, len1);
+        _fmpz_poly_mul_KS(res->coeffs, poly1->coeffs, len1,
+                                       poly2->coeffs, len2);
         _fmpz_poly_set_length(res, rlen);
     }
 }
