@@ -139,7 +139,7 @@ install: $(FLINT_LIB)
 
 build/test/%: test/%.c $(FLINT_LIB) | build/test 
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(CC) $(CFLAGS) $(INCS) $(LIBS) $< -o $@; \
+		$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS); \
 	fi
 
 build/test:
