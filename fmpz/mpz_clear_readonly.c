@@ -29,10 +29,6 @@
 
 void flint_mpz_clear_readonly(mpz_t z)
 {
-    if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
-        || (z->_mp_size == 0))
-    {
-        mpz_clear(z);
-    }
+    _fmpz_clear_readonly_mpz(z);
 }
 
