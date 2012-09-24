@@ -242,6 +242,10 @@ void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
 
+int fmpz_equal_si(const fmpz_t f, long g);
+
+int fmpz_equal_ui(const fmpz_t f, ulong g);
+
 int fmpz_read(fmpz_t f);
 
 int fmpz_fread(FILE * file, fmpz_t f);
