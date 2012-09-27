@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -40,14 +40,14 @@ void padic_set_fmpq(padic_t rop, const fmpq_t op, const padic_ctx_t ctx)
         padic_val(rop)  = fmpz_remove(fmpq_numref(t), fmpq_numref(op), ctx->p);
         padic_val(rop) -= fmpz_remove(fmpq_denref(t), fmpq_denref(op), ctx->p);
 
-        if (padic_val(rop) >= ctx->N)
+        if (padic_val(rop) >= padic_prec(rop))
         {
             padic_zero(rop);
         }
         else
         {
             _padic_inv(fmpq_denref(t), 
-                       fmpq_denref(t), ctx->p, ctx->N - padic_val(rop));
+                       fmpq_denref(t), ctx->p, padic_prec(rop) - padic_val(rop));
             fmpz_mul(padic_unit(rop), fmpq_numref(t), fmpq_denref(t));
             _padic_reduce(rop, ctx);
         }

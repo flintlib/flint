@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -27,42 +27,36 @@
 
 void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(op) || e * padic_val(op) >= ctx->N)
+    if (e == 0)
+    {
+        padic_one(rop);
+    }
+    else if (padic_is_zero(op) || e * padic_val(op) >= padic_prec(rop))
     {
         padic_zero(rop);
-        return;
     }
-
-    if (e)
+    else
     {
         fmpz_t pow;
         int alloc;
 
+        padic_val(rop) = e * padic_val(op);
+
+        alloc = _padic_ctx_pow_ui(pow, padic_prec(rop) - padic_val(rop), ctx);
         if (e > 0)
         {
-            padic_val(rop) = e * padic_val(op);
-
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
             fmpz_powm_ui(padic_unit(rop), padic_unit(op), e, pow);
         }
         else  /* e < 0 */
         {
             /* u^{-1} to precision ceil((N - v e) / -e) */
             _padic_inv(padic_unit(rop), padic_unit(op), 
-                       ctx->p, (ctx->N - padic_val(op) * e + (-e - 1)) / -e);
+                       ctx->p, (padic_prec(rop) - padic_val(rop) + (-e - 1)) / -e);
 
-            padic_val(rop) = e * padic_val(op);
-
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(rop), ctx);
             fmpz_powm_ui(padic_unit(rop), padic_unit(rop), -e, pow);
         }
-
         if (alloc)
             fmpz_clear(pow);
-    }
-    else
-    {
-        padic_one(rop, ctx);
     }
 }
 

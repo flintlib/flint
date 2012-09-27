@@ -20,21 +20,57 @@
 /******************************************************************************
 
     Copyright (C) 2011, 2012 Sebastian Pancratz
- 
+
 ******************************************************************************/
 
-#include "padic.h"
+#include "fmpz.h"
 
-void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
+long * padic_lifts_exps(long *n, long N)
 {
-    if (!fmpz_is_zero(op))
+    long *a, i;
+
+    *n = FLINT_CLOG2(N) + 1;
+
+    a = flint_malloc((*n) * sizeof(long));
+    for (a[i = 0] = N; a[i] > 1; i++)
+        a[i + 1] = (a[i] + 1) / 2;
+
+    return a;
+}
+
+void padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
+{
+    if (n == 1)
     {
-        padic_val(rop) = fmpz_remove(padic_unit(rop), op, ctx->p);
-        _padic_reduce(rop, ctx);
+        fmpz_set(pow + 0, p);
     }
-    else
+    else  /* n > 1 */
     {
-        padic_zero(rop);
+        long i = n - 1;
+        fmpz_t t = {1L};
+
+        fmpz_set(pow + i, p);
+
+        for (i--; i >= 1; i--)
+        {
+            if (a[i] & 1L)
+            {
+                fmpz_mul(pow + i, t, pow + (i + 1));
+                fmpz_mul(t, t, t);
+            }
+            else
+            {
+                fmpz_mul(t, t, pow + (i + 1));
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+            }
+        }
+        {
+            if (a[i] & 1L)
+                fmpz_mul(pow + i, t, pow + (i + 1));
+            else
+                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
+        }
+        fmpz_clear(t);
     }
 }
 

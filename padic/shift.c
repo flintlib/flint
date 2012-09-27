@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -27,7 +27,7 @@
 
 void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(op) || (padic_val(op) + v >= ctx->N))
+    if (padic_is_zero(op) || (padic_val(op) + v >= padic_prec(rop)))
     {
         padic_zero(rop);
     }

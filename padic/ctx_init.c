@@ -19,29 +19,31 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
-void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long N, 
+void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long min, long max, 
                     enum padic_print_mode mode)
 {
-    fmpz_init(ctx->p);
-    fmpz_set(ctx->p, p);
+    if (!(0 <= min && min <= max))
+    {
+        printf("Exception (padic_ctx_init).  Require 0 <= min <= max.");
+        abort();
+    }
 
-    ctx->N = N;
+    fmpz_init_set(ctx->p, p);
+
+    ctx->min = min;
+    ctx->max = max;
 
     ctx->pinv = (!COEFF_IS_MPZ(*p)) ? n_precompute_inverse(fmpz_get_ui(p)) : 0;
 
-    if (N > 0)
+    if (max - min > 0)
     {
-        long i, len;
-
-        ctx->min = FLINT_MAX(1, N - 10);
-        ctx->max = N + 10;
-        len      = ctx->max - ctx->min;
+        long i, len = max - min;
 
         ctx->pow = _fmpz_vec_init(len);
 

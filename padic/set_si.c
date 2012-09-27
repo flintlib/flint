@@ -19,18 +19,11 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
-
-void _padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
-{
-    fmpz_set_si(padic_unit(rop), op);
-    padic_val(rop) = 0;
-    _padic_canonicalise(rop, ctx);
-}
 
 void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
 {

@@ -26,17 +26,6 @@
 
 #include "padic.h"
 
-/*
-    Returns an integer $i$ such that for all $j \geq i$ we have 
-    $\ord_p(x^j / j!) \geq N$, where $\ord_p(x) = v$.
-
-    When $p$ is a word-sized prime, 
-    returns $\ceil{\frac{(p-1)N - 1}{(p-1)v - 1}}$.
-    Otherwise, returns $\ceil{N/v}$.
-
-    Assumes that $v < N$.  Moreover, $v$ has to be at least $2$ or $1$, 
-    depending on whether $p$ is $2$ or odd.
- */
 long _padic_exp_bound(long v, long N, const fmpz_t p)
 {
     if (fmpz_fits_si(p))
@@ -151,17 +140,17 @@ void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    const long N  = ctx->N;
+    const long N  = padic_prec(rop);
     const long v  = padic_val(op);
     const fmpz *p = ctx->p;
 
-    if (fmpz_is_zero(padic_unit(op)))
+    if (padic_is_zero(op))
     {
-        padic_one(rop, ctx);
+        padic_one(rop);
         return 1;
     }
 
-    if ((*p == 2L && v <= 1) || (v <= 0))
+    if ((fmpz_equal_ui(p, 2) && v <= 1) || (v <= 0))
     {
         return 0;
     }
@@ -175,7 +164,7 @@ int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         }
         else
         {
-            padic_one(rop, ctx);
+            padic_one(rop);
         }
         return 1;
     }

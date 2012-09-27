@@ -29,15 +29,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-/*
-    Returns $b$ such that for all $i \geq b$ we have 
-    \begin{equation*}
-    i v - \ord_p(i) \geq N
-    \end{equation*}
-    where $v \geq 1$.
-
-    Assumes that $1 \leq v < N$.
- */
 long _padic_log_bound(long v, long N, long p)
 {
     long b, c;
@@ -62,28 +53,6 @@ long _padic_log_bound(long v, long N, long p)
     return 2;
 }
 
-/*
-    Computes 
-    \begin{equation*}
-    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N},
-    \end{equation*}
-    reduced modulo $p^N$.
-
-    Note that this can be used to compute the $p$-adic logarithm 
-    via the equation 
-    \begin{align*}
-    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
-            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-    \end{align*}
-
-    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
-    so that the series converges.
-
-    Assumes that $v < N$, and hence in particular $N \geq 2$.
-
-    Does not support aliasing between $y$ and $z$.
- */
 void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     if (N < (1L << 9) / (long) fmpz_bits(p))
@@ -98,6 +67,9 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
+    const fmpz *p = ctx->p;
+    const long N  = padic_prec(rop);
+
     if (padic_val(op) < 0)
     {
         return 0;
@@ -124,18 +96,18 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             long v;
 
             fmpz_init(t);
-            v = fmpz_remove(t, x, ctx->p);
+            v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
+            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
             {
-                if (v >= ctx->N)
+                if (v >= N)
                 {
                     padic_zero(rop);
                 }
                 else
                 {
-                    _padic_log(padic_unit(rop), x, v, ctx->p, ctx->N);
+                    _padic_log(padic_unit(rop), x, v, p, N);
                     padic_val(rop) = 0;
                     _padic_canonicalise(rop, ctx);
                 }
