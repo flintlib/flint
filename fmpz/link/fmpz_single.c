@@ -28,6 +28,9 @@
 #include "flint.h"
 #include "fmpz.h"
 
+/* Always free larger mpz's to avoid wasting too much heap space */
+#define FLINT_MPZ_MAX_CACHE_LIMBS 64
+
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64 
 
@@ -75,7 +78,11 @@ __mpz_struct * _fmpz_new_mpz(void)
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    fmpz_unused_arr[fmpz_num_unused] = (f ^ (1L << (FLINT_BITS - 2)));
+    ulong u = fmpz_unused_arr[fmpz_num_unused] = (f ^ (1L << (FLINT_BITS - 2)));
+
+    if (fmpz_arr[u]._mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
+        mpz_realloc2(fmpz_arr + u, 1);
+
     fmpz_num_unused++;   
 }
 
