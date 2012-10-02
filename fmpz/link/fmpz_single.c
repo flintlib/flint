@@ -144,3 +144,22 @@ void _fmpz_demote_val(fmpz_t f)
     /* don't do anything if value has to be multi precision */
 }
 
+void _fmpz_init_readonly_mpz(fmpz_t f, mpz_t z)
+{
+   __mpz_struct *ptr;
+   *f = 0L;
+   ptr = _fmpz_promote(f);
+
+   mpz_clear(ptr);
+   *ptr = *z;
+}
+
+void _fmpz_clear_readonly_mpz(mpz_t z)
+{
+    if (((z->_mp_size == 1 || z->_mp_size == -1) && (z->_mp_d[0] <= COEFF_MAX))
+        || (z->_mp_size == 0))
+    {
+        mpz_clear(z);
+    }
+
+}
