@@ -37,7 +37,11 @@ long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA,
     fq_t inv;
     
     fq_init(inv);
-    fq_inv(inv,B+(lenB-1),ctx);
+    /* if(B[lenB-1].length == 0) */
+    /* { */
+    /*     printf("0 leading coefficient!\n"); */
+    /* } */
+    fq_inv(inv,&B[lenB-1],ctx);
 
     if (lenB == 1)
     {
@@ -45,43 +49,45 @@ long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA,
         return 1;
     }
 
-    F  = _fq_poly_init(2*lenB - 3);
+    F  = _fq_poly_init(2*lenB);
     R1 = F;
     R2 = R1 + lenB - 1;
 
     _fq_poly_rem(R1, A, lenA, B, lenB, inv, ctx);
     lenR1 = lenB - 1;
-    _fq_poly_normalise2(R1,lenR1);
+    _fq_poly_normalise2(R1,&lenR1);
 
     if (lenR1 > 1)
     {
         fq_inv(inv,R1+(lenR1-1),ctx);
         _fq_poly_rem(R2, B, lenB, R1, lenR1, inv, ctx);
         lenR2 = lenR1 - 1;
-        _fq_poly_normalise2(R2, lenR2);
+        _fq_poly_normalise2(R2, &lenR2);
     }
     else
     {
         if (lenR1 == 0)
         {
             _fq_poly_set(G, B, lenB);
-            _fq_poly_clear(F,2*lenB-3);
+            _fq_poly_clear(F,2*lenB);
             return lenB;
         }
         else
         {
             fq_set(&G[0],&R1[0]);
-            _fq_poly_clear(F,2*lenB-3);
+            _fq_poly_clear(F,2*lenB);
             return 1;
         }
     }
 
     for (steps = 2; lenR2 > 1; steps++)
     {
+
         fq_inv(inv,R2+(lenR2 -1),ctx);
+        _fq_poly_normalise2(R2,&lenR2);
         _fq_poly_rem(R3, R1, lenR1, R2, lenR2, inv, ctx);
         lenR1 = lenR2--;
-        _fq_poly_normalise2(R3, lenR2);
+        _fq_poly_normalise2(R3, &lenR2);
         T = R1; R1 = R2; R2 = R3; R3 = T;
     }
 
@@ -98,7 +104,7 @@ long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA,
             _fq_poly_set(G, R1, lenR1);
     }
 
-    _fq_poly_clear(F,2*lenB-3);
+    _fq_poly_clear(F,2*lenB);
     fq_clear(inv);
     return lenG;
 }

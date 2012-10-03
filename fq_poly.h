@@ -66,7 +66,7 @@ void fq_poly_clear(fq_poly_t poly);
 
 void _fq_poly_normalise(fq_poly_t poly);
 
-void _fq_poly_normalise2(fq_struct *poly, long length);
+void _fq_poly_normalise2(fq_struct *poly, long *length);
 
 static __inline__ void _fq_poly_set_length(fq_poly_t poly, long len)
 {

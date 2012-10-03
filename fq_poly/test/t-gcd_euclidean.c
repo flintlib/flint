@@ -71,7 +71,8 @@ main(void)
 
         if(!fq_poly_is_one(g)){
             printf("FAIL:\n");
-            printf("could not find coprime polynomials after %ld tries",j+1);
+            printf("could not find coprime polynomials after %ld tries\n",j+1);
+            abort();
         }
 
         for(j=0;(j<100* flint_test_multiplier()) && (c->length<2);j++)
@@ -79,7 +80,8 @@ main(void)
 
         if(c->length<2){
             printf("FAIL:\n");
-            printf("could not find non-unit polynomial after %ld tries",j+1);
+            printf("could not find non-unit polynomial after %ld tries\n",j+1);
+            abort();
         }
 
         fq_poly_make_monic(c, c,ctx);

@@ -47,7 +47,6 @@ main(void)
         fq_ctx_t ctx;
 
         fq_poly_t a,b;
-
         fmpz_init(p);
         fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
@@ -104,7 +103,6 @@ main(void)
         fq_poly_clear(a);
 
     }
-
     flint_randclear(state);
 
     printf("PASS\n");

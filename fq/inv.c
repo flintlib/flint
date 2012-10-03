@@ -53,6 +53,8 @@ void fq_inv(fq_t rop, const fq_t op, const fq_ctx_t ctx)
 {
     if (fq_is_zero(op))
     {
+
+
         printf("Exception (fq_inv).  Zero is not invertible.\n");
         abort();
     }

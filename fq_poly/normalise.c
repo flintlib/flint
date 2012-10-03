@@ -34,10 +34,9 @@ void _fq_poly_normalise(fq_poly_t poly)
     poly->length = i + 1;
 }
 
-void _fq_poly_normalise2(fq_struct *poly, long length)
+void _fq_poly_normalise2(fq_struct *poly, long *length)
 {
     long i;
-
-    for (i = length - 1; (i >= 0) && fq_is_zero(poly + i); i--) ;
-    length = i + 1;
+    for (i = (*length) - 1; (i >= 0) && fq_is_zero(poly + i); i--) ;
+    (*length) = i + 1;
 }
