@@ -141,8 +141,7 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
 
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
-    const long q = fmpz_get_si(p);
-    const long n = _padic_log_bound(v, N, q) - 1;
+    const long n = _padic_log_bound(v, N, p) - 1;
     fmpz_t pN;
 
     fmpz_init(pN);

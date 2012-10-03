@@ -87,13 +87,9 @@ static void
 _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     fmpz_t P, B, T;
-    long n;
+    long k, n;
 
-    if (fmpz_fits_si(p))
-        n = _padic_log_bound(v, N, fmpz_get_si(p));
-    else
-        n = (N - 1) / v;
-
+    n = _padic_log_bound(v, N, p);
     n = FLINT_MAX(n, 2);
 
     fmpz_init(P);
@@ -102,8 +98,8 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
     _padic_log_bsplit_series(P, B, T, y, 1, n);
 
-    n = fmpz_remove(B, B, p);
-    fmpz_pow_ui(P, p, n);
+    k = fmpz_remove(B, B, p);
+    fmpz_pow_ui(P, p, k);
     fmpz_divexact(T, T, P);
 
     _padic_inv(B, B, p, N);
