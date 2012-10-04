@@ -496,12 +496,10 @@ long _padic_log_bound(long v, long N, const fmpz_t p)
     \end{equation*}
     where $v \geq 1$.
 
-    Assumes that $1 \leq v < N$.
+    Assumes that $1 \leq v < N$ or $2 \leq v < N$ when $p$ is 
+    odd or $p = 2$, respectively.
 
-    Assumes that this computation can be carried out \emph{sensibly} 
-    within signed integers.  Put differently, this implementation is 
-    not very robust but works just fine until the input parameters 
-    become too large.
+    Assumes that $N < 2^{f-2}$ where $f$ is \code{FLINT_BITS}.
 
 void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
