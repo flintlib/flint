@@ -39,15 +39,17 @@ ulong padic_val_fac_ui_2(ulong N)
     return s;
 }
 
-ulong padic_val_fac_ui(ulong N, const fmpz_t p)
+ulong padic_val_fac_ui(ulong N, const fmpz_t prime)
 {
-    if (fmpz_abs_fits_ui(p))
+    if (fmpz_abs_fits_ui(prime))
     {
-        ulong q = fmpz_get_ui(p), s = 0, t = N;
+        const ulong p = fmpz_get_ui(prime);
+
+        ulong s = 0, t = N;
 
         do
         {
-            t /= q;
+            t /= p;
             s += t;
         }
         while (t);
@@ -62,30 +64,24 @@ ulong padic_val_fac_ui(ulong N, const fmpz_t p)
 
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 {
-    fmpz_t t, q, pow;
+    fmpz_t s, t;
 
-    if (fmpz_sgn(op) <= 0)
+    if (fmpz_sgn(op) < 0)
     {
-        printf("Exception (padic_val_fac).  op is non-positive.\n");
+        printf("Exception (padic_val_fac).  op is negative.\n");
         abort();
     }
 
-    fmpz_init(t);
-    fmpz_init(q);
-    fmpz_init(pow);
-    fmpz_one(pow);
+    fmpz_init(s);
+    fmpz_init_set(t, op);
 
     do 
     {
-        fmpz_mul(pow, pow, p);
-        fmpz_fdiv_q(q, op, pow);
-        fmpz_add(t, t, q);
+        fmpz_fdiv_q(t, t, p);
+        fmpz_add(s, s, t);
     }
-    while (!fmpz_is_zero(q));
+    while (!fmpz_is_zero(t));
 
-    fmpz_swap(rop, t);
-    fmpz_clear(t);
-    fmpz_clear(q);
-    fmpz_clear(pow);
+    fmpz_swap(rop, s);
 }
 

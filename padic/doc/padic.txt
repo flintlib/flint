@@ -591,7 +591,7 @@ ulong padic_val_fac_ui(ulong n, const fmpz_t p)
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 
     Sets \code{rop} to the $p$-adic valuation of the factorial 
-    of \code{op}.
+    of \code{op}, assuming that \code{op} is non-negative.
 
 *******************************************************************************
 
