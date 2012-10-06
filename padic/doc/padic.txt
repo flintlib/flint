@@ -38,15 +38,6 @@
     if it is in canonical form and moreover, when $u \neq 0$, we have 
     that $0 < u < p^{N-v}$.
 
-    We briefly describe the interface:
-
-    The functions in this module expect arguments of type \code{padic_t}, 
-    and each variable carries its own precision.  The functions have an 
-    interface that is similar to the MPFR functions.  In particular, they 
-    have the same semantics, specified as follows:  Compute the requested 
-    operation exactly and then reduce the result to the precision of the 
-    output variable.  
-
 *******************************************************************************
 
 fmpz * padic_unit(const padic_t op)
@@ -579,14 +570,14 @@ ulong padic_val_fac_ui_2(ulong n)
     Computes the $2$-adic valuation of $n!$.
 
     Note that since $n$ fits into an \code{unsigned long}, so does 
-    $\ord_2(n!)$ since $\ord_2{n!) \leq (n - 1) / (p - 1) = n - 1$.
+    $\ord_2(n!)$ since $\ord_2(n!) \leq (n - 1) / (p - 1) = n - 1$.
 
 ulong padic_val_fac_ui(ulong n, const fmpz_t p)
 
     Computes the $p$-adic valuation of $n!$.
 
     Note that since $n$ fits into an \code{unsigned long}, so does 
-    $\ord_p(n!)$ since $\ord_p{n!) \leq (n - 1) / (p - 1)$.
+    $\ord_p(n!)$ since $\ord_p(n!) \leq (n - 1) / (p - 1)$.
 
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)
 
