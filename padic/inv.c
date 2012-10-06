@@ -33,11 +33,11 @@ void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
 {
     long *a;
 
-    a = padic_lifts_exps(&n, N);
+    a = _padic_lifts_exps(&n, N);
 
     pow = _fmpz_vec_init(2 * n + 2);
 
-    padic_lifts_pows(pow, a, n, p);
+    _padic_lifts_pows(pow, a, n, p);
 
     flint_free(a);
 }

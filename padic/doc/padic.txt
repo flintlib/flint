@@ -288,7 +288,7 @@ int padic_equal(const padic_t op1, const padic_t op2)
 
 *******************************************************************************
 
-long * padic_lifts_exps(long *n, long N)
+long * _padic_lifts_exps(long *n, long N)
 
     Given a positive integer $N$ define the sequence 
     $a_0 = N, a_1 = \ceil{a_0/2}, \dotsc, a_{n-1} = \ceil{a_{n-2}/2} = 1$.
@@ -296,7 +296,7 @@ long * padic_lifts_exps(long *n, long N)
 
     This function sets $n$ and allocates and returns $a$.
 
-void padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
+void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
 
     Given an array $a$ as computed above, this function 
     computes the corresponding powers of $p$, that is, 

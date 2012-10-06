@@ -25,7 +25,7 @@
 
 #include "fmpz.h"
 
-long * padic_lifts_exps(long *n, long N)
+long * _padic_lifts_exps(long *n, long N)
 {
     long *a, i;
 
@@ -38,7 +38,7 @@ long * padic_lifts_exps(long *n, long N)
     return a;
 }
 
-void padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
+void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
 {
     if (n == 1)
     {

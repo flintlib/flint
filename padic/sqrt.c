@@ -49,13 +49,13 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         long *e, i, n;
         fmpz *W, *pow, *u;
 
-        e = padic_lifts_exps(&n, N);
+        e = _padic_lifts_exps(&n, N);
 
         W   = _fmpz_vec_init(2 + 2 * n);
         pow = W + 2;
         u   = W + (2 + n);
 
-        padic_lifts_pows(pow, e, n, p);
+        _padic_lifts_pows(pow, e, n, p);
 
         /* Compute reduced units */
         {

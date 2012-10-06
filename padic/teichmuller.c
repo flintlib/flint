@@ -43,12 +43,12 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         fmpz_t inv;
         fmpz_t pm1;
 
-        a = padic_lifts_exps(&n, N);
+        a = _padic_lifts_exps(&n, N);
 
         pow = _fmpz_vec_init(2 * n);
         u   = pow + n;
 
-        padic_lifts_pows(pow, a, n, p);
+        _padic_lifts_pows(pow, a, n, p);
 
         fmpz_init(s);
         fmpz_init(t);

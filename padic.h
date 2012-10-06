@@ -234,9 +234,9 @@ static __inline__ int padic_equal(const padic_t op1, const padic_t op2)
 
 /* Arithmetic operations *****************************************************/
 
-long * padic_lifts_exps(long *n, long N);
+long * _padic_lifts_exps(long *n, long N);
 
-void padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p);
+void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p);
 
 void padic_add(padic_t rop, const padic_t op1, const padic_t op2, 
                const padic_ctx_t ctx);
