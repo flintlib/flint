@@ -27,16 +27,12 @@
 
     Data structures
 
-    A $p$-adic number $x$ in $\mathbf{Q}_p$ is stored internally 
-    in the form $x = u p^v$, where $u$ is the unit part of $x$ 
-    and $v$ is its valuation.
+    A $p$-adic number of type \code{padic_t} comprises a unit~$u$, 
+    a valuation~$v$, and a precision~$N$.
 
-    We say such a number is in \emph{canonical} form if either 
-    $u = v = 0$ or $p \nmid u$.
-
-    When working modulo $p^N$, we say that the number is \emph{reduced} 
-    if it is in canonical form and moreover, when $u \neq 0$, we have 
-    that $0 < u < p^{N-v}$.
+    We provide the following macros to access these fields, so that 
+    code can be developed somewhat independently from the underlying 
+    data layout.
 
 *******************************************************************************
 
@@ -110,12 +106,11 @@ void padic_ctx_clear(padic_ctx_t ctx);
 
 int _padic_ctx_pow_ui(fmpz_t rop, ulong e, const padic_ctx_t ctx)
 
-    Sets \code{rop} to $p^e$ as efficiently as possible.
+    Sets \code{rop} to $p^e$ as efficiently as possible, where 
+    \code{rop} is expected to be an uninitialised \code{fmpz_t}.
 
     If the return value is non-zero, it is the responsibility of 
     the caller to clear the returned integer.
-
-    N.B.  Expects \code{rop} to be an uninitialised \code{fmpz_t}.
 
 *******************************************************************************
 
@@ -163,7 +158,7 @@ void padic_randtest(padic_t rop, flint_rand_t state, const padic_ctx_t ctx)
 
     Sets \code{rop} to a random $p$-adic number modulo $p^N$ with valuation 
     in the range $[- \ceil{N/10}, N)$, $[N - \ceil{-N/10}, N)$, or $[-10, 0)$ 
-    as $N$ is positive, negative or zero.
+    as $N$ is positive, negative or zero, whenever \code{rop} is non-zero.
 
 void padic_randtest_not_zero(padic_t rop, flint_rand_t state, 
                              const padic_ctx_t ctx)
@@ -253,7 +248,8 @@ void padic_zero(padic_t rop)
 
 void padic_one(padic_t rop)
 
-    Sets the $p$-adic number \code{rop} to one.
+    Sets the $p$-adic number \code{rop} to one, reduced modulo the 
+    precision of \code{rop}.
 
 *******************************************************************************
 
@@ -263,15 +259,17 @@ void padic_one(padic_t rop)
 
 int padic_is_zero(const padic_t op)
 
-    Returns whether \code{op} is zero.
+    Returns whether \code{op} is equal to zero.
 
 int padic_is_one(const padic_t op)
 
-    Returns whether \code{op} is one.
+    Returns whether \code{op} is equal to one, that is, whether 
+    $u = 1$ and $v = 0$.
 
 int padic_equal(const padic_t op1, const padic_t op2)
 
-    Returns whether \code{op1} and \code{op2} are equal.
+    Returns whether \code{op1} and \code{op2} are equal, that is, 
+    whether $u_1 = u_2$ and $v_1 = v_2$.
 
 *******************************************************************************
 
@@ -285,11 +283,11 @@ long * _padic_lifts_exps(long *n, long N)
     $a_0 = N, a_1 = \ceil{a_0/2}, \dotsc, a_{n-1} = \ceil{a_{n-2}/2} = 1$.
     Then $n = \ceil{\log_2 N} + 1$.
 
-    This function sets $n$ and allocates and returns $a$.
+    This function sets $n$ and allocates and returns the array~$a$.
 
 void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
 
-    Given an array $a$ as computed above, this function 
+    Given an array~$a$ as computed above, this function 
     computes the corresponding powers of $p$, that is, 
     \code{pow[i]} is equal to $p^{a_i}$.
 
@@ -380,7 +378,8 @@ int padic_sqrt(padic_rop, const padic_t op, const padic_ctx_t ctx)
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx)
 
-    Sets \code{rop} to \code{op} raised to the power $e$.
+    Sets \code{rop} to \code{op} raised to the power~$e$, 
+    which is defined as one whenever $e = 0$.
 
     Assumes that some computations involving $e$ and the 
     valuation of \code{op} do not overflow in the \code{long} 
@@ -390,31 +389,11 @@ void padic_pow_si(padic_t rop, const padic_t op, long e,
     then $x^e = p^{ev} u^e$ is defined modulo $p^{N + (e - 1) v}$, 
     which is a precision loss in case $v < 0$.
 
-    Note that whenever $e = 0$, \code{rop} is set to one.
-
 *******************************************************************************
 
-    Special functions
+    Exponential
 
 *******************************************************************************
-
-void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
-
-    Computes the Teichmuller lift of the $p$-adic unit \code{op}.
-
-    Assumes that $p$ is a prime and $N \geq 1$.
-
-    Supports aliasing between \code{rop} and \code{op}.
-
-void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-
-    Computes the Teichmuller lift of the $p$-adic unit \code{op}.
-
-    If \code{op} is a $p$-adic integer divisible by $p$, sets \code{rop} 
-    to zero, which satisfies $t^p - t = 0$, although it is clearly not 
-    a $(p-1)$-st root of unity.
-
-    If \code{op} has negative valuation, raises an abort signal.
 
 long _padic_exp_bound(long v, long N, const fmpz_t p)
 
@@ -428,26 +407,22 @@ long _padic_exp_bound(long v, long N, const fmpz_t p)
     Assumes that $v < N$.  Moreover, $v$ has to be at least $2$ or $1$, 
     depending on whether $p$ is $2$ or odd.
 
-void _padic_exp_naive(padic_t y, const padic_t x, const padic_ctx_t ctx)
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, 
+                                        const fmpz_t p, long N)
 
-    Returns the $p$-exponential function evaluated at \code{op}, 
-    reduced modulo $p^N$.
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, 
+                                     const fmpz_t p, long N)
 
-    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
+void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
 
-void _padic_exp_rectangular(padic_t y, const padic_t x, const padic_ctx_t ctx)
+    Sets \code{rop} to the $p$-exponential function evaluated at 
+    $x = p^v u$, reduced modulo~$p^N$.
 
-    Returns the $p$-exponential function evaluated at \code{op}, 
-    reduced modulo $p^N$.
+    Assumes that $x = \neq 0$, that $\ord_p(x) < N$ and that 
+    $\exp(x)$ converges, that is, that $\ord_p(x)$ is at least 
+    $2$ or $1$ depending on whether the prime~$p$ is $2$ or odd.
 
-    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
-
-void _padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
-
-    Returns the $p$-exponential function evaluated at \code{op}, 
-    reduced modulo $p^N$.
-
-    Assumes that $x \neq 0$ and that $\exp(x)$ converges.
+    Supports aliasing between \code{rop} and $u$.
 
 int padic_exp(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
@@ -479,6 +454,12 @@ int padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
     with the valuation and hence the rate of convergence, which 
     results in a quasi-linear algorithm in $N$, for fixed $p$.
 
+*******************************************************************************
+
+    Logarithm
+
+*******************************************************************************
+
 long _padic_log_bound(long v, long N, const fmpz_t p)
 
     Returns $b$ such that for all $i \geq b$ we have 
@@ -488,9 +469,8 @@ long _padic_log_bound(long v, long N, const fmpz_t p)
     where $v \geq 1$.
 
     Assumes that $1 \leq v < N$ or $2 \leq v < N$ when $p$ is 
-    odd or $p = 2$, respectively.
-
-    Assumes that $N < 2^{f-2}$ where $f$ is \code{FLINT_BITS}.
+    odd or $p = 2$, respectively, and also that $N < 2^{f-2}$ 
+    where $f$ is \code{FLINT_BITS}.
 
 void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
@@ -564,6 +544,29 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     Returns whether the $p$-adic logarithm function converges at 
     the $p$-adic number \code{op}, and if so sets \code{rop} to its 
     value.
+
+*******************************************************************************
+
+    Special functions
+
+*******************************************************************************
+
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+
+    Computes the Teichmuller lift of the $p$-adic unit \code{op}, 
+    assuming that $N \geq 1$.
+
+    Supports aliasing between \code{rop} and \code{op}.
+
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
+
+    Computes the Teichmuller lift of the $p$-adic unit \code{op}.
+
+    If \code{op} is a $p$-adic integer divisible by $p$, sets \code{rop} 
+    to zero, which satisfies $t^p - t = 0$, although it is clearly not 
+    a $(p-1)$-st root of unity.
+
+    If \code{op} has negative valuation, raises an \code{abort} signal.
 
 ulong padic_val_fac_ui_2(ulong n)
 

@@ -27,12 +27,49 @@
 #include "padic.h"
 
 /*
-    Assumes that the exponential series converges at $x \neq 0$, 
-    where $x = p^v u$, and that $v = \ord_p(x) < N$.
+    Computes the sum $1 + x + x^2 / 2$ reduced modulo $p^N$, 
+    where $x = p^v u$.
+
+    Supports aliasing between \code{rop} and $u$.
  */
 
-void 
-_padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
+static void _padic_exp_small(fmpz_t rop, const fmpz_t u, long v, long n, 
+                                         const fmpz_t p, const fmpz_t pN)
+{
+    if (n == 1)  /* rop = 1 */
+    {
+        fmpz_one(rop);
+    }
+    else if (n == 2)  /* rop = 1 + x */
+    {
+        fmpz_t f;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, p, v);
+        fmpz_mul(rop, f, u);
+        fmpz_add_ui(rop, rop, 1);
+        fmpz_mod(rop, rop, pN);
+        fmpz_clear(f);
+    }
+    else  /* n == 3, rop = 1 + x + x^2 / 2 */
+    {
+        fmpz_t f;
+
+        fmpz_init(f);
+        fmpz_pow_ui(f, p, v);
+        fmpz_mul(rop, f, u);
+        fmpz_mul(f, rop, rop);
+        if (fmpz_is_odd(f))
+            fmpz_add(f, f, pN);
+        fmpz_fdiv_q_2exp(f, f, 1);
+        fmpz_add(rop, rop, f);
+        fmpz_add_ui(rop, rop, 1);
+        fmpz_clear(f);
+    }
+}
+
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, 
+                                        const fmpz_t p, long N)
 {
     const long n = _padic_exp_bound(v, N, p);
 
@@ -43,7 +80,7 @@ _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long 
 
     if (n <= 3)
     {
-        _padic_exp_naive(rop, u, v, p, N);
+        _padic_exp_small(rop, u, v, n, p, pN);
     }
     else
     {

@@ -269,22 +269,19 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 void padic_pow_si(padic_t rop, const padic_t op, long e, 
                   const padic_ctx_t ctx);
 
-/* Special functions *********************************************************/
-
-void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
-
-void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+/* Exponential ***************************************************************/
 
 long _padic_exp_bound(long v, long N, const fmpz_t p);
 
 void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
-void _padic_exp_naive(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
 void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
 void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N);
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
+/* Logarithm *****************************************************************/
 
 long _padic_log_bound(long v, long N, const fmpz_t p);
 
@@ -297,6 +294,12 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx);
+
+/* Special functions *********************************************************/
+
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N);
+
+void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 ulong padic_val_fac_ui_2(ulong N);
 
