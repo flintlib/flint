@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void _padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
+void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 {
     if (op == 0)
     {
