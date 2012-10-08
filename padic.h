@@ -328,9 +328,9 @@ static __inline__ int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 static __inline__ void padic_debug(const padic_t op)
 {
-    printf("{");
+    printf("(");
     fmpz_print(padic_unit(op)); 
-    printf(" %ld %ld}", padic_val(op), padic_prec(op));
+    printf(" %ld %ld)", padic_val(op), padic_prec(op));
 }
 
 #ifdef __cplusplus

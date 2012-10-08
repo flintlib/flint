@@ -418,7 +418,7 @@ void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
     Sets \code{rop} to the $p$-exponential function evaluated at 
     $x = p^v u$, reduced modulo~$p^N$.
 
-    Assumes that $x = \neq 0$, that $\ord_p(x) < N$ and that 
+    Assumes that $x \neq 0$, that $\ord_p(x) < N$ and that 
     $\exp(x)$ converges, that is, that $\ord_p(x)$ is at least 
     $2$ or $1$ depending on whether the prime~$p$ is $2$ or odd.
 
@@ -623,5 +623,6 @@ int padic_print(const padic_t op, const padic_ctx_t ctx)
 
 void padic_debug(const padic_t op)
 
-    Prints debug information about \code{op} to the stream \code{stdout}.
+    Prints debug information about \code{op} to the stream \code{stdout}, 
+    in the format \code{"(u v N)"}.
 
