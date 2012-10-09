@@ -87,13 +87,6 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
             right = _fmpz_vec_init(nright);
             _rising_factorial(left, a, mid, trunc);
             _rising_factorial(right, mid, b, trunc);
-
-            /* Note: we will always have nright >= nleft */
-            if (nright < nleft)
-            {
-                printf("EXCEPTION: nright < nleft in _rising_factorial\n");
-                abort();
-            }
             _fmpz_poly_mul(res, right, nright, left, nleft);
             _fmpz_vec_clear(left, nleft);
             _fmpz_vec_clear(right, nright);
