@@ -485,6 +485,16 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
 
+void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
+
+    Sets \code{B} to the square of the matrix \code{A}, which must be
+    a square matrix. Aliasing is allowed.
+
+void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong e)
+
+    Sets \code{B} to the matrix \code{A} raised to the power \code{e},
+    where \code{A} must be a square matrix. Aliasing is allowed.
+
 
 *******************************************************************************
 
