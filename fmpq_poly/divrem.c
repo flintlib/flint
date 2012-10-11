@@ -106,12 +106,12 @@ void fmpq_poly_divrem(fmpq_poly_t Q, fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception: division by zero in fmpq_poly_divrem\n");
+        printf("Exception (fmpq_poly_divrem). Division by zero.\n");
         abort();
     }
     if (Q == R)
     {
-        printf("Exception: output arguments aliased\n");
+        printf("Exception (fmpq_poly_divrem). Output arguments aliased.\n");
         abort();
     }
     

@@ -37,7 +37,7 @@ fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     if (fmpz_is_zero(h))
     {
-        printf("Exception: division by zero in fmpz_tdiv_q\n");
+        printf("Exception (fmpz_tdiv_q). Division by zero.\n");
         abort();
     }
 
