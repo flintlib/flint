@@ -88,7 +88,7 @@ fmpz_poly_bit_unpack_unsigned(fmpz_poly_t poly, const fmpz_t f,
 
     if (fmpz_sgn(f) < 0)
     {
-        printf("fmpz_poly_bit_unpack_unsigned: expected an unsigned value!\n");
+        printf("Exception (fmpz_poly_bit_unpack_unsigned). Expected an unsigned value.\n");
         abort();
     }
 

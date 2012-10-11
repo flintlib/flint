@@ -88,7 +88,7 @@ fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 
     if (len != 2)
     {
-        printf("Exception: poly->length not equal to 2 in fmpz_poly_pow_binomial\n");
+        printf("Exception (fmpz_poly_pow_binomial). poly->length not equal to 2.\n");
         abort();
     }
 

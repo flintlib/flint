@@ -44,7 +44,7 @@ int fmpz_poly_fread(FILE * file, fmpz_poly_t poly)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("ERROR (fmpz_poly_fread).  Length does not fit into a long.\n");
+        printf("Exception (fmpz_poly_fread). Length does not fit into a long.\n");
         abort();
     }
     len = mpz_get_si(t);

@@ -196,7 +196,7 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
     }
     else
     {
-        printf("Exception: powering via chains not implemented for e > 148\n");
+        printf("Exception (fmpz_poly_addchains). Powering via chains not implemented for e > 148.\n");
         abort();
     }
 }
