@@ -66,7 +66,7 @@ fmpq_poly_asinh_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {
-        printf("Exception: fmpq_poly_asinh_series: constant term != 0\n");
+        printf("Exception (fmpq_poly_asinh_series): Constant term != 0.\n");
         abort();
     }
 

@@ -94,7 +94,7 @@ void fmpq_poly_rem(fmpq_poly_t R,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception: division by zero in fmpq_poly_rem\n");
+        printf("Exception (fmpq_poly_rem). Division by zero.\n");
         abort();
     }
 

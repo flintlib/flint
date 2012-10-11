@@ -108,7 +108,7 @@ void fmpq_poly_scalar_div_fmpq(fmpq_poly_t rop, const fmpq_poly_t op, const fmpq
 {
     if (fmpq_is_zero(c))
     {
-        printf("Exception: division by zero in fmpq_poly_scalar_div_fmpq\n");
+        printf("Exception (fmpq_poly_scalar_div_fmpq). Division by zero.\n");
         abort();
     }
 

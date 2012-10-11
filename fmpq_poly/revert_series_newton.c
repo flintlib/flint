@@ -111,8 +111,8 @@ fmpq_poly_revert_series_newton(fmpq_poly_t res,
     if (poly->length < 2 || !fmpz_is_zero(poly->coeffs)
                          || fmpz_is_zero(poly->coeffs + 1))
     {
-        printf("exception: fmpq_poly_revert_series_newton: input must have "
-            "zero constant term and nonzero coefficient of x^1");
+        printf("Exception (fmpq_poly_revert_series_newton). Input must have \n"
+               "zero constant term and nonzero coefficient of x^1.\n");
         abort();
     }
 
