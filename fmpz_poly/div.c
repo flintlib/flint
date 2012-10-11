@@ -44,7 +44,7 @@ fmpz_poly_div(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_poly_t B)
 
     if (B->length == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_div\n");
+        printf("Exception (fmpz_poly_div). Division by zero.\n");
         abort();
     }
 
