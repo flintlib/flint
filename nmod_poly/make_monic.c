@@ -43,7 +43,7 @@ void nmod_poly_make_monic(nmod_poly_t output, const nmod_poly_t input)
 {
     if (input->length == 0)
     {
-        printf("Exception: division by zero in nmod_poly_invert\n");
+        printf("Exception (nmod_poly_make_monic). Division by zero.\n");
         abort();
     }
 

@@ -220,7 +220,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 
     if (fmpz_sgn(f) < 0)
     {
-        printf("nmod_poly_bit_unpack: expected an unsigned value!\n");
+        printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
         abort();
     }
 

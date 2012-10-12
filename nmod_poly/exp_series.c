@@ -140,7 +140,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
 
     if (hlen > 0 && h->coeffs[0] != 0UL)
     {
-        printf("Exception: nmod_poly_exp_series: constant term != 0\n");
+        printf("Exception (nmod_poly_exp_series). Constant term != 0.\n");
         abort();
     }
 

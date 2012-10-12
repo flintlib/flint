@@ -80,7 +80,7 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
     if (n == 0 || Q->length == 0 || Q->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_inv_series_newton\n");
+        printf("Exception (nmod_poly_inv_series_newton). Division by zero.\n");
         abort();
     }
 

@@ -95,8 +95,8 @@ nmod_poly_revert_series_lagrange_fast(nmod_poly_t Qinv,
 
     if (Qlen < 2 || Q->coeffs[0] != 0 || Q->coeffs[1] == 0)
     {
-        printf("exception: nmod_poly_revert_series_lagrange_fast: input must "
-            "have zero constant and an invertible coefficient of x^1");
+        printf("Exception (nmod_poly_revert_series_lagrange_fast). Input must \n"
+               "have zero constant and an invertible coefficient of x^1.\n");
         abort();
     }
 
