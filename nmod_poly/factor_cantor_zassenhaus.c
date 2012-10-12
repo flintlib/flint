@@ -36,7 +36,7 @@ nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 
     if (f->mod.n == 2)
     {
-        printf("Exception (nmod_poly_factor_cantor_zassenhaus): \n");
+        printf("Exception (nmod_poly_factor_cantor_zassenhaus). \n");
         printf("Not implemented for p = 2.\n");
         abort();
     }

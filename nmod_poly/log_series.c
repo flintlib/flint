@@ -56,7 +56,7 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
 
     if (flen < 1 || f->coeffs[0] != 1UL)
     {
-        printf("Exception: nmod_poly_log_series: constant term != 1\n");
+        printf("Exception (nmod_poly_log_series). Constant term != 1.\n");
         abort();
     }
 

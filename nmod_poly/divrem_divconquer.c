@@ -141,7 +141,7 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_divrem_divconquer\n");
+        printf("Exception (nmod_poly_divrem_divconquer). Division by zero.\n");
         abort();
     }
 

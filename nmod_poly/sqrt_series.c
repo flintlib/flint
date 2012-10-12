@@ -53,13 +53,13 @@ nmod_poly_sqrt_series(nmod_poly_t g,
 
     if (n == 0)
     {
-        printf("Exception: division by zero in nmod_poly_sqrt_series\n");
+        printf("Exception (nmod_poly_sqrt_series). Division by zero.\n");
         abort();
     }
 
     if (h->length == 0 || h->coeffs[0] != 1UL)
     {
-        printf("Exception: nmod_poly_sqrt_series requires constant term 1\n");
+        printf("Exception (nmod_poly_sqrt_series). Requires constant term 1.\n");
         abort();
     }
 
