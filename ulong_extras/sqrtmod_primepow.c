@@ -213,7 +213,7 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
 
     if (exp < 0)
     {
-        printf("Exception: exp must be non-negative in n_sqrtmod_primepow.\n");
+        printf("Exception (n_sqrtmod_primepow). exp must be non-negative.\n");
         abort();
     }
 

@@ -90,7 +90,7 @@ void n_compute_primes(ulong num)
 
     if (primes_cutoff > FLINT_PRIMES_SMALL_CUTOFF*FLINT_PRIMES_SMALL_CUTOFF)
     {
-        printf("Exception: cannot precompute sufficiently many primes!\n");
+        printf("Exception (n_compute_primes). Cannot precompute sufficiently many primes.\n");
         abort();
     }
 
