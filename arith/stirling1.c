@@ -77,7 +77,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
             const long mid    = (a + b) / 2;
             const int  chk    = (b - a + 1 < trunc);  /* i.e. nprod < trunc */
             const long nleft  = chk ? mid - a + 1 : trunc;
-            const long nright = chk ? mid - a + 1 : trunc;
+            const long nright = chk ? b - mid + 1 : trunc;
 
             fmpz *left  = _fmpz_vec_init(nleft);
             fmpz *right = _fmpz_vec_init(nright);
