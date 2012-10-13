@@ -86,7 +86,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
                factors_left++;
 				} else
 				{
-               printf("Error : failed to factor %ld\n", n);
+               printf("Error (n_factor_partial). Failed to factor %ld.\n", n);
                abort();
 				}
          } else
