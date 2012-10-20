@@ -26,34 +26,21 @@
 #include "generics.h"
 
 void
-_elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
+_elem_poly_sub(elem_ptr res, elem_srcptr poly1, long len1,
     elem_srcptr poly2, long len2, const ring_t ring)
 {
+    long i, min;
     long size = ring->size;
 
-    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_FMPZ)
-    {
-        _fmpz_mod_poly_mul(res, poly1, len1, poly2, len2, RING_MODULUS(ring));
-        return;
-    }
+    min = FLINT_MIN(len1, len2);
 
-    if (len1 == 1 && len2 == 1)
-    {
-        elem_mul(res, poly1, poly2, ring);
-    }
-    else
-    {
-        long i;
+    for (i = 0; i < min; i++)
+        elem_sub(INDEX(res, i, size), SRC_INDEX(poly1, i, size), SRC_INDEX(poly2, i, size), ring);
 
-        _elem_vec_scalar_mul(res, poly1, len1, poly2, ring);
+    if (poly1 != res)
+        for (i = min; i < len1; i++)
+            elem_set(INDEX(res, i, size), SRC_INDEX(poly1, i, size), ring);
 
-        _elem_vec_scalar_mul(INDEX(res, len1, size),
-                            SRC_INDEX(poly2, 1, size), len2 - 1,
-                            SRC_INDEX(poly1, len1 - 1, size), ring);
-
-        for (i = 0; i < len1 - 1; i++)
-            _elem_vec_scalar_addmul(INDEX(res, i + 1, size),
-                    SRC_INDEX(poly2, 1, size), len2 - 1,
-                    SRC_INDEX(poly1, i, size), ring);
-    }
+    for (i = min; i < len2; i++)
+        elem_neg(INDEX(res, i, size), SRC_INDEX(poly2, i, size), ring);
 }

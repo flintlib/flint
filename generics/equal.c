@@ -25,35 +25,55 @@
 
 #include "generics.h"
 
-void
-_elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
-    elem_srcptr poly2, long len2, const ring_t ring)
+static __inline__ int
+elem_poly_equal(const elem_poly_struct * poly1, const elem_poly_struct * poly2, const ring_t ring)
 {
-    long size = ring->size;
+    long size, i;
 
-    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_FMPZ)
+    if (poly1->length != poly2->length)
+        return 0;
+
+    size = RING_PARENT(ring)->size;
+
+    for (i = 0; i < poly1->length; i++)
+        if (!elem_equal(SRC_INDEX(poly1->coeffs, i, size),
+                SRC_INDEX(poly2->coeffs, i, size), RING_PARENT(ring)))
+            return 0;
+
+    return 1;
+}
+
+int
+elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring)
+{
+    switch (ring->type)
     {
-        _fmpz_mod_poly_mul(res, poly1, len1, poly2, len2, RING_MODULUS(ring));
-        return;
+        case TYPE_FMPZ:
+            return fmpz_equal(op1, op2);
+
+        case TYPE_LIMB:
+            return *((mp_srcptr) op1) == *((mp_srcptr) op2);
+
+        case TYPE_POLY:
+            return elem_poly_equal(op1, op2, ring);
+
+        case TYPE_MOD:
+            return elem_equal(op1, op2, ring->parent);
+
+        default:
+            NOT_IMPLEMENTED("equal", ring);
     }
+}
 
-    if (len1 == 1 && len2 == 1)
+int
+gen_equal(const gen_t op1, const gen_t op2)
+{
+    if (op1->ring == op2->ring)
     {
-        elem_mul(res, poly1, poly2, ring);
+        return elem_equal(op1->elem, op2->elem, op1->ring);
     }
     else
     {
-        long i;
-
-        _elem_vec_scalar_mul(res, poly1, len1, poly2, ring);
-
-        _elem_vec_scalar_mul(INDEX(res, len1, size),
-                            SRC_INDEX(poly2, 1, size), len2 - 1,
-                            SRC_INDEX(poly1, len1 - 1, size), ring);
-
-        for (i = 0; i < len1 - 1; i++)
-            _elem_vec_scalar_addmul(INDEX(res, i + 1, size),
-                    SRC_INDEX(poly2, 1, size), len2 - 1,
-                    SRC_INDEX(poly1, i, size), ring);
+        NOT_IMPLEMENTED("equal with left type ", op1->ring);
     }
 }

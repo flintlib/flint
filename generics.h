@@ -126,6 +126,9 @@ void gen_zero(gen_t x);
 int elem_is_zero(elem_srcptr x, const ring_t ring);
 int gen_is_zero(const gen_t x);
 
+int elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring);
+int gen_equal(const gen_t op1, const gen_t op2);
+
 void _elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
 void _elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
 void _elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring);
@@ -147,14 +150,28 @@ void gen_set_coeff_si(gen_t x, long index, long value);
 void elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring);
 void gen_randtest(gen_t res, flint_rand_t state, const long * size);
 
+void _elem_vec_neg(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
+void gen_neg(gen_t y, const gen_t x);
+void elem_neg(elem_ptr res, elem_srcptr src, const ring_t ring);
+
 void _elem_poly_add(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
 void elem_add(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void gen_add(gen_t z, const gen_t x, const gen_t y);
+
+void _elem_poly_sub(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
+void elem_sub(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
+void gen_sub(gen_t z, const gen_t x, const gen_t y);
 
 void elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void gen_mul(gen_t z, const gen_t x, const gen_t y);
 
 void _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
+
+
+void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R,
+                      const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
+void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
+void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
 
 void _elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
