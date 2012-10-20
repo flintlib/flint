@@ -33,14 +33,15 @@ _elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
     if (len > poly->alloc)
     {
         elem_ptr ptr;
+        long size = RING_PARENT(poly_ring)->size;
 
         if (len < 2 * poly->alloc)
             len = 2 * poly->alloc;
 
-        ptr = poly->coeffs = flint_realloc(poly->coeffs, len * sizeof(elem_struct));
+        ptr = poly->coeffs = flint_realloc(poly->coeffs, len * size);
 
         for (i = poly->alloc; i < len; i++)
-            elem_init(ptr + i, poly_ring->parent);
+            elem_init(INDEX(ptr, i, size), poly_ring->parent);
 
         poly->alloc = len;
     }

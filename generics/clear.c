@@ -25,25 +25,32 @@
 
 #include "generics.h"
 
+static __inline__ void
+elem_poly_clear(elem_poly_struct * poly, const ring_t ring)
+{
+    long i, size;
+    size = RING_PARENT(ring)->size;
+
+    for (i = 0; i < poly->alloc; i++)
+        elem_clear(INDEX(poly->coeffs, i, size), ring->parent);
+
+    flint_free(poly->coeffs);
+}
+
 void
-elem_clear(elem_t elem, const ring_t ring)
+elem_clear(elem_ptr elem, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_clear(&elem->z);
+            fmpz_clear((fmpz *) elem);
             break;
 
         case TYPE_LIMB:
             break;
 
         case TYPE_POLY:
-            {
-                long i;
-                for (i = 0; i < elem->poly->alloc; i++)
-                    elem_clear(((elem_ptr) elem->poly->coeffs) + i, ring->parent);
-                flint_free(elem->poly);
-            }
+            elem_poly_clear((elem_poly_struct *) elem, ring);
             break;
 
         case TYPE_MOD:
@@ -58,5 +65,6 @@ elem_clear(elem_t elem, const ring_t ring)
 void
 gen_clear(gen_t x)
 {
-    elem_clear(&x->elem, x->ring);
+    elem_clear(x->elem, x->ring);
+    flint_free(x->elem);
 }

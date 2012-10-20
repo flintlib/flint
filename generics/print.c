@@ -28,13 +28,13 @@
 void
 _elem_poly_print(elem_srcptr poly, long len, const ring_t ring)
 {
-    long i;
+    long i, size = ring->size;
 
     printf("[");
 
     for (i = 0; i < len; i++)
     {
-        elem_print(poly + i, ring);
+        elem_print(SRC_INDEX(poly, i, size), ring);
 
         if (i < len - 1)
             printf(", ");
@@ -44,20 +44,23 @@ _elem_poly_print(elem_srcptr poly, long len, const ring_t ring)
 }
 
 void
-elem_print(const elem_t elem, const ring_t ring)
+elem_print(elem_srcptr elem, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_print(&elem->z);
+            fmpz_print(elem);
             break;
 
         case TYPE_LIMB:
-            printf("%lu", elem->n);
+            printf("%lu", *((mp_srcptr) elem));
             break;
 
         case TYPE_POLY:
-            _elem_poly_print(elem->poly->coeffs, elem->poly->length, ring->parent);
+            {
+                const elem_poly_struct * poly = elem;
+                _elem_poly_print(poly->coeffs, poly->length, ring->parent);
+            }
             break;
 
         case TYPE_MOD:
@@ -74,6 +77,6 @@ void gen_print(gen_t x)
     printf("element of ");
     ring_print(x->ring);
     printf(":\n");
-    elem_print(&x->elem, x->ring);
+    elem_print(x->elem, x->ring);
     printf("\n");
 }

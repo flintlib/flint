@@ -26,18 +26,18 @@
 #include "generics.h"
 
 int
-elem_is_zero(const elem_t x, const ring_t ring)
+elem_is_zero(elem_srcptr x, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            return fmpz_is_zero(&x->z);
+            return fmpz_is_zero(x);
 
         case TYPE_LIMB:
-            return x->n == 0;
+            return *((mp_srcptr) x) == 0;
 
         case TYPE_POLY:
-            return x->poly->length == 0;
+            return ((elem_poly_struct *) x)->length == 0;
 
         case TYPE_MOD:
             return elem_is_zero(x, ring->parent);
@@ -50,5 +50,5 @@ elem_is_zero(const elem_t x, const ring_t ring)
 int
 gen_is_zero(const gen_t x)
 {
-    return elem_is_zero(&x->elem, x->ring);
+    return elem_is_zero(x->elem, x->ring);
 }

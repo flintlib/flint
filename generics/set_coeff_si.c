@@ -25,23 +25,23 @@
 
 #include "generics.h"
 
+/* XXX: rename? */
 void
-elem_set_coeff_si(elem_t elem, long index, long value, const ring_t ring)
+elem_set_coeff_si(elem_poly_struct * poly, long index, long value, const ring_t ring)
 {
-    long i;
+    long i, size = RING_PARENT(ring)->size;
     elem_ptr ptr;
 
-    _elem_poly_fit_length(elem->poly, index + 1, ring);
-    ptr = elem->poly->coeffs;
+    _elem_poly_fit_length(poly, index + 1, ring);
+    ptr = poly->coeffs;
 
-    for (i = elem->poly->length; i < index; i++)
-        elem_zero(ptr + i, ring->parent);
+    for (i = poly->length; i < index; i++)
+        elem_zero(INDEX(ptr, i, size), ring->parent);
 
-    elem_set_si(ptr + index, value, ring->parent);
+    elem_set_si(INDEX(ptr, index, size), value, ring->parent);
 
-    _elem_poly_set_length(elem->poly,
-        FLINT_MAX(elem->poly->length, index + 1), ring);
-    _elem_poly_normalise(elem->poly, ring);
+    _elem_poly_set_length(poly, FLINT_MAX(poly->length, index + 1), ring);
+    _elem_poly_normalise(poly, ring);
 }
 
 void
@@ -53,5 +53,5 @@ gen_set_coeff_si(gen_t x, long index, long value)
         abort();
     }
 
-    elem_set_coeff_si(&x->elem, index, value, x->ring);
+    elem_set_coeff_si(x->elem, index, value, x->ring);
 }

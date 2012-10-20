@@ -25,34 +25,40 @@
 
 #include "generics.h"
 
+
+static __inline__ void
+elem_poly_randtest(elem_poly_struct * res, flint_rand_t state, const long * size, const ring_t ring)
+{
+    long i, len, _size = RING_PARENT(ring)->size;
+    elem_ptr ptr;
+
+    len = n_randint(state, size[0]);
+    _elem_poly_fit_length(res, len, ring);
+    ptr = res->coeffs;
+
+    for (i = 0; i < len; i++)
+        elem_randtest(INDEX(ptr, i, _size), state, size + 1, ring->parent);
+
+    _elem_poly_set_length(res, len, ring);
+    _elem_poly_normalise(res, ring);
+}
+
+
 void
-elem_randtest(elem_t res, flint_rand_t state, const long * size, const ring_t ring)
+elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_randtest(&res->z, state, size[0]);
+            fmpz_randtest(res, state, size[0]);
             break;
 
         case TYPE_LIMB:
-            res->n = n_randtest(state);
+            *((mp_ptr) res) = n_randtest(state);
             break;
 
         case TYPE_POLY:
-            {
-                long i, len;
-                elem_ptr ptr;
-
-                len = n_randint(state, size[0]);
-                _elem_poly_fit_length(res->poly, len, ring);
-                ptr = res->poly->coeffs;
-
-                for (i = 0; i < len; i++)
-                    elem_randtest(ptr + i, state, size + 1, ring->parent);
-
-                _elem_poly_set_length(res->poly, len, ring);
-                _elem_poly_normalise(res->poly, ring);
-            }
+            elem_poly_randtest(res, state, size, ring);
             break;
 
         case TYPE_MOD:
@@ -60,11 +66,11 @@ elem_randtest(elem_t res, flint_rand_t state, const long * size, const ring_t ri
                 switch (RING_PARENT(ring)->type)
                 {
                     case TYPE_FMPZ:
-                        fmpz_randtest_mod(&res->z, state, &RING_MODULUS(ring)->z);
+                        fmpz_randtest_mod(res, state, RING_MODULUS(ring));
                         break;
 
                     case TYPE_LIMB:
-                        res->n = n_randint(state, ring->nmod.n);
+                        *((mp_ptr) res) = n_randint(state, ring->nmod.n);
                         break;
 
                     default:
@@ -82,5 +88,5 @@ elem_randtest(elem_t res, flint_rand_t state, const long * size, const ring_t ri
 void
 gen_randtest(gen_t res, flint_rand_t state, const long * size)
 {
-    elem_randtest(&res->elem, state, size, res->ring);
+    elem_randtest(res->elem, state, size, res->ring);
 }

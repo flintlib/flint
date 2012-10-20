@@ -26,20 +26,20 @@
 #include "generics.h"
 
 void
-elem_zero(elem_t x, const ring_t ring)
+elem_zero(elem_ptr x, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_zero(&x->z);
+            fmpz_zero(x);
             break;
 
         case TYPE_LIMB:
-            x->n = 0;
+            *((mp_ptr) x) = 0;
             break;
 
         case TYPE_POLY:
-            x->poly->length = 0;
+            ((elem_poly_struct *) x)->length = 0;
             break;
 
         case TYPE_MOD:
@@ -54,5 +54,5 @@ elem_zero(elem_t x, const ring_t ring)
 void
 gen_zero(gen_t x)
 {
-    elem_zero(&x->elem, x->ring);
+    elem_zero(x->elem, x->ring);
 }

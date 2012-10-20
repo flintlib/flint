@@ -25,19 +25,28 @@
 
 #include "generics.h"
 
+static __inline__ void
+elem_poly_set(elem_poly_struct * res, const elem_poly_struct * src, const ring_t ring)
+{
+    long len = src->length;
+    _elem_poly_fit_length(res, len, ring);
+    _elem_vec_set(res->coeffs, src->coeffs, len, ring->parent);
+    _elem_poly_set_length(res, len, ring);
+}
+
 void
-elem_set(elem_t res, const elem_t src, const ring_t ring)
+elem_set(elem_ptr res, elem_srcptr src, const ring_t ring)
 {
     if (res != src)
     {
         switch (ring->type)
         {
             case TYPE_FMPZ:
-                fmpz_set(&res->z, &src->z);
+                fmpz_set(res, src);
                 break;
 
             case TYPE_LIMB:
-                res->n = src->n;
+                *((mp_ptr) res) = *((mp_srcptr) src);
                 break;
 
             case TYPE_MOD:
@@ -45,12 +54,7 @@ elem_set(elem_t res, const elem_t src, const ring_t ring)
                 break;
 
             case TYPE_POLY:
-                {
-                    long len = src->poly->length;
-                    _elem_poly_fit_length(res->poly, len, ring);
-                    _elem_vec_set(res->poly->coeffs, src->poly->coeffs, len, ring->parent);
-                    _elem_poly_set_length(res->poly, len, ring);
-                }
+                elem_poly_set(res, src, ring);
                 break;
 
             default:
@@ -64,7 +68,7 @@ gen_set(gen_t y, const gen_t x)
 {
     if (y->ring == x->ring)
     {
-        elem_set(&y->elem, &x->elem, y->ring);
+        elem_set(y->elem, x->elem, y->ring);
     }
     else
     {

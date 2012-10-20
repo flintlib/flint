@@ -30,8 +30,7 @@
 int main()
 {
     ring_t ZZ, ZZp, ZZpx, ZZpxy;
-    gen_t P, R, Q;
-    elem_t p;
+    gen_t p, P, R, Q;
     long size[3] = {8, 8, 8};
 
     flint_rand_t state;
@@ -43,9 +42,10 @@ int main()
     ring_init_limb(ZZ);
 #endif
 
-    elem_init(p, ZZ);
-    elem_set_si(p, 17, ZZ);
-    ring_init_mod(ZZp, ZZ, p);
+    gen_init(p, ZZ);
+    gen_set_si(p, 17);
+
+    ring_init_mod(ZZp, ZZ, p->elem);
     ring_init_poly(ZZpx, ZZp);
     ring_init_poly(ZZpxy, ZZpx);
 

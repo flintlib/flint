@@ -29,6 +29,7 @@ void
 ring_init_limb(ring_t ring)
 {
     ring->type = TYPE_LIMB;
+    ring->size = sizeof(mp_limb_t);
     ring->parent = NULL;
     ring->modulus = NULL;
 }

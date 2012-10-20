@@ -30,17 +30,18 @@ _elem_poly_add(elem_ptr res, elem_srcptr poly1, long len1,
     elem_srcptr poly2, long len2, const ring_t ring)
 {
     long i, min;
+    long size = ring->size;
 
     min = FLINT_MIN(len1, len2);
 
     for (i = 0; i < min; i++)
-        elem_add(res + i, poly1 + i, poly2 + i, ring);
+        elem_add(INDEX(res, i, size), SRC_INDEX(poly1, i, size), SRC_INDEX(poly2, i, size), ring);
 
     if (poly1 != res)
         for (i = min; i < len1; i++)
-            elem_set(res + i, poly1 + i, ring);
+            elem_set(INDEX(res, i, size), SRC_INDEX(poly1, i, size), ring);
 
     if (poly2 != res)
         for (i = min; i < len2; i++)
-            elem_set(res + i, poly2 + i, ring);
+            elem_set(INDEX(res, i, size), SRC_INDEX(poly2, i, size), ring);
 }

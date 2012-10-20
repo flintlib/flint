@@ -36,6 +36,7 @@ _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
         return;
     }
 */
+    long size = ring->size;
 
     if (len1 == 1 && len2 == 1)
     {
@@ -46,9 +47,14 @@ _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
         long i;
 
         _elem_vec_scalar_mul(res, poly1, len1, poly2, ring);
-        _elem_vec_scalar_mul(res + len1, poly2 + 1, len2 - 1, poly1 + len1 - 1, ring);
+
+        _elem_vec_scalar_mul(INDEX(res, len1, size),
+                            SRC_INDEX(poly2, 1, size), len2 - 1,
+                            SRC_INDEX(poly1, len1 - 1, size), ring);
 
         for (i = 0; i < len1 - 1; i++)
-            _elem_vec_scalar_addmul(res + i + 1, poly2 + 1, len2 - 1, poly1 + i, ring);
+            _elem_vec_scalar_addmul(INDEX(res, i + 1, size),
+                    SRC_INDEX(poly2, 1, size), len2 - 1,
+                    SRC_INDEX(poly1, i, size), ring);
     }
 }

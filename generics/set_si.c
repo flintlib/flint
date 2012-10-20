@@ -25,17 +25,26 @@
 
 #include "generics.h"
 
+static __inline__ mp_limb_t
+nmod_set_si(long v, nmod_t mod)
+{
+    mp_limb_t u = n_mod2_preinv(FLINT_ABS(v), mod.n, mod.ninv);
+    if (v < 0)
+        u = n_negmod(u, mod.n);
+    return u;
+}
+
 void
-elem_set_si(elem_t elem, long v, const ring_t ring)
+elem_set_si(elem_ptr elem, long v, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_set_si(&elem->z, v);
+            fmpz_set_si(elem, v);
             break;
 
         case TYPE_LIMB:
-            elem->n = v;
+            *((mp_ptr) elem) = v;
             break;
 
         case TYPE_MOD:
@@ -43,15 +52,12 @@ elem_set_si(elem_t elem, long v, const ring_t ring)
                 switch (RING_PARENT(ring)->type)
                 {
                     case TYPE_FMPZ:
-                        fmpz_set_si(&elem->z, v);
-                        fmpz_mod(&elem->z, &elem->z, &RING_MODULUS(ring)->z);
+                        fmpz_set_si(elem, v);
+                        fmpz_mod(elem, elem, RING_MODULUS(ring));
                         break;
 
                     case TYPE_LIMB:
-                        elem->n = n_mod2_preinv(FLINT_ABS(v),
-                            ring->nmod.n, ring->nmod.ninv);
-                        if (v < 0)
-                            elem->n = n_negmod(elem->n, ring->nmod.n);
+                        *((mp_ptr) elem) = nmod_set_si(v, ring->nmod);
                         break;
 
                     default:
@@ -68,5 +74,5 @@ elem_set_si(elem_t elem, long v, const ring_t ring)
 void
 gen_set_si(gen_t x, long v)
 {
-    elem_set_si(&x->elem, v, x->ring);
+    elem_set_si(x->elem, v, x->ring);
 }

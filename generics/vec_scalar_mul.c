@@ -26,10 +26,10 @@
 #include "generics.h"
 
 void
-_elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, const elem_t c, const ring_t ring)
+_elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring)
 {
-    long i;
+    long i, size = ring->size;
 
     for (i = 0; i < len; i++)
-        elem_mul(res + i, vec + i, c, ring);
+        elem_mul(INDEX(res, i, size), SRC_INDEX(vec, i, size), c, ring);
 }

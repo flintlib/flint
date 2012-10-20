@@ -26,11 +26,15 @@
 #include "generics.h"
 
 void
-ring_init_mod(ring_t ring, const ring_t elem_ring, const elem_t modulus)
+ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
 {
     ring->type = TYPE_MOD;
+    ring->size = elem_ring->size;
     ring->parent = (ring_struct *) elem_ring;
-    ring->modulus = (elem_struct *) modulus;   /* should this make a copy? */
+
+    printf("initialing mod, value = %ld\n", ((fmpz *) modulus)[0]);
+
+    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
     if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, modulus->n);
+        nmod_init(&ring->nmod, *((mp_ptr) modulus));
 }

@@ -29,6 +29,7 @@ void
 ring_init_fmpz(ring_t ring)
 {
     ring->type = TYPE_FMPZ;
+    ring->size = sizeof(fmpz);
     ring->parent = NULL;
     ring->modulus = NULL;
 }

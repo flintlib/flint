@@ -25,24 +25,29 @@
 
 #include "generics.h"
 
+static __inline__ void
+elem_poly_init(elem_poly_struct * poly, const ring_t ring)
+{
+    poly->coeffs = NULL;
+    poly->length = 0;
+    poly->alloc = 0;
+}
+
 void
-elem_init(elem_t elem, const ring_t ring)
+elem_init(elem_ptr elem, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_init(&elem->z);
+            fmpz_init(elem);
             break;
 
         case TYPE_LIMB:
-            elem->n = 0;
+            *((mp_ptr) elem) = 0;
             break;
 
         case TYPE_POLY:
-            elem->poly = flint_malloc(sizeof(elem_poly_struct));
-            elem->poly->coeffs = NULL;
-            elem->poly->length = 0;
-            elem->poly->alloc = 0;
+            elem_poly_init(elem, ring);
             break;
 
         case TYPE_MOD:
@@ -58,5 +63,6 @@ void
 gen_init(gen_t x, const ring_t ring)
 {
     x->ring = (ring_struct *) ring;
-    elem_init(&x->elem, ring);
+    x->elem = flint_malloc(ring->size);
+    elem_init(x->elem, ring);
 }

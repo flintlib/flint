@@ -28,8 +28,8 @@
 void
 _elem_vec_set(elem_ptr res, elem_srcptr src, long len, const ring_t ring)
 {
-    long i;
+    long i, size = ring->size;
 
     for (i = 0; i < len; i++)
-        elem_set(res + i, src + i, ring);
+        elem_set(INDEX(res, i, size), SRC_INDEX(src, i, size), ring);
 }

@@ -25,77 +25,65 @@
 
 #include "generics.h"
 
+static __inline__ void
+elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring)
+{
+    long rlen, len1, len2;
+
+    len1 = op1->length;
+    len2 = op2->length;
+
+    if (len1 == 0 || len2 == 0)
+    {
+        elem_zero(res, ring);
+        return;
+    }
+
+    rlen = len1 + len2 - 1;
+
+    if (res == op1 || res == op2)
+    {
+        elem_poly_struct t[1];
+        elem_init(t, ring);
+        _elem_poly_fit_length(t, rlen, ring);
+
+        if (len1 >= len2)
+            _elem_poly_mul(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
+        else
+            _elem_poly_mul(t->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
+
+        elem_poly_swap(res, t);
+        elem_clear(t, ring);
+    }
+    else
+    {
+        _elem_poly_fit_length(res, rlen, ring);
+
+        if (len1 >= len2)
+            _elem_poly_mul(res->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
+        else
+            _elem_poly_mul(res->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
+    }
+
+    _elem_poly_set_length(res, rlen, ring);
+    _elem_poly_normalise(res, ring);
+}
+
 void
-elem_mul(elem_t res, const elem_t op1, const elem_t op2, const ring_t ring)
+elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_mul(&res->z, &op1->z, &op2->z);
+            fmpz_mul(res, op1, op2);
             break;
 
         case TYPE_LIMB:
-            res->n = op1->n * op2->n;
+            *((mp_ptr) res) = (*((mp_srcptr) op1)) * (*((mp_srcptr) op2));
             break;
 
         case TYPE_POLY:
-            {
-                long rlen, len1, len2;
-
-                len1 = op1->poly->length;
-                len2 = op2->poly->length;
-
-                if (len1 == 0 || len2 == 0)
-                {
-                    elem_zero(res, ring);
-                    return;
-                }
-
-                rlen = len1 + len2 - 1;
-
-                if (res == op1 || res == op2)
-                {
-                    elem_t t;
-                    elem_init(t, ring);
-                    _elem_poly_fit_length(t->poly, rlen, ring);
-
-                    if (len1 >= len2)
-                    {
-                        _elem_poly_mul(t->poly->coeffs,
-                            op1->poly->coeffs, len1,
-                            op2->poly->coeffs, len2, ring->parent);
-                    }
-                    else
-                    {
-                        _elem_poly_mul(t->poly->coeffs,
-                            op2->poly->coeffs, len2,
-                            op1->poly->coeffs, len1, ring->parent);
-                    }
-
-                    elem_swap(res, t);
-                    elem_clear(t, ring);
-                }
-                else
-                {
-                    _elem_poly_fit_length(res->poly, rlen, ring);
-
-                    if (len1 >= len2)
-                    {
-                        _elem_poly_mul(res->poly->coeffs,
-                            op1->poly->coeffs, len1,
-                            op2->poly->coeffs, len2, ring->parent);
-                    }
-                    else
-                    {
-                        _elem_poly_mul(res->poly->coeffs,
-                            op2->poly->coeffs, len2,
-                            op1->poly->coeffs, len1, ring->parent);
-                    }
-                }
-
-                _elem_poly_set_length(res->poly, rlen, ring);
-                _elem_poly_normalise(res->poly, ring);
-            }
+            elem_poly_mul(res, op1, op2, ring);
             break;
 
         case TYPE_MOD:
@@ -103,13 +91,14 @@ elem_mul(elem_t res, const elem_t op1, const elem_t op2, const ring_t ring)
                 switch (RING_PARENT(ring)->type)
                 {
                     case TYPE_LIMB:
-                        res->n = n_mulmod2_preinv(op1->n, op2->n,
+                        *((mp_ptr) res) = n_mulmod2_preinv(*((mp_srcptr) op1),
+                            *((mp_srcptr) op2),
                             ring->nmod.n, ring->nmod.ninv);
                         break;
 
                     case TYPE_FMPZ:
-                        fmpz_mul(&res->z, &op1->z, &op2->z);
-                        fmpz_mod(&res->z, &res->z, &RING_MODULUS(ring)->z);
+                        fmpz_mul(res, op1, op2);
+                        fmpz_mod(res, res, RING_MODULUS(ring));
                         break;
 
                     default:
@@ -128,7 +117,7 @@ gen_mul(gen_t z, const gen_t x, const gen_t y)
 {
     if (x->ring == y->ring && x->ring == z->ring)
     {
-        elem_mul(&z->elem, &x->elem, &y->elem, z->ring);
+        elem_mul(z->elem, x->elem, y->elem, z->ring);
     }
     else
     {

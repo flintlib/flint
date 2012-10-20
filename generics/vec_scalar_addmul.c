@@ -27,18 +27,21 @@
 
 
 void
-_elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, const elem_t c, const ring_t ring)
+_elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring)
 {
-    long i;
+    long i, size = ring->size;
+    elem_ptr t;
 
-    elem_t t;
+    /* XXX: should use tmp alloc */
+    t = flint_malloc(ring->size);
     elem_init(t, ring);
 
     for (i = 0; i < len; i++)
     {
-        elem_mul(t, vec + i, c, ring);
-        elem_add(res + i, res + i, t, ring);
+        elem_mul(t, SRC_INDEX(vec, i, size), c, ring);
+        elem_add(INDEX(res, i, size), SRC_INDEX(res, i, size), t, ring);
     }
 
     elem_clear(t, ring);
+    flint_free(t);
 }
