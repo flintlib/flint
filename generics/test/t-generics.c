@@ -66,7 +66,7 @@ int main()
     gen_clear(R);
     gen_clear(Q);
 
-    elem_clear(p, ZZ);
+    gen_clear(p);
     ring_clear(ZZpxy);
     ring_clear(ZZpx);
     ring_clear(ZZp);
