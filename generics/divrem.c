@@ -178,13 +178,13 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
                         break;
 
                     default:
-                        NOT_IMPLEMENTED("mul (mod)", ring);
+                        NOT_IMPLEMENTED("divrem (mod)", ring);
                 }
             }
             break;
 
         default:
-            NOT_IMPLEMENTED("mul", ring);
+            NOT_IMPLEMENTED("divrem", ring);
     }
 }
 
