@@ -25,6 +25,29 @@
 
 #include "generics.h"
 
+int
+elem_leading_sign(elem_srcptr x, const ring_t ring)
+{
+    switch (ring->type)
+    {
+        case TYPE_FMPZ:
+            return fmpz_sgn(x);
+
+        case TYPE_POLY:
+            {
+                const elem_poly_struct * poly = x;
+                if (poly->length == 0)
+                    return 0;
+                else
+                    return elem_leading_sign(INDEX(poly->coeffs, poly->length - 1,
+                        RING_PARENT(ring)->size), RING_PARENT(ring));
+            }
+
+        default:
+            NOT_IMPLEMENTED("leading_sign", ring);
+    }
+}
+
 void
 elem_frac_canonicalise(elem_srcptr x, const ring_t ring)
 {
@@ -40,6 +63,12 @@ elem_frac_canonicalise(elem_srcptr x, const ring_t ring)
     {
         elem_div_content_recursive(NUMER(x, ring), g, RING_DENOM(ring), RING_NUMER(ring));
         elem_div_content_recursive(DENOM(x, ring), g, RING_DENOM(ring), RING_DENOM(ring));
+    }
+
+    if (elem_leading_sign(DENOM(x, ring), RING_DENOM(ring)) < 0)
+    {
+        elem_neg(NUMER(x, ring), NUMER(x, ring), RING_NUMER(ring));
+        elem_neg(DENOM(x, ring), DENOM(x, ring), RING_DENOM(ring));
     }
 
     elem_clear(g, RING_DENOM(ring));
