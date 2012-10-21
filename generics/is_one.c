@@ -25,14 +25,32 @@
 
 #include "generics.h"
 
-void
-ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
+int
+elem_is_one(elem_srcptr x, const ring_t ring)
 {
-    ring->type = TYPE_MOD;
-    ring->size = elem_ring->size;
-    ring->parent = (ring_struct *) elem_ring;
+    switch (ring->type)
+    {
+        case TYPE_FMPZ:
+            return fmpz_is_one(x);
 
-    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
-    if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, *((mp_ptr) modulus));
+        case TYPE_LIMB:
+            return *((mp_srcptr) x) == 1;
+
+        /* XXX: mod 1? */
+        case TYPE_MOD:
+            return elem_is_one(x, ring->parent);
+
+        case TYPE_FRAC:
+            return elem_is_one(NUMER(x, ring), ring->numer) && 
+                   elem_is_one(DENOM(x, ring), ring->denom);
+
+        default:
+            NOT_IMPLEMENTED("is_one", ring);
+    }
+}
+
+int
+gen_is_one(const gen_t x)
+{
+    return elem_is_one(x->elem, x->ring);
 }

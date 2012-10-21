@@ -25,14 +25,31 @@
 
 #include "generics.h"
 
-void
-ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
+static __inline__ void
+elem_poly_div_content_recursive(elem_poly_struct * poly, elem_srcptr cont,
+        const ring_t cont_ring, const ring_t poly_ring)
 {
-    ring->type = TYPE_MOD;
-    ring->size = elem_ring->size;
-    ring->parent = (ring_struct *) elem_ring;
+    long i, size = RING_PARENT(poly_ring)->size;
 
-    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
-    if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, *((mp_ptr) modulus));
+    for (i = 0; i < poly->length; i++)
+    {
+        elem_div_content_recursive(INDEX(poly->coeffs, i, size), cont, cont_ring, RING_PARENT(poly_ring));
+    }
+}
+
+void
+elem_div_content_recursive(elem_ptr obj, elem_srcptr cont, const ring_t cont_ring, const ring_t obj_ring)
+{
+    if (cont_ring == obj_ring)
+    {
+        elem_divexact(obj, obj, cont, cont_ring);
+    }
+    else if (obj_ring->type == TYPE_POLY)
+    {
+        elem_poly_div_content_recursive(obj, cont, cont_ring, obj_ring);
+    }
+    else
+    {
+        NOT_IMPLEMENTED("div_content_recursive", obj_ring);
+    }
 }

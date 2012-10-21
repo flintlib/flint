@@ -39,14 +39,23 @@ ring_print(const ring_t ring)
             break;
 
         case TYPE_POLY:
-            printf("polynomials over ");
+            printf("polynomials over (");
             ring_print(ring->parent);
+            printf(")");
             break;
 
         case TYPE_MOD:
             ring_print(ring->parent);
             printf(" modulo ");
             elem_print(RING_MODULUS(ring), ring->parent);
+            break;
+
+        case TYPE_FRAC:
+            printf("(");
+            ring_print(ring->numer);
+            printf(") divided by (");
+            ring_print(ring->denom);
+            printf(")");
             break;
 
         default:

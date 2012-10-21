@@ -26,13 +26,14 @@
 #include "generics.h"
 
 void
-ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
+ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring)
 {
-    ring->type = TYPE_MOD;
-    ring->size = elem_ring->size;
-    ring->parent = (ring_struct *) elem_ring;
+    ring->type = TYPE_FRAC;
 
-    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
-    if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, *((mp_ptr) modulus));
+    /* XXX: will crash for some types due to misalignment */
+    ring->size = numer_ring->size + denom_ring->size;
+    ring->denom_offset = numer_ring->size;
+
+    ring->numer = (ring_struct *)numer_ring;
+    ring->denom = (ring_struct *)denom_ring;
 }

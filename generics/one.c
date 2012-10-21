@@ -26,13 +26,13 @@
 #include "generics.h"
 
 void
-ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
+elem_one(elem_ptr x, const ring_t ring)
 {
-    ring->type = TYPE_MOD;
-    ring->size = elem_ring->size;
-    ring->parent = (ring_struct *) elem_ring;
+    elem_set_si(x, 1, ring);
+}
 
-    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
-    if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, *((mp_ptr) modulus));
+void
+gen_one(gen_t x)
+{
+    elem_one(x->elem, x->ring);
 }

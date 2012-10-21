@@ -45,17 +45,25 @@ typedef enum
     TYPE_FMPZ,
     TYPE_LIMB,
     TYPE_MOD,
+    TYPE_FRAC,
     TYPE_POLY
 }
 ring_type;
 
+/* todo: make this a union */
 typedef struct
 {
     ring_type type;
     long size;
+
     void * parent;
+
     nmod_t nmod;
     void * modulus;
+
+    void * numer;
+    void * denom;
+    long denom_offset;
 }
 ring_struct;
 
@@ -85,6 +93,12 @@ typedef gen_struct gen_t[1];
 #define RING_PARENT(ring) ((ring_struct *) ((ring)->parent))
 #define RING_MODULUS(ring) ((elem_ptr) ((ring)->modulus))
 
+#define RING_NUMER(ring) ((ring_struct *) ((ring)->numer))
+#define RING_DENOM(ring) ((ring_struct *) ((ring)->denom))
+
+#define NUMER(elem, ring) ((elem_ptr) (elem))
+#define DENOM(elem, ring) ((elem_ptr) (((char *) (elem)) + (ring)->denom_offset))
+
 #define NOT_IMPLEMENTED(opname, ring) do { \
     printf("operation %s not implemented for ring ", opname); \
     ring_print(ring); printf("\n"); \
@@ -110,6 +124,7 @@ elem_poly_swap(elem_poly_struct * op1, elem_poly_struct * op2)
 void ring_init_fmpz(ring_t ring);
 void ring_init_limb(ring_t ring);
 void ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus);
+void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring);
 void ring_init_poly(ring_t ring, const ring_t elem_ring);
 void ring_clear(ring_t ring);
 void ring_print(const ring_t ring);
@@ -125,6 +140,12 @@ void gen_zero(gen_t x);
 
 int elem_is_zero(elem_srcptr x, const ring_t ring);
 int gen_is_zero(const gen_t x);
+
+void elem_one(elem_ptr x, const ring_t ring);
+void gen_one(gen_t x);
+
+int elem_is_one(elem_srcptr x, const ring_t ring);
+int gen_is_one(const gen_t x);
 
 int elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 int gen_equal(const gen_t op1, const gen_t op2);
@@ -173,8 +194,15 @@ void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R,
 void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
 
+void elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring);
+
 void _elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
+
+void elem_content_recursive(elem_ptr cont, elem_srcptr obj, const ring_t cont_ring, const ring_t obj_ring);
+void elem_div_content_recursive(elem_ptr obj, elem_srcptr cont, const ring_t cont_ring, const ring_t obj_ring);
+
+void elem_frac_canonicalise(elem_srcptr x, const ring_t ring);
 
 #ifdef __cplusplus
 }

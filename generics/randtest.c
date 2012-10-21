@@ -79,6 +79,14 @@ elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t 
             }
             break;
 
+        case TYPE_FRAC:
+            elem_randtest(NUMER(res, ring), state, size, ring->numer);
+            elem_randtest(DENOM(res, ring), state, size, ring->denom);
+            if (elem_is_zero(DENOM(res, ring), ring->denom))
+                elem_one(DENOM(res, ring), ring->denom);
+            elem_frac_canonicalise(res, ring);
+            break;
+
         default:
             NOT_IMPLEMENTED("randtest", ring);
     }

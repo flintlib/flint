@@ -26,13 +26,22 @@
 #include "generics.h"
 
 void
-ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus)
+elem_frac_canonicalise(elem_srcptr x, const ring_t ring)
 {
-    ring->type = TYPE_MOD;
-    ring->size = elem_ring->size;
-    ring->parent = (ring_struct *) elem_ring;
+    elem_ptr g;
 
-    ring->modulus = (elem_ptr) modulus;   /* should this make a copy? */
-    if (elem_ring->type == TYPE_LIMB)
-        nmod_init(&ring->nmod, *((mp_ptr) modulus));
+    g = flint_malloc(RING_DENOM(ring)->size);
+    elem_init(g, RING_DENOM(ring));
+
+    elem_content_recursive(g, NUMER(x, ring), RING_DENOM(ring), RING_NUMER(ring));
+    elem_content_recursive(g, DENOM(x, ring), RING_DENOM(ring), RING_DENOM(ring));
+
+    if (!elem_is_one(g, RING_DENOM(ring)))
+    {
+        elem_div_content_recursive(NUMER(x, ring), g, RING_DENOM(ring), RING_NUMER(ring));
+        elem_div_content_recursive(DENOM(x, ring), g, RING_DENOM(ring), RING_DENOM(ring));
+    }
+
+    elem_clear(g, RING_DENOM(ring));
+    flint_free(g);
 }

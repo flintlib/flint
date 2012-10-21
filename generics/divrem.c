@@ -152,35 +152,8 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
             break;
 
         case TYPE_MOD:
-            {
-                switch (RING_PARENT(ring)->type)
-                {
-                    case TYPE_LIMB:
-                        {
-                            mp_limb_t t;
-                            t = n_invmod((*((mp_srcptr) B)), ring->nmod.n);
-                            t = n_mulmod2_preinv(t, (*((mp_srcptr) A)), ring->nmod.n, ring->nmod.ninv);
-                            *((mp_ptr) Q) = t;
-                            *((mp_ptr) R) = 0;
-                        }
-                        break;
-
-                    case TYPE_FMPZ:
-                        {
-                            fmpz_t t;
-                            fmpz_init(t);
-                            fmpz_invmod(t, B, RING_MODULUS(ring));
-                            fmpz_mul(Q, t, A);
-                            fmpz_mod(Q, Q, RING_MODULUS(ring));
-                            fmpz_zero(R);
-                            fmpz_clear(t);
-                        }
-                        break;
-
-                    default:
-                        NOT_IMPLEMENTED("divrem (mod)", ring);
-                }
-            }
+            elem_divexact(Q, A, B, ring);
+            elem_zero(R, ring);
             break;
 
         default:

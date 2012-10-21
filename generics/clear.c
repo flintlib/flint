@@ -57,6 +57,11 @@ elem_clear(elem_ptr elem, const ring_t ring)
             elem_clear(elem, ring->parent);
             break;
 
+        case TYPE_FRAC:
+            elem_clear(NUMER(elem, ring), ring->numer);
+            elem_clear(DENOM(elem, ring), ring->denom);
+            break;
+
         default:
             NOT_IMPLEMENTED("clear", ring);
     }

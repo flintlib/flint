@@ -67,6 +67,12 @@ elem_print(elem_srcptr elem, const ring_t ring)
             elem_print(elem, ring->parent);
             break;
 
+        case TYPE_FRAC:
+            elem_print(NUMER(elem, ring), ring->numer);
+            printf("/");
+            elem_print(DENOM(elem, ring), ring->denom);
+            break;
+
         default:
             NOT_IMPLEMENTED("print", ring);
     }

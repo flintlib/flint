@@ -54,6 +54,12 @@ elem_init(elem_ptr elem, const ring_t ring)
             elem_init(elem, ring->parent);
             break;
 
+        case TYPE_FRAC:
+            elem_init(NUMER(elem, ring), ring->numer);
+            elem_init(DENOM(elem, ring), ring->denom);
+            elem_one(DENOM(elem, ring), ring->denom);
+            break;
+
         default:
             NOT_IMPLEMENTED("init", ring);
     }
