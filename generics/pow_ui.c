@@ -33,7 +33,7 @@ pow_binexp_generic(elem_ptr res, elem_srcptr base, ulong exp, const ring_t ring)
     ulong bit = ~((~0UL) >> 1);
     elem_ptr v, R, S, T;
 
-    if (exp <= 4)
+    if (exp <= 2)
     {
         if (exp == 0)
             elem_one(res, ring);
