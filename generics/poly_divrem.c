@@ -39,6 +39,12 @@ euclidean_test(elem_srcptr X, elem_srcptr L, const ring_t ring)
         case TYPE_POLY:
             return ((const elem_poly_struct *) X)->length < ((const elem_poly_struct *) L)->length;
 
+/*
+    valid if a field, but we need to do something else if it has polynomials...
+        case TYPE_FRAC:
+            return elem_is_zero(X, ring);
+*/
+
         case TYPE_LIMB:
         default:
             NOT_IMPLEMENTED("euclidean test", ring); 
