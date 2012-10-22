@@ -56,7 +56,7 @@ int main()
     gen_init(R, ZZpxy);
 
     gen_randtest(A, state, size);
-    gen_randtest(B, state, size);
+    gen_randtest_not_zero(B, state, size);
 
     gen_mul(C, A, B);
 

@@ -25,15 +25,6 @@
 
 #include "generics.h"
 
-static __inline__ void
-elem_poly_set(elem_poly_struct * res, const elem_poly_struct * src, const ring_t ring)
-{
-    long len = src->length;
-    _elem_poly_fit_length(res, len, ring);
-    _elem_vec_set(res->coeffs, src->coeffs, len, ring->parent);
-    _elem_poly_set_length(res, len, ring);
-}
-
 void
 elem_set(elem_ptr res, elem_srcptr src, const ring_t ring)
 {

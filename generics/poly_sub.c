@@ -44,3 +44,16 @@ _elem_poly_sub(elem_ptr res, elem_srcptr poly1, long len1,
     for (i = min; i < len2; i++)
         elem_neg(INDEX(res, i, size), SRC_INDEX(poly2, i, size), ring);
 }
+
+void
+elem_poly_sub(elem_poly_struct * res,
+    const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring)
+{
+    long max = FLINT_MAX(op1->length, op2->length);
+
+    _elem_poly_fit_length(res, max, ring);
+    _elem_poly_sub(res->coeffs, op1->coeffs, op1->length, op2->coeffs, op2->length, ring->parent);
+    _elem_poly_set_length(res, max, ring);
+    _elem_poly_normalise(res, ring);
+}
+

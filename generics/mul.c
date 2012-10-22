@@ -25,50 +25,6 @@
 
 #include "generics.h"
 
-static __inline__ void
-elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring)
-{
-    long rlen, len1, len2;
-
-    len1 = op1->length;
-    len2 = op2->length;
-
-    if (len1 == 0 || len2 == 0)
-    {
-        elem_zero(res, ring);
-        return;
-    }
-
-    rlen = len1 + len2 - 1;
-
-    if (res == op1 || res == op2)
-    {
-        elem_poly_struct t[1];
-        elem_init(t, ring);
-        _elem_poly_fit_length(t, rlen, ring);
-
-        if (len1 >= len2)
-            _elem_poly_mul(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
-        else
-            _elem_poly_mul(t->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
-
-        elem_poly_swap(res, t);
-        elem_clear(t, ring);
-    }
-    else
-    {
-        _elem_poly_fit_length(res, rlen, ring);
-
-        if (len1 >= len2)
-            _elem_poly_mul(res->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
-        else
-            _elem_poly_mul(res->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
-    }
-
-    _elem_poly_set_length(res, rlen, ring);
-    _elem_poly_normalise(res, ring);
-}
-
 void
 elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
 {

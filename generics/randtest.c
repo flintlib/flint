@@ -26,7 +26,7 @@
 #include "generics.h"
 
 
-static __inline__ void
+void
 elem_poly_randtest(elem_poly_struct * res, flint_rand_t state, const long * size, const ring_t ring)
 {
     long i, len, _size = RING_PARENT(ring)->size;
@@ -90,11 +90,24 @@ elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t 
         default:
             NOT_IMPLEMENTED("randtest", ring);
     }
+}
 
+void
+elem_randtest_not_zero(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring)
+{
+    elem_randtest(res, state, size, ring);
+    if (elem_is_zero(res, ring))
+        elem_one(res, ring);
 }
 
 void
 gen_randtest(gen_t res, flint_rand_t state, const long * size)
 {
     elem_randtest(res->elem, state, size, res->ring);
+}
+
+void
+gen_randtest_not_zero(gen_t res, flint_rand_t state, const long * size)
+{
+    elem_randtest_not_zero(res->elem, state, size, res->ring);
 }
