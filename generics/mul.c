@@ -63,6 +63,10 @@ elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
             }
             break;
 
+        case TYPE_FRAC:
+            elem_frac_mul(res, op1, op2, ring);
+            break;
+
         default:
             NOT_IMPLEMENTED("mul", ring);
     }

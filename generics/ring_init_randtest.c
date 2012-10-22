@@ -25,49 +25,58 @@
 
 #include "generics.h"
 
-void
-elem_set(elem_ptr res, elem_srcptr src, const ring_t ring)
+int
+ring_init_randtest(ring_t * R, flint_rand_t state, int maxdepth)
 {
-    if (res != src)
+    int depth, frac_pos;
+
+    maxdepth = 1 + n_randint(state, maxdepth);
+
+    if (n_randint(state, 2))
     {
-        switch (ring->type)
-        {
-            case TYPE_FMPZ:
-                fmpz_set(res, src);
-                break;
-
-            case TYPE_LIMB:
-                *((mp_ptr) res) = *((mp_srcptr) src);
-                break;
-
-            case TYPE_MOD:
-                elem_set(res, src, ring->parent);
-                break;
-
-            case TYPE_POLY:
-                elem_poly_set(res, src, ring);
-                break;
-
-            case TYPE_FRAC:
-                elem_set(NUMER(res, ring), NUMER(src, ring), RING_NUMER(ring));
-                elem_set(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
-                break;
-
-            default:
-                NOT_IMPLEMENTED("set", ring);
-        }
-    }
-}
-
-void
-gen_set(gen_t y, const gen_t x)
-{
-    if (y->ring == x->ring)
-    {
-        elem_set(y->elem, x->elem, y->ring);
+        ring_init_fmpz(R[0]);
+        frac_pos = 1;
     }
     else
     {
-        NOT_IMPLEMENTED("gen_set coercing into ", y->ring);
+        ring_init_limb(R[0]);
+        frac_pos = 0;
     }
+
+    if (maxdepth < 2)
+        return 1;
+
+    depth = 1;
+
+    /* mod p in the base ring */
+    if (n_randint(state, 2))
+    {
+        gen_t prime;
+        gen_init(prime, R[0]);
+        gen_set_si(prime, 7);   /* TODO: set_ui, random prime, and TODO: provide a way to free this... */
+        ring_init_mod(R[1], R[0], prime->elem);
+        frac_pos = 0;
+        depth++;
+    }
+
+    /* else consider inserting fractions */
+    if (frac_pos != 0)
+        frac_pos = n_randint(state, maxdepth);
+
+    while (depth < maxdepth)
+    {
+        if (depth == frac_pos)
+        {
+            ring_init_frac(R[depth], R[depth-1], R[0]);
+        }
+        else
+        {
+            ring_init_poly(R[depth], R[depth-1]);
+        }
+
+        depth++;
+    }
+
+    return depth;
 }
+

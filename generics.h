@@ -141,6 +141,7 @@ void ring_init_limb(ring_t ring);
 void ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus);
 void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring);
 void ring_init_poly(ring_t ring, const ring_t elem_ring);
+int ring_init_randtest(ring_t * R, flint_rand_t state, int maxdepth);
 void ring_clear(ring_t ring);
 void ring_print(const ring_t ring);
 
@@ -154,6 +155,7 @@ void elem_one(elem_ptr x, const ring_t ring);
 int elem_is_one(elem_srcptr x, const ring_t ring);
 int elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void elem_print(elem_srcptr elem, const ring_t ring);
+void elem_swap(elem_ptr res, elem_ptr src, const ring_t ring);
 void elem_set(elem_ptr res, elem_srcptr src, const ring_t ring);
 void elem_set_si(elem_ptr elem, long v, const ring_t ring);
 void elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring);
@@ -196,6 +198,9 @@ void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
 void elem_content_recursive(elem_ptr cont, elem_srcptr obj, const ring_t cont_ring, const ring_t obj_ring);
 void elem_div_content_recursive(elem_ptr obj, elem_srcptr cont, const ring_t cont_ring, const ring_t obj_ring);
 void elem_frac_canonicalise(elem_srcptr x, const ring_t ring);
+
+void elem_frac_add(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
+void elem_frac_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 
 /* Vector functions */
 

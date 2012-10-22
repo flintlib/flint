@@ -26,60 +26,37 @@
 #include "generics.h"
 
 void
-elem_neg(elem_ptr res, elem_srcptr src, const ring_t ring)
+elem_swap(elem_ptr res, elem_ptr src, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_neg(res, src);
+            fmpz_swap(res, src);
             break;
 
         case TYPE_LIMB:
-            *((mp_ptr) res) = -(*((mp_srcptr) src));
-            break;
-
-        case TYPE_MOD:
-            switch (RING_PARENT(ring)->type)
             {
-                case TYPE_LIMB:
-                    *((mp_ptr) res) = n_negmod(*((mp_srcptr) src), ring->nmod.n);
-                    break;
-
-                case TYPE_FMPZ:
-                    if (!fmpz_is_zero(src))
-                        fmpz_sub(res, RING_MODULUS(ring), src);
-                    else
-                        fmpz_zero(res);
-                    break;
-
-                default:
-                    NOT_IMPLEMENTED("neg (mod)", ring);
+                mp_limb_t t = *((mp_ptr) res);
+                *((mp_ptr) res) = *((mp_srcptr) src);
+                *((mp_ptr) src) = t;
             }
             break;
 
+        case TYPE_MOD:
+            elem_swap(res, src, ring->parent);
+            break;
+
         case TYPE_POLY:
-            elem_poly_neg(res, src, ring);
+            elem_poly_swap(res, src);
             break;
 
         case TYPE_FRAC:
-            elem_neg(NUMER(res, ring), NUMER(src, ring), RING_NUMER(ring));
-            elem_set(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
+            elem_swap(NUMER(res, ring), NUMER(src, ring), RING_NUMER(ring));
+            elem_swap(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
             break;
 
         default:
-            NOT_IMPLEMENTED("neg", ring);
+            NOT_IMPLEMENTED("set", ring);
     }
 }
 
-void
-gen_neg(gen_t y, const gen_t x)
-{
-    if (y->ring == x->ring)
-    {
-        elem_neg(y->elem, x->elem, y->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_neg coercing into ", y->ring);
-    }
-}

@@ -60,6 +60,10 @@ elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring)
         case TYPE_MOD:
             return elem_equal(op1, op2, ring->parent);
 
+        case TYPE_FRAC:
+            return elem_equal(NUMER(op1, ring), NUMER(op2, ring), RING_NUMER(ring)) &&
+                    elem_equal(DENOM(op1, ring), DENOM(op2, ring), RING_DENOM(ring));
+
         default:
             NOT_IMPLEMENTED("equal", ring);
     }

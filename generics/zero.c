@@ -46,6 +46,11 @@ elem_zero(elem_ptr x, const ring_t ring)
             elem_zero(x, ring->parent);
             break;
 
+        case TYPE_FRAC:
+            elem_zero(NUMER(x, ring), RING_NUMER(ring));
+            elem_one(DENOM(x, ring), RING_DENOM(ring));
+            break;
+
         default:
             NOT_IMPLEMENTED("zero", ring);
     }
