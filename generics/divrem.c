@@ -54,6 +54,15 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
             elem_zero(R, ring);
             break;
 
+        case TYPE_FRAC:
+            /* assume that it's a field */
+            if (RING_NUMER(ring) == RING_DENOM(ring))
+            {
+                elem_divexact(Q, A, B, ring);
+                elem_zero(R, ring);
+                break;
+            }
+
         default:
             NOT_IMPLEMENTED("divrem", ring);
     }

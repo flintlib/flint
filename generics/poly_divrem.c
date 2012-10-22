@@ -39,11 +39,12 @@ euclidean_test(elem_srcptr X, elem_srcptr L, const ring_t ring)
         case TYPE_POLY:
             return ((const elem_poly_struct *) X)->length < ((const elem_poly_struct *) L)->length;
 
-/*
-    valid if a field, but we need to do something else if it has polynomials...
         case TYPE_FRAC:
-            return elem_is_zero(X, ring);
-*/
+            /* assume that it's a field */
+            if (RING_NUMER(ring) == RING_DENOM(ring))
+                return elem_is_zero(X, ring);
+            else
+                return euclidean_test(NUMER(X, ring), NUMER(L, ring), RING_NUMER(ring));
 
         case TYPE_LIMB:
         default:

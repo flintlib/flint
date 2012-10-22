@@ -79,6 +79,13 @@ elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
             }
             break;
 
+        case TYPE_FRAC:
+            if (RING_NUMER(ring) == RING_DENOM(ring))
+            {
+                elem_frac_div(Q, A, B, ring);
+                break;
+            }
+
         default:
             NOT_IMPLEMENTED("divexact", ring);
     }

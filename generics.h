@@ -200,7 +200,9 @@ void elem_div_content_recursive(elem_ptr obj, elem_srcptr cont, const ring_t con
 void elem_frac_canonicalise(elem_srcptr x, const ring_t ring);
 
 void elem_frac_add(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
+void elem_frac_sub(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void elem_frac_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
+void elem_frac_div(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 
 /* Vector functions */
 

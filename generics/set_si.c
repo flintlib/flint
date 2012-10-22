@@ -79,6 +79,11 @@ elem_set_si(elem_ptr elem, long v, const ring_t ring)
             }
             break;
 
+        case TYPE_FRAC:
+            elem_set_si(NUMER(elem, ring), v, RING_NUMER(ring));
+            elem_one(DENOM(elem, ring), RING_DENOM(ring));
+            break;
+
         default:
             NOT_IMPLEMENTED("set_si", ring);
     }
