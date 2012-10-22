@@ -26,6 +26,7 @@
 #ifndef GENERICS_H
 #define GENERICS_H
 
+#include <alloca.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -120,6 +121,20 @@ elem_poly_swap(elem_poly_struct * op1, elem_poly_struct * op2)
     *op1 = *op2;
     *op2 = t;
 }
+
+#define ELEM_TMP_MAX 64
+
+#define ELEM_TMP_INIT(_x, _ring) \
+    if ((_ring)->size > ELEM_TMP_MAX) \
+        (_x) = flint_malloc((_ring)->size); \
+    else \
+        (_x) = alloca((_ring)->size); \
+    elem_init((_x), (_ring));
+
+#define ELEM_TMP_CLEAR(_x, _ring) \
+    elem_clear((_x), (_ring)); \
+    if ((_ring)->size > ELEM_TMP_MAX) \
+        flint_free((_x));
 
 void ring_init_fmpz(ring_t ring);
 void ring_init_limb(ring_t ring);

@@ -32,9 +32,7 @@ _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, 
     long i, size = ring->size;
     elem_ptr t;
 
-    /* XXX: should use tmp alloc */
-    t = flint_malloc(ring->size);
-    elem_init(t, ring);
+    ELEM_TMP_INIT(t, ring);
 
     for (i = 0; i < len; i++)
     {
@@ -42,6 +40,6 @@ _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, 
         elem_add(INDEX(res, i, size), SRC_INDEX(res, i, size), t, ring);
     }
 
-    elem_clear(t, ring);
-    flint_free(t);
+    ELEM_TMP_CLEAR(t, ring);
 }
+

@@ -56,8 +56,7 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
 
     size = ring->size;
     leadB = SRC_INDEX(B, lenB - 1, size);
-    tmp = flint_malloc(size);       /* should be tmp init */
-    elem_init(tmp, ring);
+    ELEM_TMP_INIT(tmp, ring);
 
     if (R != A)
     {
@@ -66,7 +65,6 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
 
     for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
     {
-        /* TODO: euclidean test */
         if (euclidean_test(INDEX(R, iR, size), leadB, ring))
         {
             elem_zero(INDEX(Q, iQ, size), ring);
@@ -85,8 +83,7 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
         }
     }
 
-    elem_clear(tmp, ring);
-    flint_free(tmp);
+    ELEM_TMP_CLEAR(tmp, ring);
 }
 
 void

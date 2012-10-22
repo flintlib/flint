@@ -53,8 +53,7 @@ elem_frac_canonicalise(elem_srcptr x, const ring_t ring)
 {
     elem_ptr g;
 
-    g = flint_malloc(RING_DENOM(ring)->size);
-    elem_init(g, RING_DENOM(ring));
+    ELEM_TMP_INIT(g, RING_DENOM(ring));
 
     elem_content_recursive(g, NUMER(x, ring), RING_DENOM(ring), RING_NUMER(ring));
     elem_content_recursive(g, DENOM(x, ring), RING_DENOM(ring), RING_DENOM(ring));
@@ -71,6 +70,6 @@ elem_frac_canonicalise(elem_srcptr x, const ring_t ring)
         elem_neg(DENOM(x, ring), DENOM(x, ring), RING_DENOM(ring));
     }
 
-    elem_clear(g, RING_DENOM(ring));
-    flint_free(g);
+    ELEM_TMP_CLEAR(g, RING_DENOM(ring));
 }
+
