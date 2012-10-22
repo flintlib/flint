@@ -165,6 +165,8 @@ void elem_add(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
 void elem_sub(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 void elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring);
+void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
+void elem_pow_ui(elem_ptr res, elem_srcptr op, ulong exp, const ring_t ring);
 
 /* wrapped versions */
 
@@ -185,12 +187,8 @@ void gen_add(gen_t z, const gen_t x, const gen_t y);
 void gen_sub(gen_t z, const gen_t x, const gen_t y);
 void gen_mul(gen_t z, const gen_t x, const gen_t y);
 void gen_divexact(gen_t Q, const gen_t A, const gen_t B);
-
-void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R,
-                      const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
-void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
-
+void gen_pow_ui(gen_t z, const gen_t x, ulong exp);
 
 
 /* Fraction functions */
@@ -232,6 +230,9 @@ void elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const e
 
 void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
 void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R, const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
+
+void _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_t ring);
+void elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong exp, const ring_t ring);
 
 static __inline__ void
 elem_poly_set(elem_poly_struct * res, const elem_poly_struct * src, const ring_t ring)

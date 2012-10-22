@@ -44,6 +44,12 @@ elem_is_one(elem_srcptr x, const ring_t ring)
             return elem_is_one(NUMER(x, ring), ring->numer) && 
                    elem_is_one(DENOM(x, ring), ring->denom);
 
+        case TYPE_POLY:
+            {
+                const elem_poly_struct * poly = x;
+                return (poly->length == 1) && elem_is_one(poly->coeffs, RING_PARENT(ring));
+            }
+
         default:
             NOT_IMPLEMENTED("is_one", ring);
     }
