@@ -190,6 +190,8 @@ void gen_divexact(gen_t Q, const gen_t A, const gen_t B);
 void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
 void gen_pow_ui(gen_t z, const gen_t x, ulong exp);
 
+void gen_pseudo_divrem(gen_t Q, gen_t R, ulong * d, const gen_t A, const gen_t B);
+
 
 /* Fraction functions */
 
@@ -204,10 +206,12 @@ void elem_frac_div(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t 
 
 /* Vector functions */
 
+void _elem_vec_zero(elem_ptr res, long len, const ring_t ring);
 void _elem_vec_set(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
 void _elem_vec_neg(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
 void _elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
+void _elem_vec_scalar_submul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 
 /* Polynomial functions */
 
@@ -230,6 +234,9 @@ void elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const e
 
 void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
 void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R, const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
+
+void _elem_poly_pseudo_divrem(elem_ptr Q, elem_ptr R, ulong * d, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
+void elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R, ulong * d, const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
 
 void _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_t ring);
 void elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong exp, const ring_t ring);
