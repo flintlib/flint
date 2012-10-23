@@ -52,6 +52,8 @@ elem_frac_div(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
     }
     else
     {
+        /* todo: use _frac_mul, followed by sign correction */
+
         elem_mul(NUMER(res, ring), NUMER(op1, ring), DENOM(op2, ring), RING_NUMER(ring));
         elem_mul(DENOM(res, ring), DENOM(op1, ring), NUMER(op2, ring), RING_NUMER(ring));
         elem_frac_canonicalise(res, ring);
