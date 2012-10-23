@@ -120,6 +120,26 @@ int main()
             abort();
         }
 
+        gen_randtest(A, state, size);
+        gen_randtest(B, state, size);
+        gen_randtest(C, state, size);
+        gen_mul(D, A, B);
+        gen_mul(E, A, C);
+        gen_add(E, D, E);
+        gen_add(D, B, C);
+        gen_mul(D, A, D);
+
+        if (!gen_equal(D, E))
+        {
+            printf("FAIL: A*(B+C) = A*B+A*C\n");
+            gen_print(A);
+            gen_print(B);
+            gen_print(C);
+            gen_print(D);
+            gen_print(E);
+            abort();
+        }
+
         gen_clear(A);
         gen_clear(B);
         gen_clear(C);
