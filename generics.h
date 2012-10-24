@@ -168,6 +168,14 @@ void elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void elem_pow_ui(elem_ptr res, elem_srcptr op, ulong exp, const ring_t ring);
 
+
+/* versions allowing the second operand to be in a parent ring
+   (note: for gcd, the *output* is also in the parent ring) */
+
+void elem_mul_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring, const ring_t parent);
+void elem_divexact_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring, const ring_t parent);
+void elem_gcd_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring, const ring_t parent);
+
 /* wrapped versions */
 
 void gen_init(gen_t x, const ring_t ring);
