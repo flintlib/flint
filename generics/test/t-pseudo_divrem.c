@@ -40,13 +40,22 @@ _gen_poly_set_to_lead_coeff(gen_t A, const gen_t B)
     _set_to_lead_coeff(A->elem, B->elem, A->ring);
 }
 
-int ring_has_poly_frac(ring_t r)
+int bad_frac_type(ring_t r)
 {
     if (r->type == TYPE_FRAC)
-        return (RING_NUMER(r) != RING_DENOM(r));
+    {
+        if (RING_NUMER(r) == RING_DENOM(r))
+            return 0;
+
+        if (RING_NUMER(r)->type == TYPE_POLY &&
+            RING_PARENT(RING_NUMER(r)) == RING_DENOM(r))
+            return 0;
+
+        return 1;
+    }
 
     if (r->type == TYPE_POLY)
-        return ring_has_poly_frac(RING_PARENT(r));
+        return bad_frac_type(RING_PARENT(r));
 
     return 0;
 }
@@ -57,6 +66,7 @@ int main()
     long iter;
 
     printf("pseudo_divrem....");
+    fflush(stdout);
 
     flint_randinit(state);
 
@@ -64,7 +74,7 @@ int main()
     {
         int i, depth;
         ring_t rings[5];
-        long size[5] = {7, 7, 7, 7, 7};
+        long size[5] = {6, 6, 6, 6, 6};
         ulong d, d2;
         gen_t A, B, C, D, Q, Q2, R, R2;
 
@@ -72,7 +82,7 @@ int main()
         do {
             depth = ring_init_randtest(rings, state, 5);
         } while (rings[depth-1]->type != TYPE_POLY ||
-            (ring_has_poly_frac(rings[depth-1]) ||
+            (bad_frac_type(rings[depth-1]) ||
             (rings[0]->type == TYPE_LIMB &&
             (depth == 1 ||
             (depth > 1 && rings[1]->type != TYPE_MOD)))));

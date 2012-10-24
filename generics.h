@@ -197,6 +197,7 @@ void gen_pseudo_divrem(gen_t Q, gen_t R, ulong * d, const gen_t A, const gen_t B
 
 void elem_content_recursive(elem_ptr cont, elem_srcptr obj, const ring_t cont_ring, const ring_t obj_ring);
 void elem_div_content_recursive(elem_ptr obj, elem_srcptr cont, const ring_t cont_ring, const ring_t obj_ring);
+void _elem_frac_canonicalise(elem_ptr num, elem_ptr den, const ring_t num_ring, const ring_t den_ring);
 void elem_frac_canonicalise(elem_srcptr x, const ring_t ring);
 
 void elem_frac_add(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);

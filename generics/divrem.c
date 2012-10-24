@@ -62,6 +62,11 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
                 elem_zero(R, ring);
                 break;
             }
+            else if (RING_NUMER(ring)->type == TYPE_POLY)
+            {
+                elem_frac_poly_divrem(Q, R, A, B, ring);
+                break;
+            }
 
         default:
             NOT_IMPLEMENTED("divrem", ring);

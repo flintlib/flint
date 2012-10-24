@@ -27,13 +27,22 @@
 #include <stdio.h>
 #include "generics.h"
 
-int ring_has_poly_frac(ring_t r)
+int bad_frac_type(ring_t r)
 {
     if (r->type == TYPE_FRAC)
-        return (RING_NUMER(r) != RING_DENOM(r));
+    {
+        if (RING_NUMER(r) == RING_DENOM(r))
+            return 0;
+
+        if (RING_NUMER(r)->type == TYPE_POLY &&
+            RING_PARENT(RING_NUMER(r)) == RING_DENOM(r))
+            return 0;
+
+        return 1;
+    }
 
     if (r->type == TYPE_POLY)
-        return ring_has_poly_frac(RING_PARENT(r));
+        return bad_frac_type(RING_PARENT(r));
 
     return 0;
 }
@@ -57,7 +66,7 @@ int main()
         /* XXX: we want to properly generate integral domains (?) */
         do {
             depth = ring_init_randtest(rings, state, 5);
-        } while (ring_has_poly_frac(rings[depth-1]) ||
+        } while (bad_frac_type(rings[depth-1]) ||
             (rings[0]->type == TYPE_LIMB &&
             (depth == 1 ||
             (depth > 1 && rings[1]->type != TYPE_MOD))));
