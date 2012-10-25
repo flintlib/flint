@@ -77,8 +77,8 @@ ring_struct;
 typedef struct
 {
     elem_ptr coeffs;
-    long length;
     long alloc;
+    long length;
 } elem_poly_struct;
 
 typedef struct
@@ -338,6 +338,12 @@ void elem_mat_mul(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ri
 void elem_mat_randtest(elem_mat_t mat, flint_rand_t state, const long * size, const ring_t ring);
 void elem_mat_transpose(elem_mat_t B, const elem_mat_t A, const ring_t ring);
 void elem_mat_print(const elem_mat_t mat, const ring_t ring);
+long elem_mat_fflu(elem_mat_t B, elem_ptr den, long * perm, const elem_mat_t A, int rank_check, const ring_t ring);
+
+static __inline__ int elem_mat_is_empty(const elem_mat_t mat, const ring_t ring)
+{
+    return mat->r == 0 || mat->c == 0;
+}
 
 #ifdef __cplusplus
 }

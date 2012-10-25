@@ -61,6 +61,12 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
     elem_srcptr leadB;
     long i, iQ, iR, size;
 
+    if (ring->type == TYPE_FMPZ && 0)
+    {
+        _fmpz_poly_divrem(Q, R, A, lenA, B, lenB);
+        return;
+    }
+
     size = ring->size;
     leadB = SRC_INDEX(B, lenB - 1, size);
     ELEM_TMP_INIT(tmp, ring);

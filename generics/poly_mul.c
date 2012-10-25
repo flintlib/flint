@@ -31,7 +31,7 @@ _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
 {
     long size = ring->size;
 
-    if (ring->type == TYPE_FMPZ)
+    if (ring->type == TYPE_FMPZ && 0)
     {
         _fmpz_poly_mul(res, poly1, len1, poly2, len2);
         return;
