@@ -25,4 +25,45 @@
 
 #include "generics.h"
 
+void
+_elem_mat_print(const elem_ptr * rows, long r, long c, const ring_t ring)
+{
+    if (r == 0 && c == 0)
+    {
+        printf("{{}}");
+    }
+    else
+    {
+        long i, j;
+
+        printf("{");
+
+        for (i = 0; i < r; i++)
+        {
+            printf("{");
+
+            for (j = 0; j < c; j++)
+            {
+                elem_print(MAT_SRCINDEX(rows, i, j, ring), ring);
+
+                if (j < c - 1)
+                    printf(", ");
+            }
+
+            printf("}");
+
+            if (i < r - 1)
+                printf(",\n");
+        }
+
+        printf("}");
+
+    }
+}
+
+void
+elem_mat_print(const elem_mat_t mat, const ring_t ring)
+{
+    _elem_mat_print(mat->rows, mat->r, mat->c, RING_PARENT(ring));
+}
 

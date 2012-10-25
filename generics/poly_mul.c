@@ -31,6 +31,12 @@ _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
 {
     long size = ring->size;
 
+    if (ring->type == TYPE_FMPZ)
+    {
+        _fmpz_poly_mul(res, poly1, len1, poly2, len2);
+        return;
+    }
+
 /*
     if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_FMPZ)
     {

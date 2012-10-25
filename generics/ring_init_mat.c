@@ -25,4 +25,11 @@
 
 #include "generics.h"
 
+void
+ring_init_mat(ring_t ring, const ring_t elem_ring)
+{
+    ring->type = TYPE_MAT;
+    ring->size = sizeof(elem_mat_struct);
+    ring->parent = (ring_struct *) elem_ring;
+}
 

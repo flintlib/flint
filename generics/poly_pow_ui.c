@@ -26,28 +26,6 @@
 
 #include "generics.h"
 
-elem_ptr _elem_vec_init(long len, const ring_t ring)
-{
-    long i;
-    elem_ptr vec = flint_malloc(len * ring->size);
-
-    for (i = 0; i < len; i++)
-        elem_init(INDEX(vec, i, ring->size), ring);
-
-    return vec;
-}
-
-void _elem_vec_clear(elem_ptr vec, long len, const ring_t ring)
-{
-    long i;
-
-    for (i = 0; i < len; i++)
-        elem_clear(INDEX(vec, i, ring->size), ring);
-
-    flint_free(vec);
-}
-
-
 void
 _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_t ring)
 {

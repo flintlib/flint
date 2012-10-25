@@ -25,4 +25,13 @@
 
 #include "generics.h"
 
+void _elem_vec_clear(elem_ptr vec, long len, const ring_t ring)
+{
+    long i;
+
+    for (i = 0; i < len; i++)
+        elem_clear(INDEX(vec, i, ring->size), ring);
+
+    flint_free(vec);
+}
 

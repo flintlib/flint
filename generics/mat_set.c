@@ -25,4 +25,25 @@
 
 #include "generics.h"
 
+void
+_elem_mat_set(elem_ptr * B, const elem_ptr * A, long ar, long ac, const ring_t ring)
+{
+    long i, j;
+
+    for (i = 0; i < ar; i++)
+        for (j = 0; j < ac; j++)
+            elem_set(MAT_INDEX(B, i, j, ring), MAT_SRCINDEX(A, i, j, ring), ring);
+}
+
+void
+elem_mat_set(elem_mat_t B, const elem_mat_t A, const ring_t ring)
+{
+    if (B->r != A->r || B->c != A->c)
+    {
+        printf("bad dimensions for mat_neg");
+        abort();
+    }
+
+    _elem_mat_set(B->rows, A->rows, A->r, A->c, RING_PARENT(ring));
+}
 

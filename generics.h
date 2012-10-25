@@ -39,7 +39,6 @@
 #endif
 
 struct ring_struct;
-struct elem_struct;
 
 typedef enum
 {
@@ -47,9 +46,13 @@ typedef enum
     TYPE_LIMB,
     TYPE_MOD,
     TYPE_FRAC,
-    TYPE_POLY
+    TYPE_POLY,
+    TYPE_MAT
 }
 ring_type;
+
+typedef void * elem_ptr;
+typedef const void * elem_srcptr;
 
 /* todo: make this a union */
 typedef struct
@@ -68,18 +71,26 @@ typedef struct
 }
 ring_struct;
 
+#define INDEX(_ptr, _i, _size) ((char *)(_ptr) + ((_i) * (_size)))
+#define SRC_INDEX(_ptr, _i, _size) ((const char *)(_ptr) + ((_i) * (_size)))
+
 typedef struct
 {
-    void * coeffs;
+    elem_ptr coeffs;
     long length;
     long alloc;
 } elem_poly_struct;
 
-typedef void * elem_ptr;
-typedef const void * elem_srcptr;
+typedef struct
+{
+    elem_ptr * rows;
+    elem_ptr entries;
+    long r;
+    long c;
+} elem_mat_struct;
 
-#define INDEX(_ptr, _i, _size) ((char *)(_ptr) + ((_i) * (_size)))
-#define SRC_INDEX(_ptr, _i, _size) ((const char *)(_ptr) + ((_i) * (_size)))
+typedef elem_poly_struct elem_poly_t[1];
+typedef elem_mat_struct elem_mat_t[1];
 
 typedef struct
 {
@@ -141,6 +152,7 @@ void ring_init_limb(ring_t ring);
 void ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus);
 void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring);
 void ring_init_poly(ring_t ring, const ring_t elem_ring);
+void ring_init_mat(ring_t ring, const ring_t elem_ring);
 int ring_init_randtest(ring_t * R, flint_rand_t state, int maxdepth);
 void ring_clear(ring_t ring);
 void ring_print(const ring_t ring);
@@ -215,6 +227,10 @@ void elem_frac_div(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t 
 
 /* Vector functions */
 
+elem_ptr _elem_vec_init(long len, const ring_t ring);
+void _elem_vec_clear(elem_ptr vec, long len, const ring_t ring);
+elem_ptr _elem_vec_realloc(elem_ptr vec, long old_len, long new_len, const ring_t ring);
+
 void _elem_vec_zero(elem_ptr res, long len, const ring_t ring);
 void _elem_vec_set(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
 void _elem_vec_neg(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
@@ -224,9 +240,45 @@ void _elem_vec_scalar_submul(elem_ptr res, elem_srcptr vec, long len, elem_srcpt
 
 /* Polynomial functions */
 
+/*
 void _elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
 void _elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
 void _elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring);
+*/
+
+static __inline__ void
+_elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
+{
+    long alloc = poly->alloc;
+
+    if (len > alloc)
+    {
+        if (len < 2 * alloc)
+            len = 2 * alloc;
+
+        poly->coeffs = _elem_vec_realloc(poly->coeffs, alloc, len, RING_PARENT(poly_ring));
+        poly->alloc = len;
+    }
+}
+
+static __inline__ void
+_elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring)
+{
+    long i, size = RING_PARENT(poly_ring)->size;
+    elem_ptr ptr = poly->coeffs;
+
+    for (i = poly->length - 1;
+        (i >= 0) && elem_is_zero(INDEX(ptr, i, size), poly_ring->parent); i--);
+
+    poly->length = i + 1;
+}
+
+static __inline__ void
+_elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
+{
+    poly->length = len;
+}
+
 void _elem_poly_print(elem_srcptr poly, long len, const ring_t ring);
 
 void elem_set_coeff_si(elem_poly_struct * elem, long index, long value, const ring_t ring);
@@ -267,6 +319,25 @@ elem_poly_neg(elem_poly_struct * res, const elem_poly_struct * src, const ring_t
     _elem_vec_neg(res->coeffs, src->coeffs, len, ring->parent);
     _elem_poly_set_length(res, len, ring);
 }
+
+/* Matrix functions */
+
+#define MAT_INDEX(rows, i, j, ring) (INDEX((rows)[i], (j), (ring)->size))
+#define MAT_SRCINDEX(rows, i, j, ring) (SRC_INDEX((rows)[i], (j), (ring)->size))
+
+void elem_mat_init(elem_mat_t mat, long rows, long cols, const ring_t ring);
+void elem_mat_clear(elem_mat_t mat, const ring_t ring);
+void elem_mat_set(elem_mat_t B, const elem_mat_t A, const ring_t ring);
+void elem_mat_swap(elem_mat_t mat1, elem_mat_t mat2, const ring_t ring);
+void elem_mat_zero(elem_mat_t mat, const ring_t ring);
+void elem_mat_one(elem_mat_t mat, const ring_t ring);
+void elem_mat_neg(elem_mat_t B, const elem_mat_t A, const ring_t ring);
+void elem_mat_add(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
+void elem_mat_sub(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
+void elem_mat_mul(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
+void elem_mat_randtest(elem_mat_t mat, flint_rand_t state, const long * size, const ring_t ring);
+void elem_mat_transpose(elem_mat_t B, const elem_mat_t A, const ring_t ring);
+void elem_mat_print(const elem_mat_t mat, const ring_t ring);
 
 #ifdef __cplusplus
 }

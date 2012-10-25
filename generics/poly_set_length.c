@@ -25,8 +25,4 @@
 
 #include "generics.h"
 
-void
-_elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
-{
-    poly->length = len;
-}
+

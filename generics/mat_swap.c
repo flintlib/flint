@@ -25,4 +25,11 @@
 
 #include "generics.h"
 
+void
+elem_mat_swap(elem_mat_t mat1, elem_mat_t mat2, const ring_t ring)
+{
+    elem_mat_struct tmp = *mat1;
+    *mat1 = *mat2;
+    *mat2 = tmp;
+}
 

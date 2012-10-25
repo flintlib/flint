@@ -25,4 +25,23 @@
 
 #include "generics.h"
 
+void
+elem_mat_init(elem_mat_t mat, long rows, long cols, const ring_t ring)
+{
+    if (rows && cols)
+    {
+        long i, size = RING_PARENT(ring)->size;
+
+        mat->entries = _elem_vec_init(rows * cols, RING_PARENT(ring));
+        mat->rows = flint_malloc(rows * sizeof(elem_ptr));
+
+        for (i = 0; i < rows; i++)
+            mat->rows[i] = INDEX(mat->entries, i * cols, size);
+    }
+    else
+        mat->entries = NULL;
+
+    mat->r = rows;
+    mat->c = cols;
+}
 

@@ -25,4 +25,20 @@
 
 #include "generics.h"
 
+void
+_elem_mat_randtest(elem_ptr * mat,
+    flint_rand_t state, long r, long c, const long * size, const ring_t ring)
+{
+    long i, j;
+
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            elem_randtest(MAT_INDEX(mat, i, j, ring), state, size, ring);
+}
+
+void
+elem_mat_randtest(elem_mat_t mat, flint_rand_t state, const long * size, const ring_t ring)
+{
+    _elem_mat_randtest(mat->rows, state, mat->r, mat->c, size, RING_PARENT(ring));
+}
 

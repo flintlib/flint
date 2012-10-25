@@ -25,4 +25,14 @@
 
 #include "generics.h"
 
+elem_ptr _elem_vec_init(long len, const ring_t ring)
+{
+    long i;
+    elem_ptr vec = flint_malloc(ring->size * len);
+
+    for (i = 0; i < len; i++)
+        elem_init(INDEX(vec, i, ring->size), ring);
+
+    return vec;
+}
 

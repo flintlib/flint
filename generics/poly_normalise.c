@@ -25,14 +25,3 @@
 
 #include "generics.h"
 
-void
-_elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring)
-{
-    long i, size = RING_PARENT(poly_ring)->size;
-    elem_ptr ptr = poly->coeffs;
-
-    for (i = poly->length - 1;
-        (i >= 0) && elem_is_zero(INDEX(ptr, i, size), poly_ring->parent); i--);
-
-    poly->length = i + 1;
-}

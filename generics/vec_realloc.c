@@ -25,4 +25,25 @@
 
 #include "generics.h"
 
+elem_ptr _elem_vec_realloc(elem_ptr vec, long old_len, long new_len, const ring_t ring)
+{
+    long i;
+
+    if (old_len < new_len)
+    {
+        vec = flint_realloc(vec, ring->size * new_len);
+
+        for (i = old_len; i < new_len; i++)
+            elem_init(INDEX(vec, i, ring->size), ring);
+    }
+    else if (old_len > new_len)
+    {
+        for (i = new_len; i < old_len; i++)
+            elem_clear(INDEX(vec, i, ring->size), ring);
+
+        vec = flint_realloc(vec, ring->size * new_len);
+    }
+
+    return vec;
+}
 

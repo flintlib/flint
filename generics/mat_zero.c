@@ -25,4 +25,19 @@
 
 #include "generics.h"
 
+void
+_elem_mat_zero(elem_ptr * mat, long r, long c, const ring_t ring)
+{
+    long i, j;
+
+    for (i = 0; i < r; i++)
+        for (j = 0; j < c; j++)
+            elem_zero(MAT_INDEX(mat, i, j, ring), ring);
+}
+
+void
+elem_mat_zero(elem_mat_t mat, const ring_t ring)
+{
+    _elem_mat_zero(mat->rows, mat->r, mat->c, RING_PARENT(ring));
+}
 

@@ -25,4 +25,13 @@
 
 #include "generics.h"
 
+void
+elem_mat_clear(elem_mat_t mat, const ring_t ring)
+{
+    if (mat->entries != NULL)
+    {
+        _elem_vec_clear(mat->entries, mat->r * mat->c, RING_PARENT(ring));
+        flint_free(mat->rows);
+    }
+}
 

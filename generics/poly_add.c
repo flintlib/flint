@@ -32,6 +32,12 @@ _elem_poly_add(elem_ptr res, elem_srcptr poly1, long len1,
     long i, min;
     long size = ring->size;
 
+    if (ring->type == TYPE_FMPZ)
+    {
+        _fmpz_poly_add(res, poly1, len1, poly2, len2);
+        return;
+    }
+
     min = FLINT_MIN(len1, len2);
 
     for (i = 0; i < min; i++)
