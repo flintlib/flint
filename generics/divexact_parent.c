@@ -32,7 +32,7 @@ elem_poly_divexact_parent(elem_poly_struct * res,
 {
     long i, len = op1->length, size = RING_PARENT(ring)->size;
 
-    _elem_poly_fit_length(res, len, ring);
+    elem_poly_fit_length(res, len, ring);
 
     for (i = 0; i < len; i++)
     {
@@ -41,7 +41,7 @@ elem_poly_divexact_parent(elem_poly_struct * res,
             cont, RING_PARENT(ring), parent);
     }
 
-    _elem_poly_set_length(res, len, ring);
+    elem_poly_set_length(res, len, ring);
 }
 
 void

@@ -37,10 +37,10 @@ nmod_set_si(long v, nmod_t mod)
 void
 elem_poly_set_si(elem_poly_struct * poly, long value, const ring_t ring)
 {
-    _elem_poly_fit_length(poly, 1, ring);
+    elem_poly_fit_length(poly, 1, ring);
     elem_set_si(poly->coeffs, value, ring->parent);
-    _elem_poly_set_length(poly, 1, ring);
-    _elem_poly_normalise(poly, ring);
+    elem_poly_set_length(poly, 1, ring);
+    elem_poly_normalise(poly, ring);
 }
 
 void

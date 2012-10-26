@@ -27,12 +27,12 @@
 
 /* XXX: rename? */
 void
-elem_set_coeff_si(elem_poly_struct * poly, long index, long value, const ring_t ring)
+elem_set_coeff_si(elem_poly_t poly, long index, long value, const ring_t ring)
 {
     long i, size = RING_PARENT(ring)->size;
     elem_ptr ptr;
 
-    _elem_poly_fit_length(poly, index + 1, ring);
+    elem_poly_fit_length(poly, index + 1, ring);
     ptr = poly->coeffs;
 
     for (i = poly->length; i < index; i++)
@@ -40,8 +40,8 @@ elem_set_coeff_si(elem_poly_struct * poly, long index, long value, const ring_t 
 
     elem_set_si(INDEX(ptr, index, size), value, ring->parent);
 
-    _elem_poly_set_length(poly, FLINT_MAX(poly->length, index + 1), ring);
-    _elem_poly_normalise(poly, ring);
+    elem_poly_set_length(poly, FLINT_MAX(poly->length, index + 1), ring);
+    elem_poly_normalise(poly, ring);
 }
 
 void

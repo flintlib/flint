@@ -57,9 +57,9 @@ elem_poly_sub(elem_poly_struct * res,
 {
     long max = FLINT_MAX(op1->length, op2->length);
 
-    _elem_poly_fit_length(res, max, ring);
+    elem_poly_fit_length(res, max, ring);
     _elem_poly_sub(res->coeffs, op1->coeffs, op1->length, op2->coeffs, op2->length, ring->parent);
-    _elem_poly_set_length(res, max, ring);
-    _elem_poly_normalise(res, ring);
+    elem_poly_set_length(res, max, ring);
+    elem_poly_normalise(res, ring);
 }
 

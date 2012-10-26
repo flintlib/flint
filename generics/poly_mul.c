@@ -67,7 +67,7 @@ _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
 }
 
 void
-elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring)
+elem_poly_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring)
 {
     long rlen, len1, len2;
 
@@ -84,9 +84,9 @@ elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_p
 
     if (res == op1 || res == op2)
     {
-        elem_poly_struct t[1];
+        elem_poly_t t;
         elem_init(t, ring);
-        _elem_poly_fit_length(t, rlen, ring);
+        elem_poly_fit_length(t, rlen, ring);
 
         if (len1 >= len2)
             _elem_poly_mul(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
@@ -98,7 +98,7 @@ elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_p
     }
     else
     {
-        _elem_poly_fit_length(res, rlen, ring);
+        elem_poly_fit_length(res, rlen, ring);
 
         if (len1 >= len2)
             _elem_poly_mul(res->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
@@ -106,7 +106,7 @@ elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_p
             _elem_poly_mul(res->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
     }
 
-    _elem_poly_set_length(res, rlen, ring);
-    _elem_poly_normalise(res, ring);
+    elem_poly_set_length(res, rlen, ring);
+    elem_poly_normalise(res, ring);
 }
 

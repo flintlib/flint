@@ -98,7 +98,7 @@ _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_
 }
 
 void
-elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong exp, const ring_t ring)
+elem_poly_pow_ui(elem_poly_t res, const elem_poly_t poly, ulong exp, const ring_t ring)
 {
     long len = poly->length;
 
@@ -121,7 +121,7 @@ elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong ex
     }
     else if (res == poly)
     {
-        elem_poly_struct tmp[1];
+        elem_poly_t tmp;
         elem_init(tmp, ring);
         elem_poly_pow_ui(tmp, poly, exp, ring);
         elem_poly_swap(res, tmp);
@@ -130,9 +130,9 @@ elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong ex
     else
     {
         long rlen = (long) exp * (len - 1) + 1;
-        _elem_poly_fit_length(res, rlen, ring);
+        elem_poly_fit_length(res, rlen, ring);
         _elem_poly_pow_ui(res->coeffs, poly->coeffs, len, exp, RING_PARENT(ring));
-        _elem_poly_set_length(res, rlen, ring);
-        _elem_poly_normalise(res, ring);
+        elem_poly_set_length(res, rlen, ring);
+        elem_poly_normalise(res, ring);
     }
 }

@@ -33,14 +33,14 @@ elem_poly_randtest(elem_poly_struct * res, flint_rand_t state, const long * size
     elem_ptr ptr;
 
     len = n_randint(state, size[0]);
-    _elem_poly_fit_length(res, len, ring);
+    elem_poly_fit_length(res, len, ring);
     ptr = res->coeffs;
 
     for (i = 0; i < len; i++)
         elem_randtest(INDEX(ptr, i, _size), state, size + 1, ring->parent);
 
-    _elem_poly_set_length(res, len, ring);
-    _elem_poly_normalise(res, ring);
+    elem_poly_set_length(res, len, ring);
+    elem_poly_normalise(res, ring);
 }
 
 

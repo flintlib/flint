@@ -100,8 +100,8 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
 }
 
 void
-elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R,
-                      const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring)
+elem_poly_divrem(elem_poly_t Q, elem_poly_t R,
+                      const elem_poly_t A, const elem_poly_t B, const ring_t ring)
 {
     long lenA = A->length;
     long lenB = B->length;
@@ -126,14 +126,14 @@ elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R,
     }
 
     /* TODO: lenB - 1, if a field... */
-    _elem_poly_fit_length(R, lenA, ring);
-    _elem_poly_fit_length(Q, lenA - lenB + 1, ring);
+    elem_poly_fit_length(R, lenA, ring);
+    elem_poly_fit_length(Q, lenA - lenB + 1, ring);
 
     _elem_poly_divrem(Q->coeffs, R->coeffs, A->coeffs, lenA, B->coeffs, lenB, ring->parent);
 
-    _elem_poly_set_length(Q, lenA - lenB + 1, ring);
-    _elem_poly_set_length(R, lenA, ring);
-    _elem_poly_normalise(Q, ring);
-    _elem_poly_normalise(R, ring);
+    elem_poly_set_length(Q, lenA - lenB + 1, ring);
+    elem_poly_set_length(R, lenA, ring);
+    elem_poly_normalise(Q, ring);
+    elem_poly_normalise(R, ring);
 }
 

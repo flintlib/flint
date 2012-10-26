@@ -240,14 +240,8 @@ void _elem_vec_scalar_submul(elem_ptr res, elem_srcptr vec, long len, elem_srcpt
 
 /* Polynomial functions */
 
-/*
-void _elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
-void _elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring);
-void _elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring);
-*/
-
 static __inline__ void
-_elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
+elem_poly_fit_length(elem_poly_t poly, long len, const ring_t poly_ring)
 {
     long alloc = poly->alloc;
 
@@ -262,7 +256,7 @@ _elem_poly_fit_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
 }
 
 static __inline__ void
-_elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring)
+elem_poly_normalise(elem_poly_t poly, const ring_t poly_ring)
 {
     long i, size = RING_PARENT(poly_ring)->size;
     elem_ptr ptr = poly->coeffs;
@@ -274,51 +268,52 @@ _elem_poly_normalise(elem_poly_struct * poly, const ring_t poly_ring)
 }
 
 static __inline__ void
-_elem_poly_set_length(elem_poly_struct * poly, long len, const ring_t poly_ring)
+elem_poly_set_length(elem_poly_t poly, long len, const ring_t poly_ring)
 {
     poly->length = len;
 }
 
 void _elem_poly_print(elem_srcptr poly, long len, const ring_t ring);
-
-void elem_set_coeff_si(elem_poly_struct * elem, long index, long value, const ring_t ring);
-void gen_set_coeff_si(gen_t x, long index, long value);
+void elem_poly_set_coeff_si(elem_poly_t elem, long index, long value, const ring_t ring);
 
 void _elem_poly_add(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
-void elem_poly_add(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring);
+void elem_poly_add(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
 void _elem_poly_sub(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
-void elem_poly_sub(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring);
+void elem_poly_sub(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
 void _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
-void elem_poly_mul(elem_poly_struct * res, const elem_poly_struct * op1, const elem_poly_struct * op2, const ring_t ring);
+void elem_poly_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
 void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
-void elem_poly_divrem(elem_poly_struct * Q, elem_poly_struct * R, const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
+void elem_poly_divrem(elem_poly_t Q, elem_poly_t R, const elem_poly_t A, const elem_poly_t B, const ring_t ring);
 
 void _elem_poly_pseudo_divrem(elem_ptr Q, elem_ptr R, ulong * d, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
-void elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R, ulong * d, const elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring);
+void elem_poly_pseudo_divrem(elem_poly_t Q, elem_poly_t R, ulong * d, const elem_poly_t A, const elem_poly_t B, const ring_t ring);
 
 void _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_t ring);
-void elem_poly_pow_ui(elem_poly_struct * res, const elem_poly_struct * poly, ulong exp, const ring_t ring);
+void elem_poly_pow_ui(elem_poly_t res, const elem_poly_t poly, ulong exp, const ring_t ring);
 
 static __inline__ void
-elem_poly_set(elem_poly_struct * res, const elem_poly_struct * src, const ring_t ring)
+elem_poly_set(elem_poly_t res, const elem_poly_t src, const ring_t ring)
 {
     long len = src->length;
-    _elem_poly_fit_length(res, len, ring);
+    elem_poly_fit_length(res, len, ring);
     _elem_vec_set(res->coeffs, src->coeffs, len, ring->parent);
-    _elem_poly_set_length(res, len, ring);
+    elem_poly_set_length(res, len, ring);
 }
 
 static __inline__ void
-elem_poly_neg(elem_poly_struct * res, const elem_poly_struct * src, const ring_t ring)
+elem_poly_neg(elem_poly_t res, const elem_poly_t src, const ring_t ring)
 {
     long len = src->length;
-    _elem_poly_fit_length(res, len, ring);
+    elem_poly_fit_length(res, len, ring);
     _elem_vec_neg(res->coeffs, src->coeffs, len, ring->parent);
-    _elem_poly_set_length(res, len, ring);
+    elem_poly_set_length(res, len, ring);
 }
+
+/* deprecate? */
+void gen_set_coeff_si(gen_t x, long index, long value);
 
 /* Matrix functions */
 

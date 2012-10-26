@@ -78,16 +78,16 @@ _elem_frac_poly_divrem_wrap(elem_poly_struct * Q, elem_ptr Qden,
     lenQ = lenA - lenB + 1;
     lenR = lenB - 1;
 
-    _elem_poly_fit_length(Q, lenQ, num_ring);
-    _elem_poly_fit_length(R, lenA, num_ring); /* XXX: needed space for pseudo division */
+    elem_poly_fit_length(Q, lenQ, num_ring);
+    elem_poly_fit_length(R, lenA, num_ring); /* XXX: needed space for pseudo division */
 
     _elem_frac_poly_divrem(Q->coeffs, Qden, R->coeffs, Rden,
         A->coeffs, Aden, A->length,
         B->coeffs, Bden, B->length, RING_PARENT(num_ring));
 
-    _elem_poly_set_length(Q, lenQ, num_ring);
-    _elem_poly_set_length(R, lenR, num_ring);
-    _elem_poly_normalise(R, num_ring);
+    elem_poly_set_length(Q, lenQ, num_ring);
+    elem_poly_set_length(R, lenR, num_ring);
+    elem_poly_normalise(R, num_ring);
 
     _elem_frac_canonicalise(Q, Qden, num_ring, den_ring);
     _elem_frac_canonicalise(R, Rden, num_ring, den_ring);

@@ -71,9 +71,9 @@ _elem_poly_pseudo_divrem(elem_ptr Q, elem_ptr R, ulong * d,
 
 
 void
-elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R,
-                                 ulong * d, const elem_poly_struct * A,
-                                 const elem_poly_struct * B, const ring_t ring)
+elem_poly_pseudo_divrem(elem_poly_t Q, elem_poly_t R,
+                                 ulong * d, const elem_poly_t A,
+                                 const elem_poly_t B, const ring_t ring)
 {
     long lenq, lenr;
 
@@ -95,7 +95,7 @@ elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R,
     }
     else if (Q == A || Q == B)
     {
-        elem_poly_struct tmp[1];
+        elem_poly_t tmp;
         elem_init(tmp, ring);
         elem_poly_pseudo_divrem(tmp, R, d, A, B, ring);
         elem_swap(Q, tmp, ring);
@@ -103,7 +103,7 @@ elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R,
     }
     else if (R == B)
     {
-        elem_poly_struct tmp[1];
+        elem_poly_t tmp;
         elem_init(tmp, ring);
         elem_poly_pseudo_divrem(Q, tmp, d, A, B, ring);
         elem_swap(R, tmp, ring);
@@ -114,15 +114,15 @@ elem_poly_pseudo_divrem(elem_poly_struct * Q, elem_poly_struct * R,
         lenq = A->length - B->length + 1;
         lenr = A->length;
 
-        _elem_poly_fit_length(Q, lenq, ring);
-        _elem_poly_fit_length(R, lenr, ring);
+        elem_poly_fit_length(Q, lenq, ring);
+        elem_poly_fit_length(R, lenr, ring);
 
         _elem_poly_pseudo_divrem(Q->coeffs, R->coeffs, d, A->coeffs, A->length,
             B->coeffs, B->length, RING_PARENT(ring));
 
-        _elem_poly_set_length(Q, lenq, ring);
-        _elem_poly_set_length(R, lenr - 1, ring);
-        _elem_poly_normalise(R, ring);
+        elem_poly_set_length(Q, lenq, ring);
+        elem_poly_set_length(R, lenr - 1, ring);
+        elem_poly_normalise(R, ring);
     }
 }
 

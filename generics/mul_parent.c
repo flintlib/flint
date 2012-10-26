@@ -31,13 +31,13 @@ elem_poly_mul_parent(elem_poly_struct * res,
 {
     long i, size = RING_PARENT(ring)->size;
 
-    _elem_poly_fit_length(res, op1->length, ring);
+    elem_poly_fit_length(res, op1->length, ring);
 
     for (i = 0; i < op1->length; i++)
         elem_mul_parent(INDEX(res->coeffs, i, size),
             SRC_INDEX(op1->coeffs, i, size), op2, RING_PARENT(ring), parent);
 
-    _elem_poly_set_length(res, op1->length, ring);
+    elem_poly_set_length(res, op1->length, ring);
 }
 
 void
