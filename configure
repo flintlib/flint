@@ -151,6 +151,10 @@ fi
 if [ -d "${BLAS_DIR}" ]; then
    BLAS_LIB_DIR="${BLAS_DIR}"
    BLAS_INCLUDE_DIR="${BLAS_DIR}"
+elif [ "$WANT_BLAS" = "0" ]; then
+   BLAS_DIR="/usr"
+   BLAS_LIB_DIR="${BLAS_DIR}"
+   BLAS_INCLUDE_DIR="${BLAS_DIR}"
 else
    echo "Invalid BLAS directory"
    exit 1
