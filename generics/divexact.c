@@ -87,7 +87,18 @@ elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
             }
 
         default:
-            NOT_IMPLEMENTED("divexact", ring);
+            {
+                elem_ptr tmp;
+                ELEM_TMP_INIT(tmp, ring);
+                elem_divrem(Q, tmp, A, B, ring);
+                if (!elem_is_zero(tmp, ring))
+                {
+                    printf("divexact: divrem gave nonzero remainder\n");
+                    abort();
+                }
+                ELEM_TMP_CLEAR(tmp, ring);
+                break;
+            }
     }
 }
 

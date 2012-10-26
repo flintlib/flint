@@ -339,6 +339,7 @@ void elem_mat_randtest(elem_mat_t mat, flint_rand_t state, const long * size, co
 void elem_mat_transpose(elem_mat_t B, const elem_mat_t A, const ring_t ring);
 void elem_mat_print(const elem_mat_t mat, const ring_t ring);
 long elem_mat_fflu(elem_mat_t B, elem_ptr den, long * perm, const elem_mat_t A, int rank_check, const ring_t ring);
+void elem_mat_det(elem_ptr det, const elem_mat_t mat, const ring_t ring);
 
 static __inline__ int elem_mat_is_empty(const elem_mat_t mat, const ring_t ring)
 {
