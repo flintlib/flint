@@ -34,7 +34,7 @@ $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
 $(BUILD_DIR)/%.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR)	
