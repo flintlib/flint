@@ -135,6 +135,14 @@ if [ -d "${NTL_DIR}/lib" ]; then
 elif [ -d "${NTL_DIR}/lib64" ]; then
    NTL_LIB_DIR="${NTL_DIR}/lib64"
    NTL_INCLUDE_DIR="${NTL_DIR}/include"
+elif [ "$WANT_NTL" = "0" ]; then
+   NTL_DIR="/usr"
+   if [ -d "${NTL_DIR}/lib" ]; then
+      NTL_LIB_DIR="${NTL_DIR}/lib64"
+   else
+      NTL_LIB_DIR="${NTL_DIR}/lib64"
+   fi
+   NTL_INCLUDE_DIR="${NTL_DIR}/include"
 else
    echo "Invalid NTL directory"
    exit 1
