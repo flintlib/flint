@@ -12,17 +12,19 @@ LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_N
 export LD_LIBRARY_PATH
 export
 
-SOURCES = $(wildcard *.c)
+SOURCES = clz_tab.c memory_manager.c version.c profiler.c 
 
-HEADERS = $(wildcard *.h)
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) config.h fft_tuning.h fmpz-conversions.h
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
+LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
 LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
-LIB_OBJS = $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
+LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
+MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
 
-LIB_SOURCES = $(foreach dir, $(BUILD_DIRS), $(dir)/*.c)
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -44,14 +46,11 @@ all: library
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean || exit $$?;)
-	rm -f $(OBJS) $(LIB_LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
 distclean: clean
-	rm -f config.h
-	rm -f fft_tuning.h
-	rm -f fmpz-conversions.h
-	rm -f Makefile
+	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile
 
 dist:
 	git archive --format tar --prefix flint-2.3/ trunk > ../flint-2.3.tar; gzip ../flint-2.3.tar
@@ -70,18 +69,18 @@ examples: $(FLINT_LIB) $(EXMP_SOURCES)
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
-$(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library || exit $$?;)
+$(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) shared || exit $$?;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
 	  make build/interfaces/NTL-interface.lo; \
-	  $(CXX) $(PICFLAG) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	  $(CXX) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
-	  $(CC) $(PICFLAG) -shared $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
+	  $(CC) -shared $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 
-libflint.a: $(LIB_SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) || exit $$?;)
+libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) static || exit $$?;)
 	if [ "$(FLINT_SHARED)" -eq "0" ]; then \
 		touch test/t-*.c; \
 		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
@@ -101,10 +100,7 @@ library:
 		make libflint.a; \
 	fi
 
-build/interfaces:
-	mkdir -p build/interfaces
-
-check: library
+check: library test_helpers.o
 ifndef MOD
 	make $(TESTS)
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
@@ -129,11 +125,8 @@ install: $(FLINT_LIB)
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-build/test/%: test/%.c | build/test
-	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
-
-build/test:
-	mkdir -p build/test
+build:
+	mkdir -p build
 
 build/%.lo: %.c | build
 	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
@@ -141,8 +134,14 @@ build/%.lo: %.c | build
 build/%.o: %.c | build
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build:
-	mkdir -p build
+build/test/%: test/%.c | build/test
+	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+
+build/test:
+	mkdir -p build/test
+
+build/interfaces:
+	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
 	$(CXX) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
