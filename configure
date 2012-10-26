@@ -207,16 +207,6 @@ case $ARCH in
       MACHINE="unknown";;
 esac
 
-#no shared library on mingw or cygwin
-
-if [ "$OS" = "MINGW32" ]; then
-   SHARED=0
-fi
-
-if [ "$OS" = "CYGWIN" ]; then
-   SHARED=0
-fi
-
 #ABI flag
 if [ "$ABI" = "32" ]; then
    ABI_FLAG="-m32"
