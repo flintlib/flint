@@ -233,7 +233,7 @@ long fft_adjust_limbs(mp_size_t limbs);
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
 
-void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                     mp_limb_t * i2, mp_size_t n2);
 
 void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
