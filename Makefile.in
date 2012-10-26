@@ -111,7 +111,7 @@ build/interfaces:
 check: $(TESTS) 
 ifndef MOD
 	if [ "$(FLINT_STATIC)" -eq "1" -a "$(FLINT_SHARED)" -eq "0" ]; then \
-		$(foreach prog, $(TEST_PROGS), $(CC) $(CFLAGS) $(INCS) $(LIBS) $(prog).c -o build/$(prog);) \
+		$(foreach prog, $(TEST_PROGS), $(CC) $(prog).c -o build/$(prog) $(CFLAGS) $(INCS) $(LIBS);) \
 	fi
 	mkdir -p build/interfaces/test
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
