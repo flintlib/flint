@@ -48,20 +48,7 @@ elem_gcd_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t rin
 {
     if (ring == parent)
     {
-        switch (ring->type)
-        {
-            case TYPE_FMPZ:
-                fmpz_gcd(res, op1, op2);
-                break;
-
-            /* assumed to be a field */
-            case TYPE_MOD:
-                elem_one(res, ring);
-                break;
-
-            default:
-                NOT_IMPLEMENTED("gcd_parent", ring);
-        }
+        elem_gcd(res, op1, op2, ring);
     }
     else
     {
@@ -79,3 +66,25 @@ elem_gcd_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t rin
     }
 }
 
+void
+elem_gcd(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
+{
+    switch (ring->type)
+    {
+        case TYPE_FMPZ:
+            fmpz_gcd(res, op1, op2);
+            break;
+
+        /* assumed to be a field */
+        case TYPE_MOD:
+            elem_one(res, ring);
+            break;
+
+        case TYPE_POLY:
+            elem_poly_gcd_subresultant(res, op1, op2, ring);
+            break;
+
+        default:
+            NOT_IMPLEMENTED("gcd", ring);
+    }
+}

@@ -180,6 +180,7 @@ void elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t ring);
 void elem_pow_ui(elem_ptr res, elem_srcptr op, ulong exp, const ring_t ring);
 
+void elem_gcd(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring);
 
 /* versions allowing the second operand to be in a parent ring
    (note: for gcd, the *output* is also in the parent ring) */
@@ -237,6 +238,7 @@ void _elem_vec_neg(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
 void _elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_submul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
+void _elem_vec_scalar_divexact(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 
 /* Polynomial functions */
 
@@ -293,6 +295,9 @@ void elem_poly_pseudo_divrem(elem_poly_t Q, elem_poly_t R, ulong * d, const elem
 
 void _elem_poly_pow_ui(elem_ptr res, elem_srcptr poly, long len, ulong e, const ring_t ring);
 void elem_poly_pow_ui(elem_poly_t res, const elem_poly_t poly, ulong exp, const ring_t ring);
+
+void _elem_poly_gcd_subresultant(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
+void elem_poly_gcd_subresultant(elem_poly_t res, const elem_poly_t poly1, const elem_poly_t poly2, const ring_t ring);
 
 static __inline__ void
 elem_poly_set(elem_poly_t res, const elem_poly_t src, const ring_t ring)

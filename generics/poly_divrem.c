@@ -119,10 +119,24 @@ elem_poly_divrem(elem_poly_t Q, elem_poly_t R,
         return;
     }
 
-    if (Q == A || Q == B || R == A || R == B)
+    if (Q == A || Q == B)
     {
-        printf("not implemented: aliasing in divrem\n");
-        abort();
+        elem_poly_t tmp;
+        elem_init(tmp, ring);
+        elem_poly_divrem(tmp, R, A, B, ring);
+        elem_swap(Q, tmp, ring);
+        elem_clear(tmp, ring);
+        return;
+    }
+
+    if (R == B)
+    {
+        elem_poly_t tmp;
+        elem_init(tmp, ring);
+        elem_poly_divrem(Q, tmp, A, B, ring);
+        elem_swap(R, tmp, ring);
+        elem_clear(tmp, ring);
+        return;
     }
 
     /* TODO: lenB - 1, if a field... */

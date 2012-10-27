@@ -29,9 +29,9 @@
 
 void _set_to_lead_coeff(elem_poly_struct * A, const elem_poly_struct * B, const ring_t ring)
 {
-    _elem_poly_fit_length(A, 1, ring);
+    elem_poly_fit_length(A, 1, ring);
     elem_set(A->coeffs, INDEX(B->coeffs, B->length - 1, RING_PARENT(ring)->size), RING_PARENT(ring));
-    _elem_poly_set_length(A, 1, ring);
+    elem_poly_set_length(A, 1, ring);
 }
 
 void
