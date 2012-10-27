@@ -380,7 +380,7 @@ echo "PICFLAG=$PICFLAG" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 case $OS in
    MINGW*)
-      echo "PATH+:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}";;
+      echo "PATH+:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}" >> Makefile;;
    *)
       ;;
 esac
