@@ -25,7 +25,7 @@ ulong_extras directory of flint -- I hereby license it under the BSD
 license as per the remainder of the FFT implementation.)
 
 To use the FFT for multiplying large integers, one needs to use the function
-mpn_mul_fft_full as documented in the doc directory. This relies on tuning
+flint_mpn_mul_fft_main as documented in the doc directory. This relies on tuning
 values supplied in fft_tuning.h in the top level source directory.
 
 Features:

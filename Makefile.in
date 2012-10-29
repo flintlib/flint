@@ -12,17 +12,19 @@ LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_N
 export LD_LIBRARY_PATH
 export
 
-SOURCES = $(wildcard *.c)
+SOURCES = clz_tab.c memory_manager.c version.c profiler.c 
 
-HEADERS = $(wildcard *.h)
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) config.h fft_tuning.h fmpz-conversions.h
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
+LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
 LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
-LIB_OBJS = $(foreach dir, $(BUILD_DIRS), build/$(dir)/*.lo)
+LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
+MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
 
-LIB_SOURCES = $(foreach dir, $(BUILD_DIRS), $(dir)/*.c)
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -36,24 +38,19 @@ EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
 
-TEST_PROGS = $(patsubst %.c, %, $(TEST_SOURCES))
-
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: $(FLINT_LIB)
+all: library 
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean || exit $$?;)
-	rm -f $(OBJS) $(LIB_LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
+	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
 distclean: clean
-	rm -f config.h
-	rm -f fft_tuning.h
-	rm -f fmpz-conversions.h
-	rm -f Makefile
+	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile
 
 dist:
 	git archive --format tar --prefix flint-2.3/ trunk > ../flint-2.3.tar; gzip ../flint-2.3.tar
@@ -72,52 +69,45 @@ examples: $(FLINT_LIB) $(EXMP_SOURCES)
 	mkdir -p build/examples
 	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
-$(FLINT_LIB): $(LIB_SOURCES) $(HEADERS) $(OBJS) $(LOBJS) | build build/interfaces 
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) || exit $$?;) \
-		if [ "$(FLINT_SHARED)" -eq "0" ]; then \
-			$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
-		fi \
-	fi
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) library || exit $$?;) \
-	fi
+$(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) shared || exit $$?;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CXX) -fPIC $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
-			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
-		fi; \
-		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(CXX) -fPIC $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
-			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS); \
-			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;) \
-		fi; \
+	  make build/interfaces/NTL-interface.lo; \
+	  $(CXX) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
-		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CC) -fPIC -shared $(LOBJS) $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
-		fi; \
-		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(AR) rcs libflint.a $(OBJS); \
-			$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;) \
-		fi; \
+	  $(CC) -shared $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 
-library: $(FLINT_LIB)
+libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) static || exit $$?;)
+	if [ "$(FLINT_SHARED)" -eq "0" ]; then \
+		touch test/t-*.c; \
+		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
+	fi
+	if [ "$(WANT_NTL)" -eq "1" ]; then \
+		make build/interfaces/NTL-interface.o; \
+		$(AR) rcs libflint.a build/interfaces/NTL-interface.o; \
+	fi
+	$(AR) rcs libflint.a $(OBJS);
+	$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 
-build/interfaces:
-	mkdir -p build/interfaces
+library:
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		make $(FLINT_LIB); \
+	fi
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+		make libflint.a; \
+	fi
 
-check: $(TESTS) 
+check: library test_helpers.o
 ifndef MOD
-	if [ "$(FLINT_STATIC)" -eq "1" -a "$(FLINT_SHARED)" -eq "0" ]; then \
-		$(foreach prog, $(TEST_PROGS), $(CC) $(CFLAGS) $(INCS) $(LIBS) $(prog).c -o build/$(prog);) \
-	fi
-	mkdir -p build/interfaces/test
+	make $(TESTS)
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
+	mkdir -p build/interfaces/test
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(CXX) $(CFLAGS) $(INCS) interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o -o build/interfaces/test/t-NTL-interface $(LIBS); \
+		make build/interfaces/test/t-NTL-interface; \
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
@@ -135,26 +125,32 @@ install: $(FLINT_LIB)
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-build/test/%: test/%.c $(FLINT_LIB) | build/test 
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS); \
-	fi
+build:
+	mkdir -p build
+
+build/%.lo: %.c | build
+	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/%.o: %.c | build
+	$(CC) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/test/%: test/%.c | build/test
+	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
 build/test:
 	mkdir -p build/test
 
-build/%.lo: %.c | build
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@; \
-	fi
+build/interfaces:
+	mkdir -p build/interfaces
 
-build/%.o: %.c | build
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(CC) $(CFLAGS) $(INCS) -c $< -o $@; \
-	fi
+build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
+	$(CXX) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build:
-	mkdir -p build
+build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
+	$(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
+	$(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
 .PHONY: profile library clean examples tune check distclean dist install all
 

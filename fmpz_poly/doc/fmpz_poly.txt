@@ -2613,12 +2613,12 @@ void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, fmpz_poly_t A)
 
 void fmpz_poly_set_nmod_poly(fmpz_poly_t A, const nmod_poly_t Amod)
 
-    Sets the coefficients of \code{Amod} to the residues in \code{Amod},
+    Sets the coefficients of \code{A} to the residues in \code{Amod},
     normalised to the interval $-m/2 \le r < m/2$ where $m$ is the modulus.
 
 void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
 
-    Sets the coefficients of \code{Amod} to the residues in \code{Amod},
+    Sets the coefficients of \code{A} to the residues in \code{Amod},
     normalised to the interval $0 \le r < m$ where $m$ is the modulus.
 
 void
