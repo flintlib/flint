@@ -778,21 +778,26 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den,
-                            const fmpz_mat_t A)
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
-    Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
-    to the reduced row echelon form of \code{A} and returns the
-    rank of \code{A}. Aliasing of \code{A} and \code{B} is allowed.
+    Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
+    and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
+    is allowed.
 
-    Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.
+    The algorithm proceeds by first computing a row echelon form using
+    \code{fmpz_mat_fflu}. Letting the upper part of this matrix be
+    $(U | V) P$ where $U$ is full rank upper triangular and $P$ is a
+    permutation matrix, we obtain the rref by setting $V$ to $U^{-1} V$
+    using back substitution. Scaling each completed row in the back
+    substitution to the denominator \code{den}, we avoid introducing
+    new fractions. This strategy is equivalent to the fraction-free
+    Gauss-Jordan elimination in \citep{NakTurWil1997}, but faster since
+    only the part $V$ corresponding to the null space has to be updated.
 
     The denominator \code{den} is set to $\pm \operatorname{det}(S)$ where
     $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square).
     Note that the determinant is not generally the minimal denominator.
 
-    The fraction-free Gauss-Jordan algorithm is given
-    in \citep{NakTurWil1997}.
 
 *******************************************************************************
 
@@ -800,10 +805,10 @@ long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den,
 
 *******************************************************************************
 
-long fmpz_mat_rref(long * perm, fmpz_mat_t A, const fmpz_t p)
+long fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p)
 
     Uses fraction-free Gauss-Jordan elimination to set \code{A}
-    to it's reduced row echelon form and returns the rank of \code{A}.
+    to its reduced row echelon form and returns the rank of \code{A}.
     All computations are done modulo p.
 
     Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.

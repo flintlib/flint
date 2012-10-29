@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011-2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -27,78 +27,81 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-#define E(j,k) fmpz_mat_entry(B,j,k)
-
 long
-fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
-    fmpz_t t;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
-    int sign;
+    long i, j, k, m, n, rank;
+    long *pivots, *nonpivots;
 
-    if (fmpz_mat_is_empty(A))
+    rank = fmpz_mat_fflu(R, den, NULL, A, 0);
+    m = fmpz_mat_nrows(R);
+    n = fmpz_mat_ncols(R);
+
+    /* clear bottom */
+    for (i = rank; i < m; i++)
+        for (j = 0; j < n; j++)
+            fmpz_zero(fmpz_mat_entry(R, i, j));
+
+    /* Convert row echelon form to reduced row echelon form */
+    if (rank > 1)
     {
-        fmpz_set_ui(den, 1);
-        return 0;
-    }
+        fmpz_t tmp;
+        fmpz_init(tmp);
 
-    fmpz_mat_set(B, A);
-    m = B->r;
-    n = B->c;
-    rank = pivot_row = pivot_col = 0;
-    sign = 1;
+        pivots = flint_malloc(sizeof(long) * n);
+        nonpivots = pivots + rank;
 
-    fmpz_init(t);
-
-    while (pivot_row < m && pivot_col < n)
-    {
-        r = fmpz_mat_find_pivot_any(B, pivot_row, m, pivot_col);
-
-        if (r == -1)
+        for (i = j = k = 0; i < rank; i++)
         {
-            pivot_col++;
-            continue;
-        }
-        else if (r != pivot_row)
-        {
-            fmpz_mat_swap_rows(B, NULL, pivot_row, r);
-            sign = -sign;
-        }
-        rank++;
-
-        for (j = 0; j < m; j++)
-        {
-            if (j == pivot_row)
-                continue;
-
-            for (k = j > pivot_row ? pivot_col + 1 : j; k < n; k++)
+            while (fmpz_is_zero(fmpz_mat_entry(R, i, j)))
             {
-                if (k == pivot_col)
-                    continue;
-
-                fmpz_mul(E(j, k), E(j, k), E(pivot_row, pivot_col));
-                fmpz_mul(t, E(j, pivot_col), E(pivot_row, k));
-                fmpz_sub(E(j, k), E(j, k), t);
-
-                if (pivot_row > 0)
-                    fmpz_divexact(E(j, k), E(j, k), den);
+                nonpivots[k] = j;
+                k++;
+                j++;
             }
-
-            fmpz_zero(E(j, pivot_col));
+            pivots[i] = j;
+            j++;
+        }
+        while (k < n - rank)
+        {
+            nonpivots[k] = j;
+            k++;
+            j++;
         }
 
-        fmpz_set(den, E(pivot_row, pivot_col));
-        pivot_row++;
-        pivot_col++;
-    }
+        for (k = 0; k < n - rank; k++)
+        {
+            for (i = rank - 2; i >= 0; i--)
+            {
+                fmpz_mul(tmp, den, fmpz_mat_entry(R, i, nonpivots[k]));
 
-    fmpz_clear(t);
+                for (j = i + 1; j < rank; j++)
+                {
+                    fmpz_submul(tmp, fmpz_mat_entry(R, i, pivots[j]),
+                        fmpz_mat_entry(R, j, nonpivots[k]));
+                }
 
-    if (sign < 0)
-    {
-        fmpz_neg(den, den);
-        fmpz_mat_neg(B, B);
+                fmpz_divexact(fmpz_mat_entry(R, i, nonpivots[k]),
+                    tmp, fmpz_mat_entry(R, i, pivots[i]));
+            }
+        }
+
+        /* clear pivot columns */
+        for (i = 0; i < rank; i++)
+        {
+            for (j = 0; j < rank; j++)
+            {
+                if (i == j)
+                    fmpz_set(fmpz_mat_entry(R, j, pivots[i]), den);
+                else
+                    fmpz_zero(fmpz_mat_entry(R, j, pivots[i]));
+            }
+        }
+
+        flint_free(pivots);
+        fmpz_clear(tmp);
     }
 
     return rank;
 }
+
