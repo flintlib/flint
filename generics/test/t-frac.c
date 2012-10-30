@@ -66,6 +66,7 @@ int main()
     gen_randtest(H, state, size);
     gen_randtest(I, state, size);
 
+/*
     gen_print(A);
     gen_print(B);
     gen_print(C);
@@ -75,6 +76,7 @@ int main()
     gen_print(G);
     gen_print(H);
     gen_print(I);
+*/
 
     gen_clear(A);
     gen_clear(B);

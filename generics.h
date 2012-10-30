@@ -332,6 +332,7 @@ void elem_mat_swap(elem_mat_t mat1, elem_mat_t mat2, const ring_t ring);
 void elem_mat_zero(elem_mat_t mat, const ring_t ring);
 void elem_mat_one(elem_mat_t mat, const ring_t ring);
 int elem_mat_is_zero(const elem_mat_t mat, const ring_t ring);
+int elem_mat_equal(const elem_mat_t A, const elem_mat_t B, const ring_t ring);
 void elem_mat_neg(elem_mat_t B, const elem_mat_t A, const ring_t ring);
 void elem_mat_add(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
 void elem_mat_sub(elem_mat_t C, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
@@ -341,10 +342,13 @@ void elem_mat_randtest(elem_mat_t mat, flint_rand_t state, const long * size, co
 void elem_mat_transpose(elem_mat_t B, const elem_mat_t A, const ring_t ring);
 void elem_mat_print(const elem_mat_t mat, const ring_t ring);
 long elem_mat_fflu(elem_mat_t B, elem_ptr den, long * perm, const elem_mat_t A, int rank_check, const ring_t ring);
+int elem_mat_solve(elem_mat_t X, elem_ptr den, const elem_mat_t A, const elem_mat_t B, const ring_t ring);
+void elem_mat_solve_fflu_precomp(elem_mat_t X, const long * perm, const elem_mat_t FFLU, const elem_mat_t B, const ring_t ring);
 long elem_mat_rank(const elem_mat_t mat, const ring_t ring);
 void elem_mat_det(elem_ptr det, const elem_mat_t mat, const ring_t ring);
 long elem_mat_rref(elem_mat_t R, elem_ptr den, const elem_mat_t A, const ring_t ring);
 long elem_mat_nullspace(elem_mat_t res, const elem_mat_t mat, const ring_t ring);
+int elem_mat_inv(elem_mat_t X, elem_ptr den, const elem_mat_t A, const ring_t ring);
 
 static __inline__ int elem_mat_is_empty(const elem_mat_t mat, const ring_t ring)
 {

@@ -24,45 +24,23 @@
 ******************************************************************************/
 
 #include "generics.h"
+#include "perm.h"
 
-void
-_elem_mat_print(const elem_ptr * rows, long r, long c, const ring_t ring)
+int
+elem_mat_inv(elem_mat_t X, elem_ptr den, const elem_mat_t A, const ring_t ring)
 {
-    if (r == 0 && c == 0)
+    if (X == A)
     {
-        printf("{{}}\n");
+        int r;
+        elem_mat_t T;
+        elem_mat_init(T, elem_mat_nrows(A, ring), elem_mat_ncols(A, ring), ring);
+        r = elem_mat_inv(T, den, A, ring);
+        elem_mat_swap(T, X, ring);
+        elem_mat_clear(T, ring);
+        return r;
     }
-    else
-    {
-        long i, j;
 
-        printf("{");
-
-        for (i = 0; i < r; i++)
-        {
-            printf("{");
-
-            for (j = 0; j < c; j++)
-            {
-                elem_print(MAT_SRCINDEX(rows, i, j, ring), ring);
-
-                if (j < c - 1)
-                    printf(", ");
-            }
-
-            printf("}");
-
-            if (i < r - 1)
-                printf(",\n");
-        }
-
-        printf("}\n");
-    }
-}
-
-void
-elem_mat_print(const elem_mat_t mat, const ring_t ring)
-{
-    _elem_mat_print(mat->rows, mat->r, mat->c, RING_PARENT(ring));
+    elem_mat_one(X, ring);
+    return elem_mat_solve(X, den, A, X, ring);
 }
 
