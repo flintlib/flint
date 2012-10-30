@@ -27,21 +27,19 @@
 #include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
+#include "fmpz_poly_mat.h"
 #include "perm.h"
 #include "ulong_extras.h"
 
 /* checks that the rref has the right form */
-int check_rref(const fmpz_mat_t A, const fmpz_t den, long rank)
+int check_rref(const fmpz_poly_mat_t A, const fmpz_poly_t den, long rank)
 {
     long i, j, k, prev_pivot;
 
     /* bottom should be zero */
     for (i = rank; i < A->r; i++)
         for (j = 0; j < A->c; j++)
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
+            if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(A, i, j)))
                 return 0;
 
     prev_pivot = -1;
@@ -50,7 +48,7 @@ int check_rref(const fmpz_mat_t A, const fmpz_t den, long rank)
     {
         for (j = 0; j < A->c; j++)
         {
-            if (!fmpz_is_zero(fmpz_mat_entry(A, i, j)))
+            if (!fmpz_poly_is_zero(fmpz_poly_mat_entry(A, i, j)))
             {
                 /* pivot should have a higher column index than previous */
                 if (j <= prev_pivot)
@@ -59,9 +57,9 @@ int check_rref(const fmpz_mat_t A, const fmpz_t den, long rank)
                 /* column should be 0 ... 0 1 0 ... 0 */
                 for (k = 0; k < rank; k++)
                 {
-                    if (i == k && !fmpz_equal(fmpz_mat_entry(A, k, j), den))
+                    if (i == k && !fmpz_poly_equal(fmpz_poly_mat_entry(A, k, j), den))
                         return 0;
-                    if (i != k && !fmpz_is_zero(fmpz_mat_entry(A, k, j)))
+                    if (i != k && !fmpz_poly_is_zero(fmpz_poly_mat_entry(A, k, j)))
                         return 0;
                 }
 
@@ -85,46 +83,35 @@ main(void)
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
+    for (iter = 0; iter < 200 * flint_test_multiplier(); iter++)
     {
-        fmpz_mat_t A, R, B, R2;
-        fmpz_t den, c, den2;
-        long j, k, m, n, b, d, r, rank1, rank2;
+        fmpz_poly_mat_t A, R, B, R2;
+        fmpz_poly_t den, c, den2;
+        long j, k, m, n, deg, bits, rank1, rank2;
         long *perm;
+        float density;
         int equal;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        r = n_randint(state, FLINT_MIN(m, n) + 1);
+        deg = 1 + n_randint(state, 5);
+        bits = 1 + n_randint(state, 100);
+        density = n_randint(state, 100) * 0.01;
 
-        fmpz_mat_init(A, m, n);
-        fmpz_mat_init(R, m, n);
-        fmpz_mat_init(B, 2 * m, n);
-        fmpz_mat_init(R2, 2 * m, n);
+        fmpz_poly_mat_init(A, m, n);
+        fmpz_poly_mat_init(R, m, n);
+        fmpz_poly_mat_init(B, 2 * m, n);
+        fmpz_poly_mat_init(R2, 2 * m, n);
 
-        fmpz_init(c);
-        fmpz_init(den);
-        fmpz_init(den2);
+        fmpz_poly_init(c);
+        fmpz_poly_init(den);
+        fmpz_poly_init(den2);
 
         perm = _perm_init(2 * m);
 
-        /* sparse */
-        b = 1 + n_randint(state, 10) * n_randint(state, 10);
-        d = n_randint(state, 2*m*n + 1);
-        fmpz_mat_randrank(A, state, r, b);
+        fmpz_poly_mat_randtest_sparse(A, state, deg, bits, density);
 
-        /* dense */
-        if (n_randint(state, 2))
-            fmpz_mat_randops(A, state, d);
-
-        rank1 = fmpz_mat_rref(R, den, A);
-
-        if (r != rank1)
-        {
-            printf("FAIL:\n");
-            printf("wrong rank!\n");
-            abort();
-        }
+        rank1 = fmpz_poly_mat_rref(R, den, A);
 
         check_rref(R, den, rank1);
 
@@ -134,54 +121,54 @@ main(void)
 
         for (j = 0; j < m; j++)
         {
-            fmpz_randtest_not_zero(c, state, 5);
+            fmpz_poly_randtest_not_zero(c, state, deg, bits);
             for (k = 0; k < n; k++)
-                fmpz_mul(fmpz_mat_entry(B, perm[j], k), fmpz_mat_entry(A, j, k), c);
+                fmpz_poly_mul(fmpz_poly_mat_entry(B, perm[j], k), fmpz_poly_mat_entry(A, j, k), c);
         }
 
         for (j = 0; j < m; j++)
         {
-            fmpz_randtest_not_zero(c, state, 5);
+            fmpz_poly_randtest_not_zero(c, state, deg, bits);
             for (k = 0; k < n; k++)
-                fmpz_mul(fmpz_mat_entry(B, perm[m + j], k), fmpz_mat_entry(R, j, k), c);
+                fmpz_poly_mul(fmpz_poly_mat_entry(B, perm[m + j], k), fmpz_poly_mat_entry(R, j, k), c);
         }
 
-        rank2 = fmpz_mat_rref(R2, den2, B);
+        rank2 = fmpz_poly_mat_rref(R2, den2, B);
         equal = (rank1 == rank2);
 
         if (equal)
         {
-            fmpz_mat_scalar_mul_fmpz(R, R, den2);
-            fmpz_mat_scalar_mul_fmpz(R2, R2, den);
+            fmpz_poly_mat_scalar_mul_fmpz_poly(R, R, den2);
+            fmpz_poly_mat_scalar_mul_fmpz_poly(R2, R2, den);
 
             for (j = 0; j < rank2; j++)
                 for (k = 0; k < n; k++)
                     equal = equal &&
-                        fmpz_equal(fmpz_mat_entry(R, j, k), fmpz_mat_entry(R2, j, k));
+                        fmpz_poly_equal(fmpz_poly_mat_entry(R, j, k), fmpz_poly_mat_entry(R2, j, k));
             for (j = rank2; j < 2 * rank2; j++)
                 for (k = 0; k < n; k++)
-                    equal = equal && fmpz_is_zero(fmpz_mat_entry(R2, j, k));
+                    equal = equal && fmpz_poly_is_zero(fmpz_poly_mat_entry(R2, j, k));
         }
 
         if (!equal)
         {
             printf("FAIL (rank1 = %ld, rank2 = %ld)!\n", rank1, rank2);
-            fmpz_mat_print_pretty(A); printf("\n\n");
-            fmpz_mat_print_pretty(R); printf("\n\n");
-            fmpz_mat_print_pretty(R2); printf("\n\n");
+            fmpz_poly_mat_print(A, "x"); printf("\n\n");
+            fmpz_poly_mat_print(R, "x"); printf("\n\n");
+            fmpz_poly_mat_print(R2, "x"); printf("\n\n");
             abort();
         }
 
-        fmpz_clear(c);
-        fmpz_clear(den);
-        fmpz_clear(den2);
+        fmpz_poly_clear(c);
+        fmpz_poly_clear(den);
+        fmpz_poly_clear(den2);
 
         _perm_clear(perm);
 
-        fmpz_mat_clear(A);
-        fmpz_mat_clear(R);
-        fmpz_mat_clear(B);
-        fmpz_mat_clear(R2);
+        fmpz_poly_mat_clear(A);
+        fmpz_poly_mat_clear(R);
+        fmpz_poly_mat_clear(B);
+        fmpz_poly_mat_clear(R2);
     }
 
     flint_randclear(state);

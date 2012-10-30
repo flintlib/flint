@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2011-2012 Fredrik Johansson
 
 ******************************************************************************/
 
@@ -27,100 +27,85 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-#define E(j,k) fmpz_poly_mat_entry(B,j,k)
-
-static __inline__ void
-fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, long * perm, long r, long s)
-{
-    if (r != s)
-    {
-        fmpz_poly_struct * u;
-        long t;
-
-        if (perm != NULL)
-        {
-            t = perm[s];
-            perm[s] = perm[r];
-            perm[r] = t;
-        }
-
-        u = mat->rows[s];
-        mat->rows[s] = mat->rows[r];
-        mat->rows[r] = u; 
-    }
-}
-
 long
-fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
-    const fmpz_poly_mat_t A)
+fmpz_poly_mat_rref(fmpz_poly_mat_t R, fmpz_poly_t den, const fmpz_poly_mat_t A)
 {
-    fmpz_poly_t t;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
-    int sign;
+    long i, j, k, m, n, rank;
+    long *pivots, *nonpivots;
 
-    if (fmpz_poly_mat_is_empty(A))
+    rank = fmpz_poly_mat_fflu(R, den, NULL, A, 0);
+    m = fmpz_poly_mat_nrows(R);
+    n = fmpz_poly_mat_ncols(R);
+
+    /* clear bottom */
+    for (i = rank; i < m; i++)
+        for (j = 0; j < n; j++)
+            fmpz_poly_zero(fmpz_poly_mat_entry(R, i, j));
+
+    /* Convert row echelon form to reduced row echelon form */
+    if (rank > 1)
     {
-        fmpz_poly_one(den);
-        return 0;
-    }
+        fmpz_poly_t tmp, tmp2;
+        fmpz_poly_init(tmp);
+        fmpz_poly_init(tmp2);
 
-    fmpz_poly_mat_set(B, A);
-    m = B->r;
-    n = B->c;
-    rank = pivot_row = pivot_col = 0;
-    sign = 1;
+        pivots = flint_malloc(sizeof(long) * n);
+        nonpivots = pivots + rank;
 
-    fmpz_poly_init(t);
-
-    while (pivot_row < m && pivot_col < n)
-    {
-        r = fmpz_poly_mat_find_pivot_partial(B, pivot_row, m, pivot_col);
-
-        if (r == -1)
+        /* find pivot positions */
+        for (i = j = k = 0; i < rank; i++)
         {
-            pivot_col++;
-            continue;
-        }
-        else if (r != pivot_row)
-        {
-            fmpz_poly_mat_swap_rows(B, NULL, pivot_row, r);
-            sign = -sign;
-        }
-        rank++;
-
-        for (j = 0; j < m; j++)
-        {
-            if (j == pivot_row)
-                continue;
-
-            for (k = j > pivot_row ? pivot_col + 1 : j; k < n; k++)
+            while (fmpz_poly_is_zero(fmpz_poly_mat_entry(R, i, j)))
             {
-                if (k == pivot_col)
-                    continue;
-
-                fmpz_poly_mul(E(j, k), E(j, k), E(pivot_row, pivot_col));
-                fmpz_poly_mul(t, E(j, pivot_col), E(pivot_row, k));
-                fmpz_poly_sub(E(j, k), E(j, k), t);
-
-                if (pivot_row > 0)
-                    fmpz_poly_div(E(j, k), E(j, k), den);
+                nonpivots[k] = j;
+                k++;
+                j++;
             }
-
-            fmpz_poly_zero(E(j, pivot_col));
+            pivots[i] = j;
+            j++;
+        }
+        while (k < n - rank)
+        {
+            nonpivots[k] = j;
+            k++;
+            j++;
         }
 
-        fmpz_poly_set(den, E(pivot_row, pivot_col));
-        pivot_row++;
-        pivot_col++;
-    }
+        for (k = 0; k < n - rank; k++)
+        {
+            for (i = rank - 2; i >= 0; i--)
+            {
+                fmpz_poly_mul(tmp, den, fmpz_poly_mat_entry(R, i, nonpivots[k]));
 
-    fmpz_poly_clear(t);
+                for (j = i + 1; j < rank; j++)
+                {
+                    fmpz_poly_mul(tmp2, fmpz_poly_mat_entry(R, i, pivots[j]),
+                        fmpz_poly_mat_entry(R, j, nonpivots[k]));
+                    fmpz_poly_sub(tmp, tmp, tmp2);
+                }
 
-    if (sign < 0)
-    {
-        fmpz_poly_neg(den, den);
-        fmpz_poly_mat_neg(B, B);
+                fmpz_poly_div(fmpz_poly_mat_entry(R, i, nonpivots[k]),
+                    tmp, fmpz_poly_mat_entry(R, i, pivots[i]));
+            }
+        }
+
+        /* clear pivot columns */
+        for (i = 0; i < rank; i++)
+        {
+            for (j = 0; j < rank; j++)
+            {
+                if (i == j)
+                    fmpz_poly_set(fmpz_poly_mat_entry(R, j, pivots[i]), den);
+                else
+                    fmpz_poly_zero(fmpz_poly_mat_entry(R, j, pivots[i]));
+            }
+        }
+
+        flint_free(pivots);
+        fmpz_poly_clear(tmp);
+        fmpz_poly_clear(tmp2);
     }
 
     return rank;
 }
+

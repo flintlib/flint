@@ -49,9 +49,9 @@ or implied, of William Hart.
  extern "C" {
 #endif
 
-#if !defined(mpn_sumdiff_n)
-#define mpn_sumdiff_n(t, u, r, s, n) \
-   ((mpn_add_n(t, r, s, n)<<1) + mpn_sub_n(u, r, s, n))
+#if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
+extern
+mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
 
 #define fft_sumdiff(t, u, r, s, n) \
@@ -233,7 +233,7 @@ long fft_adjust_limbs(mp_size_t limbs);
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
 
-void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                     mp_limb_t * i2, mp_size_t n2);
 
 void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 

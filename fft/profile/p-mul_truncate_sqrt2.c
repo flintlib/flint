@@ -53,7 +53,7 @@ main(void)
     depth = 13;
     w = 1;
     iters = 1;
-    truncation = 1;
+    truncation = 1.0;
 
     {
        mp_size_t n = (1UL<<depth);
@@ -63,7 +63,7 @@ main(void)
        mp_size_t j;
        mp_limb_t * i1, *i2, *r1, *r2;
         
-       printf("bits = %ld\n", int_limbs*FLINT_BITS);
+       printf("limbs = %ld\n", int_limbs);
        
        i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
        i2 = i1 + int_limbs;

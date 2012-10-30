@@ -2,7 +2,8 @@ SOURCES = $(wildcard *.c)
 
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
+LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
+MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo 
 
 TEST_SOURCES = $(wildcard test/*.c)
 
@@ -12,17 +13,17 @@ TUNE_SOURCES = $(wildcard tune/*.c)
 
 TESTS = $(patsubst %.c, $(BUILD_DIR)/%, $(TEST_SOURCES))
 
-TESTS_RUN = $(foreach file, $(TESTS), $(file)_RUN)
+TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-.SECONDARY:
+all: shared static 
 
-all: $(OBJS)
+shared: $(MOD_LOBJ)
 
-library: $(LIB_OBJS)
+static: $(OBJS)
 
 profile: $(PROF_SOURCES)
 	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
@@ -33,18 +34,21 @@ tune: $(TUNE_SOURCES)
 $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
+$(MOD_LOBJ): $(LOBJS)
+	$(CC) -Wl,-r $^ -o $@ -nostdlib
+
 $(BUILD_DIR)/%.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR)	
+	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
 
 check: $(TESTS) $(TESTS_RUN)
+
+$(BUILD_DIR)/test/%: test/%.c
+	$(CC) $(CFLAGS) $(INCS) $< ../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %
 	@$<
 
-$(BUILD_DIR)/test/%: test/%.c
-	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
-
-.PHONY: profile tune clean check all %_RUN
+.PHONY: profile tune clean check all shared static %_RUN

@@ -36,7 +36,7 @@ or implied, of William Hart.
 
 static int fft_tuning_table[5][2] = FFT_TAB;
 
-void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
+void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                         mp_limb_t * i2, mp_size_t n2)
 {
    mp_size_t off, depth = 6;
@@ -68,7 +68,7 @@ void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
       j1 = (bits1 - 1)/bits + 1;
       j2 = (bits2 - 1)/bits + 1;
    }
-
+   
    if (depth < 11)
    {
       mp_size_t wadj = 1;
@@ -93,6 +93,13 @@ void mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 
       mul_truncate_sqrt2(r1, i1, n1, i2, n2, depth, w);
    } else
+   {
+      if (j1 + j2 - 1 <= 3*n)
+      {
+         depth--;
+         w *= 3;
+      }
       mul_mfa_truncate_sqrt2(r1, i1, n1, i2, n2, depth, w);
+   }
 }
 
