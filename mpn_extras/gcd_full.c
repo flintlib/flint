@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-mp_size_t mpn_gcd_full(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
     mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
 {
    mp_size_t s1 = 0, s2 = 0, m, b1, b2, mb, len1, len2, leng;

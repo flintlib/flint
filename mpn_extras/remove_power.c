@@ -30,7 +30,7 @@
 #include "mpn_extras.h"
 
 
-mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
+mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                       mp_ptr p, mp_size_t psize, ulong *exp)
 {
     int i, maxi;
@@ -58,7 +58,7 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     for (i = 0; i < FLINT_BITS && xsize >= square_size[i]; i++)
     {
         mpn_tdiv_qr(div, rem, 0, x, xsize, square[i], square_size[i]);
-        if (!mpn_zero_p(rem, square_size[i]))
+        if (!flint_mpn_zero_p(rem, square_size[i]))
         {
             i -= 1;
             break;
@@ -88,7 +88,7 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
         if (xsize >= square_size[i])
         {
             mpn_tdiv_qr(div, rem, 0, x, xsize, square[i], square_size[i]);
-            if (mpn_zero_p(rem, square_size[i]))
+            if (flint_mpn_zero_p(rem, square_size[i]))
             {
                 *exp += (1 << i);
                 xsize = xsize - square_size[i] + 1;
