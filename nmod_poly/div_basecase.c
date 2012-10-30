@@ -41,7 +41,7 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
     mp_ptr R1 = W;
     mp_srcptr Btop = B + B_len - 1;
     
-    mpn_copyi(R1, A + B_len - 1, A_len - B_len + 1);
+    flint_mpn_copyi(R1, A + B_len - 1, A_len - B_len + 1);
 
     while (coeff >= 0)
     {

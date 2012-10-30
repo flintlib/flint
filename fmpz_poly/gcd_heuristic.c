@@ -47,7 +47,7 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
       __mpz_struct * mpz_ptr = COEFF_TO_PTR(*gc);
       
       mp_ptr temp = flint_malloc(limbsg*sizeof(mp_limb_t));
-      mpn_copyi(temp, arrayg, limbsg);
+      flint_mpn_copyi(temp, arrayg, limbsg);
       
       mpn_tdiv_q(arrayg, temp, limbsg, mpz_ptr->_mp_d, mpz_ptr->_mp_size);
       tlimbs = limbsg - mpz_ptr->_mp_size + 1;
@@ -195,7 +195,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
       clear bits after g in arrayg so they are not inadvertently
       pulled into G after bit unpacking
    */
-   mpn_zero(arrayg + limbsg, limbs2-limbsg);
+   flint_mpn_zero(arrayg + limbsg, limbs2-limbsg);
 
    /* unpack gcd */
    _fmpz_poly_bit_unpack(G, glen, arrayg, pack_bits, 0);
@@ -241,7 +241,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 
 		if (divides) /* quotient really was exact */
 		{
-         mpn_zero(q, qlimbs);
+         flint_mpn_zero(q, qlimbs);
           
          if (flint_mpn_divides(q, array2, limbs2, arrayg, limbsg, temp)) 
 	      {

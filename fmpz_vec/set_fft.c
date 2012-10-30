@@ -56,7 +56,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
 			   if (size >= -1L) _fmpz_demote_val(coeffs_m); /* coefficient may be small*/
          } else
          {
-            mpn_copyi(data, coeffs_f[i], limbs); 
+            flint_mpn_copyi(data, coeffs_f[i], limbs); 
 			   size = limbs;
 			   while ((size) && (data[size - 1] == 0L)) size--; /* normalise */
 			   mpz_ptr->_mp_size = size;
@@ -72,7 +72,7 @@ void _fmpz_vec_set_fft(fmpz * coeffs_m, long length,
          mpz_ptr = _fmpz_promote(coeffs_m);
          if (mpz_ptr->_mp_alloc < limbs) _mpz_realloc(mpz_ptr, limbs);
 			data = mpz_ptr->_mp_d;
-			mpn_copyi(data, coeffs_f[i], limbs); 
+			flint_mpn_copyi(data, coeffs_f[i], limbs); 
 			size = limbs;
 			while ((size) && (data[size - 1] == 0L)) size--; /* normalise */
 			mpz_ptr->_mp_size = size;

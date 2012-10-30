@@ -291,7 +291,7 @@ main(void)
         do nmod_poly_randtest(a, state, n_randint(state, 1000));
         while (a->length < 2);
         nmod_poly_fit_length(b, a->length - 1);
-        mpn_zero(b->coeffs, a->length - 1);
+        flint_mpn_zero(b->coeffs, a->length - 1);
         nmod_poly_randtest_not_zero(b, state, n_randint(state, 1000) + 1);
         do b->coeffs[a->length - 2] = n_randint(state, n);
         while (b->coeffs[a->length - 2] == 0);

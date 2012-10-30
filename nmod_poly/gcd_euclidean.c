@@ -59,7 +59,7 @@ long _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
     {
         if (lenR1 == 0)
         {
-            mpn_copyi(G, B, lenB);
+            flint_mpn_copyi(G, B, lenB);
             _nmod_vec_clear(F);
             return lenB;
         }
@@ -89,7 +89,7 @@ long _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA,
     {
         lenG = lenR1;
         if (steps % 3 != 1)
-            mpn_copyi(G, R1, lenR1);
+            flint_mpn_copyi(G, R1, lenR1);
     }
 
     _nmod_vec_clear(F);

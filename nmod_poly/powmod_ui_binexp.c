@@ -125,8 +125,8 @@ nmod_poly_powmod_ui_binexp(nmod_poly_t res,
     if (len < trunc)
     {
         p = _nmod_vec_init(trunc);
-        mpn_copyi(p, poly->coeffs, len);
-        mpn_zero(p + len, trunc - len);
+        flint_mpn_copyi(p, poly->coeffs, len);
+        flint_mpn_zero(p + len, trunc - len);
         pcopy = 1;
     } else
         p = poly->coeffs;

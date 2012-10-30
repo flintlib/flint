@@ -161,7 +161,7 @@ void nmod_poly_set(nmod_poly_t a, const nmod_poly_t b)
     if (a != b)
     {
         nmod_poly_fit_length(a, b->length);
-        mpn_copyi(a->coeffs, b->coeffs, b->length);
+        flint_mpn_copyi(a->coeffs, b->coeffs, b->length);
         a->length = b->length;
     }
 }

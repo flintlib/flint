@@ -95,8 +95,8 @@ nmod_poly_revert_series_newton(nmod_poly_t Qinv,
     if (Qlen < n)
     {
         Q_coeffs = _nmod_vec_init(n);
-        mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
-        mpn_zero(Q_coeffs + Qlen, n - Qlen);
+        flint_mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
+        flint_mpn_zero(Q_coeffs + Qlen, n - Qlen);
     }
     else
         Q_coeffs = Q->coeffs;

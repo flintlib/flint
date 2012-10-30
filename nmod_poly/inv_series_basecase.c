@@ -42,7 +42,7 @@ _nmod_poly_inv_series_basecase(mp_ptr Qinv,
     _nmod_poly_reverse(Qrev, Q, n, n);
     
     X2n[n - 1] = 1;
-    mpn_zero(X2n, n - 1);
+    flint_mpn_zero(X2n, n - 1);
     X2n -= (n - 1);
 
     _nmod_poly_div_divconquer(Qinv, X2n, 2*n - 1, Qrev, n, mod);
@@ -71,8 +71,8 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
     if (Qlen < n)
     {
         Q_coeffs = _nmod_vec_init(n);
-        mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
-        mpn_zero(Q_coeffs + Qlen, n - Qlen);
+        flint_mpn_copyi(Q_coeffs, Q->coeffs, Qlen);
+        flint_mpn_zero(Q_coeffs + Qlen, n - Qlen);
     }
     else
         Q_coeffs = Q->coeffs;

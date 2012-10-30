@@ -39,8 +39,8 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
         mp_ptr t = V;
         mp_ptr w = t + 2*lenB - 1;
         
-        mpn_copyi(t + lenB - 1, A + lenB - 1, lenB);
-        mpn_zero(t, lenB - 1);
+        flint_mpn_copyi(t + lenB - 1, A + lenB - 1, lenB);
+        flint_mpn_zero(t, lenB - 1);
         
         _nmod_poly_divrem_basecase(Q, BQ, w, t, 2 * lenB - 1, B, lenB, mod);
         
@@ -89,7 +89,7 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
            of length n2 at BQ.
          */
 
-        mpn_copyi(dq1, d2q1, n1 - 1);
+        flint_mpn_copyi(dq1, d2q1, n1 - 1);
         if (n2 > n1 - 1)
             BQ[0] = d2q1[n1 - 1];
 
@@ -131,7 +131,7 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
          */
 
         _nmod_vec_add(BQ + n1, BQ + n1, d3q2, n2 - 1, mod);
-        mpn_copyi(BQ, d4q2, n2);
+        flint_mpn_copyi(BQ, d4q2, n2);
         _nmod_vec_add(BQ + n2, BQ + n2, d4q2 + n2, n1 - 1, mod);
 
         /*

@@ -68,7 +68,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
         xsize = xsize - square_size[i] + 1;
         if (div[xsize-1] == 0)
             xsize--;
-        mpn_copyi(x, div, xsize);
+        flint_mpn_copyi(x, div, xsize);
 
         /* Form next square if needed */
         sqsize = square_size[i] * 2;
@@ -94,7 +94,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                 xsize = xsize - square_size[i] + 1;
                 if (div[xsize-1] == 0)
                     xsize--;
-                mpn_copyi(x, div, xsize);
+                flint_mpn_copyi(x, div, xsize);
             }
         }
     }

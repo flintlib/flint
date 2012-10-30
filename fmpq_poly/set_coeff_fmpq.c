@@ -45,7 +45,7 @@ void fmpq_poly_set_coeff_fmpq(fmpq_poly_t poly, long n, const fmpq_t x)
     {
         fmpq_poly_fit_length(poly, n + 1);
         _fmpq_poly_set_length(poly, n + 1);
-        mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
+        flint_mpn_zero((mp_ptr) poly->coeffs + len, (n + 1) - len);
         len = n + 1;
     }
 

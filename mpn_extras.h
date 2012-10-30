@@ -117,7 +117,7 @@ and mpn_add.
 #define MPN_SET(xx, xs, yy, ys)   \
 do {                              \
     xs = ys;                      \
-    mpn_copyi(xx, yy, ys);        \
+    flint_mpn_copyi(xx, yy, ys);        \
 } while (0)
 
 #define CARRY(cy,xx,xs) if (cy) { xx[xs++] = cy; }

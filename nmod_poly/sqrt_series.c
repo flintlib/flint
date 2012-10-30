@@ -66,8 +66,8 @@ nmod_poly_sqrt_series(nmod_poly_t g,
     if (hlen < n)
     {
         h_coeffs = _nmod_vec_init(n);
-        mpn_copyi(h_coeffs, h->coeffs, hlen);
-        mpn_zero(h_coeffs + hlen, n - hlen);
+        flint_mpn_copyi(h_coeffs, h->coeffs, hlen);
+        flint_mpn_zero(h_coeffs + hlen, n - hlen);
     }
     else
         h_coeffs = h->coeffs;

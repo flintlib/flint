@@ -75,7 +75,7 @@ fmpz_poly_bit_pack(fmpz_t f, const fmpz_poly_t poly,
     mpz_realloc2(mpz, len * bit_size);
     d = mpz->_mp_alloc;
 
-    mpn_zero(mpz->_mp_d, d);
+    flint_mpn_zero(mpz->_mp_d, d);
 
     if (fmpz_sgn(fmpz_poly_lead(poly)) < 0)
         negate = -1;
