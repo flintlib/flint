@@ -60,6 +60,11 @@ elem_init(elem_ptr elem, const ring_t ring)
             elem_one(DENOM(elem, ring), ring->denom);
             break;
 
+        case TYPE_COMPLEX:
+            elem_init(REALPART(elem, ring), ring->parent);
+            elem_init(IMAGPART(elem, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("init", ring);
     }

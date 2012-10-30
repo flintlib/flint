@@ -51,6 +51,11 @@ elem_zero(elem_ptr x, const ring_t ring)
             elem_one(DENOM(x, ring), RING_DENOM(ring));
             break;
 
+        case TYPE_COMPLEX:
+            elem_zero(REALPART(x, ring), ring->parent);
+            elem_zero(IMAGPART(x, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("zero", ring);
     }

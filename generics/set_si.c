@@ -84,6 +84,11 @@ elem_set_si(elem_ptr elem, long v, const ring_t ring)
             elem_one(DENOM(elem, ring), RING_DENOM(ring));
             break;
 
+        case TYPE_COMPLEX:
+            elem_set_si(REALPART(elem, ring), v, ring->parent);
+            elem_zero(IMAGPART(elem, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("set_si", ring);
     }

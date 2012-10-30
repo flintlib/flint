@@ -87,6 +87,11 @@ elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t 
             elem_frac_canonicalise(res, ring);
             break;
 
+        case TYPE_COMPLEX:
+            elem_randtest(REALPART(res, ring), state, size, ring->parent);
+            elem_randtest(IMAGPART(res, ring), state, size, ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("randtest", ring);
     }

@@ -47,7 +47,8 @@ typedef enum
     TYPE_MOD,
     TYPE_FRAC,
     TYPE_POLY,
-    TYPE_MAT
+    TYPE_MAT,
+    TYPE_COMPLEX
 }
 ring_type;
 
@@ -111,6 +112,9 @@ typedef gen_struct gen_t[1];
 #define NUMER(elem, ring) ((elem_ptr) (elem))
 #define DENOM(elem, ring) ((elem_ptr) (((char *) (elem)) + (ring)->denom_offset))
 
+#define REALPART(elem, ring) ((elem_ptr) (elem))
+#define IMAGPART(elem, ring) ((elem_ptr) (((char *) (elem)) + (((ring)->size) >> 1)))
+
 #define NOT_IMPLEMENTED(opname, ring) do { \
     printf("operation %s not implemented for ring ", opname); \
     ring_print(ring); printf("\n"); \
@@ -153,6 +157,7 @@ void ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus);
 void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring);
 void ring_init_poly(ring_t ring, const ring_t elem_ring);
 void ring_init_mat(ring_t ring, const ring_t elem_ring);
+void ring_init_complex(ring_t ring, const ring_t real_ring);
 int ring_init_randtest(ring_t * R, flint_rand_t state, int maxdepth);
 void ring_clear(ring_t ring);
 void ring_print(const ring_t ring);

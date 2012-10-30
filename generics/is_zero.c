@@ -45,6 +45,10 @@ elem_is_zero(elem_srcptr x, const ring_t ring)
         case TYPE_FRAC:
             return elem_is_zero(NUMER(x, ring), ring->numer);
 
+        case TYPE_COMPLEX:
+            return elem_is_zero(REALPART(x, ring), ring->parent) &&
+                   elem_is_zero(IMAGPART(x, ring), ring->parent);
+
         default:
             NOT_IMPLEMENTED("is_zero", ring);
     }

@@ -25,42 +25,10 @@
 
 #include "generics.h"
 
-int
-elem_is_one(elem_srcptr x, const ring_t ring)
+void
+ring_init_complex(ring_t ring, const ring_t real_ring)
 {
-    switch (ring->type)
-    {
-        case TYPE_FMPZ:
-            return fmpz_is_one(x);
-
-        case TYPE_LIMB:
-            return *((mp_srcptr) x) == 1;
-
-        /* XXX: mod 1? */
-        case TYPE_MOD:
-            return elem_is_one(x, ring->parent);
-
-        case TYPE_FRAC:
-            return elem_is_one(NUMER(x, ring), ring->numer) && 
-                   elem_is_one(DENOM(x, ring), ring->denom);
-
-        case TYPE_POLY:
-            {
-                const elem_poly_struct * poly = x;
-                return (poly->length == 1) && elem_is_one(poly->coeffs, RING_PARENT(ring));
-            }
-
-        case TYPE_COMPLEX:
-            return elem_is_one(REALPART(x, ring), ring->parent) &&
-                   elem_is_zero(IMAGPART(x, ring), ring->parent);
-
-        default:
-            NOT_IMPLEMENTED("is_one", ring);
-    }
-}
-
-int
-gen_is_one(const gen_t x)
-{
-    return elem_is_one(x->elem, x->ring);
+    ring->type = TYPE_COMPLEX;
+    ring->size = 2 * real_ring->size;
+    ring->parent = (ring_struct *) real_ring;
 }

@@ -25,6 +25,45 @@
 
 #include "generics.h"
 
+
+void
+elem_complex_mul(elem_ptr z, elem_srcptr x, elem_srcptr y, const ring_t ring)
+{
+    elem_srcptr a, b, c, d;
+    elem_ptr e, f;
+    elem_ptr t, u, v;
+    const ring_struct * rring = RING_PARENT(ring);
+
+    a = REALPART(x, ring);
+    b = IMAGPART(x, ring);
+
+    c = REALPART(y, ring);
+    d = IMAGPART(y, ring);
+
+    e = REALPART(z, ring);
+    f = IMAGPART(z, ring);
+
+    ELEM_TMP_INIT(t, rring);
+    ELEM_TMP_INIT(u, rring);
+    ELEM_TMP_INIT(v, rring);
+
+    elem_add(t, a, b, rring);
+    elem_add(u, c, d, rring);
+    elem_mul(v, t, u, rring);
+
+    elem_mul(t, a, c, rring);
+    elem_mul(u, b, d, rring);
+
+    elem_sub(e, t, u, rring);
+    elem_sub(f, v, t, rring);
+    elem_sub(f, f, u, rring);
+
+    ELEM_TMP_CLEAR(t, rring);
+    ELEM_TMP_CLEAR(u, rring);
+    ELEM_TMP_CLEAR(v, rring);
+}
+
+
 void
 elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
 {
@@ -65,6 +104,10 @@ elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
 
         case TYPE_FRAC:
             elem_frac_mul(res, op1, op2, ring);
+            break;
+
+        case TYPE_COMPLEX:
+            elem_complex_mul(res, op1, op2, ring);
             break;
 
         default:

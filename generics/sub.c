@@ -66,6 +66,11 @@ elem_sub(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
             elem_frac_sub(res, op1, op2, ring);
             break;
 
+        case TYPE_COMPLEX:
+            elem_sub(REALPART(res, ring), REALPART(op1, ring), REALPART(op2, ring), ring->parent);
+            elem_sub(IMAGPART(res, ring), IMAGPART(op1, ring), IMAGPART(op2, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("sub", ring);
     }

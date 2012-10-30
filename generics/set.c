@@ -53,6 +53,11 @@ elem_set(elem_ptr res, elem_srcptr src, const ring_t ring)
                 elem_set(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
                 break;
 
+            case TYPE_COMPLEX:
+                elem_set(REALPART(res, ring), REALPART(src, ring), RING_PARENT(ring));
+                elem_set(IMAGPART(res, ring), IMAGPART(src, ring), RING_PARENT(ring));
+                break;
+
             default:
                 NOT_IMPLEMENTED("set", ring);
         }

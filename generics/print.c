@@ -73,6 +73,14 @@ elem_print(elem_srcptr elem, const ring_t ring)
             elem_print(DENOM(elem, ring), ring->denom);
             break;
 
+        case TYPE_COMPLEX:
+            printf("CC(");
+            elem_print(REALPART(elem, ring), ring->parent);
+            printf(", ");
+            elem_print(IMAGPART(elem, ring), ring->parent);
+            printf(")");
+            break;
+
         default:
             NOT_IMPLEMENTED("print", ring);
     }

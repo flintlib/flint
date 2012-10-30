@@ -62,6 +62,11 @@ elem_clear(elem_ptr elem, const ring_t ring)
             elem_clear(DENOM(elem, ring), ring->denom);
             break;
 
+        case TYPE_COMPLEX:
+            elem_clear(REALPART(elem, ring), ring->parent);
+            elem_clear(IMAGPART(elem, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("clear", ring);
     }

@@ -66,6 +66,11 @@ elem_neg(elem_ptr res, elem_srcptr src, const ring_t ring)
             elem_set(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
             break;
 
+        case TYPE_COMPLEX:
+            elem_neg(REALPART(res, ring), REALPART(src, ring), ring->parent);
+            elem_neg(IMAGPART(res, ring), IMAGPART(src, ring), ring->parent);
+            break;
+
         default:
             NOT_IMPLEMENTED("neg", ring);
     }

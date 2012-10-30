@@ -64,6 +64,12 @@ ring_print(const ring_t ring)
             printf(")");
             break;
 
+        case TYPE_COMPLEX:
+            printf("complex extension of (");
+            ring_print(ring->parent);
+            printf(")");
+            break;
+
         default:
             printf("unknown ring\n");
             abort();
