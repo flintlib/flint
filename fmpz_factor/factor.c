@@ -67,7 +67,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
     xsize = x->_mp_size;
 
     /* Factor out powers of two */
-    xsize = mpn_remove_2exp(xd, xsize, &exp);
+    xsize = flint_mpn_remove_2exp(xd, xsize, &exp);
     if (exp != 0)
         _fmpz_factor_append_ui(factor, 2UL, exp);
 
@@ -76,28 +76,28 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
     while (xsize > 1)
     {
-        found = mpn_factor_trial(xd, xsize, trial_start, trial_stop);
+        found = flint_mpn_factor_trial(xd, xsize, trial_start, trial_stop);
 
         if (found)
         {
             p = flint_primes[found];
             exp = 1;
-            xsize = mpn_divexact_1(xd, xsize, p);
+            xsize = flint_mpn_divexact_1(xd, xsize, p);
 
             /* Check if p^2 divides n */
-            if (mpn_divisible_1_p(xd, xsize, p))
+            if (flint_mpn_divisible_1_p(xd, xsize, p))
             {
                 /* TODO: when searching for squarefree numbers
                    (Moebius function, etc), we can abort here. */
-                xsize = mpn_divexact_1(xd, xsize, p);
+                xsize = flint_mpn_divexact_1(xd, xsize, p);
                 exp = 2;
             }
 
             /* If we're up to cubes, then maybe there are higher powers */
-            if (exp == 2 && mpn_divisible_1_p(xd, xsize, p))
+            if (exp == 2 && flint_mpn_divisible_1_p(xd, xsize, p))
             {
-                xsize = mpn_divexact_1(xd, xsize, p);
-                xsize = mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
+                xsize = flint_mpn_divexact_1(xd, xsize, p);
+                xsize = flint_mpn_remove_power_ascending(xd, xsize, &p, 1, &exp);
                 exp += 3;
             }
 

@@ -28,7 +28,7 @@
 #include "mpn_extras.h"
 
 
-mp_size_t mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
+mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
 {
     mp_size_t shift_limbs, reduced_size;
     mp_bitcnt_t shift_bits;

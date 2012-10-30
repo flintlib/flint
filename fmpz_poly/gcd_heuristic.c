@@ -34,7 +34,7 @@
    Divide (arrayg, limbsg) by the positive value gc inplace and
    return the number of limbs written
 */
-mp_size_t mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
+mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t gc)
 {
    if (fmpz_size(gc) == 1) 
    {
@@ -182,7 +182,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 	while (array2[limbs2 - 1] == 0) limbs2--;
 	
 	/* compute integer GCD */
-   limbsg = mpn_gcd_full(arrayg, array1, limbs1, array2, limbs2);
+   limbsg = flint_mpn_gcd_full(arrayg, array1, limbs1, array2, limbs2);
 	
    /* 
       Make space for unpacked gcd. May have one extra coeff due to 
@@ -206,7 +206,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 	_fmpz_poly_content(gc, G, glen);
 
    if (!fmpz_is_one(gc)) 
-      limbsg = mpn_tdiv_q_fmpz_inplace(arrayg, limbsg, gc);
+      limbsg = flint_mpn_tdiv_q_fmpz_inplace(arrayg, limbsg, gc);
 
    /* make space for quotient and remainder of first poly by gcd */
    qlimbs = limbs1 - limbsg + 1;
@@ -217,7 +217,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    
 	divides = 0;
 
-   if (mpn_divides(q, array1, limbs1, arrayg, limbsg, temp)) 
+   if (flint_mpn_divides(q, array1, limbs1, arrayg, limbsg, temp)) 
 	{
       /* unpack quotient of first poly by gcd */
       Q = _fmpz_vec_init(len1); 
@@ -243,7 +243,7 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
 		{
          mpn_zero(q, qlimbs);
           
-         if (mpn_divides(q, array2, limbs2, arrayg, limbsg, temp)) 
+         if (flint_mpn_divides(q, array2, limbs2, arrayg, limbsg, temp)) 
 	      {
             /* unpack quotient of second poly by gcd */
             qlimbs = limbs2 - limbsg + 1;

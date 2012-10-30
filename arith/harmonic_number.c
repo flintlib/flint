@@ -94,7 +94,7 @@ _mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
     t = p->_mp_d;
     v = q->_mp_d;
 
-    mpn_harmonic_odd_balanced(t, &ts, v, &vs, 1, n+1, n, 1);
+    flint_mpn_harmonic_odd_balanced(t, &ts, v, &vs, 1, n+1, n, 1);
     p->_mp_size = ts;
     q->_mp_size = vs;
 

@@ -44,12 +44,12 @@ MACRO MPN_SWAP(a, an, b, bn)
 
 *******************************************************************************
 
-void mpn_debug(mp_srcptr x, mp_size_t xsize)
+void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
 
     Prints debug information about \code{(x, xsize)} to \code{stdout}. 
     In particular, this will print binary representations of all the limbs.
 
-int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
+int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
     Returns $1$ if all limbs of \code{(x, xsize)} are zero, otherwise $0$.
 
@@ -59,24 +59,24 @@ int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 
 *******************************************************************************
 
-int mpn_divisible_1_p(x, xsize, d) (macro)
+int flint_mpn_divisible_1_p(x, xsize, d) (macro)
 
     Expression determining whether \code{(x, xsize)} is divisible by the
     \code{mp_limb_t d} which is assumed to be odd-valued and at least~$3$.
 
     This function is implemented as a macro.
 
-mp_size_t mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
+mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 
     Divides $x$ once by a known single-limb divisor, returns the new size.
 
-mp_size_t mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
+mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits)
 
     Divides \code{(x, xsize)} by $2^n$ where $n$ is the number of trailing 
     zero bits in $x$. The new size of $x$ is returned, and $n$ is stored in 
     the bits argument. $x$ may not be zero.
 
-mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
+mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp)
 
     Divides \code{(x, xsize)} by the largest power $n$ of \code{(p, psize)} 
@@ -89,7 +89,7 @@ mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     large powers. Because of its high overhead, it should not be used as
     the first stage of trial division.
 
-int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
 
     Searches for a factor of \code{(x, xsize)} among the primes in positions 
     \code{start, ..., stop-1} of \code{flint_primes}. Returns $i$ if 
@@ -102,7 +102,7 @@ int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
 
 *******************************************************************************
 
-int mpn_divides(mp_ptr q, mp_srcptr array1, 
+int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
       mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
 
     If \code{(arrayg, limbsg)} divides \code{(array1, limbs1)} then
@@ -118,7 +118,7 @@ int mpn_divides(mp_ptr q, mp_srcptr array1,
 
 *******************************************************************************
 
-mp_size_t mpn_gcd_full(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
     mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2)
 
     Sets \code{(arrayg, retvalue)} to the gcd of \code{(array1, limbs1)} and
@@ -133,7 +133,7 @@ mp_size_t mpn_gcd_full(mp_ptr arrayg,
 
 *******************************************************************************
 
-void mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
+void flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                                mp_ptr v, mp_size_t * vsize,
                                long a, long b, long n, int d)
 
