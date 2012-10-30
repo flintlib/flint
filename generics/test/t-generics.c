@@ -60,22 +60,28 @@ int main()
 
     gen_mul(C, A, B);
 
+/*
     gen_print(A);
     gen_print(B);
     gen_print(C);
+*/
 
-    gen_divrem(Q, R, C, A);
+   gen_divrem(Q, R, C, A);
 
+/*
     gen_print(Q);
     gen_print(R);
+*/
 
     if (!gen_equal(Q, B) || !gen_is_zero(R))
         abort();
 
     gen_divrem(Q, R, C, B);
 
+/*
     gen_print(Q);
     gen_print(R);
+*/
 
     if (!gen_equal(Q, A) || !gen_is_zero(R))
         abort();
