@@ -69,7 +69,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define random_fermat(nn, state, limbs) \
    do { \
       if (n_randint(state, 10) == 0) { \
-         mpn_zero(nn, limbs); \
+         flint_mpn_zero(nn, limbs); \
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \

@@ -150,8 +150,8 @@ nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
 
     if (len2 <= len)
     {
-        mpn_copyi(ptr2, poly2->coeffs, len2);
-        mpn_zero(ptr2 + len2, len - len2);
+        flint_mpn_copyi(ptr2, poly2->coeffs, len2);
+        flint_mpn_zero(ptr2 + len2, len - len2);
     }
     else
     {

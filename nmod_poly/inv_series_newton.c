@@ -88,8 +88,8 @@ nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
     {
         q = _nmod_vec_init(n);
 
-        mpn_copyi(q, Q->coeffs, Qlen);
-        mpn_zero(q + Qlen, n - Qlen);
+        flint_mpn_copyi(q, Q->coeffs, Qlen);
+        flint_mpn_zero(q + Qlen, n - Qlen);
     }
     else
     {

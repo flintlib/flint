@@ -56,7 +56,7 @@ main(void)
 
         _nmod_vec_randtest(vec, state, len, mod);
         _nmod_vec_randtest(vec2, state, len, mod);
-        mpn_copyi(vec3, vec2, len);
+        flint_mpn_copyi(vec3, vec2, len);
 
         _nmod_vec_scalar_mul_nmod(vec3, vec, len, c, mod);
         _nmod_vec_add(vec3, vec3, vec2, len, mod);

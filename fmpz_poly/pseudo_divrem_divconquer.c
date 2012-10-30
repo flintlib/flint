@@ -58,7 +58,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             p1 = (fmpz *) flint_malloc((lenA - n1) * sizeof(fmpz));
             {
                 long i;
-                mpn_zero((mp_ptr) p1, n2 - 1);
+                flint_mpn_zero((mp_ptr) p1, n2 - 1);
                 for (i = n2 - 1; i < lenA - n1; i++)
                     p1[i] = (A + n1)[i];
             }
@@ -134,7 +134,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             p1 = (fmpz *) flint_malloc((2 * lenB - 1) * sizeof(fmpz));
             {
                 long i;
-                mpn_zero((mp_ptr) p1, lenB - 1);
+                flint_mpn_zero((mp_ptr) p1, lenB - 1);
                 for (i = lenB - 1; i < 2*lenB - 1; i++)
                     p1[i] = (A + shift)[i];
             }
@@ -203,7 +203,7 @@ __fmpz_poly_pseudo_divrem_divconquer(fmpz * Q, fmpz * R, ulong * d,
             p1 = (fmpz *) flint_malloc((lenA - 2 * n2) * sizeof(fmpz));
             {
                 long i;
-                mpn_zero((mp_ptr) p1, n1 - 1);
+                flint_mpn_zero((mp_ptr) p1, n1 - 1);
                 for (i = n1 - 1; i < lenA - 2 * n2; i++)
                     p1[i] = (A + 2 * n2)[i];
             }

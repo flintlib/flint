@@ -194,7 +194,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
         }
         if ((n & 1L))
         {
-            mpn_copyi(h[i], h[2*i], hlen[2*i]);
+            flint_mpn_copyi(h[i], h[2*i], hlen[2*i]);
             hlen[i] = hlen[2*i];
         }
         

@@ -47,7 +47,7 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
    m = FLINT_MIN(s1, s2);
    
    /* this many output limbs will be zero */
-   mpn_zero(arrayg, m);
+   flint_mpn_zero(arrayg, m);
 
    /* set in1 to shifted array1 */
    if (b1 == 0)

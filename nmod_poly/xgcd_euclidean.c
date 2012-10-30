@@ -32,9 +32,9 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
                                mp_srcptr A, long lenA, 
                                mp_srcptr B, long lenB, nmod_t mod)
 {
-    mpn_zero(G, lenB);
-    mpn_zero(S, lenB - 1);
-    mpn_zero(T, lenA - 1);
+    flint_mpn_zero(G, lenB);
+    flint_mpn_zero(S, lenB - 1);
+    flint_mpn_zero(T, lenA - 1);
 
     if (lenB == 1)
     {

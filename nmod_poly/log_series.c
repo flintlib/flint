@@ -81,8 +81,8 @@ nmod_poly_log_series(nmod_poly_t res, const nmod_poly_t f, long n)
         if (flen < n)
         {
             f_coeffs = _nmod_vec_init(n);
-            mpn_copyi(f_coeffs, f->coeffs, flen);
-            mpn_zero(f_coeffs + flen, n - flen);
+            flint_mpn_copyi(f_coeffs, f->coeffs, flen);
+            flint_mpn_zero(f_coeffs + flen, n - flen);
         }
         else
             f_coeffs = f->coeffs;
