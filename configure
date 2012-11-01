@@ -353,8 +353,10 @@ echo "PREFIX=$PREFIX" >> Makefile
 case $OS in
    MINGW*)
       echo "PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}" >> Makefile;;
+   Darwin)
+      echo "DYLD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}" >> Makefile;;
    *)
-      ;;
+      echo "LD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}" >> Makefile;;
 esac
 echo "" >> Makefile
 
