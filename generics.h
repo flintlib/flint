@@ -296,6 +296,24 @@ elem_poly_set_length(elem_poly_t poly, long len, const ring_t poly_ring)
 */
 }
 
+static __inline__ void
+elem_poly_set(elem_poly_t res, const elem_poly_t src, const ring_t ring)
+{
+    long len = src->length;
+    elem_poly_fit_length(res, len, ring);
+    _elem_vec_set(res->coeffs, src->coeffs, len, ring->parent);
+    elem_poly_set_length(res, len, ring);
+}
+
+static __inline__ void
+elem_poly_neg(elem_poly_t res, const elem_poly_t src, const ring_t ring)
+{
+    long len = src->length;
+    elem_poly_fit_length(res, len, ring);
+    _elem_vec_neg(res->coeffs, src->coeffs, len, ring->parent);
+    elem_poly_set_length(res, len, ring);
+}
+
 void _elem_poly_print(elem_srcptr poly, long len, const ring_t ring);
 void elem_poly_set_coeff_si(elem_poly_t elem, long index, long value, const ring_t ring);
 
@@ -320,23 +338,9 @@ void elem_poly_pow_ui(elem_poly_t res, const elem_poly_t poly, ulong exp, const 
 void _elem_poly_gcd_subresultant(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
 void elem_poly_gcd_subresultant(elem_poly_t res, const elem_poly_t poly1, const elem_poly_t poly2, const ring_t ring);
 
-static __inline__ void
-elem_poly_set(elem_poly_t res, const elem_poly_t src, const ring_t ring)
-{
-    long len = src->length;
-    elem_poly_fit_length(res, len, ring);
-    _elem_vec_set(res->coeffs, src->coeffs, len, ring->parent);
-    elem_poly_set_length(res, len, ring);
-}
+void _elem_poly_nmod_mul_flat(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long ylen, const ring_t ring);
+void elem_poly_nmod_mul_flat(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
-static __inline__ void
-elem_poly_neg(elem_poly_t res, const elem_poly_t src, const ring_t ring)
-{
-    long len = src->length;
-    elem_poly_fit_length(res, len, ring);
-    _elem_vec_neg(res->coeffs, src->coeffs, len, ring->parent);
-    elem_poly_set_length(res, len, ring);
-}
 
 /* deprecate? */
 void gen_set_coeff_si(gen_t x, long index, long value);
