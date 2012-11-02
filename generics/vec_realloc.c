@@ -31,7 +31,7 @@ elem_ptr _elem_vec_realloc(elem_ptr vec, long old_len, long new_len, const ring_
 
     if (old_len < new_len)
     {
-        vec = flint_realloc(vec, ring->size * new_len);
+        vec = realloc(vec, ring->size * new_len);
 
         for (i = old_len; i < new_len; i++)
             elem_init(INDEX(vec, i, ring->size), ring);
@@ -41,7 +41,7 @@ elem_ptr _elem_vec_realloc(elem_ptr vec, long old_len, long new_len, const ring_
         for (i = new_len; i < old_len; i++)
             elem_clear(INDEX(vec, i, ring->size), ring);
 
-        vec = flint_realloc(vec, ring->size * new_len);
+        vec = realloc(vec, ring->size * new_len);
     }
 
     return vec;

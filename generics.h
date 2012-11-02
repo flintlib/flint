@@ -60,12 +60,9 @@ typedef struct
 {
     ring_type type;
     long size;
-
     void * parent;
-
     nmod_t nmod;
     void * modulus;
-
     void * numer;
     void * denom;
     long denom_offset;
@@ -175,6 +172,7 @@ void elem_print(elem_srcptr elem, const ring_t ring);
 void elem_swap(elem_ptr res, elem_ptr src, const ring_t ring);
 void elem_set(elem_ptr res, elem_srcptr src, const ring_t ring);
 void elem_set_si(elem_ptr elem, long v, const ring_t ring);
+void elem_set_ui(elem_ptr elem, ulong v, const ring_t ring);
 void elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring);
 void elem_randtest_not_zero(elem_ptr res, flint_rand_t state, const long * size, const ring_t ring);
 void elem_neg(elem_ptr res, elem_srcptr src, const ring_t ring);
@@ -268,16 +266,34 @@ elem_poly_normalise(elem_poly_t poly, const ring_t poly_ring)
     long i, size = RING_PARENT(poly_ring)->size;
     elem_ptr ptr = poly->coeffs;
 
+    i = poly->length - 1;
+
     for (i = poly->length - 1;
         (i >= 0) && elem_is_zero(INDEX(ptr, i, size), poly_ring->parent); i--);
 
     poly->length = i + 1;
+
+/*
+    if (poly->length < poly->alloc)
+    {
+        poly->coeffs = _elem_vec_realloc(poly->coeffs, poly->alloc, poly->length, poly_ring->parent);
+        poly->alloc = poly->length;
+    }
+*/
 }
 
 static __inline__ void
 elem_poly_set_length(elem_poly_t poly, long len, const ring_t poly_ring)
 {
     poly->length = len;
+
+/*
+    if (poly->length < poly->alloc)
+    {
+        poly->coeffs = _elem_vec_realloc(poly->coeffs, poly->alloc, poly->length, poly_ring->parent);
+        poly->alloc = poly->length;
+    }
+*/
 }
 
 void _elem_poly_print(elem_srcptr poly, long len, const ring_t ring);

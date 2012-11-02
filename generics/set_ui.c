@@ -25,44 +25,70 @@
 
 #include "generics.h"
 
+static __inline__ mp_limb_t
+nmod_set_ui(ulong v, nmod_t mod)
+{
+    mp_limb_t u = n_mod2_preinv(v, mod.n, mod.ninv);
+    return u;
+}
+
 void
-elem_zero(elem_ptr x, const ring_t ring)
+elem_poly_set_ui(elem_poly_struct * poly, ulong value, const ring_t ring)
+{
+    elem_poly_fit_length(poly, 1, ring);
+    elem_set_ui(poly->coeffs, value, ring->parent);
+    elem_poly_set_length(poly, 1, ring);
+    elem_poly_normalise(poly, ring);
+}
+
+void
+elem_set_ui(elem_ptr elem, ulong v, const ring_t ring)
 {
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_zero(x);
+            fmpz_set_ui(elem, v);
             break;
 
         case TYPE_LIMB:
-            *((mp_ptr) x) = 0;
+            *((mp_ptr) elem) = v;
             break;
 
         case TYPE_POLY:
-            elem_poly_set_length(x, 0, ring);
+            elem_poly_set_ui(elem, v, ring);
             break;
 
         case TYPE_MOD:
-            elem_zero(x, ring->parent);
+            {
+                switch (RING_PARENT(ring)->type)
+                {
+                    case TYPE_FMPZ:
+                        fmpz_set_ui(elem, v);
+                        fmpz_mod(elem, elem, RING_MODULUS(ring));
+                        break;
+
+                    case TYPE_LIMB:
+                        *((mp_ptr) elem) = nmod_set_ui(v, ring->nmod);
+                        break;
+
+                    default:
+                        NOT_IMPLEMENTED("set_ui (mod)", ring);
+                }
+            }
             break;
 
         case TYPE_FRAC:
-            elem_zero(NUMER(x, ring), RING_NUMER(ring));
-            elem_one(DENOM(x, ring), RING_DENOM(ring));
+            elem_set_ui(NUMER(elem, ring), v, RING_NUMER(ring));
+            elem_one(DENOM(elem, ring), RING_DENOM(ring));
             break;
 
         case TYPE_COMPLEX:
-            elem_zero(REALPART(x, ring), ring->parent);
-            elem_zero(IMAGPART(x, ring), ring->parent);
+            elem_set_ui(REALPART(elem, ring), v, ring->parent);
+            elem_zero(IMAGPART(elem, ring), ring->parent);
             break;
 
         default:
-            NOT_IMPLEMENTED("zero", ring);
+            NOT_IMPLEMENTED("set_si", ring);
     }
 }
 
-void
-gen_zero(gen_t x)
-{
-    elem_zero(x->elem, x->ring);
-}
