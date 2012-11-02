@@ -32,7 +32,7 @@ elem_poly_randtest(elem_poly_struct * res, flint_rand_t state, const long * size
     long i, len, _size = RING_PARENT(ring)->size;
     elem_ptr ptr;
 
-    len = n_randint(state, size[0]);
+    len = n_randint(state, size[0] + 1);
     elem_poly_fit_length(res, len, ring);
     ptr = res->coeffs;
 

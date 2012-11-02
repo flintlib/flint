@@ -26,34 +26,34 @@
 #include "generics.h"
 
 void
-_elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
+_elem_poly_mul_classical(elem_ptr res, elem_srcptr poly1, long len1,
     elem_srcptr poly2, long len2, const ring_t ring)
 {
     long size = ring->size;
 
-    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB)
+    if (len1 == 1 && len2 == 1)
     {
-        _nmod_poly_mul(res, poly1, len1, poly2, len2, ring->nmod);
-        return;
+        elem_mul(res, poly1, poly2, ring);
     }
-
-    if (ring->type == TYPE_POLY)
+    else
     {
-        _elem_poly_nmod_mul(res, poly1, len1, poly2, len2, ring);
-        return;
-    }
+        long i;
 
-    if (ring->type == TYPE_FMPZ && 0)
-    {
-        _fmpz_poly_mul(res, poly1, len1, poly2, len2);
-        return;
-    }
+        _elem_vec_scalar_mul(res, poly1, len1, poly2, ring);
 
-    _elem_poly_mul_classical(res, poly1, len1, poly2, len2, ring);
+        _elem_vec_scalar_mul(INDEX(res, len1, size),
+                            SRC_INDEX(poly2, 1, size), len2 - 1,
+                            SRC_INDEX(poly1, len1 - 1, size), ring);
+
+        for (i = 0; i < len1 - 1; i++)
+            _elem_vec_scalar_addmul(INDEX(res, i + 1, size),
+                    SRC_INDEX(poly2, 1, size), len2 - 1,
+                    SRC_INDEX(poly1, i, size), ring);
+    }
 }
 
 void
-elem_poly_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring)
+elem_poly_mul_classical(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring)
 {
     long rlen, len1, len2;
 
@@ -75,9 +75,9 @@ elem_poly_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, con
         elem_poly_fit_length(t, rlen, ring);
 
         if (len1 >= len2)
-            _elem_poly_mul(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
+            _elem_poly_mul_classical(t->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
         else
-            _elem_poly_mul(t->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
+            _elem_poly_mul_classical(t->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
 
         elem_poly_swap(res, t);
         elem_clear(t, ring);
@@ -87,9 +87,9 @@ elem_poly_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, con
         elem_poly_fit_length(res, rlen, ring);
 
         if (len1 >= len2)
-            _elem_poly_mul(res->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
+            _elem_poly_mul_classical(res->coeffs, op1->coeffs, len1, op2->coeffs, len2, ring->parent);
         else
-            _elem_poly_mul(res->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
+            _elem_poly_mul_classical(res->coeffs, op2->coeffs, len2, op1->coeffs, len1, ring->parent);
     }
 
     elem_poly_set_length(res, rlen, ring);

@@ -61,6 +61,12 @@ void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
     elem_srcptr leadB;
     long i, iQ, iR, size;
 
+    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB)
+    {
+        _nmod_poly_divrem(Q, R, A, lenA, B, lenB, ring->nmod);
+        return;
+    }
+
     if (ring->type == TYPE_FMPZ && 0)
     {
         _fmpz_poly_divrem(Q, R, A, lenA, B, lenB);

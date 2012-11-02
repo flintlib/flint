@@ -338,9 +338,17 @@ void elem_poly_pow_ui(elem_poly_t res, const elem_poly_t poly, ulong exp, const 
 void _elem_poly_gcd_subresultant(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
 void elem_poly_gcd_subresultant(elem_poly_t res, const elem_poly_t poly1, const elem_poly_t poly2, const ring_t ring);
 
+void _elem_poly_mul_classical(elem_ptr res, elem_srcptr poly1, long len1, elem_srcptr poly2, long len2, const ring_t ring);
+void elem_poly_mul_classical(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
+
 void _elem_poly_nmod_mul_flat(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long ylen, const ring_t ring);
 void elem_poly_nmod_mul_flat(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
+void _elem_poly_nmod_mul_KS(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long ylen, const ring_t ring);
+void elem_poly_nmod_mul_KS(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
+
+void _elem_poly_nmod_mul(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long ylen, const ring_t ring);
+void elem_poly_nmod_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
 
 /* deprecate? */
 void gen_set_coeff_si(gen_t x, long index, long value);
