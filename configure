@@ -378,6 +378,7 @@ echo "FLINT_LIB=$FLINT_LIB" >> Makefile
 echo "CC=$CC" >> Makefile
 echo "CXX=$CXX" >> Makefile
 echo "CFLAGS=$CFLAGS" >> Makefile
+echo "ABI_FLAG=$ABI_FLAG" >> Makefile
 echo "PICFLAG=$PICFLAG" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 case $OS in
