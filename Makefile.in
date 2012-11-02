@@ -1,5 +1,3 @@
-SHELL := /usr/bin/env bash
-
 BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
@@ -72,7 +70,7 @@ examples: $(FLINT_LIB) $(EXMP_SOURCES)
 $(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) shared || exit $$?;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-	  make build/interfaces/NTL-interface.lo; \
+	  $(MAKE) build/interfaces/NTL-interface.lo; \
 	  $(CXX) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 	if [ "$(WANT_NTL)" -ne "1" ]; then \
@@ -86,7 +84,7 @@ libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interface
 		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
 	fi
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		make build/interfaces/NTL-interface.o; \
+		$(MAKE) build/interfaces/NTL-interface.o; \
 		$(AR) rcs libflint.a build/interfaces/NTL-interface.o; \
 	fi
 	$(AR) rcs libflint.a $(OBJS);
@@ -94,20 +92,20 @@ libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interface
 
 library:
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		make $(FLINT_LIB); \
+		$(MAKE) $(FLINT_LIB); \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		make libflint.a; \
+		$(MAKE) libflint.a; \
 	fi
 
 check: library test_helpers.o
 ifndef MOD
-	make $(TESTS)
+	$(MAKE) $(TESTS)
 	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
 	mkdir -p build/interfaces/test
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		make build/interfaces/test/t-NTL-interface; \
+		$(MAKE) build/interfaces/test/t-NTL-interface; \
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
