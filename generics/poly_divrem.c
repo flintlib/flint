@@ -25,84 +25,17 @@
 
 #include "generics.h"
 
-static int
-euclidean_test(elem_srcptr X, elem_srcptr L, const ring_t ring)
-{
-    switch (ring->type)
-    {
-        case TYPE_FMPZ:
-            return fmpz_cmpabs(X, L) < 0;
-
-        case TYPE_MOD:
-            return elem_is_zero(X, ring);
-
-        case TYPE_POLY:
-            return ((const elem_poly_struct *) X)->length < ((const elem_poly_struct *) L)->length;
-
-        case TYPE_FRAC:
-            /* assume that it's a field */
-            if (RING_NUMER(ring) == RING_DENOM(ring))
-                return elem_is_zero(X, ring);
-            else
-                return euclidean_test(NUMER(X, ring), NUMER(L, ring), RING_NUMER(ring));
-
-        case TYPE_LIMB:
-        default:
-            NOT_IMPLEMENTED("euclidean test", ring); 
-    }
-}
-
-
-
 void _elem_poly_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A,
     long lenA, elem_srcptr B, long lenB, const ring_t ring)
 {
-    elem_ptr tmp;
-    elem_srcptr leadB;
-    long i, iQ, iR, size;
-
-    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB)
+    if (lenB < 10 || (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB))
     {
-        _nmod_poly_divrem(Q, R, A, lenA, B, lenB, ring->nmod);
-        return;
+        _elem_poly_divrem_basecase(Q, R, A, lenA, B, lenB, ring);
     }
-
-    if (ring->type == TYPE_FMPZ && 0)
+    else
     {
-        _fmpz_poly_divrem(Q, R, A, lenA, B, lenB);
-        return;
+        _elem_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, ring);
     }
-
-    size = ring->size;
-    leadB = SRC_INDEX(B, lenB - 1, size);
-    ELEM_TMP_INIT(tmp, ring);
-
-    if (R != A)
-    {
-        _elem_vec_set(R, A, lenA, ring);
-    }
-
-    for (iQ = lenA - lenB, iR = lenA - 1; iQ >= 0; iQ--, iR--)
-    {
-        if (euclidean_test(INDEX(R, iR, size), leadB, ring))
-        {
-            elem_zero(INDEX(Q, iQ, size), ring);
-        }
-        else
-        {
-            /* TODO: this could use div, not writing out the remainder */
-            elem_divrem(INDEX(Q, iQ, size), tmp, SRC_INDEX(R, iR, size), leadB, ring);
-
-            for (i = 0; i < lenB; i++)
-            {
-                /* R[iQ + i] -= B[i] * Q[iQ] */
-                elem_mul(tmp, INDEX(B, i, size), SRC_INDEX(Q, iQ, size), ring);
-                elem_sub(INDEX(R, iQ + i, size), SRC_INDEX(R, iQ + i, size), tmp, ring);
-            }
-        }
-    }
-
-    ELEM_TMP_CLEAR(tmp, ring);
 }
 
 void

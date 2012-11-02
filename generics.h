@@ -236,7 +236,10 @@ void _elem_vec_clear(elem_ptr vec, long len, const ring_t ring);
 elem_ptr _elem_vec_realloc(elem_ptr vec, long old_len, long new_len, const ring_t ring);
 
 void _elem_vec_zero(elem_ptr res, long len, const ring_t ring);
+void _elem_vec_swap(elem_ptr vec1, elem_ptr vec2, long len, const ring_t ring);
 void _elem_vec_set(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
+void _elem_vec_add(elem_ptr res, elem_srcptr vec1, elem_srcptr vec2, long len, const ring_t ring);
+void _elem_vec_sub(elem_ptr res, elem_srcptr vec1, elem_srcptr vec2, long len, const ring_t ring);
 void _elem_vec_neg(elem_ptr res, elem_srcptr src, long len, const ring_t ring);
 void _elem_vec_scalar_mul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
 void _elem_vec_scalar_addmul(elem_ptr res, elem_srcptr vec, long len, elem_srcptr c, const ring_t ring);
@@ -349,6 +352,12 @@ void elem_poly_nmod_mul_KS(elem_poly_t res, const elem_poly_t op1, const elem_po
 
 void _elem_poly_nmod_mul(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long ylen, const ring_t ring);
 void elem_poly_nmod_mul(elem_poly_t res, const elem_poly_t op1, const elem_poly_t op2, const ring_t ring);
+
+void _elem_poly_divrem_basecase(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
+void elem_poly_divrem_basecase(elem_poly_t Q, elem_poly_t R, const elem_poly_t A, const elem_poly_t B, const ring_t ring);
+
+void _elem_poly_divrem_divconquer(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
+void elem_poly_divrem_divconquer(elem_poly_t Q, elem_poly_t R, const elem_poly_t A, const elem_poly_t B, const ring_t ring);
 
 /* deprecate? */
 void gen_set_coeff_si(gen_t x, long index, long value);

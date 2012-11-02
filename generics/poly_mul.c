@@ -25,19 +25,18 @@
 
 #include "generics.h"
 
+static int is_nmod_poly(const ring_t ring)
+{
+    if (ring->type == TYPE_POLY)
+        return is_nmod_poly(RING_PARENT(ring));
+    return ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB;
+}
+
 void
 _elem_poly_mul(elem_ptr res, elem_srcptr poly1, long len1,
     elem_srcptr poly2, long len2, const ring_t ring)
 {
-    long size = ring->size;
-
-    if (ring->type == TYPE_MOD && RING_PARENT(ring)->type == TYPE_LIMB)
-    {
-        _nmod_poly_mul(res, poly1, len1, poly2, len2, ring->nmod);
-        return;
-    }
-
-    if (ring->type == TYPE_POLY)
+    if (is_nmod_poly(ring))
     {
         _elem_poly_nmod_mul(res, poly1, len1, poly2, len2, ring);
         return;

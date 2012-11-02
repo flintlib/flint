@@ -38,7 +38,7 @@ ring_get_vars(const ring_t ring)
 
 
 #define FLAT_MAX_LENGTH 25
-#define KS_MIN_SIZE 400
+#define KS_MIN_SIZE 50
 #define KS_MIN_DENSITY 0.1
 
 void
@@ -49,17 +49,9 @@ _elem_poly_nmod_mul(elem_ptr z, elem_srcptr x, long xlen, elem_srcptr y, long yl
 
     if (ring->type != TYPE_POLY)
     {
-        _nmod_poly_mul((mp_ptr) z, (mp_srcptr) x, xlen, (mp_srcptr) y, ylen, ring->nmod);
+        _nmod_poly_mul(z, x, xlen, y, ylen, ring->nmod);
         return;
     }
-
-/*
-    if (ylen == 1)
-    {
-        _elem_vec_scalar_mul(z, x, xlen, y, ring);
-        return;
-    }
-*/
 
     vars = ring_get_vars(ring) + 1;
 
