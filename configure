@@ -131,7 +131,7 @@ elif [ -d "${NTL_DIR}/lib64" ]; then
 elif [ "$WANT_NTL" = "0" ]; then
    NTL_DIR="/usr"
    if [ -d "${NTL_DIR}/lib" ]; then
-      NTL_LIB_DIR="${NTL_DIR}/lib64"
+      NTL_LIB_DIR="${NTL_DIR}/lib"
    else
       NTL_LIB_DIR="${NTL_DIR}/lib64"
    fi
