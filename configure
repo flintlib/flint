@@ -212,6 +212,9 @@ if [ "$ABI" = "32" ]; then
    esac
 elif [ "$ABI" = "64" ]; then
    ABI_FLAG="-m64"
+   if [ "$MACHINE" = "sparc" ]; then
+      MACHINE="sparc64"
+   fi
 fi
 
 echo "Configuring...${MACHINE}-${OS}"
