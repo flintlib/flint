@@ -36,7 +36,7 @@ fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 
     if (B->r != A->c || B->c != A->r)
     {
-        printf("exception: fmpz_mat_transpose: incompatible dimensions\n");
+        printf("Exception (fmpz_mat_transpose). Incompatible dimensions.\n");
         abort();
     }
 

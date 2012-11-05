@@ -34,15 +34,13 @@
 void
 fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
-    long r, c, i, j;
+    const long c = mat->c, r = mat->r;
 
-    r = mat->r;
-    c = mat->c;
+    long i, j;
 
     if (c != r)
     {
-        printf
-            ("Exception: fmpz_mat_randsimdioph called on an ill-formed matrix\n");
+        printf("Exception (fmpz_mat_randsimdioph). Ill-formed matrix.\n");
         abort();
     }
 

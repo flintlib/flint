@@ -43,7 +43,7 @@ fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     n = mat->r;
     if (n != mat->c)
     {
-        printf("exception: fmpz_mat_randdet: need a square matrix\n");
+        printf("Exception (fmpz_mat_randdet). Non-square matrix.\n");
         abort();
     }
 
