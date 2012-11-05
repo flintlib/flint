@@ -36,7 +36,12 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
     /* Exact equality? */
     if (_padic_equal(op1, op2))
     {
+<<<<<<< HEAD:padic/equal.c
         return 1;
+=======
+        printf("Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
+        abort();
+>>>>>>> eb2b23e... Updates exceptions in fmpz_poly_factor, fmpz_poly_q, fmpz_vec, and nmod_mat.:fmpz_poly_mat/transpose.c
     }
 
     /* Cases where either op1 or op2 is zero mod p^N */
