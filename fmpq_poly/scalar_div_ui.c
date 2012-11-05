@@ -62,7 +62,7 @@ void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c)
 {
     if (c == 0UL)
     {
-        printf("Exception: division by zero in fmpq_poly_scalar_div_ui\n");
+        printf("Exception (fmpq_poly_scalar_div_ui). Division by zero.\n");
         abort();
     }
     

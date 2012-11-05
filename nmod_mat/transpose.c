@@ -39,7 +39,7 @@ nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 
     if (B->r != A->c || B->c != A->r)
     {
-        printf("exception: nmod_mat_transpose: incompatible dimensions\n");
+        printf("Exception (nmod_mat_transpose). Incompatible dimensions.\n");
         abort();
     }
 

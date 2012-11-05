@@ -54,7 +54,7 @@ void fmpq_poly_sqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
     if (poly->length < 1 || !fmpz_equal(poly->coeffs, poly->den))
     {
-        printf("Exception: fmpq_poly_sqrt_series: constant term != 1\n");
+        printf("Exception (fmpq_poly_sqrt_series). Constant term != 1.\n");
         abort();
     }
 

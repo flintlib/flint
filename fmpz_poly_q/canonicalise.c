@@ -31,7 +31,7 @@ void fmpz_poly_q_canonicalise(fmpz_poly_q_t rop)
 
     if (fmpz_poly_is_zero(rop->den))
     {
-        printf("ERROR (fmpz_poly_q_canonicalise).  Denominator is zero.\n");
+        printf("Exception (fmpz_poly_q_canonicalise). Denominator is zero.\n");
         abort();
     }
 

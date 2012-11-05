@@ -47,7 +47,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
         str = (char *) flint_malloc(2 * sizeof(char));
         if (str == NULL)
         {
-            printf("Exception: malloc failed in fmpq_poly_to_string\n");
+            printf("Exception (fmpq_poly_get_str). malloc failed.\n");
             abort();
         }
         str[0] = '0';
@@ -78,7 +78,7 @@ char * fmpq_poly_get_str(const fmpq_poly_t poly)
     str = (char *) flint_malloc(len * sizeof(char));
     if (str == NULL)
     {
-        printf("Exception: malloc failed in fmpq_poly_to_string\n");
+        printf("Exception (fmpq_poly_get_str). malloc failed.\n");
         mpz_clear(z);
         mpq_clear(q);
         abort();

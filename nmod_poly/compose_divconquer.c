@@ -221,38 +221,38 @@ nmod_poly_compose_divconquer(nmod_poly_t res,
 {
     const long len1 = poly1->length;
     const long len2 = poly2->length;
-    long lenr;
     
     if (len1 == 0)
     {
         nmod_poly_zero(res);
-        return;
     }
-    if (len1 == 1 || len2 == 0)
+    else if (len1 == 1 || len2 == 0)
     {
-        nmod_poly_set_coeff_ui(res, 0, poly1->coeffs[0]);
-        nmod_poly_truncate(res, 1);
-        return;
-    }
-    
-    lenr = (len1 - 1) * (len2 - 1) + 1;
-    
-    if (res != poly1 && res != poly2)
-    {
-        nmod_poly_fit_length(res, lenr);
-        _nmod_poly_compose_divconquer(res->coeffs, poly1->coeffs, len1, 
-                                                   poly2->coeffs, len2, poly1->mod);
+        nmod_poly_fit_length(res, 1);
+        res->coeffs[0] = poly1->coeffs[0];
+        res->length = (res->coeffs[0] != 0);
     }
     else
     {
-        nmod_poly_t t;
-        nmod_poly_init2(t, poly1->mod.n, lenr);
-        _nmod_poly_compose_divconquer(t->coeffs, poly1->coeffs, len1,
+        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        
+        if (res != poly1 && res != poly2)
+        {
+            nmod_poly_fit_length(res, lenr);
+            _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+                                                   poly2->coeffs, len2, poly1->mod);
+        }
+        else
+        {
+            nmod_poly_t t;
+            nmod_poly_init2(t, poly1->mod.n, lenr);
+            _nmod_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
                                                  poly2->coeffs, len2, poly1->mod);
-        nmod_poly_swap(res, t);
-        nmod_poly_clear(t);
-    }
+            nmod_poly_swap(res, t);
+            nmod_poly_clear(t);
+        }
 
-    res->length = lenr;
-    _nmod_poly_normalise(res);
+        res->length = lenr;
+        _nmod_poly_normalise(res);
+    }
 }

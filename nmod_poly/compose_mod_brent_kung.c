@@ -112,15 +112,14 @@ nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        printf("exception: division by zero in "
-                "nmod_poly_compose_mod_brent_kung\n");
+        printf("Exception (nmod_poly_compose_mod_brent_kung). Division by zero.\n");
         abort();
     }
 
     if (len1 >= len3)
     {
-        printf("exception: nmod_poly_compose_brent_kung: the degree of the"
-                " first polynomial must be smaller than that of the modulus\n");
+        printf("Exception (nmod_poly_compose_brent_kung). The degree of the \n"
+               "first polynomial must be smaller than that of the modulus.\n");
         abort();
     }
 

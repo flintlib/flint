@@ -36,16 +36,14 @@
 void
 fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 {
-    long r, c, i, j, d;
-    fmpz_t tmp;
+    const long c = mat->c, r = mat->r, d = r;
 
-    r = mat->r;
-    c = mat->c;
-    d = r;
+    long i, j;
+    fmpz_t tmp;
 
     if (c != r)
     {
-        printf("Exception: fmpz_mat_ajtai called on an ill-formed matrix\n");
+        printf("Exception (fmpz_mat_ajtai): Non-square matrix.\n");
         abort();
     }
 

@@ -84,7 +84,7 @@ nmod_poly_compose_mod_horner(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        printf("exception: division by zero in nmod_poly_compose_mod_horner\n");
+        printf("Exception (nmod_poly_compose_mod_horner). Division by zero.\n");
         abort();
     }
 

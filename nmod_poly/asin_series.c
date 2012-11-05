@@ -57,7 +57,7 @@ nmod_poly_asin_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     if (h_len > 0 && h->coeffs[0] != 0UL)
     {
-        printf("Exception: nmod_poly_asin_series: constant term != 0\n");
+        printf("Exception (nmod_poly_asin_series). Constant term != 0.\n");
         abort();
     }
 

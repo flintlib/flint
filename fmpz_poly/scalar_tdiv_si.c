@@ -35,7 +35,7 @@ fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, const fmpz_poly_t poly2,
 {
     if (x == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_scalar_tdiv_si\n");
+        printf("Exception (fmpz_poly_scalar_tdiv_si). Division by zero.\n");
         abort();
     }
 

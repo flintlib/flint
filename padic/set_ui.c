@@ -19,13 +19,13 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
-void _padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
+void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 {
     if (op == 0)
     {
@@ -51,12 +51,8 @@ void _padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
         }
 
         fmpz_set_ui(padic_unit(rop), op);
-    }
-}
 
-void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
-{
-    _padic_set_ui(rop, op, ctx);
-    _padic_reduce(rop, ctx);
+        _padic_reduce(rop, ctx);
+    }
 }
 

@@ -66,7 +66,7 @@ fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
 {
     if (len == 0)
     {
-        printf("Exception (fmpz_mod_poly_randtest_not_zero).  len == 0.\n");
+        printf("Exception (fmpz_mod_poly_randtest_not_zero). len == 0.\n");
         abort();
     }
 

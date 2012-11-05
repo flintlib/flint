@@ -135,7 +135,7 @@ void fmpz_clear(fmpz_t f)
 
 void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m);
+void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
@@ -241,6 +241,10 @@ int fmpz_is_pm1(const fmpz_t f)
 void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
+
+int fmpz_equal_si(const fmpz_t f, long g);
+
+int fmpz_equal_ui(const fmpz_t f, ulong g);
 
 int fmpz_read(fmpz_t f);
 

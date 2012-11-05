@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2009 William Hart
-    Copyright (C) 2010 Sebastian Pancratz
+    Copyright (C) 2010, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -32,7 +32,7 @@
 #include "fmpz.h"
 
 void
-fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
+fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 {
     mp_bitcnt_t bits = fmpz_bits(m);
     int sgn = fmpz_sgn(m);

@@ -76,7 +76,7 @@ _fmpz_poly_CRT_ui(fmpz * res, const fmpz * poly1, long len1,
 
     if (c == 0)
     {
-        printf("Exception in _fmpz_poly_CRT_ui: m1 not invertible modulo m2!\n");
+        printf("Exception (_fmpz_poly_CRT_ui): m1 not invertible modulo m2.\n");
         abort();
     }
 

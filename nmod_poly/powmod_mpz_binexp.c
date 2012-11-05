@@ -107,13 +107,13 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
     if (lenf == 0)
     {
-        printf("Exception: nmod_poly_powmod: divide by zero\n");
+        printf("Exception (nmod_poly_powmod). Divide by zero.\n");
         abort();
     }
 
     if (mpz_sgn(e) < 0)
     {
-        printf("Exception: nmod_poly_powmod: negative exp not implemented\n");
+        printf("Exception (nmod_poly_powmod). Negative exp not implemented.\n");
         abort();
     }
 

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -28,10 +28,11 @@
 #include "padic.h"
 #include "long_extras.h"
 
-char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
+char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
 {
-    const fmpz * u = padic_unit(op);
-    const long v   = padic_val(op);
+    const fmpz *u = padic_unit(op);
+    const long v  = padic_val(op);
+    const fmpz *p = ctx->p;
 
     if (fmpz_is_zero(u))
     {
@@ -55,7 +56,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
             fmpz_t t;
 
             fmpz_init(t);
-            fmpz_pow_ui(t, ctx->p, v);
+            fmpz_pow_ui(t, p, v);
             fmpz_mul(t, t, u);
             str = fmpz_get_str(str, 10, t);
             fmpz_clear(t);
@@ -65,7 +66,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
             fmpz_t t;
 
             fmpz_init(t);
-            fmpz_pow_ui(t, ctx->p, -v);
+            fmpz_pow_ui(t, p, -v);
             str = _fmpq_get_str(str, 10, u, t);
             fmpz_clear(t);
         }
@@ -77,24 +78,18 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
         fmpz_t d;
         long j, N;
 
-        if (fmpz_sgn(u) < 0)
-        {
-            printf("ERROR (_padic_get_str).  u < 0 in SERIES mode.\n");
-            abort();
-        }
-
-        N = fmpz_clog(u, ctx->p) + v;
+        N = fmpz_clog(u, p) + v;
 
         if (!str)
         {
-            long b = (N - v) * (2 * fmpz_sizeinbase(ctx->p, 10) 
+            long b = (N - v) * (2 * fmpz_sizeinbase(p, 10) 
                      + z_sizeinbase(FLINT_MAX(FLINT_ABS(v), FLINT_ABS(N)), 10) 
                      + 5) + 1;
 
             str = flint_malloc(b);
             if (!str)
             {
-                printf("ERROR (_padic_get_str).  Memory allocation failed.\n");
+                printf("Exception (padic_get_str).  Memory allocation failed.\n");
                 abort();
             }
         }
@@ -109,9 +104,9 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
         /* Unroll first step */
         j = 0;
         {
-            fmpz_mod(d, x, ctx->p);       /* d = u mod p^{j+1} */
-            fmpz_sub(x, x, d);            /* x = x - d */
-            fmpz_divexact(x, x, ctx->p);  /* x = x / p */
+            fmpz_mod(d, x, p);       /* d = u mod p^{j+1} */
+            fmpz_sub(x, x, d);       /* x = x - d */
+            fmpz_divexact(x, x, p);  /* x = x / p */
 
             if (!fmpz_is_zero(d))
             {
@@ -120,7 +115,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
                     fmpz_get_str(s, 10, d);
                     while (*++s != '\0') ;
                     *s++ = '*';
-                    fmpz_get_str(s, 10, ctx->p);
+                    fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
                     sprintf(s, "%ld", j + v);
@@ -138,9 +133,9 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
 
         for ( ; !fmpz_is_zero(x); j++)
         {
-            fmpz_mod(d, x, ctx->p);       /* d = u mod p^{j+1} */
-            fmpz_sub(x, x, d);            /* x = x - d */
-            fmpz_divexact(x, x, ctx->p);  /* x = x / p */
+            fmpz_mod(d, x, p);       /* d = u mod p^{j+1} */
+            fmpz_sub(x, x, d);       /* x = x - d */
+            fmpz_divexact(x, x, p);  /* x = x / p */
 
             if (!fmpz_is_zero(d))
             {
@@ -152,7 +147,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
                     fmpz_get_str(s, 10, d);
                     while (*++s != '\0') ;
                     *s++ = '*';
-                    fmpz_get_str(s, 10, ctx->p);
+                    fmpz_get_str(s, 10, p);
                     while (*++s != '\0') ;
                     *s++ = '^';
                     sprintf(s, "%ld", j + v);
@@ -176,13 +171,13 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
     {
         if (!str)
         {
-            long b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(ctx->p, 10) 
+            long b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(p, 10) 
                    + z_sizeinbase(v, 10) + 4;
 
             str = flint_malloc(b);
             if (!str)
             {
-                printf("ERROR (_padic_get_str).  Memory allocation failed.\n");
+                printf("Exception (padic_get_str).  Memory allocation failed.\n");
                 abort();
             }
         }
@@ -198,7 +193,7 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
             fmpz_get_str(s, 10, u);
             while (*++s != '\0') ;
             *s++ = '*';
-            fmpz_get_str(s, 10, ctx->p);
+            fmpz_get_str(s, 10, p);
         }
         else
         {
@@ -207,24 +202,13 @@ char * _padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
             fmpz_get_str(s, 10, u);
             while (*++s != '\0') ;
             *s++ = '*';
-            fmpz_get_str(s, 10, ctx->p);
+            fmpz_get_str(s, 10, p);
             while (*++s != '\0') ;
             *s++ = '^';
             sprintf(s, "%ld", v);
         }
     }
 
-    return str;
-}
-
-char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
-{
-    padic_t t;
-
-    _padic_init(t);
-    padic_set(t, op, ctx);
-    str = _padic_get_str(str, t, ctx);
-    _padic_clear(t);
     return str;
 }
 

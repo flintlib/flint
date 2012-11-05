@@ -64,7 +64,7 @@ nmod_poly_inv_series_basecase(nmod_poly_t Qinv,
 
     if (n == 0 || Q->length == 0 || Q->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_inv_series_basecase\n");
+        printf("Exception (nmod_poly_inv_series_basecase). Division by zero.\n");
         abort();
     }
 

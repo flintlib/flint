@@ -19,14 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
 #include "padic.h"
@@ -51,20 +47,20 @@ main(void)
 
         padic_t a, d;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(d, ctx);
+        padic_init2(a, N);
+        padic_init2(d, N);
 
         padic_randtest(a, state, ctx);
 
         padic_neg(d, a, ctx);
         padic_neg(a, a, ctx);
 
-        result = (padic_equal(a, d, ctx));
+        result = (padic_equal(a, d));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -73,8 +69,8 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(d, ctx);
+        padic_clear(a);
+        padic_clear(d);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -89,20 +85,20 @@ main(void)
 
         padic_t a, d;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(d, ctx);
+        padic_init2(a, N);
+        padic_init2(d, N);
 
         padic_randtest(a, state, ctx);
 
         padic_neg(d, a, ctx);
         padic_neg(d, d, ctx);
 
-        result = (padic_equal(a, d, ctx));
+        result = (padic_equal(a, d));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -111,8 +107,8 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(d, ctx);
+        padic_clear(a);
+        padic_clear(d);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -127,20 +123,21 @@ main(void)
 
         padic_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
 
         padic_randtest(a, state, ctx);
 
         padic_neg(b, a, ctx);
         padic_add(b, a, b, ctx);
 
-        result = (padic_is_zero(b, ctx));
+        result = (padic_is_zero(b));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -149,8 +146,8 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
+        padic_clear(a);
+        padic_clear(b);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
