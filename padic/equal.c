@@ -19,8 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
- 
+    Copyright (C) 2011 Fredrik Johansson
+
 ******************************************************************************/
 
 #include "padic.h"
@@ -35,11 +35,8 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
 {
     /* Exact equality? */
     if (_padic_equal(op1, op2))
-    {
-        printf("Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
-        abort();
-    }
-
+        return 1;
+    
     /* Cases where either op1 or op2 is zero mod p^N */
     if (padic_is_zero(op1, ctx))
         return padic_is_zero(op2, ctx);
@@ -68,3 +65,4 @@ int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
         return 0;
     }
 }
+

@@ -34,7 +34,10 @@ fmpz_poly_mat_equal(const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
     long i, j;
 
     if (A->r != B->r || A->c != B->c)
-        return 0;
+    {
+        printf("Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
+        abort();
+    }
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)
