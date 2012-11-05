@@ -182,7 +182,7 @@ long nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
 long nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
                             const nmod_poly_mat_t A, int rank_check);
 
-long nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den, long * perm,
+long nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
                             const nmod_poly_mat_t A);
 
 /* Trace *********************************************************************/

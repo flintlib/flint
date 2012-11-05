@@ -121,6 +121,10 @@ long fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A);
 
 long fmpz_poly_mat_max_length(const fmpz_poly_mat_t A);
 
+/* Transpose *****************************************************************/
+
+void fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A);
+
 /* Truncation ****************************************************************/
 
 void fmpz_poly_mat_truncate(fmpz_poly_mat_t A, long len);
@@ -188,7 +192,7 @@ long fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
 long fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
                             const fmpz_poly_mat_t A, int rank_check);
 
-long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+long fmpz_poly_mat_rref(fmpz_poly_mat_t B, fmpz_poly_t den,
                             const fmpz_poly_mat_t A);
 
 /* Trace *********************************************************************/

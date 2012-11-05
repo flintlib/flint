@@ -573,6 +573,12 @@ void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
 
+void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to the quotient of $g$ by $h$, rounding down towards
+    zero and $s$ to the remainder.  If $h$ is $0$ an exception 
+    is raised.
+
 void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards

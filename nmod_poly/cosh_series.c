@@ -32,22 +32,11 @@
 void
 _nmod_poly_cosh_series(mp_ptr f, mp_srcptr h, long n, nmod_t mod)
 {
-    mp_ptr g, T, U, hprime;
-
-    g = _nmod_vec_init(n);
-    T = _nmod_vec_init(n);
-    U = _nmod_vec_init(n);
-    hprime = _nmod_vec_init(n);
-
-    _nmod_poly_derivative(hprime, h, n, mod); hprime[n-1] = 0UL;
-    __nmod_poly_exp_series_prealloc(f, g, h, hprime, T, U, n, mod, 1);
+    mp_ptr g = _nmod_vec_init(n);
+    _nmod_poly_exp_expinv_series(f, g, h, n, mod);
     _nmod_vec_add(f, f, g, n, mod);
     _nmod_vec_scalar_mul_nmod(f, f, n, n_invmod(2UL, mod.n), mod);
-
-    _nmod_vec_clear(hprime);
     _nmod_vec_clear(g);
-    _nmod_vec_clear(T);
-    _nmod_vec_clear(U);
 }
 
 void

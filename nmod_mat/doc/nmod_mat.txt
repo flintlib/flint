@@ -51,6 +51,27 @@ void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
     Sets \code{mat} to a copy of \code{src}. It is assumed 
     that \code{mat} and \code{src} have identical dimensions.
 
+*******************************************************************************
+
+    Basic properties and manipulation
+
+*******************************************************************************
+
+MACRO nmod_mat_entry(nmod_mat_t mat, long i, long j)
+
+    Directly accesses the entry in \code{mat} in row $i$ and column $j$,
+    indexed from zero. No bounds checking is performed. This macro can be
+    used both for reading and writing coefficients.
+
+long nmod_mat_nrows(nmod_mat_t mat)
+
+    Returns the number of rows in \code{mat}. This function is implemented
+    as a macro.
+
+long nmod_mat_ncols(nmod_mat_t mat)
+
+    Returns the number of columns in \code{mat}. This function is implemented
+    as a macro.
 
 *******************************************************************************
 
@@ -79,8 +100,9 @@ void nmod_mat_print_pretty(nmod_mat_t mat)
 
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state)
 
-    Sets the elements to uniformly random numbers between $0$ and $m-1$ 
-    inclusive, where $m$ is the modulus of \code{mat}.
+    Sets the elements to a random matrix with entries between $0$ and $m-1$
+    inclusive, where $m$ is the modulus of \code{mat}. A sparse matrix is
+    generated with increased probability.
 
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 
@@ -420,10 +442,9 @@ long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
 
 *******************************************************************************
 
-long nmod_mat_rref(long * P, nmod_mat_t A)
+long nmod_mat_rref(nmod_mat_t A)
 
-    Puts $A$ in reduced row echelon form, stores the row permutations
-    in $P$ and returns the rank of $A$.
+    Puts $A$ in reduced row echelon form and returns the rank of $A$.
 
     The rref is computed by first obtaining an unreduced row echelon
     form via LU decomposition and then solving an additional

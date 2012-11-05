@@ -1105,6 +1105,12 @@ static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, fmpz_poly_t poly, long n
     fmpz_clear(t);
 }
 
+/* Roots */
+
+void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len);
+
+void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
+
 #ifdef __cplusplus
 }
 #endif

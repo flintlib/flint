@@ -37,3 +37,11 @@ nmod_poly_randtest(nmod_poly_t poly, flint_rand_t state, long len)
     poly->length = len;
     _nmod_poly_normalise(poly);
 }
+
+void
+nmod_poly_randtest_irreducible(nmod_poly_t poly, flint_rand_t state, long len)
+{
+    do {
+        nmod_poly_randtest(poly, state, len);
+    } while (nmod_poly_is_zero(poly) || !(nmod_poly_is_irreducible(poly)));
+}

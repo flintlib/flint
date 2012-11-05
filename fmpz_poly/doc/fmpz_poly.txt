@@ -2696,3 +2696,28 @@ void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
     Converts the polynomial in-place from its coefficients in the
     Newton basis $1, (x-r_0), (x-r_0)(x-r_1), \ldots$ to the monomial
     basis. Uses repeated polynomial division, requiring $O(n^2)$ operations.
+
+*******************************************************************************
+
+    Roots
+
+*******************************************************************************
+
+void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len)
+
+void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
+
+    Computes a nonnegative integer \code{bound} that bounds the absolute
+    value of all complex roots of \code{poly}. Uses Fujiwara's bound
+
+    $$
+    2 \max \left(
+        \left|\frac{a_{n-1}}{a_n}\right|,
+        \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dots
+        \left|\frac{a_1}{a_n}\right|^{\frac{1}{n-1}},
+        \left|\frac{a_0}{2a_n}\right|^{\frac{1}{n}
+    \right)
+    $$
+
+    where the coefficients of the polynomial are $a_0, \ldots, a_n$.
+

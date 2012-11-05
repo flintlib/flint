@@ -176,7 +176,7 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 
 /* Reduced row echelon form */
 
-long nmod_mat_rref(long * P, nmod_mat_t A);
+long nmod_mat_rref(nmod_mat_t A);
 
 /* Nullspace */
 

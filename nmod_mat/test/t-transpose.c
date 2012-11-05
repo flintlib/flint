@@ -124,6 +124,9 @@ main(void)
         nmod_mat_randtest(A, state);
         nmod_mat_set(B, A);
 
+        nmod_mat_transpose(B, B);
+        nmod_mat_transpose(B, B);
+
         if (!nmod_mat_equal(B, A))
         {
             printf("FAIL: B != A\n");

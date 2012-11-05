@@ -316,6 +316,13 @@ void _fmpz_vec_scalar_fdiv_q_2exp(fmpz * vec1,
     Sets \code{(vec1, len2)} to \code{(vec2, len2)} divided by \code{2^exp}, 
     rounding down towards minus infinity whenever the division is not exact.
 
+void _fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, 
+                                       const fmpz * vec2, long len2, ulong exp)
+
+    Sets \code{(vec1, len2)} to the remainder of \code{(vec2, len2)} 
+    divided by \code{2^exp}, rounding down the quotient towards minus 
+    infinity whenever the division is not exact.
+
 void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1, 
                                   const fmpz * vec2, long len2, const fmpz_t c)
 
