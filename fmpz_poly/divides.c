@@ -61,7 +61,7 @@ int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b)
     }
 
     {
-        const lenQ = a->length - b->length + 1;
+        const long lenQ = a->length - b->length + 1;
         int res;
 
         if (q == a || q == b)
