@@ -237,6 +237,18 @@ if [ -z "$FLINT_LIB" ]; then
    esac
 fi
 
+# don't build both shared and static lib on MinGW and Cygwin
+
+case $OS in
+   CYGWIN | MINGW*)
+      if [ "$STATIC" = "1" ]; then
+         SHARED=0
+      fi
+      ;;
+   *)
+      ;;
+esac
+
 #select fft_tuning parameters
 
 case $MACHINE in
