@@ -27,8 +27,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-extern long _padic_log_bound(long v, long N, long p);
-
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 
                          const fmpz_t x, long a, long b)

@@ -29,8 +29,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-extern long _padic_log_bound(long v, long N, long p);
-
 /*
     Carries out the finite series evaluation for the logarithm 
     \begin{equation*}
