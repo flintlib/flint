@@ -30,33 +30,48 @@
 #include "ulong_extras.h"
 
 /*
-    Returns $b$ such that for all $i \geq b$ we have 
-    \begin{equation*}
-    i v - \ord_p(i) \geq N
-    \end{equation*}
-    where $v \geq 1$.
+    Assumes that $1 \leq v$ or $2 \leq v$ as $p$ is even 
+    or odd, respectively, and that $v < N < 2^{f-2}$ where 
+    $f$ is \code{FLINT_BITS}.
 
-    Assumes that $1 \leq v < N$.
+    Under the assumption that $1 \leq v < N$, or $2 \leq v < N$, 
+    one can easily prove that with $c = N - \floor{\log_p v}$ 
+    the number $b = \ceil{(c + \ceil{\log_p c} + 1) / b}$ is such 
+    that for all $i \geq b$, $i v - \ord_p(i) \geq N$.
+
+    Under the additional condition that $N < 2^{f-2}$ one can 
+    show that the code branch for primes that fit into a 
+    \code{signed long} does not cause overflow.  Moreover, 
+    independently of this, it follows that the above value $b$ 
+    is less than $2^{f-1}$.
+
+    In the first branch, we have that $b v - log_p(b) \geq N$.
+    We need to show that we can replace $\log_p$ by $\ord_p$ here.  
+    That is, we need that $iv - \ord_p(i) \geq iv - \log_p(i) \geq N$, 
+    i.e., $\log_p(i) \geq \ord_p(i)$, which is true.  We then work 
+    backwards to find the first $i$ such that this fails, then 
+    using that the function is strictly increasing for $i \geq 2$.
+
+    In the second branch we use that using signed indices in the 
+    summation is still sufficient and hence that all terms $1/i$ 
+    are units.
+    Then $ord_p(x^i/i) \geq N$ provided that $i v \geq N$.
  */
+
 long _padic_log_bound(long v, long N, const fmpz_t prime)
 {
+    if (N >= (1L << (FLINT_BITS - 2)))
+    {
+        printf("Exception (_padic_log_bound).  N = %ld is too large.\n", N);
+        abort();
+    }
+
     if (fmpz_fits_si(prime))
     {
         long b, c, p = fmpz_get_si(prime);
 
         c = N - n_flog(v, p);
         b = ((c + n_clog(c, p) + 1) + (v - 1)) / v;
-
-        /*
-            Now $i v - log_p(i) \geq N$.
-
-            We need to show that we can replace log_p by ord_p here.  That is, 
-            we need that $iv - ord_p(i) >= iv - log_p(i) >= N$, i.e., 
-            $log_p(i) >= ord_p(i)$, which is true.
-
-            We work backwards to find the first $i$ such that this fails, then 
-            using that the function is strictly increasing for $i \geq 2$.
-         */
 
         while (--b >= 2)
         {
@@ -70,14 +85,6 @@ long _padic_log_bound(long v, long N, const fmpz_t prime)
     }
     else
     {
-        /*
-            When p does not fit into signed long, we make the assumption(!) 
-            that using signed indices in the summation is still sufficient 
-            and hence that all terms 1/i are units.
-
-            Then $ord_p(x^i/i) \geq N$ provided that $i v \geq N$.
-         */
-
         return (N + v - 1) / v;
     }
 }
