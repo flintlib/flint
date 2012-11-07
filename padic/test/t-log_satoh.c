@@ -339,11 +339,10 @@ main(void)
 
         padic_t a, b, c;
 
-        fmpz_init(p);
-        pbits = n_randint(state, 4) + 2;
-        fmpz_set_ui(p, n_randprime(state, pbits, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        fmpz_init_set_ui(p, n_randprime(state, 5, 1));
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         _padic_init(a);
         _padic_init(b);

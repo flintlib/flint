@@ -532,6 +532,53 @@ int padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
     with the valuation and hence the rate of convergence, which 
     results in a quasi-linear algorithm in $N$, for fixed $p$.
 
+long _padic_log_bound(long v, long N, const fmpz_t p)
+
+    Returns $b$ such that for all $i \geq b$ we have 
+    \begin{equation*}
+    i v - \ord_p(i) \geq N
+    \end{equation*}
+    where $v \geq 1$.
+
+    Assumes that $1 \leq v < N$.
+
+    Assumes that this computation can be carried out \emph{sensibly} 
+    within signed integers.  Put differently, this implementation is 
+    not very robust but works just fine until the input parameters 
+    become too large.
+
+void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+
+void _padic_log_rectangular(fmpz_t z, 
+                            const fmpz_t y, long v, const fmpz_t p, long N)
+
+void _padic_log_satoh(fmpz_t z, 
+                      const fmpz_t y, long v, const fmpz_t p, long N)
+
+void _padic_log_balanced(fmpz_t z, 
+                         const fmpz_t y, long v, const fmpz_t p, long N)
+
+    Computes 
+    \begin{equation*}
+    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N},
+    \end{equation*}
+    reduced modulo $p^N$.
+
+    Note that this can be used to compute the $p$-adic logarithm 
+    via the equation 
+    \begin{align*}
+    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
+            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
+    \end{align*}
+
+    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
+    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
+    so that the series converges.
+
+    Assumes that $v < N$, and hence in particular $N \geq 2$.
+
+    Does not support aliasing between $y$ and $z$.
+
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Returns whether the $p$-adic logarithm function converges at 

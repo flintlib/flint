@@ -38,28 +38,48 @@
 
     Assumes that $1 \leq v < N$.
  */
-long _padic_log_bound(long v, long N, long p)
+long _padic_log_bound(long v, long N, const fmpz_t prime)
 {
-    long b, c;
-
-    c = N - n_flog(v, p);
-    b = c + n_clog(c, p) + 1;
-
-    /*
-        Now $i v - \ord_p(i) \geq N$ for all $i \geq b$.  We work 
-        backwards to find the first $i$ such that this fails, then 
-        using that the function is strictly increasing for $i \geq 2$.
-     */
-
-    while (--b >= 2)
+    if (fmpz_fits_si(prime))
     {
-        long t = b * v - n_clog(b, p) - N;
+        long b, c, p = fmpz_get_si(prime);
 
-        if (t < 0)
-            return b + 1;
+        c = N - n_flog(v, p);
+        b = ((c + n_clog(c, p) + 1) + (v - 1)) / v;
+
+        /*
+            Now $i v - log_p(i) \geq N$.
+
+            We need to show that we can replace log_p by ord_p here.  That is, 
+            we need that $iv - ord_p(i) >= iv - log_p(i) >= N$, i.e., 
+            $log_p(i) >= ord_p(i)$, which is true.
+
+            We work backwards to find the first $i$ such that this fails, then 
+            using that the function is strictly increasing for $i \geq 2$.
+         */
+
+        while (--b >= 2)
+        {
+            long t = b * v - n_clog(b, p);
+
+            if (t < N)
+                return b + 1;
+        }
+
+        return 2;
     }
+    else
+    {
+        /*
+            When p does not fit into signed long, we make the assumption(!) 
+            that using signed indices in the summation is still sufficient 
+            and hence that all terms 1/i are units.
 
-    return 2;
+            Then $ord_p(x^i/i) \geq N$ provided that $i v \geq N$.
+         */
+
+        return (N + v - 1) / v;
+    }
 }
 
 /*
