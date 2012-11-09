@@ -802,7 +802,7 @@ general
   * bugfix on ia64
   * support sparc32/sparc64
   * support OSX
-  * support Solaris, NetBSD, OpenBSDi, etc (if bash, GNU Make present)
+  * support Solaris, NetBSD, OpenBSD, etc (if bash, GNU Make present)
 
 ulong_extras
 ------------
