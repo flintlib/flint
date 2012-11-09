@@ -2,6 +2,7 @@
 
 # (C) 2007, Robert Bradshaw, William Hart, William Stein, Michael Abshoff
 # (C) 2011, William Hart
+# (C) 2012, William Hart, Jean-Pierre Flori, Thomas DuBuisson
 
 PREFIX="/usr/local"
 MPIR_DIR="/usr/local"
