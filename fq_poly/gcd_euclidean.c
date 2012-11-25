@@ -30,17 +30,43 @@
 long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA, 
                             const fq_struct* B, long lenB, const fq_ctx_t ctx)
 {
-    long steps;
-    long lenR1, lenR2 = 0, lenG = 0;
+    long lenR1 = lenA, lenR2 = lenB, lenT; /* assumes lenA \geq lenB */
+    
+    fq_struct *R1, *R2, *T;
+    
+    fq_t inv;
+
+    fq_init(inv);
+    T = _fq_poly_init(lenA);
+    R1 = _fq_poly_init(lenA);
+    R2 = _fq_poly_init(lenB);
+    _fq_poly_set(R1,A,lenA);
+    _fq_poly_set(R2,B,lenB);
+
+    while(lenR2 > 0)
+      {
+          if(!fq_is_zero(&R2[lenR2-1])) fq_inv(inv,&R2[lenR2-1],ctx);
+             else printf("something wrong with length");
+	_fq_poly_rem(R1, R1, lenR1, R2, lenR2, inv, ctx);
+	_fq_poly_normalise2(R1,&lenR1);
+	
+	_fq_poly_set(T,R1,lenR1);
+	_fq_poly_set(R1,R2,lenR2);
+	_fq_poly_set(R2,T,lenR1);
+	lenT = lenR1; 
+	lenR1 = lenR2;
+	lenR2 = lenT;
+      }
+
+    _fq_poly_set(G,R1,lenR1);
+    return lenR1;
+}
+/*
 
     fq_struct *F, *R1, *R2, *R3 = G, *T;
     fq_t inv;
     
     fq_init(inv);
-    /* if(B[lenB-1].length == 0) */
-    /* { */
-    /*     printf("0 leading coefficient!\n"); */
-    /* } */
     fq_inv(inv,&B[lenB-1],ctx);
 
     if (lenB == 1)
@@ -108,6 +134,8 @@ long _fq_poly_gcd_euclidean(fq_struct* G,const fq_struct* A, long lenA,
     fq_clear(inv);
     return lenG;
 }
+
+*/
 
 void fq_poly_gcd_euclidean(fq_poly_t G, 
                            const fq_poly_t A, const fq_poly_t B, const fq_ctx_t ctx)

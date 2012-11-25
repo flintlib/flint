@@ -50,7 +50,8 @@ void fq_poly_randtest_not_zero(fq_poly_t f, flint_rand_t state,
         printf("Exception (fq_poly_randtest_not_zero).  len = 0.\n");
         abort();
     }
-
+    
+    fq_poly_randtest(f, state, len, ctx);
     for(i = 0; (i < 10) && fq_poly_is_zero(f); i++)
         fq_poly_randtest(f, state, len, ctx);
     if (fq_poly_is_zero(f))
