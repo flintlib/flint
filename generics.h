@@ -90,15 +90,7 @@ typedef struct
 typedef elem_poly_struct elem_poly_t[1];
 typedef elem_mat_struct elem_mat_t[1];
 
-typedef struct
-{
-    ring_struct * ring;
-    elem_ptr elem;
-} gen_struct;
-
-
 typedef ring_struct ring_t[1];
-typedef gen_struct gen_t[1];
 
 #define RING_PARENT(ring) ((ring_struct *) ((ring)->parent))
 #define RING_MODULUS(ring) ((elem_ptr) ((ring)->modulus))
@@ -117,14 +109,6 @@ typedef gen_struct gen_t[1];
     ring_print(ring); printf("\n"); \
     abort(); \
   } while (0)
-
-static __inline__ void
-gen_swap(gen_t res, gen_t src)
-{
-    gen_struct t = *src;
-    *src = *res;
-    *res = t;
-}
 
 static __inline__ void
 elem_poly_swap(elem_poly_struct * op1, elem_poly_struct * op2)
@@ -346,9 +330,6 @@ void elem_poly_divrem_basecase(elem_poly_t Q, elem_poly_t R, const elem_poly_t A
 
 void _elem_poly_divrem_divconquer(elem_ptr Q, elem_ptr R, elem_srcptr A, long lenA, elem_srcptr B, long lenB, const ring_t ring);
 void elem_poly_divrem_divconquer(elem_poly_t Q, elem_poly_t R, const elem_poly_t A, const elem_poly_t B, const ring_t ring);
-
-/* deprecate? */
-void gen_set_coeff_si(gen_t x, long index, long value);
 
 /* Matrix functions */
 

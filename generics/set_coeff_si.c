@@ -44,14 +44,3 @@ elem_set_coeff_si(elem_poly_t poly, long index, long value, const ring_t ring)
     elem_poly_normalise(poly, ring);
 }
 
-void
-gen_set_coeff_si(gen_t x, long index, long value)
-{
-    if (x->ring->type != TYPE_POLY)
-    {
-        printf("set_coeff_si: ring must be a polynomial ring\n");
-        abort();
-    }
-
-    elem_set_coeff_si(x->elem, index, value, x->ring);
-}
