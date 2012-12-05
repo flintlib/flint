@@ -64,6 +64,10 @@ elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring)
             return elem_equal(NUMER(op1, ring), NUMER(op2, ring), RING_NUMER(ring)) &&
                     elem_equal(DENOM(op1, ring), DENOM(op2, ring), RING_DENOM(ring));
 
+        case TYPE_COMPLEX:
+            return elem_equal(REALPART(op1, ring), REALPART(op2, ring), RING_PARENT(ring)) &&
+                    elem_equal(IMAGPART(op1, ring), IMAGPART(op2, ring), RING_PARENT(ring));
+
         default:
             NOT_IMPLEMENTED("equal", ring);
     }

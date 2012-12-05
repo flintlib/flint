@@ -28,82 +28,99 @@
 #include "generics.h"
 
 void
-test_pow_ui(flint_rand_t state, const ring_t ring, const long * size, long iters)
+test_divexact(flint_rand_t state, const ring_t ring, const long * size, long iters)
 {
     long iter;
 
     for (iter = 0; iter < iters; iter++)
     {
-        elem_ptr A, B, C, D, E, F;
-        ulong e, f;
+        elem_ptr A, B, C, Q;
 
         A = elem_new(ring);
         B = elem_new(ring);
         C = elem_new(ring);
-        D = elem_new(ring);
-        E = elem_new(ring);
-        F = elem_new(ring);
-
-        e = n_randint(state, 8);
+        Q = elem_new(ring);
 
         elem_randtest(A, state, size, ring);
-        elem_randtest(B, state, size, ring);
-        elem_pow_ui(B, A, e, ring);
-        elem_pow_ui(A, A, e, ring);
-        if (!elem_equal(B, A, ring))
-        {
-            printf("FAIL: aliasing B, A\n");
-            ring_print(ring); printf("\n\n");
-            elem_print(A, ring); printf("\n\n");
-            elem_print(B, ring); printf("\n\n");
-            abort();
-        }
-
-        elem_randtest(A, state, size, ring);
-        elem_randtest(B, state, size, ring);
+        elem_randtest_not_zero(B, state, size, ring);
         elem_mul(C, A, B, ring);
-        elem_pow_ui(D, C, e, ring);
-        elem_pow_ui(E, A, e, ring);
-        elem_pow_ui(F, B, e, ring);
-        elem_mul(F, E, F, ring);
-        if (!elem_equal(D, F, ring))
+        elem_divexact(Q, C, B, ring);
+        if (!elem_equal(Q, A, ring))
         {
-            printf("FAIL: (A * B)^e = A^e * B^e \n");
+            printf("FAIL: (A * B) / B = A\n");
             ring_print(ring); printf("\n\n");
             elem_print(A, ring); printf("\n\n");
             elem_print(B, ring); printf("\n\n");
             elem_print(C, ring); printf("\n\n");
-            elem_print(D, ring); printf("\n\n");
-            elem_print(E, ring); printf("\n\n");
-            elem_print(F, ring); printf("\n\n");
+            elem_print(Q, ring); printf("\n\n");
             abort();
         }
 
-        e = n_randint(state, 8);
-        f = n_randint(state, 8);
-        elem_randtest(A, state, size, ring);
-        elem_pow_ui(B, A, e, ring);
-        elem_pow_ui(C, A, f, ring);
-        elem_mul(D, B, C, ring);
-        elem_pow_ui(E, A, e + f, ring);
-        if (!elem_equal(D, E, ring))
+        elem_randtest_not_zero(A, state, size, ring);
+        elem_set(B, A, ring);
+        elem_divexact(C, A, A, ring);
+        elem_divexact(Q, A, B, ring);
+        if (!elem_equal(C, Q, ring) || !elem_is_one(Q, ring))
         {
-            printf("FAIL: A^e * A^f = A^(e+f) \n");
+            printf("FAIL: aliasing A, B\n");
             ring_print(ring); printf("\n\n");
             elem_print(A, ring); printf("\n\n");
             elem_print(B, ring); printf("\n\n");
             elem_print(C, ring); printf("\n\n");
-            elem_print(D, ring); printf("\n\n");
-            elem_print(E, ring); printf("\n\n");
+            elem_print(Q, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest_not_zero(B, state, size, ring);
+        elem_mul(A, A, B, ring);
+        elem_divexact(Q, A, B, ring);
+        elem_divexact(A, A, B, ring);
+        if (!elem_equal(A, Q, ring))
+        {
+            printf("FAIL: aliasing Q, A\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(Q, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest_not_zero(B, state, size, ring);
+        elem_mul(A, A, B, ring);
+        elem_divexact(Q, A, B, ring);
+        elem_divexact(B, A, B, ring);
+        if (!elem_equal(B, Q, ring))
+        {
+            printf("FAIL: aliasing Q, A\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(Q, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest_not_zero(B, state, size, ring);
+        elem_divexact(Q, B, B, ring);
+        elem_divexact(B, B, B, ring);
+        if (!elem_equal(B, Q, ring))
+        {
+            printf("FAIL: aliasing Q, A, B\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(Q, ring); printf("\n\n");
             abort();
         }
 
         elem_del(A, ring);
         elem_del(B, ring);
         elem_del(C, ring);
-        elem_del(D, ring);
-        elem_del(E, ring);
-        elem_del(F, ring);
+        elem_del(Q, ring);
     }
 }
 
@@ -112,7 +129,7 @@ int main()
     flint_rand_t state;
     long i;
 
-    printf("pow_ui....");
+    printf("divexact....");
     fflush(stdout);
 
     flint_randinit(state);
@@ -127,10 +144,10 @@ int main()
         ring_init_poly(Zxy, Zx);
         ring_init_poly(Zxyz, Zxy);
 
-        test_pow_ui(state, Z, size, 1000);
-        test_pow_ui(state, Zx, size, 1000);
-        test_pow_ui(state, Zxy, size, 10);
-        /* slow test_pow_ui(state, Zxyz, size, 1000); */
+        test_divexact(state, Z, size, 1000);
+        test_divexact(state, Zx, size, 1000);
+        test_divexact(state, Zxy, size, 1000);
+        test_divexact(state, Zxyz, size, 1000);
 
         ring_clear(Zxyz);
         ring_clear(Zxy);
@@ -139,7 +156,7 @@ int main()
     }
 
     /* polynomials over (fmpz) integers mod n */
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 100; i++)
     {
         ring_t Z, Zn, Znx, Znxy, Znxyz;
         fmpz_t mod;
@@ -155,10 +172,10 @@ int main()
         ring_init_poly(Znxy, Znx);
         ring_init_poly(Znxyz, Znxy);
 
-        test_pow_ui(state, Zn, size, 10);
-        test_pow_ui(state, Znx, size, 10);
-        test_pow_ui(state, Znxy, size, 10);
-        /* slow test_pow_ui(state, Znxyz, size, 10); */
+        test_divexact(state, Zn, size, 10);
+        test_divexact(state, Znx, size, 10);
+        test_divexact(state, Znxy, size, 10);
+        test_divexact(state, Znxyz, size, 10);
 
         ring_clear(Znxyz);
         ring_clear(Znxy);
@@ -169,7 +186,7 @@ int main()
     }
 
     /* polynomials over (nmod) integers mod n */
-    for (i = 0; i < 20; i++)
+    for (i = 0; i < 100; i++)
     {
         ring_t Z, Zn, Znx, Znxy, Znxyz;
         mp_limb_t mod;
@@ -183,10 +200,10 @@ int main()
         ring_init_poly(Znxy, Znx);
         ring_init_poly(Znxyz, Znxy);
 
-        test_pow_ui(state, Zn, size, 10);
-        test_pow_ui(state, Znx, size, 10);
-        test_pow_ui(state, Znxy, size, 10);
-        /* slow test_pow_ui(state, Znxyz, size, 10); */
+        test_divexact(state, Zn, size, 10);
+        test_divexact(state, Znx, size, 10);
+        test_divexact(state, Znxy, size, 10);
+        test_divexact(state, Znxyz, size, 10);
 
         ring_clear(Znxyz);
         ring_clear(Znxy);
@@ -210,12 +227,15 @@ int main()
         ring_init_poly(Zxqy, Zxy);
         ring_init_frac(Zxyq, Zxy, Z);
 
-        test_pow_ui(state, Zq, size, 100);
-        test_pow_ui(state, Zqx, size, 100);
-        test_pow_ui(state, Zxq, size, 100);
-        test_pow_ui(state, Zqxy, size, 10);
-        test_pow_ui(state, Zxqy, size, 10);
-        test_pow_ui(state, Zxyq, size, 10);
+        test_divexact(state, Zq, size, 1000);
+        test_divexact(state, Zqx, size, 1000);
+        test_divexact(state, Zxq, size, 1000);
+        test_divexact(state, Zqxy, size, 1000);
+        test_divexact(state, Zxqy, size, 1000);
+
+        /*  not yet supported:
+        test_divexact(state, Zxyq, size, 1000);
+        */
 
         ring_clear(Zxyq);
         ring_clear(Zxqy);
@@ -241,10 +261,14 @@ int main()
         ring_init_frac(Zq, Z, Z);
         ring_init_complex(Zqi, Zq);
 
-        test_pow_ui(state, Zi, size, 100);
-        test_pow_ui(state, Zxi, size, 100);
-        test_pow_ui(state, Zix, size, 100);
-        test_pow_ui(state, Zqi, size, 100);
+        test_divexact(state, Zi, size, 1000);
+        test_divexact(state, Zqi, size, 1000);
+
+/*
+        not yet supported
+        test_divexact(state, Zxi, size, 1000);
+        test_divexact(state, Zix, size, 1000);
+*/
 
         ring_clear(Zqi);
         ring_clear(Zq);

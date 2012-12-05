@@ -27,132 +27,279 @@
 #include <stdio.h>
 #include "generics.h"
 
+void
+test_mul(flint_rand_t state, const ring_t ring, const long * size, long iters)
+{
+    long iter;
+
+    for (iter = 0; iter < iters; iter++)
+    {
+        elem_ptr A, B, C, D, E;
+
+        A = elem_new(ring);
+        B = elem_new(ring);
+        C = elem_new(ring);
+        D = elem_new(ring);
+        E = elem_new(ring);
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest(B, state, size, ring);
+
+        elem_mul(C, A, B, ring);
+        elem_mul(A, A, B, ring);
+
+        if (!elem_equal(C, A, ring))
+        {
+            printf("FAIL: aliasing C, A\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest(B, state, size, ring);
+        elem_mul(C, A, B, ring);
+        elem_mul(B, A, B, ring);
+        if (!elem_equal(C, B, ring))
+        {
+            printf("FAIL: aliasing C, B\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_set(B, A, ring);
+        elem_mul(C, A, B, ring);
+        elem_mul(D, A, A, ring);
+        if (!elem_equal(C, D, ring))
+        {
+            printf("FAIL: aliasing A, A\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(D, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_mul(B, A, A, ring);
+        elem_mul(A, A, A, ring);
+        if (!elem_equal(B, A, ring))
+        {
+            printf("FAIL: aliasing C, A, A\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            abort();
+        }
+
+
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest(B, state, size, ring);
+        elem_randtest(C, state, size, ring);
+        elem_mul(D, A, B, ring);
+        elem_mul(D, D, C, ring);
+        elem_mul(E, B, C, ring);
+        elem_mul(E, A, E, ring);
+        if (!elem_equal(D, E, ring))
+        {
+            printf("FAIL: (A*B)*C = A*(B*C)\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(D, ring); printf("\n\n");
+            elem_print(E, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_randtest(A, state, size, ring);
+        elem_randtest(B, state, size, ring);
+        elem_randtest(C, state, size, ring);
+        elem_mul(D, A, B, ring);
+        elem_mul(E, A, C, ring);
+        elem_add(E, D, E, ring);
+        elem_add(D, B, C, ring);
+        elem_mul(D, A, D, ring);
+
+        if (!elem_equal(D, E, ring))
+        {
+            printf("FAIL: A*(B+C) = A*B+A*C\n");
+            ring_print(ring); printf("\n\n");
+            elem_print(A, ring); printf("\n\n");
+            elem_print(B, ring); printf("\n\n");
+            elem_print(C, ring); printf("\n\n");
+            elem_print(D, ring); printf("\n\n");
+            elem_print(E, ring); printf("\n\n");
+            abort();
+        }
+
+        elem_del(A, ring);
+        elem_del(B, ring);
+        elem_del(C, ring);
+        elem_del(D, ring);
+        elem_del(E, ring);
+    }
+}
+
 int main()
 {
     flint_rand_t state;
-    long iter;
+    long i;
 
     printf("mul....");
+    fflush(stdout);
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 10000; iter++)
+    /* polynomials over (fmpz) integers */
     {
-        int i, depth;
-        ring_t R[5];
-        long size[5] = {6, 6, 6, 6, 6};
-        gen_t A, B, C, D, E;
+        ring_t Z, Zx, Zxy, Zxyz;
+        long size[4] = {6, 6, 6, 6};
 
-        depth = ring_init_randtest(R, state, 5);
+        ring_init_fmpz(Z);
+        ring_init_poly(Zx, Z);
+        ring_init_poly(Zxy, Zx);
+        ring_init_poly(Zxyz, Zxy);
 
-        gen_init(A, R[depth-1]);
-        gen_init(B, R[depth-1]);
-        gen_init(C, R[depth-1]);
-        gen_init(D, R[depth-1]);
-        gen_init(E, R[depth-1]);
+        test_mul(state, Z, size, 1000);
+        test_mul(state, Zx, size, 1000);
+        test_mul(state, Zxy, size, 1000);
+        test_mul(state, Zxyz, size, 1000);
 
-        gen_randtest(A, state, size);
-        gen_randtest(B, state, size);
-        gen_mul(C, A, B);
-        gen_mul(A, A, B);
-        if (!gen_equal(C, A))
-        {
-            printf("FAIL: aliasing C, A\n");
-            gen_print(A);
-            gen_print(B);
-            gen_print(C);
-            abort();
-        }
-
-        gen_randtest(A, state, size);
-        gen_randtest(B, state, size);
-        gen_mul(C, A, B);
-        gen_mul(B, A, B);
-        if (!gen_equal(C, B))
-        {
-            printf("FAIL: aliasing C, B\n");
-            gen_print(A);
-            gen_print(B);
-            gen_print(C);
-            abort();
-        }
-
-        gen_randtest(A, state, size);
-        gen_set(B, A);
-        gen_mul(C, A, B);
-        gen_mul(D, A, A);
-        if (!gen_equal(C, D))
-        {
-            printf("FAIL: aliasing A, A\n");
-            gen_print(A);
-            gen_print(B);
-            gen_print(C);
-            gen_print(D);
-            abort();
-        }
-
-        gen_randtest(A, state, size);
-        gen_mul(B, A, A);
-        gen_mul(A, A, A);
-        if (!gen_equal(B, A))
-        {
-            printf("FAIL: aliasing C, A, A\n");
-            gen_print(A);
-            gen_print(B);
-            abort();
-        }
-
-        gen_randtest(A, state, size);
-        gen_randtest(B, state, size);
-        gen_randtest(C, state, size);
-        gen_mul(D, A, B);
-        gen_mul(D, D, C);
-        gen_mul(E, B, C);
-        gen_mul(E, A, E);
-        if (!gen_equal(D, E))
-        {
-            printf("FAIL: (A*B)*C = A*(B*C)\n");
-            gen_print(A);
-            gen_print(B);
-            gen_print(C);
-            gen_print(D);
-            gen_print(E);
-            abort();
-        }
-
-        gen_randtest(A, state, size);
-        gen_randtest(B, state, size);
-        gen_randtest(C, state, size);
-        gen_mul(D, A, B);
-        gen_mul(E, A, C);
-        gen_add(E, D, E);
-        gen_add(D, B, C);
-        gen_mul(D, A, D);
-
-        if (!gen_equal(D, E))
-        {
-            printf("FAIL: A*(B+C) = A*B+A*C\n");
-            gen_print(A);
-            gen_print(B);
-            gen_print(C);
-            gen_print(D);
-            gen_print(E);
-            abort();
-        }
-
-        gen_clear(A);
-        gen_clear(B);
-        gen_clear(C);
-        gen_clear(D);
-        gen_clear(E);
-
-        for (i = 0; i < depth; i++)
-            ring_clear(R[i]);
+        ring_clear(Zxyz);
+        ring_clear(Zxy);
+        ring_clear(Zx);
+        ring_clear(Z);
     }
 
-    printf("PASS\n");
+    /* polynomials over (fmpz) integers mod n */
+    for (i = 0; i < 100; i++)
+    {
+        ring_t Z, Zn, Znx, Znxy, Znxyz;
+        fmpz_t mod;
+        long size[4] = {6, 6, 6, 6};
+
+        ring_init_fmpz(Z);
+
+        fmpz_init(mod);
+        fmpz_set_ui(mod, n_randtest_prime(state, 0));
+        ring_init_mod(Zn, Z, mod);
+
+        ring_init_poly(Znx, Zn);
+        ring_init_poly(Znxy, Znx);
+        ring_init_poly(Znxyz, Znxy);
+
+        test_mul(state, Zn, size, 10);
+        test_mul(state, Znx, size, 10);
+        test_mul(state, Znxy, size, 10);
+        test_mul(state, Znxyz, size, 10);
+
+        ring_clear(Znxyz);
+        ring_clear(Znxy);
+        ring_clear(Znx);
+        ring_clear(Zn);
+        fmpz_clear(mod);
+        ring_clear(Z);
+    }
+
+    /* polynomials over (nmod) integers mod n */
+    for (i = 0; i < 100; i++)
+    {
+        ring_t Z, Zn, Znx, Znxy, Znxyz;
+        mp_limb_t mod;
+        long size[4] = {6, 6, 6, 6};
+
+        ring_init_limb(Z);
+        mod = n_randtest_prime(state, 0);
+        ring_init_mod(Zn, Z, &mod);
+
+        ring_init_poly(Znx, Zn);
+        ring_init_poly(Znxy, Znx);
+        ring_init_poly(Znxyz, Znxy);
+
+        test_mul(state, Zn, size, 10);
+        test_mul(state, Znx, size, 10);
+        test_mul(state, Znxy, size, 10);
+        test_mul(state, Znxyz, size, 10);
+
+        ring_clear(Znxyz);
+        ring_clear(Znxy);
+        ring_clear(Znx);
+        ring_clear(Zn);
+        ring_clear(Z);
+    }
+
+    /* polynomials over (fmpz) integer fractions */
+    {
+        ring_t Z, Zx, Zxy, Zq, Zqx, Zxq, Zqxy, Zxqy, Zxyq;
+        long size[4] = {6, 6, 6, 6};
+
+        ring_init_fmpz(Z);
+        ring_init_poly(Zx, Z);
+        ring_init_poly(Zxy, Zx);
+        ring_init_frac(Zq, Z, Z);
+        ring_init_poly(Zqx, Zq);
+        ring_init_frac(Zxq, Zx, Z);
+        ring_init_poly(Zqxy, Zqx);
+        ring_init_poly(Zxqy, Zxy);
+        ring_init_frac(Zxyq, Zxy, Z);
+
+        test_mul(state, Zq, size, 1000);
+        test_mul(state, Zqx, size, 1000);
+        test_mul(state, Zxq, size, 1000);
+        test_mul(state, Zqxy, size, 1000);
+        test_mul(state, Zxqy, size, 1000);
+        test_mul(state, Zxyq, size, 1000);
+
+        ring_clear(Zxyq);
+        ring_clear(Zxqy);
+        ring_clear(Zqxy);
+        ring_clear(Zxq);
+        ring_clear(Zqx);
+        ring_clear(Zq);
+        ring_clear(Zxy);
+        ring_clear(Zx);
+        ring_clear(Z);
+    }
+
+    /* Complex numbers */
+    {
+        ring_t Z, Zx, Zi, Zxi, Zix, Zq, Zqi;
+        long size[4] = {6, 6, 6, 6};
+
+        ring_init_fmpz(Z);
+        ring_init_poly(Zx, Z);
+        ring_init_complex(Zi, Z);
+        ring_init_complex(Zxi, Zx);
+        ring_init_poly(Zix, Zi);
+        ring_init_frac(Zq, Z, Z);
+        ring_init_complex(Zqi, Zq);
+
+        test_mul(state, Zi, size, 1000);
+        test_mul(state, Zxi, size, 1000);
+        test_mul(state, Zix, size, 1000);
+        test_mul(state, Zqi, size, 1000);
+
+        ring_clear(Zqi);
+        ring_clear(Zq);
+        ring_clear(Zix);
+        ring_clear(Zxi);
+        ring_clear(Zi);
+        ring_clear(Zx);
+        ring_clear(Z);
+    }
+
     flint_randclear(state);
     _fmpz_cleanup();
+    printf("PASS\n");
     return EXIT_SUCCESS;
 }
 

@@ -56,7 +56,7 @@ int main()
 
     flint_randinit(state);
 
-    for (iter = 0; iter < 1000; iter++)
+    for (iter = 0; iter < 200; iter++)
     {
         int i, depth;
         ring_t rings[5];

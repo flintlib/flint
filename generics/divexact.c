@@ -37,6 +37,48 @@ elem_poly_divexact(elem_poly_struct * Q,
 }
 
 void
+elem_complex_divexact(elem_ptr q, elem_srcptr x, elem_srcptr y, const ring_t ring)
+{
+    elem_srcptr a, b, c, d;
+    elem_ptr e, f, t, u, v, w;
+    const ring_struct * rring = RING_PARENT(ring);
+
+    a = REALPART(x, ring);
+    b = IMAGPART(x, ring);
+    c = REALPART(y, ring);
+    d = IMAGPART(y, ring);
+    e = REALPART(q, ring);
+    f = IMAGPART(q, ring);
+
+    ELEM_TMP_INIT(t, rring);
+    ELEM_TMP_INIT(u, rring);
+    ELEM_TMP_INIT(v, rring);
+    ELEM_TMP_INIT(w, rring);
+
+    elem_mul(t, c, c, rring);
+    elem_mul(u, d, d, rring);
+    elem_add(v, t, u, rring);
+
+    /* re = (ac + bd) / (c^2 + d^2) */
+    elem_mul(t, a, c, rring);
+    elem_mul(u, b, d, rring);
+    elem_add(t, t, u, rring);
+
+    /* im = (bc - ad) / (c^2 + d^2) */
+    elem_mul(u, b, c, rring);
+    elem_mul(w, a, d, rring);
+    elem_sub(u, u, w, rring);
+
+    elem_divexact(e, t, v, rring);
+    elem_divexact(f, u, v, rring);
+
+    ELEM_TMP_CLEAR(t, rring);
+    ELEM_TMP_CLEAR(u, rring);
+    ELEM_TMP_CLEAR(v, rring);
+    ELEM_TMP_CLEAR(w, rring);
+}
+
+void
 elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
 {
     switch (ring->type)
@@ -79,12 +121,17 @@ elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
             }
             break;
 
+        case TYPE_COMPLEX:
+            elem_complex_divexact(Q, A, B, ring);
+            break;
+
         case TYPE_FRAC:
             if (RING_NUMER(ring) == RING_DENOM(ring))
             {
                 elem_frac_div(Q, A, B, ring);
                 break;
             }
+            /* fall through */
 
         default:
             {

@@ -163,6 +163,20 @@ void ring_print(const ring_t ring);
 
 void elem_init(elem_ptr elem, const ring_t ring);
 void elem_clear(elem_ptr elem, const ring_t ring);
+
+static __inline__ elem_ptr elem_new(const ring_t ring)
+{
+    elem_ptr p = flint_malloc(ring->size);
+    elem_init(p, ring);
+    return p;
+}
+
+static __inline__ void elem_del(elem_ptr p, const ring_t ring)
+{
+    elem_clear(p, ring);
+    flint_free(p);
+}
+
 void elem_zero(elem_ptr x, const ring_t ring);
 int elem_is_zero(elem_srcptr x, const ring_t ring);
 void elem_one(elem_ptr x, const ring_t ring);

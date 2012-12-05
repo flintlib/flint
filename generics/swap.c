@@ -55,8 +55,13 @@ elem_swap(elem_ptr res, elem_ptr src, const ring_t ring)
             elem_swap(DENOM(res, ring), DENOM(src, ring), RING_DENOM(ring));
             break;
 
+        case TYPE_COMPLEX:
+            elem_swap(REALPART(res, ring), REALPART(src, ring), RING_PARENT(ring));
+            elem_swap(IMAGPART(res, ring), IMAGPART(src, ring), RING_PARENT(ring));
+            break;
+
         default:
-            NOT_IMPLEMENTED("set", ring);
+            NOT_IMPLEMENTED("swap", ring);
     }
 }
 
