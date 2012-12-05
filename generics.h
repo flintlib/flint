@@ -155,7 +155,6 @@ void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_rin
 void ring_init_poly(ring_t ring, const ring_t elem_ring);
 void ring_init_mat(ring_t ring, const ring_t elem_ring);
 void ring_init_complex(ring_t ring, const ring_t real_ring);
-int ring_init_randtest(ring_t * R, flint_rand_t state, int maxdepth);
 void ring_clear(ring_t ring);
 void ring_print(const ring_t ring);
 
