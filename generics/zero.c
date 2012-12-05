@@ -61,8 +61,3 @@ elem_zero(elem_ptr x, const ring_t ring)
     }
 }
 
-void
-gen_zero(gen_t x)
-{
-    elem_zero(x->elem, x->ring);
-}

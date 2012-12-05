@@ -64,15 +64,3 @@ elem_set(elem_ptr res, elem_srcptr src, const ring_t ring)
     }
 }
 
-void
-gen_set(gen_t y, const gen_t x)
-{
-    if (y->ring == x->ring)
-    {
-        elem_set(y->elem, x->elem, y->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_set coercing into ", y->ring);
-    }
-}

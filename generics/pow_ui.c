@@ -165,15 +165,3 @@ elem_pow_ui(elem_ptr res, elem_srcptr op, ulong exp, const ring_t ring)
     }
 }
 
-void
-gen_pow_ui(gen_t z, const gen_t x, ulong exp)
-{
-    if (x->ring == z->ring)
-    {
-        elem_pow_ui(z->elem, x->elem, exp, z->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_pow_ui coercing into ", z->ring);
-    }
-}

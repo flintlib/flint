@@ -73,15 +73,3 @@ elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring)
     }
 }
 
-int
-gen_equal(const gen_t op1, const gen_t op2)
-{
-    if (op1->ring == op2->ring)
-    {
-        return elem_equal(op1->elem, op2->elem, op1->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("equal with left type ", op1->ring);
-    }
-}

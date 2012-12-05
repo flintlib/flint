@@ -86,11 +86,3 @@ elem_print(elem_srcptr elem, const ring_t ring)
     }
 }
 
-void gen_print(gen_t x)
-{
-    printf("element of ");
-    ring_print(x->ring);
-    printf(":\n");
-    elem_print(x->elem, x->ring);
-    printf("\n");
-}

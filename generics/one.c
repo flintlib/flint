@@ -31,8 +31,3 @@ elem_one(elem_ptr x, const ring_t ring)
     elem_set_si(x, 1, ring);
 }
 
-void
-gen_one(gen_t x)
-{
-    elem_one(x->elem, x->ring);
-}

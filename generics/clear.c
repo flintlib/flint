@@ -72,9 +72,3 @@ elem_clear(elem_ptr elem, const ring_t ring)
     }
 }
 
-void
-gen_clear(gen_t x)
-{
-    elem_clear(x->elem, x->ring);
-    flint_free(x->elem);
-}

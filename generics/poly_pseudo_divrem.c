@@ -69,7 +69,6 @@ _elem_poly_pseudo_divrem(elem_ptr Q, elem_ptr R, ulong * d,
     ELEM_TMP_CLEAR(rem, ring);
 }
 
-
 void
 elem_poly_pseudo_divrem(elem_poly_t Q, elem_poly_t R,
                                  ulong * d, const elem_poly_t A,
@@ -123,19 +122,6 @@ elem_poly_pseudo_divrem(elem_poly_t Q, elem_poly_t R,
         elem_poly_set_length(Q, lenq, ring);
         elem_poly_set_length(R, lenr - 1, ring);
         elem_poly_normalise(R, ring);
-    }
-}
-
-void
-gen_pseudo_divrem(gen_t Q, gen_t R, ulong * d, const gen_t A, const gen_t B)
-{
-    if (Q->ring == A->ring && A->ring == B->ring && R->ring == A->ring && Q->ring->type == TYPE_POLY)
-    {
-        elem_poly_pseudo_divrem(Q->elem, R->elem, d, A->elem, B->elem, Q->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_pseudo_divrem coercing into ", Q->ring);
     }
 }
 

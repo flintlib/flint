@@ -94,8 +94,3 @@ elem_set_si(elem_ptr elem, long v, const ring_t ring)
     }
 }
 
-void
-gen_set_si(gen_t x, long v)
-{
-    elem_set_si(x->elem, v, x->ring);
-}

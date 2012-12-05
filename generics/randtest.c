@@ -105,14 +105,3 @@ elem_randtest_not_zero(elem_ptr res, flint_rand_t state, const long * size, cons
         elem_one(res, ring);
 }
 
-void
-gen_randtest(gen_t res, flint_rand_t state, const long * size)
-{
-    elem_randtest(res->elem, state, size, res->ring);
-}
-
-void
-gen_randtest_not_zero(gen_t res, flint_rand_t state, const long * size)
-{
-    elem_randtest_not_zero(res->elem, state, size, res->ring);
-}

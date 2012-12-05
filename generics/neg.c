@@ -76,15 +76,3 @@ elem_neg(elem_ptr res, elem_srcptr src, const ring_t ring)
     }
 }
 
-void
-gen_neg(gen_t y, const gen_t x)
-{
-    if (y->ring == x->ring)
-    {
-        elem_neg(y->elem, x->elem, y->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_neg coercing into ", y->ring);
-    }
-}

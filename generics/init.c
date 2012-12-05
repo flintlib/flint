@@ -70,10 +70,3 @@ elem_init(elem_ptr elem, const ring_t ring)
     }
 }
 
-void
-gen_init(gen_t x, const ring_t ring)
-{
-    x->ring = (ring_struct *) ring;
-    x->elem = flint_malloc(ring->size);
-    elem_init(x->elem, ring);
-}

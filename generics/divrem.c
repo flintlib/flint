@@ -73,15 +73,3 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
     }
 }
 
-void
-gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B)
-{
-    if (Q->ring == A->ring && A->ring == B->ring && R->ring == A->ring)
-    {
-        elem_divrem(Q->elem, R->elem, A->elem, B->elem, Q->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_divrem coercing into ", Q->ring);
-    }
-}

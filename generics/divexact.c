@@ -149,15 +149,3 @@ elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
     }
 }
 
-void
-gen_divexact(gen_t Q, const gen_t A, const gen_t B)
-{
-    if (Q->ring == A->ring && A->ring == B->ring)
-    {
-        elem_divexact(Q->elem, A->elem, B->elem, Q->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("divexact coercing into ", Q->ring);
-    }
-}

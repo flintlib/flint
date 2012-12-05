@@ -115,15 +115,3 @@ elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
     }
 }
 
-void
-gen_mul(gen_t z, const gen_t x, const gen_t y)
-{
-    if (x->ring == y->ring && x->ring == z->ring)
-    {
-        elem_mul(z->elem, x->elem, y->elem, z->ring);
-    }
-    else
-    {
-        NOT_IMPLEMENTED("gen_mul coercing into ", z->ring);
-    }
-}

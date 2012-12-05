@@ -205,31 +205,6 @@ void elem_mul_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_
 void elem_divexact_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring, const ring_t parent);
 void elem_gcd_parent(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring, const ring_t parent);
 
-/* wrapped versions */
-
-void gen_init(gen_t x, const ring_t ring);
-void gen_clear(gen_t x);
-void gen_zero(gen_t x);
-int gen_is_zero(const gen_t x);
-void gen_one(gen_t x);
-int gen_is_one(const gen_t x);
-int gen_equal(const gen_t op1, const gen_t op2);
-void gen_print(gen_t x);
-void gen_set(gen_t y, const gen_t x);
-void gen_set_si(gen_t x, long v);
-void gen_randtest(gen_t res, flint_rand_t state, const long * size);
-void gen_randtest_not_zero(gen_t res, flint_rand_t state, const long * size);
-void gen_neg(gen_t y, const gen_t x);
-void gen_add(gen_t z, const gen_t x, const gen_t y);
-void gen_sub(gen_t z, const gen_t x, const gen_t y);
-void gen_mul(gen_t z, const gen_t x, const gen_t y);
-void gen_divexact(gen_t Q, const gen_t A, const gen_t B);
-void gen_divrem(gen_t Q, gen_t R, const gen_t A, const gen_t B);
-void gen_pow_ui(gen_t z, const gen_t x, ulong exp);
-
-void gen_pseudo_divrem(gen_t Q, gen_t R, ulong * d, const gen_t A, const gen_t B);
-
-
 /* Fraction functions */
 
 void elem_content_recursive(elem_ptr cont, elem_srcptr obj, const ring_t cont_ring, const ring_t obj_ring);

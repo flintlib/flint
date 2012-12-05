@@ -59,8 +59,3 @@ elem_is_one(elem_srcptr x, const ring_t ring)
     }
 }
 
-int
-gen_is_one(const gen_t x)
-{
-    return elem_is_one(x->elem, x->ring);
-}

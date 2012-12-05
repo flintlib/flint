@@ -54,8 +54,3 @@ elem_is_zero(elem_srcptr x, const ring_t ring)
     }
 }
 
-int
-gen_is_zero(const gen_t x)
-{
-    return elem_is_zero(x->elem, x->ring);
-}
