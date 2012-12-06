@@ -151,7 +151,7 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
                    
                    if (b)
                    {   
-                      g= n_gcd(c, FLINT_ABS(b));
+                      g = n_gcd(c, FLINT_ABS(b));
                       g = n_gcd(a, g);
                    } else
                       g = n_gcd(c, a);
