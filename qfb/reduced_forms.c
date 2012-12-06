@@ -199,7 +199,7 @@ long qfb_reduced_forms(qfb ** forms, long d)
     sqrt = n_sqrt(blim*blim - d);
     n_nth_prime_bounds(&primes_cutoff, &primes_cutoff, sqrt);
     if (primes_cutoff > FLINT_PRIMES_SMALL_CUTOFF*FLINT_PRIMES_SMALL_CUTOFF)
-       return qfb_reduced_forms(forms, d);
+       return qfb_reduced_forms_large(forms, d);
 
     n_compute_primes(FLINT_MAX(sqrt, 10000));
     
