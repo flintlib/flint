@@ -23,16 +23,21 @@
 
 ******************************************************************************/
 
+void qfb_array_clear(qfb ** forms, long num)
+    Clean up an array of \code{qfb} structs allocated by a qfb function.
+    The parameter \code{num} must be set to the maximum index of forms that
+    have been stored.
+
 long qfb_reduced_forms(qfb ** forms, long d)
 
     Given a discriminant $d$ (negative for negative definite forms), compute
     all the reduced binary quadratic forms of that discriminant. The function
     allocates space for these and returns it in the variable \code{forms} 
     (the user is responsible for cleaning this up by a single call to 
-    \code{flint_free} on the array pointed to by \code{forms}, after use. The
-    function returns the number of forms generated (the form class number).
-    The forms are stored in an array of \code{qfb} structs, which contain
-    fields \code{a, b, c} corresponding to forms $(a, b, c)$. 
+    \code{qfb_array_clear} on \code{forms}, after use. The function returns 
+    the number of forms generated (the form class number). The forms are 
+    stored in an array of \code{qfb} structs, which contain fields 
+    \code{a, b, c} corresponding to forms $(a, b, c)$. 
 
 long qfb_reduced_forms_large(qfb ** forms, long d)
 

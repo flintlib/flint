@@ -28,6 +28,7 @@
 
 #include <mpir.h>
 #include "flint.h"
+#include "fmpz.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -35,9 +36,9 @@
 
 typedef struct qfb
 {
-    mp_limb_signed_t a;
-    mp_limb_signed_t b;
-    mp_limb_signed_t c;
+    fmpz_t a;
+    fmpz_t b;
+    fmpz_t c;
 } qfb;
 
 typedef qfb qfb_t[1];
@@ -45,6 +46,20 @@ typedef qfb qfb_t[1];
 long qfb_reduced_forms(qfb ** forms, long d);
 
 long qfb_reduced_forms_large(qfb ** forms, long d);
+
+static __inline__
+void qfb_array_clear(qfb ** forms, long num)
+{
+   long k;
+
+   for (k = 0; k < num; k++)
+   {
+      fmpz_clear((*forms)[k].a);
+      fmpz_clear((*forms)[k].b);
+      fmpz_clear((*forms)[k].c);
+   }
+   flint_free(*forms);
+}
 
 #ifdef __cplusplus
 }

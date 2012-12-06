@@ -55,7 +55,7 @@ int pow_incr(int * pows, int * exp, int n)
 
 long qfb_reduced_forms_large(qfb ** forms, long d)
 {
-    long a, j, p, alim, alloc, num, roots, sqrt, i, prod, prime_i;
+    long a, j, k, p, alim, alloc, num, roots, sqrt, i, prod, prime_i;
     mp_limb_t a2;
     n_factor_t * fac;
 
@@ -162,11 +162,17 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
                        {
                            (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(alim, 100))*sizeof(qfb));
                            alloc += FLINT_MIN(alim, 100);
+                           for (k = num; k < alloc; k++)
+                           {
+                              fmpz_init((*forms)[k].a);
+                              fmpz_init((*forms)[k].b);
+                              fmpz_init((*forms)[k].c);
+                           }
                        }
 
-                       (*forms)[num].a = a; /* record form */
-                       (*forms)[num].b = b;
-                       (*forms)[num++].c = c;
+                       fmpz_set_si((*forms)[num].a, a); /* record form */
+                       fmpz_set_si((*forms)[num].b, b);
+                       fmpz_set_si((*forms)[num++].c, c);
                    }
                }
            }
@@ -182,7 +188,7 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
 
 long qfb_reduced_forms(qfb ** forms, long d)
 {
-    long a, b, c, p, blim, alloc, num, sqrt, i, prod, prime_i;
+    long a, b, k, c, p, blim, alloc, num, sqrt, i, prod, prime_i;
     mp_limb_t b2, exp, primes_cutoff = 0;
     n_factor_t * fac;
     mp_limb_t * s;
@@ -298,11 +304,17 @@ long qfb_reduced_forms(qfb ** forms, long d)
                      {
                          (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(blim, 100))*sizeof(qfb));
                          alloc += FLINT_MIN(blim, 100);
-                     }
+                         for (k = num; k < alloc; k++)
+                         {
+                            fmpz_init((*forms)[k].a);
+                            fmpz_init((*forms)[k].b);
+                            fmpz_init((*forms)[k].c);
+                         }
+                    }
                     
-                     (*forms)[num].a = a; /* record form */
-                     (*forms)[num].b = b;
-                     (*forms)[num++].c = c;
+                     fmpz_set_si((*forms)[num].a, a); /* record form */
+                     fmpz_set_si((*forms)[num].b, b);
+                     fmpz_set_si((*forms)[num++].c, c);
                      
                      if (b && a != c && b != a)
                      {
@@ -310,11 +322,17 @@ long qfb_reduced_forms(qfb ** forms, long d)
                          {
                              (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(blim, 100))*sizeof(qfb));
                              alloc += FLINT_MIN(blim, 100);
+                             for (k = num; k < alloc; k++)
+                             {
+                                fmpz_init((*forms)[k].a);
+                                fmpz_init((*forms)[k].b);
+                                fmpz_init((*forms)[k].c);
+                             }
                          }
                     
-                        (*forms)[num].a = a; /* record opposite form */
-                        (*forms)[num].b = -b;
-                        (*forms)[num++].c = c;
+                        fmpz_set_si((*forms)[num].a, a); /* record opposite form */
+                        fmpz_set_si((*forms)[num].b, -b);
+                        fmpz_set_si((*forms)[num++].c, c);
                      }
                  }
              }

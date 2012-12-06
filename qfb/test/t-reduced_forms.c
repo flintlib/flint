@@ -54,8 +54,9 @@ int main(void)
         {
             for (k = 0; k < num; k++)
             {
-               if (forms[j].a == forms2[k].a && forms[j].b == forms2[k].b
-                    && forms[j].c == forms2[k].c);
+               if (fmpz_equal(forms[j].a, forms2[k].a) 
+                && fmpz_equal(forms[j].b, forms2[k].b)
+                && fmpz_equal(forms[j].c, forms2[k].c))
                    break;
             }
             result &= (k != num);
@@ -68,16 +69,22 @@ int main(void)
             printf("FAIL:\n");
             
             if (num == num2)
-                printf("(%ld, %ld, %ld) != (%ld, %ld, %ld)\n", forms[j].a, forms[j].b, 
-                    forms[j].c, forms2[j].a, forms2[j].b, forms2[j].c);
-            else
+            {
+                printf("(");
+                fmpz_print(forms[j].a), printf(", ");
+                fmpz_print(forms[j].b), printf(", ");
+                fmpz_print(forms[j].c), printf(") != (");
+                fmpz_print(forms2[j].a), printf(", ");
+                fmpz_print(forms2[j].b), printf(", ");
+                fmpz_print(forms2[j].c), printf(")\n");
+             } else
                 printf("%ld != %ld\n", num, num2);
             
             abort();
         }
 
-        flint_free(forms);
-        flint_free(forms2);
+        qfb_array_clear(&forms, num);
+        qfb_array_clear(&forms2, num2);
     }
 
     flint_randclear(state);
