@@ -31,6 +31,8 @@ long qfb_reduced_forms(qfb ** forms, long d)
     (the user is responsible for cleaning this up by a single call to 
     \code{flint_free} on the array pointed to by \code{forms}, after use. The
     function returns the number of forms generated (the form class number).
+    The forms are stored in an array of \code{qfb} structs, which contain
+    fields \code{a, b, c} corresponding to forms $(a, b, c)$. 
 
 long qfb_reduced_forms_large(qfb ** forms, long d)
 
