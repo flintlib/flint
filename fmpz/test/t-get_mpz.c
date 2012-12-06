@@ -41,7 +41,7 @@ main(void)
     printf("get/set_mpz....");
     fflush(stdout);
 
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
         mpz_t b, c;

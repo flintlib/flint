@@ -74,7 +74,7 @@ fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t
     
     if (B->length == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_pseudo_rem_cohen\n");
+        printf("Exception (fmpz_poly_pseudo_rem_cohen). Division by zero.\n");
         abort();
     }
     if (A->length < B->length)

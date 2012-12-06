@@ -92,7 +92,7 @@ void fmpq_poly_tan_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
 
     if (!fmpz_is_zero(poly->coeffs))
     {
-        printf("Exception: fmpq_poly_tan_series: constant term != 0");
+        printf("Exception (fmpq_poly_tan_series). Constant term != 0.\n");
         abort();
     }
 

@@ -40,7 +40,7 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 1000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
@@ -59,7 +59,7 @@ int main(void)
          
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(state, d);
+         do a = n_randtest(state) % d;
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -77,7 +77,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 1000; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
       mp_limb_t a, d, dinv, norm;
       mpz_t d_m;
@@ -94,7 +94,7 @@ int main(void)
 
       for (j = 0; j < 100; j++)
       {
-         do a = n_randint(state, d);
+         do a = n_randtest(state) % d;
          while (a == 0UL);
       
          dinv = n_preinvert_limb(d);
@@ -107,7 +107,11 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 2000) 
+#if FLINT64
+   if (count > 220 * flint_test_multiplier()) 
+#else
+   if (count > 430 * flint_test_multiplier())
+#endif
    {
       printf("FAIL:\n");
       printf("count = %lu\n", count);

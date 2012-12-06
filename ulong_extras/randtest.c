@@ -31,7 +31,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-mp_limb_t n_randtest(flint_rand_t state)
+mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
 {
     mp_limb_t m;
     mp_limb_t n;
@@ -40,24 +40,44 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     if (m & 7UL)
     {
-        n = n_randbits(state, n_randint(state, FLINT_BITS + 1));
+        n = n_randbits(state, bits);
     }
     else
     {
         m >>= 3;
 
-        switch (m % 5UL)
+        switch (m & 7UL)
         {
             case 0:  n = 0;         break;
             case 1:  n = 1;         break;
             case 2:  n = COEFF_MAX; break;
             case 3:  n = LONG_MAX;  break;
             case 4:  n = ULONG_MAX; break;
+            case 5:  n =  (1UL<<n_randint(state, FLINT_BITS)) 
+                        - (1UL<<n_randint(state, FLINT_BITS));
+                                    break;
+            case 6:  n =  (1UL<<n_randint(state, FLINT_BITS));
+                                    break;
+            case 7:  n = -(1UL<<n_randint(state, FLINT_BITS));
+                                    break;
             default: n = 0;
         }
+
+        if (bits < FLINT_BITS)
+           n &= ((1UL<<bits) - 1UL); /* mask it off */
+
+        if (bits) /* set most significant bit */
+           n |= (1UL<<(bits - 1));
+        else
+           n = 0;
     }
 
     return n;
+}
+
+mp_limb_t n_randtest(flint_rand_t state)
+{
+    return n_randtest_bits(state, n_randint(state, FLINT_BITS + 1));
 }
 
 mp_limb_t n_randtest_not_zero(flint_rand_t state)

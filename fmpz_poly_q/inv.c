@@ -29,7 +29,7 @@ void fmpz_poly_q_inv(fmpz_poly_q_t rop, const fmpz_poly_q_t op)
 {
     if (fmpz_poly_is_zero(op->num))
     {
-        printf("ERROR (fmpz_poly_q_inv).  Denominator is zero.\n");
+        printf("Exception (fmpz_poly_q_inv). Zero is not invertible.\n");
         abort();
     }
     

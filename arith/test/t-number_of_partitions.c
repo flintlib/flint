@@ -121,11 +121,11 @@ int main(void)
     fmpz_init(p);
     v = _fmpz_vec_init(3000);
 
-    number_of_partitions_vec(v, 3000);
+    arith_number_of_partitions_vec(v, 3000);
 
     for (i = 0; i < 3000; i++)
     {
-        number_of_partitions(p, i);
+        arith_number_of_partitions(p, i);
         if (!fmpz_equal(p, v + i))
         {
             printf("FAIL:\n");
@@ -140,7 +140,7 @@ int main(void)
 
     for (i = 0; testdata[i][0] != 0; i++)
     {
-        number_of_partitions(p, testdata[i][0]);
+        arith_number_of_partitions(p, testdata[i][0]);
 
         if (fmpz_fdiv_ui(p, 1000000000) != testdata[i][1])
         {

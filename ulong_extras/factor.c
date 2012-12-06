@@ -85,7 +85,7 @@ void n_factor(n_factor_t * factors, mp_limb_t n, int proved)
                factors_left++;
 				} else
 				{
-               printf("Exception: failed to factor %ld\n", n);
+               printf("Exception (n_factor). Failed to factor %ld.\n", n);
                abort();
 				}
          } else

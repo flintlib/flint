@@ -49,7 +49,7 @@ void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, long lenA,
     else
     {
         _nmod_poly_reverse(Brev, B, lenB, lenB);
-        mpn_zero(Brev + lenB, lenQ - lenB);
+        flint_mpn_zero(Brev + lenB, lenQ - lenB);
     }
 
     _nmod_poly_div_series(Q, Arev, Brev, lenQ, mod);
@@ -68,7 +68,7 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_div_newton\n");
+        printf("Exception (nmod_poly_div_newton). Division by zero.\n");
         abort();
     }
 

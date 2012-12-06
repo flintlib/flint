@@ -60,10 +60,10 @@ mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
 */
 
 #ifdef mpn_modexact_1_odd
-#define mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
+#define flint_mpn_divisible_1_p(x, xsize, d) (mpn_modexact_1_odd(x, xsize, d) == 0)
 #else
 static __inline__ int
-mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
+flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 {
     __mpz_struct s;
     s._mp_size = xsize;
@@ -73,7 +73,7 @@ mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 #endif
 
 static __inline__
-int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
+int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 {
     long i;
     for (i = 0; i < xsize; i++)
@@ -85,7 +85,7 @@ int mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 }
 
 static __inline__
-mp_size_t mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
+mp_size_t flint_mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
 {
     mpn_divrem_1(x, 0, x, xsize, d);
     if (x[xsize - 1] == 0UL)
@@ -93,19 +93,19 @@ mp_size_t mpn_divexact_1(mp_ptr x, mp_size_t xsize, mp_limb_t d)
     return xsize;
 }
 
-void mpn_debug(mp_srcptr x, mp_size_t xsize);
+void flint_mpn_debug(mp_srcptr x, mp_size_t xsize);
 
-mp_size_t mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
+mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
 
-mp_size_t mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
+mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp);
 
-int mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
 
-int mpn_divides(mp_ptr q, mp_srcptr array1, 
+int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
 
-mp_size_t mpn_gcd_full(mp_ptr arrayg, 
+mp_size_t flint_mpn_gcd_full(mp_ptr arrayg, 
           mp_ptr array1, mp_size_t limbs1, mp_ptr array2, mp_size_t limbs2);
 
 /*
@@ -117,7 +117,7 @@ and mpn_add.
 #define MPN_SET(xx, xs, yy, ys)   \
 do {                              \
     xs = ys;                      \
-    mpn_copyi(xx, yy, ys);        \
+    flint_mpn_copyi(xx, yy, ys);        \
 } while (0)
 
 #define CARRY(cy,xx,xs) if (cy) { xx[xs++] = cy; }
@@ -180,7 +180,7 @@ do {                                                         \
 
 
 void
-mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
+flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
                           long a, long b, long n, int d);
 

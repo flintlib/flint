@@ -31,7 +31,7 @@
 #include "arith.h"
 
 void
-dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
+arith_dedekind_sum_naive(fmpq_t s, const fmpz_t h, const fmpz_t k)
 {
     fmpz_t i, j, q1, r1, q2, r2;
 

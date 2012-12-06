@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 
 void
-bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
+arith_bell_number_nmod_vec_recursive(mp_ptr b, long n, nmod_t mod)
 {
     long i, k;
     mp_ptr t;

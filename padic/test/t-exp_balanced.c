@@ -23,10 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "padic.h"
 
@@ -53,20 +49,22 @@ main(void)
         padic_t a, b;
         int ans1, ans2;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, 2);
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, 2);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
 
         padic_randtest(a, state, ctx);
 
         ans1 = padic_exp_balanced(b, a, ctx);
         ans2 = padic_exp_balanced(a, a, ctx);
 
-        result = ((ans1 == ans2) && (!ans1 || padic_equal(a, b, ctx)));
+        result = ((ans1 == ans2) && (!ans1 || padic_equal(a, b)));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -77,14 +75,14 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
+        padic_clear(a);
+        padic_clear(b);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
     }
 
-    /* Check aliasing: exp(a + b) == exp(a) exp(b) */
+    /* Functional equation: exp(a + b) == exp(a) exp(b) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -94,18 +92,20 @@ main(void)
         padic_t a, b, c, d, e, f, g;
         int ans1, ans2, ans3;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, 2);
-        N = n_randint(state, 10) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, 2);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
-        padic_init(d, ctx);
-        padic_init(e, ctx);
-        padic_init(f, ctx);
-        padic_init(g, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
+        padic_init2(d, N);
+        padic_init2(e, N);
+        padic_init2(f, N);
+        padic_init2(g, N);
 
         padic_randtest(a, state, ctx);
         padic_randtest(b, state, ctx);
@@ -117,7 +117,7 @@ main(void)
 
         ans3 = padic_exp_balanced(g, c, ctx);
 
-        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g, ctx)));
+        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
             printf("FAIL (functional equation):\n\n");
@@ -131,13 +131,13 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
-        padic_clear(d, ctx);
-        padic_clear(e, ctx);
-        padic_clear(f, ctx);
-        padic_clear(g, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
+        padic_clear(d);
+        padic_clear(e);
+        padic_clear(f);
+        padic_clear(g);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -155,20 +155,22 @@ main(void)
         padic_t a, b;
         int ans1, ans2;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
 
         padic_randtest(a, state, ctx);
 
         ans1 = padic_exp_balanced(b, a, ctx);
         ans2 = padic_exp_balanced(a, a, ctx);
 
-        result = ((ans1 == ans2) && (!ans1 || padic_equal(a, b, ctx)));
+        result = ((ans1 == ans2) && (!ans1 || padic_equal(a, b)));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -179,14 +181,14 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
+        padic_clear(a);
+        padic_clear(b);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
     }
 
-    /* Check aliasing: exp(a + b) == exp(a) exp(b) */
+    /* Functional equation: exp(a + b) == exp(a) exp(b) */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -196,18 +198,20 @@ main(void)
         padic_t a, b, c, d, e, f, g;
         int ans1, ans2, ans3;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 10) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
-        padic_init(d, ctx);
-        padic_init(e, ctx);
-        padic_init(f, ctx);
-        padic_init(g, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
+        padic_init2(d, N);
+        padic_init2(e, N);
+        padic_init2(f, N);
+        padic_init2(g, N);
 
         padic_randtest(a, state, ctx);
         padic_randtest(b, state, ctx);
@@ -219,7 +223,7 @@ main(void)
 
         ans3 = padic_exp_balanced(g, c, ctx);
 
-        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g, ctx)));
+        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
             printf("FAIL (functional equation):\n\n");
@@ -233,13 +237,13 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
-        padic_clear(d, ctx);
-        padic_clear(e, ctx);
-        padic_clear(f, ctx);
-        padic_clear(g, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
+        padic_clear(d);
+        padic_clear(e);
+        padic_clear(f);
+        padic_clear(g);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

@@ -41,7 +41,7 @@ main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 500000; i++)
+    for (i = 0; i < 50000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mp_bitcnt_t bits = n_randint(state, 300) + 1;
@@ -75,7 +75,7 @@ main(void)
         fmpz_clear(b);
     }
 
-    for (i = 0; i < 500000; i++)
+    for (i = 0; i < 50000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
         mp_bitcnt_t bits = n_randint(state, 300) + 1;

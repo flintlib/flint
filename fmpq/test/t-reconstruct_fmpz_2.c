@@ -127,7 +127,7 @@ main(void)
         fmpz_clear(res);
         fmpz_clear(N);
         fmpz_clear(D);
-        fmpz_init(t);
+        fmpz_clear(t);
         mpz_clear(tmp);
     }
 

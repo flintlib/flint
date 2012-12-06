@@ -26,72 +26,33 @@
 
 #include "padic.h"
 
-void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
-{
 #define n    (S->n)
 #define pow  (S->pow)
-#define u    (S->u)
 
-    long *a, i;
-    fmpz *t;
+void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
+{
+    long *a;
 
-    n = FLINT_CLOG2(N) + 1;
-
-    /* Compute sequence of exponents */
-    a = flint_malloc(n * sizeof(long));
-    for (a[i = 0] = N; a[i] > 1; i++)
-        a[i + 1] = (a[i] + 1) / 2;
+    a = _padic_lifts_exps(&n, N);
 
     pow = _fmpz_vec_init(2 * n + 2);
-    u   = pow + n;
-    t   = pow + 2 * n;
 
-    /* Compute powers of p */
-    {
-        fmpz_one(t);
-        fmpz_set(pow + i, p);
-    }
-    for (i--; i >= 1; i--)
-    {
-        if (a[i] & 1L)
-        {
-            fmpz_mul(pow + i, t, pow + (i + 1));
-            fmpz_mul(t, t, t);
-        }
-        else
-        {
-            fmpz_mul(t, t, pow + (i + 1));
-            fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-        }
-    }
-    {
-        if (a[i] & 1L)
-            fmpz_mul(pow + i, t, pow + (i + 1));
-        else
-            fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-    }
+    _padic_lifts_pows(pow, a, n, p);
 
     flint_free(a);
-
-#undef n
-#undef pow
-#undef u
 }
 
 void _padic_inv_clear(padic_inv_t S)
 {
-    _fmpz_vec_clear(S->pow, 2 * S->n + 2);
+    _fmpz_vec_clear(pow, 2 * n + 2);
 }
 
 void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
 {
-#define n    (S->n)
-#define pow  (S->pow)
-#define u    (S->u)
-
     long i;
-    fmpz *t;
+    fmpz *t, *u;
 
+    u = pow + n;
     t = pow + 2 * n;
 
     /* Compute reduced units */
@@ -116,13 +77,10 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
         fmpz_sub(rop, rop, t + 1);
         fmpz_mod(rop, rop, pow + i);
     }
-
-    fmpz_mod(rop, rop, pow + 0);
+}
 
 #undef n
 #undef pow
-#undef u
-}
 
 void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
@@ -142,7 +100,7 @@ void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
 void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(op))
+    if (padic_is_zero(op))
     {
         printf("Exception (padic_inv).  Zero is not invertible.\n");
         abort();
@@ -152,15 +110,16 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         If x = u p^v has negative valuation with N <= -v then the 
         exact inverse of x is zero when reduced modulo $p^N$
      */
-    if (ctx->N + padic_val(op) <= 0)
+    if (padic_prec(rop) + padic_val(op) <= 0)
     {
         padic_zero(rop);
-        return;
     }
+    else
+    {
+        _padic_inv(padic_unit(rop), 
+                   padic_unit(op), ctx->p, padic_prec(rop) + padic_val(op));
 
-    _padic_inv(padic_unit(rop), 
-               padic_unit(op), ctx->p, ctx->N + padic_val(op));
-
-    padic_val(rop) = - padic_val(op);
+        padic_val(rop) = - padic_val(op);
+    }
 }
 

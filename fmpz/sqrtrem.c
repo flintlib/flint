@@ -34,7 +34,7 @@ void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g)
 {
     if (fmpz_sgn(g) < 0)
     {
-        printf("Exception: g is negative in fmpz_sqrtrem\n");
+        printf("Exception (fmpz_sqrtrem). g is negative.\n");
         abort();
     }
     

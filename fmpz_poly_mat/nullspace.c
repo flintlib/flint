@@ -42,7 +42,7 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
 
     fmpz_poly_init(den);
     fmpz_poly_mat_init_set(tmp, mat);
-    rank = fmpz_poly_mat_rref(tmp, den, NULL, tmp);
+    rank = fmpz_poly_mat_rref(tmp, den, tmp);
     nullity = n - rank;
 
     fmpz_poly_mat_zero(res);

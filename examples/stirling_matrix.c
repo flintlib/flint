@@ -52,8 +52,8 @@ int main(int argc, char* argv[])
     fmpz_mat_init(S2, n, n);
     fmpz_mat_init(P, n, n);
 
-    stirling_number_1_mat(S1);
-    stirling_number_2_mat(S2);
+    arith_stirling_matrix_1(S1);
+    arith_stirling_matrix_2(S2);
     fmpz_mat_mul(P, S1, S2);
 
     printf("S1 [Stirling numbers of 1st kind]:\n");

@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with MPIR */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, m;
@@ -64,7 +64,7 @@ main(void)
 
         fmpz_get_mpz(d, a);
         fmpz_get_mpz(m, c);
-        x = n_randint(state, 20);
+        x = n_randtest(state);
 
         fmpz_powm_ui(b, a, x, c);
         mpz_powm_ui(e, d, x, m);
@@ -90,7 +90,7 @@ main(void)
     }
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         ulong n;
@@ -102,7 +102,7 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, b, n, c);
         fmpz_powm_ui(b, b, n, c);
@@ -124,7 +124,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         ulong n;
@@ -136,7 +136,7 @@ main(void)
         fmpz_randtest(b, state, 200);
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, b, n, c);
         fmpz_powm_ui(c, b, n, c);
@@ -158,7 +158,7 @@ main(void)
     }
 
     /* Check aliasing of a and {b, c} */
-    for (i = 0; i < 100000; i++)
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c;
         ulong n;
@@ -168,7 +168,7 @@ main(void)
 
         fmpz_randtest_not_zero(c, state, 200);
         fmpz_abs(c, c);
-        n = n_randint(state, 20);
+        n = n_randtest(state);
 
         fmpz_powm_ui(a, c, n, c);
         fmpz_powm_ui(c, c, n, c);

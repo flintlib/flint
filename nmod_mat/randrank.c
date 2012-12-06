@@ -38,7 +38,7 @@ nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, long rank)
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {
-        printf("exception: nmod_mat_randrank: impossible rank\n");
+        printf("Exception (nmod_mat_randrank). Impossible rank.\n");
         abort();
     }
 

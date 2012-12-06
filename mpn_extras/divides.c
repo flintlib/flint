@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-int mpn_divides(mp_ptr q, mp_srcptr array1, 
+int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
       mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp)
 {
    mpn_tdiv_qr(q, temp, 0, array1, limbs1, arrayg, limbsg);

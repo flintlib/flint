@@ -29,7 +29,7 @@
 #include "mpn_extras.h"
 
 
-void mpn_debug(mp_srcptr x, mp_size_t xsize)
+void flint_mpn_debug(mp_srcptr x, mp_size_t xsize)
 {
     int i, j;
     char byte[9];

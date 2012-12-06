@@ -43,7 +43,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         ulong n = n_randtest_not_zero(state);
@@ -71,7 +71,7 @@ main(void)
     }
 
     /* Check that a * n / n == a */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
         ulong n = n_randtest_not_zero(state);

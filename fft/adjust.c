@@ -44,7 +44,7 @@ void fft_adjust(mp_limb_t * r, mp_limb_t * i1, mp_size_t i, mp_size_t limbs, mp_
 
    if (x)
    {
-      mpn_copyi(r + x, i1, limbs - x);
+      flint_mpn_copyi(r + x, i1, limbs - x);
       r[limbs] = 0;
       cy = mpn_neg_n(r, i1 + limbs - x, x);
       mpn_addmod_2expp1_1(r + x, limbs - x, -i1[limbs]);

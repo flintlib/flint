@@ -95,20 +95,15 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     long i, j, k, n;
     long *hlen, alloc, powlen;
     fmpz *v, **h, *pow, *temp;
-    
-    if (len1 == 1)
+
+    if (len1 <= 2 || len2 <= 1)
     {
-        fmpz_set(res, poly1);
-        return;
-    }
-    if (len2 == 1)
-    {
-        _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
-        return;
-    }
-    if (len1 == 2)
-    {
-        _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
+        if (len1 == 1)
+            fmpz_set(res, poly1);
+        else if (len2 == 1)
+            _fmpz_poly_evaluate_fmpz(res, poly1, len1, poly2);
+        else  /* len1 == 2 */
+            _fmpz_poly_compose_horner(res, poly1, len1, poly2, len2);
         return;
     }
 
@@ -116,7 +111,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     
     hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
     
-    for (k = 1; (2 << k) < len1; k++) ;
+    k = FLINT_CLOG2(len1) - 1;
     
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
@@ -168,7 +163,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
         }
     }
     
-    _fmpz_poly_mul(pow, poly2, len2, poly2, len2);
+    _fmpz_poly_sqr(pow, poly2, len2);
     powlen = 2 * len2 - 1;
     
     for (n = (len1 + 1) / 2; n > 2; n = (n + 1) / 2)
@@ -198,7 +193,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
             hlen[i] = hlen[2*i];
         }
         
-        _fmpz_poly_mul(temp, pow, powlen, pow, powlen);
+        _fmpz_poly_sqr(temp, pow, powlen);
         powlen += powlen - 1;
         {
             fmpz * t = pow;

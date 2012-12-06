@@ -39,8 +39,9 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
     }
     else
     {
-        long i = len1 - 1, lenr;
         const long alloc = (len1 - 1) * (len2 - 1) + 1;
+
+        long i = len1 - 1, lenr;
         fmpz * t = _fmpz_vec_init(alloc);
         
         /*
@@ -53,14 +54,12 @@ _fmpz_poly_compose_horner(fmpz * res, const fmpz * poly1, long len1,
             i--;
             fmpz_add(res, res, poly1 + i);
         }
-        while (i > 0)
+        while (i--)
         {
-            i--;
             _fmpz_poly_mul(t, res, lenr, poly2, len2);
             lenr += len2 - 1;
             _fmpz_poly_add(res, t, lenr, poly1 + i, 1);
         }
-        
         _fmpz_vec_clear(t, alloc);
     }
 }

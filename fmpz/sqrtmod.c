@@ -30,7 +30,7 @@
 #include "ulong_extras.h"
 
 /*
-    Assumes that p is an odd prime, and that 1 < a < p.
+    Assumes that p is an odd prime, and that 0 <= a < p.
     Returns 1 if a is a quadratic residue and 0 otherwise.
     Does not support aliasing.
  */
@@ -84,11 +84,13 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
     while (mpz_cmp_ui(b, 1))
     {
         mpz_set(bpow, b);
-        for (m = 1; (m < r) && mpz_cmp_ui(bpow, 1); m++)
+        m = 0;
+        do
         {
             mpz_mul(bpow, bpow, bpow);
             mpz_mod(bpow, bpow, p);
-        }
+            m++;
+        } while (m < r && mpz_cmp_ui(bpow, 1));
 
         mpz_set(gpow, g);
         for (i = 1; i < r - m; i++)
@@ -100,10 +102,10 @@ static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p)
         mpz_mul(rop, rop, gpow);
         mpz_mod(rop, rop, p);
 
-        mpz_mul(gpow, gpow, gpow);
-        mpz_mod(gpow, gpow, p);
+        mpz_mul(g, gpow, gpow);
+        mpz_mod(g, g, p);
 
-        mpz_mul(b, b, gpow);
+        mpz_mul(b, b, g);
         mpz_mod(b, b, p);
 
         r = m;
@@ -148,7 +150,7 @@ int fmpz_sqrtmod(fmpz_t b, const fmpz_t a, const fmpz_t p)
         ans = n_sqrtmod(*b, *p);
         if (ans)
             fmpz_set_ui(b, ans);
-        return ans;
+        return ans != 0;
     }
     else  /* p is large */
     {

@@ -30,6 +30,8 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
+#if !defined (__WIN32) && !defined (__CYGWIN__)
+
 int
 main(void)
 {
@@ -90,3 +92,15 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+
+#else
+
+int main(void)
+{
+    printf("print/ read....");
+    fflush(stdout);
+    printf("SKIPPED\n");
+    return EXIT_SUCCESS;
+}
+
+#endif

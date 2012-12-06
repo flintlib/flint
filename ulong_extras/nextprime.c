@@ -64,7 +64,7 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
     if (n >= ULONG_MAX_PRIME)
     {
-        printf("Exception in n_nextprime: no larger single-limb prime exists");
+        printf("Exception (n_nextprime). No larger single-limb prime exists.\n");
         abort();
     }
 

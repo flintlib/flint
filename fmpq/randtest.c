@@ -76,7 +76,7 @@ void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     if (bits == 0)
     {
-        printf("Exception: 0 passed to fmpq_randtest_not_zero\n");
+        printf("Exception (fmpq_randtest_not_zero). bits == 0.\n");
         abort();
     }
 

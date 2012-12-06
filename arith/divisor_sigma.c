@@ -34,7 +34,7 @@
 
 /* note: destroys factors! */
 void
-_fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
+_arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 {
     long i;
     fmpz * p;
@@ -76,7 +76,7 @@ _fmpz_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 }
 
 void
-fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
+arith_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 {
     fmpz_factor_t factors;
 
@@ -88,6 +88,6 @@ fmpz_divisor_sigma(fmpz_t res, const fmpz_t n, ulong k)
 
     fmpz_factor_init(factors);
     fmpz_factor(factors, n);
-    _fmpz_divisor_sigma(res, factors, k);
+    _arith_divisor_sigma(res, factors, k);
     fmpz_factor_clear(factors);
 }

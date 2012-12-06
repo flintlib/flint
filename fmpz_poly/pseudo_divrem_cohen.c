@@ -96,12 +96,13 @@ fmpz_poly_pseudo_divrem_cohen(fmpz_poly_t Q, fmpz_poly_t R,
     
     if (B->length == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_pseudo_divrem_cohen\n");
+        printf("Exception (fmpz_poly_pseudo_divrem_cohen). Division by zero.\n");
         abort();
     }
     if (Q == R)
     {
-        printf("Exception: output arguments Q and R may not be aliased\n");
+        printf("Exception (fmpz_poly_pseudo_divrem_cohen). \n"
+                "Output arguments Q and R may not be aliased.\n");
         abort();
     }
     if (A->length < B->length)

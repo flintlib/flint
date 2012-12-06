@@ -58,8 +58,8 @@ int main(void)
 
         nmod_init(&mod, p);
 
-        bell_number_nmod_vec_recursive(b1, n, mod);
-        bell_number_nmod_vec_series(b2, n, mod);
+        arith_bell_number_nmod_vec_recursive(b1, n, mod);
+        arith_bell_number_nmod_vec_series(b2, n, mod);
 
         if (!_nmod_vec_equal(b1, b2, n))
         {

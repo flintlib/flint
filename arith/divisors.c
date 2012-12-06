@@ -63,7 +63,7 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 
 
 void
-_fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
+_arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
 {
     long i;
     long *exp = flint_malloc(sizeof(long) * factors->num);
@@ -118,7 +118,7 @@ _fmpz_divisors(fmpz *res, long size, fmpz_factor_t factors)
 
 
 void
-_fmpz_divisors_tiny(fmpz_poly_t res, long n)
+_arith_divisors_tiny(fmpz_poly_t res, long n)
 {
     long size;
     long i, k;
@@ -140,7 +140,7 @@ _fmpz_divisors_tiny(fmpz_poly_t res, long n)
 }
 
 void
-fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
+arith_divisors(fmpz_poly_t res, const fmpz_t n)
 {
     long i, size, m;
     fmpz_factor_t factors;
@@ -150,7 +150,7 @@ fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
         m = fmpz_get_si(n);
         if (-FLINT_NUM_TINY_DIVISORS < m && m < FLINT_NUM_TINY_DIVISORS)
         {
-            _fmpz_divisors_tiny(res, FLINT_ABS(m));
+            _arith_divisors_tiny(res, FLINT_ABS(m));
             return;
         }
     }
@@ -164,7 +164,7 @@ fmpz_divisors(fmpz_poly_t res, const fmpz_t n)
         size *= fmpz_get_ui(factors->exp + i) + 1;
 
     fmpz_poly_fit_length(res, size);
-    _fmpz_divisors(res->coeffs, size, factors);
+    _arith_divisors(res->coeffs, size, factors);
     _fmpz_poly_set_length(res, size);
     _fmpz_vec_sort(res->coeffs, size);
 

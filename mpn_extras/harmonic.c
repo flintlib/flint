@@ -105,7 +105,7 @@ Some more optimization is possible:
 */
 
 void
-mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
+flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
                         mp_ptr v, mp_size_t * vsize,
                         long a, long b, long n, int d)
 {
@@ -149,7 +149,7 @@ mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
 }
 
 void
-mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
+flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
                           long a, long b, long n, int d)
 {
@@ -159,7 +159,7 @@ mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
 
     if (b - a < 50)
     {
-        mpn_harmonic_odd_direct(t, tsize, v, vsize, a, b, n, d);
+        flint_mpn_harmonic_odd_direct(t, tsize, v, vsize, a, b, n, d);
         return;
     }
 
@@ -171,8 +171,8 @@ mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
     r = flint_malloc(tmpsize / 2 + 1);
     s = flint_malloc(tmpsize / 2 + 1);
 
-    mpn_harmonic_odd_balanced(p, &ps, q, &qs, a, m, n, d + (a == 1));
-    mpn_harmonic_odd_balanced(r, &rs, s, &ss, m, b, n, d);
+    flint_mpn_harmonic_odd_balanced(p, &ps, q, &qs, a, m, n, d + (a == 1));
+    flint_mpn_harmonic_odd_balanced(r, &rs, s, &ss, m, b, n, d);
 
     MPN_MUL(t, ts, p, ps, s, ss);
     MPN_MUL(p, ps, q, qs, r, rs);

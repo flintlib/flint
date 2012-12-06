@@ -53,7 +53,7 @@ int main()
 
     for (n = 0; n <= 500; n++)
     {
-        legendre_polynomial(R, n);
+        arith_legendre_polynomial(R, n);
 
         if (!fmpq_poly_equal(Pn, R))
         {

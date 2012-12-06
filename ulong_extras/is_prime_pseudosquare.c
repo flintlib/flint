@@ -111,7 +111,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         if (m1) return 1;
         for (j = i + 1; j < FLINT_NUM_PSEUDOSQUARES + 1; j++)
         {
-            mp_limb_t mod = n_powmod(flint_primes[j], exp, n);
+            mp_limb_t mod = n_powmod2(flint_primes[j], exp, n);
             if (mod == n - 1) return 1;
             if (mod != 1)
             {

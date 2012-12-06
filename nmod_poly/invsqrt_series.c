@@ -83,21 +83,21 @@ void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     if (n == 0 || h->length == 0 || h->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_invsqrt_series\n");
+        printf("Exception (nmod_poly_invsqrt). Division by zero.\n");
         abort();
     }
 
     if (h->coeffs[0] != 1UL)
     {
-        printf("Exception: nmod_poly_invsqrt_series requires constant term 1\n");
+        printf("Exception (nmod_poly_invsqrt_series). Constant term != 1.\n");
         abort();
     }
 
     if (hlen < n)
     {
         h_coeffs = _nmod_vec_init(n);
-        mpn_copyi(h_coeffs, h->coeffs, hlen);
-        mpn_zero(h_coeffs + hlen, n - hlen);
+        flint_mpn_copyi(h_coeffs, h->coeffs, hlen);
+        flint_mpn_zero(h_coeffs + hlen, n - hlen);
     }
     else
         h_coeffs = h->coeffs;

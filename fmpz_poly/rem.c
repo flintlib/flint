@@ -33,7 +33,7 @@
 void
 _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    if (lenA < 100)
+    if (lenA < 15)
     {
         _fmpz_poly_rem_basecase(R, A, lenA, B, lenB);
     }
@@ -54,7 +54,7 @@ void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_rem\n");
+        printf("Exception (fmpz_poly_rem). Division by zero.\n");
         abort();
     }
 

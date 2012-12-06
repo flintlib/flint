@@ -33,7 +33,10 @@
 void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
                        const fmpz * A, long lenA, const fmpz * B, long lenB)
 {
-    _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
+    if (lenB < 6)
+        _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB);
+    else
+        _fmpz_poly_divrem_divconquer(Q, R, A, lenA, B, lenB);
 }
 
 void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
@@ -44,7 +47,7 @@ void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_divrem\n");
+        printf("Exception (fmpz_poly_divrem). Division by zero.\n");
         abort();
     }
 

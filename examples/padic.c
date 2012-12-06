@@ -49,30 +49,30 @@ int main(void)
 
     fmpz_init(p);
     fmpz_set_ui(p, 7);
-    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+    padic_ctx_init(ctx, p, 8, 12, PADIC_TERSE);
 
-    _padic_init(x);
-    _padic_set_ui(x, 127, ctx);
+    padic_init2(x, 10);
+    padic_set_ui(x, 127, ctx);
 
     ctx->mode = PADIC_TERSE;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
-    _padic_clear(x);
+    padic_clear(x);
 
     padic_ctx_clear(ctx);
     fmpz_clear(p);
@@ -82,30 +82,30 @@ int main(void)
 
     fmpz_init(p);
     fmpz_set_ui(p, 2);
-    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+    padic_ctx_init(ctx, p, 10, 12, PADIC_TERSE);
 
-    _padic_init(x);
-    _padic_set_ui(x, 1057, ctx);
+    padic_init2(x, 10);
+    padic_set_ui(x, 1057, ctx);
 
     ctx->mode = PADIC_TERSE;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_SERIES;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
-    _padic_clear(x);
+    padic_clear(x);
 
     padic_ctx_clear(ctx);
     fmpz_clear(p);
@@ -115,46 +115,46 @@ int main(void)
 
     fmpz_init(p);
     fmpz_set_ui(p, 3);
-    padic_ctx_init(ctx, p, 10, PADIC_TERSE);
+    padic_ctx_init(ctx, p, 10, 12, PADIC_TERSE);
 
-    _padic_init(x);
-    _padic_set_si(x, -127, ctx);
+    padic_init2(x, 10);
+    padic_set_si(x, -127, ctx);
 
     ctx->mode = PADIC_TERSE;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
     ctx->mode = PADIC_VAL_UNIT;
-    str = _padic_get_str(NULL, x, ctx);
-    printf("print:   "), _padic_print(x, ctx), printf("\n");
+    str = padic_get_str(NULL, x, ctx);
+    printf("print:   "), padic_print(x, ctx), printf("\n");
     printf("get_str: %s\n", str);
     flint_free(str);
 
-    _padic_clear(x);
+    padic_clear(x);
 
     padic_ctx_clear(ctx);
     fmpz_clear(p);
 
     /* Log */
-    printf("Log of 7380996 mod 5^10\n");
+    printf("Log of 7380996 mod 5^20\n");
 
     fmpz_init(p);
     fmpz_set_ui(p, 5);
-    padic_ctx_init(ctx, p, 10, PADIC_SERIES);
+    padic_ctx_init(ctx, p, 10, 25, PADIC_SERIES);
 
-    _padic_init(x);
-    _padic_init(y);
-    _padic_set_ui(x, 7380996, ctx);
+    padic_init(x);
+    padic_init(y);
+    padic_set_ui(x, 7380996, ctx);
 
     padic_log(y, x, ctx);
 
     printf("x = "), padic_print(x, ctx), printf("\n");
     printf("y = "), padic_print(y, ctx), printf("\n");
 
-    _padic_clear(x);
-    _padic_clear(y);
+    padic_clear(x);
+    padic_clear(y);
 
     padic_ctx_clear(ctx);
     fmpz_clear(p);

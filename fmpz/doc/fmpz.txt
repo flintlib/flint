@@ -92,7 +92,7 @@ void fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     As per \code{fmpz_randtest}, but the result will not be $0$. 
     If \code{bits} is set to $0$, an exception will result.
 
-void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m)
+void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
     Generates a random integer in the range $0$ to $m - 1$ inclusive.
 
@@ -423,6 +423,14 @@ int fmpz_equal(const fmpz_t f, const fmpz_t g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
+int fmpz_equal_ui(const fmpz_t f, ulong g)
+
+    Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
+
+int fmpz_equal_si(const fmpz_t f, long g)
+
+    Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
+
 int fmpz_is_zero(const fmpz_t f)
 
     Returns $1$ if $f$ is $0$, otherwise returns $0$.
@@ -572,6 +580,12 @@ void fmpz_tdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
+
+void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
+
+    Sets $f$ to the quotient of $g$ by $h$, rounding down towards
+    zero and $s$ to the remainder.  If $h$ is $0$ an exception 
+    is raised.
 
 void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
 
@@ -879,15 +893,18 @@ void fmpz_and(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
 void fmpz_or(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
-    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of \code{a} and \code{b}.
+    Sets \code{r} to the bit-wise logical (inclusive) \code{or} of
+    \code{a} and \code{b}.
 
 void fmpz_xor(fmpz_t r, const fmpz_t a, const fmpz_t b)
 
-    Sets \code{r} to the bit-wise logical exclusive \code{or} of \code{a} and \code{b}.
+    Sets \code{r} to the bit-wise logical exclusive \code{or} of
+    \code{a} and \code{b}.
 
 int fmpz_popcnt(const fmpz_t a)
 
-    Returns the number of '1' bits in the given Z (aka Hamming weight or population count).
+    Returns the number of '1' bits in the given Z (aka Hamming weight or
+    population count).
     The return value is undefined if the input is negative.
 
 *******************************************************************************
@@ -913,7 +930,8 @@ int fmpz_popcnt(const fmpz_t a)
 
 *******************************************************************************
 
-void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2, int sign)
+void fmpz_CRT_ui(fmpz_t out, fmpz_t r1, fmpz_t m1, ulong r2, ulong m2,
+                     int sign)
 
     Uses the Chinese Remainder Theorem to compute the unique integer
     $0 \le x < M$ (if sign = 0) or $-M/2 < x \le M/2$ (if sign = 1)

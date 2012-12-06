@@ -4,13 +4,8 @@ TODO
 general
 -------
 
-* get rid of global random states
-
 * Write a flint2 memory manager, both reentrant and non-reentrant stack based
   versions
-
-* Write a configure script for flint2 which has an option for
-  reentrant/non-reentrant
 
 * [maybe] a type mpfr which is an alias for __mpfr_struct and using throughout
 
@@ -60,8 +55,6 @@ ulong_extras
 
 * make n_gcd take arguments in either order and use throughout flint2
 
-* have make check bomb out if one of the tests aborts
-
 * factor out some common code between n_is_perfect_power235 and
   n_factor_power235
 
@@ -90,14 +83,11 @@ ulong_extras
 long_extras
 -----------
 
-* Implement a long_extras module and use z_gcd and z_invert in fmpz_gcd and
-  fmpz_invert, respectively
+* write and use z_gcd and z_invert in fmpz_gcd and fmpz_invert, respectively
 
 
 fmpz_vec
 --------
-
-* Write test code for fmpz_vec functions
 
 * add a cache of mpfr's which can be used as temporaries for functions like
   _mpfr_vec_scalar_product
@@ -129,8 +119,6 @@ fmpz_mpoly / nmod_mpoly
 nmod_poly
 ---------
 
-* Write some macros for modular reduction in the nmod_poly module.
-
 * Make some assembly optimisations to nmod_poly module.
 
 * Add basecase versions of log, sqrt, invsqrt series
@@ -144,7 +132,7 @@ nmod_poly
 
 * Write an asymptotically fast nmod_poly_interpolate_nmod_vec
 
-* Add resultants
+* Add asymptotically fast resultants?
 
 * Optimise, write an underscore version of, and test
   nmod_poly_remove
@@ -212,7 +200,7 @@ fmpq_poly
 
 * Add mulhigh
 
-* Add resultants
+* Add asymptotically fast resultants?
 
 
 fmpz_mod_poly
@@ -243,11 +231,11 @@ arith
 
 * Write profiling code.
 
-* Write a faster fmpz_divisors using the merge sort algorithm
+* Write a faster arith_divisors using the merge sort algorithm
   (see Sage's implementation). Alternatively (or as a complement)
   write a supernaturally fast _fmpz_vec_sort.
 
-* Improve fmpz_divisors by using long and longlong arithmetic
+* Improve arith_divisors by using long and longlong arithmetic
   for divisors that fit in 1 or 2 limbs.
 
 * Optimise memory management in mpq_harmonic.
@@ -256,9 +244,6 @@ arith
   module.
 
 * Implement computation of generalised harmonic numbers.
-
-* Consider renaming fmpz_poly_ramanujan_tau to fmpz_poly_delta_qexp
-  or something similar.
 
 * Maybe: move Stirling number matrix functions to the fmpz_mat module.
 
@@ -289,7 +274,7 @@ arith
   the full precision). This should be a simple modification (some care
   is needed to get all conditionals right and to write proper tests).
 
-* Write tests for the dedekind_cosine_sum functions.
+* Write tests for the arith_hrr_expsum_factored functions.
 
 fmpz_mat
 --------

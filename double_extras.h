@@ -19,51 +19,44 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
- 
+    Copyright (C) 2012 Fredrik Johansson
+
 ******************************************************************************/
 
-#include "padic.h"
+#ifndef DOUBLE_EXTRAS_H
+#define DOUBLE_EXTRAS_H
 
-int _padic_equal(const padic_t op1, const padic_t op2)
+#include <math.h>
+#include <float.h>
+#include "flint.h"
+
+#ifdef __cplusplus
+ extern "C" {
+#endif
+
+#define D_BITS 53
+#define D_EPS 2.2204460492503130808e-16
+#define D_INF HUGE_VAL
+#define D_NAN (HUGE_VAL - HUGE_VAL)
+
+double d_randtest(flint_rand_t state);
+
+static __inline__ double
+d_polyval(const double * poly, int len, double x)
 {
-    return (padic_val(op1) == padic_val(op2)) && 
-           (fmpz_equal(padic_unit(op1), padic_unit(op2)));
+    double t;
+    int i;
+
+    for (t = poly[len-1], i = len-2; i >= 0; i--)
+        t = poly[i] + x * t;
+
+    return t;
 }
 
-int padic_equal(const padic_t op1, const padic_t op2, const padic_ctx_t ctx)
-{
-    /* Exact equality? */
-    if (_padic_equal(op1, op2))
-    {
-        return 1;
-    }
+double d_lambertw(double x);
 
-    /* Cases where either op1 or op2 is zero mod p^N */
-    if (padic_is_zero(op1, ctx))
-        return padic_is_zero(op2, ctx);
-    if (padic_is_zero(op2, ctx))
-        return 0;
-
-    if (padic_val(op1) == padic_val(op2))
-    {
-        fmpz_t d, pow;
-        int alloc, ans;
-
-        alloc = _padic_ctx_pow_ui(pow, ctx->N - padic_val(op1), ctx);
-
-        fmpz_init(d);
-        fmpz_sub(d, padic_unit(op1), padic_unit(op2));
-        ans = fmpz_divisible(d, pow);
-        fmpz_clear(d);
-
-        if (alloc)
-            fmpz_clear(pow);
-
-        return ans;
-    }
-    else
-    {
-        return 0;
-    }
+#ifdef __cplusplus
 }
+#endif
+
+#endif

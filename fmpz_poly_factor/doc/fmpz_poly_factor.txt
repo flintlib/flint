@@ -110,8 +110,8 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
     \end{equation*} 
     where $c$ is the signed content of $F$ and $\gcd(g_i, g_i') = 1$.
 
-void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
-    const fmpz_poly_factor_t lifted_fac, 
+void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t 
+    final_fac, const fmpz_poly_factor_t lifted_fac, 
     const fmpz_poly_t F, const fmpz_t P, long exp)
 
     Takes as input a factor structure \code{lifted_fac} containing a 

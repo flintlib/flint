@@ -57,7 +57,12 @@ mp_limb_t flint_primes_cutoff = 0;
 double * flint_prime_inverses;
 
 ulong flint_num_primes = 0;
+
+#if defined (__WIN32)
+pthread_mutex_t flint_num_primes_mutex = PTHREAD_MUTEX_INITIALIZER;
+#else
 pthread_mutex_t flint_num_primes_mutex;
+#endif
 
 void n_compute_primes(ulong num)
 {
@@ -85,7 +90,7 @@ void n_compute_primes(ulong num)
 
     if (primes_cutoff > FLINT_PRIMES_SMALL_CUTOFF*FLINT_PRIMES_SMALL_CUTOFF)
     {
-        printf("Exception: cannot precompute sufficiently many primes!\n");
+        printf("Exception (n_compute_primes). Cannot precompute sufficiently many primes.\n");
         abort();
     }
 
