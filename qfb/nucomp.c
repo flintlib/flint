@@ -100,6 +100,7 @@ void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L)
       fmpz_mod(t2, g->c, H);
       fmpz_mul(t2, t2, b);
       fmpz_add(t1, t1, t2);
+      fmpz_mod(t1, t1, H);
       fmpz_mul(t1, t1, y);
       fmpz_mod(l, t1, H);
 
