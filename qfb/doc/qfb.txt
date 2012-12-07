@@ -132,4 +132,4 @@ int qfb_is_principal_form(qfb_t f, fmpz_t D)
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
 
     Sets $r$ to the unique prime $(p, b, c)$ of discriminant $D$, i.e. with
-    $0 < b \leq b$.
+    $0 < b \leq b$. Requires that $p$ be a prime.
