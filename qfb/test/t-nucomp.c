@@ -43,6 +43,7 @@ int main(void)
 
     flint_randinit(state);
 
+    /* Check discriminants of composed forms are correct */
     for (i = 1; i < 10000; i++) 
     {
         qfb_t r;
@@ -85,6 +86,7 @@ int main(void)
         qfb_array_clear(&forms, num);
     }
 
+    /* Associativity test (Q1 o Q2) o Q3 == Q1 o (Q2 o Q3) */
     for (i = 1; i < 10000; i++) 
     {
         qfb_t r, s;
@@ -127,7 +129,7 @@ int main(void)
               if (!result)
               {
                  printf("FAIL:\n");
-                 printf("Transitivity fails\n");
+                 printf("Associativity fails\n");
                  printf("r = "); qfb_print(r); printf("\n");
                  printf("s = "); qfb_print(s); printf("\n");
                  abort();
