@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2012 William Hart
 
 ******************************************************************************/
 
@@ -46,15 +46,14 @@ int main(void)
     for (i = 1; i < 10000; i++) 
     {
         qfb_t r;
-        fmpz_t root, t1, t2;
+        fmpz_t root, D;
 
         num = qfb_reduced_forms(&forms, -i);
         
         if (num)
         {
            fmpz_init(root);
-           fmpz_init(t1);
-           fmpz_init(t2);
+           fmpz_init(D);
            qfb_init(r);
               
            fmpz_set_ui(root, i);
@@ -67,22 +66,18 @@ int main(void)
 
               qfb_nucomp(r, forms + i1, forms + i2, root);
 
-              fmpz_mul(t1, r->b, r->b);
-              fmpz_mul(t2, r->a, r->c);
-              fmpz_mul_2exp(t2, t2, 2);
-              fmpz_sub(t2, t1, t2);
-              result = (fmpz_cmp_si(t2, -i) == 0);
+              qfb_discriminant(D, r);
+              result = (fmpz_cmp_si(D, -i) == 0);
               if (!result)
               {
                  printf("FAIL:\n");
                  printf("Incorrect discriminant\n");
-                 fmpz_print(t2); printf(" should be %ld\n", -i);
+                 fmpz_print(D); printf(" should be %ld\n", -i);
                  abort();
               }
            }
            
-           fmpz_clear(t1);
-           fmpz_clear(t2);
+           fmpz_clear(D);
            fmpz_clear(root);
            qfb_clear(r);
         }

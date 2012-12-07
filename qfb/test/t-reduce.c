@@ -35,50 +35,45 @@ int main(void)
 {
     int result;
     flint_rand_t state;
-    qfb * forms;
-    qfb * forms2;
-    long i, j, k, num, num2;
+    long i;
 
-    printf("reduced_forms....");
+    printf("reduce....");
     fflush(stdout);
 
     flint_randinit(state);
 
-    for (i = 1; i < 30000; i++) 
+    for (i = 1; i < 100000; i++) 
     {
-        num = qfb_reduced_forms(&forms, -i);
-        num2 = qfb_reduced_forms_large(&forms2, -i);
+        fmpz_t D;
+        qfb_t r;
         
-        result = (num == num2);
-        for (j = 0; result == 1 && j < num; j++)
+        fmpz_init(D);
+        qfb_init(r);
+            
+        do
         {
-            for (k = 0; k < num; k++)
-               if (qfb_equal(forms + j, forms2 + k))
-                   break;
+           fmpz_randtest_unsigned(r->a, state, 100);
+           if (fmpz_is_zero(r->a))
+              fmpz_set_ui(r->a, 1);
+ 
+           fmpz_randtest(r->b, state, 100);
+           fmpz_randtest(r->c, state, 100);
 
-            result &= (k != num);
+           qfb_discriminant(D, r);
+        } while (fmpz_sgn(D) >= 0);
 
-            if (!result) break;
-        }
-        
+        qfb_reduce(r, r, D);
+
+        result = (qfb_is_reduced(r));
         if (!result)
         {
-            printf("FAIL:\n");
-            
-            if (num == num2)
-            {
-                qfb_print(forms + j);
-                printf(" != ");
-                qfb_print(forms2 + j);
-                printf("\n");
-             } else
-                printf("%ld != %ld\n", num, num2);
-            
-            abort();
+           printf("FAIL:\n");
+           qfb_print(r); printf("\n");
+           abort();
         }
-
-        qfb_array_clear(&forms, num);
-        qfb_array_clear(&forms2, num2);
+           
+        fmpz_clear(D);
+        qfb_clear(r);
     }
 
     flint_randclear(state);

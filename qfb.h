@@ -68,6 +68,28 @@ int qfb_equal(qfb_t f, qfb_t g)
 }
 
 static __inline__
+void qfb_set(qfb_t f, qfb_t g)
+{
+   fmpz_set(f->a, g->a); 
+   fmpz_set(f->b, g->b);
+   fmpz_set(f->c, g->c);
+}
+
+static __inline__
+void qfb_discriminant(fmpz_t D, qfb_t f)
+{
+   fmpz_t t;
+   fmpz_init(t);
+
+   fmpz_mul(t, f->a, f->c);
+   fmpz_mul_2exp(t, t, 2);
+   fmpz_mul(D, f->b, f->b);
+   fmpz_sub(D, D, t);
+
+   fmpz_clear(t);
+}
+
+static __inline__
 void qfb_print(qfb_t q)
 {
    printf("(");
@@ -91,6 +113,8 @@ void qfb_array_clear(qfb ** forms, long num)
 }
 
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
+
+int qfb_is_reduced(qfb_t r);
 
 long qfb_reduced_forms(qfb ** forms, long d);
 

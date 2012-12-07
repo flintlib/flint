@@ -42,6 +42,15 @@ void qfb_array_clear(qfb ** forms, long num)
 
 *******************************************************************************
 
+    Basic manipulation
+
+*******************************************************************************
+
+void qfb_set(qfb_t f, qfb_t g)
+    Set the binary quadratic form $f$ to be equal to $g$.
+
+*******************************************************************************
+
     Comparison
 
 *******************************************************************************
@@ -66,9 +75,17 @@ void qfb_print(qfb_t q)
 
 *******************************************************************************
 
+void qfb_discriminant(fmpz_t D, qfb_t f)
+    Set $D$ to the discriminant of the binary quadratic form $f$, i.e. to
+    $b^2 - 4ac$, where $f = (a, b, c)$.
+
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
     Set $r$ to the reduced form equivalent to the binary quadratic form $f$
     of discriminant $D$.
+
+int qfb_is_reduced(qfb_t r)
+    Returns $1$ if $q$ is a reduced binary quadratic form. Otherwise returns
+    $1$.
 
 long qfb_reduced_forms(qfb ** forms, long d)
 

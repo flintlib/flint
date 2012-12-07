@@ -23,66 +23,26 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
+#undef ulong /* prevent clash with stdlib */
 #include <stdlib.h>
+#define ulong unsigned long
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qfb.h"
 
-int main(void)
+int qfb_is_reduced(qfb_t r)
 {
-    int result;
-    flint_rand_t state;
-    qfb * forms;
-    qfb * forms2;
-    long i, j, k, num, num2;
+   if (fmpz_cmp(r->c, r->a) < 0)
+      return 0;
 
-    printf("reduced_forms....");
-    fflush(stdout);
+   if (fmpz_cmpabs(r->b, r->a) > 0)
+      return 0;
 
-    flint_randinit(state);
+   if (fmpz_cmpabs(r->a, r->b) == 0 || fmpz_cmp(r->a, r->c) == 0)
+      if (fmpz_sgn(r->b) < 0)
+         return 0;
 
-    for (i = 1; i < 30000; i++) 
-    {
-        num = qfb_reduced_forms(&forms, -i);
-        num2 = qfb_reduced_forms_large(&forms2, -i);
-        
-        result = (num == num2);
-        for (j = 0; result == 1 && j < num; j++)
-        {
-            for (k = 0; k < num; k++)
-               if (qfb_equal(forms + j, forms2 + k))
-                   break;
-
-            result &= (k != num);
-
-            if (!result) break;
-        }
-        
-        if (!result)
-        {
-            printf("FAIL:\n");
-            
-            if (num == num2)
-            {
-                qfb_print(forms + j);
-                printf(" != ");
-                qfb_print(forms2 + j);
-                printf("\n");
-             } else
-                printf("%ld != %ld\n", num, num2);
-            
-            abort();
-        }
-
-        qfb_array_clear(&forms, num);
-        qfb_array_clear(&forms2, num2);
-    }
-
-    flint_randclear(state);
-    _fmpz_cleanup();
-    printf("PASS\n");
-    return 0;
+   return 1;
 }

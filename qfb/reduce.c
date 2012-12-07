@@ -37,10 +37,8 @@ void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
    int done = 0;
    fmpz_t t;
 
-   fmpz_set(r->a, f->a);
-   fmpz_set(r->b, f->b);
-   fmpz_set(r->c, f->c);
-
+   qfb_set(r, f);
+   
    fmpz_init(t);
 
    while(!done)
