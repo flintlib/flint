@@ -67,10 +67,7 @@ int main(void)
               qfb_discriminant(D, forms + i1);
 
               qfb_nucomp(r, forms + i1, forms + i1, root);
-              qfb_reduce(r, r, D);
-              
               qfb_nudupl(s, forms + i1, root);
-              qfb_reduce(s, s, D);
               
               result = (qfb_equal(r, s));
               if (!result)
