@@ -44,7 +44,7 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
       fmpz_gcdinv(d, b, g, f);
       fmpz_mul(t, b, g);
       fmpz_sub(t, d, t);
-      fmpz_divexact(b, t, f);
+      fmpz_divexact(a, t, f);
    } else /* f == g */
    {
       fmpz_set(d, f);
