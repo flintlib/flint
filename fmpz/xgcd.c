@@ -48,8 +48,8 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
    } else /* f == g */
    {
       fmpz_set(d, f);
-      fmpz_set_ui(a, 2);
-      fmpz_set_si(b, -1);
+      fmpz_set_ui(a, 1);
+      fmpz_set_si(b, 0);
    }
 
    fmpz_clear(t);
