@@ -32,14 +32,6 @@
 #include "fmpz.h"
 #include "qfb.h"
 
-/*
-   Shanks' NUCOMP as described in:
-      "Computational aspects of NUCOMP", Michael J. Jacobson Jr.,
-      Alfred J. van der Poorten, ANTS 2002, LNCS 2369, pp. 120--133.
-
-   Computes the near reduced composition of forms f and g and returns
-   the result in r.
-*/
 void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L)
 {
    int Fdivs;
