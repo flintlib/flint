@@ -147,6 +147,8 @@ int qfb_is_principal_form(qfb_t f, fmpz_t D)
    return fmpz_is_zero(f->b); /* D = 0 mod 4 */
 }
 
+void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
+
 #ifdef __cplusplus
 }
 #endif
