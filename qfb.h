@@ -124,6 +124,29 @@ void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L);
 
 void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L);
 
+void qfb_inverse(qfb_t r, qfb_t f)
+{
+   qfb_set(r, f);
+   
+   if (fmpz_equal(f->a, f->c)
+    || fmpz_equal(f->a, f->b))
+    return;
+
+   fmpz_neg(r->b, r->b);
+}
+
+static __inline__
+int qfb_is_principal_form(qfb_t f, fmpz_t D)
+{
+   if (!fmpz_is_one(f->a))
+      return 0;
+
+   if (fmpz_is_odd(D)) /* D = 1 mod 4 */
+      return fmpz_is_one(f->b);
+
+   return fmpz_is_zero(f->b); /* D = 0 mod 4 */
+}
+
 #ifdef __cplusplus
 }
 #endif

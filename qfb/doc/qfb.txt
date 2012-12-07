@@ -119,3 +119,10 @@ void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L)
 void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L)
    
     As for \code{nucomp} except that the form $f$ is composed with itself.
+
+void qfb_inverse(qfb_t r, qfb_t f)
+    Set $r$ to the inverse of the binary quadratic form $f$.
+
+int qfb_is_principal_form(qfb_t f, fmpz_t D)
+    Return $1$ if $f$ is the reduced principal form of discriminant $D$,
+    i.e. the unit in the form class group.
