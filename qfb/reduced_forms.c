@@ -163,11 +163,7 @@ long qfb_reduced_forms_large(qfb ** forms, long d)
                            (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(alim, 100))*sizeof(qfb));
                            alloc += FLINT_MIN(alim, 100);
                            for (k = num; k < alloc; k++)
-                           {
-                              fmpz_init((*forms)[k].a);
-                              fmpz_init((*forms)[k].b);
-                              fmpz_init((*forms)[k].c);
-                           }
+                              qfb_init((*forms) + k);
                        }
 
                        fmpz_set_si((*forms)[num].a, a); /* record form */
@@ -305,11 +301,7 @@ long qfb_reduced_forms(qfb ** forms, long d)
                          (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(blim, 100))*sizeof(qfb));
                          alloc += FLINT_MIN(blim, 100);
                          for (k = num; k < alloc; k++)
-                         {
-                            fmpz_init((*forms)[k].a);
-                            fmpz_init((*forms)[k].b);
-                            fmpz_init((*forms)[k].c);
-                         }
+                            qfb_init((*forms) + k);
                     }
                     
                      fmpz_set_si((*forms)[num].a, a); /* record form */
@@ -323,11 +315,7 @@ long qfb_reduced_forms(qfb ** forms, long d)
                              (*forms) = flint_realloc(*forms, (alloc + FLINT_MIN(blim, 100))*sizeof(qfb));
                              alloc += FLINT_MIN(blim, 100);
                              for (k = num; k < alloc; k++)
-                             {
-                                fmpz_init((*forms)[k].a);
-                                fmpz_init((*forms)[k].b);
-                                fmpz_init((*forms)[k].c);
-                             }
+                                qfb_init((*forms) + k);
                          }
                     
                         fmpz_set_si((*forms)[num].a, a); /* record opposite form */

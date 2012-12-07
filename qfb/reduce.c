@@ -23,83 +23,57 @@
 
 ******************************************************************************/
 
-#ifndef QFB_H
-#define QFB_H
-
+#undef ulong /* prevent clash with stdlib */
+#include <stdlib.h>
+#define ulong unsigned long
 #include <mpir.h>
 #include "flint.h"
+#include "ulong_extras.h"
 #include "fmpz.h"
+#include "qfb.h"
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-
-typedef struct qfb
+void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
 {
-    fmpz_t a;
-    fmpz_t b;
-    fmpz_t c;
-} qfb;
+   int done = 0;
+   fmpz_t t;
 
-typedef qfb qfb_t[1];
+   fmpz_set(r->a, f->a);
+   fmpz_set(r->b, f->b);
+   fmpz_set(r->c, f->c);
 
-static __inline__
-void qfb_init(qfb_t q)
-{
-   fmpz_init(q->a);
-   fmpz_init(q->b);
-   fmpz_init(q->c);
-}
+   fmpz_init(t);
 
-static __inline__
-void qfb_clear(qfb_t q)
-{
-   fmpz_clear(q->a);
-   fmpz_clear(q->b);
-   fmpz_clear(q->c);
-}
-
-static __inline__
-int qfb_equal(qfb_t f, qfb_t g)
-{
-   return (fmpz_equal(f->a, g->a) 
-        && fmpz_equal(f->b, g->b) 
-        && fmpz_equal(f->c, g->c));
-}
-
-static __inline__
-void qfb_print(qfb_t q)
-{
-   printf("(");
-   fmpz_print(q->a); printf(", ");
-   fmpz_print(q->b); printf(", ");
-   fmpz_print(q->c); printf(")");
-}
-
-static __inline__
-void qfb_array_clear(qfb ** forms, long num)
-{
-   long k;
-
-   for (k = 0; k < num; k++)
+   while(!done)
    {
-      fmpz_clear((*forms)[k].a);
-      fmpz_clear((*forms)[k].b);
-      fmpz_clear((*forms)[k].c);
+      done = 1;
+
+      if (fmpz_cmp(r->c, r->a) < 0)
+      {
+         fmpz_swap(r->a, r->c);
+         fmpz_neg(r->b, r->b);
+
+         done = 0;
+      }
+
+      if (fmpz_cmpabs(r->b, r->a) > 0)
+      {
+         fmpz_add(t, r->a, r->a);
+         fmpz_fdiv_r(r->b, r->b, t);
+         if (fmpz_cmp(r->b, r->a) > 0)
+            fmpz_sub(r->b, r->b, t);
+
+         fmpz_add(t, t, t);
+         fmpz_mul(r->c, r->b, r->b);
+         fmpz_sub(r->c, r->c, D);
+         fmpz_divexact(r->c, r->c, t);
+
+         done = 0;
+      }
    }
-   flint_free(*forms);
+
+   if (fmpz_cmpabs(r->a, r->b) == 0 || fmpz_cmp(r->a, r->c) == 0)
+      if (fmpz_sgn(r->b) < 0)
+         fmpz_neg(r->b, r->b);
+
+   fmpz_clear(t);
 }
-
-void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
-
-long qfb_reduced_forms(qfb ** forms, long d);
-
-long qfb_reduced_forms_large(qfb ** forms, long d);
-
-void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif
