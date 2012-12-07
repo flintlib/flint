@@ -30,27 +30,54 @@
 
 void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
-   fmpz_t t;
-   fmpz_init(t);
+   fmpz_t t1, t2;
+   fmpz * f1, g1;
 
-   if (fmpz_cmp(f, g) < 0)
+   fmpz_init(t1);
+   fmpz_init(t2);
+
+   if (fmpz_is_zero(f))
    {
-      fmpz_gcdinv(d, a, f, g);
-      fmpz_mul(t, a, f);
-      fmpz_sub(t, d, t);
-      fmpz_divexact(b, t, g);
-   } else if (fmpz_cmp(g, f) < 0)
-   {
-      fmpz_gcdinv(d, b, g, f);
-      fmpz_mul(t, b, g);
-      fmpz_sub(t, d, t);
-      fmpz_divexact(a, t, f);
-   } else /* f == g */
+      fmpz_set(d, g);
+      fmpz_set_ui(a, 0);
+      fmpz_set_ui(b, 1);
+   } else if (fmpz_cmp(f, g) == 0)
    {
       fmpz_set(d, f);
       fmpz_set_ui(a, 1);
       fmpz_set_si(b, 0);
-   }
+   } else
+   {
+      /* support aliasing */
+      if (d == f || a == f)
+      {
+         f1 = t1;
+         fmpz_set(f1, f);
+      } else
+         f1 = f;
+      
+      if (d == g || a == g)
+      {
+         g1 = t2;
+         fmpz_set(g1, g);
+      } else
+         g1 = g;
+      
+      if (fmpz_cmp(f, g) < 0)
+      {
+         fmpz_gcdinv(d, a, f, g);
+         fmpz_mul(t1, a, f1);
+         fmpz_sub(t1, d, t1);
+         fmpz_divexact(b, t1, g1);
+      } else /* g < f */
+      {
+         fmpz_gcdinv(d, b, g, f);
+         fmpz_mul(t2, b, g1);
+         fmpz_sub(t2, d, t2);
+         fmpz_divexact(a, t2, f1);
+      }
+   } 
 
-   fmpz_clear(t);
+   fmpz_clear(t1);
+   fmpz_clear(t2);
 }

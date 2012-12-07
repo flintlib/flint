@@ -791,7 +791,8 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
    Computes the extended GCD of $f$ and $g$, i.e. values $a$ and $b$
    such that $af + bg = d$, where $d = \gcd(f, g)$. 
 
-   Assumes that $d$ is not aliased with $a$ or $b$.
+   Assumes that $d$ is not aliased with $a$ or $b$ and that $a$ and $b$
+   are not aliased.
 
 *******************************************************************************
 
