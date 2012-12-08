@@ -124,6 +124,9 @@ void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L);
 
 void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L);
 
+void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp);
+
+static __inline__
 void qfb_inverse(qfb_t r, qfb_t f)
 {
    qfb_set(r, f);
@@ -145,6 +148,36 @@ int qfb_is_principal_form(qfb_t f, fmpz_t D)
       return fmpz_is_one(f->b);
 
    return fmpz_is_zero(f->b); /* D = 0 mod 4 */
+}
+
+static __inline__
+void qfb_principal_form(qfb_t f, fmpz_t D)
+{
+   fmpz_set_ui(f->a, 1);
+   
+   if (fmpz_is_odd(D)) /* D = 1 mod 4 */
+      fmpz_set_ui(f->b, 1);
+   else /* D = 0 mod 4 */
+      fmpz_set_ui(f->b, 0);
+
+   fmpz_sub(f->c, f->b, D);
+   fmpz_fdiv_q_2exp(f->c, f->c, 2);
+}
+
+static __inline__
+int qfb_is_primitive(qfb_t f)
+{
+   fmpz_t g;
+   int res;
+
+   fmpz_init(g);
+
+   fmpz_gcd(g, f->a, f->b);
+   fmpz_gcd(g, g, f->c);
+   res = fmpz_is_pm1(g);
+
+   fmpz_clear(g);
+   return res;
 }
 
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);

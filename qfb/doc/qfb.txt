@@ -116,9 +116,20 @@ void qfb_nucomp(qfb_t r, qfb_t f, qfb_t g, fmpz_t L)
     $L = \lfloor |D|^{1/4} \rfloor$ where $D$ is the common discriminant of
     $f$ and $g$. The result is returned in $r$.
 
+    We require that that $f$ is a primitive form.
+
 void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L)
    
     As for \code{nucomp} except that the form $f$ is composed with itself.
+    We require that that $f$ is a primitive form.
+
+void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp)
+
+    Compute the near reduced form $r$ which is the result of composing the
+    principal form (identity) with $f$ \code{exp} times. 
+
+    We require $D$ to be set to the discriminant of $f$ and that $f$ is a
+    primitive form.
 
 void qfb_inverse(qfb_t r, qfb_t f)
     
@@ -127,9 +138,20 @@ void qfb_inverse(qfb_t r, qfb_t f)
 int qfb_is_principal_form(qfb_t f, fmpz_t D)
     
     Return $1$ if $f$ is the reduced principal form of discriminant $D$,
-    i.e. the unit in the form class group.
+    i.e. the identity in the form class group.
+
+void qfb_principal_form(qfb_t f, fmpz_t D)
+
+    Set $f$ to the principal form of discriminant $D$, i.e. the identity in
+    the form class group.
+
+int qfb_is_primitive(qfb_t f)
+
+    Return $1$ if $f$ is primitive, i.e. the greatest common divisor of its
+    three coefficients is $1$. Otherwise the function returns $0$.
 
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
 
     Sets $r$ to the unique prime $(p, b, c)$ of discriminant $D$, i.e. with
-    $0 < b \leq b$. Requires that $p$ be a prime.
+    $0 < b \leq b$. We require that $p$ is a prime.
+
