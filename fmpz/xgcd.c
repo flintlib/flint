@@ -31,7 +31,7 @@
 void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 {
    fmpz_t t1, t2;
-   fmpz * f1, g1;
+   fmpz * f1, * g1;
 
    fmpz_init(t1);
    fmpz_init(t2);
@@ -54,14 +54,14 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
          f1 = t1;
          fmpz_set(f1, f);
       } else
-         f1 = f;
+         f1 = (fmpz *) f;
       
       if (d == g || a == g)
       {
          g1 = t2;
          fmpz_set(g1, g);
       } else
-         g1 = g;
+         g1 = (fmpz *) g;
       
       if (fmpz_cmp(f, g) < 0)
       {
