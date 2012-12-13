@@ -182,6 +182,8 @@ int qfb_is_primitive(qfb_t f)
 
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
 
+int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters);
+
 #ifdef __cplusplus
 }
 #endif

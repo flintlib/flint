@@ -155,3 +155,10 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
     Sets $r$ to the unique prime $(p, b, c)$ of discriminant $D$, i.e. with
     $0 < b \leq b$. We require that $p$ is a prime.
 
+int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters)
+
+   Find the exponent of the element $f$ in the form class group of forms of
+   discriminant $d$, performing at most the given number of iterations. If
+   the number of iterations exceeds \code{iters} then the function returns
+   $0$, otherwise the function returns $1$ and exponent is set to the 
+   exponent of $f$, i.e. the minimum power of $f$ which gives the identity.
