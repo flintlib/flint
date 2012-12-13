@@ -44,6 +44,7 @@ void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L)
    fmpz_init(x); fmpz_init(y); fmpz_init(z);  
    fmpz_init(t1); fmpz_init(t2);
    fmpz_init(ax); fmpz_init(ay); fmpz_init(bx); fmpz_init(by); 
+   fmpz_init(dx); fmpz_init(dy);
    fmpz_init(q); fmpz_init(t);
    fmpz_init(Q1);
 
