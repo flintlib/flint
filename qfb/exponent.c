@@ -47,7 +47,7 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
 
    /* find odd prime such that n is a square mod p */
    pr = 2;
-   for (i = 0; i < c; i++)
+   for (i = 0; i < c + 2; )
    {
       do
       {
@@ -67,7 +67,10 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
       if (!qfb_exponent_element(exp, f, n, iters))
          return 0;
       
-      fmpz_mul(exponent, exponent, exp);
+      if (fmpz_is_one(exp))
+         i++;
+      else
+         fmpz_mul(exponent, exponent, exp);
    }
 
    qfb_clear(f);
