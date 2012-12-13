@@ -131,6 +131,10 @@ void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp)
     We require $D$ to be set to the discriminant of $f$ and that $f$ is a
     primitive form.
 
+void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp)
+
+    As per \code{qfb_pow_ui}.
+
 void qfb_inverse(qfb_t r, qfb_t f)
     
     Set $r$ to the inverse of the binary quadratic form $f$.

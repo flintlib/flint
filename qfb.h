@@ -126,6 +126,8 @@ void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L);
 
 void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp);
 
+void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp);
+
 static __inline__
 void qfb_inverse(qfb_t r, qfb_t f)
 {
