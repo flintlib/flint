@@ -32,57 +32,47 @@
 #include "fmpz.h"
 #include "qfb.h"
 
-void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e)
+int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
 {
-   fmpz_t L, exp;
-   qfb_t pow;
-
-   if (fmpz_is_zero(e))
-   {
-      qfb_principal_form(r, D);
-      return;
-   }
-
-   if (fmpz_is_one(e))
-   {
-      qfb_set(r, f);
-      return;
-   }
-
-   fmpz_init(L);
+   fmpz_t p, exp;
+   long i;
+   qfb_t f;
+   ulong pr, nmodpr;
+   
+   fmpz_init(p);
    fmpz_init(exp);
+   qfb_init(f);
 
-   fmpz_set(exp, e);
+   fmpz_set_ui(exponent, 1);
 
-   fmpz_abs(L, D);
-   fmpz_root(L, L, 4);
-
-   qfb_init(pow);
-   
-   qfb_set(pow, f);
-   while (fmpz_is_even(exp))
+   /* find odd prime such that n is a square mod p */
+   pr = 2;
+   for (i = 0; i < c; i++)
    {
-      qfb_nudupl(pow, pow, L);
-      qfb_reduce(pow, pow, D);
-      fmpz_fdiv_q_2exp(exp, exp, 1);
-   }
-
-   qfb_set(r, pow);
-   fmpz_fdiv_q_2exp(exp, exp, 1);
-   
-   while (!fmpz_is_zero(exp))
-   {
-      qfb_nudupl(pow, pow, L);
-      qfb_reduce(pow, pow, D);
-      if (fmpz_is_odd(exp))
+      do
       {
-         qfb_nucomp(r, r, pow, L);
-         qfb_reduce(r, r, D);
-      }
-      fmpz_fdiv_q_2exp(exp, exp, 1);
+         pr = n_nextprime(pr, 0);
+         nmodpr = fmpz_fdiv_ui(n, pr);
+      } while (nmodpr == 0 || n_jacobi(nmodpr, pr) < 0);
+
+      fmpz_set_ui(p, pr);
+      
+      /* find prime form of discriminant n */
+      qfb_prime_form(f, n, p);
+      qfb_reduce(f, f, n);
+      
+      if (!fmpz_is_one(exponent))
+         qfb_pow(f, f, n, exponent);
+
+      if (!qfb_exponent_element(exp, f, n, iters))
+         return 0;
+      
+      fmpz_mul(exponent, exponent, exp);
    }
 
-   qfb_clear(pow);
-   fmpz_clear(L);
+   qfb_clear(f);
+   fmpz_clear(p);
    fmpz_clear(exp);
+
+   return 1;
 }

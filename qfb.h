@@ -186,6 +186,8 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
 
 int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters);
 
+int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c);
+
 #ifdef __cplusplus
 }
 #endif

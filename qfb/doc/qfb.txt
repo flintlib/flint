@@ -164,5 +164,16 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters)
    Find the exponent of the element $f$ in the form class group of forms of
    discriminant $d$, performing at most the given number of iterations. If
    the number of iterations exceeds \code{iters} then the function returns
-   $0$, otherwise the function returns $1$ and exponent is set to the 
+   $0$, otherwise the function returns $1$ and \code{exponent} is set to the 
    exponent of $f$, i.e. the minimum power of $f$ which gives the identity.
+
+   It is assumed that the form $f$ is reduced.
+
+int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
+
+   Compute the exponent of the class group of discriminant $n$, performing
+   at most the given number of iterations, and with probability 
+   $1 - 2^{-c}$. If the number of iterations exceeds \code{iters}, the 
+   function returns $0$, otherwise it returns $1$ and \code{exponent} is
+   set to the computed exponent, i.e. the minimum power which every element
+   of the class group has to be raised to give the identity.
