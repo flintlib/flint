@@ -172,8 +172,16 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters)
 int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
 
    Compute the exponent of the class group of discriminant $n$, performing
-   at most the given number of iterations, and with probability 
+   at most the given number of iterations, and with probability at least
    $1 - 2^{-c}$. If the number of iterations exceeds \code{iters}, the 
    function returns $0$, otherwise it returns $1$ and \code{exponent} is
    set to the computed exponent, i.e. the minimum power which every element
    of the class group has to be raised to give the identity.
+
+   We use algorithm 8.1 of~\citep{SuthThesis}
+
+      % "Order Computations in Generic Groups", Andrew Sutherland,
+      % MIT Thesis 2007.
+      % http://groups.csail.mit.edu/cis/theses/sutherland-phd.pdf
+
+    
