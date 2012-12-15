@@ -157,7 +157,7 @@ int qfb_is_primitive(qfb_t f)
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
 
     Sets $r$ to the unique prime $(p, b, c)$ of discriminant $D$, i.e. with
-    $0 < b \leq b$. We require that $p$ is a prime.
+    $0 < b \leq p$. We require that $p$ is a prime.
 
 int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters)
 

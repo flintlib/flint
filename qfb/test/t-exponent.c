@@ -50,7 +50,7 @@ int main(void)
         qfb_t pow;
         long e;
         
-        d = n_randint(state, 100000);
+        d = n_randint(state, 100000) + 1;
         num = qfb_reduced_forms(&forms, -d);
         
         if (num)

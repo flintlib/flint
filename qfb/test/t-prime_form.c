@@ -46,9 +46,8 @@ int main(void)
     {
         fmpz_t D, D2, p;
         qfb_t r, s;
-        ulong n, Dmodp;
-        int square;
-
+        ulong n, q, Dmodp;
+        
         fmpz_init(D);
         fmpz_init(D2);
         fmpz_init(p);
@@ -72,24 +71,9 @@ int main(void)
            n = n_randprime(state, n_randint(state, FLINT_BITS - 1) + 2, 0);
            fmpz_set_ui(p, n);
            Dmodp = fmpz_fdiv_ui(D, n);
-           if (n == 2) /* Jacobi can't deal with this case */
-           {
-              square = 0;
-              if (fmpz_is_even(D))
-              {
-                 if (fmpz_fdiv_ui(D, 8) == 0)
-                    square = 1;
-              } else
-              {
-                 fmpz_sub_ui(D2, D, 1);
-                 if (fmpz_fdiv_ui(D2, 8) == 0)
-                    square = 1;
-              }
-           } else if (Dmodp == 0) /* ...or this case */
-              square = 1;
-           else
-              square = (n_jacobi_unsigned(Dmodp, n) > 0);
-        } while (!square);
+        } while ((mp_limb_signed_t) Dmodp < 0 /* Jacobi can't handle this */
+         || (n == 2 && ((q = fmpz_fdiv_ui(D, 8)) == 2 || q == 3 || q == 5))
+         || (n != 2 && Dmodp != 0 && n_jacobi(Dmodp, n) < 0));
 
         qfb_prime_form(s, D, p);
         qfb_discriminant(D2, s);
