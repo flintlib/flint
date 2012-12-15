@@ -410,6 +410,8 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
 
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
+
 long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
 
 long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
