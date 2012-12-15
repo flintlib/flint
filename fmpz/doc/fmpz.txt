@@ -829,6 +829,11 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
     the return value will be non-zero, otherwise the return value will
     be $0$ and the value of $f$ undefined. 
 
+int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
+
+    Computes the Jacobi symbol of $a$ modulo $p$, where $p$ is a prime
+    and $a$ is reduced modulo $p$.
+
 *******************************************************************************
 
     Bit packing and unpacking
