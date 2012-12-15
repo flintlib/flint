@@ -188,6 +188,8 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters);
 
 int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c);
 
+int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters);
+
 #ifdef __cplusplus
 }
 #endif

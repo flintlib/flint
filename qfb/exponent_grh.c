@@ -27,40 +27,48 @@
 #include <stdlib.h>
 #define ulong unsigned long
 #include <mpir.h>
+#include <mpfr.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 #include "qfb.h"
 
-int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
+int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters)
 {
    fmpz_t p, exp, n2;
-   long i;
+   mpz_t mn;
    qfb_t f;
-   ulong pr, nmodpr, s;
-   
+   ulong pr, nmodpr, s, grh_limit;
+   mpfr_t lim;
+   int ret = 1;
+
    fmpz_init(p);
    fmpz_init(n2);
    fmpz_init(exp);
    qfb_init(f);
-   int ret = 1;
+   
+   flint_mpz_init_set_readonly(mn, n);
+   mpfr_init_set_z(lim, mn, MPFR_RNDA);
+   mpfr_abs(lim, lim, MPFR_RNDU);
+   mpfr_log(lim, lim, MPFR_RNDU);
+   mpfr_mul(lim, lim, lim, MPFR_RNDU);
+   mpfr_mul_ui(lim, lim, 6, MPFR_RNDU);
+   grh_limit = mpfr_get_ui(lim, MPFR_RNDU);
 
    fmpz_set_ui(exponent, 1);
-
+   
    /* find odd prime such that n is a square mod p */
    pr = 1;
-   for (i = 0; i < c + 2; )
+   for (pr = 1; pr < grh_limit; )
    {
-      i--;
       do
       {
          pr = n_nextprime(pr, 0);
          nmodpr = fmpz_fdiv_ui(n, pr);
-         i++;
       } while ((pr == 2 && ((s = fmpz_fdiv_ui(n, 8)) == 2 || s == 3 || s == 5))
          || (pr != 2 && nmodpr != 0 && n_jacobi(nmodpr, pr) < 0));
 
-      if (i < c + 2)
+      if (pr < grh_limit)
       {
          fmpz_set_ui(p, pr);
       
@@ -94,10 +102,8 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
             ret = 0;
             goto cleanup;
          }
-      
-         if (fmpz_is_one(exp))
-            i++;
-         else
+
+         if (!fmpz_is_one(exp))
             fmpz_mul(exponent, exponent, exp);
       }
    }
@@ -108,5 +114,7 @@ cleanup:
    fmpz_clear(n2);
    fmpz_clear(exp);
 
+   flint_mpz_clear_readonly(mn);
+            
    return ret;
 }
