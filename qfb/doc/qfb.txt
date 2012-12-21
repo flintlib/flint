@@ -30,15 +30,48 @@
 *******************************************************************************
 
 void qfb_init(qfb_t q)
+
     Initialise a \code{qfb_t} $q$ for use.
 
 void qfb_clear(qfb_t q)
+
     Clear a \code{qfb_t} after use. This releases any memory allocated for
     $q$ back to flint.
 
 void qfb_array_clear(qfb ** forms, long num)
+
     Clean up an array of \code{qfb} structs allocated by a qfb function.
     The parameter \code{num} must be set to the length of the array.
+
+*******************************************************************************
+
+    Hash table
+
+*******************************************************************************
+
+qfb_hash_t * qfb_hash_init(long depth)
+    
+    Initialises a hash table of size $2^\mbox{depth}$. 
+
+void qfb_hash_clear(qfb_hash_t * qhash, long depth)
+
+    Frees all memory used by a hash table of size $2^\mbox{depth}$. 
+
+void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, 
+                              qfb_t q2, long iter, long depth)
+
+    Insert the binary quadratic form \code{q} into the given hash table 
+    of size $2^\mbox{depth}$ in the field \code{q} of the hash structure. 
+    Also store the second binary quadratic form \code{q2} (if not 
+    \code{NULL}) in the similarly named field and \code{iter} in the 
+    similarly named field of the hash structure. 
+
+long qfb_hash_find(qfb_hash_t * qhash, qfb_t q, long depth)
+
+    Search for the given binary quadratic form or its inverse in the 
+    given hash table of size $2^\mbox{depth}$. If it is found, return
+    the index in the table (which is an array of \code{qfb_hash_t} 
+    structs, otherwise return \code{-1L}.
 
 *******************************************************************************
 
@@ -47,6 +80,7 @@ void qfb_array_clear(qfb ** forms, long num)
 *******************************************************************************
 
 void qfb_set(qfb_t f, qfb_t g)
+
     Set the binary quadratic form $f$ to be equal to $g$.
 
 *******************************************************************************
@@ -56,6 +90,7 @@ void qfb_set(qfb_t f, qfb_t g)
 *******************************************************************************
 
 int qfb_equal(qfb_t f, qfb_t g)
+
     Returns $1$ if $f$ and $g$ are identical binary quadratic forms, 
     otherwise returns $0$.
 
@@ -66,6 +101,7 @@ int qfb_equal(qfb_t f, qfb_t g)
 *******************************************************************************
 
 void qfb_print(qfb_t q)
+
     Print a binary quadratic form $q$ in the format $(a, b, c)$ where
     $a$, $b$, $c$ are the entries of $q$.
 
@@ -76,14 +112,17 @@ void qfb_print(qfb_t q)
 *******************************************************************************
 
 void qfb_discriminant(fmpz_t D, qfb_t f)
+
     Set $D$ to the discriminant of the binary quadratic form $f$, i.e. to
     $b^2 - 4ac$, where $f = (a, b, c)$.
 
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D)
+
     Set $r$ to the reduced form equivalent to the binary quadratic form $f$
     of discriminant $D$.
 
 int qfb_is_reduced(qfb_t r)
+
     Returns $1$ if $q$ is a reduced binary quadratic form. Otherwise returns
     $1$.
 
@@ -161,34 +200,47 @@ void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p)
 
 int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters)
 
-   Find the exponent of the element $f$ in the form class group of forms of
-   discriminant $d$, performing at most the given number of iterations. If
-   the number of iterations exceeds \code{iters} then the function returns
-   $0$, otherwise the function returns $1$ and \code{exponent} is set to the 
-   exponent of $f$, i.e. the minimum power of $f$ which gives the identity.
+    Find the exponent of the element $f$ in the form class group of forms of
+    discriminant $n$, performing $O(\mbox{iters})$ iterations. If the function
+    fails to find the exponent it returns $0$, otherwise the function returns 
+    $1$ and \code{exponent} is set to the exponent of $f$, i.e. the minimum 
+    power of $f$ which gives the identity.
 
-   It is assumed that the form $f$ is reduced.
+    It is assumed that the form $f$ is reduced. We require that \code{iters}
+    is a power of $2$ and that \code{iters}$ >= 1024$.
+
+    The function performs a stage $2$ which stores up to $4\times$ 
+    \code{iters} binary quadratic forms, and $12\times$ \code{iters}
+    additional limbs of data in a hash table.
 
 int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
 
-   Compute the exponent of the class group of discriminant $n$, performing
-   at most the given number of iterations, and with probability at least
-   $1 - 2^{-c}$. If the number of iterations exceeds \code{iters}, the 
-   function returns $0$, otherwise it returns $1$ and \code{exponent} is
-   set to the computed exponent, i.e. the minimum power which every element
-   of the class group has to be raised to give the identity.
+    Compute the exponent of the class group of discriminant $n$, performing
+    at most the given number of iterations, and with probability at least
+    $1 - 2^{-c}$. If the number of iterations exceeds \code{iters}, the 
+    function returns $0$, otherwise it returns $1$ and \code{exponent} is
+    set to the computed exponent, i.e. the minimum power which every element
+    of the class group has to be raised to give the identity. 
 
-   We use algorithm 8.1 of~\citep{SuthThesis}
+    The function performs a stage $2$ which stores up to $4\times$ 
+    \code{iters} binary quadratic forms, and $12\times$ \code{iters}
+    additional limbs of data in a hash table.
 
-      % "Order Computations in Generic Groups", Andrew Sutherland,
-      % MIT Thesis 2007.
-      % http://groups.csail.mit.edu/cis/theses/sutherland-phd.pdf
+    We use algorithm 8.1 of~\citep{SuthThesis}
+
+       % "Order Computations in Generic Groups", Andrew Sutherland,
+       % MIT Thesis 2007.
+       % http://groups.csail.mit.edu/cis/theses/sutherland-phd.pdf
 
 int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters)
 
-  As per \code{qfb_exponent} except that a bound is computed assuming the
-  GRH, namely that the class group is generated by primes less than 
-  $6\log^2(|n|)$ as per~\citep{BuchDull1992}
+    As per \code{qfb_exponent} except that a bound is computed assuming the
+    GRH, namely that the class group is generated by primes less than 
+    $6\log^2(|n|)$ as per~\citep{BuchDull1992}
 
-     % "Distributed Class Group Computation", Johannes Buchmann, Stephan
-     % D\"{u}llman, Informatik 1 (1992), pp. 69--79.
+    The function performs a stage $2$ which stores up to $4\times$ 
+    \code{iters} binary quadratic forms, and $12\times$ \code{iters}
+    additional limbs of data in a hash table.
+
+       % "Distributed Class Group Computation", Johannes Buchmann, Stephan
+       % D\"{u}llman, Informatik 1 (1992), pp. 69--79.

@@ -43,6 +43,13 @@ typedef struct qfb
 
 typedef qfb qfb_t[1];
 
+typedef struct
+{
+   qfb_t q;
+   qfb_t q2;
+   long iter;
+} qfb_hash_t;
+
 static __inline__
 void qfb_init(qfb_t q)
 {
@@ -112,6 +119,15 @@ void qfb_array_clear(qfb ** forms, long num)
    flint_free(*forms);
 }
 
+qfb_hash_t * qfb_hash_init(long depth);
+
+void qfb_hash_clear(qfb_hash_t * qhash, long depth);
+
+void qfb_hash_insert(qfb_hash_t * qhash, qfb_t q, 
+                     qfb_t q2, long iter, long depth);
+
+long qfb_hash_find(qfb_hash_t * qhash, qfb_t q, long depth);
+
 void qfb_reduce(qfb_t r, qfb_t f, fmpz_t D);
 
 int qfb_is_reduced(qfb_t r);
@@ -127,6 +143,8 @@ void qfb_nudupl(qfb_t r, qfb_t f, fmpz_t L);
 void qfb_pow_ui(qfb_t r, qfb_t f, fmpz_t D, ulong exp);
 
 void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t exp);
+
+void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L);
 
 static __inline__
 void qfb_inverse(qfb_t r, qfb_t f)

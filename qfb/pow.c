@@ -86,3 +86,53 @@ void qfb_pow(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e)
    fmpz_clear(L);
    fmpz_clear(exp);
 }
+
+void qfb_pow_with_root(qfb_t r, qfb_t f, fmpz_t D, fmpz_t e, fmpz_t L)
+{
+   fmpz_t exp;
+   qfb_t pow;
+
+   if (fmpz_is_zero(e))
+   {
+      qfb_principal_form(r, D);
+      return;
+   }
+
+   if (fmpz_is_one(e))
+   {
+      qfb_set(r, f);
+      return;
+   }
+
+   fmpz_init(exp);
+
+   fmpz_set(exp, e);
+
+   qfb_init(pow);
+   
+   qfb_set(pow, f);
+   while (fmpz_is_even(exp))
+   {
+      qfb_nudupl(pow, pow, L);
+      qfb_reduce(pow, pow, D);
+      fmpz_fdiv_q_2exp(exp, exp, 1);
+   }
+
+   qfb_set(r, pow);
+   fmpz_fdiv_q_2exp(exp, exp, 1);
+   
+   while (!fmpz_is_zero(exp))
+   {
+      qfb_nudupl(pow, pow, L);
+      qfb_reduce(pow, pow, D);
+      if (fmpz_is_odd(exp))
+      {
+         qfb_nucomp(r, r, pow, L);
+         qfb_reduce(r, r, D);
+      }
+      fmpz_fdiv_q_2exp(exp, exp, 1);
+   }
+
+   qfb_clear(pow);
+   fmpz_clear(exp);
+}
