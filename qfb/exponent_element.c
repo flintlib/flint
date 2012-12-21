@@ -239,7 +239,7 @@ do_restart1:
 
    clean2 = 1;
 
-   restart_inc = (((iterations + 127)/128)/1024)*1024;
+   restart_inc = (((iterations/1024 + 127)/128))*1024;
                       
    pr = 13;
    i = 0;

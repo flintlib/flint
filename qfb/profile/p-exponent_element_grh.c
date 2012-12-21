@@ -34,18 +34,20 @@
 int main(int argc, char *argv[])
 {
     int result;
-    long exp, val, num, i;
+    long exp, val, num, iters, i;
 
-    if (argc != 4)
+    if (argc != 5)
     {
-       printf("usage: %s exp val num\n", argv[0]);
+       printf("usage: %s exp val num iters\n", argv[0]);
        printf("where D = -4*(10^exp + i) for i in [val..val + num)\n");
+       printf("and where O(iters) iterations are performed\n");
        return 1;
     }
 
     exp = atol(argv[1]);
     val = atol(argv[2]);
     num = atol(argv[3]);
+    iters = atol(argv[4]);
 
     for (i = 0; i < num; i++) 
     {
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
         fmpz_mul_2exp(D, D, 2);
         fmpz_neg(D, D);
 
-        if (qfb_exponent_grh(exponent, D, 4194304))
+        if (qfb_exponent_grh(exponent, D, iters))
         {
            printf("Discriminant: "); fmpz_print(D); printf("\n");
            printf("Exponent: "); fmpz_print(exponent); printf("\n\n");
