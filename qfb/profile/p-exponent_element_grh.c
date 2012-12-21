@@ -57,7 +57,6 @@ int main(int argc, char *argv[])
         fmpz_init(D);
         fmpz_init(exponent);
         
-        printf("start %ld\n", i);
         fmpz_set_ui(D, 10);
         fmpz_pow_ui(D, D, exp);
         fmpz_add_ui(D, D, i);
