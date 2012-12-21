@@ -124,40 +124,48 @@ typedef struct
    long i;
 } qfb_restart_t;
 
+#define go_restart \
+   do { \
+      need_restarts = 0; \
+      if (j == 0) \
+      { \
+         qfb_pow(f2, f2, n, exponent); \
+         goto do_restart1; \
+      } \
+      j--; \
+      qfb_set(pow, restart[j].pow); \
+      qfb_pow(pow, pow, n, exponent); \
+      i = restart[j].i; \
+      pr = restart[j].pr; \
+      goto do_restart; \
+   } while (0)
+
 int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iterations)
 {
    long i, j, oldi, iters = 1024, restart_inc;
    qfb_t pow, oldpow, f2;
    ulong pr, oldpr, s2;
    fmpz_t prod, L;
-   int ret = 1, num_restarts = 0, need_restarts = 1;
+   int ret = 1, num_restarts = 0, need_restarts = 1, clean2 = 0;
    qfb_restart_t restart[128];
 
    fmpz_set_ui(exponent, 1);
       
-   if (qfb_is_principal_form(f, n))
-      return 1;
-
+   qfb_init(f2);
    qfb_init(pow);
    qfb_init(oldpow);
    
-   qfb_set(pow, f);
    fmpz_init(prod);
    fmpz_init(L);
+
    fmpz_abs(L, n);
    fmpz_root(L, L, 4);
-
-   for (i = 0; i < 128; i++)
-      qfb_init(restart[i].pow);
-
-   restart_inc = (((iterations + 127)/128)/1024)*1024;
-   qfb_init(f2);
 
    qfb_set(f2, f);
 
 do_restart1:
    
-   if (qfb_is_principal_form(f2, n)) /* only useful on restart */
+   if (qfb_is_principal_form(f2, n))
       goto cleanup2;
 
    /* raise to various powers of small primes */
@@ -192,7 +200,7 @@ do_restart1:
       
       goto do_restart1;
    }
-
+     
    qfb_set(oldpow, pow);
    qfb_pow_ui(pow, oldpow, n, 117649); /* 7^6 */
    if (qfb_is_principal_form(pow, n))
@@ -203,7 +211,7 @@ do_restart1:
       
       goto do_restart1;
    }
-
+     
    qfb_set(oldpow, pow);
    qfb_pow_ui(pow, oldpow, n, 14641); /* 11^4 */
    if (qfb_is_principal_form(pow, n))
@@ -226,6 +234,13 @@ do_restart1:
       goto do_restart1;
    }
 
+   for (i = 0; i < 128; i++)
+      qfb_init(restart[i].pow);
+
+   clean2 = 1;
+
+   restart_inc = (((iterations + 127)/128)/1024)*1024;
+                      
    pr = 13;
    i = 0;
    
@@ -277,25 +292,14 @@ do_restart:
                if (qfb_is_principal_form(pow, n))
                {
                   fmpz_mul_ui(exponent, exponent, pr);
-                  for (j = 1; j < num_restarts; j++)
+                  for (j = 0; j < num_restarts; j++)
                   {
                      qfb_set(pow, restart[j].pow);
                      qfb_pow(pow, pow, n, exponent);
                      if (qfb_is_principal_form(pow, n))
                         break;
                   }
-                  j--;
-                  qfb_set(pow, restart[j].pow);
-                  qfb_pow(pow, pow, n, exponent);
-                  i = restart[j].i;
-                  pr = restart[j].pr;
-                  need_restarts = 0;
-                  if (j == 0)
-                  {
-                     qfb_pow(f2, f2, n, exponent);
-                     goto do_restart1;
-                  } else
-                     goto do_restart;
+                  go_restart;
                }
 
                if (oldi < 102400)
@@ -304,25 +308,14 @@ do_restart:
                   if (qfb_is_principal_form(pow, n))
                   {
                      fmpz_mul_ui(exponent, exponent, pr*pr);
-                     for (j = 1; j < num_restarts; j++)
+                     for (j = 0; j < num_restarts; j++)
                      {
                         qfb_set(pow, restart[j].pow);
                         qfb_pow(pow, pow, n, exponent);
                         if (qfb_is_principal_form(pow, n))
                            break;
                      }
-                     j--;
-                     qfb_set(pow, restart[j].pow);
-                     qfb_pow(pow, pow, n, exponent);
-                     i = restart[j].i;
-                     pr = restart[j].pr;
-                     need_restarts = 0;
-                     if (j == 0)
-                     {
-                        qfb_pow(f2, f2, n, exponent);
-                        goto do_restart1;
-                     } else
-                        goto do_restart;
+                     go_restart;
                   }
                }
             }
@@ -333,25 +326,14 @@ do_restart:
       if (s2 && n_is_prime(s2)) /* we probably should be more aggressive here */
       {
          fmpz_mul_ui(exponent, exponent, s2);
-         for (j = 1; j < num_restarts; j++)
+         for (j = 0; j < num_restarts; j++)
          {
             qfb_set(pow, restart[j].pow);
             qfb_pow(pow, pow, n, exponent);
             if (qfb_is_principal_form(pow, n))
                break;
          }
-         j--;
-         qfb_set(pow, restart[j].pow);
-         qfb_pow(pow, pow, n, exponent);
-         i = restart[j].i;
-         pr = restart[j].pr;
-         need_restarts = 0;
-         if (j == 0)
-         {
-            qfb_pow(f2, f2, n, exponent);
-            goto do_restart1;
-         } else
-            goto do_restart;
+         go_restart;
       } 
 
       iters *= 2;
@@ -360,14 +342,17 @@ do_restart:
    ret = 0;
 
 cleanup2:
+
+   if (clean2)
+      for (i = 0; i < 128; i++)
+         qfb_clear(restart[i].pow);
+
    qfb_clear(f2);
    qfb_clear(pow);
    qfb_clear(oldpow);
    fmpz_clear(prod);
    fmpz_clear(L);
 
-   for (i = 0; i < 128; i++)
-      qfb_clear(restart[i].pow);
 
    return ret;
 }
