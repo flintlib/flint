@@ -38,12 +38,12 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
    long i;
    qfb_t f;
    ulong pr, nmodpr, s;
-   
+   int ret = 1;
+
    fmpz_init(p);
    fmpz_init(n2);
    fmpz_init(exp);
    qfb_init(f);
-   int ret = 1;
 
    fmpz_set_ui(exponent, 1);
 
