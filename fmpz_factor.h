@@ -64,6 +64,9 @@ void _fmpz_factor_set_length(fmpz_factor_t factor, long newlen);
 
 void _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n);
 
+int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, 
+                                       ulong start, ulong num_primes);
+
 void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 void fmpz_factor_si(fmpz_factor_t factor, long n);

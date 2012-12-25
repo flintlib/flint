@@ -53,6 +53,19 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
     This currently only uses trial division, falling back to \code{n_factor()}
     as soon as the number shrinks to a single limb.
 
+int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, 
+                                       ulong start, ulong num_primes)
+
+    Factors $n$ into prime factors using trial division. If $n$ is 
+    zero or negative, the sign field of the \code{factor} object will be 
+    set accordingly.
+
+    The algorithm starts with the given start index in the \code{flint_primes}
+    table and uses at most \code{num_primes} primes from that point. 
+
+    The function returns 1 if $n$ is completely factored, otherwise it returns
+    $0$.
+
 void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
 
     Evaluates an integer in factored form back to an \code{fmpz_t}.
