@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
         
         fmpz_set_ui(D, 10);
         fmpz_pow_ui(D, D, exp);
-        fmpz_add_ui(D, D, i);
+        fmpz_add_ui(D, D, val + i);
         fmpz_mul_2exp(D, D, 2);
         fmpz_neg(D, D);
 
