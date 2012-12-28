@@ -577,6 +577,7 @@ mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits);
 
 mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits);
 
+int fmpz_is_probabprime(const fmpz_t p);
 
 #ifdef __cplusplus
 }

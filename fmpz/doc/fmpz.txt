@@ -1012,3 +1012,21 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 
     Clears temporary space \code{temp} used by multimodular and CRT functions
     using the given \code{comb} structure.
+
+*******************************************************************************
+
+    Primality testing
+
+*******************************************************************************
+
+int fmpz_is_probabprime(const fmpz_t p)
+
+    Performs some trial division and then some probabilistic primality tests.
+    If $p$ is definitely composite, the function returns $0$, otherwise it
+    is declared probably prime, i.e. prime for most practical purposes, and 
+    the function returns $1$. The chance of declaring a composite prime is
+    very small.
+
+    Subsequent calls to the same function do not increase the probability of
+    the number being prime.
+
