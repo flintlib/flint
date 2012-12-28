@@ -33,6 +33,9 @@ fmpz_is_probabprime(const fmpz_t p)
 {
     fmpz c = *p;
     
+    if (fmpz_sgn(p) <= 0)
+       return 0;
+
     if (!COEFF_IS_MPZ(c))
        return n_is_probabprime(c);
     else

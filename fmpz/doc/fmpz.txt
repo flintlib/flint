@@ -1030,3 +1030,8 @@ int fmpz_is_probabprime(const fmpz_t p)
     Subsequent calls to the same function do not increase the probability of
     the number being prime.
 
+int fmpz_is_prime_pseudosquare(fmpz_t n)
+
+    Return $0$ is $n$ is composite. If $n$ is too large (greater than about
+    $94$ bits) the function fails silently and returns $-1$, otherwise, if 
+    $n$ is proven prime by the pseudosquares method, return $1$.

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2012 William Hart
 
 ******************************************************************************/
 
@@ -36,48 +36,33 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    printf("jacobi....");
+    printf("is_prime_pseudosquare....");
     fflush(stdout);
 
     flint_randinit(state);
-    _flint_rand_init_gmp(state);
 
-    for (i = 0; i < 3000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 100000 * flint_test_multiplier(); i++)
     {
-        fmpz_t a, p;
-        mpz_t b, q;
+        fmpz_t p;
         int r1, r2;
 
-        fmpz_init(a);
         fmpz_init(p);
 
-        mpz_init(b);
-        mpz_init(q);
+        fmpz_randtest_unsigned(p, state, n_randint(state, 94) + 1);
 
-        mpz_rrandomb(q, state->gmp_state, n_randint(state, 200) + 1);
-        mpz_next_likely_prime(q, q, state->gmp_state);
-        fmpz_set_mpz(p, q);
+        r1 = fmpz_is_probabprime(p);
+        r2 = fmpz_is_prime_pseudosquare(p);
 
-        mpz_rrandomb(b, state->gmp_state, n_randint(state, 200) + 1);
-        mpz_mod(b, b, q);
-        fmpz_set_mpz(a, b);
-
-        r1 = fmpz_jacobi(a, p);
-        r2 = mpz_jacobi(b, q);
         result = (r1 == r2);
-
         if (!result)
         {
             printf("FAIL:\n");
-            gmp_printf("b = %Zd, q = %Zd\n", b, q);
+            fmpz_print(p);
+            printf("r1 = %d, r2 = %d\n", r1, r2);
             abort();
         }
 
-        fmpz_clear(a);
         fmpz_clear(p);
-
-        mpz_clear(b);
-        mpz_clear(q);
     }
 
     flint_randclear(state);
