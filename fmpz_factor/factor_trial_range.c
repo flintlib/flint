@@ -122,9 +122,9 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
             trial_start = trial_stop;
             trial_stop = FLINT_MIN(trial_start + 1000, start + num_primes);
         }
-    } while (xsize > 1 && trial_start != trial_stop);
+    } while ((xsize > 1 || xd[0] != 1) && trial_start != trial_stop);
 
-    /* Any single-limb factor left? */
+    /* Any factor left? */
     if (xsize > 1 || xd[0] != 1)
         ret = 0;
 
