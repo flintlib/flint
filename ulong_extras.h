@@ -61,12 +61,65 @@ typedef struct {
 
 #define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
 
+#define FLINT_SIEVE_SIZE 65536
+
 #if FLINT64
 #define ULONG_MAX_PRIME 18446744073709551557UL
 #else
 #define ULONG_MAX_PRIME 4294967291UL
 #endif
 
+typedef struct
+{
+    long small_i;
+    long small_num;
+    unsigned int * small_primes;
+
+    mp_limb_t sieve_a;
+    mp_limb_t sieve_b;
+    long sieve_i;
+    long sieve_num;
+    char * sieve;
+}
+n_primes_struct;
+
+typedef n_primes_struct n_primes_t[1];
+
+void n_primes_init(n_primes_t iter);
+
+void n_primes_clear(n_primes_t iter);
+
+void n_primes_extend_small(n_primes_t iter, mp_limb_t bound);
+
+void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b);
+
+static __inline__ mp_limb_t
+n_primes_next(n_primes_t iter)
+{
+    if (iter->small_i < iter->small_num)
+    {
+        return iter->small_primes[(iter->small_i)++];
+    }
+    else
+    {
+        for (;;)
+        {
+            mp_limb_t a;
+
+            while (iter->sieve_i < iter->sieve_num)
+                if (iter->sieve[iter->sieve_i++] != 0)
+                    return iter->sieve_a + 2 * (iter->sieve_i - 1);
+
+            if (iter->sieve_b == 0)
+                a = iter->small_primes[iter->small_num - 1] + 2;
+            else
+                a = iter->sieve_b + 2;
+
+            n_primes_sieve_range(iter, a,
+                a + FLINT_MIN(a, FLINT_SIEVE_SIZE) - 2);
+        }
+    }
+}
 
 extern const unsigned int flint_primes_small[];
 
