@@ -93,31 +93,24 @@ void n_primes_extend_small(n_primes_t iter, mp_limb_t bound);
 
 void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b);
 
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n);
+
 static __inline__ mp_limb_t
 n_primes_next(n_primes_t iter)
 {
     if (iter->small_i < iter->small_num)
-    {
         return iter->small_primes[(iter->small_i)++];
-    }
-    else
+
+    for (;;)
     {
-        for (;;)
-        {
-            mp_limb_t a;
+        while (iter->sieve_i < iter->sieve_num)
+            if (iter->sieve[iter->sieve_i++] != 0)
+                return iter->sieve_a + 2 * (iter->sieve_i - 1);
 
-            while (iter->sieve_i < iter->sieve_num)
-                if (iter->sieve[iter->sieve_i++] != 0)
-                    return iter->sieve_a + 2 * (iter->sieve_i - 1);
-
-            if (iter->sieve_b == 0)
-                a = iter->small_primes[iter->small_num - 1] + 2;
-            else
-                a = iter->sieve_b + 2;
-
-            n_primes_sieve_range(iter, a,
-                a + FLINT_MIN(a, FLINT_SIEVE_SIZE) - 2);
-        }
+        if (iter->sieve_b == 0)
+            n_primes_jump_after(iter, iter->small_primes[iter->small_num-1]);
+        else
+            n_primes_jump_after(iter, iter->sieve_b);
     }
 }
 

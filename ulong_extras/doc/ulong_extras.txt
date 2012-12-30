@@ -515,6 +515,11 @@ mp_limb_t n_primes_next(n_primes_t iter)
     When this table is exhausted, primes are generated in blocks
     by calling \code{n_primes_sieve_range}.
 
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+
+    Changes the state of \code{iter} to start generating primes
+    after $n$ (excluding $n$ itself).
+
 void n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
 
     Extends the table of small primes in \code{iter} to contain
