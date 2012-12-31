@@ -57,13 +57,13 @@ void ppm1_set(ppm1_t L, ppm1_t M)
    fmpz_set(L->m, M->m);
 }
 
-void ppm1_mul(ppm1_t R, ppm1_t L, ppm1_t M, const fmpz_t n)
+void pp1_mul(ppm1_t R, ppm1_t L, ppm1_t M, const fmpz_t n, ulong c)
 {
    fmpz_t t;
    fmpz_init(t);
 
    fmpz_mul(t, L->m, M->m);
-   fmpz_mul_ui(t, t, 3);
+   fmpz_mul_ui(t, t, c);
    fmpz_addmul(t, L->l, M->l);
    if (fmpz_is_odd(t))
       fmpz_add(t, t, n);
@@ -81,13 +81,13 @@ void ppm1_mul(ppm1_t R, ppm1_t L, ppm1_t M, const fmpz_t n)
    fmpz_clear(t);
 }
 
-void ppm1_dup(ppm1_t R, ppm1_t L, const fmpz_t n)
+void pp1_dup(ppm1_t R, ppm1_t L, const fmpz_t n, ulong c)
 {
    fmpz_t t;
    fmpz_init(t);
    
    fmpz_mul(t, L->m, L->m);
-   fmpz_mul_ui(t, t, 3);
+   fmpz_mul_ui(t, t, c);
    fmpz_addmul(t, L->l, L->l);
    if (fmpz_is_odd(t))
       fmpz_add(t, t, n);
@@ -101,7 +101,7 @@ void ppm1_dup(ppm1_t R, ppm1_t L, const fmpz_t n)
    fmpz_clear(t);
 }
 
-void ppm1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n)
+void pp1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n, ulong c)
 {
    ppm1_t P;
    ppm1_init(P);
@@ -110,7 +110,7 @@ void ppm1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n)
 
    while ((exp % 2) == 0)
    {
-      ppm1_dup(P, P, n);
+      pp1_dup(P, P, n, c);
       exp >>= 1;
    }
 
@@ -119,65 +119,116 @@ void ppm1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n)
 
    while (exp)
    {
-      ppm1_dup(P, P, n);
+      pp1_dup(P, P, n, c);
       if ((exp % 2) == 1)
-         ppm1_mul(R, R, P, n);
+         pp1_mul(R, R, P, n, c);
       exp >>= 1;
    }
 
    ppm1_clear(P);
 }
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
+int pp1_find_power(fmpz_t factor, ppm1_t oldL, ulong p, ulong c, const fmpz_t n)
+{
+   do
+   {
+      pp1_pow_ui(oldL, oldL, p, n, c);
+      fmpz_gcd(factor, n, oldL->m);
+      if (fmpz_is_zero(factor))
+         return 0;
+   } while (fmpz_is_one(factor));
+
+   return 1;
+}
+
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
 {
    long i, j;
    int ret = 0;
-   ppm1_t L, M;
+   ppm1_t L, M, oldL;
    ulong pr, oldpr;
+   c = n_nextprime(c, 0);
+
+   if (fmpz_is_even(n))
+   {
+      fmpz_set_ui(factor, 2);
+      return 1;
+   }
 
    iters = 128*((iters + 127)/128); /* round to a multiple of 128 iterations */
 
    ppm1_init(L);
+   ppm1_init(oldL);
    ppm1_init(M);
 
    fmpz_set_ui(L->l, 1);
    fmpz_set_ui(L->m, 2);
 
    /* mul by various prime powers */
-   ppm1_pow_ui(L, L, 4096, n); /* 2^12 */
+   ppm1_set(oldL, L);
+   pp1_pow_ui(L, L, 4096, n, c); /* 2^12 */
    fmpz_gcd(factor, n, L->m);
+   if (fmpz_is_zero(factor))
+   {
+      ret = pp1_find_power(factor, oldL, 2, c, n);
+      goto cleanup;
+   }
+   if (!fmpz_is_one(factor))
+   {
+      ret = 1;
+      goto cleanup;
+   }
+   
+   ppm1_set(oldL, L);
+   pp1_pow_ui(L, L, 59049, n, c); /* 3^10 */
+   fmpz_gcd(factor, n, L->m);
+   if (fmpz_is_zero(factor))
+   {
+      ret = pp1_find_power(factor, oldL, 3, c, n);
+      goto cleanup;
+   }
    if (!fmpz_is_one(factor))
    {
       ret = 1;
       goto cleanup;
    }
 
-   ppm1_pow_ui(L, L, 59049, n); /* 3^10 */
+   ppm1_set(oldL, L);
+   pp1_pow_ui(L, L, 390625, n, c); /* 5^8 */
    fmpz_gcd(factor, n, L->m);
+   if (fmpz_is_zero(factor))
+   {
+      ret = pp1_find_power(factor, oldL, 5, c, n);
+      goto cleanup;
+   }
    if (!fmpz_is_one(factor))
    {
       ret = 1;
       goto cleanup;
    }
 
-   ppm1_pow_ui(L, L, 390625, n); /* 5^8 */
+   ppm1_set(oldL, L);
+   pp1_pow_ui(L, L, 117649, n, c); /* 7^6 */
    fmpz_gcd(factor, n, L->m);
+   if (fmpz_is_zero(factor))
+   {
+      ret = pp1_find_power(factor, oldL, 7, c, n);
+      goto cleanup;
+   }
    if (!fmpz_is_one(factor))
    {
       ret = 1;
       goto cleanup;
    }
 
-   ppm1_pow_ui(L, L, 117649, n); /* 7^6 */
+   ppm1_set(oldL, L);
+   pp1_pow_ui(L, L, 14641, n, c); /* 11^4 */
    fmpz_gcd(factor, n, L->m);
-   if (!fmpz_is_one(factor))
+   if (fmpz_is_zero(factor))
    {
-      ret = 1;
+      ret = pp1_find_power(factor, oldL, 11, c, n);
       goto cleanup;
    }
-
-   ppm1_pow_ui(L, L, 14641, n); /* 11^4 */
-   fmpz_gcd(factor, n, L->m);
    if (!fmpz_is_one(factor))
    {
       ret = 1;
@@ -194,9 +245,9 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
       {
          pr = n_nextprime(pr, 0);
          if (i < 131072)
-            ppm1_pow_ui(L, L, pr*pr, n);
+            pp1_pow_ui(L, L, pr*pr, n, c);
          else
-            ppm1_pow_ui(L, L, pr, n);
+            pp1_pow_ui(L, L, pr, n, c);
       }
 
       fmpz_gcd(factor, n, L->m);
@@ -216,9 +267,9 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
       {
          pr = n_nextprime(pr, 0);
          if (i < 131072)
-            ppm1_pow_ui(L, L, pr*pr, n);
+            pp1_pow_ui(L, L, pr*pr, n, c);
          else
-            ppm1_pow_ui(L, L, pr, n);
+            pp1_pow_ui(L, L, pr, n, c);
 
          fmpz_gcd(factor, n, L->m);
          if (!fmpz_is_one(factor))
@@ -232,6 +283,7 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
 cleanup:
 
    ppm1_clear(L);
+   ppm1_clear(oldL);
    ppm1_clear(M);
 
    return ret;

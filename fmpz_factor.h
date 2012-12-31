@@ -79,7 +79,7 @@ void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
 void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters);
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c);
 
 #ifdef __cplusplus
 }

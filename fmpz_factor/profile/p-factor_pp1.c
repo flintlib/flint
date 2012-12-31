@@ -38,36 +38,39 @@ int main(void)
    fmpz_init(n);
    fmpz_init(p);
 
-   printf("Enter number to be factored: "); fflush(stdout);
-   if (!fmpz_read(n))
+   flint_rand_t state;
+   flint_randinit(state);
+
+   while(1)
    {
-      printf("Read failed\n");
-      abort();
-   }
+      printf("Enter number to be factored: "); fflush(stdout);
+      if (!fmpz_read(n))
+      {
+         printf("Read failed\n");
+         abort();
+      }
    
-   printf("Enter a number of iterations: "); fflush(stdout);
-   if (!scanf("%ld", &iters))
-   {
-      printf("Read failed\n");
-      abort();
-   }
+      printf("Enter a number of iterations: "); fflush(stdout);
+      if (!scanf("%ld", &iters))
+      {
+         printf("Read failed\n");
+         abort();
+      }
     
-   /* find prime such that n is a square mod p (or p divides n) */
-   if (fmpz_is_even(n))
-   {
-      printf("Factor: 2\n");
-      goto cleanup;
-   }
+      /* find prime such that n is a square mod p (or p divides n) */
+      if (fmpz_is_even(n))
+      {
+         printf("Factor: 2\n");
+      } else if (fmpz_factor_pp1(p, n, iters, n_randint(state, 100)))
+      {
+         printf("Factor: ");
+         fmpz_print(p);
+         printf("\n");
+      } else
+         printf("Factor not found!\n");
+   } while(1);
    
-   if (fmpz_factor_pp1(p, n, iters))
-   {
-      printf("Factor: ");
-      fmpz_print(p);
-      printf("\n");
-   } else
-      printf("Factor not found!\n");
-   
-cleanup:
+   flint_randclear(state);
 
    fmpz_clear(n);
    fmpz_clear(p);

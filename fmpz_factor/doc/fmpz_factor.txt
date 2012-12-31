@@ -74,11 +74,17 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
     them together one by one, although much more efficient algorithms
     exist. 
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
 
     Use Williams' $p + 1$ method to factor $n$, expending no more than 
     $O($\code{iters}$)$ iterations. If a factor is found, the function
     returns $1$ and \code{factor} is set to the factor that is found.
     Otherwise, the function returns $0$.
 
-    We require that $n$ be odd.
+    The value $c$ should be a random value, e.g. a random value between
+    $0$ and $100$ should be sufficient. Successive calls to the
+    function with different values of $c$ give additional chances to
+    factor $n$ with roughly exponentially decaying probability of 
+    finding a factor which has been missed (if $p+1$ or $p-1$ is not
+    smooth for any prime factors $p$ of $n$ then the function will
+    not ever succeed.
