@@ -65,12 +65,16 @@ void ppm1_mul(ppm1_t R, ppm1_t L, ppm1_t M, const fmpz_t n)
    fmpz_mul(t, L->m, M->m);
    fmpz_mul_ui(t, t, 3);
    fmpz_addmul(t, L->l, M->l);
+   if (fmpz_is_odd(t))
+      fmpz_add(t, t, n);
    fmpz_fdiv_q_2exp(t, t, 1);
    fmpz_mod(t, t, n);
 
    fmpz_mul(R->l, L->l, M->m);
    fmpz_swap(t, R->l);
    fmpz_addmul(t, L->m, M->l);
+   if (fmpz_is_odd(t))
+      fmpz_add(t, t, n);
    fmpz_fdiv_q_2exp(t, t, 1);
    fmpz_mod(R->m, t, n);
 
@@ -81,10 +85,12 @@ void ppm1_dup(ppm1_t R, ppm1_t L, const fmpz_t n)
 {
    fmpz_t t;
    fmpz_init(t);
-
+   
    fmpz_mul(t, L->m, L->m);
    fmpz_mul_ui(t, t, 3);
    fmpz_addmul(t, L->l, L->l);
+   if (fmpz_is_odd(t))
+      fmpz_add(t, t, n);
    fmpz_fdiv_q_2exp(t, t, 1);
    fmpz_mod(t, t, n);
 
@@ -194,13 +200,13 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
       }
 
       fmpz_gcd(factor, n, L->m);
+      if (fmpz_is_zero(factor))
+         break;
       if (!fmpz_is_one(factor))
       {
          ret = 1;
          goto cleanup;
       }
-      if (fmpz_is_zero(factor))
-         break;
    }
 
    if (i != iters) /* factor = 0 */
