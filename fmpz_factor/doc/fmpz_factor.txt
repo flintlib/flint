@@ -74,3 +74,11 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
     them together one by one, although much more efficient algorithms
     exist. 
 
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters)
+
+    Use Williams' $p + 1$ method to factor $n$, expending no more than 
+    $O($\code{iters}$)$ iterations. If a factor is found, the function
+    returns $1$ and \code{factor} is set to the factor that is found.
+    Otherwise, the function returns $0$.
+
+    We require that $n$ be odd.
