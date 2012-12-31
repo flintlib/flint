@@ -34,23 +34,36 @@ int main(int argc, char* argv[])
     n_primes_t iter;
     mp_limb_t p, N;
 
-    if (argc != 2)
+    if (argc < 2)
     {
-        printf("primegen N - print all primes smaller than N\n");
+        printf("primegen N - print all primes <= N\n");
+        printf("primegen -c N - generate the primes but just count them\n");
         return EXIT_FAILURE;
     }
 
-    N = strtoul(argv[1], NULL, 10);
+    N = strtoul(argv[argc-1], NULL, 10);
     if (N == ULONG_MAX)
     {
         printf("N must be smaller than %lu\n", ULONG_MAX);
         return EXIT_FAILURE;
     }
 
-    n_primes_init(iter);
-    while ((p = n_primes_next(iter)) < N)
-        printf("%lu\n", p);
-    n_primes_clear(iter);
+    if (argc == 3)
+    {
+        ulong count = 0;
+        n_primes_init(iter);
+        while ((p = n_primes_next(iter)) <= N)
+            count++;
+        n_primes_clear(iter);
+        printf("pi(%lu) = %lu\n", N, count);
+    }
+    else
+    {
+        n_primes_init(iter);
+        while ((p = n_primes_next(iter)) <= N)
+            printf("%lu\n", p);
+        n_primes_clear(iter);
+    }
 
     return EXIT_SUCCESS;
 }
