@@ -30,16 +30,17 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv, mp_ptr t)
+void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv)
 {
    mp_limb_t * a, * b, * mp, * fp, cy;
    __mpz_struct * rem;
    mp_bitcnt_t norm;
    long mn = fmpz_size(m);
    long fn = fmpz_size(f);
+   mp_limb_t t[71];
    
    if (fmpz_sgn(f) < 0 || fmpz_sgn(m) < 0
-    || mn < 2 || fn < mn)
+    || mn < 2 || mn > 30 || fn < mn)
    {
       fmpz_mod(r, f, m);
       return;

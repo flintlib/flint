@@ -33,6 +33,7 @@
 int main(void)
 {
    fmpz_t n, p;
+   ulong c;
    long iters;
    
    fmpz_init(n);
@@ -57,11 +58,15 @@ int main(void)
          abort();
       }
     
-      /* find prime such that n is a square mod p (or p divides n) */
+      do
+      {
+         c = n_randlimb(state);
+      } while (c <= 2UL);
+
       if (fmpz_is_even(n))
       {
          printf("Factor: 2\n");
-      } else if (fmpz_factor_pp1(p, n, iters, n_randint(state, 100)))
+      } else if (fmpz_factor_pp1(p, n, iters, c))
       {
          printf("Factor: ");
          fmpz_print(p);
