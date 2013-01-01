@@ -140,7 +140,7 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
 
     if (hlen > 0 && h->coeffs[0] != 0UL)
     {
-        printf("Exception: nmod_poly_exp_series: constant term != 0\n");
+        printf("Exception (nmod_poly_exp_series). Constant term != 0.\n");
         abort();
     }
 
@@ -181,8 +181,8 @@ nmod_poly_exp_series(nmod_poly_t f, const nmod_poly_t h, long n)
     if (hlen < n)
     {
         h_coeffs = _nmod_vec_init(n);
-        mpn_copyi(h_coeffs, h->coeffs, hlen);
-        mpn_zero(h_coeffs + hlen, n - hlen);
+        flint_mpn_copyi(h_coeffs, h->coeffs, hlen);
+        flint_mpn_zero(h_coeffs + hlen, n - hlen);
     }
     else
         h_coeffs = h->coeffs;

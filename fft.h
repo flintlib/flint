@@ -50,6 +50,7 @@ or implied, of William Hart.
 #endif
 
 #if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
+#define mpn_sumdiff_n __MPN(sumdiff_n)
 extern
 mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #endif
@@ -69,7 +70,7 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
 #define random_fermat(nn, state, limbs) \
    do { \
       if (n_randint(state, 10) == 0) { \
-         mpn_zero(nn, limbs); \
+         flint_mpn_zero(nn, limbs); \
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \

@@ -29,17 +29,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-/*
-    Computes $\log(1 - x) \bmod{p^N}$ where $y = 1 - x$.
-
-    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
-    so that the series converges.
-
-    Assumes that $v < N$.
-
-    Does not support aliasing between $y$ and $z$.
- */
 void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     if (N < 16)
@@ -77,6 +66,9 @@ void _padic_log_satoh(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
 int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
+    const fmpz *p = ctx->p;
+    const long N  = padic_prec(rop);
+
     if (padic_val(op) < 0)
     {
         return 0;
@@ -106,15 +98,15 @@ int padic_log_satoh(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             v = fmpz_remove(t, y, ctx->p);
             fmpz_clear(t);
 
-            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
+            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
             {
-                if (v >= ctx->N)
+                if (v >= N)
                 {
                     padic_zero(rop);
                 }
                 else
                 {
-                    _padic_log_satoh(padic_unit(rop), y, v, ctx->p, ctx->N);
+                    _padic_log_satoh(padic_unit(rop), y, v, p, N);
                     padic_val(rop) = 0;
                     padic_reduce(rop, ctx);
                 }

@@ -90,7 +90,7 @@ void fmpq_poly_div(fmpq_poly_t Q,
 
     if (fmpq_poly_is_zero(poly2))
     {
-        printf("Exception: division by zero in fmpq_poly_div\n");
+        printf("Exception (fmpq_poly_div). Division by zero.\n");
         abort();
     }
 

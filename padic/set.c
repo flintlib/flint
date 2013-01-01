@@ -19,21 +19,20 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
-void _padic_set(padic_t rop, const padic_t op)
+void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     fmpz_set(padic_unit(rop), padic_unit(op));
     padic_val(rop) = padic_val(op);
-}
 
-void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
-{
-    _padic_set(rop, op);
-    _padic_reduce(rop, ctx);
+    if (padic_prec(rop) < padic_prec(op))
+    {
+        _padic_reduce(rop, ctx);
+    }
 }
 

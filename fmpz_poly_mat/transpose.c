@@ -30,12 +30,11 @@
 void
 fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 {
-    fmpz tmp;
     long i, j;
 
     if (B->r != A->c || B->c != A->r)
     {
-        printf("Exception (fmpz_poly_mat_transpose):  Incompatible dimensions.\n");
+        printf("Exception (fmpz_poly_mat_transpose). Incompatible dimensions.\n");
         abort();
     }
 

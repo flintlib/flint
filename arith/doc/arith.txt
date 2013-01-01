@@ -48,7 +48,7 @@ void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
 
     Table lookup is used for $H_n$ whose numerator and denominator 
     fit in single limb. For larger $n$, the function
-    \code{mpn_harmonic_odd_balanced()} is used.
+    \code{flint_mpn_harmonic_odd_balanced()} is used.
 
 void arith_harmonic_number(fmpq_t x, long n)
 

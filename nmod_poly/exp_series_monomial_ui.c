@@ -94,8 +94,8 @@ nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
 
     if (power == 0)
     {
-        printf("Exception: nmod_poly_exp_series_monomial_ui: "
-                    "constant term != 0\n");
+        printf("Exception (nmod_poly_exp_series_monomial_ui). \n"
+               "Constant term != 0.\n");
         abort();
     }
 

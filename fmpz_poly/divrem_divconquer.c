@@ -136,7 +136,7 @@ fmpz_poly_divrem_divconquer(fmpz_poly_t Q, fmpz_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_divrem_divconquer\n");
+        printf("Exception (fmpz_poly_divrem_divconquer). Division by zero.\n");
         abort();
     }
 

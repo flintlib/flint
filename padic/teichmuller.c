@@ -27,7 +27,7 @@
 
 void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
-    if (*p == 2L)
+    if (fmpz_equal_ui(p, 2))
     {
         fmpz_one(rop);
     }
@@ -43,14 +43,12 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         fmpz_t inv;
         fmpz_t pm1;
 
-        n = FLINT_CLOG2(N) + 1;
-
-        a = flint_malloc(n * sizeof(long));
-        for (a[i = 0] = N; a[i] > 1; i++)
-            a[i + 1] = (a[i] + 1) / 2;
+        a = _padic_lifts_exps(&n, N);
 
         pow = _fmpz_vec_init(2 * n);
         u   = pow + n;
+
+        _padic_lifts_pows(pow, a, n, p);
 
         fmpz_init(s);
         fmpz_init(t);
@@ -58,31 +56,6 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         fmpz_init(pm1);
 
         fmpz_sub_ui(pm1, p, 1);
-
-        /* Compute powers of p */
-        {
-            fmpz_one(t);
-            fmpz_set(pow + i, p);
-        }
-        for (i--; i >= 1; i--)
-        {
-            if (a[i] & 1L)
-            {
-                fmpz_mul(pow + i, t, pow + (i + 1));
-                fmpz_mul(t, t, t);
-            }
-            else
-            {
-                fmpz_mul(t, t, pow + (i + 1));
-                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-            }
-        }
-        {
-            if (a[i] & 1L)
-                fmpz_mul(pow + i, t, pow + (i + 1));
-            else
-                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-        }
 
         /* Compute reduced units for (p-1) */
         {
@@ -133,17 +106,18 @@ void padic_teichmuller(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     if (padic_val(op) < 0)
     {
-        printf("ERROR (padic_teichmuller).  op is not a p-adic integer.\n");
+        printf("Exception (padic_teichmuller).  op is not a p-adic integer.\n");
         abort();
     }
 
-    if (_padic_is_zero(op) || padic_val(op) > 0 || ctx->N <= 0)
+    if (padic_is_zero(op) || padic_val(op) > 0 || padic_prec(rop) <= 0)
     {
         padic_zero(rop);
-        return;
     }
-
-    _padic_teichmuller(padic_unit(rop), padic_unit(op), ctx->p, ctx->N);
-    padic_val(rop) = 0;
+    else
+    {
+        _padic_teichmuller(padic_unit(rop), padic_unit(op), ctx->p, padic_prec(rop));
+        padic_val(rop) = 0;
+    }
 }
 

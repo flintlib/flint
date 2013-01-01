@@ -49,7 +49,7 @@ void test_exact(int d)
             mpz_set(a2, a);
             mpz_set_ui(b, d);
             mpz_pow_ui(b, b, j);
-            a->_mp_size = mpn_remove_power_ascending(a->_mp_d, a->_mp_size,
+            a->_mp_size = flint_mpn_remove_power_ascending(a->_mp_d, a->_mp_size,
                 b->_mp_d, b->_mp_size, &exp);
             mpz_pow_ui(b, b, exact);
             mpz_tdiv_q(c, a2, b);

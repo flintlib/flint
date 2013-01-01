@@ -151,7 +151,7 @@ void _fmpz_demote_val(fmpz_t f)
     /* don't do anything if value has to be multi precision */
 }
 
-void _fmpz_init_readonly_mpz(fmpz_t f, mpz_t z)
+void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z)
 {
    __mpz_struct *ptr;
    *f = 0L;

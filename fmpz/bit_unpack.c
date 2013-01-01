@@ -99,7 +99,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
         if (shift)
             mpn_rshift(p, arr, l, shift);
         else
-            mpn_copyi(p, arr, l);
+            flint_mpn_copyi(p, arr, l);
 
         /* shift in any rem_bits that weren't already shifted */
         if (limbs + (rem_bits != 0) > l)
@@ -197,7 +197,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
         if (shift)
             mpn_rshift(p, arr, l, shift);
         else
-            mpn_copyi(p, arr, l);
+            flint_mpn_copyi(p, arr, l);
 
         /* shift in any rem_bits that weren't already shifted */
         if (limbs + (rem_bits != 0) > l)

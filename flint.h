@@ -147,8 +147,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 
 #define FLINT_CLOG2(k)  FLINT_BIT_COUNT((k) - 1)
 
-#undef mpn_zero
-#define mpn_zero(xxx, nnn) \
+#define flint_mpn_zero(xxx, nnn) \
     do \
     { \
         long ixxx; \
@@ -156,24 +155,21 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
             (xxx)[ixxx] = 0UL; \
     } while (0)
 
-#undef mpn_copyi
-#define mpn_copyi(xxx, yyy, nnn) \
+#define flint_mpn_copyi(xxx, yyy, nnn) \
    do { \
       long ixxx; \
       for (ixxx = 0; ixxx < (nnn); ixxx++) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
-#undef mpn_copyd
-#define mpn_copyd(xxx, yyy, nnn) \
+#define flint_mpn_copyd(xxx, yyy, nnn) \
    do { \
       long ixxx; \
       for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
-#undef mpn_store
-#define mpn_store(xxx, nnn, yyy) \
+#define flint_mpn_store(xxx, nnn, yyy) \
    do \
    { \
       long ixxx; \

@@ -81,7 +81,7 @@ void _fmpz_demote(fmpz_t f)
 
 void _fmpz_demote_val(fmpz_t f);
 
-void _fmpz_init_readonly_mpz(fmpz_t f, mpz_t z);
+void _fmpz_init_readonly_mpz(fmpz_t f, const mpz_t z);
 
 void _fmpz_clear_readonly_mpz(mpz_t);
 
@@ -135,7 +135,7 @@ void fmpz_clear(fmpz_t f)
 
 void fmpz_randbits(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
-void fmpz_randm(fmpz_t f, flint_rand_t state, fmpz_t m);
+void fmpz_randm(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 void fmpz_randtest(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits);
 
@@ -241,6 +241,10 @@ int fmpz_is_pm1(const fmpz_t f)
 void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
+
+int fmpz_equal_si(const fmpz_t f, long g);
+
+int fmpz_equal_ui(const fmpz_t f, ulong g);
 
 int fmpz_read(fmpz_t f);
 
@@ -396,13 +400,21 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
+mp_limb_t fmpz_preinv1(const fmpz_t f);
+
+void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv);
+
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
 
+void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
+
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
+
+int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
 
 long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv);
 
@@ -569,6 +581,9 @@ mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits);
 
 mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits);
 
+int fmpz_is_probabprime(const fmpz_t p);
+
+int fmpz_is_prime_pseudosquare(fmpz_t n);
 
 #ifdef __cplusplus
 }

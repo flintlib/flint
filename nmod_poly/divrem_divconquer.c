@@ -71,7 +71,7 @@ void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
            then compute R = A - BQ
          */
 
-        mpn_copyi(R, d2q1, n2);
+        flint_mpn_copyi(R, d2q1, n2);
         _nmod_vec_add(R + n2, R + n2, d2q1 + n2, n1 - 1, mod);
         _nmod_vec_sub(R, A, R, lenB - 1, mod);
 
@@ -141,7 +141,7 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_divrem_divconquer\n");
+        printf("Exception (nmod_poly_divrem_divconquer). Division by zero.\n");
         abort();
     }
 

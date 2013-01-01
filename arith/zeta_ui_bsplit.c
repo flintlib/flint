@@ -176,7 +176,7 @@ mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd)
 
     if (s < 2)
     {
-        printf("Error: zeta(s) with s < 2");
+        printf("Exception (mpfr_zeta_ui_bsplit). s < 2.\n");
         abort();
     }
 

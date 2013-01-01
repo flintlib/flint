@@ -67,7 +67,7 @@ int main(void)
        g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(mp_limb_t));
        temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
 
-       result = mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
+       result = flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
        g->_mp_size = c->_mp_size - b->_mp_size + 1;
        g->_mp_size -= (g->_mp_d[g->_mp_size - 1] == 0);
        
@@ -107,7 +107,7 @@ int main(void)
        g->_mp_d = flint_malloc((c->_mp_size - b->_mp_size + 1)*sizeof(mp_limb_t));
        temp = flint_malloc(b->_mp_size * sizeof(mp_limb_t));
 
-       result = !mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
+       result = !flint_mpn_divides(g->_mp_d, c->_mp_d, c->_mp_size, b->_mp_d, b->_mp_size, temp);
        
        if (!result)
        {

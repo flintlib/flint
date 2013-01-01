@@ -46,7 +46,7 @@ fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
 
     if (c == 0)
     {
-        printf("Exception in fmpz_mat_CRT_ui: m1 not invertible modulo m2!\n");
+        printf("Exception (fmpz_mat_CRT_ui). m1 not invertible modulo m2.\n");
         abort();
     }
 

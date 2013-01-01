@@ -289,7 +289,7 @@ Johansson, Andy Novocin and David Harvey (no longer active).
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
 machines. There is also limited optimisation for ARM and ia64 machines. As 
-of version 2.0, FLINT required GCC version 2.96 or later, MPIR 2.1.1 or 
+of version 2.0, FLINT required GCC version 2.96 or later, MPIR 2.6.0 or 
 later and MPFR 3.0.0 or later. It is also required that the platform 
 provide a \code{uint64_t} type if a native 64 bit type is not available. 
 Full C99 compliance is \textbf{not} required.
@@ -307,7 +307,7 @@ file \code{fmpz_poly/test/t-add.c}.
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
 
-FLINT requires MPIR version 2.1.1 or later and MPFR 3.0.0 or later and
+FLINT requires MPIR version 2.6.0 or later and MPFR 3.0.0 or later and
 a pthread implementation. Some of the input/output tests require 
 \code{fork} and \code{pipe}, however these are disabled on MinGW which
 does not provide a posix implementation.
@@ -457,7 +457,7 @@ If possible please include details of your system, the version of GCC,
 the versions of MPIR and MPFR as well as precise details of how to 
 replicate the bug.
 
-Note that FLINT needs to be linked against version 2.1.1 or later of MPIR,
+Note that FLINT needs to be linked against version 2.6.0 or later of MPIR,
 version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
 or later.  
 
@@ -1376,24 +1376,24 @@ We now describe the functions available in \code{fmpz_mod_poly}.
 
 \section{Introduction}
 
-The \code{padic_t} data type represents elements of $\mathbf{Q}_p$, 
-stored in the form $x = p^v u$ with $u, v \in \mathbf{Z}$.  Arithmetic 
-operations can be carried out with respect to a context containing 
-the prime number $p$ and precision $N$.
+The \code{padic_t} data type represents elements of $\mathbf{Q}_p$ to 
+precision~$N$, stored in the form $x = p^v u$ with $u, v \in \mathbf{Z}$. 
+Arithmetic operations can be carried out with respect to a context 
+containing the prime number $p$ and various pieces of pre-computed data.
 
 Independent of the context, we consider a $p$-adic number 
 $x = u p^v$ to be in \emph{canonical form} whenever either 
-$p \nmid u$ or $u = v = 0$.
+$p \nmid u$ or $u = v = 0$, and we say it is \emph{reduced} 
+if, in addition, for non-zero~$u$, $u \in (0, p^{N-v})$.
 
-With a given context, i.e.\ a prime $p$ and a precision $N$, in 
-mind, we say a $p$-adic number $x = u p^v$ is \emph{reduced} if 
-either $u = v = 0$ or $p \nmid u$ and $u \in (0, p^N)$.
+We briefly describe the interface:
 
-The main idea behind the treatment of the precision is that 
-where possible $p$-adic numbers that are input arguments to 
-a function are interpreted as exact $p$-adic numbers and the 
-precision of the context object is only used as the precision 
-to which the output is to be computed.
+The functions in this module expect arguments of type \code{padic_t}, 
+and each variable carries its own precision.  The functions have an 
+interface that is similar to the MPFR functions.  In particular, they 
+have the same semantics, specified as follows:  Compute the requested 
+operation exactly and then reduce the result to the precision of the 
+output variable.
 
 \input{input/padic.tex}
 

@@ -50,7 +50,7 @@ nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n)
 
     if (h_len > 0 && h->coeffs[0] != 0UL)
     {
-        printf("Exception: nmod_poly_cosh_series: constant term != 0\n");
+        printf("Exception (nmod_poly_cosh_series). Constant term != 0.\n");
         abort();
     }
 
@@ -65,8 +65,8 @@ nmod_poly_cosh_series(nmod_poly_t g, const nmod_poly_t h, long n)
     if (h_len < n)
     {
         h_coeffs = _nmod_vec_init(n);
-        mpn_copyi(h_coeffs, h->coeffs, h_len);
-        mpn_zero(h_coeffs + h_len, n - h_len);
+        flint_mpn_copyi(h_coeffs, h->coeffs, h_len);
+        flint_mpn_zero(h_coeffs + h_len, n - h_len);
     }
     else
         h_coeffs = h->coeffs;

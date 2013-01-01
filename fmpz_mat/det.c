@@ -37,7 +37,7 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 
     if (dim != A->c)
     {
-        printf("fmpz_mat_det: nonsquare matrix");
+        printf("Exception (fmpz_mat_det). Non-square matrix.\n");
         abort();
     }
 
