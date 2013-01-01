@@ -112,6 +112,22 @@ int flint_mpn_divides(mp_ptr q, mp_srcptr array1,
 
     Assumes limbs1 \code{limbs1 >= limbsg > 0}.
 
+mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
+
+   Computes a precomputed inverse from the leading two limbs of the
+   divisor \code{b, n} to be used with the \code{preinv1} functions.
+
+mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a,
+                  mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+
+   Divide \code{a, m} by \code{b, n}, returning the high limb of the 
+   quotient (which will either be 0 or 1), storing the remainder in-place 
+   in \code{a, n} and the rest of the quotient in \code{q, m - n}.
+   We require the most significant bit of \code{b, n} to be 1.
+   dinv must be computed from \code{b[n - 1]}, \code{b[n - 2]} by 
+   flint_mpn_preinv1.
+   Thus, currently we require n >= 2 and m >= n.
+
 *******************************************************************************
 
     GCD
