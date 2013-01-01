@@ -40,7 +40,7 @@ void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv)
    mp_limb_t t[71];
    
    if (fmpz_sgn(f) < 0 || fmpz_sgn(m) < 0
-    || mn < 2 || mn > 30 || fn < mn)
+    || mn < 2 || fn > 70 || fn < mn)
    {
       fmpz_mod(r, f, m);
       return;

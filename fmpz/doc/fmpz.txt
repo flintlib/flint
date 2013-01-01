@@ -656,7 +656,7 @@ mp_limb_t fmpz_div_preinvert1(const fmpz_t f)
     functions.
 
 void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, 
-                         const fmpz_t m, mp_limb_t dinv, mp_ptr t)
+                                      const fmpz_t m, mp_limb_t dinv)
 
     As per \code{fmpz_mod} except that a precomputed inverse
     \code{dinv} is to be supplied, as computed by 
@@ -665,9 +665,6 @@ void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f,
     least $2$ limbs. The code reverts to using \code{fmpz_mod} in
     the case that the inputs are negative or $m$ is only a single
     limb.
-
-    We require \code{fmpz_size(m) + 1} limbs of temporary space in 
-    $t$.
 
 ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
 
