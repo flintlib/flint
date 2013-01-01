@@ -174,12 +174,12 @@ int pp1_find_power(fmpz_t factor, ppm1_t oldL, ulong p, const fmpz_t n, mp_limb_
    return 1;
 }
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
 {
    long i, j;
    int ret = 0;
    ppm1_t L, M, oldL;
-   ulong pr, oldpr;
+   ulong pr, oldpr, sqrt, bits0;
    mp_limb_t ninv;
    
    if (fmpz_is_even(n))
@@ -188,9 +188,10 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
       return 1;
    }
 
-   ninv = fmpz_preinv1(n);
+   sqrt = n_sqrt(B0);
+   bits0 = FLINT_BIT_COUNT(B0);
 
-   iters = 1024*((iters + 1023)/1024); /* round to a multiple of 128 iterations */
+   ninv = fmpz_preinv1(n);
 
    ppm1_init(L);
    ppm1_init(oldL);
@@ -276,16 +277,19 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
 
    pr = 11;
    oldpr = 11;
-   for (i = 0; i < iters; )
+   for (i = 0; pr < B0; )
    {
       j = i + 1024;
       oldpr = pr;
       for ( ; i < j; i++)
       {
          pr = n_nextprime(pr, 0);
-         if (i < 131072)
-            pp1_pow_ui(L, L, pr*pr, n, ninv);
-         else
+         if (pr < sqrt)
+         {
+            ulong bits = FLINT_BIT_COUNT(pr);
+            ulong exp = bits0 / bits;
+            pp1_pow_ui(L, L, n_pow(pr, exp), n, ninv);
+         } else
             pp1_pow_ui(L, L, pr, n, ninv);
       }
       
@@ -299,15 +303,18 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c)
       }
    }
 
-   if (i != iters) /* factor = 0 */
+   if (pr < B0) /* factor = 0 */
    {
       pr = oldpr;
       do
       {
          pr = n_nextprime(pr, 0);
-         if (i < 131072)
-            pp1_pow_ui(L, L, pr*pr, n, ninv);
-         else
+         if (pr < sqrt)
+         {
+            ulong bits = FLINT_BIT_COUNT(pr);
+            ulong exp = bits0 / bits;
+            pp1_pow_ui(L, L, n_pow(pr, exp), n, ninv);
+         } else
             pp1_pow_ui(L, L, pr, n, ninv);
 
          pp1_factor(factor, n, L->l);
