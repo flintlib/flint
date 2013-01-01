@@ -126,7 +126,7 @@ void pp1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n, mp_limb_t ninv)
 {
    fmpz_t L0;
    
-   ulong b = FLINT_BIT_COUNT(exp-1);
+   ulong b = FLINT_BIT_COUNT(exp);
    ulong bit = (1UL<<(b - 1));
 
    fmpz_init(L0);
