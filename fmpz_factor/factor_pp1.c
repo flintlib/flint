@@ -64,53 +64,15 @@ void ppm1_print(ppm1_t L)
 
 void pp1_2k(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int sec)
 {
-   fmpz_t t;
-   fmpz_init(t);
-   
    if (sec)
    {
-      fmpz_mul(t, L->l, L->m);
-      fmpz_sub(t, t, L0);
+      fmpz_mul(R->m, L->l, L->m);
+      fmpz_sub(R->m, R->m, L0);
    }
 
    fmpz_mul(R->l, L->l, L->l);
    fmpz_sub_ui(R->l, R->l, 2);
    
-   if (sec)
-   {
-      if (fmpz_sgn(t) < 0)
-         fmpz_add(R->m, t, n);
-      else
-         fmpz_mod_preinv1(R->m, t, n, ninv);
-   }
-
-   if (fmpz_sgn(R->l) < 0)
-      fmpz_add(R->l, R->l, n);
-   else
-      fmpz_mod_preinv1(R->l, R->l, n, ninv);
-   
-   fmpz_clear(t);
-}
-
-void pp1_2kp1(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int sec)
-{
-   fmpz_t t;
-   fmpz_init(t);
-   
-   fmpz_mul(t, L->l, L->m);
-   fmpz_sub(t, t, L0);
-   
-   if (sec)
-   {
-      fmpz_mul(R->m, L->m, L->m);
-      fmpz_sub_ui(R->m, R->m, 2);
-   }
-
-   if (fmpz_sgn(t) < 0)
-      fmpz_add(R->l, t, n);
-   else
-      fmpz_mod_preinv1(R->l, t, n, ninv);
-
    if (sec)
    {
       if (fmpz_sgn(R->m) < 0)
@@ -119,7 +81,35 @@ void pp1_2kp1(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int
          fmpz_mod_preinv1(R->m, R->m, n, ninv);
    }
 
-   fmpz_clear(t);
+   if (fmpz_sgn(R->l) < 0)
+      fmpz_add(R->l, R->l, n);
+   else
+      fmpz_mod_preinv1(R->l, R->l, n, ninv);
+}
+
+void pp1_2kp1(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int sec)
+{
+   fmpz_mul(R->l, L->l, L->m);
+   fmpz_sub(R->l, R->l, L0);
+   
+   if (sec)
+   {
+      fmpz_mul(R->m, L->m, L->m);
+      fmpz_sub_ui(R->m, R->m, 2);
+   }
+
+   if (fmpz_sgn(R->l) < 0)
+      fmpz_add(R->l, R->l, n);
+   else
+      fmpz_mod_preinv1(R->l, R->l, n, ninv);
+
+   if (sec)
+   {
+      if (fmpz_sgn(R->m) < 0)
+         fmpz_add(R->m, R->m, n);
+      else
+         fmpz_mod_preinv1(R->m, R->m, n, ninv);
+   }
 }
 
 void pp1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n, mp_limb_t ninv)
