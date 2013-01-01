@@ -28,15 +28,9 @@ fmpz
 
 * Inline or create inline versions of core fmpz functions.
 
-* Inline mpz_get/set_ui in core fmpz functions.
-
 * [maybe] Avoid the double allocation of both an mpz struct and limb data,
   having an fmpz point directly to a combined structure. This would require
   writing replacements for most mpz functions.
-
-* Consider using mpz's instead of fmpz's in the multi CRT code
-
-* Improve, document and test fmpz_fdiv_r.
 
 
 ulong_extras
@@ -130,25 +124,18 @@ nmod_poly
 * Determine cutoffs for compose_series_divconquer for default use in
   compose_series (only when one polynomial is small).
 
-* Write an asymptotically fast nmod_poly_interpolate_nmod_vec
-
 * Add asymptotically fast resultants?
 
 * Optimise, write an underscore version of, and test
   nmod_poly_remove
 
-* Implement modular composition
-
-* Improve powmod and powpowmod using precomputed Newton inverse,
-  2^k-ary/sliding window powering, and the Kaltofen-Shoup
-  baby step giant step technique
+* Improve powmod and powpowmod using precomputed Newton inverse and
+  2^k-ary/sliding window powering.
 
 * Maybe restructure the code in factor.c
 
 * Add a (fast) function to convert an nmod_poly_factor_t to
   an expanded polynomial
-
-* Write proper nmod_poly_rem functions and use throughout
 
 
 fmpz_poly
@@ -189,8 +176,6 @@ fmpq_poly
 
 * add fmpq_poly_fprint_pretty
 
-* Add fmpq versions of functions that take mpq input or output.
-
 * Rewrite _fmpq_poly_interpolate_fmpz_vec to use the Newton form as done
   in the fmpz_poly interpolation function. In general this should
   be much faster.
@@ -201,6 +186,8 @@ fmpq_poly
 * Add mulhigh
 
 * Add asymptotically fast resultants?
+
+* Add pow_trunc
 
 
 fmpz_mod_poly
@@ -293,8 +280,6 @@ fmpz_mat
 
 * Write multiplication functions optimised for sparse matrices by changing
   the loop order and discarding zero multipliers.
-
-* Implement fmpz_mat_pow.
 
 * Implement fast null space computation.
 
