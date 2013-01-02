@@ -31,33 +31,14 @@
 #include "mpn_extras.h"
 #include "ulong_extras.h"
 
-typedef struct
+void pp1_set(mp_ptr x1, mp_ptr y1, 
+              mp_srcptr x2, mp_srcptr y2, mp_size_t nn)
 {
-   fmpz_t l;
-   fmpz_t m;
-} ppm1_struct;
-
-typedef ppm1_struct ppm1_t[1];
-
-void ppm1_init(ppm1_t L)
-{
-   fmpz_init(L->l);
-   fmpz_init(L->m);
+   mpn_copyi(x1, x2, nn);
+   mpn_copyi(y1, y2, nn);
 }
 
-void ppm1_clear(ppm1_t L)
-{
-   fmpz_clear(L->l);
-   fmpz_clear(L->m);
-}
-
-void ppm1_set(ppm1_t L, ppm1_t M)
-{
-   fmpz_set(L->l, M->l);
-   fmpz_set(L->m, M->m);
-}
-
-void ppm1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
+void pp1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
 {
    mp_ptr tx = flint_malloc(nn*sizeof(mp_limb_t));
    mp_ptr ty = flint_malloc(nn*sizeof(mp_limb_t));
@@ -227,18 +208,12 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
    flint_mpn_preinvn(ninv, n, nn);
    
    mpn_zero(x, nn);
-   c=99;
    x[0] = (c << norm);
    if (nn > 1 && norm)
       x[1] = (c >> (FLINT_BITS - norm));
 
-   flint_mpn_mulmod_preinvn(y, x, x, nn, n, ninv, norm);
-   if (mpn_sub_1(y, y, nn, 2UL << norm))
-      mpn_add_n(y, y, n, nn);
-
    /* mul by various prime powers */
-   mpn_copyi(oldx, x, nn);
-   mpn_copyi(oldy, y, nn);
+   pp1_set(oldx, oldy, x, y, nn);
    pp1_pow_ui(x, y, nn, 4096, n, ninv, norm); /* 2^12 */
    r = pp1_factor(factor, n, x, nn, norm);
    if (r == 0)
@@ -252,8 +227,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       goto cleanup;
    }
    
-   mpn_copyi(oldx, x, nn);
-   mpn_copyi(oldy, y, nn);
+   pp1_set(oldx, oldy, x, y, nn);
    pp1_pow_ui(x, y, nn, 59049, n, ninv, norm); /* 3^10 */
    r = pp1_factor(factor, n, x, nn, norm);
    if (r == 0)
@@ -267,8 +241,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       goto cleanup;
    }
    
-   mpn_copyi(oldx, x, nn);
-   mpn_copyi(oldy, y, nn);
+   pp1_set(oldx, oldy, x, y, nn);
    pp1_pow_ui(x, y, nn, 390625, n, ninv, norm); /* 5^8 */
    r = pp1_factor(factor, n, x, nn, norm);
    if (r == 0)
@@ -282,8 +255,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       goto cleanup;
    }
    
-   mpn_copyi(oldx, x, nn);
-   mpn_copyi(oldy, y, nn);
+   pp1_set(oldx, oldy, x, y, nn);
    pp1_pow_ui(x, y, nn, 117649, n, ninv, norm); /* 7^6 */
    r = pp1_factor(factor, n, x, nn, norm);
    if (r == 0)
@@ -297,8 +269,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       goto cleanup;
    }
    
-   mpn_copyi(oldx, x, nn);
-   mpn_copyi(oldy, y, nn);
+   pp1_set(oldx, oldy, x, y, nn);
    pp1_pow_ui(x, y, nn, 14641, n, ninv, norm); /* 11^4 */
    r = pp1_factor(factor, n, x, nn, norm);
    if (r == 0)
