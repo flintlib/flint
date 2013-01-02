@@ -188,12 +188,15 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
    mp_size_t nn = fmpz_size(n_in), r;
    mp_ptr x, y, oldx, oldy, n, ninv, factor;
    ulong pr, oldpr, sqrt, bits0, norm;
-   
+   n_primes_t iter;
+
    if (fmpz_is_even(n_in))
    {
       fmpz_set_ui(fac, 2);
       return 1;
    }
+
+   n_primes_init(iter);
 
    sqrt = n_sqrt(B0);
    bits0 = FLINT_BIT_COUNT(B0);
@@ -309,15 +312,18 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       goto cleanup;
    }
    
+   n_primes_jump_after(iter, 11);
+   
    pr = 11;
    oldpr = 11;
+
    for (i = 0; pr < B0; )
    {
       j = i + 1024;
       oldpr = pr;
       for ( ; i < j; i++)
       {
-         pr = n_nextprime(pr, 0);
+         pr = n_primes_next(iter);
          if (pr < sqrt)
          {
             ulong bits = FLINT_BIT_COUNT(pr);
@@ -339,10 +345,11 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
 
    if (pr < B0) /* factor = 0 */
    {
-      pr = oldpr;
+      n_primes_jump_after(iter, oldpr);
+      
       do
       {
-         pr = n_nextprime(pr, 0);
+         pr = n_primes_next(iter);
          if (pr < sqrt)
          {
             ulong bits = FLINT_BIT_COUNT(pr);
@@ -377,5 +384,7 @@ cleanup:
    flint_free(n);
    flint_free(ninv);
    
+   n_primes_clear(iter);
+
    return ret;
 }

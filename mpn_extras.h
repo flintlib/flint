@@ -200,9 +200,6 @@ mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a,
 
 void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
 
-mp_limb_t flint_mpn_rem2n_preinvn(mp_ptr a, 
-                        mp_srcptr b, mp_size_t n, mp_srcptr dinv);
-
 void flint_mpn_mulmod_preinvn(mp_ptr r, 
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm);

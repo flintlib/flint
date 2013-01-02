@@ -402,12 +402,6 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 mp_limb_t fmpz_preinv1(const fmpz_t f);
 
-void fmpz_preinvn(mp_ptr finv, const fmpz_t f);
-
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv);
-
-void fmpz_mod2n_preinvn(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_srcptr dinv);
-
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);

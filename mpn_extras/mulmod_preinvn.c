@@ -23,62 +23,41 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "longlong.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
 
-void fmpz_mod2n_preinvn(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_srcptr dinv)
+void flint_mpn_mulmod_preinvn(mp_ptr r, 
+        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+        mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
-   mp_ptr a, b, mp, fp;
-   __mpz_struct * rem;
-   mp_bitcnt_t norm;
-   long mn = fmpz_size(m);
-   long fn = fmpz_size(f);
-   mp_limb_t ts[30], cy;
-   
-   rem = _fmpz_promote(r);
-   mpz_realloc(rem, 2*mn);
-   
-   mp = COEFF_TO_PTR(*m)->_mp_d;
-   fp = COEFF_TO_PTR(*f)->_mp_d;
-   count_leading_zeros(norm, mp[mn - 1]);
+   mp_limb_t cy;
+   mp_limb_t ts[150];
+   mp_ptr t;
 
-   a = rem->_mp_d;
-   mpn_zero(a + fn, 2*mn - fn);
+   if (n <= 30)
+      t = ts;
+   else
+      t = flint_malloc(5*n*sizeof(mp_limb_t));
 
+   mpn_mul_n(t, a, b, n);
    if (norm)
-   {
-      cy = mpn_lshift(a, fp, fn, norm);
-      if (cy)
-      {
-         a[fn] = cy;
-         fn++;
-      }
-      
-      if (mn > 30)
-         b = flint_malloc(mn*sizeof(mp_limb_t));
-      else
-         b = ts;
-      mpn_lshift(b, mp, mn, norm);
-   } else
-   {
-      flint_mpn_copyi(a, fp, fn);
-      b = mp;
-   }
+      mpn_rshift(t, t, 2*n, norm);
+
+   mpn_mul_n(t + 3*n, t + n, dinv, n);
+   mpn_add_n(t + 4*n, t + 4*n, t + n, n);
+
+   mpn_mul_n(t + 2*n, t + 4*n, d, n);
+   cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n);
+
+   while (cy > 0)
+      cy -= mpn_sub_n(r, r, d, n);
    
-   flint_mpn_rem2n_preinvn(a, b, mn, dinv);
+   if (mpn_cmp(r, d, n) >= 0)
+      mpn_sub_n(r, r, d, n);
 
-   if (norm)
-   {
-      mpn_rshift(a, a, fn, norm);
-      if (mn > 30)
-         flint_free(b);
-   }
-
-   MPN_NORM(a, fn);
-   rem->_mp_size = fn;
-   _fmpz_demote_val(r);
+   if (n > 30)
+      flint_free(t);
 }

@@ -650,22 +650,6 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
     \code{unsigned long}.  If $x$ is $0$ an exception will result.
 
-mp_limb_t fmpz_div_preinvert1(const fmpz_t f)
-
-    Compute a precomputed inverse of $f$ for use in the \code{preinv1}
-    functions.
-
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, 
-                                      const fmpz_t m, mp_limb_t dinv)
-
-    As per \code{fmpz_mod} except that a precomputed inverse
-    \code{dinv} is to be supplied, as computed by 
-    \code{fmpz_preinv1}. This will be faster than \code{fmpz_mod}
-    so long as $m$ is not too large (e.g. under $30$ limbs) and at
-    least $2$ limbs. The code reverts to using \code{fmpz_mod} in
-    the case that the inputs are negative or $m$ is only a single
-    limb.
-
 ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
 
     Returns the remainder of $g$ modulo $x$ where $x$ is an 

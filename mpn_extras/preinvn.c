@@ -23,31 +23,34 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "longlong.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
 
-void fmpz_preinvn(mp_ptr finv, const fmpz_t f)
+void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n)
 {
-   long fn = fmpz_size(f);
-   mp_ptr fp, f1;
-   mp_bitcnt_t norm;
-
-   fp = COEFF_TO_PTR(*f)->_mp_d;
-   count_leading_zeros(norm, fp[fn - 1]);
-
-   if (norm)
-   {
-      f1 = flint_malloc(fn*sizeof(mp_limb_t));
-      mpn_lshift(f1, fp, fn, norm);
-   } else
-      f1 = fp;
+   mp_ptr q, r, d1;
    
-   flint_mpn_preinvn(finv, f1, fn);
+   d1 = flint_malloc(n*sizeof(mp_limb_t));
+   if (mpn_add_1(d1, d, n, 1)) /* check for d + 1 == 0 */
+   {
+      mpn_zero(dinv, n);
+      flint_free(d1);
+      return;
+   }
 
-   if (norm)
-      flint_free(f1);
+   r = flint_malloc((2*n + 1)*sizeof(mp_limb_t));
+   q = flint_malloc((n + 2)*sizeof(mp_limb_t));
+ 
+   mpn_zero(r, 2*n);
+   r[2*n] = 1;
+
+   mpn_tdiv_qr(q, r, 0, r, 2*n + 1, d1, n);
+   mpn_copyi(dinv, q, n);
+   
+   flint_free(r);
+   flint_free(q);
+   flint_free(d1);
 }
