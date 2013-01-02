@@ -57,224 +57,258 @@ void ppm1_set(ppm1_t L, ppm1_t M)
    fmpz_set(L->m, M->m);
 }
 
-void ppm1_print(ppm1_t L)
+void ppm1_print(mp_srcptr x, mp_srcptr y, mp_size_t nn, ulong norm)
 {
-   printf("["), fmpz_print(L->l), printf(", "), fmpz_print(L->m), printf("]");
+   mp_ptr tx = flint_malloc(nn*sizeof(mp_limb_t));
+   mp_ptr ty = flint_malloc(nn*sizeof(mp_limb_t));
+
+   if (norm)
+   {
+      mpn_rshift(tx, x, nn, norm);
+      mpn_rshift(ty, y, nn, norm);
+   } else
+   {
+       mpn_copyi(tx, x, nn);
+       mpn_copyi(ty, y, nn);
+   }
+
+   printf("["), gmp_printf("%Nd", tx, nn), printf(", "), gmp_printf("%Nd", ty, nn), printf("]");
+
+   flint_free(tx);
+   flint_free(ty);
 }
 
-void pp1_2k(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int sec)
+void pp1_2k(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
+            mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   if (sec)
-   {
-      fmpz_mul(R->m, L->l, L->m);
-      fmpz_sub(R->m, R->m, L0);
-   }
+   flint_mpn_mulmod_preinvn(y, y, x, nn, n, ninv, norm);
+   if (mpn_sub_n(y, y, x0, nn))
+      mpn_add_n(y, y, n, nn);
 
-   fmpz_mul(R->l, L->l, L->l);
-   fmpz_sub_ui(R->l, R->l, 2);
-   
-   if (sec)
-   {
-      if (fmpz_sgn(R->m) < 0)
-         fmpz_add(R->m, R->m, n);
-      else
-         fmpz_mod_preinv1(R->m, R->m, n, ninv);
-   }
-
-   if (fmpz_sgn(R->l) < 0)
-      fmpz_add(R->l, R->l, n);
-   else
-      fmpz_mod_preinv1(R->l, R->l, n, ninv);
+   flint_mpn_mulmod_preinvn(x, x, x, nn, n, ninv, norm);
+   if (mpn_sub_1(x, x, nn, 2UL << norm))
+      mpn_add_n(x, x, n, nn);
 }
 
-void pp1_2kp1(ppm1_t R, ppm1_t L, const fmpz_t n, mp_limb_t ninv, fmpz_t L0, int sec)
+void pp1_2kp1(mp_ptr x, mp_ptr y, mp_size_t nn, mp_srcptr n, 
+              mp_srcptr ninv, mp_srcptr x0, ulong norm)
 {
-   fmpz_mul(R->l, L->l, L->m);
-   fmpz_sub(R->l, R->l, L0);
-   
-   if (sec)
-   {
-      fmpz_mul(R->m, L->m, L->m);
-      fmpz_sub_ui(R->m, R->m, 2);
-   }
+   flint_mpn_mulmod_preinvn(x, x, y, nn, n, ninv, norm);
+   if (mpn_sub_n(x, x, x0, nn))
+      mpn_add_n(x, x, n, nn);
 
-   if (fmpz_sgn(R->l) < 0)
-      fmpz_add(R->l, R->l, n);
-   else
-      fmpz_mod_preinv1(R->l, R->l, n, ninv);
-
-   if (sec)
-   {
-      if (fmpz_sgn(R->m) < 0)
-         fmpz_add(R->m, R->m, n);
-      else
-         fmpz_mod_preinv1(R->m, R->m, n, ninv);
-   }
+   flint_mpn_mulmod_preinvn(y, y, y, nn, n, ninv, norm);
+   if (mpn_sub_1(y, y, nn, 2UL << norm))
+      mpn_add_n(y, y, n, nn);
 }
 
-void pp1_pow_ui(ppm1_t R, ppm1_t L, ulong exp, const fmpz_t n, mp_limb_t ninv)
+void pp1_pow_ui(mp_ptr x, mp_ptr y, mp_size_t nn, 
+                ulong exp, mp_srcptr n, mp_srcptr ninv, ulong norm)
 {
-   fmpz_t L0;
-   
-   ulong b = FLINT_BIT_COUNT(exp);
-   ulong bit = (1UL<<(b - 1));
+   mp_limb_t t[30];
+   mp_ptr x0 = t;
+   ulong bit = ((1UL << FLINT_BIT_COUNT(exp)) >> 2);
 
-   fmpz_init(L0);
-   fmpz_set(L0, L->l);
+   if (nn > 30)
+      x0 = flint_malloc(nn*sizeof(mp_limb_t));
+   mpn_copyi(x0, x, nn);
 
-   fmpz_set(R->l, L->l);
-
-   fmpz_mul(R->m, R->l, R->l);
-   fmpz_sub_ui(R->m, R->m, 2);
-   if (fmpz_sgn(R->m) < 0)
-      fmpz_add(R->m, R->m, n);
-   else
-      fmpz_mod_preinv1(R->m, R->m, n, ninv);
-   
-   bit >>= 1;
+   flint_mpn_mulmod_preinvn(y, x, x, nn, n, ninv, norm);
+   if (mpn_sub_1(y, y, nn, 2UL << norm))
+      mpn_add_n(y, y, n, nn);
 
    while (bit)
    {
       if (exp & bit)
-         pp1_2kp1(R, R, n, ninv, L0, bit != 1);
+         pp1_2kp1(x, y, nn, n, ninv, x0, norm);
       else
-         pp1_2k(R, R, n, ninv, L0, bit != 1);
+         pp1_2k(x, y, nn, n, ninv, x0, norm);
 
       bit >>= 1;
    }
 
-   fmpz_clear(L0);
+   if (nn > 30)
+      flint_free(x0);
 }
 
-void pp1_factor(fmpz_t factor, const fmpz_t n, const fmpz_t l)
+mp_size_t pp1_factor(mp_ptr factor, mp_srcptr n,
+                     mp_srcptr x, mp_size_t nn, ulong norm)
 {
-   fmpz_t t;
+   mp_size_t ret = 0, xn = nn;
+   
+   mp_ptr n2 = flint_malloc(nn*sizeof(mp_limb_t));
+   mp_ptr x2 = flint_malloc(nn*sizeof(mp_limb_t));
 
-   fmpz_init(t);
+   if (norm)
+      mpn_rshift(n2, n, nn, norm);
+   else
+      mpn_copyi(n2, n, nn);
 
-   fmpz_sub_ui(t, l, 2);
-   if (fmpz_sgn(t) < 0)
-      fmpz_add(t, t, n);
+   if (norm)
+      mpn_rshift(x2, x, nn, norm);
+   else
+      mpn_copyi(x2, x, nn);
+   
+   if (mpn_sub_1(x2, x2, nn, 2))
+      mpn_add_n(x2, x2, n2, nn);
 
-   fmpz_gcd(factor, n, t);
+   MPN_NORM(x2, xn);
 
-   fmpz_clear(t);
+   if (xn == 0)
+      goto cleanup;
+   
+   ret = flint_mpn_gcd_full(factor, n2, nn, x2, xn);
+
+cleanup:
+
+   flint_free(n2);
+   flint_free(x2);
+
+   return ret;
 }
 
-int pp1_find_power(fmpz_t factor, ppm1_t oldL, ulong p, const fmpz_t n, mp_limb_t ninv)
+mp_size_t pp1_find_power(mp_ptr factor, mp_ptr x, mp_ptr y, mp_size_t nn, 
+                          ulong p, mp_srcptr n, mp_srcptr ninv, ulong norm)
 {
+   mp_size_t ret;
+   
    do
    {
-      pp1_pow_ui(oldL, oldL, p, n, ninv);
-      pp1_factor(factor, n, oldL->l);
-      if (fmpz_is_zero(factor))
-         return 0;
-   } while (fmpz_is_one(factor));
+      pp1_pow_ui(x, y, nn, p, n, ninv, norm);
+      ret = pp1_factor(factor, n, x, nn, norm);
+   } while (ret == 1 && factor[0] == 1);
 
-   return 1;
+   return ret;
 }
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
+int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
 {
    long i, j;
    int ret = 0;
-   ppm1_t L, M, oldL;
-   ulong pr, oldpr, sqrt, bits0;
-   mp_limb_t ninv;
+   mp_size_t nn = fmpz_size(n_in), r;
+   mp_ptr x, y, oldx, oldy, n, ninv, factor;
+   ulong pr, oldpr, sqrt, bits0, norm;
    
-   if (fmpz_is_even(n))
+   if (fmpz_is_even(n_in))
    {
-      fmpz_set_ui(factor, 2);
+      fmpz_set_ui(fac, 2);
       return 1;
    }
 
    sqrt = n_sqrt(B0);
    bits0 = FLINT_BIT_COUNT(B0);
 
-   ninv = fmpz_preinv1(n);
+   x      = flint_malloc(nn*sizeof(mp_limb_t));
+   y      = flint_malloc(nn*sizeof(mp_limb_t));
+   oldx   = flint_malloc(nn*sizeof(mp_limb_t));
+   oldy   = flint_malloc(nn*sizeof(mp_limb_t));
+   n      = flint_malloc(nn*sizeof(mp_limb_t));
+   ninv   = flint_malloc(nn*sizeof(mp_limb_t));
+   factor = flint_malloc(nn*sizeof(mp_limb_t));
+      
+   if (nn == 1)
+   {
+      n[0] = fmpz_get_ui(n_in);
+      count_leading_zeros(norm, n[0]);
+      n[0] <<= norm;
+   } else
+   {
+      mp_ptr np = COEFF_TO_PTR(*n_in)->_mp_d;
+      count_leading_zeros(norm, np[nn - 1]);
+      if (norm)
+         mpn_lshift(n, np, nn, norm);
+      else
+         mpn_copyi(n, np, nn);
+   }
 
-   ppm1_init(L);
-   ppm1_init(oldL);
-   ppm1_init(M);
+   flint_mpn_preinvn(ninv, n, nn);
+   
+   mpn_zero(x, nn);
+   c=99;
+   x[0] = (c << norm);
+   if (nn > 1 && norm)
+      x[1] = (c >> (FLINT_BITS - norm));
 
-   fmpz_set_ui(L->l, c);
-   fmpz_set_ui(L->m, c);
-   fmpz_mul(L->m, L->m, L->m);
-   fmpz_sub_ui(L->m, L->m, 2);
-   if (fmpz_sgn(L->m) < 0)
-      fmpz_add(L->m, L->m, n);
+   flint_mpn_mulmod_preinvn(y, x, x, nn, n, ninv, norm);
+   if (mpn_sub_1(y, y, nn, 2UL << norm))
+      mpn_add_n(y, y, n, nn);
 
    /* mul by various prime powers */
-   ppm1_set(oldL, L);
-   pp1_pow_ui(L, L, 4096, n, ninv); /* 2^12 */
-   pp1_factor(factor, n, L->l);
-   if (fmpz_is_zero(factor))
+   mpn_copyi(oldx, x, nn);
+   mpn_copyi(oldy, y, nn);
+   pp1_pow_ui(x, y, nn, 4096, n, ninv, norm); /* 2^12 */
+   r = pp1_factor(factor, n, x, nn, norm);
+   if (r == 0)
    {
-      ret = pp1_find_power(factor, oldL, 2, n, ninv);
+      ret = pp1_find_power(factor, oldx, oldy, nn, 2, n, ninv, norm);
       goto cleanup;
    }
-   if (!fmpz_is_one(factor))
+   if (r != 1 || factor[0] != 1)
    {
       ret = 1;
       goto cleanup;
    }
    
-   ppm1_set(oldL, L);
-   pp1_pow_ui(L, L, 59049, n, ninv); /* 3^10 */
-   pp1_factor(factor, n, L->l);
-   if (fmpz_is_zero(factor))
+   mpn_copyi(oldx, x, nn);
+   mpn_copyi(oldy, y, nn);
+   pp1_pow_ui(x, y, nn, 59049, n, ninv, norm); /* 3^10 */
+   r = pp1_factor(factor, n, x, nn, norm);
+   if (r == 0)
    {
-      ret = pp1_find_power(factor, oldL, 3, n, ninv);
+      ret = pp1_find_power(factor, oldx, oldy, nn, 3, n, ninv, norm);
       goto cleanup;
    }
-   if (!fmpz_is_one(factor))
-   {
-      ret = 1;
-      goto cleanup;
-   }
-
-   ppm1_set(oldL, L);
-   pp1_pow_ui(L, L, 390625, n, ninv); /* 5^8 */
-   pp1_factor(factor, n, L->l);
-   if (fmpz_is_zero(factor))
-   {
-      ret = pp1_find_power(factor, oldL, 5, n, ninv);
-      goto cleanup;
-   }
-   if (!fmpz_is_one(factor))
+   if (r != 1 || factor[0] != 1)
    {
       ret = 1;
       goto cleanup;
    }
-
-   ppm1_set(oldL, L);
-   pp1_pow_ui(L, L, 117649, n, ninv); /* 7^6 */
-   pp1_factor(factor, n, L->l);
-   if (fmpz_is_zero(factor))
+   
+   mpn_copyi(oldx, x, nn);
+   mpn_copyi(oldy, y, nn);
+   pp1_pow_ui(x, y, nn, 390625, n, ninv, norm); /* 5^8 */
+   r = pp1_factor(factor, n, x, nn, norm);
+   if (r == 0)
    {
-      ret = pp1_find_power(factor, oldL, 7, n, ninv);
+      ret = pp1_find_power(factor, oldx, oldy, nn, 5, n, ninv, norm);
       goto cleanup;
    }
-   if (!fmpz_is_one(factor))
-   {
-      ret = 1;
-      goto cleanup;
-   }
-
-   ppm1_set(oldL, L);
-   pp1_pow_ui(L, L, 14641, n, ninv); /* 11^4 */
-   pp1_factor(factor, n, L->l);
-   if (fmpz_is_zero(factor))
-   {
-      ret = pp1_find_power(factor, oldL, 11, n, ninv);
-      goto cleanup;
-   }
-   if (!fmpz_is_one(factor))
+   if (r != 1 || factor[0] != 1)
    {
       ret = 1;
       goto cleanup;
    }
-
+   
+   mpn_copyi(oldx, x, nn);
+   mpn_copyi(oldy, y, nn);
+   pp1_pow_ui(x, y, nn, 117649, n, ninv, norm); /* 7^6 */
+   r = pp1_factor(factor, n, x, nn, norm);
+   if (r == 0)
+   {
+      ret = pp1_find_power(factor, oldx, oldy, nn, 7, n, ninv, norm);
+      goto cleanup;
+   }
+   if (r != 1 || factor[0] != 1)
+   {
+      ret = 1;
+      goto cleanup;
+   }
+   
+   mpn_copyi(oldx, x, nn);
+   mpn_copyi(oldy, y, nn);
+   pp1_pow_ui(x, y, nn, 14641, n, ninv, norm); /* 11^4 */
+   r = pp1_factor(factor, n, x, nn, norm);
+   if (r == 0)
+   {
+      ret = pp1_find_power(factor, oldx, oldy, nn, 11, n, ninv, norm);
+      goto cleanup;
+   }
+   if (r != 1 || factor[0] != 1)
+   {
+      ret = 1;
+      goto cleanup;
+   }
+   
    pr = 11;
    oldpr = 11;
    for (i = 0; pr < B0; )
@@ -288,15 +322,15 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
          {
             ulong bits = FLINT_BIT_COUNT(pr);
             ulong exp = bits0 / bits;
-            pp1_pow_ui(L, L, n_pow(pr, exp), n, ninv);
+            pp1_pow_ui(x, y, nn, n_pow(pr, exp), n, ninv, norm);
          } else
-            pp1_pow_ui(L, L, pr, n, ninv);
+            pp1_pow_ui(x, y, nn, pr, n, ninv, norm);
       }
       
-      pp1_factor(factor, n, L->l);
-      if (fmpz_is_zero(factor))
+      r = pp1_factor(factor, n, x, nn, norm);
+      if (r == 0)
          break;
-      if (!fmpz_is_one(factor))
+      if (r != 1 || factor[0] != 1)
       {
          ret = 1;
          goto cleanup;
@@ -313,14 +347,14 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
          {
             ulong bits = FLINT_BIT_COUNT(pr);
             ulong exp = bits0 / bits;
-            pp1_pow_ui(L, L, n_pow(pr, exp), n, ninv);
+            pp1_pow_ui(x, y, nn, n_pow(pr, exp), n, ninv, norm);
          } else
-            pp1_pow_ui(L, L, pr, n, ninv);
+            pp1_pow_ui(x, y, nn, pr, n, ninv, norm);
 
-         pp1_factor(factor, n, L->l);
-         if (!fmpz_is_one(factor))
+         r = pp1_factor(factor, n, x, nn, norm);
+         if (r != 1 || factor[0] != 1)
          {
-            ret = (fmpz_is_zero(factor) ? 0 : 1);
+            ret = (r == 0 ? 0 : 1);
             goto cleanup;
          }
       } while (1);
@@ -328,9 +362,20 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
 
 cleanup:
 
-   ppm1_clear(L);
-   ppm1_clear(oldL);
-   ppm1_clear(M);
+   if (ret)
+   {
+      __mpz_struct * fm = _fmpz_promote(fac);
+      mpz_realloc(fm, r);
+      mpn_copyi(fm->_mp_d, factor, r);
+      fm->_mp_size = r;
+   }
 
+   flint_free(x);
+   flint_free(y);
+   flint_free(oldx);
+   flint_free(oldy);
+   flint_free(n);
+   flint_free(ninv);
+   
    return ret;
 }

@@ -30,53 +30,24 @@
 #include "fmpz.h"
 #include "mpn_extras.h"
 
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv)
+void fmpz_preinvn(mp_ptr finv, const fmpz_t f)
 {
-   mp_limb_t * a, * b, * mp, * fp, cy;
-   __mpz_struct * rem;
-   mp_bitcnt_t norm;
-   long mn = fmpz_size(m);
    long fn = fmpz_size(f);
-   mp_limb_t t[71];
-   
-   if (fmpz_sgn(f) < 0 || fmpz_sgn(m) < 0
-    || mn < 2 || fn > 70 || fn < mn)
-   {
-      fmpz_mod(r, f, m);
-      return;
-   }
+   mp_ptr fp, f1;
+   mp_bitcnt_t norm;
 
-   rem = _fmpz_promote(r);
-   mpz_realloc(rem, fn + 1);
-   
-   mp = COEFF_TO_PTR(*m)->_mp_d;
    fp = COEFF_TO_PTR(*f)->_mp_d;
-   count_leading_zeros(norm, mp[mn - 1]);
+   count_leading_zeros(norm, fp[fn - 1]);
 
-   a = rem->_mp_d;
-   
    if (norm)
    {
-      cy = mpn_lshift(a, fp, fn, norm);
-      if (cy)
-      {
-         a[fn] = cy;
-         fn++;
-      }
-      b = t + fn - mn;
-      mpn_lshift(b, mp, mn, norm);
+      f1 = flint_malloc(fn*sizeof(mp_limb_t));
+      mpn_lshift(f1, fp, fn, norm);
    } else
-   {
-      flint_mpn_copyi(a, fp, fn);
-      b = mp;
-   }
+      f1 = fp;
    
-   flint_mpn_divrem_basecase_preinv1(t, a, fn, b, mn, dinv);
+   flint_mpn_preinvn(finv, f1, fn);
 
    if (norm)
-      mpn_rshift(a, a, fn, norm);
-
-   MPN_NORM(a, fn);
-   rem->_mp_size = fn;
-   _fmpz_demote_val(r);
+      flint_free(f1);
 }

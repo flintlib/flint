@@ -184,7 +184,7 @@ flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
                           long a, long b, long n, int d);
 
-mp_limb_t flint_mpn_div_preinv1(mp_limb_t d, mp_limb_t d2);
+mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 
 mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a, 
            mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
@@ -198,6 +198,14 @@ mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a,
       add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
    } while (0)
 
+void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+
+mp_limb_t flint_mpn_rem2n_preinvn(mp_ptr a, 
+                        mp_srcptr b, mp_size_t n, mp_srcptr dinv);
+
+void flint_mpn_mulmod_preinvn(mp_ptr r, 
+        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+        mp_srcptr d, mp_srcptr dinv, ulong norm);
 
 #ifdef __cplusplus
 }

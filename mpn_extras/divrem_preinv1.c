@@ -23,60 +23,62 @@
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "longlong.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "mpn_extras.h"
 
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv)
+mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
 {
-   mp_limb_t * a, * b, * mp, * fp, cy;
-   __mpz_struct * rem;
-   mp_bitcnt_t norm;
-   long mn = fmpz_size(m);
-   long fn = fmpz_size(f);
-   mp_limb_t t[71];
+   mp_limb_t q, r[2], p[2], cy;
    
-   if (fmpz_sgn(f) < 0 || fmpz_sgn(m) < 0
-    || mn < 2 || fn > 70 || fn < mn)
+   if (d2 + 1 == 0 && d1 + 1 == 0)
+      return 0;
+
+   if (d1 + 1 == 0)
+      q = ~d1, r[1] = ~d2;
+   else
+      udiv_qrnnd(q, r[1], ~d1, ~d2, d1 + 1);
+
+   r[0] = 0;
+
+   if (d2 + 1 == 0)
+      add_ssaaaa(cy, r[1], 0, r[1], 0, q);   
+   else
    {
-      fmpz_mod(r, f, m);
-      return;
+      umul_ppmm(p[1], p[0], q, ~d2 - 1);
+      cy = mpn_add_n(r, r, p, 2);
    }
-
-   rem = _fmpz_promote(r);
-   mpz_realloc(rem, fn + 1);
+ 
+   p[0] = d2 + 1, p[1] = d1 + (d2 + 1 == 0);
+   if (cy || mpn_cmp(r, p, 2) >= 0)
+      q++;
    
-   mp = COEFF_TO_PTR(*m)->_mp_d;
-   fp = COEFF_TO_PTR(*f)->_mp_d;
-   count_leading_zeros(norm, mp[mn - 1]);
+   return q;
+}
 
-   a = rem->_mp_d;
+mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
+                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
+{
+   mp_limb_t ret;
+   mp_size_t i;
+
+   /* ensure { a + i, n } < { b, n } */
+   if ((ret = (mpn_cmp(a + m - n, b, n) >= 0)))
+      mpn_sub_n(a + m - n, a + m - n, b, n);
    
-   if (norm)
+   for (i = m - 1; i >= n; i--)
    {
-      cy = mpn_lshift(a, fp, fn, norm);
-      if (cy)
+      flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
+      a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
+
+      if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)
       {
-         a[fn] = cy;
-         fn++;
+         q[i - n]++;
+         a[i] -= mpn_sub_n(a + i - n, a + i - n, b, n);
       }
-      b = t + fn - mn;
-      mpn_lshift(b, mp, mn, norm);
-   } else
-   {
-      flint_mpn_copyi(a, fp, fn);
-      b = mp;
    }
-   
-   flint_mpn_divrem_basecase_preinv1(t, a, fn, b, mn, dinv);
 
-   if (norm)
-      mpn_rshift(a, a, fn, norm);
-
-   MPN_NORM(a, fn);
-   rem->_mp_size = fn;
-   _fmpz_demote_val(r);
+   return ret;
 }
