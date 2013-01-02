@@ -498,33 +498,46 @@ long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
 *******************************************************************************
 
+void n_primes_init(n_primes_t iter)
+
+    Initialises the prime number iterator \code{iter} for use.
+
+void n_primes_clear(n_primes_t iter)
+
+    Clears memory allocated by the prime number iterator \code{iter}.
+
+mp_limb_t n_primes_next(n_primes_t iter)
+
+    Returns the next prime number and advances the state of \code{iter}.
+    The first call returns 2.
+
+    Small primes are looked up from \code{flint_small_primes}.
+    When this table is exhausted, primes are generated in blocks
+    by calling \code{n_primes_sieve_range}.
+
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+
+    Changes the state of \code{iter} to start generating primes
+    after $n$ (excluding $n$ itself).
+
+void n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
+
+    Extends the table of small primes in \code{iter} to contain
+    at least two primes larger than or equal to \code{bound}.
+
+void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+
+    Sets the block endpoints of \code{iter} to the smallest and
+    largest odd numbers between $a$ and $b$ inclusive, and
+    sieves to mark all odd primes in this range.
+    The iterator state is changed to point to the first
+    number in the sieved range.
+
 void n_compute_primes(ulong num_primes)
 
     Precomputes \code{num_primes} primes and their \code{double} 
     precomputed inverses and stores them in \code{flint_primes} 
     and \code{flint_prime_inverse}, respectively.
-
-    The algorithm is a simple sieve of Eratosthenes with the 
-    constant array of primes \code{flint_small_primes} as a starting 
-    point.
-
-    The sieve works by marking all multiples of small primes in
-    the sieve, but the sieve does not contain entries for numbers
-    below the current cutoff (in case the function may have already 
-    been called before). 
-
-    One only needs to start sieving with $p^2$ as all smaller multiples 
-    of $p$ have already been marked off. 
-
-    At first $p^2$ may be less than the start of the sieve (the old 
-    cutoff), so this case is dealt with separately, but for all 
-    primes $p$ beyond that all multiples of $p$ starting at $p^2$ are 
-    marked off in the sieve.
-
-    As the small prime cutoff is currently $1030$, primes can be 
-    computed up to almost $n = 2^{20}$, in fact 
-    $\floor{n / \log_2(n) \times 0.7} = 74898$ primes which actually 
-    takes us to $949937$.
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
