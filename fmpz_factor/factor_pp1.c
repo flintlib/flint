@@ -218,85 +218,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
    pp1_set_ui(x, nn, norm, c);
    
    /* mul by various prime powers */
-   pp1_set(oldx, oldy, x, y, nn);
-   pp1_pow_ui(x, y, nn, 4096, n, ninv, norm); /* 2^12 */
-   r = pp1_factor(factor, n, x, nn, norm);
-   if (r == 0)
-   {
-      ret = pp1_find_power(factor, oldx, oldy, nn, 2, n, ninv, norm);
-      goto cleanup;
-   }
-   if (r != 1 || factor[0] != 1)
-   {
-      ret = 1;
-      goto cleanup;
-   }
-   
-   pp1_set(oldx, oldy, x, y, nn);
-   pp1_pow_ui(x, y, nn, 59049, n, ninv, norm); /* 3^10 */
-   r = pp1_factor(factor, n, x, nn, norm);
-   if (r == 0)
-   {
-      ret = pp1_find_power(factor, oldx, oldy, nn, 3, n, ninv, norm);
-      goto cleanup;
-   }
-   if (r != 1 || factor[0] != 1)
-   {
-      ret = 1;
-      goto cleanup;
-   }
-   
-   pp1_set(oldx, oldy, x, y, nn);
-   pp1_pow_ui(x, y, nn, 390625, n, ninv, norm); /* 5^8 */
-   r = pp1_factor(factor, n, x, nn, norm);
-   if (r == 0)
-   {
-      ret = pp1_find_power(factor, oldx, oldy, nn, 5, n, ninv, norm);
-      goto cleanup;
-   }
-   if (r != 1 || factor[0] != 1)
-   {
-      ret = 1;
-      goto cleanup;
-   }
-   
-   pp1_set(oldx, oldy, x, y, nn);
-   pp1_pow_ui(x, y, nn, 117649, n, ninv, norm); /* 7^6 */
-   r = pp1_factor(factor, n, x, nn, norm);
-   if (r == 0)
-   {
-      ret = pp1_find_power(factor, oldx, oldy, nn, 7, n, ninv, norm);
-      goto cleanup;
-   }
-   if (r != 1 || factor[0] != 1)
-   {
-      ret = 1;
-      goto cleanup;
-   }
-   
-   pp1_set(oldx, oldy, x, y, nn);
-   pp1_pow_ui(x, y, nn, 14641, n, ninv, norm); /* 11^4 */
-   r = pp1_factor(factor, n, x, nn, norm);
-   if (r == 0)
-   {
-      ret = pp1_find_power(factor, oldx, oldy, nn, 11, n, ninv, norm);
-      goto cleanup;
-   }
-   if (r != 1 || factor[0] != 1)
-   {
-      ret = 1;
-      goto cleanup;
-   }
-   
-   n_primes_jump_after(iter, 11);
-   
-   pr = 11;
-   oldpr = 11;
+   pr = 0;
+   oldpr = 0;
 
    for (i = 0; pr < B0; )
    {
       j = i + 1024;
       oldpr = pr;
+      pp1_set(oldx, oldy, x, y, nn);
       for ( ; i < j; i++)
       {
          pr = n_primes_next(iter);
@@ -322,10 +251,12 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
    if (pr < B0) /* factor = 0 */
    {
       n_primes_jump_after(iter, oldpr);
-      
+      pp1_set(x, y, oldx, oldy, nn);
+         
       do
       {
          pr = n_primes_next(iter);
+         pp1_set(oldx, oldy, x, y, nn);
          if (pr < sqrt)
          {
             ulong bits = FLINT_BIT_COUNT(pr);
@@ -335,13 +266,19 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
             pp1_pow_ui(x, y, nn, pr, n, ninv, norm);
 
          r = pp1_factor(factor, n, x, nn, norm);
+         if (r == 0)
+            break;
          if (r != 1 || factor[0] != 1)
          {
             ret = (r == 0 ? 0 : 1);
             goto cleanup;
          }
       } while (1);
-   }
+   } else
+      goto cleanup;
+
+   /* factor is still 0 */
+   ret = pp1_find_power(factor, oldx, oldy, nn, pr, n, ninv, norm);
 
 cleanup:
 
