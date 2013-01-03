@@ -179,7 +179,7 @@ main(void)
                    sum += s[c];
             }
         }
-        printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);
+        printf("len = %ld, time = %ldms\n", len, sum), fflush(stdout);
         for (k = 0; k < rows; k++)
         {
             if (X[k][j] == -1) 

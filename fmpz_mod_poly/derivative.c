@@ -32,8 +32,23 @@
 void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
                                const fmpz_t p)
 {
-    _fmpz_poly_derivative(res, poly, len);
-    _fmpz_vec_scalar_mod_fmpz(res, res, len - 1, p);
+    long j, k = 1;
+
+	for (j = 1; j < len; j++)
+	{
+        if (k == 0)
+            fmpz_zero(res + (j - 1));
+        else if (k == 1)
+            fmpz_set(res + (j - 1), poly + j);
+        else
+        {
+            fmpz_mul_ui(res + (j - 1), poly + j, k);
+            fmpz_mod(res + (j - 1), res + (j - 1), p);
+        }
+
+        if (fmpz_equal_ui(p, ++k))
+            k = 0;
+	}
 }
 
 void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)

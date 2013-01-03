@@ -37,7 +37,7 @@ void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h)
 
     if (h == 0)
     {
-        printf("Exception: division by zero in fmpz_divexact_ui\n");
+        printf("Exception (fmpz_divexact_ui). Division by zero.\n");
         abort();
     }
 

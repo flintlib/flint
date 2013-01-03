@@ -35,7 +35,7 @@ void check_value(long n, char *ans)
     fmpz_init(x);
     fmpz_init(y);
     fmpz_set_si(y, n);
-    fmpz_ramanujan_tau(x, y);
+    arith_ramanujan_tau(x, y);
     fmpz_set_str(y, ans, 10);
     if (!fmpz_equal(x,y))
     {
@@ -59,7 +59,7 @@ void consistency_check(long n)
     fmpz_init(x);
     fmpz_init(y);
 
-    fmpz_poly_ramanujan_tau(p, n);
+    arith_ramanujan_tau_series(p, n);
     if (p->length != n && !(n == 1 && p->length == 0))
     {
         printf("FAIL:\n");
@@ -70,7 +70,7 @@ void consistency_check(long n)
     for (k=0; k<n; k++)
     {
         fmpz_set_si(y, k);
-        fmpz_ramanujan_tau(x, y);
+        arith_ramanujan_tau(x, y);
         fmpz_poly_get_coeff_fmpz(y, p, k);
         if (!fmpz_equal(x,y))
         {

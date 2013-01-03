@@ -46,7 +46,7 @@ int main()
     printf("comb_init/clear....");
     fflush(stdout);
 
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         n = n_randint(state, 10);
         num_primes = (1L << n);

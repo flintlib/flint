@@ -124,7 +124,8 @@ nmod_poly_pow_binexp(nmod_poly_t res, const nmod_poly_t poly, ulong e)
         else if (len == 1)
         {
             nmod_poly_fit_length(res, 1);
-            res->coeffs[0] = n_powmod2_preinv(poly->coeffs[0], e, poly->mod.n, poly->mod.ninv);
+            res->coeffs[0] = n_powmod2_preinv(poly->coeffs[0], e,
+                poly->mod.n, poly->mod.ninv);
             res->length = 1;
             _nmod_poly_normalise(res);
         }

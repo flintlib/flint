@@ -28,7 +28,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-double euler_number_size(ulong n)
+double arith_euler_number_size(ulong n)
 {
     double x;
 

@@ -314,8 +314,8 @@ void fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
     Sets the entries of \code{Amod} to the residues in \code{Amod},
     normalised to the interval $0 <= r < m$ where $m$ is the modulus.
 
-void fmpz_poly_CRT_ui(fmpz_poly_t res, const fmpz_poly_t poly1,
-                        const fmpz_t m, const nmod_poly_t poly2, int sign)
+void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
+                        const fmpz_t m1, const nmod_mat_t mat2, int sign)
 
     Given \code{mat1} with entries modulo \code{m} and \code{mat2}
     with modulus $n$, sets \code{res} to the CRT reconstruction modulo $mn$
@@ -337,7 +337,7 @@ void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres,
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use \code{fmpz_mat_multi_mod_precomp}.
+    set of moduli, it is faster to use\\ \code{fmpz_mat_multi_mod_precomp}.
 
 void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues,
     long nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
@@ -354,7 +354,7 @@ void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
 
     This function is provided for convenience purposes.
     For reducing or reconstructing multiple integer matrices over the same
-    set of moduli, it is faster to use \code{fmpz_mat_multi_CRT_ui_precomp}.
+    set of moduli, it is faster to use\\ \code{fmpz_mat_multi_CRT_ui_precomp}.
 
 *******************************************************************************
 
@@ -485,6 +485,16 @@ void fmpz_mat_mul_multi_mod(fmpz_mat_t C, fmpz_mat_t A, fmpz_mat_t B)
     The matrices must have compatible dimensions for matrix multiplication.
     No aliasing is allowed.
 
+void fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
+
+    Sets \code{B} to the square of the matrix \code{A}, which must be
+    a square matrix. Aliasing is allowed.
+
+void fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong e)
+
+    Sets \code{B} to the matrix \code{A} raised to the power \code{e},
+    where \code{A} must be a square matrix. Aliasing is allowed.
+
 
 *******************************************************************************
 
@@ -529,8 +539,8 @@ void fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
     Sets \code{det} to the determinant of the square matrix $A$.
     The matrix of dimension $0 \times 0$ is defined to have determinant 1.
 
-    This function automatically chooses between \code{fmpz_mat_det_cofactor},
-    \code{fmpz_mat_det_bareiss}, \code{fmpz_mat_det_modular} and
+    This function automatically chooses between \code{fmpz_mat_det_cofactor},\\
+    \code{fmpz_mat_det_bareiss}, \code{fmpz_mat_det_modular} and\\
     \code{fmpz_mat_det_modular_accelerated}
     (with \code{proved} = 1), depending on the size of the matrix
     and its entries.
@@ -607,6 +617,22 @@ void fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
     common multiple of the denominators in $x$. This yields a divisor $d$
     such that $|\det(A)| / d$ is tiny with very high probability.
 
+
+*******************************************************************************
+
+    Charactersitic polynomial
+
+*******************************************************************************
+
+void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
+
+    Sets \code{(cp, n+1)} to the characteristic polynomial of 
+    an $n \times n$ square matrix.
+
+void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
+
+    Computes the characteristic polynomial of length $n + 1$ of 
+    an $n \times n$ square matrix.
 
 *******************************************************************************
 
@@ -752,24 +778,42 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_poly_t den, long * perm,
-                            const fmpz_mat_t A)
+long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
-    Uses fraction-free Gauss-Jordan elimination to set (\code{B}, \code{den})
-    to the reduced row echelon form of \code{A} and returns the
-    rank of \code{A}. Aliasing of \code{A} and \code{B} is allowed.
+    Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
+    and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
+    is allowed.
+
+    The algorithm proceeds by first computing a row echelon form using
+    \code{fmpz_mat_fflu}. Letting the upper part of this matrix be
+    $(U | V) P$ where $U$ is full rank upper triangular and $P$ is a
+    permutation matrix, we obtain the rref by setting $V$ to $U^{-1} V$
+    using back substitution. Scaling each completed row in the back
+    substitution to the denominator \code{den}, we avoid introducing
+    new fractions. This strategy is equivalent to the fraction-free
+    Gauss-Jordan elimination in \citep{NakTurWil1997}, but faster since
+    only the part $V$ corresponding to the null space has to be updated.
+
+    The denominator \code{den} is set to $\pm \operatorname{det}(S)$ where
+    $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square).
+    Note that the determinant is not generally the minimal denominator.
+
+
+*******************************************************************************
+
+    Modular gaussian elimination
+
+*******************************************************************************
+
+long fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p)
+
+    Uses fraction-free Gauss-Jordan elimination to set \code{A}
+    to its reduced row echelon form and returns the rank of \code{A}.
+    All computations are done modulo p.
 
     Pivot elements are chosen with \code{fmpz_mat_find_pivot_any}.
     If \code{perm} is non-\code{NULL}, the permutation of
     rows in the matrix will also be applied to \code{perm}.
-
-    The denominator \code{den} is set to $\pm \operatorname{det}(S)$ where
-    $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square)
-    and the sign is decided by the parity of the permutation. Note that the
-    determinant is not generally the minimal denominator.
-
-    The fraction-free Gauss-Jordan algorithm is given
-    in \citep{NakTurWil1997}.
 
 *******************************************************************************
 

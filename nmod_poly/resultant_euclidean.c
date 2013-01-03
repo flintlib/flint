@@ -51,7 +51,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, long len1,
         }
         else
         {
-            return n_powmod2_preinv(poly2[0], len1 - 1, mod.n, mod.ninv);
+            return n_powmod2_ui_preinv(poly2[0], len1 - 1, mod.n, mod.ninv);
         }
     }
     else  /* len1 >= len2 >= 2 */

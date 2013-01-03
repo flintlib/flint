@@ -94,8 +94,8 @@ fmpz_poly_compose_series_brent_kung(fmpz_poly_t res,
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {
-        printf("exception: fmpz_poly_compose_series_brent_kung: inner "
-                "polynomial must have zero constant term\n");
+        printf("Exception (fmpz_poly_compose_series_brent_kung). Inner \n"
+               "polynomial must have zero constant term.\n");
         abort();
     }
 

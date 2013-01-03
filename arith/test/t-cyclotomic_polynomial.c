@@ -84,8 +84,8 @@ int main()
         fmpz_poly_init(A);
         fmpz_poly_init(B);
 
-        cyclotomic_polynomial(A, n);
-        cyclotomic_polynomial(B, n);
+        arith_cyclotomic_polynomial(A, n);
+        cyclotomic_naive(B, n);
 
         if (!fmpz_poly_equal(A, B))
         {
@@ -118,7 +118,7 @@ int main()
         /* fmpz_set_str(ref, "31484567640915734941", 10);  64-bit case */
 
         fmpz_poly_init(A);
-        cyclotomic_polynomial(A, 10163195UL);
+        arith_cyclotomic_polynomial(A, 10163195UL);
         fmpz_poly_height(h, A);
 
         if (!fmpz_equal(h, ref))

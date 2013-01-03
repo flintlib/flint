@@ -59,12 +59,12 @@ int main(void)
 
     for (i = 0; i < N; i++)
     {
-        sum_of_squares_vec(r, i, N);
+        arith_sum_of_squares_vec(r, i, N);
 
         for (j = 0; j < N; j++)
         {
             fmpz_set_ui(t, j);
-            sum_of_squares(t, i, t);
+            arith_sum_of_squares(t, i, t);
 
             if (!fmpz_equal(t, r + j) || !fmpz_equal(t, known[i] + j))
             {

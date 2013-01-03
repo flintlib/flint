@@ -75,7 +75,7 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
 
 		if (lenA == 0)
 		{
-			printf("Exception: non-squarefree polynomial detected in fmpz_poly_signature\n");
+			printf("Exception (fmpz_poly_signature). Non-squarefree polynomial detected.\n");
             _fmpz_vec_clear(w, 2 * len + 2);
 			abort();
 		}

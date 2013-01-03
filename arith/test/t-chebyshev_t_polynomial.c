@@ -45,12 +45,12 @@ int main()
     fmpz_poly_init(T2);
     fmpz_poly_init(t);
 
-    chebyshev_t_polynomial(T0, 0);
-    chebyshev_t_polynomial(T1, 1);
+    arith_chebyshev_t_polynomial(T0, 0);
+    arith_chebyshev_t_polynomial(T1, 1);
 
     for (n = 2; n <= 500; n++)
     {
-        chebyshev_t_polynomial(T2, n);
+        arith_chebyshev_t_polynomial(T2, n);
 
         /* Verify T_{n+1} = 2 x T_n - T_{n-1} */
         fmpz_poly_scalar_mul_ui(t, T1, 2UL);

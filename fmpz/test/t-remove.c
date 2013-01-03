@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
 
     /* Compare with MPIR, random input */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
@@ -92,7 +92,7 @@ main(void)
     }
 
     /* Compare with MPIR, random input but ensure that factors exist */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c, pow;
         mpz_t d, e, f, g;
@@ -148,7 +148,7 @@ main(void)
     }
 
     /* Check aliasing of a and b */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c;
         long x;
@@ -178,7 +178,7 @@ main(void)
     }
 
     /* Check aliasing of a and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         long x, y;
@@ -213,7 +213,7 @@ main(void)
     }
 
     /* Check aliasing of b and c */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
         long x, y;

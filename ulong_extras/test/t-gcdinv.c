@@ -39,7 +39,7 @@ int main(void)
    
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++) 
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) 
    {
       mp_limb_t a, b, c, g, g2, s, t2, t, bits1, bits2, bits3;
       
@@ -49,11 +49,11 @@ int main(void)
 
       do
       {
-         a = n_randbits(state, bits1);
-         b = n_randbits(state, bits2);
+         a = n_randtest_bits(state, bits1);
+         b = n_randtest_bits(state, bits2);
       } while ((n_gcd(a, b) != 1UL) || (b >= a));
 
-      c = n_randbits(state, bits3);
+      c = n_randtest_bits(state, bits3);
 
       g = n_xgcd(&s, &t, a*c, b*c);
       g2 = n_gcdinv(&t2, b*c, a*c);

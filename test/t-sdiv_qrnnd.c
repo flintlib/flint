@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <limits.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
@@ -46,7 +47,8 @@ int main(void)
       {
          d = n_randtest_not_zero(state);
          nh = n_randtest(state);
-      } while (FLINT_ABS(nh) >= FLINT_ABS(d)/2);
+      } while ((FLINT_ABS(nh) >= FLINT_ABS(d)/2) || (nh == LONG_MIN));
+
       nl = n_randtest(state);
 
       sdiv_qrnnd(q, r, nh, nl, d);

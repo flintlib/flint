@@ -93,7 +93,7 @@ main(void)
                mpn_urandomb(i2, state->gmp_state, b2);
   
                mpn_mul(r2, i1, n1, i2, n2);
-               mpn_mul_fft_main(r1, i1, n1, i2, n2);
+               flint_mpn_mul_fft_main(r1, i1, n1, i2, n2);
            
                for (j = 0; j < n1 + n2; j++)
                {

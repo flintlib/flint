@@ -29,10 +29,10 @@
 #include "ulong_extras.h"
 
 void
-bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
+arith_bell_number_nmod_vec(mp_ptr b, long n, nmod_t mod)
 {
     if (n < 2000 || mod.n <= n)
-        bell_number_nmod_vec_recursive(b, n, mod);
+        arith_bell_number_nmod_vec_recursive(b, n, mod);
     else
-        bell_number_nmod_vec_series(b, n, mod);
+        arith_bell_number_nmod_vec_series(b, n, mod);
 }

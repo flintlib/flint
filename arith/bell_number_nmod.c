@@ -44,7 +44,7 @@ static const char bell_mod_2[3] = {1, 1, 0};
 static const char bell_mod_3[13] = {1, 1, 2, 2, 0, 1, 2, 1, 0, 0, 1, 0, 1};
 
 mp_limb_t
-bell_number_nmod(ulong n, nmod_t mod)
+arith_bell_number_nmod(ulong n, nmod_t mod)
 {
     mp_limb_t s, t, u;
     mp_ptr facs, pows;
@@ -59,7 +59,7 @@ bell_number_nmod(ulong n, nmod_t mod)
     if (mod.n <= n)
     {
         mp_ptr bvec = flint_malloc(sizeof(mp_limb_t) * (n + 1));
-        bell_number_nmod_vec_recursive(bvec, n + 1, mod);
+        arith_bell_number_nmod_vec_recursive(bvec, n + 1, mod);
         s = bvec[n];
         flint_free(bvec);
         return s;
@@ -74,13 +74,13 @@ bell_number_nmod(ulong n, nmod_t mod)
 
     /* Compute powers */
     pows = flint_calloc(n + 1, sizeof(mp_limb_t));
-    pows[0] = n_powmod2_preinv(0, n, mod.n, mod.ninv);
-    pows[1] = n_powmod2_preinv(1, n, mod.n, mod.ninv);
+    pows[0] = n_powmod2_ui_preinv(0, n, mod.n, mod.ninv);
+    pows[1] = n_powmod2_ui_preinv(1, n, mod.n, mod.ninv);
 
     for (i = 2; i <= n; i++)
     {
         if (pows[i] == 0)
-            pows[i] = n_powmod2_preinv(i, n, mod.n, mod.ninv);
+            pows[i] = n_powmod2_ui_preinv(i, n, mod.n, mod.ninv);
 
         for (j = 2; j <= i && i * j <= n; j++)
             if (pows[i * j] == 0)

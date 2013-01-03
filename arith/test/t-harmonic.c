@@ -43,7 +43,7 @@ void numerical_test(fmpq_t res, long n, double ans)
     mpq_t tmp;
     mpq_init(tmp);
 
-    harmonic_number(res, n);
+    arith_harmonic_number(res, n);
     fmpq_get_mpq(tmp, res);
     err = mpq_get_d(tmp) - ans;
     err = FLINT_ABS(err);
@@ -101,7 +101,7 @@ int main(void)
     for (i = -2; i < 1000; i++)
     {
         mpq_harmonic_balanced(x, 1, i);
-        harmonic_number(t, i);
+        arith_harmonic_number(t, i);
         fmpq_get_mpq(y, t);
 
         if (!mpq_equal(x, y))
@@ -146,6 +146,7 @@ int main(void)
     mpq_clear(y);
     fmpq_clear(t);
 
+    _fmpz_cleanup();
     printf("PASS\n");
     return 0;
 }

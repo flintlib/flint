@@ -53,7 +53,7 @@ nmod_poly_compose_mod(nmod_poly_t res,
 
     if (len3 == 0)
     {
-        printf("exception: division by zero in nmod_poly_compose_mod\n");
+        printf("Exception (nmod_poly_compose_mod). Division by zero.\n");
         abort();
     }
 
@@ -83,8 +83,8 @@ nmod_poly_compose_mod(nmod_poly_t res,
 
     if (len2 <= len)
     {
-        mpn_copyi(ptr2, poly2->coeffs, len2);
-        mpn_zero(ptr2 + len2, len - len2);
+        flint_mpn_copyi(ptr2, poly2->coeffs, len2);
+        flint_mpn_zero(ptr2 + len2, len - len2);
     }
     else
     {

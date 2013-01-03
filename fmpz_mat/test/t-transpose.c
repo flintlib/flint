@@ -83,6 +83,8 @@ main(void)
 
         fmpz_mat_randtest(A, state, 1+n_randint(state, 100));
         fmpz_mat_set(B, A);
+        fmpz_mat_transpose(B, B);
+        fmpz_mat_transpose(B, B);
 
         if (!fmpz_mat_equal(B, A))
         {

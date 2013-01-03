@@ -53,7 +53,7 @@ int main(void)
     printf("factorial_mod2_preinv....");
     fflush(stdout);
 
-    for (n = 0; n < 1000; n++)
+    for (n = 0; n < 100 * flint_test_multiplier(); n++)
     {
         mp_limb_t p, pinv, x, y;
 

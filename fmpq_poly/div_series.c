@@ -72,7 +72,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
         a = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < A->length; i++)
             a[i] = A->coeffs[i];
-        mpn_zero((mp_ptr) a + A->length, n - A->length);
+        flint_mpn_zero((mp_ptr) a + A->length, n - A->length);
         flags |= 1UL;
     }
 
@@ -86,7 +86,7 @@ void fmpq_poly_div_series(fmpq_poly_t Q, const fmpq_poly_t A,
         b = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < B->length; i++)
             b[i] = B->coeffs[i];
-        mpn_zero((mp_ptr) b + B->length, n - B->length);
+        flint_mpn_zero((mp_ptr) b + B->length, n - B->length);
         flags |= 2UL;
     }
 

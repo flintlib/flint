@@ -39,7 +39,7 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, s1, s2;
       mpz_t a_m, s2_m;
@@ -67,7 +67,7 @@ int main(void)
       mpz_clear(s2_m);
    }
 
-   for (i = 0; i < 100000; i++)
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++)
    {
       mp_limb_t a, s1, s2, bits;
       mpz_t a_m, s2_m;
@@ -75,8 +75,8 @@ int main(void)
       mpz_init(a_m);
       mpz_init(s2_m);
       
-      bits = n_randint(state, 33);
-      a = n_randbits(state, bits);
+      bits = n_randint(state, FLINT_BITS/2 + 1);
+      a = n_randtest_bits(state, bits);
       a = a*a;
       a += (n_randint(state, 100) - 50);
       s1 = n_sqrt(a);

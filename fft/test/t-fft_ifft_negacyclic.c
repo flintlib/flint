@@ -76,7 +76,7 @@ main(void)
             for (i = 0, ptr = (mp_limb_t *) jj + 2*n; i < 2*n; i++, ptr += size) 
             {
                 jj[i] = ptr;
-                mpn_copyi(jj[i], ii[i], size);
+                flint_mpn_copyi(jj[i], ii[i], size);
             }
    
             fft_negacyclic(ii, n, w, &t1, &t2, &s1);

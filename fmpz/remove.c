@@ -119,7 +119,7 @@ long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     if ((fmpz_sgn(f) <= 0) || fmpz_is_one(f))
     {
-        printf("Exception:  factor f <= 1 in fmpz_remove\n");
+        printf("Exception (fmpz_remove). factor f <= 1.\n");
         abort();
     }
 

@@ -62,7 +62,7 @@ fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
 
     if (flen < 1 || !fmpz_equal(f->coeffs, f->den))
     {
-        printf("Exception: fmpq_poly_log_series: constant term != 1\n");
+        printf("Exception (fmpq_poly_log_series). Constant term != 1.\n");
         abort();
     }
 

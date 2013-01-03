@@ -161,7 +161,7 @@ balanced_product(fmpz * c, fmpz * alpha, long len, long prec)
 }
 
 void
-_cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
+_arith_cos_minpoly(fmpz * coeffs, long d, ulong n)
 {
     long i, j, prec, exp;
     fmpz * alpha;
@@ -257,7 +257,7 @@ _cyclotomic_cos_polynomial(fmpz * coeffs, long d, ulong n)
 }
 
 void
-cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n)
+arith_cos_minpoly(fmpz_poly_t poly, ulong n)
 {
     if (n == 0)
     {
@@ -268,7 +268,7 @@ cyclotomic_cos_polynomial(fmpz_poly_t poly, ulong n)
         long d = (n <= 2) ? 1 : n_euler_phi(n) / 2;
 
         fmpz_poly_fit_length(poly, d + 1);
-        _cyclotomic_cos_polynomial(poly->coeffs, d, n);
+        _arith_cos_minpoly(poly->coeffs, d, n);
         _fmpz_poly_set_length(poly, d + 1);
     }
 }

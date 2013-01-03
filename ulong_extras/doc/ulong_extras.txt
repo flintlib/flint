@@ -34,16 +34,10 @@
 void n_randinit(flint_rand_t state)
 
     Initialise a random state for use in random functions. 
-    Currently this function does nothing, but must be used
-    for compatibility with future versions of flint. In 
-    particular the random functions below are not implemented
-    in a threadsafe manner.
 
-void n_randinit(flint_rand_t state)
+void n_randclear(flint_rand_t state)
 
-    Release any memory used by a random state. Currently this 
-    function does nothing, but must be used for compatibility 
-    with future versions of flint.
+    Release any memory used by a random state. 
 
 mp_limb_t n_randlimb(flint_rand_t state)
 
@@ -62,6 +56,14 @@ mp_limb_t n_randbits(flint_rand_t state, unsigned int bits)
     bits. The most significant bit is always set, unless zero is passed,
     in which case zero is returned.
 
+mp_limb_t n_randtest_bits(flint_rand_t state, int bits)
+
+    Returns a uniformly pseudo random number with the given number of 
+    bits. The most significant bit is always set, unless zero is passed,
+    in which case zero is returned. The probability of a value with a
+    sparse binary representation being returned is increased. This
+    function is intended for use in test code.
+
 mp_limb_t n_randint(flint_rand_t state, mp_limb_t limit)
 
     Returns a uniformly pseudo random number up to but not including
@@ -72,16 +74,15 @@ mp_limb_t n_randtest(flint_rand_t state)
 
     Returns a pseudo random number with a random number of bits,
     from $0$ to \code{FLINT_BITS}.  The probability of the special 
-    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased.  
+    values $0$, $1$, \code{COEFF_MAX} and \code{LONG_MAX} is increased
+    as is the probability of a value with sparse binary representation.  
     This random function is mainly used for testing purposes.
-    Warning: this function is not threadsafe and is for use in test
-    code only. It should not be used in library code.
+    This function is intended for use in test code. 
 
 mp_limb_t n_randtest_not_zero(flint_rand_t state)
 
     As for \code{n_randtest()}, but does not return $0$.
-    Warning: this function is not threadsafe and is for use in test
-    code only. It should not be used in library code.
+    This function is intended for use in test code. 
 
 mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
 
@@ -93,6 +94,7 @@ mp_limb_t n_randtest_prime(flint_rand_t state, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with size randomly chosen between 2 and \code{FLINT_BITS} bits.
+    This function is intended for use in test code.
 
 *******************************************************************************
 
@@ -148,18 +150,18 @@ int n_sizeinbase(mp_limb_t n, int base)
 mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
     Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed 
-    by \code{n_precompute_inverse()}. We require $n < 2^{53}$ and 
-    \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
+    by\\ \code{n_precompute_inverse()}. We require \code{n < 2^FLINT_D_BITS}
+    and \code{a < 2^(FLINT_BITS-1)} and $0 \leq a < n^2$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
     significant bit of which we shall call a place, and can be at most 
-    half a place out. When $a$ is multiplied by $n$, the binary representation
-    of $a$ is exact and the mantissa is less than $2$, thus we see that 
-    \code{m * ninv} can be at most one out in the mantissa. We now truncate 
-    \code{m * ninv} to the nearest integer, which is always a round down. 
-    Either we already have an integer, or we need to make a change down of at 
-    least $1$ in the last place. In the latter case we either get 
+    half a place out. When $a$ is multiplied by $ninv$, the binary 
+    representation of $a$ is exact and the mantissa is less than $2$, thus we 
+    see that \code{a * ninv} can be at most one out in the mantissa. We now 
+    truncate \code{a * ninv} to the nearest integer, which is always a round 
+    down. Either we already have an integer, or we need to make a change down 
+    of at least $1$ in the last place. In the latter case we either get 
     precisely the exact quotient or below it as when we rounded the
     product to the nearest place we changed by at most half a place.
     In the case that truncating to an integer takes us below the
@@ -171,23 +173,23 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double ninv)
     where we had to round up to the nearest place which happened to 
     be an integer, so that truncating to an integer didn't change 
     anything. But this implies that the exact quotient $a/n$ is less 
-    than $2^{-54}$ from an integer. But this is impossible, as $n < 2^{53}$. 
-    Thus the quotient we have computed is either exactly what we are 
-    after, or one too small.
+    than $2^{-54}$ from an integer. We deal with this rare case by 
+    subtracting 1 from the quotient. Then the quotient we have computed is 
+    either exactly what we are after, or one too small.
 
 mp_limb_t n_mod2_precomp(mp_limb_t a, mp_limb_t n, double ninv)
 
-    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_precompute_inverse()}. There are no restrictions on $a$ or 
     on $n$.
 
     As for \code{n_mod_precomp()} for $n < 2^{53}$ and $a < n^2$ the 
-    computed quotient is either what we are after or one too small. We 
-    deal with these cases. Otherwise we can be sure that the 
+    computed quotient is either what we are after or one too large or small. 
+    We deal with these cases. Otherwise we can be sure that the 
     top $52$ bits of the quotient are computed correctly. We take
     the remainder and adjust the quotient by multiplying the
     remainder by \code{ninv} to compute another approximate quotient as
-    per \code{mod_precomp}. Now the remainder may have been either 
+    per \code{mod_precomp}. Now the remainder may be either 
     negative or positive, so the quotient we compute may be one
     out in either direction.
 
@@ -197,7 +199,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
     \code{n_preinvert_limb()}. There are no restrictions on $a$ or on $n$. 
 
     The old version of this function was implemented simply by 
-    making use of \code{udiv_qrnnd_preinv()}.
+    making use of\\ \code{udiv_qrnnd_preinv()}.
 
     The new version uses the new algorithm of Granlund and 
     M\"oller~\citep{GraMol2010}. First $n$ is normalised and a 
@@ -211,7 +213,7 @@ mp_limb_t n_mod2_preinv(mp_limb_t a, mp_limb_t n, mp_limb_t ninv)
 mp_limb_t n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, 
                                                                    double npre)
 
-    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_precompute_inverse()} and sets $q$ to the quotient. There 
     are no restrictions on $a$ or on $n$.
 
@@ -258,14 +260,14 @@ mp_limb_t n_lll_mod_preinv(mp_limb_t a_hi, mp_limb_t a_mi,
 mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
-    and $0 \leq a, b < n$.
+    computed by\\ \code{n_precompute_inverse()}. We require 
+    \code{n < 2^FLINT_D_BITS} and $0 \leq a, b < n$.
 
     We assume the processor is in the standard round to nearest
     mode. Thus \code{ninv} is correct to $53$ binary bits, the least 
     significant bit of which we shall call a place, and can be at most half 
     a place out. The product of $a$ and $b$ is computed with error at most 
-    half a place. When \code{a * b} is multiplied by $n$ we find that the 
+    half a place. When \code{a * b} is multiplied by $ninv$ we find that the 
     exact quotient and computed quotient differ by less than two places. As 
     the quotient is less than $n$ this means that the exact quotient is at 
     most $1$ away from the computed quotient. We truncate this quotient to 
@@ -277,12 +279,35 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
     computed integer quotient is at most two above and one below the quotient 
     we are after.
 
-n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
+mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
+                                           mp_limb_t n, mp_limb_t ninv)
 
-    Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by 
+    Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, $b$ or 
     on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
     then reducing using \code{n_ll_mod_preinv()}.
+
+mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, 
+                                            mp_limb_t ninv, ulong norm)
+
+    Returns $a b \pmod{n}$ given a precomputed inverse of $n$ computed by\\ 
+    \code{n_preinvert_limb()}, assuming $a$ and $b$ are reduced modulo $n$ 
+    and $n$ is normalised, i.e. with most significant bit set. There are 
+    no other restrictions on $a$, $b$ or $n$.
+
+    The value \code{norm} is provided for convenience. As $n$ is required
+    to be normalised, it may be that $a$ and $b$ have been shifted to the
+    left by \code{norm} bits before calling the function. Their product
+    then has an extra factor of $2^\mbox{norm}$. Specifying a nonzero
+    \code{norm} will shift the product right by this many bits before
+    reducing it.
+
+    The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
+
+    % Torbjorn Granlund and Niels Moller
+    % Improved Division by Invariant Integers
+    % http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
+
 
 *******************************************************************************
 
@@ -393,17 +418,28 @@ mp_limb_t n_invmod(mp_limb_t x, mp_limb_t y)
 mp_limb_t n_powmod_precomp(mp_limb_t a, mp_limb_signed_t exp, 
                                                       mp_limb_t n, double npre)
 
-    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ 
-    computed by \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
+    Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
+    computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
     and $0 \leq a < n$. There are no restrictions on \code{exp}, i.e.\ 
     it can be negative.
 
     This is implemented as a standard binary powering algorithm using
     repeated squaring and reducing modulo $n$ at each step.
 
+mp_limb_t n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, 
+                                                      mp_limb_t n, double npre)
+
+    Returns \code{a^exp} modulo $n$ given a precomputed inverse of $n$ 
+    computed by\\ \code{n_precompute_inverse()}. We require $n < 2^{53}$ 
+    and $0 \leq a < n$. The exponent \code{exp} is unsigned and so
+    can be larger than allowed by \code{n_powmod_precomp}.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
+
 mp_limb_t n_powmod(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
-    Returns \code{(a^exp) % n}. We require \code{n < 2^FLINT_D_BITS} 
+    Returns \code{a^exp} modulo $n$. We require \code{n < 2^FLINT_D_BITS} 
     and $0 \leq a < n$. There are no restrictions on \code{exp}, i.e.\ 
     it can be negative.
 
@@ -427,6 +463,17 @@ mp_limb_t n_powmod2(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n)
 
     This is implemented by precomputing an inverse limb and calling the 
     \code{preinv} version of this function.
+
+mp_limb_t n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, 
+                                                                mp_limb_t ninv)
+
+    Returns \code{(a^exp) % n} given a precomputed inverse of $n$ computed 
+    by \code{n_preinvert_limb()}. We require $0 \leq a < n$, but there are no 
+    restrictions on $n$. The exponent \code{exp} is unsigned and so can be
+    larger than allowed by \code{n_powmod2_preinv}.
+
+    This is implemented as a standard binary powering algorithm using
+    repeated squaring and reducing modulo $n$ at each step.
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
 
@@ -474,33 +521,46 @@ long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
 *******************************************************************************
 
+void n_primes_init(n_primes_t iter)
+
+    Initialises the prime number iterator \code{iter} for use.
+
+void n_primes_clear(n_primes_t iter)
+
+    Clears memory allocated by the prime number iterator \code{iter}.
+
+mp_limb_t n_primes_next(n_primes_t iter)
+
+    Returns the next prime number and advances the state of \code{iter}.
+    The first call returns 2.
+
+    Small primes are looked up from \code{flint_small_primes}.
+    When this table is exhausted, primes are generated in blocks
+    by calling \code{n_primes_sieve_range}.
+
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+
+    Changes the state of \code{iter} to start generating primes
+    after $n$ (excluding $n$ itself).
+
+void n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
+
+    Extends the table of small primes in \code{iter} to contain
+    at least two primes larger than or equal to \code{bound}.
+
+void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+
+    Sets the block endpoints of \code{iter} to the smallest and
+    largest odd numbers between $a$ and $b$ inclusive, and
+    sieves to mark all odd primes in this range.
+    The iterator state is changed to point to the first
+    number in the sieved range.
+
 void n_compute_primes(ulong num_primes)
 
     Precomputes \code{num_primes} primes and their \code{double} 
     precomputed inverses and stores them in \code{flint_primes} 
     and \code{flint_prime_inverse}, respectively.
-
-    The algorithm is a simple sieve of Eratosthenes with the 
-    constant array of primes \code{flint_small_primes} as a starting 
-    point.
-
-    The sieve works by marking all multiples of small primes in
-    the sieve, but the sieve does not contain entries for numbers
-    below the current cutoff (in case the function may have already 
-    been called before). 
-
-    One only needs to start sieving with $p^2$ as all smaller multiples 
-    of $p$ have already been marked off. 
-
-    At first $p^2$ may be less than the start of the sieve (the old 
-    cutoff), so this case is dealt with separately, but for all 
-    primes $p$ beyond that all multiples of $p$ starting at $p^2$ are 
-    marked off in the sieve.
-
-    As the small prime cutoff is currently $1030$, primes can be 
-    computed up to almost $n = 2^{20}$, in fact 
-    $\floor{n / \log_2(n) \times 0.7} = 74898$ primes which actually 
-    takes us to $949937$.
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
@@ -1021,6 +1081,19 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
 
     The factors are proved prime if \code{proved} is $1$, otherwise
     they are merely probably prime.
+
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
+
+    Factors $n$ using Williams' $p + 1$ factoring algorithm, with prime
+    limit set to $B0$. We require $c$ to be set to a random value. Each
+    trial of the algorithm with a different value of $c$ gives another
+    chance to factor $n$, with roughly exponentially decreasing chance
+    of finding a missing factor. If $p + 1$ (or $p - 1$) is not smooth
+    for any factor $p$ of $n$, the algorithm will never succeed. The
+    value $c$ should be less than $n$ and greater than $2$.
+
+    If the algorithm succeeds, it returns the factor, otherwise it
+    returns $0$ or $1$ (the trivial factors modulo $n$).
 
 *******************************************************************************
 

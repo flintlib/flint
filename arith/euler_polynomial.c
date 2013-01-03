@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 #include "arith.h"
 
-void euler_polynomial(fmpq_poly_t poly, ulong n)
+void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
     long k;
@@ -42,7 +42,7 @@ void euler_polynomial(fmpq_poly_t poly, ulong n)
         return;
     }
 
-    bernoulli_polynomial(poly, n + 1);
+    arith_bernoulli_polynomial(poly, n + 1);
 
     fmpz_init(t);
     fmpz_set_si(t, -2L);

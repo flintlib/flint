@@ -40,7 +40,7 @@ nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
 
     nmod_poly_init(den, nmod_poly_mat_modulus(mat));
     nmod_poly_mat_init_set(tmp, mat);
-    rank = nmod_poly_mat_rref(tmp, den, NULL, tmp);
+    rank = nmod_poly_mat_rref(tmp, den, tmp);
     nullity = n - rank;
 
     nmod_poly_mat_zero(res);

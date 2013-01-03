@@ -34,7 +34,7 @@
 void fmpz_poly_init(fmpz_poly_t poly)
 
     Initialises \code{poly} for use, setting its length to zero.  
-    A corresponding call to \code{fmpz_poly_clear()} must be made after 
+    A corresponding call to\\ \code{fmpz_poly_clear()} must be made after 
     finishing with the \code{fmpz_poly_t} to free the memory used by 
     the polynomial.
 
@@ -1166,6 +1166,9 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
     It is assumed that \code{len1 >= len2 > 0}. No aliasing of inputs and 
     outputs is permitted.
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     Uses a multimodular algorithm. The resultant is first computed and 
     extended GCD's modulo various primes $p$ are computed and combined using
     CRT. When the CRT stabilises the resulting polynomials are simply reduced
@@ -1178,6 +1181,9 @@ void fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     Uses the multimodular algorithm.
 
 void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t, 
@@ -1189,6 +1195,9 @@ void _fmpz_poly_xgcd(fmpz_t r, fmpz * s, fmpz * t,
     of $s$ will be no greater than \code{len2} and the length of $t$ will be
     no greater than \code{len1} (both are zero padded if necessary).
 
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
+
     It is assumed that \code{len1 >= len2 > 0}. No aliasing of inputs and 
     outputs is permitted.
 
@@ -1198,6 +1207,9 @@ void fmpz_poly_xgcd(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
     Set $r$ to the resultant of $f$ and $g$. If the resultant is zero, the
     function then returns immediately, otherwise $s$ and $t$ are found such
     that \code{s*f + t*g = r}.
+
+    The function assumes that $f$ and $g$ are primitive (have Gaussian content
+    equal to 1). The result is undefined otherwise.
 
 void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
                                               const fmpz * poly2, long len2)
@@ -2022,7 +2034,7 @@ void _fmpz_poly_compose_series_horner(fmpz * res,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2045,7 +2057,7 @@ void _fmpz_poly_compose_series_brent_kung(fmpz * res, const fmpz * poly1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2068,7 +2080,7 @@ void _fmpz_poly_compose_series(fmpz * res, const fmpz * poly1, long len1,
     to be zero.
 
     Assumes that \code{len1, len2, n > 0}, that \code{len1, len2 <= n},
-    and that \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
+    and that\\ \code{(len1-1) * (len2-1) + 1 <= n}, and that \code{res} has
     space for \code{n} coefficients. Does not support aliasing between any
     of the inputs and the output.
 
@@ -2380,7 +2392,7 @@ long _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, long *link,
     this function so that you can keep them for restarting Hensel lifting 
     later. The product of local factors must be squarefree.
 
-    The return value is an exponent which must be passed to the function 
+    The return value is an exponent which must be passed to the function\\ 
     \code{_fmpz_poly_hensel_continue_lift()} as \code{prev_exp} if the 
     Hensel lifting is to be resumed.
 
@@ -2397,7 +2409,7 @@ long _fmpz_poly_hensel_continue_lift(fmpz_poly_factor_t lifted_fac,
 
     It lifts from \code{curr} to $N$. It also requires \code{prev} 
     (to lift the cofactors) given as the return value of the function 
-    \code{_fmpz_poly_hensel_start_lift()} or the function 
+    \code{_fmpz_poly_hensel_start_lift()} or the function\\ 
     \code{_fmpz_poly_hensel_continue_lift()}. The current lifted factors 
     are supplied in \code{lifted_fac} and upon return are updated
     there. As usual \code{link}, \code{v}, and \code{w} describe the 
@@ -2601,12 +2613,12 @@ void fmpz_poly_get_nmod_poly(nmod_poly_t Amod, fmpz_poly_t A)
 
 void fmpz_poly_set_nmod_poly(fmpz_poly_t A, const nmod_poly_t Amod)
 
-    Sets the coefficients of \code{Amod} to the residues in \code{Amod},
+    Sets the coefficients of \code{A} to the residues in \code{Amod},
     normalised to the interval $-m/2 \le r < m/2$ where $m$ is the modulus.
 
 void fmpz_poly_set_nmod_poly_unsigned(fmpz_poly_t A, const nmod_poly_t Amod)
 
-    Sets the coefficients of \code{Amod} to the residues in \code{Amod},
+    Sets the coefficients of \code{A} to the residues in \code{Amod},
     normalised to the interval $0 \le r < m$ where $m$ is the modulus.
 
 void
@@ -2684,3 +2696,28 @@ void _fmpz_poly_newton_to_monomial(fmpz * poly, const fmpz * roots, long n)
     Converts the polynomial in-place from its coefficients in the
     Newton basis $1, (x-r_0), (x-r_0)(x-r_1), \ldots$ to the monomial
     basis. Uses repeated polynomial division, requiring $O(n^2)$ operations.
+
+*******************************************************************************
+
+    Roots
+
+*******************************************************************************
+
+void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len)
+
+void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly)
+
+    Computes a nonnegative integer \code{bound} that bounds the absolute
+    value of all complex roots of \code{poly}. Uses Fujiwara's bound
+
+    $$
+    2 \max \left(
+        \left|\frac{a_{n-1}}{a_n}\right|,
+        \left|\frac{a_{n-2}}{a_n}\right|^{\frac{1}{2}}, \dots
+        \left|\frac{a_1}{a_n}\right|^{\frac{1}{n-1}},
+        \left|\frac{a_0}{2a_n}\right|^{\frac{1}{n}
+    \right)
+    $$
+
+    where the coefficients of the polynomial are $a_0, \ldots, a_n$.
+

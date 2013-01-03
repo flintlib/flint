@@ -67,7 +67,7 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
 
 #define CRT_MAX_RESOLUTION 16
 
-void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
@@ -82,14 +82,14 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
         return;
 
     for (i = 0; i < n; i++)
-        bernoulli_number_denom(den + i, i);
+        arith_bernoulli_number_denom(den + i, i);
 
     /* Number of nonzero entries (apart from B_1) */
     m = (n + 1) / 2;
     resolution = FLINT_MAX(1, FLINT_MIN(CRT_MAX_RESOLUTION, m / 16));
 
     /* Note that the denominators must be accounted for */
-    size = bernoulli_number_size(n) + _fmpz_vec_max_bits(den, n) + 2;
+    size = arith_bernoulli_number_size(n) + _fmpz_vec_max_bits(den, n) + 2;
 
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
@@ -126,7 +126,7 @@ void _bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, long n)
     /* Reconstruction */
     for (k = 0; k < n; k += 2)
     {
-        size = bernoulli_number_size(k) + fmpz_bits(den + k) + 2;
+        size = arith_bernoulli_number_size(k) + fmpz_bits(den + k) + 2;
         /* Use only as large a comb as needed */
         num_primes_k = (size + prime_bits - 1) / prime_bits;
         for (i = 0; i < resolution; i++)

@@ -122,7 +122,7 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
 {
     long i, dim = fmpz_mat_nrows(A);
 
-    if (dim == 0)
+    if (dim == 0 || fmpz_mat_ncols(B) == 0)
     {
         fmpz_one(den);
         return 1;
@@ -172,7 +172,7 @@ fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
     }
     else
     {
-        printf("Exception: fmpz_mat_solve_cramer: dim > 3 not implemented");
+        printf("Exception (fmpz_mat_solve_cramer). dim > 3 not implemented.");
         abort();
     }
 }

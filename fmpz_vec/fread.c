@@ -49,7 +49,7 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("ERROR (_fmpz_vec_fread).  Length does not fit into a long.\n");
+        printf("Exception (_fmpz_vec_fread). Length does not fit into a long.\n");
         abort();
     }
     if (alloc)

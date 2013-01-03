@@ -218,6 +218,13 @@ int fmpz_poly_is_unit(const fmpz_poly_t op)
     return (op->length == 1) && (*(op->coeffs) == 1L || *(op->coeffs) == -1L);
 }
 
+static __inline__
+int fmpz_poly_equal_fmpz(const fmpz_poly_t poly, const fmpz_t c)
+{
+	return ((poly->length == 0) && fmpz_is_zero(c)) ||
+        ((poly->length == 1) && fmpz_equal(poly->coeffs, c));
+}
+
 /*  Addition and subtraction  ************************************************/
 
 void _fmpz_poly_add(fmpz * res, const fmpz * poly1, long len1, 
@@ -718,14 +725,14 @@ static __inline__
 void _fmpz_poly_pseudo_divrem(fmpz * Q, fmpz * R, ulong * d, 
                     const fmpz * A, long A_len, const fmpz * B, long B_len)
 {
-    _fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, A_len, B, B_len);
+    _fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, A_len, B, B_len);
 }
 
 static __inline__
 void fmpz_poly_pseudo_divrem(fmpz_poly_t Q, fmpz_poly_t R, 
                        ulong * d, const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    fmpz_poly_pseudo_divrem_basecase(Q, R, d, A, B);
+    fmpz_poly_pseudo_divrem_divconquer(Q, R, d, A, B);
 }
 
 void _fmpz_poly_pseudo_div(fmpz * Q, ulong * d, const fmpz * A, long lenA, 
@@ -1097,6 +1104,12 @@ static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, fmpz_poly_t poly, long n
     fmpz_get_mpz(x, t);
     fmpz_clear(t);
 }
+
+/* Roots */
+
+void _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len);
+
+void fmpz_poly_bound_roots(fmpz_t bound, const fmpz_poly_t poly);
 
 #ifdef __cplusplus
 }

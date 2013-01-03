@@ -41,7 +41,7 @@ int main(void)
    printf("is_probabprime_lucas....");
    fflush(stdout);
  
-   for (i = 0; i < 100000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
 
@@ -64,7 +64,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 100000; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
       mpz_init(d_m);
 
@@ -79,7 +79,7 @@ int main(void)
       mpz_clear(d_m);
    }
       
-   result = (count < 200UL);
+   result = (count < 20 * flint_test_multiplier());
    if (!result)
    {
       printf("FAIL:\n");

@@ -1,21 +1,28 @@
-LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lpthread -lflint -lmpir -lmpfr -lm
-LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -lpthread -lmpir -lmpfr -lm
-INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR)
-LINKLIBS=
+BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
+   fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
+   arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
+   fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
+   fmpz_factor fmpz_poly_factor fft qsieve double_extras
 
-LD_LIBRARY_PATH:=${CURDIR}:${FLINT_MPFR_LIB_DIR}:${FLINT_MPIR_LIB_DIR}:${FLINT_NTL_LIB_DIR}:${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH
+LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
+LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
+INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR) -I$(FLINT_BLAS_INCLUDE_DIR)
+
 export
 
-SOURCES = $(wildcard *.c)
+SOURCES = clz_tab.c memory_manager.c version.c profiler.c 
 
-HEADERS = $(wildcard *.h)
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) config.h fft_tuning.h fmpz-conversions.h
 
-OBJS = $(patsubst %.c, build/%.o, $(LIB_SOURCES))
+OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 
-LIB_OBJS = $(patsubst %.c, build/%.lo, $(LIB_SOURCES))
+LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
+LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
-LIB_SOURCES = $(SOURCES) $(foreach dir, $(BUILD_DIRS), $(wildcard $(dir)/*.c))
+LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
+MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
+
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
 
 EXMP_SOURCES = $(wildcard examples/*.c)
 
@@ -27,93 +34,86 @@ TUNE_SOURCES = $(wildcard tune/*.c)
 
 EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
-TESTS = $(patsubst %.c, %, $(TEST_SOURCES))
+TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
 
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: all-dirs $(OBJS) recursive library 
-
-all-dirs:
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir);)
+all: library 
 
 clean:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean;)
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) clean || exit $$?;)
+	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
 
 distclean: clean
-	rm -f Makefile
+	rm -f config.h fft_tuning.h fmpz-conversions.h Makefile
 
 dist:
-	git archive --format tar --prefix flint-2.3/ trunk > ../flint-2.3.tar; gzip ../flint-2.3.tar
+	git archive --format tar --prefix flint-2.3/ flint-2.3 > ../flint-2.3.tar; gzip ../flint-2.3.tar
 
-profile: all profiler.o
+profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile;)
+	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) profile || exit $$?;)
 
-tune: all
+tune: $(FLINT_LIB) $(TUNE_SOURCES)
 	mkdir -p build/tune
-	$(foreach prog, $(TUNE), $(CC) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune;)
+	$(foreach prog, $(TUNE), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) tune || exit $$?;)
 
-recursive:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) 
-
-examples: all $(LOBJS) library
+examples: $(FLINT_LIB) $(EXMP_SOURCES)
 	mkdir -p build/examples
-	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
+	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
-check: $(FLINT_LIB)
-ifndef MOD
-	mkdir -p build/test
-	mkdir -p build/interfaces/test
-	$(foreach prog, $(TESTS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS);)
-	$(foreach prog, $(TESTS), build/$(prog);)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;)
+$(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) shared || exit $$?;)
 	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		$(CXX) $(CFLAGS) $(INCS) interfaces/test/t-NTL-interface.cpp build/interfaces/NTL-interface.o -o build/interfaces/test/t-NTL-interface $(LIBS) -lntl; \
+	  $(MAKE) build/interfaces/NTL-interface.lo; \
+	  $(CXX) $(ABI_FLAG) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
+	fi
+	if [ "$(WANT_NTL)" -ne "1" ]; then \
+	  $(CC) $(ABI_FLAG) -shared $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
+	fi
+
+libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -C $(dir) static || exit $$?;)
+	if [ "$(FLINT_SHARED)" -eq "0" ]; then \
+		touch test/t-*.c; \
+		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
+	fi
+	if [ "$(WANT_NTL)" -eq "1" ]; then \
+		$(MAKE) build/interfaces/NTL-interface.o; \
+		$(AR) rcs libflint.a build/interfaces/NTL-interface.o; \
+	fi
+	$(AR) rcs libflint.a $(OBJS);
+	$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
+
+library:
+	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+		$(MAKE) $(FLINT_LIB); \
+	fi
+	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+		$(MAKE) libflint.a; \
+	fi
+
+check: library test_helpers.o
+ifndef MOD
+	$(MAKE) $(TESTS)
+	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
+	mkdir -p build/interfaces/test
+	if [ "$(WANT_NTL)" -eq "1" ]; then \
+		$(MAKE) build/interfaces/test/t-NTL-interface; \
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check;) 
+	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) check || exit $$?;)
 endif
 
-library: library-recursive $(OBJS) $(LIB_OBJS)
-	mkdir -p build
-	mkdir -p build/interfaces
-	if [ "$(WANT_NTL)" -eq "1" ]; then \
-		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.lo; \
-			$(CXX) -fPIC -shared build/interfaces/NTL-interface.lo $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
-		fi; \
-		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(CXX) -fPIC  $(CFLAGS) $(INCS) -c interfaces/NTL-interface.cpp -o build/interfaces/NTL-interface.o; \
-			$(AR) rcs libflint.a build/interfaces/NTL-interface.o $(OBJS) $(LINKLIBS); \
-		fi; \
-	fi
-	if [ "$(WANT_NTL)" -ne "1" ]; then \
-		if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-			$(CC) -fPIC -shared $(LIB_OBJS) $(LIBS2) -o $(FLINT_LIB); \
-		fi; \
-		if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-			$(AR) rcs libflint.a $(OBJS) $(LINKLIBS); \
-		fi; \
-	fi
-
-library-recursive:
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir);) \
-	fi
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); $(MAKE) -C $(dir) library;) \
-	fi
-
-$(FLINT_LIB): library
-
-install: library
+install: $(FLINT_LIB)
 	mkdir -p $(PREFIX)/lib
 	mkdir -p $(PREFIX)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
@@ -124,16 +124,32 @@ install: library
 	fi
 	cp *.h $(PREFIX)/include/flint
 
-.PHONY: profile library library-recursive recursive clean check check-recursive all
+build:
+	mkdir -p build
 
-build/%.lo: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+build/%.lo: %.c | build
+	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/%.o: %.c
-	$(CC) -fPIC $(CFLAGS) $(INCS) -c $< -o $@
+build/%.o: %.c | build
+	$(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
-BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
-   fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
-   arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
-   fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_factor fmpz_poly_factor \
-   fft qsieve
+build/test/%: test/%.c | build/test
+	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+
+build/test:
+	mkdir -p build/test
+
+build/interfaces:
+	mkdir -p build/interfaces
+
+build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
+	$(CXX) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
+	$(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
+
+build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
+	$(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
+
+.PHONY: profile library clean examples tune check distclean dist install all
+

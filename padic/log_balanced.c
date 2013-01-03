@@ -27,8 +27,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-extern long _padic_log_bound(long v, long N, long p);
-
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 
                          const fmpz_t x, long a, long b)
@@ -89,13 +87,9 @@ static void
 _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     fmpz_t P, B, T;
-    long n;
+    long k, n;
 
-    if (fmpz_fits_si(p))
-        n = _padic_log_bound(v, N, fmpz_get_si(p));
-    else
-        n = (N - 1) / v;
-
+    n = _padic_log_bound(v, N, p);
     n = FLINT_MAX(n, 2);
 
     fmpz_init(P);
@@ -104,8 +98,8 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
     _padic_log_bsplit_series(P, B, T, y, 1, n);
 
-    n = fmpz_remove(B, B, p);
-    fmpz_pow_ui(P, p, n);
+    k = fmpz_remove(B, B, p);
+    fmpz_pow_ui(P, p, k);
     fmpz_divexact(T, T, P);
 
     _padic_inv(B, B, p, N);
@@ -116,33 +110,11 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
     fmpz_clear(T);
 }
 
-/*
-    Computes 
-    \begin{equation*}
-    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
-    \end{equation*}
-
-    Note that this can be used to compute the $p$-adic logarithm 
-    via the equation 
-    \begin{align*}
-    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
-            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-    \end{align*}
-
-    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
-    so that the series converges.
-
-    Assumes that $v < N$.
-
-    Does not support aliasing between $y$ and $z$.
- */
-
 void 
 _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
     fmpz_t pv, pN, r, t, u;
-    long val;
+    long w;
     padic_inv_t S;
 
     fmpz_init(pv);
@@ -152,16 +124,12 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
     fmpz_init(u);
     _padic_inv_precompute(S, p, N);
 
-    fmpz_set(t, y);
     fmpz_set(pv, p);
     fmpz_pow_ui(pN, p, N);
+    fmpz_mod(t, y, pN);
     fmpz_zero(z);
-    val = 1;
+    w = 1;
 
-    /*
-        TODO:  Abort earlier if larger than $p^N$, possible
-        with variable precision?
-     */
     while (!fmpz_is_zero(t))
     {
         fmpz_mul(pv, pv, pv);
@@ -170,7 +138,8 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
         if (!fmpz_is_zero(t))
         {
             fmpz_mul(t, t, pv);
-            fmpz_add_ui(u, r, 1);
+            fmpz_sub_ui(u, r, 1);
+            fmpz_neg(u, u);
             _padic_inv_precomp(u, u, S);
             fmpz_mul(t, t, u);
             fmpz_mod(t, t, pN);
@@ -178,12 +147,13 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
         if (!fmpz_is_zero(r))
         {
-            fmpz_neg(r, r);
-            _padic_log_bsplit(r, r, val, p, N);
+            _padic_log_bsplit(r, r, w, p, N);
             fmpz_sub(z, z, r);
         }
-        val *= 2;
+        w *= 2;
     }
+
+    fmpz_mod(z, z, pN);
 
     fmpz_clear(pv);
     fmpz_clear(pN);
@@ -195,6 +165,9 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 
 int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
+    const fmpz *p = ctx->p;
+    const long N  = padic_prec(rop);
+
     if (padic_val(op) < 0)
     {
         return 0;
@@ -208,6 +181,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
         padic_get_fmpz(x, op, ctx);
         fmpz_sub_ui(x, x, 1);
+        fmpz_neg(x, x);
 
         if (fmpz_is_zero(x))
         {
@@ -220,20 +194,20 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             long v;
 
             fmpz_init(t);
-            v = fmpz_remove(t, x, ctx->p);
+            v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
+            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
             {
-                if (v >= ctx->N)
+                if (v >= N)
                 {
                     padic_zero(rop);
                 }
                 else
                 {
-                    _padic_log_balanced(padic_unit(rop), x, v, ctx->p, ctx->N);
+                    _padic_log_balanced(padic_unit(rop), x, v, p, N);
                     padic_val(rop) = 0;
-                    padic_reduce(rop, ctx);
+                    _padic_canonicalise(rop, ctx);
                 }
                 ans = 1;
             }

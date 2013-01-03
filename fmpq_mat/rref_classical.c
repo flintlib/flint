@@ -31,9 +31,8 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-
 long
-fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
 {
     long m, n, i, j, pivot_row, pivot_col, rank;
 
@@ -46,17 +45,13 @@ fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
     if (A != B)
         fmpq_mat_set(B, A);
 
-    if (perm)
-        for (j = 0; j < m; j++)
-            perm[j] = j;
-
     rank = 0;
     pivot_row = 0;
     pivot_col = 0;
 
     while (pivot_row < m && pivot_col < n)
     {
-        if (!fmpq_mat_pivot(perm, B, pivot_row, pivot_col))
+        if (!fmpq_mat_pivot(NULL, B, pivot_row, pivot_col))
         {
             pivot_col++;
             continue;
@@ -95,4 +90,3 @@ fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
 
     return rank;
 }
-

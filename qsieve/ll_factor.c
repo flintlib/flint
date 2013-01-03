@@ -102,7 +102,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 
     /* refine qs_inf->bits */
     qs_inf->bits = fmpz_bits(qs_inf->kn);
-    if (qs_inf->bits >= 2*FLINT_BITS)
+    if (qs_inf->bits > 2*FLINT_BITS)
     {
 		qsieve_ll_clear(qs_inf);
         return 0; /* kn is too large to factor */
@@ -262,6 +262,7 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 
     fmpz_clear(X);
     fmpz_clear(Y);
+    flint_free(nullrows);
 
     /************************************************************************
         CLEAN UP:

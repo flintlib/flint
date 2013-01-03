@@ -42,7 +42,7 @@ int main(void)
    
    flint_randinit(state);
 
-   for (i = 0; i < 100000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
 
@@ -57,7 +57,7 @@ int main(void)
 
       do
       {
-         j = n_randint(state, d);
+         j = n_randtest(state) % d;
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -72,20 +72,20 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 100000; i++) /* Test that not too many composites pass */
+   for (i = 0; i < 10000 * flint_test_multiplier(); i++) /* Test that not too many composites pass */
    {
       mpz_init(d_m);
 
       do
       {
-         d = n_randbits(state, n_randint(state, FLINT_BITS) + 1);
+         d = n_randtest_bits(state, n_randint(state, FLINT_BITS) + 1);
          if (d < 2UL) d = 2;
          mpz_set_ui(d_m, d);
       } while (mpz_probab_prime_p(d_m, 12));
 
       do
       {
-         j = n_randint(state, d);
+         j = n_randtest(state) % d;
          if ((j == 1L) && (d != 2UL)) j++;
       } while (n_gcd(d, j) != 1UL);
 
@@ -94,7 +94,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   result = (count < 1000UL);
+   result = (count < 200 * flint_test_multiplier());
    if (!result)
    {
       printf("FAIL:\n");

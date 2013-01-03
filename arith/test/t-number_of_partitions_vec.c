@@ -56,8 +56,8 @@ int main(void)
         nmod_t mod;
         nmod_init(&mod, n_randtest_prime(state, 0));
 
-        number_of_partitions_vec(p, n);
-        number_of_partitions_nmod_vec(pmod, n, mod);
+        arith_number_of_partitions_vec(p, n);
+        arith_number_of_partitions_nmod_vec(pmod, n, mod);
 
         for (k = 0; k < n; k++)
         {

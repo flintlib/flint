@@ -47,7 +47,7 @@ int main(void)
 
     n = 45;
     res = _fmpz_vec_init(n);
-    landau_function_vec(res, n);
+    arith_landau_function_vec(res, n);
 
     for (k = 0; k < n; k++)
     {

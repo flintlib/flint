@@ -61,7 +61,7 @@ void nmod_poly_rem(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_rem\n");
+        printf("Exception (nmod_poly_rem). Division by zero.\n");
         abort();
     }
     if (lenA < lenB)

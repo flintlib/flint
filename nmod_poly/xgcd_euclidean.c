@@ -32,9 +32,9 @@ long _nmod_poly_xgcd_euclidean(mp_ptr G, mp_ptr S, mp_ptr T,
                                mp_srcptr A, long lenA, 
                                mp_srcptr B, long lenB, nmod_t mod)
 {
-    mpn_zero(G, lenB);
-    mpn_zero(S, lenB - 1);
-    mpn_zero(T, lenA - 1);
+    flint_mpn_zero(G, lenB);
+    flint_mpn_zero(S, lenB - 1);
+    flint_mpn_zero(T, lenA - 1);
 
     if (lenB == 1)
     {
@@ -163,11 +163,11 @@ nmod_poly_xgcd_euclidean(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         }
         else if (lenB == 1)  /* lenA >= lenB = 1 */
         {
-            nmod_poly_one(G);
-            nmod_poly_zero(S);
             nmod_poly_fit_length(T, 1);
             T->length = 1;
             T->coeffs[0] = n_invmod(B->coeffs[0], A->mod.n);
+            nmod_poly_one(G);
+            nmod_poly_zero(S);
         }
         else  /* lenA >= lenB >= 2 */
         {

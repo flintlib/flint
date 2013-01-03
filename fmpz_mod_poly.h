@@ -101,6 +101,10 @@ void
 fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len);
 
 void
+fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
+                                   flint_rand_t state, long len);
+
+void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
                                 flint_rand_t state, long len);
 
@@ -256,12 +260,50 @@ void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, long len, const fmpz_t p);
 
 void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly);
 
+void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, long len1,
+                           const fmpz * poly2, long len2, const fmpz * f,
+                           long lenf, const fmpz_t p);
+
+void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                    const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t f);
+
 /*  Powering *****************************************************************/
 
 void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
                         const fmpz_t p);
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e);
+
+void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+                              ulong e, long trunc, const fmpz_t p);
+
+void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
+                       const fmpz_mod_poly_t poly, ulong e, long trunc);
+
+void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+                                     ulong e, long trunc, const fmpz_t p);
+
+void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
+                              const fmpz_mod_poly_t poly, ulong e, long trunc);
+
+void
+_fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
+                                ulong e, const fmpz * f, long lenf, const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
+                         const fmpz_mod_poly_t poly, ulong e,
+                         const fmpz_mod_poly_t f);
+
+void
+_fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
+                                  const fmpz_t e, const fmpz * f,
+                                  long lenf, const fmpz_t p);
+
+void
+fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
+                           const fmpz_mod_poly_t poly, const fmpz_t e,
+                           const fmpz_mod_poly_t f);
 
 /*  Division *****************************************************************/
 
@@ -278,6 +320,8 @@ void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R,
 
 void fmpz_mod_poly_div_basecase(fmpz_mod_poly_t Q, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B);
+
+ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t p);
 
 void _fmpz_mod_poly_rem_basecase(fmpz * R, 
     const fmpz * A, long lenA, const fmpz * B, long lenB, 
@@ -486,6 +530,32 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 {
     fmpz_mod_poly_compose_divconquer(res, poly1, poly2);
 }
+
+/* Modular composition  ******************************************************/
+
+void
+_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+                                       const fmpz * h, long lenh, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                  const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
+
+void
+_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, long len1,
+                              const fmpz * poly2, const fmpz * poly3, long len3, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                             const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
+
+void
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
+                                              const fmpz * h, long lenh, const fmpz_t p);
+
+void
+fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
+                         const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3);
 
 /*  Radix conversion *********************************************************/
 

@@ -32,57 +32,56 @@
 int _fmpz_poly_divides(fmpz * q, const fmpz * a, 
                        long len1, const fmpz * b, long len2)
 {
-   fmpz * r = _fmpz_vec_init(len1);
-   
-   _fmpz_poly_divrem(q, r, a, len1, b, len2);
+    fmpz * r = _fmpz_vec_init(len1);
 
-   FMPZ_VEC_NORM(r, len1);
+    _fmpz_poly_divrem(q, r, a, len1, b, len2);
 
-   _fmpz_vec_clear(r, len1);
+    FMPZ_VEC_NORM(r, len1);
 
-   return (len1 == 0);
+    _fmpz_vec_clear(r, len1);
+
+    return (len1 == 0);
 }
 
 int fmpz_poly_divides(fmpz_poly_t q, const fmpz_poly_t a, const fmpz_poly_t b)
 {
-   long len_out;
-   int res;
+    if (fmpz_poly_is_zero(b))
+    {
+        printf("Exception (fmpz_poly_divides). Division by zero.\n");
+        abort();
+    }
+    if (fmpz_poly_is_zero(a))
+    {
+        fmpz_poly_zero(q);
+        return 1;
+    }
+    if (a->length < b->length)
+    {
+        return 0;
+    }
 
-   if (b->length == 0)
-   {
-       printf("Exception: division by zero in fmpz_poly_divides\n");
-       abort();
-   }
+    {
+        const long lenQ = a->length - b->length + 1;
+        int res;
 
-   if (a->length == 0)
-   {
-      fmpz_poly_zero(q);
+        if (q == a || q == b)
+        {
+            fmpz_poly_t t;
 
-      return 1;
-   }
-
-   if (a->length < b->length)
-      return 0;
-
-   len_out = a->length - b->length + 1;
-      
-   if (q == a || q == b)
-   {
-      fmpz_poly_t temp;
-      
-      fmpz_poly_init2(temp, len_out);
-      res = _fmpz_poly_divides(temp->coeffs, a->coeffs, a->length, b->coeffs, b->length);
-      temp->length = len_out;
-      _fmpz_poly_normalise(temp);
-      fmpz_poly_swap(q, temp);
-      fmpz_poly_clear(temp);
-   } else
-   {
-      fmpz_poly_fit_length(q, len_out);
-      res = _fmpz_poly_divides(q->coeffs, a->coeffs, a->length, b->coeffs, b->length);
-      q->length = len_out;
-      _fmpz_poly_normalise(q);
-   }
-
-   return res;
+            fmpz_poly_init2(t, lenQ);
+            res = _fmpz_poly_divides(t->coeffs, a->coeffs, a->length, b->coeffs, b->length);
+            _fmpz_poly_set_length(t, lenQ);
+            _fmpz_poly_normalise(t);
+            fmpz_poly_swap(q, t);
+            fmpz_poly_clear(t);
+        }
+        else
+        {
+            fmpz_poly_fit_length(q, lenQ);
+            res = _fmpz_poly_divides(q->coeffs, a->coeffs, a->length, b->coeffs, b->length);
+            _fmpz_poly_set_length(q, lenQ);
+            _fmpz_poly_normalise(q);
+        }
+        return res;
+    }
 }

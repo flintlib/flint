@@ -31,13 +31,13 @@
 #include "ulong_extras.h"
 
 
-void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
+void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {
     mpz_t r;
     mpfr_t t, u, z, pi;
     long prec, pi_prec;
 
-    bernoulli_number_denom(den, n);
+    arith_bernoulli_number_denom(den, n);
 
     if (n % 2)
     {
@@ -51,8 +51,9 @@ void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
         return;
     }
 
-    prec = bernoulli_number_size(n) + fmpz_bits(den) + 10;
-    pi_prec = prec + FLINT_BIT_COUNT(n);
+    prec = arith_bernoulli_number_size(n) + fmpz_bits(den);
+    prec += 10 + 2*FLINT_BIT_COUNT(n);
+    pi_prec = prec;
 
     mpz_init(r);
     mpfr_init2(t, prec);
@@ -70,7 +71,7 @@ void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     mpfr_div(t, t, pi, GMP_RNDN);
 
     /* t = t / zeta(n) */
-    _zeta_inv_euler_product(z, n, 0);
+    mpfr_zeta_inv_euler_product(z, n, 0);
     mpfr_div(t, t, z, GMP_RNDN);
 
     /* round numerator */
@@ -89,3 +90,4 @@ void _bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     mpfr_clear(z);
     mpfr_clear(pi);
 }
+

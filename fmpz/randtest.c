@@ -56,7 +56,7 @@ fmpz_randtest_unsigned(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
     {
         _fmpz_demote(f);
         if (m & 3UL)
-            *f = n_randbits(state, bits);
+            *f = n_randtest_bits(state, bits);
         else
         {
             m >>= 2;
@@ -83,7 +83,7 @@ fmpz_randtest_not_zero(fmpz_t f, flint_rand_t state, mp_bitcnt_t bits)
 {
     if (bits == 0)
     {
-        printf("Exception: 0 passed to fmpz_randtest_not_zero\n");
+        printf("Exception (fmpz_randtest_not_zero). bits == 0.\n");
         abort();
     }
 

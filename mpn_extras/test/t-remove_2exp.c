@@ -51,7 +51,7 @@ int main(void)
             mpz_setbit(a, nonzero);
             mpz_set(b, a);
             mpz_mul_2exp(a, a, zero);
-            a->_mp_size = mpn_remove_2exp(a->_mp_d, a->_mp_size, &check);
+            a->_mp_size = flint_mpn_remove_2exp(a->_mp_d, a->_mp_size, &check);
             if (check != zero || mpz_cmp(a,b))
             {
                 gmp_printf("%d %d \n", zero, nonzero);

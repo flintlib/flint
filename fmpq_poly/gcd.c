@@ -101,47 +101,46 @@ void _fmpq_poly_gcd(fmpz *G, fmpz_t denG,
 
 void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
 {
-    long lenA = A->length, lenB = B->length, lenG = FLINT_MIN(lenA, lenB);
-
-    if (lenA == 0)
+    if (A->length < B->length)
     {
-        if (lenB == 0)
-            fmpq_poly_zero(G);
-        else
-            fmpq_poly_make_monic(G, B);
-        return;
-    }
-    else if (lenB == 0)
-    {
-        fmpq_poly_make_monic(G, A);
-        return;
-    }
-
-    if (G == A || G == B)
-    {
-        fmpq_poly_t t;
-        fmpq_poly_init2(t, lenG);
-        if (lenA >= lenB)
-            _fmpq_poly_gcd(t->coeffs, t->den, A->coeffs, A->length, 
-                                              B->coeffs, B->length);
-        else
-            _fmpq_poly_gcd(t->coeffs, t->den, B->coeffs, B->length, 
-                                              A->coeffs, A->length);
-        fmpq_poly_swap(t, G);
-        fmpq_poly_clear(t);
+        fmpq_poly_gcd(G, B, A);
     }
     else
     {
-        fmpq_poly_fit_length(G, lenG);
-        if (lenA >= lenB)
-            _fmpq_poly_gcd(G->coeffs, G->den, A->coeffs, A->length, 
-                                              B->coeffs, B->length);
-        else
-            _fmpq_poly_gcd(G->coeffs, G->den, B->coeffs, B->length, 
-                                              A->coeffs, A->length);
-    }
+        long lenA = A->length, lenB = B->length;
 
-    _fmpq_poly_set_length(G, lenG);
-    _fmpq_poly_normalise(G);
+        if (lenA == 0) /* lenA = lenB = 0 */
+        {
+            fmpq_poly_zero(G);
+        }
+        else if (lenB == 0) /* lenA > lenB = 0 */
+        {
+            fmpq_poly_make_monic(G, A);
+        }
+        else /* lenA >= lenB >= 1 */
+        {
+            if (G == A || G == B)
+            {
+                fmpq_poly_t t;
+                fmpq_poly_init2(t, lenB);
+                
+                _fmpq_poly_gcd(t->coeffs, t->den, A->coeffs, A->length, 
+                                              B->coeffs, B->length);
+            
+                fmpq_poly_swap(t, G);
+                fmpq_poly_clear(t);
+            }
+            else
+            {
+                fmpq_poly_fit_length(G, lenB);
+                 
+                _fmpq_poly_gcd(G->coeffs, G->den, A->coeffs, A->length, 
+                                              B->coeffs, B->length);
+            }
+
+            _fmpq_poly_set_length(G, lenB);
+            _fmpq_poly_normalise(G);
+        }
+    }
 }
 

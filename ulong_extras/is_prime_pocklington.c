@@ -76,7 +76,7 @@ n_is_prime_pocklington(mp_limb_t n, ulong iterations)
         for (j = 2; j < iterations && pass == 0; j++)
         {
             b = n_powmod2_preinv(j, exp, n, ninv);
-            if (n_powmod2_preinv(b, factors.p[i], n, ninv) != 1UL)
+            if (n_powmod2_ui_preinv(b, factors.p[i], n, ninv) != 1UL)
                 return 0;
 
             b = n_submod(b, 1UL, n);

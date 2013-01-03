@@ -39,15 +39,15 @@ mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs,
    
    for (skip = 0, i = 0; skip + coeff_limbs <= total_limbs; skip += coeff_limbs, i++)
    {
-      mpn_zero(poly[i], output_limbs + 1);
-      mpn_copyi(poly[i], limbs + skip, coeff_limbs);
+      flint_mpn_zero(poly[i], output_limbs + 1);
+      flint_mpn_copyi(poly[i], limbs + skip, coeff_limbs);
    }
    
    if (i < length) 
-      mpn_zero(poly[i], output_limbs + 1);
+      flint_mpn_zero(poly[i], output_limbs + 1);
    
    if (total_limbs > skip) 
-      mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
+      flint_mpn_copyi(poly[i], limbs + skip, total_limbs - skip);
    
    return length;
 }
@@ -70,11 +70,11 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs,
     
    for (i = 0; i < length - 1; i++)
    {
-      mpn_zero(poly[i], output_limbs + 1);
+      flint_mpn_zero(poly[i], output_limbs + 1);
       
       if (!shift_bits)
       {
-         mpn_copyi(poly[i], limb_ptr, coeff_limbs);
+         flint_mpn_copyi(poly[i], limb_ptr, coeff_limbs);
          poly[i][coeff_limbs - 1] &= mask;
          limb_ptr += (coeff_limbs - 1);
          shift_bits += top_bits;
@@ -96,12 +96,12 @@ mp_size_t fft_split_bits(mp_limb_t ** poly, mp_limb_t * limbs,
       } 
    }
    
-   mpn_zero(poly[i], output_limbs + 1);
+   flint_mpn_zero(poly[i], output_limbs + 1);
    
    limbs_left = total_limbs - (limb_ptr - limbs);
    
    if (!shift_bits)
-      mpn_copyi(poly[i], limb_ptr, limbs_left);
+      flint_mpn_copyi(poly[i], limb_ptr, limbs_left);
    else
       mpn_rshift(poly[i], limb_ptr, limbs_left, shift_bits);                   
      

@@ -32,7 +32,7 @@
 #include "arith.h"
 
 double
-dedekind_sum_coprime_d(double h, double k)
+arith_dedekind_sum_coprime_d(double h, double k)
 {
     double a, b, t, s, sign;
 

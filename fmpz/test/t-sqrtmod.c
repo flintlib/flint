@@ -40,7 +40,7 @@ int main(void)
 
     flint_randinit(state);
 
-    for (i = 0; i < 1000; i++) /* Test random integers */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random integers */
     {
         int ans;
         fmpz_t a, b, c, p;
@@ -79,7 +79,7 @@ int main(void)
         fmpz_clear(p);
     }
 
-    for (i = 0; i < 1000; i++) /* Test random squares */
+    for (i = 0; i < 100 * flint_test_multiplier(); i++) /* Test random squares */
     {
         int ans;
         fmpz_t a, b, c, d, p;
@@ -101,6 +101,13 @@ int main(void)
 
         fmpz_mul(a, b, b);
         fmpz_mod(a, a, p);
+
+        /* check a special case */
+        if (i == 0)
+        {
+            fmpz_set_str(p, "15951355998396157", 10);
+            fmpz_set_str(a, "7009303413761286", 10);
+        }
 
         ans = fmpz_sqrtmod(c, a, p);
 

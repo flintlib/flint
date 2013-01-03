@@ -33,7 +33,7 @@ void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x
     {
         if (x == 0)
         {
-            printf("ERROR (fmpz_poly_q_scalar_div_si).  Division by zero.\n");
+            printf("Exception (fmpz_poly_q_scalar_div_si). Division by zero.\n");
             abort();
         }
         if (x == 1)

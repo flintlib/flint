@@ -41,7 +41,7 @@ int main(void)
    printf("is_prime_pocklington....");
    fflush(stdout);
    
-   for (i = 0; i < 10000; i++) /* Test that primes pass the test */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that primes pass the test */
    {
       mpz_init(d_m);
 
@@ -66,7 +66,7 @@ int main(void)
       mpz_clear(d_m);
    }
          
-   for (i = 0; i < 10000; i++) /* Test that composites do not pass */
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test that composites do not pass */
    {
       mpz_init(d_m);
 
@@ -90,7 +90,7 @@ int main(void)
       mpz_clear(d_m);
    }
 
-   if (count > 2000)
+   if (count > 200 * flint_test_multiplier())
    {
       printf("FAIL: Pocklington-Lehmer failed too many times (%lu times)\n", count);
       abort();

@@ -35,7 +35,7 @@
 #define CRT_MAX_RESOLUTION 16
 
 void
-bell_number_vec_multi_mod(fmpz * res, long n)
+arith_bell_number_vec_multi_mod(fmpz * res, long n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
@@ -49,7 +49,7 @@ bell_number_vec_multi_mod(fmpz * res, long n)
 
     resolution = FLINT_MAX(1, FLINT_MIN(CRT_MAX_RESOLUTION, n / 16));
 
-    size = bell_number_size(n);
+    size = arith_bell_number_size(n);
     prime_bits = FLINT_BITS - 1;
     num_primes = (size + prime_bits - 1) / prime_bits;
 
@@ -67,7 +67,7 @@ bell_number_vec_multi_mod(fmpz * res, long n)
         /* printf("prime %ld of %ld\n", k, num_primes); */
         polys[k] = _nmod_vec_init(n);
         nmod_init(&mod, primes[k]);
-        bell_number_nmod_vec(polys[k], n, mod);
+        arith_bell_number_nmod_vec(polys[k], n, mod);
     }
 
     /* Init CRT comb */
@@ -80,7 +80,7 @@ bell_number_vec_multi_mod(fmpz * res, long n)
     /* Reconstruction */
     for (k = 0; k < n; k++)
     {
-        size = bell_number_size(k);
+        size = arith_bell_number_size(k);
         /* Use only as large a comb as needed */
         num_primes_k = (size + prime_bits - 1) / prime_bits;
         for (i = 0; i < resolution; i++)

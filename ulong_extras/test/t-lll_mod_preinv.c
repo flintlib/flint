@@ -39,12 +39,12 @@ int main(void)
 
    flint_randinit(state);
 
-   for (i = 0; i < 1000000; i++)
+   for (i = 0; i < 100000 * flint_test_multiplier(); i++)
    {
       mp_limb_t d, dinv, nh, nm, nl, r1, r2;
 
       d = n_randtest_not_zero(state);
-      nh = n_randint(state, d);
+      nh = n_randtest(state) % d;
       nm = n_randtest(state);
       nl = n_randtest(state);
       

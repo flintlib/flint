@@ -19,27 +19,22 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
-void _padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
+void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(op))
     {
         padic_val(rop) = fmpz_remove(padic_unit(rop), op, ctx->p);
+        _padic_reduce(rop, ctx);
     }
     else
     {
         padic_zero(rop);
     }
-}
-
-void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
-{
-    _padic_set_fmpz(rop, op, ctx);
-    padic_reduce(rop, ctx);
 }
 

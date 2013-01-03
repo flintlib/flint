@@ -27,24 +27,34 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-mp_limb_t 
-n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
+mp_limb_t
+n_powmod2_ui_preinv(mp_limb_t a, mp_limb_t exp, mp_limb_t n, mp_limb_t ninv)
 {
     mp_limb_t x, y;
-    mp_limb_t e;
-    
-    if (n == 1UL) return 0UL;
 
-    e = (exp < 0L ? -exp : exp);
+    if (n == 1UL) return 0UL;
 
     x = 1UL;
     y = a;
-    while (e) 
+    while (exp)
     {
-        if (e & 1) x = n_mulmod2_preinv(x, y, n, ninv);
-        e = e >> 1;
-        if (e) y = n_mulmod2_preinv(y, y, n, ninv);
+        if (exp & 1) x = n_mulmod2_preinv(x, y, n, ninv);
+        exp >>= 1;
+        if (exp) y = n_mulmod2_preinv(y, y, n, ninv);
     }
 
-    return (exp < 0L ? n_invmod(x, n) : x);
-} 
+    return x;
+}
+
+mp_limb_t
+n_powmod2_preinv(mp_limb_t a, mp_limb_signed_t exp, mp_limb_t n, mp_limb_t ninv)
+{
+    if (exp < 0L)
+    {
+        a = n_invmod(a, n);
+        exp = -exp;
+    }
+
+    return n_powmod2_ui_preinv(a, exp, n, ninv);
+}
+

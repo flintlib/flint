@@ -30,7 +30,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void euler_number(fmpz_t res, ulong n)
+void arith_euler_number(fmpz_t res, ulong n)
 {
-    _euler_number_zeta(res, n);
+    _arith_euler_number_zeta(res, n);
 }

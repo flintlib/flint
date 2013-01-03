@@ -281,9 +281,9 @@ findroot(mpfr_t x, fmpz_poly_t poly, double x0)
 void cos_minpoly(fmpz_poly_t poly, long p, long q)
 {
     if (p % 2 == 0)
-        cyclotomic_cos_polynomial(poly, q);
+        arith_cos_minpoly(poly, q);
     else
-        cyclotomic_cos_polynomial(poly, 2 * q);
+        arith_cos_minpoly(poly, 2 * q);
 }
 
 int use_newton(long prec, long q)
@@ -410,7 +410,7 @@ sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, long k)
 
 
 void
-_number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
+_arith_number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
 {
     trig_prod_t prod;
     mpfr_t acc, C, t1, t2, t3, t4, exp1;
@@ -475,7 +475,7 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
     for (k = N0; k <= N; k++)
     {
         trig_prod_init(prod);
-        dedekind_cosine_sum_factored(prod, k, n % k);
+        arith_hrr_expsum_factored(prod, k, n % k);
 
         if (prod->prefactor != 0)
         {
@@ -540,7 +540,7 @@ _number_of_partitions_mpfr(mpfr_t x, ulong n, long N0, long N)
 }
 
 void
-number_of_partitions_mpfr(mpfr_t x, ulong n)
+arith_number_of_partitions_mpfr(mpfr_t x, ulong n)
 {
-    _number_of_partitions_mpfr(x, n, 1, partitions_needed_terms(n));
+    _arith_number_of_partitions_mpfr(x, n, 1, partitions_needed_terms(n));
 }

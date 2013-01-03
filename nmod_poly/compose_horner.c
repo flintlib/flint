@@ -20,103 +20,103 @@
 /******************************************************************************
 
     Copyright (C) 2010 William Hart
+    Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <mpir.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "nmod_poly.h"
+#include "ulong_extras.h"
 
-void _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, 
-                     long len1, mp_srcptr poly2, long len2, nmod_t mod)
+void 
+_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1, 
+                                      mp_srcptr poly2, long len2, nmod_t mod)
 {
-    mp_limb_t * val1, * val2, t;
-    long i, m, m2;
-   
-    if (len1 == 1) /* constant only */
+    if (len1 == 1)
     {
         res[0] = poly1[0];
-
-        return;
     }
-
-    if (len2 == 1) /* evaluate at constant */
+    else if (len2 == 1)
     {
         res[0] = _nmod_poly_evaluate_nmod(poly1, len1, poly2[0], mod);
-
-        return;
     }
-
-    if (len1 == 2) /* linear poly not dealt with by general case */
+    else if (len1 == 2)
     {
-        t = poly1[0];
         _nmod_vec_scalar_mul_nmod(res, poly2, len2, poly1[1], mod);
-        res[0] = n_addmod(res[0], t, mod.n);
-       
-        return;
+        res[0] = n_addmod(res[0], poly1[0], mod.n);
     }
+    else
+    {
+        const long alloc = (len1 - 1) * (len2 - 1) + 1;
+        long i = len1 - 1, lenr = len2;
+        mp_limb_t *t, *t1, *t2;
+        t = _nmod_vec_init(alloc);
 
-   	/* general case */
-    m = len1 - 1;
-	m2 = len2 - 1;
+        if (len1 % 2 == 0)
+        {
+            t1 = res;
+            t2 = t;
+        }
+        else
+        {
+            t1 = t;
+            t2 = res;
+        }
 
-    val1 = _nmod_vec_init(m*m2 + 1);
-    val2 = _nmod_vec_init(m*m2 + 1);
-
-    /* initial c_m * poly2 + c_{m-1} */
-    _nmod_vec_scalar_mul_nmod(val1, poly2, len2, poly1[m], mod);
-    val1[0] = n_addmod(val1[0], poly1[m - 1], mod.n);
-    
-	m -= 2;
-    i = 1;
-
-	for ( ; m > 0; m--, i++) /* all but final val * poly2 + c_{m-1} */
-	{
-       _nmod_poly_mul(val2, val1, m2*i + 1, poly2, len2, mod);
-       MP_PTR_SWAP(val1, val2);
-       val1[0] = n_addmod(val1[0], poly1[m], mod.n);
-	}
-
-    /* final val * poly2 + c_0 */
-    t = poly1[0];
-    _nmod_poly_mul(res, val1, m2*(len1 - 2) + 1, poly2, len2, mod);
-	res[0] = n_addmod(res[0], t, mod.n);
-
-    _nmod_vec_clear(val1);
-    _nmod_vec_clear(val2);
+        /*  Perform the first two steps as one, 
+            "res = a(m) * poly2 + a(m-1)".      */
+        {
+            _nmod_vec_scalar_mul_nmod(t1, poly2, len2, poly1[i], mod);
+            i--;
+            t1[0] = n_addmod(t1[0], poly1[i], mod.n);
+        }
+        while (i--)
+        {
+            _nmod_poly_mul(t2, t1, lenr, poly2, len2, mod);
+            lenr += len2 - 1;
+            MP_PTR_SWAP(t1, t2);
+            t1[0] = n_addmod(t1[0], poly1[i], mod.n);
+        }
+        _nmod_vec_clear(t);
+    }
 }
 
 void nmod_poly_compose_horner(nmod_poly_t res, 
-                       const nmod_poly_t poly1, const nmod_poly_t poly2)
+                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-	long len_out;
+    const long len1 = poly1->length;
+    const long len2 = poly2->length;
     
-    if (poly1->length == 0) /* nothing to evaluate */ 
-	{
-	   nmod_poly_zero(res);
+    if (len1 == 0)
+    {
+        nmod_poly_zero(res);
+    }
+    else if (len1 == 1 || len2 == 0)
+    {
+        nmod_poly_fit_length(res, 1);
+        res->coeffs[0] = poly1->coeffs[0];
+        res->length = (res->coeffs[0] != 0);
+    }
+    else
+    {
+        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        
+        if (res != poly1 && res != poly2)
+        {
+            nmod_poly_fit_length(res, lenr);
+            _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, len1, 
+                                                   poly2->coeffs, len2, poly1->mod);
+        }
+        else
+        {
+            nmod_poly_t t;
+            nmod_poly_init2(t, poly1->mod.n, lenr);
+            _nmod_poly_compose_horner(t->coeffs, poly1->coeffs, len1,
+                                                 poly2->coeffs, len2, poly1->mod);
+            nmod_poly_swap(res, t);
+            nmod_poly_clear(t);
+        }
 
-	   return;
-	}
-
-    if (poly2->length == 0) /* constant only */ 
-	{
-	   nmod_poly_set_coeff_ui(res, 0, poly1->coeffs[0]);
-       nmod_poly_truncate(res, 1);
-
-	   return;
-	}
-
-    len_out = (poly1->length - 1)*(poly2->length - 1) + 1;
-
-	nmod_poly_fit_length(res, len_out);
-
-    _nmod_poly_compose_horner(res->coeffs, poly1->coeffs, poly1->length, 
-        poly2->coeffs, poly2->length, poly1->mod);
-
-    res->length = len_out;
-
-    _nmod_poly_normalise(res);
-
-	return;
+        res->length = lenr;
+        _nmod_poly_normalise(res);
+    }
 }

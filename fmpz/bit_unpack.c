@@ -41,7 +41,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
     else
         sign = ((((mp_limb_t) 1) << (FLINT_BITS - 1)) & arr[limbs - 1]);
 
-    if (bits <= FLINT_BITS - 1)  /* fits into a small coeff */
+    if (bits <= FLINT_BITS - 2)  /* fits into a small coeff */
     {
         _fmpz_demote(coeff);
 
@@ -66,7 +66,11 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
         {
             (*coeff)++;
             if ((*coeff) > COEFF_MAX)
-                fmpz_set_ui(coeff, *coeff);
+            {
+                fmpz v = *coeff;
+                *coeff = 0;
+                fmpz_set_ui(coeff, v);
+            }
         }
 
         /* negate the coeff if necessary */
@@ -95,7 +99,7 @@ fmpz_bit_unpack(fmpz_t coeff, mp_srcptr arr, mp_bitcnt_t shift,
         if (shift)
             mpn_rshift(p, arr, l, shift);
         else
-            mpn_copyi(p, arr, l);
+            flint_mpn_copyi(p, arr, l);
 
         /* shift in any rem_bits that weren't already shifted */
         if (limbs + (rem_bits != 0) > l)
@@ -193,7 +197,7 @@ fmpz_bit_unpack_unsigned(fmpz_t coeff, mp_srcptr arr,
         if (shift)
             mpn_rshift(p, arr, l, shift);
         else
-            mpn_copyi(p, arr, l);
+            flint_mpn_copyi(p, arr, l);
 
         /* shift in any rem_bits that weren't already shifted */
         if (limbs + (rem_bits != 0) > l)
