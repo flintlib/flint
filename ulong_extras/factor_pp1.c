@@ -100,7 +100,9 @@ mp_limb_t n_pp1_factor(mp_limb_t n, mp_limb_t x, ulong norm)
    }
    
    x = n_submod(x, 2, n);
-   
+   if (x == 0)
+      return 0;
+
    return n_gcd(n, x);
 }
 
