@@ -27,17 +27,13 @@
 #include <stdlib.h>
 #include "profiler.h"
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_factor.h"
+#include "ulong_extras.h"
 
 int main(void)
 {
-   fmpz_t n, p;
    ulong c;
-   ulong B0;
-   
-   fmpz_init(n);
-   fmpz_init(p);
+   ulong B0; 
+   mp_limb_t n, p;
 
    flint_rand_t state;
    flint_randinit(state);
@@ -45,7 +41,7 @@ int main(void)
    while(1)
    {
       printf("Enter number to be factored: "); fflush(stdout);
-      if (!fmpz_read(n))
+      if (!scanf("%lu", &n))
       {
          printf("Read failed\n");
          abort();
@@ -60,22 +56,17 @@ int main(void)
     
       do
       {
-         c = n_randlimb(state);
+         c = n_randint(state, n);
       } while (c <= 2UL);
 
-      if (fmpz_factor_pp1(p, n, B0, c))
-      {
-         printf("Factor: ");
-         fmpz_print(p);
-         printf("\n");
-      } else
+      p = n_factor_pp1(n, B0, c);
+      if (p >= 2)
+         printf("Factor: %lu\n", p);
+      else
          printf("Factor not found!\n");
    } while(1);
    
    flint_randclear(state);
-
-   fmpz_clear(n);
-   fmpz_clear(p);
 
    return 0;
 }
