@@ -1082,6 +1082,19 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
     The factors are proved prime if \code{proved} is $1$, otherwise
     they are merely probably prime.
 
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
+
+    Factors $n$ using Williams' $p + 1$ factoring algorithm, with prime
+    limit set to $B0$. We require $c$ to be set to a random value. Each
+    trial of the algorithm with a different value of $c$ gives another
+    chance to factor $n$, with roughly exponentially decreasing chance
+    of finding a missing factor. If $p + 1$ (or $p - 1$) is not smooth
+    for any factor $p$ of $n$, the algorithm will never succeed. The
+    value $c$ should be less than $n$ and greater than $2$.
+
+    If the algorithm succeeds, it returns the factor, otherwise it
+    returns $0$ or $1$ (the trivial factors modulo $n$).
+
 *******************************************************************************
 
     Arithmetic functions
