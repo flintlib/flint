@@ -497,6 +497,30 @@ void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len);
 void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, 
                              const fmpz * roots, long len, const fmpz_t mod);
 
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, 
+                        long len, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, 
+              const fmpz * poly, long plen, fmpz_poly_struct ** tree, 
+                                                 long len, const fmpz_t mod);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, 
+    const fmpz * poly, long plen, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
+                        long len, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+
+
 /*  Composition  *************************************************************/
 
 void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
