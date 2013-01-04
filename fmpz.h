@@ -409,8 +409,6 @@ fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
       fmpz_sub(r, mod, a);
 }
 
-mp_limb_t fmpz_preinv1(const fmpz_t f);
-
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_lcm(fmpz_t f, const fmpz_t g, const fmpz_t h);
