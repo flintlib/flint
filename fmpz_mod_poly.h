@@ -369,9 +369,19 @@ void _fmpz_mod_poly_rem(fmpz *R,
                         const fmpz_t invB, const fmpz_t p)
 {
     fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
+    fmpz *T = _fmpz_vec_init(lenA);
 
-    _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+    if (lenA < lenB)
+    {
+       _fmpz_vec_set(R, A, lenA);
+       _fmpz_vec_zero(R + lenA, lenB - 1 - lenA);
+    } else
+    {
+       _fmpz_mod_poly_divrem_divconquer(Q, T, A, lenA, B, lenB, invB, p);
+       _fmpz_vec_set(R, T, lenB - 1);
+    }
 
+    _fmpz_vec_clear(T, lenA);
     _fmpz_vec_clear(Q, lenA - lenB + 1);
 }
 

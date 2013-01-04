@@ -35,23 +35,18 @@ fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len)
 {
     fmpz_poly_struct ** tree = NULL;
 
-    long i, j, height = FLINT_CLOG2(len);
-
-    tree = flint_malloc(sizeof(fmpz_poly_struct *) * (height + 1));
-    
-    tree[0] = flint_malloc(len*sizeof(fmpz_poly_struct));
-    
-    for (j = 0; j < len; j++)
-        fmpz_poly_init(tree[0] + j);
-
-    len = (1<<(FLINT_FLOG2(len)));
-        
-    for (i = 1; i <= height; i++, len /= 2)
+    if (len)
     {
-        tree[i] = flint_malloc(len*sizeof(fmpz_poly_struct));
+        long i, j, height = FLINT_CLOG2(len);
 
-        for (j = 0; j < len; j++)
-           fmpz_poly_init(tree[i] + j);
+        tree = flint_malloc(sizeof(fmpz_poly_struct *) * (height + 1));
+        for (i = 0; i <= height; i++, len = (len + 1)/2)
+        {
+           tree[i] = flint_malloc(sizeof(fmpz_poly_struct) * len);
+           for (j = 0; j < len; j++)
+              fmpz_poly_init(tree[i] + j);
+        }
+            
     }
 
     return tree;
@@ -59,83 +54,62 @@ fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len)
 
 void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len)
 {
-    long i, j, height = FLINT_CLOG2(len);
-
-    for (j = 0; j < len; j++)
-        fmpz_poly_clear(tree[0] + j);
-
-    flint_free(tree[0]);
-
-    len = (1<<(FLINT_FLOG2(len)));
-    
-    for (i = 1; i <= height; i++, len /= 2)
+    if (len)
     {
-        for (j = 0; j < len; j++)
-            fmpz_poly_clear(tree[i] + j);
+        long i, j, height = FLINT_CLOG2(len);
 
-        flint_free(tree[i]);
+        for (i = 0; i <= height; i++, len = (len + 1)/2)
+        {
+           for (j = 0; j < len; j++)
+              fmpz_poly_clear(tree[i] + j);
+           flint_free(tree[i]);
+        }
+
+        flint_free(tree);
     }
-
-    flint_free(tree);
 }
 
 void
 _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, const fmpz * roots, long len, const fmpz_t mod)
 {
-    long height, i, jump, j, k;
-    long len2 = (1<<(FLINT_FLOG2(len)));
-    long * group = malloc(len2*sizeof(long));
-    
+    long height, pow, left, i;
+    fmpz_poly_struct * pa, * pb;
+
     if (len == 0)
         return;
 
     height = FLINT_CLOG2(len);
-    
+
     /* zeroth level, (x-a) */
     for (i = 0; i < len; i++)
     {
-        fmpz_poly_set_coeff_ui(tree[0] + i,  1, 1);
-        if (!fmpz_is_zero(roots + i))
-           fmpz_sub((tree[0] + i)->coeffs, mod, roots + i);
+        fmpz_poly_set_coeff_ui(tree[0] + i, 1, 1);
+        fmpz_negmod((tree[0] + i)->coeffs, roots + i, mod);
     }
-    
-    group[0] = len;
-    jump = len2;
-    while (jump > 1)
-    {
-        for (i = 0; i < len2; i += jump)
-        {
-           long full = group[i];
-           long half = (group[i] + 1)/2;
-           group[i] = half;
-           group[i + jump/2] = full - half;
-        }
-        jump /= 2;
-    }
-    
-    j = 0;
-    for (i = 0; i < len2; i++)
-    {
-        if (group[i] == 1)
-        {
-            fmpz_poly_set(tree[1] + i, tree[0] + j);
-            j++;
-        } else
-        {
-            fmpz_poly_mul(tree[1] + i, tree[0] + j, tree[0] + j + 1);
-            _fmpz_vec_scalar_mod_fmpz((tree[1] + i)->coeffs, (tree[1] + i)->coeffs, (tree[1] + i)->length - 1, mod);
-        }
-    }
-    
-    len2 /= 2;
-    for (k = 1; k < height - 1; k++)
-    {
-        for (i = 0; i < len2; i++)
-        {
-            fmpz_poly_mul(tree[k + 1] + i, tree[k] + 2*i, tree[k] + 2*i + 1);
-            _fmpz_vec_scalar_mod_fmpz((tree[k + 1] + i)->coeffs, (tree[k + 1] + i)->coeffs, (tree[k + 1] + i)->length - 1, mod);
 
+    for (i = 0; i < height - 1; i++)
+    {
+        left = len;
+        pow = 1L << i;
+        pa = tree[i];
+        pb = tree[i + 1];
+
+        while (left >= 2 * pow)
+        {
+            fmpz_poly_fit_length(pb, pa->length + (pa + 1)->length - 1);
+            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, mod);
+            _fmpz_poly_set_length(pb, pa->length + (pa + 1)->length - 1);
+            left -= 2 * pow;
+            pa += 2;
+            pb += 1;
         }
-        len2 /= 2;
+
+        if (left > pow)
+        {
+            fmpz_poly_fit_length(pb, pa->length + (pa + 1)->length - 1);
+            _fmpz_mod_poly_mul(pb->coeffs, pa->coeffs, pa->length, (pa + 1)->coeffs, (pa + 1)->length, mod);
+            _fmpz_poly_set_length(pb, pa->length + (pa + 1)->length - 1);
+        } else if (left > 0)
+            fmpz_poly_set(pb, pa);
     }
 }

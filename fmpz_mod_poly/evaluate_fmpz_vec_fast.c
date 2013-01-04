@@ -37,7 +37,6 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
 {
     long height, i, j, pow, left;
     long tree_height;
-    long tlen;
     fmpz_t temp, inv;
     fmpz * t, * u, * pb, * pc, * swap;
     fmpz_poly_struct * pa;
@@ -62,8 +61,8 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         return;
     }
 
-    t = _fmpz_vec_init(len);
-    u = _fmpz_vec_init(len);
+    t = _fmpz_vec_init(2*len);
+    u = _fmpz_vec_init(2*len);
 
     left = len;
 
@@ -75,12 +74,11 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         height--;
     pow = 1L << height;
 
-    for (i = j = 0; i < len; i += pow, j += (pow + 1))
+    for (i = j = 0; i < len; i += pow, j++)
     {
-        fmpz_poly_struct * B = tree[height] + j;
-        tlen = ((i + pow) <= len) ? pow : len % pow;
-        fmpz_invmod(inv, B->coeffs + B->length - 1, mod);
-        _fmpz_mod_poly_rem(t + i, poly, plen, B->coeffs, tlen + 1, inv, mod);
+        pa = tree[height] + j;
+        fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
+        _fmpz_mod_poly_rem(t + i, poly, plen, pa->coeffs, pa->length, inv, mod);
     }
 
     for (i = height - 1; i >= 0; i--)
@@ -91,32 +89,33 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
         pb = t;
         pc = u;
 
+        left = len;
         while (left >= 2 * pow)
         {
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc, pb, 2 * pow, pa->coeffs, pow + 1, inv, mod);
+            _fmpz_mod_poly_rem(pc, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
             
-            pa += pow + 1;
+            pa++;
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc + pow, pb, 2 * pow, pa->coeffs, pow + 1, inv, mod);
-
-            pa += pow + 1;
+            _fmpz_mod_poly_rem(pc + pow, pb, 2 * pow, pa->coeffs, pa->length, inv, mod);
+            
+            pa++;
             pb += 2 * pow;
             pc += 2 * pow;
             left -= 2 * pow;
         }
-
+        
         if (left > pow)
         {
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc, pb, left, pa->coeffs, pow + 1, inv, mod);
+            _fmpz_mod_poly_rem(pc, pb, left, pa->coeffs, pa->length, inv, mod);
             
-            pa += pow + 1;
+            pa ++;
             fmpz_invmod(inv, pa->coeffs + pa->length - 1, mod);
-            _fmpz_mod_poly_rem(pc + pow, pb, left, pa->coeffs, left - pow + 1, inv, mod);
+            _fmpz_mod_poly_rem(pc + pow, pb, left, pa->coeffs, pa->length, inv, mod);
         }
         else if (left > 0)
-            _fmpz_vec_set(pc, pb, left);
+           _fmpz_vec_set(pc, pb, left);
 
         swap = t;
         t = u;
@@ -128,8 +127,8 @@ _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
 
     _fmpz_vec_set(vs, t, len);
 
-    _fmpz_vec_clear(t, len);
-    _fmpz_vec_clear(u, len);
+    _fmpz_vec_clear(t, 2*len);
+    _fmpz_vec_clear(u, 2*len);
 }
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, const fmpz * poly, long plen,

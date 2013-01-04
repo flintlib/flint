@@ -38,7 +38,7 @@ _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
     if (len < 32)
         _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, coeffs, len, xs, n, mod);
     else
-        _fmpz_mod_poly_evaluate_nmod_vec_fast(ys, coeffs, len, xs, n, mod);
+        _fmpz_mod_poly_evaluate_fmpz_vec_fast(ys, coeffs, len, xs, n, mod);
 }
 
 void
