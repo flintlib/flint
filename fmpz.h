@@ -400,7 +400,14 @@ ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-mp_limb_t fmpz_preinv1(const fmpz_t f);
+static __inline__ void
+fmpz_negmod(fmpz_t r, const fmpz_t a, const fmpz_t mod)
+{
+   if (fmpz_is_zero(a))
+      fmpz_zero(r);
+   else
+      fmpz_sub(r, mod, a);
+}
 
 void fmpz_gcd(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
