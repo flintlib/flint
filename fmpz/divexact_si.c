@@ -37,7 +37,7 @@ void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h)
 
     if (h == 0)
     {
-        printf("Exception: division by zero in fmpz_divexact_si\n");
+        printf("Exception (fmpz_divexact_si). Division by zero.\n");
         abort();
     }
 

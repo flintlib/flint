@@ -19,14 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "padic.h"
 
@@ -41,8 +37,8 @@ main(void)
 
     flint_randinit(state);
 
-    /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    /* Check aliasing (x 1,000) */
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
         long N;
@@ -50,23 +46,21 @@ main(void)
 
         padic_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 100) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
-        padic_randtest_not_zero(a, state, ctx);
-        padic_val(a) = FLINT_ABS(padic_val(a));
+        padic_randtest_int(a, state, ctx);
         padic_set(b, a, ctx);
 
         padic_teichmuller(c, b, ctx);
         padic_teichmuller(b, b, ctx);
 
-        result = (padic_equal(b, c, ctx));
+        result = (padic_equal(b, c));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -76,53 +70,50 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
     }
 
-    /* Check correctness:  for word-sized p */
+    /* Check x^p == x for word-sized p (x 10,000)*/
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        long prime, N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 100) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        prime = n_randprime(state, 2 + n_randint(state, FLINT_BITS - 2), 0);
+        fmpz_init_set_ui(p, prime);
+        N = n_randint(state, PADIC_TEST_PREC_MAX);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
-        padic_randtest(a, state, ctx);
-        padic_val(a) = FLINT_ABS(padic_val(a));
+        padic_randtest_int(a, state, ctx);
 
         padic_teichmuller(b, a, ctx);
-
         padic_pow_si(c, b, fmpz_get_si(p), ctx);
-        padic_sub(c, c, b, ctx);
 
-        result = (padic_is_zero(c, ctx));
+        result = (padic_equal(b, c));
         if (!result)
         {
-            printf("FAIL (correctness):\n\n");
+            printf("FAIL (x^p == x):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

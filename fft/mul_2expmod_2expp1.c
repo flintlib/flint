@@ -41,7 +41,7 @@ void mpn_mul_2expmod_2expp1(mp_limb_t * t, mp_limb_t * i1, mp_size_t limbs, mp_b
    if (d == 0)
    {   
       if (t != i1)
-         mpn_copyi(t, i1, limbs + 1);
+         flint_mpn_copyi(t, i1, limbs + 1);
    } else
    {
       hi1 = ((mp_limb_signed_t) i1[limbs] >> (GMP_LIMB_BITS - d)); 

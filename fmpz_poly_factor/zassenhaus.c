@@ -170,7 +170,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
         if (r > cutoff)
         {
-            printf("Exception (fmpz_poly_factor_zassenhaus): r > cutoff\n");
+            printf("Exception (fmpz_poly_factor_zassenhaus). r > cutoff.\n");
             nmod_poly_factor_clear(fac);
             abort();
         }

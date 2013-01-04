@@ -80,7 +80,7 @@ void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
 {
     if (c == 0L)
     {
-        printf("Exception: division by zero in fmpq_poly_scalar_div_si\n");
+        printf("Exception (fmpq_poly_scalar_div_si). Division by zero.\n");
         abort();
     }
     

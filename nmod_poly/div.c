@@ -58,7 +58,7 @@ nmod_poly_div(nmod_poly_t Q,
     
     if (B_len == 0)
     {
-        printf("Exception: division by zero in nmod_poly_divrem\n");
+        printf("Exception (nmod_poly_divrem). Division by zero.\n");
         abort();
     }
 

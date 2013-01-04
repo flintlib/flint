@@ -23,12 +23,22 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "padic.h"
+
+/*
+    Set-up.  Currently we only test the logarithm for positive values of N. 
+    This is important as for negative N, exp(0) is 1, which is 0 mod p^N, 
+    and then log(0) does not converge.
+ */
+static long __rand_prec(flint_rand_t state, long i)
+{
+    long N;
+
+    N = n_randint(state, PADIC_TEST_PREC_MAX) + 1;
+
+    return N;
+}
 
 int
 main(void)
@@ -44,35 +54,30 @@ main(void)
 /** p == 2 *******************************************************************/
 
     /* Check aliasing: a = log(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t p = {2L};
         long N;
         padic_ctx_t ctx;
 
         padic_t a, b;
+        int ans1, ans2;
 
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
+        padic_init2(a, N);
+        padic_init2(b, N);
 
         padic_randtest(a, state, ctx);
 
-        if (!_padic_is_zero(a) && padic_val(a) < 2)
-        {
-            padic_val(a) = 2;
-            padic_reduce(a, ctx);
-        }
+        padic_one(b);
+        padic_add(a, a, b, ctx);
 
-        _padic_one(b);
-        _padic_add(a, a, b, ctx);
+        ans1 = padic_log_rectangular(b, a, ctx);
+        ans2 = padic_log_rectangular(a, a, ctx);
 
-        padic_log_rectangular(b, a, ctx);
-        padic_log_rectangular(a, a, ctx);
-
-        result = (padic_equal(a, b, ctx));
+        result = (ans1 == ans2) && (!ans1 || padic_equal(a, b));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -81,8 +86,8 @@ main(void)
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
+        padic_clear(a);
+        padic_clear(b);
 
         padic_ctx_clear(ctx);
     }
@@ -95,45 +100,35 @@ main(void)
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, e, f, g;
+        int ans1, ans2, ans3;
 
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
-        _padic_init(d);
-        _padic_init(e);
-        _padic_init(f);
-        _padic_init(g);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
+        padic_init2(d, N);
+        padic_init2(e, N);
+        padic_init2(f, N);
+        padic_init2(g, N);
 
         padic_randtest(a, state, ctx);
         padic_randtest(b, state, ctx);
 
-        if (!_padic_is_zero(a) && padic_val(a) < 2)
-        {
-            padic_val(a) = 2;
-            padic_reduce(a, ctx);
-        }
-        if (!_padic_is_zero(b) && padic_val(b) < 2)
-        {
-            padic_val(b) = 2;
-            padic_reduce(b, ctx);
-        }
-
-        _padic_one(c);
-        _padic_add(a, a, c, ctx);
-        _padic_add(b, b, c, ctx);
+        padic_one(c);
+        padic_add(a, a, c, ctx);
+        padic_add(b, b, c, ctx);
 
         padic_mul(c, a, b, ctx);
 
-        padic_log_rectangular(d, a, ctx);
-        padic_log_rectangular(e, b, ctx);
+        ans1 = padic_log_rectangular(d, a, ctx);
+        ans2 = padic_log_rectangular(e, b, ctx);
         padic_add(f, d, e, ctx);
 
-        padic_log_rectangular(g, c, ctx);
+        ans3 = padic_log_rectangular(g, c, ctx);
 
-        result = (padic_equal(f, g, ctx));
+        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
             printf("FAIL (functional equation):\n\n");
@@ -147,13 +142,13 @@ main(void)
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
-        _padic_clear(d);
-        _padic_clear(e);
-        _padic_clear(f);
-        _padic_clear(g);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
+        padic_clear(d);
+        padic_clear(e);
+        padic_clear(f);
+        padic_clear(g);
 
         padic_ctx_clear(ctx);
     }
@@ -166,37 +161,36 @@ main(void)
         padic_ctx_t ctx;
 
         padic_t a, b, c;
+        int ans1, ans2;
 
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
         padic_randtest(a, state, ctx);
-        if (!_padic_is_zero(a) && padic_val(a) < 2)
-        {
-            padic_val(a) = 2;
-            padic_reduce(a, ctx);
-        }
 
-        padic_exp(b, a, ctx);
-        padic_log_rectangular(c, b, ctx);
+        ans1 = padic_exp(b, a, ctx);
+        if (ans1)
+            ans2 = padic_log_rectangular(c, b, ctx);
 
-        result = (padic_equal(a, c, ctx));
+        result = !ans1 || (ans1 == ans2 && padic_equal(a, c));
         if (!result)
         {
             printf("FAIL (log(exp(x)) == x):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("ans1 = %d\n", ans1);
+            printf("ans2 = %d\n", ans2);
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         padic_ctx_clear(ctx);
     }
@@ -204,38 +198,31 @@ main(void)
 /** p > 2 ********************************************************************/
 
     /* Check aliasing: a = log(a) */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long pbits, N;
+        long N;
         padic_ctx_t ctx;
 
         padic_t a, b;
+        int ans1, ans2;
 
-        fmpz_init(p);
-        pbits = n_randint(state, 4) + 2;
-        fmpz_set_ui(p, n_randprime(state, pbits, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
+        padic_init2(a, N);
+        padic_init2(b, N);
 
         padic_randtest(a, state, ctx);
 
-        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
-        {
-            padic_val(a) = (*p == 2L) + 1;
-            padic_reduce(a, ctx);
-        }
+        padic_one(b);
+        padic_add(a, a, b, ctx);
 
-        _padic_one(b);
-        _padic_add(a, a, b, ctx);
+        ans1 = padic_log_rectangular(b, a, ctx);
+        ans2 = padic_log_rectangular(a, a, ctx);
 
-        padic_log_rectangular(b, a, ctx);
-        padic_log_rectangular(a, a, ctx);
-
-        result = (padic_equal(a, b, ctx));
+        result = (ans1 == ans2) && (!ans1 || padic_equal(a, b));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -244,8 +231,8 @@ main(void)
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
+        padic_clear(a);
+        padic_clear(b);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -255,56 +242,42 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long pbits, N;
+        long N;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, e, f, g;
+        int ans1, ans2, ans3;
 
-        fmpz_init(p);
-        pbits = n_randint(state, 4) + 2;
-        fmpz_set_ui(p, n_randprime(state, pbits, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
-        _padic_init(d);
-        _padic_init(e);
-        _padic_init(f);
-        _padic_init(g);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
+        padic_init2(d, N);
+        padic_init2(e, N);
+        padic_init2(f, N);
+        padic_init2(g, N);
 
         padic_randtest(a, state, ctx);
-
-        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
-        {
-            padic_val(a) = (*p == 2L) + 1;
-            padic_reduce(a, ctx);
-        }
-
-        _padic_one(c);
-        _padic_add(a, a, c, ctx);
-
         padic_randtest(b, state, ctx);
 
-        if (!_padic_is_zero(b) && (padic_val(b) < 1 || (*p == 2L && padic_val(b) < 2)))
-        {
-            padic_val(b) = (*p == 2L) + 1;
-            padic_reduce(b, ctx);
-        }
+        padic_one(c);
+        padic_add(a, a, c, ctx);
 
-        _padic_one(c);
-        _padic_add(b, b, c, ctx);
+        padic_one(c);
+        padic_add(b, b, c, ctx);
 
         padic_mul(c, a, b, ctx);
 
-        padic_log_rectangular(d, a, ctx);
-        padic_log_rectangular(e, b, ctx);
+        ans1 = padic_log_rectangular(d, a, ctx);
+        ans2 = padic_log_rectangular(e, b, ctx);
         padic_add(f, d, e, ctx);
 
-        padic_log_rectangular(g, c, ctx);
+        ans3 = padic_log_rectangular(g, c, ctx);
 
-        result = (padic_equal(f, g, ctx));
+        result = (!ans1 || !ans2 || (ans3 && padic_equal(f, g)));
         if (!result)
         {
             printf("FAIL (functional equation):\n\n");
@@ -315,16 +288,19 @@ main(void)
             printf("e = log(b)          = "), padic_print(e, ctx), printf("\n");
             printf("f = log(a) + log(b) = "), padic_print(f, ctx), printf("\n");
             printf("g = log(a * b)      = "), padic_print(g, ctx), printf("\n");
+            printf("ans1 = %d\n", ans1);
+            printf("ans2 = %d\n", ans2);
+            printf("ans3 = %d\n", ans3);
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
-        _padic_clear(d);
-        _padic_clear(e);
-        _padic_clear(f);
-        _padic_clear(g);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
+        padic_clear(d);
+        padic_clear(e);
+        padic_clear(f);
+        padic_clear(g);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
@@ -334,45 +310,42 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long pbits, N;
+        long N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
+        int ans1, ans2;
 
-        fmpz_init(p);
-        pbits = n_randint(state, 4) + 2;
-        fmpz_set_ui(p, n_randprime(state, pbits, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+/*      fmpz_init_set_ui(p, n_randtest_prime(state, 0)); */
+        fmpz_init_set_ui(p, n_randprime(state, 5, 1));
+        N = __rand_prec(state, i);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
         padic_randtest(a, state, ctx);
 
-        if (!_padic_is_zero(a) && (padic_val(a) < 1 || (*p == 2L && padic_val(a) < 2)))
-        {
-            padic_val(a) = (*p == 2L) + 1;
-            padic_reduce(a, ctx);
-        }
+        ans1 = padic_exp(b, a, ctx);
+        if (ans1)
+            ans2 = padic_log_rectangular(c, b, ctx);
 
-        padic_exp(b, a, ctx);
-        padic_log_rectangular(c, b, ctx);
-
-        result = (padic_equal(a, c, ctx));
+        result = !ans1 || (ans1 == ans2 && padic_equal(a, c));
         if (!result)
         {
             printf("FAIL (log(exp(x)) == x):\n\n");
             printf("a = "), padic_print(a, ctx), printf("\n");
             printf("b = "), padic_print(b, ctx), printf("\n");
             printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("ans1 = %d\n", ans1);
+            printf("ans2 = %d\n", ans2);
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

@@ -220,7 +220,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 
     if (fmpz_sgn(f) < 0)
     {
-        printf("nmod_poly_bit_unpack: expected an unsigned value!\n");
+        printf("Exception (nmod_poly_bit_unpack). f < 0.\n");
         abort();
     }
 
@@ -233,7 +233,7 @@ nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
     len = (fmpz_bits(f) + bit_size - 1) / bit_size;
 
     mpz_init2(tmp, bit_size*len);
-    mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
+    flint_mpn_zero(tmp->_mp_d, tmp->_mp_alloc);
     fmpz_get_mpz(tmp, f);
 
     nmod_poly_fit_length(poly, len);

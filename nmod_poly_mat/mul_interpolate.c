@@ -62,7 +62,8 @@ nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
 
     if (mod.n < len)
     {
-        printf("nmod_poly_mat_mul_interpolate: too small characteristic\n");
+        printf("Exception (nmod_poly_mat_mul_interpolate). \n"
+               "Characteristic is too small.\n");
         abort();
     }
 

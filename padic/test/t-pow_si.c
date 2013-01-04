@@ -19,15 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
-#include "fmpq.h"
 #include "padic.h"
 #include "long_extras.h"
 #include "ulong_extras.h"
@@ -44,7 +39,7 @@ main(void)
     flint_randinit(state);
 
     /* Check aliasing */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
         long N;
@@ -53,14 +48,14 @@ main(void)
         padic_t a, b, c;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 100) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
         padic_randtest(a, state, ctx);
         padic_set(b, a, ctx);
@@ -70,7 +65,7 @@ main(void)
         padic_pow_si(c, b, e, ctx);
         padic_pow_si(b, b, e, ctx);
 
-        result = (padic_equal(b, c, ctx));
+        result = (padic_equal(b, c));
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
@@ -81,16 +76,16 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
     }
 
-    /* Compare with multiplication for e > 0 and val(a) >= 0 */
-    for (i = 0; i < 10000; i++)
+    /* Compare with multiplication for e >= 0 and val(a) >= 0 */
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
         long N;
@@ -99,26 +94,26 @@ main(void)
         padic_t a, b, c;
         long j, e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 100);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
-        padic_init(c, ctx);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
 
-        padic_randtest(a, state, ctx);
+        padic_randtest_int(a, state, ctx);
         padic_val(a) = FLINT_ABS(padic_val(a));
 
-        e = n_randint(state, 50) + 1;
+        e = n_randint(state, 50);
 
         padic_pow_si(b, a, e, ctx);
-        _padic_one(c);
+        padic_one(c);
         for (j = 0; j < e; j++)
             padic_mul(c, c, a, ctx);
 
-        result = (padic_equal(b, c, ctx));
+        result = (padic_equal(b, c));
         if (!result)
         {
             printf("FAIL (cmp with multiplication):\n\n");
@@ -129,115 +124,114 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
-        padic_clear(c, ctx);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);
     }
 
     /* Compare with fmpq, check precision */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long N;
-        padic_ctx_t ctx1, ctx2;
+        long N, N2;
+        padic_ctx_t ctx;
 
         padic_t a, b, c;
         fmpq_t s, t;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 100);
-        padic_ctx_init(ctx1, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
+        padic_init2(a, N);
+        padic_init2(b, N);
+        padic_init2(c, N);
         fmpq_init(s);
         fmpq_init(t);
 
-        padic_randtest(a, state, ctx1);
+        padic_randtest(a, state, ctx);
         e = n_randint(state, 50) + 1;
 
-        padic_ctx_init(ctx2, p, N + (e - 1) * padic_val(a), PADIC_SERIES);
+        N2 = N + (e - 1) * padic_val(a);
 
-        padic_pow_si(b, a, e, ctx2);
+        padic_prec(b) = N2;
+        padic_prec(c) = N2;
+        padic_pow_si(b, a, e, ctx);
 
-        padic_get_fmpq(s, a, ctx1);
+        padic_get_fmpq(s, a, ctx);
         fmpq_pow_si(t, s, e);
-        padic_set_fmpq(c, t, ctx2);
+        padic_set_fmpq(c, t, ctx);
 
-        result = (padic_equal(b, c, ctx2));
+        result = (padic_equal(b, c));
         if (!result)
         {
             printf("FAIL (cmp with fmpq):\n\n");
-            printf("a = "), padic_print(a, ctx1), printf("\n");
-            printf("b = "), padic_print(b, ctx2), printf("\n");
-            printf("c = "), padic_print(c, ctx2), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
             printf("s = "), fmpq_print(s), printf("\n");
             printf("t = "), fmpq_print(t), printf("\n");
             printf("e = %ld\n", e);
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
         fmpq_clear(s);
         fmpq_clear(t);
 
         fmpz_clear(p);
-        padic_ctx_clear(ctx1);
-        padic_ctx_clear(ctx2);
+        padic_ctx_clear(ctx);
     }
 
     /* Check precision */
-    for (i = 0; i < 10000; i++)
+    for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
         long N_lo, N_hi, N_res;
-        padic_ctx_t ctx_lo, ctx_hi, ctx_res;
+        padic_ctx_t ctx;
 
         padic_t a, b, c, d, t;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N_lo = z_randint(state, 100);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N_lo = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+               + PADIC_TEST_PREC_MIN;
         N_hi = N_lo + n_randint(state, 20);
-        padic_ctx_init(ctx_lo, p, N_lo, PADIC_SERIES);
-        padic_ctx_init(ctx_hi, p, N_hi, PADIC_SERIES);
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N_lo-10), FLINT_MAX(0, N_hi+10), PADIC_SERIES);
 
-        _padic_init(a);
-        _padic_init(b);
-        _padic_init(c);
-        _padic_init(d);
-        _padic_init(t);
+        padic_init2(a, N_hi);
+        padic_init2(b, N_hi);
+        padic_init2(t, N_lo);
 
-        padic_randtest(a, state, ctx_hi);
-        padic_randtest(b, state, ctx_hi);
-        padic_sub(t, a, b, ctx_hi);
-        padic_reduce(t, ctx_lo);
-        padic_add(b, b, t, ctx_hi);
+        padic_randtest(a, state, ctx);
+        padic_randtest(b, state, ctx);
+        padic_sub(t, a, b, ctx);
+        padic_add(b, b, t, ctx);
         e = n_randint(state, 50) + 1;
 
         N_res = N_lo + (e - 1) * FLINT_MIN(padic_val(a), padic_val(b));
-        padic_ctx_init(ctx_res, p, N_res, PADIC_SERIES);
 
-        padic_pow_si(c, a, e, ctx_res);
-        padic_pow_si(d, b, e, ctx_res);
+        padic_init2(c, N_res);
+        padic_init2(d, N_res);
 
-        result = (padic_equal(c, d, ctx_res));
+        padic_pow_si(c, a, e, ctx);
+        padic_pow_si(d, b, e, ctx);
+
+        result = (padic_equal(c, d));
         if (!result)
         {
             printf("FAIL (cmp with fmpq):\n\n");
-            printf("a = "), padic_print(a, ctx_hi), printf("\n");
-            printf("b = "), padic_print(b, ctx_hi), printf("\n");
-            printf("c = "), padic_print(c, ctx_res), printf("\n");
-            printf("d = "), padic_print(d, ctx_res), printf("\n");
+            printf("a = "), padic_print(a, ctx), printf("\n");
+            printf("b = "), padic_print(b, ctx), printf("\n");
+            printf("c = "), padic_print(c, ctx), printf("\n");
+            printf("d = "), padic_print(d, ctx), printf("\n");
             printf("e = %ld\n", e);
             printf("N_lo  = %ld\n", N_lo);
             printf("N_hi  = %ld\n", N_hi);
@@ -245,16 +239,14 @@ main(void)
             abort();
         }
 
-        _padic_clear(a);
-        _padic_clear(b);
-        _padic_clear(c);
-        _padic_clear(d);
-        _padic_clear(t);
+        padic_clear(a);
+        padic_clear(b);
+        padic_clear(c);
+        padic_clear(d);
+        padic_clear(t);
 
         fmpz_clear(p);
-        padic_ctx_clear(ctx_lo);
-        padic_ctx_clear(ctx_hi);
-        padic_ctx_clear(ctx_res);
+        padic_ctx_clear(ctx);
     }
 
     flint_randclear(state);

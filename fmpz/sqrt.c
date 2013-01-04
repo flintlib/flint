@@ -34,7 +34,7 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g)
 {
     if (fmpz_sgn(g) < 0)
     {
-        printf("Exception: g is negative in fmpz_sqrt\n");
+        printf("Exception (fmpz_sqrt). g is negative.\n");
         abort();
     }
     

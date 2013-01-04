@@ -54,8 +54,8 @@ fmpq_poly_compose_series(fmpq_poly_t res,
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {
-        printf("exception: fmpq_poly_compose_series: inner polynomial "
-                "must have zero constant term\n");
+        printf("Exception (fmpq_poly_compose_series). Inner polynomial \n"
+               "must have zero constant term,\n");
         abort();
     }
 

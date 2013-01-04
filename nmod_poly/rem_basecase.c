@@ -41,7 +41,7 @@ void _nmod_poly_rem_basecase_1(mp_ptr R, mp_ptr W,
         long iR;
         mp_ptr R1 = W;
 
-        mpn_copyi(R1, A, lenA);
+        flint_mpn_copyi(R1, A, lenA);
 
         for (iR = lenA - 1; iR >= lenB - 1; iR--)
         {
@@ -162,7 +162,7 @@ nmod_poly_rem_basecase(nmod_poly_t R, const nmod_poly_t A, const nmod_poly_t B)
 
     if (lenB == 0)
     {
-        printf("Exception: division by zero in nmod_poly_rem_basecase\n");
+        printf("Exception (nmod_poly_rem_basecase). Division by zero.\n");
         abort();
     }
     if (lenA < lenB)

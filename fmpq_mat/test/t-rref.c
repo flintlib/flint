@@ -43,14 +43,12 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         long m, n, r, rank, b, d;
-        long * perm;
         fmpq_mat_t A, B, C;
         fmpz_mat_t M;
         fmpz_t den;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1,m) * sizeof(long));
 
         fmpz_init(den);
 
@@ -72,7 +70,7 @@ main(void)
             fmpz_randtest_not_zero(den, state, b);
             fmpq_mat_set_fmpz_mat_div_fmpz(A, M, den);
 
-            rank = fmpq_mat_rref_classical(perm, B, A);
+            rank = fmpq_mat_rref_classical(B, A);
             if (r != rank)
             {
                 printf("FAIL:\n");
@@ -82,7 +80,7 @@ main(void)
                 abort();
             }
 
-            rank = fmpq_mat_rref_fraction_free(perm, C, A);
+            rank = fmpq_mat_rref_fraction_free(C, A);
             if (r != rank)
             {
                 printf("FAIL:\n");
@@ -110,8 +108,6 @@ main(void)
         }
 
         fmpz_clear(den);
-
-        flint_free(perm);
     }
 
     flint_randclear(state);

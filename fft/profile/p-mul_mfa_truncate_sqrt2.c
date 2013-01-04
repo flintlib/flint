@@ -50,10 +50,10 @@ main(void)
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    depth = 15;
+    depth = 13;
     w = 2;
     iters = 1;
-    truncation = 1.0;
+    truncation = 0.5;
 
     {
        mp_size_t n = (1UL<<depth);
@@ -63,7 +63,7 @@ main(void)
        mp_size_t j;
        mp_limb_t * i1, *i2, *r1, *r2;
         
-       printf("bits = %ld\n", int_limbs*FLINT_BITS);
+       printf("limbs = %ld\n", int_limbs);
        
        i1 = flint_malloc(6*int_limbs*sizeof(mp_limb_t));
        i2 = i1 + int_limbs;

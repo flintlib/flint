@@ -72,7 +72,7 @@ int main(void)
 
        g->_mp_d = flint_malloc(FLINT_MIN(s1, s2)*sizeof(mp_limb_t));
 
-       g->_mp_size = mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
+       g->_mp_size = flint_mpn_gcd_full(g->_mp_d, a->_mp_d, a->_mp_size, b->_mp_d, b->_mp_size); 
 
        result = (mpz_cmp(g, c) == 0);
        if (!result)

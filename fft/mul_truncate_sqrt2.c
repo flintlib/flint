@@ -76,7 +76,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
 
    j1 = fft_split_bits(ii, i1, n1, bits1, limbs);
    for (j = j1 ; j < 4*n; j++)
-      mpn_zero(ii[j], limbs + 1);
+      flint_mpn_zero(ii[j], limbs + 1);
    
    fft_truncate_sqrt2(ii, n, w, &t1, &t2, &s1, trunc);
     
@@ -84,7 +84,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
    {
       j2 = fft_split_bits(jj, i2, n2, bits1, limbs);
       for (j = j2 ; j < 4*n; j++)
-         mpn_zero(jj[j], limbs + 1);
+         flint_mpn_zero(jj[j], limbs + 1);
       fft_truncate_sqrt2(jj, n, w, &t1, &t2, &s1, trunc);      
    } else j2 = j1;
 
@@ -103,7 +103,7 @@ void mul_truncate_sqrt2(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1,
       mpn_normmod_2expp1(ii[j], limbs);
    }
    
-   mpn_zero(r1, r_limbs);
+   flint_mpn_zero(r1, r_limbs);
    fft_combine_bits(r1, ii, j1 + j2 - 1, bits1, limbs, r_limbs);
      
    flint_free(ii);

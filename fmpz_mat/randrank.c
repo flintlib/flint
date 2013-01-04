@@ -39,7 +39,7 @@ fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank,
 
     if (rank < 0 || rank > mat->r || rank > mat->c)
     {
-        printf("exception: fmpz_mat_randrank: impossible rank\n");
+        printf("Exception (fmpz_mat_randrank). Impossible rank.\n");
         abort();
     }
 

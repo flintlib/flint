@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -29,6 +29,8 @@
 
 int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
 {
+    const fmpz *p = ctx->p;
+
     if (fmpz_is_zero(u))
     {
         fputc('0', file);
@@ -46,7 +48,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
             fmpz_t t;
 
             fmpz_init(t);
-            fmpz_pow_ui(t, ctx->p, v);
+            fmpz_pow_ui(t, p, v);
             fmpz_mul(t, t, u);
             fmpz_fprint(file, t);
             fmpz_clear(t);
@@ -56,7 +58,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
             fmpz_t t;
 
             fmpz_init(t);
-            fmpz_pow_ui(t, ctx->p, -v);
+            fmpz_pow_ui(t, p, -v);
             _fmpq_fprint(file, u, t);
             fmpz_clear(t);
         }
@@ -67,12 +69,6 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
         fmpz_t d;
         long j;
 
-        if (fmpz_sgn(u) < 0)
-        {
-            printf("ERROR (_padic_fprint).  u < 0 in SERIES mode.\n");
-            abort();
-        }
-
         fmpz_init(d);
         fmpz_init(x);
 
@@ -81,9 +77,9 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
         /* Unroll first step */
         j = 0;
         {
-            fmpz_mod(d, x, ctx->p);       /* d = u mod p^{j+1} */
-            fmpz_sub(x, x, d);            /* x = x - d */
-            fmpz_divexact(x, x, ctx->p);  /* x = x / p */
+            fmpz_mod(d, x, p);       /* d = u mod p^{j+1} */
+            fmpz_sub(x, x, d);       /* x = x - d */
+            fmpz_divexact(x, x, p);  /* x = x / p */
 
             if (!fmpz_is_zero(d))
             {
@@ -91,7 +87,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
                 {
                     fmpz_fprint(file, d);
                     fputc('*', file);
-                    fmpz_fprint(file, ctx->p);
+                    fmpz_fprint(file, p);
                     fprintf(file, "^%ld", j + v);
                 }
                 else
@@ -105,9 +101,9 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
 
         for ( ; !fmpz_is_zero(x); j++)
         {
-            fmpz_mod(d, x, ctx->p);       /* d = u mod p^{j+1} */
-            fmpz_sub(x, x, d);            /* x = x - d */
-            fmpz_divexact(x, x, ctx->p);  /* x = x / p */
+            fmpz_mod(d, x, p);       /* d = u mod p^{j+1} */
+            fmpz_sub(x, x, d);       /* x = x - d */
+            fmpz_divexact(x, x, p);  /* x = x / p */
 
             if (!fmpz_is_zero(d))
             {
@@ -116,7 +112,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
                     fprintf(file, " + ");
                     fmpz_fprint(file, d);
                     fputc('*', file);
-                    fmpz_fprint(file, ctx->p);
+                    fmpz_fprint(file, p);
                     fprintf(file, "^%ld", j + v);
                 }
                 else
@@ -140,13 +136,13 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
         {
             fmpz_fprint(file, u);
             fputc('*', file);
-            fmpz_fprint(file, ctx->p);
+            fmpz_fprint(file, p);
         }
         else 
         {
             fmpz_fprint(file, u);
             fputc('*', file);
-            fmpz_fprint(file, ctx->p);
+            fmpz_fprint(file, p);
             fprintf(file, "^%ld", v);
         }
     }

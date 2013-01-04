@@ -19,14 +19,10 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "padic.h"
 
@@ -41,7 +37,7 @@ main(void)
 
     flint_randinit(state);
 
-    /* Check that Zp(QQ(x)) == x. */
+    /* Check that Zp(ZZ(x)) == x. */
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
@@ -51,26 +47,23 @@ main(void)
         padic_t a, b;
         fmpz_t c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = n_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
-        padic_init(a, ctx);
-        padic_init(b, ctx);
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
+
+        padic_init2(a, N);
+        padic_init2(b, N);
         fmpz_init(c);
 
-        padic_randtest(a, state, ctx);
-        if (padic_val(a) < 0)
-        {
-            padic_val(a) = - padic_val(a);
-            padic_reduce(a, ctx);
-        }
+        padic_randtest_int(a, state, ctx);
 
         padic_get_fmpz(c, a, ctx);
         padic_set_fmpz(b, c, ctx);
 
-        result = (padic_equal(a, b, ctx));
+        result = (padic_equal(a, b));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -80,8 +73,8 @@ main(void)
             abort();
         }
 
-        padic_clear(a, ctx);
-        padic_clear(b, ctx);
+        padic_clear(a);
+        padic_clear(b);
         fmpz_clear(c);
 
         fmpz_clear(p);

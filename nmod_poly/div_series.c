@@ -54,7 +54,7 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
 
     if (n == 0 || Blen == 0 || B->coeffs[0] == 0)
     {
-        printf("Exception: division by zero in nmod_poly_div_series\n");
+        printf("Exception (nmod_poly_div_series). Division by zero.\n");
         abort();
     }
     
@@ -63,8 +63,8 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
     if (Alen < n)
     {
         A_coeffs = _nmod_vec_init(n);
-        mpn_copyi(A_coeffs, A->coeffs, Alen);
-        mpn_zero(A_coeffs + Alen, n - Alen);
+        flint_mpn_copyi(A_coeffs, A->coeffs, Alen);
+        flint_mpn_zero(A_coeffs + Alen, n - Alen);
     }
     else
         A_coeffs = A->coeffs;
@@ -72,8 +72,8 @@ nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A,
     if (Blen < n)
     {
         B_coeffs = _nmod_vec_init(n);
-        mpn_copyi(B_coeffs, B->coeffs, Blen);
-        mpn_zero(B_coeffs + Blen, n - Blen);
+        flint_mpn_copyi(B_coeffs, B->coeffs, Blen);
+        flint_mpn_zero(B_coeffs + Blen, n - Blen);
     }
     else
         B_coeffs = B->coeffs;

@@ -180,11 +180,11 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c);
 
-long fmpq_mat_rref_classical(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+long fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
 
-long fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+long fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
-long fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A);
+long fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 #ifdef __cplusplus
 }

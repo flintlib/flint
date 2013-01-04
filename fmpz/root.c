@@ -39,7 +39,7 @@ fmpz_root(fmpz_t r, fmpz_t f, long n)
     
     if (n == 0)
     {
-        printf("Exception: unable to take 0-th root in fmpz_root\n");
+        printf("Exception (fmpz_root). Unable to take 0-th root.\n");
         abort();
     }
 
@@ -55,7 +55,7 @@ fmpz_root(fmpz_t r, fmpz_t f, long n)
         {
             if (c < 0L)
             {
-                printf("Exception: unable to take square root of negative value in fmpz_root\n");
+                printf("Exception (fmpz_root). Unable to take square root of negative value.\n");
                 abort();
             }
 
