@@ -23,13 +23,38 @@
 
 ******************************************************************************/
 
+#undef ulong /* avoid clash with stdlib */
+#include <string.h>
+#define ulong unsigned long
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_factor.h"
+#include "fmpz_mod_poly.h"
 #include "mpn_extras.h"
 #include "ulong_extras.h"
+
+#define DEBUG 0 /* turn on some trace information */
+
+#ifdef FLINT64
+static
+ulong pp1_primorial[15] =
+{
+   2UL, 6UL, 30UL, 210UL, 2310UL, 30030UL, 510510UL, 9699690UL,
+   223092870UL, 6469693230UL, 200560490130UL, 7420738134810UL,
+   304250263527210UL, 13082761331670030UL, 614889782588491410UL
+};
+#define num_primorials 15
+#else
+static
+ulong pp1_primorial[9] = 
+{
+   2UL, 6UL, 30UL, 210UL, 2310UL, 30030UL, 510510UL, 9699690UL,
+   223092870UL
+};
+#define num_primorials 9
+#endif
 
 void pp1_set(mp_ptr x1, mp_ptr y1, 
               mp_srcptr x2, mp_srcptr y2, mp_size_t nn)
@@ -170,12 +195,12 @@ mp_size_t pp1_find_power(mp_ptr factor, mp_ptr x, mp_ptr y, mp_size_t nn,
    return ret;
 }
 
-int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
+int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
 {
    long i, j;
    int ret = 0;
    mp_size_t nn = fmpz_size(n_in), r;
-   mp_ptr x, y, oldx, oldy, n, ninv, factor;
+   mp_ptr x, y, oldx, oldy, n, ninv, factor, ptr_0, ptr_1, ptr_2, ptr_k;
    ulong pr, oldpr, sqrt, bits0, norm;
    n_primes_t iter;
 
@@ -185,10 +210,14 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       return 1;
    }
 
+#if DEBUG
+   printf("starting stage 1\n");
+#endif
+
    n_primes_init(iter);
 
-   sqrt = n_sqrt(B0);
-   bits0 = FLINT_BIT_COUNT(B0);
+   sqrt = n_sqrt(B1);
+   bits0 = FLINT_BIT_COUNT(B1);
 
    x      = flint_malloc(nn*sizeof(mp_limb_t));
    y      = flint_malloc(nn*sizeof(mp_limb_t));
@@ -221,7 +250,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
    pr = 0;
    oldpr = 0;
 
-   for (i = 0; pr < B0; )
+   for (i = 0; pr < B1; )
    {
       j = i + 1024;
       oldpr = pr;
@@ -248,7 +277,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
       }
    }
 
-   if (pr < B0) /* factor = 0 */
+   if (pr < B1) /* factor = 0 */
    {
       n_primes_jump_after(iter, oldpr);
       pp1_set(x, y, oldx, oldy, nn);
@@ -270,15 +299,282 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B0, ulong c)
             break;
          if (r != 1 || factor[0] != 1)
          {
-            ret = (r == 0 ? 0 : 1);
+            ret = 1;
             goto cleanup;
          }
       } while (1);
-   } else
-      goto cleanup;
 
-   /* factor is still 0 */
-   ret = pp1_find_power(factor, oldx, oldy, nn, pr, n, ninv, norm);
+      /* factor is still 0 */
+      ret = pp1_find_power(factor, oldx, oldy, nn, pr, n, ninv, norm);
+   } else /* stage 2 */
+   {
+      double quot;
+      int num;
+      char * sieve = flint_malloc(32768);
+      long * sieve_index = flint_malloc(32768*sizeof(long));
+      mp_ptr diff = flint_malloc(16384*nn*sizeof(mp_limb_t));
+      ulong offset[15], num_roots;
+      long k, index = 0, s;
+      fmpz * roots, * roots2, * evals;
+      fmpz_poly_struct ** tree, ** tree2;
+      ulong B2sqrt;
+
+#if DEBUG
+      ulong primorial;
+      printf("starting stage 2\n");
+#endif
+
+      B2sqrt = B1/100;
+      
+      /* find primorial <= B2sqrt ... */
+      for (num = 1; num < num_primorials; num++)
+      {
+         if (pp1_primorial[num] > B2sqrt)
+            break;
+      }
+      num--;
+ 
+      /* ... but not too big */
+      quot = (double) B2sqrt / (double) pp1_primorial[num];
+      if (quot < 1.1 && num > 0)
+         num--;
+
+#if DEBUG
+      primorial = pp1_primorial[num];
+      printf("found primorial %lu\n", primorial);
+#endif
+
+      /* adjust Bsqrt to multiple of primorial */
+      B2sqrt = (((B2sqrt - 1)/ pp1_primorial[num]) + 1) * pp1_primorial[num];
+
+#if DEBUG
+      printf("adjusted B2sqrt %lu\n", B2sqrt);
+#endif
+
+      /* compute num roots */
+      num++; /* number of primes is 1 more than primorial index */
+      pr = 2;
+      num_roots = B2sqrt;
+      for (i = 0; i < num; i++)
+      {
+         num_roots = (num_roots*(pr - 1))/pr;
+         pr = n_nextprime(pr, 0);
+      }
+
+#if DEBUG
+      printf("computed num_roots %lu\n", num_roots);
+      printf("B2 = %lu\n", num_roots * B2sqrt);
+#endif
+
+      /* construct roots */
+      roots = _fmpz_vec_init(num_roots);
+      for (i = 0; i < num_roots; i++)
+      {
+         __mpz_struct * m = _fmpz_promote(roots + i);
+         mpz_realloc(m, nn);
+      }
+
+      roots2 = _fmpz_vec_init(num_roots);
+      for (i = 0; i < num_roots; i++)
+      {
+         __mpz_struct * m = _fmpz_promote(roots2 + i);
+         mpz_realloc(m, nn);
+      }
+
+      evals = _fmpz_vec_init(num_roots);
+
+#if DEBUG
+      printf("constructed roots\n");
+#endif
+
+      /* compute differences table v0, ... */
+      mpn_zero(diff, nn);
+      diff[0] = (2UL << norm);
+
+      /* ... v2, ... */
+      flint_mpn_mulmod_preinvn(diff + nn, x, x, nn, n, ninv, norm);
+      if (mpn_sub_1(diff + nn, diff + nn, nn, 2UL << norm))
+         mpn_add_n(diff + nn, diff + nn, n, nn);
+
+      /* ... the rest ... v_{k+2} = v_k v_2 - v_{k-2} */
+      k = 2*nn;
+      for (i = 2; i < 16384; i++, k += nn)
+      {
+         flint_mpn_mulmod_preinvn(diff + k, diff + k - nn, diff + nn, nn, n, ninv, norm);
+         if (mpn_sub_n(diff + k, diff + k, diff + k - 2*nn, nn))
+            mpn_add_n(diff + k, diff + k, n, nn);
+      }
+
+#if DEBUG
+      printf("conputed differences table\n");
+#endif
+
+      /* initial positions */
+      pr = 2;
+      for (i = 0; i < num; i++)
+      {
+         offset[i] = pr/2;
+         pr = n_nextprime(pr, 0);
+      }
+
+      s = 0;
+      while (2*s + 1 < B2sqrt)
+      {
+         /* sieve */
+         memset(sieve, 1, 32768);
+         pr = 3;
+         for (i = 1; i < num; i++)
+         {
+            j = offset[i];
+            while (j < 32768)
+               sieve[j] = 0, j += pr;
+
+            /* store offset for start of next sieve run */
+            offset[i] = j - 32768;
+            pr = n_nextprime(pr, 0);
+         }
+
+         /* compute roots */
+         for (i = 0; i < 32768 && 2*(s + i) + 1 < B2sqrt; i++)
+         {
+            if (sieve[i])
+            {
+               ptr_2 = COEFF_TO_PTR(roots[index])->_mp_d;
+               k = (i + 1)/2;
+               for (j = i - 1; j >= k; j--)
+               {
+                  if (sieve[j] && sieve[2*j - i])
+                  {
+                     /* V_{n+k} = V_n V_k - V_{n-k} */
+                     ptr_0 = COEFF_TO_PTR(roots[sieve_index[2*j - i]])->_mp_d;
+                     ptr_1 = COEFF_TO_PTR(roots[sieve_index[j]])->_mp_d;
+                     ptr_k = diff + (i - j)*nn;
+                     flint_mpn_mulmod_preinvn(ptr_2, ptr_1, ptr_k, nn, n, ninv, norm);
+                     if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
+                        mpn_add_n(ptr_2, ptr_2, n, nn);
+                     break;
+                  }
+               }
+
+               if (j < k) /* pair not found, compute using pow_ui */
+               {
+                  mpn_copyi(ptr_2, x, nn);
+                  pp1_pow_ui(ptr_2, y, nn, 2*(s + i) + 1, n, ninv, norm);
+               }
+             
+               sieve_index[i] = index;
+               index++;
+            }
+         }
+
+         s += 32768;
+      }
+
+#if DEBUG
+      printf("roots computed %ld\n", index);
+#endif
+
+      /* v_1 */
+      mpn_copyi(oldx, x, nn);
+      pp1_pow_ui(oldx, y, nn, B2sqrt, n, ninv, norm);
+      ptr_0 = COEFF_TO_PTR(roots2[0])->_mp_d;
+      mpn_copyi(ptr_0, oldx, nn);
+
+      /* v_2 */
+      ptr_1 = COEFF_TO_PTR(roots2[1])->_mp_d;
+      flint_mpn_mulmod_preinvn(ptr_1, ptr_0, ptr_0, nn, n, ninv, norm);
+      if (mpn_sub_1(ptr_1, ptr_1, nn, 2UL << norm))
+         mpn_add_n(ptr_1, ptr_1, n, nn);
+     
+      for (i = 2; i < num_roots; i++)
+      {
+         /* V_{k+n} = V_k V_n - V_{k-n} */
+         ptr_2 = COEFF_TO_PTR(roots2[i])->_mp_d;
+      
+         flint_mpn_mulmod_preinvn(ptr_2, ptr_1, oldx, nn, n, ninv, norm);
+         if (mpn_sub_n(ptr_2, ptr_2, ptr_0, nn))
+             mpn_add_n(ptr_2, ptr_2, n, nn);
+                     
+         ptr_0 = ptr_1;
+         ptr_1 = ptr_2;
+      }
+
+#if DEBUG
+      printf("roots2 computed %lu\n", num_roots);
+#endif
+
+      for (i = 0; i < num_roots; i++)
+      {
+         mp_size_t sn;
+         __mpz_struct * m1 = COEFF_TO_PTR(roots[i]);
+         __mpz_struct * m2 = COEFF_TO_PTR(roots2[i]);
+         
+         ptr_1 = m1->_mp_d;
+         ptr_2 = m2->_mp_d;
+      
+         mpn_rshift(ptr_1, ptr_1, nn, norm);
+         mpn_rshift(ptr_2, ptr_2, nn, norm);
+
+         sn = nn;
+         MPN_NORM(ptr_1, sn);
+         m1->_mp_size = sn;
+
+         sn = nn;
+         MPN_NORM(ptr_2, sn);
+         m2->_mp_size = sn;
+
+         _fmpz_demote_val(roots + i);
+         _fmpz_demote_val(roots2 + i);
+      }
+
+#if DEBUG
+      printf("normalised roots\n");
+#endif
+
+      tree = _fmpz_mod_poly_tree_alloc(num_roots);
+      _fmpz_mod_poly_tree_build(tree, roots, num_roots, n_in);
+
+      tree2 = _fmpz_mod_poly_tree_alloc(num_roots);
+      _fmpz_mod_poly_tree_build(tree2, roots2, num_roots, n_in);
+
+      fmpz_poly_mul(tree2[FLINT_CLOG2(num_roots)], tree2[FLINT_CLOG2(num_roots)-1], tree2[FLINT_CLOG2(num_roots)-1]+1);
+     
+#if DEBUG
+      printf("built trees\n");
+#endif
+
+      _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(evals, tree2[FLINT_CLOG2(num_roots)]->coeffs, tree2[FLINT_CLOG2(num_roots)]->length, tree, num_roots, n_in);
+      _fmpz_mod_poly_tree_free(tree, num_roots);
+      _fmpz_mod_poly_tree_free(tree2, num_roots);
+      
+#if DEBUG
+      printf("evaluated at roots\n");
+#endif
+
+      for (i = 0; i < num_roots; i++)
+      {
+         fmpz_gcd(fac, n_in, evals + i);
+         if (!fmpz_is_zero(fac) && !fmpz_is_one(fac))
+         {
+            ret = 1;
+            break;
+         }
+      }
+
+      _fmpz_vec_clear(evals, num_roots);
+      _fmpz_vec_clear(roots, num_roots);
+      _fmpz_vec_clear(roots2, num_roots);
+      flint_free(sieve);
+      flint_free(diff);
+
+
+      if (i < num_roots)
+         goto cleanup2;
+   }
+
+#if DEBUG
+   printf("done stage2\n");
+#endif
 
 cleanup:
 
@@ -289,6 +585,8 @@ cleanup:
       mpn_copyi(fm->_mp_d, factor, r);
       fm->_mp_size = r;
    }
+
+cleanup2:
 
    flint_free(x);
    flint_free(y);
