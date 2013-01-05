@@ -77,7 +77,7 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
 int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B0, ulong c)
 
     Use Williams' $p + 1$ method to factor $n$, using a prime bound in
-    stage 1 of \code{B0}. If a factor is found, the function
+    stage 1 of \code{B1}. If a factor is found, the function
     returns $1$ and \code{factor} is set to the factor that is found.
     Otherwise, the function returns $0$.
 

@@ -32,7 +32,7 @@
 int main(void)
 {
    ulong c;
-   ulong B0; 
+   ulong B1; 
    mp_limb_t n, p;
 
    flint_rand_t state;
@@ -47,8 +47,8 @@ int main(void)
          abort();
       }
    
-      printf("Enter B0: "); fflush(stdout);
-      if (!scanf("%lu", &B0))
+      printf("Enter B1: "); fflush(stdout);
+      if (!scanf("%lu", &B1))
       {
          printf("Read failed\n");
          abort();
@@ -59,7 +59,7 @@ int main(void)
          c = n_randint(state, n);
       } while (c <= 2UL);
 
-      p = n_factor_pp1(n, B0, c);
+      p = n_factor_pp1(n, B1, c);
       if (p >= 2)
          printf("Factor: %lu\n", p);
       else

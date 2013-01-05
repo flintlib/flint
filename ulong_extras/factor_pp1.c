@@ -120,7 +120,7 @@ mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
    return factor;
 }
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
 {
    long i, j;
    mp_limb_t factor = 0;
@@ -133,8 +133,8 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
 
    n_primes_init(iter);
 
-   sqrt = n_sqrt(B0);
-   bits0 = FLINT_BIT_COUNT(B0);
+   sqrt = n_sqrt(B1);
+   bits0 = FLINT_BIT_COUNT(B1);
 
    count_leading_zeros(norm, n);
    n <<= norm;
@@ -147,7 +147,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
    pr = 0;
    oldpr = 0;
 
-   for (i = 0; pr < B0; )
+   for (i = 0; pr < B1; )
    {
       j = i + 1024;
       oldpr = pr;
@@ -172,7 +172,7 @@ mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c)
          goto cleanup;
    }
 
-   if (pr < B0) /* factor = 0 */
+   if (pr < B1) /* factor = 0 */
    {
       n_primes_jump_after(iter, oldpr);
       n_pp1_set(x, y, oldx, oldy);  

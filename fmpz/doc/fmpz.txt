@@ -831,7 +831,7 @@ int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_negmod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
-    Sets $f$ to $-g \pmod{h}$.
+    Sets $f$ to $-g \pmod{h}$, assuming $g$ is reduced modulo $h$.
 
 int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
 
