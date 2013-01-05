@@ -344,7 +344,7 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
       printf("found primorial %lu\n", primorial);
 #endif
 
-      /* adjust Bsqrt to multiple of primorial */
+      /* adjust B2sqrt to multiple of primorial */
       B2sqrt = (((B2sqrt - 1)/ pp1_primorial[num]) + 1) * pp1_primorial[num];
 
 #if DEBUG
