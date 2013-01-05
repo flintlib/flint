@@ -334,7 +334,7 @@ mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
 
-mp_limb_t n_factor_pp1(mp_limb_t n, ulong B0, ulong c);
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c);
 
 int n_is_squarefree(mp_limb_t n);
 
