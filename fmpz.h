@@ -181,6 +181,58 @@ fmpz_set_ui(fmpz_t f, ulong val)
     }
 }
 
+static __inline__ void
+fmpz_neg_ui(fmpz_t f, ulong val)
+{
+    if (val > COEFF_MAX)
+    {
+        __mpz_struct *mpz_coeff = _fmpz_promote(f);
+        mpz_set_ui(mpz_coeff, val);
+        mpz_neg(mpz_coeff, mpz_coeff);
+    }
+    else
+    {
+        _fmpz_demote(f);
+        *f = -(long) val;
+    }
+}
+
+static __inline__ void
+fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+{
+    if (hi == 0)
+    {
+        fmpz_set_ui(f, lo);
+    }
+    else
+    {
+        __mpz_struct *z = _fmpz_promote(f);
+        if (z->_mp_alloc < 2)
+            mpz_realloc2(z, 2 * FLINT_BITS);
+        z->_mp_d[0] = lo;
+        z->_mp_d[1] = hi;
+        z->_mp_size = 2;
+    }
+}
+
+static __inline__ void
+fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+{
+    if (hi == 0)
+    {
+        fmpz_neg_ui(f, lo);
+    }
+    else
+    {
+        __mpz_struct *z = _fmpz_promote(f);
+        if (z->_mp_alloc < 2)
+            mpz_realloc2(z, 2 * FLINT_BITS);
+        z->_mp_d[0] = lo;
+        z->_mp_d[1] = hi;
+        z->_mp_size = -2;
+    }
+}
+
 void fmpz_get_mpz(mpz_t x, const fmpz_t f);
 
 void fmpz_set_mpz(fmpz_t f, const mpz_t x);
