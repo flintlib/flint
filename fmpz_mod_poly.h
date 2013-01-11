@@ -369,9 +369,19 @@ void _fmpz_mod_poly_rem(fmpz *R,
                         const fmpz_t invB, const fmpz_t p)
 {
     fmpz *Q = _fmpz_vec_init(lenA - lenB + 1);
+    fmpz *T = _fmpz_vec_init(lenA);
 
-    _fmpz_mod_poly_divrem_divconquer(Q, R, A, lenA, B, lenB, invB, p);
+    if (lenA < lenB)
+    {
+       _fmpz_vec_set(R, A, lenA);
+       _fmpz_vec_zero(R + lenA, lenB - 1 - lenA);
+    } else
+    {
+       _fmpz_mod_poly_divrem_divconquer(Q, T, A, lenA, B, lenB, invB, p);
+       _fmpz_vec_set(R, T, lenB - 1);
+    }
 
+    _fmpz_vec_clear(T, lenA);
     _fmpz_vec_clear(Q, lenA - lenB + 1);
 }
 
@@ -489,6 +499,37 @@ void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len,
 
 void fmpz_mod_poly_evaluate_fmpz(fmpz_t res, 
                                  const fmpz_mod_poly_t poly, const fmpz_t a);
+
+fmpz_poly_struct ** _fmpz_mod_poly_tree_alloc(long len);
+
+void _fmpz_mod_poly_tree_free(fmpz_poly_struct ** tree, long len);
+
+void _fmpz_mod_poly_tree_build(fmpz_poly_struct ** tree, 
+                             const fmpz * roots, long len, const fmpz_t mod);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, 
+                        long len, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, 
+              const fmpz * poly, long plen, fmpz_poly_struct ** tree, 
+                                                 long len, const fmpz_t mod);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, 
+    const fmpz * poly, long plen, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+void _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
+                        long len, const fmpz * xs, long n, const fmpz_t mod);
+
+void fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
+                        const fmpz_mod_poly_t poly, const fmpz * xs, long n);
+
+
 
 /*  Composition  *************************************************************/
 

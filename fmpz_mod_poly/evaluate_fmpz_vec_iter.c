@@ -19,7 +19,8 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2012 William Hart
 
 ******************************************************************************/
 
@@ -27,34 +28,22 @@
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
+#include "fmpz_poly.h"
+#include "fmpz_mod_poly.h"
 
 void
-fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
+_fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, long len,
+    const fmpz * xs, long n, const fmpz_t mod)
 {
-    fmpz c = *g;
+    long i;
+    for (i = 0; i < n; i++)
+        _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, mod);
+}
 
-    if (!COEFF_IS_MPZ(c))       /* coeff is small */
-    {
-        mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
-        {
-            add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            fmpz_neg_uiui(f, sum[1], sum[0]);
-        }
-        else                    /* coeff is non-negative, x non-negative */
-        {
-            if (x < c)
-                fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
-            else
-                fmpz_neg_ui(f, x - c);  /* positive or zero */
-        }
-    }
-    else
-    {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
-        mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
-    }
+void
+fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
+        const fmpz_mod_poly_t poly, const fmpz * xs, long n)
+{
+    _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, poly->coeffs,
+                                        poly->length, xs, n, &(poly->p));
 }

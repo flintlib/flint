@@ -38,22 +38,14 @@ void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
 		if (c >= 0L)  /* both operands non-negative */
 		{
 			add_ssaaaa(sum[1], sum[0], 0, c, 0, x);
-			if (sum[1] == 0) fmpz_set_ui(f, sum[0]);  /* result fits in 1 limb */
-			else /* result takes two limbs */
-			{
-                __mpz_struct * mpz_ptr;
-				mpz_t temp;
-				temp->_mp_d = sum;
-				temp->_mp_size = 2;  /* result is sum of two non-negative numbers and is hence non-negative */
-				
-		        mpz_ptr = _fmpz_promote(f);  /* g has already been read */
-				mpz_set(mpz_ptr, temp);			
-			}
+            fmpz_set_uiui(f, sum[1], sum[0]);
 		}
         else  /* coeff is negative, x positive */
 		{
-			if (-c > x) fmpz_set_si(f, x + c);  /* can't overflow as g is small and x smaller */
-			else fmpz_set_ui(f, x + c);  /* won't be negative and has to be less than x */
+			if (-c > x)
+                fmpz_set_si(f, x + c); /* can't overflow as g is small and x smaller */
+			else
+                fmpz_set_ui(f, x + c);  /* won't be negative and has to be less than x */
 		}
 	}
     else

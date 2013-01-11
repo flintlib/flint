@@ -29,56 +29,35 @@
 #include "longlong.h"
 #include "mpn_extras.h"
 
-mp_limb_t flint_mpn_div_preinv1(mp_limb_t d1, mp_limb_t d2)
+void flint_mpn_mulmod_preinvn(mp_ptr r, 
+        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+        mp_srcptr d, mp_srcptr dinv, ulong norm)
 {
-   mp_limb_t q, r[2], p[2], cy;
-   
-   if (d2 + 1 == 0 && d1 + 1 == 0)
-      return 0;
+   mp_limb_t cy;
+   mp_limb_t ts[150];
+   mp_ptr t;
 
-   if (d1 + 1 == 0)
-      q = ~d1, r[1] = ~d2;
+   if (n <= 30)
+      t = ts;
    else
-      udiv_qrnnd(q, r[1], ~d1, ~d2, d1 + 1);
+      t = flint_malloc(5*n*sizeof(mp_limb_t));
 
-   r[0] = 0;
+   mpn_mul_n(t, a, b, n);
+   if (norm)
+      mpn_rshift(t, t, 2*n, norm);
 
-   if (d2 + 1 == 0)
-      add_ssaaaa(cy, r[1], 0, r[1], 0, q);   
-   else
-   {
-      umul_ppmm(p[1], p[0], q, ~d2 - 1);
-      cy = mpn_add_n(r, r, p, 2);
-   }
- 
-   p[0] = d2 + 1, p[1] = d1 + (d2 + 1 == 0);
-   if (cy || mpn_cmp(r, p, 2) >= 0)
-      q++;
+   mpn_mul_n(t + 3*n, t + n, dinv, n);
+   mpn_add_n(t + 4*n, t + 4*n, t + n, n);
+
+   mpn_mul_n(t + 2*n, t + 4*n, d, n);
+   cy = t[n] - t[3*n] - mpn_sub_n(r, t, t + 2*n, n);
+
+   while (cy > 0)
+      cy -= mpn_sub_n(r, r, d, n);
    
-   return q;
-}
+   if (mpn_cmp(r, d, n) >= 0)
+      mpn_sub_n(r, r, d, n);
 
-mp_limb_t flint_mpn_divrem_basecase_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
-                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
-{
-   mp_limb_t ret;
-   mp_size_t i;
-
-   /* ensure { a + i, n } < { b, n } */
-   if ((ret = (mpn_cmp(a + m - n, b, n) >= 0)))
-      mpn_sub_n(a + m - n, a + m - n, b, n);
-   
-   for (i = m - 1; i >= n; i--)
-   {
-      flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
-      a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
-
-      if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)
-      {
-         q[i - n]++;
-         a[i] -= mpn_sub_n(a + i - n, a + i - n, b, n);
-      }
-   }
-
-   return ret;
+   if (n > 30)
+      flint_free(t);
 }

@@ -71,6 +71,8 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 void fmpz_factor_si(fmpz_factor_t factor, long n);
 
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B1, ulong c);
+
 /* Expansion *****************************************************************/
 
 void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
@@ -78,8 +80,6 @@ void fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor);
 void fmpz_factor_expand_multiexp(fmpz_t n, const fmpz_factor_t factor);
 
 void fmpz_factor_expand(fmpz_t n, const fmpz_factor_t factor);
-
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, long iters, ulong c);
 
 #ifdef __cplusplus
 }

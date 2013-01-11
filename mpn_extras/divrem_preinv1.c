@@ -19,42 +19,37 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2012 William Hart
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "longlong.h"
+#include "mpn_extras.h"
 
-void
-fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
+mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, mp_size_t m, 
+                                 mp_srcptr b, mp_size_t n, mp_limb_t dinv)
 {
-    fmpz c = *g;
+   mp_limb_t ret;
+   mp_size_t i;
 
-    if (!COEFF_IS_MPZ(c))       /* coeff is small */
-    {
-        mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
-        {
-            add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            fmpz_neg_uiui(f, sum[1], sum[0]);
-        }
-        else                    /* coeff is non-negative, x non-negative */
-        {
-            if (x < c)
-                fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
-            else
-                fmpz_neg_ui(f, x - c);  /* positive or zero */
-        }
-    }
-    else
-    {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
-        mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
-    }
+   /* ensure { a + i, n } < { b, n } */
+   if ((ret = (mpn_cmp(a + m - n, b, n) >= 0)))
+      mpn_sub_n(a + m - n, a + m - n, b, n);
+   
+   for (i = m - 1; i >= n; i--)
+   {
+      flint_mpn_divrem21_preinv(q[i - n], a[i], a[i - 1], dinv);
+      a[i] -= mpn_submul_1(a + i - n, b, n, q[i - n]);
+
+      if (mpn_cmp(a + i - n, b, n) >= 0 || a[i] != 0)
+      {
+         q[i - n]++;
+         a[i] -= mpn_sub_n(a + i - n, a + i - n, b, n);
+      }
+   }
+
+   return ret;
 }

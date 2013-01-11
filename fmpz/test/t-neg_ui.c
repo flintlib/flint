@@ -23,60 +23,55 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "longlong.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
-#include "mpn_extras.h"
 
-void fmpz_mod_preinv1(fmpz_t r, const fmpz_t f, const fmpz_t m, mp_limb_t dinv)
+int
+main(void)
 {
-   mp_limb_t * a, * b, * mp, * fp, cy;
-   __mpz_struct * rem;
-   mp_bitcnt_t norm;
-   long mn = fmpz_size(m);
-   long fn = fmpz_size(f);
-   mp_limb_t t[71];
-   
-   if (fmpz_sgn(f) < 0 || fmpz_sgn(m) < 0
-    || mn < 2 || fn > 70 || fn < mn)
-   {
-      fmpz_mod(r, f, m);
-      return;
-   }
+    int i, result;
 
-   rem = _fmpz_promote(r);
-   mpz_realloc(rem, fn + 1);
-   
-   mp = COEFF_TO_PTR(*m)->_mp_d;
-   fp = COEFF_TO_PTR(*f)->_mp_d;
-   count_leading_zeros(norm, mp[mn - 1]);
+    flint_rand_t state;
+    flint_randinit(state);
 
-   a = rem->_mp_d;
-   
-   if (norm)
-   {
-      cy = mpn_lshift(a, fp, fn, norm);
-      if (cy)
-      {
-         a[fn] = cy;
-         fn++;
-      }
-      b = t + fn - mn;
-      mpn_lshift(b, mp, mn, norm);
-   } else
-   {
-      flint_mpn_copyi(a, fp, fn);
-      b = mp;
-   }
-   
-   flint_mpn_divrem_basecase_preinv1(t, a, fn, b, mn, dinv);
+    printf("neg_ui....");
+    fflush(stdout);
 
-   if (norm)
-      mpn_rshift(a, a, fn, norm);
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    {
+        fmpz_t a, b;
+        ulong c;
 
-   MPN_NORM(a, fn);
-   rem->_mp_size = fn;
-   _fmpz_demote_val(r);
+        c = n_randtest(state);
+
+        fmpz_init(a);
+        fmpz_init(b);
+
+        fmpz_set_ui(a, c);
+        fmpz_neg(a, a);
+
+        fmpz_neg_ui(b, c);
+
+        result = fmpz_equal(a, b);
+        if (!result)
+        {
+            printf("FAIL:\n");
+            printf("c = %lu\n", c);
+            printf("a = "); fmpz_print(a); printf("\n");
+            printf("b = "); fmpz_print(b); printf("\n");
+            abort();
+        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
+    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

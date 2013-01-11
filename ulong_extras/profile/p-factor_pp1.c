@@ -19,42 +19,54 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright 2012 William Hart
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include "profiler.h"
 #include "flint.h"
 #include "ulong_extras.h"
-#include "fmpz.h"
 
-void
-fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
+int main(void)
 {
-    fmpz c = *g;
+   ulong c;
+   ulong B1; 
+   mp_limb_t n, p;
 
-    if (!COEFF_IS_MPZ(c))       /* coeff is small */
-    {
-        mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
-        {
-            add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            fmpz_neg_uiui(f, sum[1], sum[0]);
-        }
-        else                    /* coeff is non-negative, x non-negative */
-        {
-            if (x < c)
-                fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
-            else
-                fmpz_neg_ui(f, x - c);  /* positive or zero */
-        }
-    }
-    else
-    {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
-        mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
-    }
+   flint_rand_t state;
+   flint_randinit(state);
+
+   while(1)
+   {
+      printf("Enter number to be factored: "); fflush(stdout);
+      if (!scanf("%lu", &n))
+      {
+         printf("Read failed\n");
+         abort();
+      }
+   
+      printf("Enter B1: "); fflush(stdout);
+      if (!scanf("%lu", &B1))
+      {
+         printf("Read failed\n");
+         abort();
+      }
+    
+      do
+      {
+         c = n_randint(state, n);
+      } while (c <= 2UL);
+
+      p = n_factor_pp1(n, B1, c);
+      if (p >= 2)
+         printf("Factor: %lu\n", p);
+      else
+         printf("Factor not found!\n");
+   } while(1);
+   
+   flint_randclear(state);
+
+   return 0;
 }

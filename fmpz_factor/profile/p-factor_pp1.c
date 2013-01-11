@@ -34,7 +34,7 @@ int main(void)
 {
    fmpz_t n, p;
    ulong c;
-   long iters;
+   ulong B1;
    
    fmpz_init(n);
    fmpz_init(p);
@@ -51,8 +51,8 @@ int main(void)
          abort();
       }
    
-      printf("Enter a number of iterations: "); fflush(stdout);
-      if (!scanf("%ld", &iters))
+      printf("Enter B1: "); fflush(stdout);
+      if (!scanf("%lu", &B1))
       {
          printf("Read failed\n");
          abort();
@@ -63,10 +63,7 @@ int main(void)
          c = n_randlimb(state);
       } while (c <= 2UL);
 
-      if (fmpz_is_even(n))
-      {
-         printf("Factor: 2\n");
-      } else if (fmpz_factor_pp1(p, n, iters, c))
+      if (fmpz_factor_pp1(p, n, B1, c))
       {
          printf("Factor: ");
          fmpz_print(p);

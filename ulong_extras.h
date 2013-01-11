@@ -184,6 +184,9 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
 mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
                                         mp_limb_t n, mp_limb_t ninv);
 
+mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, 
+                            mp_limb_t n, mp_limb_t ninv, ulong norm);
+
 mp_limb_t
 n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
 
@@ -330,6 +333,8 @@ mp_limb_t n_factor_lehman(mp_limb_t n);
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
+
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c);
 
 int n_is_squarefree(mp_limb_t n);
 

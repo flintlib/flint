@@ -19,42 +19,41 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2009 William Hart
+    Copyright (C) 2012 William Hart
 
 ******************************************************************************/
 
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include "longlong.h"
+#include "mpn_extras.h"
 
-void
-fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
+mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
 {
-    fmpz c = *g;
+   mp_limb_t q, r[2], p[2], cy;
+   
+   if (d2 + 1 == 0 && d1 + 1 == 0)
+      return 0;
 
-    if (!COEFF_IS_MPZ(c))       /* coeff is small */
-    {
-        mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
-        {
-            add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            fmpz_neg_uiui(f, sum[1], sum[0]);
-        }
-        else                    /* coeff is non-negative, x non-negative */
-        {
-            if (x < c)
-                fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
-            else
-                fmpz_neg_ui(f, x - c);  /* positive or zero */
-        }
-    }
-    else
-    {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
-        mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
-    }
+   if (d1 + 1 == 0)
+      q = ~d1, r[1] = ~d2;
+   else
+      udiv_qrnnd(q, r[1], ~d1, ~d2, d1 + 1);
+
+   r[0] = 0;
+
+   if (d2 + 1 == 0)
+      add_ssaaaa(cy, r[1], 0, r[1], 0, q);   
+   else
+   {
+      umul_ppmm(p[1], p[0], q, ~d2 - 1);
+      cy = mpn_add_n(r, r, p, 2);
+   }
+ 
+   p[0] = d2 + 1, p[1] = d1 + (d2 + 1 == 0);
+   if (cy || mpn_cmp(r, p, 2) >= 0)
+      q++;
+   
+   return q;
 }
