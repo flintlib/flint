@@ -48,6 +48,9 @@ main(void)
 
         c = n_randtest(state);
 
+        fmpz_init(a);
+        fmpz_init(b);
+
         fmpz_set_ui(a, c);
         fmpz_neg(a, a);
 

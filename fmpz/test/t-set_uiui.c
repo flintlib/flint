@@ -49,6 +49,9 @@ main(void)
         hi = n_randtest(state);
         lo = n_randtest(state);
 
+        fmpz_init(a);
+        fmpz_init(b);
+
         fmpz_set_ui(a, hi);
         fmpz_mul_2exp(a, a, FLINT_BITS);
         fmpz_add_ui(a, a, lo);
