@@ -19,19 +19,16 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic_poly.h"
 
-/*
-    Assumes that x is reduced.
- */
 void padic_poly_set_coeff_padic(padic_poly_t poly, long n, const padic_t x, 
                                 const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(x))
+    if (padic_is_zero(x) || padic_val(x) >= padic_poly_prec(poly))
     {
         if (n < poly->length)
         {
@@ -74,6 +71,17 @@ void padic_poly_set_coeff_padic(padic_poly_t poly, long n, const padic_t x,
         fmpz_set(poly->coeffs + n, padic_unit(x));
         fmpz_clear(pow);
         poly->val = padic_val(x);
+    }
+
+    if (padic_poly_prec(poly) < padic_prec(x))  /* Reduction? */
+    {
+        int c;
+        fmpz_t pow;
+
+        c = _padic_ctx_pow_ui(pow, padic_poly_prec(poly) - padic_poly_val(poly), ctx);
+        fmpz_mod(poly->coeffs + n, poly->coeffs + n, pow);
+        if (c)
+            fmpz_clear(pow);
     }
 
     _padic_poly_normalise(poly);

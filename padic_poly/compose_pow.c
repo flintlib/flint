@@ -29,16 +29,16 @@
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
+static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {
-        if (*v < ctx->N)
+        if (*v < N)
         {
             int alloc;
             fmpz_t pow;
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - *v, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - *v, ctx);
             fmpz_mod(u, u, pow);
             if (alloc)
                 fmpz_clear(pow);
@@ -51,7 +51,7 @@ static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
     }
 }
 
-void _padic_poly_compose_pow(fmpz *rop, long *rval, 
+void _padic_poly_compose_pow(fmpz *rop, long *rval, long N, 
                              const fmpz *op, long val, long len, long k, 
                              const padic_ctx_t ctx)
 {
@@ -68,7 +68,7 @@ void _padic_poly_compose_pow(fmpz *rop, long *rval,
         fmpz_set(rop, op);
         *rval = val;
 
-        __padic_reduce(rop, rval, ctx);
+        __padic_reduce(rop, rval, N, ctx);
     }
     else
     {
@@ -98,7 +98,7 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, long k,
     else
     {
         padic_poly_fit_length(rop, lenr);
-        _padic_poly_compose_pow(rop->coeffs, &(rop->val), 
+        _padic_poly_compose_pow(rop->coeffs, &(rop->val), rop->N, 
                                 op->coeffs, op->val, op->length, k, ctx);
         _padic_poly_set_length(rop, lenr);
     }

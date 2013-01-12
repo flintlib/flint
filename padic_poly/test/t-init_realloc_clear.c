@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -47,19 +47,22 @@ main(void)
     {
         padic_poly_t a;
 
-        padic_poly_init2(a, n_randint(state, 100));
+        padic_poly_init2(a, n_randint(state, 100), PADIC_DEFAULT_PREC);
         padic_poly_clear(a);
     }
 
     for (i = 0; i < 10000; i++)
     {
+        long N;
         fmpz_t p;
         padic_poly_t a;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, 7);
+        fmpz_init_set_ui(p, 7);
 
-        padic_poly_init2(a, n_randint(state, 100));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+
+        padic_poly_init2(a, n_randint(state, 100), N);
         padic_poly_realloc(a, n_randint(state, 100), p);
         padic_poly_clear(a);
 
@@ -74,12 +77,12 @@ main(void)
 
         padic_poly_t a;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
+        padic_poly_init2(a, 0, N);
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
         padic_poly_clear(a);
 

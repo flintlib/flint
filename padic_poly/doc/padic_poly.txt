@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -53,15 +53,16 @@
 void padic_poly_init(padic_poly_t poly)
 
     Initialises \code{poly} for use, setting its length to zero.  
+    The precision of the polynomial is set to \code{PADIC_DEFAULT_PREC}. 
     A corresponding call to \code{padic_poly_clear()} must be made 
     after finishing with the \code{padic_poly_t} to free the memory 
     used by the polynomial.
 
-void padic_poly_init2(padic_poly_t poly, long alloc)
+void padic_poly_init2(padic_poly_t poly, long alloc, long prec)
 
     Initialises \code{poly} with space for at least \code{alloc} coefficients 
     and sets the length to zero.  The allocated coefficients are all set to 
-    zero.
+    zero.  The precision is set to \code{prec}.
 
 void padic_poly_realloc(padic_poly_t poly, long alloc, const fmpz_t p)
 
@@ -106,7 +107,8 @@ void _padic_poly_canonicalise(fmpz *poly, long *v, long len, const fmpz_t p)
 void padic_poly_canonicalise(padic_poly_t poly, const fmpz_t p)
 
     Brings the polynomial \code{poly} into canonical form, 
-    assuming that it is normalised already.
+    assuming that it is normalised already.  Does \emph{not} 
+    carry out any reduction.
 
 void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
 
@@ -137,7 +139,20 @@ long padic_poly_val(padic_poly_t poly)
     which is defined to be the minimum valuation of all 
     its coefficients.
 
-    The valuation of the zero polynomial is taken to be $0$.
+    The valuation of the zero polynomial is~$0$.
+
+    Note that this is implemented as a macro and can be 
+    used as either a \code{lvalue} or a \code{rvalue}.
+
+long padic_poly_prec(padic_poly_t poly)
+
+    Returns the precision of the polynomial \code{poly}. 
+
+    Note that this is implemented as a macro and can be 
+    used as either a \code{lvalue} or a \code{rvalue}.
+
+    Note that increasing the precision might require 
+    a call to \code{padic_poly_reduce()}.
 
 *******************************************************************************
 
@@ -161,8 +176,12 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
                              long val, long len, const padic_ctx_t ctx)
 
     Sets $f$ to a random polynomial of length at most \code{len} 
-    with the prescribed valuation \code{val} and entries reduced 
-    modulo $p^N$.
+    with at most the prescribed valuation \code{val} and entries 
+    reduced modulo $p^N$.
+
+    Specifically, we aim to set the valuation to be exactly equal 
+    to \code{val}, but do not check for additional cancellation 
+    when creating the coefficients.
 
 *******************************************************************************
 
@@ -170,78 +189,78 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
 
 *******************************************************************************
 
-void padic_poly_set_padic(padic_poly_t poly, const padic_t x)
+void padic_poly_set_padic(padic_poly_t poly, const padic_t x, 
+                          const padic_ctx_t ctx)
 
-    Sets the polynomial \code{poly} to the $p$-adic number $x$.
+    Sets the polynomial \code{poly} to the $p$-adic number $x$, 
+    reduced to the precision of the polynomial.
 
-    No further reduction takes place.
+void padic_poly_set(padic_poly_t poly1, const padic_poly_t poly2, 
+                    const padic_ctx_t ctx)
 
-void padic_poly_set(padic_poly_t poly1, const padic_poly_t poly2)
-
-    Sets the polynomial \code{poly1} to the polynomial \code{poly2}.
-
-    No further reduction takes place.
+    Sets the polynomial \code{poly1} to the polynomial \code{poly2}, 
+    reduced to the precision of \code{poly1}.
 
 void padic_poly_set_si(padic_poly_t poly, long x, const padic_ctx_t ctx)
 
     Sets the polynomial \code{poly} to the \code{signed long} 
-    integer $x$ reduced modulo $p^N$.
+    integer $x$ reduced to the precision of the polynomial.
 
 void padic_poly_set_ui(padic_poly_t poly, ulong x, const padic_ctx_t ctx)
 
     Sets the polynomial \code{poly} to the \code{unsigned long} 
-    integer $x$ reduced modulo $p^N$.
+    integer $x$ reduced to the precision of the polynomial.
 
 void padic_poly_set_fmpz(padic_poly_t poly, const fmpz_t x, 
                          const padic_ctx_t ctx)
 
     Sets the polynomial \code{poly} to the integer $x$ 
-    reduced modulo $p^N$.
+    reduced to the precision of the polynomial.
 
-void 
-padic_poly_set_fmpq(padic_poly_t poly, const fmpq_t x, const padic_ctx_t ctx)
+void padic_poly_set_fmpq(padic_poly_t poly, const fmpq_t x, 
+                         const padic_ctx_t ctx)
 
     Sets the polynomial \code{poly} to the value of the rational $x$, 
-    reduced modulo $p^N$.
+    reduced to the precision of the polynomial.
 
 void padic_poly_set_fmpz_poly(padic_poly_t rop, const fmpz_poly_t op, 
                               const padic_ctx_t ctx)
 
     Sets the polynomial \code{rop} to the integer polynomial \code{op}
-    reduced modulo $p^N$.
+    reduced to the precision of the polynomial.
 
 void padic_poly_set_fmpq_poly(padic_poly_t rop, 
                               const fmpq_poly_t op, const padic_ctx_t ctx)
 
     Sets the polynomial \code{rop} to the value of the rational 
-    polynomial \code{op}, reduced modulo $p^N$.
+    polynomial \code{op}, reduced to the precision of the polynomial.
 
 int padic_poly_get_fmpz_poly(fmpz_poly_t rop, const padic_poly_t op, 
                              const padic_ctx_t ctx)
 
     Sets the integer polynomial \code{rop} to the value of the $p$-adic 
-    polynomial \code{op} reduced modulo $p^N$ and returns $1$ if the 
-    polynomial is $p$-adically integral.  Otherwise, returns $0$.
+    polynomial \code{op} and returns $1$ if the polynomial is $p$-adically 
+    integral.  Otherwise, returns $0$.
 
 void padic_poly_get_fmpq_poly(fmpq_poly_t rop, 
                               const padic_poly_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to the rational polynomial corresponding to 
-    the $p$-adic polynomial \code{op}, with coefficients reduced 
-    modulo $p^N$.
+    the $p$-adic polynomial \code{op}.
 
 void padic_poly_zero(padic_poly_t poly)
 
     Sets \code{poly} to the zero polynomial.
 
-void padic_poly_one(padic_poly_t poly, const padic_ctx_t ctx)
+void padic_poly_one(padic_poly_t poly)
 
     Sets \code{poly} to the constant polynomial $1$, 
-    reduced modulo $p^N$.
+    reduced to the precision of the polynomial.
 
 void padic_poly_swap(padic_poly_t poly1, padic_poly_t poly2)
 
-    Swaps the two polynomials \code{poly1} and \code{poly2}.
+    Swaps the two polynomials \code{poly1} and \code{poly2}, 
+    including their precisions.
 
     This is done efficiently by swapping pointers.
 
@@ -255,14 +274,13 @@ void padic_poly_get_coeff_padic(padic_t c, const padic_poly_t poly, long n,
                                            const padic_ctx_t ctx)
 
     Sets $c$ to the coefficient of $x^n$ in the polynomial, 
-    reduced modulo $p^N$.
+    reduced modulo the precision of $c$.
 
 void padic_poly_set_coeff_padic(padic_poly_t f, long n, const padic_t c, 
                                                 const padic_ctx_t ctx)
 
     Sets the coefficient of $x^n$ in the polynomial $f$ to $c$, 
-    assuming that $c$ is already reduced with respect to the 
-    same context as $f$.
+    reduced to the precision of the polynomial $f$.
 
     Note that this operation can take linear time in the length 
     of the polynomial.
@@ -285,7 +303,8 @@ int padic_poly_is_zero(const padic_poly_t poly)
 int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
 
     Returns whether the polynomial \code{poly} is equal 
-    to the constant polynomial~$1$.
+    to the constant polynomial~$1$, taking the precision 
+    of the polynomial into account.
 
 *******************************************************************************
 
@@ -293,17 +312,16 @@ int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
 
 *******************************************************************************
 
-void _padic_poly_add(fmpz *rop, long *rval, 
-                     const fmpz *op1, long val1, long len1, 
-                     const fmpz *op2, long val2, long len2, 
+void _padic_poly_add(fmpz *rop, long *rval, long N, 
+                     const fmpz *op1, long val1, long len1, long N1, 
+                     const fmpz *op2, long val2, long len2, long N2, 
                      const padic_ctx_t ctx)
 
     Sets \code{(rop, *val, FLINT_MAX(len1, len2)} to the sum of 
     \code{(op1, val1, len1)} and \code{(op2, val2, len2)}.
 
-    Assumes that the input is reduced with respect to the given 
-    context and guarantees that that this is also the case for 
-    the output.
+    Assumes that the input is reduced and guarantees that this is 
+    also the case for the output.
 
     Assumes that $\min\{v_1, v_2} < N$.
 
@@ -323,9 +341,8 @@ void _padic_poly_sub(fmpz *rop, long *rval,
     Sets \code{(rop, *val, FLINT_MAX(len1, len2)} to the difference of 
     \code{(op1, val1, len1)} and \code{(op2, val2, len2)}.
 
-    Assumes that the input is reduced with respect to the given 
-    context and guarantees that that this is also the case for 
-    the output.
+    Assumes that the input is reduced and guarantees that this is 
+    also the case for the output.
 
     Assumes that $\min\{v_1, v_2} < N$.
 
@@ -372,7 +389,7 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
 
 *******************************************************************************
 
-void _padic_poly_mul(fmpz *rop, long *rval, 
+void _padic_poly_mul(fmpz *rop, long *rval, long N, 
                      const fmpz *op1, long val1, long len1, 
                      const fmpz *op2, long val2, long len2, 
                      const padic_ctx_t ctx)
@@ -399,7 +416,7 @@ void padic_poly_mul(padic_poly_t res,
 
 *******************************************************************************
 
-void _padic_poly_pow(fmpz *rop, long *rval, 
+void _padic_poly_pow(fmpz *rop, long *rval, long N, 
                      const fmpz *op, long val, long len, ulong e,
                      const padic_ctx_t ctx)
 
@@ -414,12 +431,12 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
                     const padic_ctx_t ctx)
 
     Sets the polynomial \code{rop} to the polynomial \code{op} raised 
-    to the power~$e$, reduced in the given context.
+    to the power~$e$, reduced to the precision in \code{rop}.
 
     In the special case $e = 0$, sets \code{rop} to the constant 
-    polynomial one in the given context.  Also note that when $e = 1$, 
-    this operation sets \code{rop} to \code{op} and then reduces 
-    \code{rop}.
+    polynomial one reduced to the precision of \code{rop}.  
+    Also note that when $e = 1$, this operation sets \code{rop} to 
+    \code{op} and then reduces \code{rop}.
 
     When the valuation of the input polynomial is negative, 
     this results in a loss of $p$-adic precision.  Suppose 
@@ -457,12 +474,12 @@ void padic_poly_inv_series(padic_poly_t g, const padic_poly_t f, long n,
 
 *******************************************************************************
 
-void _padic_poly_derivative(fmpz *rop, long *rval, 
+void _padic_poly_derivative(fmpz *rop, long *rval, long N, 
                             const fmpz *op, long val, long len, 
                             const padic_ctx_t ctx)
 
     Sets \code{(rop, rval)} to the derivative of \code{(op, val)} reduced 
-    in the context provided.
+    modulo $p^N$.
 
     Supports aliasing of the input and the output parameters.
 
@@ -470,7 +487,7 @@ void padic_poly_derivative(padic_poly_t rop,
                            const padic_poly_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to the derivative of \code{op}, reducing the 
-    result modulo $p^N$.
+    result modulo the precision of \code{rop}.
 
 *******************************************************************************
 
@@ -478,20 +495,17 @@ void padic_poly_derivative(padic_poly_t rop,
 
 *******************************************************************************
 
-void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n)
+void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n, 
+                           const padic_ctx_t ctx)
 
     Notationally, sets the polynomial \code{rop} to the polynomial \code{op} 
-    multiplied by $x^n$, where $n \geq 0$.
-
-    No reduction takes place.
+    multiplied by $x^n$, where $n \geq 0$, and reduces the result.
 
 void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n)
 
     Notationally, sets the polynomial \code{rop} to the polynomial 
     \code{op} after floor division by $x^n$, where $n \geq 0$, ensuring 
-    the result is in canonical form.
-
-    No reduction takes place.
+    the result is reduced.
 
 *******************************************************************************
 
@@ -499,7 +513,7 @@ void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n)
 
 *******************************************************************************
 
-void _padic_poly_evaluate_padic(fmpz_t u, long *v, 
+void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N, 
                                 const fmpz *poly, long val, long len, 
                                 const fmpz_t a, long b, const padic_ctx_t ctx)
 
@@ -523,14 +537,13 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
 
 *******************************************************************************
 
-void _padic_poly_compose(fmpz *rop, long *rval, 
+void _padic_poly_compose(fmpz *rop, long *rval, long N,  
                          const fmpz *op1, long val1, long len1, 
                          const fmpz *op2, long val2, long len2, 
                          const padic_ctx_t ctx)
 
     Sets \code{(rop, *rval, (len1-1)*(len2-1)+1)} to the composition 
-    of the two input polynomials, reducing the result in the given 
-    context.
+    of the two input polynomials, reducing the result modulo $p^N$.
 
     Assumes that \code{len1} is non-zero.
 
@@ -547,7 +560,7 @@ void padic_poly_compose(padic_poly_t rop,
     denote the polynomials \code{op1} and \code{op2}, respectively. 
     Then \code{rop} is set to $f(g(X))$.
 
-void _padic_poly_compose_pow(fmpz *rop, long *rval, 
+void _padic_poly_compose_pow(fmpz *rop, long *rval, long N, 
                              const fmpz *op, long val, long len, long k, 
                              const padic_ctx_t ctx)
 
@@ -582,8 +595,8 @@ int padic_poly_debug(const padic_poly_t poly)
 int _padic_poly_fprint(FILE *file, const fmpz *poly, long val, long len, 
                        const padic_ctx_t ctx)
 
-int _padic_poly_fprint(FILE * file, const padic_poly_t poly, 
-                       const padic_ctx_t ctx)
+int padic_poly_fprint(FILE *file, const padic_poly_t poly, 
+                      const padic_ctx_t ctx)
 
     Prints a simple representation of the polynomial \code{poly} 
     to the stream \code{file}.

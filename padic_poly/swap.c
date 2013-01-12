@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
    
 ******************************************************************************/
 
@@ -43,6 +43,10 @@ void padic_poly_swap(padic_poly_t poly1, padic_poly_t poly2)
         t          = poly1->val;
         poly1->val = poly2->val;
         poly2->val = t;
+
+        t        = poly1->N;
+        poly1->N = poly2->N;
+        poly2->N = t;
 
         c             = poly1->coeffs;
         poly1->coeffs = poly2->coeffs;

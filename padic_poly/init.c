@@ -20,7 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2008, 2009 William Hart
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -36,13 +36,15 @@ void padic_poly_init(padic_poly_t poly)
     poly->alloc  = 0;
     poly->length = 0;
     poly->val    = 0;
+    poly->N      = PADIC_DEFAULT_PREC;
 }
 
-void padic_poly_init2(padic_poly_t poly, long alloc)
+void padic_poly_init2(padic_poly_t poly, long alloc, long prec)
 {
     poly->coeffs = alloc ? (fmpz *) flint_calloc(alloc, sizeof(fmpz)) : NULL;
     poly->alloc  = alloc;
     poly->length = 0;
     poly->val    = 0;
+    poly->N      = prec;
 }
 

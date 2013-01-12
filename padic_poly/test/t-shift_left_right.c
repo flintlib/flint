@@ -51,20 +51,20 @@ main(void)
         padic_poly_t a, b, c;
         long shift = n_randint(state, 100);
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
-        padic_poly_set(b, a);
+        padic_poly_set(b, a, ctx);
 
-        padic_poly_shift_left(c, b, shift);
-        padic_poly_shift_left(b, b, shift);
+        padic_poly_shift_left(c, b, shift, ctx);
+        padic_poly_shift_left(b, b, shift, ctx);
 
         result = (padic_poly_equal(b, c));
         if (!result)
@@ -90,17 +90,17 @@ main(void)
         padic_poly_t a, b, c;
         long shift = n_randint(state, 100);
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
-        padic_poly_set(b, a);
+        padic_poly_set(b, a, ctx);
 
         padic_poly_shift_right(c, b, shift, ctx);
         padic_poly_shift_right(b, b, shift, ctx);
@@ -129,18 +129,18 @@ main(void)
         padic_poly_t a, b, c;
         long shift = n_randint(state, 100);
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
 
-        padic_poly_shift_left(b, a, shift);
+        padic_poly_shift_left(b, a, shift, ctx);
         padic_poly_shift_right(c, b, shift, ctx);
 
         result = (padic_poly_equal(a, c));

@@ -25,9 +25,6 @@
 
 #include "padic_poly.h"
 
-/*
-    Brings f in the form p^v * poly, no reduction.
- */
 void _padic_poly_canonicalise(fmpz *poly, long *v, long len, const fmpz_t p)
 {
     const long min = _fmpz_vec_ord_p(poly, len, p);

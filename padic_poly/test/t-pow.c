@@ -51,17 +51,17 @@ main(void)
         padic_poly_t a, b, c;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
-        padic_poly_set(b, a);
+        padic_poly_set(b, a, ctx);
         e = n_randint(state, 10);
 
         padic_poly_pow(c, b, e, ctx);
@@ -93,14 +93,14 @@ main(void)
         fmpq_poly_t aQQ, bQQ;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
         fmpq_poly_init(aQQ);
         fmpq_poly_init(bQQ);
 
@@ -127,17 +127,15 @@ main(void)
         }
         else
         {
-            padic_ctx_t lo;
             padic_poly_t blo, clo;
 
-            padic_ctx_init(lo, ctx->p, ctx->N + (e - 1) * a->val, PADIC_SERIES);
-            padic_poly_init(blo);
-            padic_poly_init(clo);
+            long N2 = N + (e - 1) * a->val;
 
-            padic_poly_set(blo, b);
-            padic_poly_set(clo, c);
-            padic_poly_reduce(blo, lo);
-            padic_poly_reduce(clo, lo);
+            padic_poly_init2(blo, 0, N2);
+            padic_poly_init2(clo, 0, N2);
+
+            padic_poly_set(blo, b, ctx);
+            padic_poly_set(clo, c, ctx);
 
             result = (padic_poly_equal(blo, clo));
             if (!result)
@@ -146,15 +144,14 @@ main(void)
                 printf("a = "), padic_poly_print(a, ctx), printf("\n\n");
                 printf("b = "), padic_poly_print(b, ctx), printf("\n\n");
                 printf("c = "), padic_poly_print(c, ctx), printf("\n\n");
-                printf("blo = "), padic_poly_print(blo, lo), printf("\n\n");
-                printf("clo = "), padic_poly_print(clo, lo), printf("\n\n");
-                printf("N = %ld\n\n", ctx->N);
+                printf("blo = "), padic_poly_print(blo, ctx), printf("\n\n");
+                printf("clo = "), padic_poly_print(clo, ctx), printf("\n\n");
+                printf("N = %ld\n\n", N);
                 printf("e = %ld\n\n", e);
-                printf("N + (e - 1) v = %ld\n\n", ctx->N + (e - 1) * a->val);
+                printf("N + (e - 1) v = %ld\n\n", N + (e - 1) * a->val);
                 abort();
             }
 
-            padic_ctx_clear(lo);
             padic_poly_clear(blo);
             padic_poly_clear(clo);
         }

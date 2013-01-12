@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_pow(fmpz *rop, long *rval, 
+void _padic_poly_pow(fmpz *rop, long *rval, long N, 
                      const fmpz *op, long val, long len, ulong e,
                      const padic_ctx_t ctx)
 {
@@ -35,7 +35,7 @@ void _padic_poly_pow(fmpz *rop, long *rval,
 
     *rval = (long) e * val;
 
-    alloc = _padic_ctx_pow_ui(pow, ctx->N - *rval, ctx);
+    alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
     _fmpz_mod_poly_pow(rop, op, len, e, pow);
 
@@ -48,16 +48,15 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
 {
     if (e == 0)
     {
-        padic_poly_one(rop, ctx);
+        padic_poly_one(rop);
     }
-    else if (op->length == 0 || (long) e * op->val >= ctx->N)
+    else if (op->length == 0 || (long) e * op->val >= rop->N)
     {
         padic_poly_zero(rop);
     }
     else if (e == 1)
     {
-        padic_poly_set(rop, op);
-        padic_poly_reduce(rop, ctx);
+        padic_poly_set(rop, op, ctx);
     }
     else
     {
@@ -74,7 +73,7 @@ void padic_poly_pow(padic_poly_t rop, const padic_poly_t op, ulong e,
             t = rop->coeffs;
         }
 
-        _padic_poly_pow(t, &(rop->val), 
+        _padic_poly_pow(t, &(rop->val), rop->N, 
                         op->coeffs, op->val, op->length, e, ctx);
 
         if (rop == op)

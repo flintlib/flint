@@ -19,13 +19,13 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic_poly.h"
 
-void _padic_poly_mul(fmpz *rop, long *rval, 
+void _padic_poly_mul(fmpz *rop, long *rval, long N, 
                      const fmpz *op1, long val1, long len1, 
                      const fmpz *op2, long val2, long len2, 
                      const padic_ctx_t ctx)
@@ -35,7 +35,7 @@ void _padic_poly_mul(fmpz *rop, long *rval,
 
     *rval = val1 + val2;
 
-    alloc = _padic_ctx_pow_ui(pow, ctx->N - *rval, ctx);
+    alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
     _fmpz_poly_mul(rop, op1, len1, op2, len2);
     _fmpz_vec_scalar_mod_fmpz(rop, rop, len1 + len2 - 1, pow);
@@ -52,7 +52,7 @@ void padic_poly_mul(padic_poly_t f,
     const long lenH = h->length;
     const long lenF = lenG + lenH - 1;
 
-    if (lenG == 0 || lenH == 0 || g->val + h->val >= ctx->N)
+    if (lenG == 0 || lenH == 0 || g->val + h->val >= f->N)
     {
         padic_poly_zero(f);
     }
@@ -71,10 +71,10 @@ void padic_poly_mul(padic_poly_t f,
         }
 
         if (lenG >= lenH)
-            _padic_poly_mul(t, &(f->val), g->coeffs, g->val, lenG, 
+            _padic_poly_mul(t, &(f->val), f->N, g->coeffs, g->val, lenG, 
                                           h->coeffs, h->val, lenH, ctx);
         else
-            _padic_poly_mul(t, &(f->val), h->coeffs, h->val, lenH, 
+            _padic_poly_mul(t, &(f->val), f->N, h->coeffs, h->val, lenH, 
                                           g->coeffs, g->val, lenG, ctx);
 
         if (f == g || f == h)

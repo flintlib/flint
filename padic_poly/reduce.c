@@ -19,20 +19,19 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic_poly.h"
 
-/*
-    Assumes the polynomial is in canonical form.
- */
 void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
 {
+    const long N = padic_poly_prec(poly);
+
     if (poly->length > 0)
     {
-        if (poly->val >= ctx->N)
+        if (poly->val >= N)
         {
             padic_poly_zero(poly);
         }
@@ -41,7 +40,7 @@ void padic_poly_reduce(padic_poly_t poly, const padic_ctx_t ctx)
             fmpz_t pow;
             int alloc;
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - poly->val, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - poly->val, ctx);
 
             _fmpz_vec_scalar_mod_fmpz(poly->coeffs, poly->coeffs, poly->length, pow);
 

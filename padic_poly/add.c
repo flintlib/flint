@@ -19,33 +19,28 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "fmpz_mod_poly.h"
 #include "padic_poly.h"
 
-void _padic_poly_add(fmpz *rop, long *val, 
-                     const fmpz *op1, long val1, long len1, 
-                     const fmpz *op2, long val2, long len2, 
+void _padic_poly_add(fmpz *rop, long *val, long N, 
+                     const fmpz *op1, long val1, long len1, long N1, 
+                     const fmpz *op2, long val2, long len2, long N2, 
                      const padic_ctx_t ctx)
 {
     const long len = FLINT_MAX(len1, len2);
-    fmpz_t pow;
-    int alloc;
 
     *val = FLINT_MIN(val1, val2);
 
-    alloc = _padic_ctx_pow_ui(pow, ctx->N - *val, ctx);
-
     if (val1 == val2)
     {
-        _fmpz_mod_poly_add(rop, op1, len1, op2, len2, pow);
+        _fmpz_poly_add(rop, op1, len1, op2, len2);
     }
     else  /* => (op1 != op2) */
     {
-        long i;
         fmpz_t x;
 
         fmpz_init(x);
@@ -80,18 +75,32 @@ void _padic_poly_add(fmpz *rop, long *val,
             }
         }
         fmpz_clear(x);
-
-        for (i = 0; i < len; i++)
-        {
-            if (fmpz_cmpabs(rop + i, pow) >= 0)
-                fmpz_sub(rop + i, rop + i, pow);
-        }
     }
 
-    if (alloc)
-        fmpz_clear(pow);
-
     _padic_poly_canonicalise(rop, val, len, ctx->p);
+
+    /* Reduce */
+    {
+        fmpz_t pow;
+        int alloc;
+
+        alloc = _padic_ctx_pow_ui(pow, N - *val, ctx);
+
+        if (N >= N1 && N >= N2)
+        {
+            long i;
+            for (i = 0; i < len; i++)
+                if (fmpz_cmpabs(rop + i, pow) >= 0)
+                    fmpz_sub(rop + i, rop + i, pow);
+        }
+        else
+        {
+            _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
+        }
+
+        if (alloc)
+            fmpz_clear(pow);
+    }
 }
 
 void padic_poly_add(padic_poly_t f, 
@@ -102,7 +111,7 @@ void padic_poly_add(padic_poly_t f,
     const long lenH = h->length;
     const long lenF = FLINT_MAX(lenG, lenH);
 
-    if (lenG == 0 && lenH == 0)
+    if ((lenG == 0 && lenH == 0) || (FLINT_MIN(g->val, h->val) >= f->N))
     {
         padic_poly_zero(f);
         return;
@@ -110,8 +119,9 @@ void padic_poly_add(padic_poly_t f,
 
     padic_poly_fit_length(f, lenF);
 
-    _padic_poly_add(f->coeffs, &(f->val), g->coeffs, g->val, lenG, 
-                                          h->coeffs, h->val, lenH, ctx);
+    _padic_poly_add(f->coeffs, &(f->val), f->N, 
+                    g->coeffs, g->val, lenG, g->N, 
+                    h->coeffs, h->val, lenH, h->N, ctx);
 
     _padic_poly_set_length(f, lenF);
     _padic_poly_normalise(f);

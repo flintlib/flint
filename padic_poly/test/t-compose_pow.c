@@ -50,17 +50,17 @@ main(void)
         padic_poly_t a, b, c;
         long k;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
-        padic_poly_set(b, a);
+        padic_poly_set(b, a, ctx);
         k = n_randint(state, 20) + 1;
 
         padic_poly_compose_pow(c, b, k, ctx);
@@ -69,7 +69,7 @@ main(void)
         result = (padic_poly_equal(b, c));
         if (!result)
         {
-            printf("FAIL:\n");
+            printf("FAIL (aliasing):\n");
             padic_poly_print(a, ctx), printf("\n\n");
             padic_poly_print(b, ctx), printf("\n\n");
             padic_poly_print(c, ctx), printf("\n\n");
@@ -91,27 +91,25 @@ main(void)
         long k;
         padic_t one;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(f);
-        padic_poly_init(g);
-        padic_poly_init(h1);
-        padic_poly_init(h2);
+        padic_poly_init2(f,  0, N);
+        padic_poly_init2(g,  0, LONG_MAX);  /* TODO:  Check this is OK */
+        padic_poly_init2(h1, 0, N);
+        padic_poly_init2(h2, 0, N);
 
         padic_poly_randtest(f, state, n_randint(state, 40), ctx);
         k = n_randint(state, 20) + 1;
 
         padic_poly_compose_pow(h1, f, k, ctx);
 
-        _padic_init(one);
-        _padic_one(one);
-        padic_poly_fit_length(g, k + 1);
+        padic_init(one);
+        padic_one(one);
         padic_poly_set_coeff_padic(g, k, one, ctx);
-        _padic_poly_set_length(g, k + 1);
-        _padic_clear(one);
+        padic_clear(one);
         padic_poly_compose(h2, f, g, ctx);
 
         result = (padic_poly_equal(h1, h2));
@@ -122,8 +120,8 @@ main(void)
             printf("g  = "), padic_poly_print(g, ctx), printf("\n\n");
             printf("h1 = "), padic_poly_print(h1, ctx), printf("\n\n");
             printf("h2 = "), padic_poly_print(h2, ctx), printf("\n\n");
-            printf("p = "), fmpz_print(p), printf("\n\n");
-            printf("N = %ld\n\n", ctx->N);
+            printf("p  = "), fmpz_print(p), printf("\n\n");
+            printf("N  = %ld\n\n", N);
             abort();
         }
 

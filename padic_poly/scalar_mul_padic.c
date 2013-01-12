@@ -19,17 +19,17 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic_poly.h"
 
-void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, 
+void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, long N, 
                                   const fmpz *op, long val, long len, 
                                   const padic_t c, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(c) || val + padic_val(c) >= ctx->N)
+    if (padic_is_zero(c) || val + padic_val(c) >= N)
     {
         _fmpz_vec_zero(rop, len);
         *rval = 0;
@@ -41,7 +41,7 @@ void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval,
 
         *rval = val + padic_val(c);
 
-        alloc = _padic_ctx_pow_ui(pow, ctx->N - *rval, ctx);
+        alloc = _padic_ctx_pow_ui(pow, N - *rval, ctx);
 
         _fmpz_vec_scalar_mul_fmpz(rop, op, len, padic_unit(c));
 
@@ -55,8 +55,8 @@ void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval,
 void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op, 
                                  const padic_t c, const padic_ctx_t ctx)
 {
-    if (padic_poly_is_zero(op) || _padic_is_zero(c) ||
-        op->val + padic_val(c) >= ctx->N)
+    if (padic_poly_is_zero(op) || padic_is_zero(c) ||
+        op->val + padic_val(c) >= rop->N)
     {
         padic_poly_zero(rop);
     }
@@ -65,7 +65,7 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
         padic_poly_fit_length(rop, op->length);
         _padic_poly_set_length(rop, op->length);
 
-        _padic_poly_scalar_mul_padic(rop->coeffs, &(rop->val), 
+        _padic_poly_scalar_mul_padic(rop->coeffs, &(rop->val), rop->N, 
                                      op->coeffs, op->val, op->length, c, ctx);
     }
 }

@@ -39,9 +39,9 @@ main(void)
     int i, result;
     flint_rand_t state;
 
-    padic_ctx_t ctx;
     fmpz_t p;
     long N;
+    padic_ctx_t ctx;
 
     printf("sub... ");
     fflush(stdout);
@@ -53,15 +53,15 @@ main(void)
     {
         padic_poly_t a, b, c, d;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
-        padic_poly_init(d);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
+        padic_poly_init2(d, 0, N);
 
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
         padic_poly_randtest(b, state, n_randint(state, 100), ctx);
@@ -95,14 +95,14 @@ main(void)
     {
         padic_poly_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
         padic_poly_randtest(b, state, n_randint(state, 100), ctx);
 
@@ -132,14 +132,14 @@ main(void)
     {
         padic_poly_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(a);
-        padic_poly_init(b);
-        padic_poly_init(c);
+        padic_poly_init2(a, 0, N);
+        padic_poly_init2(b, 0, N);
+        padic_poly_init2(c, 0, N);
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
         padic_poly_randtest(b, state, n_randint(state, 100), ctx);
 

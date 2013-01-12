@@ -29,16 +29,16 @@
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
+static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {
-        if (*v < ctx->N)
+        if (*v < N)
         {
             int alloc;
             fmpz_t pow;
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - *v, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - *v, ctx);
             fmpz_mod(u, u, pow);
             if (alloc)
                 fmpz_clear(pow);
@@ -72,7 +72,7 @@ static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
     $p^{-nb} f(x)$ to precision $N-w-nb$.
  */
 
-void _padic_poly_evaluate_padic(fmpz_t u, long *v, 
+void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N,  
                                 const fmpz *poly, long val, long len, 
                                 const fmpz_t a, long b, const padic_ctx_t ctx)
 {
@@ -86,11 +86,11 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v,
         fmpz_set(u, poly);
         *v = val;
 
-        __padic_reduce(u, v, ctx);
+        __padic_reduce(u, v, N, ctx);
     }
     else if (b >= 0)
     {
-        if (val >= ctx->N)
+        if (val >= N)
         {
             fmpz_zero(u);
             *v = 0;
@@ -102,7 +102,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v,
             int alloc;
 
             fmpz_init(x);
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - val, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - val, ctx);
 
             fmpz_pow_ui(x, ctx->p, b);
             fmpz_mul(x, x, a);
@@ -122,7 +122,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v,
     {
         const long n = len - 1;
 
-        if (val + n*b >= ctx->N)
+        if (val + n*b >= N)
         {
             fmpz_zero(u);
             *v = 0;
@@ -138,7 +138,7 @@ void _padic_poly_evaluate_padic(fmpz_t u, long *v,
             fmpz_init(s);
             fmpz_init(t);
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - val - n*b, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - val - n*b, ctx);
 
             fmpz_pow_ui(s, ctx->p, -b);
             fmpz_one(t);
@@ -171,16 +171,16 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
     {
         padic_t t;
 
-        _padic_init(t);
-        _padic_poly_evaluate_padic(padic_unit(t), &padic_val(t), 
+        padic_init2(t, padic_prec(y));
+        _padic_poly_evaluate_padic(padic_unit(t), &padic_val(t), padic_prec(t), 
                                    poly->coeffs, poly->val, poly->length, 
                                    padic_unit(x), padic_val(x), ctx);
         padic_swap(y, t);
-        _padic_clear(t);
+        padic_clear(t);
     }
     else
     {
-        _padic_poly_evaluate_padic(padic_unit(y), &padic_val(y), 
+        _padic_poly_evaluate_padic(padic_unit(y), &padic_val(y), padic_prec(y), 
                                    poly->coeffs, poly->val, poly->length, 
                                    padic_unit(x), padic_val(x), ctx);
     }

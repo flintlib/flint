@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -44,6 +44,7 @@ typedef struct
     long alloc;
     long length;
     long val;
+    long N;
 } padic_poly_struct;
 
 typedef padic_poly_struct padic_poly_t[1];
@@ -85,7 +86,7 @@ static __inline__ long _fmpz_vec_ord_p(const fmpz *vec, long len, const fmpz_t p
 
 void padic_poly_init(padic_poly_t poly);
 
-void padic_poly_init2(padic_poly_t poly, long alloc);
+void padic_poly_init2(padic_poly_t poly, long alloc, long prec);
 
 void padic_poly_clear(padic_poly_t poly);
 
@@ -146,6 +147,10 @@ static __inline__ long padic_poly_val(const padic_poly_t poly)
     return poly->val;
 }
 
+#define padic_poly_val(poly)   ((poly)->val)
+
+#define padic_poly_prec(poly)  ((poly)->N)
+
 /*  Randomisation  ***********************************************************/
 
 void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
@@ -159,9 +164,11 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
 
 /*  Assignment and basic manipulation  ***************************************/
 
-void padic_poly_set(padic_poly_t f, const padic_poly_t g);
+void padic_poly_set(padic_poly_t f, const padic_poly_t g, 
+                    const padic_ctx_t ctx);
 
-void padic_poly_set_padic(padic_poly_t poly, const padic_t x);
+void padic_poly_set_padic(padic_poly_t poly, const padic_t x, 
+                          const padic_ctx_t ctx);
 
 void padic_poly_set_si(padic_poly_t poly, long x, const padic_ctx_t ctx);
 
@@ -191,13 +198,12 @@ static __inline__ void padic_poly_zero(padic_poly_t poly)
     poly->val = 0;
 }
 
-static __inline__ void 
-padic_poly_one(padic_poly_t poly, const padic_ctx_t ctx)
+static __inline__ void padic_poly_one(padic_poly_t poly)
 {
-    if (ctx->N > 0)
+    if (padic_poly_prec(poly) > 0)
     {
         padic_poly_fit_length(poly, 1);
-        fmpz_set_ui(poly->coeffs, 1);
+        fmpz_one(poly->coeffs);
         _padic_poly_set_length(poly, 1);
         poly->val = 0;
     }
@@ -230,29 +236,25 @@ int padic_poly_is_zero(const padic_poly_t poly)
 static __inline__ 
 int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
 {
-    if (ctx->N > 0)
-    {
-        return (poly->length == 1 && fmpz_is_one(poly->coeffs));
-    }
-    else
-    {
-        return (poly->length == 0);
-    }
+    return (poly->length == 1) && fmpz_is_one(poly->coeffs) && 
+           (poly->val == 0);
 }
 
 /*  Addition and subtraction  ************************************************/
 
-void _padic_poly_add(fmpz *rop, long *rval, const fmpz *op1, long val1, long len1, 
-                                            const fmpz *op2, long val2, long len2, 
-                                            const padic_ctx_t ctx);
+void _padic_poly_add(fmpz *rop, long *rval, long N, 
+                     const fmpz *op1, long val1, long len1, long N1, 
+                     const fmpz *op2, long val2, long len2, long N2, 
+                     const padic_ctx_t ctx);
 
 void padic_poly_add(padic_poly_t f, 
                     const padic_poly_t g, const padic_poly_t h, 
                     const padic_ctx_t ctx);
 
-void _padic_poly_sub(fmpz *rop, long *rval, const fmpz *op1, long val1, long len1, 
-                                            const fmpz *op2, long val2, long len2, 
-                                            const padic_ctx_t ctx);
+void _padic_poly_sub(fmpz *rop, long *rval, long N, 
+                     const fmpz *op1, long val1, long len1, long N1, 
+                     const fmpz *op2, long val2, long len2, long N2, 
+                     const padic_ctx_t ctx);
 
 void padic_poly_sub(padic_poly_t f, 
                     const padic_poly_t g, const padic_poly_t h, 
@@ -263,7 +265,7 @@ void padic_poly_neg(padic_poly_t f, const padic_poly_t g,
 
 /*  Scalar multiplication and division  **************************************/
 
-void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, 
+void _padic_poly_scalar_mul_padic(fmpz *rop, long *rval, long N, 
                                   const fmpz *op, long val, long len, 
                                   const padic_t c, const padic_ctx_t ctx);
 
@@ -272,7 +274,7 @@ void padic_poly_scalar_mul_padic(padic_poly_t rop, const padic_poly_t op,
 
 /*  Multiplication  **********************************************************/
 
-void _padic_poly_mul(fmpz *rop, long *rval, 
+void _padic_poly_mul(fmpz *rop, long *rval, long N, 
                      const fmpz *op1, long val1, long len1, 
                      const fmpz *op2, long val2, long len2, 
                      const padic_ctx_t ctx);
@@ -283,7 +285,7 @@ void padic_poly_mul(padic_poly_t f,
 
 /*  Powering  ****************************************************************/
 
-void _padic_poly_pow(fmpz *rop, long *rval, 
+void _padic_poly_pow(fmpz *rop, long *rval, long N, 
                      const fmpz *op, long val, long len, ulong e,
                      const padic_ctx_t ctx);
 
@@ -297,7 +299,7 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, long n,
 
 /*  Derivative  **************************************************************/
 
-void _padic_poly_derivative(fmpz *rop, long *rval, 
+void _padic_poly_derivative(fmpz *rop, long *rval, long N, 
                             const fmpz *op, long val, long len, 
                             const padic_ctx_t ctx);
 
@@ -306,14 +308,15 @@ void padic_poly_derivative(padic_poly_t rop,
 
 /*  Shifting  ****************************************************************/
 
-void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n);
+void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n, 
+                           const padic_ctx_t ctx);
 
 void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n, 
                             const padic_ctx_t ctx);
 
 /*  Evaluation  **************************************************************/
 
-void _padic_poly_evaluate_padic(fmpz_t u, long *v, 
+void _padic_poly_evaluate_padic(fmpz_t u, long *v, long N, 
                                 const fmpz *poly, long val, long len, 
                                 const fmpz_t a, long b, const padic_ctx_t ctx);
 
@@ -322,7 +325,7 @@ void padic_poly_evaluate_padic(padic_t y, const padic_poly_t poly,
 
 /*  Composition  *************************************************************/
 
-void _padic_poly_compose(fmpz *rop, long *rval, 
+void _padic_poly_compose(fmpz *rop, long *rval, long N, 
                          const fmpz *op1, long val1, long len1, 
                          const fmpz *op2, long val2, long len2, 
                          const padic_ctx_t ctx);
@@ -331,7 +334,7 @@ void padic_poly_compose(padic_poly_t rop,
                         const padic_poly_t op1, const padic_poly_t op2, 
                         const padic_ctx_t ctx);
 
-void _padic_poly_compose_pow(fmpz *rop, long *rval, 
+void _padic_poly_compose_pow(fmpz *rop, long *rval, long N, 
                              const fmpz *op, long val, long len, long k, 
                              const padic_ctx_t ctx);
 
@@ -342,8 +345,8 @@ void padic_poly_compose_pow(padic_poly_t rop, const padic_poly_t op, long k,
 
 static __inline__ int padic_poly_debug(const padic_poly_t poly)
 {
-    printf("(alloc = %ld, length = %ld, val = %ld, vec = ", 
-        poly->alloc, poly->length, poly->val);
+    printf("(alloc = %ld, length = %ld, val = %ld, N = %ld, vec = ", 
+        poly->alloc, poly->length, poly->val, poly->N);
     if (poly->coeffs)
     {
         printf("{");
@@ -355,7 +358,6 @@ static __inline__ int padic_poly_debug(const padic_poly_t poly)
         printf("NULL");
     }
     printf(")");
-    fflush(stdout);
 
     return 1;
 }

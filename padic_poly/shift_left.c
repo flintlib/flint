@@ -25,11 +25,18 @@
 
 #include "padic_poly.h"
 
-void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n)
+void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n, 
+                           const padic_ctx_t ctx)
 {
+    if (rop->N < op->N)
+    {
+        printf("Exception (padic_poly_shift_left).  rop->N < op->N.\n");
+        abort();
+    }
+
     if (n == 0)
     {
-        padic_poly_set(rop, op);
+        padic_poly_set(rop, op, ctx);
     }
     else if (op->length == 0)
     {
@@ -41,6 +48,7 @@ void padic_poly_shift_left(padic_poly_t rop, const padic_poly_t op, long n)
         _fmpz_poly_shift_left(rop->coeffs, op->coeffs, op->length, n);
         rop->val = op->val;
         _padic_poly_set_length(rop, op->length + n);
+        /* TODO: Reduce */
     }
 }
 

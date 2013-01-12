@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -32,8 +32,7 @@ void padic_poly_get_coeff_padic(padic_t x, const padic_poly_t f, long n,
     {
         fmpz_set(padic_unit(x), f->coeffs + n);
         padic_val(x) = f->val;
-
-        padic_val(x) += _fmpz_remove(padic_unit(x), ctx->p, ctx->pinv);
+        padic_reduce(x, ctx);
     }
     else
     {

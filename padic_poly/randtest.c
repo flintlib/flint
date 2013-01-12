@@ -33,10 +33,12 @@
 void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state, 
                              long val, long len, const padic_ctx_t ctx)
 {
+    const long N = padic_poly_prec(f);
+
     if (len == 0)
         return;
 
-    if (val >= ctx->N)
+    if (val >= N)
     {
         padic_poly_zero(f);
     }
@@ -50,7 +52,7 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
 
         padic_poly_fit_length(f, len);
 
-        alloc = _padic_ctx_pow_ui(pow, ctx->N - f->val, ctx);
+        alloc = _padic_ctx_pow_ui(pow, N - f->val, ctx);
 
         for (i = 0; i < len; i++)
             fmpz_randm(f->coeffs + i, state, pow);
@@ -69,19 +71,21 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
 void padic_poly_randtest(padic_poly_t f, flint_rand_t state, 
                          long len, const padic_ctx_t ctx)
 {
+    const long N = padic_poly_prec(f);
+
     long min, max, val;
 
-    if (ctx->N > 0)
+    if (N > 0)
     {
-        min = - ((ctx->N + 9) / 10);
-        max = ctx->N;
+        min = - ((N + 9) / 10);
+        max = N;
     }
-    else if (ctx->N < 0)
+    else if (N < 0)
     {
-        min = ctx->N - ((-ctx->N + 9) / 10);
-        max = ctx->N;
+        min = N - ((-N + 9) / 10);
+        max = N;
     }
-    else  /* ctx->N == 0 */
+    else  /* N == 0 */
     {
         min = -10;
         max = 0;
@@ -111,8 +115,8 @@ void padic_poly_randtest_not_zero(padic_poly_t f, flint_rand_t state,
     {
         padic_poly_fit_length(f, 1);
         _padic_poly_set_length(f, 1);
-        fmpz_set_ui(f->coeffs + 0, 1);
-        f->val = ctx->N - 1;
+        fmpz_one(f->coeffs + 0);
+        f->val = f->N - 1;
     }
 }
 

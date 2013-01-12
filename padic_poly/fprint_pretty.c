@@ -33,7 +33,7 @@ int _padic_poly_fprint_pretty(FILE *file,
     long i;
     padic_t x;
 
-    _padic_init(x);
+    padic_init(x);  /* Precision is not used anywhere! */
 
     if (len == 0)
     {
@@ -41,10 +41,7 @@ int _padic_poly_fprint_pretty(FILE *file,
     }
     else if (len == 1)
     {
-        fmpz_set(padic_unit(x), poly);
-        padic_val(x) = val;
-
-        padic_fprint(file, x, ctx);
+        _padic_fprint(file, poly + 0, val, ctx);
     }
     else if (len == 2)
     {
@@ -52,7 +49,7 @@ int _padic_poly_fprint_pretty(FILE *file,
         padic_val(x) = val;
         _padic_canonicalise(x, ctx);
 
-        if (_padic_is_one(x))
+        if (padic_is_one(x))
         {
             fprintf(file, "%s", var);
         }
@@ -92,7 +89,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             padic_val(x) = val;
             _padic_canonicalise(x, ctx);
 
-            if (_padic_is_one(x))
+            if (padic_is_one(x))
                fprintf(file, "%s^%ld", var, i);
             else if (*(padic_unit(x)) == -1L && padic_val(x) == 0)
                fprintf(file, "-%s^%ld", var, i);
@@ -101,7 +98,7 @@ int _padic_poly_fprint_pretty(FILE *file,
                 fputc('(', file);
                 padic_fprint(file, x, ctx);
                 fputc(')', file);
-               fprintf(file, "*%s^%ld", var, i);
+                fprintf(file, "*%s^%ld", var, i);
             }
             --i;
         }
@@ -120,7 +117,7 @@ int _padic_poly_fprint_pretty(FILE *file,
             else
                 fputc('-', file);
 
-            if (_padic_is_one(x))
+            if (padic_is_one(x))
                 fprintf(file, "%s^%ld", var, i);
             else
             {
@@ -139,7 +136,7 @@ int _padic_poly_fprint_pretty(FILE *file,
 
             fputc(fmpz_sgn(poly + 1) > 0 ? '+' : '-', file);
 
-            if (_padic_is_one(x))
+            if (padic_is_one(x))
                 fputs(var, file);
             else
             {
@@ -163,8 +160,7 @@ int _padic_poly_fprint_pretty(FILE *file,
         }
     }
 
-    _padic_clear(x);
-
+    padic_clear(x);
     return 1;
 }
 

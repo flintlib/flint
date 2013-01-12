@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -42,14 +42,14 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, long n,
         printf("Exception (padic_poly_inv_series):  Constant term is zero.\n");
         abort();
     }
-    if (fmpz_divisible(Q->coeffs, ctx->p))
+    if (fmpz_divisible(Q->coeffs + 0, ctx->p))
     {
         printf("Exception (padic_poly_inv_series):\n");
         printf("Valuation of constant term is not minimal.\n");
         abort();
     }
 
-    if (- Q->val >= ctx->N)
+    if (- Q->val >= Qinv->N)
     {
         padic_poly_zero(Qinv);
         return;
@@ -74,8 +74,8 @@ void padic_poly_inv_series(padic_poly_t Qinv, const padic_poly_t Q, long n,
     fmpz_init(cinv);
     fmpz_init(pow);
 
-    _padic_inv(cinv, Q->coeffs, ctx->p, ctx->N + Q->val);
-    palloc = _padic_ctx_pow_ui(pow, ctx->N + Q->val, ctx);
+    _padic_inv(cinv, Q->coeffs, ctx->p, Qinv->N + Q->val);
+    palloc = _padic_ctx_pow_ui(pow, Qinv->N + Q->val, ctx);
 
     if (Qinv != Q)
     {

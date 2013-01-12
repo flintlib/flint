@@ -29,16 +29,16 @@
 /*
     TODO:  Move this bit of code into "padic".
  */
-static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
+static void __padic_reduce(fmpz_t u, long *v, long N, const padic_ctx_t ctx)
 {
     if (!fmpz_is_zero(u))
     {
-        if (*v < ctx->N)
+        if (*v < N)
         {
             int alloc;
             fmpz_t pow;
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - *v, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - *v, ctx);
             fmpz_mod(u, u, pow);
             if (alloc)
                 fmpz_clear(pow);
@@ -53,7 +53,7 @@ static void __padic_reduce(fmpz_t u, long *v, const padic_ctx_t ctx)
 
 /* Assumes that len1 > 0. */
 
-void _padic_poly_compose(fmpz *rop, long *rval, 
+void _padic_poly_compose(fmpz *rop, long *rval, long N, 
                          const fmpz *op1, long val1, long len1, 
                          const fmpz *op2, long val2, long len2, 
                          const padic_ctx_t ctx)
@@ -65,11 +65,11 @@ void _padic_poly_compose(fmpz *rop, long *rval,
         fmpz_set(rop, op1);
         *rval = val1;
 
-        __padic_reduce(rop, rval, ctx);
+        __padic_reduce(rop, rval, N, ctx);
     }
     else if (val2 >= 0)
     {
-        if (val1 >= ctx->N)
+        if (val1 >= N)
         {
             _fmpz_vec_zero(rop, lenr);
             *rval = 0;
@@ -87,7 +87,7 @@ void _padic_poly_compose(fmpz *rop, long *rval,
             fmpz_pow_ui(f, ctx->p, val2);
             _fmpz_vec_scalar_mul_fmpz(vec2, op2, len2, f);
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - val1, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - val1, ctx);
 
             _fmpz_mod_poly_compose(rop, op1, len1, vec2, len2, pow);
             *rval= val1;
@@ -104,7 +104,7 @@ void _padic_poly_compose(fmpz *rop, long *rval,
     {
         const long n = len1 - 1;
 
-        if (val1 + n*len2 >= ctx->N)
+        if (val1 + n*val2 >= N)
         {
             _fmpz_vec_zero(rop, lenr);
             *rval = 0;
@@ -121,7 +121,7 @@ void _padic_poly_compose(fmpz *rop, long *rval,
             fmpz_init(s);
             fmpz_init(t);
 
-            alloc = _padic_ctx_pow_ui(pow, ctx->N - val1 - n*val2, ctx);
+            alloc = _padic_ctx_pow_ui(pow, N - val1 - n*val2, ctx);
 
             fmpz_pow_ui(s, ctx->p, -val2);
             fmpz_one(t);
@@ -170,7 +170,7 @@ void padic_poly_compose(padic_poly_t rop,
         if (rop != op1 && rop != op2)
         {
             padic_poly_fit_length(rop, lenr);
-            _padic_poly_compose(rop->coeffs, &(rop->val), 
+            _padic_poly_compose(rop->coeffs, &(rop->val), rop->N, 
                                 op1->coeffs, op1->val, op1->length, 
                                 op2->coeffs, op2->val, op2->length, ctx);
             _padic_poly_set_length(rop, lenr);
@@ -179,7 +179,7 @@ void padic_poly_compose(padic_poly_t rop,
         {
             fmpz *t = _fmpz_vec_init(lenr);
 
-            _padic_poly_compose(t, &(rop->val), 
+            _padic_poly_compose(t, &(rop->val), rop->N, 
                                 op1->coeffs, op1->val, op1->length, 
                                 op2->coeffs, op2->val, op2->length, ctx);
             _fmpz_vec_clear(rop->coeffs, rop->alloc);

@@ -38,18 +38,19 @@ void padic_poly_set_fmpq_poly(padic_poly_t f,
     }
     else
     {
+        const long N = padic_poly_prec(f);
         fmpz_t t;
 
         fmpz_init(t);
 
         f->val = - fmpz_remove(t, g->den, ctx->p);
 
-        if (f->val < ctx->N)
+        if (f->val < N)
         {
             padic_poly_fit_length(f, len);
             _padic_poly_set_length(f, len);
 
-            _padic_inv(t, t, ctx->p, ctx->N - f->val);
+            _padic_inv(t, t, ctx->p, N - f->val);
             _fmpz_vec_scalar_mul_fmpz(f->coeffs, g->coeffs, len, t);
             if (f->val == 0)
                 padic_poly_canonicalise(f, ctx->p);

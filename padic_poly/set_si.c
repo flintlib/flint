@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -29,9 +29,9 @@ void padic_poly_set_si(padic_poly_t poly, long x, const padic_ctx_t ctx)
 {
     padic_t y;
 
-    _padic_init(y);
+    padic_init2(y, padic_poly_prec(poly));
     padic_set_si(y, x, ctx);
-    padic_poly_set_padic(poly, y);
-    _padic_clear(y);
+    padic_poly_set_padic(poly, y, ctx);
+    padic_clear(y);
 }
 

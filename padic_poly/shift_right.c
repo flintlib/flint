@@ -30,7 +30,7 @@ void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n,
 {
     if (n == 0)
     {
-        padic_poly_set(rop, op);
+        padic_poly_set(rop, op, ctx);
     }
     else if (op->length <= n)
     {
@@ -44,6 +44,7 @@ void padic_poly_shift_right(padic_poly_t rop, const padic_poly_t op, long n,
         _padic_poly_set_length(rop, op->length - n);
         _padic_poly_normalise(rop);
         padic_poly_canonicalise(rop, ctx->p);
+        /* TODO: Reduce */
     }
 }
 

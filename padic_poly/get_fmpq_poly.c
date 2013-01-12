@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -30,9 +30,9 @@
     Assumes that len > 0.
  */
 
-void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den, 
-                               const fmpz *op, long val, long len, 
-                               const fmpz_t p)
+static void _padic_poly_get_fmpq_poly(fmpz *rop, fmpz_t den, 
+                                      const fmpz *op, long val, long len, 
+                                      const fmpz_t p)
 {
     if (val == 0)
     {

@@ -45,26 +45,26 @@ main(void)
     flint_randinit(state);
 
     /* Compare with the computation over QQ */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 100; i++)
     {
         padic_poly_t f, g, h, h2;
         fmpq_poly_t fQQ, gQQ, hQQ;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
-        padic_poly_init(f);
-        padic_poly_init(g);
-        padic_poly_init(h);
-        padic_poly_init(h2);
+        padic_poly_init2(f,  0, N);
+        padic_poly_init2(g,  0, N);
+        padic_poly_init2(h,  0, N);
+        padic_poly_init2(h2, 0, N);
         fmpq_poly_init(fQQ);
         fmpq_poly_init(gQQ);
         fmpq_poly_init(hQQ);
 
         padic_poly_randtest(f, state, n_randint(state, 40), ctx);
-        padic_poly_randtest(g, state, n_randint(state, 20), ctx);
+        padic_poly_randtest(g, state, n_randint(state, 15), ctx);
 
         padic_poly_get_fmpq_poly(fQQ, f, ctx);
         padic_poly_get_fmpq_poly(gQQ, g, ctx);
@@ -79,48 +79,45 @@ main(void)
             result = (padic_poly_equal(h, h2));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
+                printf("FAIL (cmp with QQ, ord_p(g) >= 0):\n");
                 printf("f  = "), padic_poly_print(f, ctx),  printf("\n\n");
                 printf("g  = "), padic_poly_print(g, ctx),  printf("\n\n");
                 printf("h  = "), padic_poly_debug(h),  printf("\n\n");
                 printf("h2 = "), padic_poly_debug(h2), printf("\n\n");
-                printf("p = "), fmpz_print(p), printf("\n\n");
-                printf("N = %ld\n\n", ctx->N);
+                printf("p  = "), fmpz_print(p), printf("\n\n");
+                printf("N  = %ld\n\n", N);
                 abort();
             }
         }
         else
         {
-            padic_ctx_t ctx2;
+            long N2 = N + (f->length - 1) * padic_poly_val(g);
             padic_poly_t hX, h2X;
 
-            padic_ctx_init(ctx2, ctx->p, 
-                           ctx->N + (f->length - 1) * padic_poly_val(g), 
-                           PADIC_SERIES);
-            padic_poly_init(hX);
-            padic_poly_init(h2X);
+            padic_poly_init2(hX,  0, N2);
+            padic_poly_init2(h2X, 0, N2);
 
-            padic_poly_set(hX, h);
-            padic_poly_set(h2X, h2);
-            padic_poly_reduce(h2, ctx2);
-            padic_poly_reduce(h2X, ctx2);
+            padic_poly_set(hX,  h,  ctx);
+            padic_poly_set(h2X, h2, ctx);
 
             result = (padic_poly_equal(h2, h2X));
             if (!result)
             {
-                printf("FAIL (cmp with QQ):\n");
-                printf("f  = "), padic_poly_print(f, ctx),  printf("\n\n");
-                printf("g  = "), padic_poly_print(g, ctx),  printf("\n\n");
-                printf("h  = "), padic_poly_print(h, ctx),  printf("\n\n");
-                printf("h2 = "), padic_poly_print(h2, ctx), printf("\n\n");
-                printf("hX  = "), padic_poly_print(hX, ctx2),  printf("\n\n");
-                printf("h2X = "), padic_poly_print(h2X, ctx2), printf("\n\n");
+                printf("FAIL (cmp with QQ, ord_p(g) < 0):\n");
+                printf("f   = "), padic_poly_print(f,   ctx), printf("\n\n");
+                printf("g   = "), padic_poly_print(g,   ctx), printf("\n\n");
+                printf("h   = "), padic_poly_print(h,   ctx), printf("\n\n");
+                printf("h2  = "), padic_poly_print(h2,  ctx), printf("\n\n");
+                printf("hX  = "), padic_poly_print(hX,  ctx), printf("\n\n");
+                printf("h2X = "), padic_poly_print(h2X, ctx), printf("\n\n");
+                printf("p   = "), fmpz_print(p), printf("\n\n");
+                printf("N   = %ld\n\n", N);
+                printf("N2  = %ld\n\n", N2);
                 abort();
             }
 
             padic_poly_clear(hX);
             padic_poly_clear(h2X);
-            padic_ctx_clear(ctx2);
         }
 
         padic_poly_clear(f);
