@@ -41,8 +41,7 @@ void _padic_reduce(padic_t rop, const padic_ctx_t ctx)
         }
         else
         {
-            fmpz_zero(padic_unit(rop));
-            padic_val(rop) = 0;
+            padic_zero(rop);
         }
     }
 }

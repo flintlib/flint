@@ -110,7 +110,6 @@ void padic_add(padic_t rop, const padic_t op1, const padic_t op2,
             {
                 if (fmpz_cmpabs(padic_unit(rop), pow) >= 0)
                     fmpz_sub(padic_unit(rop), padic_unit(rop), pow);
-
             }
             else
             {
