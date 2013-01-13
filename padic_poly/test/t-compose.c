@@ -100,7 +100,7 @@ main(void)
             padic_poly_set(hX,  h,  ctx);
             padic_poly_set(h2X, h2, ctx);
 
-            result = (padic_poly_equal(h2, h2X));
+            result = (padic_poly_equal(h2X, h2X));
             if (!result)
             {
                 printf("FAIL (cmp with QQ, ord_p(g) < 0):\n");
