@@ -74,7 +74,7 @@ main(void)
         padic_poly_inv_series(c, b, n, ctx);
         padic_poly_inv_series(b, b, n, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -144,7 +144,7 @@ main(void)
         padic_poly_mul(c, a, b, ctx);
         padic_poly_truncate(c, n, p);
 
-        result = (padic_poly_is_one(c, ctx));
+        result = (padic_poly_is_one(c, ctx) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL:\n");

@@ -406,5 +406,17 @@ int padic_poly_print_pretty(const padic_poly_t poly, const char *var,
     return padic_poly_fprint_pretty(stdout, poly, var, ctx);
 }
 
+/*  Testing  *****************************************************************/
+
+int _padic_poly_is_canonical(const fmpz *op, long val, long len, 
+                             const padic_ctx_t ctx);
+
+int padic_poly_is_canonical(const padic_poly_t op, const padic_ctx_t ctx);
+
+int _padic_poly_is_reduced(const fmpz *op, long val, long len, long N, 
+                           const padic_ctx_t ctx);
+
+int padic_poly_is_reduced(const padic_poly_t op, const padic_ctx_t ctx);
+
 #endif
 

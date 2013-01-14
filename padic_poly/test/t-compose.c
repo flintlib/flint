@@ -76,7 +76,7 @@ main(void)
 
         if (padic_poly_val(g) >= 0)
         {
-            result = (padic_poly_equal(h, h2));
+            result = (padic_poly_equal(h, h2) && padic_poly_is_reduced(h, ctx));
             if (!result)
             {
                 printf("FAIL (cmp with QQ, ord_p(g) >= 0):\n");
@@ -100,7 +100,7 @@ main(void)
             padic_poly_set(hX,  h,  ctx);
             padic_poly_set(h2X, h2, ctx);
 
-            result = (padic_poly_equal(h2X, h2X));
+            result = (padic_poly_equal(hX, h2X) && padic_poly_is_reduced(hX, ctx));
             if (!result)
             {
                 printf("FAIL (cmp with QQ, ord_p(g) < 0):\n");

@@ -68,13 +68,9 @@ while [ "$1" != "" ]; do
          BUILD="$VALUE"
          ;;
       --prefix)
-<<<<<<< HEAD
          PREFIX=$VALUE
          FLINT_CPIMPORT_DIR="$PREFIX/share/flint"
          FLINT_CPIMPORT="$FLINT_CPIMPORT_DIR/CPimport.txt"
-=======
-         PREFIX="$VALUE"
->>>>>>> trunk
          ;;
       --disable-shared)
          SHARED=0

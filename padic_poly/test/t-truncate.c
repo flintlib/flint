@@ -74,7 +74,7 @@ main(void)
         padic_poly_truncate(b, n, ctx->p);
         padic_poly_truncate(c, n, ctx->p);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -117,7 +117,7 @@ main(void)
         padic_poly_truncate(a, n, ctx->p);
         padic_poly_get_fmpq_poly(c, a, ctx);
 
-        result = (fmpq_poly_equal(b, c));
+        result = (fmpq_poly_equal(b, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL:\n");

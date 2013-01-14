@@ -66,7 +66,7 @@ main(void)
         padic_poly_compose_pow(c, b, k, ctx);
         padic_poly_compose_pow(b, b, k, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL (aliasing):\n");
@@ -112,7 +112,7 @@ main(void)
         padic_clear(one);
         padic_poly_compose(h2, f, g, ctx);
 
-        result = (padic_poly_equal(h1, h2));
+        result = (padic_poly_equal(h1, h2) && padic_poly_is_reduced(h1, ctx));
         if (!result)
         {
             printf("FAIL (cmp with composition):\n");

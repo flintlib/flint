@@ -68,7 +68,7 @@ main(void)
         padic_poly_add(c, a, b, ctx);
         padic_poly_add(a, a, b, ctx);
 
-        result = (padic_poly_equal(a, c));
+        result = (padic_poly_equal(a, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL (alias a, c):\n");
@@ -110,7 +110,7 @@ main(void)
         padic_poly_add(c, a, b, ctx);
         padic_poly_add(b, a, b, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL (alias b, c):\n");
@@ -163,7 +163,7 @@ main(void)
         fmpq_poly_add(x, y, z);
         padic_poly_set_fmpq_poly(d, x, ctx);
 
-        result = (padic_poly_equal(a, d));
+        result = (padic_poly_equal(a, d) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL (cmp with Q):\n");

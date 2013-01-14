@@ -67,7 +67,7 @@ main(void)
         padic_poly_pow(c, b, e, ctx);
         padic_poly_pow(b, b, e, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL:\n");
@@ -115,7 +115,7 @@ main(void)
 
         if (e == 0)
         {
-            result = (padic_poly_equal(b, c));
+            result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
             if (!result)
             {
                 printf("FAIL (cmp with QQ):\n");
@@ -137,7 +137,7 @@ main(void)
             padic_poly_set(blo, b, ctx);
             padic_poly_set(clo, c, ctx);
 
-            result = (padic_poly_equal(blo, clo));
+            result = (padic_poly_equal(blo, clo) && padic_poly_is_reduced(blo, ctx));
             if (!result)
             {
                 printf("FAIL (cmp with QQ):\n");

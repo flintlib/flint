@@ -66,7 +66,7 @@ main(void)
         padic_poly_get_fmpq_poly(c, a, ctx);
         padic_poly_set_fmpq_poly(b, c, ctx);
 
-        result = (padic_poly_equal(a, b));
+        result = (padic_poly_equal(a, b) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL:\n");

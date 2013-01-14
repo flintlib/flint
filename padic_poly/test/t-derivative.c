@@ -65,7 +65,7 @@ main(void)
         padic_poly_derivative(c, b, ctx);
         padic_poly_derivative(b, b, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL (alias):\n");
@@ -109,7 +109,7 @@ main(void)
         fmpq_poly_derivative(bQQ, aQQ);
         padic_poly_set_fmpq_poly(c, bQQ, ctx);
 
-        result = (padic_poly_equal(b, c));
+        result = (padic_poly_equal(b, c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL (cmp with QQ):\n");

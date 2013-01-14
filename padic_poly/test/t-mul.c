@@ -68,7 +68,7 @@ main(void)
         padic_poly_mul(a, b, c, ctx);
         padic_poly_mul(b, b, c, ctx);
 
-        result = (padic_poly_equal(a, b));
+        result = (padic_poly_equal(a, b) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL (aliasing a and b):\n");
@@ -105,7 +105,7 @@ main(void)
         padic_poly_mul(a, b, c, ctx);
         padic_poly_mul(c, b, c, ctx);
 
-        result = (padic_poly_equal(a, c));
+        result = (padic_poly_equal(a, c) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL (aliasing a and c):\n");
@@ -160,7 +160,7 @@ main(void)
             padic_poly_add(t, c, d, ctx);
             padic_poly_mul(a2, b, t, ctx);      /* Lower precision */
 
-            result = (padic_poly_equal(a1, a2));
+            result = (padic_poly_equal(a1, a2) && padic_poly_is_reduced(a1, ctx));
             if (!result)
             {
                 printf("FAIL (distributivity):\n");
@@ -217,7 +217,7 @@ main(void)
         fmpq_poly_mul(x, y, z);
         padic_poly_set_fmpq_poly(d, x, ctx);
 
-        result = (padic_poly_equal(a, d));
+        result = (padic_poly_equal(a, d) && padic_poly_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL (cmp with Q):\n");
