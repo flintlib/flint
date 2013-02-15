@@ -23,38 +23,58 @@
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void
-fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
+int
+main(void)
 {
-    fmpz c = *g;
+    int i, result;
 
-    if (!COEFF_IS_MPZ(c))       /* coeff is small */
+    flint_rand_t state;
+    flint_randinit(state);
+
+    printf("set_uiui....");
+    fflush(stdout);
+
+    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        mp_limb_t sum[2];
-        if (c < 0L)             /* g negative, x positive, so difference is negative */
+        fmpz_t a, b;
+        ulong hi, lo;
+
+        hi = n_randtest(state);
+        lo = n_randtest(state);
+
+        fmpz_init(a);
+        fmpz_init(b);
+
+        fmpz_set_ui(a, hi);
+        fmpz_mul_2exp(a, a, FLINT_BITS);
+        fmpz_add_ui(a, a, lo);
+
+        fmpz_set_uiui(b, hi, lo);
+
+        result = fmpz_equal(a, b);
+        if (!result)
         {
-            add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            fmpz_neg_uiui(f, sum[1], sum[0]);
+            printf("FAIL:\n");
+            printf("hi = %lu\n", hi);
+            printf("lo = %lu\n", lo);
+            printf("a = "); fmpz_print(a); printf("\n");
+            printf("b = "); fmpz_print(b); printf("\n");
+            abort();
         }
-        else                    /* coeff is non-negative, x non-negative */
-        {
-            if (x < c)
-                fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
-            else
-                fmpz_neg_ui(f, x - c);  /* positive or zero */
-        }
+
+        fmpz_clear(a);
+        fmpz_clear(b);
     }
-    else
-    {
-        __mpz_struct *mpz_ptr, *mpz_ptr2;
-        mpz_ptr2 = _fmpz_promote(f);    /* g is already large */
-        mpz_ptr = COEFF_TO_PTR(c);
-        mpz_sub_ui(mpz_ptr2, mpz_ptr, x);
-        _fmpz_demote_val(f);    /* cancellation may have occurred */
-    }
+
+    flint_randclear(state);
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }

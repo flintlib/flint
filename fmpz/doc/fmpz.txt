@@ -164,6 +164,20 @@ void fmpz_set_ui(fmpz_t f, ulong val)
 
     Sets $f$ to the given \code{unsigned long} value.
 
+void fmpz_neg_ui(fmpz_t f, ulong val)
+
+    Sets $f$ to the given \code{unsigned long} value, and then negates $f$.
+
+void fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+
+    Sets $f$ to \code{lo}, plus \code{hi} shifted to the left by
+    \code{FLINT_BITS}.
+
+void fmpz_neg_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
+
+    Sets $f$ to \code{lo}, plus \code{hi} shifted to the left by
+    \code{FLINT_BITS}, and then negates $f$.
+
 void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
     Sets $f$ to the given \code{mpz_t} value.

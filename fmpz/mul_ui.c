@@ -45,24 +45,10 @@ fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
         /* unsigned limb by limb multiply (assembly for most CPU's) */
         umul_ppmm(prod[1], prod[0], uc2, x);
-        if (!prod[1])           /* result fits in one limb */
-        {
-            fmpz_set_ui(f, prod[0]);
-            if (c2 < 0L)
-                fmpz_neg(f, f);
-        }
-        else                    /* result takes two limbs */
-        {
-            __mpz_struct *mpz_ptr = _fmpz_promote(f);
-            
-            /*
-               Two limbs, least significant first, native endian, 
-               no nails, stored in prod
-            */
-            mpz_import(mpz_ptr, 2, -1, sizeof(mp_limb_t), 0, 0, prod);
-            if (c2 < 0L)
-                mpz_neg(mpz_ptr, mpz_ptr);
-        }
+        if (c2 < 0L)
+            fmpz_neg_uiui(f, prod[1], prod[0]);
+        else
+            fmpz_set_uiui(f, prod[1], prod[0]);
     }
     else                        /* c2 is large */
     {
