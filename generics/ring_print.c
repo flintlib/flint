@@ -34,6 +34,10 @@ ring_print(const ring_t ring)
             printf("fmpzs");
             break;
 
+        case TYPE_MPZ:
+            printf("mpzs");
+            break;
+
         case TYPE_LIMB:
             printf("limbs");
             break;

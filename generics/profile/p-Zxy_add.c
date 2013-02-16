@@ -66,7 +66,7 @@ int main()
         ring_t Z, Zx, Zxy;
         long size[3] = { 3, 3, 9 };
 
-        ring_init_fmpz(Z);
+        ring_init_mpz(Z);
         ring_init_poly(Zx, Z);
         ring_init_poly(Zxy, Zx);
         

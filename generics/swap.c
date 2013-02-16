@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -32,6 +33,10 @@ elem_swap(elem_ptr res, elem_ptr src, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_swap(res, src);
+            break;
+
+        case TYPE_MPZ:
+            mpz_swap(res, src);
             break;
 
         case TYPE_LIMB:

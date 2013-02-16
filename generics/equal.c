@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -50,6 +51,9 @@ elem_equal(elem_srcptr op1, elem_srcptr op2, const ring_t ring)
     {
         case TYPE_FMPZ:
             return fmpz_equal(op1, op2);
+
+        case TYPE_MPZ:
+            return mpz_cmp(op1, op2) == 0;
 
         case TYPE_LIMB:
             return *((mp_srcptr) op1) == *((mp_srcptr) op2);

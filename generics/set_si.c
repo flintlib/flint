@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -50,6 +51,10 @@ elem_set_si(elem_ptr elem, long v, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_set_si(elem, v);
+            break;
+
+        case TYPE_MPZ:
+            mpz_set_si(elem, v);
             break;
 
         case TYPE_LIMB:

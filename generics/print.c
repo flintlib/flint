@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -50,6 +51,10 @@ elem_print(elem_srcptr elem, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_print(elem);
+            break;
+
+        case TYPE_MPZ:
+            gmp_printf("%Zd", elem);
             break;
 
         case TYPE_LIMB:

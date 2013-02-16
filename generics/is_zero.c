@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -32,6 +33,9 @@ elem_is_zero(elem_srcptr x, const ring_t ring)
     {
         case TYPE_FMPZ:
             return fmpz_is_zero(x);
+
+        case TYPE_MPZ:
+            return mpz_sgn((const __mpz_struct *) x) == 0;
 
         case TYPE_LIMB:
             return *((mp_srcptr) x) == 0;

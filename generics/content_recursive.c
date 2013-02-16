@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -47,6 +48,10 @@ elem_content_recursive(elem_ptr cont, elem_srcptr obj, const ring_t cont_ring, c
         {
             case TYPE_FMPZ:
                 fmpz_gcd(cont, cont, obj);
+                break;
+
+            case TYPE_MPZ:
+                mpz_gcd(cont, cont, obj);
                 break;
 
             /* assumed to be a field */

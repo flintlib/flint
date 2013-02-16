@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -43,7 +44,11 @@ elem_clear(elem_ptr elem, const ring_t ring)
     switch (ring->type)
     {
         case TYPE_FMPZ:
-            fmpz_clear((fmpz *) elem);
+            fmpz_clear(elem);
+            break;
+
+        case TYPE_MPZ:
+            mpz_clear(elem);
             break;
 
         case TYPE_LIMB:

@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -51,6 +52,11 @@ elem_randtest(elem_ptr res, flint_rand_t state, const long * size, const ring_t 
     {
         case TYPE_FMPZ:
             fmpz_randtest(res, state, size[0]);
+            break;
+
+        case TYPE_MPZ:
+            _flint_rand_init_gmp(state);
+            mpz_rrandomb(res, state->gmp_state, size[0]);
             break;
 
         case TYPE_LIMB:

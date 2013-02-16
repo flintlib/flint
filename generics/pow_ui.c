@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -130,6 +131,10 @@ elem_pow_ui(elem_ptr res, elem_srcptr op, ulong exp, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_pow_ui(res, op, exp);
+            break;
+
+        case TYPE_MPZ:
+            mpz_pow_ui(res, op, exp);
             break;
 
         case TYPE_POLY:

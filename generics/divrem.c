@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -33,6 +34,10 @@ elem_divrem(elem_ptr Q, elem_ptr R, elem_srcptr A, elem_srcptr B, const ring_t r
     {
         case TYPE_FMPZ:
             fmpz_fdiv_qr(Q, R, A, B);
+            break;
+
+        case TYPE_MPZ:
+            mpz_fdiv_qr(Q, R, A, B);
             break;
 
         case TYPE_LIMB:

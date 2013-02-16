@@ -20,57 +20,17 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
 #include "generics.h"
 
-static __inline__ void
-elem_poly_init(elem_poly_struct * poly, const ring_t ring)
-{
-    poly->coeffs = NULL;
-    poly->length = 0;
-    poly->alloc = 0;
-}
-
 void
-elem_init(elem_ptr elem, const ring_t ring)
+ring_init_mpz(ring_t ring)
 {
-    switch (ring->type)
-    {
-        case TYPE_FMPZ:
-            fmpz_init(elem);
-            break;
-
-        case TYPE_MPZ:
-            mpz_init(elem);
-            break;
-
-        case TYPE_LIMB:
-            *((mp_ptr) elem) = 0;
-            break;
-
-        case TYPE_POLY:
-            elem_poly_init(elem, ring);
-            break;
-
-        case TYPE_MOD:
-            elem_init(elem, ring->parent);
-            break;
-
-        case TYPE_FRAC:
-            elem_init(NUMER(elem, ring), ring->numer);
-            elem_init(DENOM(elem, ring), ring->denom);
-            elem_one(DENOM(elem, ring), ring->denom);
-            break;
-
-        case TYPE_COMPLEX:
-            elem_init(REALPART(elem, ring), ring->parent);
-            elem_init(IMAGPART(elem, ring), ring->parent);
-            break;
-
-        default:
-            NOT_IMPLEMENTED("init", ring);
-    }
+    ring->type = TYPE_MPZ;
+    ring->size = sizeof(__mpz_struct);
+    ring->parent = NULL;
+    ring->modulus = NULL;
 }
-

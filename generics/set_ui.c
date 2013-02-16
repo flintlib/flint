@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -48,6 +49,10 @@ elem_set_ui(elem_ptr elem, ulong v, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_set_ui(elem, v);
+            break;
+
+        case TYPE_MPZ:
+            mpz_set_ui(elem, v);
             break;
 
         case TYPE_LIMB:

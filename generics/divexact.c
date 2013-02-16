@@ -21,6 +21,7 @@
 
     Copyright (C) 2010 Sebastian Pancratz
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -85,6 +86,10 @@ elem_divexact(elem_ptr Q, elem_srcptr A, elem_srcptr B, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_divexact(Q, A, B);
+            break;
+
+        case TYPE_MPZ:
+            mpz_divexact(Q, A, B);
             break;
 
         case TYPE_POLY:

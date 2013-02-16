@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -28,6 +29,7 @@
 
 #include <alloca.h>
 #include "flint.h"
+#include "mpir.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
 #include "fmpz_vec.h"
@@ -43,6 +45,7 @@ struct ring_struct;
 typedef enum
 {
     TYPE_FMPZ,
+    TYPE_MPZ,
     TYPE_LIMB,
     TYPE_MOD,
     TYPE_FRAC,
@@ -133,6 +136,7 @@ elem_poly_swap(elem_poly_struct * op1, elem_poly_struct * op2)
         flint_free((_x));
 
 void ring_init_fmpz(ring_t ring);
+void ring_init_mpz(ring_t ring);
 void ring_init_limb(ring_t ring);
 void ring_init_mod(ring_t ring, const ring_t elem_ring, elem_srcptr modulus);
 void ring_init_frac(ring_t ring, const ring_t numer_ring, const ring_t denom_ring);

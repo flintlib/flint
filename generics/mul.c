@@ -20,6 +20,7 @@
 /******************************************************************************
 
     Copyright (C) 2012 Fredrik Johansson
+    Copyright (C) 2013 William Hart
 
 ******************************************************************************/
 
@@ -71,6 +72,10 @@ elem_mul(elem_ptr res, elem_srcptr op1, elem_srcptr op2, const ring_t ring)
     {
         case TYPE_FMPZ:
             fmpz_mul(res, op1, op2);
+            break;
+
+        case TYPE_MPZ:
+            mpz_mul(res, op1, op2);
             break;
 
         case TYPE_LIMB:
