@@ -227,14 +227,12 @@ void padic_poly_set_coeff_padic(padic_poly_t f, long n, const padic_t c,
 
 int padic_poly_equal(const padic_poly_t f, const padic_poly_t g);
 
-static __inline__ 
-int padic_poly_is_zero(const padic_poly_t poly)
+static __inline__ int padic_poly_is_zero(const padic_poly_t poly)
 {
     return poly->length == 0;
 }
 
-static __inline__ 
-int padic_poly_is_one(const padic_poly_t poly, const padic_ctx_t ctx)
+static __inline__ int padic_poly_is_one(const padic_poly_t poly)
 {
     return (poly->length == 1) && fmpz_is_one(poly->coeffs) && 
            (poly->val == 0);

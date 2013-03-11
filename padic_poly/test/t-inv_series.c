@@ -144,7 +144,7 @@ main(void)
         padic_poly_mul(c, a, b, ctx);
         padic_poly_truncate(c, n, p);
 
-        result = (padic_poly_is_one(c, ctx) && padic_poly_is_reduced(b, ctx));
+        result = (padic_poly_is_one(c) && padic_poly_is_reduced(b, ctx));
         if (!result)
         {
             printf("FAIL:\n");

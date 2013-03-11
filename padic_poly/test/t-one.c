@@ -61,7 +61,7 @@ main(void)
         padic_poly_randtest(a, state, n_randint(state, 100), ctx);
         padic_poly_one(a);
 
-        result = (padic_poly_is_one(a, ctx) || N <= 0);
+        result = (padic_poly_is_one(a) || N <= 0);
         if (!result)
         {
             printf("FAIL:\n");
