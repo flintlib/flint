@@ -52,14 +52,14 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
             {
                 fprintf(file, " ");
 
-                if (fmpz_is_zero(padic_mat_unit(A, i, j)))
+                if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
                     fprintf(file, "0");
                 }
                 else
                 {
                     v = A->val 
-                      + fmpz_remove(t, padic_mat_unit(A, i, j), ctx->p);
+                      + fmpz_remove(t, padic_mat_entry(A, i, j), ctx->p);
 
                     if (v == 0)
                     {
@@ -84,7 +84,7 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
     }
     else if (ctx->mode == PADIC_SERIES)
     {
-        printf("ERROR (_padic_mat_fprint).  Not implemented yet.\n");
+        printf("ERROR (_padic_mat_fprint).  Mode PADIC_SERIES not implemented yet.\n");
         abort();
     }
     else if (ctx->mode == PADIC_VAL_UNIT)
@@ -101,14 +101,14 @@ int padic_mat_fprint(FILE * file, const padic_mat_t A, const padic_ctx_t ctx)
             {
                 fprintf(file, " ");
 
-                if (fmpz_is_zero(padic_mat_unit(A, i, j)))
+                if (fmpz_is_zero(padic_mat_entry(A, i, j)))
                 {
                     fprintf(file, "0");
                 }
                 else
                 {
                     v = A->val 
-                      + fmpz_remove(t, padic_mat_unit(A, i, j), ctx->p);
+                      + fmpz_remove(t, padic_mat_entry(A, i, j), ctx->p);
 
                     if (v == 0)
                     {

@@ -28,12 +28,6 @@
 void padic_mat_get_fmpq_mat(fmpq_mat_t B, 
                             const padic_mat_t A, const padic_ctx_t ctx)
 {
-    if (!(B->r == padic_mat_nrows(A) && B->c == padic_mat_ncols(A)))
-    {
-        printf("ERROR (padic_mat_get_fmpq_mat).  Incompatible dimensions.\n");
-        abort();
-    }
-
     if (!padic_mat_is_empty(A))
     {
         if (padic_mat_is_zero(A))
@@ -52,17 +46,16 @@ void padic_mat_get_fmpq_mat(fmpq_mat_t B,
                 {
                     if (padic_mat_val(A) >= 0)
                     {
-                        fmpz_mul(fmpq_mat_entry_num(B, i, j), padic_mat_unit(A, i, j), f);
+                        fmpz_mul(fmpq_mat_entry_num(B, i, j), padic_mat_entry(A, i, j), f);
                         fmpz_one(fmpq_mat_entry_den(B, i, j));
                     }
                     else
                     {
-                        fmpz_set(fmpq_mat_entry_num(B, i, j), padic_mat_unit(A, i, j));
+                        fmpz_set(fmpq_mat_entry_num(B, i, j), padic_mat_entry(A, i, j));
                         fmpz_set(fmpq_mat_entry_den(B, i, j), f);
+                        fmpq_canonicalise(fmpq_mat_entry(B, i, j));
                     }
-                    fmpq_canonicalise(fmpq_mat_entry(B, i, j));
                 }
-
             fmpz_clear(f);
         }
     }

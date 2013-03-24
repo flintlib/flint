@@ -19,28 +19,49 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
+/*
+    Assumptions:
+
+    o  That the matrix dimensions be compatible.
+    o  That the matrices be non-empty.
+    o  That ord_p(A) >= ord_p(B).
+ */
+
 void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                    const padic_ctx_t ctx)
 {
-    if (padic_mat_is_empty(C))
+    if (padic_mat_is_zero(A))
+    {
+        padic_mat_neg(C, B, ctx);
         return;
+    }
+    if (padic_mat_is_zero(B))
+    {
+        padic_mat_set(C, A, ctx);
+        return;
+    }
+    if (FLINT_MIN(padic_mat_val(A), padic_mat_val(B)) >= padic_mat_prec(C))
+    {
+        padic_mat_zero(C);
+        return;
+    }
 
     if (padic_mat_val(A) == padic_mat_val(B))
     {
         fmpz_mat_sub(padic_mat(C), padic_mat(A), padic_mat(B));
         padic_mat_val(C) = padic_mat_val(A);
+        _padic_mat_canonicalise(C, ctx);
     }
     else 
     {
         fmpz_t x;
-
         fmpz_init(x);
 
         if (padic_mat_val(A) < padic_mat_val(B))
@@ -84,12 +105,16 @@ void _padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B,
         fmpz_clear(x);
     }
 
-    _padic_mat_canonicalise(C, ctx);
 }
 
 void padic_mat_sub(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx)
 {
+    if (padic_mat_is_empty(C))
+    {
+        return;
+    }
+
     _padic_mat_sub(C, A, B, ctx);
     _padic_mat_reduce(C, ctx);
 }

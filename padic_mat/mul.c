@@ -19,30 +19,32 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void _padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
-                                   const padic_ctx_t ctx)
-{
-    if (padic_mat_is_empty(C))
-        return;
-
-    fmpz_mat_mul(padic_mat(C), padic_mat(A), padic_mat(B));
-
-    padic_mat_val(C) = padic_mat_val(A) + padic_mat_val(B);
-
-    _padic_mat_canonicalise(C, ctx);
-}
-
 void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx)
 {
-    _padic_mat_mul(C, A, B, ctx);
-    _padic_mat_reduce(C, ctx);
+    if (padic_mat_is_empty(C))
+    {
+        return;
+    }
+
+    if (padic_mat_is_zero(A) || padic_mat_is_zero(B))
+    {
+        padic_mat_zero(C);
+    }
+    else
+    {
+        fmpz_mat_mul(padic_mat(C), padic_mat(A), padic_mat(B));
+
+        padic_mat_val(C) = padic_mat_val(A) + padic_mat_val(B);
+
+        padic_mat_reduce(C, ctx);
+    }
 }
 

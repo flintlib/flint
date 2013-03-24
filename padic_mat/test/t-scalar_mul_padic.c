@@ -38,6 +38,11 @@ main(void)
     int i, result;
     flint_rand_t state;
 
+    fmpz_t p;
+    long N;
+    padic_ctx_t ctx;
+    long m, n;
+
     printf("scalar_mul_padic... ");
     fflush(stdout);
 
@@ -46,25 +51,20 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p;
-        long N;
-        padic_ctx_t ctx;
-        long m, n;
-
         padic_mat_t a, b;
         padic_t x;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        padic_mat_init(a, m, n);
-        padic_mat_init(b, m, n);
-        _padic_init(x);
+        padic_mat_init2(a, m, n, N);
+        padic_mat_init2(b, m, n, N);
+        padic_init2(x, N);
 
         padic_mat_randtest(a, state, ctx);
         padic_randtest(x, state, ctx);
@@ -72,7 +72,7 @@ main(void)
         padic_mat_scalar_mul_padic(b, a, x, ctx);
         padic_mat_scalar_mul_padic(a, a, x, ctx);
 
-        result = (padic_mat_equal(a, b) && _padic_mat_is_canonical(a, p));
+        result = (padic_mat_equal(a, b) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -84,7 +84,7 @@ main(void)
 
         padic_mat_clear(a);
         padic_mat_clear(b);
-        _padic_clear(x);
+        padic_clear(x);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -30,8 +30,8 @@ void padic_mat_get_entry_padic(padic_t rop,
                                const padic_mat_t op, long i, long j, 
                                const padic_ctx_t ctx)
 {
-    fmpz_set(padic_unit(rop), padic_mat_unit(op, i, j));
+    fmpz_set(padic_unit(rop), padic_mat_entry(op, i, j));
     padic_val(rop) = padic_mat_val(op);
-    _padic_canonicalise(rop, ctx);
+    padic_reduce(rop, ctx);
 }
 

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -27,9 +27,9 @@
 
     Module documentation
 
-    We represent a matrix over $\mathbf{Q}_p$ as a 
-    product $p^v M$, where $p$ is a prime number, 
-    $v \in \mathbf{Z}$ and $M$ a matrix over $\mathbf{Z}$.
+    We represent a matrix over $\mathbf{Q}_p$ as a product $p^v M$, 
+    where $p$ is a prime number, $v \in \mathbf{Z}$ and $M$ a matrix 
+    over $\mathbf{Z}$.
 
     We say this matrix is in \emph{canonical form} if either $M$ is zero, 
     in which case we choose $v = 0$, too, or if $M$ contains at least one 
@@ -51,15 +51,16 @@ fmpz_mat_struct * padic_mat(const padic_mat_t A)
     Returns a pointer to the unit part of the matrix, which 
     is a matrix over $\mathbf{Z}$.
 
-    The return value of this function can be used as an argument 
-    to the functions in the \code{fmpz_mat} module.
+    The return value can be used as an argument to 
+    the functions in the \code{fmpz_mat} module.
 
-fmpz * padic_mat_unit(const padic_mat_t A, long i, long j)
+fmpz * padic_mat_entry(const padic_mat_t A, long i, long j)
 
     Returns a pointer to unit part of the entry in position $(i, j)$. 
     Note that this is not necessarily a unit.
 
-    This is implemented as a macro.
+    The return value can be used as an argument to 
+    the functions in the \code{fmpz} module.
 
 long padic_mat_val(const padic_mat_t A)
 
@@ -84,8 +85,13 @@ long padic_mat_ncols(const padic_mat_t A)
 
 void padic_mat_init(padic_mat_t A, long r, long c)
 
-    Initialises the matrix $A$ as a zero matrix with the 
-    specified numbers of rows and columns.
+    Initialises the matrix $A$ as a zero matrix with the specified numbers 
+    of rows and columns and precision \code{PADIC_DEFAULT_PREC}.
+
+void padic_mat_init2(padic_mat_t A, long r, long c, long prec)
+
+    Initialises the matrix $A$ as a zero matrix with the specified numbers 
+    of rows and columns and the given precision.
 
 void padic_mat_clear(padic_mat_t A)
 
@@ -103,8 +109,7 @@ void _padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx)
 void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx)
 
     Ensures that the matrix $A$ is reduced modulo $p^N$, 
-    without assuming that it is necessarily in canonical 
-    form.
+    without assuming that it is necessarily in canonical form.
 
 int padic_mat_is_empty(const padic_mat_t A)
 
@@ -115,6 +120,10 @@ int padic_mat_is_square(const padic_mat_t A)
 
     Returns whether the matrix $A$ is square.
 
+int padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
+
+    Returns whether the matrix $A$ is in canonical form.
+
 *******************************************************************************
 
     Basic assignment
@@ -123,7 +132,7 @@ int padic_mat_is_square(const padic_mat_t A)
 
 void padic_mat_set(padic_mat_t B, const padic_mat_t A)
 
-    Sets $B$ to a copy of $A$.
+    Sets $B$ to a copy of $A$, respecting the precision of $B$.
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B)
 
@@ -134,15 +143,10 @@ void padic_mat_zero(padic_mat_t A)
 
     Sets the matrix $A$ to zero.
 
-void _padic_mat_one(padic_mat_t A)
+void padic_mat_one(padic_mat_t A)
 
-    Sets the matrix $A$ to the identity matrix.
-
-void padic_mat_one(padic_mat_t A, const padic_ctx_t ctx)
-
-    Sets the matrix $A$ to the identity matrix, reduced 
-    according to the context.  If the precision in the context 
-    is negative then the matrix will in fact be the zero matrix.
+    Sets the matrix $A$ to the identity matrix.  If the precision 
+    is negative then the matrix will be the zero matrix.
 
 *******************************************************************************
 

@@ -30,18 +30,20 @@ void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t c
 {
     if (!padic_mat_is_empty(mat))
     {
+        const long N = padic_mat_prec(mat);
+
         long i, j, min, max;
         fmpz_t pow;
 
-        if (ctx->N > 0)
+        if (N > 0)
         {
-            min = - ((ctx->N + 9) / 10);
-            max = ctx->N;
+            min = - ((N + 9) / 10);
+            max = N;
         }
-        else if (ctx->N < 0)
+        else if (N < 0)
         {
-            min = ctx->N - ((-ctx->N + 9) / 10);
-            max = ctx->N;
+            min = N - ((-N + 9) / 10);
+            max = N;
         }
         else  /* ctx->N == 0 */
         {
@@ -52,11 +54,11 @@ void padic_mat_randtest(padic_mat_t mat, flint_rand_t state, const padic_ctx_t c
         padic_mat_val(mat) = n_randint(state, max - min) + min;
 
         fmpz_init(pow);
-        fmpz_pow_ui(pow, ctx->p, ctx->N - padic_mat_val(mat));
+        fmpz_pow_ui(pow, ctx->p, N - padic_mat_val(mat));
 
         for (i = 0; i < padic_mat(mat)->r; i++)
             for (j = 0; j < padic_mat(mat)->c; j++)
-                fmpz_randm(padic_mat_unit(mat, i, j), state, pow);
+                fmpz_randm(padic_mat_entry(mat, i, j), state, pow);
 
         fmpz_clear(pow);
 

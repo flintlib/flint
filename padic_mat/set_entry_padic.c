@@ -29,16 +29,16 @@
 void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j, 
                                const padic_t op, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(op))
+    if (padic_is_zero(op))
     {
-        fmpz_zero(padic_mat_unit(rop, i, j));
+        fmpz_zero(padic_mat_entry(rop, i, j));
         _padic_mat_canonicalise(rop, ctx);
         return;
     }
 
     if (padic_mat_val(rop) == padic_val(op))
     {
-        fmpz_set(padic_mat_unit(rop, i, j), padic_unit(op));
+        fmpz_set(padic_mat_entry(rop, i, j), padic_unit(op));
     }
     else if (padic_mat_val(rop) < padic_val(op))
     {
@@ -46,7 +46,7 @@ void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j,
 
         fmpz_init(t);
         fmpz_pow_ui(t, ctx->p, padic_val(op) - padic_mat_val(rop));
-        fmpz_mul(padic_mat_unit(rop, i, j), padic_unit(op), t);
+        fmpz_mul(padic_mat_entry(rop, i, j), padic_unit(op), t);
         fmpz_clear(t);
 
         _padic_mat_canonicalise(rop, ctx);
@@ -62,7 +62,7 @@ void padic_mat_set_entry_padic(padic_mat_t rop, long i, long j,
                                   padic_mat(rop)->r * padic_mat(rop)->c, pow);
         fmpz_clear(pow);
 
-        fmpz_set(padic_mat_unit(rop, i, j), padic_unit(op));
+        fmpz_set(padic_mat_entry(rop, i, j), padic_unit(op));
         padic_mat_val(rop) = padic_val(op);
     }
 }

@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -38,6 +38,11 @@ main(void)
     int i, result;
     flint_rand_t state;
 
+    fmpz_t p;
+    long N;
+    padic_ctx_t ctx;
+    long m, n;
+
     printf("get/ set_fmpq_mat... ");
     fflush(stdout);
 
@@ -46,31 +51,26 @@ main(void)
     /* Qp -> QQ -> Qp */
     for (i = 0; i < 1000; i++)
     {
-        fmpz_t p;
-        long N;
-        padic_ctx_t ctx;
-        long m, n;
-
         padic_mat_t a, c;
         fmpq_mat_t b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_SERIES);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
 
-        padic_mat_init(a, m, n);
-        padic_mat_init(c, m, n);
+        padic_mat_init2(a, m, n, N);
+        padic_mat_init2(c, m, n, N);
         fmpq_mat_init(b, m, n);
 
         padic_mat_randtest(a, state, ctx);
         padic_mat_get_fmpq_mat(b, a, ctx);
         padic_mat_set_fmpq_mat(c, b, ctx);
 
-        result = (padic_mat_equal(a, c) && _padic_mat_is_canonical(a, p));
+        result = (padic_mat_equal(a, c) && padic_mat_is_reduced(a, ctx));
 
         if (!result)
         {

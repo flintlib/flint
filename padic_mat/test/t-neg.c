@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -38,6 +38,11 @@ main(void)
     int i, result;
     flint_rand_t state;
 
+    fmpz_t p;
+    long N;
+    padic_ctx_t ctx;
+    long m, n;
+
     printf("neg... ");
     fflush(stdout);
 
@@ -46,30 +51,25 @@ main(void)
     /* Check aliasing */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p;
-        long N;
-        padic_ctx_t ctx;
-        long m, n;
-
         padic_mat_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        padic_mat_init(a, m, n);
-        padic_mat_init(b, m, n);
+        padic_mat_init2(a, m, n, N);
+        padic_mat_init2(b, m, n, N);
 
         padic_mat_randtest(a, state, ctx);
 
         padic_mat_neg(b, a, ctx);
         padic_mat_neg(a, a, ctx);
 
-        result = (padic_mat_equal(a, b) && _padic_mat_is_canonical(a, p));
+        result = (padic_mat_equal(a, b) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -88,31 +88,26 @@ main(void)
     /* Check a + (-a) == 0 */
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p;
-        long N;
-        padic_ctx_t ctx;
-        long m, n;
-
         padic_mat_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
 
-        padic_mat_init(a, m, n);
-        padic_mat_init(b, m, n);
-        padic_mat_init(c, m, n);
+        padic_mat_init2(a, m, n, N);
+        padic_mat_init2(b, m, n, N);
+        padic_mat_init2(c, m, n, N);
 
         padic_mat_randtest(a, state, ctx);
 
         padic_mat_neg(b, a, ctx);
         padic_mat_add(c, a, b, ctx);
 
-        result = (padic_mat_is_zero(c) && _padic_mat_is_canonical(c, p));
+        result = (padic_mat_is_zero(c) && padic_mat_is_reduced(c, ctx));
         if (!result)
         {
             printf("FAIL:\n\n");

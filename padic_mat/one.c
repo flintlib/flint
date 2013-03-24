@@ -26,15 +26,9 @@
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void _padic_mat_one(padic_mat_t A)
+void padic_mat_one(padic_mat_t A)
 {
-    fmpz_mat_one(padic_mat(A));
-    A->val = 0;
-}
-
-void padic_mat_one(padic_mat_t A, const padic_ctx_t ctx)
-{
-    if (ctx->N > 0)
+    if (padic_mat_prec(A) > 0)
     {
         fmpz_mat_one(padic_mat(A));
         A->val = 0;

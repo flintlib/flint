@@ -53,13 +53,13 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
         fmpz_init(d);
         v = fmpz_remove(d, c, ctx->p);
 
-        if (padic_mat_val(A) - v >= ctx->N)
+        if (padic_mat_val(A) - v >= padic_mat_prec(B))
         {
             padic_mat_zero(B);
         }
         else
         {
-            _padic_inv(d, d, ctx->p, ctx->N - padic_mat_val(A) + v);
+            _padic_inv(d, d, ctx->p, padic_mat_prec(B) - padic_mat_val(A) + v);
 
             fmpz_mat_scalar_mul_fmpz(padic_mat(B), padic_mat(A), d);
             padic_mat_val(B) = padic_mat_val(A) - v;

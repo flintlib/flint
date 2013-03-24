@@ -38,6 +38,11 @@ main(void)
     int i, result;
     flint_rand_t state;
 
+    fmpz_t p;
+    long N;
+    padic_ctx_t ctx;
+    long m, n;
+
     printf("get/ set_entry_padic... ");
     fflush(stdout);
 
@@ -45,26 +50,21 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        fmpz_t p;
-        long N;
-        padic_ctx_t ctx;
-        long m, n;
-
         padic_mat_t a;
         padic_t x, y;
         long r, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50);
-        padic_ctx_init(ctx, p, N, PADIC_VAL_UNIT);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_SERIES);
 
         m = n_randint(state, 20) + 1;
         n = n_randint(state, 20) + 1;
 
-        padic_mat_init(a, m, n);
-        _padic_init(x);
-        _padic_init(y);
+        padic_mat_init2(a, m, n, N);
+        padic_init2(x, N);
+        padic_init2(y, N);
 
         padic_mat_randtest(a, state, ctx);
         padic_randtest_not_zero(x, state, ctx);
@@ -75,7 +75,7 @@ main(void)
         padic_mat_set_entry_padic(a, r, c, x, ctx);
         padic_mat_get_entry_padic(y, a, r, c, ctx);
 
-        result = (_padic_equal(x, y) && _padic_mat_is_canonical(a, p));
+        result = (padic_equal(x, y) && padic_mat_is_reduced(a, ctx));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -86,8 +86,8 @@ main(void)
         }
 
         padic_mat_clear(a);
-        _padic_clear(x);
-        _padic_clear(y);
+        padic_clear(x);
+        padic_clear(y);
 
         fmpz_clear(p);
         padic_ctx_clear(ctx);

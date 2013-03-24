@@ -19,16 +19,33 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
 #include "fmpz_mat.h"
 #include "padic_mat.h"
 
-void padic_mat_set(padic_mat_t B, const padic_mat_t A)
+void padic_mat_set(padic_mat_t rop, const padic_mat_t op, const padic_ctx_t ctx)
 {
-    fmpz_mat_set(padic_mat(B), padic_mat(A));
-    B->val = A->val;
+    if (op != rop)
+    {
+        if (padic_mat_val(op) >= padic_mat_prec(rop))
+        {
+            padic_mat_zero(rop);
+        }
+        else if (padic_mat_prec(rop) >= padic_mat_prec(op))
+        {
+            fmpz_mat_set(padic_mat(rop), padic_mat(op));
+            padic_mat_val(rop) = padic_mat_val(op);
+        }
+        else
+        {
+            fmpz_mat_set(padic_mat(rop), padic_mat(op));
+            padic_mat_val(rop) = padic_mat_val(op);
+
+            _padic_mat_reduce(rop, ctx);
+        }
+    }
 }
 

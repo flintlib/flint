@@ -30,5 +30,13 @@ void padic_mat_init(padic_mat_t A, long r, long c)
 {
     fmpz_mat_init(padic_mat(A), r, c);
     A->val = 0;
+    A->N   = PADIC_DEFAULT_PREC;
+}
+
+void padic_mat_init2(padic_mat_t A, long r, long c, long prec)
+{
+    fmpz_mat_init(padic_mat(A), r, c);
+    A->val = 0;
+    A->N   = prec;
 }
 

@@ -30,7 +30,7 @@ void _padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
 {
     if (!padic_mat_is_empty(mat) && !padic_mat_is_zero(mat))
     {
-        if (mat->val >= ctx->N)
+        if (mat->val >= padic_mat_prec(mat))
         {
             padic_mat_zero(mat);
         }
@@ -40,7 +40,7 @@ void _padic_mat_reduce(padic_mat_t mat, const padic_ctx_t ctx)
             fmpz_t pow;
 
             fmpz_init(pow);
-            fmpz_pow_ui(pow, ctx->p, ctx->N - mat->val);
+            fmpz_pow_ui(pow, ctx->p, padic_mat_prec(mat) - mat->val);
             for (i = 0; i < padic_mat(mat)->r * padic_mat(mat)->c; i++)
             {
                 fmpz_mod(padic_mat(mat)->entries + i, 

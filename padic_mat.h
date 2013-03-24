@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -41,26 +41,33 @@ typedef struct
 {
     fmpz_mat_struct mat;
     long val;
+    long N;
 } padic_mat_struct;
 
 typedef padic_mat_struct padic_mat_t[1];
 
 /* Macros  *******************************************************************/
 
-#define padic_mat(A)             (&((A)->mat))
-#define padic_mat_unit(A, i, j)  ((A)->mat.rows[i] + (j))
-#define padic_mat_val(A)         ((A)->val)
+#define padic_mat(A)              (&((A)->mat))
+#define padic_mat_entry(A, i, j)  ((A)->mat.rows[i] + (j))
+#define padic_mat_val(A)          ((A)->val)
+#define padic_mat_prec(A)         ((A)->N)
 
-#define padic_mat_nrows(A)       (((A)->mat).r)
-#define padic_mat_ncols(A)       (((A)->mat).c)
+#define padic_mat_nrows(A)        (((A)->mat).r)
+#define padic_mat_ncols(A)        (((A)->mat).c)
 
 /* Memory management  ********************************************************/
 
 void padic_mat_init(padic_mat_t A, long r, long c);
+
+void padic_mat_init2(padic_mat_t A, long r, long c, long prec);
+
 void padic_mat_clear(padic_mat_t A);
 
 void _padic_mat_canonicalise(padic_mat_t A, const padic_ctx_t ctx);
+
 void _padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
+
 void padic_mat_reduce(padic_mat_t A, const padic_ctx_t ctx);
 
 static __inline__ int
@@ -76,7 +83,7 @@ padic_mat_is_square(const padic_mat_t A)
 }
 
 static __inline__ int 
-_padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
+padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
 {
     if (fmpz_mat_is_zero(padic_mat(A)))
     {
@@ -89,24 +96,64 @@ _padic_mat_is_canonical(const padic_mat_t A, const fmpz_t p)
 
         for (i = 0; i < padic_mat(A)->r; i++)
             for (j = 0; j < padic_mat(A)->c; j++)
-                if (!fmpz_divisible(padic_mat_unit(A, i, j), p))
+                if (!fmpz_divisible(padic_mat_entry(A, i, j), p))
                     canonical = 1;
-
         return canonical;
+    }
+}
+
+static __inline__ int 
+padic_mat_is_reduced(const padic_mat_t A, const padic_ctx_t ctx)
+{
+    if (padic_mat_is_empty(A))
+    {
+        return 1;
+    }
+    else if (fmpz_mat_is_zero(padic_mat(A)))
+    {
+        return (padic_mat_val(A) == 0);
+    }
+    else if (padic_mat_is_canonical(A, ctx->p))
+    {
+        const long v = padic_mat_val(A);
+        const long N = padic_mat_prec(A);
+
+        if (v >= N)
+        {
+            return 0;
+        }
+        else
+        {
+            long i, j;
+            fmpz_t pN;
+            int reduced = 1;
+            int alloc = _padic_ctx_pow_ui(pN, N - v, ctx);
+
+            for (i = 0; (i < padic_mat_nrows(A)) && reduced; i++)
+                for (j = 0; (j < padic_mat_ncols(A)) && reduced; j++)
+                    reduced = (fmpz_cmp(padic_mat_entry(A, i, j), pN) < 0);
+
+            if (alloc)
+                fmpz_clear(pN);
+
+            return reduced;
+        }
+    }
+    else
+    {
+        return 0;
     }
 }
 
 /* Basic assignment **********************************************************/
 
-void padic_mat_set(padic_mat_t B, const padic_mat_t A);
+void padic_mat_set(padic_mat_t B, const padic_mat_t A, const padic_ctx_t ctx);
 
 void padic_mat_swap(padic_mat_t A, padic_mat_t B);
 
 void padic_mat_zero(padic_mat_t A);
 
-void _padic_mat_one(padic_mat_t A);
-
-void padic_mat_one(padic_mat_t A, const padic_ctx_t ctx);
+void padic_mat_one(padic_mat_t A);
 
 /* Conversions ***************************************************************/
 
@@ -197,8 +244,6 @@ void padic_mat_scalar_div_fmpz(padic_mat_t B,
 
 /* Multiplication ************************************************************/
 
-void _padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
-                                   const padic_ctx_t ctx);
 void padic_mat_mul(padic_mat_t C, const padic_mat_t A, const padic_mat_t B, 
                                   const padic_ctx_t ctx);
 

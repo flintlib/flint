@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -30,14 +30,10 @@
 void padic_mat_set_fmpq_mat(padic_mat_t B, 
                             const fmpq_mat_t A, const padic_ctx_t ctx)
 {
-    if (!(A->r == padic_mat_nrows(B) && A->c == padic_mat_ncols(B)))
-    {
-        printf("ERROR (padic_mat_set_fmpq_mat).  Incompatible dimensions.\n");
-        abort();
-    }
-
     if (!fmpq_mat_is_empty(A))
     {
+        const long N = padic_mat_prec(B);
+
         long i, j, m = LONG_MAX, v, w;
         fmpz_t f, g, s, t;
 
@@ -56,7 +52,7 @@ void padic_mat_set_fmpq_mat(padic_mat_t B,
                     m = FLINT_MIN(m, v - w);
                 }
 
-        if (m >= ctx->N)
+        if (m >= N)
         {
             padic_mat_zero(B);
         }
@@ -66,24 +62,24 @@ void padic_mat_set_fmpq_mat(padic_mat_t B,
                 for (j = 0; j < A->c; j++)
                     if (fmpq_is_zero(fmpq_mat_entry(A, i, j)))
                     {
-                        fmpz_zero(padic_mat_unit(B, i, j));
+                        fmpz_zero(padic_mat_entry(B, i, j));
                     }
                     else
                     {
                         v = fmpz_remove(s, fmpq_mat_entry_num(A, i, j), ctx->p);
                         w = fmpz_remove(t, fmpq_mat_entry_den(A, i, j), ctx->p);
-                        if (v - w >= ctx->N)
+                        if (v - w >= N)
                         {
-                            fmpz_zero(padic_mat_unit(B, i, j));
+                            fmpz_zero(padic_mat_entry(B, i, j));
                         }
                         else
                         {
                             fmpz_pow_ui(f, ctx->p, (v - w) - m);
-                            fmpz_pow_ui(g, ctx->p, ctx->N - (v - w));
-                            _padic_inv(t, t, ctx->p, ctx->N - (v - w));
-                            fmpz_mul(padic_mat_unit(B, i, j), s, t);
-                            fmpz_mod(padic_mat_unit(B, i, j), padic_mat_unit(B, i, j), g);
-                            fmpz_mul(padic_mat_unit(B, i, j), padic_mat_unit(B, i, j), f);
+                            fmpz_pow_ui(g, ctx->p, N - (v - w));
+                            _padic_inv(t, t, ctx->p, N - (v - w));
+                            fmpz_mul(padic_mat_entry(B, i, j), s, t);
+                            fmpz_mod(padic_mat_entry(B, i, j), padic_mat_entry(B, i, j), g);
+                            fmpz_mul(padic_mat_entry(B, i, j), padic_mat_entry(B, i, j), f);
                         }
                     }
             padic_mat_val(B) = m;

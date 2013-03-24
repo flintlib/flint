@@ -35,7 +35,7 @@ void _padic_mat_scalar_mul_padic(padic_mat_t B,
         return;
     }
 
-    if (_padic_is_zero(c) || padic_mat_is_zero(A))
+    if (padic_is_zero(c) || padic_mat_is_zero(A))
     {
         padic_mat_zero(B);
         return;
