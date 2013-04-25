@@ -314,9 +314,13 @@ int fmpz_read(fmpz_t f);
 
 int fmpz_fread(FILE * file, fmpz_t f);
 
+size_t fmpz_inp_raw( fmpz_t x, FILE *fin );
+
 int fmpz_print(const fmpz_t x);
 
 int fmpz_fprint(FILE * file, const fmpz_t x);
+
+size_t fmpz_out_raw( FILE *fout, const fmpz_t x );
 
 size_t fmpz_sizeinbase(const fmpz_t f, int b);
 
