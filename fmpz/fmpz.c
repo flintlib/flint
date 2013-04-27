@@ -34,9 +34,15 @@
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64 
 
-__thread __mpz_struct ** mpz_free_arr = NULL;
-__thread ulong mpz_free_num = 0;
-__thread ulong mpz_free_alloc = 0;
+#if HAVE_TLS
+#define TLS_PREFIX __thread
+#else
+#define TLS_PREFIX
+#endif
+
+TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
+TLS_PREFIX ulong mpz_free_num = 0;
+TLS_PREFIX ulong mpz_free_alloc = 0;
 
 __mpz_struct * _fmpz_new_mpz(void)
 {
