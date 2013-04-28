@@ -390,9 +390,9 @@ if [ "$TLS" = "1" ]; then
       else
          echo "no"
       fi
-      rm -f build/test-popcnt{,.c}
+      rm -f build/test-tls{,.c}
    else
-      rm -f build/test-popcnt.c
+      rm -f build/test-tls.c
       echo "no"
    fi
 fi
