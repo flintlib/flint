@@ -34,71 +34,61 @@
 /* The number of new mpz's allocated at a time */
 #define MPZ_BLOCK 64 
 
-/* The array of mpz's used by the F_mpz type */
-__mpz_struct * fmpz_arr;
+#if HAVE_TLS
+#define TLS_PREFIX __thread
+#else
+#define TLS_PREFIX
+#endif
 
-/* Total number of mpz's initialised in F_mpz_arr */
-ulong fmpz_allocated = 0;
-
-/* An array of pointers to mpz's which are not being used presently */
-ulong * fmpz_unused_arr;
-
-ulong fmpz_num_unused = 0;
+TLS_PREFIX __mpz_struct ** mpz_free_arr = NULL;
+TLS_PREFIX ulong mpz_free_num = 0;
+TLS_PREFIX ulong mpz_free_alloc = 0;
 
 __mpz_struct * _fmpz_new_mpz(void)
 {
-    if (fmpz_num_unused == 0) /* time to allocate MPZ_BLOCK more mpz_t's */
+    if (mpz_free_num != 0)
     {
-        ulong i;
-        if (fmpz_allocated) /* realloc mpz_t's and unused array */
-        {
-            fmpz_arr = (__mpz_struct *) flint_realloc(fmpz_arr, (fmpz_allocated + MPZ_BLOCK) * sizeof(__mpz_struct));
-            fmpz_unused_arr = (ulong *) flint_realloc(fmpz_unused_arr, (fmpz_allocated + MPZ_BLOCK) * sizeof(ulong));
-        } else /* first time alloc of mpz_t's and unused array */
-        {
-            fmpz_arr = (__mpz_struct *) flint_malloc(MPZ_BLOCK*sizeof(__mpz_struct)); 
-            fmpz_unused_arr = (ulong *) flint_malloc(MPZ_BLOCK*sizeof(ulong));
-        }
-        
-        /* initialise the new mpz_t's and unused array */
-        for (i = 0; i < MPZ_BLOCK; i++)
-        {
-            mpz_init(fmpz_arr + fmpz_allocated + i);
-            fmpz_unused_arr[fmpz_num_unused] = fmpz_allocated + i;
-            fmpz_num_unused++;
-        }
-        
-        fmpz_allocated += MPZ_BLOCK;   
-    } 
-    
-    fmpz_num_unused--;
-    
-    return fmpz_arr + fmpz_unused_arr[fmpz_num_unused];
+        return mpz_free_arr[--mpz_free_num];
+    }
+    else
+    {
+        __mpz_struct * z = flint_malloc(sizeof(__mpz_struct));
+        mpz_init(z);
+        return z;
+    }
 }
 
 void _fmpz_clear_mpz(fmpz f)
 {
-    ulong u = fmpz_unused_arr[fmpz_num_unused] = (f ^ (1L << (FLINT_BITS - 2)));
+    __mpz_struct * ptr = COEFF_TO_PTR(f);
 
-    if (fmpz_arr[u]._mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
-        mpz_realloc2(fmpz_arr + u, 1);
+    if (ptr->_mp_alloc > FLINT_MPZ_MAX_CACHE_LIMBS)
+        mpz_realloc2(ptr, 1);
 
-    fmpz_num_unused++;   
+    if (mpz_free_num == mpz_free_alloc)
+    {
+        mpz_free_alloc = FLINT_MAX(64, mpz_free_alloc * 2);
+        mpz_free_arr = flint_realloc(mpz_free_arr, mpz_free_alloc * sizeof(__mpz_struct *));
+    }
+
+    mpz_free_arr[mpz_free_num++] = ptr;
 }
 
 void _fmpz_cleanup_mpz_content(void)
 {
-    long i;
-    for (i = 0; i < fmpz_num_unused; i++)
-        mpz_clear(fmpz_arr + fmpz_unused_arr[i]);
+    ulong i;
+
+    for (i = 0; i < mpz_free_num; i++)
+    {
+        mpz_clear(mpz_free_arr[i]);
+        flint_free(mpz_free_arr[i]);
+    }
 }
 
 void _fmpz_cleanup(void)
 {
     _fmpz_cleanup_mpz_content();
-
-    if (fmpz_num_unused) flint_free(fmpz_unused_arr);
-    if (fmpz_allocated) flint_free(fmpz_arr);
+    flint_free(mpz_free_arr);
 }
 
 __mpz_struct * _fmpz_promote(fmpz_t f)

@@ -115,7 +115,7 @@ typedef __mpfr_struct mpfr;
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
-#define FLINT_ABS(x) ((long)(x) < 0 ? (-x) : (x))
+#define FLINT_ABS(x) ((long)(x) < 0 ? (-(x)) : (x))
 
 #define MP_PTR_SWAP(x, y) \
     do { \

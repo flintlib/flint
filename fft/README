@@ -108,6 +108,171 @@ See the corresponding test function for an example of how to call it.
 The function implementation itself is the best reference for which 
 inputs will use which table entries.
 
+Strategy
+--------
+
+Let's suppose we wish to compute a convolution of length 2n where n is a power of 2. We do this with a standard Fermat transform with coefficients mod p = 2^wn + 1. Note 2^w is a 2n-th root of unity.
+
+We assume wn is divisible by GMP_LIMB_BITS (either 32 or 64). In practice n is always divisible by this constant.
+
+Write l = wn/GMP_LIMB_BITS. Each coeff is stored in a block of l+1 limbs in twos complement form. We accumulate carries in the top limb meaning reduction mod p does not need to be done after an addition or subtraction.
+
+Coefficients are also accessed via one level of indirection so that coefficients can be swapped by swapping pointers.
+
+A couple of extra temporary coefficients are allocated for operations which cannot be done entirely in-place.
+
+1. Efficient butterflies
+
+The FFT butterfly step is:
+
+[a{i}, b{i}] => [a{i}+b{i}, z^i*(a{i}-b{i})]
+
+We use MPIR's sumdiff to simultaneously perform the addition and subtraction. The multiplication by z^i is a shift by iw bits which we decompose into a shift by b bits and x limbs. The output is written in a location with an offset of x limbs. To handle the wraparound we split the operation into two parts. Finally we shift by the remaining b bits. An additional negation needs to occur when i >= n as nw = -1 mod p.
+
+The IFFT butterfly is:
+
+[a{i}, b{i}] => [a{i}+z^-i*b{i}, a{i}-z^-i*b{i}]
+
+We first decompose iw into b bits and x limbs. We perform the bit shift first, in-place. Then we use sumdiff, this time reading at an offset of x limbs, splitting the operation into two parts as before. 
+
+2. Cache locality
+
+We use the Matrix Fourier Algorithm. To perform an FFT of length m = RC we:
+
+  * Split the coefficients into R rows of C columns
+  * Perform a length R FFT on each column, i.e. with an input stride of C
+  * Multiply each coefficient by z^{r*c} where z = exp(2*Pi*I/m),
+note z corresponds to a shift of w bits
+  * Perform a length C FFT on each row, i.e. with an input stride of 1
+  * Transpose the matrix of coefficients
+
+To perform an IFFT we complete the steps in reverse, using IFFT's instead of FFT's.
+
+We set R, C to be both around sqrt(m) to minimise the maximum size of FFT which is in cache at any one time. When the FFT is followed by the IFFT as in the convolution we do not perform the transposes of the matrix coefficients as they cancel each other out.
+
+We do not perform the twiddles by z^{rc} in a separate pass over the data. We combine them with the length R FFT's and IFFT's. They are combined with the butterflies at the very bottom level of the FFT's and IFFT's. They essentially cost nothing as they just increase the bit shifts already being performed.
+
+The algorithm expects the FFT's to output their coefficients in reverse binary order, thus we have to revbin the coefficient order after the column FFTs and before the column IFFTs.
+
+3. Truncation
+
+When performing a convolution where we know that many of the output coefficients will be zero (this happens when multiplying integers that are not of an optimal split-into-a-nice-power-of-two length) we can use Van der Hoeven's truncated FFT.
+
+There are two cases: a) less than or equal to half of the FFT output coeffs
+are non-zero and b) more than half the coefficients are non-zero:
+
+a) A 0 0 0
+
+b) A A A 0
+
+In the first case, the first layer of the FFT would do nothing. As we
+only care about the left half, we recurse on only the left half A 0,
+ignoring the remaining zeros.
+
+In the second case we compute the first layer of the FFT. We then do
+an ordinary FFT on the left half and recurse with a truncated FFT on
+the right half.
+
+Of course we need to be careful in that the first layer of the FFT
+will have replaced our zeroes with non-zero coefficients, so we don't
+recurse to the above two cases.
+
+We start instead with an FFT with non-zero coefficients (labelled B).
+
+A B B B
+
+or
+
+A A A B
+
+But the cases can be dealt with in a similar way to the cases where
+there are zeros. The saving comes in that we repeatedly ignore
+coefficients on the right hand side when they are all past the
+truncation point.
+
+The IFFT is slightly more involved. We know that we are going to
+*end up with* zeroes on the right hand side. We start with the results
+of the pointwise mults, though we do not perform all the pointwise
+mults. If we are going to end up with c zeroes, we do not perform the
+last c pointwise mults.
+
+So we want our IFFT to get to
+
+A A A 0
+
+starting from
+
+P P P ?
+
+Again there are two cases, depending on how many zeros we will end up with:
+
+a) A 0 0 0
+
+b) A A A 0
+
+In case (a) , by working backwards from what we know we will get, the
+next to last level must be
+
+A/2 0 (A/2)~ 0 where ~ is the opposite of the twiddle that will be
+applied by the IFFT butterfly.
+
+But I can compute the LHS, A/2 0, simply by recursing on the truncated
+IFFT. Then it is just a matter of multiplying by 2 to get A 0 which is
+what I was after.
+
+In case (b) an ordinary IFFT can compute the left hand of the
+penultimate layer, as we have all the necessary pointwise mults for
+that.
+
+A A A 0
+B B ? ?
+
+The right hand side we compute by recursing on the truncated IFFT. But
+we don't know what the final question mark is. To get it we have to
+reverse the steps of the IFFT to find it. As we have the second B we
+can compute the second A simply by performing some IFFT butterflies.
+Now we can compute the second ? by reversing the IFFT butterflies. So
+we are left with:
+
+A A' A 0'
+B' B' ? C'
+
+where I wrote a dash on the coefficients we actually now know.
+
+Now we can recurse using the truncated IFFT on the right hand side.
+
+Although the coefficients C' are not zero, the principles are the same
+and we split into two cases as above.
+
+This allows us to get the question mark, yielding:
+
+A A' A 0'
+B' B' C' C'
+
+and clearly now we can compute the A's we don't know from the known
+coefficients.
+
+To combine the MFA with truncation we simply truncate at one level of the MFA, i.e. set the truncation length to be a multiple of the length of the inner FFT's. When we are at the lower levels computing row FFT's we don't compute those which lie past the truncation point. 
+
+We need to take care to perform the right pointwise mults because we do not transpose the matrix or output coefficients in revbin order. 
+
+4. Negacyclic convolution
+
+The pointwise multiplications mod p are somtimes large enough to make use of an FFT. For this purpose we use a negacyclic convolution which naturally performs integer multiplication mod p.
+
+If we do this naively we break up into coefficients whose sizes are multiples of half the negacyclic FFT lengths. This becomes inefficient.
+
+In order to get around this we must perform two multiplications, one via a negacyclic FFT with big coefficients and one naively with very small coefficients and CRT them together. This gives more flexibility in the size of coefficients we use in the negacyclic FFT allowing the large pointwise multication mod p to be done efficiently (not implemented yet).
+
+5. Sqrt 2 trick
+
+In the ring Z/pZ where p = 2^S + 1 the value 2^(2S/4)-2^(S/4) is a 
+square root of 2. This allows us to perform a convolution of twice 
+the length without twice the cost. To perform the operations we need 
+to be able to perform twiddles by powers of sqrt2. These are decomposed 
+and the operations are combined as much as possible with the 
+multiplications by powers of 2.
+
 Acknowledgements
 ----------------
 

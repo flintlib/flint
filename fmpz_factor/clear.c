@@ -34,5 +34,5 @@ void
 fmpz_factor_clear(fmpz_factor_t factor)
 {
     _fmpz_vec_clear(factor->p, factor->alloc);
-    _fmpz_vec_clear(factor->exp, factor->alloc);
+    flint_free(factor->exp);
 }

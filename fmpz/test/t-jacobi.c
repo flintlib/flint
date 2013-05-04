@@ -42,7 +42,7 @@ main(void)
     flint_randinit(state);
     _flint_rand_init_gmp(state);
 
-    for (i = 0; i < 10000 * flint_test_multiplier(); i++)
+    for (i = 0; i < 3000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, p;
         mpz_t b, q;

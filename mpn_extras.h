@@ -184,6 +184,30 @@ flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
                           long a, long b, long n, int d);
 
+mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
+
+mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a, 
+           mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv);
+
+#define flint_mpn_divrem21_preinv(q, a_hi, a_lo, dinv) \
+   do { \
+      mp_limb_t __q2, __q3, __q4; \
+      umul_ppmm((q), __q2, (a_hi), (dinv)); \
+      umul_ppmm(__q3, __q4, (a_lo), (dinv)); \
+      add_ssaaaa((q), __q2, (q), __q2, 0, __q3); \
+      add_ssaaaa((q), __q2, (q), __q2, (a_hi), (a_lo)); \
+   } while (0)
+
+void flint_mpn_mulmod_preinv1(mp_ptr r, 
+        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+        mp_srcptr d, mp_limb_t dinv, ulong norm);
+
+void flint_mpn_preinvn(mp_ptr dinv, mp_srcptr d, mp_size_t n);
+
+void flint_mpn_mulmod_preinvn(mp_ptr r, 
+        mp_srcptr a, mp_srcptr b, mp_size_t n, 
+        mp_srcptr d, mp_srcptr dinv, ulong norm);
+
 #ifdef __cplusplus
 }
 #endif

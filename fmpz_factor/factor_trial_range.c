@@ -45,8 +45,17 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
 
     if (!COEFF_IS_MPZ(*n))
     {
+        fmpz_t prod;
+        fmpz_init(prod);
+        
         fmpz_factor_si(factor, *n);
-        return;
+        
+        fmpz_factor_expand_iterative(prod, factor);
+        ret = (fmpz_cmp(prod, n) == 0);
+
+        fmpz_clear(prod);
+
+        return ret;
     }
 
     _fmpz_factor_set_length(factor, 0);
