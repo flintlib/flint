@@ -136,6 +136,7 @@ typedef struct
       qfb_set(pow, restart[j].pow); \
       qfb_pow(pow, pow, n, exponent); \
       i = restart[j].i; \
+      n_primes_jump_after(iter, restart[j].pr); \
       pr = restart[j].pr; \
       goto do_restart; \
    } while (0)
@@ -148,6 +149,9 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iterations)
    fmpz_t prod, L;
    int ret = 1, num_restarts = 0, need_restarts = 1, clean2 = 0;
    qfb_restart_t restart[128];
+   n_primes_t iter;
+
+   n_primes_init(iter);
 
    fmpz_set_ui(exponent, 1);
       
@@ -242,6 +246,7 @@ do_restart1:
    restart_inc = (((iterations/1024 + 127)/128))*1024;
                       
    pr = 13;
+   n_primes_jump_after(iter, 13);
    i = 0;
    
 do_restart:
@@ -266,13 +271,13 @@ do_restart:
          
          for ( ; i < j; i+=4)
          {
-            pr = n_nextprime(pr, 0);
+            pr = n_primes_next(iter);
             fmpz_set_ui(prod, pr);
-            pr = n_nextprime(pr, 0);
+            pr = n_primes_next(iter);
             fmpz_mul_ui(prod, prod, pr);
-            pr = n_nextprime(pr, 0);
+            pr = n_primes_next(iter);
             fmpz_mul_ui(prod, prod, pr);
-            pr = n_nextprime(pr, 0);
+            pr = n_primes_next(iter);
             fmpz_mul_ui(prod, prod, pr);
             if (i < 102400)
                fmpz_mul(prod, prod, prod);
@@ -283,11 +288,12 @@ do_restart:
          if (qfb_is_principal_form(pow, n))
          {
             qfb_set(pow, oldpow);
+            n_primes_jump_after(iter, oldpr);
             pr = oldpr;
             while (1)
             {
-               pr = n_nextprime(pr, 0);
-            
+               pr = n_primes_next(iter);
+         
                qfb_pow_ui(pow, pow, n, pr);
                if (qfb_is_principal_form(pow, n))
                {
@@ -352,7 +358,7 @@ cleanup2:
    qfb_clear(oldpow);
    fmpz_clear(prod);
    fmpz_clear(L);
-
+   n_primes_clear(iter);
 
    return ret;
 }

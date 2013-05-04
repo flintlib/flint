@@ -39,7 +39,9 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
    qfb_t f;
    ulong pr, nmodpr, s;
    int ret = 1;
+   n_primes_t iter;
 
+   n_primes_init(iter);
    fmpz_init(p);
    fmpz_init(n2);
    fmpz_init(exp);
@@ -48,13 +50,13 @@ int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c)
    fmpz_set_ui(exponent, 1);
 
    /* find odd prime such that n is a square mod p */
-   pr = 1;
+   pr = 0;
    for (i = 0; i < c + 2; )
    {
       i--;
       do
       {
-         pr = n_nextprime(pr, 0);
+         pr = n_primes_next(iter);
          nmodpr = fmpz_fdiv_ui(n, pr);
          i++;
       } while ((pr == 2 && ((s = fmpz_fdiv_ui(n, 8)) == 2 || s == 3 || s == 5))
@@ -107,6 +109,7 @@ cleanup:
    fmpz_clear(p);
    fmpz_clear(n2);
    fmpz_clear(exp);
+   n_primes_clear(iter);
 
    return ret;
 }

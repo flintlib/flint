@@ -41,7 +41,9 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters)
    ulong pr, nmodpr, s, grh_limit;
    mpfr_t lim;
    int ret = 1;
+   n_primes_t iter;
 
+   n_primes_init(iter);
    fmpz_init(p);
    fmpz_init(n2);
    fmpz_init(exp);
@@ -58,12 +60,12 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters)
    fmpz_set_ui(exponent, 1);
    
    /* find odd prime such that n is a square mod p */
-   pr = 1;
+   pr = 0;
    for (pr = 1; pr < grh_limit; )
    {
       do
       {
-         pr = n_nextprime(pr, 0);
+         pr = n_primes_next(iter);
          nmodpr = fmpz_fdiv_ui(n, pr);
       } while ((pr == 2 && ((s = fmpz_fdiv_ui(n, 8)) == 2 || s == 3 || s == 5))
          || (pr != 2 && nmodpr != 0 && n_jacobi(nmodpr, pr) < 0));
@@ -113,6 +115,7 @@ cleanup:
    fmpz_clear(p);
    fmpz_clear(n2);
    fmpz_clear(exp);
+   n_primes_clear(iter);
 
    flint_mpz_clear_readonly(mn);
             
