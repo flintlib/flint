@@ -41,19 +41,20 @@ mp_limb_t flint_mpn_preinv1(mp_limb_t d1, mp_limb_t d2)
    else
       udiv_qrnnd(q, r[1], ~d1, ~d2, d1 + 1);
 
+   if (d2 + 1 == 0)
+      return q;
+
    r[0] = 0;
 
-   if (d2 + 1 == 0)
-      add_ssaaaa(cy, r[1], 0, r[1], 0, q);   
-   else
-   {
-      umul_ppmm(p[1], p[0], q, ~d2 - 1);
-      cy = mpn_add_n(r, r, p, 2);
-   }
+   umul_ppmm(p[1], p[0], q, ~d2);
+   cy = mpn_add_n(r, r, p, 2);
  
    p[0] = d2 + 1, p[1] = d1 + (d2 + 1 == 0);
-   if (cy || mpn_cmp(r, p, 2) >= 0)
+   while (cy || mpn_cmp(r, p, 2) >= 0)
+   {
       q++;
+      cy -= mpn_sub_n(r, r, p, 2);
+   }
    
    return q;
 }
