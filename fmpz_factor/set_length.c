@@ -37,10 +37,7 @@ _fmpz_factor_set_length(fmpz_factor_t factor, long newlen)
     {
         long i;
         for (i = newlen; i < factor->num; i++)
-        {
             _fmpz_demote(factor->p + i); 
-            _fmpz_demote(factor->exp + i); 
-        }
     }
     factor->num = newlen;
 }

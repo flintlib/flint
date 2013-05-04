@@ -54,11 +54,8 @@ fmpz_factor_print(const fmpz_factor_t factor)
     {
         fmpz_print(factor->p + i);
 
-        if (fmpz_get_ui(factor->exp + i) != 1UL)
-        {
-            printf("^");
-            fmpz_print(factor->exp + i);
-        }
+        if (factor->exp[i] != 1UL)
+            printf("^%lu", factor->exp[i]);
 
         if (i != factor->num - 1)
             printf(" * ");
