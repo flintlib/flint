@@ -55,6 +55,6 @@ _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
     for (i = 0; i < nfac.num; i++)
     {
         fmpz_set_ui(factor->p + len + i, nfac.p[i]);
-        fmpz_set_ui(factor->exp + len + i, nfac.exp[i]);
+        factor->exp[len + i] = nfac.exp[i];
     }
 }
