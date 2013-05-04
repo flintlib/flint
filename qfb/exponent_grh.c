@@ -78,6 +78,7 @@ int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters)
          qfb_prime_form(f, n, p);
          fmpz_set(n2, n);
 
+         /* deal with non-fundamental discriminants */
          if (nmodpr == 0 && fmpz_fdiv_ui(f->c, pr) == 0)
          {   
             fmpz_fdiv_q_ui(f->a, f->a, pr);
