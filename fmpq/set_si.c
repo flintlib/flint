@@ -38,12 +38,7 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
     }
     else
     {
-        ulong r = FLINT_ABS(p);
-
-        if (r >= q)
-            r = n_gcd(r, q);
-        else
-            r = n_gcd(q, r);
+        ulong r = n_gcd_full(FLINT_ABS(p), q);
 
         fmpz_set_si(rnum, p / r);
         fmpz_set_ui(rden, q / r);

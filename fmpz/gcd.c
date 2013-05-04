@@ -34,7 +34,7 @@ z_gcd(long a, long b)
     ulong ua = FLINT_ABS(a);
     ulong ub = FLINT_ABS(b);
 
-    return (ua >= ub) ? n_gcd(ua, ub) : n_gcd(ub, ua);
+    return n_gcd_full(ua, ub);
 }
 
 void

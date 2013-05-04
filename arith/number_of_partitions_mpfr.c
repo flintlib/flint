@@ -365,8 +365,7 @@ eval_trig_prod(mpfr_t sum, trig_prod_t prod)
 
         mpfr_init2(t, mpfr_get_prec(sum));
         mpfr_set_si(sum, prod->prefactor, MPFR_RNDN);
-        v = n_gcd(FLINT_MAX(prod->sqrt_p, prod->sqrt_q),
-                  FLINT_MIN(prod->sqrt_p, prod->sqrt_q));
+        v = n_gcd_full(prod->sqrt_p, prod->sqrt_q);
         prod->sqrt_p /= v;
         prod->sqrt_q /= v;
 

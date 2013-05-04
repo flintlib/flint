@@ -19,42 +19,53 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 William Hart
-    Copyright (C) 2011 Fredrik Johansson
+    Copyright (C) 2009 William Hart
 
 ******************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
-#include "nmod_poly.h"
 #include "ulong_extras.h"
 
-ulong
-nmod_poly_deflation(const nmod_poly_t input)
+int main(void)
 {
-    ulong deflation;
-    long i, coeff;
+   int i, result;
+   flint_rand_t state;
+   
+   printf("gcd_full....");
+   fflush(stdout);
+   
+   flint_randinit(state);
 
-    if (input->length <= 1)
-        return input->length;
+   for (i = 0; i < 1000 * flint_test_multiplier(); i++) 
+   {
+      mp_limb_t a, b, c, bits1, bits2, bits3;
+      
+      bits1 = n_randint(state, FLINT_BITS-1) + 1;
+      bits2 = n_randint(state, bits1) + 1;
+      bits3 = n_randint(state, FLINT_BITS - bits1) + 1;
 
-    coeff = 1;
-    while (!input->coeffs[coeff])
-        coeff++;
+      do
+      {
+         a = n_randtest_bits(state, bits1);
+         b = n_randtest_bits(state, bits2);
+      } while ((n_gcd_full(a, b) != 1UL));
 
-    deflation = n_gcd_full(input->length - 1, coeff);
+      c = n_randtest_bits(state, bits3);
 
-    while ((deflation > 1) && (coeff + deflation < input->length))
-    {
-        for (i = 0; i < deflation - 1; i++)
-        {
-            coeff++;
-            if (input->coeffs[coeff])
-                deflation = n_gcd_full(coeff, deflation);
-        }
-        if (i == deflation - 1)
-            coeff++;
-    }
+      result = (n_gcd_full(a*c, b*c) == c);
+      if (!result)
+      {
+         printf("FAIL:\n");
+         printf("a = %lu, b = %lu, c = %lu\n", a, b, c); 
+         abort();
+      }
+   }
 
-    return deflation;
+   flint_randclear(state);
+
+   printf("PASS\n");
+   return 0;
 }
