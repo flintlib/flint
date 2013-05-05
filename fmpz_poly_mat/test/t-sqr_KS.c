@@ -55,7 +55,10 @@ main(void)
         fmpz_poly_mat_init(C, m, m);
         fmpz_poly_mat_init(D, m, m);
 
-        fmpz_poly_mat_randtest(A, state, deg, bits);
+        if (n_randint(state, 2))
+            fmpz_poly_mat_randtest(A, state, deg, bits);
+        else
+            fmpz_poly_mat_randtest(A, state, deg, bits);
         fmpz_poly_mat_randtest(C, state, deg, bits);  /* noise in output */
 
         fmpz_poly_mat_sqr_classical(C, A);
