@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Andres Goens
+    Copyright (C) 2012,2013 Andres Goens
     Copyright (C) 2012 Sebastian Pancratz
 
 ******************************************************************************/
@@ -48,6 +48,11 @@
 
 *******************************************************************************
 
+fq_struct * _fq_poly_init(long len)
+
+    Initializes a polynomial as an array of \code{fq_struct}, 
+    of length \code{len}. Returns a pointer to the first coefficient.
+
 void fq_poly_init(fq_poly_t poly)
 
     Initialises \code{poly} for use, with context ctx, and setting 
@@ -59,7 +64,9 @@ void fq_poly_init2(fq_poly_t poly, long alloc)
 
     Initialises \code{poly} with space for at least \code{alloc} coefficients 
     and sets the length to zero.  The allocated coefficients are all set to 
-    zero.
+    zero.  A corresponding call to \code{fq_poly_clear()} 
+    must be made after finishing with the \code{fq_poly_t} to free the memory 
+    used by the polynomial.
 
 void fq_poly_realloc(fq_poly_t poly, long alloc)
 
@@ -95,6 +102,13 @@ void _fq_poly_normalise(fq_poly_t poly)
     Sets the length of \code{poly} so that the top coefficient is non-zero. 
     If all coefficients are zero, the length is set to zero.  This function 
     is mainly used internally, as all functions guarantee normalisation.
+
+void _fq_poly_normalise2(fq_struct *poly, long *length)
+
+    Sets the length \code{length} of \code{(poly,length)} so that the
+    top coefficient is non-zero. If all coefficients are zero, the length 
+    is set to zero. This function is mainly used internally, as all 
+    functions guarantee normalisation.
 
 void fq_poly_truncate(fq_poly_t poly, long newlen)
 
@@ -238,6 +252,8 @@ void _fq_poly_add(fq_struct *res,
                   const fq_struct *poly2, long len2, 
                   const fq_ctx_t ctx)
 
+    Sets \code{res} to the sum of \code{(poly1,len1)} and \code{(poly2,len2)}.
+
 void fq_poly_add(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, 
                  const fq_ctx_t ctx)
 
@@ -248,6 +264,8 @@ void _fq_poly_sub(fq_struct *res,
                   const fq_struct *poly2, long len2, 
                   const fq_ctx_t ctx)
 
+    Sets \code{res} to the difference of \code{(poly1,len1)} and \code{(poly2,len2)}.
+
 void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2, 
                  const fq_ctx_t ctx)
 
@@ -255,6 +273,8 @@ void fq_poly_sub(fq_poly_t res, const fq_poly_t poly1, const fq_poly_t poly2,
 
 void _fq_poly_neg(fq_struct *rop, const fq_struct *op, long len, 
                   const fq_ctx_t ctx)
+
+    Sets \code{res} to the additive inverse of \code{(poly,len)}.
 
 void fq_poly_neg(fq_poly_t res, const fq_poly_t poly, const fq_ctx_t ctx)
 
@@ -269,20 +289,42 @@ void fq_poly_neg(fq_poly_t res, const fq_poly_t poly, const fq_ctx_t ctx)
 void _fq_poly_scalar_mul_fq(fq_struct *rop, 
     const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx)
 
+    Sets \code{(rop,len)} to the product of \code{(op,len)} by the
+    scalar \code{x}, in the context defined by \code{ctx}. 
+
 void fq_poly_scalar_mul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
+
+    Sets \code{(rop,len)} to the product of \code{(op,len)} by the
+    scalar \code{x}, in the context defined by \code{ctx}.
 
 void _fq_poly_scalar_addmul_fq(fq_struct *rop, 
     const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx)
 
+    Adds to \code{(rop,len)} the product of \code{(op,len)} by the
+    scalar \code{x}, in the context defined by \code{ctx}.
+    In particular, assumes the same length for \code{op} and 
+    \code{rop}.
+    
 void fq_poly_scalar_addmul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
+
+    Adds to \code{rop} the product of \code{op} by the
+    scalar \code{x}, in the context defined by \code{ctx}.
 
 void _fq_poly_scalar_submul_fq(fq_struct *rop, 
     const fq_struct *op, long len, const fq_t x, const fq_ctx_t ctx)
 
+    Substracts from \code{(rop,len)} the product of \code{(op,len)} by the
+    scalar \code{x}, in the context defined by \code{ctx}.
+    In particular, assumes the same length for \code{op} and 
+    \code{rop}.
+
 void fq_poly_scalar_submul_fq(fq_poly_t rop, 
     const fq_poly_t op, const fq_t x, const fq_ctx_t ctx)
+
+    Substracts from \code{rop} the product of \code{op} by the
+    scalar \code{x}, in the context defined by \code{ctx}.
 
 *******************************************************************************
 
@@ -441,24 +483,64 @@ void _fq_poly_sqr_classical(fq_struct *rop,
                             const fq_struct *op, long len, 
                             const fq_ctx_t ctx)
 
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}, 
+    assuming that \code{(op,len)} is not zero and using classical
+     polynomial multiplication.
+
+    Permits zero padding.  Does not support aliasing of \code{rop} 
+    with either \code{op1} or \code{op2}.
+
 void fq_poly_sqr_classical(fq_poly_t rop, 
                            const fq_poly_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the square of \code{op} using classical
+     polynomial multiplication.
+		       
 
 void _fq_poly_sqr_reorder(fq_struct *rop, 
                           const fq_struct *op, long len, const fq_ctx_t ctx)
 
+    Sets \code{(rop, 2*len- 1)} to the square of \code{(op, len)},
+    assuming that \code{len} is not zero reordering the two indeterminates
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+
+    Permits zero padding.  Supports aliasing.
+
 void fq_poly_sqr_reorder(fq_poly_t rop, 
                          const fq_poly_t op, const fq_ctx_t ctx)
 
+    Sets \code{rop} to the square of \code{op},
+    assuming that \code{len} is not zero reordering the two indeterminates
+    $X$ and $Y$ when viewing the polynomials as elements of $\mathbb{F}_p[X,Y]$.
+    See \code{fq_poly_mul_reorder}.
+
+
 void _fq_poly_sqr_KS(fq_struct *rop, const fq_struct *op, long len, 
                                      const fq_ctx_t ctx)
+    Sets \code{(rop, 2*len - 1)} to the square of \code{(op, len)}.
+
+    Permits zero padding and places no assumptions on the 
+    lengths \code{len1} and \code{len2}.  Supports aliasing.
 
 void fq_poly_sqr_KS(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the square \code{op} using Kronecker substitution,
+    that is, by encoding each coefficient in $\mathbf{F}_{q}$ as an integer
+    and reducing this problem to multiplying two polynomials over the integers.
 
 void _fq_poly_sqr(fq_struct *rop, const fq_struct *op, long len, 
                                   const fq_ctx_t ctx)
 
+    Sets \code{(rop, 2* len - 1)} to the square of \code{(op, len)}, 
+    choosing an appropriate algorithm.
+
+    Permits zero padding.  Does not support aliasing.
+
 void fq_poly_sqr(fq_poly_t rop, const fq_poly_t op, const fq_ctx_t ctx)
+
+    Sets \code{rop} to the square of \code{op}, 
+    choosing an appropriate algorithm.
+
 
 *******************************************************************************
 
@@ -586,6 +668,21 @@ void fq_poly_divrem(fq_poly_t Q, fq_poly_t R,
     Assumes that the leading coefficient of $B$ is invertible.  This can 
     be taken for granted the context is for a finite field, that is, when 
     $p$ is prime and $f(X)$ is irreducible.
+
+void _fq_poly_rem(fq_struct *R, const fq_struct *A, long lenA,
+                  const fq_struct *B, long lenB, const fq_t invB,
+                  const fq_ctx_t ctx)
+
+    Sets \code{R} to the remainder of the division of \code{(A,lenA)} by
+    \code{(B,lenB)}. Assumes that the leading coefficient of \code{(B,lenB)}
+    is invertible and that \code{invB} is its inverse.
+
+void fq_poly_rem(fq_poly_t R, 
+                    const fq_poly_t A, const fq_poly_t B, 
+                    const fq_ctx_t ctx)
+
+    Sets \code{R} to the remainder of the division of \code{A} by
+    \code{B} in the context described by \code{ctx}.
 
 *******************************************************************************
 
@@ -762,3 +859,45 @@ void fq_poly_compose(fq_poly_t rop, const fq_poly_t op1, const fq_poly_t op2,
     \code{op1}, and \code{op2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
+*******************************************************************************
+
+    Output
+
+*******************************************************************************
+
+int _fq_poly_fprint_pretty(FILE *file, const fq_struct *poly, long len, 
+                            const char *x, const fq_ctx_t ctx)
+
+    Prints the pretty representation of \code{(poly, len)} to the stream 
+    \code{file}, using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
+int fq_poly_fprint_pretty(FILE * file, const fq_poly_t poly, const char *x, 
+                          const fq_ctx_t ctx)
+
+    Prints the pretty representation of \code{poly} to the stream 
+    \code{file}, using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
+
+int _fq_poly_print_pretty(const fq_struct *poly, long len, 
+                          const char *x, const fq_ctx_t ctx)
+    Prints the pretty representation of \code{(poly, len)} to \code{stdout},
+    using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
+
+
+int fq_poly_print_pretty(const fq_poly_t poly, const char *x, 
+                         const fq_ctx_t ctx)
+
+    Prints the pretty representation of \code{poly} to \code{stdout},
+    using the string \code{x} to represent the indeterminate.
+
+    In case of success, returns a positive value.  In case of failure, 
+    returns a non-positive value.
