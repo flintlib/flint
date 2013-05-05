@@ -104,7 +104,6 @@ ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2)
 
       qfb_nucomp(pow2, pow2, pow, L);
       qfb_reduce(pow2, pow2, n);
-
    }
 
    fmpz_clear(r);
@@ -151,6 +150,7 @@ int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1, ulong B2)
    qfb_restart_t restart[128];
    n_primes_t iter;
    ulong hi, lo;
+   double quot;
    mp_bitcnt_t bits0;
 
    n_primes_init(iter);
@@ -182,7 +182,7 @@ do_restart1:
    qfb_set(oldpow, f2);
    fmpz_set_ui(pow2, 2);
    fmpz_pow_ui(pow2, pow2, bits0);
-   qfb_pow(pow, oldpow, n, pow2); /* 2^12 */
+   qfb_pow(pow, oldpow, n, pow2);
    if (qfb_is_principal_form(pow, n))
    {
       ulong s = find_power(oldpow, n, 2);
@@ -198,6 +198,7 @@ do_restart1:
 
    n_prime_pi_bounds(&lo, &hi, B1);
    restart_inc = (((hi/1024 + 127)/128))*1024;
+   quot = (double) B2/((double) lo * (double) lo);
                       
    pr = 2;
    n_primes_jump_after(iter, 2);
@@ -316,7 +317,7 @@ do_restart:
       }
    
       /* stage 2 */
-      s2 = qfb_exponent_element_stage2(pow, n, B2);
+      s2 = qfb_exponent_element_stage2(pow, n, (ulong) ((double) iters * (double) iters * quot));
       if (s2 && n_is_prime(s2)) /* we probably should be more aggressive here */
       {
          fmpz_mul_ui(exponent, exponent, s2);
@@ -330,7 +331,7 @@ do_restart:
          go_restart;
       } 
 
-      iters *= 2;
+      iters = FLINT_MIN(2*iters, hi);
    } while (pr <= B1);
 
    ret = 0;

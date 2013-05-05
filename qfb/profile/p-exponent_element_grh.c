@@ -34,20 +34,21 @@
 int main(int argc, char *argv[])
 {
     int result;
-    long exp, val, num, iters, i;
+    long exp, val, num, B1, B2, i;
 
-    if (argc != 5)
+    if (argc != 6)
     {
-       printf("usage: %s exp val num iters\n", argv[0]);
+       printf("usage: %s exp val num B1 B2\n", argv[0]);
        printf("where D = -4*(10^exp + i) for i in [val..val + num)\n");
-       printf("and where O(iters) iterations are performed\n");
+       printf("with prime bound B1 and large prime bound B2\n");
        return 1;
     }
 
     exp = atol(argv[1]);
     val = atol(argv[2]);
     num = atol(argv[3]);
-    iters = atol(argv[4]);
+    B1 = atol(argv[4]);
+    B2 = atol(argv[5]);
 
     for (i = 0; i < num; i++) 
     {
@@ -63,7 +64,7 @@ int main(int argc, char *argv[])
         fmpz_mul_2exp(D, D, 2);
         fmpz_neg(D, D);
 
-        if (qfb_exponent_grh(exponent, D, iters))
+        if (qfb_exponent_grh(exponent, D, B1, B2))
         {
            printf("Discriminant: "); fmpz_print(D); printf("\n");
            printf("Exponent: "); fmpz_print(exponent); printf("\n\n");
