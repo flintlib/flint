@@ -104,6 +104,12 @@ void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
     This is equivalent to applying \code{fmpz_poly_randtest} to all entries
     in the matrix.
 
+void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state,
+        long len, mp_bitcnt_t bits)
+
+    This is equivalent to applying \code{fmpz_poly_randtest_unsigned} to
+    all entries in the matrix.
+
 void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
         long len, mp_bitcnt_t bits, float density)
 
