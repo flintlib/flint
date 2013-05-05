@@ -48,13 +48,13 @@ ulong find_power(qfb_t f, fmpz_t n, ulong base)
    return s;
 }
 
-ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, long iters)
+ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, ulong B2)
 {
    qfb_t pow, pow2, f2;
+   fmpz_t L, r;
+   long i, i2, ret = 0, iters = n_sqrt(B2);
    long depth = FLINT_BIT_COUNT(iters) + 1;
    qfb_hash_t * qhash = qfb_hash_init(depth);
-   fmpz_t L, r;
-   long i, i2, ret = 0;
    
    fmpz_init(L);
    fmpz_init(r);
@@ -87,7 +87,7 @@ ulong qfb_exponent_element_stage2(qfb_t f, fmpz_t n, long iters)
    qfb_reduce(pow, pow, n);
    qfb_set(pow2, pow);
    
-   for(i = 2; i <= 3*iters; i += 2) /* giant steps */ 
+   for(i = 2; i <= iters; i += 2) /* giant steps */ 
    {
       i2 = qfb_hash_find(qhash, pow2, depth);
       if (i2 != -1) /* found collision */
@@ -141,7 +141,7 @@ typedef struct
       goto do_restart; \
    } while (0)
 
-int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1)
+int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1, ulong B2)
 {
    long i, j, iters = 1024, restart_inc;
    qfb_t pow, oldpow, f2;
@@ -208,7 +208,7 @@ do_restart:
    /* keep raising iters by a factor of 2 until pr exceeds B1 or exponent found */
    do
    {
-      /* raise to prime powers (squared) until the identity is found */
+      /* raise to prime powers until the identity is found */
       for ( ; i < iters; )
       {
          if ((i % restart_inc) == 0 && need_restarts)
@@ -316,7 +316,7 @@ do_restart:
       }
    
       /* stage 2 */
-      s2 = qfb_exponent_element_stage2(pow, n, iters);
+      s2 = qfb_exponent_element_stage2(pow, n, B2);
       if (s2 && n_is_prime(s2)) /* we probably should be more aggressive here */
       {
          fmpz_mul_ui(exponent, exponent, s2);

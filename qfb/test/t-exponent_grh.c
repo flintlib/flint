@@ -61,7 +61,7 @@ int main(void)
 
            fmpz_set_si(D, -d);
            
-           result = qfb_exponent_grh(exp, D, 1000000);
+           result = qfb_exponent_grh(exp, D, 1000000, 1000000000);
            if (!result)
            {
               printf("FAIL:\n");

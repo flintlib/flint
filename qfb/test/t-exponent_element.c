@@ -79,7 +79,7 @@ int main(void)
                  fmpz_add_ui(exp1, exp1, 1);
               }
 
-              result = qfb_exponent_element(exp2, forms + i1, D, 1000000);
+              result = qfb_exponent_element(exp2, forms + i1, D, 1000000, 1000000000);
               if (!result)
               {
                  printf("FAIL:\n");
