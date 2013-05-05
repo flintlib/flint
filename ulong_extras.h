@@ -61,12 +61,58 @@ typedef struct {
 
 #define FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF 311
 
+#define FLINT_SIEVE_SIZE 65536
+
 #if FLINT64
 #define ULONG_MAX_PRIME 18446744073709551557UL
 #else
 #define ULONG_MAX_PRIME 4294967291UL
 #endif
 
+typedef struct
+{
+    long small_i;
+    long small_num;
+    unsigned int * small_primes;
+
+    mp_limb_t sieve_a;
+    mp_limb_t sieve_b;
+    long sieve_i;
+    long sieve_num;
+    char * sieve;
+}
+n_primes_struct;
+
+typedef n_primes_struct n_primes_t[1];
+
+void n_primes_init(n_primes_t iter);
+
+void n_primes_clear(n_primes_t iter);
+
+void n_primes_extend_small(n_primes_t iter, mp_limb_t bound);
+
+void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b);
+
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n);
+
+static __inline__ mp_limb_t
+n_primes_next(n_primes_t iter)
+{
+    if (iter->small_i < iter->small_num)
+        return iter->small_primes[(iter->small_i)++];
+
+    for (;;)
+    {
+        while (iter->sieve_i < iter->sieve_num)
+            if (iter->sieve[iter->sieve_i++] != 0)
+                return iter->sieve_a + 2 * (iter->sieve_i - 1);
+
+        if (iter->sieve_b == 0)
+            n_primes_jump_after(iter, iter->small_primes[iter->small_num-1]);
+        else
+            n_primes_jump_after(iter, iter->sieve_b);
+    }
+}
 
 extern const unsigned int flint_primes_small[];
 
@@ -137,6 +183,9 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b,
 
 mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
                                         mp_limb_t n, mp_limb_t ninv);
+
+mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, 
+                            mp_limb_t n, mp_limb_t ninv, ulong norm);
 
 mp_limb_t
 n_powmod_ui_precomp(mp_limb_t a, mp_limb_t exp, mp_limb_t n, double npre);
@@ -284,6 +333,8 @@ mp_limb_t n_factor_lehman(mp_limb_t n);
 mp_limb_t n_factor_SQUFOF(mp_limb_t n, ulong iters);
 
 void n_factor(n_factor_t * factors, mp_limb_t n, int proved);
+
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c);
 
 int n_is_squarefree(mp_limb_t n);
 

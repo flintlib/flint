@@ -39,31 +39,14 @@ fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
         if (c < 0L)             /* g negative, x positive, so difference is negative */
         {
             add_ssaaaa(sum[1], sum[0], 0, -c, 0, x);
-            if (sum[1] == 0)
-            {
-                fmpz_set_ui(f, sum[0]); /* result fits in 1 limb */
-                fmpz_neg(f, f);
-            }
-            else                /* result takes two limbs */
-            {
-                __mpz_struct * mpz_ptr;
-                mpz_t temp;
-                temp->_mp_d = sum;
-                temp->_mp_size = -2;    /* result is negative number minus negative number, hence negative */
-
-                mpz_ptr = _fmpz_promote(f);   /* g has already been read */
-                mpz_set(mpz_ptr, temp);
-            }
+            fmpz_neg_uiui(f, sum[1], sum[0]);
         }
         else                    /* coeff is non-negative, x non-negative */
         {
             if (x < c)
                 fmpz_set_ui(f, c - x);  /* won't be negative and is smaller than c */
             else
-            {
-                fmpz_set_ui(f, x - c);  /* positive or zero */
-                fmpz_neg(f, f);
-            }
+                fmpz_neg_ui(f, x - c);  /* positive or zero */
         }
     }
     else

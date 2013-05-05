@@ -60,7 +60,7 @@ int main(void)
       {
          printf("FAIL:\n");
          printf("a = %lu, b = %lu, d = %lu, dinv = %lu\n", a, b, d, dinv); 
-         printf("r1 = %lu, r2 = %lu\n", r1, r2);
+         printf("q = %lu, r1 = %lu, r2 = %lu\n", q, r1, r2);
          abort();
       }
    }

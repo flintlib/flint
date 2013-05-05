@@ -44,7 +44,7 @@ nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
         for (i = 0; i < rows; i++)
         {
             mat->rows[i] = mat->entries + i * cols;
-            mpn_copyi(mat->rows[i], src->rows[i], cols);
+            flint_mpn_copyi(mat->rows[i], src->rows[i], cols);
         }
     }
     else

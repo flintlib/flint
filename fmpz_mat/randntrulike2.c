@@ -35,17 +35,14 @@
 void
 fmpz_mat_randntrulike2(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, ulong q)
 {
-    long r, c, d, i, j, k;
-    fmpz *h;
+    const long c = mat->c, r = mat->r, d = r / 2;
 
-    r = mat->r;
-    c = mat->c;
-    d = r / 2;
+    long i, j, k;
+    fmpz *h;
 
     if ((c != r) || (c != 2 * d))
     {
-        printf
-            ("Exception: fmpz_mat_randntrulike called on an ill-formed matrix\n");
+        printf("Exception (fmpz_mat_randntrulike2). Ill-formed matrix.\n");
         abort();
     }
 

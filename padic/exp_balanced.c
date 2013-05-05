@@ -26,8 +26,6 @@
 
 #include "padic.h"
 
-extern long _padic_exp_bound(long v, long N, const fmpz_t p);
-
 /*
     Computes the sum 
     \begin{equation*}
@@ -226,7 +224,7 @@ void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, long xv,
 void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, 
                                      const fmpz_t p, long N)
 {
-    if (*p == 2L)
+    if (fmpz_equal_ui(p, 2))
         _padic_exp_balanced_2(rop, u, v, N);
     else
         _padic_exp_balanced_p(rop, u, v, p, N);
@@ -234,17 +232,17 @@ void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v,
 
 int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    const long N  = ctx->N;
+    const long N  = padic_prec(rop);
     const long v  = padic_val(op);
     const fmpz *p = ctx->p;
 
-    if (fmpz_is_zero(padic_unit(op)))
+    if (padic_is_zero(op))
     {
-        padic_one(rop, ctx);
+        padic_one(rop);
         return 1;
     }
 
-    if ((*p == 2L && v <= 1) || (v <= 0))
+    if ((fmpz_equal_ui(p, 2) && v <= 1) || (v <= 0))
     {
         return 0;
     }
@@ -258,7 +256,7 @@ int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         }
         else
         {
-            padic_one(rop, ctx);
+            padic_one(rop);
         }
         return 1;
     }

@@ -57,7 +57,7 @@ void ifft_butterfly_sqrt2(mp_limb_t * s, mp_limb_t * t, mp_limb_t * i1,
    /* multiply by 2^{wn/2} */
    y = limbs/2;
    
-   mpn_copyi(temp + y, i2, limbs - y);
+   flint_mpn_copyi(temp + y, i2, limbs - y);
    temp[limbs] = 0;
    if (y) cy = mpn_neg_n(temp, i2 + limbs - y, y);
    mpn_addmod_2expp1_1(temp + y, limbs - y, -i2[limbs]);

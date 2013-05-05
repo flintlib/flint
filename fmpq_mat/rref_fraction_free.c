@@ -32,7 +32,7 @@
 #include "fmpq_mat.h"
 
 long
-fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 {
     fmpz_mat_t Aclear;
     fmpz_t den;
@@ -45,7 +45,7 @@ fmpq_mat_rref_fraction_free(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
     fmpq_mat_get_fmpz_mat_rowwise(Aclear, NULL, A);
     fmpz_init(den);
 
-    rank = fmpz_mat_rref(Aclear, den, NULL, Aclear);
+    rank = fmpz_mat_rref(Aclear, den, Aclear);
 
     if (rank == 0)
         fmpq_mat_zero(B);

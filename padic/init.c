@@ -19,20 +19,23 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
  
 ******************************************************************************/
 
 #include "padic.h"
 
-void _padic_init(padic_t rop)
+void padic_init(padic_t rop)
 {
     fmpz_init(padic_unit(rop));
-    padic_val(rop) = 0;
+    padic_val(rop)  = 0;
+    padic_prec(rop) = PADIC_DEFAULT_PREC;
 }
 
-void padic_init(padic_t rop, const padic_ctx_t ctx)
+void padic_init2(padic_t rop, long N)
 {
-    _padic_init(rop);
+    fmpz_init(padic_unit(rop));
+    padic_val(rop)  = 0;
+    padic_prec(rop) = N;
 }
 

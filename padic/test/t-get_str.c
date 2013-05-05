@@ -19,18 +19,13 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2012 Sebastian Pancratz
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <mpir.h>
-#include "flint.h"
 #include "ulong_extras.h"
 #include "long_extras.h"
-#include "fmpq.h"
 #include "padic.h"
 
 int
@@ -55,18 +50,18 @@ main(void)
 
         char *s, *t;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 5, 1));
-        N = z_randint(state, 50) + 1;
-        padic_ctx_init(ctx, p, N, PADIC_TERSE);
+        fmpz_init_set_ui(p, n_randtest_prime(state, 0));
+        N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
+            + PADIC_TEST_PREC_MIN;
+        padic_ctx_init(ctx, p, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), PADIC_TERSE);
 
-        padic_init(x, ctx);
+        padic_init2(x, N);
         fmpq_init(y);
 
         padic_randtest(x, state, ctx);
-        _padic_get_fmpq(y, x, ctx);
+        padic_get_fmpq(y, x, ctx);
 
-        s = _padic_get_str(NULL, x, ctx);
+        s = padic_get_str(NULL, x, ctx);
         t = fmpq_get_str(NULL, 10, y);
 
         result = strcmp(s, t) == 0;
@@ -74,15 +69,16 @@ main(void)
         {
             printf("FAIL:\n\n");
             printf("x = "), padic_print(x, ctx), printf("\n");
-            printf("y = "), fmpq_clear(y), printf("\n");
+            printf("y = "), fmpq_print(y), printf("\n");
             abort();
         }
 
         free(s);
         free(t);
-        _padic_clear(x);
+        padic_clear(x);
         fmpq_clear(y);
         padic_ctx_clear(ctx);
+        fmpz_clear(p);
     }
 
     flint_randclear(state);

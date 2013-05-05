@@ -32,10 +32,10 @@
 #include "fmpq_mat.h"
 
 long
-fmpq_mat_rref(long * perm, fmpq_mat_t B, const fmpq_mat_t A)
+fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 {
     if (A->r <= 2 || A->c <= 2)
-        return fmpq_mat_rref_classical(perm, B, A);
+        return fmpq_mat_rref_classical(B, A);
     else
-        return fmpq_mat_rref_fraction_free(perm, B, A);
+        return fmpq_mat_rref_fraction_free(B, A);
 }

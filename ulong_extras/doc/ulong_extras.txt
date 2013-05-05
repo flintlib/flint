@@ -279,12 +279,35 @@ mp_limb_t n_mulmod_precomp(mp_limb_t a, mp_limb_t b, mp_limb_t n, double ninv)
     computed integer quotient is at most two above and one below the quotient 
     we are after.
 
-n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, mp_limb_t ninv)
+mp_limb_t n_mulmod2_preinv(mp_limb_t a, mp_limb_t b, 
+                                           mp_limb_t n, mp_limb_t ninv)
 
     Returns $a b \bmod{n}$ given a precomputed inverse of $n$ computed by\\ 
     \code{n_preinvert_limb()}. There are no restrictions on $a$, $b$ or 
     on $n$. This is implemented by multiplying using \code{umul_ppmm()} and 
     then reducing using \code{n_ll_mod_preinv()}.
+
+mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n, 
+                                            mp_limb_t ninv, ulong norm)
+
+    Returns $a b \pmod{n}$ given a precomputed inverse of $n$ computed by\\ 
+    \code{n_preinvert_limb()}, assuming $a$ and $b$ are reduced modulo $n$ 
+    and $n$ is normalised, i.e. with most significant bit set. There are 
+    no other restrictions on $a$, $b$ or $n$.
+
+    The value \code{norm} is provided for convenience. As $n$ is required
+    to be normalised, it may be that $a$ and $b$ have been shifted to the
+    left by \code{norm} bits before calling the function. Their product
+    then has an extra factor of $2^\mbox{norm}$. Specifying a nonzero
+    \code{norm} will shift the product right by this many bits before
+    reducing it.
+
+    The algorithm use is that of Granlund and M\"oller~\citep{GraMol2010}.
+
+    % Torbjorn Granlund and Niels Moller
+    % Improved Division by Invariant Integers
+    % http://www.lysator.liu.se/~nisse/archive/draft-division-paper.pdf
+
 
 *******************************************************************************
 
@@ -498,33 +521,46 @@ long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
 *******************************************************************************
 
+void n_primes_init(n_primes_t iter)
+
+    Initialises the prime number iterator \code{iter} for use.
+
+void n_primes_clear(n_primes_t iter)
+
+    Clears memory allocated by the prime number iterator \code{iter}.
+
+mp_limb_t n_primes_next(n_primes_t iter)
+
+    Returns the next prime number and advances the state of \code{iter}.
+    The first call returns 2.
+
+    Small primes are looked up from \code{flint_small_primes}.
+    When this table is exhausted, primes are generated in blocks
+    by calling \code{n_primes_sieve_range}.
+
+void n_primes_jump_after(n_primes_t iter, mp_limb_t n)
+
+    Changes the state of \code{iter} to start generating primes
+    after $n$ (excluding $n$ itself).
+
+void n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
+
+    Extends the table of small primes in \code{iter} to contain
+    at least two primes larger than or equal to \code{bound}.
+
+void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
+
+    Sets the block endpoints of \code{iter} to the smallest and
+    largest odd numbers between $a$ and $b$ inclusive, and
+    sieves to mark all odd primes in this range.
+    The iterator state is changed to point to the first
+    number in the sieved range.
+
 void n_compute_primes(ulong num_primes)
 
     Precomputes \code{num_primes} primes and their \code{double} 
     precomputed inverses and stores them in \code{flint_primes} 
     and \code{flint_prime_inverse}, respectively.
-
-    The algorithm is a simple sieve of Eratosthenes with the 
-    constant array of primes \code{flint_small_primes} as a starting 
-    point.
-
-    The sieve works by marking all multiples of small primes in
-    the sieve, but the sieve does not contain entries for numbers
-    below the current cutoff (in case the function may have already 
-    been called before). 
-
-    One only needs to start sieving with $p^2$ as all smaller multiples 
-    of $p$ have already been marked off. 
-
-    At first $p^2$ may be less than the start of the sieve (the old 
-    cutoff), so this case is dealt with separately, but for all 
-    primes $p$ beyond that all multiples of $p$ starting at $p^2$ are 
-    marked off in the sieve.
-
-    As the small prime cutoff is currently $1030$, primes can be 
-    computed up to almost $n = 2^{20}$, in fact 
-    $\floor{n / \log_2(n) \times 0.7} = 74898$ primes which actually 
-    takes us to $949937$.
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
@@ -1045,6 +1081,19 @@ mp_limb_t n_factor_partial(n_factor_t * factors,
 
     The factors are proved prime if \code{proved} is $1$, otherwise
     they are merely probably prime.
+
+mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
+
+    Factors $n$ using Williams' $p + 1$ factoring algorithm, with prime
+    limit set to $B1$. We require $c$ to be set to a random value. Each
+    trial of the algorithm with a different value of $c$ gives another
+    chance to factor $n$, with roughly exponentially decreasing chance
+    of finding a missing factor. If $p + 1$ (or $p - 1$) is not smooth
+    for any factor $p$ of $n$, the algorithm will never succeed. The
+    value $c$ should be less than $n$ and greater than $2$.
+
+    If the algorithm succeeds, it returns the factor, otherwise it
+    returns $0$ or $1$ (the trivial factors modulo $n$).
 
 *******************************************************************************
 

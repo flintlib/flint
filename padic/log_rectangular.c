@@ -29,8 +29,6 @@
 #include "padic.h"
 #include "ulong_extras.h"
 
-extern long _padic_log_bound(long v, long N, long p);
-
 /*
     Carries out the finite series evaluation for the logarithm 
     \begin{equation*}
@@ -141,31 +139,9 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
     }
 }
 
-/*
-    Computes 
-    \begin{equation*}
-    z = - \sum_{i = 1}^{\infty} \frac{y^i}{i} \pmod{p^N}.
-    \end{equation*}
-
-    Note that this can be used to compute the $p$-adic logarithm 
-    via the equation 
-    \begin{align*}
-    \log(x) & = \sum_{i=1}^{\infty} (-1)^{i-1} \frac{(x-1)^i}{i} \\
-            & = - \sum_{i=1}^{\infty} \frac{(1-x)^i}{i}.
-    \end{align*}
-
-    Assumes that $y = 1 - x$ is non-zero and that $v = \ord_p(y)$ 
-    is at least $1$ when $p$ is odd and at least $2$ when $p = 2$ 
-    so that the series converges.
-
-    Assumes that $v < N$.
-
-    Does not support aliasing between $y$ and $z$.
- */
 void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 {
-    const long q = fmpz_get_si(p);
-    const long n = _padic_log_bound(v, N, q) - 1;
+    const long n = _padic_log_bound(v, N, p) - 1;
     fmpz_t pN;
 
     fmpz_init(pN);
@@ -179,6 +155,9 @@ void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, lo
 
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
+    const fmpz *p = ctx->p;
+    const long N  = padic_prec(rop);
+
     if (padic_val(op) < 0)
     {
         return 0;
@@ -205,18 +184,18 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
             long v;
 
             fmpz_init(t);
-            v = fmpz_remove(t, x, ctx->p);
+            v = fmpz_remove(t, x, p);
             fmpz_clear(t);
 
-            if (v >= 2 || (*(ctx->p) != 2L && v >= 1))
+            if (v >= 2 || (!fmpz_equal_ui(p, 2) && v >= 1))
             {
-                if (v >= ctx->N)
+                if (v >= N)
                 {
                     padic_zero(rop);
                 }
                 else
                 {
-                    _padic_log_rectangular(padic_unit(rop), x, v, ctx->p, ctx->N);
+                    _padic_log_rectangular(padic_unit(rop), x, v, p, N);
                     padic_val(rop) = 0;
                     _padic_canonicalise(rop, ctx);
                 }

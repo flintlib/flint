@@ -76,8 +76,8 @@ nmod_poly_pow_trunc(nmod_poly_t res,
     if (poly->length < trunc)
     {
         p = _nmod_vec_init(trunc);
-        mpn_copyi(p, poly->coeffs, poly->length);
-        mpn_zero(p + poly->length, trunc - poly->length);
+        flint_mpn_copyi(p, poly->coeffs, poly->length);
+        flint_mpn_zero(p + poly->length, trunc - poly->length);
         pcopy = 1;
     } else
         p = poly->coeffs;

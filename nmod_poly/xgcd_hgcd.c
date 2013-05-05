@@ -235,8 +235,8 @@ long _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
         }
         _nmod_vec_clear(q);
     }
-    mpn_zero(S + lenS, lenB - 1 - lenS);
-    mpn_zero(T + lenT, lenA - 1 - lenT);
+    flint_mpn_zero(S + lenS, lenB - 1 - lenS);
+    flint_mpn_zero(T + lenT, lenA - 1 - lenT);
 
     return lenG;
 }

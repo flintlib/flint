@@ -90,7 +90,7 @@ fmpz_poly_div_basecase(fmpz_poly_t Q,
     
     if (B->length == 0)
     {
-        printf("Exception: division by zero in fmpz_poly_div_basecase\n");
+        printf("Exception (fmpz_poly_div_basecase). Division by zero.\n");
         abort();
     }
     if (A->length < B->length)

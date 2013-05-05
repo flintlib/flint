@@ -49,42 +49,13 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
         long *e, i, n;
         fmpz *W, *pow, *u;
 
-        n = FLINT_CLOG2(N) + 1;
-
-        /* Compute sequence of exponents */
-        e = flint_malloc(n * sizeof(long));
-
-        for (e[i = 0] = N; e[i] > 1; i++)
-            e[i + 1] = (e[i] + 1) / 2;
+        e = _padic_lifts_exps(&n, N);
 
         W   = _fmpz_vec_init(2 + 2 * n);
         pow = W + 2;
         u   = W + (2 + n);
 
-        /* Compute powers of p */
-        {
-            fmpz_one(W);
-            fmpz_set(pow + i, p);
-        }
-        for (i--; i >= 1; i--)
-        {
-            if (e[i] & 1L)
-            {
-                fmpz_mul(pow + i, W, pow + (i + 1));
-                fmpz_mul(W, W, W);
-            }
-            else
-            {
-                fmpz_mul(W, W, pow + (i + 1));
-                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-            }
-        }
-        {
-            if (e[i] & 1L)
-                fmpz_mul(pow + i, W, pow + (i + 1));
-            else
-                fmpz_mul(pow + i, pow + (i + 1), pow + (i + 1));
-        }
+        _padic_lifts_pows(pow, e, n, p);
 
         /* Compute reduced units */
         {
@@ -219,7 +190,7 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, long N)
 
 int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 {
-    if (*p == 2L)
+    if (fmpz_equal_ui(p, 2))
     {
         return _padic_sqrt_2(rop, op, N);
     }
@@ -231,7 +202,7 @@ int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
 
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    if (_padic_is_zero(op))
+    if (padic_is_zero(op))
     {
         padic_zero(rop);
         return 1;
@@ -248,11 +219,11 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         zero modulo $p^N$.  We only have to establish whether 
         or not the element \code{op} is a square.
      */
-    if (padic_val(rop) >= ctx->N)
+    if (padic_val(rop) >= padic_prec(rop))
     {
         int ans;
 
-        if (*(ctx->p) == 2L)
+        if (fmpz_equal_ui(ctx->p, 2))
         {
             ans = (fmpz_fdiv_ui(padic_unit(op), 8) == 1);
         }
@@ -266,6 +237,6 @@ int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx)
     }
 
     return _padic_sqrt(padic_unit(rop), 
-                       padic_unit(op), ctx->p, ctx->N - padic_val(rop));
+                       padic_unit(op), ctx->p, padic_prec(rop) - padic_val(rop));
 }
 

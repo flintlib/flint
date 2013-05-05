@@ -51,8 +51,9 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
         return;
     }
 
-    prec = arith_bernoulli_number_size(n) + fmpz_bits(den) + 10;
-    pi_prec = prec + FLINT_BIT_COUNT(n);
+    prec = arith_bernoulli_number_size(n) + fmpz_bits(den);
+    prec += 10 + 2*FLINT_BIT_COUNT(n);
+    pi_prec = prec;
 
     mpz_init(r);
     mpfr_init2(t, prec);
@@ -89,3 +90,4 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
     mpfr_clear(z);
     mpfr_clear(pi);
 }
+

@@ -169,7 +169,7 @@ void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod);
 static __inline__
 void _nmod_vec_zero(mp_ptr vec, long len)
 {
-   mpn_zero(vec, len);
+   flint_mpn_zero(vec, len);
 }
 
 mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len);
@@ -177,7 +177,7 @@ mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len);
 static __inline__
 void _nmod_vec_set(mp_ptr res, mp_srcptr vec, long len)
 {
-   mpn_copyi(res, vec, len);
+   flint_mpn_copyi(res, vec, len);
 }
 
 static __inline__
@@ -251,10 +251,21 @@ int _nmod_vec_dot_bound_limbs(long len, nmod_t mod);
                 NMOD_RED(s0, s0, mod);                                      \
                 break;                                                      \
             case 2:                                                         \
-                for (i = 0; i < len; i++)                                   \
+                if (mod.n <= (1UL << (FLINT_BITS / 2)))                     \
                 {                                                           \
-                    umul_ppmm(t1, t0, (expr1), (expr2));                    \
-                    add_ssaaaa(s1, s0, s1, s0, t1, t0);                     \
+                    for (i = 0; i < len; i++)                               \
+                    {                                                       \
+                        t0 = (expr1) * (expr2);                             \
+                        add_ssaaaa(s1, s0, s1, s0, 0, t0);                  \
+                    }                                                       \
+                }                                                           \
+                else                                                        \
+                {                                                           \
+                    for (i = 0; i < len; i++)                               \
+                    {                                                       \
+                        umul_ppmm(t1, t0, (expr1), (expr2));                \
+                        add_ssaaaa(s1, s0, s1, s0, t1, t0);                 \
+                    }                                                       \
                 }                                                           \
                 NMOD2_RED2(s0, s1, s0, mod);                                \
                 break;                                                      \

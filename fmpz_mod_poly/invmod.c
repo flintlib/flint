@@ -64,7 +64,7 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
 
     if (lenP < 2)
     {
-        printf("Exception (fmpz_mod_poly_invmod).  lenP < 2.\n");
+        printf("Exception (fmpz_mod_poly_invmod). lenP < 2.\n");
         abort();
     }
     if (lenB == 0)

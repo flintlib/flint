@@ -49,7 +49,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len,
         str = flint_malloc(2);
         if (!str)
         {
-            printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
             abort();
         }
         str[0] = '0';
@@ -89,7 +89,7 @@ char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, long len,
         str   = flint_malloc(size);
         if (!str)
         {
-            printf("Exception: malloc failed in fmpq_poly_to_string_pretty\n");
+            printf("Exception (fmpq_poly_get_str_pretty). malloc failed.\n");
             abort();
         }
 
