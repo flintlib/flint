@@ -202,11 +202,11 @@ int qfb_is_primitive(qfb_t f)
 
 void qfb_prime_form(qfb_t r, fmpz_t D, fmpz_t p);
 
-int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, long iters);
+int qfb_exponent_element(fmpz_t exponent, qfb_t f, fmpz_t n, ulong B1);
 
-int qfb_exponent(fmpz_t exponent, fmpz_t n, long iters, long c);
+int qfb_exponent(fmpz_t exponent, fmpz_t n, ulong B1, long c);
 
-int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, long iters);
+int qfb_exponent_grh(fmpz_t exponent, fmpz_t n, ulong B1);
 
 #ifdef __cplusplus
 }

@@ -201,7 +201,8 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
    int ret = 0;
    mp_size_t nn = fmpz_size(n_in), r;
    mp_ptr x, y, oldx, oldy, n, ninv, factor, ptr_0, ptr_1, ptr_2, ptr_k;
-   ulong pr, oldpr, sqrt, bits0, norm;
+   ulong pr, oldpr, sqrt, norm;
+   mp_bitcnt_t bits0;
    n_primes_t iter;
 
    if (fmpz_is_even(n_in))
