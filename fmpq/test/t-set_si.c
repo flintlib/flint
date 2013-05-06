@@ -23,37 +23,65 @@
 
 ******************************************************************************/
 
-#include <limits.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <mpir.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpq.h"
+#include "fmpz_vec.h"
 #include "ulong_extras.h"
+#include "long_extras.h"
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
+int
+main(void)
 {
-    if (q == 1 || p == 0)
-    {
-        fmpz_set_si(rnum, p);
-        fmpz_one(rden);
-    }
-    else
-    {
-        ulong r = n_gcd_full(p < 0 ? (-(ulong) p) : (ulong) p, q);
+    int i;
+    flint_rand_t state;
+    flint_randinit(state);
 
-        if (p < 0)
+    printf("set_si....");
+    fflush(stdout);
+
+    for (i = 0; i < 10000; i++)
+    {
+        fmpq_t x, y;
+        fmpz_t p, q;
+        long P, Q;
+
+        fmpq_init(x);
+        fmpq_init(y);
+        fmpz_init(p);
+        fmpz_init(q);
+
+        P = z_randtest(state);
+        Q = n_randtest_not_zero(state);
+
+        fmpz_set_si(p, P);
+        fmpz_set_ui(q, Q);
+
+        fmpq_set_fmpz_frac(x, p, q);
+        fmpq_set_si(y, P, Q);
+
+        if (!fmpq_is_canonical(y) || !fmpq_equal(x, y))
         {
-            fmpz_set_ui(rnum, (-(ulong) p) / r);
-            fmpz_neg(rnum, rnum);
+            printf("FAIL");
+            printf("p: "); fmpz_print(p); printf("\n"); 
+            printf("q: "); fmpz_print(q); printf("\n"); 
+            printf("x: "); fmpq_print(x); printf("\n"); 
+            printf("y: "); fmpq_print(y); printf("\n"); 
+            abort();
         }
-        else
-            fmpz_set_si(rnum, p / r);
 
-        fmpz_set_ui(rden, q / r);
+        fmpq_clear(x);
+        fmpq_clear(y);
+        fmpz_clear(p);
+        fmpz_clear(q);
     }
-}
 
-void fmpq_set_si(fmpq_t res, long p, ulong q)
-{
-    _fmpq_set_si(&res->num, &res->den, p, q);
+    flint_randclear(state);
+
+    _fmpz_cleanup();
+    printf("PASS\n");
+    return 0;
 }
