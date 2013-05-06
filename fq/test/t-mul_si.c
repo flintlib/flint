@@ -124,8 +124,6 @@ main(void)
         fq_ctx_clear(ctx);
     }
 
-
-
     flint_randclear(state);
     _fmpz_cleanup();
     printf("PASS\n");
