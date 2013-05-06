@@ -28,7 +28,6 @@
 long _fq_poly_hamming_weight(const fq_struct *op, long len)
 {
     long i, sum = 0;
-
     for (i = 0; i < len; i++)
         sum += !fq_is_zero(op + i);
 
@@ -37,6 +36,7 @@ long _fq_poly_hamming_weight(const fq_struct *op, long len)
 
 long fq_poly_hamming_weight(const fq_poly_t op)
 {
-    return _fq_poly_hamming_weight(op->length, op->length);
+  
+    return _fq_poly_hamming_weight(op->coeffs, op->length);
 }
 
