@@ -28,7 +28,7 @@
 #ifndef FMPQ_POLY_H
 #define FMPQ_POLY_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "fmpz.h"
 #include "fmpq.h"
 #include "fmpz_vec.h"

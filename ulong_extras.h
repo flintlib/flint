@@ -29,7 +29,7 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus

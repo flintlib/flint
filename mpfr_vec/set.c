@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "mpfr_vec.h"

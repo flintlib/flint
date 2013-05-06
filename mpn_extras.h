@@ -26,7 +26,7 @@
 #ifndef MPN_EXTRAS_H
 #define MPN_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -53,7 +53,7 @@
         (bn) = __tn;           \
     } while (0)
 
-/* Not defined in mpir.h
+/* Not defined in gmp.h
 mp_limb_t  __gmpn_modexact_1_odd(mp_srcptr src, mp_size_t size,
                                  mp_limb_t divisor);
 #define mpn_modexact_1_odd __gmpn_modexact_1_odd

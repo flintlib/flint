@@ -25,7 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_mat.h"
 #include "nmod_vec.h"

@@ -27,7 +27,7 @@
 #ifndef FMPZ_VEC_H
 #define FMPZ_VEC_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "fmpz.h"
 
 #ifdef __cplusplus

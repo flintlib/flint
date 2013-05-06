@@ -26,7 +26,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "arith.h"
 #include "fmpz.h"

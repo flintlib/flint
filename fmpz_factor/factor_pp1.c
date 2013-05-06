@@ -26,7 +26,7 @@
 #undef ulong /* avoid clash with stdlib */
 #include <string.h>
 #define ulong unsigned long
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"

@@ -26,7 +26,7 @@
 #ifndef LONG_EXTRAS_H
 #define LONG_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus

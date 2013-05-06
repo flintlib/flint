@@ -26,7 +26,7 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "longlong.h"
 #include "config.h"

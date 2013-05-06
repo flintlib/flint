@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #define ulong unsigned long
 
-#include <mpir.h>
+#include <gmp.h>
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "flint.h"

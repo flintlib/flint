@@ -26,7 +26,7 @@
 #ifndef QSIEVE_H
 #define QSIEVE_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 

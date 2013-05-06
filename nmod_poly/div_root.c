@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_vec.h"
 #include "nmod_poly.h"

@@ -26,7 +26,7 @@
 #ifndef MFPR_VEC_H
 #define MPFR_VEC_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h> 
 
 #ifdef __cplusplus

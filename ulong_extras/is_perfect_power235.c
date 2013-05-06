@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #undef ulong /* prevent clash with standard library */
 #include <math.h>
 #define ulong unsigned long

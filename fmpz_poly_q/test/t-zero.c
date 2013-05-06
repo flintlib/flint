@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "fmpz_poly_q.h"
 #include "ulong_extras.h"

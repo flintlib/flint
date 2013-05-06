@@ -6,7 +6,7 @@
 # (C) 2012, Jan Engelhardt
 
 PREFIX="/usr/local"
-MPIR_DIR="/usr/local"
+GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
 BLAS_DIR="/usr/local"
@@ -25,7 +25,7 @@ usage()
    echo "   where <options> may be"
    echo "     -h display usage information"
    echo "   where <args> may be:"
-   echo "     --with-mpir=<path> Specify location of MPIR"
+   echo "     --with-gmp=<path> Specify location of GMP"
    echo "     --with-mpfr=<path> Specify location of MPFR"
    echo "     --with-blas=<path> Specify location of BLAS"
    echo "     --with-ntl=<path>  Specify location of NTL and build NTL interface"
@@ -49,8 +49,8 @@ while [ "$1" != "" ]; do
       -h) usage
          exit 0
          ;;
-      --with-mpir)
-         MPIR_DIR="$VALUE"
+      --with-gmp)
+         GMP_DIR="$VALUE"
          ;;
       --with-mpfr)
          MPFR_DIR="$VALUE"
@@ -105,17 +105,17 @@ done
 
 #find dependencies
 
-if [ -d "${MPIR_DIR}/lib" ]; then
-   MPIR_LIB_DIR="${MPIR_DIR}/lib"
-   MPIR_INCLUDE_DIR="${MPIR_DIR}/include"
-elif [ -d "${MPIR_DIR}/lib64" ]; then
-   MPIR_LIB_DIR="${MPIR_DIR}/lib64"
-   MPIR_INCLUDE_DIR="${MPIR_DIR}/include"
-elif [ -d "${MPIR_DIR}/.libs" ]; then
-   MPIR_LIB_DIR="${MPIR_DIR}/.libs"
-   MPIR_INCLUDE_DIR="${MPIR_DIR}"
+if [ -d "${GMP_DIR}/lib" ]; then
+   GMP_LIB_DIR="${GMP_DIR}/lib"
+   GMP_INCLUDE_DIR="${GMP_DIR}/include"
+elif [ -d "${GMP_DIR}/lib64" ]; then
+   GMP_LIB_DIR="${GMP_DIR}/lib64"
+   GMP_INCLUDE_DIR="${GMP_DIR}/include"
+elif [ -d "${GMP_DIR}/.libs" ]; then
+   GMP_LIB_DIR="${GMP_DIR}/.libs"
+   GMP_INCLUDE_DIR="${GMP_DIR}"
 else
-   echo "Invalid MPIR directory"
+   echo "Invalid GMP directory"
    exit 1
 fi
 
@@ -414,8 +414,8 @@ echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile
 echo "EXTRA_LIBS=$EXTRA_LIBS" >> Makefile
-echo "FLINT_MPIR_LIB_DIR=$MPIR_LIB_DIR" >> Makefile
-echo "FLINT_MPIR_INCLUDE_DIR=$MPIR_INCLUDE_DIR" >> Makefile
+echo "FLINT_GMP_LIB_DIR=$GMP_LIB_DIR" >> Makefile
+echo "FLINT_GMP_INCLUDE_DIR=$GMP_INCLUDE_DIR" >> Makefile
 echo "FLINT_BLAS_LIB_DIR=$BLAS_LIB_DIR" >> Makefile
 echo "FLINT_BLAS_INCLUDE_DIR=$BLAS_INCLUDE_DIR" >> Makefile
 echo "FLINT_MPFR_LIB_DIR=$MPFR_LIB_DIR" >> Makefile
@@ -432,15 +432,15 @@ echo "PICFLAG=$PICFLAG" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 case "$OS" in
    MINGW*)
-      echo "PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
+      echo "PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
    Darwin)
-      echo "DYLD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
+      echo "DYLD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
    sparc)
-      echo "LD_LIBRARY_PATH32+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
+      echo "LD_LIBRARY_PATH32+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
    sparc64)
-      echo "LD_LIBRARY_PATH64+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
+      echo "LD_LIBRARY_PATH64+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
    *)
-      echo "LD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_MPIR_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
+      echo "LD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
 esac
 echo "" >> Makefile
 
