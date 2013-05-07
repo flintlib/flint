@@ -187,19 +187,14 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #endif
 
 #ifndef mpn_tdiv_q
-void
-mpn_div_q (mp_ptr qp,
-	   mp_srcptr np, mp_size_t nn,
-	   mp_srcptr dp, mp_size_t dn, mp_ptr scratch);
-
-
 static __inline__
 void mpn_tdiv_q(mp_ptr qp,
 	   mp_srcptr np, mp_size_t nn,
 	   mp_srcptr dp, mp_size_t dn)
     {
-    mp_ptr scratch = flint_malloc((nn+1)*sizeof(mp_limb_t));
-    mpn_div_q(qp, np, nn, dp, dn, scratch);
+    mp_ptr _scratch = flint_malloc(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    flint_free(_scratch);
     }
 #endif
 
