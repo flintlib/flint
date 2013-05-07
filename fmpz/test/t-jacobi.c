@@ -55,7 +55,11 @@ main(void)
         mpz_init(q);
 
         mpz_rrandomb(q, state->gmp_state, n_randint(state, 200) + 1);
+#ifdef mpz_next_likely_prime
         mpz_next_likely_prime(q, q, state->gmp_state);
+#else
+        mpz_nextprime(q, q);
+#endif
         fmpz_set_mpz(p, q);
 
         mpz_rrandomb(b, state->gmp_state, n_randint(state, 200) + 1);
