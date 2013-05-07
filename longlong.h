@@ -32,6 +32,10 @@
  extern "C" {
 #endif
 
+#ifndef __GMP_BITS_PER_MP_LIMB
+#define __GMP_BITS_PER_MP_LIMB GMP_LIMB_BITS
+#endif
+
 /* x86 : 64 bit */
 #if (__GMP_BITS_PER_MP_LIMB == 64 && defined (__amd64__)) 
 
