@@ -177,6 +177,16 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
          (xxx)[ixxx] = yyy; \
    } while (0)
 
+/* compatibility between gmp and mpir */
+#ifndef mpn_com_n
+#define mpn_com_n mpn_com
+#endif
+
+#ifndef mpn_neg_n
+#define mpn_neg_n mpn_neg
+#endif
+
+
 #ifdef __cplusplus
 }
 #endif
