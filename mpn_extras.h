@@ -208,6 +208,9 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
         mp_srcptr a, mp_srcptr b, mp_size_t n, 
         mp_srcptr d, mp_srcptr dinv, ulong norm);
 
+int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
+    mp_bitcnt_t b, mp_ptr tp);
+
 #ifdef __cplusplus
 }
 #endif
