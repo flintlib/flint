@@ -221,10 +221,10 @@ case "$ARCH" in
       MACHINE="sparc";;
    sparc64)
       MACHINE="sparc64";;
-   ppc | powerpc | [P|p]ower*)
-      MACHINE="ppc";;
    ppc64 | powerpc64)
       MACHINE="ppc64";;
+   ppc | powerpc | [P|p]ower*)
+      MACHINE="ppc";;
    *)
       MACHINE="unknown";;
 esac
