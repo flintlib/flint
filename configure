@@ -25,7 +25,7 @@ usage()
    echo "   where <options> may be"
    echo "     -h display usage information"
    echo "   where <args> may be:"
-   echo "     --with-gmp=<path> Specify location of GMP"
+   echo "     --with-gmp=<path>  Specify location of GMP"
    echo "     --with-mpfr=<path> Specify location of MPFR"
    echo "     --with-blas=<path> Specify location of BLAS"
    echo "     --with-ntl=<path>  Specify location of NTL and build NTL interface"

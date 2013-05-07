@@ -289,8 +289,9 @@ Johansson, Andy Novocin and David Harvey (no longer active).
 FLINT 2 and following should compile on any machine with GCC and a standard 
 GNU toolchain, however it is specially optimised for x86 (32 and 64 bit)
 machines. There is also limited optimisation for ARM and ia64 machines. As 
-of version 2.0, FLINT required GCC version 2.96 or later, MPIR 2.6.0 or 
-later and MPFR 3.0.0 or later. It is also required that the platform 
+of version 2.0, FLINT required GCC version 2.96 or later, either MPIR
+(2.6.0 or later) or GMP (5.1.1 or later), and MPFR 3.0.0 or later.
+It is also required that the platform 
 provide a \code{uint64_t} type if a native 64 bit type is not available. 
 Full C99 compliance is \textbf{not} required.
 
@@ -307,12 +308,15 @@ file \code{fmpz_poly/test/t-add.c}.
 The easiest way to use FLINT is to build a shared library.  Simply download 
 the FLINT tarball and untar it on your system.
 
-FLINT requires MPIR version 2.6.0 or later and MPFR 3.0.0 or later and
-a pthread implementation. Some of the input/output tests require 
+FLINT requires either MPIR (version 2.6.0 or later) or GMP
+(version 5.1.1 or later). If MPIR is used, MPIR must be built with
+the \code{--enable-gmpcompat} option. FLINT also requires
+MPFR 3.0.0 or later and a pthread implementation.
+Some of the input/output tests require 
 \code{fork} and \code{pipe}, however these are disabled on MinGW which
 does not provide a posix implementation.
 
-To configure FLINT you must specify where MPIR and MPFR are on
+To configure FLINT you must specify where GMP/MPIR and MPFR are on
 your system. FLINT can work with the libraries installed as usual,
 e.g. in \code{/usr/local} or it can work with the libraries built
 from source in their standard source trees. 
@@ -387,7 +391,7 @@ make install
 
 Now to use FLINT, simply include the appropriate header files for 
 the FLINT modules you wish to use in your C program.  Then compile 
-your program, linking against the FLINT library, MPIR, MPFR and
+your program, linking against the FLINT library, GMP/MPIR, MPFR and
 pthreads with the options \code{-lflint -lmpfr -lgmp -lpthread}.
 
 Note that you may have to set \code{LD_LIBRARY_PATH} or equivalent
@@ -454,12 +458,12 @@ email with your bug report to \url{hart_wb@yahoo.com} or report them on the
 FLINT devel list \url{https://groups.google.com/group/flint-devel?hl=en}.
 
 If possible please include details of your system, the version of GCC, 
-the versions of MPIR and MPFR as well as precise details of how to 
+the versions of GMP/MPIR and MPFR as well as precise details of how to 
 replicate the bug.
 
-Note that FLINT needs to be linked against version 2.6.0 or later of MPIR,
-version 3.0.0 or later of MPFR and must be compiled with gcc version 2.96 
-or later.  
+Note that FLINT needs to be linked against version 2.6.0 or later of MPIR
+(or version 5.1.1 or later of GMP), version 3.0.0 or later of MPFR and
+must be compiled with gcc version 2.96 or later.  
 
 \chapter{Contributors}
 
