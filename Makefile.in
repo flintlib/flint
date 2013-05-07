@@ -56,12 +56,12 @@ dist:
 
 profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(PROFS), $(CC) $(CFLAGS) $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
 
 tune: $(FLINT_LIB) $(TUNE_SOURCES)
 	mkdir -p build/tune
-	$(foreach prog, $(TUNE), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) tune || exit $$?;)
 
 examples: $(FLINT_LIB) $(EXMP_SOURCES)
