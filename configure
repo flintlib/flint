@@ -17,7 +17,6 @@ STATIC=1
 TLS=1
 REENTRANT=0
 BUILD=
-ABI=
 
 usage()
 {
