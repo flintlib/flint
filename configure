@@ -256,12 +256,7 @@ echo "Configuring...${MACHINE}-${OS}"
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
-         case "$MACHINE" in
-            *64)
-               FLINT_LIB="libflint.dylib64";;
-            *)
-               FLINT_LIB="libflint.dylib";;
-         esac;;
+         FLINT_LIB="libflint.dylib";;
       CYGWIN | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
