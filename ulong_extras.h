@@ -29,7 +29,7 @@
 #ifndef ULONG_EXTRAS_H
 #define ULONG_EXTRAS_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 
 #ifdef __cplusplus
@@ -243,6 +243,15 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a,
 long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
 
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
+
+static __inline__ mp_limb_t
+n_gcd_full(mp_limb_t x, mp_limb_t y)
+{
+    if (x >= y)
+        return n_gcd(x, y);
+    else
+        return n_gcd(y, x);
+}
 
 mp_limb_t n_xgcd(mp_limb_t * a, mp_limb_t * b, mp_limb_t x, mp_limb_t y);
 

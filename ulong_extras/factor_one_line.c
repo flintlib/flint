@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 
@@ -47,8 +47,7 @@ mp_limb_t n_factor_one_line(mp_limb_t n, ulong iters)
         {
             factor = n_sqrt(mod);
             sqrti -= factor;
-            if (orig_n >= sqrti) factor = n_gcd(orig_n, sqrti); 
-            else factor = n_gcd(sqrti, orig_n);
+            factor = n_gcd_full(orig_n, sqrti);
             if (factor != 1UL) 
             { 
                 return factor;

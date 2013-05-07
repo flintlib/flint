@@ -32,7 +32,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz_mod_poly.h"

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "arith.h"

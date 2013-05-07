@@ -4,9 +4,9 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
    fmpz_factor fmpz_poly_factor fft qsieve double_extras
 
-LIBS=-L$(CURDIR) -L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
-LIBS2=-L$(FLINT_MPIR_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lmpir -lm -lpthread
-INCS=-I$(CURDIR) -I$(FLINT_MPIR_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR) -I$(FLINT_BLAS_INCLUDE_DIR)
+LIBS=-L$(CURDIR) -L$(FLINT_GMP_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lgmp -lm -lpthread
+LIBS2=-L$(FLINT_GMP_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lgmp -lm -lpthread
+INCS=-I$(CURDIR) -I$(FLINT_GMP_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR) -I$(FLINT_BLAS_INCLUDE_DIR)
 
 export
 

@@ -30,7 +30,7 @@ or implied, of William Hart.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fft.h"
@@ -64,7 +64,7 @@ main(void)
         for (j = 0; j < length; j++)
            poly[j] = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
 
-        mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
+        flint_mpn_urandomb(in, state->gmp_state, total_limbs*FLINT_BITS);
 
         fft_split_bits(poly, in, total_limbs, bits, limbs);
         fft_combine_bits(out, poly, length, bits, limbs, total_limbs);

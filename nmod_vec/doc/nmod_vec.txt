@@ -111,6 +111,28 @@ mp_limb_t nmod_neg(mp_limb_t a, nmod_t mod)
     reduced modulo \code{mod.n}, but no assumptions are made about the 
     latter.
 
+mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+    Returns $ab$ modulo \code{mod.n}. No assumptions are made about 
+    \code{mod.n}. It is assumed that $a$ and $b$ are already reduced 
+    modulo \code{mod.n}.
+
+mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
+
+    Returns $a^{-1}$ modulo \code{mod.n}. The inverse is assumed to exist.
+
+mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
+
+    Returns $a^{-1}$ modulo \code{mod.n}. The inverse of $b$ is assumed to
+    exist. It is assumed that $a$ is already reduced modulo \code{mod.n}.
+
+mp_limb_t nmod_pow_ui(mp_limb_t a, ulong e, nmod_t mod)
+
+    Returns $a^e$ modulo \code{mod.n}. No assumptions are made about 
+    \code{mod.n}. It is assumed that $a$ is already reduced
+    modulo \code{mod.n}.
+
+
 *******************************************************************************
 
     Random functions

@@ -26,7 +26,7 @@
 #ifndef FMPZ_FACTOR_H
 #define FMPZ_FACTOR_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 

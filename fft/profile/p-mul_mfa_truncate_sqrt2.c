@@ -30,7 +30,7 @@ or implied, of William Hart.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fft.h"
@@ -70,8 +70,8 @@ main(void)
        r1 = i2 + int_limbs;
        r2 = r1 + 2*int_limbs;
    
-       mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-       mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+       flint_mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
+       flint_mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
   
        for (j = 0; j < iters; j++)
           mul_mfa_truncate_sqrt2(r1, i1, int_limbs, i2, int_limbs, depth, w);

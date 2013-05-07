@@ -26,7 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"

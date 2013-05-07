@@ -30,7 +30,7 @@
 #include <stdlib.h>
 #define ulong unsigned long
 
-#include <mpir.h>
+#include <gmp.h>
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "flint.h"
@@ -138,10 +138,22 @@ mp_limb_t nmod_mul(mp_limb_t a, mp_limb_t b, nmod_t mod)
 }
 
 static __inline__
+mp_limb_t nmod_inv(mp_limb_t a, nmod_t mod)
+{
+    return n_invmod(a, mod.n);
+}
+
+static __inline__
 mp_limb_t nmod_div(mp_limb_t a, mp_limb_t b, nmod_t mod)
 {
     b = n_invmod(b, mod.n);
     return n_mulmod2_preinv(a, b, mod.n, mod.ninv);
+}
+
+static __inline__
+mp_limb_t nmod_pow_ui(mp_limb_t a, ulong exp, nmod_t mod)
+{
+    return n_powmod2_ui_preinv(a, exp, mod.n, mod.ninv);
 }
 
 static __inline__

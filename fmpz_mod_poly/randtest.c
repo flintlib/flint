@@ -26,10 +26,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
+#include "fmpz_mod_poly_factor.h"
 
 void
 fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, long len)

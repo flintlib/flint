@@ -28,12 +28,13 @@ or implied, of William Hart.
 
 */
 
-#include "mpir.h"
+#include "gmp.h"
 #include "flint.h"
 #include "fft.h"
 #include "longlong.h"
 #include "ulong_extras.h"
 #include "fft_tuning.h"
+#include "mpn_extras.h"
 
 static mp_size_t mulmod_2expp1_table_n[FFT_N_NUM] = MULMOD_TAB;
 
@@ -121,7 +122,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
    {
       if (i1 != i2) mpn_normmod_2expp1(jj[j], limbs);
       c = 2*ii[j][limbs] + jj[j][limbs];
-      ii[j][limbs] = mpn_mulmod_2expp1(ii[j], ii[j], jj[j], c, n*w, tt);
+      ii[j][limbs] = flint_mpn_mulmod_2expp1_basecase(ii[j], ii[j], jj[j], c, n*w, tt);
    }
    
    ifft_negacyclic(ii, n, w, &t1, &t2, &s1);
@@ -203,7 +204,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 
    if (limbs <= FFT_MULMOD_2EXPP1_CUTOFF) 
    {
-      r[limbs] = mpn_mulmod_2expp1(r, i1, i2, c, bits, tt);
+      r[limbs] = flint_mpn_mulmod_2expp1_basecase(r, i1, i2, c, bits, tt);
       return;
    }
    

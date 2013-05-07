@@ -26,7 +26,7 @@
 #ifndef MFPR_POLY_H
 #define MPFR_POLY_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h> 
 #include "flint.h"
 

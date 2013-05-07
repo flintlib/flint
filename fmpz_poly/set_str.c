@@ -27,13 +27,13 @@
 #include <string.h>
 #include <ctype.h>
 #include <math.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-int 
+int
 _fmpz_poly_set_str(fmpz * poly, const char *str)
 {
     char * w;
@@ -47,7 +47,8 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
     if (len == 0)
         return 0;
 
-    while (*str++ != ' ') ;
+    while (*str++ != ' ')
+        ;
 
     /* Find maximal gap between spaces and allocate w */
     {
@@ -68,12 +69,12 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
     {
         char * v;
         int ans;
-        
+
         for (str++, v = w; *str != ' ' && *str != '\0';)
             *v++ = *str++;
         *v = '\0';
         ans = fmpz_set_str(poly++, w, 10);
-        
+
         if (ans)
         {
             flint_free(w);
@@ -101,7 +102,7 @@ fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
         fmpz_poly_zero(poly);
         return 0;
     }
-    
+
     fmpz_poly_fit_length(poly, len);
 
     ans = _fmpz_poly_set_str(poly->coeffs, str);
@@ -116,6 +117,6 @@ fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
         _fmpz_vec_zero(poly->coeffs, len);
         _fmpz_poly_set_length(poly, 0);
     }
-    
+
     return ans;
 }

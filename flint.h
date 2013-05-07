@@ -26,7 +26,7 @@
 #ifndef FLINT_H
 #define FLINT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "longlong.h"
 #include "config.h"
@@ -176,6 +176,28 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)
+
+/* compatibility between gmp and mpir */
+#ifndef mpn_com_n
+#define mpn_com_n mpn_com
+#endif
+
+#ifndef mpn_neg_n
+#define mpn_neg_n mpn_neg
+#endif
+
+#ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
+static __inline__
+void mpn_tdiv_q(mp_ptr qp,
+	   mp_srcptr np, mp_size_t nn,
+	   mp_srcptr dp, mp_size_t dn)
+    {
+    mp_ptr _scratch = flint_malloc(dn * sizeof(mp_limb_t));
+    mpn_tdiv_qr(qp, _scratch, 0, np, nn, dp, dn);
+    flint_free(_scratch);
+    }
+#endif
 
 #ifdef __cplusplus
 }

@@ -30,9 +30,10 @@ or implied, of William Hart.
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+#include "mpn_extras.h"
 #include "fft.h"
 
 /* set p = 2^wn + 1 */
@@ -111,7 +112,7 @@ main(void)
                     nn2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r1 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
                     r2 = flint_malloc((limbs + 1)*sizeof(mp_limb_t));
-                    mpn_rrandom(nn1, state->gmp_state, limbs);
+                    flint_mpn_rrandom(nn1, state->gmp_state, limbs);
                     random_fermat(nn1, state, limbs);
                     random_fermat(nn2, state, limbs);
                      

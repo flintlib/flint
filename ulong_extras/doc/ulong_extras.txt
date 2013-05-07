@@ -333,6 +333,11 @@ mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y)
     be $3$. When the quotient is $4$ or above, we use division. However this 
     happens rarely for generic inputs.
 
+mp_limb_t n_gcd_full(mp_limb_t x, mp_limb_t y)
+
+    Returns the greatest common divisor $g$ of $x$ and $y$.
+    No assumptions are made about $x$ and $y$.
+
 mp_limb_t n_gcdinv(mp_limb_t * a, mp_limb_t x, mp_limb_t y)
 
     Returns the greatest common divisor $g$ of $x$ and $y$ and computes 

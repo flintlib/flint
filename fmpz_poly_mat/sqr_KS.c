@@ -36,7 +36,7 @@ fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     long i, j, n;
     long A_len;
     int signs;
-    mp_bitcnt_t A_bits, bit_size;
+    long A_bits, bit_size;
 
     n = A->r;
 
@@ -69,10 +69,10 @@ fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
     for (i = 0; i < n; i++)
         for (j = 0; j < n; j++)
             if (signs)
-                fmpz_poly_bit_unpack_unsigned(fmpz_poly_mat_entry(B, i, j),
+                fmpz_poly_bit_unpack(fmpz_poly_mat_entry(B, i, j),
                     fmpz_mat_entry(BB, i, j), bit_size);
             else
-                fmpz_poly_bit_unpack(fmpz_poly_mat_entry(B, i, j),
+                fmpz_poly_bit_unpack_unsigned(fmpz_poly_mat_entry(B, i, j),
                     fmpz_mat_entry(BB, i, j), bit_size);
 
     fmpz_mat_clear(AA);

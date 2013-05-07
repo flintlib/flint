@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -93,7 +93,7 @@ void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
         fmpz_one(prev);
         fmpz_set(this, tau_p);
 
-        for (r = 1; r < fmpz_get_ui(factors->exp + k); r++)
+        for (r = 1; r < factors->exp[k]; r++)
         {
             fmpz_mul(next, tau_p, this);
             fmpz_submul(next, p_11, prev);

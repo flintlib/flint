@@ -34,7 +34,7 @@
 #include <NTL/lip.h>
 #include <NTL/ctools.h>
 #include <NTL/g_lip.h>
-#include <mpir.h>
+#include <gmp.h>
 
 #include "flint.h"
 #include "fmpz.h"

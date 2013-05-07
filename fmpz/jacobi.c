@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -33,25 +33,28 @@ fmpz_jacobi(const fmpz_t a, const fmpz_t p)
 {
     fmpz c = *p;
     fmpz d = *a;
+    mpz_t t, u;
+    int r;
 
     if (d == 0)
        return 0;
 
     if (c == 2)
-       return 1;
+        return 1;
 
-    if (!COEFF_IS_MPZ(c))
-       return n_jacobi(d, c);
-    else
-    {
-       if (!COEFF_IS_MPZ(d))
-       {
-          __mpz_struct m;
-          m._mp_d = &d;
-          m._mp_size = 1;
-          m._mp_alloc = 1;
-          return mpz_jacobi(&m, COEFF_TO_PTR(c));
-       } else
-          return mpz_jacobi(COEFF_TO_PTR(d), COEFF_TO_PTR(c));
-    }
+    if (!COEFF_IS_MPZ(c) && !COEFF_IS_MPZ(d))
+        return n_jacobi(d, c);
+
+    if (COEFF_IS_MPZ(c) && COEFF_IS_MPZ(d))
+        return mpz_jacobi(COEFF_TO_PTR(d), COEFF_TO_PTR(c));
+
+    flint_mpz_init_set_readonly(t, a);
+    flint_mpz_init_set_readonly(u, p);
+
+    r = mpz_jacobi(t, u);
+
+    flint_mpz_clear_readonly(t);
+    flint_mpz_clear_readonly(u);
+
+    return r;
 }

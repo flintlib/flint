@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_poly.h"
@@ -75,7 +75,7 @@ _arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
     {
         exp[i] = 0;
         fmpz_set(powers + i, factors->p + i);
-        exp_max[i] = fmpz_get_ui(factors->exp + i);
+        exp_max[i] = factors->exp[i];
         fmpz_pow_ui(powers + i, powers + i, exp_max[i]);
     }
 
@@ -161,7 +161,7 @@ arith_divisors(fmpz_poly_t res, const fmpz_t n)
     /* TODO: check for overflow for huge n */
     size = 1;
     for (i = 0; i < factors->num; i++)
-        size *= fmpz_get_ui(factors->exp + i) + 1;
+        size *= factors->exp[i] + 1;
 
     fmpz_poly_fit_length(res, size);
     _arith_divisors(res->coeffs, size, factors);

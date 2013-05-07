@@ -26,7 +26,7 @@
 #ifndef FMPQ_MAT_H
 #define FMPQ_MAT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_mat.h"

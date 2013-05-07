@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
@@ -60,7 +60,7 @@ void arith_euler_phi(fmpz_t res, const fmpz_t n)
     {
         fmpz_sub_ui(t, factors->p + i, 1UL);
         fmpz_mul(res, res, t);
-        exp = fmpz_get_ui(factors->exp + i);
+        exp = factors->exp[i];
         if (exp != 1)
         {
             fmpz_pow_ui(t, factors->p + i, exp - 1UL);

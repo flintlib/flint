@@ -26,7 +26,7 @@
 #ifndef NMOD_POLY_MAT_H
 #define NMOD_POLY_MAT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "nmod_vec.h"

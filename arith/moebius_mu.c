@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_factor.h"
@@ -47,7 +47,7 @@ int arith_moebius_mu(const fmpz_t n)
     mu = 1;
     for (i = 0; i < factors->num; i++)
     {
-        if (fmpz_get_ui(factors->exp + i) != 1UL)
+        if (factors->exp[i] != 1UL)
         {
             mu = 0;
             break;

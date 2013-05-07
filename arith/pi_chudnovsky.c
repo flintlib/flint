@@ -32,7 +32,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "arith.h"
 

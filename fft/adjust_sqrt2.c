@@ -28,7 +28,7 @@ or implied, of William Hart.
 
 */
 
-#include "mpir.h"
+#include "gmp.h"
 #include "flint.h"
 #include "fft.h"
       

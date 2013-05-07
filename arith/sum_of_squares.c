@@ -23,7 +23,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "fmpz.h"
@@ -48,12 +48,12 @@ sum_of_two_squares(fmpz_t r, const fmpz_t n)
 
         if (res == 1)
         {
-            fmpz_add_ui(fac->exp + i, fac->exp + i, 1);
-            fmpz_mul(r, r, fac->exp + i);
+            fac->exp[i]++;
+            fmpz_mul_ui(r, r, fac->exp[i]);
         }
         else if (res == 3)
         {
-            if (fmpz_is_odd(fac->exp + i))
+            if (fac->exp[i] % 2)
             {
                 fmpz_zero(r);
                 break;

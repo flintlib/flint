@@ -39,7 +39,7 @@ The following modifications were made by William Hart:
 #include <stdio.h>
 #define ulong unsigned long 
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
 #include "qsieve.h"

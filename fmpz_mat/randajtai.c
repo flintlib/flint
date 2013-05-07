@@ -26,7 +26,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include <math.h>
 #include "flint.h"
 #include "fmpz.h"

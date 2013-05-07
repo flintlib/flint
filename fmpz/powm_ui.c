@@ -24,7 +24,7 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include <limits.h>
 #include "flint.h"
 #include "fmpz.h"

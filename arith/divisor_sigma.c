@@ -24,7 +24,7 @@
 ******************************************************************************/
 
 #include <stdlib.h>
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"
 #include "fmpz_vec.h"
@@ -51,7 +51,7 @@ _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
     {
         for (i = 0; i < factors->num; i++)
         {
-            fmpz_add_ui(r, factors->exp + i, 1UL);
+            fmpz_set_ui(r, factors->exp[i] + 1UL);
             fmpz_mul(res, res, r);
         }
         return;
@@ -63,7 +63,7 @@ _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
             p = factors->p + i;
             fmpz_set(p, factors->p + i);
             fmpz_pow_ui(p, p, k);
-            fmpz_pow_ui(r, p, fmpz_get_ui(factors->exp + i)  + 1UL);
+            fmpz_pow_ui(r, p, factors->exp[i]  + 1UL);
             fmpz_sub_ui(r, r, 1UL);
             fmpz_sub_ui(p, p, 1UL);
             fmpz_divexact(p, r, p);

@@ -26,7 +26,7 @@
 #ifndef ARITH_H
 #define ARITH_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h>
 #include "flint.h"
 #include "fmpz.h"

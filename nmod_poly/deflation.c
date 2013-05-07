@@ -24,12 +24,10 @@
 
 ******************************************************************************/
 
-#include <mpir.h>
+#include <gmp.h>
 #include "flint.h"
 #include "nmod_poly.h"
 #include "ulong_extras.h"
-
-#define GCD(a,b) (((a) >= (b)) ? n_gcd(a, b) : n_gcd(b, a))
 
 ulong
 nmod_poly_deflation(const nmod_poly_t input)
@@ -44,7 +42,7 @@ nmod_poly_deflation(const nmod_poly_t input)
     while (!input->coeffs[coeff])
         coeff++;
 
-    deflation = GCD(input->length - 1, coeff);
+    deflation = n_gcd_full(input->length - 1, coeff);
 
     while ((deflation > 1) && (coeff + deflation < input->length))
     {
@@ -52,7 +50,7 @@ nmod_poly_deflation(const nmod_poly_t input)
         {
             coeff++;
             if (input->coeffs[coeff])
-                deflation = GCD(coeff, deflation);
+                deflation = n_gcd_full(coeff, deflation);
         }
         if (i == deflation - 1)
             coeff++;

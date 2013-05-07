@@ -26,7 +26,7 @@
 #ifndef MFPR_MAT_H
 #define MPFR_MAT_H
 
-#include <mpir.h>
+#include <gmp.h>
 #include <mpfr.h> 
 
 #ifdef __cplusplus
