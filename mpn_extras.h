@@ -222,13 +222,13 @@ void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
 }
 
 static __inline__
-void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_bitcnt_t n)
 {
   __mpz_struct str;
   str._mp_d = rp;
-  str._mp_alloc = n;
-  str._mp_size = n;
-  mpz_rrandomb(&str,state,FLINT_BITS*n);
+  str._mp_alloc = (n + FLINT_BITS - 1)/FLINT_BITS;
+  str._mp_size = (n + FLINT_BITS - 1)/FLINT_BITS;
+  mpz_rrandomb(&str,state,n);
 }
 
 #ifdef __cplusplus
