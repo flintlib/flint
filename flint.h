@@ -186,6 +186,22 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define mpn_neg_n mpn_neg
 #endif
 
+#ifndef mpn_tdiv_q
+void
+mpn_div_q (mp_ptr qp,
+	   mp_srcptr np, mp_size_t nn,
+	   mp_srcptr dp, mp_size_t dn, mp_ptr scratch);
+
+
+static __inline__
+void mpn_tdiv_q(mp_ptr qp,
+	   mp_srcptr np, mp_size_t nn,
+	   mp_srcptr dp, mp_size_t dn)
+    {
+    mp_ptr scratch = flint_malloc((nn+1)*sizeof(mp_limb_t));
+    mpn_div_q(qp, np, nn, dp, dn, scratch);
+    }
+#endif
 
 #ifdef __cplusplus
 }
