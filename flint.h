@@ -187,6 +187,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #endif
 
 #ifndef mpn_tdiv_q
+/* substitute for mpir's mpn_tdiv_q */
 static __inline__
 void mpn_tdiv_q(mp_ptr qp,
 	   mp_srcptr np, mp_size_t nn,
