@@ -82,8 +82,8 @@ main(void)
             i2 = i1 + n1;
             r1 = i2 + n2;
    
-            mpn_urandomb(i1, state->gmp_state, b1);
-            mpn_urandomb(i2, state->gmp_state, b2);
+            flint_mpn_urandomb(i1, state->gmp_state, b1);
+            flint_mpn_urandomb(i2, state->gmp_state, b2);
   
             best_off = -1;
             
@@ -142,8 +142,8 @@ main(void)
             r1 = i2 + int_limbs + 1;
             tt = r1 + 2*(int_limbs + 1);
                 
-            mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
-            mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
+            flint_mpn_urandomb(i1, state->gmp_state, int_limbs*FLINT_BITS);
+            flint_mpn_urandomb(i2, state->gmp_state, int_limbs*FLINT_BITS);
             i1[int_limbs] = 0;
             i2[int_limbs] = 0;
 

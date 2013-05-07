@@ -89,8 +89,8 @@ main(void)
                r1 = i2 + n2;
                r2 = r1 + n1 + n2;
    
-               mpn_urandomb(i1, state->gmp_state, b1);
-               mpn_urandomb(i2, state->gmp_state, b2);
+               flint_mpn_urandomb(i1, state->gmp_state, b1);
+               flint_mpn_urandomb(i2, state->gmp_state, b2);
   
                mpn_mul(r2, i1, n1, i2, n2);
                flint_mpn_mul_fft_main(r1, i1, n1, i2, n2);

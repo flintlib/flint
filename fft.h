@@ -44,6 +44,7 @@ or implied, of William Hart.
 
 #include "gmp.h"
 #include "flint.h"
+#include "mpn_extras.h"
 
 #ifdef __cplusplus
  extern "C" {
@@ -74,9 +75,9 @@ mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
          nn[limbs] = 1; \
       } else { \
          if (n_randint(state, 2) == 0) \
-            mpn_rrandom(nn, state->gmp_state, limbs); \
+            flint_mpn_rrandom(nn, state->gmp_state, limbs); \
          else \
-            mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
+            flint_mpn_urandomb(nn, state->gmp_state, limbs*FLINT_BITS); \
          nn[limbs] = n_randint(state, 1024); \
       } \
       if (n_randint(state, 2)) \

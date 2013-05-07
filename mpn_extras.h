@@ -211,6 +211,26 @@ void flint_mpn_mulmod_preinvn(mp_ptr r,
 int flint_mpn_mulmod_2expp1_basecase(mp_ptr xp, mp_srcptr yp, mp_srcptr zp, int c,
     mp_bitcnt_t b, mp_ptr tp);
 
+static __inline__
+void flint_mpn_rrandom(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+{
+  __mpz_struct str;
+  str._mp_d = rp;
+  str._mp_alloc = n;
+  str._mp_size =n;
+  mpz_rrandomb(&str,state,FLINT_BITS*n);
+}
+
+static __inline__
+void flint_mpn_urandomb(mp_limb_t *rp, gmp_randstate_t state, mp_size_t n)
+{
+  __mpz_struct str;
+  str._mp_d = rp;
+  str._mp_alloc = n;
+  str._mp_size = n;
+  mpz_rrandomb(&str,state,FLINT_BITS*n);
+}
+
 #ifdef __cplusplus
 }
 #endif
