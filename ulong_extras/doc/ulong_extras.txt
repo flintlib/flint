@@ -787,7 +787,7 @@ int n_is_probabprime_fibonacci(mp_limb_t n)
 
 int n_is_probabprime_BPSW(mp_limb_t n)
 
-    Implements the Bailey--Pomerance--Selfridge--Wagstaff probable primality
+    Implements the Baillie--Pomerance--Selfridge--Wagstaff probable primality
     test. There are no known counterexamples to this being a primality test.
     For further details, see~\citep{CraPom2005}.
 
