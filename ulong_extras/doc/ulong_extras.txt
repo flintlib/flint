@@ -520,6 +520,14 @@ long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
     \code{m} then 0 is returned by the function and the location \code{sqrt} 
     points to is set to NULL. 
 
+mp_limb_t n_smallest_primitive_root(mp_limb_t n)
+
+    Computes the smallest primitive root modulo \code{n}.
+    
+    Assumes \code{n} is equal to \code{2}, \code{4}, \code{p^k} or \code{2p^k} 
+    where \code{p^k} is a power of an odd prime number (otherwise the primitive
+    root modulo \code{n} doesn't exist).
+    
 *******************************************************************************
 
     Prime number generation and counting
