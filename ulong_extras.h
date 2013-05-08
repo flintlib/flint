@@ -361,6 +361,8 @@ mp_limb_t n_factorial_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
 mp_limb_t n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv);
 
+mp_limb_t n_smallest_primitive_root(mp_limb_t n);
+
 #ifdef __cplusplus
 }
 #endif
