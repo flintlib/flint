@@ -50,10 +50,47 @@ or implied, of William Hart.
  extern "C" {
 #endif
 
+#if defined(__MPIR_VERSION)
+
 #if !defined(__MPIR_RELEASE ) || __MPIR_RELEASE < 20600
 #define mpn_sumdiff_n __MPN(sumdiff_n)
 extern
 mp_limb_t mpn_sumdiff_n(mp_ptr, mp_ptr, mp_srcptr, mp_srcptr, mp_size_t);
+#endif
+
+#else
+
+static __inline__ mp_limb_t
+mpn_sumdiff_n(mp_ptr s, mp_ptr d, mp_srcptr x, mp_srcptr y, mp_size_t n)
+{
+    mp_limb_t ret;
+    mp_ptr t;
+
+    if (n == 0)
+        return 0;
+
+    if ((s == x && d == y) || (s == y && d == x))
+    {
+        t = flint_malloc(n * sizeof(mp_limb_t));
+        ret = mpn_sub_n(t, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        flint_mpn_copyi(d, t, n);
+        flint_free(t);
+        return ret;
+    }
+
+    if (s == x || s == y)
+    {
+        ret = mpn_sub_n(d, x, y, n);
+        ret += 2 * mpn_add_n(s, x, y, n);
+        return ret;
+    }
+
+    ret = 2 * mpn_add_n(s, x, y, n);
+    ret += mpn_sub_n(d, x, y, n);
+    return ret;
+}
+
 #endif
 
 #define fft_sumdiff(t, u, r, s, n) \
