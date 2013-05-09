@@ -7,9 +7,14 @@ find . -name "*\.c" -exec perl -0777ne 'print m!/\*(?:.|[\r\n])*?\*/!g;' {} \; |
 files=$(find . -name "*\.c")
 headers=$(find . -name "*\.h")
 
-echo $files
-
 for y in $files
+do
+perl -pi -w -e "s/\blong\b/len_t/g;
+s/([\(\*\s]+)long([\)\*\s]+)/$1len_t$2/g" $y
+git add $y
+done
+
+for y in $headers
 do
 perl -pi -w -e "s/\blong\b/len_t/g;
 s/([\(\*\s]+)long([\)\*\s]+)/$1len_t$2/g" $y
