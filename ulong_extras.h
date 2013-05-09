@@ -136,7 +136,7 @@ mp_limb_t n_randtest(flint_rand_t state);
 
 mp_limb_t n_randtest_not_zero(flint_rand_t state);
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned len_t bits, int proved);
+mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved);
 
 mp_limb_t n_randtest_prime(flint_rand_t state, int proved);
 

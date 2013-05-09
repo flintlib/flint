@@ -137,7 +137,7 @@ double fmpz_get_d(const fmpz_t f)
     \code{f} cannot be represented exactly. The outcome is undefined
     if \code{f} is too large to fit in the normal range of a double.
 
-double fmpz_get_d_2exp(long * exp, const fmpz_t f)
+double fmpz_get_d_2exp(len_t * exp, const fmpz_t f)
 
     Returns $f$ as a normalized \code{double} along with a $2$-exponent 
     \code{exp}, i.e.\ if $r$ is the return value then \code{f = r * 2^exp}, 
@@ -156,7 +156,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     the function.  Otherwise, it is up to the caller to ensure that 
     the allocated block of memory is sufficiently large.
 
-void fmpz_set_si(fmpz_t f, long val)
+void fmpz_set_si(fmpz_t f, len_t val)
 
     Sets $f$ to the given \code{signed long} value.
 
@@ -391,14 +391,14 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
 
     Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
 
-mp_limb_t fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits)
+mp_limb_t fmpz_abs_lbound_ui_2exp(len_t * exp, const fmpz_t x, int bits)
 
     For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits and
     sets \code{exp} to an exponent $e$, such that $|x| \ge m 2^e$. The number
     of bits must be between 1 and \code{FLINT_BITS} inclusive.
     The mantissa is guaranteed to be correctly rounded.
 
-mp_limb_t fmpz_abs_ubound_ui_2exp(long * exp, const fmpz_t x, int bits)
+mp_limb_t fmpz_abs_ubound_ui_2exp(len_t * exp, const fmpz_t x, int bits)
 
     For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits
     and sets \code{exp} to an exponent $e$, such that $|x| \le m 2^e$.
@@ -423,7 +423,7 @@ int fmpz_cmp_ui(const fmpz_t f, ulong g)
     Returns a negative value if $f < g$, positive value if $g < f$, 
     otherwise returns $0$.
 
-int fmpz_cmp_si(const fmpz_t f, long g)
+int fmpz_cmp_si(const fmpz_t f, len_t g)
 
     Returns a negative value if $f < g$, positive value if $g < f$, 
     otherwise returns $0$.
@@ -441,7 +441,7 @@ int fmpz_equal_ui(const fmpz_t f, ulong g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
-int fmpz_equal_si(const fmpz_t f, long g)
+int fmpz_equal_si(const fmpz_t f, len_t g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
@@ -500,7 +500,7 @@ void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to $g \times h$.
 
-void fmpz_mul_si(fmpz_t f, const fmpz_t g, long x)
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, len_t x)
 
     Sets $f$ to $g \times x$ where $x$ is a \code{signed long}.
 
@@ -538,7 +538,7 @@ void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding up towards
     infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding up towards
     infinity.  If $h$ is $0$ an exception is raised.
@@ -558,7 +558,7 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
@@ -601,7 +601,7 @@ void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
     zero and $s$ to the remainder.  If $h$ is $0$ an exception 
     is raised.
 
-void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
@@ -628,7 +628,7 @@ void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
     is $0$ an exception is raised.
 
-void fmpz_divexact_si(fmpz_t f, const fmpz_t g, long h)
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, len_t h)
 
     Sets $f$ to the quotient of $g$ and $h$, assuming that the
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
@@ -650,7 +650,7 @@ int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
     Returns whether $f$ is divisible by $g > 0$.
 
-int fmpz_divisible_si(const fmpz_t f, long g)
+int fmpz_divisible_si(const fmpz_t f, len_t g)
 
     Returns whether $f$ is divisible by $g > 0$.
 
@@ -687,18 +687,18 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 
     Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
 
-long fmpz_clog(const fmpz_t x, const fmpz_t b)
+len_t fmpz_clog(const fmpz_t x, const fmpz_t b)
 
-long fmpz_clog_ui(const fmpz_t x, ulong b)
+len_t fmpz_clog_ui(const fmpz_t x, ulong b)
 
     Returns $\ceil{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
     the return value fits into a signed \code{long}.
 
-long fmpz_flog(const fmpz_t x, const fmpz_t b)
+len_t fmpz_flog(const fmpz_t x, const fmpz_t b)
 
-long fmpz_flog_ui(const fmpz_t x, ulong b)
+len_t fmpz_flog_ui(const fmpz_t x, ulong b)
 
     Returns $\floor{\log_b x}$.
 
@@ -736,7 +736,7 @@ int fmpz_is_square(const fmpz_t f)
 
     Returns nonzero if $f$ is a perfect square and zero otherwise.
 
-void fmpz_root(fmpz_t r, fmpz_t f, long n)
+void fmpz_root(fmpz_t r, fmpz_t f, len_t n)
 
     Set $r$ to the integer part of the $n$-th root of $f$. Requires that
     $n > 0$ and that if $n$ is even then $f$ be non-negative, otherwise an 
@@ -768,7 +768,7 @@ void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
     Sets $f$ to the product $g$ and $h$ divided by \code{2^exp}, rounding
     down towards zero.
 
-void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp)
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, len_t x, ulong exp)
 
     Sets $f$ to the product $g$ and $x$ divided by \code{2^exp}, rounding
     down towards zero.
@@ -814,7 +814,7 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
 
 *******************************************************************************
 
-long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
+len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Removes all factors $f$ from $x$ and returns the number of such.
 
@@ -824,7 +824,7 @@ long _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Does not support aliasing.
 
-long fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
+len_t fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     Remove all occurrences of the factor $f > 1$ from the 
     integer \code{op} and sets \code{rop} to the resulting 
@@ -1008,7 +1008,7 @@ void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     space which must be provided by \code{fmpz_comb_temp_init} and 
     cleared by \code{fmpz_comb_temp_clear}.
 
-void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
+void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, len_t num_primes)
 
     Initialises a \code{comb} structure for multimodular reduction and 
     recombination.  The array \code{primes} is assumed to contain 
