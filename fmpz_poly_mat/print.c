@@ -31,7 +31,7 @@
 void
 fmpz_poly_mat_print(const fmpz_poly_mat_t A, const char * x)
 {
-    long i, j;
+    len_t i, j;
 
     printf("<%ld x %ld matrix over Z[%s]>\n", A->r, A->c, x);
 

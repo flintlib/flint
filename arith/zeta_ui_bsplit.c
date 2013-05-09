@@ -46,7 +46,7 @@ zeta_bsplit_clear(zeta_bsplit_state * S)
 
 
 static __inline__ void
-zeta_coeff_k(zeta_bsplit_state * S, long k, long n, long s)
+zeta_coeff_k(zeta_bsplit_state * S, len_t k, len_t n, len_t s)
 {
     if (k + 1 < 0)
     {
@@ -90,7 +90,7 @@ zeta_coeff_k(zeta_bsplit_state * S, long k, long n, long s)
 }
 
 void
-zeta_bsplit(zeta_bsplit_state * L, long a, long b, long n, long s, int resumable)
+zeta_bsplit(zeta_bsplit_state * L, len_t a, len_t b, len_t n, len_t s, int resumable)
 {
     if (a + 1 == b)
     {
@@ -101,7 +101,7 @@ zeta_bsplit(zeta_bsplit_state * L, long a, long b, long n, long s, int resumable
         zeta_bsplit_state Rs;
         zeta_bsplit_state * R = &Rs;
 
-        long m = (a + b) / 2;
+        len_t m = (a + b) / 2;
 
         zeta_bsplit(L, m, b, n, s, 1);
 
@@ -169,10 +169,10 @@ mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd)
 {
     zeta_bsplit_state sm;
     zeta_bsplit_state * sum = &sm;
-    long prec, wp, n;
+    len_t prec, wp, n;
     mpfr_t t, u;
     mpz_t w;
-    long i;
+    len_t i;
 
     if (s < 2)
     {

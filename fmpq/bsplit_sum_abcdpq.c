@@ -30,7 +30,7 @@
 
 void
 fmpq_bsplit_sum_abcdpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * cd, const fmpq * pq, long n1, long n2)
+        const fmpq * ab, const fmpq * cd, const fmpq * pq, len_t n1, len_t n2)
 {
     if (n2 <= n1)
     {
@@ -52,7 +52,7 @@ fmpq_bsplit_sum_abcdpq(fmpq_bsplit_t s,
         fmpq_bsplit_t L, R;
         fmpz_t t, u, v;
 
-        long m = (n1 + n2) / 2;
+        len_t m = (n1 + n2) / 2;
 
         fmpq_bsplit_init(L);
         fmpq_bsplit_init(R);

@@ -30,9 +30,9 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_clear(fmpz * vec, long len)
+_fmpz_vec_clear(fmpz * vec, len_t len)
 {
-    long i;
+    len_t i;
     for (i = 0; i < len; i++)
         fmpz_clear(vec + i);
     flint_free(vec);

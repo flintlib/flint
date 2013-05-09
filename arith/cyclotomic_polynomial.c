@@ -34,9 +34,9 @@
 
 void
 _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,
-                                        long num_factors, ulong phi)
+                                        len_t num_factors, ulong phi)
 {
-    long i, k;
+    len_t i, k;
     int small;
     ulong D;
 
@@ -108,7 +108,7 @@ void
 arith_cyclotomic_polynomial(fmpz_poly_t poly, ulong n)
 {
     n_factor_t factors;
-    long i, j;
+    len_t i, j;
     ulong s, phi;
 
     if (n <= 2)

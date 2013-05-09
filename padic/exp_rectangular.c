@@ -33,7 +33,7 @@
     Supports aliasing between \code{rop} and $u$.
  */
 
-static void _padic_exp_small(fmpz_t rop, const fmpz_t u, long v, long n, 
+static void _padic_exp_small(fmpz_t rop, const fmpz_t u, len_t v, len_t n, 
                                          const fmpz_t p, const fmpz_t pN)
 {
     if (n == 1)  /* rop = 1 */
@@ -68,10 +68,10 @@ static void _padic_exp_small(fmpz_t rop, const fmpz_t u, long v, long n,
     }
 }
 
-void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, 
-                                        const fmpz_t p, long N)
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, len_t v, 
+                                        const fmpz_t p, len_t N)
 {
-    const long n = _padic_exp_bound(v, N, p);
+    const len_t n = _padic_exp_bound(v, N, p);
 
     fmpz_t pN;
 
@@ -84,10 +84,10 @@ void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v,
     }
     else
     {
-        const long k = fmpz_fits_si(p) ? 
+        const len_t k = fmpz_fits_si(p) ? 
                        (n - 1 - 1) / (fmpz_get_si(p) - 1) : 0;
 
-        long i, npows, nsums;
+        len_t i, npows, nsums;
 
         fmpz_t c, f, s, t, sum, pNk;
         fmpz *pows;
@@ -120,8 +120,8 @@ void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v,
 
         for (i = nsums - 1; i >= 0; i--)
         {
-            long lo = i * npows;
-            long hi = FLINT_MIN(n - 1, lo + npows - 1);
+            len_t lo = i * npows;
+            len_t hi = FLINT_MIN(n - 1, lo + npows - 1);
 
             fmpz_zero(s);
             fmpz_one(c);
@@ -165,8 +165,8 @@ void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v,
 
 int padic_exp_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    const long N  = padic_prec(rop);
-    const long v  = padic_val(op);
+    const len_t N  = padic_prec(rop);
+    const len_t v  = padic_val(op);
     const fmpz *p = ctx->p;
 
     if (padic_is_zero(op))

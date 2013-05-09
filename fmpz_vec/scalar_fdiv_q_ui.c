@@ -30,9 +30,9 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, const fmpz * vec2, long len2, ulong c)
+_fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, const fmpz * vec2, len_t len2, ulong c)
 {
-    long i;
+    len_t i;
     for (i = 0; i < len2; i++)
         fmpz_fdiv_q_ui(vec1 + i, vec2 + i, c);
 }

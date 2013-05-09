@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A;
     flint_rand_t state;
-    long i, m, n, b, d, r;
+    len_t i, m, n, b, d, r;
 
     printf("rank....");
     fflush(stdout);

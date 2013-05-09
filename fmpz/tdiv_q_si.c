@@ -31,10 +31,10 @@
 #include "fmpz.h"
 
 void
-fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, long h)
+fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
 {
     fmpz c1 = *g;
-    long c2 = h;
+    len_t c2 = h;
 
     if (h == 0)
     {

@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, long len, const fmpz_t a)
+_fmpz_poly_evaluate_fmpz(fmpz_t res, const fmpz * f, len_t len, const fmpz_t a)
 {
     if (len <= 50)
         _fmpz_poly_evaluate_horner_fmpz(res, f, len, a);

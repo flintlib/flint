@@ -35,7 +35,7 @@ nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b)
 {
     nmod_mat_t X, B;
     int result;
-    long i, m;
+    len_t i, m;
 
     m = A->r;
 

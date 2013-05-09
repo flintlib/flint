@@ -30,10 +30,10 @@
 
 
 void
-_fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
+_fmpz_poly_div_root(fmpz * Q, const fmpz * A, len_t len, const fmpz_t c)
 {
     fmpz_t r, t;
-    long i;
+    len_t i;
 
     if (len < 2)
         return;
@@ -58,7 +58,7 @@ _fmpz_poly_div_root(fmpz * Q, const fmpz * A, long len, const fmpz_t c)
 void
 fmpz_poly_div_root(fmpz_poly_t Q, const fmpz_poly_t A, const fmpz_t c)
 {
-    long len = A->length;
+    len_t len = A->length;
 
     if (len <= 1)
     {

@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("neg....");
     fflush(stdout);
@@ -47,7 +47,7 @@ main(void)
         nmod_poly_mat_t A, B;
         nmod_mat_t a, b, c;
         mp_limb_t x, mod;
-        long m, n, deg;
+        len_t m, n, deg;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 20);
@@ -93,7 +93,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B;
-        long m, n, deg;
+        len_t m, n, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);

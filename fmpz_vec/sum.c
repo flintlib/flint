@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len)
+_fmpz_vec_sum(fmpz_t res, const fmpz * vec, len_t len)
 {
     if (len <= 1)
     {
@@ -40,7 +40,7 @@ _fmpz_vec_sum(fmpz_t res, const fmpz * vec, long len)
     }
     else
     {
-        long i;
+        len_t i;
 
         fmpz_add(res, vec, vec + 1);
 

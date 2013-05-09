@@ -46,7 +46,7 @@ main(void)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        long trunc = 0;
+        len_t trunc = 0;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -79,7 +79,7 @@ main(void)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        long trunc = 0;
+        len_t trunc = 0;
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -112,7 +112,7 @@ main(void)
     {
         nmod_poly_t a1, a2, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        long trunc = 0;
+        len_t trunc = 0;
 
         nmod_poly_init(a1, n);
         nmod_poly_init(a2, n);

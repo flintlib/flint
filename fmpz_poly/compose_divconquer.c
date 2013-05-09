@@ -89,11 +89,11 @@
  */
 
 void
-_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1, 
-                                          const fmpz * poly2, long len2)
+_fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, len_t len1, 
+                                          const fmpz * poly2, len_t len2)
 {
-    long i, j, k, n;
-    long *hlen, alloc, powlen;
+    len_t i, j, k, n;
+    len_t *hlen, alloc, powlen;
     fmpz *v, **h, *pow, *temp;
 
     if (len1 <= 2 || len2 <= 1)
@@ -109,14 +109,14 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
 
     /* Initialisation */
     
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (len_t *) flint_malloc(((len1 + 1) / 2) * sizeof(len_t));
     
     k = FLINT_CLOG2(len1) - 1;
     
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
-        long hi = (len1 + (1 << i) - 1) / (1 << i);
+        len_t hi = (len1 + (1 << i) - 1) / (1 << i);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
@@ -170,7 +170,7 @@ _fmpz_poly_compose_divconquer(fmpz * res, const fmpz * poly1, long len1,
     {
         if (hlen[1] > 0)
         {
-            long templen = powlen + hlen[1] - 1;
+            len_t templen = powlen + hlen[1] - 1;
             _fmpz_poly_mul(temp, pow, powlen, h[1], hlen[1]);
             _fmpz_poly_add(h[0], temp, templen, h[0], hlen[0]);
             hlen[0] = FLINT_MAX(hlen[0], templen);
@@ -214,9 +214,9 @@ void
 fmpz_poly_compose_divconquer(fmpz_poly_t res, 
                              const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long lenr;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
+    len_t lenr;
     
     if (len1 == 0)
     {

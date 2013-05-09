@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, 
-                                const fmpz * poly, const fmpz_t den, long len, 
+                                const fmpz * poly, const fmpz_t den, len_t len, 
                                 const fmpz_t r, const fmpz_t s)
 {
     fmpz_t gcd1;  /* GCD( poly, r ) */

@@ -34,7 +34,7 @@
 
 void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 {
-    long n, i, j;
+    len_t n, i, j;
 
     n = temp->n;
     j = (1L << (n - 1));
@@ -54,7 +54,7 @@ void fmpz_comb_temp_clear(fmpz_comb_temp_t temp)
 void
 fmpz_comb_clear(fmpz_comb_t comb)
 {
-    long i, j, n;
+    len_t i, j, n;
 
     n = comb->n;
 

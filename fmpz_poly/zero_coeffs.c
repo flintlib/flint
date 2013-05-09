@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_zero_coeffs(fmpz_poly_t poly, long i, long j)
+fmpz_poly_zero_coeffs(fmpz_poly_t poly, len_t i, len_t j)
 {
     if (i < 0)
         i = 0;

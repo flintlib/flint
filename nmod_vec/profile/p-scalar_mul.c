@@ -33,7 +33,7 @@
 typedef struct
 {
    mp_bitcnt_t bits;
-   long length;
+   len_t length;
 } info_t;
 
 void sample(void * arg, ulong count)
@@ -42,8 +42,8 @@ void sample(void * arg, ulong count)
    nmod_t mod;
    info_t * info = (info_t *) arg;
    mp_bitcnt_t bits = info->bits;
-   long length = info->length;
-   long i, j;
+   len_t length = info->length;
+   len_t i, j;
    mp_ptr vec = _nmod_vec_init(length);
    mp_ptr vec2 = _nmod_vec_init(length);
    flint_rand_t state;

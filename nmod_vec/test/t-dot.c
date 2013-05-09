@@ -42,13 +42,13 @@ main(void)
 
     for (i = 0; i < 10000; i++)
     {
-        long len;
+        len_t len;
         nmod_t mod;
         mp_limb_t m, res;
         mp_ptr x, y;
         int limbs1;
         mpz_t s, t;
-        long j;
+        len_t j;
 
         len = n_randint(state, 1000) + 1;
         m = n_randtest_not_zero(state);

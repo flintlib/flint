@@ -42,7 +42,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, d;
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, d;
@@ -126,7 +126,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, d;
@@ -164,7 +164,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d;
@@ -209,7 +209,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, e;
@@ -261,7 +261,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b;

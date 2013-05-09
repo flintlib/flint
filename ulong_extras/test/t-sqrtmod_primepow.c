@@ -42,7 +42,7 @@ int main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod a power of 2 */
     {
         mp_limb_t a, b, p, pow, pow2, pinv;
-        long exp, num, i;
+        len_t exp, num, i;
         mp_limb_t * sqrt;
         int btest;
 
@@ -99,7 +99,7 @@ int main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++) /* Test random squares mod other prime powers */
     {
         mp_limb_t a, b, p, pow, pow2, pinv;
-        long exp, maxexp, num, i;
+        len_t exp, maxexp, num, i;
         mp_bitcnt_t bits;
         mp_limb_t * sqrt;
         int btest;
@@ -161,7 +161,7 @@ int main(void)
     for (i = 0; i < 500 * flint_test_multiplier(); i++) /* Test random nonsquares */
     {
         mp_limb_t a, b, p, pow, pinv;
-        long exp, maxexp;
+        len_t exp, maxexp;
         mp_bitcnt_t bits;
         mp_limb_t * sqrt;
         

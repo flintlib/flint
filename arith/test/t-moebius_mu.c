@@ -50,7 +50,7 @@ int main(void)
 {
     fmpz_t x;
     ulong p;
-    long i, j, k, l;
+    len_t i, j, k, l;
     flint_rand_t state;
     flint_randinit(state);
 

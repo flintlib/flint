@@ -31,10 +31,10 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres, 
+fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, len_t nres, 
     const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
 {
-    long i, j, k;
+    len_t i, j, k;
     mp_ptr r;
 
     r = _nmod_vec_init(nres);
@@ -53,12 +53,12 @@ fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, long nres,
 }
 
 void
-fmpz_mat_multi_mod_ui(nmod_mat_t * residues, long nres, const fmpz_mat_t mat)
+fmpz_mat_multi_mod_ui(nmod_mat_t * residues, len_t nres, const fmpz_mat_t mat)
 {
     fmpz_comb_t comb;
     fmpz_comb_temp_t temp;
     mp_ptr primes;
-    long i;
+    len_t i;
 
     primes = _nmod_vec_init(nres);
     for (i = 0; i < nres; i++)

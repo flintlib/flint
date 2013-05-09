@@ -33,7 +33,7 @@ void
 fmpz_poly_mat_scalar_mul_fmpz_poly(fmpz_poly_mat_t B, const fmpz_poly_mat_t A,
                                                         const fmpz_poly_t c)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < fmpz_poly_mat_nrows(B); i++)
         for (j = 0; j < fmpz_poly_mat_ncols(B); j++)

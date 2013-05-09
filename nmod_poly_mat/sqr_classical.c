@@ -39,7 +39,7 @@ nmod_poly_sqr(nmod_poly_t y, const nmod_poly_t x)
 void
 nmod_poly_mat_sqr_classical(nmod_poly_mat_t B, const nmod_poly_mat_t A)
 {
-    long n = A->r;
+    len_t n = A->r;
 
     if (n == 0)
         return;

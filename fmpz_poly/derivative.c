@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len)
+void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, len_t len)
 {
-    long i;
+    len_t i;
 
     for (i = 1; i < len; i++)
         fmpz_mul_ui(rpoly + (i - 1), poly + i, i);
@@ -38,7 +38,7 @@ void _fmpz_poly_derivative(fmpz * rpoly, const fmpz * poly, long len)
 
 void fmpz_poly_derivative(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
 
     if (len < 2)
     {

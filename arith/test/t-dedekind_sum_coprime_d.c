@@ -37,7 +37,7 @@ int main(void)
     double s1, s2f;
     fmpz_t hh, kk;
     fmpq_t s2;
-    long h, k;
+    len_t h, k;
 
     printf("dedekind_sum_coprime_d....");
     fflush(stdout);

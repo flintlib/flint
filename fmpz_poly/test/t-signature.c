@@ -47,8 +47,8 @@ main(void)
     {
         fmpz_poly_t poly, linear, quadratic, rem;
         fmpz_t lhs, rhs;
-        long nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
-        long len = n_randint(state, 20) + 1;
+        len_t nreal, ncomplex, nreal_max, ncomplex_max, r1, r2;
+        len_t len = n_randint(state, 20) + 1;
         mp_bitcnt_t bits = n_randint(state, 50) + 1;
         
         fmpz_poly_init2(poly, len);
@@ -135,7 +135,7 @@ main(void)
 
     {
         fmpz_poly_t poly;
-        long r1, r2;
+        len_t r1, r2;
         fmpz_poly_init(poly);
         fmpz_poly_set_str(poly, "6  1 1 1 10 5 1");
         fmpz_poly_signature(&r1, &r2, poly);

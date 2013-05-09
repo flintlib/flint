@@ -33,7 +33,7 @@
 void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < op->r; i++)
         for (j = 0; j < op->c; j++)

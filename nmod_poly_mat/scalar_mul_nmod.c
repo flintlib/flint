@@ -31,7 +31,7 @@ void
 nmod_poly_mat_scalar_mul_nmod(nmod_poly_mat_t B, const nmod_poly_mat_t A,
                                                     mp_limb_t c)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < nmod_poly_mat_nrows(B); i++)
         for (j = 0; j < nmod_poly_mat_ncols(B); j++)

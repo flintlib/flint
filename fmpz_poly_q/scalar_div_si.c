@@ -25,7 +25,7 @@
 
 #include "fmpz_poly_q.h"
 
-void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x)
+void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, len_t x)
 {
     fmpz_t cont, fx, gcd;
     

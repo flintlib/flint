@@ -31,7 +31,7 @@
 
 void 
 _fmpq_poly_evaluate_fmpz(fmpz_t rnum, fmpz_t rden, const fmpz * poly, 
-                         const fmpz_t den, long len, const fmpz_t a)
+                         const fmpz_t den, len_t len, const fmpz_t a)
 {
     fmpz_t d;
     

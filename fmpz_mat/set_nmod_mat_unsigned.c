@@ -33,7 +33,7 @@
 void
 fmpz_mat_set_nmod_mat_unsigned(fmpz_mat_t A, const nmod_mat_t Amod)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < Amod->r; i++)
         for (j = 0; j < Amod->c; j++)

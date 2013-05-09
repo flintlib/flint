@@ -29,8 +29,8 @@
 #include "nmod_poly.h"
 
 /* This gives some speedup for small lengths. */
-static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, long al,
-    mp_srcptr b, long bl, nmod_t mod)
+static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, len_t al,
+    mp_srcptr b, len_t bl, nmod_t mod)
 {
     if (al == 2)
         r[0] = nmod_sub(a[0], nmod_mul(a[1], b[0], mod), mod);
@@ -40,11 +40,11 @@ static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, long al,
 
 void
 _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
-    long plen, mp_ptr * tree, long len, nmod_t mod)
+    len_t plen, mp_ptr * tree, len_t len, nmod_t mod)
 {
-    long height, i, j, pow, left;
-    long tree_height;
-    long tlen;
+    len_t height, i, j, pow, left;
+    len_t tree_height;
+    len_t tlen;
     mp_ptr t, u, swap, pa, pb, pc;
 
     /* avoid worrying about some degenerate cases */
@@ -117,8 +117,8 @@ _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
     _nmod_vec_clear(u);
 }
 
-void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly, long plen,
-    mp_srcptr xs, long n, nmod_t mod)
+void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly, len_t plen,
+    mp_srcptr xs, len_t n, nmod_t mod)
 {
     mp_ptr * tree;
 
@@ -130,7 +130,7 @@ void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr poly, long plen,
 
 void
 nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, long n)
+        const nmod_poly_t poly, mp_srcptr xs, len_t n)
 {
     _nmod_poly_evaluate_nmod_vec_fast(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

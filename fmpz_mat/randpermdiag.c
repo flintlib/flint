@@ -32,12 +32,12 @@
 
 int
 fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
-                      const fmpz * diag, long n)
+                      const fmpz * diag, len_t n)
 {
     int parity;
-    long i;
-    long * rows;
-    long * cols;
+    len_t i;
+    len_t * rows;
+    len_t * cols;
 
     rows = _perm_init(mat->r);
     cols = _perm_init(mat->c);

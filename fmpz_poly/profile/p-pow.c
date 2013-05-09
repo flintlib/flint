@@ -81,14 +81,14 @@ main(void)
             
                 timeit_t t[2];
                 int l, loops = 1, r = 0;
-                long s[2] = {0L, 0L};
+                len_t s[2] = {0L, 0L};
                 double T[2];
             
                 /*
                    Construct random polynomial f of length len
                  */
                 {
-                    long ell;
+                    len_t ell;
                     for (ell = 0; ell < len; ell++)
                         fmpz_randbits(f->coeffs + ell, state, bits);
                     if ((f->coeffs)[len - 1] == 0L)

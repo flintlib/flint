@@ -35,7 +35,7 @@ mp_limb_t n_factor_lehman(mp_limb_t n)
     double limit;
     mp_limb_t cuberoot, k;
     n_factor_t factors;
-    long bound;
+    len_t bound;
 
 #if FLINT64 /* cannot compute enough primes */
     if (n > 10000000000000000UL) return n;

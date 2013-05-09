@@ -35,7 +35,7 @@
 #include "ulong_extras.h"
 
 void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state, 
-                        long len, mp_bitcnt_t bits)
+                        len_t len, mp_bitcnt_t bits)
 {
     ulong m;
 
@@ -73,7 +73,7 @@ void fmpq_poly_randtest(fmpq_poly_t poly, flint_rand_t state,
 }
 
 void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, flint_rand_t state,
-                                 long len, mp_bitcnt_t bits)
+                                 len_t len, mp_bitcnt_t bits)
 {
     ulong m;
 
@@ -111,7 +111,7 @@ void fmpq_poly_randtest_unsigned(fmpq_poly_t poly, flint_rand_t state,
 }
 
 void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state, 
-                                 long len, mp_bitcnt_t bits)
+                                 len_t len, mp_bitcnt_t bits)
 {
     if ((bits == 0) | (len == 0))
     {

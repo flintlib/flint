@@ -30,9 +30,9 @@
 
 void
 fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
-                            long len)
+                            len_t len)
 {
-    long d = fmpz_poly_mat_nrows(A);
+    len_t d = fmpz_poly_mat_nrows(A);
 
     if (len < 1)
     {
@@ -59,13 +59,13 @@ fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
     else
     {
         fmpz_poly_mat_t T, U;
-        long i;
+        len_t i;
 
         fmpz_poly_mat_init_set(T, A);
         fmpz_poly_mat_truncate(T, len);
         fmpz_poly_mat_init(U, d, d);
 
-        for (i = ((long) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        for (i = ((len_t) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
         {
             fmpz_poly_mat_sqrlow(U, T, len);
 

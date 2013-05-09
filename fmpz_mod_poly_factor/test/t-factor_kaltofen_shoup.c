@@ -46,8 +46,8 @@ main(void)
         fmpz_mod_poly_t poly1, poly, q, r, product;
         fmpz_mod_poly_factor_t res;
         fmpz_t modulus;
-        long i, j, length, num;
-        long exp[5];
+        len_t i, j, length, num;
+        len_t exp[5];
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));
 

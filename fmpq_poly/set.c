@@ -33,7 +33,7 @@ void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
     if (poly1 != poly2)
     {
-        long i, len = poly2->length;
+        len_t i, len = poly2->length;
         
         fmpq_poly_fit_length(poly1, len);
         for (i = 0; i < len; i++)

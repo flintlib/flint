@@ -28,17 +28,17 @@
 #include "fft.h"
 #include "fft_tuning.h"
 
-void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1, 
-               const fmpz * input2, long len2, long trunc)
+void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, len_t len1, 
+               const fmpz * input2, len_t len2, len_t trunc)
 {
-    long len_out = len1 + len2 - 1;
-    long loglen  = FLINT_CLOG2(len_out);
-    long loglen2 = FLINT_CLOG2(len2);
-    long n = (1L << (loglen - 2));
+    len_t len_out = len1 + len2 - 1;
+    len_t loglen  = FLINT_CLOG2(len_out);
+    len_t loglen2 = FLINT_CLOG2(len2);
+    len_t n = (1L << (loglen - 2));
 
-    long output_bits, limbs, size, i;
+    len_t output_bits, limbs, size, i;
     mp_limb_t * ptr, * t1, * t2, * tt, * s1, ** ii, ** jj;
-    long bits1, bits2;
+    len_t bits1, bits2;
     int sign = 0;
 
     ulong size1 = _fmpz_vec_max_limbs(input1, len1); 
@@ -111,10 +111,10 @@ void _fmpz_poly_mullow_SS(fmpz * output, const fmpz * input1, long len1,
 
 void
 fmpz_poly_mullow_SS(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, len_t n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

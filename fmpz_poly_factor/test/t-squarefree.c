@@ -44,7 +44,7 @@ int main(void)
     {
         fmpz_poly_t f, g[10], h, t;
         fmpz_poly_factor_t fac;
-        long k, l, n = n_randint(state, 10) + 1;
+        len_t k, l, n = n_randint(state, 10) + 1;
 
         fmpz_poly_init(f);
         fmpz_poly_init(h);

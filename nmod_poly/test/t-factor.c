@@ -51,7 +51,7 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem, product;
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead = 1;
-        long length, num, i, j;
+        len_t length, num, i, j;
         ulong exp[5], prod1;
 
         modulus = n_randtest_prime(state, 0);
@@ -155,8 +155,8 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res, res2;
         mp_limb_t modulus;
-        long length, num, i, j;
-        long exp[5], prod1;
+        len_t length, num, i, j;
+        len_t exp[5], prod1;
         ulong inflation;
         int found;
 

@@ -27,8 +27,8 @@
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
-                                              const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, len_t len1, 
+                                              const fmpz *poly2, len_t len2, 
                                               const fmpz_t p)
 {
     if (len1 == 1 || len2 == 0)
@@ -37,8 +37,8 @@ void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1,
     }
     else
     {
-        const long alloc = (len1 - 1) * (len2 - 1) + 1;
-        long i = len1 - 1, lenr = len2;
+        const len_t alloc = (len1 - 1) * (len2 - 1) + 1;
+        len_t i = len1 - 1, lenr = len2;
         fmpz * t = _fmpz_vec_init(alloc);
         
         /*
@@ -68,8 +68,8 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
                                   const fmpz_mod_poly_t poly1, 
                                   const fmpz_mod_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
 
     if (len1 == 0)
     {
@@ -81,7 +81,7 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
     }
     else
     {
-        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        const len_t lenr = (len1 - 1) * (len2 - 1) + 1;
 
         if ((res != poly1) && (res != poly2))
         {

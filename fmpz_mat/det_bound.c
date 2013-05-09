@@ -36,7 +36,7 @@ void
 fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 {
     fmpz_t p, s, t;
-    long i, j;
+    len_t i, j;
 
     fmpz_init(p);
     fmpz_init(s);

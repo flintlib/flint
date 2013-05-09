@@ -43,7 +43,7 @@ fmpz_set_d(fmpz_t f, double c)
     {
         _fmpz_demote(f);
         /* guaranteed to fit, since c gets truncated */
-        *f = (long) c;
+        *f = (len_t) c;
     }
     else
     {

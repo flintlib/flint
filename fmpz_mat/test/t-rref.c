@@ -34,9 +34,9 @@
 #include "ulong_extras.h"
 
 /* checks that the rref has the right form */
-int check_rref(const fmpz_mat_t A, const fmpz_t den, long rank)
+int check_rref(const fmpz_mat_t A, const fmpz_t den, len_t rank)
 {
-    long i, j, k, prev_pivot;
+    len_t i, j, k, prev_pivot;
 
     /* bottom should be zero */
     for (i = rank; i < A->r; i++)
@@ -77,7 +77,7 @@ int check_rref(const fmpz_mat_t A, const fmpz_t den, long rank)
 int
 main(void)
 {
-    long iter;
+    len_t iter;
     flint_rand_t state;
 
     printf("rref....");
@@ -89,8 +89,8 @@ main(void)
     {
         fmpz_mat_t A, R, B, R2;
         fmpz_t den, c, den2;
-        long j, k, m, n, b, d, r, rank1, rank2;
-        long *perm;
+        len_t j, k, m, n, b, d, r, rank1, rank2;
+        len_t *perm;
         int equal;
 
         m = n_randint(state, 10);

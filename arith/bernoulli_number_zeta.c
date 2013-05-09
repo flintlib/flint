@@ -35,7 +35,7 @@ void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {
     mpz_t r;
     mpfr_t t, u, z, pi;
-    long prec, pi_prec;
+    len_t prec, pi_prec;
 
     arith_bernoulli_number_denom(den, n);
 

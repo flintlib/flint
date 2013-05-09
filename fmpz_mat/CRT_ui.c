@@ -35,7 +35,7 @@ void
 fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
                         const fmpz_t m1, const nmod_mat_t mat2, int sign)
 {
-    long i, j;
+    len_t i, j;
     mp_limb_t c;
     mp_limb_t m2 = mat2->mod.n;
     mp_limb_t m2inv = mat2->mod.ninv;

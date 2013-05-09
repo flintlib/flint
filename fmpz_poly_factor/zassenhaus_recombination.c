@@ -32,15 +32,15 @@
 
 void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac, 
 	const fmpz_poly_factor_t lifted_fac, 
-    const fmpz_poly_t F, const fmpz_t P, long exp)
+    const fmpz_poly_t F, const fmpz_t P, len_t exp)
 {
-    const long r = lifted_fac->num;
+    const len_t r = lifted_fac->num;
 
-    long k, *used_arr, *sub_arr;
+    len_t k, *used_arr, *sub_arr;
     fmpz_poly_t f, Q, R, tryme;
     fmpz *leadF;
 
-    used_arr = flint_calloc(2 * r, sizeof(long));
+    used_arr = flint_calloc(2 * r, sizeof(len_t));
     sub_arr  = used_arr + r;
 
     fmpz_poly_init(f);
@@ -57,7 +57,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
 
     for (k = 1; k < r; k++)
     {
-        long count = 0, indx = k - 1, l;
+        len_t count = 0, indx = k - 1, l;
 
         for(l = 0; l < k; l++)
             sub_arr[l] = l;
@@ -126,7 +126,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t final_fac,
     }
 
     {
-        long test = 0;
+        len_t test = 0;
 
         for (k = 0; k < r; k++)
             test = test + used_arr[k];

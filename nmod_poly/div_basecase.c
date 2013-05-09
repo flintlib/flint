@@ -32,11 +32,11 @@
 
 void
 _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, long A_len, mp_srcptr B, long B_len,
+                             mp_srcptr A, len_t A_len, mp_srcptr B, len_t B_len,
                              nmod_t mod)
 {
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
-    long len, coeff = A_len - B_len;
+    len_t len, coeff = A_len - B_len;
     
     mp_ptr R1 = W;
     mp_srcptr Btop = B + B_len - 1;
@@ -75,10 +75,10 @@ _nmod_poly_div_basecase_1(mp_ptr Q, mp_ptr W,
 
 void
 _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, long A_len, mp_srcptr B, long B_len,
+                             mp_srcptr A, len_t A_len, mp_srcptr B, len_t B_len,
                              nmod_t mod)
 {
-    long coeff, i, len;
+    len_t coeff, i, len;
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_ptr B2, R2;
     mp_srcptr Btop;
@@ -136,10 +136,10 @@ _nmod_poly_div_basecase_2(mp_ptr Q, mp_ptr W,
 
 void
 _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
-                             mp_srcptr A, long A_len, mp_srcptr B, long B_len,
+                             mp_srcptr A, len_t A_len, mp_srcptr B, len_t B_len,
                              nmod_t mod)
 {
-    long coeff, i, len;
+    len_t coeff, i, len;
     mp_limb_t lead_inv = n_invmod(B[B_len - 1], mod.n);
     mp_limb_t r_coeff;
     mp_ptr B3, R3;
@@ -200,10 +200,10 @@ _nmod_poly_div_basecase_3(mp_ptr Q, mp_ptr W,
 
 void
 _nmod_poly_div_basecase(mp_ptr Q, mp_ptr W,
-                           mp_srcptr A, long A_len, mp_srcptr B, long B_len,
+                           mp_srcptr A, len_t A_len, mp_srcptr B, len_t B_len,
                            nmod_t mod)
 {
-    long bits =
+    len_t bits =
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(A_len - B_len + 1);
 
     if (bits <= FLINT_BITS)
@@ -220,7 +220,7 @@ nmod_poly_div_basecase(nmod_poly_t Q, const nmod_poly_t A,
 {
     mp_ptr Q_coeffs, W;
     nmod_poly_t t1;
-    long Alen, Blen;
+    len_t Alen, Blen;
 
     Blen = B->length;
 

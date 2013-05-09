@@ -32,8 +32,8 @@
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1,
-                             long len1, const fmpz * poly2, long len2,
-                             long start)
+                             len_t len1, const fmpz * poly2, len_t len2,
+                             len_t start)
 {
     _fmpz_vec_zero(res, start);
 
@@ -44,7 +44,7 @@ _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1,
     }
     else                        /* Ordinary case */
     {
-        long i, m, n;
+        len_t i, m, n;
 
         /* Set res[i] = poly1[i]*poly2[0] */
         if (start < len1)
@@ -70,9 +70,9 @@ _fmpz_poly_mulhigh_classical(fmpz * res, const fmpz * poly1,
 void
 fmpz_poly_mulhigh_classical(fmpz_poly_t res,
                             const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                            long start)
+                            len_t start)
 {
-    long len_out = poly1->length + poly2->length - 1;
+    len_t len_out = poly1->length + poly2->length - 1;
 
     if (poly1->length == 0 || poly2->length == 0 || start >= len_out)
     {

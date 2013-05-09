@@ -44,8 +44,8 @@
 typedef struct
 {
     mp_limb_t * entries;
-    long r;
-    long c;
+    len_t r;
+    len_t c;
     mp_limb_t ** rows;
     nmod_t mod;
 }
@@ -68,20 +68,20 @@ _nmod_mat_set_mod(nmod_mat_t mat, mp_limb_t n)
 }
 
 /* Memory management */
-void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n);
+void nmod_mat_init(nmod_mat_t mat, len_t rows, len_t cols, mp_limb_t n);
 void nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src);
 void nmod_mat_clear(nmod_mat_t mat);
 
-void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, long r1, long c1, long r2, long c2);
+void nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat, len_t r1, len_t c1, len_t r2, len_t c2);
 void nmod_mat_window_clear(nmod_mat_t window);
 
 /* Random matrix generation */
 void nmod_mat_randtest(nmod_mat_t mat, flint_rand_t state);
 void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state);
 int nmod_mat_randpermdiag(nmod_mat_t mat, flint_rand_t state, 
-                 mp_srcptr diag, long n);
-void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, long rank);
-void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state);
+                 mp_srcptr diag, len_t n);
+void nmod_mat_randrank(nmod_mat_t, flint_rand_t state, len_t rank);
+void nmod_mat_randops(nmod_mat_t mat, len_t count, flint_rand_t state);
 void nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit);
 void nmod_mat_randtriu(nmod_mat_t mat, flint_rand_t state, int unit);
 
@@ -147,7 +147,7 @@ mp_limb_t nmod_mat_det(const nmod_mat_t A);
 
 /* Rank */
 
-long nmod_mat_rank(const nmod_mat_t A);
+len_t nmod_mat_rank(const nmod_mat_t A);
 
 /* Inverse */
 
@@ -165,9 +165,9 @@ void nmod_mat_solve_triu_classical(nmod_mat_t X, const nmod_mat_t U, const nmod_
 
 /* LU decomposition */
 
-long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check);
-long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check);
-long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check);
+len_t nmod_mat_lu(len_t * P, nmod_mat_t A, int rank_check);
+len_t nmod_mat_lu_classical(len_t * P, nmod_mat_t A, int rank_check);
+len_t nmod_mat_lu_recursive(len_t * P, nmod_mat_t A, int rank_check);
 
 /* Nonsingular solving */
 
@@ -176,11 +176,11 @@ int nmod_mat_solve_vec(mp_ptr x, const nmod_mat_t A, mp_srcptr b);
 
 /* Reduced row echelon form */
 
-long nmod_mat_rref(nmod_mat_t A);
+len_t nmod_mat_rref(nmod_mat_t A);
 
 /* Nullspace */
 
-long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
+len_t nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A);
 
 
 /* Tuning parameters *********************************************************/

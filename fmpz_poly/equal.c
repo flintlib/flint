@@ -31,7 +31,7 @@
 int
 fmpz_poly_equal(const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long i;
+    len_t i;
 
     if (poly1 == poly2)
         return 1;               /* same polynomial */

@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 
 int
-_nmod_vec_dot_bound_limbs(long len, nmod_t mod)
+_nmod_vec_dot_bound_limbs(len_t len, nmod_t mod)
 {
     mp_limb_t t2, t1, t0, u1, u0;
 

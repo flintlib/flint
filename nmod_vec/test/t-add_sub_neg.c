@@ -43,7 +43,7 @@ main(void)
     /* Check (a + b) - b == a */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(state, 100) + 1;
+        len_t len = n_randint(state, 100) + 1;
         nmod_t mod;
         mp_limb_t n = n_randtest_not_zero(state);
 
@@ -75,7 +75,7 @@ main(void)
     /* Check (a + -b) == a - b */
     for (i = 0; i < 10000; i++)
     {
-        long len = n_randint(state, 100) + 1;
+        len_t len = n_randint(state, 100) + 1;
         mp_limb_t n = n_randtest_not_zero(state);
         nmod_t mod;
 

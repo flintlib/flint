@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, q, r, prod;
-        long d;
+        len_t d;
         fmpz_t p;
 
         fmpz_init(p);

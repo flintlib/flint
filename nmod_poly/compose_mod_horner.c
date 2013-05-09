@@ -31,9 +31,9 @@
 
 void
 _nmod_poly_compose_mod_horner(mp_ptr res,
-    mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
+    mp_srcptr f, len_t lenf, mp_srcptr g, mp_srcptr h, len_t lenh, nmod_t mod)
 {
-    long i, len;
+    len_t i, len;
     mp_ptr t;
 
     if (lenh == 1)
@@ -75,10 +75,10 @@ nmod_poly_compose_mod_horner(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t len3 = poly3->length;
+    len_t len = len3 - 1;
 
     mp_ptr ptr2;
 

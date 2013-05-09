@@ -31,7 +31,7 @@
 void
 fmpz_mat_one(fmpz_mat_t mat)
 {
-    long i, n;
+    len_t i, n;
 
     fmpz_mat_zero(mat);
     n = FLINT_MIN(mat->r, mat->c);

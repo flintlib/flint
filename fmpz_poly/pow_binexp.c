@@ -31,11 +31,11 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
+_fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, len_t len, ulong e)
 {
     ulong bit = ~((~0UL) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
+    len_t rlen;
+    len_t alloc = (len_t) e * (len - 1) + 1;
     fmpz *v = _fmpz_vec_init(alloc);
     fmpz *R, *S, *T;
 
@@ -114,8 +114,8 @@ _fmpz_poly_pow_binexp(fmpz * res, const fmpz * poly, long len, ulong e)
 void
 fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const long len = poly->length;
-    long rlen;
+    const len_t len = poly->length;
+    len_t rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -136,7 +136,7 @@ fmpz_poly_pow_binexp(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (len_t) e * (len - 1) + 1;
 
     if (res != poly)
     {

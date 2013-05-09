@@ -32,10 +32,10 @@
 #include "arith.h"
 
 static void
-__ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
+__ramanujan_even_common_denom(fmpz * num, fmpz * den, len_t start, len_t n)
 {
     fmpz_t t, c, d, cden;
-    long j, k, m, mcase;
+    len_t j, k, m, mcase;
     int prodsize;
 
     if (start >= n)
@@ -97,7 +97,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
 
         for (j = 6; j <= m; j += 6)
         {
-            long r = m - j;
+            len_t r = m - j;
 
             /* c = binomial(m+3, m-j); */
             switch (prodsize)
@@ -145,9 +145,9 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, long start, long n)
     fmpz_clear(cden);
 }
 
-void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, long n)
+void _arith_bernoulli_number_vec_recursive(fmpz * num, fmpz * den, len_t n)
 {
-    long i, start;
+    len_t i, start;
     fmpz_t t;
     fmpz_t d;
 

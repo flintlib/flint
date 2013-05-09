@@ -48,8 +48,8 @@ main(void)
         fmpz *a, *b, *c;
         fmpz_t n;
         mpz_t d, e, f, m;
-        long i;
-        long len = n_randint(state, 100);
+        len_t i;
+        len_t len = n_randint(state, 100);
 
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);
@@ -106,8 +106,8 @@ main(void)
         fmpz *a, *b;
         fmpz_t n;
         mpz_t d, e, f, m;
-        long i;
-        long len = n_randint(state, 100);
+        len_t i;
+        len_t len = n_randint(state, 100);
 
         fmpz_init(n);
         fmpz_randtest_not_zero(n, state, 100);

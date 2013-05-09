@@ -39,8 +39,8 @@
 typedef struct
 {
     fmpq * entries;
-    long r;
-    long c;
+    len_t r;
+    len_t c;
     fmpq ** rows;
 } fmpq_mat_struct;
 
@@ -53,7 +53,7 @@ typedef fmpq_mat_struct fmpq_mat_t[1];
 #define fmpq_mat_nrows(mat) ((mat)->r)
 #define fmpq_mat_ncols(mat) ((mat)->c)
 
-void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols);
+void fmpq_mat_init(fmpq_mat_t mat, len_t rows, len_t cols);
 
 void fmpq_mat_clear(fmpq_mat_t mat);
 
@@ -178,13 +178,13 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A);
 
 /* Echelon form **************************************************************/
 
-int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c);
+int fmpq_mat_pivot(len_t * perm, fmpq_mat_t mat, len_t r, len_t c);
 
-long fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
+len_t fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A);
 
-long fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
+len_t fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A);
 
-long fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
+len_t fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A);
 
 #ifdef __cplusplus
 }

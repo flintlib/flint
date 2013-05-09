@@ -39,11 +39,11 @@
 
 /* Memory management *********************************************************/
 
-static __inline__ long * _perm_init(long n)
+static __inline__ len_t * _perm_init(len_t n)
 {
-    long i, *vec;
+    len_t i, *vec;
 
-    vec = (long *) flint_malloc(n * sizeof(long));
+    vec = (len_t *) flint_malloc(n * sizeof(len_t));
 
     if (!vec)
     {
@@ -57,16 +57,16 @@ static __inline__ long * _perm_init(long n)
     return vec;
 }
 
-static __inline__ void _perm_clear(long * vec)
+static __inline__ void _perm_clear(len_t * vec)
 {
     flint_free(vec);
 }
 
 /* Assignment ****************************************************************/
 
-static __inline__ long _perm_equal(const long *vec1, const long *vec2, long n)
+static __inline__ len_t _perm_equal(const len_t *vec1, const len_t *vec2, len_t n)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < n; i++)
         if (vec1[i] != vec2[i])
@@ -75,30 +75,30 @@ static __inline__ long _perm_equal(const long *vec1, const long *vec2, long n)
     return 1;
 }
 
-static __inline__ void _perm_set(long *res, const long *vec, long n)
+static __inline__ void _perm_set(len_t *res, const len_t *vec, len_t n)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < n; i++)
         res[i] = vec[i];
 }
 
-static __inline__ void _perm_set_one(long *vec, long n)
+static __inline__ void _perm_set_one(len_t *vec, len_t n)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < n; i++)
         vec[i] = i;
 }
 
 static __inline__ void
- _perm_inv(long *res, const long *vec, long n)
+ _perm_inv(len_t *res, const len_t *vec, len_t n)
 {
-    long i;
+    len_t i;
 
     if (res == vec)
     {
-        long *t = (long *) flint_malloc(n * sizeof(long));
+        len_t *t = (len_t *) flint_malloc(n * sizeof(len_t));
 
         if (!t)
         {
@@ -123,13 +123,13 @@ static __inline__ void
 /* Composition ***************************************************************/
 
 static __inline__ void
-_perm_compose(long *res, const long *vec1, const long *vec2, long n)
+_perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, len_t n)
 {
-    long i;
+    len_t i;
 
     if (res == vec1)
     {
-        long *t = (long *) flint_malloc(n * sizeof(long));
+        len_t *t = (len_t *) flint_malloc(n * sizeof(len_t));
 
         for (i = 0; i < n; i++)
             t[i] = vec1[i];
@@ -147,17 +147,17 @@ _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
 /* Randomisation *************************************************************/
 
-int _perm_randtest(long * vec, long n, flint_rand_t state);
+int _perm_randtest(len_t * vec, len_t n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-int _perm_parity(const long * vec, long n);
+int _perm_parity(const len_t * vec, len_t n);
 
 /* Input and output **********************************************************/
 
-static __inline__  int _long_vec_print(const long * vec, long len)
+static __inline__  int _long_vec_print(const len_t * vec, len_t len)
 {
-    long i;
+    len_t i;
 
     printf("%ld", len);
     if (len > 0)
@@ -170,9 +170,9 @@ static __inline__  int _long_vec_print(const long * vec, long len)
     return 1;
 }
 
-static __inline__ int _perm_print(const long * vec, long n)
+static __inline__ int _perm_print(const len_t * vec, len_t n)
 {
-    long i;
+    len_t i;
 
     printf("%ld", n);
     if (n > 0)

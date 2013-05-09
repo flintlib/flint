@@ -30,7 +30,7 @@
 
 static void
 binary_splitting(fmpz_poly_mat_t P, fmpz_poly_mat_t * const factors,
-                                                            long n1, long n2)
+                                                            len_t n1, len_t n2)
 {
     if (n2 - n1 <= 0)
     {
@@ -47,7 +47,7 @@ binary_splitting(fmpz_poly_mat_t P, fmpz_poly_mat_t * const factors,
     else
     {
         fmpz_poly_mat_t P1, P2;
-        long m = (n1 + n2) / 2;
+        len_t m = (n1 + n2) / 2;
 
         fmpz_poly_mat_init(P1, P->r, P->c);
         fmpz_poly_mat_init(P2, P->r, P->c);
@@ -64,7 +64,7 @@ binary_splitting(fmpz_poly_mat_t P, fmpz_poly_mat_t * const factors,
 
 void
 fmpz_poly_mat_prod(fmpz_poly_mat_t res,
-                        fmpz_poly_mat_t * const factors, long n)
+                        fmpz_poly_mat_t * const factors, len_t n)
 {
     binary_splitting(res, factors, 0, n);
 }

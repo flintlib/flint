@@ -51,7 +51,7 @@ main(void)
         fmpz_poly_t F, G, H, R;
         fmpz_poly_factor_t F_fac;
         nmod_poly_factor_t f_fac;
-        long bits, nbits, n, exp, j;
+        len_t bits, nbits, n, exp, j;
 
         bits  = n_randint(state, 200) + 1;
         nbits = n_randint(state,FLINT_BITS - 6) + 6;

@@ -36,7 +36,7 @@
 void
 _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 {
-    long i;
+    len_t i;
     fmpz * p;
     fmpz_t r;
 

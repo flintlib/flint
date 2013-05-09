@@ -21,7 +21,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         fmpz_poly_q_t a, b;
-        long x;
+        len_t x;
 
         fmpz_poly_q_init(a);
         fmpz_poly_q_init(b);
@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         fmpz_poly_q_t a, b, c, d;
-        long x;
+        len_t x;
 
         fmpz_poly_q_init(a);
         fmpz_poly_q_init(b);

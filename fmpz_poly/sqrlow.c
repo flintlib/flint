@@ -31,7 +31,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, long len, long n)
+void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, len_t len, len_t n)
 {
     mp_size_t limbs;
 
@@ -67,9 +67,9 @@ void _fmpz_poly_sqrlow(fmpz * res, const fmpz * poly, long len, long n)
        _fmpz_poly_mullow_SS(res, poly, len, poly, len, n);
 }
 
-void fmpz_poly_sqrlow(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+void fmpz_poly_sqrlow(fmpz_poly_t res, const fmpz_poly_t poly, len_t n)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
 
     if (len == 0 || n == 0)
     {

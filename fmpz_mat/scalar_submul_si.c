@@ -30,7 +30,7 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c)
 {
     if (c > 0)
         fmpz_mat_scalar_submul_ui(B, A, c);

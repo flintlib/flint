@@ -55,16 +55,16 @@ do {                                                        \
     nmod_poly_gcd_hgcd() should rely on this.
  */
 
-long _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, long lenA, 
-                                   mp_srcptr B, long lenB, nmod_t mod)
+len_t _nmod_poly_gcd_hgcd(mp_ptr G, mp_srcptr A, len_t lenA, 
+                                   mp_srcptr B, len_t lenB, nmod_t mod)
 {
-    const long cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+    const len_t cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
     mp_ptr J = _nmod_vec_init(2 * lenB);
     mp_ptr R = J + lenB;
 
-    long lenG, lenJ, lenR;
+    len_t lenG, lenJ, lenR;
 
     __rem(R, lenR, A, lenA, B, lenB);
 
@@ -108,7 +108,7 @@ void nmod_poly_gcd_hgcd(nmod_poly_t G,
     }
     else /* lenA >= lenB >= 0 */
     {
-        long lenA = A->length, lenB = B->length, lenG;
+        len_t lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
         mp_ptr g;
 

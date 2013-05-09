@@ -75,7 +75,7 @@ flint_mpn_divisible_1_p(mp_srcptr x, mp_size_t xsize, mp_limb_t d)
 static __inline__
 int flint_mpn_zero_p(mp_srcptr x, mp_size_t xsize)
 {
-    long i;
+    len_t i;
     for (i = 0; i < xsize; i++)
     {
         if (x[i])
@@ -100,7 +100,7 @@ mp_size_t flint_mpn_remove_2exp(mp_ptr x, mp_size_t xsize, mp_bitcnt_t *bits);
 mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
                                      mp_ptr p, mp_size_t psize, ulong *exp);
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop);
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, len_t start, len_t stop);
 
 int flint_mpn_divides(mp_ptr q, mp_srcptr array1, 
          mp_size_t limbs1, mp_srcptr arrayg, mp_size_t limbsg, mp_ptr temp);
@@ -182,7 +182,7 @@ do {                                                         \
 void
 flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
-                          long a, long b, long n, int d);
+                          len_t a, len_t b, len_t n, int d);
 
 mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2);
 

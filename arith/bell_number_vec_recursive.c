@@ -31,9 +31,9 @@
 #include "arith.h"
 
 void
-arith_bell_number_vec_recursive(fmpz * b, long n)
+arith_bell_number_vec_recursive(fmpz * b, len_t n)
 {
-    long i, k;
+    len_t i, k;
     fmpz * t;
 
     if (n < BELL_NUMBER_TAB_SIZE)

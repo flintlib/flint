@@ -36,9 +36,9 @@
 void
 fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 {
-    const long c = mat->c, r = mat->r, d = r;
+    const len_t c = mat->c, r = mat->r, d = r;
 
-    long i, j;
+    len_t i, j;
     fmpz_t tmp;
 
     if (c != r)

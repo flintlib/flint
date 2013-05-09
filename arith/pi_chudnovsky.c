@@ -56,20 +56,20 @@ typedef struct {
 } fac_t[1];
 
 typedef struct {
-    long int fac;
-    long int pow;
-    long int nxt;
+    len_t fac;
+    len_t pow;
+    len_t nxt;
 } sieve_t;
 
 typedef struct 
 {
     sieve_t *sieve;
-    long int sieve_size;
+    len_t sieve_size;
     fac_t ftmp, fmul;
     mpz_t gcd;
     mpz_t *pstack, *qstack, *gstack;
     fac_t *fpstack, *fgstack;
-    long int top;
+    len_t top;
 }
 pi_state_struct;
 
@@ -215,7 +215,7 @@ fac_reset(fac_t f)
 }
 
 static __inline__ void
-fac_init_size(fac_t f, long int s)
+fac_init_size(fac_t f, len_t s)
 {
     if (s < INIT_FACS)
         s = INIT_FACS;
@@ -240,7 +240,7 @@ fac_clear(fac_t f)
 }
 
 static __inline__ void
-fac_resize(fac_t f, long int s)
+fac_resize(fac_t f, len_t s)
 {
     if (f[0].max_facs < s)
     {
@@ -251,9 +251,9 @@ fac_resize(fac_t f, long int s)
 
 /* f = base^pow */
 static __inline__ void
-fac_set_bp(pi_state state, fac_t f, unsigned long base, long int pow)
+fac_set_bp(pi_state state, fac_t f, unsigned long base, len_t pow)
 {
-    long int i;
+    len_t i;
     assert(base<state->sieve_size);
     for (i=0, base/=2; base>0; i++, base = state->sieve[base].nxt)
     {
@@ -268,7 +268,7 @@ fac_set_bp(pi_state state, fac_t f, unsigned long base, long int pow)
 static __inline__ void
 fac_mul2(pi_state state, fac_t r, fac_t f, fac_t g)
 {
-    long int i, j, k;
+    len_t i, j, k;
 
     for (i=j=k=0; i<f[0].num_facs && j<g[0].num_facs; k++)
     {
@@ -332,7 +332,7 @@ fac_mul_bp(pi_state state, fac_t f, unsigned long base, unsigned long pow)
 static __inline__ void
 fac_compact(fac_t f)
 {
-    long int i, j;
+    len_t i, j;
     for (i=0, j=0; i<f[0].num_facs; i++)
     {
         if (f[0].pow[i]>0)
@@ -350,9 +350,9 @@ fac_compact(fac_t f)
 
 /* convert factorized form to number */
 void
-bs_mul(pi_state state, mpz_t r, long int a, long int b)
+bs_mul(pi_state state, mpz_t r, len_t a, len_t b)
 {
-    long int i, j;
+    len_t i, j;
     if (b-a<=32)
     {
         mpz_set_ui(r, 1);
@@ -376,7 +376,7 @@ bs_mul(pi_state state, mpz_t r, long int a, long int b)
 void
 fac_remove_gcd(pi_state state, mpz_t p, fac_t fp, mpz_t g, fac_t fg)
 {
-    long int i, j, k, c;
+    len_t i, j, k, c;
 
     fac_resize(state->fmul, min(fp->num_facs, fg->num_facs));
 
@@ -425,7 +425,7 @@ fac_remove_gcd(pi_state state, mpz_t p, fac_t fp, mpz_t g, fac_t fg)
 /* binary splitting */
 void
 bs(pi_state state, unsigned long a, unsigned long b,
-    unsigned gflag, long int level)
+    unsigned gflag, len_t level)
 {
     unsigned long i, mid;
 
@@ -498,12 +498,12 @@ bs(pi_state state, unsigned long a, unsigned long b,
 }
 
 void
-build_sieve(pi_state state, long int n, sieve_t *s)
+build_sieve(pi_state state, len_t n, sieve_t *s)
 {
-    long int m, i, j, k;
+    len_t m, i, j, k;
 
     state->sieve_size = n;
-    m = (long int)sqrt(n);
+    m = (len_t)sqrt(n);
     memset(s, 0, sizeof(sieve_t)*n/2);
 
     s[1/2].fac = 1;
@@ -544,7 +544,7 @@ mpfr_pi_chudnovsky(mpfr_t res, mpfr_rnd_t rnd)
 {
     mpf_t  pi, qi, t1, t2;
     mpfr_prec_t prec;
-    long int i, depth=1, terms;
+    len_t i, depth=1, terms;
     pi_state state;
 
     prec = mpfr_get_prec(res) + 64;

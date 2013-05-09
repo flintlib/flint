@@ -71,14 +71,14 @@ typedef struct {
 
 typedef struct
 {
-    long small_i;
-    long small_num;
+    len_t small_i;
+    len_t small_num;
     unsigned int * small_primes;
 
     mp_limb_t sieve_a;
     mp_limb_t sieve_b;
-    long sieve_i;
-    long sieve_num;
+    len_t sieve_i;
+    len_t sieve_num;
     char * sieve;
 }
 n_primes_struct;
@@ -235,12 +235,12 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
 
-long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp); 
+len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp); 
 
-long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
-                                              mp_limb_t p, long exp);
+len_t n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
+                                              mp_limb_t p, len_t exp);
 
-long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
+len_t n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
 
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 

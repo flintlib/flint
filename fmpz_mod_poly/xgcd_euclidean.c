@@ -28,9 +28,9 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
-                                   const fmpz *A, long lenA, 
-                                   const fmpz *B, long lenB, 
+len_t _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
+                                   const fmpz *A, len_t lenA, 
+                                   const fmpz *B, len_t lenB, 
                                    const fmpz_t invB, const fmpz_t p)
 {
     _fmpz_vec_zero(G, lenB);
@@ -46,7 +46,7 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
     else
     {
         fmpz *Q, *R;
-        long lenQ, lenR;
+        len_t lenQ, lenR;
 
         Q = _fmpz_vec_init(2 * lenA);
         R = Q + lenA;
@@ -67,7 +67,7 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
         {
             fmpz_t inv;
             fmpz *D, *U, *V1, *V3, *W;
-            long lenD, lenU, lenV1, lenV3, lenW;
+            len_t lenD, lenU, lenV1, lenV3, lenW;
 
             fmpz_init(inv);
             W  = _fmpz_vec_init(FLINT_MAX(5 * lenB, lenA + lenB));
@@ -104,7 +104,7 @@ long _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T,
                 FMPZ_VEC_SWAP(U, lenU, V1, lenV1);
                 {
                     fmpz *__t;
-                    long __tn;
+                    len_t __tn;
 
                     __t = D;
                     D   = V3;
@@ -150,7 +150,7 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     }
     else  /* lenA >= lenB >= 0 */
     {
-        const long lenA = A->length, lenB = B->length;
+        const len_t lenA = A->length, lenB = B->length;
         fmpz_t inv;
 
         fmpz_init(inv);
@@ -170,7 +170,7 @@ fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
         else  /* lenA >= lenB >= 2 */
         {
             fmpz *g, *s, *t;
-            long lenG;
+            len_t lenG;
 
             if (G == A || G == B)
             {

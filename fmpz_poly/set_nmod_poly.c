@@ -33,7 +33,7 @@
 void
 fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly)
 {
-    long len = poly->length;
+    len_t len = poly->length;
 
     if (len == 0)
     {
@@ -41,7 +41,7 @@ fmpz_poly_set_nmod_poly(fmpz_poly_t res, const nmod_poly_t poly)
     }
     else
     {
-        long i;
+        len_t i;
         fmpz_poly_fit_length(res, len);
         for (i = 0; i < len; i++)
             fmpz_set_ui_smod(res->coeffs + i, poly->coeffs[i], poly->mod.n);

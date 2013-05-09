@@ -30,8 +30,8 @@
 void
 nmod_poly_mat_sqr_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 {
-    long i, j, k;
-    long A_len, len;
+    len_t i, j, k;
+    len_t A_len, len;
 
     nmod_mat_t *C_mod, *A_mod;
 

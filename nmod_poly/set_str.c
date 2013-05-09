@@ -33,7 +33,7 @@
 int nmod_poly_set_str(nmod_poly_t poly, const char * s)
 {
     const char * whitespace = " \t\n\r";
-    long i, length;
+    len_t i, length;
     mp_limb_t n;
 
     if (sscanf(s, "%ld %lu", &length, &n) != 2)

@@ -165,7 +165,7 @@ void nmod_init(nmod_t * mod, mp_limb_t n)
 }
 
 static __inline__
-mp_ptr _nmod_vec_init(long len)
+mp_ptr _nmod_vec_init(len_t len)
 {
    return (mp_ptr) flint_malloc(len * sizeof(mp_limb_t));
 }
@@ -176,26 +176,26 @@ void _nmod_vec_clear(mp_ptr vec)
    flint_free(vec);
 }
 
-void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod);
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, len_t len, nmod_t mod);
 
 static __inline__
-void _nmod_vec_zero(mp_ptr vec, long len)
+void _nmod_vec_zero(mp_ptr vec, len_t len)
 {
    flint_mpn_zero(vec, len);
 }
 
-mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, long len);
+mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, len_t len);
 
 static __inline__
-void _nmod_vec_set(mp_ptr res, mp_srcptr vec, long len)
+void _nmod_vec_set(mp_ptr res, mp_srcptr vec, len_t len)
 {
    flint_mpn_copyi(res, vec, len);
 }
 
 static __inline__
-void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
+void _nmod_vec_swap(mp_ptr a, mp_ptr b, len_t length)
 {
-    long i;
+    len_t i;
     for (i = 0; i < length; i++)
     {
         mp_limb_t t = a[i];
@@ -205,9 +205,9 @@ void _nmod_vec_swap(mp_ptr a, mp_ptr b, long length)
 }
 
 static __inline__
-int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
+int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, len_t len)
 {
-   long i;
+   len_t i;
 
    for (i = 0; i < len; i++)
       if (vec[i] != vec2[i]) return 0;
@@ -216,9 +216,9 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, long len)
 }
 
 static __inline__
-int _nmod_vec_is_zero(mp_srcptr vec, long len)
+int _nmod_vec_is_zero(mp_srcptr vec, len_t len)
 {
-   long i;
+   len_t i;
 
    for (i = 0; i < len; i++)
       if (vec[i] != 0) return 0;
@@ -227,25 +227,25 @@ int _nmod_vec_is_zero(mp_srcptr vec, long len)
 }
 
 void _nmod_vec_reduce(mp_ptr res, mp_srcptr vec, 
-                                        long len, nmod_t mod);
+                                        len_t len, nmod_t mod);
 
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-                        mp_srcptr vec2, long len, nmod_t mod);
+                        mp_srcptr vec2, len_t len, nmod_t mod);
 
 void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
-                        mp_srcptr vec2, long len, nmod_t mod);
+                        mp_srcptr vec2, len_t len, nmod_t mod);
 
 void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, 
-                                            long len, nmod_t mod);
+                                            len_t len, nmod_t mod);
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-                            long len, mp_limb_t c, nmod_t mod);
+                            len_t len, mp_limb_t c, nmod_t mod);
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-                            long len, mp_limb_t c, nmod_t mod);
+                            len_t len, mp_limb_t c, nmod_t mod);
 
 
-int _nmod_vec_dot_bound_limbs(long len, nmod_t mod);
+int _nmod_vec_dot_bound_limbs(len_t len, nmod_t mod);
 
 
 #define NMOD_VEC_DOT(res, i, len, expr1, expr2, mod, nlimbs)                \
@@ -295,10 +295,10 @@ int _nmod_vec_dot_bound_limbs(long len, nmod_t mod);
     } while (0);
 
 mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
-    long len, nmod_t mod, int nlimbs);
+    len_t len, nmod_t mod, int nlimbs);
 
-mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset,
-    long len, nmod_t mod, int nlimbs);
+mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, len_t offset,
+    len_t len, nmod_t mod, int nlimbs);
 
 #ifdef __cplusplus
 }

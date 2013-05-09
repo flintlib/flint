@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A;
     flint_rand_t state;
-    long i, m;
+    len_t i, m;
 
     fmpz_t det1, det2;
 

@@ -31,9 +31,9 @@
 
 void
 _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
-                                        long n, nmod_t mod)
+                                        len_t n, nmod_t mod)
 {
-    long j, k, rlen;
+    len_t j, k, rlen;
     mp_limb_t a;
 
     _nmod_vec_zero(res, n);
@@ -84,7 +84,7 @@ _nmod_poly_log_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
 
 void
 nmod_poly_log_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
-                                    ulong power, long n)
+                                    ulong power, len_t n)
 {
     if (power == 0)
     {

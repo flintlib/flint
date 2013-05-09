@@ -30,7 +30,7 @@
 
 void fmpz_mod_poly_set_fmpz_poly(fmpz_mod_poly_t f, const fmpz_poly_t g)
 {
-    long i;
+    len_t i;
 
     fmpz_mod_poly_fit_length(f, g->length);
     _fmpz_mod_poly_set_length(f, g->length);

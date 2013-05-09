@@ -29,9 +29,9 @@
 #define n    (S->n)
 #define pow  (S->pow)
 
-void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, long N)
+void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, len_t N)
 {
-    long *a;
+    len_t *a;
 
     a = _padic_lifts_exps(&n, N);
 
@@ -49,7 +49,7 @@ void _padic_inv_clear(padic_inv_t S)
 
 void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
 {
-    long i;
+    len_t i;
     fmpz *t, *u;
 
     u = pow + n;
@@ -82,7 +82,7 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
 #undef n
 #undef pow
 
-void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
 {
     if (N == 1)
     {

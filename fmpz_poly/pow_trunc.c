@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
+_fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, len_t n)
 {
     ulong bit = ~((~0UL) >> 1);
     fmpz *v = _fmpz_vec_init(n);
@@ -104,11 +104,11 @@ _fmpz_poly_pow_trunc(fmpz * res, const fmpz * poly, ulong e, long n)
 }
 
 void
-fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, long n)
+fmpz_poly_pow_trunc(fmpz_poly_t res, const fmpz_poly_t poly, ulong e, len_t n)
 {
     fmpz * copy;
     int clear;
-    long i, len;
+    len_t i, len;
 
     if (n == 0)
     {

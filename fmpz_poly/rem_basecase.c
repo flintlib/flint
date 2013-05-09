@@ -32,8 +32,8 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, long lenA,
-                                  const fmpz * B, long lenB)
+_fmpz_poly_rem_basecase(fmpz * R, const fmpz * A, len_t lenA,
+                                  const fmpz * B, len_t lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
     fmpz_t q;
@@ -59,7 +59,7 @@ void
 fmpz_poly_rem_basecase(fmpz_poly_t R,
                        const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenr;
+    len_t lenr;
     fmpz *r;
     
     if (B->length == 0)

@@ -32,11 +32,11 @@
 
 
 void
-fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
+fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, len_t count)
 {
-    long c, i, j, k;
-    long m = mat->r;
-    long n = mat->c;
+    len_t c, i, j, k;
+    len_t m = mat->r;
+    len_t n = mat->c;
 
     if (mat->r == 0 || mat->c == 0)
         return;

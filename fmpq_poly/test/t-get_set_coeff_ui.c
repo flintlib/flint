@@ -50,10 +50,10 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
-        long coeff, len;
+        len_t coeff, len;
 
         fmpq_poly_init(a);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (len_t) (n_randint(state, 100) + 1);
         fmpq_poly_randtest(a, state, len, 100);
 
         for (j = 0; j < 1000; j++)

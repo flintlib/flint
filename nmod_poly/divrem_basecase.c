@@ -33,11 +33,11 @@
 
 void
 _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                             mp_srcptr A, len_t lenA, mp_srcptr B, len_t lenB,
                              nmod_t mod)
 {
     const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
-    long iR;
+    len_t iR;
     mp_ptr ptrQ = Q - lenB + 1;
     mp_ptr R1 = W;
     
@@ -67,11 +67,11 @@ _nmod_poly_divrem_basecase_1(mp_ptr Q, mp_ptr R, mp_ptr W,
 
 void
 _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                             mp_srcptr A, len_t lenA, mp_srcptr B, len_t lenB,
                              nmod_t mod)
 {
     const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
-    long iR, i;
+    len_t iR, i;
     mp_ptr B2 = W, R2 = W + 2*(lenB - 1), ptrQ = Q - lenB + 1;
 
     for (i = 0; i < lenB - 1; i++)
@@ -117,11 +117,11 @@ _nmod_poly_divrem_basecase_2(mp_ptr Q, mp_ptr R, mp_ptr W,
 
 void
 _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
-                             mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                             mp_srcptr A, len_t lenA, mp_srcptr B, len_t lenB,
                              nmod_t mod)
 {
     const mp_limb_t invL = n_invmod(B[lenB - 1], mod.n);
-    long iR, i;
+    len_t iR, i;
     mp_ptr B3 = W, R3 = W + 3*(lenB - 1), ptrQ = Q - lenB + 1;
 
     for (i = 0; i < lenB - 1; i++)
@@ -171,10 +171,10 @@ _nmod_poly_divrem_basecase_3(mp_ptr Q, mp_ptr R, mp_ptr W,
 
 void
 _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
-                           mp_srcptr A, long lenA, mp_srcptr B, long lenB,
+                           mp_srcptr A, len_t lenA, mp_srcptr B, len_t lenB,
                            nmod_t mod)
 {
-    const long bits =
+    const len_t bits =
         2 * (FLINT_BITS - mod.norm) + FLINT_BIT_COUNT(lenA - lenB + 1);
 
     if (bits <= FLINT_BITS)
@@ -189,7 +189,7 @@ void
 nmod_poly_divrem_basecase(nmod_poly_t Q, nmod_poly_t R, const nmod_poly_t A,
                           const nmod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
+    const len_t lenA = A->length, lenB = B->length;
     mp_ptr Q_coeffs, R_coeffs, W;
     nmod_poly_t t1, t2;
 

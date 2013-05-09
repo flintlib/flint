@@ -30,7 +30,7 @@
 void
 nmod_poly_mat_det(nmod_poly_t det, const nmod_poly_mat_t A)
 {
-    long n = A->r;
+    len_t n = A->r;
 
     if (n == 0)
     {

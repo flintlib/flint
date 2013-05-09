@@ -39,7 +39,7 @@ main(void)
     fmpz_mat_t A, X, B, AX;
     fmpz_t den;
     flint_rand_t state;
-    long i, m, n, r;
+    len_t i, m, n, r;
     int success;
 
     printf("solve....");

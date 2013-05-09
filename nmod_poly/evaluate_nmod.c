@@ -29,9 +29,9 @@
 #include "nmod_poly.h"
 
 mp_limb_t
-_nmod_poly_evaluate_nmod(mp_srcptr poly, long len, mp_limb_t c, nmod_t mod)
+_nmod_poly_evaluate_nmod(mp_srcptr poly, len_t len, mp_limb_t c, nmod_t mod)
 {
-    long m;
+    len_t m;
     mp_limb_t val;
 
     if (len == 0)

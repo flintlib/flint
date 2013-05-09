@@ -34,7 +34,7 @@
 void
 _fmpz_factor_extend_factor_ui(fmpz_factor_t factor, mp_limb_t n)
 {
-    long i, len;
+    len_t i, len;
     n_factor_t nfac;
 
     if (n == 0)

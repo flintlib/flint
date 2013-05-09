@@ -36,7 +36,7 @@
 #define DOUBLE_MIN COEFF_MIN
 #endif
 
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
+extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, len_t);
 
 double
 fmpz_get_d(const fmpz_t f)

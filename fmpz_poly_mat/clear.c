@@ -33,7 +33,7 @@ fmpz_poly_mat_clear(fmpz_poly_mat_t A)
 {
     if (A->entries)
     {
-        long i;
+        len_t i;
 
         for (i = 0; i < A->r * A->c; i++)
             fmpz_poly_clear(A->entries + i);

@@ -136,10 +136,10 @@ void mpn_addmod_2expp1_1(mp_limb_t * r, mp_size_t limbs, mp_limb_signed_t c)
    }
 }
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, len_t length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs);
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, len_t length, 
                  mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs);
 
 mp_size_t fft_split_limbs(mp_limb_t ** poly, mp_limb_t * limbs, 
@@ -267,7 +267,7 @@ void fft_naive_convolution_1(mp_limb_t * r, mp_limb_t * ii,
 void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2, 
                              mp_size_t r_limbs, mp_bitcnt_t depth, mp_bitcnt_t w);
 
-long fft_adjust_limbs(mp_size_t limbs);
+len_t fft_adjust_limbs(mp_size_t limbs);
 
 void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2, 
                                         mp_size_t n, mp_size_t w, mp_limb_t * tt);
@@ -275,8 +275,8 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
 void flint_mpn_mul_fft_main(mp_limb_t * r1, mp_limb_t * i1, mp_size_t n1, 
                                                     mp_limb_t * i2, mp_size_t n2);
 
-void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
-                                 long limbs, long trunc, mp_limb_t ** t1, 
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, len_t depth, 
+                                 len_t limbs, len_t trunc, mp_limb_t ** t1, 
                                 mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt);
 
 #ifdef __cplusplus

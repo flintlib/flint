@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     flint_rand_t state;
 
     printf("trace....");
@@ -46,7 +46,7 @@ main(void)
     {
         nmod_mat_t A, B, AB, BA;
         mp_limb_t mod, trab, trba;
-        long m, n;
+        len_t m, n;
 
         mod = n_randtest_prime(state, 0);
         m = n_randint(state, 10);

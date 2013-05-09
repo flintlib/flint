@@ -32,12 +32,12 @@
 void
 nmod_mat_init_set(nmod_mat_t mat, const nmod_mat_t src)
 {
-    long rows = src->r;
-    long cols = src->c;
+    len_t rows = src->r;
+    len_t cols = src->c;
 
     if ((rows) && (cols))
     {
-        long i;
+        len_t i;
         mat->entries = flint_malloc(rows * cols * sizeof(mp_limb_t));
         mat->rows = flint_malloc(rows * sizeof(mp_limb_t *));
 

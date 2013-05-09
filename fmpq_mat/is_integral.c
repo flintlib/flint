@@ -31,7 +31,7 @@
 
 int fmpq_mat_is_integral(const fmpq_mat_t mat)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < mat->r; i++)
     {

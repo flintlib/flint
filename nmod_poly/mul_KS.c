@@ -31,10 +31,10 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, long len1,
-                  mp_srcptr in2, long len2, mp_bitcnt_t bits, nmod_t mod)
+_nmod_poly_mul_KS(mp_ptr out, mp_srcptr in1, len_t len1,
+                  mp_srcptr in2, len_t len2, mp_bitcnt_t bits, nmod_t mod)
 {
-    long len_out = len1 + len2 - 1, limbs1, limbs2;
+    len_t len_out = len1 + len2 - 1, limbs1, limbs2;
     mp_ptr mpn1, mpn2, res;
 
     if (bits == 0)
@@ -78,7 +78,7 @@ nmod_poly_mul_KS(nmod_poly_t res,
                  const nmod_poly_t poly1, const nmod_poly_t poly2,
                  mp_bitcnt_t bits)
 {
-    long len_out;
+    len_t len_out;
 
     if ((poly1->length == 0) || (poly2->length == 0))
     {

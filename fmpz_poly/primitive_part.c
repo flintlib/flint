@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
+_fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, len_t len)
 {
     fmpz_t x;
     fmpz_init(x);
@@ -44,7 +44,7 @@ _fmpz_poly_primitive_part(fmpz * res, const fmpz * poly, long len)
 void
 fmpz_poly_primitive_part(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    long len = poly->length;
+    len_t len = poly->length;
     if (len == 0)
     {
         fmpz_poly_zero(res);

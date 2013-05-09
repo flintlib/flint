@@ -39,7 +39,7 @@ main(void)
     flint_rand_t state;
 
     double output;
-    long exp;
+    len_t exp;
 
     printf("get_d_2exp....");
     fflush(stdout);

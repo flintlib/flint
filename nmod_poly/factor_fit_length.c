@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include "nmod_poly.h"
 
-void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, long len)
+void nmod_poly_factor_fit_length(nmod_poly_factor_t fac, len_t len)
 {
     if (len > fac->alloc)
     {

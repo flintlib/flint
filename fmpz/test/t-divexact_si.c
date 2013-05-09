@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_t a, c;
         mpz_t e, f, g;
-        long n;
+        len_t n;
 
         fmpz_init(a);
         fmpz_init(c);
@@ -87,7 +87,7 @@ main(void)
     {
         fmpz_t a, c;
         mpz_t d, f, g;
-        long n;
+        len_t n;
 
         fmpz_init(a);
         fmpz_init(c);

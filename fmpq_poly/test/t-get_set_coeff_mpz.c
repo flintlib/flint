@@ -53,19 +53,19 @@ main(void)
     {
         fmpq_poly_t a;
         fmpz_t x1, x2;
-        long coeff, len;
+        len_t coeff, len;
 
         fmpq_poly_init(a);
         fmpz_init(x1);
         fmpz_init(x2);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (len_t) (n_randint(state, 100) + 1);
 
         for (j = 0; j < 100; j++)
         {
             fmpz_randtest(x1, state, 200);
             fmpz_get_mpz(mpq_numref(n1), x1);
             mpz_set_si(mpq_denref(n1), 1);
-            coeff = (long) n_randint(state, len);
+            coeff = (len_t) n_randint(state, len);
             fmpq_poly_set_coeff_mpz(a, coeff, mpq_numref(n1));
             fmpq_poly_get_coeff_mpq(n2, a, coeff);
 

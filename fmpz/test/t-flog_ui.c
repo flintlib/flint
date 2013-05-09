@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, x, y;
-        long k;
+        len_t k;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b;
-        long k, l;
+        len_t k, l;
 
         fmpz_init(a);
         fmpz_init(b);

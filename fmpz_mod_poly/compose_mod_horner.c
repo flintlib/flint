@@ -31,10 +31,10 @@
 #include "ulong_extras.h"
 
 void
-_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
-                                              const fmpz * h, long lenh, const fmpz_t p)
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, len_t lenf, const fmpz * g,
+                                              const fmpz * h, len_t lenh, const fmpz_t p)
 {
-    long i, len;
+    len_t i, len;
     fmpz * t;
 
     if (lenh == 1)
@@ -79,11 +79,11 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly
                          const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3)
 {
     fmpz_t inv3;
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
-    long vec_len = FLINT_MAX(len3 - 1, len2);
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t len3 = poly3->length;
+    len_t len = len3 - 1;
+    len_t vec_len = FLINT_MAX(len3 - 1, len2);
 
     fmpz * ptr2;
 

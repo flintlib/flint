@@ -30,10 +30,10 @@
 #include "fmpq_poly.h"
 
 int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden, 
-                   const fmpz * rpoly, const fmpz_t rden, long len)
+                   const fmpz * rpoly, const fmpz_t rden, len_t len)
 {
     int ans;
-    long i = len - 1;
+    len_t i = len - 1;
     fmpz_t lcoeff, rcoeff;
     
     if (fmpz_equal(lden, rden))
@@ -81,7 +81,7 @@ int _fmpq_poly_cmp(const fmpz * lpoly, const fmpz_t lden,
 
 int fmpq_poly_cmp(const fmpq_poly_t left, const fmpq_poly_t right)
 {
-    long len1, len2;
+    len_t len1, len2;
     
     if (left == right)
         return 0;

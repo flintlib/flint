@@ -37,7 +37,7 @@ void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
         }
         else
         {
-            long i;
+            len_t i;
 
             fmpz_poly_factor_fit_length(res, fac->num);
             fmpz_set(&(res->c), &(fac->c));

@@ -45,8 +45,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B, AB, expA, expB, expAB, S;
-        long n;
-        long N = 100;
+        len_t n;
+        len_t N = 100;
         mp_limb_t mod;
 
         /* Make sure to workout the Newton code */
@@ -113,7 +113,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
-        long n;
+        len_t n;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);
         n = n_randtest(state) % 50;

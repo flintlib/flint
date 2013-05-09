@@ -32,7 +32,7 @@ void
 nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res, const nmod_poly_t f)
 {
     nmod_poly_t h, v, g, x;
-    long i, j, num;
+    len_t i, j, num;
 
     nmod_poly_init_preinv(h, f->mod.n, f->mod.ninv);
     nmod_poly_init_preinv(g, f->mod.n, f->mod.ninv);

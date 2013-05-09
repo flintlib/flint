@@ -46,7 +46,7 @@ main(void)
         fmpq_t d;
         int success;
 
-        long n, m, bits;
+        len_t n, m, bits;
 
         n = n_randint(state, 10);
         m = n_randint(state, 10);
@@ -97,7 +97,7 @@ main(void)
         fmpq_mat_t A, B, X;
         fmpz_mat_t M;
         fmpz_t den;
-        long n, m, bits;
+        len_t n, m, bits;
         int success;
 
         n = 1 + n_randint(state, 10);

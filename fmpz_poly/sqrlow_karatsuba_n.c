@@ -36,10 +36,10 @@
  */
 
 void _fmpz_poly_sqrlow_kara_recursive(fmpz * out, 
-                                      const fmpz * pol, fmpz * temp, long len)
+                                      const fmpz * pol, fmpz * temp, len_t len)
 {
-    long m1 = len / 2;
-    long m2 = len - m1;
+    len_t m1 = len / 2;
+    len_t m2 = len - m1;
     int odd = (len & 1);
 
     if (len <= 6)
@@ -73,10 +73,10 @@ void _fmpz_poly_sqrlow_kara_recursive(fmpz * out,
     but in the recursion we might need 4 * \ceil{len/2}, which 
     exceeds 2 * len by at most 2.
 */
-void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, long n)
+void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, len_t n)
 {
     fmpz *temp;
-    long len, loglen = 0;
+    len_t len, loglen = 0;
 
     if (n == 1)
     {
@@ -96,10 +96,10 @@ void _fmpz_poly_sqrlow_karatsuba_n(fmpz * res, const fmpz * poly, long n)
 }
 
 void
-fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+fmpz_poly_sqrlow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly, len_t n)
 {
-    const long len = FLINT_MIN(poly->length, n);
-    long i, lenr;
+    const len_t len = FLINT_MIN(poly->length, n);
+    len_t i, lenr;
 
     int clear = 0;
     fmpz *copy;

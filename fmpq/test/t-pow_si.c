@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 100000; i++)
     {
         fmpq_t a, b, c;
-        long e;
+        len_t e;
 
         fmpq_init(a);
         fmpq_init(b);
@@ -81,7 +81,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpq_t a, b, c;
-        long j, e;
+        len_t j, e;
 
         fmpq_init(a);
         fmpq_init(b);

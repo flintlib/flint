@@ -32,7 +32,7 @@
 void
 nmod_mat_set(nmod_mat_t B, const nmod_mat_t A)
 {
-    long i;
+    len_t i;
 
     if (B == A || A->c == 0)
         return;

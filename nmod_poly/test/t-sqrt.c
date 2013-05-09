@@ -117,7 +117,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
-        long j;
+        len_t j;
         int square;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);

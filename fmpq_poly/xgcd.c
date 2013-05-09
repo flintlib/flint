@@ -32,13 +32,13 @@
 
 void _fmpq_poly_xgcd(fmpz *G, fmpz_t denG, 
                      fmpz *S, fmpz_t denS, fmpz *T, fmpz_t denT, 
-                     const fmpz *A, const fmpz_t denA, long lenA, 
-                     const fmpz *B, const fmpz_t denB, long lenB)
+                     const fmpz *A, const fmpz_t denA, len_t lenA, 
+                     const fmpz *B, const fmpz_t denB, len_t lenB)
 {
     int alloc = 0;
     fmpz *primA, *primB, *C, *D;
     fmpz_t cA, cB;
-    long lenG, lenC, lenD;
+    len_t lenG, lenC, lenD;
 
     fmpz_init(cA);
     fmpz_init(cB);
@@ -151,7 +151,7 @@ void fmpq_poly_xgcd(fmpq_poly_t G, fmpq_poly_t S, fmpq_poly_t T,
        fmpq_poly_xgcd(G, T, S, B, A);
     } else
     {
-       long lenA = A->length, lenB = B->length, lenG = lenB;
+       len_t lenA = A->length, lenB = B->length, lenG = lenB;
 
        if (lenA == 0)  /* lenA = lenB = 0 */
        {

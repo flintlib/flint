@@ -33,11 +33,11 @@
 
 void
 _fmpz_poly_pseudo_divrem_basecase(fmpz * Q, fmpz * R, ulong * d,
-                                  const fmpz * A, long lenA, const fmpz * B,
-                                  long lenB)
+                                  const fmpz * A, len_t lenA, const fmpz * B,
+                                  len_t lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iQ = lenA - lenB, iR = lenA - 1;
+    len_t iQ = lenA - lenB, iR = lenA - 1;
     fmpz_t rem;
 
     fmpz_init(rem);
@@ -75,7 +75,7 @@ fmpz_poly_pseudo_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
                                  ulong * d, const fmpz_poly_t A,
                                  const fmpz_poly_t B)
 {
-    long lenq, lenr;
+    len_t lenq, lenr;
     fmpz *q, *r;
 
     if (B->length == 0)

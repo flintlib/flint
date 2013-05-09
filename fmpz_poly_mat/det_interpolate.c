@@ -31,7 +31,7 @@
 void
 fmpz_poly_mat_det_interpolate(fmpz_poly_t det, const fmpz_poly_mat_t A)
 {
-    long i, l, n, len;
+    len_t i, l, n, len;
 
     fmpz_mat_t X;
     fmpz * x;

@@ -39,7 +39,7 @@ fmpz_poly_init(fmpz_poly_t poly)
 }
 
 void
-fmpz_poly_init2(fmpz_poly_t poly, long alloc)
+fmpz_poly_init2(fmpz_poly_t poly, len_t alloc)
 {
     if (alloc)                  /* allocate space for alloc small coeffs */
         poly->coeffs = (fmpz *) flint_calloc(alloc, sizeof(fmpz));

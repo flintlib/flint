@@ -58,7 +58,7 @@
     Then $ord_p(x^i/i) \geq N$ provided that $i v \geq N$.
  */
 
-long _padic_log_bound(long v, long N, const fmpz_t prime)
+len_t _padic_log_bound(len_t v, len_t N, const fmpz_t prime)
 {
     if (N >= (1L << (FLINT_BITS - 2)))
     {
@@ -68,14 +68,14 @@ long _padic_log_bound(long v, long N, const fmpz_t prime)
 
     if (fmpz_fits_si(prime))
     {
-        long b, c, p = fmpz_get_si(prime);
+        len_t b, c, p = fmpz_get_si(prime);
 
         c = N - n_flog(v, p);
         b = ((c + n_clog(c, p) + 1) + (v - 1)) / v;
 
         while (--b >= 2)
         {
-            long t = b * v - n_clog(b, p);
+            len_t t = b * v - n_clog(b, p);
 
             if (t < N)
                 return b + 1;
@@ -89,9 +89,9 @@ long _padic_log_bound(long v, long N, const fmpz_t prime)
     }
 }
 
-void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+void _padic_log(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
 {
-    if (N < (1L << 9) / (long) fmpz_bits(p))
+    if (N < (1L << 9) / (len_t) fmpz_bits(p))
     {
         _padic_log_rectangular(z, y, v, p, N);
     }
@@ -104,7 +104,7 @@ void _padic_log(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
-    const long N  = padic_prec(rop);
+    const len_t N  = padic_prec(rop);
 
     if (padic_val(op) < 0)
     {
@@ -129,7 +129,7 @@ int padic_log(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         else
         {
             fmpz_t t;
-            long v;
+            len_t v;
 
             fmpz_init(t);
             v = fmpz_remove(t, x, p);

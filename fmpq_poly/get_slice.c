@@ -29,14 +29,14 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, long i, long j)
+void fmpq_poly_get_slice(fmpq_poly_t rop, const fmpq_poly_t op, len_t i, len_t j)
 {
     i = FLINT_MAX(i, 0);
     j = FLINT_MIN(j, op->length);
 
     if (i < j)
     {
-        long k;
+        len_t k;
 
         if (rop == op)
         {

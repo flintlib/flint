@@ -46,9 +46,9 @@ main(void)
     {
         nmod_poly_mat_t a;
         mp_limb_t mod;
-        long j, k;
-        long rows = n_randint(state, 100);
-        long cols = n_randint(state, 100);
+        len_t j, k;
+        len_t rows = n_randint(state, 100);
+        len_t cols = n_randint(state, 100);
         mod = n_randtest_prime(state, 0);
 
         nmod_poly_mat_init(a, rows, cols, mod);

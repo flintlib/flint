@@ -30,7 +30,7 @@
 void
 nmod_poly_mat_trace(nmod_poly_t trace, const nmod_poly_mat_t mat)
 {
-    long i, n = nmod_poly_mat_nrows(mat);
+    len_t i, n = nmod_poly_mat_nrows(mat);
 
     if (n == 0)
         nmod_poly_zero(trace);

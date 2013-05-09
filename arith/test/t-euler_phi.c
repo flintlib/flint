@@ -35,7 +35,7 @@
 
 int main(void)
 {
-    long i;
+    len_t i;
     ulong n;
     fmpz_t x, y, z;
     flint_rand_t state;

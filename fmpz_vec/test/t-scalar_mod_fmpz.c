@@ -47,7 +47,7 @@ main(void)
     {
         fmpz_t p;
         fmpz *a, *b;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 100);
@@ -79,7 +79,7 @@ main(void)
     {
         fmpz_t p;
         fmpz *a, *b;
-        long j, len = n_randint(state, 100);
+        len_t j, len = n_randint(state, 100);
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 100);

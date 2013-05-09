@@ -32,7 +32,7 @@
 void
 nmod_mat_add(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long i;
+    len_t i;
 
     if (C->c == 0)
         return;

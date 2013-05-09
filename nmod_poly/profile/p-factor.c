@@ -53,7 +53,7 @@ int main(void)
     int i, j, k, n, num;
     double t, T1, T2, T3, T4;
 
-    const long degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
+    const len_t degs[] = {8, 16, 32, 64, 128, 256, 512, 1024};
     const int iter_count[] = {10000, 5000, 1000, 500, 300, 100, 50, 20};
 
     flint_randinit(state);

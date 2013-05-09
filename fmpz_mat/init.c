@@ -30,11 +30,11 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
+fmpz_mat_init(fmpz_mat_t mat, len_t rows, len_t cols)
 {
     if ((rows) && (cols))       /* Allocate space for r*c small entries */
     {
-        long i;
+        len_t i;
         mat->entries = (fmpz *) flint_calloc(rows * cols, sizeof(fmpz));
         mat->rows = (fmpz **) flint_malloc(rows * sizeof(fmpz *));    /* Initialise rows */
 

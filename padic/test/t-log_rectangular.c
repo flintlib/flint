@@ -31,9 +31,9 @@
     This is important as for negative N, exp(0) is 1, which is 0 mod p^N, 
     and then log(0) does not converge.
  */
-static long __rand_prec(flint_rand_t state, long i)
+static len_t __rand_prec(flint_rand_t state, len_t i)
 {
-    long N;
+    len_t N;
 
     N = n_randint(state, PADIC_TEST_PREC_MAX) + 1;
 
@@ -57,7 +57,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p = {2L};
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b;
@@ -96,7 +96,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p = {2L};
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, e, f, g;
@@ -157,7 +157,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p = {2L};
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
@@ -201,7 +201,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b;
@@ -242,7 +242,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, e, f, g;
@@ -310,7 +310,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;

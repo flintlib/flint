@@ -35,7 +35,7 @@ nmod_mat_solve_triu_recursive(nmod_mat_t X,
                                                                     int unit)
 {
     nmod_mat_t UA, UB, UD, XX, XY, BX, BY;
-    long r, n, m;
+    len_t r, n, m;
 
     n = U->r;
     m = B->c;

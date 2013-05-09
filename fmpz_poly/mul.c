@@ -30,8 +30,8 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mul(fmpz * res, const fmpz * poly1, long len1,
-               const fmpz * poly2, long len2)
+_fmpz_poly_mul(fmpz * res, const fmpz * poly1, len_t len1,
+               const fmpz * poly2, len_t len2)
 {
     mp_size_t limbs1, limbs2;
 
@@ -60,9 +60,9 @@ void
 fmpz_poly_mul(fmpz_poly_t res,
               const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long rlen;
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t rlen;
 
     if (len1 == 0 || len2 == 0)
     {

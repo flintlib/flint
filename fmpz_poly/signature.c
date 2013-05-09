@@ -30,10 +30,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
+void _fmpz_poly_signature(len_t * r1, len_t * r2, fmpz * poly, len_t len)
 {
     fmpz *A, *B, *f, *g, *h, *w;
-    long lenA, lenB;
+    len_t lenA, lenB;
     int s, t;
     
     if (len <= 2)
@@ -65,7 +65,7 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
     
     while (1)
 	{
-        long delta = lenA - lenB;
+        len_t delta = lenA - lenB;
         int sgnA;
 
         _fmpz_poly_pseudo_rem_cohen(A, A, lenA, B, lenB);
@@ -110,7 +110,7 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
                 B = temp;
             }
             {
-                long temp = lenA;
+                len_t temp = lenA;
                 lenA = lenB;
                 lenB = temp;
             }
@@ -136,7 +136,7 @@ void _fmpz_poly_signature(long * r1, long * r2, fmpz * poly, long len)
 	}
 }
 
-void fmpz_poly_signature(long * r1, long * r2, fmpz_poly_t poly)
+void fmpz_poly_signature(len_t * r1, len_t * r2, fmpz_poly_t poly)
 {
     _fmpz_poly_signature(r1, r2, poly->coeffs, poly->length);
 }

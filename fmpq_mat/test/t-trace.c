@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     flint_rand_t state;
 
     printf("trace....");
@@ -47,7 +47,7 @@ main(void)
     {
         fmpq_mat_t A, B, AB, BA;
         fmpq_t trab, trba;
-        long m, n;
+        len_t m, n;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);

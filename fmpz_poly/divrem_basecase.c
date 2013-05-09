@@ -32,11 +32,11 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
-                           const fmpz * B, long lenB)
+_fmpz_poly_divrem_basecase(fmpz * Q, fmpz * R, const fmpz * A, len_t lenA,
+                           const fmpz * B, len_t lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    long iQ, iR;
+    len_t iQ, iR;
 
     if (R != A)
         _fmpz_vec_set(R, A, lenA);
@@ -57,7 +57,7 @@ void
 fmpz_poly_divrem_basecase(fmpz_poly_t Q, fmpz_poly_t R,
                           const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenq, lenr;
+    len_t lenq, lenr;
     fmpz *q, *r;
     
     if (B->length == 0)

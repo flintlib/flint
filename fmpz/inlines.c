@@ -42,7 +42,7 @@ void __free_fmpz(fmpz * f)
    free(f);
 }   
 
-void __fmpz_set_si(fmpz_t f, long val)
+void __fmpz_set_si(fmpz_t f, len_t val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {

@@ -29,12 +29,12 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, long len1, 
-                             mp_srcptr poly2, long len2, mp_srcptr f,
-                            long lenf, nmod_t mod)
+void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, len_t len1, 
+                             mp_srcptr poly2, len_t len2, mp_srcptr f,
+                            len_t lenf, nmod_t mod)
 {
     mp_ptr T, Q;
-    long lenT, lenQ;
+    len_t lenT, lenQ;
 
     lenT = len1 + len2 - 1;
     lenQ = lenT - lenf + 1;
@@ -55,7 +55,7 @@ void
 nmod_poly_mulmod(nmod_poly_t res,
     const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f)
 {
-    long len1, len2, lenf;
+    len_t len1, len2, lenf;
     mp_ptr fcoeffs;
 
     lenf = f->length;

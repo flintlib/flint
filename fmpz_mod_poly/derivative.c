@@ -29,10 +29,10 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, len_t len, 
                                const fmpz_t p)
 {
-    long j, k = 1;
+    len_t j, k = 1;
 
 	for (j = 1; j < len; j++)
 	{
@@ -53,7 +53,7 @@ void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len,
 
 void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
 
     if (len < 2)
     {

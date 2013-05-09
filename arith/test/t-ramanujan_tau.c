@@ -29,7 +29,7 @@
 #include "arith.h"
 #include "ulong_extras.h"
 
-void check_value(long n, char *ans)
+void check_value(len_t n, char *ans)
 {
     fmpz_t x, y;
     fmpz_init(x);
@@ -49,11 +49,11 @@ void check_value(long n, char *ans)
     fmpz_clear(y);
 }
 
-void consistency_check(long n)
+void consistency_check(len_t n)
 {
     fmpz_poly_t p;
     fmpz_t x, y;
-    long k;
+    len_t k;
 
     fmpz_poly_init(p);
     fmpz_init(x);

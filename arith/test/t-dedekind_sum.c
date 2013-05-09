@@ -37,7 +37,7 @@
     naive implementation. Doing a live comparison with large values against
     the naive implementation would take too long.
 */
-static const long testdata[][4] =
+static const len_t testdata[][4] =
 {
     /* h, k,  p/q */
     {20816815L, 29229L, -10669L, 87687L},
@@ -96,7 +96,7 @@ int main(void)
     flint_rand_t state;
     fmpz_t hh, kk;
     fmpq_t s1, s2;
-    long i, h, k;
+    len_t i, h, k;
 
     printf("dedekind_sum....");
     fflush(stdout);

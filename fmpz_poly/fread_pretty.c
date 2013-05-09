@@ -89,7 +89,7 @@ int fmpz_poly_fread_pretty(FILE *file, fmpz_poly_t poly, char **x)
 
     fmpz_t f_coeff;
     mpz_t z_coeff, z_exp;
-    long exp;
+    len_t exp;
 
     int r = 0;
 

@@ -32,7 +32,7 @@
 
 void fmpq_mat_mul_direct(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
 {
-    long i, j, k;
+    len_t i, j, k;
 
     if (A == C || B == C)
     {

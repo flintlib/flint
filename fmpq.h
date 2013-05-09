@@ -66,10 +66,10 @@ static __inline__ void fmpq_clear(fmpq_t x)
     fmpz_clear(fmpq_denref(x));
 }
 
-static __inline__ fmpq * _fmpq_vec_init(long n)
+static __inline__ fmpq * _fmpq_vec_init(len_t n)
 {
     fmpq * v = (fmpq *) flint_malloc(sizeof(fmpq) * n);
-    long i;
+    len_t i;
 
     for (i = 0; i < n; i++)
         fmpq_init(v + i);
@@ -77,7 +77,7 @@ static __inline__ fmpq * _fmpq_vec_init(long n)
     return v;
 }
 
-static __inline__ void _fmpq_vec_clear(fmpq * vec, long n)
+static __inline__ void _fmpq_vec_clear(fmpq * vec, len_t n)
 {
     _fmpz_vec_clear((fmpz *) vec, 2 * n);
 }
@@ -151,9 +151,9 @@ int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
 int fmpq_is_canonical(const fmpq_t x);
 
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q);
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, len_t p, ulong q);
 
-void fmpq_set_si(fmpq_t res, long p, ulong q);
+void fmpq_set_si(fmpq_t res, len_t p, ulong q);
 
 
 void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
@@ -232,9 +232,9 @@ void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
 void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
-                  const fmpz_t opnum, const fmpz_t opden, long e);
+                  const fmpz_t opnum, const fmpz_t opden, len_t e);
 
-void fmpq_pow_si(fmpq_t rop, const fmpq_t op, long e);
+void fmpq_pow_si(fmpq_t rop, const fmpq_t op, len_t e);
 
 
 void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
@@ -307,11 +307,11 @@ _fmpq_next_signed_minimal(fmpz_t rnum, fmpz_t rden,
 void
 fmpq_next_signed_minimal(fmpq_t res, const fmpq_t x);
 
-long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n);
+len_t fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, len_t n);
 
-void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n);
+void fmpq_set_cfrac(fmpq_t x, const fmpz * c, len_t n);
 
-long fmpq_cfrac_bound(const fmpq_t x);
+len_t fmpq_cfrac_bound(const fmpq_t x);
 
 typedef struct
 {
@@ -334,13 +334,13 @@ void fmpq_bsplit_get_fmpq(fmpq_t x, const fmpq_bsplit_t s);
 
 void fmpq_bsplit_get_mpfr(mpfr_t x, const fmpq_bsplit_t s);
 
-void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, long n1, long n2);
+void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, len_t n1, len_t n2);
 
 void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * pq, long n1, long n2);
+        const fmpq * ab, const fmpq * pq, len_t n1, len_t n2);
 
 void fmpq_bsplit_sum_abcdpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * cd, const fmpq * pq, long n1, long n2);
+        const fmpq * ab, const fmpq * cd, const fmpq * pq, len_t n1, len_t n2);
 
 #ifdef __cplusplus
 }

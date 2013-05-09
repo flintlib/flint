@@ -32,17 +32,17 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, long len,
-    const fmpz * xs, long n, const fmpz_t mod)
+_fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys, const fmpz * coeffs, len_t len,
+    const fmpz * xs, len_t n, const fmpz_t mod)
 {
-    long i;
+    len_t i;
     for (i = 0; i < n; i++)
         _fmpz_mod_poly_evaluate_fmpz(ys + i, coeffs, len, xs + i, mod);
 }
 
 void
 fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
-        const fmpz_mod_poly_t poly, const fmpz * xs, long n)
+        const fmpz_mod_poly_t poly, const fmpz * xs, len_t n)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, poly->coeffs,
                                         poly->length, xs, n, &(poly->p));

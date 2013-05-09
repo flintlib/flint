@@ -31,7 +31,7 @@
 void
 nmod_poly_mat_print(const nmod_poly_mat_t A, const char * x)
 {
-    long i, j;
+    len_t i, j;
 
     printf("<%ld x %ld matrix over Z/nZ[%s]>\n", A->r, A->c, x);
 

@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, long len)
+int _fmpq_poly_is_monic(const fmpz * poly, const fmpz_t den, len_t len)
 {
     return (len > 0) && fmpz_equal(poly + (len - 1), den);
 }

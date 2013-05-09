@@ -28,9 +28,9 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, long len, const fmpz_t p)
+void _fmpz_vec_scalar_mod_fmpz(fmpz *res, const fmpz *vec, len_t len, const fmpz_t p)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < len; i++)
         fmpz_mod(res + i, vec + i, p);

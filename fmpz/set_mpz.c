@@ -31,7 +31,7 @@
 void
 fmpz_set_mpz(fmpz_t f, const mpz_t x)
 {
-    long size = (long) x->_mp_size;
+    len_t size = (len_t) x->_mp_size;
 
     if (size == 0L)             /* x is zero */
     {

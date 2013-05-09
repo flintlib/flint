@@ -34,7 +34,7 @@
 void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
-    long k;
+    len_t k;
 
     if (n == 0)
     {

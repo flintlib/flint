@@ -28,8 +28,8 @@
 
 int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f)
 {
-    long i, n;
-    long *degs;
+    len_t i, n;
+    len_t *degs;
     fmpz_mod_poly_factor_t dist_deg;
 
     n = fmpz_mod_poly_degree(f);
@@ -40,7 +40,7 @@ int fmpz_mod_poly_is_irreducible_ddf(const fmpz_mod_poly_t f)
     if (!fmpz_mod_poly_is_squarefree(f))
         return 0;
 
-    if (!(degs = (long *)flint_malloc(n * sizeof(long))))
+    if (!(degs = (len_t *)flint_malloc(n * sizeof(len_t))))
     {
         printf("Exception (fmpz_mod_poly_is_irreducible_ddf): \n");
         printf("Not enough memory.\n");

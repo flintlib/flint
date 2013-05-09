@@ -50,17 +50,17 @@ main(void)
     {
         fmpq_poly_t a;
         fmpq_t x, y;
-        long coeff, len;
+        len_t coeff, len;
 
         fmpq_poly_init(a);
         fmpq_init(x);
         fmpq_init(y);
-        len = (long) (n_randint(state, 100) + 1);
+        len = (len_t) (n_randint(state, 100) + 1);
 
         for (j = 0; j < 50; j++)
         {
             fmpq_randtest(x, state, 200);
-            coeff = (long) n_randint(state, len);
+            coeff = (len_t) n_randint(state, len);
             fmpq_poly_set_coeff_fmpq(a, coeff, x);
             fmpq_poly_get_coeff_fmpq(y, a, coeff);
 

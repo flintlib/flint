@@ -35,7 +35,7 @@ void
 fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,
                         const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long i, j, m, n;
+    len_t i, j, m, n;
     fmpz_t t, u;
 
     m = B->r;

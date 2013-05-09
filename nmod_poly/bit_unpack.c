@@ -33,10 +33,10 @@
 
 /* Assumes len > 0, bits > 0. */
 void
-_nmod_poly_bit_unpack(mp_ptr res, long len, mp_srcptr mpn, mp_bitcnt_t bits,
+_nmod_poly_bit_unpack(mp_ptr res, len_t len, mp_srcptr mpn, mp_bitcnt_t bits,
                       nmod_t mod)
 {
-    long i;
+    len_t i;
     ulong current_bit = 0, current_limb = 0;
     mp_limb_t temp_lower, temp_upper, temp_upper2;
 
@@ -215,7 +215,7 @@ _nmod_poly_bit_unpack(mp_ptr res, long len, mp_srcptr mpn, mp_bitcnt_t bits,
 void
 nmod_poly_bit_unpack(nmod_poly_t poly, const fmpz_t f, mp_bitcnt_t bit_size)
 {
-    long len;
+    len_t len;
     mpz_t tmp;
 
     if (fmpz_sgn(f) < 0)

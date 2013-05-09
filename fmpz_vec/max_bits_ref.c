@@ -28,10 +28,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long
-_fmpz_vec_max_bits_ref(const fmpz * vec, long len)
+len_t
+_fmpz_vec_max_bits_ref(const fmpz * vec, len_t len)
 {
-    long i, bits, max_bits = 0, sign = 1;
+    len_t i, bits, max_bits = 0, sign = 1;
 
     for (i = 0; i < len; i++)
     {

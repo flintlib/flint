@@ -32,9 +32,9 @@
 
 void
 fmpz_multi_mod_ui_basecase(mp_limb_t * out, fmpz_t in, mp_limb_t * primes,
-                           long num_primes)
+                           len_t num_primes)
 {
-    long i;
+    len_t i;
     for (i = 0; i < num_primes; i++)
     {
         out[i] = fmpz_fdiv_ui(in, primes[i]);
@@ -45,12 +45,12 @@ void
 fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in, const fmpz_comb_t comb,
     fmpz_comb_temp_t temp)
 {
-    long i, j;
-    long n = comb->n;
-    long log_comb;
-    long stride;
-    long num;
-    long num_primes = comb->num_primes;
+    len_t i, j;
+    len_t n = comb->n;
+    len_t log_comb;
+    len_t stride;
+    len_t num;
+    len_t num_primes = comb->num_primes;
     fmpz ** comb_temp = temp->comb_temp;
 
     if (num_primes == 1)

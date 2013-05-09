@@ -122,7 +122,7 @@ mp_limb_t n_pp1_find_power(mp_limb_t * x, mp_limb_t * y,
 
 mp_limb_t n_factor_pp1(mp_limb_t n, ulong B1, ulong c)
 {
-   long i, j;
+   len_t i, j;
    mp_limb_t factor = 0;
    mp_limb_t x, y, oldx, oldy, ninv;
    ulong pr, oldpr, sqrt, bits0, norm;

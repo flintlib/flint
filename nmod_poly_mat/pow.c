@@ -30,7 +30,7 @@
 void
 nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
 {
-    long d = nmod_poly_mat_nrows(A);
+    len_t d = nmod_poly_mat_nrows(A);
 
     if (exp == 0 || d == 0)
     {
@@ -52,12 +52,12 @@ nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
     else
     {
         nmod_poly_mat_t T, U;
-        long i;
+        len_t i;
 
         nmod_poly_mat_init_set(T, A);
         nmod_poly_mat_init(U, d, d, nmod_poly_mat_modulus(A));
 
-        for (i = ((long) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        for (i = ((len_t) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
         {
             nmod_poly_mat_sqr(U, T);
 

@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
-        long n;
+        len_t n;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -73,7 +73,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
-        long m, n;
+        len_t m, n;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

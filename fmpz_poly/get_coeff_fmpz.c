@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
+fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, len_t n)
 {
     if (n < poly->length)
         fmpz_set(x, poly->coeffs + n);

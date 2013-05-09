@@ -31,7 +31,7 @@
 void
 fmpz_poly_mat_one(fmpz_poly_mat_t A)
 {
-    long i, n;
+    len_t i, n;
 
     fmpz_poly_mat_zero(A);
     n = FLINT_MIN(A->r, A->c);

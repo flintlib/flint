@@ -32,7 +32,7 @@
 mp_limb_t
 n_factorial_fast_mod2_preinv(ulong n, mp_limb_t p, mp_limb_t pinv)
 {
-    long i, m;
+    len_t i, m;
     nmod_t mod;
     mp_ptr t, u, v;
     mp_limb_t r, s;

@@ -28,8 +28,8 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA, 
-                                           const fmpz *B, long lenB, 
+len_t _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, len_t lenA, 
+                                           const fmpz *B, len_t lenB, 
                                            const fmpz_t invB, const fmpz_t p)
 {
     if (lenB == 1)
@@ -39,10 +39,10 @@ long _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA,
     }
     else  /* lenA >= lenB > 1 */
     {
-        const long lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
+        const len_t lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz_t invR3;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
-        long lenR2, lenR3;
+        len_t lenR2, lenR3;
 
         W  = _fmpz_vec_init(lenW);
         Q  = W;
@@ -100,8 +100,8 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     }
     else /* lenA >= lenB >= 0 */
     {
-        const long lenA = A->length, lenB = B->length;
-        long lenG;
+        const len_t lenA = A->length, lenB = B->length;
+        len_t lenG;
         fmpz *g;
     
         if (lenA == 0) /* lenA = lenB = 0 */

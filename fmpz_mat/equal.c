@@ -31,7 +31,7 @@
 
 int fmpz_mat_equal(const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    long j;
+    len_t j;
 
     if (mat1->r != mat2->r || mat1->c != mat2->c)
     {

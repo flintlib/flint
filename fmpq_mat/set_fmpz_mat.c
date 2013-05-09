@@ -32,7 +32,7 @@
 
 void fmpq_mat_set_fmpz_mat(fmpq_mat_t dest, const fmpz_mat_t src)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < src->r; i++)
     {

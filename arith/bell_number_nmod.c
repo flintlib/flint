@@ -48,7 +48,7 @@ arith_bell_number_nmod(ulong n, nmod_t mod)
 {
     mp_limb_t s, t, u;
     mp_ptr facs, pows;
-    long i, j;
+    len_t i, j;
 
     if (n < BELL_NUMBER_TAB_SIZE)
         return n_mod2_preinv(bell_number_tab[n], mod.n, mod.ninv);

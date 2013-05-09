@@ -43,7 +43,7 @@ int main()
     fmpz * den1;
     fmpz * den2;
     fmpz * den3;
-    long i, n, N;
+    len_t i, n, N;
 
     printf("bernoulli_number_vec....");
     fflush(stdout);

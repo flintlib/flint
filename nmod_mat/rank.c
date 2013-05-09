@@ -30,11 +30,11 @@
 #include "nmod_mat.h"
 
 
-long
+len_t
 nmod_mat_rank(const nmod_mat_t A)
 {
-    long m, n, rank;
-    long * perm;
+    len_t m, n, rank;
+    len_t * perm;
     nmod_mat_t tmp;
 
     m = A->r;
@@ -44,7 +44,7 @@ nmod_mat_rank(const nmod_mat_t A)
         return 0;
 
     nmod_mat_init_set(tmp, A);
-    perm = flint_malloc(sizeof(long) * m);
+    perm = flint_malloc(sizeof(len_t) * m);
 
     rank = nmod_mat_lu(perm, tmp, 0);
 

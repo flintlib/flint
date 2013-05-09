@@ -29,12 +29,12 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-long
+len_t
 fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
 {
-    long i, j, k, n, rank, nullity;
-    long * pivots;
-    long * nonpivots;
+    len_t i, j, k, n, rank, nullity;
+    len_t * pivots;
+    len_t * nonpivots;
     fmpz_poly_mat_t tmp;
     fmpz_poly_t den;
 
@@ -54,8 +54,8 @@ fmpz_poly_mat_nullspace(fmpz_poly_mat_t res, const fmpz_poly_mat_t mat)
     }
     else if (nullity)
     {
-        pivots = flint_malloc(rank * sizeof(long));
-        nonpivots = flint_malloc(nullity * sizeof(long));
+        pivots = flint_malloc(rank * sizeof(len_t));
+        nonpivots = flint_malloc(nullity * sizeof(len_t));
 
         for (i = j = k = 0; i < rank; i++)
         {

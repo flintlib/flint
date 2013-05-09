@@ -46,7 +46,7 @@ main(void)
     /* Compare with MPIR:  random */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long a;
+        len_t a;
         fmpz_t b;
         mpz_t d;
         int e, f;
@@ -80,7 +80,7 @@ main(void)
     /* Compare with MPIR:  b a multiple of a */
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long a;
+        len_t a;
         fmpz_t b;
         mpz_t d;
         int e, f;

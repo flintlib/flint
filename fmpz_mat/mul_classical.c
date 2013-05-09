@@ -31,8 +31,8 @@
 void
 fmpz_mat_mul_classical(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long ar, bc, br;
-    long i, j, k;
+    len_t ar, bc, br;
+    len_t i, j, k;
 
     ar = A->r;
     br = B->r;

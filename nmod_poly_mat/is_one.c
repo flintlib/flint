@@ -30,7 +30,7 @@
 int
 nmod_poly_mat_is_one(const nmod_poly_mat_t A)
 {
-    long i, j;
+    len_t i, j;
 
     if (A->r == 0 || A->c == 0)
         return 1;

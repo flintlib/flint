@@ -47,7 +47,7 @@ main(void)
     {
         fmpz *a;
         fmpz_t h;
-        long len, bits, bits2;
+        len_t len, bits, bits2;
 
         fmpz_init(h);
 

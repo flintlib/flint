@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_gcd(fmpz *G, fmpz_t denG, 
-                    const fmpz *A, long lenA, const fmpz *B, long lenB)
+                    const fmpz *A, len_t lenA, const fmpz *B, len_t lenB)
 {
     if (lenA == 1)  /* lenA == lenB == 1 */
     {
@@ -42,7 +42,7 @@ void _fmpq_poly_gcd(fmpz *G, fmpz_t denG,
     {
         fmpz *primA, *primB;
         fmpz_t s, t;
-        long lenG;
+        len_t lenG;
 
         fmpz_init(s);
         fmpz_init(t);
@@ -107,7 +107,7 @@ void fmpq_poly_gcd(fmpq_poly_t G, const fmpq_poly_t A, const fmpq_poly_t B)
     }
     else
     {
-        long lenA = A->length, lenB = B->length;
+        len_t lenA = A->length, lenB = B->length;
 
         if (lenA == 0) /* lenA = lenB = 0 */
         {

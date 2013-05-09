@@ -34,15 +34,15 @@
 
 void
 _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
-    long bits)
+    len_t bits)
 {
-    long i, j;
+    len_t i, j;
 
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    long num_primes;
-    long primes_bits;
+    len_t num_primes;
+    len_t primes_bits;
     mp_limb_t * primes;
     mp_limb_t * residues;
 
@@ -136,8 +136,8 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
 void
 fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long A_bits;
-    long B_bits;
+    len_t A_bits;
+    len_t B_bits;
 
     A_bits = fmpz_mat_max_bits(A);
     B_bits = fmpz_mat_max_bits(B);

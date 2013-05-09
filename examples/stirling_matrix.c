@@ -37,7 +37,7 @@
 
 int main(int argc, char* argv[])
 {
-    long n;
+    len_t n;
     fmpz_mat_t S1, S2, P;
 
     if (argc != 2)

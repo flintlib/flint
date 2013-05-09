@@ -48,7 +48,7 @@ main(void)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
-        long trunc;
+        len_t trunc;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

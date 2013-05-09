@@ -27,11 +27,11 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-long
+len_t
 fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
 {
-    long i, j, k, m, n, rank;
-    long *pivots, *nonpivots;
+    len_t i, j, k, m, n, rank;
+    len_t *pivots, *nonpivots;
 
     rank = fmpz_mat_fflu(R, den, NULL, A, 0);
     m = fmpz_mat_nrows(R);
@@ -48,7 +48,7 @@ fmpz_mat_rref(fmpz_mat_t R, fmpz_t den, const fmpz_mat_t A)
         fmpz_t tmp;
         fmpz_init(tmp);
 
-        pivots = flint_malloc(sizeof(long) * n);
+        pivots = flint_malloc(sizeof(len_t) * n);
         nonpivots = pivots + rank;
 
         for (i = j = k = 0; i < rank; i++)

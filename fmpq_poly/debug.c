@@ -31,7 +31,7 @@
 
 int fmpq_poly_debug(const fmpq_poly_t poly)
 {
-    long i;
+    len_t i;
 
     printf("{alloc: %ld, length: %ld, coeffs:", poly->alloc, poly->length);
     for (i = 0; i < poly->alloc; i++)

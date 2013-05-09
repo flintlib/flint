@@ -30,7 +30,7 @@
 void
 fmpz_poly_mat_transpose(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 {
-    long i, j;
+    len_t i, j;
 
     if (B->r != A->c || B->c != A->r)
     {

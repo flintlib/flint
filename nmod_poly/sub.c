@@ -31,10 +31,10 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_sub(mp_ptr res, mp_srcptr poly1, long len1, mp_srcptr poly2,
-               long len2, nmod_t mod)
+_nmod_poly_sub(mp_ptr res, mp_srcptr poly1, len_t len1, mp_srcptr poly2,
+               len_t len2, nmod_t mod)
 {
-    long i, min = FLINT_MIN(len1, len2);
+    len_t i, min = FLINT_MIN(len1, len2);
 
     _nmod_vec_sub(res, poly1, poly2, min, mod);
 
@@ -54,7 +54,7 @@ void
 nmod_poly_sub(nmod_poly_t res, const nmod_poly_t poly1,
               const nmod_poly_t poly2)
 {
-    long max = FLINT_MAX(poly1->length, poly2->length);
+    len_t max = FLINT_MAX(poly1->length, poly2->length);
 
     nmod_poly_fit_length(res, max);
 

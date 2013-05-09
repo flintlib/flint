@@ -33,7 +33,7 @@
 
 void
 _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
-                                ulong e, long trunc, const fmpz_t p)
+                                ulong e, len_t trunc, const fmpz_t p)
 {
     ulong bit = ~((~0UL) >> 1);
     fmpz * v = _fmpz_vec_init(trunc);
@@ -108,9 +108,9 @@ _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
 
 void
 fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
-                         const fmpz_mod_poly_t poly, ulong e, long trunc)
+                         const fmpz_mod_poly_t poly, ulong e, len_t trunc)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
     fmpz * q;
     int qcopy = 0;
 

@@ -44,7 +44,7 @@ main(void)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         nmod_poly_mat_t A;
-        long m, n;
+        len_t m, n;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);

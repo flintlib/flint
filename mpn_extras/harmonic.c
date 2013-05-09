@@ -107,7 +107,7 @@ Some more optimization is possible:
 void
 flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
                         mp_ptr v, mp_size_t * vsize,
-                        long a, long b, long n, int d)
+                        len_t a, len_t b, len_t n, int d)
 {
     mp_size_t ts, vs;
 
@@ -119,7 +119,7 @@ flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
     if (a == 1)
     {
         mp_limb_t r, s;
-        long k;
+        len_t k;
         for (k = b - 1 - (b % 2); k > 0; k -= 2)
         {
             while (k <= (n >> d))
@@ -151,11 +151,11 @@ flint_mpn_harmonic_odd_direct(mp_ptr t, mp_size_t * tsize,
 void
 flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                           mp_ptr v, mp_size_t * vsize,
-                          long a, long b, long n, int d)
+                          len_t a, len_t b, len_t n, int d)
 {
     mp_ptr p, q, r, s;
     mp_size_t ps, qs, rs, ss, ts, vs;
-    long m, tmpsize;
+    len_t m, tmpsize;
 
     if (b - a < 50)
     {

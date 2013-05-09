@@ -36,13 +36,13 @@ mp_limb_t
 _nmod_mat_det(nmod_mat_t A)
 {
     mp_limb_t det;
-    long * P;
+    len_t * P;
 
-    long m = A->r;
-    long rank;
-    long i;
+    len_t m = A->r;
+    len_t rank;
+    len_t i;
 
-    P = flint_malloc(sizeof(long) * m);
+    P = flint_malloc(sizeof(len_t) * m);
     rank = nmod_mat_lu(P, A, 1);
 
     det = 0UL;
@@ -67,7 +67,7 @@ nmod_mat_det(const nmod_mat_t A)
 {
     nmod_mat_t tmp;
     mp_limb_t det;
-    long dim = A->r;
+    len_t dim = A->r;
 
     if (dim != A->c)
     {

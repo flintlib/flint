@@ -54,7 +54,7 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
 {
     if (fmpz_mod_poly_length(f) > 2)
     {
-        const long n = fmpz_mod_poly_degree(f);
+        const len_t n = fmpz_mod_poly_degree(f);
         fmpz_mod_poly_t a, x, x_p;
 
         fmpz_mod_poly_init(a, &f->p);
@@ -78,7 +78,7 @@ fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
         else
         {
             n_factor_t factors;
-            long i;
+            len_t i;
 
             n_factor_init(&factors);
             n_factor(&factors, n, 1);

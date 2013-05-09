@@ -42,7 +42,7 @@ main(void)
 
     for (i = 0; i < 1000000; i++)
     {
-        long len;
+        len_t len;
         nmod_t mod;
         mp_limb_t m;
         int limbs1, limbs2;

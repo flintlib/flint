@@ -36,7 +36,7 @@ int
 main(void)
 {
     nmod_mat_t A;
-    long i, m, n, d, r;
+    len_t i, m, n, d, r;
     mp_limb_t mod;
     flint_rand_t state;
     flint_randinit(state);

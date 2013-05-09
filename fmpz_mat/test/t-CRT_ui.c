@@ -45,7 +45,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long bits, prime_bits, rows, cols, num_primes, j;
+        len_t bits, prime_bits, rows, cols, num_primes, j;
         fmpz_t mod;
         fmpz_mat_t A, B, C;
         nmod_mat_t Amod;

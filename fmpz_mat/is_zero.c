@@ -32,7 +32,7 @@
 int
 fmpz_mat_is_zero(const fmpz_mat_t mat)
 {
-    long j;
+    len_t j;
 
     if (mat->r == 0 || mat->c == 0)
         return 1;

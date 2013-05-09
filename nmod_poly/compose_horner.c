@@ -28,8 +28,8 @@
 #include "ulong_extras.h"
 
 void 
-_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1, 
-                                      mp_srcptr poly2, long len2, nmod_t mod)
+_nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, len_t len1, 
+                                      mp_srcptr poly2, len_t len2, nmod_t mod)
 {
     if (len1 == 1)
     {
@@ -46,8 +46,8 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1,
     }
     else
     {
-        const long alloc = (len1 - 1) * (len2 - 1) + 1;
-        long i = len1 - 1, lenr = len2;
+        const len_t alloc = (len1 - 1) * (len2 - 1) + 1;
+        len_t i = len1 - 1, lenr = len2;
         mp_limb_t *t, *t1, *t2;
         t = _nmod_vec_init(alloc);
 
@@ -83,8 +83,8 @@ _nmod_poly_compose_horner(mp_ptr res, mp_srcptr poly1, long len1,
 void nmod_poly_compose_horner(nmod_poly_t res, 
                               const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
     
     if (len1 == 0)
     {
@@ -98,7 +98,7 @@ void nmod_poly_compose_horner(nmod_poly_t res,
     }
     else
     {
-        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        const len_t lenr = (len1 - 1) * (len2 - 1) + 1;
         
         if (res != poly1 && res != poly2)
         {

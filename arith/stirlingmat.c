@@ -29,9 +29,9 @@
 
 
 void
-_arith_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
+_arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, len_t klen, int kind)
 {
-    long k;
+    len_t k;
     fmpz_t t, u;
 
     if (n == 0)
@@ -73,9 +73,9 @@ _arith_stirling_next_row(fmpz * new, fmpz * prev, long n, long klen, int kind)
 }
 
 static void
-_arith_stirling_mat(fmpz ** rows, long r, long c, int kind)
+_arith_stirling_mat(fmpz ** rows, len_t r, len_t c, int kind)
 {
-    long i, j;
+    len_t i, j;
 
     if (r == 0 || c == 0)
         return;
@@ -93,17 +93,17 @@ _arith_stirling_mat(fmpz ** rows, long r, long c, int kind)
     }
 }
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 0);
 }
 
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 1);
 }
 
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, long n, long klen)
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 2);
 }

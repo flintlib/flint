@@ -29,10 +29,10 @@
 #include "fmpz.h"
 
 mp_limb_t
-fmpz_abs_lbound_ui_2exp(long * exp, const fmpz_t x, int bits)
+fmpz_abs_lbound_ui_2exp(len_t * exp, const fmpz_t x, int bits)
 {
     mp_limb_t m;
-    long shift, e, size;
+    len_t shift, e, size;
     fmpz c = *x;
 
     if (!COEFF_IS_MPZ(c))

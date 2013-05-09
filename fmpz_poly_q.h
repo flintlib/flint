@@ -65,18 +65,18 @@ void fmpz_poly_q_clear(fmpz_poly_q_t rop);
 /* Randomisation *************************************************************/
 
 void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          long len1, mp_bitcnt_t bits1, 
-                          long len2, mp_bitcnt_t bits2);
+                          len_t len1, mp_bitcnt_t bits1, 
+                          len_t len2, mp_bitcnt_t bits2);
 
 void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   long len1, mp_bitcnt_t bits1, 
-                                   long len2, mp_bitcnt_t bits2);
+                                   len_t len1, mp_bitcnt_t bits1, 
+                                   len_t len2, mp_bitcnt_t bits2);
 
 /* Assignment ****************************************************************/
 
 void fmpz_poly_q_set(fmpz_poly_q_t rop, const fmpz_poly_q_t op);
 
-void fmpz_poly_q_set_si(fmpz_poly_q_t rop, long op);
+void fmpz_poly_q_set_si(fmpz_poly_q_t rop, len_t op);
 
 void fmpz_poly_q_swap(fmpz_poly_q_t op1, fmpz_poly_q_t op2);
 
@@ -136,11 +136,11 @@ void fmpz_poly_q_submul(fmpz_poly_q_t rop, const fmpz_poly_q_t op1, const fmpz_p
 
 /* Scalar multiplication and division ****************************************/
 
-void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x);
+void fmpz_poly_q_scalar_mul_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, len_t x);
 void fmpz_poly_q_scalar_mul_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
 void fmpz_poly_q_scalar_mul_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
 
-void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, long x);
+void fmpz_poly_q_scalar_div_si(fmpz_poly_q_t rop, const fmpz_poly_q_t op, len_t x);
 void fmpz_poly_q_scalar_div_mpz(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpz_t x);
 void fmpz_poly_q_scalar_div_mpq(fmpz_poly_q_t rop, const fmpz_poly_q_t op, const mpq_t x);
 

@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long iter;
+    len_t iter;
     int result;
     flint_rand_t state;
 
@@ -45,8 +45,8 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_t x, y;
-        long bits, yexp;
-        long exp;
+        len_t bits, yexp;
+        len_t exp;
         mp_limb_t man;
 
         fmpz_init(x);

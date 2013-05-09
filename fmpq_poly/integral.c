@@ -30,9 +30,9 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden, 
-                           const fmpz * poly, const fmpz_t den, long len)
+                           const fmpz * poly, const fmpz_t den, len_t len)
 {
-    long k;
+    len_t k;
     fmpz_t t;
 
     fmpz_init(t);
@@ -60,7 +60,7 @@ void _fmpq_poly_integral(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_integral(fmpq_poly_t res, const fmpq_poly_t poly)
 {
-    long len = poly->length;
+    len_t len = poly->length;
 
     if (len == 0)
     {

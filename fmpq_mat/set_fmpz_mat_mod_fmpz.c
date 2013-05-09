@@ -36,7 +36,7 @@ fmpq_mat_set_fmpz_mat_mod_fmpz(fmpq_mat_t X,
                                     const fmpz_mat_t Xmod, const fmpz_t mod)
 {
     fmpz_t num, den, t, u, d;
-    long i, j;
+    len_t i, j;
 
     int success = 1;
 

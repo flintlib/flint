@@ -44,7 +44,7 @@ main(void)
     {
         fmpq_mat_t A;
         fmpz_mat_t B;
-        long n, m;
+        len_t n, m;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -63,7 +63,7 @@ main(void)
 
         if (m && n)
         {
-            long i, j;
+            len_t i, j;
             i = n_randint(state, m);
             j = n_randint(state, n);
 

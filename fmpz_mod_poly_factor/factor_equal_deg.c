@@ -32,7 +32,7 @@
 
 void
 fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
-                               const fmpz_mod_poly_t pol, long d)
+                               const fmpz_mod_poly_t pol, len_t d)
 {
     if (pol->length == d + 1)
     {

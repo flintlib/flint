@@ -35,7 +35,7 @@ void
 nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B)
 {
-    long ar, bc, br, dim;
+    len_t ar, bc, br, dim;
 
     ar = A->r;
     br = B->r;
@@ -49,7 +49,7 @@ nmod_poly_mat_mul(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     }
     else
     {
-        long Alen, Blen;
+        len_t Alen, Blen;
         mp_limb_t mod = nmod_poly_mat_modulus(A);
 
         Alen = nmod_poly_mat_max_length(A);

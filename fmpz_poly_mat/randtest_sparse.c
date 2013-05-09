@@ -30,10 +30,10 @@
 #include "ulong_extras.h"
 
 void
-fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, long len,
+fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, len_t len,
     mp_bitcnt_t bits, float density)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < A->r; i++)
     {
@@ -41,7 +41,7 @@ fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state, long len,
         {
             if (n_randint(state, 1000) < density * 1000)
             {
-                long l = n_randint(state, len + 1);
+                len_t l = n_randint(state, len + 1);
                 l = FLINT_MAX(l, 1);
                 fmpz_poly_randtest_not_zero(fmpz_poly_mat_entry(A, i, j),
                     state, l, bits);

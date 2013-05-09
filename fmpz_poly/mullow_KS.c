@@ -32,14 +32,14 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
-                                 const fmpz * poly2, long len2, long n)
+_fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, len_t len1,
+                                 const fmpz * poly2, len_t len2, len_t n)
 {
     int neg1, neg2;
-    long limbs1, limbs2, loglen;
-    long bits1, bits2, bits;
+    len_t limbs1, limbs2, loglen;
+    len_t bits1, bits2, bits;
     mp_limb_t *arr1, *arr2, *arr3;
-    long sign = 0;
+    len_t sign = 0;
 
     FMPZ_VEC_NORM(poly1, len1);
     FMPZ_VEC_NORM(poly2, len2);
@@ -118,10 +118,10 @@ _fmpz_poly_mullow_KS(fmpz * res, const fmpz * poly1, long len1,
 
 void
 fmpz_poly_mullow_KS(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, len_t n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

@@ -33,9 +33,9 @@
 
 
 static void
-_rising_factorial(fmpz * res, long a, long b, long trunc)
+_rising_factorial(fmpz * res, len_t a, len_t b, len_t trunc)
 {
-    const long span = b - a;
+    const len_t span = b - a;
 
     switch (span)
     {
@@ -74,10 +74,10 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
         break;
     default:
         {
-            const long mid    = (a + b) / 2;
+            const len_t mid    = (a + b) / 2;
             const int  chk    = (b - a + 1 < trunc);  /* i.e. nprod < trunc */
-            const long nleft  = chk ? mid - a + 1 : trunc;
-            const long nright = chk ? b - mid + 1 : trunc;
+            const len_t nleft  = chk ? mid - a + 1 : trunc;
+            const len_t nright = chk ? b - mid + 1 : trunc;
 
             fmpz *left  = _fmpz_vec_init(nleft);
             fmpz *right = _fmpz_vec_init(nright);
@@ -97,7 +97,7 @@ _rising_factorial(fmpz * res, long a, long b, long trunc)
 }
 
 void
-arith_stirling_number_1u(fmpz_t s, long n, long k)
+arith_stirling_number_1u(fmpz_t s, len_t n, len_t k)
 {
     /* Various special cases
        TODO: factorials, binomial coefficients, harmonic numbers ... */
@@ -119,7 +119,7 @@ arith_stirling_number_1u(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_1(fmpz_t s, long n, long k)
+arith_stirling_number_1(fmpz_t s, len_t n, len_t k)
 {
     arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
@@ -127,16 +127,16 @@ arith_stirling_number_1(fmpz_t s, long n, long k)
 }
 
 void
-arith_stirling_number_1u_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1u_vec(fmpz * row, len_t n, len_t klen)
 {
     if (klen > 0)
         _rising_factorial(row, 0, n, klen);
 }
 
 void
-arith_stirling_number_1_vec(fmpz * row, long n, long klen)
+arith_stirling_number_1_vec(fmpz * row, len_t n, len_t klen)
 {
-    long k;
+    len_t k;
 
     arith_stirling_number_1u_vec(row, n, klen);
 

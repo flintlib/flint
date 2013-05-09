@@ -30,7 +30,7 @@
 #include "fmpq.h"
 #include "ulong_extras.h"
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, len_t p, ulong q)
 {
     if (q == 1 || p == 0)
     {
@@ -53,7 +53,7 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, long p, ulong q)
     }
 }
 
-void fmpq_set_si(fmpq_t res, long p, ulong q)
+void fmpq_set_si(fmpq_t res, len_t p, ulong q)
 {
     _fmpq_set_si(&res->num, &res->den, p, q);
 }

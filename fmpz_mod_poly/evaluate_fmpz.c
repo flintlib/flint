@@ -27,7 +27,7 @@
 #include "flint.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len, 
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, len_t len, 
                                   const fmpz_t a, const fmpz_t p)
 {
     if (len == 0)
@@ -40,7 +40,7 @@ void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len,
     }
     else
     {
-        long i = len - 1;
+        len_t i = len - 1;
         fmpz_t t;
 
         fmpz_init(t);

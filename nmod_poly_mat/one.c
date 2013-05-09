@@ -30,7 +30,7 @@
 void
 nmod_poly_mat_one(nmod_poly_mat_t A)
 {
-    long i, n;
+    len_t i, n;
 
     nmod_poly_mat_zero(A);
     n = FLINT_MIN(A->r, A->c);

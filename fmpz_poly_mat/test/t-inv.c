@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("inv....");
     fflush(stdout);
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_mat_t A, Ainv;
         fmpz_poly_t den1, den2;
-        long n, bits, deg;
+        len_t n, bits, deg;
         float density;
         int ns1, ns2;
         int result;
@@ -93,7 +93,7 @@ main(void)
     {
         fmpz_poly_mat_t A, Ainv, B, Iden;
         fmpz_poly_t den, det;
-        long n, bits, deg;
+        len_t n, bits, deg;
         float density;
         int nonsingular;
 

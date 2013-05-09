@@ -41,8 +41,8 @@
     Does not support aliasing.
  */
 static void 
-_padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n, 
-                              const fmpz_t p, long N, const fmpz_t P0)
+_padic_log_rectangular_series(fmpz_t z, const fmpz_t y, len_t n, 
+                              const fmpz_t p, len_t N, const fmpz_t P0)
 {
     if (n <= 2)
     {
@@ -68,10 +68,10 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
     }
     else
     {
-        const long b = n_sqrt(n);
-        const long k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
+        const len_t b = n_sqrt(n);
+        const len_t k = fmpz_fits_si(p) ? n_flog(n, fmpz_get_si(p)) : 0;
 
-        long i, j;
+        len_t i, j;
         fmpz_t c, f, t, P1;
         fmpz *ypow;
 
@@ -94,8 +94,8 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
 
         for (j = (n + (b - 1)) / b - 1; j >= 0; j--)
         {
-            const long hi = FLINT_MIN(b, n - j*b);
-            long w;
+            const len_t hi = FLINT_MIN(b, n - j*b);
+            len_t w;
 
             /* Compute inner sum in c */
             fmpz_rfac_uiui(f, 1 + j*b, hi);
@@ -139,9 +139,9 @@ _padic_log_rectangular_series(fmpz_t z, const fmpz_t y, long n,
     }
 }
 
-void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+void _padic_log_rectangular(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
 {
-    const long n = _padic_log_bound(v, N, p) - 1;
+    const len_t n = _padic_log_bound(v, N, p) - 1;
     fmpz_t pN;
 
     fmpz_init(pN);
@@ -156,7 +156,7 @@ void _padic_log_rectangular(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, lo
 int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
-    const long N  = padic_prec(rop);
+    const len_t N  = padic_prec(rop);
 
     if (padic_val(op) < 0)
     {
@@ -181,7 +181,7 @@ int padic_log_rectangular(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         else
         {
             fmpz_t t;
-            long v;
+            len_t v;
 
             fmpz_init(t);
             v = fmpz_remove(t, x, p);

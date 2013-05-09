@@ -29,11 +29,11 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_height(fmpz_t height, const fmpz * vec, long len)
+_fmpz_vec_height(fmpz_t height, const fmpz * vec, len_t len)
 {
     if (len)
     {
-        long pos = _fmpz_vec_height_index(vec, len);
+        len_t pos = _fmpz_vec_height_index(vec, len);
 
         fmpz_abs(height, vec + pos);
     }

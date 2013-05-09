@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("rank....");
     fflush(stdout);
@@ -47,7 +47,7 @@ main(void)
         nmod_poly_mat_t A;
         nmod_mat_t Ax;
         mp_limb_t mod, x;
-        long j, m, n, deg, rank, zrank;
+        len_t j, m, n, deg, rank, zrank;
         float density;
 
         /* Don't pick a too small modulus, to avoid failure in
@@ -71,7 +71,7 @@ main(void)
         zrank = 0;
         for (j = 0; j < 5; j++)
         {
-            long r;
+            len_t r;
             x = n_randint(state, mod);
             nmod_poly_mat_evaluate_nmod(Ax, A, x);
             r = nmod_mat_rank(Ax);

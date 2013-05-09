@@ -48,12 +48,12 @@ int main(void)
     flint_rand_t state;
 
     mp_limb_t p[] = {17ul, 2147483659ul, 9223372036854775837ul};
-    const long degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 
+    const len_t degs[]      = {   20,   40,  60,  80, 100, 120, 140, 160, 180, 200, 
                                 220,  240, 260, 280, 300, 320, 340, 360, 380, 400, 
                                 420,  440, 460, 480, 500, 520, 540, 560, 580, 600, 
                                 620,  640, 660, 680, 700, 720, 740, 760, 780, 800, 
                                 820,  840, 860, 880, 900, 920, 940, 960, 980, 1000};
-    const long runs[3][N] = {{ 2000, 1000, 500, 300, 200, 200, 200, 180, 140, 140, 
+    const len_t runs[3][N] = {{ 2000, 1000, 500, 300, 200, 200, 200, 180, 140, 140, 
                                 100,   80,  80,  80,  50,  50,  40,  30,  30,  20,  
                                  18,   16,  14,  12,  10,  10,  10,  10,  10,  10,  
                                   9,    9,   9,   9,   8,   8,   8,   8,   7,   7,
@@ -70,8 +70,8 @@ int main(void)
                                   6,    6,   6,   5,   5,   5,   5,   5,   4,   4}};
 
     clock_t c0, c1;
-    long double cpu[3][2][N];
-    long i, k, c, n;
+    len_t double cpu[3][2][N];
+    len_t i, k, c, n;
 
     nmod_poly_t A, B, C, G;
 
@@ -83,8 +83,8 @@ int main(void)
 
         for (k = 0; k < N; k++)
         {
-            const long d = degs[k];
-            const long r = runs[i][k];
+            const len_t d = degs[k];
+            const len_t r = runs[i][k];
 
             cpu[i][0][k] = 0;
             cpu[i][1][k] = 0;
@@ -115,11 +115,11 @@ int main(void)
                 cpu[i][1][k] += (c1 - c0);
             }
 
-            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) CLOCKS_PER_SEC;
-            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) CLOCKS_PER_SEC;
+            cpu[i][0][k] = (len_t double) cpu[i][0][k] / (len_t double) CLOCKS_PER_SEC;
+            cpu[i][1][k] = (len_t double) cpu[i][1][k] / (len_t double) CLOCKS_PER_SEC;
 
-            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
-            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
+            cpu[i][0][k] = (len_t double) cpu[i][0][k] / (len_t double) (100*r);
+            cpu[i][1][k] = (len_t double) cpu[i][1][k] / (len_t double) (100*r);
 
             printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);

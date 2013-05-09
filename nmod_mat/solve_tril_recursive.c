@@ -37,7 +37,7 @@ nmod_mat_solve_tril_recursive(nmod_mat_t X,
                                                                     int unit)
 {
     nmod_mat_t LA, LC, LD, XX, XY, BX, BY;
-    long r, n, m;
+    len_t r, n, m;
 
     n = L->r;
     m = B->c;

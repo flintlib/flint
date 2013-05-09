@@ -31,7 +31,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, long n, const fmpz_t x)
+fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, len_t n, const fmpz_t x)
 {
     fmpz_mod_poly_fit_length(poly, n + 1);
 

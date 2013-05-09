@@ -33,8 +33,8 @@
 #include "fmpz_poly.h"
 
 static void
-__fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA, 
-                                     const fmpz * B, long lenB)
+__fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, len_t lenA, 
+                                     const fmpz * B, len_t lenB)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -42,8 +42,8 @@ __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
            Convert unbalanced division into a 2 q1 - 1 by q1 division
          */
 
-        const long q1 = lenA - lenB + 1;
-        const long q2 = lenB - q1;
+        const len_t q1 = lenA - lenB + 1;
+        const len_t q2 = lenB - q1;
 
         fmpz * temp = _fmpz_vec_init(2 * q1 - 1);
 
@@ -63,17 +63,17 @@ __fmpz_poly_div_divconquer(fmpz * Q, const fmpz * A, long lenA,
 
 /* needed due to partial overlap */
 static void
-_fmpz_vec_sub_dec(fmpz * a, const fmpz * b, const fmpz * c, long n)
+_fmpz_vec_sub_dec(fmpz * a, const fmpz * b, const fmpz * c, len_t n)
 {
-    long i;
+    len_t i;
 
     for (i = n - 1; i >= 0; i--)
         fmpz_sub(a + i, b + i, c + i);
 }
 
 void _fmpz_poly_div_divconquer(fmpz *Q, 
-                               const fmpz *A, long lenA, 
-                               const fmpz *B, long lenB)
+                               const fmpz *A, len_t lenA, 
+                               const fmpz *B, len_t lenB)
 {
     if (lenA <= 2 * lenB - 1)
     {
@@ -82,7 +82,7 @@ void _fmpz_poly_div_divconquer(fmpz *Q,
     else  /* lenA > 2 * lenB - 1 */
     {
         fmpz *S, *T;
-        long shift, next, n = 2 * lenB - 1;
+        len_t shift, next, n = 2 * lenB - 1;
 
         S = _fmpz_vec_init(2 * n);
         T = S + n;
@@ -113,8 +113,8 @@ void
 fmpz_poly_div_divconquer(fmpz_poly_t Q, 
                          const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
+    const len_t lenA = A->length;
+    const len_t lenB = B->length;
     fmpz_poly_t t;
     fmpz *q;
 

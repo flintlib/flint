@@ -79,7 +79,7 @@ main(void)
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
         fmpz_t a;
-        long b, c;
+        len_t b, c;
 
         b = z_randtest(state);
 

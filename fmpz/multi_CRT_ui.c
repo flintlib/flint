@@ -35,8 +35,8 @@ void
 __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
     const fmpz_comb_t comb, fmpz_t temp)
 {
-    long n = comb->n;
-    long p;
+    len_t n = comb->n;
+    len_t p;
 
     if (n == 0L)
     {
@@ -49,7 +49,7 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
         /* XXX: overflow possible? */
         p = comb->primes[0];
         if ((p - (*input)) < (*input))
-            fmpz_set_si(output, (long) ((*input) - p));
+            fmpz_set_si(output, (len_t) ((*input) - p));
         else
             fmpz_set_ui(output, (*input));
         return;
@@ -68,11 +68,11 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
 void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 {
-    long i, j;
-    long n = comb->n;
-    long num;
-    long log_res;
-    long num_primes = comb->num_primes;
+    len_t i, j;
+    len_t n = comb->n;
+    len_t num;
+    len_t log_res;
+    len_t num_primes = comb->num_primes;
 
     fmpz ** comb_temp = ctemp->comb_temp;
     fmpz * temp = ctemp->temp;

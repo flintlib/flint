@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     flint_rand_t state;
     flint_randinit(state);
 
@@ -46,7 +46,7 @@ main(void)
         nmod_mat_t A, B, C, D;
         mp_limb_t mod = n_randtest_not_zero(state);
 
-        long m, k, n;
+        len_t m, k, n;
 
         m = n_randint(state, 400);
         k = n_randint(state, 400);

@@ -41,7 +41,7 @@ int main(void)
     /* check inv(inv(a)) == a */
     for (i = 0; i < 10000; i++)
     {
-        long n, *a, *b, *c;
+        len_t n, *a, *b, *c;
 
         n = n_randint(state, 100);
 
@@ -71,7 +71,7 @@ int main(void)
     /* check aliasing */
     for (i = 0; i < 10000; i++)
     {
-        long n, *a, *b;
+        len_t n, *a, *b;
 
         n = n_randint(state, 100);
 

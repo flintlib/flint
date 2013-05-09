@@ -28,8 +28,8 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-long
-_fmpz_vec_height_index(const fmpz * vec, long len)
+len_t
+_fmpz_vec_height_index(const fmpz * vec, len_t len)
 {
     if (len == 1)
     {
@@ -39,7 +39,7 @@ _fmpz_vec_height_index(const fmpz * vec, long len)
     {
         fmpz c;
         mp_srcptr max_d;
-        long max_mpz_limbs, i, max_i, max_coeff, mpz_limbs;
+        len_t max_mpz_limbs, i, max_i, max_coeff, mpz_limbs;
 
         max_coeff = 0;
         max_i = 0;

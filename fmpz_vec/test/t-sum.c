@@ -48,8 +48,8 @@ main(void)
         fmpz *a, *b;
         fmpz_t x, y, z;
 
-        long len1 = n_randint(state, 100);
-        long len2 = n_randint(state, 100);
+        len_t len1 = n_randint(state, 100);
+        len_t len2 = n_randint(state, 100);
 
         a = _fmpz_vec_init(len1 + len2);
         b = a + len1;

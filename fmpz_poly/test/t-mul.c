@@ -139,7 +139,7 @@ main(void)
     /* Check _fmpz_poly_mul directly */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        long len1, len2;
+        len_t len1, len2;
         fmpz_poly_t a, b, out1, out2;
 
         len1 = n_randint(state, 100) + 1;

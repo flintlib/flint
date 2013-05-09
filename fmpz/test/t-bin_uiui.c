@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     ulong n, k;
     fmpz_t x, y;
     mpz_t z;

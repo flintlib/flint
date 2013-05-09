@@ -41,7 +41,7 @@ fmpz_cdiv_abs_q(fmpz_t q, const fmpz_t x, const fmpz_t y)
 }
 
 void
-_fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len)
+_fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, len_t len)
 {
 
     if (len <= 1)
@@ -54,7 +54,7 @@ _fmpz_poly_bound_roots(fmpz_t bound, const fmpz * poly, long len)
     }
     else
     {
-        long i;
+        len_t i;
         fmpz_t t;
 
         fmpz_init(t);

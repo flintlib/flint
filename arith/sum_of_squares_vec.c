@@ -30,9 +30,9 @@
 #include "arith.h"
 
 static void
-theta3_qexp(fmpz * r, long n)
+theta3_qexp(fmpz * r, len_t n)
 {
-    long i, j;
+    len_t i, j;
 
     _fmpz_vec_zero(r, n);
 
@@ -44,9 +44,9 @@ theta3_qexp(fmpz * r, long n)
 }
 
 static void
-theta3_qexp_squared(fmpz * r, long n)
+theta3_qexp_squared(fmpz * r, len_t n)
 {
-    long i, j, x, y;
+    len_t i, j, x, y;
 
     _fmpz_vec_zero(r, n);
 
@@ -62,7 +62,7 @@ theta3_qexp_squared(fmpz * r, long n)
 }
 
 void
-arith_sum_of_squares_vec(fmpz * r, ulong k, long n)
+arith_sum_of_squares_vec(fmpz * r, ulong k, len_t n)
 {
     if (k == 0 || n <= 1)
     {

@@ -34,9 +34,9 @@
 
 int main()
 {
-    long i, j;
+    len_t i, j;
     mp_limb_t n;
-    long num_primes;
+    len_t num_primes;
     mp_limb_t * primes;
     mp_limb_t p;
     fmpz_comb_t comb;

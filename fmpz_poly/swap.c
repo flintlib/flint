@@ -33,7 +33,7 @@ fmpz_poly_swap(fmpz_poly_t poly1, fmpz_poly_t poly2)
 {
     if (poly1 != poly2)
     {
-        long temp;
+        len_t temp;
         fmpz *temp_c;
 
         temp = poly1->length;

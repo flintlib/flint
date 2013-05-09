@@ -27,7 +27,7 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
+_nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, len_t n, nmod_t mod)
 {
     if (n == 0)
     {
@@ -35,7 +35,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
     }
     else if (n < 20)
     {
-        long i, j;
+        len_t i, j;
 
         poly[n] = 1UL;
         poly[n - 1] = nmod_neg(xs[0], mod);
@@ -57,7 +57,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
     }
     else
     {
-        const long m = (n + 1) / 2;
+        const len_t m = (n + 1) / 2;
         mp_ptr tmp;
 
         tmp = _nmod_vec_init(n + 2);
@@ -71,7 +71,7 @@ _nmod_poly_product_roots_nmod_vec(mp_ptr poly, mp_srcptr xs, long n, nmod_t mod)
 }
 
 void
-nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, long n)
+nmod_poly_product_roots_nmod_vec(nmod_poly_t poly, mp_srcptr xs, len_t n)
 {
     nmod_poly_fit_length(poly, n + 1);
     _nmod_poly_product_roots_nmod_vec(poly->coeffs, xs, n, poly->mod);

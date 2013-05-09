@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_log_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * f, const fmpz_t fden, long n)
+                           const fmpz * f, const fmpz_t fden, len_t n)
 {
     fmpz * f_diff;
     fmpz * f_inv;
@@ -55,10 +55,10 @@ void _fmpq_poly_log_series(fmpz * g, fmpz_t gden,
 
 
 void
-fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+fmpq_poly_log_series(fmpq_poly_t res, const fmpq_poly_t f, len_t n)
 {
     fmpz * f_coeffs;
-    long flen = f->length;
+    len_t flen = f->length;
 
     if (flen < 1 || !fmpz_equal(f->coeffs, f->den))
     {

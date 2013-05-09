@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, long length, mpfr_t c)
+_mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, len_t length, mpfr_t c)
 {
-    long i;
+    len_t i;
     for (i = 0; i < length; i++)
         mpfr_mul(res + i, vec + i, c, GMP_RNDN);
 }

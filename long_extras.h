@@ -35,7 +35,7 @@
 
 /* Properties ****************************************************************/
 
-size_t z_sizeinbase(long n, int b);
+size_t z_sizeinbase(len_t n, int b);
 
 /* Randomisation  ************************************************************/
 

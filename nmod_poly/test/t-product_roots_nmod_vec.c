@@ -47,7 +47,7 @@ main(void)
         nmod_poly_t P, Q, tmp;
         mp_ptr x;
         mp_limb_t mod;
-        long j, n;
+        len_t j, n;
 
         n = n_randint(state, 100);
         mod = n_randtest_prime(state, 0);

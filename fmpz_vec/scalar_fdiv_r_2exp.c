@@ -30,10 +30,10 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, long len2,
+_fmpz_vec_scalar_fdiv_r_2exp(fmpz * vec1, const fmpz * vec2, len_t len2,
                              ulong exp)
 {
-    long i;
+    len_t i;
     for (i = 0; i < len2; i++)
         fmpz_fdiv_r_2exp(vec1 + i, vec2 + i, exp);
 }

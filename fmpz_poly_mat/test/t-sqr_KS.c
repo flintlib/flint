@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("sqr_KS....");
     fflush(stdout);
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, C, D;
-        long m, bits, deg;
+        len_t m, bits, deg;
 
         /* TODO: add separate unsigned tests */
         m = n_randint(state, 15);
@@ -87,7 +87,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
-        long m, bits, deg;
+        len_t m, bits, deg;
 
         m = n_randint(state, 20);
         deg = 1 + n_randint(state, 10);

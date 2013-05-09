@@ -32,7 +32,7 @@
 void
 fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    long i;
+    len_t i;
 
     if (res->c < 1)
         return;

@@ -33,7 +33,7 @@
 
 void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
                                        const fmpz * pol2, fmpz * temp,
-                                       long length);
+                                       len_t length);
 
 /*
    Multiplication using truncated karatsuba. Below length 7, classical 
@@ -47,10 +47,10 @@ void _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
 
 void
 _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
-                                  const fmpz * pol2, fmpz * temp, long length)
+                                  const fmpz * pol2, fmpz * temp, len_t length)
 {
-    long m1 = length / 2;
-    long m2 = length - m1;
+    len_t m1 = length / 2;
+    len_t m2 = length - m1;
     int odd = (length & 1);
 
     if (length <= 6)
@@ -85,10 +85,10 @@ _fmpz_poly_mulhigh_kara_recursive(fmpz * out, const fmpz * pol1,
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
-                               const fmpz * poly2, long len)
+                               const fmpz * poly2, len_t len)
 {
     fmpz *temp;
-    long length, loglen = 0;
+    len_t length, loglen = 0;
 
     if (len == 1)
     {
@@ -110,9 +110,9 @@ _fmpz_poly_mulhigh_karatsuba_n(fmpz * res, const fmpz * poly1,
 void
 fmpz_poly_mulhigh_karatsuba_n(fmpz_poly_t res,
                               const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                              long len)
+                              len_t len)
 {
-    long lenr = poly1->length + poly2->length - 1;
+    len_t lenr = poly1->length + poly2->length - 1;
     int clear1 = 0, clear2 = 0;
     fmpz *pol1, *pol2;
 

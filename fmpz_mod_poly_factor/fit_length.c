@@ -29,7 +29,7 @@
 #include "fmpz_mod_poly_factor.h"
 
 void
-fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, long len)
+fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, len_t len)
 {
     if (len > fac->alloc)
     {

@@ -34,12 +34,12 @@
 void
 nmod_poly_factor_init(nmod_poly_factor_t fac)
 {
-    long i;
+    len_t i;
 
     fac->alloc = 5;
     fac->num   = 0;
     fac->p     = flint_malloc(sizeof(nmod_poly_struct) * 5);
-    fac->exp   = flint_malloc(sizeof(long) * 5);
+    fac->exp   = flint_malloc(sizeof(len_t) * 5);
 
     for (i = 0; i < 5; i++)
         nmod_poly_init_preinv(fac->p + i, 0, 0);

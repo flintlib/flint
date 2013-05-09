@@ -25,20 +25,20 @@
 
 #include "fmpz.h"
 
-long * _padic_lifts_exps(long *n, long N)
+len_t * _padic_lifts_exps(len_t *n, len_t N)
 {
-    long *a, i;
+    len_t *a, i;
 
     *n = FLINT_CLOG2(N) + 1;
 
-    a = flint_malloc((*n) * sizeof(long));
+    a = flint_malloc((*n) * sizeof(len_t));
     for (a[i = 0] = N; a[i] > 1; i++)
         a[i + 1] = (a[i] + 1) / 2;
 
     return a;
 }
 
-void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
+void _padic_lifts_pows(fmpz *pow, const len_t *a, len_t n, const fmpz_t p)
 {
     if (n == 1)
     {
@@ -46,7 +46,7 @@ void _padic_lifts_pows(fmpz *pow, const long *a, long n, const fmpz_t p)
     }
     else  /* n > 1 */
     {
-        long i = n - 1;
+        len_t i = n - 1;
         fmpz_t t = {1L};
 
         fmpz_set(pow + i, p);

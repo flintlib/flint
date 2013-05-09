@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i, n;
+    len_t i, n;
     fmpz_t x, y, z, w;
 
     printf("fib_ui....");

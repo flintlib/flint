@@ -26,9 +26,9 @@
 #include "perm.h"
 
 int
-_perm_parity(const long *vec, long n)
+_perm_parity(const len_t *vec, len_t n)
 {
-    long i, k;
+    len_t i, k;
     int * encountered;
     int parity;
 

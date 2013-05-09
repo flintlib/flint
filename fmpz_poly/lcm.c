@@ -28,11 +28,11 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1, 
-                                              const fmpz * poly2, long len2)
+void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, len_t len1, 
+                                              const fmpz * poly2, len_t len2)
 {
     fmpz *W;
-    long lenW = len2;
+    len_t lenW = len2;
 
     W = _fmpz_vec_init(len2);
 
@@ -51,7 +51,7 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1,
     else
     {
         fmpz *V;
-        long lenV = len1 + len2 - lenW;
+        len_t lenV = len1 + len2 - lenW;
 
         V = _fmpz_vec_init(lenV);
         _fmpz_poly_div(V, res, len1 + len2 - 1, W, lenW);
@@ -69,8 +69,8 @@ void _fmpz_poly_lcm(fmpz * res, const fmpz * poly1, long len1,
 void fmpz_poly_lcm(fmpz_poly_t res, const fmpz_poly_t poly1, 
                                                     const fmpz_poly_t poly2)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0)
     {

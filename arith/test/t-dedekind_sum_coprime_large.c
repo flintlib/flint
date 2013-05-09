@@ -36,7 +36,7 @@ int main(void)
 {
     fmpz_t hh, kk;
     fmpq_t s1, s2;
-    long h, k;
+    len_t h, k;
 
     printf("dedekind_sum_coprime_large....");
     fflush(stdout);

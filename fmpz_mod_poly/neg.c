@@ -29,9 +29,9 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
+void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, len_t len, const fmpz_t p)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < len; i++)
     {
@@ -44,7 +44,7 @@ void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, long len, const fmpz_t p)
 
 void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
 
     fmpz_mod_poly_fit_length(res, len);
     _fmpz_mod_poly_set_length(res, len);

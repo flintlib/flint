@@ -47,8 +47,8 @@ main(void)
         nmod_poly_t product;
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead;
-        long i, j, length, num;
-        long prod1, exp[5];
+        len_t i, j, length, num;
+        len_t prod1, exp[5];
 
         modulus = n_randtest_prime(state, 0);
 

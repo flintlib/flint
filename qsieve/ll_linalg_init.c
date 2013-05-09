@@ -31,7 +31,7 @@
 
 void qsieve_ll_linalg_init(qs_t qs_inf)
 {
-    long i;
+    len_t i;
     
     qs_inf->extra_rels = 64; /* number of opportunities to factor n */
     qs_inf->max_factors = 30; /* maximum number of factors a relation can have */
@@ -45,7 +45,7 @@ void qsieve_ll_linalg_init(qs_t qs_inf)
     qs_inf->unmerged = qs_inf->matrix + qs_inf->buffer_size;
     qs_inf->Y_arr = flint_malloc(qs_inf->buffer_size*sizeof(fmpz));
     qs_inf->curr_rel = qs_inf->relation
-                     = flint_malloc(2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(long));
+                     = flint_malloc(2*qs_inf->buffer_size*qs_inf->max_factors*sizeof(len_t));
     qs_inf->qsort_arr = flint_malloc(qs_inf->qsort_rels*sizeof(la_col_t *));
 
     for (i = 0; i < qs_inf->buffer_size; i++)
@@ -61,7 +61,7 @@ void qsieve_ll_linalg_init(qs_t qs_inf)
         qs_inf->unmerged[i].data = NULL;
     }
     
-    qs_inf->prime_count = flint_malloc(qs_inf->num_primes*sizeof(long));
+    qs_inf->prime_count = flint_malloc(qs_inf->num_primes*sizeof(len_t));
 
     qs_inf->num_unmerged = 0;
     qs_inf->columns = 0;

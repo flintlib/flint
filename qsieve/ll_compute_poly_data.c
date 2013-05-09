@@ -35,9 +35,9 @@
 #include "fmpz.h"
 
 void balance4(qs_t qs_inf, mp_limb_t * A_ind, 
-     prime_t * factor_base, long min, long fact, long span, mp_limb_t target)
+     prime_t * factor_base, len_t min, len_t fact, len_t span, mp_limb_t target)
 {
-    long i, j;
+    len_t i, j;
     
     mp_limb_t prod = factor_base[A_ind[0]].p * factor_base[A_ind[1]].p;
     i = fact;
@@ -58,9 +58,9 @@ void balance4(qs_t qs_inf, mp_limb_t * A_ind,
 }
 
 void balance5(qs_t qs_inf, mp_limb_t * A_ind, 
-     prime_t * factor_base, long min, long high, long span, mp_limb_t target)
+     prime_t * factor_base, len_t min, len_t high, len_t span, mp_limb_t target)
 {
-    long i, j;
+    len_t i, j;
     
     mp_limb_t prod = factor_base[A_ind[0]].p * factor_base[A_ind[1]].p 
                    * factor_base[A_ind[2]].p;
@@ -83,16 +83,16 @@ void balance5(qs_t qs_inf, mp_limb_t * A_ind,
 
 void try_compute_A(qs_t qs_inf)
 {
-   long min = qs_inf->min;
-   long span = qs_inf->span;
-   long fact = qs_inf->fact;
-   long mid = qs_inf->mid;
-   long high = qs_inf->high;
-   long s = qs_inf->s;
+   len_t min = qs_inf->min;
+   len_t span = qs_inf->span;
+   len_t fact = qs_inf->fact;
+   len_t mid = qs_inf->mid;
+   len_t high = qs_inf->high;
+   len_t s = qs_inf->s;
    mp_limb_t * A_ind = qs_inf->A_ind;
    mp_limb_t target = qs_inf->target_A;
    prime_t * factor_base = qs_inf->factor_base;
-   long i, j;
+   len_t i, j;
    mp_limb_t prod;
        
    if (qs_inf->A == 0) /* this is our first poly */
@@ -276,7 +276,7 @@ out_of_polys:
 
 void qsieve_ll_compute_A(qs_t qs_inf)
 {
-    long i;
+    len_t i;
     
     do
     {
@@ -299,7 +299,7 @@ void qsieve_ll_compute_A(qs_t qs_inf)
 
 void qsieve_ll_compute_B_terms(qs_t qs_inf)
 {
-   long s = qs_inf->s;
+   len_t s = qs_inf->s;
    mp_limb_t * A_ind = qs_inf->A_ind;
    mp_limb_t * A_modp = qs_inf->A_modp;
    mp_limb_t * B_terms = qs_inf->B_terms;
@@ -307,7 +307,7 @@ void qsieve_ll_compute_B_terms(qs_t qs_inf)
    mp_limb_t A = qs_inf->A;
    mp_limb_t B;
    mp_limb_t p, temp, temp2, pinv;
-   long i;
+   len_t i;
    
    for (i = 0; i < s; i++)
    {
@@ -331,7 +331,7 @@ void qsieve_ll_compute_B_terms(qs_t qs_inf)
 
 void qsieve_ll_compute_off_adj(qs_t qs_inf)
 {
-   long num_primes = qs_inf->num_primes;
+   len_t num_primes = qs_inf->num_primes;
    mp_limb_t A = qs_inf->A;
    mp_limb_t B = qs_inf->B;
    mp_limb_t * A_inv = qs_inf->A_inv;
@@ -341,9 +341,9 @@ void qsieve_ll_compute_off_adj(qs_t qs_inf)
    mp_limb_t * soln2 = qs_inf->soln2;
    int * sqrts = qs_inf->sqrts;
    prime_t * factor_base = qs_inf->factor_base;
-   long s = qs_inf->s;
+   len_t s = qs_inf->s;
    mp_limb_t p, temp, pinv;
-   long i, j;
+   len_t i, j;
    
    for (i = 2; i < num_primes; i++) /* skip k and 2 */
    {
@@ -378,7 +378,7 @@ void qsieve_ll_compute_off_adj(qs_t qs_inf)
 
 void qsieve_ll_compute_A_factor_offsets(qs_t qs_inf)
 {
-   long s = qs_inf->s;
+   len_t s = qs_inf->s;
    mp_limb_t * A_ind = qs_inf->A_ind;
    mp_limb_t * A_modp = qs_inf->A_modp;
    mp_limb_t * soln1 = qs_inf->soln1;
@@ -391,7 +391,7 @@ void qsieve_ll_compute_A_factor_offsets(qs_t qs_inf)
    prime_t * factor_base = qs_inf->factor_base;
    mp_limb_t * inv_p2 = qs_inf->inv_p2;
    mp_limb_t pinv;
-   long j;
+   len_t j;
    
    for (j = 0; j < s; j++)
    {

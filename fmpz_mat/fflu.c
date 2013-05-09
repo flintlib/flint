@@ -31,12 +31,12 @@
 
 #define E(j,k) fmpz_mat_entry(B,j,k)
 
-long
-fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, long * perm,
+len_t
+fmpz_mat_fflu(fmpz_mat_t B, fmpz_t den, len_t * perm,
                             const fmpz_mat_t A, int rank_check)
 {
     fmpz_t t;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
+    len_t m, n, j, k, rank, r, pivot_row, pivot_col;
 
     if (fmpz_mat_is_empty(A))
     {

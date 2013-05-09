@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void padic_pow_si(padic_t rop, const padic_t op, long e, const padic_ctx_t ctx)
+void padic_pow_si(padic_t rop, const padic_t op, len_t e, const padic_ctx_t ctx)
 {
     if (e == 0)
     {

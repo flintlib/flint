@@ -31,9 +31,9 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_poly_hensel_lift(fmpz *G, fmpz *H, fmpz *A, fmpz *B, 
-    const fmpz *f, long lenF, 
-    const fmpz *g, long lenG, const fmpz *h, long lenH, 
-    const fmpz *a, long lenA, const fmpz *b, long lenB, 
+    const fmpz *f, len_t lenF, 
+    const fmpz *g, len_t lenG, const fmpz *h, len_t lenH, 
+    const fmpz *a, len_t lenA, const fmpz *b, len_t lenB, 
     const fmpz_t p, const fmpz_t p1)
 {
     _fmpz_poly_hensel_lift_without_inverse(G, H, f, lenF, g, lenG, h, lenH, 
@@ -50,8 +50,8 @@ void fmpz_poly_hensel_lift(fmpz_poly_t G, fmpz_poly_t H,
     const fmpz_poly_t a, const fmpz_poly_t b, 
     const fmpz_t p, const fmpz_t p1)
 {
-    const long lenG = g->length;
-    const long lenH = h->length;
+    const len_t lenG = g->length;
+    const len_t lenH = h->length;
 
     fmpz_poly_fit_length(G, lenG);
     fmpz_poly_fit_length(H, lenH);

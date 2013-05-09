@@ -31,9 +31,9 @@
 
 
 void
-_fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
+_fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, len_t n)
 {
-    long i;
+    len_t i;
     fmpz *R, *S, *T, *tmp;
 
     if (n <= 2)
@@ -66,11 +66,11 @@ _fmpz_poly_revert_series_lagrange(fmpz * Qinv, const fmpz * Q, long n)
 
 void
 fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
-                                        const fmpz_poly_t Q, long n)
+                                        const fmpz_poly_t Q, len_t n)
 {
     fmpz *Qcopy;
     int Qalloc;
-    long Qlen = Q->length;
+    len_t Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
@@ -86,7 +86,7 @@ fmpz_poly_revert_series_lagrange(fmpz_poly_t Qinv,
     }
     else
     {
-        long i;
+        len_t i;
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Qlen; i++)
             Qcopy[i] = Q->coeffs[i];

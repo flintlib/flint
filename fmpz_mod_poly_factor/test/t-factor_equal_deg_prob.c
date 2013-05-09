@@ -41,7 +41,7 @@ main(void)
     {
         fmpz_mod_poly_t poly1, poly2, q, r;
         fmpz_t modulus;
-        long length;
+        len_t length;
         int i, num;
 
         fmpz_init_set_ui(modulus, n_randtest_prime(state, 0));

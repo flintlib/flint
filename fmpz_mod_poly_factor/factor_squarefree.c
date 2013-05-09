@@ -36,7 +36,7 @@ fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
 {
     fmpz_mod_poly_t f_d, g, g_1, r;
     fmpz_t p, x;
-    long deg, i, p_ui;
+    len_t deg, i, p_ui;
 
     if (f->length <= 1)
     {

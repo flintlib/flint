@@ -49,7 +49,7 @@ _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
 int
 fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 {
-    long dim = A->r;
+    len_t dim = A->r;
 
     if (dim == 0)
     {
@@ -70,7 +70,7 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     else
     {
         fmpz_mat_t I;
-        long i;
+        len_t i;
         int success;
 
         fmpz_mat_init(I, dim, dim);

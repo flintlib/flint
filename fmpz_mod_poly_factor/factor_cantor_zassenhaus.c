@@ -34,7 +34,7 @@ fmpz_mod_poly_factor_cantor_zassenhaus(fmpz_mod_poly_factor_t res,
                                        const fmpz_mod_poly_t f)
 {
     fmpz_mod_poly_t h, v, g, x;
-    long i, j, num;
+    len_t i, j, num;
 
     fmpz_mod_poly_init(h, &f->p);
     fmpz_mod_poly_init(g, &f->p);

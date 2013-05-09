@@ -34,7 +34,7 @@ mpfr_mat_clear(mpfr_mat_t mat)
 {
     if (mat->entries)
     {
-        long i;
+        len_t i;
         for (i = 0; i < mat->r * mat->c; i++)
             mpfr_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */

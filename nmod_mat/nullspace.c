@@ -28,19 +28,19 @@
 #include "flint.h"
 #include "nmod_mat.h"
 
-long
+len_t
 nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 {
-    long i, j, k, m, n, rank, nullity;
-    long * p;
-    long * pivots;
-    long * nonpivots;
+    len_t i, j, k, m, n, rank, nullity;
+    len_t * p;
+    len_t * pivots;
+    len_t * nonpivots;
     nmod_mat_t tmp;
 
     m = A->r;
     n = A->c;
 
-    p = flint_malloc(sizeof(long) * FLINT_MAX(m, n));
+    p = flint_malloc(sizeof(len_t) * FLINT_MAX(m, n));
 
     nmod_mat_init_set(tmp, A);
     rank = nmod_mat_rref(tmp);

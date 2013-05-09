@@ -63,11 +63,11 @@ const ulong FLINT_TINY_DIVISORS_LOOKUP[FLINT_NUM_TINY_DIVISORS] = {
 
 
 void
-_arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
+_arith_divisors(fmpz *res, len_t size, fmpz_factor_t factors)
 {
-    long i;
-    long *exp = flint_malloc(sizeof(long) * factors->num);
-    long *exp_max = flint_malloc(sizeof(long) * factors->num);
+    len_t i;
+    len_t *exp = flint_malloc(sizeof(len_t) * factors->num);
+    len_t *exp_max = flint_malloc(sizeof(len_t) * factors->num);
     fmpz *powers = _fmpz_vec_init(factors->num);
     fmpz_t d;
 
@@ -118,10 +118,10 @@ _arith_divisors(fmpz *res, long size, fmpz_factor_t factors)
 
 
 void
-_arith_divisors_tiny(fmpz_poly_t res, long n)
+_arith_divisors_tiny(fmpz_poly_t res, len_t n)
 {
-    long size;
-    long i, k;
+    len_t size;
+    len_t i, k;
 
     size = FLINT_TINY_DIVISORS_SIZE[n];
 
@@ -142,7 +142,7 @@ _arith_divisors_tiny(fmpz_poly_t res, long n)
 void
 arith_divisors(fmpz_poly_t res, const fmpz_t n)
 {
-    long i, size, m;
+    len_t i, size, m;
     fmpz_factor_t factors;
 
     if (!COEFF_IS_MPZ(*n))

@@ -46,7 +46,7 @@ main(void)
     {
         fmpq_t x, y, r;
         fmpz * c;
-        long n, bound;
+        len_t n, bound;
 
         fmpq_init(x);
         fmpq_init(y);

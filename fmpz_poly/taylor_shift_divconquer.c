@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, long len)
+_fmpz_poly_taylor_shift_divconquer(fmpz * poly, const fmpz_t c, len_t len)
 {
     fmpz d[2];
 

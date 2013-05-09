@@ -50,10 +50,10 @@ main(void)
         fmpz *a, *b;
         mp_ptr c;
         nmod_t mod;
-        long i;
+        len_t i;
         mp_limb_t t;
 
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         mp_limb_t n = n_randtest_not_zero(state);
 
         a = _fmpz_vec_init(len);

@@ -33,7 +33,7 @@ mp_limb_t n_mod_precomp(mp_limb_t a, mp_limb_t n, double npre)
 
     quot = (mp_limb_t) ((double) a * npre);
     rem  = a - quot*n;
-    if ((long) rem < 0) /* unlikely */
+    if ((len_t) rem < 0) /* unlikely */
        rem += n;
     return rem - (n & (((mp_limb_signed_t) (n - rem - 1)) >> (FLINT_BITS-1)));
 }

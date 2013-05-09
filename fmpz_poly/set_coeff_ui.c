@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_set_coeff_ui(fmpz_poly_t poly, long n, ulong x)
+fmpz_poly_set_coeff_ui(fmpz_poly_t poly, len_t n, ulong x)
 {
     fmpz_poly_fit_length(poly, n + 1);
 

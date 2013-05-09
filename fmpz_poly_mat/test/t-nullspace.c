@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("nullspace....");
     fflush(stdout);
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, N, AN;
-        long n, m, bits, deg, rank, nullity;
+        len_t n, m, bits, deg, rank, nullity;
         float density;
 
         m = n_randint(state, 13);

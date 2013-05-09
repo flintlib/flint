@@ -34,7 +34,7 @@ nmod_poly_factor_squarefree(nmod_poly_factor_t res, const nmod_poly_t f)
 {
     nmod_poly_t f_d, g, g_1;
     mp_limb_t p;
-    long deg, i;
+    len_t deg, i;
 
     if (f->length <= 1) 
     {

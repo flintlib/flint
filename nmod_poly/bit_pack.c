@@ -33,9 +33,9 @@
 
 /* Assumes length > 0, bits > 0. */
 void
-_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, long len, mp_bitcnt_t bits)
+_nmod_poly_bit_pack(mp_ptr res, mp_srcptr poly, len_t len, mp_bitcnt_t bits)
 {
-    long i;
+    len_t i;
     ulong current_bit = 0, current_limb = 0;
     ulong total_limbs = (len * bits - 1) / FLINT_BITS + 1;
     mp_limb_t temp_lower, temp_upper;
@@ -143,9 +143,9 @@ void
 nmod_poly_bit_pack(fmpz_t f, const nmod_poly_t poly,
                    mp_bitcnt_t bit_size)
 {
-    long len, limbs;
+    len_t len, limbs;
     __mpz_struct * mpz;
-    long i;
+    len_t i;
 
     len = nmod_poly_length(poly);
 

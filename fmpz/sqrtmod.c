@@ -36,7 +36,7 @@
  */
 static int _fmpz_sqrtmod(mpz_t rop, const mpz_t a, const mpz_t p) 
 {
-    long i, r, m;
+    len_t i, r, m;
     mpz_t p1, k, exp, b, g, bpow, gpow;
 
     if (mpz_jacobi(a, p) == -1)

@@ -35,7 +35,7 @@
 void
 nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
 {
-    long dim = A->r;
+    len_t dim = A->r;
 
     if (dim < KS_MIN_DIM)
     {
@@ -43,7 +43,7 @@ nmod_poly_mat_sqr(nmod_poly_mat_t C, const nmod_poly_mat_t A)
     }
     else
     {
-        long Alen;
+        len_t Alen;
         mp_limb_t mod = nmod_poly_mat_modulus(A);
 
         Alen = nmod_poly_mat_max_length(A);

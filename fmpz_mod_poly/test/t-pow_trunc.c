@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;
-        long e, trunc;
+        len_t e, trunc;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
@@ -88,7 +88,7 @@ main(void)
     {
         fmpz_mod_poly_t a, b, c;
         fmpz_t p;
-        long e, trunc;
+        len_t e, trunc;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

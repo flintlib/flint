@@ -50,9 +50,9 @@
     and so in this case we use that the leading (resp.\ constant) 
     term of $g$ divides the leading (resp.\ constant) term of $f$.
  */
-static void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, long m)
+static void _fmpz_poly_factor_mignotte(fmpz_t B, const fmpz *f, len_t m)
 {
-    long j;
+    len_t j;
     fmpz_t b, f2, lc, s, t;
 
     fmpz_init(b);
@@ -102,9 +102,9 @@ static void fmpz_poly_factor_mignotte(fmpz_t B, const fmpz_poly_t f)
 }
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-                                  long exp, const fmpz_poly_t f, long cutoff)
+                                  len_t exp, const fmpz_poly_t f, len_t cutoff)
 {
-    const long lenF = f->length;
+    const len_t lenF = f->length;
 
     #if TRACE_ZASSENHAUS == 1
     printf("\n[Zassenhaus]\n");
@@ -117,8 +117,8 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
     }
     else
     {
-        long i;
-        long r = lenF;
+        len_t i;
+        len_t r = lenF;
         mp_limb_t p = 2;
         nmod_poly_t d, g, t;
         nmod_poly_factor_t fac;
@@ -180,7 +180,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
         }
         else
         {
-            long a;
+            len_t a;
             fmpz_poly_factor_t lifted_fac;
             fmpz_poly_factor_init(lifted_fac);
 
@@ -226,7 +226,7 @@ void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac,
 
 void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
 {
-    const long lenG = G->length;
+    const len_t lenG = G->length;
     fmpz_poly_t g;
 
     if (lenG == 0)
@@ -252,7 +252,7 @@ void fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t fac, const fmpz_poly_t G)
     }
     else
     {
-        long j, k;
+        len_t j, k;
         fmpz_poly_factor_t sq_fr_fac;
 
         /* Does a presearch for a factor of form x^k */

@@ -31,12 +31,12 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-long
+len_t
 fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 {
     fmpz_mat_t Aclear;
     fmpz_t den;
-    long rank;
+    len_t rank;
 
     if (fmpq_mat_is_empty(A))
         return 0;

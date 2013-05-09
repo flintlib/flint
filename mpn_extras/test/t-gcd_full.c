@@ -36,7 +36,7 @@ int main(void)
     mpz_t a, b, c, g;
     gmp_randstate_t st;
     flint_rand_t state;
-    long s1, s2;
+    len_t s1, s2;
     
     printf("gcd_full....");
     fflush(stdout);

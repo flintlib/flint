@@ -30,11 +30,11 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols)
+void fmpq_mat_init(fmpq_mat_t mat, len_t rows, len_t cols)
 {
     if ((rows) && (cols))
     {
-        long i;
+        len_t i;
         mat->entries = (fmpq *) flint_calloc(rows * cols, sizeof(fmpq));
         mat->rows = (fmpq **) flint_malloc(rows * sizeof(fmpq *));
 

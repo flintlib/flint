@@ -37,7 +37,7 @@ void test_set(char * in, char * out)
     flint_free(res);
 }
 
-void test_set_si(long x, char * out)
+void test_set_si(len_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop;
@@ -502,7 +502,7 @@ void test_sub_in_place3(char * in, char * out)
     flint_free(res);
 }
 
-void test_scalar_mul_si(char * in, long x, char * out)
+void test_scalar_mul_si(char * in, len_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;
@@ -583,7 +583,7 @@ void test_scalar_mul_mpq(char * in, mpq_t x, char * out)
     flint_free(res);
 }
 
-void test_scalar_div_si(char * in, long x, char * out)
+void test_scalar_div_si(char * in, len_t x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;

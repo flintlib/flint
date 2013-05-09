@@ -35,7 +35,7 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
     fmpz * den;
-    long k;
+    len_t k;
 
     if (n == 0)
     {

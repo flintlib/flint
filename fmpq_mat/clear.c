@@ -35,7 +35,7 @@ void fmpq_mat_clear(fmpq_mat_t mat)
 {
     if (mat->entries)
     {
-        long i;
+        len_t i;
 
         for (i = 0; i < mat->r * mat->c; i++)
             fmpq_clear(mat->entries + i);

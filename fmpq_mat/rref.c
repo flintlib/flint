@@ -31,7 +31,7 @@
 #include "fmpq.h"
 #include "fmpq_mat.h"
 
-long
+len_t
 fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 {
     if (A->r <= 2 || A->c <= 2)

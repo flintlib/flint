@@ -37,9 +37,9 @@ with op = -1, computes D = C - A*B
 
 static __inline__ void
 _nmod_mat_addmul_basic(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
-    mp_ptr * const B, long m, long k, long n, int op, nmod_t mod, int nlimbs)
+    mp_ptr * const B, len_t m, len_t k, len_t n, int op, nmod_t mod, int nlimbs)
 {
-    long i, j;
+    len_t i, j;
     mp_limb_t c;
 
     for (i = 0; i < m; i++)
@@ -60,11 +60,11 @@ _nmod_mat_addmul_basic(mp_ptr * D, mp_ptr * const C, mp_ptr * const A,
 
 static __inline__ void
 _nmod_mat_addmul_transpose(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, long m, long k, long n, int op, nmod_t mod, int nlimbs)
+    const mp_ptr * B, len_t m, len_t k, len_t n, int op, nmod_t mod, int nlimbs)
 {
     mp_ptr tmp;
     mp_limb_t c;
-    long i, j;
+    len_t i, j;
 
     tmp = flint_malloc(sizeof(mp_limb_t) * k * n);
 
@@ -93,10 +93,10 @@ _nmod_mat_addmul_transpose(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
 /* requires nlimbs = 1 */
 void
 _nmod_mat_addmul_packed(mp_ptr * D, const mp_ptr * C, const mp_ptr * A,
-    const mp_ptr * B, long M, long N, long K, int op, nmod_t mod, int nlimbs)
+    const mp_ptr * B, len_t M, len_t N, len_t K, int op, nmod_t mod, int nlimbs)
 {
-    long i, j, k;
-    long Kpack;
+    len_t i, j, k;
+    len_t Kpack;
     int pack, pack_bits;
     mp_limb_t c, d, mask;
     mp_ptr tmp;
@@ -176,7 +176,7 @@ void
 _nmod_mat_mul_classical(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B, int op)
 {
-    long m, k, n;
+    len_t m, k, n;
     int nlimbs;
     nmod_t mod;
 

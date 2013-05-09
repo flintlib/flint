@@ -62,8 +62,8 @@ mp_size_t flint_mpn_tdiv_q_fmpz_inplace(mp_ptr arrayg, mp_size_t limbsg, fmpz_t 
    Returns 1 if sign * (G, glen) * (Q, qlen) = (P, len), else returns 0.
    Temp requires space for glen + qlen - 1 coefficients
 */
-int multiplies_out(fmpz * P, long len, const fmpz * Q, long qlen, 
-                   const fmpz * G, long glen, long sign, fmpz * temp)
+int multiplies_out(fmpz * P, len_t len, const fmpz * Q, len_t qlen, 
+                   const fmpz * G, len_t glen, len_t sign, fmpz * temp)
 {
    int divides = 0;
 
@@ -82,13 +82,13 @@ int multiplies_out(fmpz * P, long len, const fmpz * Q, long qlen,
    
 /* Assumes len1 != 0 != len2 */
 int
-_fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1, 
-                                        const fmpz * poly2, long len2)
+_fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, len_t len1, 
+                                        const fmpz * poly2, len_t len2)
 {
 	ulong bits1, bits2, max_bits, pack_bits, bound_bits, bits_G, bits_Q;
    ulong limbs1, limbs2, limbsg, pack_limbs, qlimbs;
    ulong log_glen, log_length;
-   long sign1, sign2, glen, qlen;
+   len_t sign1, sign2, glen, qlen;
 	fmpz_t ac, bc, d, gc;
    fmpz * A, * B, * G, * Q, * t;
    mp_ptr array1, array2, arrayg, q, temp;
@@ -172,12 +172,12 @@ _fmpz_poly_gcd_heuristic(fmpz * res, const fmpz * poly1, long len1,
    arrayg = flint_calloc(limbs2, sizeof(mp_limb_t));
    
    /* pack first poly and normalise */
-   sign1 = (long) fmpz_sgn(A + len1 - 1);
+   sign1 = (len_t) fmpz_sgn(A + len1 - 1);
 	_fmpz_poly_bit_pack(array1, A, len1, pack_bits, sign1);
 	while (array1[limbs1 - 1] == 0) limbs1--;
 
    /* pack second poly and normalise */
-   sign2 = (long) fmpz_sgn(B + len2 - 1);
+   sign2 = (len_t) fmpz_sgn(B + len2 - 1);
    _fmpz_poly_bit_pack(array2, B, len2, pack_bits, sign2);
 	while (array2[limbs2 - 1] == 0) limbs2--;
 	
@@ -299,8 +299,8 @@ fmpz_poly_gcd_heuristic(fmpz_poly_t res, const fmpz_poly_t poly1,
     }
     else /* len1 >= len2 >= 0 */
     {
-        const long len1 = poly1->length;
-        const long len2 = poly2->length;
+        const len_t len1 = poly1->length;
+        const len_t len2 = poly2->length;
         int done = 1; /* len1 = 0 or len2 = 0 need done = 1 */
 
         if (len1 == 0) /* len1 = len2 = 0 */

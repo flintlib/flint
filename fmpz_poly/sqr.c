@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, long len)
+void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, len_t len)
 {
     mp_size_t limbs;
 
@@ -55,8 +55,8 @@ void _fmpz_poly_sqr(fmpz * res, const fmpz * poly, long len)
 
 void fmpz_poly_sqr(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    long len = poly->length;
-    long rlen;
+    len_t len = poly->length;
+    len_t rlen;
 
     if (len == 0)
     {

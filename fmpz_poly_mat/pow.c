@@ -31,7 +31,7 @@
 void
 fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
 {
-    long d = fmpz_poly_mat_nrows(A);
+    len_t d = fmpz_poly_mat_nrows(A);
 
     if (exp == 0 || d == 0)
     {
@@ -53,12 +53,12 @@ fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
     else
     {
         fmpz_poly_mat_t T, U;
-        long i;
+        len_t i;
 
         fmpz_poly_mat_init_set(T, A);
         fmpz_poly_mat_init(U, d, d);
 
-        for (i = ((long) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        for (i = ((len_t) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
         {
             fmpz_poly_mat_sqr(U, T);
 

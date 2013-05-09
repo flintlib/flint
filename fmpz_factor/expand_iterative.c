@@ -32,7 +32,7 @@
 void
 fmpz_factor_expand_iterative(fmpz_t n, const fmpz_factor_t factor)
 {
-    long i;
+    len_t i;
     fmpz_t tmp;
 
     fmpz_set_si(n, factor->sign);

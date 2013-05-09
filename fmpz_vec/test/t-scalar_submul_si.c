@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b, *c, *d;
-        long len = n_randint(state, 100), x;
+        len_t len = n_randint(state, 100), x;
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

@@ -32,9 +32,9 @@
 
 void
 fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
-                            const fmpz_mod_poly_t poly, long exp)
+                            const fmpz_mod_poly_t poly, len_t exp)
 {
-    long i;
+    len_t i;
     fmpz_t p;
 
     if (poly->length <= 1)
@@ -51,11 +51,11 @@ fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
 
     if (fac->alloc == fac->num)
     {
-        long new_size = 2 * fac->alloc;
+        len_t new_size = 2 * fac->alloc;
 
         fac->poly =
             flint_realloc(fac->poly, sizeof(fmpz_mod_poly_struct) * new_size);
-        fac->exp = flint_realloc(fac->exp, sizeof(long) * new_size);
+        fac->exp = flint_realloc(fac->exp, sizeof(len_t) * new_size);
 
         fmpz_init_set_ui(p, 5);
         for (i = fac->alloc; i < new_size; i++)

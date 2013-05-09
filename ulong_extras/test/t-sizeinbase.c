@@ -34,7 +34,7 @@ int main(void)
 {
     mp_limb_t n;
     int base, size1, size2;
-    long rep;
+    len_t rep;
     mpz_t t;
     char * str;
 

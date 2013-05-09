@@ -197,7 +197,7 @@ mp_size_t pp1_find_power(mp_ptr factor, mp_ptr x, mp_ptr y, mp_size_t nn,
 
 int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
 {
-   long i, j;
+   len_t i, j;
    int ret = 0;
    mp_size_t nn = fmpz_size(n_in), r;
    mp_ptr x, y, oldx, oldy, n, ninv, factor, ptr_0, ptr_1, ptr_2, ptr_k;
@@ -311,10 +311,10 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
       double quot;
       int num;
       char * sieve = flint_malloc(32768);
-      long * sieve_index = flint_malloc(32768*sizeof(long));
+      len_t * sieve_index = flint_malloc(32768*sizeof(len_t));
       mp_ptr diff = flint_malloc(16384*nn*sizeof(mp_limb_t));
       ulong offset[15], num_roots;
-      long k, index = 0, s;
+      len_t k, index = 0, s;
       fmpz * roots, * roots2, * evals;
       fmpz_poly_struct ** tree, ** tree2;
       ulong B2sqrt;

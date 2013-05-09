@@ -34,7 +34,7 @@
 #define LU(ii,jj) nmod_poly_mat_entry(FFLU,(ii),(jj))
 
 void
-nmod_poly_mat_set_perm(nmod_poly_mat_t X, const long * perm,
+nmod_poly_mat_set_perm(nmod_poly_mat_t X, const len_t * perm,
     const nmod_poly_mat_t B)
 {
     if (X == B)
@@ -44,7 +44,7 @@ nmod_poly_mat_set_perm(nmod_poly_mat_t X, const long * perm,
     }
     else
     {
-        long i, j;
+        len_t i, j;
 
         if (perm == NULL)
             abort();
@@ -58,11 +58,11 @@ nmod_poly_mat_set_perm(nmod_poly_mat_t X, const long * perm,
 
 void
 nmod_poly_mat_solve_fflu_precomp(nmod_poly_mat_t X,
-                    const long * perm,
+                    const len_t * perm,
                     const nmod_poly_mat_t FFLU, const nmod_poly_mat_t B)
 {
     nmod_poly_t T;
-    long i, j, k, m, n;
+    len_t i, j, k, m, n;
 
     n = X->r;
     m = X->c;

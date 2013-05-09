@@ -29,9 +29,9 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, long len, nmod_t mod)
+void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, len_t len, nmod_t mod)
 {
-    long i;
+    len_t i;
     for (i = 0 ; i < len; i++)
         res[i] = nmod_neg(vec[i], mod);
 }

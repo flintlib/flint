@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("mullow....");
     fflush(stdout);
@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C, D;
-        long m, n, k, bits, deg, len;
+        len_t m, n, k, bits, deg, len;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -94,7 +94,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long m, n, bits, deg, len;
+        len_t m, n, bits, deg, len;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -135,7 +135,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long m, n, bits, deg, len;
+        len_t m, n, bits, deg, len;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

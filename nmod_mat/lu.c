@@ -30,8 +30,8 @@
 #include "nmod_vec.h"
 #include "nmod_mat.h"
 
-long 
-nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
+len_t 
+nmod_mat_lu(len_t * P, nmod_mat_t A, int rank_check)
 {
     return nmod_mat_lu_recursive(P, A, rank_check);
 }

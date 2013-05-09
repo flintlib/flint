@@ -30,7 +30,7 @@
 int
 nmod_poly_mat_equal(const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 {
-    long i, j;
+    len_t i, j;
 
     if (A->r != B->r || A->c != B->c)
         return 0;

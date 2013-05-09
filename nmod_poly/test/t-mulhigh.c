@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         nmod_poly_t a, b, c;
-        long j, n;
+        len_t j, n;
 
         mp_limb_t m = n_randtest_not_zero(state);
 

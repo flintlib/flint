@@ -29,7 +29,7 @@
 
 void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
     fmpz_t inv;
 
     if (len == 0)

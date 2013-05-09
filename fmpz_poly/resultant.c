@@ -30,8 +30,8 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1, 
-                                 const fmpz * poly2, long len2)
+_fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, len_t len1, 
+                                 const fmpz * poly2, len_t len2)
 {
     if (len2 == 1)
     {
@@ -41,8 +41,8 @@ _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1,
     {
         fmpz_t a, b, g, h, t;
         fmpz *A, *B, *W;
-        const long alloc = len1 + len2;
-        long sgn = 1;
+        const len_t alloc = len1 + len2;
+        len_t sgn = 1;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -67,7 +67,7 @@ _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1,
 
         do
         {
-            const long d = len1 - len2;
+            const len_t d = len1 - len2;
 
             if (!(len1 & 1L) & !(len2 & 1L))
                 sgn = -sgn;
@@ -84,7 +84,7 @@ _fmpz_poly_resultant(fmpz_t res, const fmpz * poly1, long len1,
 
             {
                 fmpz * T;
-                long len;
+                len_t len;
                 T = A, A = B, B = T;
                 len = len1, len1 = len2, len2 = len;
             }
@@ -125,7 +125,7 @@ void
 fmpz_poly_resultant(fmpz_t res, const fmpz_poly_t poly1, 
                                 const fmpz_poly_t poly2)
 {
-    const long len1 = poly1->length, len2 = poly2->length;
+    const len_t len1 = poly1->length, len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0)
     {

@@ -27,11 +27,11 @@
 #include "nmod_poly.h"
 #include "mpn_extras.h"
 
-long _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, long lenA, 
-                                        mp_srcptr B, long lenB, nmod_t mod)
+len_t _nmod_poly_gcd_euclidean(mp_ptr G, mp_srcptr A, len_t lenA, 
+                                        mp_srcptr B, len_t lenB, nmod_t mod)
 {
-    long steps;
-    long lenR1, lenR2 = 0, lenG = 0;
+    len_t steps;
+    len_t lenR1, lenR2 = 0, lenG = 0;
 
     mp_ptr F, R1, R2, R3 = G, T;
     
@@ -105,7 +105,7 @@ void nmod_poly_gcd_euclidean(nmod_poly_t G,
     }
     else /* lenA >= lenB >= 0 */
     {
-        long lenA = A->length, lenB = B->length, lenG;
+        len_t lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
         mp_ptr g;
 

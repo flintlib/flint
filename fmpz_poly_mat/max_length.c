@@ -28,10 +28,10 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-long
+len_t
 fmpz_poly_mat_max_length(const fmpz_poly_mat_t A)
 {
-    long i, j, len, max;
+    len_t i, j, len, max;
 
     max = 0;
 
