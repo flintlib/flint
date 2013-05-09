@@ -53,11 +53,11 @@ int main(void)
         qadic_t a, b, c;
 
         d = n_randint(state, 10) + 1;
-        qadic_ctx_init_conway(ctx, p, d, 1, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, 1, 1, "X", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
-        qadic_init(c);
+        qadic_init2(a, 1);
+        qadic_init2(b, 1);
+        qadic_init2(c, 1);
 
         qadic_randtest_val(a, state, 0, ctx);
         padic_poly_fit_length(b, d);
@@ -105,7 +105,7 @@ int main(void)
 
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
 
         qadic_init(a);
         qadic_init(b);
@@ -143,14 +143,13 @@ int main(void)
         int ans1, ans2;
         qadic_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
+        qadic_init2(a, N);
+        qadic_init2(b, N);
 
         qadic_randtest(a, state, ctx);
 
@@ -184,11 +183,10 @@ int main(void)
         int ans;
         qadic_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "X", PADIC_SERIES);
 
         qadic_init(a);
         qadic_init(b);
@@ -204,10 +202,10 @@ int main(void)
         {
             qadic_t a2, c2;
 
-            qadic_init(a2);
-            qadic_init(c2);
-            qadic_scalar_mod_ppow(a2, a, N + a->val, ctx);
-            qadic_scalar_mod_ppow(c2, c, N + a->val, ctx);
+            qadic_init2(a2, N + a->val);
+            qadic_init2(c2, N + a->val);
+            qadic_set(a2, a, ctx);
+            qadic_set(c2, c, ctx);
 
             result = (qadic_equal(a2, c2));
             if (!result)
@@ -259,16 +257,15 @@ int main(void)
         int ans;
         qadic_t a, b, c, d;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 3 + n_randint(state, 3), 1));
         deg = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, deg, N, "X", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, deg, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "X", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
-        qadic_init(c);
-        qadic_init(d);
+        qadic_init2(a, N);
+        qadic_init2(b, N);
+        qadic_init2(c, N);
+        qadic_init2(d, N);
 
         qadic_randtest(b, state, ctx);
         qadic_mul(a, b, b, ctx);
@@ -281,10 +278,10 @@ int main(void)
         {
             qadic_t a2, d2;
 
-            qadic_init(a2);
-            qadic_init(d2);
-            qadic_scalar_mod_ppow(a2, a, N + a->val, ctx);
-            qadic_scalar_mod_ppow(d2, d, N + a->val, ctx);
+            qadic_init2(a2, N + a->val);
+            qadic_init2(d2, N + a->val);
+            qadic_set(a2, a, ctx);
+            qadic_set(d2, d, ctx);
 
             result = (qadic_equal(a2, d2));
             if (!result)

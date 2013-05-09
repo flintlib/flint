@@ -72,7 +72,7 @@ void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len,
 
 void qadic_norm_analytic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = (&ctx->pctx)->N;
+    const long N  = padic_prec(rop);
     const long d  = qadic_ctx_degree(ctx);
     const fmpz *p = (&ctx->pctx)->p;
 

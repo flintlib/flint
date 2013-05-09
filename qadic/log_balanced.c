@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern long _padic_log_bound(long v, long N, long p);
+extern long _padic_log_bound(long v, long N, const fmpz_t p);
 
 /*
     Assumes that P, T are vectors of length 2 d - 1.
@@ -125,13 +125,7 @@ _qadic_log_bsplit(fmpz *z, const fmpz *y, long v, long len,
     fmpz_t B, C;
     long n;
 
-    if (fmpz_fits_si(p))
-    {
-        n = _padic_log_bound(v, N, fmpz_get_si(p));
-    }
-    else
-        n = (N - 1) / v;
-
+    n = _padic_log_bound(v, N, p);
     n = FLINT_MAX(n, 2);
 
     P = _fmpz_vec_init(2*d - 1);
@@ -247,7 +241,7 @@ int qadic_log_balanced(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p  = (&ctx->pctx)->p;
     const long d   = qadic_ctx_degree(ctx);
-    const long N   = (&ctx->pctx)->N;
+    const long N   = qadic_prec(rop);
     const long len = op->length;
 
     if (op->val < 0)

@@ -50,18 +50,17 @@ main(void)
 
         qadic_t a, b, c;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "a", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
-        qadic_init(c);
+        qadic_init2(a, N);
+        qadic_init2(b, N);
+        qadic_init2(c, N);
 
         qadic_randtest_not_zero(a, state, ctx);
-        qadic_set(b, a);
+        qadic_set(b, a, ctx);
 
         qadic_inv(c, b, ctx);
         qadic_inv(b, b, ctx);
@@ -93,14 +92,13 @@ main(void)
 
         qadic_t a, b;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "a", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
+        qadic_init2(a, N);
+        qadic_init2(b, N);
 
         do qadic_randtest_val(a, state, 0, ctx);
         while (qadic_is_zero(a));
@@ -108,7 +106,7 @@ main(void)
         qadic_inv(b, a, ctx);
         qadic_mul(b, a, b, ctx);
 
-        result = (qadic_is_one(b, ctx));
+        result = qadic_is_one(b);
         if (!result)
         {
             printf("FAIL:\n\n");

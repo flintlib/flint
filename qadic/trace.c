@@ -64,7 +64,7 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(rop);
 
     if (qadic_is_zero(op) || op->val >= N)
     {

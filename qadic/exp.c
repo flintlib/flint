@@ -45,13 +45,13 @@ void _qadic_exp(fmpz *rop, const fmpz *op, long v, long len,
 
 int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N  = (&ctx->pctx)->N;
+    const long N  = qadic_prec(rop);
     const long v  = op->val;
     const fmpz *p = (&ctx->pctx)->p;
 
     if (padic_poly_is_zero(op))
     {
-        padic_poly_one(rop, &ctx->pctx);
+        padic_poly_one(rop);
         return 1;
     }
 
@@ -100,7 +100,7 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         }
         else
         {
-            padic_poly_one(rop, &ctx->pctx);
+            padic_poly_one(rop);
         }
         return 1;
     }

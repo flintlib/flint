@@ -26,7 +26,7 @@
 #include "fmpz_mod_poly.h"
 #include "qadic.h"
 
-extern long _padic_log_bound(long v, long N, long p);
+extern long _padic_log_bound(long v, long N, const fmpz_t p);
 
 /*
     Carries out the finite series evaluation for the logarithm 
@@ -163,27 +163,17 @@ void _qadic_log_rectangular(fmpz *z, const fmpz *y, long v, long len,
                             const fmpz_t p, long N, const fmpz_t pN)
 {
     const long d = j[lena - 1];
+    const long n = _padic_log_bound(v, N, p) - 1;
 
-    if (fmpz_fits_si(p))
-    {
-        const long q = fmpz_get_si(p);
-        const long i = _padic_log_bound(v, N, q) - 1 + 10;
-
-        _qadic_log_rectangular_series(z, y, len, i, a, j, lena, p, N, pN);
-        _fmpz_mod_poly_neg(z, z, d, pN);
-    }
-    else
-    {
-        printf("Exception (_qadic_log_rectangular).  Not implemented.\n");
-        abort();
-    }
+    _qadic_log_rectangular_series(z, y, len, n, a, j, lena, p, N, pN);
+    _fmpz_mod_poly_neg(z, z, d, pN);
 }
 
 int qadic_log_rectangular(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p  = (&ctx->pctx)->p;
     const long d   = qadic_ctx_degree(ctx);
-    const long N   = (&ctx->pctx)->N;
+    const long N   = qadic_prec(rop);
     const long len = op->length;
 
     if (op->val < 0)

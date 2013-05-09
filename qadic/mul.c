@@ -46,7 +46,7 @@ void qadic_mul(qadic_t x, const qadic_t y, const qadic_t z,
     const long leny = y->length;
     const long lenz = z->length;
     const long lenx = leny + lenz - 1;
-    const long N    = (&ctx->pctx)->N;
+    const long N    = qadic_prec(x);
     const long d    = qadic_ctx_degree(ctx);
 
     if (leny == 0 || lenz == 0 || y->val + z->val >= N)

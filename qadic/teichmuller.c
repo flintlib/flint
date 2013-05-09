@@ -149,7 +149,7 @@ void _qadic_teichmuller(fmpz *rop, const fmpz *op, long len,
 
 void qadic_teichmuller(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(rop);
 
     if (op->val < 0)
     {

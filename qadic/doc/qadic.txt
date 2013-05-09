@@ -67,12 +67,14 @@
 *******************************************************************************
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx, 
-                           const fmpz_t p, long d, long N, const char *var, 
-                           enum padic_print_mode mode)
+                           const fmpz_t p, long d, long min, long max, 
+                           const char *var, enum padic_print_mode mode)
 
-    Initialises the context \code{ctx} with prime $p$, precision $N$, 
-    extension degree $d$, variable name \code{var} and printing mode 
-    \code{mode}.
+    Initialises the context \code{ctx} with prime $p$, extension degree $d$, 
+    variable name \code{var} and printing mode \code{mode}.
+
+    Stores powers of $p$ with exponents between \code{min} (inclusive) and 
+    \code{max} exclusive.  Assumes that \code{min} is at most \code{max}. 
 
     Assumes that $p$ is a prime.
 

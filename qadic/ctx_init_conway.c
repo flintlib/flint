@@ -35,8 +35,8 @@
 #endif
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx,
-                           const fmpz_t p, long d, long N, const char *var, 
-                           enum padic_print_mode mode)
+                           const fmpz_t p, long d, long min, long max, 
+                           const char *var, enum padic_print_mode mode)
 {
     char *buf;
     FILE *file;
@@ -112,7 +112,7 @@ void qadic_ctx_init_conway(qadic_ctx_t ctx,
             ctx->j[j] = d;
 
             /* Complete the initialisation of the context */
-            padic_ctx_init(&ctx->pctx, p, N, mode);
+            padic_ctx_init(&ctx->pctx, p, min, max, mode);
 
             ctx->var = flint_malloc(strlen(var) + 1);
             strcpy(ctx->var, var);

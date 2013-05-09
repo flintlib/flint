@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
  
 ******************************************************************************/
 
@@ -49,6 +49,11 @@
 
 #define qadic_val(op) ((op)->val)
 
+static __inline__ long qadic_prec(const qadic_t op)
+{
+    return padic_poly_prec(op);
+}
+
 typedef struct
 {
     padic_ctx_struct pctx;
@@ -64,8 +69,8 @@ qadic_ctx_struct;
 typedef qadic_ctx_struct qadic_ctx_t[1];
 
 void qadic_ctx_init_conway(qadic_ctx_t ctx, 
-                           const fmpz_t p, long d, long N, const char *var, 
-                           enum padic_print_mode mode);
+                           const fmpz_t p, long d, long min, long max, 
+                           const char *var, enum padic_print_mode mode);
 
 void qadic_ctx_clear(qadic_ctx_t ctx);
 
@@ -80,7 +85,6 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 
     printf("p    = "), fmpz_print((&ctx->pctx)->p), printf("\n");
     printf("d    = %ld\n", ctx->j[ctx->len - 1]);
-    printf("N    = %ld\n", (&ctx->pctx)->N);
     printf("f(X) = ");
     fmpz_print(ctx->a + 0);
     for (k = 1; k < ctx->len; k++)
@@ -111,6 +115,11 @@ static __inline__ void qadic_ctx_print(const qadic_ctx_t ctx)
 static __inline__ void qadic_init(qadic_t x)
 {
     padic_poly_init(x);
+}
+
+static __inline__ void qadic_init2(qadic_t rop, long prec)
+{
+    padic_poly_init2(rop, 0, prec);
 }
 
 static __inline__ void qadic_clear(qadic_t x)
@@ -163,7 +172,7 @@ _fmpz_mod_poly_reduce(fmpz *R, long lenR,
 
 static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(x);
     const long d = ctx->j[ctx->len - 1];
 
     if (x->length == 0 || x->val >= N)
@@ -175,7 +184,7 @@ static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
         fmpz_t pow;
         int alloc;
 
-        alloc = _padic_ctx_pow_ui(pow, (&ctx->pctx)->N - x->val, &ctx->pctx);
+        alloc = _padic_ctx_pow_ui(pow, N - x->val, &ctx->pctx);
 
         _fmpz_mod_poly_reduce(x->coeffs, x->length, ctx->a, ctx->j, ctx->len, pow);
         _padic_poly_set_length(x, FLINT_MIN(x->length, d));
@@ -215,7 +224,7 @@ qadic_randtest_val(qadic_t x, flint_rand_t state, long val,
 static __inline__ void 
 qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(x);
 
     if (N <= 0)
     {
@@ -230,23 +239,24 @@ qadic_randtest_int(qadic_t x, flint_rand_t state, const qadic_ctx_t ctx)
 
 /* Assignments and conversions ***********************************************/
 
-static __inline__ void qadic_zero(qadic_t x)
+static __inline__ void qadic_zero(qadic_t op)
 {
-    padic_poly_zero(x);
+    padic_poly_zero(op);
 }
 
-static __inline__ void qadic_one(qadic_t x, const qadic_ctx_t ctx)
+static __inline__ void qadic_one(qadic_t op)
 {
-    padic_poly_one(x, &ctx->pctx);
+    padic_poly_one(op);
 }
 
 static __inline__ void qadic_gen(qadic_t x, const qadic_ctx_t ctx)
 {
+    const long N = qadic_prec(x);
     const long d = qadic_ctx_degree(ctx);
 
     if (d > 1)
     {
-        if ((&ctx->pctx)->N > 0)
+        if (N > 0)
         {
             padic_poly_fit_length(x, 2);
             fmpz_zero(x->coeffs + 0);
@@ -296,9 +306,9 @@ qadic_get_padic(padic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
 }
 
-static __inline__ void qadic_set(qadic_t x, const qadic_t y)
+static __inline__ void qadic_set(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
-    padic_poly_set(x, y);
+    padic_poly_set(rop, op, &(ctx->pctx));
 }
 
 void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op, 
@@ -306,16 +316,14 @@ void qadic_set_fmpz_poly(qadic_t rop, const fmpz_poly_t op,
 
 /* Comparison ****************************************************************/
 
-static __inline__ int 
-qadic_is_zero(const qadic_t x)
+static __inline__ int qadic_is_zero(const qadic_t op)
 {
-    return padic_poly_is_zero(x);
+    return padic_poly_is_zero(op);
 }
 
-static __inline__ int 
-qadic_is_one(const qadic_t x, const qadic_ctx_t ctx)
+static __inline__ int qadic_is_one(const qadic_t op)
 {
-    return padic_poly_is_one(x, &ctx->pctx);
+    return padic_poly_is_one(op);
 }
 
 static __inline__ int 
@@ -412,6 +420,13 @@ void _qadic_trace(fmpz_t rop, const fmpz *op, long len,
 
 void qadic_trace(padic_t rop, const qadic_t op, const qadic_ctx_t ctx);
 
+
+void _qadic_norm_resultant(fmpz_t rop, const fmpz *op, long len, 
+                           const fmpz *a, const long *j, long lena, 
+                           const fmpz_t p, long N);
+void _qadic_norm_analytic(fmpz_t rop, const fmpz *y, long v, long len, 
+                          const fmpz *a, const long *j, long lena, 
+                          const fmpz_t p, long N);
 void _qadic_norm(fmpz_t rop, const fmpz *op, long len, 
                  const fmpz *a, const long *j, long lena, 
                  const fmpz_t p, long N);
@@ -430,6 +445,11 @@ static __inline__ int
 qadic_print_pretty(const qadic_t op, const qadic_ctx_t ctx)
 {
     return qadic_fprint_pretty(stdout, op, ctx);
+}
+
+static __inline__ int qadic_debug(const qadic_t op)
+{
+    return padic_poly_debug(op);
 }
 
 #endif

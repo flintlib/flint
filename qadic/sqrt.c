@@ -795,7 +795,7 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 {
     const fmpz *p = (&ctx->pctx)->p;
     const long d  = qadic_ctx_degree(ctx);
-    const long N  = (&ctx->pctx)->N;
+    const long N  = qadic_prec(rop);
 
     fmpz *t;
     int ans;

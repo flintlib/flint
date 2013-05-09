@@ -52,17 +52,16 @@ main(void)
         long j;
         int ans;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
-        qadic_ctx_init_conway(ctx, p, d, N, "a", PADIC_SERIES);
+        qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0,N-10), FLINT_MAX(0,N+10), "a", PADIC_SERIES);
 
-        qadic_init(a);
-        qadic_init(b);
-        qadic_init(c);
-        _padic_init(x);
-        _padic_init(y);
+        qadic_init2(a, N);
+        qadic_init2(b, N);
+        qadic_init2(c, N);
+        padic_init2(x, N);
+        padic_init2(y, N);
 
         qadic_randtest(a, state, ctx);
 
@@ -76,7 +75,7 @@ main(void)
         }
         ans = qadic_get_padic(y, b, ctx);
 
-        result = (ans && _padic_equal(x, y));
+        result = (ans && padic_equal(x, y));
         if (!result)
         {
             printf("FAIL:\n\n");
@@ -96,8 +95,8 @@ main(void)
         qadic_clear(a);
         qadic_clear(b);
         qadic_clear(c);
-        _padic_clear(x);
-        _padic_clear(y);
+        padic_clear(x);
+        padic_clear(y);
 
         fmpz_clear(p);
         qadic_ctx_clear(ctx);

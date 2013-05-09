@@ -123,7 +123,7 @@ void _qadic_pow(fmpz *rop, const fmpz *op, long len, const fmpz_t e,
 
 void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(x);
 
     if (fmpz_sgn(e) < 0)
     {
@@ -133,7 +133,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
 
     if (fmpz_is_zero(e))
     {
-        qadic_one(x, ctx);
+        qadic_one(x);
     }
     else if (qadic_is_zero(y))
     {
@@ -152,8 +152,7 @@ void qadic_pow(qadic_t x, const qadic_t y, const fmpz_t e, const qadic_ctx_t ctx
         }
         else if (fmpz_is_one(e))
         {
-            qadic_set(x, y);
-            qadic_reduce(x, ctx);
+            qadic_set(x, y, ctx);
         }
         else 
         {

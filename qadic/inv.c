@@ -137,7 +137,7 @@ void _qadic_inv(fmpz *rop, const fmpz *op, long len,
 
 void qadic_inv(qadic_t x, const qadic_t y, const qadic_ctx_t ctx)
 {
-    const long N = (&ctx->pctx)->N;
+    const long N = qadic_prec(x);
 
     if (qadic_is_zero(y))
     {
