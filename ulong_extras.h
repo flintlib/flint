@@ -120,7 +120,7 @@ extern mp_limb_t * flint_primes;
 
 extern double * flint_prime_inverses;
 
-extern mp_limb_t flint_num_primes;
+extern ulong flint_num_primes;
 
 extern mp_limb_t flint_primes_cutoff;
 
@@ -328,7 +328,7 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n,
                 mp_limb_t * prod, ulong num_primes, mp_limb_t limit);
 
 mp_limb_t n_factor_trial(n_factor_t * factors, 
-                                  mp_limb_t n, mp_limb_t num_primes);
+                                  mp_limb_t n, ulong num_primes);
 
 mp_limb_t n_factor_partial(n_factor_t * factors, 
                            mp_limb_t n, mp_limb_t limit, int proved);
