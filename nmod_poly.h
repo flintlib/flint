@@ -470,6 +470,16 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
                            const nmod_poly_t poly, mpz_srcptr e,
                            const nmod_poly_t f);
 
+void
+_nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
+                                    ulong e, mp_srcptr f, long lenf,
+                                    mp_srcptr finv, long lenfinv, nmod_t mod);
+
+void
+nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, 
+                           const nmod_poly_t poly, ulong e,
+                           const nmod_poly_t f, const nmod_poly_t finv);
+
 /* Division  *****************************************************************/
 
 void _nmod_poly_divrem_basecase(mp_ptr Q, mp_ptr R, mp_ptr W,
