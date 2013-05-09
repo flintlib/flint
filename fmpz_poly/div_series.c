@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n)
+_fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, len_t n)
 {
     if (n == 1)
     {
@@ -49,7 +49,7 @@ _fmpz_poly_div_series(fmpz * Q, const fmpz * A, const fmpz * B, long n)
 }
 
 void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A, 
-                                         const fmpz_poly_t B, long n)
+                                         const fmpz_poly_t B, len_t n)
 {
     fmpz *a, *b;
     ulong flags = 0UL;  /* 2^0 for a, 2^1 for b */
@@ -72,7 +72,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     }
     else
     {
-        long i;
+        len_t i;
         a = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < A->length; i++)
             a[i] = A->coeffs[i];
@@ -86,7 +86,7 @@ void fmpz_poly_div_series(fmpz_poly_t Q, const fmpz_poly_t A,
     }
     else
     {
-        long i;
+        len_t i;
         b = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < B->length; i++)
             b[i] = B->coeffs[i];

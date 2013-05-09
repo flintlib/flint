@@ -49,7 +49,7 @@ do {                               \
 } while (0)
 
 int _fmpq_poly_fprint_pretty(FILE * file, 
-                             const fmpz *poly, const fmpz_t den, long len, 
+                             const fmpz *poly, const fmpz_t den, len_t len, 
                              const char * x)
 {
     fmpz_t n, d, g;
@@ -94,7 +94,7 @@ int _fmpq_poly_fprint_pretty(FILE * file,
     }
     else  /* len >= 3 */
     {
-        long i = len - 1;  /* i >= 2 */
+        len_t i = len - 1;  /* i >= 2 */
         {
             if (poly[i] == 1L)
                fprintf(file, "%s^%ld", x, i);

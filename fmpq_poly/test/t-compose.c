@@ -111,7 +111,7 @@ main(void)
     {
         fmpq_poly_t f, g, h, s, t, u;
         mpq_t c;
-        long k;
+        len_t k;
 
         fmpq_poly_init(f);
         fmpq_poly_init(g);

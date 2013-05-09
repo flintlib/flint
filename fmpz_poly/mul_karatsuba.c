@@ -58,16 +58,16 @@
 */
 
 void _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
-                                   fmpz * temp, long bits);
+                                   fmpz * temp, len_t bits);
 
 /*
    Switches the coefficients of poly in of length len into a 
    poly out of length 2^bits.
  */
 void
-revbin1(fmpz * out, const fmpz * in, long len, long bits)
+revbin1(fmpz * out, const fmpz * in, len_t len, len_t bits)
 {
-    long i;
+    len_t i;
     for (i = 0; i < len; i++)
         out[n_revbin(i, bits)] = in[i];
 }
@@ -77,21 +77,21 @@ revbin1(fmpz * out, const fmpz * in, long len, long bits)
    poly out of length len.
  */
 void
-revbin2(fmpz * out, const fmpz * in, long len, long bits)
+revbin2(fmpz * out, const fmpz * in, len_t len, len_t bits)
 {
-    long i;
+    len_t i;
     for (i = 0; i < len; i++)
         out[i] = in[n_revbin(i, bits)];
 }
 
 /* in1 += x*in2 assuming both in1 and in2 are revbin'd. */
 void
-_fmpz_vec_add_rev(fmpz * in1, fmpz * in2, long bits)
+_fmpz_vec_add_rev(fmpz * in1, fmpz * in2, len_t bits)
 {
-    long i;
+    len_t i;
     for (i = 0; i < (1L << bits) - 1; i++)
     {
-        long j = n_revbin(n_revbin(i, bits) + 1, bits);
+        len_t j = n_revbin(n_revbin(i, bits) + 1, bits);
         fmpz_add(in1 + j, in1 + j, in2 + i);
     }
 }
@@ -104,10 +104,10 @@ _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, long bits)
  */
 void
 _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
-                              fmpz * temp, long bits)
+                              fmpz * temp, len_t bits)
 {
-    long length = (1L << bits);
-    long m = length / 2;
+    len_t length = (1L << bits);
+    len_t m = length / 2;
 
     if (length == 1)
     {
@@ -136,10 +136,10 @@ _fmpz_poly_mul_kara_recursive(fmpz * out, fmpz * rev1, fmpz * rev2,
 /* Assumes poly1 and poly2 are not length 0 and len1 >= len2. */
 void
 _fmpz_poly_mul_karatsuba(fmpz * res, const fmpz * poly1,
-                         long len1, const fmpz * poly2, long len2)
+                         len_t len1, const fmpz * poly2, len_t len2)
 {
     fmpz *rev1, *rev2, *out, *temp;
-    long length, loglen = 0;
+    len_t length, loglen = 0;
 
     if (len1 == 1)
     {
@@ -172,7 +172,7 @@ void
 fmpz_poly_mul_karatsuba(fmpz_poly_t res,
                         const fmpz_poly_t poly1, const fmpz_poly_t poly2)
 {
-    long len_out;
+    len_t len_out;
 
     if ((poly1->length == 0) || (poly2->length == 0))
     {

@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long m, n, mod, i, j, rep;
+    len_t m, n, mod, i, j, rep;
     flint_rand_t state;
     flint_randinit(state);
 

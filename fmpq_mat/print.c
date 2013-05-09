@@ -32,7 +32,7 @@
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {
-    long i, j;
+    len_t i, j;
 
     printf("<%ld x %ld matrix over Q>\n", mat->r, mat->c);
 

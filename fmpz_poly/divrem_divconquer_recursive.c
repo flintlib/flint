@@ -36,7 +36,7 @@
 void
 _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W, 
                                        const fmpz * A, const fmpz * B,
-                                       long lenB)
+                                       len_t lenB)
 {
     if (lenB <= FLINT_DIVREM_DIVCONQUER_CUTOFF)
     {
@@ -50,8 +50,8 @@ _fmpz_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     }
     else
     {
-        const long n2 = lenB / 2;
-        const long n1 = lenB - n2;
+        const len_t n2 = lenB / 2;
+        const len_t n1 = lenB - n2;
 
         fmpz * W1 = W;
         fmpz * W2 = W + lenB;

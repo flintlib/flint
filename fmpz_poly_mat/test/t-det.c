@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("det....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_mat_t A, B, C;
         fmpz_poly_t a, b, ab, c;
-        long n, bits, deg;
+        len_t n, bits, deg;
         float density;
 
         n = n_randint(state, 10);

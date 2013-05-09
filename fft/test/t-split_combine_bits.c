@@ -57,7 +57,7 @@ main(void)
         
         mp_bitcnt_t bits = n_randint(state, 200) + 1;
         mp_size_t limbs = (2*bits - 1)/FLINT_BITS + 1;
-        long length = (total_limbs*FLINT_BITS - 1)/bits + 1;
+        len_t length = (total_limbs*FLINT_BITS - 1)/bits + 1;
         
         mp_limb_t ** poly;
         poly = flint_malloc(length*sizeof(mp_limb_t *));

@@ -42,7 +42,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long lo, hi, N;
+        len_t lo, hi, N;
         padic_ctx_t ctx;
 
         padic_t a;
@@ -90,7 +90,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long lo, hi, N;
+        len_t lo, hi, N;
         padic_ctx_t ctx;
 
         padic_t a;

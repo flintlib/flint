@@ -49,7 +49,7 @@ main(void)
         fmpq_poly_t P;
         fmpz *x, *y, *z;
         fmpq_t q;
-        long j, n, bits;
+        len_t j, n, bits;
 
         n = n_randint(state, 50);
         bits = n_randint(state, 100);

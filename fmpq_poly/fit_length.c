@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_fit_length(fmpq_poly_t poly, long len)
+void fmpq_poly_fit_length(fmpq_poly_t poly, len_t len)
 {
     if (len > poly->alloc)
     {

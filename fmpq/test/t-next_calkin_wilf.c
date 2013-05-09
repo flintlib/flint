@@ -33,7 +33,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     fmpq_t r, ans;
 
     printf("next_calkin_wilf....");

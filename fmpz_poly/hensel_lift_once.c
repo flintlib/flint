@@ -32,15 +32,15 @@
 
 void fmpz_poly_hensel_lift_once(fmpz_poly_factor_t lifted_fac, 
                                 const fmpz_poly_t f, 
-                                const nmod_poly_factor_t local_fac, long N)
+                                const nmod_poly_factor_t local_fac, len_t N)
 {
-    const long r = local_fac->num;
+    const len_t r = local_fac->num;
 
-    long i;
-    long *link;
+    len_t i;
+    len_t *link;
     fmpz_poly_t *v, *w;
 
-    link = flint_malloc((2*r - 2) * sizeof(long));
+    link = flint_malloc((2*r - 2) * sizeof(len_t));
     v    = flint_malloc(2*(2*r - 2) * sizeof(fmpz_poly_t));
     w    = v + (2*r - 2);
 

@@ -50,7 +50,7 @@ int qsieve_ll_relations_cmp(const void * a, const void * b)
 {
   la_col_t * ra = *((la_col_t **) a);
   la_col_t * rb = *((la_col_t **) b);
-  long point;
+  len_t point;
 
   if (ra->weight > rb->weight) return 1;
   else if (ra->weight < rb->weight) return -1;
@@ -73,7 +73,7 @@ int qsieve_ll_relations_cmp2(const void * a, const void * b)
 {
   la_col_t * ra = (la_col_t *) a;
   la_col_t * rb = (la_col_t *) b;
-  long point;
+  len_t point;
 
   if (ra->weight > rb->weight) return 1;
   else if (ra->weight < rb->weight) return -1;
@@ -101,15 +101,15 @@ int qsieve_ll_relations_cmp2(const void * a, const void * b)
    
 ===========================================================================*/
 
-long qsieve_ll_merge_sort(qs_t qs_inf)
+len_t qsieve_ll_merge_sort(qs_t qs_inf)
 {
    la_col_t * matrix = qs_inf->matrix;
-   long columns = qs_inf->columns;
+   len_t columns = qs_inf->columns;
    la_col_t ** qsort_arr = qs_inf->qsort_arr;
-   long num_unmerged = qs_inf->num_unmerged;
-   long dups = 0;
+   len_t num_unmerged = qs_inf->num_unmerged;
+   len_t dups = 0;
    int comp;
-   long i;
+   len_t i;
 
    for (i = columns + num_unmerged - 1L; i >= dups; i--) 
    {
@@ -150,7 +150,7 @@ long qsieve_ll_merge_sort(qs_t qs_inf)
    
    if (dups)
    {
-      long i;
+      len_t i;
       for (i = 0; i < columns; i++)
           copy_col(matrix + i, matrix + i + dups);
       
@@ -176,15 +176,15 @@ long qsieve_ll_merge_sort(qs_t qs_inf)
    
 ===========================================================================*/
 
-long qsieve_ll_merge_relations(qs_t qs_inf)
+len_t qsieve_ll_merge_relations(qs_t qs_inf)
 {
-   const long num_unmerged = qs_inf->num_unmerged;
+   const len_t num_unmerged = qs_inf->num_unmerged;
    la_col_t * unmerged = qs_inf->unmerged;
    la_col_t ** qsort_arr = qs_inf->qsort_arr;
    
    if (num_unmerged)
    {
-      long i;
+      len_t i;
 
       for (i = 0; i < num_unmerged; i++)
          qsort_arr[i] = unmerged + i;
@@ -204,16 +204,16 @@ long qsieve_ll_merge_relations(qs_t qs_inf)
    
 ===========================================================================*/
 
-long qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y)
+len_t qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y)
 {
    la_col_t * unmerged = qs_inf->unmerged;
-   long num_unmerged = qs_inf->num_unmerged;
-   long * small = qs_inf->small;
-   long num_factors = qs_inf->num_factors; 
+   len_t num_unmerged = qs_inf->num_unmerged;
+   len_t * small = qs_inf->small;
+   len_t num_factors = qs_inf->num_factors; 
    fac_t * factor = qs_inf->factor; 
-   long * curr_rel = qs_inf->curr_rel;
-   long fac_num = 0; 
-   long i;
+   len_t * curr_rel = qs_inf->curr_rel;
+   len_t fac_num = 0; 
+   len_t i;
 
    clear_col(unmerged + num_unmerged);
    

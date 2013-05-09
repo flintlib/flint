@@ -31,9 +31,9 @@
 #include "fmpz_mod_poly_factor.h"
 
 void
-fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp)
+fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, len_t exp)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < fac->num; i++)
         fac->exp[i] *= exp;

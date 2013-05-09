@@ -32,12 +32,12 @@
 #include "ulong_extras.h"
 
 void
-_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, long len1,
-                              const fmpz * poly2, const fmpz * poly3, long len3, const fmpz_t p)
+_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * poly1, len_t len1,
+                              const fmpz * poly2, const fmpz * poly3, len_t len3, const fmpz_t p)
 {
     fmpz_mat_t A, B, C;
     fmpz * t, * h, * tmp;
-    long i, j, n, m;
+    len_t i, j, n, m;
 
     n = len3 - 1;
 
@@ -109,11 +109,11 @@ void
 fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
                              const fmpz_mod_poly_t poly2, const fmpz_mod_poly_t poly3)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
-    long vec_len = FLINT_MAX(len3 - 1, len2);
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t len3 = poly3->length;
+    len_t len = len3 - 1;
+    len_t vec_len = FLINT_MAX(len3 - 1, len2);
 
     fmpz * ptr2;
     fmpz_t inv3;

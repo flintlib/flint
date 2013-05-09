@@ -32,11 +32,11 @@
 #include "fmpz_poly.h"
 
 char *
-_fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
+_fmpz_poly_get_str_pretty(const fmpz * poly, len_t len, const char *x)
 {
     char *str;
     size_t off;
-    long i, bound, nz;
+    len_t i, bound, nz;
 
     if (len == 0)
     {
@@ -60,7 +60,7 @@ _fmpz_poly_get_str_pretty(const fmpz * poly, long len, const char *x)
             bound += fmpz_sizeinbase(poly + i, 10) + 1;
             nz++;
         }
-    bound += nz * (3 + strlen(x) + (long) (ceil(log10(len))));
+    bound += nz * (3 + strlen(x) + (len_t) (ceil(log10(len))));
 
     str = flint_malloc(bound);
     off = 0;

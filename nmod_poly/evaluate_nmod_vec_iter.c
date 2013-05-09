@@ -29,17 +29,17 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, long len,
-    mp_srcptr xs, long n, nmod_t mod)
+_nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, mp_srcptr coeffs, len_t len,
+    mp_srcptr xs, len_t n, nmod_t mod)
 {
-    long i;
+    len_t i;
     for (i = 0; i < n; i++)
         ys[i] = _nmod_poly_evaluate_nmod(coeffs, len, xs[i], mod);
 }
 
 void
 nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
-        const nmod_poly_t poly, mp_srcptr xs, long n)
+        const nmod_poly_t poly, mp_srcptr xs, len_t n)
 {
     _nmod_poly_evaluate_nmod_vec_iter(ys, poly->coeffs,
                                         poly->length, xs, n, poly->mod);

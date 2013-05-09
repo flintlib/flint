@@ -35,7 +35,7 @@
 #define NMOD_POLY_INV_NEWTON_CUTOFF 400
 
 void 
-_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
+_nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, len_t n, nmod_t mod)
 {
     if (n < NMOD_POLY_INV_NEWTON_CUTOFF)
     {
@@ -43,13 +43,13 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
     }
     else
     {
-        long *a, i, m;
+        len_t *a, i, m;
         mp_ptr W;
 
         for (i = 1; (1L << i) < n; i++) ;
 
-        W = flint_malloc(n * sizeof(mp_limb_t) + i * sizeof(long));
-        a = (long *) (W + n);
+        W = flint_malloc(n * sizeof(mp_limb_t) + i * sizeof(len_t));
+        a = (len_t *) (W + n);
 
         a[i = 0] = n;
         while (n >= NMOD_POLY_INV_NEWTON_CUTOFF)
@@ -72,9 +72,9 @@ _nmod_poly_inv_series_newton(mp_ptr Qinv, mp_srcptr Q, long n, nmod_t mod)
 }
 
 void
-nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
+nmod_poly_inv_series_newton(nmod_poly_t Qinv, const nmod_poly_t Q, len_t n)
 {
-    const long Qlen = Q->length;
+    const len_t Qlen = Q->length;
 
     mp_ptr q, qinv;
 

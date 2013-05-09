@@ -219,7 +219,7 @@ void fft_mulmod_2expp1(mp_limb_t * r, mp_limb_t * i1, mp_limb_t * i2,
    _fft_mulmod_2expp1(r, i1, i2, limbs, depth1, w1);
 }
 
-long fft_adjust_limbs(mp_size_t limbs)
+len_t fft_adjust_limbs(mp_size_t limbs)
 {
    mp_size_t bits1 = limbs*FLINT_BITS, bits2;
    mp_size_t depth = 1, limbs2, depth1 = 1, depth2 = 1, adj;

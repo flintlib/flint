@@ -32,7 +32,7 @@
 
 void
 _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
-                          mp_srcptr A, mp_srcptr B, long lenB, nmod_t mod)
+                          mp_srcptr A, mp_srcptr B, len_t lenB, nmod_t mod)
 {
     if (lenB <= NMOD_DIVREM_DIVCONQUER_CUTOFF)
     {
@@ -49,8 +49,8 @@ _nmod_poly_divrem_divconquer_recursive(mp_ptr Q, mp_ptr BQ, mp_ptr W, mp_ptr V,
     }
     else
     {
-        const long n2 = lenB / 2;
-        const long n1 = lenB - n2;
+        const len_t n2 = lenB / 2;
+        const len_t n1 = lenB - n2;
 
         mp_ptr W1 = W;
         mp_ptr W2 = W + n2;

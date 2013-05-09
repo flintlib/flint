@@ -31,11 +31,11 @@
 
 
 void
-nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
+nmod_mat_randops(nmod_mat_t mat, len_t count, flint_rand_t state)
 {
-    long c, i, j, k;
-    long m = mat->r;
-    long n = mat->c;
+    len_t c, i, j, k;
+    len_t m = mat->r;
+    len_t n = mat->c;
 
     if (mat->r == 0 || mat->c == 0)
         return;

@@ -31,7 +31,7 @@
 
 void
 fmpz_poly_mulhigh_n(fmpz_poly_t res,
-                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, long n)
+                    const fmpz_poly_t poly1, const fmpz_poly_t poly2, len_t n)
 {
     mp_size_t limbs1 = _fmpz_vec_max_limbs(poly1->coeffs, poly1->length);
     mp_size_t limbs2 = _fmpz_vec_max_limbs(poly2->coeffs, poly2->length);

@@ -33,7 +33,7 @@
 typedef int (*__compar_fn_t) (__const void *, __const void *);
 #endif
 
-void _fmpz_vec_sort(fmpz * vec, long len)
+void _fmpz_vec_sort(fmpz * vec, len_t len)
 {
     qsort(vec, len, sizeof(fmpz), (__compar_fn_t) fmpz_cmp);
 }

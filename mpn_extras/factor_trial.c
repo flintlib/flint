@@ -32,9 +32,9 @@
 #include "ulong_extras.h"
 
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, len_t start, len_t stop)
 {
-    long i;
+    len_t i;
     n_compute_primes(stop);
     for (i = start; i < stop; i++)
     {

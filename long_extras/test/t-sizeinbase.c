@@ -46,7 +46,7 @@ main(void)
 
     for (i = 0; i < 100000; i++)
     {
-        long a;
+        len_t a;
         mpz_t b;
         int base;
         size_t r1, r2;

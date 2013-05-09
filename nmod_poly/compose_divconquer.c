@@ -89,11 +89,11 @@
  */
 
 void
-_nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
-                                          mp_srcptr poly2, long len2, nmod_t mod)
+_nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, len_t len1, 
+                                          mp_srcptr poly2, len_t len2, nmod_t mod)
 {
-    long i, j, k, n;
-    long * hlen, alloc, powlen;
+    len_t i, j, k, n;
+    len_t * hlen, alloc, powlen;
     mp_ptr v, * h, pow, temp;
     
     if (len1 == 1)
@@ -114,14 +114,14 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
 
     /* Initialisation */
     
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (len_t *) flint_malloc(((len1 + 1) / 2) * sizeof(len_t));
     
     for (k = 1; (2 << k) < len1; k++) ;
     
     hlen[0] = hlen[1] = ((1 << k) - 1) * (len2 - 1) + 1;
     for (i = k - 1; i > 0; i--)
     {
-        long hi = (len1 + (1 << i) - 1) / (1 << i);
+        len_t hi = (len1 + (1 << i) - 1) / (1 << i);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = ((1 << i) - 1) * (len2 - 1) + 1;
     }
@@ -175,7 +175,7 @@ _nmod_poly_compose_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     {
         if (hlen[1] > 0)
         {
-            long templen = powlen + hlen[1] - 1;
+            len_t templen = powlen + hlen[1] - 1;
             _nmod_poly_mul(temp, pow, powlen, h[1], hlen[1], mod);
             _nmod_poly_add(h[0], temp, templen, h[0], hlen[0], mod);
             hlen[0] = FLINT_MAX(hlen[0], templen);
@@ -219,8 +219,8 @@ void
 nmod_poly_compose_divconquer(nmod_poly_t res, 
                              const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
     
     if (len1 == 0)
     {
@@ -234,7 +234,7 @@ nmod_poly_compose_divconquer(nmod_poly_t res,
     }
     else
     {
-        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        const len_t lenr = (len1 - 1) * (len2 - 1) + 1;
         
         if (res != poly1 && res != poly2)
         {

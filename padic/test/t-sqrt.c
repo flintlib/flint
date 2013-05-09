@@ -43,7 +43,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans1, ans2;
@@ -83,7 +83,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans;
@@ -106,7 +106,7 @@ int main(void)
 
         if (ans && padic_val(a) < 0)
         {
-            long N2 = N + padic_val(a);
+            len_t N2 = N + padic_val(a);
             padic_t a2, d2;
 
             padic_init2(a2, N2);
@@ -159,7 +159,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans;
@@ -184,7 +184,7 @@ int main(void)
 
         if (ans && padic_val(a) < 0)
         {
-            long N2 = N + padic_val(a);
+            len_t N2 = N + padic_val(a);
             padic_t a2, d2;
 
             padic_init2(a2, N2);
@@ -242,7 +242,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans1, ans2;
@@ -281,7 +281,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans;
@@ -304,7 +304,7 @@ int main(void)
 
         if (ans && padic_val(a) < 0)
         {
-            long N2 = N + padic_val(a);
+            len_t N2 = N + padic_val(a);
             padic_t a2, d2;
 
             padic_init2(a2, N2);
@@ -357,7 +357,7 @@ int main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         int ans;
@@ -382,7 +382,7 @@ int main(void)
 
         if (ans && padic_val(a) < 0)
         {
-            long N2 = N + padic_val(a);
+            len_t N2 = N + padic_val(a);
             padic_t a2, d2;
 
             padic_init2(a2, N2);

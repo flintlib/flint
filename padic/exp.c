@@ -26,12 +26,12 @@
 
 #include "padic.h"
 
-long _padic_exp_bound(long v, long N, const fmpz_t p)
+len_t _padic_exp_bound(len_t v, len_t N, const fmpz_t p)
 {
     if (fmpz_fits_si(p))
     {
         fmpz_t n, d, f;
-        long i;
+        len_t i;
 
         fmpz_init(n);
         fmpz_init(d);
@@ -57,7 +57,7 @@ long _padic_exp_bound(long v, long N, const fmpz_t p)
     }
 }
 
-void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
+void _padic_exp(fmpz_t rop, const fmpz_t u, len_t v, const fmpz_t p, len_t N)
 {
     if (N < 1024)
         _padic_exp_rectangular(rop, u, v, p, N);
@@ -67,8 +67,8 @@ void _padic_exp(fmpz_t rop, const fmpz_t u, long v, const fmpz_t p, long N)
 
 int padic_exp(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    const long N  = padic_prec(rop);
-    const long v  = padic_val(op);
+    const len_t N  = padic_prec(rop);
+    const len_t v  = padic_val(op);
     const fmpz *p = ctx->p;
 
     if (padic_is_zero(op))

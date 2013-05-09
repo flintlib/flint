@@ -30,12 +30,12 @@
 #include "mpfr_mat.h"
 
 void
-mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec)
+mpfr_mat_init(mpfr_mat_t mat, len_t rows, len_t cols, mpfr_prec_t prec)
 {
 
     if ((rows) && (cols))       /* Allocate space for r*c small entries */
     {
-        long i;
+        len_t i;
         mat->entries =
             (__mpfr_struct *) flint_malloc(rows * cols * sizeof(__mpfr_struct));
         mat->rows = (__mpfr_struct **) flint_malloc(rows * sizeof(__mpfr_struct *));  /* Initialise rows */

@@ -64,15 +64,15 @@ do {                                                                  \
 } while (0)
 
 void _fmpz_poly_hensel_lift_only_inverse(fmpz *A, fmpz *B, 
-    const fmpz *G, long lenG, const fmpz *H, long lenH, 
-    const fmpz *a, long lenA, const fmpz *b, long lenB, 
+    const fmpz *G, len_t lenG, const fmpz *H, len_t lenH, 
+    const fmpz *a, len_t lenA, const fmpz *b, len_t lenB, 
     const fmpz_t p, const fmpz_t p1)
 {
     const fmpz one[1] = {1L};
-    const long lenC = FLINT_MAX(lenA + lenG - 1, lenB + lenH - 1);
-    const long lenM = FLINT_MAX(lenG, lenH);
-    const long lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
-    const long lenD = FLINT_MAX(lenC, lenE);
+    const len_t lenC = FLINT_MAX(lenA + lenG - 1, lenB + lenH - 1);
+    const len_t lenM = FLINT_MAX(lenG, lenH);
+    const len_t lenE = FLINT_MAX(lenG + lenB - 2, lenH + lenA - 2);
+    const len_t lenD = FLINT_MAX(lenC, lenE);
     fmpz *C, *D, *E, *M;
 
     C = _fmpz_vec_init(lenC + lenD + lenD + lenM);

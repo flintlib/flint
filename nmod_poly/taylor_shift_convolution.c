@@ -29,9 +29,9 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_taylor_shift_convolution(mp_ptr p, mp_limb_t c, long len, nmod_t mod)
+_nmod_poly_taylor_shift_convolution(mp_ptr p, mp_limb_t c, len_t len, nmod_t mod)
 {
-    long i, n = len - 1;
+    len_t i, n = len - 1;
     mp_limb_t f, d;
     mp_ptr t, u;
 

@@ -36,7 +36,7 @@
 static void
 check_rref(fmpz_mat_t A)
 {
-    long i, j, prev_pivot, prev_row_zero;
+    len_t i, j, prev_pivot, prev_row_zero;
 
     prev_row_zero = 0;
     prev_pivot = -1;
@@ -76,8 +76,8 @@ main(void)
     fmpz_mat_t A;
     fmpz_t p;
     flint_rand_t state;
-    long i, j, k, m, n, b, d, r, rank;
-    long *perm;
+    len_t i, j, k, m, n, b, d, r, rank;
+    len_t *perm;
 
     printf("rref_mod....");
     fflush(stdout);
@@ -89,7 +89,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(len_t));
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
@@ -129,7 +129,7 @@ main(void)
     {
         m = n_randint(state, 10);
         n = n_randint(state, 10);
-        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(long));
+        perm = flint_malloc(FLINT_MAX(1, m) * sizeof(len_t));
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 

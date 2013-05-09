@@ -33,7 +33,7 @@
 void
 _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    long *perm, n = fmpz_mat_nrows(tmp);
+    len_t *perm, n = fmpz_mat_nrows(tmp);
     perm = _perm_init(n);
 
     fmpz_mat_fflu(tmp, det, perm, tmp, 1);

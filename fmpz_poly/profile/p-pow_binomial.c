@@ -62,7 +62,7 @@ main(void)
            Construct random polynomial f of length len
          */
         {
-            long k;
+            len_t k;
             for (k = 0; k < len; k++)
                 fmpz_randbits(f->coeffs + k, state, bits);
             if ((f->coeffs)[len-1] == 0L)
@@ -74,7 +74,7 @@ main(void)
         {
             timeit_t t[1];
             int l, loops = 1, r = 0;
-            long s[1] = {0};
+            len_t s[1] = {0};
             
           loop:
             

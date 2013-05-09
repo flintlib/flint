@@ -32,7 +32,7 @@
 
 void
 _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, long n, nmod_t mod)
+                            mp_srcptr xs, mp_srcptr ys, len_t n, nmod_t mod)
 {
     if (n < 6)
         _nmod_poly_interpolate_nmod_vec_newton(poly, xs, ys, n, mod);
@@ -44,7 +44,7 @@ _nmod_poly_interpolate_nmod_vec(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, long n)
+                                    mp_srcptr xs, mp_srcptr ys, len_t n)
 {
     if (n == 0)
     {

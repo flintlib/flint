@@ -48,7 +48,7 @@ main(void)
     {
         fmpz *a, *b;
         fmpz_t n;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
         if (n_randint(state, 2))
@@ -80,7 +80,7 @@ main(void)
     {
         fmpz *a, *b, *lhs, *rhs;
         fmpz_t n;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         fmpz_init(n);
         fmpz_randtest(n, state, 100);
         if (n_randint(state, 2))
@@ -122,7 +122,7 @@ main(void)
     {
         fmpz *a, *b;
         fmpz_t n1, n2, n;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         fmpz_init(n1);
         fmpz_init(n2);
         fmpz_init(n);

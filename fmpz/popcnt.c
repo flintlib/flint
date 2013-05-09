@@ -4,14 +4,14 @@
 #include "fmpz.h"
 
 #ifdef POPCNT_INTRINSICS
-static __inline__ mp_bitcnt_t shortCount(long val)
+static __inline__ mp_bitcnt_t shortCount(len_t val)
 {
         return __builtin_popcountl(val);
 }
 #else
 /* A naive implementation if neither your processor nor your compiler want to
  * do the work. */
-static __inline__ mp_bitcnt_t shortCount(long val)
+static __inline__ mp_bitcnt_t shortCount(len_t val)
 {
         mp_bitcnt_t cnt;
         for(cnt=0; val; val >>= 1) {

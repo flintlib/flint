@@ -36,7 +36,7 @@ int main()
 {
     fmpz_poly_t T, U;
 
-    long n;
+    len_t n;
 
     printf("chebyshev_u_polynomial....");
     fflush(stdout);

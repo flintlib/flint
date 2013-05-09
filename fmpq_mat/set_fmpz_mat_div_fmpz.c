@@ -34,7 +34,7 @@ void
 fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xnum,
                                                 const fmpz_t den)
 {
-    long i, j;
+    len_t i, j;
 
     if (fmpz_is_one(den))
     {

@@ -29,9 +29,9 @@
 #include "ulong_extras.h"
 #include "nmod_vec.h"
 
-void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, long len, nmod_t mod)
+void _nmod_vec_randtest(mp_ptr vec, flint_rand_t state, len_t len, nmod_t mod)
 {
-    long i, sparseness;
+    len_t i, sparseness;
 
     if (n_randint(state, 2))
     {

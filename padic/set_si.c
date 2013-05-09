@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
+void padic_set_si(padic_t rop, len_t op, const padic_ctx_t ctx)
 {
     fmpz_set_si(padic_unit(rop), op);
     padic_val(rop) = 0;

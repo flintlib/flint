@@ -32,12 +32,12 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, long lenA,
-                        const fmpz * B, long lenB)
+_fmpz_poly_div_basecase(fmpz * Q, fmpz * R, const fmpz * A, len_t lenA,
+                        const fmpz * B, len_t lenB)
 {
     const fmpz * leadB = B + lenB - 1;
-    long B1, iQ = lenA - lenB;
-    long alloc;
+    len_t B1, iQ = lenA - lenB;
+    len_t alloc;
 
     while (lenA >= lenB && fmpz_cmpabs(A + lenA - 1, leadB) < 0)
     {
@@ -85,7 +85,7 @@ void
 fmpz_poly_div_basecase(fmpz_poly_t Q, 
                        const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    long lenq;
+    len_t lenq;
     fmpz *q;
     
     if (B->length == 0)

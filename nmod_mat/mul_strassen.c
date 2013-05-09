@@ -35,8 +35,8 @@
 void
 nmod_mat_mul_strassen(nmod_mat_t C, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long a, b, c;
-    long anr, anc, bnr, bnc;
+    len_t a, b, c;
+    len_t anr, anc, bnr, bnc;
 
     nmod_mat_t A11, A12, A21, A22;
     nmod_mat_t B11, B12, B21, B22;

@@ -42,11 +42,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
-        long v;
+        len_t v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -86,11 +86,11 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
-        long v, v1, v2;
+        len_t v, v1, v2;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -117,7 +117,7 @@ main(void)
 
         if ((v >= 0) || (-v < N)) /* Otherwise, no precision left */
         {
-            long N2 = (v >= 0) ? N : N + v;
+            len_t N2 = (v >= 0) ? N : N + v;
 
             padic_prec(b) = N2;
             padic_prec(c) = N2;

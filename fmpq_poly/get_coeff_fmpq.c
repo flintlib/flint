@@ -31,7 +31,7 @@
 #include "fmpq.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, long n)
+void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, len_t n)
 {
     if (n >= poly->length)  /* Coefficient is beyond the end of poly */
     {

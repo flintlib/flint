@@ -29,9 +29,9 @@
 #include "fmpz_poly_mat.h"
 
 void
-fmpz_poly_mat_randtest(fmpz_poly_mat_t A, flint_rand_t state, long len, mp_bitcnt_t bits)
+fmpz_poly_mat_randtest(fmpz_poly_mat_t A, flint_rand_t state, len_t len, mp_bitcnt_t bits)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

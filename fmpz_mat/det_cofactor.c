@@ -125,7 +125,7 @@ _fmpz_mat_det_cofactor_4x4(fmpz_t det, fmpz ** const x)
 void
 fmpz_mat_det_cofactor(fmpz_t det, const fmpz_mat_t A)
 {
-    long dim = A->r;
+    len_t dim = A->r;
 
     switch (dim)
     {

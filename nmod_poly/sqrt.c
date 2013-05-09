@@ -27,9 +27,9 @@
 #include "nmod_poly.h"
 
 static __inline__
-int _nmod_poly_sqrt_2(mp_ptr s, mp_srcptr p, long len)
+int _nmod_poly_sqrt_2(mp_ptr s, mp_srcptr p, len_t len)
 {
-   long i;
+   len_t i;
 
    for (i = 1; i < len; i += 2)
        if (p[i] != 0)
@@ -42,9 +42,9 @@ int _nmod_poly_sqrt_2(mp_ptr s, mp_srcptr p, long len)
 }
 
 int
-_nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long len, nmod_t mod)
+_nmod_poly_sqrt(mp_ptr s, mp_srcptr p, len_t len, nmod_t mod)
 {
-    long slen;
+    len_t slen;
     int result;
     mp_ptr t;
     mp_limb_t c, d;
@@ -107,7 +107,7 @@ _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long len, nmod_t mod)
 int
 nmod_poly_sqrt(nmod_poly_t b, const nmod_poly_t a)
 {
-    long blen, len = a->length;
+    len_t blen, len = a->length;
     int result;
 
     if (len % 2 == 0)

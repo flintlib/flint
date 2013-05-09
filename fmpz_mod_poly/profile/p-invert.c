@@ -36,7 +36,7 @@
 int
 main(void)
 {
-    long len, iter;
+    len_t len, iter;
     fmpz_mod_poly_t f, g, q, r;
     fmpz_t N, c, one;
     timeit_t t;
@@ -78,7 +78,7 @@ main(void)
     
     timeit_stop(t);
 
-    printf("len = %ld, time = %ldms\n", len, ((long) t->cpu)/10);
+    printf("len = %ld, time = %ldms\n", len, ((len_t) t->cpu)/10);
         
     fmpz_mod_poly_clear(f);
     fmpz_mod_poly_clear(g);

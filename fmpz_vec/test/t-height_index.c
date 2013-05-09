@@ -32,10 +32,10 @@
 #include "fmpz_vec.h"
 #include "ulong_extras.h"
 
-static long
-refimpl(const fmpz * v, long len)
+static len_t
+refimpl(const fmpz * v, len_t len)
 {
-    long i, max = 0;
+    len_t i, max = 0;
 
     for (i = 1; i < len; i++)
         if (fmpz_cmpabs(v + i, v + max) > 0)
@@ -58,7 +58,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
-        long len, bits, p1, p2;
+        len_t len, bits, p1, p2;
 
         len = 1 + n_randint(state, 100);
 

@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
 {
     if (fmpz_equal_ui(p, 2))
     {
@@ -37,7 +37,7 @@ void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, long N)
     }
     else
     {
-        long *a, i, n;
+        len_t *a, i, n;
         fmpz *pow, *u;
         fmpz_t s, t;
         fmpz_t inv;

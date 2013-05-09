@@ -38,7 +38,7 @@ int main()
 {
     fmpq_poly_t Pn, Pn1, Pn2, R;
 
-    long n;
+    len_t n;
 
     printf("legendre_polynomial....");
     fflush(stdout);

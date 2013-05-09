@@ -32,7 +32,7 @@
 void
 fmpz_mat_sub(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    long i;
+    len_t i;
 
     if (res->c < 1)
         return;

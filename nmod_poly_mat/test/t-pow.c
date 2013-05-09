@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("pow....");
     fflush(stdout);
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B, C;
-        long m, j, exp, deg;
+        len_t m, j, exp, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);
@@ -87,7 +87,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_mat_t A, B;
-        long m, exp, deg;
+        len_t m, exp, deg;
         mp_limb_t mod;
 
         mod = n_randtest_prime(state, 0);

@@ -31,10 +31,10 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_div(fmpz * Q, fmpz_t q, 
-                    const fmpz * A, const fmpz_t a, long lenA, 
-                    const fmpz * B, const fmpz_t b, long lenB)
+                    const fmpz * A, const fmpz_t a, len_t lenA, 
+                    const fmpz * B, const fmpz_t b, len_t lenB)
 {
-    long lenQ = lenA - lenB + 1;
+    len_t lenQ = lenA - lenB + 1;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
@@ -86,7 +86,7 @@ void _fmpq_poly_div(fmpz * Q, fmpz_t q,
 void fmpq_poly_div(fmpq_poly_t Q, 
                       const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long lenA, lenB, lenQ;
+    len_t lenA, lenB, lenQ;
 
     if (fmpq_poly_is_zero(poly2))
     {

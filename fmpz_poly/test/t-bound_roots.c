@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long iter;
+    len_t iter;
     flint_rand_t state;
 
     printf("bound_roots....");
@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t f, g;
         fmpz_t t, p, q, bound, nbound;
-        long i, num_roots;
+        len_t i, num_roots;
 
         fmpz_init(t);
         fmpz_init(p);

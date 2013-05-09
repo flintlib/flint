@@ -33,7 +33,7 @@
 
 int main()
 {
-    long i, j;
+    len_t i, j;
     int sign;
 
     fmpz_t input;
@@ -57,7 +57,7 @@ int main()
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long nprimes;
+        len_t nprimes;
 
         m2 = n_randtest_prime(state, 0);
         nprimes = 1 + n_randint(state, 4);

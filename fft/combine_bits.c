@@ -33,7 +33,7 @@ or implied, of William Hart.
 #include "flint.h"
 #include "fft.h"
 
-void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, len_t length, 
             mp_size_t coeff_limbs, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    mp_size_t skip, i;
@@ -51,7 +51,7 @@ void fft_combine_limbs(mp_limb_t * res, mp_limb_t ** poly, long length,
    }  
 }
 
-void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, long length, 
+void fft_combine_bits(mp_limb_t * res, mp_limb_t ** poly, len_t length, 
                   mp_bitcnt_t bits, mp_size_t output_limbs, mp_size_t total_limbs)
 {
    mp_bitcnt_t shift_bits, top_bits = ((FLINT_BITS - 1) & bits);

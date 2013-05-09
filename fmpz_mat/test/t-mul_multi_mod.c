@@ -35,7 +35,7 @@
 int main(void)
 {
     fmpz_mat_t A, B, C, D;
-    long i;
+    len_t i;
     flint_rand_t state;
 
     printf("mul_multi_mod....");
@@ -45,7 +45,7 @@ int main(void)
 
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long m, n, k;
+        len_t m, n, k;
 
         m = n_randint(state, 50);
         n = n_randint(state, 50);

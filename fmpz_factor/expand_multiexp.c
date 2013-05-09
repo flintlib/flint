@@ -34,9 +34,9 @@
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, const ulong * e, long len)
+_fmpz_factor_eval_multiexp(fmpz_t res, const fmpz * p, const ulong * e, len_t len)
 {
-    long i, j;
+    len_t i, j;
     ulong mask, emax;
     fmpz * q;
     fmpz_t tmp;

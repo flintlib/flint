@@ -30,10 +30,10 @@
 #include "nmod_vec.h"
 
 mp_limb_t
-_nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, long len, nmod_t mod, int nlimbs)
+_nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, len_t len, nmod_t mod, int nlimbs)
 {
     mp_limb_t res;
-    long i;
+    len_t i;
     NMOD_VEC_DOT(res, i, len, vec1[i], vec2[i], mod, nlimbs);
     return res;
 }

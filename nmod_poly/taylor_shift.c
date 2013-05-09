@@ -27,7 +27,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, long len, nmod_t mod)
+_nmod_poly_taylor_shift(mp_ptr poly, mp_limb_t c, len_t len, nmod_t mod)
 {
     if (len < 100 || len > mod.n)
         _nmod_poly_taylor_shift_horner(poly, c, len, mod);

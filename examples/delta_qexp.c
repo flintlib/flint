@@ -39,7 +39,7 @@
 int main(int argc, char* argv[])
 {
     fmpz_t c, n;
-    long N = 0;
+    len_t N = 0;
 
     if (argc == 2)
         N = atol(argv[1]);

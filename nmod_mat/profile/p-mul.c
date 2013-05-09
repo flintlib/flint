@@ -76,13 +76,13 @@ int main(void)
 {
     double min_classical, min_strassen, max;
     mat_mul_t params;
-    long dim;
+    len_t dim;
 
     printf("nmod_mat_mul:\n");
 
     params.modulus = 40000;
 
-    for (dim = 2; dim <= 512; dim = (long) ((double) dim * 1.1) + 1)
+    for (dim = 2; dim <= 512; dim = (len_t) ((double) dim * 1.1) + 1)
     {
         params.dim = dim;
 

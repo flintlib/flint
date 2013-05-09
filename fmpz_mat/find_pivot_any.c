@@ -27,11 +27,11 @@
 #include "fmpz.h"
 #include "fmpz_mat.h"
 
-long
+len_t
 fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    len_t start_row, len_t end_row, len_t c)
 {
-    long r;
+    len_t r;
 
     for (r = start_row; r < end_row; r++)
     {

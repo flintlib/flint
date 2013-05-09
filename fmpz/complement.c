@@ -29,7 +29,7 @@ void fmpz_complement(fmpz_t r, const fmpz_t f)
 {
     if (!COEFF_IS_MPZ(*f)) /* f is small */
     {
-	long res = ~(*f);
+	len_t res = ~(*f);
 	fmpz_set_si(r, res);
     } else /* f is big */
     {

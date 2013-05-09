@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("det_interpolate....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_mat_t A;
         fmpz_poly_t a, b;
-        long n, bits, deg;
+        len_t n, bits, deg;
 
         n = n_randint(state, 10);
         deg = 1 + n_randint(state, 5);

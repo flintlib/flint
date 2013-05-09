@@ -32,8 +32,8 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1, 
-                                const fmpz * poly2, long len2, long n)
+_fmpz_poly_mullow(fmpz * res, const fmpz * poly1, len_t len1, 
+                                const fmpz * poly2, len_t len2, len_t n)
 {
     mp_size_t limbs1, limbs2;
 
@@ -93,10 +93,10 @@ _fmpz_poly_mullow(fmpz * res, const fmpz * poly1, long len1,
 void
 fmpz_poly_mullow(fmpz_poly_t res,
                    const fmpz_poly_t poly1, const fmpz_poly_t poly2,
-                   long n)
+                   len_t n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

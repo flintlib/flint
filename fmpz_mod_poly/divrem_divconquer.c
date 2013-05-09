@@ -33,7 +33,7 @@
 
 static void
 __fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz * A, len_t lenA, const fmpz * B, len_t lenB, 
     const fmpz_t invB, const fmpz_t p)
 {
     if (lenA < 2 * lenB - 1)
@@ -42,8 +42,8 @@ __fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R,
            Convert unbalanced division into a 2 n1 - 1 by n1 division
          */
 
-        const long n1 = lenA - lenB + 1;
-        const long n2 = lenB - n1;
+        const len_t n1 = lenA - lenB + 1;
+        const len_t n2 = lenB - n1;
 
         const fmpz * p1 = A + n2;
         const fmpz * d1 = B + n2;
@@ -91,7 +91,7 @@ __fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R,
 }
 
 void _fmpz_mod_poly_divrem_divconquer(fmpz *Q, fmpz *R, 
-    const fmpz *A, long lenA, const fmpz *B, long lenB, 
+    const fmpz *A, len_t lenA, const fmpz *B, len_t lenB, 
     const fmpz_t invB, const fmpz_t p)
 {
     if (lenA <= 2 * lenB - 1)
@@ -100,7 +100,7 @@ void _fmpz_mod_poly_divrem_divconquer(fmpz *Q, fmpz *R,
     }
     else  /* lenA > 2 * lenB - 1 */
     {
-        long shift, n = 2 * lenB - 1;
+        len_t shift, n = 2 * lenB - 1;
         fmpz *QB, *W;
 
         _fmpz_vec_set(R, A, lenA);
@@ -130,9 +130,9 @@ void
 fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    const long lenA = A->length;
-    const long lenB = B->length;
-    const long lenQ = lenA - lenB + 1;
+    const len_t lenA = A->length;
+    const len_t lenB = B->length;
+    const len_t lenQ = lenA - lenB + 1;
 
     fmpz *q, *r;
     fmpz_t invB;

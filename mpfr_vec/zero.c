@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_zero(mpfr * vec, long length)
+_mpfr_vec_zero(mpfr * vec, len_t length)
 {
-    long i;
+    len_t i;
     for (i = 0; i < length; i++)
         mpfr_set_ui(vec + i, 0, GMP_RNDN);
 }

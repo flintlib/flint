@@ -30,10 +30,10 @@
 
 
 static void
-_fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
+_fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, len_t n)
 {
     fmpz_t p, q, t;
-    long i, j;
+    len_t i, j;
 
     fmpz_init(p);
     fmpz_init(q);
@@ -59,7 +59,7 @@ _fmpz_poly_interpolate_newton(fmpz * ys, const fmpz * xs, long n)
 
 void
 fmpz_poly_interpolate_fmpz_vec(fmpz_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, long n)
+                                    const fmpz * xs, const fmpz * ys, len_t n)
 {
     if (n == 0)
     {

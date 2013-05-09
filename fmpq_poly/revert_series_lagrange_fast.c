@@ -38,9 +38,9 @@
 
 static void
 _set_vec(fmpz * rnum, fmpz_t den,
-                const fmpz * xnum, const fmpz * xden, long len)
+                const fmpz * xnum, const fmpz * xden, len_t len)
 {
-    long j;
+    len_t j;
     fmpz_t t;
     fmpz_init(t);
     fmpz_one(den);
@@ -59,9 +59,9 @@ _set_vec(fmpz * rnum, fmpz_t den,
 
 void
 _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
-                                    const fmpz * Q, const fmpz_t Qden, long n)
+                                    const fmpz * Q, const fmpz_t Qden, len_t n)
 {
-    long i, j, k, m;
+    len_t i, j, k, m;
     fmpz *R, *Rden, *S, *T, *dens, *tmp;
     fmpz_t Sden, Tden, t;
 
@@ -159,7 +159,7 @@ _fmpq_poly_revert_series_lagrange_fast(fmpz * Qinv, fmpz_t den,
 
 void
 fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
-            const fmpq_poly_t poly, long n)
+            const fmpq_poly_t poly, len_t n)
 {
     fmpz *copy;
     int alloc;
@@ -185,7 +185,7 @@ fmpq_poly_revert_series_lagrange_fast(fmpq_poly_t res,
     }
     else
     {
-        long i;
+        len_t i;
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];

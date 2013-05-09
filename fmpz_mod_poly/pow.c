@@ -31,12 +31,12 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, long len, ulong e, 
+void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, len_t len, ulong e, 
                         const fmpz_t p)
 {
     ulong bit = ~((~0UL) >> 1);
-    long rlen;
-    long alloc = (long) e * (len - 1) + 1;
+    len_t rlen;
+    len_t alloc = (len_t) e * (len - 1) + 1;
     fmpz *v = _fmpz_vec_init(alloc);
     fmpz *R, *S, *T;
 
@@ -114,8 +114,8 @@ void _fmpz_mod_poly_pow(fmpz *res, const fmpz *poly, long len, ulong e,
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
 {
-    const long len = op->length;
-    long rlen;
+    const len_t len = op->length;
+    len_t rlen;
 
     if ((len < 2) || (e < 3UL))
     {
@@ -137,7 +137,7 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
         return;
     }
 
-    rlen = (long) e * (len - 1) + 1;
+    rlen = (len_t) e * (len - 1) + 1;
 
     if (rop != op)
     {

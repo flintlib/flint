@@ -31,7 +31,7 @@
 #include "nmod_poly.h"
 
 void _nmod_poly_make_monic(mp_ptr output, 
-                            mp_srcptr input, long len, nmod_t mod)
+                            mp_srcptr input, len_t len, nmod_t mod)
 {
     mp_limb_t inv;
     

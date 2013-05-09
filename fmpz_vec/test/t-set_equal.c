@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         _fmpz_vec_randtest(a, state, len, 200);
@@ -68,7 +68,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);
@@ -93,8 +93,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100) + 1;
-        long coeff;
+        len_t len = n_randint(state, 100) + 1;
+        len_t coeff;
 
         a = _fmpz_vec_init(len);
         b = _fmpz_vec_init(len);

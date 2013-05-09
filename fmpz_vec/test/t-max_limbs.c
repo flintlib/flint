@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a;
-        long len, bits;
+        len_t len, bits;
         mp_size_t limbs, limbs2;
 
         len = n_randint(state, 100);

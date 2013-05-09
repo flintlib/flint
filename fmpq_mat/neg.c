@@ -32,7 +32,7 @@
 
 void fmpq_mat_neg(fmpq_mat_t rop, const fmpq_mat_t op)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < op->r; i++)
         for (j = 0; j < op->c; j++)

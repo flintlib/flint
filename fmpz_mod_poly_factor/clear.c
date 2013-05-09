@@ -35,7 +35,7 @@
 void
 fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < fac->alloc; i++)
         fmpz_mod_poly_clear(fac->poly + i);

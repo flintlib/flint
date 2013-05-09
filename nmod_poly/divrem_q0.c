@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 
 void _nmod_poly_divrem_q0(mp_ptr Q, mp_ptr R, 
-                          mp_srcptr A, mp_srcptr B, long lenA, nmod_t mod)
+                          mp_srcptr A, mp_srcptr B, len_t lenA, nmod_t mod)
 {
     const mp_limb_t invL = (B[lenA-1] == 1) ? 1 : n_invmod(B[lenA-1], mod.n);
 

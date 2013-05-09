@@ -43,7 +43,7 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         fmpz_poly_q_t a, b;
-        long coeff = n_randint(state, 50);
+        len_t coeff = n_randint(state, 50);
         fmpz_t x1, x2;
 
         fmpz_init(x1);

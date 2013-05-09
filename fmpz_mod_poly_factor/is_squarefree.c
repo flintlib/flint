@@ -31,11 +31,11 @@
 #include <string.h>
 
 int
-_fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p)
+_fmpz_mod_poly_is_squarefree(const fmpz * f, len_t len, const fmpz_t p)
 {
     fmpz * fd, * g;
     fmpz_t invd;
-    long dlen;
+    len_t dlen;
     int res;
 
     if (len <= 2)

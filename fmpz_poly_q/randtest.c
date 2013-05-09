@@ -26,8 +26,8 @@
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
-                          long len1, mp_bitcnt_t bits1, 
-                          long len2, mp_bitcnt_t bits2)
+                          len_t len1, mp_bitcnt_t bits1, 
+                          len_t len2, mp_bitcnt_t bits2)
 {
     len2  = FLINT_MAX(len2, 1);
     bits2 = FLINT_MAX(bits2, 1);
@@ -38,8 +38,8 @@ void fmpz_poly_q_randtest(fmpz_poly_q_t poly, flint_rand_t state,
 }
 
 void fmpz_poly_q_randtest_not_zero(fmpz_poly_q_t poly, flint_rand_t state, 
-                                   long len1, mp_bitcnt_t bits1, 
-                                   long len2, mp_bitcnt_t bits2)
+                                   len_t len1, mp_bitcnt_t bits1, 
+                                   len_t len2, mp_bitcnt_t bits2)
 {
     len1  = FLINT_MAX(len1, 1);
     len2  = FLINT_MAX(len2, 1);

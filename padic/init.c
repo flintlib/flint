@@ -32,7 +32,7 @@ void padic_init(padic_t rop)
     padic_prec(rop) = PADIC_DEFAULT_PREC;
 }
 
-void padic_init2(padic_t rop, long N)
+void padic_init2(padic_t rop, len_t N)
 {
     fmpz_init(padic_unit(rop));
     padic_val(rop)  = 0;

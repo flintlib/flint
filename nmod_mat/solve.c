@@ -34,7 +34,7 @@
 int
 nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
 {
-    long i, rank, *perm;
+    len_t i, rank, *perm;
     nmod_mat_t LU;
     int result;
 
@@ -42,7 +42,7 @@ nmod_mat_solve(nmod_mat_t X, const nmod_mat_t A, const nmod_mat_t B)
         return 1;
 
     nmod_mat_init_set(LU, A);
-    perm = flint_malloc(sizeof(long) * A->r);
+    perm = flint_malloc(sizeof(len_t) * A->r);
     for (i = 0; i < A->r; i++)
         perm[i] = i;
 

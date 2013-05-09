@@ -31,7 +31,7 @@
 
 void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
 {
-    long i;
+    len_t i;
 
     for (i = poly->length - 1; (i >= 0) && !poly->coeffs[i]; i--) ;
     poly->length = i + 1;

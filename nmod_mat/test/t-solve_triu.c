@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long i;
+    len_t i;
     flint_rand_t state;
     flint_randinit(state);
 
@@ -45,7 +45,7 @@ main(void)
     {
         nmod_mat_t A, X, B, Y;
         mp_limb_t m;
-        long rows, cols;
+        len_t rows, cols;
         int unit;
 
         m = n_randtest_prime(state, 0);

@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         ulong exp = n_randint(state, 200);
 
         a = _fmpz_vec_init(len);
@@ -74,7 +74,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
         ulong e1 = n_randint(state, 200);
         ulong e2 = n_randint(state, 200);
 

@@ -36,7 +36,7 @@ void flint_mpn_mulmod_preinv1(mp_ptr r,
    mp_limb_t q;
    mp_limb_t ts[150];
    mp_ptr t;
-   long i;
+   len_t i;
 
    if (n <= 30)
       t = ts;

@@ -30,7 +30,7 @@
 #include "fmpz.h"
 
 void
-fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, long x, ulong exp)
+fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, len_t x, ulong exp)
 {
    fmpz c2 = *g;
 

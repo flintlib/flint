@@ -35,7 +35,7 @@
 int main(void)
 {
     flint_rand_t state;
-    long i, j;
+    len_t i, j;
 
     printf("bell_number_nmod....");
     fflush(stdout);
@@ -45,7 +45,7 @@ int main(void)
     for (i = 0; i < 10; i++)
     {
         mp_ptr b;
-        long n;
+        len_t n;
         nmod_t mod;
         mp_limb_t p;
 

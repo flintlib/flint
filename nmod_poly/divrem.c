@@ -33,8 +33,8 @@
 #include "mpn_extras.h"
 
 void
-_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA, 
-                                  mp_srcptr B, long lenB, nmod_t mod)
+_nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, len_t lenA, 
+                                  mp_srcptr B, len_t lenB, nmod_t mod)
 {
     if (lenA == lenB)
         _nmod_poly_divrem_q0(Q, R, A, B, lenB, mod);
@@ -55,7 +55,7 @@ _nmod_poly_divrem(mp_ptr Q, mp_ptr R, mp_srcptr A, long lenA,
 void nmod_poly_divrem(nmod_poly_t Q, nmod_poly_t R,
                       const nmod_poly_t A, const nmod_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
+    const len_t lenA = A->length, lenB = B->length;
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
     

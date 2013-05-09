@@ -31,7 +31,7 @@
 void
 nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < mat->r * mat->c; i++)
     {

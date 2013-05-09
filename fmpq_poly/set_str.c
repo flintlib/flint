@@ -37,7 +37,7 @@ int
 _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
 {
     char * w;
-    long i, len;
+    len_t i, len;
     mpq_t * a;
 
     len = atol(str);
@@ -57,10 +57,10 @@ _fmpq_poly_set_str(fmpz * poly, fmpz_t den, const char * str)
     /* Find maximal gap between spaces and allocate w */
     {
         const char * s = str;
-        long max;
+        len_t max;
         for (max = 0; *s != '\0';)
         {
-            long cur;
+            len_t cur;
             for (s++, cur = 1; *s != ' ' && *s != '\0'; s++, cur++) ;
             if (max < cur)
                 max = cur;
@@ -106,7 +106,7 @@ int
 fmpq_poly_set_str(fmpq_poly_t poly, const char * str)
 {
     int ans;
-    long len;
+    len_t len;
 
     len = atol(str);
     if (len < 0)

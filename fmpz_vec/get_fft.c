@@ -31,14 +31,14 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-long _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
-                       const fmpz * coeffs_m, long l, long length)
+len_t _fmpz_vec_get_fft(mp_limb_t ** coeffs_f, 
+                       const fmpz * coeffs_m, len_t l, len_t length)
 {
-   long size_f = l + 1;
+   len_t size_f = l + 1;
    mp_limb_t * coeff;
 
    mp_limb_t mask = -1L;
-   long bits = 0, limbs = 0, size_j, i, c;
+   len_t bits = 0, limbs = 0, size_j, i, c;
    int sign = 1, signed_c;
    
    for (i = 0; i < length; i++, coeffs_m++)

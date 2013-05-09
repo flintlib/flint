@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t A;
         nmod_poly_t M, M2;
-        long length;
+        len_t length;
         mp_limb_t mod;
 
         length = n_randint(state, 50);

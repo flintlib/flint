@@ -34,19 +34,19 @@
 
 typedef struct
 {
-    long m;
-    long n;
-    long k;
+    len_t m;
+    len_t n;
+    len_t k;
     int algorithm;
-    long bits;
+    len_t bits;
 } mat_mul_t;
 
 
 void sample(void * arg, ulong count)
 {
     mat_mul_t * params = (mat_mul_t *) arg;
-    long i, m = params->m, n = params->n, k = params->k;
-    long bits = params->bits;
+    len_t i, m = params->m, n = params->n, k = params->k;
+    len_t bits = params->bits;
     int algorithm = params->algorithm;
 
     flint_rand_t rnd;
@@ -89,15 +89,15 @@ int main(void)
 {
     double min_default, min_classical, min_inline, min_multi_mod, max;
     mat_mul_t params;
-    long bits, dim;
+    len_t bits, dim;
 
-    for (bits = 1; bits <= 2000; bits = (long) ((double) bits * 1.3) + 1)
+    for (bits = 1; bits <= 2000; bits = (len_t) ((double) bits * 1.3) + 1)
     {
         params.bits = bits;
 
         printf("fmpz_mat_mul (bits = %ld):\n", params.bits);
 
-        for (dim = 1; dim <= 512; dim = (long) ((double) dim * 1.3) + 1)
+        for (dim = 1; dim <= 512; dim = (len_t) ((double) dim * 1.3) + 1)
         {
             params.m = dim;
             params.n = dim;

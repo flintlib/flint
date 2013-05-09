@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
+int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, len_t len)
 {
     if (len < 3)
         return 1;
@@ -52,7 +52,7 @@ int _fmpq_poly_is_squarefree(const fmpz * poly, const fmpz_t den, long len)
     }
     else
     {
-        long gdeg;
+        len_t gdeg;
         fmpz * w = _fmpz_vec_init(2 * len);
         
         _fmpz_poly_derivative(w, poly, len);

@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("solve....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_mat_t A, X, B, AX, Bden;
         fmpz_poly_t den, det;
-        long n, m, bits, deg;
+        len_t n, m, bits, deg;
         float density;
         int solved;
 

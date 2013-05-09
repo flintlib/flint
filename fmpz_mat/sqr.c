@@ -33,7 +33,7 @@
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    long n = A->r;
+    len_t n = A->r;
 
     if (n == 0)
     {

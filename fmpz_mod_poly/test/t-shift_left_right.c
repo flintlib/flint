@@ -48,7 +48,7 @@ main(void)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
-        long shift = n_randint(state, 100);
+        len_t shift = n_randint(state, 100);
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
@@ -80,7 +80,7 @@ main(void)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
-        long shift;
+        len_t shift;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);
@@ -114,7 +114,7 @@ main(void)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b, c;
-        long shift = n_randint(state, 100);
+        len_t shift = n_randint(state, 100);
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

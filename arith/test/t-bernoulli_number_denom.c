@@ -34,7 +34,7 @@
 int main()
 {
     fmpz_t s, t;
-    long n;
+    len_t n;
 
     printf("bernoulli_number_denom....");
     fflush(stdout);

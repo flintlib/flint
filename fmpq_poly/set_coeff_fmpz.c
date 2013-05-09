@@ -30,9 +30,9 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, long n, const fmpz_t x)
+void fmpq_poly_set_coeff_fmpz(fmpq_poly_t poly, len_t n, const fmpz_t x)
 {
-    long len = poly->length;
+    len_t len = poly->length;
     const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
     
     if (!replace && fmpz_is_zero(x))

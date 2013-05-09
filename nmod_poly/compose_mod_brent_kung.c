@@ -31,13 +31,13 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr poly1, long len1, 
+_nmod_poly_compose_mod_brent_kung(mp_ptr res, mp_srcptr poly1, len_t len1, 
                             mp_srcptr poly2,
-                            mp_srcptr poly3, long len3, nmod_t mod)
+                            mp_srcptr poly3, len_t len3, nmod_t mod)
 {
     nmod_mat_t A, B, C;
     mp_ptr t, h;
-    long i, n, m;
+    len_t i, n, m;
 
     n = len3 - 1;
 
@@ -103,10 +103,10 @@ nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
                     const nmod_poly_t poly1, const nmod_poly_t poly2,
                     const nmod_poly_t poly3)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long len3 = poly3->length;
-    long len = len3 - 1;
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t len3 = poly3->length;
+    len_t len = len3 - 1;
 
     mp_ptr ptr2;
 

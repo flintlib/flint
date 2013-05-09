@@ -33,7 +33,7 @@
 void
 fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)
 {
-    long i, j;
+    len_t i, j;
     mp_limb_t m = Amod->mod.n;
 
     for (i = 0; i < A->r; i++)

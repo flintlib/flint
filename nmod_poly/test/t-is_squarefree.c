@@ -45,7 +45,7 @@ main(void)
     {
         nmod_poly_t poly, Q, R, t;
         mp_limb_t modulus;
-        long i, num_factors, exp, max_exp;
+        len_t i, num_factors, exp, max_exp;
         int v, result;
 
         modulus = n_randtest_prime(state, 0);

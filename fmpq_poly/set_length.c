@@ -29,9 +29,9 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_set_length(fmpq_poly_t poly, long len)
+void _fmpq_poly_set_length(fmpq_poly_t poly, len_t len)
 {
-    long i;
+    len_t i;
     for (i = len; i < poly->length; i++)
         _fmpz_demote(poly->coeffs + i);
     poly->length = len;

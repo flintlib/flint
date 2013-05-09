@@ -27,12 +27,12 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-long
+len_t
 nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
 {
-    long i, j, k, n, rank, nullity;
-    long * pivots;
-    long * nonpivots;
+    len_t i, j, k, n, rank, nullity;
+    len_t * pivots;
+    len_t * nonpivots;
     nmod_poly_mat_t tmp;
     nmod_poly_t den;
 
@@ -52,8 +52,8 @@ nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
     }
     else if (nullity)
     {
-        pivots = flint_malloc(rank * sizeof(long));
-        nonpivots = flint_malloc(nullity * sizeof(long));
+        pivots = flint_malloc(rank * sizeof(len_t));
+        nonpivots = flint_malloc(nullity * sizeof(len_t));
 
         for (i = j = k = 0; i < rank; i++)
         {

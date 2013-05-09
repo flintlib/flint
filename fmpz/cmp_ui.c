@@ -38,7 +38,7 @@ fmpz_cmp_ui(const fmpz_t f, ulong g)
         if (c < 0L || g > COEFF_MAX)
             return -1;
         else 
-            return c < (long) g ? -1 : c > (long) g;
+            return c < (len_t) g ? -1 : c > (len_t) g;
     }
     else                     /* f is large */
         return mpz_cmp_ui(COEFF_TO_PTR(c), g);

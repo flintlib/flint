@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("rank....");
     fflush(stdout);
@@ -47,7 +47,7 @@ main(void)
         fmpz_poly_mat_t A;
         fmpz_mat_t Ax;
         fmpz_t x;
-        long j, m, n, bits, deg, rank, zrank;
+        len_t j, m, n, bits, deg, rank, zrank;
         float density;
 
         m = n_randint(state, 15);
@@ -66,7 +66,7 @@ main(void)
         zrank = 0;
         for (j = 0; j < 5; j++)
         {
-            long r;
+            len_t r;
             fmpz_randbits(x, state, 15);
             fmpz_poly_mat_evaluate_fmpz(Ax, A, x);
             r = fmpz_mat_rank(Ax);

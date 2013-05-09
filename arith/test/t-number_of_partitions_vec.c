@@ -39,9 +39,9 @@ int main(void)
     flint_rand_t state;
     fmpz * p;
     mp_ptr pmod;
-    long k, n;
+    len_t k, n;
 
-    const long maxn = 1000;
+    const len_t maxn = 1000;
 
     printf("number_of_partitions_vec....");
     fflush(stdout);
@@ -76,7 +76,7 @@ int main(void)
 
             for (k = 1; k < n; k++)
             {
-                long j;
+                len_t j;
 
                 j = n - 1 - k*(3*k - 1)/2;
                 if (j >= 0)

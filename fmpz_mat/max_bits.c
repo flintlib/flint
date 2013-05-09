@@ -29,10 +29,10 @@
 #include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-long
+len_t
 fmpz_mat_max_bits(const fmpz_mat_t mat)
 {
-    long i, bits, row_bits, sign;
+    len_t i, bits, row_bits, sign;
 
     sign = 1;
     bits = 0;

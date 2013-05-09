@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    long m, n, rep, res1, res2;
+    len_t m, n, rep, res1, res2;
     flint_rand_t state;
 
     printf("max_bits....");

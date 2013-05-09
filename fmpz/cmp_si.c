@@ -30,7 +30,7 @@
 #include "fmpz.h"
 
 int
-fmpz_cmp_si(const fmpz_t f, long g)
+fmpz_cmp_si(const fmpz_t f, len_t g)
 {
     fmpz c = *f;
 

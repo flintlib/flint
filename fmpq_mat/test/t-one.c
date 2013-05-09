@@ -45,7 +45,7 @@ main(void)
     {
         fmpq_mat_t A, B, C, I;
 
-        long n, bits;
+        len_t n, bits;
 
         n = n_randint(state, 10);
 

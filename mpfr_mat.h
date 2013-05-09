@@ -36,8 +36,8 @@
 typedef struct
 {
     __mpfr_struct * entries;
-    long r;
-    long c;
+    len_t r;
+    len_t c;
     mp_bitcnt_t prec;
     __mpfr_struct ** rows;
 } mpfr_mat_struct;
@@ -45,7 +45,7 @@ typedef struct
 /* fmpz_mat_t allows reference-like semantics for fmpz_mat_struct */
 typedef mpfr_mat_struct mpfr_mat_t[1];
 
-void mpfr_mat_init(mpfr_mat_t mat, long rows, long cols, mpfr_prec_t prec);
+void mpfr_mat_init(mpfr_mat_t mat, len_t rows, len_t cols, mpfr_prec_t prec);
 
 void mpfr_mat_clear(mpfr_mat_t mat);
 

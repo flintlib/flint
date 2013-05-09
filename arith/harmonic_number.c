@@ -70,13 +70,13 @@ const mp_limb_t FLINT_HARMONIC_TINY_Q[] =
 };
 
 static void
-_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
+_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, len_t n)
 {
     mpz_t p, q;
 
     mp_ptr t, v;
     mp_size_t ts, vs;
-    long size;
+    len_t size;
 
     if (n <= 0)
     {
@@ -107,7 +107,7 @@ _mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, long n)
     _fmpq_canonicalise(num, den);
 }
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, len_t n)
 {
     n = FLINT_MAX(n, 0);
 
@@ -122,7 +122,7 @@ void _arith_harmonic_number(fmpz_t num, fmpz_t den, long n)
     }
 }
 
-void arith_harmonic_number(fmpq_t x, long n)
+void arith_harmonic_number(fmpq_t x, len_t n)
 {
     _arith_harmonic_number(fmpq_numref(x), fmpq_denref(x), n);
 }

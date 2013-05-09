@@ -31,11 +31,11 @@
 
 
 void
-nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
+nmod_mat_init(nmod_mat_t mat, len_t rows, len_t cols, mp_limb_t n)
 {
     if ((rows) && (cols))
     {
-        long i;
+        len_t i;
         mat->entries = flint_calloc(rows * cols, sizeof(mp_limb_t));
         mat->rows = flint_malloc(rows * sizeof(mp_limb_t *));
 

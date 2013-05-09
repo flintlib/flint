@@ -33,7 +33,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-int _fmpz_poly_fprint(FILE * file, const fmpz * poly, long len)
+int _fmpz_poly_fprint(FILE * file, const fmpz * poly, len_t len)
 {
     return _fmpz_vec_fprint(file, poly, len);
 }

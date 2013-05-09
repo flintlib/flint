@@ -35,7 +35,7 @@ fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den,
                     const fmpz_poly_mat_t A, const fmpz_poly_mat_t B)
 {
     fmpz_poly_mat_t LU;
-    long dim, *perm;
+    len_t dim, *perm;
     int result;
 
     if (fmpz_poly_mat_is_empty(B))

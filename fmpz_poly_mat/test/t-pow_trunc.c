@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("pow_trunc....");
     fflush(stdout);
@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long n, exp, bits, deg, len;
+        len_t n, exp, bits, deg, len;
 
         n = n_randint(state, 10);
         exp = n_randint(state, 15);
@@ -88,7 +88,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
-        long n, exp, bits, deg, len;
+        len_t n, exp, bits, deg, len;
 
         n = n_randint(state, 10);
         exp = n_randint(state, 15);

@@ -33,7 +33,7 @@
 
 int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 {
-    long n = A->r;
+    len_t n = A->r;
 
     if (n == 0)
     {
@@ -90,7 +90,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
     {
         fmpz_mat_t Aclear, Bclear, I;
         fmpz * den;
-        long i;
+        len_t i;
         int success;
 
         fmpz_mat_init(Aclear, n, n);

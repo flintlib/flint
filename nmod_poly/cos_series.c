@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_cos_series(mp_ptr g, mp_srcptr h, len_t n, nmod_t mod)
 {
     mp_ptr t, u;
 
@@ -50,10 +50,10 @@ _nmod_poly_cos_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 }
 
 void
-nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, long n)
+nmod_poly_cos_series(nmod_poly_t g, const nmod_poly_t h, len_t n)
 {
     mp_ptr h_coeffs;
-    long h_len = h->length;
+    len_t h_len = h->length;
 
     if (h_len > 0 && h->coeffs[0] != 0UL)
     {

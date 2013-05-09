@@ -55,7 +55,7 @@ __nmod_poly_factor(nmod_poly_factor_t result,
     nmod_poly_t monic_input;
     nmod_poly_factor_t sqfree_factors, factors;
     mp_limb_t leading_coeff;
-    long i, len;
+    len_t i, len;
 
     len = input->length;
 
@@ -101,7 +101,7 @@ mp_limb_t
 __nmod_poly_factor_deflation(nmod_poly_factor_t result,
     const nmod_poly_t input, int algorithm)
 {
-    long i;
+    len_t i;
     ulong deflation;
 
     if (input->length <= 1)
@@ -182,7 +182,7 @@ nmod_poly_factor(nmod_poly_factor_t result, const nmod_poly_t input)
 {
     mp_limb_t p = input->mod.n;
     unsigned int bits = FLINT_BIT_COUNT (p);
-    long n = nmod_poly_degree(input);
+    len_t n = nmod_poly_degree(input);
 
     if (((7 <= p && p < 32) && (n + 136 * p >= 5952)) ||
         ((bits >= 5) && (n + 2 * bits >= 74)))

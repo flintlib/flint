@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #first find instances of long in comments and store them (manually repair afterwards)
-find . -name "*\.c" -exec perl -0777ne 'print m!/\*(?:.|[\r\n])*?\*/!g;' {} \; | grep "\slong" > comments
+#find . -name "*\.c" -exec perl -0777ne 'print m!/\*(?:.|[\r\n])*?\*/!g;' {} \; | grep "\slong" > comments
 
 #now replace all instances of long
 files=$(find . -name "*\.c")
@@ -12,6 +12,8 @@ for y in $files
 do
 perl -pi -w -e "s/\blong\b/len_t/g;
 s/([\(\*\s]+)long([\)\*\s]+)/$1len_t$2/g" $y
+#repair unsigned len_t, len_t int
+perl -pi -w -e "s/unsigned len_t/unsigned long/g;s/len_t int/len_t/g" $y
 git add $y
 done
 
@@ -19,6 +21,8 @@ for y in $headers
 do
 perl -pi -w -e "s/\blong\b/len_t/g;
 s/([\(\*\s]+)long([\)\*\s]+)/$1len_t$2/g" $y
+#repair unsigned len_t, let_t int
+perl -pi -w -e "s/unsigned len_t/unsigned long/g;s/len_t int/len_t/g" $y
 git add $y
 done
 

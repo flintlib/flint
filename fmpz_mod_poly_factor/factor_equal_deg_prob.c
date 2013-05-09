@@ -33,12 +33,12 @@
 int
 fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
                                     flint_rand_t state,
-                                    const fmpz_mod_poly_t pol, long d)
+                                    const fmpz_mod_poly_t pol, len_t d)
 {
     fmpz_mod_poly_t a, b, c;
     fmpz_t exp, t, p;
     int res = 1;
-    long i;
+    len_t i;
 
     if (pol->length <= 1)
     {

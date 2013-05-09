@@ -34,7 +34,7 @@ nmod_mat_solve_tril_classical(nmod_mat_t X, const nmod_mat_t L,
                                                 const nmod_mat_t B, int unit)
 {
     int nlimbs;
-    long i, j, n, m;
+    len_t i, j, n, m;
     nmod_t mod;
     mp_ptr inv, tmp;
 

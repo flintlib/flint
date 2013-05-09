@@ -43,7 +43,7 @@ main(void)
 
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        long b;
+        len_t b;
         fmpz_t a, c;
         mpz_t d, e, f, g;
 
@@ -86,7 +86,7 @@ main(void)
     /* Test aliasing of a and c */
     for (i = 0; i < 10000 * flint_test_multiplier(); i++)
     {
-        long b;
+        len_t b;
         fmpz_t a;
         mpz_t d, e, f, g;
 

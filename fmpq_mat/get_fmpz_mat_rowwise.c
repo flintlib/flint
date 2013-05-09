@@ -33,10 +33,10 @@
 
 void
 _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
-                        const fmpq_mat_struct ** mat, long n)
+                        const fmpq_mat_struct ** mat, len_t n)
 {
     fmpz_t t, lcm;
-    long i, j, k;
+    len_t i, j, k;
 
     if (fmpq_mat_is_empty(mat[0]))
         return;

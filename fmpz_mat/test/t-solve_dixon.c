@@ -38,7 +38,7 @@ main(void)
     fmpz_mat_t A, X, B, AX, AXm, Bm;
     fmpz_t mod;
     flint_rand_t state;
-    long i, m, n, r;
+    len_t i, m, n, r;
     int success;
 
     printf("solve_dixon....");

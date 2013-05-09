@@ -30,12 +30,12 @@
 #include "fmpz_mat.h"
 
 
-long
+len_t
 fmpz_mat_rank(const fmpz_mat_t A)
 {
     fmpz_mat_t tmp;
     fmpz_t den;
-    long rank;
+    len_t rank;
 
     if (fmpz_mat_is_empty(A))
         return 0;

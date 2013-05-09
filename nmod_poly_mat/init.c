@@ -29,11 +29,11 @@
 #include "nmod_poly_mat.h"
 
 void
-nmod_poly_mat_init(nmod_poly_mat_t A, long rows, long cols, mp_limb_t n)
+nmod_poly_mat_init(nmod_poly_mat_t A, len_t rows, len_t cols, mp_limb_t n)
 {
     if (rows && cols)
     {
-        long i;
+        len_t i;
 
         A->entries = (nmod_poly_struct *) flint_malloc(rows * cols * sizeof(nmod_poly_struct));
         A->rows = (nmod_poly_struct **) flint_malloc(rows * sizeof(nmod_poly_struct *));

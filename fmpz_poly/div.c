@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_div(fmpz * Q, const fmpz * A, long lenA, const fmpz * B, long lenB)
+_fmpz_poly_div(fmpz * Q, const fmpz * A, len_t lenA, const fmpz * B, len_t lenB)
 {
     _fmpz_poly_div_divconquer(Q, A, lenA, B, lenB);
 }

@@ -50,7 +50,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        long n = n_randint(state, 50) + 1;
+        len_t n = n_randint(state, 50) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -83,7 +83,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
-        long n = n_randint(state, 80) + 1;
+        len_t n = n_randint(state, 80) + 1;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

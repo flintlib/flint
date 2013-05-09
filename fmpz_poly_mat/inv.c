@@ -36,7 +36,7 @@ int
 fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
                     const fmpz_poly_mat_t A)
 {
-    long n = fmpz_poly_mat_nrows(A);
+    len_t n = fmpz_poly_mat_nrows(A);
 
     if (n == 0)
     {
@@ -75,7 +75,7 @@ fmpz_poly_mat_inv(fmpz_poly_mat_t Ainv, fmpz_poly_t den,
     else
     {
         fmpz_poly_mat_t LU, I;
-        long * perm;
+        len_t * perm;
         int result;
 
         perm = _perm_init(n);

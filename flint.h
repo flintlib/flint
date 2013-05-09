@@ -31,6 +31,12 @@
 #include "longlong.h"
 #include "config.h"
 
+/* this is a test comment that has
+ the string len_t
+ in it, and goes over many lines! */
+
+/* slong) test */
+
 #ifdef __cplusplus
  extern "C" {
 #endif
@@ -45,6 +51,8 @@
 #endif
 
 extern char version[];
+
+typedef mp_size_t len_t;
 
 #define ulong unsigned long
 
@@ -115,7 +123,7 @@ typedef __mpfr_struct mpfr;
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
-#define FLINT_ABS(x) ((long)(x) < 0 ? (-(x)) : (x))
+#define FLINT_ABS(x) ((len_t)(x) < 0 ? (-(x)) : (x))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
@@ -150,21 +158,21 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_zero(xxx, nnn) \
     do \
     { \
-        long ixxx; \
+        len_t ixxx; \
         for (ixxx = 0; ixxx < (nnn); ixxx++) \
             (xxx)[ixxx] = 0UL; \
     } while (0)
 
 #define flint_mpn_copyi(xxx, yyy, nnn) \
    do { \
-      long ixxx; \
+      len_t ixxx; \
       for (ixxx = 0; ixxx < (nnn); ixxx++) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
 #define flint_mpn_copyd(xxx, yyy, nnn) \
    do { \
-      long ixxx; \
+      len_t ixxx; \
       for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
@@ -172,7 +180,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_store(xxx, nnn, yyy) \
    do \
    { \
-      long ixxx; \
+      len_t ixxx; \
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)

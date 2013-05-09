@@ -86,8 +86,8 @@ fmpz_poly_q_sub(fmpz_poly_q_t rop,
     /* Polynomials? */
     if (fmpz_poly_length(op1->den) == 1 && fmpz_poly_length(op2->den) == 1)
     {
-        const long len1 = fmpz_poly_length(op1->num);
-        const long len2 = fmpz_poly_length(op2->num);
+        const len_t len1 = fmpz_poly_length(op1->num);
+        const len_t len2 = fmpz_poly_length(op2->num);
 
         fmpz_poly_fit_length(rop->num, FLINT_MAX(len1, len2));
         _fmpq_poly_sub(rop->num->coeffs, rop->den->coeffs, 

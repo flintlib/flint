@@ -31,8 +31,8 @@
 #include "mpn_extras.h"
 
 
-void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1, 
-                                        const fmpz * poly2, long len2)
+void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, len_t len1, 
+                                        const fmpz * poly2, len_t len2)
 {
     mp_bitcnt_t bits1, bits2, nb1, nb2, bits_small, pbits, curr_bits = 0, new_bits;   
     fmpz_t ac, bc, hc, d, g, l, eval_A, eval_B, eval_GCD, modulus;
@@ -40,7 +40,7 @@ void _fmpz_poly_gcd_modular(fmpz * res, const fmpz * poly1, long len1,
     mp_ptr a, b, h;
     mp_limb_t p, h_inv, g_mod;
     nmod_t mod;
-    long i, n, n0, unlucky, hlen, bound;
+    len_t i, n, n0, unlucky, hlen, bound;
     int g_pm1;
 
     fmpz_init(ac);
@@ -315,8 +315,8 @@ fmpz_poly_gcd_modular(fmpz_poly_t res, const fmpz_poly_t poly1,
     }
     else /* len1 >= len2 >= 0 */
     {
-        const long len1 = poly1->length;
-        const long len2 = poly2->length;
+        const len_t len1 = poly1->length;
+        const len_t len2 = poly2->length;
         
         if (len1 == 0) /* len1 = len2 = 0 */
         {

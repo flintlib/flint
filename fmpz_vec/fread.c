@@ -30,10 +30,10 @@
 #include "fmpz.h"
 #include "fmpz_vec.h"
 
-int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
+int _fmpz_vec_fread(FILE * file, fmpz ** vec, len_t * len)
 {
     int alloc, r;
-    long i;
+    len_t i;
     mpz_t t;
 
     alloc = (*vec == NULL);
@@ -49,7 +49,7 @@ int _fmpz_vec_fread(FILE * file, fmpz ** vec, long * len)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("Exception (_fmpz_vec_fread). Length does not fit into a long.\n");
+        printf("Exception (_fmpz_vec_fread). Length does not fit into a len_t.\n");
         abort();
     }
     if (alloc)

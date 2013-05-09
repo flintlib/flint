@@ -32,7 +32,7 @@
 
 void fmpq_mat_randtest(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)

@@ -47,7 +47,7 @@ int main(void)
 
       count_leading_zeros(count, n);
 
-      result = ((n == 0UL) || (((long)(n << count) < 0L) && (r_shift(n, FLINT_BITS-count) == 0UL)));
+      result = ((n == 0UL) || (((len_t)(n << count) < 0L) && (r_shift(n, FLINT_BITS-count) == 0UL)));
       if (!result)
       {
          printf("FAIL:\n");

@@ -31,14 +31,14 @@
 void
 nmod_poly_mat_det_fflu(nmod_poly_t det, const nmod_poly_mat_t A)
 {
-    long n = nmod_poly_mat_nrows(A);
+    len_t n = nmod_poly_mat_nrows(A);
 
     if (n == 0)
         nmod_poly_one(det);
     else
     {
         nmod_poly_mat_t tmp;
-        long * perm;
+        len_t * perm;
         nmod_poly_mat_init_set(tmp, A);
         perm = _perm_init(n);
 

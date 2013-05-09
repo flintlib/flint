@@ -32,7 +32,7 @@
 
 void
 _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B, 
-                                             long n, nmod_t mod)
+                                             len_t n, nmod_t mod)
 {
     mp_ptr Binv = _nmod_vec_init(n);
 
@@ -44,11 +44,11 @@ _nmod_poly_div_series(mp_ptr Q, mp_srcptr A, mp_srcptr B,
 
 void
 nmod_poly_div_series(nmod_poly_t Q, const nmod_poly_t A, 
-                                    const nmod_poly_t B, long n)
+                                    const nmod_poly_t B, len_t n)
 {
     mp_ptr A_coeffs, B_coeffs, Q_coeffs;
     nmod_poly_t t1;
-    long Alen, Blen;
+    len_t Alen, Blen;
     
     Blen = B->length;
 

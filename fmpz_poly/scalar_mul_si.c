@@ -29,9 +29,9 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, long x)
+fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, const fmpz_poly_t poly2, len_t x)
 {
-    long i;
+    len_t i;
 
     /* Either scalar or input poly is zero */
     if ((x == 0L) || (poly2->length == 0))

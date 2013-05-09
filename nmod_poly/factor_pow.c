@@ -30,9 +30,9 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_factor_pow(nmod_poly_factor_t fac, long exp)
+nmod_poly_factor_pow(nmod_poly_factor_t fac, len_t exp)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < fac->num; i++)
         fac->exp[i] *= exp;

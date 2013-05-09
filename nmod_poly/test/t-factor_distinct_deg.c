@@ -46,8 +46,8 @@ main(void)
         nmod_poly_t poly1, poly, q, r, product;
         nmod_poly_factor_t res;
         mp_limb_t modulus, lead;
-        long i, length, num;
-        long *degs;
+        len_t i, length, num;
+        len_t *degs;
 
         modulus = n_randtest_prime(state, 0);
 
@@ -90,7 +90,7 @@ main(void)
             nmod_poly_mul(poly1, poly1, poly);
         }
 
-        if (!(degs = flint_malloc((poly1->length - 1) * sizeof(long))))
+        if (!(degs = flint_malloc((poly1->length - 1) * sizeof(len_t))))
         {
             printf("Fatal error: not enough memory.");
             abort();

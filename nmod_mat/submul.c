@@ -33,7 +33,7 @@ void
 nmod_mat_submul(nmod_mat_t D, const nmod_mat_t C,
                                 const nmod_mat_t A, const nmod_mat_t B)
 {
-    long m, k, n;
+    len_t m, k, n;
 
     m = A->r;
     k = A->c;

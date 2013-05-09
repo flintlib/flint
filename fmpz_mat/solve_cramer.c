@@ -64,7 +64,7 @@ _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,
     if (success)
     {
         fmpz_t t12, t13, t14, x0, x1, x2;
-        long i, n = fmpz_mat_ncols(B);
+        len_t i, n = fmpz_mat_ncols(B);
 
         fmpz_init(t12);
         fmpz_init(t13);
@@ -120,7 +120,7 @@ int
 fmpz_mat_solve_cramer(fmpz_mat_t X, fmpz_t den,
                             const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long i, dim = fmpz_mat_nrows(A);
+    len_t i, dim = fmpz_mat_nrows(A);
 
     if (dim == 0 || fmpz_mat_ncols(B) == 0)
     {

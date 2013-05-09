@@ -41,7 +41,7 @@ int main(void)
     /* check (b^(-1))(b(a)) = a */
     for (i = 0; i < 10000; i++)
     {
-        long n, *a, *b, *binv, *c;
+        len_t n, *a, *b, *binv, *c;
 
         n = n_randint(state, 100);
 
@@ -76,7 +76,7 @@ int main(void)
     /* check aliasing with first argument */
     for (i = 0; i < 10000; i++)
     {
-        long n, *a, *b, *c;
+        len_t n, *a, *b, *c;
 
         n = n_randint(state, 100);
 

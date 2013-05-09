@@ -29,7 +29,7 @@
 #include "fmpz.h"
 
 ulong
-z_gcd(long a, long b)
+z_gcd(len_t a, len_t b)
 {
     ulong ua = FLINT_ABS(a);
     ulong ub = FLINT_ABS(b);

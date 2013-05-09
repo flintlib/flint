@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_set(mpfr * vec1, mpfr * vec2, long length)
+_mpfr_vec_set(mpfr * vec1, mpfr * vec2, len_t length)
 {
-    long i;
+    len_t i;
     for (i = 0; i < length; i++)
         mpfr_set(vec1 + i, vec2 + i, GMP_RNDN);
 }

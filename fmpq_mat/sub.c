@@ -32,7 +32,7 @@
 
 void fmpq_mat_sub(fmpq_mat_t mat, const fmpq_mat_t mat1, const fmpq_mat_t mat2)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)

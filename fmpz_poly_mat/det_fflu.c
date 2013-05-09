@@ -32,14 +32,14 @@
 void
 fmpz_poly_mat_det_fflu(fmpz_poly_t det, const fmpz_poly_mat_t A)
 {
-    long n = fmpz_poly_mat_nrows(A);
+    len_t n = fmpz_poly_mat_nrows(A);
 
     if (n == 0)
         fmpz_poly_one(det);
     else
     {
         fmpz_poly_mat_t tmp;
-        long * perm;
+        len_t * perm;
         fmpz_poly_mat_init_set(tmp, A);
         perm = _perm_init(n);
 

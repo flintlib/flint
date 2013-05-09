@@ -29,13 +29,13 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-mp_ptr * _nmod_poly_tree_alloc(long len)
+mp_ptr * _nmod_poly_tree_alloc(len_t len)
 {
     mp_ptr * tree = NULL;
 
     if (len)
     {
-        long i, height = FLINT_CLOG2(len);
+        len_t i, height = FLINT_CLOG2(len);
 
         tree = flint_malloc(sizeof(mp_ptr) * (height + 1));
         for (i = 0; i <= height; i++)
@@ -45,11 +45,11 @@ mp_ptr * _nmod_poly_tree_alloc(long len)
     return tree;
 }
 
-void _nmod_poly_tree_free(mp_ptr * tree, long len)
+void _nmod_poly_tree_free(mp_ptr * tree, len_t len)
 {
     if (len)
     {
-        long i, height = FLINT_CLOG2(len);
+        len_t i, height = FLINT_CLOG2(len);
 
         for (i = 0; i <= height; i++)
             flint_free(tree[i]);
@@ -59,9 +59,9 @@ void _nmod_poly_tree_free(mp_ptr * tree, long len)
 }
 
 void
-_nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, long len, nmod_t mod)
+_nmod_poly_tree_build(mp_ptr * tree, mp_srcptr roots, len_t len, nmod_t mod)
 {
-    long height, pow, left, i;
+    len_t height, pow, left, i;
     mp_ptr pa, pb;
 
     if (len == 0)

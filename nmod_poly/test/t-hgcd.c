@@ -67,8 +67,8 @@ main(void)
         nmod_poly_t a, b, c, d, c1, d1, s, t;
 
         mp_ptr M[4];
-        long lenM[4];
-        long sgnM;
+        len_t lenM[4];
+        len_t sgnM;
 
         mp_limb_t n = n_randprime(state, FLINT_BITS, 0);
 

@@ -36,7 +36,7 @@
 
 void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
 {
-    const long n = mat->r;
+    const len_t n = mat->r;
 
     if (n == 0)
     {
@@ -49,7 +49,7 @@ void _fmpz_mat_charpoly(fmpz *cp, const fmpz_mat_t mat)
     }
     else
     {
-        long i, j, k, t;
+        len_t i, j, k, t;
         fmpz *a, *A, *s;
 
         a = _fmpz_vec_init(n * n);

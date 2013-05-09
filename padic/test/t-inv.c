@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, d;
@@ -88,11 +88,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, d;
-        long v;
+        len_t v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
@@ -110,7 +110,7 @@ main(void)
 
         if (-v < N) /* Otherwise, no precision left */
         {
-            long N2 = N - FLINT_ABS(v);
+            len_t N2 = N - FLINT_ABS(v);
 
             padic_prec(d) = N2;
 
@@ -142,7 +142,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, d;
@@ -182,11 +182,11 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, d;
-        long v;
+        len_t v;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
 
@@ -204,7 +204,7 @@ main(void)
 
         if (-v < N) /* Otherwise, no precision left */
         {
-            long N2 = N - FLINT_ABS(v);
+            len_t N2 = N - FLINT_ABS(v);
 
             padic_prec(d) = N2;
 

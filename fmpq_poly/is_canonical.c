@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, long len)
+int _fmpq_poly_is_canonical(const fmpz * poly, const fmpz_t den, len_t len)
 {
     if (len)
     {

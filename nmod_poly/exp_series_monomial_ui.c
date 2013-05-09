@@ -31,9 +31,9 @@
 
 void
 _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
-                                        long n, nmod_t mod)
+                                        len_t n, nmod_t mod)
 {
-    long k, r;
+    len_t k, r;
     mp_limb_t rfac;
     mp_limb_t a;
 
@@ -76,7 +76,7 @@ _nmod_poly_exp_series_monomial_ui(mp_ptr res, mp_limb_t coeff, ulong power,
 
 void
 nmod_poly_exp_series_monomial_ui(nmod_poly_t res, mp_limb_t coeff,
-                                    ulong power, long n)
+                                    ulong power, len_t n)
 {
     if (n == 0)
     {

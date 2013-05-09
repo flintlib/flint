@@ -30,7 +30,7 @@
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p) 
 {
-    long i, r, m;
+    len_t i, r, m;
     mp_limb_t p1, k, b, g, bpow, gpow, res;
     mp_limb_t pinv;
 

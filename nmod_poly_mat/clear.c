@@ -32,7 +32,7 @@ nmod_poly_mat_clear(nmod_poly_mat_t A)
 {
     if (A->entries)
     {
-        long i;
+        len_t i;
 
         for (i = 0; i < A->r * A->c; i++)
             nmod_poly_clear(A->entries + i);

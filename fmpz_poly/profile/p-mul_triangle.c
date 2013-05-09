@@ -61,8 +61,8 @@
 #define bitshi   67108864
 #define bitsh    2
 #define cutoff   22000000000L
-#define cols     ((long)(log((double)lenhi/(double)lenlo)/log(lenh) + 1.5))
-#define rows     ((long)(log((double)bitshi/(double)bitslo)/log(bitsh) + 1.5))
+#define cols     ((len_t)(log((double)lenhi/(double)lenlo)/log(lenh) + 1.5))
+#define rows     ((len_t)(log((double)bitshi/(double)bitslo)/log(bitsh) + 1.5))
 #define cpumin   100
 #define ncases   1
 #define nalgs    2
@@ -87,7 +87,7 @@ int write_rgb_ppm(const char* file_name, unsigned char* pixels,
 int
 main(void)
 {
-    long i, j, k, len, bits;
+    len_t i, j, k, len, bits;
     int X[rows][cols];
     double T[rows][cols][nalgs];
     fmpz_poly_t f, g, h;
@@ -101,7 +101,7 @@ main(void)
     
     for (len = lenlo, j = 0; len <= lenhi; len *= lenh, j++)
     {
-        long s[nalgs], sum;
+        len_t s[nalgs], sum;
         
         for (bits = bitslo, i = 0; bits <= bitshi; bits *= bitsh, i++)
         {
@@ -120,7 +120,7 @@ main(void)
                        Construct random polynomials f and g
                      */
                     {
-                        long k;
+                        len_t k;
                         for (k = 0; k < len; k++)
                         {
                             fmpz_randbits(f->coeffs + k, state, bits);

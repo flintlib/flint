@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, long len)
+void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, len_t len)
 {
     if (len > poly->alloc)
     {

@@ -34,7 +34,7 @@
 #define LU(ii,jj) fmpz_mat_entry(FFLU,(ii),(jj))
 
 void
-fmpz_mat_set_perm(fmpz_mat_t X, const long * perm, const fmpz_mat_t B)
+fmpz_mat_set_perm(fmpz_mat_t X, const len_t * perm, const fmpz_mat_t B)
 {
     if (X == B)
     {
@@ -43,7 +43,7 @@ fmpz_mat_set_perm(fmpz_mat_t X, const long * perm, const fmpz_mat_t B)
     }
     else
     {
-        long i, j;
+        len_t i, j;
 
         if (perm == NULL)
             abort();
@@ -57,11 +57,11 @@ fmpz_mat_set_perm(fmpz_mat_t X, const long * perm, const fmpz_mat_t B)
 
 void
 fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
-                    const long * perm,
+                    const len_t * perm,
                     const fmpz_mat_t FFLU, const fmpz_mat_t B)
 {
     fmpz_t T;
-    long i, j, k, m, n;
+    len_t i, j, k, m, n;
 
     n = X->r;
     m = X->c;

@@ -34,7 +34,7 @@
 void
 nmod_mat_print_pretty(const nmod_mat_t mat)
 {
-    long i, j;
+    len_t i, j;
     int width;
     char fmt[FLINT_BITS + 5];
 

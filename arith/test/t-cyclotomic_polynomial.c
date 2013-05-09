@@ -35,7 +35,7 @@
 void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 {
     fmpz_poly_t t;
-    long d;
+    len_t d;
 
     fmpz_poly_init(t);
 
@@ -74,7 +74,7 @@ void cyclotomic_naive(fmpz_poly_t poly, ulong n)
 int main()
 {
     fmpz_poly_t A, B;
-    long n;
+    len_t n;
 
     printf("cyclotomic_polynomial....");
     fflush(stdout);

@@ -31,7 +31,7 @@
 
 void
 _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, long n)
+                           const fmpz * h, const fmpz_t hden, len_t n)
 {
     fmpz * t;
     fmpz_t tden;
@@ -50,7 +50,7 @@ _fmpq_poly_sinh_series(fmpz * g, fmpz_t gden,
     fmpz_clear(tden);
 }
 
-void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
+void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, len_t n)
 {
     fmpz *copy;
     int alloc;
@@ -80,7 +80,7 @@ void fmpq_poly_sinh_series(fmpq_poly_t res, const fmpq_poly_t poly, long n)
     }
     else
     {
-        long i;
+        len_t i;
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];

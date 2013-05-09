@@ -35,7 +35,7 @@
 
 int main(void)
 {
-    long k;
+    len_t k;
     flint_rand_t state;
 
     printf("zeta_ui_bsplit....");
@@ -45,7 +45,7 @@ int main(void)
 
     for (k = 0; k < 100; k++)
     {
-        long prec, n;
+        len_t prec, n;
         mpfr_t x, y;
 
         n = 2 + n_randint(state, 20);

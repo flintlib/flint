@@ -34,7 +34,7 @@
 
 void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
 {
-    long n = mat->r;
+    len_t n = mat->r;
 
     if (n == 0)
     {
@@ -60,7 +60,7 @@ void fmpq_mat_det(fmpq_t det, const fmpq_mat_t mat)
     {
         fmpz_mat_t num;
         fmpz * den;
-        long i;
+        len_t i;
 
         fmpz_mat_init(num, mat->r, mat->c);
         den = _fmpz_vec_init(mat->r);

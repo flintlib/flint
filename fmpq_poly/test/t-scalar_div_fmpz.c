@@ -84,7 +84,7 @@ main(void)
     {
         fmpq_poly_t a, b, c;
         fmpz_t n1;
-        long n;
+        len_t n;
 
         n = z_randtest_not_zero(state);
         fmpz_init(n1);

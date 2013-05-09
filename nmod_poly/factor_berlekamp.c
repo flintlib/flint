@@ -34,9 +34,9 @@
 #include "perm.h"
 
 static void
-nmod_poly_to_nmod_mat_col(nmod_mat_t mat, long col, nmod_poly_t poly)
+nmod_poly_to_nmod_mat_col(nmod_mat_t mat, len_t col, nmod_poly_t poly)
 {
-    long i;
+    len_t i;
 
     for (i = 0; i < poly->length; i++)
         nmod_mat_entry(mat, i, col) = poly->coeffs[i];
@@ -47,9 +47,9 @@ nmod_poly_to_nmod_mat_col(nmod_mat_t mat, long col, nmod_poly_t poly)
 
 static void
 nmod_mat_col_to_nmod_poly_shifted(nmod_poly_t poly, nmod_mat_t mat,
-                                            long col, long * shift)
+                                            len_t col, len_t * shift)
 {
-    long i, j, rows = mat->r;
+    len_t i, j, rows = mat->r;
 
     nmod_poly_fit_length(poly, rows);
 
@@ -73,7 +73,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     flint_rand_t state, const nmod_poly_t f)
 {
     const mp_limb_t p = nmod_poly_modulus(f);
-    const long n      = nmod_poly_degree(f);
+    const len_t n      = nmod_poly_degree(f);
 
     nmod_poly_factor_t fac1, fac2;
     nmod_poly_t x, x_p;
@@ -81,7 +81,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
     nmod_poly_t Q;
     nmod_mat_t matrix;
     mp_limb_t coeff;
-    long i, nullity, col, row, *shift;
+    len_t i, nullity, col, row, *shift;
     nmod_poly_t *basis;
 
     if (f->length <= 2)
@@ -126,7 +126,7 @@ __nmod_poly_factor_berlekamp(nmod_poly_factor_t factors,
 
     /* Find a basis for the nullspace */
     basis = (nmod_poly_t *) flint_malloc(nullity * sizeof(nmod_poly_t));
-    shift = (long *) flint_calloc(n, sizeof(long));
+    shift = (len_t *) flint_calloc(n, sizeof(len_t));
 
     col = 1;  /* first column is always zero */
     row = 0;

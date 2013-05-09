@@ -37,9 +37,9 @@ int main(void)
     flint_rand_t state;
     fmpz * b1;
     fmpz * b2;
-    long n, k;
+    len_t n, k;
 
-    const long maxn = 400;
+    const len_t maxn = 400;
 
     printf("bell_number....");
     fflush(stdout);

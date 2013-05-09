@@ -31,10 +31,10 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_rem(fmpz * R, fmpz_t r, 
-                    const fmpz * A, const fmpz_t a, long lenA, 
-                    const fmpz * B, const fmpz_t b, long lenB)
+                    const fmpz * A, const fmpz_t a, len_t lenA, 
+                    const fmpz * B, const fmpz_t b, len_t lenB)
 {
-    long lenR;
+    len_t lenR;
     ulong d;
     const fmpz * lead = B + (lenB - 1);
     
@@ -90,7 +90,7 @@ void _fmpq_poly_rem(fmpz * R, fmpz_t r,
 void fmpq_poly_rem(fmpq_poly_t R, 
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    long lenA, lenB, lenR;
+    len_t lenA, lenB, lenR;
 
     if (fmpq_poly_is_zero(poly2))
     {

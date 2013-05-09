@@ -28,7 +28,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int fmpz_divisible_si(const fmpz_t x, long p)
+int fmpz_divisible_si(const fmpz_t x, len_t p)
 {
     fmpz y = *x;
 

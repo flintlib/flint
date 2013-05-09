@@ -33,7 +33,7 @@
 int
 fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat)
 {
-    long i, j;
+    len_t i, j;
     
     for (i = 0; i < mat->r; i++)
     {

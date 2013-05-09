@@ -81,7 +81,7 @@ main(void)
     
     for (len1 = len1lo, j = 0; len1 <= len1hi; len1 += len1h, j++)
     {
-        long s[nalgs];
+        len_t s[nalgs];
         
         for (len2 = len2lo, i = 0; len2 <= len2hi; len2 += len2h, i++)
         {
@@ -99,7 +99,7 @@ main(void)
                    Construct random polynomials f and g
                  */
                 {
-                    long k;
+                    len_t k;
                     for (k = 0; k < len1; k++)
                         fmpz_randbits(f->coeffs + k, state, bits);
                     if ((f->coeffs)[len1-1] == 0L)
@@ -107,7 +107,7 @@ main(void)
                     f->length = len1;
                 }
                 {
-                    long k;
+                    len_t k;
                     for (k = 0; k < len2; k++)
                         fmpz_randbits(g->coeffs + k, state, bits);
                     if ((g->coeffs)[len2-1] == 0L)

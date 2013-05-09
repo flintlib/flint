@@ -30,7 +30,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
+void fmpq_poly_realloc(fmpq_poly_t poly, len_t alloc)
 {
     if (alloc == 0)  /* Clear up, reinitialise */
     {
@@ -43,7 +43,7 @@ void fmpq_poly_realloc(fmpq_poly_t poly, long alloc)
     {
         if (poly->length > alloc)  /* Reduce the size */
         {
-            long i;
+            len_t i;
             for (i = alloc; i < poly->length; i++)
                 _fmpz_demote(poly->coeffs + i);
             poly->length = alloc;

@@ -32,7 +32,7 @@
 void
 nmod_mat_zero(nmod_mat_t mat)
 {
-    long i, m, n;
+    len_t i, m, n;
 
     m = mat->r;
     n = mat->c;

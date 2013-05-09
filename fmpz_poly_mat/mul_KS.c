@@ -33,10 +33,10 @@ void
 fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     const fmpz_poly_mat_t B)
 {
-    long i, j;
-    long A_len, B_len;
+    len_t i, j;
+    len_t A_len, B_len;
     int signs;
-    long A_bits, B_bits, bit_size;
+    len_t A_bits, B_bits, bit_size;
 
     fmpz_mat_t AA, BB, CC;
 

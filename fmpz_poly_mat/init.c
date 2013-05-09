@@ -29,11 +29,11 @@
 #include "fmpz_poly_mat.h"
 
 void
-fmpz_poly_mat_init(fmpz_poly_mat_t A, long rows, long cols)
+fmpz_poly_mat_init(fmpz_poly_mat_t A, len_t rows, len_t cols)
 {
     if (rows && cols)
     {
-        long i;
+        len_t i;
 
         A->entries = (fmpz_poly_struct *) flint_malloc(rows * cols * sizeof(fmpz_poly_struct));
         A->rows = (fmpz_poly_struct **) flint_malloc(rows * sizeof(fmpz_poly_struct *));

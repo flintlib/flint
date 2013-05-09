@@ -28,13 +28,13 @@
 #include "ulong_extras.h"
 #include "qsieve.h"
 
-prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, long num_primes)
+prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, len_t num_primes)
 {
     mp_limb_t p, nmod, nmod2;
     mp_limb_t pinv;
     mp_limb_t k = qs_inf->k;
-    long num = qs_inf->num_primes;
-    long fb_prime = 2;
+    len_t num = qs_inf->num_primes;
+    len_t fb_prime = 2;
     prime_t * factor_base;
     int * sqrts;
     int kron;
@@ -105,8 +105,8 @@ prime_t * compute_factor_base(mp_limb_t * small_factor, qs_t qs_inf, long num_pr
 
 mp_limb_t qsieve_ll_primes_init(qs_t qs_inf)
 {
-    long num_primes;
-    long i, s, min, fact, span;
+    len_t num_primes;
+    len_t i, s, min, fact, span;
     mp_limb_t fact_approx;
     fmpz_t temp;
     mp_limb_t k = qs_inf->k;
@@ -165,7 +165,7 @@ mp_limb_t qsieve_ll_primes_init(qs_t qs_inf)
         if (min + span <= num_primes - 2) /* we have enough primes */
             break;
 
-        num_primes = (long) (1.1 * (double) num_primes);
+        num_primes = (len_t) (1.1 * (double) num_primes);
         factor_base = compute_factor_base(&small_factor, qs_inf, num_primes); /* increase size of FB */
         if (small_factor)
             return small_factor;

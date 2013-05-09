@@ -35,10 +35,10 @@
 #include "nmod_poly.h"
 
 void
-arith_number_of_partitions_vec(fmpz * res, long len)
+arith_number_of_partitions_vec(fmpz * res, len_t len)
 {
     fmpz * tmp;
-    long k, n;
+    len_t k, n;
 
     if (len < 1)
         return;

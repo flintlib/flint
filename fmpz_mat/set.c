@@ -35,7 +35,7 @@ fmpz_mat_set(fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
     if (mat1 != mat2)
     {
-        long i;
+        len_t i;
 
         if (mat2->r && mat2->c)
             for (i = 0; i < mat2->r; i++)

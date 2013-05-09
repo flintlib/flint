@@ -28,18 +28,18 @@
 #include "nmod_vec.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, long len, long k)
+void _nmod_poly_shift_right(mp_ptr res, mp_srcptr poly, len_t len, len_t k)
 {
     flint_mpn_copyi(res, poly + k, len);
 }
 
-void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, long k)
+void nmod_poly_shift_right(nmod_poly_t res, const nmod_poly_t poly, len_t k)
 {
     if (k >= poly->length) /* shift all coeffs out */
         res->length = 0;
     else
     {
-        const long len = poly->length - k;
+        const len_t len = poly->length - k;
         nmod_poly_fit_length(res, len);
 
         _nmod_poly_shift_right(res->coeffs, poly->coeffs, len, k);

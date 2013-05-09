@@ -32,7 +32,7 @@
 #include "longlong.h"
 
 
-void arith_landau_function_vec(fmpz * res, long len)
+void arith_landau_function_vec(fmpz * res, len_t len)
 {
     mp_limb_t p, pmax;
     mp_limb_t pk, pkhi;

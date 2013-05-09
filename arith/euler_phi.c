@@ -37,7 +37,7 @@ void arith_euler_phi(fmpz_t res, const fmpz_t n)
     fmpz_factor_t factors;
     fmpz_t t;
     ulong exp;
-    long i;
+    len_t i;
 
     if (fmpz_sgn(n) <= 0)
     {

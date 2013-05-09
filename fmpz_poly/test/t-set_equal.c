@@ -69,7 +69,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
-        long coeff = n_randint(state, 100);
+        len_t coeff = n_randint(state, 100);
         fmpz_t x1, x2;
 
         fmpz_init(x1);

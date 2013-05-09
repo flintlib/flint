@@ -42,11 +42,11 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
-        long e;
+        len_t e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -88,11 +88,11 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long N;
+        len_t N;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
-        long j, e;
+        len_t j, e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -136,12 +136,12 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long N, N2;
+        len_t N, N2;
         padic_ctx_t ctx;
 
         padic_t a, b, c;
         fmpq_t s, t;
-        long e;
+        len_t e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 
@@ -194,11 +194,11 @@ main(void)
     for (i = 0; i < 2000; i++)
     {
         fmpz_t p;
-        long N_lo, N_hi, N_res;
+        len_t N_lo, N_hi, N_res;
         padic_ctx_t ctx;
 
         padic_t a, b, c, d, t;
-        long e;
+        len_t e;
 
         fmpz_init_set_ui(p, n_randtest_prime(state, 0));
         N_lo = n_randint(state, PADIC_TEST_PREC_MAX - PADIC_TEST_PREC_MIN) 

@@ -40,7 +40,7 @@ fmpz_mod_poly_factor_set(fmpz_mod_poly_factor_t res,
         }
         else
         {
-            long i;
+            len_t i;
 
             fmpz_mod_poly_factor_fit_length(res, fac->num);
             for (i = 0; i < fac->num; i++)

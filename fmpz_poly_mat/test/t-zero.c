@@ -45,7 +45,7 @@ main(void)
     for (iter = 0; iter < 100 * flint_test_multiplier(); iter++)
     {
         fmpz_poly_mat_t A;
-        long m, n;
+        len_t m, n;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);

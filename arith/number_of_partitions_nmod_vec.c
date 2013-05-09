@@ -36,11 +36,11 @@
 
 
 void
-arith_number_of_partitions_nmod_vec(mp_ptr res, long len, nmod_t mod)
+arith_number_of_partitions_nmod_vec(mp_ptr res, len_t len, nmod_t mod)
 {
     mp_ptr tmp;
     mp_limb_t r;
-    long k, n;
+    len_t k, n;
 
     r = mod.n - 1UL;
 

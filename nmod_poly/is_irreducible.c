@@ -53,7 +53,7 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
     if (nmod_poly_length(f) > 2)
     {
         const mp_limb_t p = nmod_poly_modulus(f);
-        const long n      = nmod_poly_degree(f);
+        const len_t n      = nmod_poly_degree(f);
         nmod_poly_t a, x, x_p;
 
         nmod_poly_init(a, p);
@@ -77,7 +77,7 @@ nmod_poly_is_irreducible(const nmod_poly_t f)
         else
         {
             n_factor_t factors;
-            long i;
+            len_t i;
 
             n_factor_init(&factors);
             n_factor(&factors, n, 1);

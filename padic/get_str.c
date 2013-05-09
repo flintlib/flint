@@ -31,7 +31,7 @@
 char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *u = padic_unit(op);
-    const long v  = padic_val(op);
+    const len_t v  = padic_val(op);
     const fmpz *p = ctx->p;
 
     if (fmpz_is_zero(u))
@@ -76,13 +76,13 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
         char *s;
         fmpz_t x;
         fmpz_t d;
-        long j, N;
+        len_t j, N;
 
         N = fmpz_clog(u, p) + v;
 
         if (!str)
         {
-            long b = (N - v) * (2 * fmpz_sizeinbase(p, 10) 
+            len_t b = (N - v) * (2 * fmpz_sizeinbase(p, 10) 
                      + z_sizeinbase(FLINT_MAX(FLINT_ABS(v), FLINT_ABS(N)), 10) 
                      + 5) + 1;
 
@@ -171,7 +171,7 @@ char * padic_get_str(char *str, const padic_t op, const padic_ctx_t ctx)
     {
         if (!str)
         {
-            long b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(p, 10) 
+            len_t b = fmpz_sizeinbase(u, 10) + fmpz_sizeinbase(p, 10) 
                    + z_sizeinbase(v, 10) + 4;
 
             str = flint_malloc(b);

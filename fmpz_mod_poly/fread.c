@@ -32,7 +32,7 @@
 
 int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
 {
-    long i, length;
+    len_t i, length;
     fmpz_t coeff;
     unsigned long res;
 

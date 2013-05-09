@@ -32,7 +32,7 @@
 void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    long dim, m, n, k;
+    len_t dim, m, n, k;
 
     m = A->r;
     n = A->c;
@@ -60,7 +60,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
     else
     {
-        long ab, bb, bits;
+        len_t ab, bb, bits;
 
         ab = fmpz_mat_max_bits(A);
         bb = fmpz_mat_max_bits(B);

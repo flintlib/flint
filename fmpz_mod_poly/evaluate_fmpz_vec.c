@@ -33,7 +33,7 @@
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs, 
-                        long len, const fmpz * xs, long n, const fmpz_t mod)
+                        len_t len, const fmpz * xs, len_t n, const fmpz_t mod)
 {
     if (len < 32)
         _fmpz_mod_poly_evaluate_fmpz_vec_iter(ys, coeffs, len, xs, n, mod);
@@ -43,7 +43,7 @@ _fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys, const fmpz * coeffs,
 
 void
 fmpz_mod_poly_evaluate_fmpz_vec(fmpz * ys,
-        const fmpz_mod_poly_t poly, const fmpz * xs, long n)
+        const fmpz_mod_poly_t poly, const fmpz * xs, len_t n)
 {
     _fmpz_mod_poly_evaluate_fmpz_vec(ys, poly->coeffs,
                                         poly->length, xs, n, &(poly->p));

@@ -29,7 +29,7 @@
 
 static void
 _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T, 
-                         const fmpz_t x, long a, long b)
+                         const fmpz_t x, len_t a, len_t b)
 {
     if (b - a == 1)
     {
@@ -47,7 +47,7 @@ _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
     }
     else
     {
-        const long m = (a + b) / 2;
+        const len_t m = (a + b) / 2;
 
         fmpz_t RP, RB, RT;
 
@@ -84,10 +84,10 @@ _padic_log_bsplit_series(fmpz_t P, fmpz_t B, fmpz_t T,
  */
 
 static void 
-_padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+_padic_log_bsplit(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
 {
     fmpz_t P, B, T;
-    long k, n;
+    len_t k, n;
 
     n = _padic_log_bound(v, N, p);
     n = FLINT_MAX(n, 2);
@@ -111,10 +111,10 @@ _padic_log_bsplit(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 }
 
 void 
-_padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
+_padic_log_balanced(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
 {
     fmpz_t pv, pN, r, t, u;
-    long w;
+    len_t w;
     padic_inv_t S;
 
     fmpz_init(pv);
@@ -166,7 +166,7 @@ _padic_log_balanced(fmpz_t z, const fmpz_t y, long v, const fmpz_t p, long N)
 int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
-    const long N  = padic_prec(rop);
+    const len_t N  = padic_prec(rop);
 
     if (padic_val(op) < 0)
     {
@@ -191,7 +191,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
         else
         {
             fmpz_t t;
-            long v;
+            len_t v;
 
             fmpz_init(t);
             v = fmpz_remove(t, x, p);

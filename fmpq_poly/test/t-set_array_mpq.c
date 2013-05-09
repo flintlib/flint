@@ -46,7 +46,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        long j, n = 100;
+        len_t j, n = 100;
         fmpq_poly_t f, g;
         mpq_t * a;
 

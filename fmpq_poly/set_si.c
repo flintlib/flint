@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_si(fmpq_poly_t poly, long x)
+void fmpq_poly_set_si(fmpq_poly_t poly, len_t x)
 {
     fmpq_poly_fit_length(poly, 1);
     fmpz_set_si(poly->coeffs, x);

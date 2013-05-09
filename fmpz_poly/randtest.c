@@ -33,7 +33,7 @@
 
 void
 fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state, 
-                   long len, mp_bitcnt_t bits)
+                   len_t len, mp_bitcnt_t bits)
 {
     fmpz_poly_fit_length(f, len);
     _fmpz_vec_randtest(f->coeffs, state, len, bits);
@@ -43,7 +43,7 @@ fmpz_poly_randtest(fmpz_poly_t f, flint_rand_t state,
 
 void
 fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state, 
-                            long len, mp_bitcnt_t bits)
+                            len_t len, mp_bitcnt_t bits)
 {
     fmpz_poly_fit_length(f, len);
     _fmpz_vec_randtest_unsigned(f->coeffs, state, len, bits);
@@ -53,7 +53,7 @@ fmpz_poly_randtest_unsigned(fmpz_poly_t f, flint_rand_t state,
 
 void
 fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state, 
-                            long len, mp_bitcnt_t bits)
+                            len_t len, mp_bitcnt_t bits)
 {
     if ((bits == 0) || (len == 0))
     {

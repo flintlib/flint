@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, long n)
+_fmpz_poly_taylor_shift(fmpz * poly, const fmpz_t c, len_t n)
 {
     if (n <= 256)
         _fmpz_poly_taylor_shift_horner(poly, c, n);

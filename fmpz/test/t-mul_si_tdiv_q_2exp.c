@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_t a, b;
         mpz_t d, e, f;
-        long x;
+        len_t x;
         ulong exp;
 
         fmpz_init(a);
@@ -90,7 +90,7 @@ main(void)
     {
         fmpz_t a;
         mpz_t d, e, f;
-        long x;
+        len_t x;
         ulong exp;
 
         fmpz_init(a);

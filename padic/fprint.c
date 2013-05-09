@@ -27,7 +27,7 @@
 
 #include "padic.h"
 
-int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
+int _padic_fprint(FILE * file, const fmpz_t u, len_t v, const padic_ctx_t ctx)
 {
     const fmpz *p = ctx->p;
 
@@ -67,7 +67,7 @@ int _padic_fprint(FILE * file, const fmpz_t u, long v, const padic_ctx_t ctx)
     {
         fmpz_t x;
         fmpz_t d;
-        long j;
+        len_t j;
 
         fmpz_init(d);
         fmpz_init(x);

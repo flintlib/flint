@@ -33,8 +33,8 @@
 
 static 
 void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
-                                   mp_srcptr A, long lenA, 
-                                   mp_srcptr B, long lenB, nmod_t mod)
+                                   mp_srcptr A, len_t lenA, 
+                                   mp_srcptr B, len_t lenB, nmod_t mod)
 {
     if (lenA < 2 * lenB - 1)
     {
@@ -42,8 +42,8 @@ void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
            Convert unbalanced division into a 2 n1 - 1 by n1 division
          */
 
-        const long n1 = lenA - lenB + 1;
-        const long n2 = lenB - n1;
+        const len_t n1 = lenA - lenB + 1;
+        const len_t n2 = lenB - n1;
 
         mp_srcptr p1 = A + n2;
         mp_srcptr d1 = B + n2;
@@ -90,8 +90,8 @@ void __nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
 }
 
 void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R, 
-                                  mp_srcptr A, long lenA, 
-                                  mp_srcptr B, long lenB, nmod_t mod)
+                                  mp_srcptr A, len_t lenA, 
+                                  mp_srcptr B, len_t lenB, nmod_t mod)
 {
     if (lenA <= 2 * lenB - 1)
     {
@@ -99,7 +99,7 @@ void _nmod_poly_divrem_divconquer(mp_ptr Q, mp_ptr R,
     }
     else  /* lenA > 2 * lenB - 1 */
     {
-        long shift, n = 2 * lenB - 1;
+        len_t shift, n = 2 * lenB - 1;
         mp_ptr S, QB, W, V, T;
 
         S = _nmod_vec_init(lenA + 2 * (lenB - 1) + n + NMOD_DIVREM_DC_ITCH(lenB, mod));
@@ -134,7 +134,7 @@ void nmod_poly_divrem_divconquer(nmod_poly_t Q, nmod_poly_t R,
 {
     nmod_poly_t tQ, tR;
     mp_ptr q, r;
-    long lenA, lenB;
+    len_t lenA, lenB;
 
     lenA = A->length;
     lenB = B->length;

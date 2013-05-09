@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-fmpz_poly_realloc(fmpz_poly_t poly, long alloc)
+fmpz_poly_realloc(fmpz_poly_t poly, len_t alloc)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {

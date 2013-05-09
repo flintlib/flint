@@ -35,12 +35,12 @@
  */
 
 void
-_nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1, 
-                                                 mp_srcptr poly2, long len2, 
-                                                 long N, nmod_t mod)
+_nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, len_t len1, 
+                                                 mp_srcptr poly2, len_t len2, 
+                                                 len_t N, nmod_t mod)
 {
-    long i, j, k, n;
-    long *hlen, alloc, powlen;
+    len_t i, j, k, n;
+    len_t *hlen, alloc, powlen;
     mp_ptr v, *h, pow, temp;
     
     if (len1 == 1)
@@ -64,15 +64,15 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
 
     /* Initialisation */
     
-    hlen = (long *) flint_malloc(((len1 + 1) / 2) * sizeof(long));
+    hlen = (len_t *) flint_malloc(((len1 + 1) / 2) * sizeof(len_t));
     
     for (k = 1; (2 << k) < len1; k++) ;
     
     hlen[0] = hlen[1] = FLINT_MIN(N, ((1 << k) - 1) * (len2 - 1) + 1);
     for (i = k - 1; i > 0; i--)
     {
-        long hi = (len1 + (1 << i) - 1) / (1 << i);
-        long t  = FLINT_MIN(N, ((1 << i) - 1) * (len2 - 1) + 1);
+        len_t hi = (len1 + (1 << i) - 1) / (1 << i);
+        len_t t  = FLINT_MIN(N, ((1 << i) - 1) * (len2 - 1) + 1);
         for (n = (hi + 1) / 2; n < hi; n++)
             hlen[n] = t;
     }
@@ -126,7 +126,7 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
     {
         if (hlen[1] > 0)
         {
-            long templen = FLINT_MIN(N, powlen + hlen[1] - 1);
+            len_t templen = FLINT_MIN(N, powlen + hlen[1] - 1);
             _nmod_poly_mullow(temp, pow, powlen, h[1], hlen[1], templen, mod);
             _nmod_poly_add(h[0], temp, templen, h[0], hlen[0], mod);
             hlen[0] = FLINT_MAX(hlen[0], templen);
@@ -174,11 +174,11 @@ _nmod_poly_compose_series_divconquer(mp_ptr res, mp_srcptr poly1, long len1,
 
 void 
 nmod_poly_compose_series_divconquer(nmod_poly_t res, 
-    const nmod_poly_t poly1, const nmod_poly_t poly2, long N)
+    const nmod_poly_t poly1, const nmod_poly_t poly2, len_t N)
 {
-    const long len1 = poly1->length;
-    const long len2 = FLINT_MIN(N, poly2->length);
-    long lenr;
+    const len_t len1 = poly1->length;
+    const len_t len2 = FLINT_MIN(N, poly2->length);
+    len_t lenr;
     
     if (len1 == 0 || N == 0)
     {

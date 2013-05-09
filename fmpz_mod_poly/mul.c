@@ -30,8 +30,8 @@
 #include "fmpz_poly.h"
 #include "fmpz_mod_poly.h"
 
-void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, long len1, 
-                                   const fmpz *poly2, long len2, const fmpz_t p)
+void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, len_t len1, 
+                                   const fmpz *poly2, len_t len2, const fmpz_t p)
 {
     _fmpz_poly_mul(res, poly1, len1, poly2, len2);
     _fmpz_vec_scalar_mod_fmpz(res, res, len1 + len2 - 1, p);
@@ -40,9 +40,9 @@ void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, long len1,
 void fmpz_mod_poly_mul(fmpz_mod_poly_t res, 
                        const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    const long lenr = len1 + len2 - 1;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
+    const len_t lenr = len1 + len2 - 1;
 
     if ((len1 == 0) || (len2 == 0))
     {

@@ -35,14 +35,14 @@
 #define CRT_MAX_RESOLUTION 16
 
 void
-arith_bell_number_vec_multi_mod(fmpz * res, long n)
+arith_bell_number_vec_multi_mod(fmpz * res, len_t n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
     mp_ptr primes, residues;
     mp_ptr * polys;
     nmod_t mod;
-    long i, j, k, size, prime_bits, num_primes, num_primes_k, resolution;
+    len_t i, j, k, size, prime_bits, num_primes, num_primes_k, resolution;
 
     if (n < 1)
         return;

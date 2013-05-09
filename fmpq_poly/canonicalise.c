@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, long len)
+void _fmpq_poly_canonicalise(fmpz * poly, fmpz_t den, len_t len)
 {
     if (*den == 1L)
         return;

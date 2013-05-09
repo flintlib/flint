@@ -30,9 +30,9 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, long c)
+fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

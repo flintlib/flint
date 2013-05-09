@@ -31,7 +31,7 @@
 void
 fmpz_poly_mat_det(fmpz_poly_t det, const fmpz_poly_mat_t A)
 {
-    long n = A->r;
+    len_t n = A->r;
 
     if (n == 0)
     {

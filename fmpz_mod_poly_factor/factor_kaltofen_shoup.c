@@ -32,10 +32,10 @@ fmpz_mod_poly_factor_kaltofen_shoup(fmpz_mod_poly_factor_t res,
 {
     fmpz_mod_poly_t v;
     fmpz_mod_poly_factor_t sq_free, dist_deg;
-    long i, j, k, l, res_num, dist_deg_num;
-    long *degs;
+    len_t i, j, k, l, res_num, dist_deg_num;
+    len_t *degs;
 
-    if (!(degs = flint_malloc(fmpz_mod_poly_degree(poly) * sizeof(long))))
+    if (!(degs = flint_malloc(fmpz_mod_poly_degree(poly) * sizeof(len_t))))
     {
         printf("Exception (fmpz_mod_poly_factor_kaltofen_shoup): \n");
         printf("Not enough memory.\n");

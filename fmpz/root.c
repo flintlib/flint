@@ -33,7 +33,7 @@
 #include "fmpz.h"
 
 void
-fmpz_root(fmpz_t r, fmpz_t f, long n)
+fmpz_root(fmpz_t r, fmpz_t f, len_t n)
 {
     fmpz c = *f;
     

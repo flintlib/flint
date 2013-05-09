@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
+_fmpz_poly_rem(fmpz * R, const fmpz * A, len_t lenA, const fmpz * B, len_t lenB)
 {
     if (lenA < 15)
     {
@@ -49,7 +49,7 @@ _fmpz_poly_rem(fmpz * R, const fmpz * A, long lenA, const fmpz * B, long lenB)
 
 void fmpz_poly_rem(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    const long lenA = A->length, lenB = B->length;
+    const len_t lenA = A->length, lenB = B->length;
     fmpz *r;
 
     if (lenB == 0)

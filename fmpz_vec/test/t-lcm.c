@@ -49,7 +49,7 @@ main(void)
     {
         fmpz_t a, c, d;
         fmpz *f;
-        long len = n_randint(state, 100);
+        len_t len = n_randint(state, 100);
 
         fmpz_init(a);
         fmpz_init(c);

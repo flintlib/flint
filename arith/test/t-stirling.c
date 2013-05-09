@@ -41,9 +41,9 @@ int main(void)
     fmpz * row;
     fmpz_t s;
 
-    long n, k, mm, nn;
+    len_t n, k, mm, nn;
 
-    const long maxn = 40;
+    const len_t maxn = 40;
 
     printf("stirling....");
     fflush(stdout);

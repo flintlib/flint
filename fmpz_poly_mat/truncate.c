@@ -29,9 +29,9 @@
 #include "fmpz_poly_mat.h"
 
 void
-fmpz_poly_mat_truncate(fmpz_poly_mat_t A, long len)
+fmpz_poly_mat_truncate(fmpz_poly_mat_t A, len_t len)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < fmpz_poly_mat_nrows(A); i++)
         for (j = 0; j < fmpz_poly_mat_ncols(A); j++)

@@ -32,7 +32,7 @@
 void
 fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

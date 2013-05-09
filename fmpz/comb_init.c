@@ -34,7 +34,7 @@
 
 void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 {
-    long n, i, j;
+    len_t n, i, j;
 
     /* Allocate space for comb_temp */
     temp->n = n = comb->n;
@@ -52,10 +52,10 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 }
 
 void
-fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, long num_primes)
+fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, len_t num_primes)
 {
-    long i, j;
-    long n, num;
+    len_t i, j;
+    len_t n, num;
     ulong log_comb, log_res;
     fmpz_t temp, temp2;
 

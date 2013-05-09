@@ -36,7 +36,7 @@
 
 int main(int argc, char* argv[])
 {
-    long i;
+    len_t i;
     fmpz_t x, y;
 
     /* Data needed by multi CRT functions */
@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     mp_limb_t * primes;
     mp_limb_t * residues;
 
-    long num_primes;
+    len_t num_primes;
 
     if (argc != 3)
     {

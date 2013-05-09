@@ -41,7 +41,7 @@ int main(void)
     /* check inv(inv(a)) == a */
     for (i = 0; i < 10000; i++)
     {
-        long n, *a, *b, *c;
+        len_t n, *a, *b, *c;
         int ap, bp, cp, ap2, bp2, cp2;
 
         n = n_randint(state, 100);

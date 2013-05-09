@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("sqr....");
     fflush(stdout);
@@ -48,7 +48,7 @@ main(void)
         fmpz_poly_mat_t A, C;
         fmpz_mat_t a, c, d;
         fmpz_t x;
-        long m, bits, deg;
+        len_t m, bits, deg;
 
         m = n_randint(state, 20);
         deg = 1 + n_randint(state, 10);
@@ -99,7 +99,7 @@ main(void)
     for (i = 0; i < 1000; i++)
     {
         fmpz_poly_mat_t A, B;
-        long m, bits, deg;
+        len_t m, bits, deg;
 
         m = n_randint(state, 20);
         deg = 1 + n_randint(state, 10);

@@ -32,9 +32,9 @@
 #include "fmpq_mat.h"
 
 int
-fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
+fmpq_mat_pivot(len_t * perm, fmpq_mat_t mat, len_t r, len_t c)
 {
-    long t, j;
+    len_t t, j;
     fmpq * u;
 
     if (!fmpq_is_zero(fmpq_mat_entry(mat, r, c)))

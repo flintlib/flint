@@ -32,7 +32,7 @@
 /*
     Assumes len > 0 and 0 < n <= 2 * len - 1.
  */
-void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, long len, long n)
+void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, len_t len, len_t n)
 {
     if (len == 1 || n == 1)  /* Special case */
     {
@@ -40,7 +40,7 @@ void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, long len, long n)
     }
     else   /* Ordinary case */
     {
-        long i;
+        len_t i;
 
         _fmpz_vec_scalar_mul_fmpz(rop, op, FLINT_MIN(len, n), op);
 
@@ -59,9 +59,9 @@ void _fmpz_poly_sqrlow_classical(fmpz *rop, const fmpz *op, long len, long n)
 }
 
 void
-fmpz_poly_sqrlow_classical(fmpz_poly_t res, const fmpz_poly_t poly, long n)
+fmpz_poly_sqrlow_classical(fmpz_poly_t res, const fmpz_poly_t poly, len_t n)
 {
-    long len = poly->length;
+    len_t len = poly->length;
 
     if (len == 0 || n == 0)
     {

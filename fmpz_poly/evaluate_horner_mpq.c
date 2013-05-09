@@ -30,7 +30,7 @@
 
 void
 _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
-                               const fmpz * f, long len, 
+                               const fmpz * f, len_t len, 
                                const fmpz_t anum, const fmpz_t aden)
 {
     if (len == 0)
@@ -45,7 +45,7 @@ _fmpz_poly_evaluate_horner_mpq(fmpz_t rnum, fmpz_t rden,
     }
     else
     {
-        long i = len - 1;
+        len_t i = len - 1;
         fmpz_t d;
         fmpz_init(d);
         

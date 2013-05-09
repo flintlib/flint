@@ -47,8 +47,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
-        long n;
+        len_t len = n_randint(state, 100);
+        len_t n;
 
         n = z_randtest_not_zero(state);
 
@@ -77,8 +77,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b;
-        long len = n_randint(state, 100);
-        long n;
+        len_t len = n_randint(state, 100);
+        len_t n;
 
         n = z_randtest_not_zero(state);
 

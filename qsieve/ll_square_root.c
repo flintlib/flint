@@ -36,19 +36,19 @@
 #include "fmpz.h"
 
 void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf, 
-   uint64_t * nullrows, long ncols, long l, fmpz_t N)
+   uint64_t * nullrows, len_t ncols, len_t l, fmpz_t N)
 {
-   long position, i, j;
-   long * relation = qs_inf->relation;
+   len_t position, i, j;
+   len_t * relation = qs_inf->relation;
    prime_t * factor_base = qs_inf->factor_base;
-   long * prime_count = qs_inf->prime_count;
-   long num_primes = qs_inf->num_primes;
+   len_t * prime_count = qs_inf->prime_count;
+   len_t num_primes = qs_inf->num_primes;
    fmpz * Y_arr = qs_inf->Y_arr; 
    fmpz_t pow;
 
    fmpz_init(pow);
       
-   memset(prime_count, 0, num_primes*sizeof(long));
+   memset(prime_count, 0, num_primes*sizeof(len_t));
       
    fmpz_one(X);
    fmpz_one(Y);

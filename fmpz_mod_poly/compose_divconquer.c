@@ -41,7 +41,7 @@
  */
 
 void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res, 
-    const fmpz *poly1, long len1, fmpz **pow2, long len2, fmpz *v, 
+    const fmpz *poly1, len_t len1, fmpz **pow2, len_t len2, fmpz *v, 
     const fmpz_t p)
 {
     if (len1 == 1)
@@ -57,7 +57,7 @@ void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res,
     }
     else
     {
-        const long i = FLINT_BIT_COUNT(len1 - 1) - 1;
+        const len_t i = FLINT_BIT_COUNT(len1 - 1) - 1;
         fmpz *w = v + ((1L << i) - 1) * (len2 - 1) + 1;
 
         _fmpz_mod_poly_compose_divconquer_recursive(v, 
@@ -75,8 +75,8 @@ void _fmpz_mod_poly_compose_divconquer_recursive(fmpz *res,
 }
 
 void _fmpz_mod_poly_compose_divconquer(fmpz *res, 
-                                       const fmpz *poly1, long len1, 
-                                       const fmpz *poly2, long len2, 
+                                       const fmpz *poly1, len_t len1, 
+                                       const fmpz *poly2, len_t len2, 
                                        const fmpz_t p)
 {
     if (len1 == 1 || len2 == 0)
@@ -85,10 +85,10 @@ void _fmpz_mod_poly_compose_divconquer(fmpz *res,
     }
     else
     {
-        const long k = FLINT_BIT_COUNT(len1 - 1);
-        const long lenV = len2 * ((1L << k) - 1) + k;
-        const long lenW = (len2 - 1) * ((1L << k) - 2) - (len2 - 2) * (k-1);
-        long i;
+        const len_t k = FLINT_BIT_COUNT(len1 - 1);
+        const len_t lenV = len2 * ((1L << k) - 1) + k;
+        const len_t lenW = (len2 - 1) * ((1L << k) - 2) - (len2 - 2) * (k-1);
+        len_t i;
         fmpz *v, *w, **pow2;
 
         v    = _fmpz_vec_init(lenV + lenW);
@@ -119,8 +119,8 @@ void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res,
                                       const fmpz_mod_poly_t poly1, 
                                       const fmpz_mod_poly_t poly2)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
 
     if (len1 == 0)
     {
@@ -132,7 +132,7 @@ void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res,
     }
     else
     {
-        const long lenr = (len1 - 1) * (len2 - 1) + 1;
+        const len_t lenr = (len1 - 1) * (len2 - 1) + 1;
 
         if ((res != poly1) && (res != poly2))
         {

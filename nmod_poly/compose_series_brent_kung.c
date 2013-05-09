@@ -31,12 +31,12 @@
 #include "ulong_extras.h"
 
 void
-_nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, long len1, 
-                            mp_srcptr poly2, long len2, long n, nmod_t mod)
+_nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, len_t len1, 
+                            mp_srcptr poly2, len_t len2, len_t n, nmod_t mod)
 {
     nmod_mat_t A, B, C;
     mp_ptr t, h;
-    long i, m;
+    len_t i, m;
 
     if (n == 1)
     {
@@ -86,11 +86,11 @@ _nmod_poly_compose_series_brent_kung(mp_ptr res, mp_srcptr poly1, long len1,
 
 void
 nmod_poly_compose_series_brent_kung(nmod_poly_t res, 
-                    const nmod_poly_t poly1, const nmod_poly_t poly2, long n)
+                    const nmod_poly_t poly1, const nmod_poly_t poly2, len_t n)
 {
-    long len1 = poly1->length;
-    long len2 = poly2->length;
-    long lenr;
+    len_t len1 = poly1->length;
+    len_t len2 = poly2->length;
+    len_t lenr;
 
     if (len2 != 0 && poly2->coeffs[0] != 0)
     {

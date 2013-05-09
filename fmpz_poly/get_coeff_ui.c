@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 ulong
-fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, long n)
+fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, len_t n)
 {
     return (n < poly->length) ? fmpz_get_ui(poly->coeffs + n) : 0UL;
 }

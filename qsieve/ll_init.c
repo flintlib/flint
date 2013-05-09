@@ -72,6 +72,6 @@ void qsieve_ll_init(qs_t qs_inf, mp_limb_t hi, mp_limb_t lo)
     qs_inf->A = 0;
 
 #if (QS_DEBUG & 16)
-    qs_inf->sieve_tally = flint_malloc(256*sizeof(long));
+    qs_inf->sieve_tally = flint_malloc(256*sizeof(len_t));
 #endif
 }

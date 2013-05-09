@@ -48,7 +48,7 @@ main(void)
         fmpz_mat_t A, Amod;
         fmpz_t mod;
 
-        long rows, cols;
+        len_t rows, cols;
 
         rows = n_randint(state, 20);
         cols = n_randint(state, 20);

@@ -30,8 +30,8 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden, 
-                          const fmpz *poly1, const fmpz_t den1, long len1, 
-                          const fmpz *poly2, const fmpz_t den2, long len2)
+                          const fmpz *poly1, const fmpz_t den1, len_t len1, 
+                          const fmpz *poly2, const fmpz_t den2, len_t len2)
 {
     if (len2 == 1)
     {
@@ -62,7 +62,7 @@ void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
     {
         fmpz_t c1, c2;
         fmpz *prim1, *prim2, *g;
-        long lenG = len2;
+        len_t lenG = len2;
 
         fmpz_init(c1);
         fmpz_init(c2);
@@ -135,8 +135,8 @@ void _fmpq_poly_resultant(fmpz_t rnum, fmpz_t rden,
 
 void fmpq_poly_resultant(fmpq_t r, const fmpq_poly_t f, const fmpq_poly_t g)
 {
-    const long len1 = f->length;
-    const long len2 = g->length;
+    const len_t len1 = f->length;
+    const len_t len2 = g->length;
 
     if (len1 == 0 || len2 == 0)
     {

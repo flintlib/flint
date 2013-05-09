@@ -27,9 +27,9 @@
 #include "flint.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
+void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, len_t len, len_t m)
 {
-    long i, min;
+    len_t i, min;
     mp_limb_t temp;
       
     if (input != output)
@@ -55,7 +55,7 @@ void _nmod_poly_reverse(mp_ptr output, mp_srcptr input, long len, long m)
     }
 }
 
-void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, long m)
+void nmod_poly_reverse(nmod_poly_t output, const nmod_poly_t input, len_t m)
 {
     nmod_poly_fit_length(output, m);
      

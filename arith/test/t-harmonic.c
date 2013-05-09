@@ -35,7 +35,7 @@
 #include "profiler.h"
 
 
-void numerical_test(fmpq_t res, long n, double ans)
+void numerical_test(fmpq_t res, len_t n, double ans)
 {
     const double tol = 1e-13;
     double err;
@@ -58,9 +58,9 @@ void numerical_test(fmpq_t res, long n, double ans)
 }
 
 void
-mpq_harmonic_balanced(mpq_t res, long a, long b)
+mpq_harmonic_balanced(mpq_t res, len_t a, len_t b)
 {
-    long k;
+    len_t k;
     mpq_t t;
 
     mpq_init(t);
@@ -87,7 +87,7 @@ mpq_harmonic_balanced(mpq_t res, long a, long b)
 
 int main(void)
 {
-    long i;
+    len_t i;
     mpq_t x, y;
     fmpq_t t;
 

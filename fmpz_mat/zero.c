@@ -31,7 +31,7 @@
 void
 fmpz_mat_zero(fmpz_mat_t mat)
 {
-    long i;
+    len_t i;
 
     if (mat->c < 1)
         return;

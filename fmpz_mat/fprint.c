@@ -65,9 +65,9 @@ do {                             \
 int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 {
     int z;
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
+    len_t i, j;
+    len_t r = mat->r;
+    len_t c = mat->c;
 
     xxx_printf();
     for (i = 0; (i < r); i++)
@@ -88,9 +88,9 @@ int fmpz_mat_fprint(FILE * file, const fmpz_mat_t mat)
 int fmpz_mat_fprint_pretty(FILE * file, const fmpz_mat_t mat)
 {
     int z;
-    long i, j;
-    long r = mat->r;
-    long c = mat->c;
+    len_t i, j;
+    len_t r = mat->r;
+    len_t c = mat->c;
 
     xxx_putc('[');
     for (i = 0; i < r; i++)

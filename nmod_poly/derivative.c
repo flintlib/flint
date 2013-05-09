@@ -28,9 +28,9 @@
 #include "ulong_extras.h"
 #include "nmod_poly.h"
 
-void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, long len, nmod_t mod)
+void _nmod_poly_derivative(mp_ptr x_prime, mp_srcptr x, len_t len, nmod_t mod)
 {
-	long j;
+	len_t j;
     mp_limb_t k = 1;
 
 	for (j = 1; j < len; j++)

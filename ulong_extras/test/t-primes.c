@@ -32,7 +32,7 @@
 int main(void)
 {
     flint_rand_t state;
-    long n;
+    len_t n;
 
     printf("primes....");
     fflush(stdout);
@@ -43,7 +43,7 @@ int main(void)
     /* compare with n_nextprime */
     {
         n_primes_t iter;
-        long i;
+        len_t i;
         mp_limb_t p, q;
 
         n_primes_init(iter);

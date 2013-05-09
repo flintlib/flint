@@ -27,11 +27,11 @@
 #include "nmod_poly.h"
 #include "nmod_poly_mat.h"
 
-long
+len_t
 nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
 {
-    long i, j, k, m, n, rank;
-    long *pivots, *nonpivots;
+    len_t i, j, k, m, n, rank;
+    len_t *pivots, *nonpivots;
 
     rank = nmod_poly_mat_fflu(R, den, NULL, A, 0);
     m = nmod_poly_mat_nrows(R);
@@ -49,7 +49,7 @@ nmod_poly_mat_rref(nmod_poly_mat_t R, nmod_poly_t den, const nmod_poly_mat_t A)
         nmod_poly_init(tmp, nmod_poly_mat_modulus(R));
         nmod_poly_init(tmp2, nmod_poly_mat_modulus(R));
 
-        pivots = flint_malloc(sizeof(long) * n);
+        pivots = flint_malloc(sizeof(len_t) * n);
         nonpivots = pivots + rank;
 
         /* find pivot positions */

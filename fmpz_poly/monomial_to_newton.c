@@ -29,9 +29,9 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, long n)
+_fmpz_poly_monomial_to_newton(fmpz * poly, const fmpz * roots, len_t n)
 {
-    long i, j;
+    len_t i, j;
 
     for (i = 0; i < n - 1; i++)
         for (j = n - 2; j >= i; j--)

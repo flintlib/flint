@@ -36,13 +36,13 @@ or implied, of William Hart.
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, long depth, 
-                              long limbs, long trunc, mp_limb_t ** t1, 
+void fft_convolution(mp_limb_t ** ii, mp_limb_t ** jj, len_t depth, 
+                              len_t limbs, len_t trunc, mp_limb_t ** t1, 
                           mp_limb_t ** t2, mp_limb_t ** s1, mp_limb_t * tt)
 {
-   long n = (1L<<depth), j;
-   long w = (limbs*FLINT_BITS)/n;
-   long sqrt = (1L<<(depth/2));
+   len_t n = (1L<<depth), j;
+   len_t w = (limbs*FLINT_BITS)/n;
+   len_t sqrt = (1L<<(depth/2));
    
    if (depth <= 6)
    {

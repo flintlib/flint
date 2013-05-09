@@ -37,7 +37,7 @@ void nmod_poly_factor_set(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
         }
         else
         {
-            long i;
+            len_t i;
 
             nmod_poly_factor_fit_length(res, fac->num);
             for (i = 0; i < fac->num; i++)

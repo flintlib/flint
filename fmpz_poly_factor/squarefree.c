@@ -57,7 +57,7 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, const fmpz_poly_t F)
         else
         {
             fmpz_poly_t v, w, s;
-            long i;
+            len_t i;
 
             fmpz_poly_init(v);
             fmpz_poly_init(w);

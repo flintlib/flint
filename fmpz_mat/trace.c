@@ -31,7 +31,7 @@
 void
 fmpz_mat_trace(fmpz_t trace, const fmpz_mat_t mat)
 {
-    long i, n = fmpz_mat_nrows(mat);
+    len_t i, n = fmpz_mat_nrows(mat);
 
     if (n == 0)
         fmpz_zero(trace);

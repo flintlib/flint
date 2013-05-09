@@ -73,7 +73,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        long coeff = (long) n_randint(state, 100);
+        len_t coeff = (len_t) n_randint(state, 100);
         mpq_t x1, x2;
         fmpz_t x1fmpz;
 

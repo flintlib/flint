@@ -30,11 +30,11 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, long lenR, long k, 
+                    const fmpz *R, len_t lenR, len_t k, 
                     const fmpz_t invL, const fmpz_t p)
 {
-    const long degR = lenR - 1;
-    long i;
+    const len_t degR = lenR - 1;
+    len_t i;
     fmpz_t invLP;
     fmpz *W;
 
@@ -49,8 +49,8 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
 
     for (i = 0; i < k; i++)
     {
-        const long lenQ = (1L << i) * degR;
-        long j;
+        const len_t lenQ = (1L << i) * degR;
+        len_t j;
 
         /* W := rev{Rpow[i], lenQ} */
         for (j = 0; j < lenQ; j++)
@@ -73,9 +73,9 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
 }
 
 void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
-                              const fmpz_mod_poly_t R, long degF)
+                              const fmpz_mod_poly_t R, len_t degF)
 {
-    const long degR = R->length - 1;
+    const len_t degR = R->length - 1;
 
     if (degF < degR)
     {
@@ -84,12 +84,12 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
     }
     else
     {
-        const long N = degF / degR;
-        const long k = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}} */
-        const long lenV = degR * ((1L << k) - 1) + k;
-        const long lenW = degR * ((1L << k) - 1);
+        const len_t N = degF / degR;
+        const len_t k = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}} */
+        const len_t lenV = degR * ((1L << k) - 1) + k;
+        const len_t lenW = degR * ((1L << k) - 1);
 
-        long i;
+        len_t i;
 
         D->V = _fmpz_vec_init(lenV + lenW);
         D->W = D->V + lenV;
@@ -118,10 +118,10 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
 {
     if (D->k)
     {
-        const long degR = D->degR;
-        const long k    = D->k;
-        const long lenV = degR * ((1L << k) - 1) + k;
-        const long lenW = degR * ((1L << k) - 1);
+        const len_t degR = D->degR;
+        const len_t k    = D->k;
+        const len_t lenV = degR * ((1L << k) - 1) + k;
+        const len_t lenW = degR * ((1L << k) - 1);
 
         _fmpz_vec_clear(D->V, lenV + lenW);
         flint_free(D->Rpow);
@@ -131,7 +131,7 @@ void fmpz_mod_poly_radix_clear(fmpz_mod_poly_radix_t D)
 }
 
 void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
-                          long degR, long k, long i, fmpz *W, const fmpz_t p)
+                          len_t degR, len_t k, len_t i, fmpz *W, const fmpz_t p)
 {
     if (i == -1)
     {
@@ -139,7 +139,7 @@ void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv,
     }
     else
     {
-        const long lenQ = (1L << i) * degR;
+        const len_t lenQ = (1L << i) * degR;
 
         fmpz *Frev = W;
         fmpz *Q    = W + lenQ;
@@ -162,10 +162,10 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
                          const fmpz_mod_poly_t F, 
                          const fmpz_mod_poly_radix_t D)
 {
-    const long lenF = F->length;
-    const long degF = F->length - 1;
-    const long degR = D->degR;
-    const long N    = degF / degR;
+    const len_t lenF = F->length;
+    const len_t degF = F->length - 1;
+    const len_t degR = D->degR;
+    const len_t N    = degF / degR;
 
     if (N == 0)
     {
@@ -173,16 +173,16 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B,
     }
     else
     {
-        const long k    = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}}    */
-        const long lenG = (1L << k) * degR;       /* Padded size            */
-        const long t    = (lenG - 1) / degR - N;  /* Extra {degR}-blocks    */
+        const len_t k    = FLINT_BIT_COUNT(N);     /* k := ceil{log{N+1}}    */
+        const len_t lenG = (1L << k) * degR;       /* Padded size            */
+        const len_t t    = (lenG - 1) / degR - N;  /* Extra {degR}-blocks    */
 
         fmpz *G;                                  /* Padded copy of F       */
         fmpz *T;                                  /* Additional B[i]        */
         fmpz **C;                                 /* Enlarged version of B  */
         fmpz *W;                                  /* Temporary space        */
 
-        long i;
+        len_t i;
 
         if (lenF < lenG)
         {

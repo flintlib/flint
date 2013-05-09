@@ -33,7 +33,7 @@ nmod_poly_mat_solve_fflu(nmod_poly_mat_t X, nmod_poly_t den,
                     const nmod_poly_mat_t A, const nmod_poly_mat_t B)
 {
     nmod_poly_mat_t LU;
-    long dim, *perm;
+    len_t dim, *perm;
     int result;
 
     if (nmod_poly_mat_is_empty(B))

@@ -34,9 +34,9 @@
 void
 fmpz_mat_randintrel(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    const long c = mat->c, r = mat->r;
+    const len_t c = mat->c, r = mat->r;
 
-    long i, j;
+    len_t i, j;
 
     if (c != r + 1)
     {

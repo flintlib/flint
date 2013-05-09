@@ -33,8 +33,8 @@
 
 void
 _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden, 
-                  const fmpz * poly1, const fmpz_t den1, long len1, 
-                  const fmpz * poly2, const fmpz_t den2, long len2, long n)
+                  const fmpz * poly1, const fmpz_t den1, len_t len1, 
+                  const fmpz * poly2, const fmpz_t den2, len_t len2, len_t n)
 {
     _fmpz_poly_mullow(rpoly, poly1, len1, poly2, len2, n);
     fmpz_mul(rden, den1, den2);
@@ -42,11 +42,11 @@ _fmpq_poly_mullow(fmpz * rpoly, fmpz_t rden,
 
 void
 fmpq_poly_mullow(fmpq_poly_t res,
-                 const fmpq_poly_t poly1, const fmpq_poly_t poly2, long n)
+                 const fmpq_poly_t poly1, const fmpq_poly_t poly2, len_t n)
 {
-    const long len1 = poly1->length;
-    const long len2 = poly2->length;
-    long lenr;
+    const len_t len1 = poly1->length;
+    const len_t len2 = poly2->length;
+    len_t lenr;
 
     if (len1 == 0 || len2 == 0 || n == 0)
     {

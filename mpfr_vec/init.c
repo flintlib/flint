@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 __mpfr_struct *
-_mpfr_vec_init(long length, mp_bitcnt_t prec)
+_mpfr_vec_init(len_t length, mp_bitcnt_t prec)
 {
-    long i;
+    len_t i;
 
     __mpfr_struct *vec =
         (__mpfr_struct *) flint_malloc(length * sizeof(__mpfr_struct));

@@ -34,7 +34,7 @@ n_primes_extend_small(n_primes_t iter, mp_limb_t bound)
     while (iter->small_primes[iter->small_num - 2] < bound)
     {
         n_primes_t iter2;
-        long i, num;
+        len_t i, num;
 
         num = iter->small_num * 2;
 

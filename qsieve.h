@@ -67,15 +67,15 @@ typedef struct prime_t
 
 typedef struct fac_t /* struct for factors of relations */
 {
-   long ind;
-   long exp;
+   len_t ind;
+   len_t exp;
 } fac_t;
 
 typedef struct la_col_t /* matrix column */
 {
-	long * data;		/* The list of occupied rows in this column */
-	long weight;		/* Number of nonzero entries in this column */
-	long orig;         /* Original relation number */
+	len_t * data;		/* The list of occupied rows in this column */
+	len_t weight;		/* Number of nonzero entries in this column */
+	len_t orig;         /* Original relation number */
 } la_col_t;
 
 typedef struct qs_s
@@ -90,9 +90,9 @@ typedef struct qs_s
    mp_limb_t k; /* Multiplier */
    fmpz_t kn; /* kn as a multiprecision integer */
 
-   long num_primes; /* number of factor base primes including k and 2 */
-   long small_primes; /* number of primes to not sieve with */
-   long sieve_size; /* size of sieve to use */
+   len_t num_primes; /* number of factor base primes including k and 2 */
+   len_t small_primes; /* number of primes to not sieve with */
+   len_t sieve_size; /* size of sieve to use */
 
    prime_t * factor_base; /* data about factor base primes */
 
@@ -128,32 +128,32 @@ typedef struct qs_s
 
    mp_limb_t target_A; /* approximate target value for A coeff of poly */
 
-   long s; /* number of prime factors of A coeff */
-   long min; /* minimum FB prime that can appear as factor of A */
-   long span; /* size of set of possible prime factors of A */
-   long fact; /* middle of set of possible prime factors of A */
-   long mid; /* start of range for middle factor */
-   long high; /* end of range for middle factor */
+   len_t s; /* number of prime factors of A coeff */
+   len_t min; /* minimum FB prime that can appear as factor of A */
+   len_t span; /* size of set of possible prime factors of A */
+   len_t fact; /* middle of set of possible prime factors of A */
+   len_t mid; /* start of range for middle factor */
+   len_t high; /* end of range for middle factor */
 
 
    /*********************
      Relations data
    **********************/
 
-   long qsort_rels; /* number of relations to accumulate before sorting */
-   long extra_rels; /* number of extra relations beyond num_primes */
-   long max_factors; /* maximum number of factors a relation can have */
+   len_t qsort_rels; /* number of relations to accumulate before sorting */
+   len_t extra_rels; /* number of extra relations beyond num_primes */
+   len_t max_factors; /* maximum number of factors a relation can have */
 
-   long * small; /* exponents of small prime factors in relations */
+   len_t * small; /* exponents of small prime factors in relations */
    fac_t * factor; /* factors for a relation */
    fmpz * Y_arr; /* array of Y's corresponding to relations */
-   long * curr_rel; /* current relation in array of relations */
-   long * relation; /* relation array */
+   len_t * curr_rel; /* current relation in array of relations */
+   len_t * relation; /* relation array */
 
-   long buffer_size; /* size of buffer of relations */
-   long num_relations; /* number of relations so far */
+   len_t buffer_size; /* size of buffer of relations */
+   len_t num_relations; /* number of relations so far */
 
-   long num_factors; /* number of factors found in a relation */
+   len_t num_factors; /* number of factors found in a relation */
 
    /*********************
      Linear algebra data
@@ -163,21 +163,21 @@ typedef struct qs_s
    la_col_t * unmerged; /* unmerged matrix columns */
    la_col_t ** qsort_arr; /* array of columns ready to be sorted */
 
-   long num_unmerged; /* number of columns unmerged */
-   long columns; /* number of columns in matrix so far */
+   len_t num_unmerged; /* number of columns unmerged */
+   len_t columns; /* number of columns in matrix so far */
 
    /*********************
      Square root data
    **********************/
 
-   long * prime_count; /* counts of the exponents of primes appearing in the square */
+   len_t * prime_count; /* counts of the exponents of primes appearing in the square */
 
    /*********************
      Statistics
    **********************/
 
 #if (QS_DEBUG & 16)
-   long * sieve_tally;
+   len_t * sieve_tally;
 #endif
 
 } qs_s;
@@ -235,23 +235,23 @@ void qsieve_ll_compute_A_factor_offsets(qs_t qs_inf);
 
 void qsieve_ll_compute_C(qs_t qs_inf);
 
-long qsieve_ll_collect_relations(qs_t qs_inf, char * sieve);
+len_t qsieve_ll_collect_relations(qs_t qs_inf, char * sieve);
 
-long qsieve_ll_merge_sort(qs_t qs_inf);
+len_t qsieve_ll_merge_sort(qs_t qs_inf);
       
-long qsieve_ll_merge_relations(qs_t qs_inf);
+len_t qsieve_ll_merge_relations(qs_t qs_inf);
 
-long qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y);
+len_t qsieve_ll_insert_relation(qs_t qs_inf, fmpz_t Y);
 
 mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo);
 
-static __inline__ void insert_col_entry(la_col_t * col, long entry)
+static __inline__ void insert_col_entry(la_col_t * col, len_t entry)
 {
    if (((col->weight >> 4) << 4) == col->weight) /* need more space */
    {
        if (col->weight != 0) col->data = 
-           (long *) flint_realloc(col->data, (col->weight + 16)*sizeof(long));
-       else col->data = (long *) flint_malloc(16*sizeof(long));
+           (len_t *) flint_realloc(col->data, (col->weight + 16)*sizeof(len_t));
+       else col->data = (len_t *) flint_malloc(16*sizeof(len_t));
    }
    
    col->data[col->weight] = entry;
@@ -292,15 +292,15 @@ static __inline__ void free_col(la_col_t * col)
    if (col->weight) flint_free(col->data);
 }
 
-uint64_t get_null_entry(uint64_t * nullrows, long i, long l);
+uint64_t get_null_entry(uint64_t * nullrows, len_t i, len_t l);
 
-void reduce_matrix(qs_t qs_inf, long * nrows, long * ncols, la_col_t * cols);
+void reduce_matrix(qs_t qs_inf, len_t * nrows, len_t * ncols, la_col_t * cols);
 
-uint64_t * block_lanczos(flint_rand_t state, long nrows, long dense_rows, 
-                                                       long ncols, la_col_t *B);
+uint64_t * block_lanczos(flint_rand_t state, len_t nrows, len_t dense_rows, 
+                                                       len_t ncols, la_col_t *B);
 
 void qsieve_ll_square_root(fmpz_t X, fmpz_t Y, qs_t qs_inf,
-                             uint64_t * nullrows, long ncols, long l, fmpz_t N);
+                             uint64_t * nullrows, len_t ncols, len_t l, fmpz_t N);
 
 #ifdef __cplusplus
 }

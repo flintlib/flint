@@ -30,12 +30,12 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-long
+len_t
 fmpz_flog_ui(const fmpz_t n, ulong b)
 {
     fmpz_t t;
     int sign;
-    long r;
+    len_t r;
 
     if (fmpz_is_one(n))
         return 0;

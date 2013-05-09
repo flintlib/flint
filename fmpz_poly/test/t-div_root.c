@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t P, Q, D, DQ;
         fmpz_t c;
-        long n, b;
+        len_t n, b;
 
         n = n_randint(state, 100);
         b = n_randint(state, 200);
@@ -92,7 +92,7 @@ main(void)
     {
         fmpz_poly_t P, Q1, Q2;
         fmpz_t c;
-        long n, b;
+        len_t n, b;
 
         n = n_randint(state, 100);
         b = n_randint(state, 200);

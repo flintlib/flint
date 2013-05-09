@@ -33,12 +33,12 @@
 
 void
 _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
-                                    const fmpz * xs, const fmpz * ys, long n)
+                                    const fmpz * xs, const fmpz * ys, len_t n)
 {
     fmpz *P, *Q, *w;
     fmpz_t t;
 
-    long i, j;
+    len_t i, j;
 
     /* Constant */
     if (n == 1)
@@ -103,7 +103,7 @@ _fmpq_poly_interpolate_fmpz_vec(fmpz * poly, fmpz_t den,
 
 void
 fmpq_poly_interpolate_fmpz_vec(fmpq_poly_t poly,
-                                    const fmpz * xs, const fmpz * ys, long n)
+                                    const fmpz * xs, const fmpz * ys, len_t n)
 {
     if (n == 0)
     {

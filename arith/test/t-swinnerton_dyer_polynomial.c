@@ -52,7 +52,7 @@ int main()
 {
     fmpz_poly_t S;
     mp_limb_t r;
-    long n;
+    len_t n;
 
     printf("swinnerton_dyer_polynomial....");
     fflush(stdout);

@@ -46,10 +46,10 @@
  */
 
 int 
-_fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, long len)
+_fmpq_poly_fprint(FILE * file, const fmpz * poly, const fmpz_t den, len_t len)
 {
     int r;
-    long i;
+    len_t i;
     fmpz_t n, d, g;
 
     fmpz_init(n);

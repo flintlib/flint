@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("prod....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 50 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, *V;
-        long m, j, count, bits, deg;
+        len_t m, j, count, bits, deg;
         float density;
 
         m = n_randint(state, 6);

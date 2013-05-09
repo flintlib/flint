@@ -31,7 +31,7 @@
 
 void
 _fmpq_poly_sin_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, long n)
+                           const fmpz * h, const fmpz_t hden, len_t n)
 {
     fmpz * t;
     fmpz * u;
@@ -62,10 +62,10 @@ _fmpq_poly_sin_series(fmpz * g, fmpz_t gden,
 }
 
 void
-fmpq_poly_sin_series(fmpq_poly_t res, const fmpq_poly_t f, long n)
+fmpq_poly_sin_series(fmpq_poly_t res, const fmpq_poly_t f, len_t n)
 {
     fmpz * f_coeffs;
-    long flen = f->length;
+    len_t flen = f->length;
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {

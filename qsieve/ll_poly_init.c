@@ -35,7 +35,7 @@ mp_limb_t qsieve_ll_poly_init(qs_t qs_inf)
    
    mp_limb_t ** A_inv2B;
 
-   long i; 
+   len_t i; 
         
    qs_inf->B_terms = flint_malloc(4*s*sizeof(mp_limb_t));
    qs_inf->A_ind = qs_inf->B_terms + s;  

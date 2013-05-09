@@ -36,7 +36,7 @@ int
 main()
 {
     double x, w, tol;
-    long iter, prec = 70;
+    len_t iter, prec = 70;
     mpfr_t xx, ww, wnew, t, u, v, p, q, max_err;
 
     flint_rand_t state;

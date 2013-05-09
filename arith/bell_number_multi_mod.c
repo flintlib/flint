@@ -37,7 +37,7 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_t comb;
     nmod_t mod;
     mp_ptr primes, residues;
-    long k, size, prime_bits, num_primes;
+    len_t k, size, prime_bits, num_primes;
 
     size = arith_bell_number_size(n);
     prime_bits = FLINT_BITS - 1;

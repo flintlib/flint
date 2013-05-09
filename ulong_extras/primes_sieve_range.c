@@ -29,7 +29,7 @@
 #include "ulong_extras.h"
 
 static void
-mark(char * sieve, mp_limb_t a, long len, mp_limb_t p)
+mark(char * sieve, mp_limb_t a, len_t len, mp_limb_t p)
 {
     mp_limb_t t;
 
@@ -56,7 +56,7 @@ void
 n_sieve_odd(char * sieve, ulong n, mp_limb_t a,
     unsigned int * sieve_primes, mp_limb_t bound)
 {
-    long i;
+    len_t i;
     mp_limb_t p;
 
     for (i = 0; i < n / 2; i++)

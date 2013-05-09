@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, q;
-        long n = n_randint(state, 50) + 1;
+        len_t n = n_randint(state, 50) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -78,7 +78,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, q;
-        long n = n_randint(state, 50) + 1;
+        len_t n = n_randint(state, 50) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -110,7 +110,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, p, q;
-        long n = n_randint(state, 50) + 1;
+        len_t n = n_randint(state, 50) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

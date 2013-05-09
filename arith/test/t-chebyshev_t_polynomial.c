@@ -35,7 +35,7 @@
 int main()
 {
     fmpz_poly_t T0, T1, T2, t;
-    long n;
+    len_t n;
 
     printf("chebyshev_t_polynomial....");
     fflush(stdout);

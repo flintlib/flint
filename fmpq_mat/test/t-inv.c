@@ -46,7 +46,7 @@ main(void)
         fmpq_t d;
 
         int success1, success2;
-        long n, bits;
+        len_t n, bits;
 
         n = n_randint(state, 10);
         bits = 1 + n_randint(state, 100);
@@ -59,7 +59,7 @@ main(void)
 
         /* XXX: replace with a randtest function */
         {
-            long k;
+            len_t k;
 
             for (k = 0; (k < 100) && fmpq_is_zero(d); k++)
             {
@@ -101,7 +101,7 @@ main(void)
         fmpq_t d;
 
         int success1, success2;
-        long n, bits;
+        len_t n, bits;
 
         n = n_randint(state, 10);
         bits = 1 + n_randint(state, 100);
@@ -139,7 +139,7 @@ main(void)
     /* Test singular matrices */
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
-        long n, r, b, d;
+        len_t n, r, b, d;
         fmpq_mat_t A, B;
         fmpz_mat_t M;
         fmpz_t den;

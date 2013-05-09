@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void padic_shift(padic_t rop, const padic_t op, long v, const padic_ctx_t ctx)
+void padic_shift(padic_t rop, const padic_t op, len_t v, const padic_ctx_t ctx)
 {
     if (padic_is_zero(op) || (padic_val(op) + v >= padic_prec(rop)))
     {

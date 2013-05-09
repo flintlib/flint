@@ -29,10 +29,10 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, long);
+extern double __gmpn_get_d(mp_limb_t *, size_t, size_t, len_t);
 
 double
-fmpz_get_d_2exp(long *exp, const fmpz_t f)
+fmpz_get_d_2exp(len_t *exp, const fmpz_t f)
 {
     fmpz d = *f;
 

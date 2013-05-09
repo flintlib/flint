@@ -67,7 +67,7 @@ pthread_mutex_t flint_num_primes_mutex;
 void n_compute_primes(ulong num)
 {
     n_primes_t iter;
-    long i;
+    len_t i;
 
     if (flint_num_primes >= num) return;
 

@@ -29,9 +29,9 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_lcm(fmpz_t res, const fmpz * vec, long len)
+_fmpz_vec_lcm(fmpz_t res, const fmpz * vec, len_t len)
 {
-    long i;
+    len_t i;
 
     fmpz_one(res);
     for (i = 0; i < len && !fmpz_is_zero(res); i++)

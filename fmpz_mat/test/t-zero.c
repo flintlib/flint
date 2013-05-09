@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long m, n, i, j, rep;
+    len_t m, n, i, j, rep;
     flint_rand_t state;
 
     printf("zero....");

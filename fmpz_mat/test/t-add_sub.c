@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    long m, n, rep;
+    len_t m, n, rep;
     flint_rand_t state;
 
     printf("add/sub/neg....");

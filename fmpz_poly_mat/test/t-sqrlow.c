@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    long i;
+    len_t i;
 
     printf("sqrlow....");
     fflush(stdout);
@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 30 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        long n, bits, deg, len;
+        len_t n, bits, deg, len;
 
         n = n_randint(state, 20);
         deg = 1 + n_randint(state, 10);
@@ -87,7 +87,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
-        long n, bits, deg, len;
+        len_t n, bits, deg, len;
 
         n = n_randint(state, 20);
         deg = 1 + n_randint(state, 10);

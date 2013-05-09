@@ -34,7 +34,7 @@
 int nmod_mat_inv(nmod_mat_t B, const nmod_mat_t A)
 {
     nmod_mat_t I;
-    long i, dim;
+    len_t i, dim;
     int result;
 
     dim = A->r;

@@ -32,7 +32,7 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, long n, const mpq_t x)
+void fmpq_poly_set_coeff_mpq(fmpq_poly_t poly, len_t n, const mpq_t x)
 {
     fmpq_t f;
 

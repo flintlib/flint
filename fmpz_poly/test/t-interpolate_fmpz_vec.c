@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t P, Q;
         fmpz *x, *y;
-        long j, n, npoints, bits;
+        len_t j, n, npoints, bits;
 
         npoints = n_randint(state, 50);
         n = n_randint(state, npoints + 1);

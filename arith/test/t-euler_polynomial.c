@@ -40,7 +40,7 @@ int main()
     fmpq_poly_t P, Q;
     mpz_t t;
 
-    long k, n;
+    len_t k, n;
 
     printf("euler_polynomial....");
     fflush(stdout);

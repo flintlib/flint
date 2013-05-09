@@ -30,12 +30,12 @@
 #define E(j,k) fmpz_poly_mat_entry(B,j,k)
 
 static __inline__ void
-fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, long * perm, long r, long s)
+fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, len_t * perm, len_t r, len_t s)
 {
     if (r != s)
     {
         fmpz_poly_struct * u;
-        long t;
+        len_t t;
 
         if (perm)
         {
@@ -50,12 +50,12 @@ fmpz_poly_mat_swap_rows(fmpz_poly_mat_t mat, long * perm, long r, long s)
     }
 }
 
-long
-fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+len_t
+fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, len_t * perm,
     const fmpz_poly_mat_t A, int rank_check)
 {
     fmpz_poly_t t;
-    long m, n, j, k, rank, r, pivot_row, pivot_col;
+    len_t m, n, j, k, rank, r, pivot_row, pivot_col;
 
     if (fmpz_poly_mat_is_empty(A))
     {

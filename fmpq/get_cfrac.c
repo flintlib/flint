@@ -28,11 +28,11 @@
 #include "fmpz.h"
 #include "fmpq.h"
 
-long
-fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
+len_t
+fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, len_t n)
 {
     fmpz_t p, q;
-    long i;
+    len_t i;
 
     fmpz_init(p);
     fmpz_init(q);

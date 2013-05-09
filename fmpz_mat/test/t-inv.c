@@ -39,7 +39,7 @@ main(void)
     fmpz_mat_t A, B, C, I;
     fmpz_t den;
     flint_rand_t state;
-    long i, j, m, r;
+    len_t i, j, m, r;
 
     printf("inv....");
     fflush(stdout);

@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_t a, b, c;
         mpz_t d, e, f, g;
-        long x, y;
+        len_t x, y;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -96,7 +96,7 @@ main(void)
     {
         fmpz_t a, b, c, pow;
         mpz_t d, e, f, g;
-        long x, y;
+        len_t x, y;
         ulong n;
 
         fmpz_init(a);
@@ -151,7 +151,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, c;
-        long x;
+        len_t x;
 
         fmpz_init(a);
         fmpz_init(c);
@@ -181,7 +181,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
-        long x, y;
+        len_t x, y;
 
         fmpz_init(a);
         fmpz_init(b);
@@ -216,7 +216,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_t a, b, c;
-        long x, y;
+        len_t x, y;
 
         fmpz_init(a);
         fmpz_init(b);

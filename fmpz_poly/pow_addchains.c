@@ -30,11 +30,11 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len, 
+void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, len_t len, 
                                                           const int * a, int n)
 {
     int *b;
-    long lenm1 = len - 1, lenv;
+    len_t lenm1 = len - 1, lenv;
     fmpz *v;
 
     /*
@@ -108,7 +108,7 @@ void _fmpz_poly_pow_addchains(fmpz * res, const fmpz * poly, long len,
 
 void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const long len = poly->length;
+    const len_t len = poly->length;
     
     if ((len < 2) | (e < 3UL))
     {
@@ -168,7 +168,7 @@ void fmpz_poly_pow_addchains(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         };
         
         int a[11], i = 11, n = (int) e;
-        long rlen = (long) e * (len - 1) + 1;
+        len_t rlen = (len_t) e * (len - 1) + 1;
 
         /*
            Copy the addition chain into 1 = a[0] < a[1] < ... < a[n]

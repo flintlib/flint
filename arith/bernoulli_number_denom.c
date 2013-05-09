@@ -54,7 +54,7 @@ static const __u32 __bernoulli_denom_small[] =
 
 void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
-    long i;
+    len_t i;
     mp_limb_t p;
 
     if (n % 2 == 1)

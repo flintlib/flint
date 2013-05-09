@@ -31,10 +31,10 @@
 
 
 void
-fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, long rank,
+fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, len_t rank,
                   mp_bitcnt_t bits)
 {
-    long i;
+    len_t i;
     fmpz * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)

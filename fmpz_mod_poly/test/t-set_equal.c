@@ -78,7 +78,7 @@ main(void)
     {
         fmpz_t p;
         fmpz_mod_poly_t a, b;
-        long coeff = n_randint(state, 100);
+        len_t coeff = n_randint(state, 100);
         fmpz_t x;
 
         fmpz_init(p);

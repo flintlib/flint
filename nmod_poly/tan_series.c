@@ -31,9 +31,9 @@
 
 
 void
-_nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+_nmod_poly_tan_series(mp_ptr g, mp_srcptr h, len_t n, nmod_t mod)
 {
-    long m;
+    len_t m;
     mp_ptr t, u;
 
     if (n <= 3)
@@ -65,11 +65,11 @@ _nmod_poly_tan_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
 }
 
 void
-nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, long n)
+nmod_poly_tan_series(nmod_poly_t g, const nmod_poly_t h, len_t n)
 {
     mp_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;
-    long h_len;
+    len_t h_len;
     
     h_len = h->length;
 

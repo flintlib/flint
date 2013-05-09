@@ -33,7 +33,7 @@
 void
 _arith_chebyshev_u_polynomial(fmpz * coeffs, ulong n)
 {
-    long k, i, d, m;
+    len_t k, i, d, m;
 
     d = n % 2;
 
