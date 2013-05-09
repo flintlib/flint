@@ -419,6 +419,15 @@ void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, len_t len1,
 void nmod_poly_mulmod(nmod_poly_t res,
     const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f);
 
+void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, long len1, 
+                              mp_srcptr poly2, long len2, mp_srcptr f,
+                              long lenf, mp_srcptr finv, long lenfinv, nmod_t mod);
+
+void
+nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
+                        const nmod_poly_t poly2, const nmod_poly_t f,
+                        const nmod_poly_t finv);
+
 /* Powering  *****************************************************************/
 
 void _nmod_poly_pow_binexp(mp_ptr res, 
