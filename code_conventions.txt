@@ -22,10 +22,10 @@ possible the following primitive datatype should be used:
     | limb counts in multiprecision integers | mp_size_t           |
     | limbs                                  | mp_limb_t           |
     | mp_limb_t arrays                       | mp_ptr/ mp_srcptr   |
-    | ui/ si function constants              | unsigned long/ long |
-    | polynomial lengths                     | long                |
-    | number of indeterminates               | long                |
-    | row/ column indices                    | long                |
+    | ui/ si function constants              | unsigned long/len_t |
+    | polynomial lengths                     | len_t               |
+    | number of indeterminates               | len_t               |
+    | row/ column indices                    | len_t               |
     | precision for mpfr types               | mpfr_prec_t         |
 
 The typical definitions of these in terms of primitive types are:
@@ -35,6 +35,7 @@ The typical definitions of these in terms of primitive types are:
     | mp_limb_t     | unsigned int, unsigned long, or unsigned long long |
     | mp_ptr        | mp_limb_t *                                        |
     | mp_srcptr     | const mp_limb_t *                                  |
+    | len_t         | long                                               |
 
 Type definitions
 ----------------
