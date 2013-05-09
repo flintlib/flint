@@ -33,12 +33,6 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
    fmpz_t t1, t2;
    fmpz * f1, * g1;
 
-   int sign1 = fmpz_sgn(f);
-   int sign2 = fmpz_sgn(g);
-
-   fmpz_init(t1);
-   fmpz_init(t2);
-
    if (fmpz_is_zero(f))
    {
       fmpz_set(d, g);
@@ -51,6 +45,12 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
       fmpz_set_si(b, 0);
    } else
    {
+      int sign1 = fmpz_sgn(f);
+      int sign2 = fmpz_sgn(g);
+
+      fmpz_init(t1);
+      fmpz_init(t2);
+
       /* support aliasing */
       if (d == f || a == f || sign1 < 0)
       {
@@ -81,11 +81,11 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
          fmpz_sub(t2, d, t2);
          fmpz_divexact(a, t2, f1);
       }
+
+      if (sign1 < 0) fmpz_neg(a, a);
+      if (sign2 < 0) fmpz_neg(b, b);
+
+      fmpz_clear(t1);
+      fmpz_clear(t2);
    } 
-
-   if (sign1 < 0) fmpz_neg(a, a);
-   if (sign2 < 0) fmpz_neg(b, b);
-
-   fmpz_clear(t1);
-   fmpz_clear(t2);
 }

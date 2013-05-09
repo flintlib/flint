@@ -58,6 +58,8 @@ main(void)
         fmpz_randtest_unsigned(G, state, 200);
         fmpz_add_ui(G, G, 1);
         fmpz_randm(F, state, G);
+        if (n_randint(state, 2)) fmpz_neg(G, G);
+        if (n_randint(state, 2)) fmpz_neg(F, F);
         fmpz_set(f, F);
         fmpz_set(g, G);
 
@@ -108,6 +110,8 @@ main(void)
         fmpz_randtest_unsigned(G, state, 200);
         fmpz_add_ui(G, G, 1);
         fmpz_randm(F, state, G);
+        if (n_randint(state, 2)) fmpz_neg(G, G);
+        if (n_randint(state, 2)) fmpz_neg(F, F);
         fmpz_set(f, F);
         fmpz_set(g, G);
 
@@ -158,6 +162,8 @@ main(void)
         fmpz_randtest_unsigned(G, state, 200);
         fmpz_add_ui(G, G, 1);
         fmpz_randm(F, state, G);
+        if (n_randint(state, 2)) fmpz_neg(G, G);
+        if (n_randint(state, 2)) fmpz_neg(F, F);
         fmpz_set(f, F);
         fmpz_set(g, G);
 
@@ -208,6 +214,8 @@ main(void)
         fmpz_randtest_unsigned(G, state, 200);
         fmpz_add_ui(G, G, 1);
         fmpz_randm(F, state, G);
+        if (n_randint(state, 2)) fmpz_neg(G, G);
+        if (n_randint(state, 2)) fmpz_neg(F, F);
         fmpz_set(f, F);
         fmpz_set(g, G);
 
@@ -257,7 +265,9 @@ main(void)
         fmpz_randtest_unsigned(g, state, 200);
         fmpz_add_ui(g, g, 1);
         fmpz_randm(f, state, g);
-
+        if (n_randint(state, 2)) fmpz_neg(g, g);
+        if (n_randint(state, 2)) fmpz_neg(f, f);
+        
         fmpz_xgcd(d, a, b, f, g);
 
         fmpz_mul(t1, a, f);
