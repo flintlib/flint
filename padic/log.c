@@ -41,7 +41,7 @@
 
     Under the additional condition that $N < 2^{f-2}$ one can 
     show that the code branch for primes that fit into a 
-    \code{signed len_t} does not cause overflow.  Moreover, 
+    \code{signed long} does not cause overflow.  Moreover, 
     independently of this, it follows that the above value $b$ 
     is less than $2^{f-1}$.
 

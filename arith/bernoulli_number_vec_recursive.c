@@ -73,7 +73,7 @@ __ramanujan_even_common_denom(fmpz * num, fmpz * den, len_t start, len_t n)
         }
 
         /* All factors are strictly smaller than m + 4; choose prodsize such
-           that (m + 4)^prodsize fits in a signed len_t. */
+           that (m + 4)^prodsize fits in a signed long. */
         {
 #if FLINT64
             if      (m < 1444L)       prodsize = 6;

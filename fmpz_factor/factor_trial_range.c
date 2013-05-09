@@ -109,7 +109,7 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
             _fmpz_factor_append_ui(factor, flint_primes[found], exp);
             /* printf("added %lu %lu\n", flint_primes[found], exp); */
 
-            /* Continue using only trial division as len_t as it is successful.
+            /* Continue using only trial division as long as it is successful.
                This allows quickly factoring huge highly composite numbers
                such as factorials, which can arise in some applications. */
             trial_start = found + 1;
