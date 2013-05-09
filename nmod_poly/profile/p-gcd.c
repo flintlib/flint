@@ -70,7 +70,7 @@ int main(void)
                                   6,    6,   6,   5,   5,   5,   5,   5,   4,   4}};
 
     clock_t c0, c1;
-    len_t double cpu[3][2][N];
+    long double cpu[3][2][N];
     len_t i, k, c, n;
 
     nmod_poly_t A, B, C, G;
@@ -115,11 +115,11 @@ int main(void)
                 cpu[i][1][k] += (c1 - c0);
             }
 
-            cpu[i][0][k] = (len_t double) cpu[i][0][k] / (len_t double) CLOCKS_PER_SEC;
-            cpu[i][1][k] = (len_t double) cpu[i][1][k] / (len_t double) CLOCKS_PER_SEC;
+            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) CLOCKS_PER_SEC;
+            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) CLOCKS_PER_SEC;
 
-            cpu[i][0][k] = (len_t double) cpu[i][0][k] / (len_t double) (100*r);
-            cpu[i][1][k] = (len_t double) cpu[i][1][k] / (len_t double) (100*r);
+            cpu[i][0][k] = (long double) cpu[i][0][k] / (long double) (100*r);
+            cpu[i][1][k] = (long double) cpu[i][1][k] / (long double) (100*r);
 
             printf("%4ld %10.8Lf %10.8Lf\n", A->length, cpu[i][0][k], cpu[i][1][k]);
             fflush(stdout);
