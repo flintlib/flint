@@ -423,3 +423,4 @@ echo "" >> Makefile
 
 cat Makefile.in >> Makefile
 
+echo "FLINT was successfully configured."
