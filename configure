@@ -320,7 +320,10 @@ if [ $? -eq 0 ]; then
          echo "no"
       fi
       rm -f build/test-popcnt{,.c}
-   fi
+   #in case -mpopcnt is not available, the test program will use an illegal
+   #instruction and that will print out something on stderr when the if
+   #construction is exited, whence the following "2> /dev/null"
+   fi 2> /dev/null
 else
    rm -f build/test-popcnt.c
    echo "no"
@@ -423,3 +426,4 @@ echo "" >> Makefile
 
 cat Makefile.in >> Makefile
 
+echo "FLINT was successfully configured."
