@@ -38,6 +38,7 @@ void _padic_poly_add(fmpz *rop, long *val, long N,
     if (val1 == val2)
     {
         _fmpz_poly_add(rop, op1, len1, op2, len2);
+        _padic_poly_canonicalise(rop, val, len, ctx->p);
     }
     else  /* => (op1 != op2) */
     {
@@ -77,9 +78,8 @@ void _padic_poly_add(fmpz *rop, long *val, long N,
         fmpz_clear(x);
     }
 
-    _padic_poly_canonicalise(rop, val, len, ctx->p);
-
     /* Reduce */
+    if (N - *val > 0)
     {
         fmpz_t pow;
         int alloc;
@@ -98,8 +98,16 @@ void _padic_poly_add(fmpz *rop, long *val, long N,
             _fmpz_vec_scalar_mod_fmpz(rop, rop, len, pow);
         }
 
+        if (_fmpz_vec_is_zero(rop, len))
+            *val = 0;
+
         if (alloc)
             fmpz_clear(pow);
+    }
+    else
+    {
+        _fmpz_vec_zero(rop, len);
+        *val = 0;
     }
 }
 
@@ -111,6 +119,16 @@ void padic_poly_add(padic_poly_t f,
     const long lenH = h->length;
     const long lenF = FLINT_MAX(lenG, lenH);
 
+    if (lenG == 0)
+    {
+        padic_poly_set(f, h, ctx);
+        return;
+    }
+    if (lenH == 0)
+    {
+        padic_poly_set(f, g, ctx);
+        return;
+    }
     if ((lenG == 0 && lenH == 0) || (FLINT_MIN(g->val, h->val) >= f->N))
     {
         padic_poly_zero(f);
