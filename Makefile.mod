@@ -26,10 +26,10 @@ shared: $(MOD_LOBJ)
 static: $(OBJS)
 
 profile: $(PROF_SOURCES)
-	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(PROFS), $(CC) $(CFLAGS) $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
         
 tune: $(TUNE_SOURCES)
-	$(foreach prog, $(TUNE), $(CC) $(ABI_FLAG) -O2 -std=c99 $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
 $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
 	$(CC) $(CFLAGS) -c $(INCS) $< -o $@

@@ -17,7 +17,6 @@ STATIC=1
 TLS=1
 REENTRANT=0
 BUILD=
-ABI=
 
 usage()
 {
@@ -221,10 +220,10 @@ case "$ARCH" in
       MACHINE="sparc";;
    sparc64)
       MACHINE="sparc64";;
-   ppc | powerpc | [P|p]ower*)
-      MACHINE="ppc";;
    ppc64 | powerpc64)
       MACHINE="ppc64";;
+   ppc | powerpc | [P|p]ower*)
+      MACHINE="ppc";;
    *)
       MACHINE="unknown";;
 esac
@@ -256,12 +255,7 @@ echo "Configuring...${MACHINE}-${OS}"
 if [ -z "$FLINT_LIB" ]; then
    case "$OS" in
       Darwin)
-         case "$MACHINE" in
-            *64)
-               FLINT_LIB="libflint.dylib64";;
-            *)
-               FLINT_LIB="libflint.dylib";;
-         esac;;
+         FLINT_LIB="libflint.dylib";;
       CYGWIN | MINGW*)
          FLINT_LIB="libflint.dll";;
       *)
@@ -289,24 +283,6 @@ case "$MACHINE" in
    *)
       cp fft_tuning32.in fft_tuning.h;;
 esac
-
-#various tuning parameters
-
-if [ -z "$FLINT_TUNE" ]; then
-   if [ "$KERNEL" = "Linux" -a "$ARCH" = "x86_64" ]; then
-      FLINT_TUNE="-funroll-loops"
-   elif [ "$KERNEL" = "Darwin" -a "$ARCH" = "ppc" ]; then
-      FLINT_TUNE=" -funroll-loops"
-   elif [ "`uname -p`" = "powerpc" ]; then
-      FLINT_TUNE="-m64 -mcpu=970 -mtune=970 -mpowerpc64 -falign-loops=16 -falign-functions=16 -falign-labels=16 -falign-jumps=16"
-   elif [ "$ARCH" = "ia64" ]; then
-      # -funroll-loops crashes the build on itanium under GCC-4.2.1, as reported by
-      # Kate Minola.
-      FLINT_TUNE=""
-   else
-      FLINT_TUNE="-funroll-loops"
-   fi
-fi
 
 # defaults for CC and CXX
 
@@ -350,15 +326,16 @@ else
    echo "no"
 fi
 
-#defaults for CFLAGS, CC and CXX
+#defaults for CFLAGS
 
 if [ -z "$CFLAGS" ]; then
-   CFLAGS="-O2 -g -ansi -pedantic -Wall $POPCNT_FLAG $ABI_FLAG"
+   CFLAGS="-ansi -pedantic -Wall -O2 -funroll-loops -g $POPCNT_FLAG $ABI_FLAG"
 fi
 
-#add tuning parameters to CFLAGS
-
-CFLAGS="$CFLAGS $FLINT_TUNE"
+#this is needed on PPC G5 and does not hurt on other OS Xes
+if [ "$KERNEL" = Darwin ]; then
+   CFLAGS="-fno-common $CFLAGS"
+fi
 
 #PIC flag
 

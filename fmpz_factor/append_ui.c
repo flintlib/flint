@@ -31,7 +31,7 @@
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_append_ui(fmpz_factor_t factor, ulong p, ulong exp)
+_fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp)
 {
     _fmpz_factor_fit_length(factor, factor->num + 1);
     fmpz_set_ui(factor->p + factor->num, p);
