@@ -43,8 +43,8 @@ usage()
 }
 
 while [ "$1" != "" ]; do
-   PARAM=`echo $1 | awk -F= '{print $1}'`
-   VALUE=`echo $1 | awk -F= '{print $2}'`
+   PARAM=`echo $1 | sed 's/=.*//'`
+   VALUE=`echo $1 | sed 's/[^=]*=//'`
    case $PARAM in
       -h|--help)
          usage
