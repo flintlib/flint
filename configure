@@ -24,28 +24,30 @@ usage()
    echo "   where <options> may be"
    echo "     -h display usage information"
    echo "   where <args> may be:"
-   echo "     --with-gmp=<path>  Specify location of GMP"
-   echo "     --with-mpfr=<path> Specify location of MPFR"
-   echo "     --with-blas=<path> Specify location of BLAS"
-   echo "     --with-ntl=<path>  Specify location of NTL and build NTL interface"
-   echo "     --build=arch-os    Specify architecture/OS combination rather than use values from uname -m/-s"
-   echo "     --prefix=<path>    Specify path to installation location"
-   echo "     --disable-shared   Do not build a shared library"
-   echo "     --disable-static   Do not build a static library"
-   echo "     --reentrant        Build fully reentrant version of library"
-   echo "     --single           Faster non-reentrant version of library (default)"
-   echo "     --disable-tls      Do not use thread-local storage"
-   echo "     CC=<name>          Use the C compiler with the given name"
-   echo "     AR=<name>          Use the AR library builder with the given name"
-   echo "     CFLAGS=<flags>     Pass the given flags to the compiler"
-   echo "     ABI=[32|64]        Tell the compiler to use given ABI"
+   echo "     --prefix=<path>      Specify path to installation location (default: /usr/local)"
+   echo "     --with-gmp=<path>    Specify location of GMP (default: /usr/local)"
+   echo "     --with-mpfr=<path>   Specify location of MPFR (default: /usr/local)"
+   echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr/local)"
+   echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
+   echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
+   echo "     --disable-shared     Do not build a shared library"
+   echo "     --disable-static     Do not build a static library"
+   echo "     --reentrant          Build fully reentrant version of library"
+   echo "     --single             Faster non-reentrant version of library (default)"
+   echo "     --disable-tls        Do not use thread-local storage"
+   echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
+   echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
+   echo "     AR=<name>            Use the AR library builder with the given name (default: ar)"
+   echo "     CFLAGS=<flags>       Pass the given flags to the compiler"
+   echo "     ABI=[32|64]          Tell the compiler to use given ABI (default: empty)"
 }
 
 while [ "$1" != "" ]; do
    PARAM=`echo $1 | awk -F= '{print $1}'`
    VALUE=`echo $1 | awk -F= '{print $2}'`
    case $PARAM in
-      -h) usage
+      -h|--help)
+         usage
          exit 0
          ;;
       --with-gmp)
@@ -95,7 +97,8 @@ while [ "$1" != "" ]; do
       ABI)
          ABI="$VALUE"
          ;;
-      *) usage
+      *)
+         usage
          exit 1
          ;;
    esac
@@ -106,77 +109,125 @@ done
 
 if [ -d "${GMP_DIR}/lib" ]; then
    GMP_LIB_DIR="${GMP_DIR}/lib"
-   GMP_INCLUDE_DIR="${GMP_DIR}/include"
+   GMP_INC_DIR="${GMP_DIR}/include"
 elif [ -d "${GMP_DIR}/lib64" ]; then
    GMP_LIB_DIR="${GMP_DIR}/lib64"
-   GMP_INCLUDE_DIR="${GMP_DIR}/include"
+   GMP_INC_DIR="${GMP_DIR}/include"
 elif [ -d "${GMP_DIR}/.libs" ]; then
    GMP_LIB_DIR="${GMP_DIR}/.libs"
-   GMP_INCLUDE_DIR="${GMP_DIR}"
+   GMP_INC_DIR="${GMP_DIR}"
 else
    echo "Invalid GMP directory"
    exit 1
 fi
+LIB_DIRS="${LIB_DIRS} ${GMP_LIB_DIR}"
+INC_DIRS="${INC_DIRS} ${GMP_INC_DIR}"
+LIBS="-lgmp"
 
 if [ -d "${MPFR_DIR}/lib" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib"
-   MPFR_INCLUDE_DIR="${MPFR_DIR}/include"
+   MPFR_INC_DIR="${MPFR_DIR}/include"
 elif [ -d "${MPFR_DIR}/lib64" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/lib64"
-   MPFR_INCLUDE_DIR="${MPFR_DIR}/include"
+   MPFR_INC_DIR="${MPFR_DIR}/include"
 elif [ -d "${MPFR_DIR}/.libs" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/.libs"
-   MPFR_INCLUDE_DIR="${MPFR_DIR}"
+   MPFR_INC_DIR="${MPFR_DIR}"
 elif [ -d "${MPFR_DIR}/src/.libs" ]; then
    MPFR_LIB_DIR="${MPFR_DIR}/src/.libs"
-   MPFR_INCLUDE_DIR="${MPFR_DIR}/src"
+   MPFR_INC_DIR="${MPFR_DIR}/src"
 else
    echo "Invalid MPFR directory"
    exit 1
 fi
-
-if [ -d "${NTL_DIR}/lib" ]; then
-   NTL_LIB_DIR="${NTL_DIR}/lib"
-   NTL_INCLUDE_DIR="${NTL_DIR}/include"
-elif [ -d "${NTL_DIR}/lib64" ]; then
-   NTL_LIB_DIR="${NTL_DIR}/lib64"
-   NTL_INCLUDE_DIR="${NTL_DIR}/include"
-elif [ "$WANT_NTL" = "0" ]; then
-   NTL_DIR="/usr"
-   if [ -d "${NTL_DIR}/lib" ]; then
-      NTL_LIB_DIR="${NTL_DIR}/lib"
-   else
-      NTL_LIB_DIR="${NTL_DIR}/lib64"
-   fi
-   NTL_INCLUDE_DIR="${NTL_DIR}/include"
-else
-   echo "Invalid NTL directory"
-   exit 1
-fi
-
-if [ -d "${BLAS_DIR}" ]; then
-   BLAS_LIB_DIR="${BLAS_DIR}"
-   BLAS_INCLUDE_DIR="${BLAS_DIR}"
-elif [ "$WANT_BLAS" = "0" ]; then
-   BLAS_DIR="/usr"
-   BLAS_LIB_DIR="${BLAS_DIR}"
-   BLAS_INCLUDE_DIR="${BLAS_DIR}"
-else
-   echo "Invalid BLAS directory"
-   exit 1
-fi
+LIB_DIRS="${LIB_DIRS} ${MPFR_LIB_DIR}"
+INC_DIRS="${INC_DIRS} ${MPFR_INC_DIR}"
 
 #configure extra libraries
 
 if [ "$WANT_NTL" = "1" ]; then
-    EXTRA_LIBS="$EXTRA_LIBS -lntl"
+   if [ -d "${NTL_DIR}/lib" ]; then
+      NTL_LIB_DIR="${NTL_DIR}/lib"
+      NTL_INC_DIR="${NTL_DIR}/include"
+   elif [ -d "${NTL_DIR}/lib64" ]; then
+      NTL_LIB_DIR="${NTL_DIR}/lib64"
+      NTL_INC_DIR="${NTL_DIR}/include"
+   else
+      echo "Invalid NTL directory"
+      exit 1
+   fi
+   EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${NTL_INC_DIR}"
+   EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${NTL_LIB_DIR}"
+   EXTRA_LIBS="${EXTRA_LIBS} -lntl"
 fi
 
 if [ "$WANT_BLAS" = "1" ]; then
-    EXTRA_LIBS="$EXTRA_LIBS -lopenblas"
+   if [ -d "${BLAS_DIR}" ]; then
+      BLAS_LIB_DIR="${BLAS_DIR}"
+      BLAS_INC_DIR="${BLAS_DIR}"
+   else
+      echo "Invalid BLAS directory"
+      exit 1
+   fi
+   EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${BLAS_INC_DIR}"
+   EXTRA_LIB_DIRS="${EXTRA_LIB_DIRS} ${BLAS_LIB_DIR}"
+   EXTRA_LIBS="${EXTRA_LIBS} -lopenblas"
 fi
-    
 CONFIG_BLAS="#define HAVE_BLAS ${WANT_BLAS}"
+
+#include paths
+
+INCS="-I\$(CURDIR)"
+for INC_DIR in ${INC_DIRS} ${EXTRA_INC_DIRS}; do
+   INCS="${INCS} -I${INC_DIR}"
+done
+
+#library paths
+
+LLIBS="-L\$(CURDIR)"
+for LIB_DIR in ${LIB_DIRS} ${EXTRA_LIB_DIRS}; do
+   LLIBS="${LLIBS} -L${LIB_DIR}"
+done
+
+#linker params
+LIBS2="-lmpfr -lgmp -lm -lpthread"
+LIBS="-lflint $LIBS2"
+LIBS2="$LLIBS $LIBS2"
+LIBS="$LLIBS $LIBS"
+
+#paths for dynamic linker
+
+case "$OS" in
+   CYGWIN | MINGW*)
+      DLPATH="PATH";;
+   Darwin)
+      DLPATH="DYLD_LIBRARY_PATH";;
+   sparc)
+      DLPATH="LD_LIBRARY_PATH32";;
+   sparc64)
+      DLPATH="LD_LIBRARY_PATH64";;
+   *)
+      DLPATH="LD_LIBRARY_PATH";;
+esac
+
+DLPATH_ADD="\$(CURDIR)"
+for LIB_DIR in ${LIB_DIRS} ${EXTRA_LIB_DIRS}; do
+   DLPATH_ADD="${DLPATH_ADD}:${LIB_DIR}"
+done
+
+# defaults for CC, CXX and AR
+
+if [ -z "$CC" ]; then
+   CC=gcc
+fi
+
+if [ -z "$CXX" ]; then
+   CXX=g++
+fi
+
+if [ -z "$AR" ]; then
+   AR=ar
+fi
 
 #handle reentrant flag
 
@@ -284,16 +335,6 @@ case "$MACHINE" in
       cp fft_tuning32.in fft_tuning.h;;
 esac
 
-# defaults for CC and CXX
-
-if [ -z "$CC" ]; then
-   CC=gcc
-fi
-
-if [ -z "$CXX" ]; then
-   CXX=g++
-fi
-
 # Test for popcnt flag and set needed CFLAGS
 
 mkdir -p build
@@ -342,12 +383,12 @@ fi
 
 #PIC flag
 
-if [ -z "$PICFLAG" ]; then
+if [ -z "$PIC_FLAG" ]; then
    case "$OS" in
       CYGWIN | MINGW*)
          ;;
       *)
-         PICFLAG="-fPIC";;
+         PIC_FLAG="-fPIC";;
    esac
 fi
 
@@ -392,36 +433,25 @@ echo "SHELL := /usr/bin/env bash" >> Makefile
 echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
-echo "WANT_NTL=$WANT_NTL" >> Makefile
-echo "EXTRA_LIBS=$EXTRA_LIBS" >> Makefile
-echo "FLINT_GMP_LIB_DIR=$GMP_LIB_DIR" >> Makefile
-echo "FLINT_GMP_INCLUDE_DIR=$GMP_INCLUDE_DIR" >> Makefile
-echo "FLINT_BLAS_LIB_DIR=$BLAS_LIB_DIR" >> Makefile
-echo "FLINT_BLAS_INCLUDE_DIR=$BLAS_INCLUDE_DIR" >> Makefile
-echo "FLINT_MPFR_LIB_DIR=$MPFR_LIB_DIR" >> Makefile
-echo "FLINT_MPFR_INCLUDE_DIR=$MPFR_INCLUDE_DIR" >> Makefile
-echo "FLINT_NTL_LIB_DIR=$NTL_LIB_DIR" >> Makefile
-echo "FLINT_NTL_INCLUDE_DIR=$NTL_INCLUDE_DIR" >> Makefile
-echo "" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
+echo "PREFIX=$PREFIX" >> Makefile
+echo "" >> Makefile
+echo "WANT_NTL=$WANT_NTL" >> Makefile
+echo "" >> Makefile
+echo "INCS=$INCS" >> Makefile
+echo "LIBS=$LIBS" >> Makefile
+echo "LIBS2=$LIBS2" >> Makefile
+echo "" >> Makefile
 echo "CC=$CC" >> Makefile
 echo "CXX=$CXX" >> Makefile
+echo "AR=$AR" >> Makefile
+echo "" >> Makefile
 echo "CFLAGS=$CFLAGS" >> Makefile
 echo "ABI_FLAG=$ABI_FLAG" >> Makefile
-echo "PICFLAG=$PICFLAG" >> Makefile
-echo "PREFIX=$PREFIX" >> Makefile
-case "$OS" in
-   MINGW*)
-      echo "PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
-   Darwin)
-      echo "DYLD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
-   sparc)
-      echo "LD_LIBRARY_PATH32+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
-   sparc64)
-      echo "LD_LIBRARY_PATH64+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
-   *)
-      echo "LD_LIBRARY_PATH+=:\${CURDIR}:\${FLINT_MPFR_LIB_DIR}:\${FLINT_GMP_LIB_DIR}:\${FLINT_NTL_LIB_DIR}:\${FLINT_BLAS_LIB_DIR}" >> Makefile;;
-esac
+echo "PIC_FLAG=$PIC_FLAG" >> Makefile
+echo "" >> Makefile
+echo "DLPATH=$DLPATH" >> Makefile
+echo "DLPATH_ADD=$DLPATH_ADD" >> Makefile
 echo "" >> Makefile
 
 cat Makefile.in >> Makefile
