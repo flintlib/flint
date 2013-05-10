@@ -42,7 +42,7 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: library 
+all: library
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
@@ -58,7 +58,7 @@ dist:
 
 profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
 
 tune: $(FLINT_LIB) $(TUNE_SOURCES)
@@ -116,15 +116,15 @@ else
 endif
 
 install: library
-	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include/flint
+	mkdir -p $(DESTDIR)$(PREFIX)/lib
+	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(PREFIX)/lib; \
+		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(PREFIX)/lib; \
+		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
-	cp *.h $(PREFIX)/include/flint
+	cp *.h $(DESTDIR)$(PREFIX)/include/flint
 
 build:
 	mkdir -p build
