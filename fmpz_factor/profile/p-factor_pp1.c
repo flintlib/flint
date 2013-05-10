@@ -63,7 +63,7 @@ int main(void)
          c = n_randlimb(state);
       } while (c <= 2UL);
 
-      if (fmpz_factor_pp1(p, n, B1, c))
+      if (fmpz_factor_pp1(p, n, B1, B1/100, c))
       {
          printf("Factor: ");
          fmpz_print(p);
