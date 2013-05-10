@@ -104,6 +104,9 @@ while [ "$1" != "" ]; do
       CC)
          CC="$VALUE"
          ;;
+      CXX)
+         CXX="$VALUE"
+         ;;
       CFLAGS)
          CFLAGS="$VALUE"
          ;;
