@@ -58,7 +58,7 @@ dist:
 
 profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) $(CFLAGS) $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(PROFS), $(CC) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
 
 tune: $(FLINT_LIB) $(TUNE_SOURCES)
