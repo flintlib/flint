@@ -116,15 +116,15 @@ else
 endif
 
 install: library
-	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include/flint
+	mkdir -p $(DESTDIR)/lib
+	mkdir -p $(DESTDIR)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(PREFIX)/lib; \
+		cp $(FLINT_LIB) $(DESTDIR)/lib; \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(PREFIX)/lib; \
+		cp libflint.a $(DESTDIR)/lib; \
 	fi
-	cp *.h $(PREFIX)/include/flint
+	cp *.h $(DESTDIR)/include/flint
 
 build:
 	mkdir -p build

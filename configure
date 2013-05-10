@@ -5,7 +5,7 @@
 # (C) 2012, William Hart, Jean-Pierre Flori, Thomas DuBuisson
 # (C) 2012, Jan Engelhardt
 
-PREFIX="/usr/local"
+DESTDIR="/usr/local"
 GMP_DIR="/usr/local"
 MPFR_DIR="/usr/local"
 NTL_DIR="/usr/local"
@@ -68,7 +68,7 @@ while [ "$1" != "" ]; do
          BUILD="$VALUE"
          ;;
       --prefix)
-         PREFIX="$VALUE"
+         DESTDIR="$VALUE"
          ;;
       --disable-shared)
          SHARED=0
@@ -435,7 +435,7 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
-echo "PREFIX=$PREFIX" >> Makefile
+echo "DESTDIR=$DESTDIR" >> Makefile
 echo "" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile
 echo "" >> Makefile
