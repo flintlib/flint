@@ -29,7 +29,9 @@ usage()
    echo "     --with-gmp=<path>    Specify location of GMP (default: /usr/local)"
    echo "     --with-mpfr=<path>   Specify location of MPFR (default: /usr/local)"
    echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr/local)"
+   echo "     --without-blas       Do not use BLAS (default)"
    echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
+   echo "     --without-ntl        Do not build NTL interface (default)"
    echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
    echo "     --enable-shared      Build a shared library (default)"
    echo "     --disable-shared     Do not build a shared library"
@@ -66,11 +68,17 @@ while [ "$1" != "" ]; do
             NTL_DIR="$VALUE"
          fi
          ;;
+      --without-ntl)
+         WANT_NTL=0
+         ;;
       --with-blas)
          WANT_BLAS=1
          if [ ! -z "$VALUE" ]; then
             BLAS_DIR="$VALUE"
          fi
+         ;;
+      --without-blas)
+         WANT_BLAS=0
          ;;
       --build)
          BUILD="$VALUE"
