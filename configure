@@ -31,10 +31,13 @@ usage()
    echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr/local)"
    echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
    echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
+   echo "     --enable-shared      Build a shared library (default)"
    echo "     --disable-shared     Do not build a shared library"
+   echo "     --enable-static      Build a static library (default)"
    echo "     --disable-static     Do not build a static library"
-   echo "     --reentrant          Build fully reentrant version of library"
-   echo "     --single             Faster non-reentrant version of library (default)"
+   echo "     --single             Faster [non-reentrant if tls not used] version of library (default)"
+   echo "     --reentrant          Build fully reentrant [with or without tls] version of library"
+   echo "     --enable-tls         Use thread-local storage (default)"
    echo "     --disable-tls        Do not use thread-local storage"
    echo "     CC=<name>            Use the C compiler with the given name (default: gcc)"
    echo "     CXX=<name>           Use the C++ compiler with the given name (default: g++)"
@@ -71,17 +74,26 @@ while [ "$1" != "" ]; do
       --prefix)
          PREFIX="$VALUE"
          ;;
+      --enable-shared)
+         SHARED=1
+         ;;
       --disable-shared)
          SHARED=0
+         ;;
+      --enable-static)
+         STATIC=1
          ;;
       --disable-static)
          STATIC=0
          ;;
+      --single)
+         REENTRANT=0
+         ;;
       --reentrant)
          REENTRANT=1
          ;;
-      --single)
-         REENTRANT=0
+      --enable-tls)
+         TLS=1
          ;;
       --disable-tls)
          TLS=0
