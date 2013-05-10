@@ -415,7 +415,8 @@ if [ "$TLS" = "1" ]; then
    else
       rm -f build/test-tls.c
       echo "no"
-   fi
+   #build-tls can segfault on systems where tls is not available
+   fi 2> /dev/null
 fi
 
 #write out config.h
