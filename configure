@@ -50,7 +50,7 @@ usage()
 
 while [ "$1" != "" ]; do
    PARAM=`echo $1 | sed 's/=.*//'`
-   VALUE=`echo $1 | sed 's/[^=]*=\?//'`
+   VALUE=`echo $1 | sed 's/[^=]*//; s/=//'`
    case "$PARAM" in
       -h|--help)
          usage
