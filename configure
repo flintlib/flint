@@ -330,12 +330,16 @@ if [ -z "$FLINT_LIB" ]; then
    esac
 fi
 
-# don't build both shared and static lib on MinGW and Cygwin
+#don't build both shared and static lib on MinGW and Cygwin
 
 case "$OS" in
    CYGWIN | MINGW*)
-      if [ "$STATIC" = "1" ]; then
-         SHARED=0
+      if [ "$STATIC" = "1" ] && [ "$SHARED" = "1" ]; then
+         echo "Building both static and shared versions of MPIR/GMP on $OS is currently"
+         echo "unsupported, and so is it for MPFR and FLINT."
+         echo "You should pass --disable--shared or --disable-static to configure"
+         echo "depending on the versions of MPIR/GMP and MPFR you built."
+         exit 1
       fi
       ;;
    *)
@@ -393,6 +397,7 @@ if [ -z "$CFLAGS" ]; then
 fi
 
 #this is needed on PPC G5 and does not hurt on other OS Xes
+
 if [ "$KERNEL" = Darwin ]; then
    CFLAGS="-fno-common $CFLAGS"
 fi
