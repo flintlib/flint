@@ -48,8 +48,8 @@ usage()
 
 while [ "$1" != "" ]; do
    PARAM=`echo $1 | sed 's/=.*//'`
-   VALUE=`echo $1 | sed 's/[^=]*=//'`
-   case $PARAM in
+   VALUE=`echo $1 | sed 's/[^=]*=\?//'`
+   case "$PARAM" in
       -h|--help)
          usage
          exit 0
@@ -61,12 +61,16 @@ while [ "$1" != "" ]; do
          MPFR_DIR="$VALUE"
          ;;
       --with-ntl)
-         NTL_DIR="$VALUE"
          WANT_NTL=1
+         if [ ! -z "$VALUE" ]; then
+            NTL_DIR="$VALUE"
+         fi
          ;;
       --with-blas)
-         BLAS_DIR="$VALUE"
          WANT_BLAS=1
+         if [ ! -z "$VALUE" ]; then
+            BLAS_DIR="$VALUE"
+         fi
          ;;
       --build)
          BUILD="$VALUE"
