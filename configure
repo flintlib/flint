@@ -25,6 +25,7 @@ usage()
    echo "     -h display usage information"
    echo "   where <args> may be:"
    echo "     --prefix=<path>      Specify path to installation location (default: /usr/local)"
+   echo "     --with-mpir=<path>   Specify location of MPIR (default: /usr/local)"
    echo "     --with-gmp=<path>    Specify location of GMP (default: /usr/local)"
    echo "     --with-mpfr=<path>   Specify location of MPFR (default: /usr/local)"
    echo "     --with-blas[=<path>] Use BLAS and specify its location (default: /usr/local)"
@@ -50,7 +51,7 @@ while [ "$1" != "" ]; do
          usage
          exit 0
          ;;
-      --with-gmp)
+      --with-mpir|--with-gmp)
          GMP_DIR="$VALUE"
          ;;
       --with-mpfr)
