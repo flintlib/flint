@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # (C) 2007, Robert Bradshaw, William Hart, William Stein, Michael Abshoff
 # (C) 2011, William Hart
