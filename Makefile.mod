@@ -3,7 +3,7 @@ SOURCES = $(wildcard *.c)
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
 LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
-MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo 
+MOD_LOBJ = $(BUILD_DIR)/../$(MOD_DIR).lo
 
 TEST_SOURCES = $(wildcard test/*.c)
 
@@ -19,7 +19,7 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: shared static 
+all: shared static
 
 shared: $(MOD_LOBJ)
 
@@ -27,7 +27,7 @@ static: $(OBJS)
 
 profile: $(PROF_SOURCES)
 	$(foreach prog, $(PROFS), $(CC) $(CFLAGS) $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
-        
+
 tune: $(TUNE_SOURCES)
 	$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
@@ -38,7 +38,7 @@ $(MOD_LOBJ): $(LOBJS)
 	$(CC) $(ABI_FLAG) -Wl,-r $^ -o $@ -nostdlib
 
 $(BUILD_DIR)/%.lo: %.c
-	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@
+	$(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
 	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
