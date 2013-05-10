@@ -29,11 +29,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <pthread.h>
 #define ulong unsigned long
+
 #include <gmp.h>
 #include "flint.h"
 #include "ulong_extras.h"
+
+#if HAVE_PTHREAD
+#include <pthread.h>
+#endif
 
 unsigned int * sieve;
 
@@ -58,10 +62,12 @@ double * flint_prime_inverses;
 
 ulong flint_num_primes = 0;
 
+#if HAVE_PTHREAD
 #if defined (__WIN32)
 pthread_mutex_t flint_num_primes_mutex = PTHREAD_MUTEX_INITIALIZER;
 #else
 pthread_mutex_t flint_num_primes_mutex;
+#endif
 #endif
 
 void n_compute_primes(ulong num)
@@ -71,12 +77,14 @@ void n_compute_primes(ulong num)
 
     if (flint_num_primes >= num) return;
 
+#if HAVE_PTHREAD
     pthread_mutex_lock(&flint_num_primes_mutex);
     if (flint_num_primes >= num) /* someone may have changed this before we locked */
     {
         pthread_mutex_unlock(&flint_num_primes_mutex);
-        return; 
+        return;
     }
+#endif
 
     num = FLINT_MAX(num, 2 * flint_num_primes);
     num = FLINT_MAX(num, 16384);
@@ -103,5 +111,7 @@ void n_compute_primes(ulong num)
     flint_primes_cutoff = flint_primes[num - 1];
     flint_num_primes = num;
 
+#if HAVE_PTHREAD
     pthread_mutex_unlock(&flint_num_primes_mutex);
+#endif
 }
