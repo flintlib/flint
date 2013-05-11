@@ -19,7 +19,7 @@ export
 SOURCES = clz_tab.c memory_manager.c version.c profiler.c
 LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h config.h fft_tuning.h fmpz-conversions.h
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
