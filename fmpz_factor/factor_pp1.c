@@ -581,6 +581,7 @@ cleanup:
       mpz_realloc(fm, r);
       mpn_copyi(fm->_mp_d, factor, r);
       fm->_mp_size = r;
+      _fmpz_demote_val(fac);
    }
 
 cleanup2:
