@@ -630,7 +630,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
 {
     const long d    = j[lena - 1];
     const fmpz_t p  = {2L};
-    const fmpz_t p4  = {4L};
+    const fmpz_t p4 = {4L};
     const fmpz_t p8 = {8L};
     int ans;
 
@@ -644,37 +644,35 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
     s = _fmpz_vec_init(2 * d - 1);
     t = _fmpz_vec_init(2 * d - 1);
 
-    for (k = 0; k < lena; k++)                        /* Dense copy of f    */
+    /* Dense copy of f */
+    for (k = 0; k < lena; k++)
         fmpz_set(f + j[k], a + k);
 
-    _fmpz_vec_scalar_mod_fmpz(t, op, len, p8);
-    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);   /* 1/u mod 8          */
+    /* Compute s = invsqrt(op) (mod 2) */
+    _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 1);
+    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p);
+    _fmpz_mod_poly_sqrtmod_2(s, r, d, a, j, lena);
 
-printf("op = "), _fmpz_vec_print(op, len), printf("\n");
-printf("t = "), _fmpz_vec_print(t, len), printf("\n");
-printf("r = "), _fmpz_vec_print(r, d), printf("\n");
-    _fmpz_vec_scalar_mod_fmpz(t, r, d, p);
-    _fmpz_mod_poly_sqrtmod_2(s, t, d, a, j, lena);    /* invsqrt(u) mod 2   */
-printf("t = "), _fmpz_vec_print(t, d), printf("\n");
-printf("s = "), _fmpz_vec_print(s, d), printf("\n");
+    /* Compute t = (1/op - s^2) / 4 (mod 2) */
+    _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 3);
+    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);
+    _fmpz_poly_sqr(t, s, d);
+    _fmpz_poly_reduce(t, 2*d - 1, a, j, lena);
+    _fmpz_vec_sub(t, r, t, d);
+    _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 2);
 
-    _fmpz_poly_sqr(c, s, d);
-    _fmpz_poly_reduce(c, 2 * d - 1, a, j, lena);
-    _fmpz_poly_add(c, c, d, r, d);
-    _fmpz_vec_scalar_mod_fmpz(c, c, d, p8);
-    _fmpz_vec_scalar_fdiv_q_2exp(c, c, d, 2);         /* (1/u - s^2)/4 mod 2*/
-
+    /* Check whether X^2 + s X = t (mod 2) has a solution */
     /*
         u = (op,len) is a square in Zq iff it is a square modulo 8, 
-        which is the case iff t^2 + st + c == 0 is soluble.  Let g 
-        be c/s^2.  Then the above quadratic is soluble iff Y^2 + Y + d = 0 
-        is soluble.
+        which is the case iff X^2 + s X + t == 0 (mod 2) is soluble.  
+        Let g be t/s^2.  Then the above quadratic is soluble iff 
+        Y^2 + Y + d = 0 is soluble.
      */
 
     _fmpz_poly_sqr(g, s, d);
     _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
-    _fmpz_mod_poly_invmod(t, g, d, f, d + 1, p);
-    _fmpz_poly_mul(g, c, d, t, d);
+    _fmpz_mod_poly_invmod(r, g, d, f, d + 1, p);
+    _fmpz_poly_mul(g, r, d, t, d);
     _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
 
     ans = _artin_schreier_preimage(r, g, d, a, j, lena);
@@ -683,6 +681,7 @@ printf("s = "), _fmpz_vec_print(s, d), printf("\n");
 
     if (ans)
     {
+        /* Set t = r s, a square root */
         _fmpz_poly_mul(t, r, d, s, d);
         _fmpz_mod_poly_reduce(t, 2 * d - 1, a, j, lena, p);
 
