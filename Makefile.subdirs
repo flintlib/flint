@@ -51,7 +51,7 @@ clean:
 
 check: $(TESTS) $(TESTS_RUN)
 
-$(BUILD_DIR)/test/%: test/%.c ../test_helpers $(HEADERS)
+$(BUILD_DIR)/test/%: test/%.c  ../test_helpers.o $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< ../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %

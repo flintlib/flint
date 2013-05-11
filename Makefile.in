@@ -116,7 +116,7 @@ static: libflint.a
 
 check: library test_helpers.o
 ifndef MOD
-	$(MAKE) $(TESTS)
+	$(AT)$(MAKE) $(TESTS)
 	$(AT)$(foreach prog, $(TESTS), $(prog) || exit $$?;)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 	mkdir -p build/interfaces/test
