@@ -17,33 +17,27 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
 export
 
 SOURCES = clz_tab.c memory_manager.c version.c profiler.c
+LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
 
-HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) config.h fft_tuning.h fmpz-conversions.h
+HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h config.h fft_tuning.h fmpz-conversions.h
 
 OBJS = $(patsubst %.c, build/%.o, $(SOURCES))
-
 LIB_OBJS = $(patsubst %, build/%/*.o, $(BUILD_DIRS))
-LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 
+LOBJS = $(patsubst %.c, build/%.lo, $(SOURCES))
 LIB_LOBJS = $(patsubst %, build/%/*.lo, $(BUILD_DIRS))
 MOD_LOBJS = $(patsubst %, build/%.lo, $(BUILD_DIRS))
 
-LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
-
 EXMP_SOURCES = $(wildcard examples/*.c)
-
-TEST_SOURCES = $(wildcard test/*.c)
-
-PROF_SOURCES = $(wildcard profile/*.c)
-
-TUNE_SOURCES = $(wildcard tune/*.c)
-
 EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
+TEST_SOURCES = $(wildcard test/*.c)
 TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
 
+PROF_SOURCES = $(wildcard profile/*.c)
 PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
+TUNE_SOURCES = $(wildcard tune/*.c)
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
 all: library
@@ -74,7 +68,7 @@ examples: library $(EXMP_SOURCES)
 	mkdir -p build/examples
 	@$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
-$(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
+$(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
 	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) shared || exit $$?;)
 	@if [ "$(WANT_NTL)" -eq "1" ]; then \
 	  $(MAKE) build/interfaces/NTL-interface.lo; \
@@ -84,7 +78,7 @@ $(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interf
 	  $(CC) $(ABI_FLAG) -shared $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 
-libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
+libflint.a: $(OBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
 	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) static || exit $$?;)
 	@if [ "$(FLINT_SHARED)" -eq "0" ]; then \
 		touch test/t-*.c; \
@@ -99,11 +93,15 @@ libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interface
 
 library:
 	@if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(MAKE) $(FLINT_LIB); \
+		$(MAKE) shared; \
 	fi
 	@if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(MAKE) libflint.a; \
+		$(MAKE) static; \
 	fi
+
+shared: $(FLINT_LIB)
+
+static: libflint.a
 
 check: library test_helpers.o
 ifndef MOD
@@ -133,13 +131,13 @@ install: library
 build:
 	mkdir -p build
 
-build/%.lo: %.c | build
+build/%.lo: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/%.o: %.c | build
+build/%.o: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/test/%: test/%.c | build/test
+build/test/%: test/%.c $(HEADERS) | build/test
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
 build/test:
@@ -157,5 +155,5 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
-.PHONY: profile library clean examples tune check distclean dist install all
+.PHONY: profile library shared static clean examples tune check distclean dist install all
 
