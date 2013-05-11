@@ -45,7 +45,7 @@ TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 all: library
 
 clean:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
+	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
 	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
