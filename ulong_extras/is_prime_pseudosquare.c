@@ -66,7 +66,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         return (n == 2UL);
     }
 
-    n_compute_primes(FLINT_PSEUDOSQUARES_CUTOFF);
+    n_compute_primes(FLINT_PSEUDOSQUARES_CUTOFF+1);
 
     for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
     {
