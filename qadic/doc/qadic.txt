@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011, 2012 Sebastian Pancratz
+    Copyright (C) 2011, 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -33,8 +33,7 @@
     than $\deg(f)$.
 
     As such, \code{qadic_struct} and \code{qadic_t} are 
-    just macros defined as \code{padic_poly_struct} and 
-    \code{padic_poly_t}.
+    typedef'ed as \code{padic_poly_struct} and \code{padic_poly_t}.
 
 *******************************************************************************
 
@@ -49,12 +48,12 @@
 
     The first field in the context structure is a $p$-adic 
     context struct \code{pctx}, which contains data about 
-    the $p$-adic precision, the printing mode etc.
+    the prime~$p$, precomputed powers, the printing mode etc.
 
     The polynomial $f$ is represented as a sparse polynomial 
     using two arrays $j$ and $a$ of length \code{len}, where 
     $f(X) = \sum_{i} a_{i} X^{j_{i}}$.  We also assume that 
-    the array $j$ is sorted in ascending order.
+    the array~$j$ is sorted in ascending order.
 
     We choose this data structure to improve reduction 
     modulo $f(X)$ in $\mathbf{Q}_p[X]$, assuming a sparse 
@@ -110,6 +109,11 @@ void qadic_init(qadic_t rop)
 
     Initialises the element \code{rop}, setting its value to~$0$.
 
+void qadic_init2(qadic_t rop, long prec)
+
+    Initialises the element \code{rop} with the given output precision, 
+    setting the value to~$0$.
+
 void qadic_clear(qadic_t rop)
 
     Clears the element \code{rop}.
@@ -158,7 +162,9 @@ long qadic_val(const qadic_t op)
 
     Returns the valuation of \code{op}.
 
-    This function is implemented as a macro.
+long qadic_prec(const qadic_t op)
+
+    Returns the precision of \code{op}.
 
 *******************************************************************************
 
