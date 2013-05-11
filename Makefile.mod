@@ -2,6 +2,8 @@ QUIET_CC  = @echo '   ' CC  ' ' $@;
 
 SOURCES = $(wildcard *.c)
 
+HEADERS = $(wildcard ../*.h)
+
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
 LOBJS = $(patsubst %.c, $(BUILD_DIR)/%.lo, $(SOURCES))
@@ -27,19 +29,19 @@ shared: $(MOD_LOBJ)
 
 static: $(OBJS)
 
-profile: $(PROF_SOURCES)
+profile: $(PROF_SOURCES) ../profile.o $(HEADERS)
 	@$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
-tune: $(TUNE_SOURCES)
+tune: $(TUNE_SOURCES) $(HEADERS)
 	@$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
-$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c
+$(BUILD_DIR)/$(MOD_DIR)_%.o: %.c $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) -c $(INCS) $< -o $@
 
 $(MOD_LOBJ): $(LOBJS)
 	$(QUIET_CC) $(CC) $(ABI_FLAG) -Wl,-r $^ -o $@ -nostdlib
 
-$(BUILD_DIR)/%.lo: %.c
+$(BUILD_DIR)/%.lo: %.c $(HEADERS)
 	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@
 
 clean:
@@ -47,7 +49,7 @@ clean:
 
 check: $(TESTS) $(TESTS_RUN)
 
-$(BUILD_DIR)/test/%: test/%.c
+$(BUILD_DIR)/test/%: test/%.c ../test_helpers $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< ../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %
