@@ -4,6 +4,10 @@ else
   $(DLPATH):=$(DLPATH_ADD)
 endif
 
+QUIET_CC  = @echo '   ' CC  ' ' $@;
+QUIET_CXX = @echo '   ' CXX ' ' $@;
+QUIET_AR  = @echo '   ' AR  ' ' $@;
+
 BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
@@ -45,7 +49,7 @@ TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 all: library
 
 clean:
-	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
+	@$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
 	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
@@ -56,72 +60,72 @@ distclean: clean
 dist:
 	git archive --format tar --prefix flint-2.3/ flint-2.3 > ../flint-2.3.tar; gzip ../flint-2.3.tar
 
-profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
+profile: library $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
+	@$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
 
-tune: $(FLINT_LIB) $(TUNE_SOURCES)
+tune: library $(TUNE_SOURCES)
 	mkdir -p build/tune
-	$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) tune || exit $$?;)
+	@$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) tune || exit $$?;)
 
-examples: $(FLINT_LIB) $(EXMP_SOURCES)
+examples: library $(EXMP_SOURCES)
 	mkdir -p build/examples
-	$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
+	@$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
 $(FLINT_LIB): $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(LOBJS) | build build/interfaces
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) shared || exit $$?;)
-	if [ "$(WANT_NTL)" -eq "1" ]; then \
+	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) shared || exit $$?;)
+	@if [ "$(WANT_NTL)" -eq "1" ]; then \
 	  $(MAKE) build/interfaces/NTL-interface.lo; \
 	  $(CXX) $(ABI_FLAG) -shared build/interfaces/NTL-interface.lo $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
-	if [ "$(WANT_NTL)" -ne "1" ]; then \
+	@if [ "$(WANT_NTL)" -ne "1" ]; then \
 	  $(CC) $(ABI_FLAG) -shared $(LOBJS) $(MOD_LOBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 
 libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interfaces
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) static || exit $$?;)
-	if [ "$(FLINT_SHARED)" -eq "0" ]; then \
+	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) static || exit $$?;)
+	@if [ "$(FLINT_SHARED)" -eq "0" ]; then \
 		touch test/t-*.c; \
 		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
 	fi
-	if [ "$(WANT_NTL)" -eq "1" ]; then \
+	@if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(MAKE) build/interfaces/NTL-interface.o; \
 		$(AR) rcs libflint.a build/interfaces/NTL-interface.o; \
 	fi
-	$(AR) rcs libflint.a $(OBJS);
-	$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
+	$(QUIET_AR) $(AR) rcs libflint.a $(OBJS);
+	@$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
 
 library:
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+	@if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		$(MAKE) $(FLINT_LIB); \
 	fi
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+	@if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		$(MAKE) libflint.a; \
 	fi
 
 check: library test_helpers.o
 ifndef MOD
 	$(MAKE) $(TESTS)
-	$(foreach prog, $(TESTS), $(prog) || exit $$?;)
-	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) check || exit $$?;)
+	@$(foreach prog, $(TESTS), $(prog) || exit $$?;)
+	@$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) check || exit $$?;)
 	mkdir -p build/interfaces/test
-	if [ "$(WANT_NTL)" -eq "1" ]; then \
+	@if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(MAKE) build/interfaces/test/t-NTL-interface; \
 		build/interfaces/test/t-NTL-interface; \
 	fi
 else
-	$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) check || exit $$?;)
+	@$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) check || exit $$?;)
 endif
 
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
-	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
+	@if [ "$(FLINT_SHARED)" -eq "1" ]; then \
 		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
 	fi
-	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
+	@if [ "$(FLINT_STATIC)" -eq "1" ]; then \
 		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	cp *.h $(DESTDIR)$(PREFIX)/include/flint
@@ -130,13 +134,13 @@ build:
 	mkdir -p build
 
 build/%.lo: %.c | build
-	$(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CC) $(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/%.o: %.c | build
-	$(CC) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/test/%: test/%.c | build/test
-	$(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
+	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
 build/test:
 	mkdir -p build/test
@@ -145,13 +149,13 @@ build/interfaces:
 	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
-	$(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CXX) $(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
-	$(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
-	$(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
+	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
 .PHONY: profile library clean examples tune check distclean dist install all
 
