@@ -195,7 +195,7 @@ mp_size_t pp1_find_power(mp_ptr factor, mp_ptr x, mp_ptr y, mp_size_t nn,
    return ret;
 }
 
-int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
+int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong B2sqrt, ulong c)
 {
    len_t i, j;
    int ret = 0;
@@ -317,15 +317,12 @@ int fmpz_factor_pp1(fmpz_t fac, const fmpz_t n_in, ulong B1, ulong c)
       len_t k, index = 0, s;
       fmpz * roots, * roots2, * evals;
       fmpz_poly_struct ** tree, ** tree2;
-      ulong B2sqrt;
 
 #if DEBUG
       ulong primorial;
       printf("starting stage 2\n");
 #endif
 
-      B2sqrt = B1/100;
-      
       /* find primorial <= B2sqrt ... */
       for (num = 1; num < num_primorials; num++)
       {
@@ -584,6 +581,7 @@ cleanup:
       mpz_realloc(fm, r);
       mpn_copyi(fm->_mp_d, factor, r);
       fm->_mp_size = r;
+      _fmpz_demote_val(fac);
    }
 
 cleanup2:
