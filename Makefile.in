@@ -34,13 +34,13 @@ EXMP_SOURCES = $(wildcard examples/*.c)
 EXMPS = $(patsubst %.c, %, $(EXMP_SOURCES))
 
 TEST_SOURCES = $(wildcard test/*.c)
-TESTS = $(patsubst %.c, build/%, $(TEST_SOURCES))
+TESTS = $(patsubst %.c, build/%$(EXEEXT), $(TEST_SOURCES))
 
 PROF_SOURCES = $(wildcard profile/*.c)
-PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
+PROFS = $(patsubst %.c, %$(EXEEXT), $(PROF_SOURCES))
 
 TUNE_SOURCES = $(wildcard tune/*.c)
-TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
+TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
 
 all: library
 
@@ -144,7 +144,7 @@ build/%.lo: %.c $(HEADERS) | build
 build/%.o: %.c $(HEADERS) | build
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/test/%: test/%.c $(HEADERS) | build/test
+build/test/%$(EXEXT): test/%.c $(HEADERS) | build/test
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< -o $@ $(LIBS)
 
 build/test:
@@ -159,7 +159,7 @@ build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
 
-build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
+build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
 .PHONY: profile library shared static clean examples tune check distclean dist install all
