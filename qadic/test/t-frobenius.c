@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2012 Sebastian Pancratz
+    Copyright (C) 2012, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -96,8 +96,7 @@ main(void)
         qadic_t a, b, c, lhs, rhs;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 50) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
@@ -105,8 +104,8 @@ main(void)
         qadic_init2(a, N);
         qadic_init2(b, N);
         qadic_init2(c, N);
-        qadic_init2(lhs, N);
-        qadic_init2(rhs, N);
+        qadic_init2(lhs, 1);
+        qadic_init2(rhs, 1);
 
         qadic_randtest_int(a, state, ctx);
         e = n_randint(state, 10) % d;
@@ -120,8 +119,9 @@ main(void)
             qadic_pow(c, a, t, ctx);
             fmpz_clear(t);
         }
-        qadic_scalar_mod_ppow(lhs, b, 1, ctx);
-        qadic_scalar_mod_ppow(rhs, c, 1, ctx);
+
+        qadic_set(lhs, b, ctx);
+        qadic_set(rhs, c, ctx);
 
         result = (qadic_equal(lhs, rhs));
         if (!result)
@@ -156,8 +156,7 @@ main(void)
         qadic_t a, b, s, s1, s2, lhs, rhs;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 10) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
@@ -217,8 +216,7 @@ main(void)
         qadic_t a, b, s, s1, s2, lhs, rhs;
         long e;
 
-        fmpz_init(p);
-        fmpz_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
+        fmpz_init_set_ui(p, n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = n_randint(state, 10) + 1;
         qadic_ctx_init_conway(ctx, p, d, FLINT_MAX(0, N-10), FLINT_MAX(0, N+10), "a", PADIC_SERIES);
