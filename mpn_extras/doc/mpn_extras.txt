@@ -116,6 +116,7 @@ mp_limb_t flint_mpn_preinv1(mp_limb_t d, mp_limb_t d2)
 
     Computes a precomputed inverse from the leading two limbs of the
     divisor \code{b, n} to be used with the \code{preinv1} functions.
+    We require the most significant bit of \code{b, n} to be 1.
 
 mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
                   mp_size_t m, mp_srcptr b, mp_size_t n, mp_limb_t dinv)
@@ -125,7 +126,7 @@ mp_limb_t flint_mpn_divrem_preinv1(mp_ptr q, mp_ptr a,
     in \code{a, n} and the rest of the quotient in \code{q, m - n}.
     We require the most significant bit of \code{b, n} to be 1.
     dinv must be computed from \code{b[n - 1]}, \code{b[n - 2]} by 
-    flint_mpn_preinv1.
+    flint_mpn_preinv1. We also require \code{m >= n >= 2}.
 
 void flint_mpn_mulmod_preinv1(mp_ptr r, 
                  mp_srcptr a, mp_srcptr b, mp_size_t n, 

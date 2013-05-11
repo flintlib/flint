@@ -1,16 +1,18 @@
+ifdef $(DLPATH)
+  $(DLPATH):=$($(DLPATH)):$(DLPATH_ADD)
+else
+  $(DLPATH):=$(DLPATH_ADD)
+endif
+
 BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    fmpz_mat mpfr_vec mpfr_mat nmod_vec nmod_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
    fmpz_factor fmpz_poly_factor fft qsieve double_extras
 
-LIBS=-L$(CURDIR) -L$(FLINT_GMP_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) -lflint $(EXTRA_LIBS) -lmpfr -lgmp -lm -lpthread
-LIBS2=-L$(FLINT_GMP_LIB_DIR) -L$(FLINT_MPFR_LIB_DIR) -L$(FLINT_NTL_LIB_DIR) -L$(FLINT_BLAS_LIB_DIR) $(EXTRA_LIBS) -lmpfr -lgmp -lm -lpthread
-INCS=-I$(CURDIR) -I$(FLINT_GMP_INCLUDE_DIR) -I$(FLINT_MPFR_INCLUDE_DIR) -I$(FLINT_NTL_INCLUDE_DIR) -I$(FLINT_BLAS_INCLUDE_DIR)
-
 export
 
-SOURCES = clz_tab.c memory_manager.c version.c profiler.c 
+SOURCES = clz_tab.c memory_manager.c version.c profiler.c
 
 HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) config.h fft_tuning.h fmpz-conversions.h
 
@@ -40,7 +42,7 @@ PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
 
 TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
 
-all: library 
+all: library
 
 clean:
 	$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) clean || exit $$?;)
@@ -56,7 +58,7 @@ dist:
 
 profile: $(FLINT_LIB) $(PROF_SOURCES) profiler.o
 	mkdir -p build/profile
-	$(foreach prog, $(PROFS), $(CC) $(CFLAGS) $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
+	$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.mod -C $(dir) profile || exit $$?;)
 
 tune: $(FLINT_LIB) $(TUNE_SOURCES)
@@ -114,21 +116,21 @@ else
 endif
 
 install: library
-	mkdir -p $(PREFIX)/lib
-	mkdir -p $(PREFIX)/include/flint
+	mkdir -p $(DESTDIR)$(PREFIX)/lib
+	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
 	if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		cp $(FLINT_LIB) $(PREFIX)/lib; \
+		cp $(FLINT_LIB) $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		cp libflint.a $(PREFIX)/lib; \
+		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
-	cp *.h $(PREFIX)/include/flint
+	cp *.h $(DESTDIR)$(PREFIX)/include/flint
 
 build:
 	mkdir -p build
 
 build/%.lo: %.c | build
-	$(CC) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(CC) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/%.o: %.c | build
 	$(CC) $(CFLAGS) $(INCS) -c $< -o $@;
@@ -143,7 +145,7 @@ build/interfaces:
 	mkdir -p build/interfaces
 
 build/interfaces/NTL-interface.lo: interfaces/NTL-interface.cpp
-	$(CXX) $(PICFLAG) $(CFLAGS) $(INCS) -c $< -o $@;
+	$(CXX) $(PIC_FLAG) $(CFLAGS) $(INCS) -c $< -o $@;
 
 build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 	$(CXX) $(CFLAGS) $(INCS) -c $< -o $@;
