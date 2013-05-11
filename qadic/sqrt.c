@@ -485,7 +485,7 @@ _fmpz_mod_poly_sqrtmod_2(fmpz *rop, const fmpz *op, long len,
     Returns whether \code{(op, len)} is a square, and if so 
     sets \code{(rop, 2 * d - 1)} to a square root mod $p^N$.
 
-    Assumes that \code{(op, len)} is a unit.
+    Assumes that \code{(op, len)} has valuation $0$.
  */
 static int 
 _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len, 
@@ -622,7 +622,7 @@ _qadic_sqrt_p(fmpz *rop, const fmpz *op, long len,
     Returns whether \code{(op, len)} is a square, and if so 
     sets \code{(rop, 2 * d - 1)} to a square root mod $2^N$.
 
-    Assumes that \code{(op, len)} is a unit.
+    Assumes that \code{(op, len)} has valuation $0$.
  */
 static int 
 _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len, 
@@ -774,7 +774,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
     sets \code{(rop, 2 * d - 1)} to a square root, reduced 
     modulo $2^N$.
 
-    Assumes that \code{(op, len)} is a unit.
+    Assumes that \code{(op, len)} has valuation $0$.
  */
 int _qadic_sqrt(fmpz *rop, const fmpz *op, long len, 
                 const fmpz *a, const long *j, long lena, 
@@ -821,14 +821,14 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
         return 1;
     }
 
-    if (rop != op)
+    if (rop == op)
     {
-        padic_poly_fit_length(rop, 2 * d - 1);
-        t = rop->coeffs;
+        t = _fmpz_vec_init(2 * d - 1);
     }
     else
     {
-        t = _fmpz_vec_init(2 * d - 1);
+        padic_poly_fit_length(rop, 2 * d - 1);
+        t = rop->coeffs;
     }
 
     ans = _qadic_sqrt(t, op->coeffs, op->length, ctx->a, ctx->j, ctx->len, p, N - rop->val);
@@ -842,6 +842,8 @@ int qadic_sqrt(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
     }
     _padic_poly_set_length(rop, d);
     _padic_poly_normalise(rop);
+    if (padic_poly_length(rop) == 0)
+        padic_poly_val(rop) = 0;
 
     return ans;
 }
