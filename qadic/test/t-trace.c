@@ -89,6 +89,7 @@ main(void)
                 printf("sigma^%ld = ", j), qadic_print_pretty(c, ctx), printf("\n");
             }
             printf("ans = %d\n", ans);
+            qadic_ctx_print(ctx);
             abort();
         }
 

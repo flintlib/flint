@@ -100,7 +100,7 @@ int main(void)
 /* PRIME (any) ***************************************************************/
 
     /* Check aliasing: a = sqrt(a) */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 1000*0; i++)
     {
         fmpz_t p;
         long d, N;
@@ -108,7 +108,7 @@ int main(void)
 
         int ans1, ans2;
         qadic_t a, b, c;
-printf("i = %ld\n", i);
+
         fmpz_init_set_ui(p, n_randint(state, 2) ? 2 : n_randprime(state, 2 + n_randint(state, 3), 1));
         d = n_randint(state, 10) + 1;
         N = z_randint(state, 50) + 1;
@@ -128,12 +128,6 @@ printf("i = %ld\n", i);
         if (!result)
         {
             printf("FAIL (aliasing):\n\n");
-            qadic_debug(a);
-            printf("\n");
-            qadic_debug(b);
-            printf("\n");
-            qadic_debug(c);
-            printf("\n");
             printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
             printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
             printf("c = "), qadic_print_pretty(c, ctx), printf("\n");
@@ -150,7 +144,7 @@ printf("i = %ld\n", i);
     }
 
     /* Test random squares */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 1000*0; i++)
     {
         fmpz_t p;
         long deg, N;
@@ -230,7 +224,7 @@ printf("i = %ld\n", i);
     }
 
     /* Test random elements */
-    for (i = 0; i < 1000; i++)
+    for (i = 0; i < 1000*0; i++)
     {
         fmpz_t p;
         long d, N;

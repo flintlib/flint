@@ -634,10 +634,9 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
     const fmpz_t p8 = {8L};
     int ans;
 
-    fmpz *c, *f, *g, *r, *s, *t;
+    fmpz *f, *g, *r, *s, *t;
     long k;
 
-    c = _fmpz_vec_init(2 * d - 1);
     f = _fmpz_vec_init(2 * d - 1);
     g = _fmpz_vec_init(2 * d - 1);
     r = _fmpz_vec_init(2 * d - 1);
@@ -706,16 +705,14 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
             long *e, i, n;
             fmpz *u;
 
-            /*n = FLINT_CLOG2(N - 2) + 1;*/
-            n = FLINT_CLOG2(N);
+            n = FLINT_FLOG2(N - 1);
 
-            /* Compute sequence of exponents, ignoring initial 2 */
+            /* Compute sequence of exponents */
             e = flint_malloc(n * sizeof(long));
-            for (e[i = 0] = N; e[i] > 3; i++)
-                e[i + 1] = (e[i] + 3) / 2;
+            for (e[i = 0] = N; e[i] > 2; i++)
+                e[i + 1] = (e[i] + 1) / 2;
 
-            u   = _fmpz_vec_init(len * n);
-assert(n > 1);
+            u = _fmpz_vec_init(len * n);
 
             /* Compute reduced units */
             {
@@ -730,7 +727,7 @@ assert(n > 1);
             {
                 _fmpz_vec_set(rop, s, d);
             }
-            for (i = n - 1; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */ /* XXX */
+            for (i = n - 1; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
             {
                 _fmpz_poly_sqr(s, rop, d);
                 _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
@@ -744,7 +741,7 @@ assert(n > 1);
                 _fmpz_vec_scalar_fdiv_r_2exp(rop, rop, d, e[i]);
             }
             {
-                _fmpz_poly_mul(s, rop, d, u + 1 * len, len);
+                _fmpz_poly_mul(s, rop, d, u + (n > 1) * len, len);  /* XXX */
                 _fmpz_poly_reduce(s, d + len - 1, a, j, lena);
                 _fmpz_poly_sqr(t, s, d);
                 _fmpz_poly_reduce(t, 2 * d - 1, a, j, lena);
@@ -761,7 +758,6 @@ assert(n > 1);
         }
     }
 
-    _fmpz_vec_clear(c, 2 * d - 1);
     _fmpz_vec_clear(f, 2 * d - 1);
     _fmpz_vec_clear(g, 2 * d - 1);
     _fmpz_vec_clear(r, 2 * d - 1);
