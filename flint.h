@@ -31,12 +31,6 @@
 #include "longlong.h"
 #include "config.h"
 
-/* this is a test comment that has
- the string len_t
- in it, and goes over many lines! */
-
-/* slong) test */
-
 #ifdef __cplusplus
  extern "C" {
 #endif
