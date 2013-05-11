@@ -706,7 +706,8 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
             long *e, i, n;
             fmpz *u;
 
-            n = FLINT_CLOG2(N - 2) + 1;
+            /*n = FLINT_CLOG2(N - 2) + 1;*/
+            n = FLINT_CLOG2(N);
 
             /* Compute sequence of exponents, ignoring initial 2 */
             e = flint_malloc(n * sizeof(long));
@@ -714,6 +715,7 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
                 e[i + 1] = (e[i] + 3) / 2;
 
             u   = _fmpz_vec_init(len * n);
+assert(n > 1);
 
             /* Compute reduced units */
             {
