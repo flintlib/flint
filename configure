@@ -454,7 +454,7 @@ done
 
 LIBS2="-lmpfr -lgmp -lm"
 if [ "$PTHREAD" = "1" ]; then
-   LIBS2="${LIBS2} -pthread"
+   LIBS2="${LIBS2} -lpthread"
 fi
 LIBS="-lflint $LIBS2"
 LIBS2="$LLIBS $LIBS2"
