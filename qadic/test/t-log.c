@@ -176,12 +176,7 @@ main(void)
         qadic_init2(b, N);
         qadic_init2(c, N);
 
-        qadic_randtest(a, state, ctx);
-        if (!qadic_is_zero(a) && (a->val < 1 || (*p == 2L && a->val < 2)))
-        {
-            a->val = (*p == 2L) + 1;
-            qadic_scalar_mod_ppow(a, a, N, ctx);
-        }
+        qadic_randtest_val(a, state, (*p == 2L) + 1, ctx);
 
         qadic_exp(b, a, ctx);
         qadic_log(c, b, ctx);

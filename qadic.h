@@ -199,9 +199,6 @@ static __inline__ void qadic_reduce(qadic_t x, const qadic_ctx_t ctx)
     }
 }
 
-void qadic_scalar_mod_ppow(qadic_t rop, const qadic_t op, long e, 
-                           const qadic_ctx_t ctx);
-
 /* Randomisation *************************************************************/
 
 static __inline__ void 

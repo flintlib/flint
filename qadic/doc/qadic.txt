@@ -147,11 +147,6 @@ void qadic_reduce(qadic_t rop, const qadic_ctx_t ctx)
 
     Reduces \code{rop} modulo $f(X)$ and $p^N$.
 
-void qadic_scalar_mod_ppow(qadic_t rop, const qadic_t op, long e, 
-                           const qadic_ctx_t ctx)
-
-    Reduces \code{rop} modulo $p^e$.
-
 *******************************************************************************
 
     Properties
