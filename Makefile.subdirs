@@ -49,7 +49,9 @@ $(BUILD_DIR)/%.lo: %.c $(HEADERS)
 clean:
 	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
 
-check: $(TESTS) $(TESTS_RUN)
+tests: $(TESTS)
+
+check: tests $(TESTS_RUN)
 
 $(BUILD_DIR)/test/%$(EXEEXT): test/%.c  ../test_helpers.o $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< ../test_helpers.o -o $@ $(LIBS)
@@ -57,4 +59,4 @@ $(BUILD_DIR)/test/%$(EXEEXT): test/%.c  ../test_helpers.o $(HEADERS)
 %_RUN: %
 	@$<
 
-.PHONY: profile tune clean check all shared static %_RUN
+.PHONY: profile tune clean check tests all shared static %_RUN

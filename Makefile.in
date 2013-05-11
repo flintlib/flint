@@ -110,6 +110,13 @@ shared: $(FLINT_LIB)
 
 static: libflint.a
 
+tests: library test_helpers.o $(TESTS)
+	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) tests || exit $$?;)
+	mkdir -p build/interfaces/test
+	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
+		$(MAKE) build/interfaces/test/t-NTL-interface; \
+	fi
+
 check: library test_helpers.o
 ifndef MOD
 	$(AT)$(MAKE) $(TESTS)
@@ -162,5 +169,5 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 build/interfaces/test/t-NTL-interface$(EXEEXT): interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
-.PHONY: profile library shared static clean examples tune check distclean dist install all
+.PHONY: profile library shared static clean examples tune check tests distclean dist install all
 
