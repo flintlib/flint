@@ -99,11 +99,15 @@ libflint.a: $(LIB_SOURCES) $(SOURCES) $(HEADERS) $(OBJS) | build build/interface
 
 library:
 	@if [ "$(FLINT_SHARED)" -eq "1" ]; then \
-		$(MAKE) $(FLINT_LIB); \
+		$(MAKE) shared; \
 	fi
 	@if [ "$(FLINT_STATIC)" -eq "1" ]; then \
-		$(MAKE) libflint.a; \
+		$(MAKE) static; \
 	fi
+
+shared: $(FLINT_LIB)
+
+static: libflint.a
 
 check: library test_helpers.o
 ifndef MOD
@@ -157,5 +161,5 @@ build/interfaces/NTL-interface.o: interfaces/NTL-interface.cpp
 build/interfaces/test/t-NTL-interface: interfaces/test/t-NTL-interface.cpp
 	$(QUIET_CXX) $(CXX) $(CFLAGS) $(INCS) $< build/interfaces/NTL-interface.o -o $@ $(LIBS);
 
-.PHONY: profile library clean examples tune check distclean dist install all
+.PHONY: profile library shared static clean examples tune check distclean dist install all
 
