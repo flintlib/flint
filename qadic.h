@@ -43,9 +43,9 @@
 
 /* Data types and context ****************************************************/
 
-#define qadic_t padic_poly_t
+typedef padic_poly_t qadic_t;
 
-#define qadic_struct padic_poly_struct
+typedef padic_poly_struct qadic_struct;
 
 #define qadic_val(op) ((op)->val)
 
