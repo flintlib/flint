@@ -329,10 +329,9 @@ static __inline__ int qadic_is_one(const qadic_t op)
     return padic_poly_is_one(op);
 }
 
-static __inline__ int 
-qadic_equal(const qadic_t x, const qadic_t y)
+static __inline__ int qadic_equal(const qadic_t op1, const qadic_t op2)
 {
-    return padic_poly_equal(x, y);
+    return padic_poly_equal(op1, op2);
 }
 
 /* Basic arithmetic **********************************************************/
