@@ -317,6 +317,17 @@ if [ -z "$FLINT_LIB" ]; then
    esac
 fi
 
+#extension for executables
+
+if [ -z "$EXEEXT" ]; then
+   case "$OS" in
+      CYGWIN | MINGW*)
+         EXEEXT=".exe";;
+      *)
+         EXEEXT="";;
+   esac
+fi
+
 #don't build both shared and static lib on MinGW and Cygwin
 
 case "$OS" in
@@ -453,7 +464,7 @@ done
 
 LIBS2="-lmpfr -lgmp -lm"
 if [ "$PTHREAD" = "1" ]; then
-   LIBS2="${LIBS2} -pthread"
+   LIBS2="${LIBS2} -lpthread"
 fi
 LIBS="-lflint $LIBS2"
 LIBS2="$LLIBS $LIBS2"
@@ -496,6 +507,7 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
+echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile

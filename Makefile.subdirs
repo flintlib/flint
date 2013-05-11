@@ -17,13 +17,13 @@ PROF_SOURCES = $(wildcard profile/*.c)
 
 TUNE_SOURCES = $(wildcard tune/*.c)
 
-TESTS = $(patsubst %.c, $(BUILD_DIR)/%, $(TEST_SOURCES))
+TESTS = $(patsubst %.c, $(BUILD_DIR)/%$(EXEEXT), $(TEST_SOURCES))
 
 TESTS_RUN = $(patsubst %, %_RUN, $(TESTS))
 
-PROFS = $(patsubst %.c, %, $(PROF_SOURCES))
+PROFS = $(patsubst %.c, %$(EXEEXT), $(PROF_SOURCES))
 
-TUNE = $(patsubst %.c, %, $(TUNE_SOURCES))
+TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
 
 all: shared static
 
@@ -49,12 +49,14 @@ $(BUILD_DIR)/%.lo: %.c $(HEADERS)
 clean:
 	rm -rf $(BUILD_DIR) $(MOD_LOBJ)
 
-check: $(TESTS) $(TESTS_RUN)
+tests: $(TESTS)
 
-$(BUILD_DIR)/test/%: test/%.c  $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
+check: tests $(TESTS_RUN)
+
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %
 	@$<
 
-.PHONY: profile tune clean check all shared static %_RUN
+.PHONY: profile tune clean check tests all shared static %_RUN
