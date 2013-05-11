@@ -1,5 +1,7 @@
 QUIET_CC  = @echo '   ' CC  ' ' $@;
 
+AT=@
+
 SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard ../*.h)
@@ -30,10 +32,10 @@ shared: $(MOD_LOBJ)
 static: $(OBJS)
 
 profile: $(PROF_SOURCES) ../profile.o $(HEADERS)
-	@$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
 tune: $(TUNE_SOURCES) $(HEADERS)
-	@$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
+	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
 $(BUILD_DIR)/$(MOD_DIR)_%.o: %.c $(HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) -c $(INCS) $< -o $@
