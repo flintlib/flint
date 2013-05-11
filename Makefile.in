@@ -76,6 +76,7 @@ examples: library $(EXMP_SOURCES)
 	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
 $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
 	  $(MAKE) build/interfaces/NTL-interface.lo; \
@@ -86,10 +87,12 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
 	fi
 
 libflint.a: $(OBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) static || exit $$?;)
 	$(AT)if [ "$(FLINT_SHARED)" -eq "0" ]; then \
 		touch test/t-*.c; \
 		$(foreach dir, $(BUILD_DIRS), touch $(dir)/test/t-*.c;) \
+		$(foreach ext, $(EXTENSIONS), $(foreach mod, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), touch $(ext)/$(mod)/test/t-*.c;)) \
 	fi
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(MAKE) build/interfaces/NTL-interface.o; \
@@ -97,6 +100,7 @@ libflint.a: $(OBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
 	fi
 	$(QUIET_AR) $(AR) rcs libflint.a $(OBJS);
 	$(AT)$(foreach mod, $(BUILD_DIRS), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach mod, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(AR) rcs libflint.a build/$(mod)/*.o || exit $$?;))
 
 library:
 	$(AT)if [ "$(FLINT_SHARED)" -eq "1" ]; then \
@@ -122,6 +126,7 @@ ifndef MOD
 	fi
 else
 	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) check || exit $$?;))
 endif
 
 install: library
