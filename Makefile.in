@@ -43,6 +43,7 @@ TUNE_SOURCES = $(wildcard tune/*.c)
 TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
 
 EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), build/$(dir).lo))
+EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
 
 all: library
 
@@ -153,7 +154,7 @@ install: library
 		cp libflint.a $(DESTDIR)$(PREFIX)/lib; \
 	fi
 	cp *.h $(DESTDIR)$(PREFIX)/include/flint
-
+	cp $(EXT_HEADERS) $(DESTDIR)$(PREFIX)/include/flint
 build:
 	mkdir -p build
 
