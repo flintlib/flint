@@ -71,14 +71,14 @@ int qadic_exp(qadic_t rop, const qadic_t op, const qadic_ctx_t ctx)
 
             alloc = _padic_ctx_pow_ui(pN, N, &ctx->pctx);
 
-            if (rop != op)
+            if (rop == op)
             {
-                padic_poly_fit_length(rop, 2 * d - 1);
-                t = rop->coeffs;
+                t = _fmpz_vec_init(2 * d - 1);
             }
             else
             {
-                t = _fmpz_vec_init(2 * d - 1);
+                padic_poly_fit_length(rop, 2 * d - 1);
+                t = rop->coeffs;
             }
 
             _qadic_exp(t, op->coeffs, v, op->length, 
