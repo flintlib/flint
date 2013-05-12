@@ -60,10 +60,15 @@ void padic_poly_randtest_val(padic_poly_t f, flint_rand_t state,
         if (alloc)
             fmpz_clear(pow);
 
+        for (i = 0; i < len; i++)
+            if (!fmpz_divisible(f->coeffs + i, ctx->p))
+                break;
+        if (i == len)
+            fmpz_one(f->coeffs + n_randint(state, len));
+
         _padic_poly_set_length(f, len);
         _padic_poly_normalise(f);
 
-        padic_poly_canonicalise(f, ctx->p);
         padic_poly_reduce(f, ctx);
     }
 }
