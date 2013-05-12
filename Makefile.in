@@ -122,6 +122,7 @@ static: libflint.a
 
 tests: library test_helpers.o $(TESTS)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) tests || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/test; export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) tests || exit $$?;))
 	mkdir -p build/interfaces/test
 	$(AT)if [ "$(WANT_NTL)" -eq "1" ]; then \
 		$(MAKE) build/interfaces/test/t-NTL-interface; \
