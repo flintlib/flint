@@ -201,7 +201,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
    {
       fmpz_set_ui(f, flint_fmpz_pseudosquares[i][1]);
       fmpz_mul_2exp(f, f, 32);
-      fmpz_add_ui(f, flint_fmpz_pseudosquares[i][0]);
+      fmpz_add_ui(f, f, flint_fmpz_pseudosquares[i][0]);
    } else if (i < FLINT_NUM_FMPZ_PSEUDOSQUARES)
    {
       fmpz_set_ui(f, flint_fmpz_pseudosquares[i][2]);
