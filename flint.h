@@ -48,7 +48,8 @@ extern char version[];
 
 typedef mp_size_t len_t;
 
-#define ulong unsigned long
+#define ulong mp_limb_t
+#define slong mp_limb_signed_t
 
 void * flint_malloc(size_t size);
 void * flint_realloc(void * ptr, size_t size);

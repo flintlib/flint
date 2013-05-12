@@ -188,7 +188,7 @@ void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2)
 
     Sets \code{poly1} to equal \code{poly2}.
 
-void fmpq_poly_set_si(fmpq_poly_t poly, long x)
+void fmpq_poly_set_si(fmpq_poly_t poly, slong x)
 
     Sets \code{poly} to the integer $x$.
 
@@ -320,7 +320,7 @@ void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, long n)
 
     Retrieves the $n$th coefficient of \code{poly}, in lowest terms.
 
-void fmpq_poly_set_coeff_si(fmpq_poly_t poly, long n, long x)
+void fmpq_poly_set_coeff_si(fmpq_poly_t poly, len_t n, slong x)
 
     Sets the $n$th coefficient in \code{poly} to the integer $x$.
 
@@ -436,7 +436,7 @@ void fmpq_poly_sub(fmpq_poly_t res, fmpq_poly poly1, fmpq_poly poly2)
 *******************************************************************************
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                        const fmpz * poly, const fmpz_t den, long len, long c)
+                        const fmpz * poly, const fmpz_t den, len_t len, slong c)
 
     Sets \code{(rpoly, rden, len)} to the product of $c$ of 
     \code{(poly, den, len)}.
@@ -488,7 +488,7 @@ void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     Supports aliasing of \code{(rpoly, den)} and \code{(poly, den)}.
     The \code{fmpz_t}'s $r$ and $s$ may not be part of \code{(rpoly, rden)}.
 
-void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
+void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 
     Sets \code{rop} to $c$ times \code{op}.
 
@@ -528,7 +528,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     Assumes that $c$ is not part of \code{(rpoly, rden)}.
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
-                                           const fmpz_t den, long len, long c)
+                                           const fmpz_t den, len_t len, slong c)
 
     Sets \code{(rpoly, rden, len)} to \code{(poly, den, len)} divided by $c$, 
     in lowest terms.
@@ -556,7 +556,7 @@ void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
     \code{(poly, den)}. The \code{fmpz_t}'s $r$ and $s$ may not be part of 
     \code{(rpoly, poly)}.
 
-void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, long c)
+void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 
 void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 

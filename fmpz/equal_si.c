@@ -27,7 +27,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-int fmpz_equal_si(const fmpz_t f, len_t g)
+int fmpz_equal_si(const fmpz_t f, slong g)
 {
     fmpz c = *f;
 

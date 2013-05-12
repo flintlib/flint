@@ -28,7 +28,7 @@
 #undef ulong /* prevent clash with standard library */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 #include "flint.h"
 #include "ulong_extras.h"
 

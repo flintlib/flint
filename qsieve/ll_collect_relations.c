@@ -27,7 +27,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long 
+#define ulong mp_limb_t
 
 #include <gmp.h>
 #include "flint.h"

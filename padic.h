@@ -29,7 +29,7 @@
 #undef ulong /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 
@@ -160,7 +160,7 @@ void padic_randtest_int(padic_t rop, flint_rand_t state,
 
 void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-void padic_set_si(padic_t rop, len_t op, const padic_ctx_t ctx);
+void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx);
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx);
 
@@ -266,7 +266,7 @@ void padic_inv(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
 int padic_sqrt(padic_t rop, const padic_t op, const padic_ctx_t ctx);
 
-void padic_pow_si(padic_t rop, const padic_t op, len_t e, 
+void padic_pow_si(padic_t rop, const padic_t op, slong e, 
                   const padic_ctx_t ctx);
 
 /* Exponential ***************************************************************/

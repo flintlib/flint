@@ -30,7 +30,7 @@
 #include "fmpz.h"
 
 void
-fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
+fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 {
     fmpz c1 = *g;
     len_t c2 = h;

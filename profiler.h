@@ -49,7 +49,7 @@ int gettimeofday(struct timeval * p, void * tz);
 #else
 #include <sys/resource.h>
 #endif
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #ifndef FLINT_PROFILER_H
 #define FLINT_PROFILER_H

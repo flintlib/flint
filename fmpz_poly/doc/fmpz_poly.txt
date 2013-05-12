@@ -103,7 +103,7 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2)
 
     Sets \code{poly1} to equal \code{poly2}.
 
-void fmpz_poly_set_si(fmpz_poly_t poly, long c)
+void fmpz_poly_set_si(fmpz_poly_t poly, slong c)
 
     Sets \code{poly} to the signed integer \code{c}.
 
@@ -241,7 +241,7 @@ void fmpz_poly_get_coeff_fmpz(fmpz_t x, const fmpz_poly_t poly, long n)
     numbering is from zero and if $n$ is set to a value beyond the end of 
     the polynomial, zero is returned.
 
-long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, long n)
+long fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
 
     Returns coefficient $n$ of \code{poly} as a \code{long}. The result is 
     undefined if the value does not fit into a \code{long}. Coefficient 
@@ -286,7 +286,7 @@ void fmpz_poly_set_coeff_fmpz(fmpz_poly_t poly, long n, const fmpz_t x)
     length of \code{poly} then the polynomial is extended and zero 
     coefficients inserted if necessary.
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, long n, long x)
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, len_t n, slong x)
 
     Sets coefficient $n$ of \code{poly} to the \code{long} value \code{x}. 
     Coefficient numbering starts from zero and if $n$ is beyond the current 
@@ -376,7 +376,7 @@ void fmpz_poly_scalar_mul_mpz(fmpz_poly_t poly1,
 
     Sets \code{poly1} to \code{poly2} times the \code{mpz_t} $x$.
 
-void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets \code{poly1} to \code{poly2} times the signed \code{long x}.
 
@@ -410,7 +410,7 @@ void fmpz_poly_scalar_fdiv_mpz(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
     rounding coefficients down toward~$- \infty$.
 
-void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
     rounding coefficients down toward~$- \infty$.
@@ -431,7 +431,7 @@ void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{fmpz_t x}, 
     rounding coefficients toward~$0$.
 
-void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
     rounding coefficients toward~$0$.
@@ -458,7 +458,7 @@ void fmpz_poly_scalar_divexact_mpz(fmpz_poly_t poly1,
     Sets \code{poly1} to \code{poly2} divided by the \code{mpz_t x}, 
     assuming the coefficient is exact for every coefficient.
 
-void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, long x)
+void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
     Sets \code{poly1} to \code{poly2} divided by the \code{long x}, 
     assuming the coefficient is exact for every coefficient.
