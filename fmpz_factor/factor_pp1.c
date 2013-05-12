@@ -25,7 +25,7 @@
 
 #undef ulong /* avoid clash with stdlib */
 #include <string.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 #include <gmp.h>
 #include "flint.h"
 #include "fmpz.h"

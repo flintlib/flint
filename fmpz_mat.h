@@ -29,7 +29,7 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 #include "flint.h"
@@ -139,22 +139,22 @@ void fmpz_mat_neg(fmpz_mat_t B, const fmpz_mat_t A);
 
 /* Scalar operations */
 void fmpz_mat_scalar_mul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c);
+void fmpz_mat_scalar_mul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_mul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c);
+void fmpz_mat_scalar_addmul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_addmul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_submul_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c);
+void fmpz_mat_scalar_submul_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_submul_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B, const nmod_mat_t A, const fmpz_t c);
 void fmpz_mat_scalar_addmul_nmod_mat_ui(fmpz_mat_t B, const nmod_mat_t A, ulong c);
 
 void fmpz_mat_scalar_divexact_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t c);
-void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, len_t c);
+void fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c);
 void fmpz_mat_scalar_divexact_ui(fmpz_mat_t B, const fmpz_mat_t A, ulong c);
 
 void fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m);

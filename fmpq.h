@@ -29,7 +29,7 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 #include <mpfr.h>
@@ -151,9 +151,9 @@ int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den);
 int fmpq_is_canonical(const fmpq_t x);
 
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, len_t p, ulong q);
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
 
-void fmpq_set_si(fmpq_t res, len_t p, ulong q);
+void fmpq_set_si(fmpq_t res, slong p, ulong q);
 
 
 void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q);
@@ -232,9 +232,9 @@ void fmpq_mul(fmpq_t res, const fmpq_t op1, const fmpq_t op2);
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x);
 
 void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
-                  const fmpz_t opnum, const fmpz_t opden, len_t e);
+                  const fmpz_t opnum, const fmpz_t opden, slong e);
 
-void fmpq_pow_si(fmpq_t rop, const fmpq_t op, len_t e);
+void fmpq_pow_si(fmpq_t rop, const fmpq_t op, slong e);
 
 
 void _fmpq_addmul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,

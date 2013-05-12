@@ -31,7 +31,7 @@
 
 #undef ulong /* interferes with system includes */
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 #include "flint.h"
@@ -110,7 +110,7 @@ void fmpz_poly_set(fmpz_poly_t poly1, const fmpz_poly_t poly2);
 
 void fmpz_poly_set_ui(fmpz_poly_t poly, ulong c);
 
-void fmpz_poly_set_si(fmpz_poly_t poly, len_t c);
+void fmpz_poly_set_si(fmpz_poly_t poly, slong c);
 
 void fmpz_poly_set_fmpz(fmpz_poly_t poly, const fmpz_t c);
 
@@ -174,9 +174,9 @@ void fmpz_poly_randtest_not_zero(fmpz_poly_t f, flint_rand_t state,
 
 /*  Getting and setting coefficients  ****************************************/
 
-len_t fmpz_poly_get_coeff_si(const fmpz_poly_t poly, len_t n);
+len_t fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n);
 
-void fmpz_poly_set_coeff_si(fmpz_poly_t poly, len_t n, len_t x);
+void fmpz_poly_set_coeff_si(fmpz_poly_t poly, len_t n, slong x);
 
 ulong fmpz_poly_get_coeff_ui(const fmpz_poly_t poly, len_t n);
 
@@ -247,7 +247,7 @@ void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1,
                              const fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, 
-                             const fmpz_poly_t poly2, len_t x);
+                             const fmpz_poly_t poly2, slong x);
 
 void fmpz_poly_scalar_mul_fmpz(fmpz_poly_t poly1, 
                                const fmpz_poly_t poly2, const fmpz_t x);
@@ -262,7 +262,7 @@ void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1,
                               const fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, 
-                              const fmpz_poly_t poly2, len_t x);
+                              const fmpz_poly_t poly2, slong x);
 
 void fmpz_poly_scalar_fdiv_fmpz(fmpz_poly_t poly1, 
                                 const fmpz_poly_t poly2, const fmpz_t x);
@@ -271,7 +271,7 @@ void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1,
                               const fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, 
-                              const fmpz_poly_t poly2, len_t x);
+                              const fmpz_poly_t poly2, slong x);
 
 void fmpz_poly_scalar_tdiv_fmpz(fmpz_poly_t poly1, 
                                 const fmpz_poly_t poly2, const fmpz_t x);
@@ -280,7 +280,7 @@ void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1,
                                   const fmpz_poly_t poly2, ulong x);
 
 void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, 
-                                  const fmpz_poly_t poly2, len_t x);
+                                  const fmpz_poly_t poly2, slong x);
 
 void fmpz_poly_scalar_divexact_fmpz(fmpz_poly_t poly1, 
                                     const fmpz_poly_t poly2, const fmpz_t x);

@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, const fmpz * vec2, len_t len2, len_t c)
+_fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, const fmpz * vec2, len_t len2, slong c)
 {
     len_t i;
     for (i = 0; i < len2; i++)

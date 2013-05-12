@@ -405,7 +405,7 @@ your machine, you can do the following in your code:
 #undef ulong
 #include <stdio.h>
 // other system headers
-#define ulong unsigned long
+#define ulong mp_limb_t
 \end{lstlisting}
 
 This prevents FLINT's definition of \code{ulong} interfering with

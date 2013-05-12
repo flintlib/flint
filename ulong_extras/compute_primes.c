@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 #include "flint.h"

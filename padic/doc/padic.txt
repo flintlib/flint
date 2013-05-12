@@ -187,7 +187,7 @@ void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
     Sets \code{rop} to the $p$-adic number \code{op}.
 
-void padic_set_si(padic_t rop, long op, const padic_ctx_t ctx)
+void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the 
     \code{long} integer \code{op}.
@@ -375,7 +375,7 @@ int padic_sqrt(padic_rop, const padic_t op, const padic_ctx_t ctx)
     $u \bmod 8$ is a square in $\mathbf{Z} / 8 \mathbf{Z}$, 
     for $p = 2$.
 
-void padic_pow_si(padic_t rop, const padic_t op, long e, 
+void padic_pow_si(padic_t rop, const padic_t op, slong e, 
                   const padic_ctx_t ctx)
 
     Sets \code{rop} to \code{op} raised to the power~$e$, 

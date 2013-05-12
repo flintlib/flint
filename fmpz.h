@@ -29,7 +29,7 @@
 #undef ulong /* interferes with system includes */
 #include <stdlib.h>
 #include <stdio.h>
-#define ulong unsigned long
+#define ulong mp_limb_t
 
 #include <gmp.h>
 
@@ -147,12 +147,12 @@ void fmpz_randtest_mod(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
 void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m);
 
-len_t fmpz_get_si(const fmpz_t f);
+slong fmpz_get_si(const fmpz_t f);
 
 ulong fmpz_get_ui(const fmpz_t f);
 
 static __inline__ void
-fmpz_set_si(fmpz_t f, len_t val)
+fmpz_set_si(fmpz_t f, slong val)
 {
     if (val < COEFF_MIN || val > COEFF_MAX) /* val is large */
     {
@@ -294,7 +294,7 @@ void fmpz_set(fmpz_t f, const fmpz_t g);
 
 int fmpz_equal(const fmpz_t f, const fmpz_t g);
 
-int fmpz_equal_si(const fmpz_t f, len_t g);
+int fmpz_equal_si(const fmpz_t f, slong g);
 
 int fmpz_equal_ui(const fmpz_t f, ulong g);
 
@@ -325,7 +325,7 @@ int fmpz_cmp(const fmpz_t f, const fmpz_t g);
 
 int fmpz_cmp_ui(const fmpz_t f, ulong g);
 
-int fmpz_cmp_si(const fmpz_t f, len_t g);
+int fmpz_cmp_si(const fmpz_t f, slong g);
 
 int fmpz_cmpabs(const fmpz_t f, const fmpz_t g);
 
@@ -388,7 +388,7 @@ void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x);
 
-void fmpz_mul_si(fmpz_t f, const fmpz_t g, len_t x);
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x);
 
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
@@ -482,17 +482,17 @@ len_t fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f);
 
 void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_divexact_si(fmpz_t f, const fmpz_t g, len_t h);
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h);
 
 void fmpz_divexact_ui(fmpz_t f, const fmpz_t g, ulong h);
 
 int fmpz_divisible(const fmpz_t f, const fmpz_t g);
 
-int fmpz_divisible_si(const fmpz_t f, len_t g);
+int fmpz_divisible_si(const fmpz_t f, slong g);
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
-void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, len_t h);
+void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 
 void fmpz_cdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
@@ -506,7 +506,7 @@ void fmpz_fdiv_r(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 void fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
-void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, len_t h);
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 
 void fmpz_fdiv_q_2exp(fmpz_t f, const fmpz_t g, ulong exp);
 
@@ -518,7 +518,7 @@ void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h);
 
 void fmpz_tdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h);
 
-void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, len_t h);
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h);
 
 ulong fmpz_tdiv_ui(const fmpz_t g, ulong h);
 
@@ -562,7 +562,7 @@ fmpz_divexact2_uiui(fmpz_t f, const fmpz_t g, ulong h1, ulong h2)
 
 void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp);
 
-void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, len_t x, ulong exp);
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp);
 
 void fmpz_fac_ui(fmpz_t f, ulong n);
 

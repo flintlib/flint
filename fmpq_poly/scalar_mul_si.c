@@ -32,7 +32,7 @@
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
                               const fmpz * poly, const fmpz_t den, len_t len, 
-                              len_t c)
+                              slong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
 
@@ -69,7 +69,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     fmpz_clear(gcd);
 }
 
-void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, len_t c)
+void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c)
 {
     if (c == 0 || fmpq_poly_is_zero(op))
     {

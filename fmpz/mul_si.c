@@ -29,7 +29,7 @@
 #include "fmpz.h"
 
 void
-fmpz_mul_si(fmpz_t f, const fmpz_t g, len_t x)
+fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 {
     fmpz c2 = *g;
 

@@ -31,7 +31,7 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-void fmpz_divexact_si(fmpz_t f, const fmpz_t g, len_t h)
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
 {
     fmpz c1 = *g;
 

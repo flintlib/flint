@@ -141,7 +141,7 @@ void _fmpz_vec_sub(fmpz * res, const fmpz * vec1,
 /*  Scalar multiplication and division  **************************************/
 
 void _fmpz_vec_scalar_mul_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_mul_ui(fmpz * vec1, 
                                       const fmpz * vec2, len_t len2, ulong c);
@@ -156,7 +156,7 @@ void _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
                                                   len_t len2, const fmpz_t x);
 
 void _fmpz_vec_scalar_divexact_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_divexact_ui(fmpz * vec1, 
                                       const fmpz * vec2, len_t len2, ulong c);
@@ -165,7 +165,7 @@ void _fmpz_vec_scalar_fdiv_q_fmpz(fmpz * vec1,
                                const fmpz * vec2, len_t len2, const fmpz_t c);
 
 void _fmpz_vec_scalar_fdiv_q_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_fdiv_q_ui(fmpz * vec1, 
                                       const fmpz * vec2, len_t len2, ulong c);
@@ -180,7 +180,7 @@ void _fmpz_vec_scalar_tdiv_q_fmpz(fmpz * vec1,
                                const fmpz * vec2, len_t len2, const fmpz_t c);
 
 void _fmpz_vec_scalar_tdiv_q_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_tdiv_q_ui(fmpz * vec1, 
                                       const fmpz * vec2, len_t len2, ulong c);
@@ -189,22 +189,22 @@ void _fmpz_vec_scalar_tdiv_q_2exp(fmpz * vec1, const fmpz * vec2,
                                                        len_t len2, ulong exp);
 
 void _fmpz_vec_scalar_addmul_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_addmul_fmpz(fmpz * poly1, const fmpz * poly2, 
                                                   len_t len2, const fmpz_t x);
 
 void _fmpz_vec_scalar_addmul_si_2exp(fmpz * vec1, const fmpz * vec2, 
-                                               len_t len2, len_t c, ulong exp);
+                                               len_t len2, slong c, ulong exp);
 
 void _fmpz_vec_scalar_submul_si(fmpz * vec1, 
-                                       const fmpz * vec2, len_t len2, len_t c);
+                                       const fmpz * vec2, len_t len2, slong c);
 
 void _fmpz_vec_scalar_submul_fmpz(fmpz * vec1, const fmpz * vec2, 
                                                   len_t len2, const fmpz_t x);
 
 void _fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, 
-                                               len_t len2, len_t c, ulong exp);
+                                               len_t len2, slong c, ulong exp);
 
 /*  Vector sum and product  **************************************************/
 

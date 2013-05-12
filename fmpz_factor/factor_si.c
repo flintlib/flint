@@ -31,7 +31,7 @@
 #include "fmpz_factor.h"
 
 void
-fmpz_factor_si(fmpz_factor_t factor, len_t n)
+fmpz_factor_si(fmpz_factor_t factor, slong n)
 {
     _fmpz_factor_set_length(factor, 0);
 

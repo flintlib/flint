@@ -117,7 +117,7 @@ void fmpq_poly_randtest_not_zero(fmpq_poly_t f, flint_rand_t state,
 
 void fmpq_poly_set(fmpq_poly_t poly1, const fmpq_poly_t poly2);
 
-void fmpq_poly_set_si(fmpq_poly_t poly, len_t x);
+void fmpq_poly_set_si(fmpq_poly_t poly, slong x);
 
 void fmpq_poly_set_ui(fmpq_poly_t poly, ulong x);
 
@@ -183,7 +183,7 @@ void fmpq_poly_get_coeff_fmpq(fmpq_t x, const fmpq_poly_t poly, len_t n);
 
 void fmpq_poly_get_coeff_mpq(mpq_t x, const fmpq_poly_t poly, len_t n);
 
-void fmpq_poly_set_coeff_si(fmpq_poly_t poly, len_t n, len_t x);
+void fmpq_poly_set_coeff_si(fmpq_poly_t poly, len_t n, slong x);
 
 void fmpq_poly_set_coeff_ui(fmpq_poly_t poly, len_t n, ulong x);
 
@@ -232,7 +232,7 @@ void fmpq_poly_sub(fmpq_poly_t res,
 /*  Scalar multiplication and division  **************************************/
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                       const fmpz * poly, const fmpz_t den, len_t len, len_t c);
+                       const fmpz * poly, const fmpz_t den, len_t len, slong c);
 
 void _fmpq_poly_scalar_mul_ui(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, len_t len, ulong c);
@@ -243,7 +243,7 @@ void _fmpq_poly_scalar_mul_fmpz(fmpz * rpoly, fmpz_t rden,
 void _fmpq_poly_scalar_mul_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                   const fmpz_t den, len_t len, const fmpz_t r, const fmpz_t s);
 
-void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, len_t c);
+void fmpq_poly_scalar_mul_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c);
 
 void fmpq_poly_scalar_mul_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 
@@ -260,7 +260,7 @@ void fmpq_poly_scalar_mul_mpq(fmpq_poly_t rop,
                               const fmpq_poly_t op, const mpq_t c);
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, 
-                       const fmpz * poly, const fmpz_t den, len_t len, len_t c);
+                       const fmpz * poly, const fmpz_t den, len_t len, slong c);
 
 void _fmpq_poly_scalar_div_ui(fmpz * rpoly, fmpz_t rden, 
                       const fmpz * poly, const fmpz_t den, len_t len, ulong c);
@@ -271,7 +271,7 @@ void _fmpq_poly_scalar_div_fmpz(fmpz * rpoly, fmpz_t rden,
 void _fmpq_poly_scalar_div_fmpq(fmpz * rpoly, fmpz_t rden, const fmpz * poly, 
                   const fmpz_t den, len_t len, const fmpz_t r, const fmpz_t s);
 
-void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, len_t c);
+void fmpq_poly_scalar_div_si(fmpq_poly_t rop, const fmpq_poly_t op, slong c);
 
 void fmpq_poly_scalar_div_ui(fmpq_poly_t rop, const fmpq_poly_t op, ulong c);
 

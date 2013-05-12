@@ -115,7 +115,7 @@ void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
 *******************************************************************************
 
-ulong fmpz_get_si(const fmpz_t f)
+slong fmpz_get_si(const fmpz_t f)
 
     Returns $f$ as a \code{signed long}.  The result is undefined
     if $f$ does not fit into a \code{long}.
@@ -156,7 +156,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
     the function.  Otherwise, it is up to the caller to ensure that 
     the allocated block of memory is sufficiently large.
 
-void fmpz_set_si(fmpz_t f, len_t val)
+void fmpz_set_si(fmpz_t f, slong val)
 
     Sets $f$ to the given \code{signed long} value.
 
@@ -423,7 +423,7 @@ int fmpz_cmp_ui(const fmpz_t f, ulong g)
     Returns a negative value if $f < g$, positive value if $g < f$, 
     otherwise returns $0$.
 
-int fmpz_cmp_si(const fmpz_t f, len_t g)
+int fmpz_cmp_si(const fmpz_t f, slong g)
 
     Returns a negative value if $f < g$, positive value if $g < f$, 
     otherwise returns $0$.
@@ -441,7 +441,7 @@ int fmpz_equal_ui(const fmpz_t f, ulong g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
-int fmpz_equal_si(const fmpz_t f, len_t g)
+int fmpz_equal_si(const fmpz_t f, slong g)
 
     Returns $1$ if $f$ is equal to $g$, otherwise returns $0$.
 
@@ -500,7 +500,7 @@ void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
     Sets $f$ to $g \times h$.
 
-void fmpz_mul_si(fmpz_t f, const fmpz_t g, len_t x)
+void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
     Sets $f$ to $g \times x$ where $x$ is a \code{signed long}.
 
@@ -538,7 +538,7 @@ void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding up towards
     infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
+void fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets $f$ to the quotient of $g$ by $h$, rounding up towards
     infinity.  If $h$ is $0$ an exception is raised.
@@ -558,7 +558,7 @@ void fmpz_fdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
     Sets $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
 
-void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
+void fmpz_fdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     minus infinity.  If $h$ is $0$ an exception is raised.
@@ -601,7 +601,7 @@ void fmpz_tdiv_qr(fmpz_t f, fmpz_t s, const fmpz_t g, const fmpz_t h)
     zero and $s$ to the remainder.  If $h$ is $0$ an exception 
     is raised.
 
-void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, len_t h)
+void fmpz_tdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 
     Set $f$ to the quotient of $g$ by $h$, rounding down towards
     zero.  If $h$ is $0$ an exception is raised.
@@ -628,7 +628,7 @@ void fmpz_divexact(fmpz_t f, const fmpz_t g, const fmpz_t h)
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
     is $0$ an exception is raised.
 
-void fmpz_divexact_si(fmpz_t f, const fmpz_t g, len_t h)
+void fmpz_divexact_si(fmpz_t f, const fmpz_t g, slong h)
 
     Sets $f$ to the quotient of $g$ and $h$, assuming that the
     division is exact, i.e.\ $g$ is a multiple of $h$.  If $h$ 
@@ -650,7 +650,7 @@ int fmpz_divisible(const fmpz_t f, const fmpz_t g)
 
     Returns whether $f$ is divisible by $g > 0$.
 
-int fmpz_divisible_si(const fmpz_t f, len_t g)
+int fmpz_divisible_si(const fmpz_t f, slong g)
 
     Returns whether $f$ is divisible by $g > 0$.
 
@@ -768,7 +768,7 @@ void fmpz_mul_tdiv_q_2exp(fmpz_t f, const fmpz_t g, const fmpz_t h, ulong exp)
     Sets $f$ to the product $g$ and $h$ divided by \code{2^exp}, rounding
     down towards zero.
 
-void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, len_t x, ulong exp)
+void fmpz_mul_si_tdiv_q_2exp(fmpz_t f, const fmpz_t g, slong x, ulong exp)
 
     Sets $f$ to the product $g$ and $x$ divided by \code{2^exp}, rounding
     down towards zero.
