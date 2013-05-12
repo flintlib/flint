@@ -53,6 +53,7 @@ verbose:
 
 clean:
 	$(AT)$(foreach dir, $(BUILD_DIRS), export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) clean || exit $$?;)
+	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) clean || exit $$?;))
 	rm -rf test_helpers.o profiler.o
 	rm -f $(OBJS) $(LOBJS) $(TESTS) $(PROFS) $(EXMPS) $(FLINT_LIB) libflint.a
 	rm -rf build
