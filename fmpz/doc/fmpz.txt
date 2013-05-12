@@ -808,7 +808,8 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
    Assumes that $d$ is not aliased with $a$ or $b$ and that $a$ and $b$
    are not aliased.
 
-void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, fmpz_t r2, fmpz_t r1, fmpz_t L)
+void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
+                                          fmpz_t r2, fmpz_t r1, const fmpz_t L)
 
    This function is an implementation of Lehmer extended GCD with early 
    termination, as used in the \code{qfb} module. It terminates early when 
