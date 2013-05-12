@@ -141,8 +141,8 @@ int main(void)
     printf("Compute a square root\n");
 
     fmpz_init_set_ui(p, 2);
-    d = 5;
-    N = 1;
+    d = 3;
+    N = 2;
     qadic_ctx_init_conway(ctx, p, d, 0, N, "X", PADIC_SERIES);
 
     qadic_init2(a, N);
@@ -150,10 +150,8 @@ int main(void)
 
     padic_poly_fit_length(a, d);
     a->coeffs[0] = 1L;
-    a->coeffs[1] = 0L;
+    a->coeffs[1] = 3L;
     a->coeffs[2] = 1L;
-    a->coeffs[3] = 1L;
-    a->coeffs[4] = 1L;
     a->val = 0;
     _padic_poly_set_length(a, d);
 
