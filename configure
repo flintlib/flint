@@ -18,6 +18,8 @@ TLS=1
 PTHREAD=1
 REENTRANT=0
 BUILD=
+EXTENSIONS=
+EXT_MODS=
 
 usage()
 {
@@ -33,6 +35,7 @@ usage()
    echo "     --without-blas       Do not use BLAS (default)"
    echo "     --with-ntl[=<path>]  Build NTL interface and specify its location (default: /usr/local)"
    echo "     --without-ntl        Do not build NTL interface (default)"
+   echo "     --extensions=<path>  Specify location of extension modules"
    echo "     --build=arch-os      Specify architecture/OS combination rather than use values from uname -m/-s"
    echo "     --enable-shared      Build a shared library (default)"
    echo "     --disable-shared     Do not build a shared library"
@@ -82,6 +85,9 @@ while [ "$1" != "" ]; do
          ;;
       --without-blas)
          WANT_BLAS=0
+         ;;
+      --extensions)
+         EXTENSIONS="$VALUE"
          ;;
       --build)
          BUILD="$VALUE"
@@ -311,6 +317,17 @@ if [ -z "$FLINT_LIB" ]; then
    esac
 fi
 
+#extension for executables
+
+if [ -z "$EXEEXT" ]; then
+   case "$OS" in
+      CYGWIN | MINGW*)
+         EXEEXT=".exe";;
+      *)
+         EXEEXT="";;
+   esac
+fi
+
 #don't build both shared and static lib on MinGW and Cygwin
 
 case "$OS" in
@@ -425,6 +442,10 @@ fi
 
 CONFIG_PTHREAD="#define HAVE_PTHREAD ${PTHREAD}"
 
+#pocess external modules
+
+EXTRA_INC_DIRS="${EXTRA_INC_DIRS} ${EXTENSIONS}"
+
 #include paths
 
 INCS="-I\$(CURDIR)"
@@ -443,7 +464,7 @@ done
 
 LIBS2="-lmpfr -lgmp -lm"
 if [ "$PTHREAD" = "1" ]; then
-   LIBS2="${LIBS2} -pthread"
+   LIBS2="${LIBS2} -lpthread"
 fi
 LIBS="-lflint $LIBS2"
 LIBS2="$LLIBS $LIBS2"
@@ -486,6 +507,7 @@ echo "" >> Makefile
 echo "FLINT_STATIC=$STATIC" >> Makefile
 echo "FLINT_SHARED=$SHARED" >> Makefile
 echo "FLINT_LIB=$FLINT_LIB" >> Makefile
+echo "EXEEXT=$EXEEXT" >> Makefile
 echo "PREFIX=$PREFIX" >> Makefile
 echo "" >> Makefile
 echo "WANT_NTL=$WANT_NTL" >> Makefile
@@ -504,6 +526,7 @@ echo "PIC_FLAG=$PIC_FLAG" >> Makefile
 echo "" >> Makefile
 echo "DLPATH=$DLPATH" >> Makefile
 echo "DLPATH_ADD=$DLPATH_ADD" >> Makefile
+echo "EXTENSIONS=$EXTENSIONS" >> Makefile
 echo "" >> Makefile
 
 cat Makefile.in >> Makefile

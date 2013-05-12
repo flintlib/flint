@@ -71,7 +71,8 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n);
 
 void fmpz_factor_si(fmpz_factor_t factor, len_t n);
 
-int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, ulong B1, ulong c);
+int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n, 
+                                       ulong B1, ulong B2_sqrt, ulong c);
 
 /* Expansion *****************************************************************/
 
