@@ -42,7 +42,7 @@ main(void)
     mp_bitcnt_t depth, w, depth1, w1;
     clock_t start, end;
     double elapsed;
-    double best;
+    double best = 0.0;
     mp_size_t best_off, off, best_d, best_w;
 
     flint_rand_t state;
@@ -72,7 +72,6 @@ main(void)
 
             mp_bitcnt_t b1 = len1*bits1, b2 = len2*bits1;
             mp_size_t n1, n2;
-            mp_size_t j;
             mp_limb_t * i1, *i2, *r1;
    
             n1 = (b1 - 1)/FLINT_BITS + 1;
@@ -131,8 +130,7 @@ main(void)
             mp_size_t n = (1UL<<depth);
             mp_bitcnt_t bits = n*w;
             mp_size_t int_limbs = (bits - 1)/FLINT_BITS + 1;
-            mp_size_t j;
-            mp_limb_t c, * i1, * i2, * r1, * tt;
+            mp_limb_t * i1, * i2, * r1, * tt;
         
             if (depth <= 21) iters = 32*((mp_size_t) 1 << (21 - depth));
             else iters = FLINT_MAX(32/((mp_size_t) 1 << (depth - 21)), 1);

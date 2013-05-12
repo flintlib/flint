@@ -31,7 +31,7 @@ shared: $(MOD_LOBJ)
 
 static: $(OBJS)
 
-profile: $(PROF_SOURCES) ../profiler.o $(HEADERS)
+profile: $(PROF_SOURCES) $(BUILD_DIR)/../../profiler.o $(HEADERS)
 	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c ../profiler.o -o $(BUILD_DIR)/$(prog) $(LIBS) || exit $$?;)
 
 tune: $(TUNE_SOURCES) $(HEADERS)
