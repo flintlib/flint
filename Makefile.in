@@ -42,6 +42,10 @@ PROFS = $(patsubst %.c, %$(EXEEXT), $(PROF_SOURCES))
 TUNE_SOURCES = $(wildcard tune/*.c)
 TUNE = $(patsubst %.c, %$(EXEEXT), $(TUNE_SOURCES))
 
+EXT_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/*.c)))
+EXT_TEST_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/test/t-*.c)))
+EXT_TUNE_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/tune/*.c)))
+EXT_PROF_SOURCES = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), $(wildcard $(ext)/$(dir)/profile/p-*.c)))
 EXT_OBJS = $(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), build/$(dir).lo))
 EXT_HEADERS = $(foreach ext, $(EXTENSIONS), $(wildcard $(ext)/*.h))
 
@@ -65,13 +69,13 @@ distclean: clean
 dist:
 	git archive --format tar --prefix flint-2.3/ flint-2.3 > ../flint-2.3.tar; gzip ../flint-2.3.tar
 
-profile: library $(PROF_SOURCES) profiler.o
+profile: library $(PROF_SOURCES) $(EXT_PROF_SOURCES) profiler.o
 	mkdir -p build/profile
 	$(AT)$(foreach prog, $(PROFS), $(CC) $(ABI_FLAG) -std=c99 -O2 -g $(INCS) $(prog).c profiler.o -o build/$(prog) $(LIBS) || exit $$?;)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/profile; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) profile || exit $$?;)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir)/profile; export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) profile || exit $$?;))
 
-tune: library $(TUNE_SOURCES)
+tune: library $(TUNE_SOURCES) $(EXT_TUNE_SOURCES)
 	mkdir -p build/tune
 	$(AT)$(foreach prog, $(TUNE), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir)/tune; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) tune || exit $$?;)
@@ -81,7 +85,7 @@ examples: library $(EXMP_SOURCES)
 	mkdir -p build/examples
 	$(AT)$(foreach prog, $(EXMPS), $(CC) $(CFLAGS) $(INCS) $(prog).c -o build/$(prog) $(LIBS) || exit $$?;)
 
-$(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
+$(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	echo $(EXT_OBJS)
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) shared || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) shared || exit $$?;)
@@ -93,7 +97,7 @@ $(FLINT_LIB): $(LOBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
 	  $(CC) $(ABI_FLAG) -shared $(LOBJS) $(MOD_LOBJS) $(EXT_OBJS) $(LIBS2) -o $(FLINT_LIB); \
 	fi
 
-libflint.a: $(OBJS) $(LIB_SOURCES) $(HEADERS) | build build/interfaces
+libflint.a: $(OBJS) $(LIB_SOURCES) $(EXT_SOURCES) $(HEADERS) $(EXT_HEADERS) | build build/interfaces
 	$(AT)$(foreach ext, $(EXTENSIONS), $(foreach dir, $(patsubst $(ext)/%.h, %, $(wildcard $(ext)/*.h)), mkdir -p build/$(dir); export BUILD_DIR=$(CURDIR)/build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f $(CURDIR)/Makefile.subdirs -C $(ext)/$(dir) static || exit $$?;))
 	$(AT)$(foreach dir, $(BUILD_DIRS), mkdir -p build/$(dir); export BUILD_DIR=../build/$(dir); export MOD_DIR=$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) static || exit $$?;)
 	$(AT)if [ "$(FLINT_SHARED)" -eq "0" ]; then \
