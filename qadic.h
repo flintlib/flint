@@ -49,7 +49,7 @@ typedef padic_poly_struct qadic_struct;
 
 static __inline__ long qadic_val(const qadic_t op)
 {
-    return qadic_val(op);
+    return padic_poly_val(op);
 }
 
 static __inline__ long qadic_prec(const qadic_t op)

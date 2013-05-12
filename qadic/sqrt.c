@@ -630,140 +630,163 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
 {
     const long d    = j[lena - 1];
     const fmpz_t p  = {2L};
-    const fmpz_t p4 = {4L};
-    const fmpz_t p8 = {8L};
+    fmpz *f;
+    long k;
     int ans;
 
-    fmpz *f, *g, *r, *s, *t;
-    long k;
 
-    f = _fmpz_vec_init(2 * d - 1);
-    g = _fmpz_vec_init(2 * d - 1);
-    r = _fmpz_vec_init(2 * d - 1);
-    s = _fmpz_vec_init(2 * d - 1);
-    t = _fmpz_vec_init(2 * d - 1);
-
-    /* Dense copy of f */
-    for (k = 0; k < lena; k++)
-        fmpz_set(f + j[k], a + k);
-
-    /* Compute s = invsqrt(op) (mod 2) */
-    _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 1);
-    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p);
-    _fmpz_mod_poly_sqrtmod_2(s, r, d, a, j, lena);
-
-    /* Compute t = (1/op - s^2) / 4 (mod 2) */
-    _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 3);
-    _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);
-    _fmpz_poly_sqr(t, s, d);
-    _fmpz_poly_reduce(t, 2*d - 1, a, j, lena);
-    _fmpz_vec_sub(t, r, t, d);
-    _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 2);
-
-    /* Check whether X^2 + s X = t (mod 2) has a solution */
-    /*
-        u = (op,len) is a square in Zq iff it is a square modulo 8, 
-        which is the case iff X^2 + s X + t == 0 (mod 2) is soluble.  
-        Let g be t/s^2.  Then the above quadratic is soluble iff 
-        Y^2 + Y + d = 0 is soluble.
-     */
-
-    _fmpz_poly_sqr(g, s, d);
-    _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
-    _fmpz_mod_poly_invmod(r, g, d, f, d + 1, p);
-    _fmpz_poly_mul(g, r, d, t, d);
-    _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
-
-    ans = _artin_schreier_preimage(r, g, d, a, j, lena);
-
-    _fmpz_vec_zero(rop, 2 * d - 1);
-
-    if (ans)
+    if (N == 1)
     {
-        /* Set t = r s, a square root */
-        _fmpz_poly_mul(t, r, d, s, d);
-        _fmpz_mod_poly_reduce(t, 2 * d - 1, a, j, lena, p);
+        f = _fmpz_vec_init(2 * d - 1);
 
-        _fmpz_vec_scalar_addmul_fmpz(s, t, d, p);
+        /* Dense copy of f */
+        for (k = 0; k < lena; k++)
+            fmpz_set(f + j[k], a + k);
 
+        _fmpz_mod_poly_sqrtmod_2(rop, op, len, a, j, lena);
+
+        _fmpz_vec_clear(f, 2 * d - 1);
+
+        ans = 1;
+    }
+    else
+    {
+        const fmpz_t p4 = {4L};
+        const fmpz_t p8 = {8L};
+
+        fmpz *g, *r, *s, *t;
+/*    printf("Here.\n"), fflush(stdout);
+    printf("op = "), _fmpz_vec_print(op, len), printf("\n");*/
+
+        f = _fmpz_vec_init(2 * d - 1);
+        g = _fmpz_vec_init(2 * d - 1);
+        r = _fmpz_vec_init(2 * d - 1);
+        s = _fmpz_vec_init(2 * d - 1);
+        t = _fmpz_vec_init(2 * d - 1);
+
+        /* Dense copy of f */
+        for (k = 0; k < lena; k++)
+            fmpz_set(f + j[k], a + k);
+
+        /* Compute s = invsqrt(op) (mod 2) */
+        _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 1);
+        _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p);
+        _fmpz_mod_poly_sqrtmod_2(s, r, d, a, j, lena);
+
+/*    printf("s = invsqrt(op) = "), _fmpz_vec_print(s, d), printf("\n");*/
+
+        /* Compute t = (1/op - s^2) / 4 (mod 2) */
+        _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 3);
+        _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);
+        _fmpz_poly_sqr(t, s, d);
+        _fmpz_poly_reduce(t, 2*d - 1, a, j, lena);
+        _fmpz_vec_sub(t, r, t, d);
+        _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 1);
+
+/*    printf("(1/op) - s^2) / 4 (mod 2) = "), _fmpz_vec_print(t, d), printf("\n");*/
+
+        /* Check whether X^2 + s X = t (mod 2) has a solution */
         /*
-            Now (s,d) is an inverse square root of (op,len) 
-            to precision 2.
+            u = (op,len) is a square in Zq iff it is a square modulo 8, 
+            which is the case iff X^2 + s X + t == 0 (mod 2) is soluble.  
+            Let g be t/s^2.  Then the above quadratic is soluble iff 
+            Y^2 + Y + d = 0 is soluble.
          */
 
-        if (N == 1)
+        _fmpz_poly_sqr(g, s, d);
+        _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
+        _fmpz_mod_poly_invmod(r, g, d, f, d + 1, p);
+        _fmpz_poly_mul(g, r, d, t, d);
+        _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
+
+        ans = _artin_schreier_preimage(r, g, d, a, j, lena);
+/*    printf("There.\n");
+    printf("r = "), _fmpz_vec_print(r, d), printf("\n");
+    printf("g = "), _fmpz_vec_print(g, d), printf("\n");*/
+        _fmpz_vec_zero(rop, 2 * d - 1);
+
+        if (ans)
         {
-            _fmpz_vec_scalar_mod_fmpz(s, s, d, p);
-            _fmpz_mod_poly_invmod(rop, s, d, f, d + 1, p);
+            /* Set t = r s, a square root */
+            _fmpz_poly_mul(t, r, d, s, d);
+            _fmpz_mod_poly_reduce(t, 2 * d - 1, a, j, lena, p);
+
+            _fmpz_vec_scalar_addmul_fmpz(s, t, d, p);
+
+            /*
+                Now (s,d) is an inverse square root of (op,len) 
+                to precision 2.
+             */
+
+            if (N == 2)
+            {
+                _fmpz_mod_poly_invmod(rop, s, d, f, d + 1, p4);
+            }
+            else  /* N >= 3 */
+            {
+                long *e, i, n;
+                fmpz *u;
+
+                n = FLINT_FLOG2(N - 1) + 1;
+
+                /* Compute sequence of exponents */
+                e = flint_malloc(n * sizeof(long));
+                for (e[i = 0] = N; e[i] > 2; i++)
+                    e[i + 1] = (e[i] + 1) / 2;
+
+                u = _fmpz_vec_init(len * n);
+
+                /* Compute reduced units */
+                {
+                    _fmpz_vec_scalar_fdiv_r_2exp(u + 0 * len, op, len, e[0]);
+                }
+                for (i = 1; i < n; i++)
+                {
+                    _fmpz_vec_scalar_fdiv_r_2exp(u + i * len, u + (i - 1) * len, len, e[i]);
+                }
+
+                /* Run Newton iteration */
+                {
+                    _fmpz_vec_set(rop, s, d);
+                }
+                for (i = n - 2; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
+                {
+                    _fmpz_poly_sqr(s, rop, d);
+                    _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
+                    _fmpz_poly_mul(t, s, d, u + i * len, len);
+                    _fmpz_poly_reduce(t, d + len - 1, a, j, lena);
+                    fmpz_sub_ui(t, t, 1);
+                    _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 1);
+                    _fmpz_poly_mul(s, t, d, rop, d);
+                    _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
+                    _fmpz_poly_sub(rop, rop, d, s, d);
+                    _fmpz_vec_scalar_fdiv_r_2exp(rop, rop, d, e[i]);
+                }
+                {
+                    _fmpz_poly_mul(s, rop, d, u + (n > 1) * len, len);  /* XXX */
+                    _fmpz_poly_reduce(s, d + len - 1, a, j, lena);
+                    _fmpz_poly_sqr(t, s, d);
+                    _fmpz_poly_reduce(t, 2 * d - 1, a, j, lena);
+                    _fmpz_poly_sub(t, u + 0 * len, len, t, d);
+                    _fmpz_vec_scalar_fdiv_q_2exp(t, t, d, 1);
+                    _fmpz_poly_mul(r, rop, d, t, d);
+                    _fmpz_poly_reduce(r, 2 * d - 1, a, j, lena);
+                    _fmpz_poly_add(rop, r, d, s, d);
+                    _fmpz_vec_scalar_fdiv_r_2exp(rop, rop, d, e[0]);
+                }
+
+                _fmpz_vec_clear(u, len * n);
+                flint_free(e);
+            }
         }
-        else if (N == 2)
-        {
-            _fmpz_mod_poly_invmod(rop, s, d, f, d + 1, p4);
-        }
-        else  /* N >= 3 */
-        {
-            long *e, i, n;
-            fmpz *u;
 
-            n = FLINT_FLOG2(N - 1);
+        _fmpz_vec_clear(f, 2 * d - 1);
+        _fmpz_vec_clear(g, 2 * d - 1);
+        _fmpz_vec_clear(r, 2 * d - 1);
+        _fmpz_vec_clear(s, 2 * d - 1);
+        _fmpz_vec_clear(t, 2 * d - 1);
 
-            /* Compute sequence of exponents */
-            e = flint_malloc(n * sizeof(long));
-            for (e[i = 0] = N; e[i] > 2; i++)
-                e[i + 1] = (e[i] + 1) / 2;
-
-            u = _fmpz_vec_init(len * n);
-
-            /* Compute reduced units */
-            {
-                _fmpz_vec_scalar_fdiv_r_2exp(u + 0 * len, op, len, e[0]);
-            }
-            for (i = 1; i < n; i++)
-            {
-                _fmpz_vec_scalar_fdiv_r_2exp(u + i * len, u + (i - 1) * len, len, e[i]);
-            }
-
-            /* Run Newton iteration */
-            {
-                _fmpz_vec_set(rop, s, d);
-            }
-            for (i = n - 1; i >= 1; i--)  /* z := z - z (a z^2 - 1) / 2 */
-            {
-                _fmpz_poly_sqr(s, rop, d);
-                _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
-                _fmpz_poly_mul(t, s, d, u + i * len, len);
-                _fmpz_poly_reduce(t, d + len - 1, a, j, lena);
-                fmpz_sub_ui(t, t, 1);
-                _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 1);
-                _fmpz_poly_mul(s, t, d, rop, d);
-                _fmpz_poly_reduce(s, 2 * d - 1, a, j, lena);
-                _fmpz_poly_sub(rop, rop, d, s, d);
-                _fmpz_vec_scalar_fdiv_r_2exp(rop, rop, d, e[i]);
-            }
-            {
-                _fmpz_poly_mul(s, rop, d, u + (n > 1) * len, len);  /* XXX */
-                _fmpz_poly_reduce(s, d + len - 1, a, j, lena);
-                _fmpz_poly_sqr(t, s, d);
-                _fmpz_poly_reduce(t, 2 * d - 1, a, j, lena);
-                _fmpz_poly_sub(t, u + 0 * len, len, t, d);
-                _fmpz_vec_scalar_fdiv_q_2exp(t, t, d, 1);
-                _fmpz_poly_mul(r, rop, d, t, d);
-                _fmpz_poly_reduce(r, 2 * d - 1, a, j, lena);
-                _fmpz_poly_add(rop, r, d, s, d);
-                _fmpz_vec_scalar_fdiv_r_2exp(rop, rop, d, e[0]);
-            }
-
-            _fmpz_vec_clear(u, len * n);
-            flint_free(e);
-        }
     }
-
-    _fmpz_vec_clear(f, 2 * d - 1);
-    _fmpz_vec_clear(g, 2 * d - 1);
-    _fmpz_vec_clear(r, 2 * d - 1);
-    _fmpz_vec_clear(s, 2 * d - 1);
-    _fmpz_vec_clear(t, 2 * d - 1);
-
     return ans;
 }
 

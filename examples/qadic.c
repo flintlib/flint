@@ -19,7 +19,7 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2011 Sebastian Pancratz
+    Copyright (C) 2011, 2013 Sebastian Pancratz
 
 ******************************************************************************/
 
@@ -35,17 +35,26 @@
 int main(void)
 {
     fmpz_t p;
+    long d, N;
     qadic_ctx_t ctx;
+
     qadic_t a, b, c;
+
+    int ans;
+
+    /*************************************************************************/
+
     fmpz_t e = {4L};
-    fmpz nine[1] = {9L};
+    fmpz_t nine = {9L};
 
     fmpz_init_set_ui(p, 3);
-    qadic_ctx_init_conway(ctx, p, 2, 5, "a", PADIC_SERIES);
+    d = 2;
+    N = 5;
+    qadic_ctx_init_conway(ctx, p, d, 0, N, "a", PADIC_SERIES);
 
-    qadic_init(a);
-    qadic_init(b);
-    qadic_init(c);
+    qadic_init2(a, N);
+    qadic_init2(b, N);
+    qadic_init2(c, N);
 
     printf("Compute a power and a sum\n");
     padic_poly_fit_length(a, 2);
@@ -63,6 +72,7 @@ int main(void)
     qadic_print_pretty(a, ctx); printf("\n");
     qadic_print_pretty(b, ctx); printf("\n");
     qadic_print_pretty(c, ctx); printf("\n");
+    printf("\n");
 
     printf("Compute a Teichmuller lift\n");
     padic_poly_fit_length(a, 2);
@@ -77,15 +87,17 @@ int main(void)
     qadic_print_pretty(a, ctx); printf("\n");
     qadic_print_pretty(b, ctx); printf("\n");
     qadic_print_pretty(c, ctx); printf("\n");
+    printf("\n");
 
     printf("Compute an inverse\n");
-    qadic_set(a, b);
+    qadic_set(a, b, ctx);
     qadic_inv(b, a, ctx);
     qadic_mul(c, a, b, ctx);
 
     qadic_print_pretty(a, ctx); printf("\n");
     qadic_print_pretty(b, ctx); printf("\n");
     qadic_print_pretty(c, ctx); printf("\n");
+    printf("\n");
 
     qadic_clear(a);
     qadic_clear(b);
@@ -99,10 +111,12 @@ int main(void)
     printf("Compute a Frobenius image\n");
 
     fmpz_init_set_ui(p, 3);
-    qadic_ctx_init_conway(ctx, p, 2, 5, "X", PADIC_TERSE);
+    d = 2;
+    N = 5;
+    qadic_ctx_init_conway(ctx, p, d, 0, N, "X", PADIC_TERSE);
 
-    qadic_init(a);
-    qadic_init(b);
+    qadic_init2(a, N);
+    qadic_init2(b, N);
 
     padic_poly_fit_length(a, 2);
     a->coeffs[0] = 78L;
@@ -111,17 +125,51 @@ int main(void)
     _padic_poly_set_length(a, 2);
 
     qadic_frobenius(b, a, 1, ctx);
-
-    printf("Context:\n"), qadic_ctx_print(ctx), printf("\n");
-
     printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
     printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+    printf("Context:\n"), qadic_ctx_print(ctx);
+    printf("\n");
 
     qadic_clear(a);
     qadic_clear(b);
 
     qadic_ctx_clear(ctx);
     fmpz_clear(p);
+
+    /*************************************************************************/
+
+    printf("Compute a square root\n");
+
+    fmpz_init_set_ui(p, 2);
+    d = 5;
+    N = 1;
+    qadic_ctx_init_conway(ctx, p, d, 0, N, "X", PADIC_SERIES);
+
+    qadic_init2(a, N);
+    qadic_init2(b, N);
+
+    padic_poly_fit_length(a, d);
+    a->coeffs[0] = 1L;
+    a->coeffs[1] = 0L;
+    a->coeffs[2] = 1L;
+    a->coeffs[3] = 1L;
+    a->coeffs[4] = 1L;
+    a->val = 0;
+    _padic_poly_set_length(a, d);
+
+    ans = qadic_sqrt(b, a, ctx);
+    printf("a = "), qadic_print_pretty(a, ctx), printf("\n");
+    printf("b = "), qadic_print_pretty(b, ctx), printf("\n");
+    printf("ans = %d\n", ans);
+    printf("Context:\n"), qadic_ctx_print(ctx);
+    printf("\n");
+
+    qadic_clear(a);
+    qadic_clear(b);
+
+    qadic_ctx_clear(ctx);
+    fmpz_clear(p);
+
 
     return EXIT_SUCCESS;
 }
