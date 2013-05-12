@@ -808,6 +808,22 @@ void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g)
    Assumes that $d$ is not aliased with $a$ or $b$ and that $a$ and $b$
    are not aliased.
 
+void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
+                                          fmpz_t r2, fmpz_t r1, const fmpz_t L)
+
+   This function is an implementation of Lehmer extended GCD with early 
+   termination, as used in the \code{qfb} module. It terminates early when 
+   remainders fall below the specified bound. The initial values \code{r1}
+   and \code{r2} are treated as successive remainders in the Euclidean 
+   algorithm and are replaced with the last two remainders computed. The
+   values \code{co1} and \code{co2} are the last two cofactors and satisfy
+   the identity \code{co2*r1 - co1*r2 == +/- r2_orig} upon termination, where
+   \code{r2_orig} is the starting value of \code{r2} supplied, and \code{r1}
+   and \code{r2} are the final values.
+
+   Aliasing of inputs is not allowed. Similarly aliasing of inputs and outputs 
+   is not allowed.
+
 *******************************************************************************
 
     Modular arithmetic

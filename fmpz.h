@@ -469,6 +469,9 @@ void fmpz_gcdinv(fmpz_t d, fmpz_t a, const fmpz_t f, const fmpz_t g);
 
 void fmpz_xgcd(fmpz_t d, fmpz_t a, fmpz_t b, const fmpz_t f, const fmpz_t g);
 
+void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1, 
+                                       fmpz_t r2, fmpz_t r1, const fmpz_t L);
+
 int fmpz_invmod(fmpz_t f, const fmpz_t g, const fmpz_t h);
 
 int fmpz_jacobi(const fmpz_t a, const fmpz_t p);
