@@ -1342,6 +1342,28 @@ void nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
     $h$ is nonzero and that $f$ has smaller degree than $h$.
     The algorithm used is the Brent-Kung matrix algorithm.
 
+void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr f, long f,
+                            mp_srcptr g, mp_srcptr h, long lenh,
+                            mp_srcptr hinv, long hinv, nmod_t mod)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h, const nmod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$. Furthermore,
+    we require \code{hinv} to be the inverse of the reverse of \code{h}.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
 void _nmod_poly_compose_mod(mp_ptr res,
     mp_srcptr f, long lenf, mp_srcptr g, mp_srcptr h, long lenh, nmod_t mod)
 
