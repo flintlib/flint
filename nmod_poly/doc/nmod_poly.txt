@@ -527,6 +527,28 @@ void nmod_poly_mulmod(nmod_poly_t res,
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
 
+void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, long len1, 
+                              mp_srcptr poly2, long len2, mp_srcptr f,
+                              long lenf, mp_srcptr finv, long lenfinv, nmod_t mod)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{finv} is the inverse of the reverse of \code{f}
+    mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
+    which is equivalent to requiring that the result will actually be reduced.
+    Otherwise, simply use \code{_nmod_poly_mul} instead.
+
+    Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
+
+void nmod_poly_mulmod_preinv(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f,
+    const nmod_poly_t finv)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
+    inverse of the reverse of \code{f}.
+
 *******************************************************************************
 
     Powering
@@ -2140,9 +2162,9 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 		const nmod_poly_t poly, long **degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
-    of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}
-    ${f[d]} is the product of the monic irreducible factors of \code{poly}
-    of degree ${d}. Factors are stored in \code{res}, assotiated powers
+    of degree n into factors ${f[d]}$ such that for ${1 \leq d \leq n}$
+    ${f[d]}$ is the product of the monic irreducible factors of \code{poly}
+    of degree ${d}$. Factors are stored in \code{res}, assotiated powers
     of irreducible polynomials are stored in \code{degs} in the same order
     as factors.
 
