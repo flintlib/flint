@@ -41,6 +41,7 @@ const unsigned char FLINT_PRIME_PI_ODD_LOOKUP[] =
 ulong n_prime_pi(mp_limb_t n)
 {
     ulong low, mid, high;
+    const mp_limb_t * primes;
 
     if (n < FLINT_PRIME_PI_ODD_LOOKUP_CUTOFF)
     {
@@ -50,12 +51,12 @@ ulong n_prime_pi(mp_limb_t n)
     }
 
     n_prime_pi_bounds(&low, &high, n);
-    n_compute_primes(high+1);
+    primes = n_primes_arr_readonly(high + 1);
 
     while (low < high)
     {
         mid = (low + high) / 2;
-        if (n < flint_primes[mid-1])
+        if (n < primes[mid-1])
             high = mid;
         else
             low = mid + 1;

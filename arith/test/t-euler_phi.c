@@ -81,19 +81,18 @@ int main(void)
     }
 
     /* Power of a single prime, phi(p^n) = (p-1) * p^(n-1) */
-    n_compute_primes(100);
     for (i = 0; i < 100; i++)
     {
         n = (n_randtest(state) % 100) + 1;
-        fmpz_set_ui(x, flint_primes[i]);
+        fmpz_set_ui(x, n_nth_prime(i+1));
         fmpz_pow_ui(x, x, n);
         arith_euler_phi(x, x);
-        fmpz_set_ui(y, flint_primes[i]);
+        fmpz_set_ui(y, n_nth_prime(i+1));
         fmpz_pow_ui(y, y, n-1);
-        fmpz_mul_ui(y, y, flint_primes[i]-1);
+        fmpz_mul_ui(y, y, n_nth_prime(i+1)-1);
         if (!fmpz_equal(x, y))
         {
-            printf("FAIL: %lu ^ %lu\n", flint_primes[i], n);
+            printf("FAIL: %lu ^ %lu\n", n_nth_prime(i+1), n);
         }
     }
 

@@ -33,15 +33,18 @@ mp_limb_t n_factor_trial_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t * 
    mp_limb_t p;
    double ppre;
    ulong i;
+   const mp_limb_t * primes;
+   const double * inverses;
 
    (*prod) = 1;
-   n_compute_primes(num_primes);
+   primes = n_primes_arr_readonly(num_primes);
+   inverses = n_prime_inverses_arr_readonly(num_primes);
 
    for (i = 0; i < num_primes; i++)
    {
-      p = flint_primes[i];
+      p = primes[i];
       if (p*p > n) break;
-      ppre = flint_prime_inverses[i];
+      ppre = inverses[i];
       exp = n_remove2_precomp(&n, p, ppre);
       if (exp) 
       {

@@ -233,6 +233,7 @@ int fmpz_is_prime_pseudosquare(fmpz_t n)
     mp_limb_t p, B, mod8;
     fmpz_t NB, f, exp, mod, nm1;
     int ret;
+    const mp_limb_t * primes;
 
     if (fmpz_sgn(n) <= 0) 
        return 0;
@@ -240,11 +241,11 @@ int fmpz_is_prime_pseudosquare(fmpz_t n)
     if (fmpz_size(n) == 1) 
        return n_is_prime_pseudosquare(fmpz_get_ui(n));
 
-    n_compute_primes(FLINT_PSEUDOSQUARES_CUTOFF);
+    primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF + 1);
 
     for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
     {
-        p = flint_primes[i];
+        p = primes[i];
         if (fmpz_fdiv_ui(n, p) == 0) 
            return 0;
     }
@@ -255,7 +256,7 @@ int fmpz_is_prime_pseudosquare(fmpz_t n)
     fmpz_init(mod);
     fmpz_init(nm1);
     
-    B  = flint_primes[FLINT_PSEUDOSQUARES_CUTOFF];
+    B  = primes[FLINT_PSEUDOSQUARES_CUTOFF];
     fmpz_sub_ui(nm1, n, 1);
     fmpz_fdiv_q_ui(NB, nm1, B);
     fmpz_add_ui(NB, NB, 1);
@@ -279,7 +280,7 @@ int fmpz_is_prime_pseudosquare(fmpz_t n)
     
     for (j = 0; j <= i; j++)
     {
-        fmpz_set_ui(mod, flint_primes[j]);
+        fmpz_set_ui(mod, primes[j]);
         fmpz_powm(mod, mod, exp, n);
         if (!fmpz_is_one(mod) && fmpz_cmp(mod, nm1) != 0) 
         {
@@ -322,7 +323,7 @@ int fmpz_is_prime_pseudosquare(fmpz_t n)
             
         for (j = i + 1; j < FLINT_NUM_FMPZ_PSEUDOSQUARES + 1; j++)
         {
-            fmpz_set_ui(mod, flint_primes[j]);
+            fmpz_set_ui(mod, primes[j]);
             fmpz_powm(mod, mod, exp, n);
             if (fmpz_cmp(mod, nm1) == 0)
             {
