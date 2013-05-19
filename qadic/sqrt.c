@@ -628,35 +628,21 @@ static int
 _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len, 
               const fmpz *a, const long *j, long lena, long N)
 {
-    const long d    = j[lena - 1];
-    const fmpz_t p  = {2L};
-    fmpz *f;
-    long k;
     int ans;
-
 
     if (N == 1)
     {
-        f = _fmpz_vec_init(2 * d - 1);
-
-        /* Dense copy of f */
-        for (k = 0; k < lena; k++)
-            fmpz_set(f + j[k], a + k);
-
         _fmpz_mod_poly_sqrtmod_2(rop, op, len, a, j, lena);
-
-        _fmpz_vec_clear(f, 2 * d - 1);
 
         ans = 1;
     }
     else
     {
-        const fmpz_t p4 = {4L};
-        const fmpz_t p8 = {8L};
+        const long d    = j[lena - 1];
+        const fmpz_t p  = {2L};
 
-        fmpz *g, *r, *s, *t;
-/*    printf("Here.\n"), fflush(stdout);
-    printf("op = "), _fmpz_vec_print(op, len), printf("\n");*/
+        fmpz *f, *g, *r, *s, *t;
+        long k;
 
         f = _fmpz_vec_init(2 * d - 1);
         g = _fmpz_vec_init(2 * d - 1);
@@ -668,22 +654,19 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
         for (k = 0; k < lena; k++)
             fmpz_set(f + j[k], a + k);
 
+        /* Compute r = 1/op (mod 8) */
+        _qadic_inv(r, op, len, a, j, lena, p, 3);
+
         /* Compute s = invsqrt(op) (mod 2) */
-        _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 1);
-        _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p);
+        _fmpz_vec_scalar_fdiv_r_2exp(t, r, d, 1);
         _fmpz_mod_poly_sqrtmod_2(s, r, d, a, j, lena);
 
-/*    printf("s = invsqrt(op) = "), _fmpz_vec_print(s, d), printf("\n");*/
-
         /* Compute t = (1/op - s^2) / 4 (mod 2) */
-        _fmpz_vec_scalar_fdiv_r_2exp(t, op, len, 3);
-        _fmpz_mod_poly_invmod(r, t, len, f, d + 1, p8);
         _fmpz_poly_sqr(t, s, d);
         _fmpz_poly_reduce(t, 2*d - 1, a, j, lena);
         _fmpz_vec_sub(t, r, t, d);
+        _fmpz_vec_scalar_fdiv_q_2exp(t, t, d, 2);
         _fmpz_vec_scalar_fdiv_r_2exp(t, t, d, 1);
-
-/*    printf("(1/op) - s^2) / 4 (mod 2) = "), _fmpz_vec_print(t, d), printf("\n");*/
 
         /* Check whether X^2 + s X = t (mod 2) has a solution */
         /*
@@ -691,36 +674,29 @@ _qadic_sqrt_2(fmpz *rop, const fmpz *op, long len,
             which is the case iff X^2 + s X + t == 0 (mod 2) is soluble.  
             Let g be t/s^2.  Then the above quadratic is soluble iff 
             Y^2 + Y + d = 0 is soluble.
-         */
 
-        _fmpz_poly_sqr(g, s, d);
-        _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
-        _fmpz_mod_poly_invmod(r, g, d, f, d + 1, p);
-        _fmpz_poly_mul(g, r, d, t, d);
+            We can observe that 1/s^2 = op (mod 2).
+         */
+        _fmpz_vec_scalar_fdiv_r_2exp(r, op, len, 1);
+        _fmpz_poly_mul(g, t, d, r, len);
         _fmpz_mod_poly_reduce(g, 2 * d - 1, a, j, lena, p);
 
         ans = _artin_schreier_preimage(r, g, d, a, j, lena);
-/*    printf("There.\n");
-    printf("r = "), _fmpz_vec_print(r, d), printf("\n");
-    printf("g = "), _fmpz_vec_print(g, d), printf("\n");*/
+
         _fmpz_vec_zero(rop, 2 * d - 1);
 
         if (ans)
         {
-            /* Set t = r s, a square root */
+            /* Set t = r s, a root of X^2 + s X = t (mod 2) */
             _fmpz_poly_mul(t, r, d, s, d);
             _fmpz_mod_poly_reduce(t, 2 * d - 1, a, j, lena, p);
 
-            _fmpz_vec_scalar_addmul_fmpz(s, t, d, p);
-
-            /*
-                Now (s,d) is an inverse square root of (op,len) 
-                to precision 2.
-             */
+            /* Now s + 2t is an invsqrt of (op, len) to precision 4. */
+            _fmpz_vec_scalar_addmul_si(s, t, d, 2);
 
             if (N == 2)
             {
-                _fmpz_mod_poly_invmod(rop, s, d, f, d + 1, p4);
+                _qadic_inv(rop, s, d, a, j, lena, p, 2);
             }
             else  /* N >= 3 */
             {
