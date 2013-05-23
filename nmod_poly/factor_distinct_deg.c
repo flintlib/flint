@@ -91,19 +91,13 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
         }
         /* compute interval polynomials */
         nmod_poly_set_coeff_ui(I[j], 0, 1);
-        for (i = 0; i < l && 2*d <= s->length-1; i++, d++)
+        for (i = l-1; (i >= 0) && (2*d <= s->length-1); i--, d++)
         {
             nmod_poly_rem(tmp, h[i], s);
             nmod_poly_sub(tmp, H[j], tmp);
             nmod_poly_mulmod_preinv (I[j], tmp, I[j], s, vinv);
         }
 
-        if (s->length-1 < 2*d)
-        {
-            nmod_poly_realloc (I[j], 1L);
-            nmod_poly_set_coeff_ui (I[j], 0L, 1);
-            break;
-        }
         /* compute F_j=f^{[j*l+1]} * ... * f^{[j*l+l]} */
         /* F_j is stored on the place of I_j */
         nmod_poly_gcd(I[j], s, I[j]);
@@ -112,6 +106,10 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
             nmod_poly_remove(s, I[j]);
             nmod_poly_reverse (vinv, s, s->length);
             nmod_poly_inv_series (vinv, vinv, s->length);
+        }
+        if (s->length-1 < 2*d)
+        {
+            break;
         }
     }
     if (s->length > 1)
