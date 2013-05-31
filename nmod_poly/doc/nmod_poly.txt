@@ -1707,36 +1707,36 @@ void nmod_poly_revert_series(nmod_poly_t Qinv, const nmod_poly_t Q, long n)
 
 *******************************************************************************
 
-void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+void _nmod_poly_invsqrt_series(mp_ptr g, mp_srcptr h, len_t n, nmod_t mod)
 
     Set the first $n$ terms of $g$ to the series expansion of $1/\sqrt{h}$.
     It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
     is zero-padded as necessary to length $n$. Aliasing is not permitted.
 
-void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+void nmod_poly_invsqrt_series(nmod_poly_t g, const nmod_poly_t h, len_t n)
 
     Set $g$ to the series expansion of $1/\sqrt{h}$ to order $O(x^n)$.
     It is assumed that $h$ has constant term 1.
 
-void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, long n, nmod_t mod)
+void _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, len_t n, nmod_t mod)
 
     Set the first $n$ terms of $g$ to the series expansion of $\sqrt{h}$.
     It is assumed that $n > 0$, that $h$ has constant term 1 and that $h$
     is zero-padded as necessary to length $n$. Aliasing is not permitted.
 
-void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, long n)
+void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, len_t n)
 
     Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
     It is assumed that $h$ has constant term 1.
 
-void _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, long n, nmod_t mod)
+int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, len_t n, nmod_t mod)
 
     If \code{(p, len)} is a perfect square, sets \code{(s, n / 2 + 1)}
     to a square root of $p$ and returns 1. Otherwise returns 0.
 
-void nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p, long n)
+int nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p)
 
-    If $p$ is a perfect square, sets $s$ to a square root of $a$
+    If $p$ is a perfect square, sets $s$ to a square root of $p$
     and returns 1. Otherwise returns 0.
 
 *******************************************************************************
