@@ -17,18 +17,18 @@ Primitive types
 Depending on the main interpretation of the value of a variable, where 
 possible the following primitive datatype should be used:
 
-    | bit counts up to a single limb         | ulong               |
-    | bit counts, multiprecision             | mp_bitcnt_t         |
-    | byte counts (strings)                  | size_t              |
-    | limb counts in multiprecision integers | mp_size_t           |
-    | limbs                                  | mp_limb_t           |
-    | mp_limb_t arrays                       | mp_ptr/ mp_srcptr   |
-    | ui/ si function constants              | ulong/slong         |
-    | exponents (unsigned/signed)            | ulong/slong         |
-    | polynomial lengths                     | len_t               |
-    | number of indeterminates               | len_t               |
-    | row/ column indices                    | len_t               |
-    | precision for mpfr types               | mpfr_prec_t         |
+    | bit counts up to a single limb         | ulong                       |
+    | bit counts, multiprecision             | mp_bitcnt_t                 |
+    | byte counts (strings)                  | size_t                      |
+    | limb counts in multiprecision integers | mp_size_t                   |
+    | limbs (unsigned/signed)                | mp_limb_t/ mp_limb_signed_t |
+    | mp_limb_t arrays                       | mp_ptr/ mp_srcptr           |
+    | ui/ si function constants              | ulong/ slong                |
+    | exponents (unsigned/signed)            | ulong/ slong                |
+    | polynomial lengths                     | len_t                       |
+    | number of indeterminates               | len_t                       |
+    | row/ column indices                    | len_t                       |
+    | precision for mpfr types               | mpfr_prec_t                 |
 
 The typical definitions of these in terms of primitive types are:
 
