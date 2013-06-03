@@ -41,6 +41,16 @@ The typical definitions of these in terms of primitive types are:
     | ulong         | unsigned long or unsigned long long                |
     | slong         | long or long long                                  |
 
+Use of const
+------------
+
+Input parameters to functions should be marked const in the following cases:
+
+* complex types that are passed by reference, e.g. fmpz_poly_t
+
+They should not be used on output parameters or for simple types or simple
+structs which are passed by value and not reference, e.g. nmod_t.
+
 Random functions
 ----------------
 
