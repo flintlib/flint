@@ -563,9 +563,30 @@ void n_primes_sieve_range(n_primes_t iter, mp_limb_t a, mp_limb_t b)
 
 void n_compute_primes(ulong num_primes)
 
-    Precomputes \code{num_primes} primes and their \code{double} 
-    precomputed inverses and stores them in \code{flint_primes} 
-    and \code{flint_prime_inverse}, respectively.
+    Precomputes at least \code{num_primes} primes and their \code{double} 
+    precomputed inverses and stores them in an internal cache.
+    Assuming that FLINT has been built with support for thread-local storage,
+    each thread has its own cache.
+
+const mp_limb_t * n_primes_arr_readonly(ulong num_primes)
+
+    Returns a pointer to a read-only array of the first \code{num_primes}
+    prime numbers. The computed primes are cached for repeated calls.
+    The pointer is valid until the user calls \code{n_cleanup_primes}
+    in the same thread.
+
+const double * n_prime_inverses_arr_readonly(ulong n)
+
+    Returns a pointer to a read-only array of inverses of the first
+    \code{num_primes} prime numbers. The computed primes are cached for
+    repeated calls. The pointer is valid until the user calls
+    \code{n_cleanup_primes} in the same thread.
+
+void n_cleanup_primes()
+
+    Frees the internal cache of prime numbers used by the current thread.
+    This will invalidate any pointers returned by
+    \code{n_primes_arr_readonly} or \code{n_prime_inverses_arr_readonly}.
 
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
@@ -577,11 +598,9 @@ ulong n_prime_pi(mp_limb_t n)
 
     Returns the value of the prime counting function $\pi(n)$, i.e.\ the
     number of primes less than or equal to $n$. The invariant
-    \code{n_prime_pi(n_nth_prime(n)) == n} holds, or
-    \code{n_prime_pi(flint_primes[n-1]) == n}, where \code{flint_primes} is
-    indexed from zero.
+    \code{n_prime_pi(n_nth_prime(n)) == n}.
 
-    Currently, this function simply extends \code{flint_primes} up to
+    Currently, this function simply extends the table of cached primes up to
     an upper limit and then performs a binary search.
 
 void n_prime_pi_bounds(ulong *lo, ulong *hi, mp_limb_t n)
@@ -603,8 +622,8 @@ mp_limb_t n_nth_prime(ulong n)
     Returns the $n$th prime number $p_n$, using the mathematical indexing
     convention $p_1 = 2, p_2 = 3, \dotsc$.
 
-    This function simply ensures that \code{flint_primes} is large enough
-    and then looks up \code{flint_primes[n-1]}.
+    This function simply ensures that the table of cached primes is large
+    enough and then looks up the entry.
 
 void n_nth_prime_bounds(mp_limb_t *lo, mp_limb_t *hi, ulong n)
 
@@ -653,7 +672,7 @@ int n_is_oddprime_small(mp_limb_t n)
 int n_is_oddprime_binary(mp_limb_t n) 
 
     This function performs a simple binary search through 
-    \code{flint_primes} for $n$. If it exists in the array it returns
+    the table of cached primes for $n$. If it exists in the array it returns
     $1$, otherwise $0$. For the algorithm to operate correctly 
     $n$ should be odd and at least $17$. 
 
@@ -920,7 +939,7 @@ mp_limb_t n_factor_trial_range(n_factor_t * factors,
                   mp_limb_t n, ulong start, ulong num_primes)
 
     Trial factor $n$ with the first \code{num_primes} primes, but
-    starting at the prime in \code{flint_primes} with index start. 
+    starting at the prime with index start (counting from zero).
 
     One requires an initialised \code{n_factor_t} structure, but factors
     will be added by default to an already used \code{n_factor_t}. Use 

@@ -57,8 +57,7 @@ int n_is_probabprime(mp_limb_t n)
         if (n < FLINT_ODDPRIME_SMALL_CUTOFF)
             return n_is_oddprime_small(n);
 
-        n_compute_primes(74000);
-        if (n < flint_primes_cutoff)
+        if (n < FLINT_PRIMES_TAB_DEFAULT_CUTOFF)
             return n_is_oddprime_binary(n);
       
         npre = n_precompute_inverse(n);

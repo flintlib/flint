@@ -80,7 +80,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
 
         if (found)
         {
-            p = flint_primes[found];
+            p = n_primes_arr_readonly(found+1)[found];
             exp = 1;
             xsize = flint_mpn_divexact_1(xd, xsize, p);
 
@@ -101,8 +101,8 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
                 exp += 3;
             }
 
-            _fmpz_factor_append_ui(factor, flint_primes[found], exp);
-            /* printf("added %lu %lu\n", flint_primes[found], exp); */
+            _fmpz_factor_append_ui(factor, p, exp);
+            /* printf("added %lu %lu\n", p, exp); */
 
             /* Continue using only trial division as long as it is successful.
                This allows quickly factoring huge highly composite numbers

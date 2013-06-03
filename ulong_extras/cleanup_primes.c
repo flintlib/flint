@@ -19,30 +19,28 @@
 =============================================================================*/
 /******************************************************************************
 
-    Copyright (C) 2010 Fredrik Johansson
+    Copyright (C) 2013 Fredrik Johansson
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include <gmp.h>
 #include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "mpn_extras.h"
 #include "ulong_extras.h"
 
-
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, len_t start, len_t stop)
+void
+n_cleanup_primes()
 {
-    len_t i;
-    const mp_limb_t * primes;
+    int i;
 
-    primes = n_primes_arr_readonly(stop);
-
-    for (i = start; i < stop; i++)
+    for (i = 0; i < _flint_primes_used; i++)
     {
-        if (flint_mpn_divisible_1_p(x, xsize, primes[i]))
-            return i;
+        if (i < _flint_primes_used - 1 && _flint_primes[i] == _flint_primes[i+1])
+            continue;
+
+        flint_free(_flint_primes[i]);
+        flint_free(_flint_prime_inverses[i]);
     }
-    return 0;
+
+    _flint_primes_used = 0;
 }
+

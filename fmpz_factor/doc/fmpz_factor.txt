@@ -53,6 +53,10 @@ void fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
     This currently only uses trial division, falling back to \code{n_factor()}
     as soon as the number shrinks to a single limb.
 
+void fmpz_factor_si(fmpz_factor_t factor, slong n)
+
+    Like \code{fmpz_factor}, but takes a machine integer $n$ as input.
+
 int fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, 
                                        ulong start, ulong num_primes)
 
@@ -89,3 +93,4 @@ int fmpz_factor_pp1(fmpz_t factor, const fmpz_t n,
     of finding a factor which has been missed (if $p+1$ or $p-1$ is not
     smooth for any prime factors $p$ of $n$ then the function will
     not ever succeed).
+
