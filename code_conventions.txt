@@ -17,7 +17,7 @@ Primitive types
 Depending on the main interpretation of the value of a variable, where 
 possible the following primitive datatype should be used:
 
-    | bit counts up to a single limb         | unsigned long       |
+    | bit counts up to a single limb         | ulong               |
     | bit counts, multiprecision             | mp_bitcnt_t         |
     | byte counts (strings)                  | size_t              |
     | limb counts in multiprecision integers | mp_size_t           |
