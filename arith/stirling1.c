@@ -22,15 +22,8 @@
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
-#include "arith.h"
-#include "ulong_extras.h"
 
+#include "arith.h"
 
 static void
 _rising_factorial(fmpz * res, len_t a, len_t b, len_t trunc)
@@ -97,7 +90,7 @@ _rising_factorial(fmpz * res, len_t a, len_t b, len_t trunc)
 }
 
 void
-arith_stirling_number_1u(fmpz_t s, len_t n, len_t k)
+arith_stirling_number_1u(fmpz_t s, slong n, slong k)
 {
     /* Various special cases
        TODO: factorials, binomial coefficients, harmonic numbers ... */
@@ -119,7 +112,7 @@ arith_stirling_number_1u(fmpz_t s, len_t n, len_t k)
 }
 
 void
-arith_stirling_number_1(fmpz_t s, len_t n, len_t k)
+arith_stirling_number_1(fmpz_t s, slong n, slong k)
 {
     arith_stirling_number_1u(s, n, k);
     if ((n + k) % 2)
@@ -127,14 +120,14 @@ arith_stirling_number_1(fmpz_t s, len_t n, len_t k)
 }
 
 void
-arith_stirling_number_1u_vec(fmpz * row, len_t n, len_t klen)
+arith_stirling_number_1u_vec(fmpz * row, slong n, len_t klen)
 {
     if (klen > 0)
         _rising_factorial(row, 0, n, klen);
 }
 
 void
-arith_stirling_number_1_vec(fmpz * row, len_t n, len_t klen)
+arith_stirling_number_1_vec(fmpz * row, slong n, len_t klen)
 {
     len_t k;
 

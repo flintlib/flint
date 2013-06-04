@@ -48,10 +48,10 @@ void mpfr_zeta_ui_bsplit(mpfr_t x, ulong s, mpfr_rnd_t rnd);
 
 /* Various arithmetic functions **********************************************/
 
-void arith_primorial(fmpz_t res, len_t n);
+void arith_primorial(fmpz_t res, slong n);
 
-void _arith_harmonic_number(fmpz_t num, fmpz_t den, len_t n);
-void arith_harmonic_number(fmpq_t x, len_t n);
+void _arith_harmonic_number(fmpz_t num, fmpz_t den, slong n);
+void arith_harmonic_number(fmpq_t x, slong n);
 
 void arith_ramanujan_tau(fmpz_t res, const fmpz_t n);
 void arith_ramanujan_tau_series(fmpz_poly_t res, len_t n);
@@ -65,17 +65,17 @@ void arith_euler_phi(fmpz_t res, const fmpz_t n);
 
 /* Stirling numbers **********************************************************/
 
-void arith_stirling_number_1u(fmpz_t s, len_t n, len_t k);
-void arith_stirling_number_1(fmpz_t s, len_t n, len_t k);
-void arith_stirling_number_2(fmpz_t s, len_t n, len_t k);
+void arith_stirling_number_1u(fmpz_t s, slong n, slong k);
+void arith_stirling_number_1(fmpz_t s, slong n, slong k);
+void arith_stirling_number_2(fmpz_t s, slong n, slong k);
 
-void arith_stirling_number_1u_vec(fmpz * row, len_t n, len_t klen);
-void arith_stirling_number_1_vec(fmpz * row, len_t n, len_t klen);
-void arith_stirling_number_2_vec(fmpz * row, len_t n, len_t klen);
+void arith_stirling_number_1u_vec(fmpz * row, slong n, len_t klen);
+void arith_stirling_number_1_vec(fmpz * row, slong n, len_t klen);
+void arith_stirling_number_2_vec(fmpz * row, slong n, len_t klen);
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen);
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen);
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen);
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, len_t klen);
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, len_t klen);
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, len_t klen);
 
 void arith_stirling_matrix_1u(fmpz_mat_t mat);
 void arith_stirling_matrix_1(fmpz_mat_t mat);

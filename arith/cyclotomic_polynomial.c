@@ -23,14 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
-
 
 void
 _arith_cyclotomic_polynomial(fmpz * a, ulong n, mp_ptr factors,

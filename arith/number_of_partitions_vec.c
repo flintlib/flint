@@ -23,16 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
 
 void
 arith_number_of_partitions_vec(fmpz * res, len_t len)

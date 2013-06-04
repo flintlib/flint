@@ -23,18 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 void _arith_euler_number_zeta(fmpz_t res, ulong n)
 {
     mpz_t r;
     mpfr_t t, z, pi;
-    len_t prec, pi_prec;
+    mp_bitcnt_t prec, pi_prec;
 
     if (n % 2)
     {

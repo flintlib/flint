@@ -23,15 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
-#include "nmod_poly.h"
-#include "nmod_vec.h"
-#include "ulong_extras.h"
 
 static void
 __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
@@ -76,7 +69,8 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, len_t n)
     mp_ptr * polys;
     mp_ptr temppoly;
     nmod_t mod;
-    len_t i, j, k, m, size, prime_bits, num_primes, num_primes_k, resolution;
+    len_t i, j, k, m, num_primes, num_primes_k, resolution;
+    mp_bitcnt_t size, prime_bits;
 
     if (n < 1)
         return;

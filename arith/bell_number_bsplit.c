@@ -24,11 +24,6 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
 
 
@@ -91,7 +86,8 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, len_t a, len_t b, len_t n, len_t bmax)
 void
 arith_bell_number_bsplit(fmpz_t b, ulong n)
 {
-    len_t N, prec;
+    len_t N;
+    mp_bitcnt_t prec;
     mpz_t P, Q;
     mpfr_t Pf, Qf, E, one;
 

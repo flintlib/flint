@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 #include "nmod_poly.h"
-#include "nmod_vec.h"
 #include "arith.h"
 
 #define CRT_MAX_RESOLUTION 16
@@ -42,7 +36,8 @@ arith_bell_number_vec_multi_mod(fmpz * res, len_t n)
     mp_ptr primes, residues;
     mp_ptr * polys;
     nmod_t mod;
-    len_t i, j, k, size, prime_bits, num_primes, num_primes_k, resolution;
+    len_t i, j, k, num_primes, num_primes_k, resolution;
+    mp_bitcnt_t size, prime_bits;
 
     if (n < 1)
         return;

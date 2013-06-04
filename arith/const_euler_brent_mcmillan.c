@@ -24,11 +24,6 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "arith.h"
 
 void
@@ -37,7 +32,8 @@ mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd)
     fmpq_bsplit_t sum;
     fmpq *ab, *cd, *pq;
     mpfr_t S0, K0, I0, t, u, v;
-    len_t bits, wp, n, nterms1, nterms2, k;
+    len_t n, nterms1, nterms2, k;
+    mp_bitcnt_t bits, wp;
 
     bits = mpfr_get_prec(res) + 20;
     n = 0.08665 * bits + 1;
