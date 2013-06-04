@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, 
