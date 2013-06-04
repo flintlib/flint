@@ -23,14 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-
 
 static mp_limb_t
 find_good_prime_and_invert(nmod_mat_t Ainv,
@@ -64,7 +57,7 @@ find_good_prime_and_invert(nmod_mat_t Ainv,
 
 /* We need to perform several matrix-vector products Ay, and speed them
    up by using modular multiplication (this is only faster if we
-   precompute the modular matrices. Note: we assume that all
+   precompute the modular matrices). Note: we assume that all
    primes are >= p. This allows reusing y_mod as the right-hand
    side without reducing it. */
 

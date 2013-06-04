@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
 
 void
 fmpz_mat_solve_bound(fmpz_t N, fmpz_t D,

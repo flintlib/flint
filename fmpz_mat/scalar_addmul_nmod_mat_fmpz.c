@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
 
 void
 fmpz_mat_scalar_addmul_nmod_mat_fmpz(fmpz_mat_t B,

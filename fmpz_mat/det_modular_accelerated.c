@@ -23,14 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
-
 
 void
 fmpz_mat_det_modular_accelerated(fmpz_t det, const fmpz_mat_t A, int proved)

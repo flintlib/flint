@@ -23,18 +23,11 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "nmod_vec.h"
-#include "nmod_mat.h"
-#include "ulong_extras.h"
-
 
 void
 _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
-    len_t bits)
+    mp_bitcnt_t bits)
 {
     len_t i, j;
 
@@ -42,7 +35,7 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     fmpz_comb_temp_t comb_temp;
 
     len_t num_primes;
-    len_t primes_bits;
+    mp_bitcnt_t primes_bits;
     mp_limb_t * primes;
     mp_limb_t * residues;
 
@@ -136,8 +129,8 @@ _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
 void
 fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    len_t A_bits;
-    len_t B_bits;
+    slong A_bits;
+    slong B_bits;
 
     A_bits = fmpz_mat_max_bits(A);
     B_bits = fmpz_mat_max_bits(B);

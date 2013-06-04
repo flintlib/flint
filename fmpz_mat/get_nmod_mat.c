@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-
 
 void
 fmpz_mat_get_nmod_mat(nmod_mat_t Amod, const fmpz_mat_t A)

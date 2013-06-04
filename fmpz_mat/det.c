@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
 
 void
 fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)

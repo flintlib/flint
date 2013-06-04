@@ -23,9 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
 #include "fmpz_mat.h"
-#include "fmpz_poly.h"
 
 /*
     Assumes that \code{mat} is an $n \times n$ matrix and sets \code{(cp,n+1)} 

@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
 
 /* Enable to exercise corner cases */
 #define DEBUG_USE_SMALL_PRIMES 0

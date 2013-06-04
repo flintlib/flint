@@ -170,7 +170,7 @@ void fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
 
 void _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
-    const fmpz_mat_t B, len_t bits);
+    const fmpz_mat_t B, mp_bitcnt_t bits);
 
 void fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A,
     const fmpz_mat_t B);
