@@ -6,7 +6,7 @@
 #now replace all instances of long
 files=$(find . -name "*\.c")
 headers=$(find . -name "*\.h")
-docs=$(find . -name "*\.h")
+docs=$(find . -name "*\.c")
 
 for y in $files
 do
@@ -29,6 +29,7 @@ done
 for y in $docs
 do
 perl -pi -e "s/(\([^\n]*?[^u])long([^\n]*?\))/\1len_t\2/g;s/\(long([^\n]*?\))/\(len_t\1/g;s/^long\b/len_t/g" $y
+perl -pi -w -e "s/slen_t/slong/g;" $y
 git add $y
 done
 
