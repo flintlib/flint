@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void fmpq_inv(fmpq_t dest, const fmpq_t src)
 {

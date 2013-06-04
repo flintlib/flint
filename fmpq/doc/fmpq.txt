@@ -41,14 +41,14 @@ void fmpq_clear(fmpq_t x)
     Clears the \code{fmpq_t} variable \code{x}. To use the variable again,
     it must be re-initialised with \code{fmpq_init}.
 
-fmpq * _fmpq_vec_init(long n)
+fmpq * _fmpq_vec_init(len_t n)
 
     Initialises a vector of \code{fmpq} values of length $n$ and sets
     all values to 0. This is equivalent to generating a \code{fmpz} vector
     of length $2n$ with \code{_fmpz_vec_init} and setting all denominators
     to 1.
 
-void _fmpq_vec_clear(fmpq * vec, long n)
+void _fmpq_vec_clear(fmpq * vec, len_t n)
 
     Frees an \code{fmpq} vector.
 
@@ -120,11 +120,11 @@ void fmpq_one(fmpq_t res)
 
 *******************************************************************************
 
-int fmpq_is_zero(fmpq_t res)
+int fmpq_is_zero(const fmpq_t res)
 
     Returns nonzero if \code{res} has value 0, and returns zero otherwise.
 
-int fmpq_is_one(fmpq_t res)
+int fmpq_is_one(const fmpq_t res)
 
     Returns nonzero if \code{res} has value $1$, and returns zero otherwise.
 
@@ -162,11 +162,11 @@ void fmpq_set_fmpz_frac(fmpq_t res, const fmpz_t p, const fmpz_t q)
     This is equivalent to assigning the numerator and denominator
     separately and calling \code{fmpq_canonicalise}.
 
-void fmpq_set_si(fmpq_t res, slong p, ulong q);
+void fmpq_set_si(fmpq_t res, slong p, ulong q)
 
     Sets \code{res} to the canonical form of the fraction \code{p / q}.
 
-void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q);
+void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
 
     Sets \code{(rnum, rden)} to the canonical form of the fraction
     \code{p / q}. \code{rnum} and \code{rden} may not be aliased.
@@ -269,7 +269,7 @@ void fmpq_fprint(FILE * file, const fmpq_t x)
     The numerator and denominator are printed verbatim as integers, 
     with a forward slash (/) printed in between.
 
-void _fmpq_fprint(FILE * file, fmpz_t num, fmpz_t den)
+void _fmpq_fprint(FILE * file, const fmpz_t num, const fmpz_t den)
 
     Does the same thing as \code{fmpq_fprint}, but for numerator
     and denominator given explicitly as \code{fmpz_t} variables. 
@@ -280,7 +280,7 @@ void fmpq_print(const fmpq_t x)
     printed verbatim as integers, with a forward slash (/) printed in
     between.
 
-void _fmpq_print(fmpz_t num, fmpz_t den)
+void _fmpq_print(const fmpz_t num, const fmpz_t den)
 
     Does the same thing as \code{fmpq_print}, but for numerator
     and denominator given explicitly as \code{fmpz_t} variables. 
@@ -423,7 +423,8 @@ void fmpq_div_2exp(fmpq_t res, const fmpq_t x, mp_bitcnt_t exp)
 
 *******************************************************************************
 
-int _fmpq_mod_fmpz(fmpz_t res, fmpz_t num, fmpz_t den, fmpz_t mod)
+int _fmpq_mod_fmpz(fmpz_t res,
+        const fmpz_t num, const fmpz_t den, const fmpz_t mod)
 
 int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
 
@@ -536,7 +537,7 @@ void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
 
 *******************************************************************************
 
-long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
+len_t fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, len_t n)
 
     Generates up to $n$ terms of the (simple) continued fraction expansion
     of $x$, writing the coefficients to the vector $c$ and the remainder $r$
@@ -565,7 +566,7 @@ long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
     This function implements a simple algorithm, performing repeated
     divisions. The running time is quadratic.
 
-void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
+void fmpq_set_cfrac(fmpq_t x, const fmpz * c, len_t n)
 
     Sets $x$ to the value of the continued fraction
 
@@ -582,7 +583,7 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
     This product is split in half recursively to balance the size
     of the coefficients.
 
-long fmpq_cfrac_bound(const fmpq_t x)
+len_t fmpq_cfrac_bound(const fmpq_t x)
 
     Returns an upper bound for the number of terms in the continued
     fraction expansion of $x$. The computed bound is not necessarily sharp.
@@ -603,7 +604,7 @@ void fmpq_bsplit_init(fmpq_bsplit_t s)
     of a series of rational numbers computed using binary splitting.
     The algorithm is described in \cite{HaiPap1998}.
 
-void fmpq_bsplit_clear(fmpq_bsplit_t s);
+void fmpq_bsplit_clear(fmpq_bsplit_t s)
 
     Frees the binary splitting variable $s$.
 
@@ -619,7 +620,7 @@ void fmpq_bsplit_get_mpfr(mpfr_t x, const fmpq_bsplit_t s)
     multiplications and divisions, possibly resulting in 3-4 bits
     of roundoff error.
 
-void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, long n1, long n2)
+void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, len_t n1, len_t n2)
 
     With $n_1 = 0$ and $n_2 = n$, computes
 
@@ -631,7 +632,7 @@ void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, long n1, long n2)
     the content of the sum corresponding to that interval.
 
 void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * pq, long n1, long n2)
+        const fmpq * ab, const fmpq * pq, len_t n1, len_t n2)
 
     With $n_1 = 0$ and $n_2 = n$, computes
 
@@ -642,7 +643,7 @@ void fmpq_bsplit_sum_abpq(fmpq_bsplit_t s,
     the content of the sum corresponding to that interval.
 
 void fmpq_bsplit_sum_pq(fmpq_bsplit_t s,
-        const fmpq * ab, const fmpq * cd, const fmpq * pq, long n1, long n2)
+        const fmpq * ab, const fmpq * cd, const fmpq * pq, len_t n1, len_t n2)
 
     With $n_1 = 0$ and $n_2 = n$, computes
 
@@ -650,3 +651,4 @@ void fmpq_bsplit_sum_pq(fmpq_bsplit_t s,
 
     using binary splitting. With $0 \le n_1 \le n_2 \le n$, computes
     the content of the sum corresponding to that interval.
+

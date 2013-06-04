@@ -23,17 +23,12 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void
 _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
 {
-    ulong x = n_randlimb(state);
+    mp_limb_t x = n_randlimb(state);
 
     fmpz_randtest(num, state, bits);
     fmpz_randtest_not_zero(den, state, bits);
@@ -69,7 +64,7 @@ _fmpq_randtest(fmpz_t num, fmpz_t den, flint_rand_t state, mp_bitcnt_t bits)
 
 void fmpq_randtest(fmpq_t res, flint_rand_t state, mp_bitcnt_t bits)
 {
-    _fmpq_randtest(&res->num, &res->den, state, bits);
+    _fmpq_randtest(fmpq_numref(res), fmpq_denref(res), state, bits);
 }
 
 void fmpq_randtest_not_zero(fmpq_t f, flint_rand_t state, mp_bitcnt_t bits)

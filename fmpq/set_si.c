@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <limits.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
 {
@@ -55,5 +50,5 @@ void _fmpq_set_si(fmpz_t rnum, fmpz_t rden, slong p, ulong q)
 
 void fmpq_set_si(fmpq_t res, slong p, ulong q)
 {
-    _fmpq_set_si(&res->num, &res->den, p, q);
+    _fmpq_set_si(fmpq_numref(res), fmpq_denref(res), p, q);
 }

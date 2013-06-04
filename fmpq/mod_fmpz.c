@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 int
 _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod)
@@ -47,6 +42,6 @@ _fmpq_mod_fmpz(fmpz_t res, const fmpz_t num, const fmpz_t den, const fmpz_t mod)
 
 int fmpq_mod_fmpz(fmpz_t res, const fmpq_t x, const fmpz_t mod)
 {
-    return _fmpq_mod_fmpz(res, &x->num, &x->den, mod);
+    return _fmpq_mod_fmpz(res, fmpq_numref(x), fmpq_denref(x), mod);
 }
 

@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 #define ONE_OVER_LOG2_PHI (1.44042009041255648 + 1e-13)
