@@ -41,14 +41,14 @@ void fmpq_clear(fmpq_t x)
     Clears the \code{fmpq_t} variable \code{x}. To use the variable again,
     it must be re-initialised with \code{fmpq_init}.
 
-fmpq * _fmpq_vec_init(long n)
+fmpq * _fmpq_vec_init(len_t n)
 
     Initialises a vector of \code{fmpq} values of length $n$ and sets
     all values to 0. This is equivalent to generating a \code{fmpz} vector
     of length $2n$ with \code{_fmpz_vec_init} and setting all denominators
     to 1.
 
-void _fmpq_vec_clear(fmpq * vec, long n)
+void _fmpq_vec_clear(fmpq * vec, len_t n)
 
     Frees an \code{fmpq} vector.
 
@@ -536,7 +536,7 @@ void fmpq_next_signed_calkin_wilf(fmpq_t res, const fmpq_t x)
 
 *******************************************************************************
 
-long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
+len_t fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, len_t n)
 
     Generates up to $n$ terms of the (simple) continued fraction expansion
     of $x$, writing the coefficients to the vector $c$ and the remainder $r$
@@ -565,7 +565,7 @@ long fmpq_get_cfrac(fmpz * c, fmpq_t rem, const fmpq_t x, long n)
     This function implements a simple algorithm, performing repeated
     divisions. The running time is quadratic.
 
-void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
+void fmpq_set_cfrac(fmpq_t x, const fmpz * c, len_t n)
 
     Sets $x$ to the value of the continued fraction
 
@@ -582,7 +582,7 @@ void fmpq_set_cfrac(fmpq_t x, const fmpz * c, long n)
     This product is split in half recursively to balance the size
     of the coefficients.
 
-long fmpq_cfrac_bound(const fmpq_t x)
+len_t fmpq_cfrac_bound(const fmpq_t x)
 
     Returns an upper bound for the number of terms in the continued
     fraction expansion of $x$. The computed bound is not necessarily sharp.
@@ -619,7 +619,7 @@ void fmpq_bsplit_get_mpfr(mpfr_t x, const fmpq_bsplit_t s)
     multiplications and divisions, possibly resulting in 3-4 bits
     of roundoff error.
 
-void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, long n1, long n2)
+void fmpq_bsplit_sum_pq(fmpq_bsplit_t s, const fmpq * pq, len_t n1, len_t n2)
 
     With $n_1 = 0$ and $n_2 = n$, computes
 

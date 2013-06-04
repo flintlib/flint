@@ -29,7 +29,7 @@
 
 *******************************************************************************
 
-void nmod_mat_init(nmod_mat_t mat, long rows, long cols, mp_limb_t n)
+void nmod_mat_init(nmod_mat_t mat, len_t rows, len_t cols, mp_limb_t n)
 
     Initialises \code{mat} to a \code{rows}-by-\code{cols} matrix with 
     coefficients modulo~$n$, where $n$ can be any nonzero integer that 
@@ -57,18 +57,18 @@ void nmod_mat_set(nmod_mat_t mat, nmod_mat_t src)
 
 *******************************************************************************
 
-MACRO nmod_mat_entry(nmod_mat_t mat, long i, long j)
+MACRO nmod_mat_entry(nmod_mat_t mat, len_t i, len_t j)
 
     Directly accesses the entry in \code{mat} in row $i$ and column $j$,
     indexed from zero. No bounds checking is performed. This macro can be
     used both for reading and writing coefficients.
 
-long nmod_mat_nrows(nmod_mat_t mat)
+len_t nmod_mat_nrows(nmod_mat_t mat)
 
     Returns the number of rows in \code{mat}. This function is implemented
     as a macro.
 
-long nmod_mat_ncols(nmod_mat_t mat)
+len_t nmod_mat_ncols(nmod_mat_t mat)
 
     Returns the number of columns in \code{mat}. This function is implemented
     as a macro.
@@ -120,7 +120,7 @@ int nmod_mat_randpermdiag(nmod_mat_t mat,
     Returns $0$ or $1$, depending on whether the permutation is even 
     or odd respectively.
 
-void nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
+void nmod_mat_randrank(nmod_mat_t mat, len_t rank, flint_rand_t state)
 
     Sets \code{mat} to a random sparse matrix with the given rank, 
     having exactly as many non-zero elements as the rank, with the 
@@ -130,7 +130,7 @@ void nmod_mat_randrank(nmod_mat_t mat, long rank, flint_rand_t state)
     The matrix can be transformed into a dense matrix with unchanged
     rank by subsequently calling \code{nmod_mat_randops()}.
 
-void nmod_mat_randops(nmod_mat_t mat, long count, flint_rand_t state)
+void nmod_mat_randops(nmod_mat_t mat, len_t count, flint_rand_t state)
 
     Randomises \code{mat} by performing elementary row or column 
     operations. More precisely, at most \code{count} random additions 
@@ -265,7 +265,7 @@ mp_limb_t nmod_mat_det(nmod_mat_t A)
 
     Returns the determinant of $A$. The modulus of $A$ must be a prime number.
 
-long nmod_mat_rank(nmod_mat_t A)
+len_t nmod_mat_rank(nmod_mat_t A)
 
     Returns the rank of $A$. The modulus of $A$ must be a prime number.
 
@@ -401,7 +401,7 @@ int nmod_mat_solve_vec(mp_limb_t * x, nmod_mat_t A, mp_limb_t * b)
 
 *******************************************************************************
 
-long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
+len_t nmod_mat_lu(len_t * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition $LU = PA$ of a given
     matrix $A$, returning the rank of $A$.
@@ -421,13 +421,13 @@ long nmod_mat_lu(long * P, nmod_mat_t A, int rank_check)
 
     This function calls \code{nmod_mat_lu_recursive}.
 
-long nmod_mat_lu_classical(long * P, nmod_mat_t A, int rank_check)
+len_t nmod_mat_lu_classical(len_t * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition $LU = PA$ of a given
     matrix $A$, returning the rank of $A$. The behavior of this function
     is identical to that of \code{nmod_mat_lu}. Uses Gaussian elimination.
 
-long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
+len_t nmod_mat_lu_recursive(len_t * P, nmod_mat_t A, int rank_check)
 
     Computes a generalised LU decomposition $LU = PA$ of a given
     matrix $A$, returning the rank of $A$. The behavior of this function
@@ -442,7 +442,7 @@ long nmod_mat_lu_recursive(long * P, nmod_mat_t A, int rank_check)
 
 *******************************************************************************
 
-long nmod_mat_rref(nmod_mat_t A)
+len_t nmod_mat_rref(nmod_mat_t A)
 
     Puts $A$ in reduced row echelon form and returns the rank of $A$.
 
@@ -457,7 +457,7 @@ long nmod_mat_rref(nmod_mat_t A)
 
 *******************************************************************************
 
-long nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
+len_t nmod_mat_nullspace(nmod_mat_t X, const nmod_mat_t A)
 
     Computes the nullspace of $A$ and returns the nullity.
 

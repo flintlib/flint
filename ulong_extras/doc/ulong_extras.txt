@@ -84,7 +84,7 @@ mp_limb_t n_randtest_not_zero(flint_rand_t state)
     As for \code{n_randtest()}, but does not return $0$.
     This function is intended for use in test code. 
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
+mp_limb_t n_randprime(flint_rand_t state, unsigned len_t bits, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with \code{bits} bits, where \code{bits} must be at least 2 and
@@ -487,7 +487,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
 
-long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
+len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp)
 
     Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -498,7 +498,7 @@ long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
+len_t n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, len_t exp)
 
     Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -509,7 +509,7 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+len_t n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     Computes all the square roots of \code{a} modulo \code{m} given the 
     factorisation of \code{m} in \code{fac}. The roots are stored in an array 

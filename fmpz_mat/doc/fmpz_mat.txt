@@ -32,7 +32,7 @@
 
 *******************************************************************************
 
-void fmpz_mat_init(fmpz_mat_t mat, long rows, long cols)
+void fmpz_mat_init(fmpz_mat_t mat, len_t rows, len_t cols)
 
     Initialises a matrix with the given number of rows and columns for use. 
 
@@ -61,7 +61,7 @@ void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
     are allowed to be different.
 
-fmpz * fmpz_mat_entry(fmpz_mat_t mat, long i, long j)
+fmpz * fmpz_mat_entry(fmpz_mat_t mat, len_t i, len_t j)
 
     Returns a reference to the entry of \code{mat} at row $i$ and column $j$.
     This reference can be passed as an input or output variable to any
@@ -192,7 +192,7 @@ void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     The matrix can be transformed into a dense matrix with unchanged
     determinant by subsequently calling \code{fmpz_mat_randops()}.
 
-void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, long count)
+void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, len_t count)
 
     Randomises \code{mat} by performing elementary row or column operations.
     More precisely, at most \code{count} random additions or subtractions of
@@ -640,7 +640,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
 *******************************************************************************
 
-long fmpz_mat_rank(const fmpz_mat_t A)
+len_t fmpz_mat_rank(const fmpz_mat_t A)
 
     Returns the rank, that is, the number of linearly independent columns
     (equivalently, rows), of $A$. The rank is computed by row reducing
@@ -743,7 +743,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
 
 *******************************************************************************
 
-long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+len_t fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
                                     long start_row, long end_row, long c)
 
     Attempts to find a pivot entry for row reduction.
@@ -756,7 +756,7 @@ long fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
+len_t fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
                             const fmpz_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -778,7 +778,7 @@ long fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, long * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+len_t fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
     Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
     and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
@@ -805,7 +805,7 @@ long fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
 *******************************************************************************
 
-long fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p)
+len_t fmpz_mat_rref_mod(len_t * perm, fmpz_mat_t A, const fmpz_t p)
 
     Uses fraction-free Gauss-Jordan elimination to set \code{A}
     to its reduced row echelon form and returns the rank of \code{A}.
@@ -821,7 +821,7 @@ long fmpz_mat_rref_mod(long * perm, fmpz_mat_t A, const fmpz_t p)
 
 *******************************************************************************
 
-long fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
+len_t fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
 
     Computes a basis for the right rational nullspace of $A$ and returns
     the dimension of the nullspace (or nullity). $B$ is set to a matrix with
@@ -841,7 +841,7 @@ long fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-long fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B, fmpz_t den,
+len_t fmpz_mat_rref_fraction_free(long * perm, fmpz_mat_t B, fmpz_t den,
         const fmpz_mat_t A)
 
     Computes an integer matrix \code{B} and an integer \code{den} such that
