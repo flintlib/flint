@@ -1,0 +1,176 @@
+% vim:spell spelllang=en_us textwidth=75
+
+\documentclass{scrartcl}
+\usepackage[utf8]{inputenc}
+\usepackage{amsfonts}
+
+\title{A generic expression template library for arithmetic data types}
+\author{Tom Bachmann\footnote{\texttt{e\_mc\_h2@web.de}}}
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+
+This note describes the design I plan to implement this summer for a c++
+wrapper for the FLINT library\footnote{\texttt{www.flintlib.org}}.
+
+Any kinds of comments are appreciated.
+
+\paragraph{Overview}
+In first approximation, FLINT implements arithmetic operations on and
+representations of elements of specific rings, \emph{with unlimited
+precision}. The implemented rings include $\mathbb{Z}, \mathbb{Q},
+\mathbb{Z}[X], \mathbb{Z}[X_{ij}], \mathbb{F}_q[X], \mathbb{Z}/n\mathbb{Z}$
+and similar ones. FLINT is written in C, so arithmetic operations look like
+\texttt{fmpz\_add(target, source1, source2)}. In crude terms, this note
+describes how to write a C++ wrapper, allowing us to turn the above
+expression into \texttt{target = source1 + source2}.
+
+
+\section*{Objectives}
+
+The wrapper library has to satisfy a number of competing objectives:
+
+\begin{description}
+\item[Performance] Whenever feasible, the C++ code should compile down into
+    equivalent C code which is as close in performance to hand-written code as
+    possible.
+\item[Portability] The library should be usable on as many different
+    compilers and compiler versions as possible.
+\item[Easy extensibility] It should be straightforward for FLINT developers
+    (which may only know C) to extend the wrapper library to add a new data
+    type.
+\item[Completeness] The wrapper library should expose all FLINT C
+    functions.
+\end{description}
+
+There are also the following secondary objectives:
+
+\begin{itemize}
+\item If possible, the library should be sufficiently generic to be used by
+    other open source projects seeking to create a C++ wrapper.
+\item If possible, the wrapper should anticipate and/or facilitate
+    generics.
+\item The wrapper should allow for further layers of abstraction, e.g. to
+    provide an NTL-compatible interface.
+\end{itemize}
+
+
+\section*{Design}
+
+In order to meet the above goals, we have made the following decisions.
+Performance will be achieved using expression templates, following the
+C++98 standard. To improve diagnostics, we will use static assert
+frequently (in C++98 mode we use standard implementations, in C++11 mode we
+use the language internal one). There will be no automatic casts. The
+wrapper library will be split clearly into FLINT-specific and generic
+parts.
+
+\subsection*{Overview}
+
+\subsection*{Expression template parsing}
+
+\subsection*{Temporary allocation}
+
+\subsection*{Conflict resolution for traits}
+
+\subsection*{Class structure for (FLINT) generics}
+
+Corresponding to any ring, there will be two classes: the \emph{context}
+representing the ring itself, and the \emph{element} representing elements
+of the ring. Contexts are immutable, but elements are usually not. Often
+the context will be essentially empty (e.g. for $\mathbb{Z}$), but
+sometimes it may hold data common to all elements, e.g. the modulus $n$ of
+$\mathbb{Z}/n\mathbb{Z}.$ We also differentiate between \emph{primitive
+types}, \emph{compound types} and \emph{specialised types}. The primitive
+types such as $\mathbb{Z}, \mathbb{Q}_p$
+are the building blocks and are atomic from the point of view of this
+wrapper. Compound types such as $A[T]$ (for any ring $A$) or $Frac(A)$ (for
+domains $A$) are built from primitive and compound types. They have
+implementations of arithmetic operations in terms of operations in $A,$ and
+so are generic. Finally the specialised types are versions of compound
+types with particular arithmetic implementations tailored to the particular
+type, e.g. $\mathbb{Z}[T]$ (where multiplication can be implemented using
+polynomial reconstruction and multiplication in $\mathbb{Z}$).
+
+For the initial implementation, the generic types will not come with
+arithmetic implementations. Instead I will focus on wrapping all the
+particular implementations in FLINT.
+
+Tables \ref{tab:primitive-types}, \ref{tab:compound-types} and
+\ref{tab:specialised-types} list the primitive, compound, and specialised
+types of the FLINT wrapper.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{cc}
+FLINT name & representing \\
+\hline
+fmpz & $\mathbb{Z}$ \\
+padic & $\mathbb{Q}_p$ (to fixed accuracy) \\
+ulong & $\mathbb{Z}/2^{s}\mathbb{Z}$ (where $s$ is the machine wordsize) \\
+\end{tabular}
+\end{center}
+\caption{Primitive types for the FLINT wrapper.}
+\label{tab:primitive-types}
+\end{table}
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{cc}
+wrapper name & representing \\
+\hline
+poly & $A[T]$ \\
+fraction & $Frac(A)$ ($A$ a domain) \\
+PIquotient & $A/aA$ \\
+vector (not actually a ring) & $A^n$ (with $n$ large) \\
+matrix (not always a ring) & $n \times m$ matrices over $A$ (with $m, n$ large) \\
+\end{tabular}
+\end{center}
+\caption{Compound types for the FLINT wrapper.}
+\label{tab:compound-types}
+\end{table}
+
+A potential later addition could be fixed-size vectors and matrices with
+automatically unrolled operations.
+
+\begin{table}[h]
+\begin{center}
+\begin{tabular}{cc}
+FLINT name & specialising compound type \\
+\hline
+fmpq & \texttt{fraction<fmpz>} \\
+fmpz\_poly\_q & \texttt{fraction<poly<fmpz>>} \\
+\\
+``mod'' & \texttt{PIquotient<fmpz>} \\
+nmod & \texttt{PIquotient<ulong>} \\
+\\
+fmpz\_poly & \texttt{poly<fmpz>} \\
+fmpq\_poly & \texttt{poly<fmpq>} \\
+nmod\_poly & \texttt{poly<nmod>} \\
+fmpz\_mod\_poly & \texttt{poly<PIquotient<fmpz> } \\
+\\
+fmpz\_vec & \texttt{vector<fmpz>} \\
+nmod\_vec & \texttt{vector<PIquotient<ulong>>} \\
+\\
+fmpz\_mat & \texttt{matrix<fmpz>} \\
+fmpq\_mat & \texttt{matrix<fraction<fmpz>>} \\
+fmpz\_poly\_mat & \texttt{matrix<poly<fmpz>>} \\
+nmod\_mat & \texttt{matrix<PIquotient<ulong>>} \\
+nmod\_poly\_mat & \texttt{matrix<poly<PIquotient<ulong>>>}
+\end{tabular}
+\end{center}
+\caption{Specialised types for the FLINT wrapper.}
+\label{tab:specialised-types}
+\end{table}
+
+\section*{FLINT examples}
+
+\paragraph{Ternary add for \texttt{fmpz}}
+
+\paragraph{Use of context in \texttt{padic}}
+
+\paragraph{Wrapper class with additional member functions}
+
+\end{document}
