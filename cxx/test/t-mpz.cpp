@@ -23,9 +23,16 @@
 
 ******************************************************************************/
 
-#ifndef CXX_H
-#define CXX_H
+#include <iostream>
 
-#include "cxx/prototype.h"
+#include "cxx.h"
 
-#endif
+int
+main ()
+{
+    std::cout << "mpz....";
+    //flint::mpz a('a');
+    flint::mpz a(4ul);
+    std::cout << a << std::endl;
+    std::cout << "PASS" << std::endl;
+}

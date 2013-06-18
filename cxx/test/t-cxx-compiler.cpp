@@ -28,7 +28,7 @@
 int
 main(void)
 {
-  std::cout << "cxx-compiler....";
-  std::cout << "PASS" << std::endl;
-  return 0;
+    std::cout << "cxx-compiler....";
+    std::cout << "PASS" << std::endl;
+    return 0;
 }
