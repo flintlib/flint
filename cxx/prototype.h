@@ -36,12 +36,36 @@
 
 namespace flint {
 
+namespace traits {
+struct true_
+{
+    static const bool val = true;
+};
+
+struct false_
+{
+    static const bool val = false;
+};
+
+template<class T> struct is_signed_integer : false_ { };
+template<> struct is_signed_integer<signed char> : true_ { };
+template<> struct is_signed_integer<signed short> : true_ { };
+template<> struct is_signed_integer<signed int> : true_ { };
+template<> struct is_signed_integer<signed long> : true_ { };
+
+template<class T> struct is_unsigned_integer : false_ { };
+template<> struct is_unsigned_integer<unsigned char> : true_ { };
+template<> struct is_unsigned_integer<unsigned short> : true_ { };
+template<> struct is_unsigned_integer<unsigned int> : true_ { };
+template<> struct is_unsigned_integer<unsigned long> : true_ { };
+}
+
 namespace operations {
 struct immediate {};
 struct plus {};
 } // operations
 
-namespace traits {
+namespace rules {
 template<class T>
 struct no_op
 {
@@ -54,48 +78,29 @@ struct UNIMPLEMENTED
     static const bool unimplemented_marker = true;
 };
 
-template<class T, class From>
+template<class T, class From, class Enable = void>
 struct initialization
     : UNIMPLEMENTED
 { };
 
-template<class T>
+template<class T, class Enable = void>
 struct print
     : UNIMPLEMENTED
 { };
 
-template<class T>
+template<class T, class Enable = void>
 struct destruction
     : public no_op<T>
 {};
-} // traits
+} // rules
 
 namespace mp {
-struct no { int data[2]; };
-typedef int yes;
-template<class T> T fakeinstance();
-
-// use with care
-template<class To, class From>
-struct _is_convertible
-{
-private:
-    static yes test(...) {return yes();}
-    static no test(To) {return no();}
-public:
-    static const bool val = (sizeof(test(fakeinstance<From>())) != sizeof(yes));
-};
 
 template<class T>
 struct not_
 {
     static const bool val = !T::val;
 };
-
-template<class T>
-struct is_implemented
-    : public not_<_is_convertible<traits::UNIMPLEMENTED, T> >
-{ };
 
 template<bool, class U = void>
 struct enable_if_v
@@ -113,10 +118,32 @@ struct enable_if
 { };
 }
 
+namespace traits {
+struct no { int data[2]; };
+typedef int yes;
+template<class T> T fakeinstance();
+
+// use with care
+template<class To, class From>
+struct _is_convertible
+{
+private:
+    static yes test(...) {return yes();}
+    static no test(To) {return no();}
+public:
+    static const bool val = (sizeof(test(fakeinstance<From>())) != sizeof(yes));
+};
+
+template<class T>
+struct is_implemented
+    : public mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> >
+{ };
+} // traits
+
 namespace detail {
 struct EXPRESSION
 { };
-}
+} // detail
 
 template<class Derived, class Operation, class Data>
 class expression
@@ -136,31 +163,31 @@ public:
 
     // TODO strip qualifiers?
     template<class T>
-    explicit expression(const T& t, int enable = mp::enable_if<mp::is_implemented<traits::initialization<derived_t, T> > >::val)
+    explicit expression(const T& t, int enable = mp::enable_if<traits::is_implemented<rules::initialization<derived_t, T> > >::val)
     {
-        traits::initialization<derived_t, T>::doit(downcast(), t);
+        rules::initialization<derived_t, T>::doit(downcast(), t);
     }
 
-    ~expression() {traits::destruction<derived_t>::doit(downcast());}
+    ~expression() {rules::destruction<derived_t>::doit(downcast());}
 
     Data& _data() {return data;}
     const Data& _data() const {return data;}
 
-    // XXX move this stuff below the traits?
+    // XXX move this stuff below the rules?
     void print(std::ostream& o) const
     {
-        traits::print<evaluated_t>::doit(evaluate(), o);
+        rules::print<evaluated_t>::doit(evaluate(), o);
     }
 
     const evaluated_t& evaluate() const {return downcast(); /* TODO */ }
 };
 
-namespace mp {
+namespace traits {
 template<class T>
 struct is_expression
     : public _is_convertible<detail::EXPRESSION, T>
 { };
-}
+} // traitrs
 
 template<template<class O, class D> class Derived>
 struct derived_wrapper
@@ -176,7 +203,7 @@ struct derived_wrapper
 // operators
 
 template<class Expr>
-typename mp::enable_if<mp::is_expression<Expr>, std::ostream&>::type
+typename mp::enable_if<traits::is_expression<Expr>, std::ostream&>::type
 operator<<(std::ostream& o, const Expr& e)
 {
     e.print(o);
@@ -202,7 +229,7 @@ public:
 namespace flint {
 typedef mpz_expression<operations::immediate, fmpz_t> mpz;
 
-namespace traits {
+namespace rules {
 template<>
 struct initialization<mpz, mpz>
 {
@@ -212,12 +239,22 @@ struct initialization<mpz, mpz>
     }
 };
 
-template<>
-struct initialization<mpz, unsigned long>
+template<class T>
+struct initialization<mpz, T, typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
 {
-    static void doit(mpz& target, unsigned long source)
+    static void doit(mpz& target, T source)
     {
         fmpz_init_set_ui(target._data(), source);
+    }
+};
+
+template<class T>
+struct initialization<mpz, T, typename mp::enable_if<traits::is_signed_integer<T> >::type>
+{
+    static void doit(mpz& target, T source)
+    {
+        fmpz_init(target._data());
+        fmpz_set_si(target._data(), source);
     }
 };
 
@@ -240,7 +277,7 @@ struct print<mpz>
         std::free(str);
     }
 };
-} // traits
+} // rules
 } // flint
 
 #endif

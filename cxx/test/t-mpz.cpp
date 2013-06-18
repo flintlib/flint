@@ -32,7 +32,7 @@ main ()
 {
     std::cout << "mpz....";
     //flint::mpz a('a');
-    flint::mpz a(4ul);
+    flint::mpz a((short)-4);
     std::cout << a << std::endl;
     std::cout << "PASS" << std::endl;
 }
