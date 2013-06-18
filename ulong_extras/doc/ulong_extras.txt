@@ -298,7 +298,7 @@ mp_limb_t n_mulmod_preinv(mp_limb_t a, mp_limb_t b, mp_limb_t n,
     The value \code{norm} is provided for convenience. As $n$ is required
     to be normalised, it may be that $a$ and $b$ have been shifted to the
     left by \code{norm} bits before calling the function. Their product
-    then has an extra factor of $2^\mbox{norm}$. Specifying a nonzero
+    then has an extra factor of $2^\text{norm}$. Specifying a nonzero
     \code{norm} will shift the product right by this many bits before
     reducing it.
 
