@@ -527,6 +527,28 @@ void nmod_poly_mulmod(nmod_poly_t res,
     Sets \code{res} to the remainder of the product of \code{poly1} and
     \code{poly2} upon polynomial division by \code{f}.
 
+void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, long len1, 
+                              mp_srcptr poly2, long len2, mp_srcptr f,
+                              long lenf, mp_srcptr finv, long lenfinv, nmod_t mod)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}.
+
+    It is required that \code{finv} is the inverse of the reverse of \code{f}
+    mod \code{x^lenf}. It is required that \code{len1 + len2 - lenf > 0},
+    which is equivalent to requiring that the result will actually be reduced.
+    Otherwise, simply use \code{_nmod_poly_mul} instead.
+
+    Aliasing of \code{f} or \code{finv} and \code{res} is not permitted.
+
+void nmod_poly_mulmod_preinv(nmod_poly_t res,
+    const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f,
+    const nmod_poly_t finv)
+
+    Sets \code{res} to the remainder of the product of \code{poly1} and
+    \code{poly2} upon polynomial division by \code{f}. \code{finv} is the
+    inverse of the reverse of \code{f}.
+
 *******************************************************************************
 
     Powering
@@ -613,6 +635,29 @@ void nmod_poly_powmod_ui_binexp(nmod_poly_t res,
 
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+
+void
+_nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
+                                    ulong e, mp_srcptr f, long lenf,
+                                    mp_srcptr finv, long lenfinv, nmod_t mod)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
+
+    We require \code{lenf > 1}. It is assumed that \code{poly} is already
+    reduced modulo \code{f} and zero-padded as necessary to have length
+    exactly \code{lenf - 1}. The output \code{res} must have room for
+    \code{lenf - 1} coefficients.
+
+void
+nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, 
+                           const nmod_poly_t poly, ulong e,
+                           const nmod_poly_t f, const nmod_poly_t finv)
+
+    Sets \code{res} to \code{poly} raised to the power \code{e}
+    modulo \code{f}, using binary exponentiation. We require \code{e >= 0}.
+    We require \code{finv} to be the inverse of the reverse of \code{f}.
 
 void _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
                                 mpz_srcptr e, mp_srcptr f,
@@ -886,6 +931,32 @@ void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
     The algorithm used is to reverse the polynomials and divide the 
     resulting power series, then reverse the result.
 
+void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, long lenA,
+            mp_srcptr B, long lenB, mp_srcptr Binv, long lenBinv, nmod_t mod)
+
+    Notionally computes polynomials $Q$ and $R$ such that $A = BQ + R$ with
+    $\len(R)$ less than \code{lenB}, where \code{A} is of length \code{lenA} 
+    and \code{B} is of length \code{lenB}, but return only $Q$.
+
+    We require that $Q$ have space for \code{lenA - lenB + 1} coefficients 
+    and assume that the leading coefficient of $B$ is a unit. Furthermore, we
+    assume that $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the 
+    resulting power series, then reverse the result.
+
+void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
+                                 const nmod_poly_t B, const nmod_poly_t Binv)
+
+    Notionally computes $Q$ and $R$ such that $A = BQ + R$ with 
+    $\len(R) < \len(B)$, but returns only $Q$.
+
+    We assume that the leading coefficient of $B$ is a unit and that $Binv$ is
+    the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+
+    The algorithm used is to reverse the polynomials and divide the 
+    resulting power series, then reverse the result.
+
 void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R, mp_srcptr A, long Alen, 
                                         mp_srcptr B, long Blen, nmod_t mod)
 
@@ -900,6 +971,25 @@ void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R,
 
     Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
     The algorithm used is to call \code{div_newton()} and then multiply out 
+    and compute the remainder.
+
+void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
+ long lenA, mp_srcptr B, long lenB, mp_srcptr Binv, long lenBinv, nmod_t mod)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R)$ less than 
+    \code{lenB}, where $A$ is of length \code{lenA} and $B$ is of length 
+    \code{lenB}. We require that $Q$ have space for \code{lenA - lenB + 1}
+    coefficients. Furthermore, we assume that $Binv$ is the inverse of the 
+    reverse of $B$ mod $x^{\len(B)}$. The algorithm used is to call 
+    \code{div_newton21_preinv()} and then multiply out and compute
+    the remainder.
+
+void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
+            const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv)
+
+    Computes $Q$ and $R$ such that $A = BQ + R$ with $\len(R) < \len(B)$. 
+    We assume $Binv$ is the inverse of the reverse of $B$ mod $x^{\len(B)}$.
+    The algorithm used is to call \code{div_newton21()} and then multiply out 
     and compute the remainder.
 
 mp_limb_t _nmod_poly_div_root(mp_ptr Q, mp_srcptr A, long len,
@@ -1250,6 +1340,28 @@ void nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that $f$ has smaller degree than $h$.
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void _nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr f, long f,
+                            mp_srcptr g, mp_srcptr h, long lenh,
+                            mp_srcptr hinv, long hinv, nmod_t mod)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that the length of $g$ is one less than the
+    length of $h$ (possibly with zero padding). We also require that
+    the length of $f$ is less than the length of $h$. Furthermore, we require 
+    \code{hinv} to be the inverse of the reverse of \code{h}.
+    The output is not allowed to be aliased with any of the inputs.
+
+    The algorithm used is the Brent-Kung matrix algorithm.
+
+void nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res, 
+                    const nmod_poly_t f, const nmod_poly_t g,
+                    const nmod_poly_t h, const nmod_poly_t hinv)
+
+    Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
+    $h$ is nonzero and that $f$ has smaller degree than $h$. Furthermore,
+    we require \code{hinv} to be the inverse of the reverse of \code{h}.
     The algorithm used is the Brent-Kung matrix algorithm.
 
 void _nmod_poly_compose_mod(mp_ptr res,
@@ -2140,9 +2252,9 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
 		const nmod_poly_t poly, long **degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
-    of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}
-    ${f[d]} is the product of the monic irreducible factors of \code{poly}
-    of degree ${d}. Factors are stored in \code{res}, assotiated powers
+    of degree n into factors ${f[d]}$ such that for ${1 \leq d \leq n}$
+    ${f[d]}$ is the product of the monic irreducible factors of \code{poly}
+    of degree ${d}$. Factors are stored in \code{res}, assotiated powers
     of irreducible polynomials are stored in \code{degs} in the same order
     as factors.
 

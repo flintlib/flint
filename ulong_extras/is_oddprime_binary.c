@@ -32,24 +32,25 @@
 int n_is_oddprime_binary(mp_limb_t n) 
 {
     ulong diff, prime_lo, prime_hi;
+    const mp_limb_t * primes;
 
     n_prime_pi_bounds(&prime_lo, &prime_hi, n);
-    if (prime_hi >= flint_num_primes) prime_hi = flint_num_primes - 1;
+    primes = n_primes_arr_readonly(prime_hi + 1);
 
-    if (n == flint_primes[prime_hi]) return 1;
-    if (n > flint_primes[prime_hi]) return 0;
-    
+    if (n == primes[prime_hi]) return 1;
+    if (n > primes[prime_hi]) return 0;
+
     diff = (prime_hi - prime_lo + 1) / 2;
 
     while (1)
     {
         ulong diff2;
-        if (flint_primes[prime_lo + diff] <= n) prime_lo += diff;
+        if (primes[prime_lo + diff] <= n) prime_lo += diff;
         if (diff <= 1UL) break;
         diff  = (diff + 1)/2;
         diff2 = (prime_hi - prime_lo + 1)/2;
         if (diff > diff2) diff = diff2;
     }
-       
-    return (n == flint_primes[prime_lo]);
+
+    return (n == primes[prime_lo]);
 }

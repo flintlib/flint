@@ -65,7 +65,6 @@ int main(void)
         check(x, n_moebius_mu(FLINT_ABS(i)));
     }
 
-    n_compute_primes(100);
     for (i = 0; i < 1000; i++)
     {
         fmpz_set_ui(x, 1);
@@ -75,7 +74,7 @@ int main(void)
         for (j = 0; j < k; j++)
         {
             l += (n_randtest(state) % 10) + 1;
-            fmpz_mul_ui(x, x, flint_primes[l]);
+            fmpz_mul_ui(x, x, n_nth_prime(l+1));
         }
 
         check(x, (k % 2 ? -1 : 1));
@@ -85,7 +84,7 @@ int main(void)
         fmpz_abs(x, x);
 
         /* No longer square-free */
-        p = flint_primes[n_randtest(state) % 100];
+        p = n_nth_prime(n_randtest(state) % 100 + 1);
         fmpz_mul_ui(x, x, p*p);
         check(x, 0);
     }

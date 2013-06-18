@@ -57,7 +57,7 @@ mp_limb_t n_factor_partial(n_factor_t * factors, mp_limb_t n, mp_limb_t limit, i
    factors_left = 1;
    exp_arr[0] = 1;
 
-   cutoff = flint_primes[FLINT_FACTOR_TRIAL_PRIMES - 1]*flint_primes[FLINT_FACTOR_TRIAL_PRIMES - 1];
+   cutoff = FLINT_FACTOR_TRIAL_CUTOFF;
 
    while (factors_left > 0 && prod <= limit)
    {

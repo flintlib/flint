@@ -58,6 +58,8 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 {
     unsigned int i, j, m1;
     mp_limb_t p, B, NB, exp, mod8;
+    const mp_limb_t * primes;
+    const double * inverses;
 
     if (n < 2UL) return 0;
 
@@ -66,18 +68,19 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         return (n == 2UL);
     }
 
-    n_compute_primes(FLINT_PSEUDOSQUARES_CUTOFF);
+    primes = n_primes_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
+    inverses = n_prime_inverses_arr_readonly(FLINT_PSEUDOSQUARES_CUTOFF+1);
 
     for (i = 0; i < FLINT_PSEUDOSQUARES_CUTOFF; i++)
     {
         double ppre;
-        p = flint_primes[i];
+        p = primes[i];
         if (p*p > n) return 1;
-        ppre = flint_prime_inverses[i];
+        ppre = inverses[i];
         if (!n_mod2_precomp(n, p, ppre)) return 0;
     }
 
-    B  = flint_primes[FLINT_PSEUDOSQUARES_CUTOFF];
+    B  = primes[FLINT_PSEUDOSQUARES_CUTOFF];
     NB = (n - 1)/B + 1;
     m1 = 0;
 
@@ -90,7 +93,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
 
     for (j = 0; j <= i; j++)
     {
-        mp_limb_t mod = n_powmod2(flint_primes[j], exp, n);
+        mp_limb_t mod = n_powmod2(primes[j], exp, n);
         if ((mod != 1UL) && (mod != n - 1)) return 0;
         if (mod == n - 1) m1 = 1;
     }
@@ -111,7 +114,7 @@ int n_is_prime_pseudosquare(mp_limb_t n)
         if (m1) return 1;
         for (j = i + 1; j < FLINT_NUM_PSEUDOSQUARES + 1; j++)
         {
-            mp_limb_t mod = n_powmod2(flint_primes[j], exp, n);
+            mp_limb_t mod = n_powmod2(primes[j], exp, n);
             if (mod == n - 1) return 1;
             if (mod != 1)
             {

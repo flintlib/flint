@@ -55,6 +55,12 @@ typedef struct {
 #define FLINT_PSEUDOSQUARES_CUTOFF 1000
 
 #define FLINT_FACTOR_TRIAL_PRIMES 3000
+/* nth_prime(FLINT_FACTOR_TRIAL_PRIMES) */
+#define FLINT_FACTOR_TRIAL_PRIMES_PRIME 27449UL
+#define FLINT_FACTOR_TRIAL_CUTOFF (27449UL * 27449UL)
+
+#define FLINT_PRIMES_TAB_DEFAULT_CUTOFF 1000000
+
 #define FLINT_FACTOR_SQUFOF_ITERS 50000
 #define FLINT_FACTOR_ONE_LINE_MAX (1UL<<39)
 #define FLINT_FACTOR_ONE_LINE_ITERS 40000
@@ -116,13 +122,16 @@ n_primes_next(n_primes_t iter)
 
 extern const unsigned int flint_primes_small[];
 
-extern mp_limb_t * flint_primes;
+extern FLINT_TLS_PREFIX mp_limb_t * _flint_primes[FLINT_BITS];
+extern FLINT_TLS_PREFIX double * _flint_prime_inverses[FLINT_BITS];
+extern FLINT_TLS_PREFIX int _flint_primes_used;
 
-extern double * flint_prime_inverses;
+void n_compute_primes(ulong num_primes);
 
-extern ulong flint_num_primes;
+void n_cleanup_primes();
 
-extern mp_limb_t flint_primes_cutoff;
+const mp_limb_t * n_primes_arr_readonly(ulong n);
+const double * n_prime_inverses_arr_readonly(ulong n);
 
 mp_limb_t n_randlimb(flint_rand_t state);
 
@@ -298,8 +307,6 @@ int n_is_prime_pseudosquare(mp_limb_t n);
 int n_is_prime_pocklington(mp_limb_t n, ulong iterations);
 
 int n_is_prime(mp_limb_t n);
-
-void n_compute_primes(ulong num_primes);
 
 mp_limb_t n_nth_prime(ulong n);
 

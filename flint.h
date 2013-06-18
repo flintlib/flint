@@ -67,6 +67,12 @@ void flint_free(void * ptr);
 
 #define mp_bitcnt_t unsigned long
 
+#if HAVE_TLS
+#define FLINT_TLS_PREFIX __thread
+#else
+#define FLINT_TLS_PREFIX
+#endif
+
 int flint_test_multiplier(void);
 
 typedef struct

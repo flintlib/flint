@@ -29,13 +29,14 @@ Jean-Pierre Flori: Many build system patches and Sage integration.
 Frithjof Schulze: Some fmpz functions and various patches.
 Curtis Bright: Numerous patches including 32 bit support
 Jan Tuitman : contributed to the design of the padics module.
+Martin Lee: Improvements to factorisation for polynomials over F_p.
 
 Additional research was contributed by Daniel Scott and Daniel Ellam.
 
 Further patches and bug reports have been made by Michael Abshoff, Didier 
 Deshommes, Craig Citro, Timothy Abbot, Carl Witty, Jaap Spies, Kiran 
 Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan 
-Grayson, Martin Lee, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
+Grayson, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
 Puydt and many others.
 
 Ralph Hemmecke made available an autotools build for FLINT.

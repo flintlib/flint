@@ -31,6 +31,8 @@
 #include "fmpq_poly.h"
 #include "ulong_extras.h"
 
+#pragma GCC diagnostic ignored "-Woverlength-strings"
+
 int
 main(void)
 {
@@ -140,8 +142,6 @@ main(void)
              " -39835 0 7967 0 55769 -7967 103571 111298990 47802 -3808226"
              " -3800259");
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Woverlength-strings"
         fmpq_poly_set_str(g, "59  -458395/219902324736 151585/4581298432"
            " 112595/219902324736 -2016245/54975581184 0 35/73300774912 0"
            " -234880919/219902324736 7/219902324736 -7/1278501888"
@@ -158,7 +158,6 @@ main(void)
            " -7/109951162368 -5402264413/219902324736 7/5114007552 35/9162596864"
            " 1133545/219902324736 -151319/73300774912 0 7/219902324736"
            " 7/54975581184 0 -10367/109951162368 7/54975581184 -161/109951162368");
-#pragma GCC diagnostic pop
 
         fmpq_poly_resultant(x, f, g);
         fmpq_poly_resultant(y, g, f);
@@ -186,3 +185,4 @@ main(void)
     printf("PASS\n");
     return 0;
 }
+

@@ -38,8 +38,6 @@ mp_limb_t n_nth_prime(ulong n)
         abort();
     }
 
-    if (n > flint_num_primes)
-        n_compute_primes(n+1);
-
-    return flint_primes[n-1];
+    return n_primes_arr_readonly(n)[n-1];
 }
+
