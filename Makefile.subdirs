@@ -5,6 +5,7 @@ AT=@
 SOURCES = $(wildcard *.c)
 
 HEADERS = $(wildcard ../*.h)
+TEST_HEADERS = $(wildcard *.h)
 
 OBJS = $(patsubst %.c, $(BUILD_DIR)/$(MOD_DIR)_%.o, $(SOURCES))
 
@@ -55,10 +56,10 @@ tests: $(TESTS)
 
 check: tests $(TESTS_RUN)
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.c $(BUILD_DIR)/../../test_helpers.o $(HEADERS) $(TEST_HEADERS)
 	$(QUIET_CC) $(CC) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
 
-$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o $(HEADERS)
+$(BUILD_DIR)/test/%$(EXEEXT): test/%.cpp $(BUILD_DIR)/../../test_helpers.o $(HEADERS) $(TEST_HEADERS)
 	$(QUIET_CC) $(CXX) $(CFLAGS) $(INCS) $< $(BUILD_DIR)/../../test_helpers.o -o $@ $(LIBS)
 
 %_RUN: %
