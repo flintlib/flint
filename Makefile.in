@@ -15,12 +15,12 @@ BUILD_DIRS = ulong_extras long_extras perm fmpz fmpz_vec fmpz_poly fmpq_poly \
    arith mpn_extras nmod_mat fmpq fmpq_mat padic fmpz_poly_q \
    fmpz_poly_mat nmod_poly_mat fmpz_mod_poly fmpz_mod_poly_factor \
    fmpz_factor fmpz_poly_factor fft qsieve double_extras \
-   padic_poly padic_mat qadic
+   padic_poly padic_mat qadic cxx
 
 export
 
 SOURCES = clz_tab.c memory_manager.c version.c profiler.c
-LIB_SOURCES = $(patsubst %, %/*.c, $(BUILD_DIRS))
+LIB_SOURCES = $(wildcard $(patsubst %, %/*.c, $(BUILD_DIRS)))
 
 HEADERS = $(patsubst %, %.h, $(BUILD_DIRS)) flint.h longlong.h config.h fft_tuning.h fmpz-conversions.h
 
@@ -148,6 +148,12 @@ ifndef MOD
 else
 	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 endif
+
+define CHECK_TARGET
+check-$(1): library test_helpers.o
+	$(AT)mkdir -p build/$(1)/test; export BUILD_DIR=../build/$(1); $(MAKE) -f ../Makefile.subdirs -C $(1) check || exit $$$$?
+endef
+$(foreach dir, $(BUILD_DIRS), $(eval $(call CHECK_TARGET,$(dir))))
 
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
