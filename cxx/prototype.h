@@ -68,9 +68,11 @@ template<class T> struct reference<T&> {typedef T& type;};
 template<class T> struct reference<const T&> {typedef const T& type;};
 template<class T> struct make_const {typedef const T type;};
 template<class T> struct make_const<T&> {typedef const T& type;};
+template<class T> struct basetype {typedef T type;};
+template<class T> struct basetype<T&> {typedef T type;};
+template<class T> struct basetype<const T&> {typedef T type;};
 }
 
-// void is the end marker, never use otherwise
 template<class Head, class Tail>
 struct tuple
 {
@@ -78,13 +80,13 @@ struct tuple
     Tail tail;
 
     typedef Head head_t;
-    static const bool has_tail = true;
 
     typename traits::reference<head_t>::type first() {return head;}
     typename traits::forwarding<head_t>::type first() const {return head;}
     typename traits::reference<typename Tail::head_t>::type second() {return tail.head;}
     typename traits::forwarding<typename Tail::head_t>::type second() const {return tail.head;}
 
+    tuple() {};
     tuple(typename traits::forwarding<Head>::type h,
           typename traits::forwarding<Tail>::type t)
         : head(h), tail(t)
@@ -92,23 +94,14 @@ struct tuple
     }
 };
 struct empty {};
-template<class Head>
-struct tuple<Head, void>
-{
-    Head head;
-    typedef Head head_t;
-    empty tail;
-    static const bool has_tail = false;
-
-    tuple(typename traits::forwarding<Head>::type h) : head(h) {}
-};
 
 template<>
 struct tuple<void, void>
 {
+    typedef empty head_t;
+    typedef empty tail_t;
     empty head;
     empty tail;
-    static const bool has_tail = false;
 };
 typedef tuple<void, void> empty_tuple;
 
@@ -116,7 +109,7 @@ namespace mp {
 template<class T1, class T2 = void, class T3 = void>
 struct make_tuple
 {
-    typedef tuple<T1, tuple<T2, tuple<T3, void> > > type;
+    typedef tuple<T1, tuple<T2, tuple<T3, empty_tuple> > > type;
     static type make(typename traits::forwarding<T1>::type t1,
               typename traits::forwarding<T2>::type t2,
               typename traits::forwarding<T3>::type t3)
@@ -127,7 +120,7 @@ struct make_tuple
 template<class T1, class T2>
 struct make_tuple<T1, T2, void>
 {
-    typedef tuple<T1, tuple<T2, void> > type;
+    typedef tuple<T1, tuple<T2, empty_tuple> > type;
     static type make(typename traits::forwarding<T1>::type t1,
               typename traits::forwarding<T2>::type t2)
     {
@@ -137,10 +130,10 @@ struct make_tuple<T1, T2, void>
 template<class T1>
 struct make_tuple<T1, void, void>
 {
-    typedef tuple<T1, void> type;
+    typedef tuple<T1, empty_tuple> type;
     static type make(typename traits::forwarding<T1>::type t1)
     {
-        return type(t1);
+        return type(t1, empty_tuple());
     }
 };
 
@@ -151,10 +144,10 @@ template<class Tuple, class Return = void>
 struct back_tuple;
 
 template<class T, class Return>
-struct back_tuple<tuple<T*, void>, Return>
+struct back_tuple<tuple<T*, empty_tuple>, Return>
 {
-    typedef tuple<T, void> type;
-    static void init(tuple<T*, void>& to, type& from, Return* ret /* unused */)
+    typedef tuple<T, empty_tuple> type;
+    static void init(tuple<T*, empty_tuple>& to, type& from, Return* ret /* unused */)
     {
         to.head = &from.head;
     }
@@ -162,7 +155,7 @@ struct back_tuple<tuple<T*, void>, Return>
 template<class Head, class Tail, class Return>
 struct back_tuple<tuple<Head*, Tail>, Return>
 {
-    typedef tuple<Head, typename back_tuple<Tail, void>::type> type;
+    typedef tuple<Head, typename back_tuple<Tail, empty_tuple>::type> type;
     static void init(tuple<Head*, Tail>& to, type& from, Return* ret /* unused */)
     {
         back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
@@ -171,10 +164,10 @@ struct back_tuple<tuple<Head*, Tail>, Return>
 };
 
 template<class T>
-struct back_tuple<tuple<T*, void>, T>
+struct back_tuple<tuple<T*, empty_tuple>, T>
 {
     typedef void type;
-    static void init(tuple<T*, void>& to, empty& from, T* ret)
+    static void init(tuple<T*, empty_tuple>& to, empty& from, T* ret)
     {
         to.head = ret;
     }
@@ -192,9 +185,34 @@ struct back_tuple<tuple<Head*, Tail>, Head>
 template<class Return>
 struct back_tuple<empty_tuple, Return>
 {
-    typedef tuple<void, void> type;
-    static void init(tuple<void, void>& to, type& from, Return* ret)
+    typedef empty_tuple type;
+    static void init(empty_tuple& to, type& from, Return* ret)
     {
+    }
+};
+
+template<class Tuple1, class Tuple2>
+struct concat_tuple;
+
+template<class Tuple2>
+struct concat_tuple<empty_tuple, Tuple2>
+{
+    typedef Tuple2 type;
+    static Tuple2& get_second(Tuple2& t) {return t;}
+    static void init_first(empty_tuple&, type&) {};
+};
+template<class Head, class Tail, class Tuple2>
+struct concat_tuple<tuple<Head, Tail>, Tuple2>
+{
+    typedef tuple<Head, typename concat_tuple<Tail, Tuple2>::type> type;
+    static Tuple2& get_second(type& t)
+    {
+        return concat_tuple<Tail, Tuple2>::get_second(t.tail);
+    }
+    static void init_first(tuple<Head, Tail>& t, type& o)
+    {
+        t.head = o.head;
+        concat_tuple<Tail, Tuple2>::init_first(t.tail, o.tail);
     }
 };
 }
@@ -262,6 +280,12 @@ struct not_
     static const bool val = !T::val;
 };
 
+template<class T, class U>
+struct and_
+{
+    static const bool val = T::val && U::val;
+};
+
 template<bool, class U = void>
 struct enable_if_v
 {
@@ -313,6 +337,11 @@ public:
 template<class T>
 struct is_implemented
     : public mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> >
+{ };
+
+template<class T>
+struct is_immediate
+    : public _is_convertible<typename basetype<T>::type::operation_t, operations::immediate>
 { };
 } // traits
 
@@ -401,20 +430,19 @@ class expression
     : public detail::EXPRESSION
 {
 protected:
-    typedef detail::evaluation_traits<Operation, expression> ev_traits_t;
-
     Data data;
 
     explicit expression(const Data & d) : data(d) {}
 
 public:
+    typedef detail::evaluation_traits<Operation, expression> ev_traits_t;
     typedef typename Derived::template type<Operation, Data>::result derived_t;
     typedef typename ev_traits_t::evaluated_t evaluated_t;
     typedef typename ev_traits_t::evaluation_return_t evaluation_return_t;
     typedef Data data_t;
     typedef Operation operation_t;
 
-private:
+    // XXX private??
     derived_t& downcast() {return *static_cast<derived_t*>(this);}
     const derived_t& downcast() const {return *static_cast<const derived_t*>(this);}
 
@@ -515,6 +543,7 @@ operator<<(std::ostream& o, const Expr& e)
     return o;
 }
 
+// TODO other order
 template<class Expr1, class Expr2>
 inline typename mp::enable_if<traits::is_expression<Expr1>, typename Expr1::template return_types<Expr2>::plus_return_t>::type
 operator+(const Expr1& e1, const Expr2& e2)
@@ -647,13 +676,37 @@ struct print<mpz>
 };
 
 template<bool result_is_temporary>
-struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, void> > >, result_is_temporary>
+struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >, result_is_temporary>
 {
     typedef mpz return_t;
     typedef empty_tuple temporaries_t;
-    static void doit(const mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, void> > >& input, temporaries_t temps, return_t* output)
+    static void doit(const mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >& input, temporaries_t temps, return_t* output)
     {
         fmpz_add(output->_data(), input._data().first()._data(), input._data().second()._data());
+    }
+};
+
+template<bool result_is_temporary, class Op, class Data1, class Data2>
+struct evaluation<
+    mpz_expression<Op, tuple<Data1, tuple<Data2, empty_tuple> > >,
+    result_is_temporary,
+    typename mp::enable_if<mp::and_<mp::not_<traits::is_immediate<Data1> >,
+                                    mp::not_<traits::is_immediate<Data1> > > >::type>
+{
+    typedef mpz return_t;
+    typedef evaluation<Data1, true> ev1_t;
+    typedef evaluation<Data2, true> ev2_t;
+    typedef mp::concat_tuple<tuple<mpz*, typename ev1_t::temporaries_t>, tuple<mpz*, typename ev2_t::temporaries_t> > concater;
+    typedef typename concater::type temporaries_t;
+
+    static void doit(const mpz_expression<Op, tuple<Data1, tuple<Data2, empty_tuple> > >& input, temporaries_t temps, return_t* output)
+    {
+        tuple<mpz*, typename ev1_t::temporaries_t> temps1;
+        concater::init_first(temps1, temps);
+        tuple<mpz*, typename ev2_t::temporaries_t> temps2 = concater::get_second(temps);
+        ev1_t::doit(input._data().first(), temps1.tail, temps1.head);
+        ev2_t::doit(input._data().second(), temps2.tail, temps2.head);
+        *output = *temps1.head + *temps2.head;
     }
 };
 } // rules

@@ -39,5 +39,6 @@ main ()
     b = "7";
     std::cout << b << std::endl;
     std::cout << a + b << std::endl;
+    std::cout << ((a + b) + (a + b)) << std::endl;
     std::cout << "PASS" << std::endl;
 }
