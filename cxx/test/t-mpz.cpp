@@ -33,6 +33,11 @@ main ()
     std::cout << "mpz....";
     //flint::mpz a('a');
     flint::mpz a((short)-4);
+    flint::mpz b;
     std::cout << a << std::endl;
+    std::cout << b << std::endl;
+    b = "7";
+    std::cout << b << std::endl;
+    std::cout << a + b << std::endl;
     std::cout << "PASS" << std::endl;
 }

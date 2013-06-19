@@ -26,7 +26,8 @@
 // TODO
 // * formatting
 // * static asserts
-// * evaluation
+// * contexts
+// * tuple merging
 
 #ifndef CXX_PROTOTYPE_H
 #define CXX_PROTOTYPE_H
@@ -58,6 +59,144 @@ template<> struct is_unsigned_integer<unsigned char> : true_ { };
 template<> struct is_unsigned_integer<unsigned short> : true_ { };
 template<> struct is_unsigned_integer<unsigned int> : true_ { };
 template<> struct is_unsigned_integer<unsigned long> : true_ { };
+
+template<class T> struct forwarding {typedef const T& type;};
+template<class T> struct forwarding<T&> {typedef const T& type;};
+template<class T> struct forwarding<const T&> {typedef const T& type;};
+template<class T> struct reference {typedef T& type;};
+template<class T> struct reference<T&> {typedef T& type;};
+template<class T> struct reference<const T&> {typedef const T& type;};
+template<class T> struct make_const {typedef const T type;};
+template<class T> struct make_const<T&> {typedef const T& type;};
+}
+
+// void is the end marker, never use otherwise
+template<class Head, class Tail>
+struct tuple
+{
+    Head head;
+    Tail tail;
+
+    typedef Head head_t;
+    static const bool has_tail = true;
+
+    typename traits::reference<head_t>::type first() {return head;}
+    typename traits::forwarding<head_t>::type first() const {return head;}
+    typename traits::reference<typename Tail::head_t>::type second() {return tail.head;}
+    typename traits::forwarding<typename Tail::head_t>::type second() const {return tail.head;}
+
+    tuple(typename traits::forwarding<Head>::type h,
+          typename traits::forwarding<Tail>::type t)
+        : head(h), tail(t)
+    {
+    }
+};
+struct empty {};
+template<class Head>
+struct tuple<Head, void>
+{
+    Head head;
+    typedef Head head_t;
+    empty tail;
+    static const bool has_tail = false;
+
+    tuple(typename traits::forwarding<Head>::type h) : head(h) {}
+};
+
+template<>
+struct tuple<void, void>
+{
+    empty head;
+    empty tail;
+    static const bool has_tail = false;
+};
+typedef tuple<void, void> empty_tuple;
+
+namespace mp {
+template<class T1, class T2 = void, class T3 = void>
+struct make_tuple
+{
+    typedef tuple<T1, tuple<T2, tuple<T3, void> > > type;
+    static type make(typename traits::forwarding<T1>::type t1,
+              typename traits::forwarding<T2>::type t2,
+              typename traits::forwarding<T3>::type t3)
+    {
+        return type(t1, make_tuple<T2, T3>::make(t2, t3));
+    }
+};
+template<class T1, class T2>
+struct make_tuple<T1, T2, void>
+{
+    typedef tuple<T1, tuple<T2, void> > type;
+    static type make(typename traits::forwarding<T1>::type t1,
+              typename traits::forwarding<T2>::type t2)
+    {
+        return type(t1, make_tuple<T2>::make(t2));
+    }
+};
+template<class T1>
+struct make_tuple<T1, void, void>
+{
+    typedef tuple<T1, void> type;
+    static type make(typename traits::forwarding<T1>::type t1)
+    {
+        return type(t1);
+    }
+};
+
+// Create a tuple backing a tuple of points.
+// If Tuple::head_t is the same as Return*, do not back the head
+// and instead feed it in separately.
+template<class Tuple, class Return = void>
+struct back_tuple;
+
+template<class T, class Return>
+struct back_tuple<tuple<T*, void>, Return>
+{
+    typedef tuple<T, void> type;
+    static void init(tuple<T*, void>& to, type& from, Return* ret /* unused */)
+    {
+        to.head = &from.head;
+    }
+};
+template<class Head, class Tail, class Return>
+struct back_tuple<tuple<Head*, Tail>, Return>
+{
+    typedef tuple<Head, typename back_tuple<Tail, void>::type> type;
+    static void init(tuple<Head*, Tail>& to, type& from, Return* ret /* unused */)
+    {
+        back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
+        to.head = &from.head;
+    }
+};
+
+template<class T>
+struct back_tuple<tuple<T*, void>, T>
+{
+    typedef void type;
+    static void init(tuple<T*, void>& to, empty& from, T* ret)
+    {
+        to.head = ret;
+    }
+};
+template<class Head, class Tail>
+struct back_tuple<tuple<Head*, Tail>, Head>
+{
+    typedef typename back_tuple<Tail, void>::type type;
+    static void init(tuple<Head*, Tail>& to, type& from, Head* ret)
+    {
+        to.head = ret;
+        back_tuple<Tail, void>::init(to.tail, from, ret /* unused */ );
+    }
+};
+template<class Return>
+struct back_tuple<empty_tuple, Return>
+{
+    typedef tuple<void, void> type;
+    static void init(tuple<void, void>& to, type& from, Return* ret)
+    {
+    }
+};
 }
 
 namespace operations {
@@ -92,6 +231,27 @@ template<class T, class Enable = void>
 struct destruction
     : public no_op<T>
 {};
+
+template<class T, class Enable = void>
+struct empty_initialization
+    : UNIMPLEMENTED
+{ };
+
+template<class T, class U, class Enable = void>
+struct assignment
+    : UNIMPLEMENTED
+{ };
+
+// TODO priorities
+// If result_is_temporary is true, then the result coincides with the
+// first temporary (provided these have the same type)
+template<class T, bool result_is_temporary, class Enable = void>
+struct evaluation;
+//{
+//    typedef X return_t;
+//    typedef Y temporaries_t; // a tuple of *pointers*
+//    static void doit(const T& input, temporaries_t temps, return_t* output);
+//};
 } // rules
 
 namespace mp {
@@ -112,16 +272,32 @@ template<class U>
 struct enable_if_v<false, U>
 { };
 
+template<bool v, class U = void>
+struct disable_if_v : enable_if_v<!v, U> { };
+
 template<class T, class U = void>
 struct enable_if
     : public enable_if_v<T::val, U>
 { };
+
+template<class T, class U = void>
+struct disable_if
+    : public disable_if_v<T::val, U>
+{ };
+}
+
+namespace detail{
+template<class T>
+struct wrap
+{
+    T t;
+};
 }
 
 namespace traits {
 struct no { int data[2]; };
 typedef int yes;
-template<class T> T fakeinstance();
+template<class T> detail::wrap<T> fakeinstance();
 
 // use with care
 template<class To, class From>
@@ -131,7 +307,7 @@ private:
     static yes test(...) {return yes();}
     static no test(To) {return no();}
 public:
-    static const bool val = (sizeof(test(fakeinstance<From>())) != sizeof(yes));
+    static const bool val = (sizeof(test(fakeinstance<From>().t)) != sizeof(yes));
 };
 
 template<class T>
@@ -143,30 +319,123 @@ struct is_implemented
 namespace detail {
 struct EXPRESSION
 { };
+
+template<class Operation, class Expr>
+struct evaluation_traits
+{
+    typedef typename Expr::derived_t derived_t;
+    typedef rules::evaluation<derived_t, false> rule_t;
+    typedef rules::evaluation<derived_t, true> temp_rule_t;
+    typedef typename rule_t::return_t evaluation_return_t;
+    typedef evaluation_return_t evaluated_t;
+
+    static evaluation_return_t evaluate(const derived_t& from)
+    {
+        evaluation_return_t res;
+        evaluate_into_fresh(res, from);
+        return res;
+    }
+
+    static void evaluate_into(evaluation_return_t& to, const derived_t& from)
+    {
+        typedef mp::back_tuple<typename rule_t::temporaries_t> back_t;
+        typename back_t::type temps_backing;
+        typename rule_t::temporaries_t temps;
+        back_t::init(temps, temps_backing, 0);
+        rule_t::doit(from, temps, &to);
+    }
+
+    static void evaluate_into_fresh(evaluation_return_t& to, const derived_t& from)
+    {
+        typedef mp::back_tuple<typename temp_rule_t::temporaries_t, evaluation_return_t> back_t;
+        typename back_t::type temps_backing;
+        typename temp_rule_t::temporaries_t temps;
+        back_t::init(temps, temps_backing, &to);
+        temp_rule_t::doit(from, temps, &to);
+    }
+};
+
+template<class Expr>
+struct evaluation_traits<operations::immediate, Expr>
+{
+    typedef typename Expr::derived_t derived_t;
+    typedef typename Expr::derived_t evaluated_t;
+    typedef evaluated_t& evaluation_return_t;
+
+    static evaluated_t& evaluate(derived_t& d) {return d;}
+    static const evaluated_t& evaluate(const derived_t& d) {return d;}
+
+    static void evaluate_into(derived_t& to, const derived_t& from)
+    {
+        rules::assignment<derived_t, derived_t>::doit(to, from);
+    }
+
+    static void evaluate_into_fresh(derived_t& to, const derived_t& from)
+    {
+        evaluate_into(to, from);
+    }
+};
+
+template<class Operation, class Expr>
+struct storage_traits
+{
+    typedef Expr type;
+};
+
+template<class Expr>
+struct storage_traits<operations::immediate, Expr>
+{
+    typedef const Expr& type;
+};
 } // detail
+
+namespace traits {
+template<class T>
+struct is_expression
+    : public _is_convertible<detail::EXPRESSION, T>
+{ };
+} // traits
 
 template<class Derived, class Operation, class Data>
 class expression
     : public detail::EXPRESSION
 {
 protected:
+    typedef detail::evaluation_traits<Operation, expression> ev_traits_t;
+
     Data data;
+
+    explicit expression(const Data & d) : data(d) {}
+
+public:
     typedef typename Derived::template type<Operation, Data>::result derived_t;
-    typedef derived_t evaluated_t;
+    typedef typename ev_traits_t::evaluated_t evaluated_t;
+    typedef typename ev_traits_t::evaluation_return_t evaluation_return_t;
+    typedef Data data_t;
+    typedef Operation operation_t;
 
 private:
     derived_t& downcast() {return *static_cast<derived_t*>(this);}
     const derived_t& downcast() const {return *static_cast<const derived_t*>(this);}
 
 public:
-    explicit expression(const Data & d) : data(d) {}
-
     // TODO strip qualifiers?
     template<class T>
-    explicit expression(const T& t, int enable = mp::enable_if<traits::is_implemented<rules::initialization<derived_t, T> > >::val)
+    explicit expression(const T& t, typename mp::enable_if<traits::is_implemented<rules::initialization<derived_t, T> > >::type* = 0)
     {
         rules::initialization<derived_t, T>::doit(downcast(), t);
     }
+
+    template<class T>
+    explicit expression(const T& t,
+            typename mp::disable_if<traits::is_implemented<rules::initialization<derived_t, T> > >::type* = 0,
+            typename mp::enable_if<traits::is_expression<T> >::type* = 0)
+    {
+        T::ev_traits_t::evaluate_into_fresh(downcast(), t.downcast());
+    }
+
+    // XXX is this ok if non-implemented (i.e. may the compiler eagerly instantiate)?
+    expression() {rules::empty_initialization<derived_t>::doit(downcast());}
 
     ~expression() {rules::destruction<derived_t>::doit(downcast());}
 
@@ -179,15 +448,51 @@ public:
         rules::print<evaluated_t>::doit(evaluate(), o);
     }
 
-    const evaluated_t& evaluate() const {return downcast(); /* TODO */ }
-};
+    typename traits::make_const<evaluation_return_t>::type evaluate() const {return ev_traits_t::evaluate(downcast());}
+    evaluation_return_t evaluate() {return ev_traits_t::evaluate(downcast());}
 
-namespace traits {
-template<class T>
-struct is_expression
-    : public _is_convertible<detail::EXPRESSION, T>
-{ };
-} // traitrs
+    template<class T>
+    void set(const T& t, typename mp::enable_if<traits::is_expression<T> >::type* = 0)
+    {
+        T::ev_traits_t::evaluate_into(downcast(), t.downcast());
+    }
+    template<class T>
+    void set(const T& t, typename mp::disable_if<traits::is_expression<T> >::type* = 0)
+    {
+        rules::assignment<derived_t, T>::doit(downcast(), t);
+    }
+
+protected:
+    template<class T, class Op>
+    struct helper
+    {
+        typedef mp::make_tuple<
+            typename detail::storage_traits<Operation, derived_t>::type,
+            typename detail::storage_traits<typename T::operation_t, T>::type
+          > maker;
+        typedef typename maker::type type;
+        typedef typename Derived::template type<Op, typename maker::type>::result new_derived_t;
+
+        static new_derived_t
+        make(const expression& self, const T& other)
+        {
+            return new_derived_t(maker::make(self.downcast(), other.downcast()));
+        }
+    };
+
+public:
+    template<class T>
+    typename helper<T, operations::plus>::new_derived_t plus(const T& t) const
+    {
+        return helper<T, operations::plus>::make(*this, t);
+    }
+
+    template<class T>
+    struct return_types
+    {
+        typedef typename helper<T, operations::plus>::new_derived_t plus_return_t;
+    };
+};
 
 template<template<class O, class D> class Derived>
 struct derived_wrapper
@@ -203,11 +508,18 @@ struct derived_wrapper
 // operators
 
 template<class Expr>
-typename mp::enable_if<traits::is_expression<Expr>, std::ostream&>::type
+inline typename mp::enable_if<traits::is_expression<Expr>, std::ostream&>::type
 operator<<(std::ostream& o, const Expr& e)
 {
     e.print(o);
     return o;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_expression<Expr1>, typename Expr1::template return_types<Expr2>::plus_return_t>::type
+operator+(const Expr1& e1, const Expr2& e2)
+{
+    return e1.plus(e2);
 }
 
 
@@ -218,8 +530,19 @@ class mpz_expression
     : public expression<derived_wrapper<mpz_expression>, Operation, Data>
 {
 public:
+    mpz_expression() {}
     template<class T>
     explicit mpz_expression(const T& t) : mpz_expression::expression(t) {}
+
+    template<class T>
+    mpz_expression& operator=(const T& t)
+    {
+        this->set(t);
+        return *this;
+    }
+
+//protected: // XXX
+    explicit mpz_expression(const Data& d) : mpz_expression::expression(d) {}
 };
 
 } // flint
@@ -259,6 +582,51 @@ struct initialization<mpz, T, typename mp::enable_if<traits::is_signed_integer<T
 };
 
 template<>
+struct assignment<mpz, mpz>
+{
+    static void doit(mpz& target, const mpz& source)
+    {
+        fmpz_set(target._data(), source._data());
+    }
+};
+
+template<class T>
+struct assignment<mpz, T, typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
+{
+    static void doit(mpz& target, T source)
+    {
+        fmpz_set_ui(target._data(), source);
+    }
+};
+
+template<class T>
+struct assignment<mpz, T, typename mp::enable_if<traits::is_signed_integer<T> >::type>
+{
+    static void doit(mpz& target, T source)
+    {
+        fmpz_set_si(target._data(), source);
+    }
+};
+
+template<int n>
+struct assignment<mpz, char[n]>
+{
+    static void doit(mpz& target, const char* source)
+    {
+        fmpz_set_str(target._data(), const_cast<char*>(source), 10);
+    }
+};
+
+template<>
+struct empty_initialization<mpz>
+{
+    static void doit(mpz& v)
+    {
+        fmpz_init(v._data());
+    }
+};
+
+template<>
 struct destruction<mpz>
 {
     static void doit(mpz& v)
@@ -275,6 +643,17 @@ struct print<mpz>
         char* str = fmpz_get_str(0, 10, v._data());
         o << str;
         std::free(str);
+    }
+};
+
+template<bool result_is_temporary>
+struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, void> > >, result_is_temporary>
+{
+    typedef mpz return_t;
+    typedef empty_tuple temporaries_t;
+    static void doit(const mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, void> > >& input, temporaries_t temps, return_t* output)
+    {
+        fmpz_add(output->_data(), input._data().first()._data(), input._data().second()._data());
     }
 };
 } // rules
