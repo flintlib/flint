@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void
 fmpq_height(fmpz_t height, const fmpq_t x)

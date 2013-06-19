@@ -23,16 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
+#include <math.h>
 #include "arith.h"
-#include "mpfr.h"
-#include "math.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 
 #define MAX_32BIT 58
 
@@ -163,10 +155,12 @@ balanced_product(fmpz * c, fmpz * alpha, len_t len, len_t prec)
 void
 _arith_cos_minpoly(fmpz * coeffs, len_t d, ulong n)
 {
-    len_t i, j, prec, exp;
+    len_t i, j;
     fmpz * alpha;
     fmpz_t half;
     mpfr_t t, u;
+    mp_bitcnt_t prec;
+    slong exp;
 
     if (n <= MAX_32BIT)
     {

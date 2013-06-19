@@ -23,17 +23,11 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
 
 #define AA(i,j) fmpz_mat_entry(A, i, j)
 #define BB(i,j) fmpz_mat_entry(B, i, j)
 #define XX(i,j) fmpz_mat_entry(X, i, j)
-
 
 int
 _fmpz_mat_solve_cramer_3x3(fmpz_mat_t X, fmpz_t den,

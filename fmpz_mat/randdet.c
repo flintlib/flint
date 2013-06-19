@@ -23,14 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
 #include "fmpz_factor.h"
-#include "ulong_extras.h"
-
 
 void
 fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)

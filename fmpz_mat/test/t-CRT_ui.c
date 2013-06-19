@@ -114,6 +114,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

@@ -22,14 +22,8 @@
     Copyright (C) 2010 Fredrik Johansson
 
 ******************************************************************************/
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
+
 #include "arith.h"
-#include "ulong_extras.h"
 
 void _arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, 
                                                len_t klen, int kind);

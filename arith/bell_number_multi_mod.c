@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
 #include "arith.h"
 
 void
@@ -37,7 +32,8 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_t comb;
     nmod_t mod;
     mp_ptr primes, residues;
-    len_t k, size, prime_bits, num_primes;
+    len_t k, num_primes;
+    mp_bitcnt_t size, prime_bits;
 
     size = arith_bell_number_size(n);
     prime_bits = FLINT_BITS - 1;

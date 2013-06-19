@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 #include "fmpz_mat.h"
 

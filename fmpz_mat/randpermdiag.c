@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
 #include "perm.h"
 
 int

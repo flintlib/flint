@@ -25,13 +25,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
 #include "arith.h"
 
 
@@ -60,7 +54,8 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 {
     fmpz *square_roots, *T, *tmp1, *tmp2, *tmp3;
     fmpz_t one;
-    len_t i, j, k, prec, N;
+    len_t i, j, k, N;
+    slong prec;
 
     if (n == 0)
     {

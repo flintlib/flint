@@ -23,15 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz_factor.h"
 
 #define FLINT_NUM_TINY_DIVISORS FLINT_BITS
 
@@ -66,8 +59,8 @@ void
 _arith_divisors(fmpz *res, len_t size, fmpz_factor_t factors)
 {
     len_t i;
-    len_t *exp = flint_malloc(sizeof(len_t) * factors->num);
-    len_t *exp_max = flint_malloc(sizeof(len_t) * factors->num);
+    slong *exp = flint_malloc(sizeof(slong) * factors->num);
+    slong *exp_max = flint_malloc(sizeof(slong) * factors->num);
     fmpz *powers = _fmpz_vec_init(factors->num);
     fmpz_t d;
 

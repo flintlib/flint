@@ -23,16 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpz_vec.h"
 #include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
-
 
 void arith_ramanujan_tau_series(fmpz_poly_t res, len_t n)
 {

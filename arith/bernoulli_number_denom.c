@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 #define BERNOULLI_DENOM_MAX_SMALL 178
 

@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_print(const fmpq_mat_t mat)
 {

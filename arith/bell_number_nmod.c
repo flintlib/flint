@@ -23,10 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 const mp_limb_t bell_number_tab[] = 
 {

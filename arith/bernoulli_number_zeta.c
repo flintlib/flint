@@ -23,19 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
-
 
 void _arith_bernoulli_number_zeta(fmpz_t num, fmpz_t den, ulong n)
 {
     mpz_t r;
     mpfr_t t, u, z, pi;
-    len_t prec, pi_prec;
+    mp_bitcnt_t prec, pi_prec;
 
     arith_bernoulli_number_denom(den, n);
 

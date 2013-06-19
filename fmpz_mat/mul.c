@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-
 
 void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
@@ -60,7 +56,7 @@ fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
     }
     else
     {
-        len_t ab, bb, bits;
+        slong ab, bb, bits;
 
         ab = fmpz_mat_max_bits(A);
         bb = fmpz_mat_max_bits(B);

@@ -24,12 +24,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 #if FLINT64
 #define LARGEST_ULONG_PRIMORIAL 52
@@ -127,7 +122,7 @@ mp_size_t mpn_prod_limbs(mp_limb_t * result, const mp_limb_t * factors,
     return len;
 }
 
-void arith_primorial(fmpz_t res, len_t n)
+void arith_primorial(fmpz_t res, slong n)
 {
     mp_size_t len, pi;
     ulong bits;

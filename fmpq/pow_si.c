@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden, 
                   const fmpz_t opnum, const fmpz_t opden, slong e)

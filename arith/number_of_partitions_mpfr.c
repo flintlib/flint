@@ -26,15 +26,7 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "ulong_extras.h"
 #include "arith.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "profiler.h"
-
 
 #define DOUBLE_PREC 53
 #define PI 3.141592653589793238462643
@@ -82,7 +74,7 @@ partitions_remainder_bound_log2(double n, double N)
 len_t
 partitions_needed_terms(ulong n)
 {
-    len_t N;
+    slong N;
     for (N = 1; partitions_remainder_bound_log2(n, N) > 10; N++);
     for ( ; partitions_remainder_bound(n, N) > (n > 1500 ? 0.25 : 1); N++);
     return N;
@@ -116,7 +108,7 @@ bound_primes(ulong k)
 }
 
 
-static __inline__ len_t
+static __inline__ slong
 log2_ceil(double x)
 {
     /* ceil(log2(n)) = bitcount(n-1);
@@ -124,10 +116,10 @@ log2_ceil(double x)
     return FLINT_BIT_COUNT((len_t) x);
 }
 
-static len_t
+static slong
 partitions_prec_bound(ulong n, len_t k, len_t N)
 {
-    len_t prec;
+    slong prec;
 
     prec = partitions_term_bound(n, k);
     prec += log2_ceil(8 * N * (26 * (sqrt(n) / k) + 7 * bound_primes(k) + 22));
@@ -235,8 +227,9 @@ fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz_poly_t f, const mpfr_t a)
 void
 findroot(mpfr_t x, fmpz_poly_t poly, double x0)
 {
-    len_t i, prec, initial_prec, target_prec, guard_bits;
-    len_t precs[FLINT_BITS];
+    len_t i;
+    slong prec, initial_prec, target_prec, guard_bits;
+    slong precs[FLINT_BITS];
     fmpz_poly_t poly2;
     mpfr_t t, u, xn;
 
@@ -415,7 +408,8 @@ _arith_number_of_partitions_mpfr(mpfr_t x, ulong n, len_t N0, len_t N)
     mpfr_t acc, C, t1, t2, t3, t4, exp1;
     mpz_t n24;
     double Cd;
-    len_t k, prec, guard_bits;
+    len_t k;
+    slong prec, guard_bits;
 #if VERBOSE
     timeit_t t0;
 #endif

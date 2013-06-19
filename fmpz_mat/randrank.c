@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
-
 
 void
 fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, len_t rank,

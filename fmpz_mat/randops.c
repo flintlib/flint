@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
-#include "ulong_extras.h"
-
 
 void
 fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, len_t count)

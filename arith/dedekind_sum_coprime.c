@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
-#include "ulong_extras.h"
 #include "arith.h"
 
 /* Small enough that a numerical computation is safe */

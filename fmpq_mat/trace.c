@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void

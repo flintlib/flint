@@ -30,7 +30,7 @@
 
 *******************************************************************************
 
-void fmpq_mat_init(fmpq_mat_t mat, long rows, long cols)
+void fmpq_mat_init(fmpq_mat_t mat, len_t rows, len_t cols)
 
     Initialises a matrix with the given number of rows and columns for use.
 
@@ -141,7 +141,7 @@ void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop,
 
 *******************************************************************************
 
-void fmpq_mat_print(fmpq_mat_t mat)
+void fmpq_mat_print(const fmpq_mat_t mat)
 
     Prints the matrix \code{mat} to standard output.
 
@@ -195,13 +195,13 @@ int fmpq_mat_is_zero(const fmpq_mat_t mat)
     Returns nonzero if all entries in \code{mat} are zero, and returns
     zero otherwise.
 
-int fmpq_mat_is_empty(fmpq_mat_t mat)
+int fmpq_mat_is_empty(const fmpq_mat_t mat)
 
     Returns a non-zero value if the number of rows or the number of
     columns in \code{mat} is zero, and otherwise returns
     zero.
 
-int fmpq_mat_is_square(fmpq_mat_t mat)
+int fmpq_mat_is_square(const fmpq_mat_t mat)
 
     Returns a non-zero value if the number of rows is equal to the
     number of columns in \code{mat}, and otherwise returns zero.
@@ -255,7 +255,7 @@ void fmpq_mat_get_fmpz_mat_rowwise_2(fmpz_mat_t num, fmpz_mat_t num2,
     and extracting the two submatrices in the result.
 
 void fmpq_mat_get_fmpz_mat_colwise(fmpz_mat_t num, fmpz * den,
-    const fmpq_mat_t mat);
+    const fmpq_mat_t mat)
 
     Clears denominators in \code{mat} column by column. The rescaled
     numerators are written to \code{num}, and the denominator
@@ -313,7 +313,7 @@ void fmpq_mat_mul_cleared(fmpq_mat_t C, const fmpq_mat_t A,
     Sets \code{C} to the matrix product \code{AB}, computed
     by clearing denominators and multiplying over the integers.
 
-void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B);
+void fmpq_mat_mul(fmpq_mat_t C, const fmpq_mat_t A, const fmpq_mat_t B)
 
     Sets \code{C} to the matrix product \code{AB}. This
     simply calls \code{fmpq_mat_mul_cleared}.
@@ -398,7 +398,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
 *******************************************************************************
 
-int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
+int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, len_t r, len_t c)
 
     Helper function for row reduction. Returns 1 if the entry of \code{mat}
     at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero
@@ -407,21 +407,22 @@ int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, long r, long c)
     entries in \code{perm} (unless \code{NULL}) and returns -1. If no
     nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
 
-long fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
+len_t fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. Performs Gauss-Jordan elimination directly over the rational
     numbers. This algorithm is usually inefficient and is mainly intended
     to be used for testing purposes.
 
-long fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
+len_t fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. Clears denominators and performs fraction-free Gauss-Jordan
     elimination using \code{fmpz_mat} functions.
 
-long fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
+len_t fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. This function automatically chooses between the classical and
     fraction-free algorithms depending on the size of the matrix.
+

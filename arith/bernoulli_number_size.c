@@ -23,11 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
 #include <math.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 double arith_bernoulli_number_size(ulong n)
 {

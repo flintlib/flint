@@ -23,13 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
-#include "fmpq.h"
 
 void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, len_t n)
 {

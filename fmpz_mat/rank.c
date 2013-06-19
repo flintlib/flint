@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-
 
 len_t
 fmpz_mat_rank(const fmpz_mat_t A)

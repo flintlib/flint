@@ -23,14 +23,8 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
-
 
 int arith_moebius_mu(const fmpz_t n)
 {

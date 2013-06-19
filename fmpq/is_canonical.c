@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den)
 {
@@ -48,5 +43,5 @@ int _fmpq_is_canonical(const fmpz_t num, const fmpz_t den)
 
 int fmpq_is_canonical(const fmpq_t x)
 {
-    return _fmpq_is_canonical(&x->num, &x->den);
+    return _fmpq_is_canonical(fmpq_numref(x), fmpq_denref(x));
 }

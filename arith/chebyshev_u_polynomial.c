@@ -23,11 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "arith.h"
 
 void

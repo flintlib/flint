@@ -23,10 +23,7 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
-
 
 void
 _arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, len_t klen, int kind)

@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-
 
 int
 fmpq_get_mpfr(mpfr_t r, const fmpq_t x, mpfr_rnd_t rnd)
