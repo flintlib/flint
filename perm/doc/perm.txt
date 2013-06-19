@@ -30,11 +30,11 @@
 
 *******************************************************************************
 
-long * _perm_init(long n)
+len_t * _perm_init(len_t n)
 
     Initialises the permutation for use.
 
-void _perm_clear(long *vec)
+void _perm_clear(len_t *vec)
 
     Clears the permutation.
 
@@ -44,15 +44,15 @@ void _perm_clear(long *vec)
 
 *******************************************************************************
 
-void _perm_set(long *res, const long *vec, long n)
+void _perm_set(len_t *res, const len_t *vec, len_t n)
 
     Sets the permutation \code{res} to the same as the permutation \code{vec}.
 
-void _perm_set_one(long *vec, long n)
+void _perm_set_one(len_t *vec, len_t n)
 
     Sets the permutation to the identity permutation.
 
-void _perm_inv(long *res, const long *vec, long n)
+void _perm_inv(len_t *res, const len_t *vec, len_t n)
 
     Sets \code{res} to the inverse permutation of \code{vec}.
     Allows aliasing of \code{res} and \code{vec}.
@@ -63,7 +63,7 @@ void _perm_inv(long *res, const long *vec, long n)
 
 *******************************************************************************
 
-void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
+void _perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, long n)
 
     Forms the composition $\pi_1 \circ \pi_2$ of two permutations 
     $\pi_1$ and $\pi_2$.  Here, $\pi_2$ is applied first, that is, 
@@ -77,7 +77,7 @@ void _perm_compose(long *res, const long *vec1, const long *vec2, long n)
 
 *******************************************************************************
 
-int _perm_parity(const long *vec, long n)
+int _perm_parity(const len_t *vec, len_t n)
 
     Returns the parity of \code{vec}, 0 if the permutation is even and 1 if
     the permutation is odd.
@@ -88,7 +88,7 @@ int _perm_parity(const long *vec, long n)
 
 *******************************************************************************
 
-int _perm_randtest(long *vec, long n, flint_rand_t state)
+int _perm_randtest(len_t *vec, len_t n, flint_rand_t state)
 
     Generates a random permutation vector of length $n$ and returns
     its parity, 0 or 1.
@@ -102,7 +102,7 @@ int _perm_randtest(long *vec, long n, flint_rand_t state)
 
 *******************************************************************************
 
-int _perm_print(const long * vec, long n)
+int _perm_print(const len_t * vec, len_t n)
 
     Prints the permutation vector of length $n$ to \code{stdout}.
 

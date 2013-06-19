@@ -398,7 +398,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
 *******************************************************************************
 
-int fmpq_mat_pivot(long * perm, fmpq_mat_t mat, len_t r, len_t c)
+int fmpq_mat_pivot(len_t * perm, fmpq_mat_t mat, len_t r, len_t c)
 
     Helper function for row reduction. Returns 1 if the entry of \code{mat}
     at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero

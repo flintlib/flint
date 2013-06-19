@@ -42,12 +42,12 @@ void fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
 
     Frees all memory associated with \code{fac}.
 
-void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
+void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, len_t alloc)
 
     Reallocates the factor structure to provide space for
     precisely \code{alloc} factors.
 
-void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, long len)
+void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, len_t len)
 
     Ensures that the factor structure has space for at
     least \code{len} factors.  This functions takes care
@@ -81,7 +81,7 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
 
     Does not support aliasing between \code{res} and \code{fac}.
 
-void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp)
+void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, len_t exp)
 
     Raises \code{fac} to the power \code{exp}.
 
@@ -99,7 +99,7 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
     Uses Rabin irreducibility test.
 
-int _fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p)
+int _fmpz_mod_poly_is_squarefree(const fmpz * f, len_t len, const fmpz_t p)
 
     Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
     special case, the zero polynomial is not considered squarefree.
@@ -138,7 +138,7 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     as factors.
 
     Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is ${n * sizeof(long)}).
+    powers (maximum space required is ${n * sizeof(len_t)}).
 
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
 				      const fmpz_mod_poly_t f)
