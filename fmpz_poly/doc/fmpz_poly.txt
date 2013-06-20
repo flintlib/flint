@@ -295,7 +295,7 @@ void fmpz_poly_set_coeff_si(fmpz_poly_t poly, len_t n, slong x)
 
 void fmpz_poly_set_coeff_ui(fmpz_poly_t poly, len_t n, ulong x)
 
-    Sets coefficient $n$ of \code{poly} to the \code{unsigned long} value 
+    Sets coefficient $n$ of \code{poly} to the \code{ulong} value 
     \code{x}.  Coefficient numbering starts from zero and if $n$ is beyond 
     the current length of \code{poly} then the polynomial is extended and 
     zero coefficients inserted if necessary.
@@ -382,7 +382,7 @@ void fmpz_poly_scalar_mul_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
 void fmpz_poly_scalar_mul_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
-    Sets \code{poly1} to \code{poly2} times the \code{unsigned long x}.
+    Sets \code{poly1} to \code{poly2} times the \code{ulong x}.
 
 void fmpz_poly_scalar_mul_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong exp)
 
@@ -417,7 +417,7 @@ void fmpz_poly_scalar_fdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
 void fmpz_poly_scalar_fdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
-    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    Sets \code{poly1} to \code{poly2} divided by the \code{ulong x}, 
     rounding coefficients down toward~$- \infty$.
 
 void fmpz_poly_scalar_fdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
@@ -438,7 +438,7 @@ void fmpz_poly_scalar_tdiv_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 
 void fmpz_poly_scalar_tdiv_ui(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
 
-    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    Sets \code{poly1} to \code{poly2} divided by the \code{ulong x}, 
     rounding coefficients toward~$0$.
 
 void fmpz_poly_scalar_tdiv_2exp(fmpz_poly_t poly1, fmpz_poly_t poly2, ulong x)
@@ -466,7 +466,7 @@ void fmpz_poly_scalar_divexact_si(fmpz_poly_t poly1, fmpz_poly_t poly2, slong x)
 void fmpz_poly_scalar_divexact_ui(fmpz_poly_t poly1, 
                                   fmpz_poly_t poly2, ulong x)
 
-    Sets \code{poly1} to \code{poly2} divided by the \code{unsigned long x}, 
+    Sets \code{poly1} to \code{poly2} divided by the \code{ulong x}, 
     assuming the coefficient is exact for every coefficient.
 
 void fmpz_poly_scalar_mod_fmpz(fmpz_poly_t poly1, 

@@ -51,7 +51,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
         rem = 0;
     } else
     {
-        quot = (unsigned long) ( a * npre);
+        quot = (ulong) ( a * npre);
         rem = a - quot * n;
     }
 

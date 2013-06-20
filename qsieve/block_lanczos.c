@@ -196,7 +196,7 @@ static void mul_64x64_64x64(uint64_t *a, uint64_t *b, uint64_t *c ) {
 
 	uint64_t ai, bj, accum;
 	uint64_t tmp[64];
-	unsigned long i, j;
+	ulong i, j;
 
 	for (i = 0; i < 64; i++) {
 		j = 0;
@@ -233,7 +233,7 @@ static void precompute_Nx64_64x64(uint64_t *x, uint64_t *c) {
 	   by x[][]. */
 
 	uint64_t accum, xk;
-	unsigned long i, j, k, index;
+	ulong i, j, k, index;
 
 	for (j = 0; j < 8; j++) {
 		for (i = 0; i < 256; i++) {
@@ -312,7 +312,7 @@ static void mul_64xN_Nx64(uint64_t *x, uint64_t *y,
 
 	for(i = 0; i < 8; i++) {
 
-		unsigned long j;
+		ulong j;
 		uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
 
 		a0 = a1 = a2 = a3 = 0;

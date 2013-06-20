@@ -902,7 +902,7 @@ void test_div_in_place3(char * in, char * out)
     flint_free(res);
 }
 
-void test_pow(char * in, unsigned long x, char * out)
+void test_pow(char * in, ulong x, char * out)
 {
     int ans;
     fmpz_poly_q_t rop, op;

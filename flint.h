@@ -65,7 +65,7 @@ void flint_free(void * ptr);
     #define FLINT_D_BITS 31
 #endif
 
-#define mp_bitcnt_t unsigned long
+#define mp_bitcnt_t ulong
 
 #if HAVE_TLS
 #define FLINT_TLS_PREFIX __thread

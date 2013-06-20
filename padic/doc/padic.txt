@@ -194,7 +194,7 @@ void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx)
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 
-    Sets the $p$-adic number \code{rop} to the \code{unsigned long} 
+    Sets the $p$-adic number \code{rop} to the \code{ulong} 
     integer \code{op}.
 
 void padic_set_fmpz(padic_t rop, const fmpz_t op, const padic_ctx_t ctx)
@@ -572,14 +572,14 @@ ulong padic_val_fac_ui_2(ulong n)
 
     Computes the $2$-adic valuation of $n!$.
 
-    Note that since $n$ fits into an \code{unsigned long}, so does 
+    Note that since $n$ fits into an \code{ulong}, so does 
     $\ord_2(n!)$ since $\ord_2(n!) \leq (n - 1) / (p - 1) = n - 1$.
 
 ulong padic_val_fac_ui(ulong n, const fmpz_t p)
 
     Computes the $p$-adic valuation of $n!$.
 
-    Note that since $n$ fits into an \code{unsigned long}, so does 
+    Note that since $n$ fits into an \code{ulong}, so does 
     $\ord_p(n!)$ since $\ord_p(n!) \leq (n - 1) / (p - 1)$.
 
 void padic_val_fac(fmpz_t rop, const fmpz_t op, const fmpz_t p)

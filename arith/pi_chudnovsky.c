@@ -49,10 +49,10 @@
 #define max(x,y) ((x)>(y)?(x):(y))
 
 typedef struct {
-    unsigned long max_facs;
-    unsigned long num_facs;
-    unsigned long *fac;
-    unsigned long *pow;
+    ulong max_facs;
+    ulong num_facs;
+    ulong *fac;
+    ulong *pow;
 } fac_t[1];
 
 typedef struct {
@@ -91,9 +91,9 @@ typedef pi_state_struct pi_state[1];
 
 /* r = sqrt(x) */
 void
-my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, unsigned long x)
+my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, ulong x)
 {
-    unsigned long prec, bits, prec0;
+    ulong prec, bits, prec0;
 
     prec0 = mpf_get_prec(r);
 
@@ -152,7 +152,7 @@ my_sqrt_ui(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, unsigned long x)
 void
 my_div(pi_state state, mpf_t t1, mpf_t t2, mpf_t r, mpf_t y, mpf_t x)
 {
-    unsigned long prec, bits, prec0;
+    ulong prec, bits, prec0;
 
     prec0 = mpf_get_prec(r);
 
@@ -220,7 +220,7 @@ fac_init_size(fac_t f, len_t s)
     if (s < INIT_FACS)
         s = INIT_FACS;
 
-    f[0].fac  = flint_malloc(s*sizeof(unsigned long)*2);
+    f[0].fac  = flint_malloc(s*sizeof(ulong)*2);
     f[0].pow  = f[0].fac + s;
     f[0].max_facs = s;
 
@@ -251,7 +251,7 @@ fac_resize(fac_t f, len_t s)
 
 /* f = base^pow */
 static __inline__ void
-fac_set_bp(pi_state state, fac_t f, unsigned long base, len_t pow)
+fac_set_bp(pi_state state, fac_t f, ulong base, len_t pow)
 {
     len_t i;
     assert(base<state->sieve_size);
@@ -322,7 +322,7 @@ fac_mul(pi_state state, fac_t f, fac_t g)
 
 /* f *= base^pow */
 static __inline__ void
-fac_mul_bp(pi_state state, fac_t f, unsigned long base, unsigned long pow)
+fac_mul_bp(pi_state state, fac_t f, ulong base, ulong pow)
 {
     fac_set_bp(state, state->ftmp, base, pow);
     fac_mul(state, f, state->ftmp);
@@ -424,10 +424,10 @@ fac_remove_gcd(pi_state state, mpz_t p, fac_t fp, mpz_t g, fac_t fg)
 
 /* binary splitting */
 void
-bs(pi_state state, unsigned long a, unsigned long b,
+bs(pi_state state, ulong a, ulong b,
     unsigned gflag, len_t level)
 {
-    unsigned long i, mid;
+    ulong i, mid;
 
     if (b - a == 1)
     {

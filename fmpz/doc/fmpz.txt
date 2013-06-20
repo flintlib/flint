@@ -122,8 +122,8 @@ slong fmpz_get_si(const fmpz_t f)
 
 ulong fmpz_get_ui(const fmpz_t f)
 
-    Returns $f$ as an \code{unsigned long}.  The result is undefined
-    if $f$ does not fit into an \code{unsigned long} or is negative.
+    Returns $f$ as an \code{ulong}.  The result is undefined
+    if $f$ does not fit into an \code{ulong} or is negative.
 
 void fmpz_set_d(fmpz_t f, double c)
 
@@ -162,11 +162,11 @@ void fmpz_set_si(fmpz_t f, slong val)
 
 void fmpz_set_ui(fmpz_t f, ulong val)
 
-    Sets $f$ to the given \code{unsigned long} value.
+    Sets $f$ to the given \code{ulong} value.
 
 void fmpz_neg_ui(fmpz_t f, ulong val)
 
-    Sets $f$ to the given \code{unsigned long} value, and then negates $f$.
+    Sets $f$ to the given \code{ulong} value, and then negates $f$.
 
 void fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
 
@@ -377,7 +377,7 @@ void fmpz_one(fmpz_t f)
 int fmpz_abs_fits_ui(const fmpz_t f)
 
     Returns whether the absolute value of $f$ 
-    fits into an \code{unsigned long}.
+    fits into an \code{ulong}.
 
 int fmpz_fits_si(const fmpz_t f)
 
@@ -486,7 +486,7 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g + x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g + x$ where $x$ is an \code{ulong}.
 
 void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -494,7 +494,7 @@ void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g - x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g - x$ where $x$ is an \code{ulong}.
 
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -506,12 +506,12 @@ void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
     Sets $f$ to $g \times x \times y$ where $x$ and $y$ are of type
-    \code{unsigned long}.
+    \code{ulong}.
 
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong e)
 
@@ -523,7 +523,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $f + g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $f + g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -531,7 +531,7 @@ void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $f - g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $f - g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -662,17 +662,17 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
-    \code{unsigned long}.  If $x$ is $0$ an exception will result.
+    \code{ulong}.  If $x$ is $0$ an exception will result.
 
 ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
 
     Returns the remainder of $g$ modulo $x$ where $x$ is an 
-    \code{unsigned long}, without changing $g$.  If $x$ is $0$ an
+    \code{ulong}, without changing $g$.  If $x$ is $0$ an
     exception will result.
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g^x$ where $x$ is an \code{unsigned long}.  If 
+    Sets $f$ to $g^x$ where $x$ is an \code{ulong}.  If 
     $x$ is $0$ and $g$ is $0$, then $f$ will be set to $1$.
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
@@ -744,12 +744,12 @@ void fmpz_root(fmpz_t r, fmpz_t f, len_t n)
 
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
-    Sets $f$ to the factorial $n!$ where $n$ is an \code{unsigned long}.
+    Sets $f$ to the factorial $n!$ where $n$ is an \code{ulong}.
 
 void fmpz_fib_ui(fmpz_t f, ulong n)
 
     Sets $f$ to the Fibonacci number $F_n$ where $n$ is an
-    \code{unsigned long}.
+    \code{ulong}.
 
 void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 

@@ -36,7 +36,7 @@
 
 #if FLINT_BITS==64
    #ifndef uint64_t
-   #define uint64_t unsigned long
+   #define uint64_t ulong
    #endif
 #else
    #include <stdint.h>

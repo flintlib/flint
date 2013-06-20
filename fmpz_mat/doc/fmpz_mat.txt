@@ -399,7 +399,7 @@ void fmpz_mat_scalar_addmul_fmpz(fmpz_mat_t B, const fmpz_mat_t A,
                                     const fmpz_t c)
 
     Set \code{A = A + B*c} where \code{B} is an \code{fmpz_mat_t} and \code{c}
-    is a scalar respectively of type \code{slong}, \code{unsigned long},
+    is a scalar respectively of type \code{slong}, \code{ulong},
     or \code{fmpz_t}. The dimensions of \code{A} and \code{B} must
     be compatible.
 

@@ -60,7 +60,7 @@ int main(void)
 
     for (rep = 0; rep < 10000 * flint_test_multiplier(); rep++)
     {
-        unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
+        ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
         n = n_randtest(state) % ((1UL<<bits) - 1UL) + 1; 
         mpz_set_ui(mpz_n, n);
 

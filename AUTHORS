@@ -13,7 +13,7 @@ Gonzalo Tornaria : Theta function module, Montgomery multiplication and modular
 David Howden : Computing Bernoulli numbers mod many primes, fast polynomial
                multiplication over Z/pZ
 Burcin Erocal : Primary FLINT wrapper in Sage
-Tom Boothby : Improved factoring of unsigned longs and detection of perfect 
+Tom Boothby : Improved factoring of ulongs and detection of perfect 
               powers
 Daniel Woodhouse : Multivariate multiplication over Z/nZ, Z and 
                    getPeriodSequence 

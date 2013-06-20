@@ -167,7 +167,7 @@ ulong nmod_poly_get_coeff_ui(const nmod_poly_t poly, len_t j)
 
     Returns the coefficient of \code{poly} at index~\code{j}, where 
     coefficients are numbered with zero being the constant coefficient, 
-    and returns it as an \code{unsigned long}. If \code{j} refers to a 
+    and returns it as an \code{ulong}. If \code{j} refers to a 
     coefficient beyond the end of \code{poly}, zero is returned.
 
 void nmod_poly_set_coeff_ui(nmod_poly_t poly, len_t j, ulong c)

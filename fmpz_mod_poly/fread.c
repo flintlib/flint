@@ -34,7 +34,7 @@ int fmpz_mod_poly_fread(FILE * f, fmpz_mod_poly_t poly)
 {
     len_t i, length;
     fmpz_t coeff;
-    unsigned long res;
+    ulong res;
 
     fmpz_init(coeff);
     if (fscanf(f, "%ld", &length) != 1) {

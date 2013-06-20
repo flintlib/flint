@@ -162,7 +162,7 @@ void prof_stop()
    stop_clock(0);
 }
 
-typedef void (*profile_target_t)(void* arg, unsigned long count);
+typedef void (*profile_target_t)(void* arg, ulong count);
 
 void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 

@@ -32,7 +32,7 @@ Features:
 --------
 
 * Cache friendly up to huge transforms (integers of billions of bits)
-* Truncated -- no ugly performance jumps at power of 2 lengths and no problem
+* Truncated -- no uglytwit performance jumps at power of 2 lengths and no problem
   with unbalanced multiplications
 * Extremely fast
 * Easy to tune
