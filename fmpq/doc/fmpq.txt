@@ -363,7 +363,7 @@ void _fmpq_div(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     difference, product or quotient respectively of the fractions
     represented by \code{(op1num, op1den)} and \code{(op2num, op2den)}.
     Aliasing between any combination of the variables is allowed,
-    as long as no numerator is aliased with a denominator.
+    whilst no numerator is aliased with a denominator.
 
 void fmpq_addmul(fmpq_t res, const fmpq_t op1, const fmpq_t op2)
 
@@ -383,7 +383,7 @@ void _fmpq_submul(fmpz_t rnum, fmpz_t rden, const fmpz_t op1num,
     \code{(rnum, rden)} + \code{(op1num, op1den)} * \code{(op2num, op2den)} or
     \code{(rnum, rden)} - \code{(op1num, op1den)} * \code{(op2num, op2den)}
     respectively. Aliasing between any combination of the variables is allowed,
-    as long as no numerator is aliased with a denominator.
+    whilst no numerator is aliased with a denominator.
 
 void fmpq_inv(fmpq_t dest, const fmpq_t src)
 
@@ -396,7 +396,7 @@ void _fmpq_pow_si(fmpz_t rnum, fmpz_t rden,
 void fmpq_pow_si(fmpq_t res, const fmpq_t op, slong e);
 
     Sets \code{res} to \code{op} raised to the power~$e$, where~$e$ 
-    is a \code{signed long}.  If $e$ is $0$ and \code{op} is $0$, then 
+    is a \code{slong}.  If $e$ is $0$ and \code{op} is $0$, then 
     \code{res} will be set to $1$.
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)

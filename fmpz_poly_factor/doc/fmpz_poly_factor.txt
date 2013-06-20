@@ -66,7 +66,7 @@ void fmpz_poly_factor_set(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
     Sets \code{res} to the same factorisation as \code{fac}.
 
 void fmpz_poly_factor_insert(fmpz_poly_factor_t fac, 
-                             const fmpz_poly_t p, long e)
+                             const fmpz_poly_t p, slong e)
 
     Adds the primitive polynomial $p^e$ to the factorisation \code{fac}.
 
@@ -112,7 +112,7 @@ void fmpz_poly_factor_squarefree(fmpz_poly_factor_t fac, fmpz_poly_t F)
 
 void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t 
     final_fac, const fmpz_poly_factor_t lifted_fac, 
-    const fmpz_poly_t F, const fmpz_t P, long exp)
+    const fmpz_poly_t F, const fmpz_t P, slong exp)
 
     Takes as input a factor structure \code{lifted_fac} containing a 
     squarefree factorization of the polynomial $F \bmod p$. The algorithm 
@@ -123,7 +123,7 @@ void fmpz_poly_factor_zassenhaus_recombination(fmpz_poly_factor_t
     \code{F^exp} to the factor structure \code{final_fac}.
 
 void _fmpz_poly_factor_zassenhaus(fmpz_poly_factor_t final_fac, 
-                                  long exp, fmpz_poly_t f, long cutoff)
+                                  slong exp, fmpz_poly_t f, slong cutoff)
 
     This is the internal wrapper of Zassenhaus.
 

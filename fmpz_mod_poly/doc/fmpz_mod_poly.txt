@@ -99,13 +99,13 @@ void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, len_t len)
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
 
 void fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
-					flint_rand_t state, long len)
+					flint_rand_t state, slong len)
 
     Sets the polynomial~$f$ to a random irreducible polynomial of length
     up~\code{len}, assuming \code{len} is positive.
 
 void fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f, 
-                                     flint_rand_t state, long len)
+                                     flint_rand_t state, slong len)
 
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}, 
     assuming \code{len} is positive.
@@ -227,7 +227,7 @@ void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, len_t n)
 *******************************************************************************
 
 void _fmpz_mod_poly_shift_left(fmpz * res, 
-                               const fmpz * poly, long len, long n)
+                               const fmpz * poly, slong len, slong n)
 
     Sets \code{(res, len + n)} to \code{(poly, len)} shifted left by 
     $n$ coefficients.  
@@ -237,13 +237,13 @@ void _fmpz_mod_poly_shift_left(fmpz * res,
     Supports aliasing between \code{res} and \code{poly}.
 
 void fmpz_mod_poly_shift_left(fmpz_mod_poly_t f, 
-                              const fmpz_mod_poly_t g, long n)
+                              const fmpz_mod_poly_t g, slong n)
 
     Sets \code{res} to \code{poly} shifted left by $n$ coeffs.  Zero 
     coefficients are inserted.
 
 void _fmpz_mod_poly_shift_right(fmpz * res, 
-                                const fmpz * poly, long len, long n)
+                                const fmpz * poly, slong len, slong n)
 
     Sets \code{(res, len - n)} to \code{(poly, len)} shifted right by 
     $n$ coefficients.  
@@ -254,7 +254,7 @@ void _fmpz_mod_poly_shift_right(fmpz * res,
     coefficients of \code{poly} are not set to zero.
 
 void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f, 
-                               const fmpz_mod_poly_t g, long n)
+                               const fmpz_mod_poly_t g, slong n)
 
     Sets \code{res} to \code{poly} shifted right by $n$ coefficients.  If $n$ 
     is equal to or greater than the current length of \code{poly}, \code{res} 
@@ -266,8 +266,8 @@ void fmpz_mod_poly_shift_right(fmpz_mod_poly_t f,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, long len1, 
-                                   const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_add(fmpz *res, const fmpz *poly1, slong len1, 
+                                   const fmpz *poly2, slong len2, 
                                    const fmpz_t p)
 
     Sets \code{res} to the sum of \code{(poly1, len1)} and 
@@ -280,8 +280,8 @@ void fmpz_mod_poly_add(fmpz_mod_poly_t res,
 
     Sets \code{res} to the sum of \code{poly1} and \code{poly2}.
 
-void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, long len1, 
-                                   const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_sub(fmpz *res, const fmpz *poly1, slong len1, 
+                                   const fmpz *poly2, slong len2, 
                                    const fmpz_t p)
 
     Sets \code{res} to \code{(poly1, len1)} minus \code{(poly2, len2)}.  It 
@@ -309,7 +309,7 @@ void fmpz_mod_poly_neg(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, long len, 
+void _fmpz_mod_poly_scalar_mul_fmpz(fmpz *res, const fmpz *poly, slong len, 
                                     const fmpz_t x, const fmpz_t p)
 
     Sets \code{(res, len}) to \code{(poly, len)} multiplied by $x$, 
@@ -326,8 +326,8 @@ void fmpz_mod_poly_scalar_mul_fmpz(fmpz_mod_poly_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, long len1, 
-                                   const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_mul(fmpz *res, const fmpz *poly1, slong len1, 
+                                   const fmpz *poly2, slong len2, 
                                    const fmpz_t p)
 
     Sets \code{(res, len1 + len2 - 1)} to the product of \code{(poly1, len1)} 
@@ -340,9 +340,9 @@ void fmpz_mod_poly_mul(fmpz_mod_poly_t res,
 
     Sets \code{res} to the product of \code{poly1} and \code{poly2}.
 
-void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1, 
-                                      const fmpz *poly2, long len2, 
-                                      const fmpz_t p, long n)
+void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, slong len1, 
+                                      const fmpz *poly2, slong len2, 
+                                      const fmpz_t p, slong n)
 
     Sets \code{(res, n)} to the lowest $n$ coefficients of the product of 
     \code{(poly1, len1)} and \code{(poly2, len2)}.
@@ -352,7 +352,7 @@ void _fmpz_mod_poly_mullow(fmpz *res, const fmpz *poly1, long len1,
     the inputs and the output.
 
 void fmpz_mod_poly_mullow(fmpz_mod_poly_t res, 
-    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, long n)
+    const fmpz_mod_poly_t poly1, const fmpz_mod_poly_t poly2, slong n)
 
     Sets \code{res} to the lowest $n$ coefficients of the product of 
     \code{poly1} and \code{poly2}.
@@ -365,9 +365,9 @@ void fmpz_mod_poly_sqr(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Computes \code{res} as the square of \code{poly}.
 
-void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, long len1,
-			   const fmpz * poly2, long len2, const fmpz * f,
-			   long lenf, const fmpz_t p)
+void _fmpz_mod_poly_mulmod(fmpz * res, const fmpz * poly1, slong len1,
+			   const fmpz * poly2, slong len2, const fmpz * f,
+			   slong lenf, const fmpz_t p)
 
     Sets \code{res, len1 + len2 - 1} to the remainder of the product of
     \code{poly1} and \code{poly2} upon polynomial division by \code{f}.
@@ -390,7 +390,7 @@ void fmpz_mod_poly_mulmod(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, long len, ulong e, 
+void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e, 
                         const fmpz_t p)
 
     Sets \code{res = poly^e}, assuming that $e > 1$ and \code{elen > 0}, 
@@ -403,7 +403,7 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
     so that in particular \code{0^0 = 1}.
 
 void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
-			      ulong e, long trunc, const fmpz_t p)
+			      ulong e, slong trunc, const fmpz_t p)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     (assumed to be zero padded if necessary to length \code{trunc}) to
@@ -413,14 +413,14 @@ void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
     \code{e > 1}. Aliasing is not permitted.
 
 void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
-		       const fmpz_mod_poly_t poly, ulong e, long trunc)
+		       const fmpz_mod_poly_t poly, ulong e, slong trunc)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     to the power \code{e}. This is equivalent to doing a powering
     followed by a truncation.
 
 void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
-				     ulong e, long trunc, const fmpz_t p)
+				     ulong e, slong trunc, const fmpz_t p)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     (assumed to be zero padded if necessary to length \code{trunc}) to
@@ -431,7 +431,7 @@ void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
     exponentiation method.
 
 void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
-			      const fmpz_mod_poly_t poly, ulong e, long trunc)
+			      const fmpz_mod_poly_t poly, ulong e, slong trunc)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
     to the power \code{e}. This is equivalent to doing a powering
@@ -439,7 +439,7 @@ void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
 
 void _fmpz_mod_poly_powmod_ui_binexp(fmpz * res, const fmpz * poly,
 				     ulong e, const fmpz * f,
-				     long lenf, const fmpz_t p)
+				     slong lenf, const fmpz_t p)
 
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
@@ -458,7 +458,7 @@ void fmpz_mod_poly_powmod_ui_binexp(fmpz_mod_poly_t res,
 
 void _fmpz_mod_poly_powmod_fmpz_binexp(fmpz * res, const fmpz * poly,
 				       const fmpz_t e, const fmpz * f,
-				       long lenf, const fmpz_t p)
+				       slong lenf, const fmpz_t p)
 
     Sets \code{res} to \code{poly} raised to the power \code{e}
     modulo \code{f}, using binary exponentiation. We require \code{e > 0}.
@@ -482,7 +482,7 @@ void fmpz_mod_poly_powmod_fmpz_binexp(fmpz_mod_poly_t res,
 *******************************************************************************
 
 void _fmpz_mod_poly_divrem_basecase(fmpz * Q, fmpz * R, 
-    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
@@ -505,7 +505,7 @@ void fmpz_mod_poly_divrem_basecase(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     modulo $p$.
 
 void _fmpz_mod_poly_div_basecase(fmpz * Q, fmpz * R, 
-    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
@@ -529,7 +529,7 @@ ulong fmpz_mod_poly_remove(fmpz_mod_poly_t f, const fmpz_mod_poly_t g)
     returns the exponent.
 
 void _fmpz_mod_poly_rem_basecase(fmpz * R, 
-    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes $Q$, $R$ such that $A = B Q + R$ with 
@@ -547,7 +547,7 @@ void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R,
     of $B$ is a unit.
 
 void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
-    const fmpz * A, const fmpz * B, long lenB, 
+    const fmpz * A, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 
     Computes \code{(Q, lenB)}, \code{(BQ, 2 lenB - 1)} such that 
@@ -565,7 +565,7 @@ void _fmpz_mod_poly_divrem_divconquer_recursive(fmpz * Q, fmpz * BQ, fmpz * W,
     memory.
 
 void _fmpz_mod_poly_divrem_divconquer(fmpz * Q, fmpz * R, 
-    const fmpz * A, long lenA, const fmpz * B, long lenB, 
+    const fmpz * A, slong lenA, const fmpz * B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
@@ -586,8 +586,8 @@ void fmpz_mod_poly_divrem_divconquer(fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that $B$ is non-zero and that the leading coefficient 
     of $B$ is invertible modulo $p$.
 
-void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, long lenA, 
-    const fmpz * B, long lenB, const fmpz_t invB, const fmpz_t p)
+void _fmpz_mod_poly_divrem(fmpz * Q, fmpz * R, const fmpz * A, slong lenA, 
+    const fmpz * B, slong lenB, const fmpz_t invB, const fmpz_t p)
 
     Computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} such that 
     $A = B Q + R$ and $0 \leq \len(R) < \len(B)$.
@@ -623,7 +623,7 @@ void fmpz_mod_poly_divrem_f(fmpz_t f, fmpz_mod_poly_t Q, fmpz_mod_poly_t R,
     Assumes that $B$ is non-zero.
 
 void _fmpz_mod_poly_rem(fmpz *R, 
-                        const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                        const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                         const fmpz_t invB, const fmpz_t p)
 
     Notationally, computes \code{(Q, lenA - lenB + 1)}, \code{(R, lenA)} 
@@ -654,7 +654,7 @@ void fmpz_mod_poly_rem(fmpz_mod_poly_t R,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n, 
+void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n, 
                                       const fmpz_t cinv, const fmpz_t p)
 
     Sets \code{(Qinv, n)} to the inverse of \code{(Q, n)} modulo $x^n$, 
@@ -662,7 +662,7 @@ void _fmpz_mod_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, long n,
     invertible modulo $p$ and that its inverse is \code{cinv}.
 
 void fmpz_mod_poly_inv_series_newton(fmpz_mod_poly_t Qinv, 
-    const fmpz_mod_poly_t Q, long n)
+    const fmpz_mod_poly_t Q, slong n)
 
     Sets \code{Qinv} to the inverse of \code{Q} modulo $x^n$, 
     where $n \geq 1$, assuming that the bottom coefficient of 
@@ -682,8 +682,8 @@ void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
 
-len_t _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, long lenA, 
-                                           const fmpz *B, long lenB, 
+len_t _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
+                                           const fmpz *B, slong lenB, 
                                            const fmpz_t invB, const fmpz_t p)
 
     Sets $G$ to the greatest common divisor of $(A, \len(A))$ 
@@ -708,8 +708,8 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
 
-len_t _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, long lenA, 
-                                 const fmpz *B, long lenB, 
+len_t _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
+                                 const fmpz *B, slong lenB, 
                                  const fmpz_t invB, const fmpz_t p)
 
     Sets $G$ to the greatest common divisor of $(A, \len(A))$ 
@@ -731,7 +731,7 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G,
     number.  Thus, this function assumes that $p$ is prime.
 
 len_t _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
-    const fmpz *A, long lenA, const fmpz *B, long lenB, const fmpz_t p)
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor 
     of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
@@ -754,8 +754,8 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.
 
-len_t _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, long lenA, 
-                          const fmpz *B, long lenB, const fmpz_t p)
+len_t _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, 
+                          const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor 
     of $(A, \len(A))$ and $(B, \len(B))$ and returns its length, 
@@ -779,8 +779,8 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
     number.
 
 len_t _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
-                                   const fmpz *A, long lenA, 
-                                   const fmpz *B, long lenB, 
+                                   const fmpz *A, slong lenA, 
+                                   const fmpz *B, slong lenB, 
                                    const fmpz_t invB, const fmpz_t p)
 
     Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
@@ -812,8 +812,8 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
 len_t _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, 
-                         const fmpz *A, long lenA, 
-                         const fmpz *B, long lenB, 
+                         const fmpz *A, slong lenA, 
+                         const fmpz *B, slong lenB, 
                          const fmpz_t invB, const fmpz_t p)
 
     Computes the GCD of $A$ and $B$ together with cofactors $S$ and $T$ 
@@ -845,7 +845,7 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
 len_t _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
-                           const fmpz *A, long lenA, const fmpz *B, long lenB, 
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                            const fmpz_t p)
 
     Computes \code{(G, lenA)}, \code{(S, lenB-1)} such that 
@@ -863,8 +863,8 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     In the case that $A = 0 \pmod{B}$, returns $G = S = 0$.
 
 int _fmpz_mod_poly_invmod(fmpz *A, 
-                          const fmpz *B, long lenB, 
-                          const fmpz *P, long lenP, const fmpz_t p)
+                          const fmpz *B, slong lenB, 
+                          const fmpz *P, slong lenP, const fmpz_t p)
 
     Attempts to set \code{(A, lenP-1)} to the inverse of \code{(B, lenB)} 
     modulo the polynomial \code{(P, lenP)}.  Returns $1$ if \code{(B, lenB)} 
@@ -896,7 +896,7 @@ int fmpz_mod_poly_invmod(fmpz_mod_poly_t A,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, long len, 
+void _fmpz_mod_poly_derivative(fmpz *res, const fmpz *poly, slong len, 
                                const fmpz_t p)
 
     Sets \code{(res, len - 1)} to the derivative of \code{(poly, len)}.  
@@ -913,7 +913,7 @@ void fmpz_mod_poly_derivative(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, long len, 
+void _fmpz_mod_poly_evaluate_fmpz(fmpz_t res, const fmpz *poly, slong len, 
                                   const fmpz_t a, const fmpz_t p)
 
     Evaluates the polynomial \code{(poly, len)} at the integer $a$ and sets 
@@ -935,8 +935,8 @@ void fmpz_mod_poly_evaluate_fmpz(fmpz_t res,
 
 *******************************************************************************
 
-void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, long len1, 
-                                              const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_compose_horner(fmpz *res, const fmpz *poly1, slong len1, 
+                                              const fmpz *poly2, slong len2, 
                                               const fmpz_t p)
 
     Sets \code{res} to the composition of \code{(poly1, len1)} and 
@@ -960,8 +960,8 @@ void fmpz_mod_poly_compose_horner(fmpz_mod_poly_t res,
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
-void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, long len1,
-                                                  const fmpz *poly2, long len2,
+void _fmpz_mod_poly_compose_divconquer(fmpz *res, const fmpz *poly1, slong len1,
+                                                  const fmpz *poly2, slong len2,
                                                   const fmpz_t p)
 
     Sets \code{res} to the composition of \code{(poly1, len1)} and 
@@ -987,8 +987,8 @@ void fmpz_mod_poly_compose_divconquer(fmpz_mod_poly_t res,
     \code{poly1}, and \code{poly2} by $f$, $g$, and $h$, respectively, 
     sets $f(t) = g(h(t))$.
 
-void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, long len1, 
-                                       const fmpz *poly2, long len2, 
+void _fmpz_mod_poly_compose(fmpz *res, const fmpz *poly1, slong len1, 
+                                       const fmpz *poly2, slong len2, 
                                        const fmpz_t p)
 
     Sets \code{res} to the composition of \code{(poly1, len1)} and 
@@ -1017,8 +1017,8 @@ void fmpz_mod_poly_compose(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly1,
 *******************************************************************************
 
 void
-_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
-				       const fmpz * h, long lenh, const fmpz_t p);
+_fmpz_mod_poly_compose_mod(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
+				       const fmpz * h, slong lenh, const fmpz_t p);
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1033,8 +1033,8 @@ fmpz_mod_poly_compose_mod(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
     $h$ is nonzero.
 
 void
-_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, long lenf, const fmpz * g,
-					      const fmpz * h, long lenh, const fmpz_t p);
+_fmpz_mod_poly_compose_mod_horner(fmpz * res, const fmpz * f, slong lenf, const fmpz * g,
+					      const fmpz * h, slong lenh, const fmpz_t p);
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1051,8 +1051,8 @@ fmpz_mod_poly_compose_mod_horner(fmpz_mod_poly_t res, const fmpz_mod_poly_t f,
     $h$ is nonzero. The algorithm used is Horner's rule.
 
 void
-_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * f, long len1,
-				  const fmpz * g, const fmpz * h, long len3, const fmpz_t p)
+_fmpz_mod_poly_compose_mod_brent_kung(fmpz * res, const fmpz * f, slong len1,
+				  const fmpz * g, const fmpz * h, slong len3, const fmpz_t p)
 
     Sets \code{res} to the composition $f(g)$ modulo $h$. We require that
     $h$ is nonzero and that the length of $g$ is one less than the
@@ -1095,7 +1095,7 @@ fmpz_mod_poly_compose_mod_brent_kung(fmpz_mod_poly_t res, const fmpz_mod_poly_t 
 *******************************************************************************
 
 void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv, 
-                    const fmpz *R, long lenR, long k, 
+                    const fmpz *R, slong lenR, slong k, 
                     const fmpz_t invL, const fmpz_t p)
 
     Computes powers of $R$ of the form $R^{2^i}$ and their Newton inverses 
@@ -1117,7 +1117,7 @@ void _fmpz_mod_poly_radix_init(fmpz **Rpow, fmpz **Rinv,
     $\len(F) \leq 2^k \deg(R)$.
 
 void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D, 
-                              const fmpz_mod_poly_t R, long degF)
+                              const fmpz_mod_poly_t R, slong degF)
 
     Carries out the precomputation necessary to perform radix conversion 
     to radix~$R$ for polynomials~$F$ of degree at most \code{degF}.
@@ -1126,7 +1126,7 @@ void fmpz_mod_poly_radix_init(fmpz_mod_poly_radix_t D,
     and that the leading coefficient is a unit.
 
 void _fmpz_mod_poly_radix(fmpz **B, const fmpz *F, fmpz **Rpow, fmpz **Rinv, 
-                          long degR, long k, long i, fmpz *W, const fmpz_t p)
+                          slong degR, slong k, slong i, fmpz *W, const fmpz_t p)
 
     This is the main recursive function used by the 
     function \code{fmpz_mod_poly_radix()}.
@@ -1178,7 +1178,7 @@ void fmpz_mod_poly_radix(fmpz_mod_poly_struct **B, const fmpz_mod_poly_t F,
 
 *******************************************************************************
 
-int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, long len, 
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p)
 
     Prints the polynomial \code{(poly, len)} to the stream \code{file}.

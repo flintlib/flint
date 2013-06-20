@@ -32,7 +32,7 @@
 
 void fmpz_init(fmpz_t f)
 
-    A small \code{fmpz_t} is initialised, i.e.\ just a \code{long}.  
+    A small \code{fmpz_t} is initialised, i.e.\ just a \code{slong}.  
     The value is set to zero.
 
 void fmpz_init2(fmpz_t f, ulong limbs)
@@ -41,7 +41,7 @@ void fmpz_init2(fmpz_t f, ulong limbs)
     number of limbs.
 
     If \code{limbs} is zero then a small \code{fmpz_t} is allocated, 
-    i.e.\ just a \code{long}.  The value is also set to zero.  It is 
+    i.e.\ just a \code{slong}.  The value is also set to zero.  It is 
     not necessary to call this function except to save time.  A call 
     to \code{fmpz_init} will do just fine.
 
@@ -117,8 +117,8 @@ void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
 slong fmpz_get_si(const fmpz_t f)
 
-    Returns $f$ as a \code{signed long}.  The result is undefined
-    if $f$ does not fit into a \code{long}.
+    Returns $f$ as a \code{slong}.  The result is undefined
+    if $f$ does not fit into a \code{slong}.
 
 ulong fmpz_get_ui(const fmpz_t f)
 
@@ -158,7 +158,7 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
 void fmpz_set_si(fmpz_t f, slong val)
 
-    Sets $f$ to the given \code{signed long} value.
+    Sets $f$ to the given \code{slong} value.
 
 void fmpz_set_ui(fmpz_t f, ulong val)
 
@@ -381,7 +381,7 @@ int fmpz_abs_fits_ui(const fmpz_t f)
 
 int fmpz_fits_si(const fmpz_t f)
 
-    Returns whether the value of $f$ fits into a \code{long}.
+    Returns whether the value of $f$ fits into a \code{slong}.
 
 void fmpz_setbit(fmpz_t f, ulong i)
 
@@ -502,7 +502,7 @@ void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
-    Sets $f$ to $g \times x$ where $x$ is a \code{signed long}.
+    Sets $f$ to $g \times x$ where $x$ is a \code{slong}.
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
@@ -694,7 +694,7 @@ len_t fmpz_clog_ui(const fmpz_t x, ulong b)
     Returns $\ceil{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
-    the return value fits into a signed \code{long}.
+    the return value fits into a signed \code{slong}.
 
 len_t fmpz_flog(const fmpz_t x, const fmpz_t b)
 
@@ -703,7 +703,7 @@ len_t fmpz_flog_ui(const fmpz_t x, ulong b)
     Returns $\floor{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
-    the return value fits into a signed \code{long}.
+    the return value fits into a signed \code{slong}.
 
 double fmpz_dlog(const fmpz_t x)
 

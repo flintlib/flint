@@ -626,7 +626,7 @@ In all respects, \code{fmpz_t}'s act precisely like GMP/ MPIR's
 \code{mpz_t}'s, with automatic memory management, however, in the first 
 place only one limb is used to implement them.  Once an \code{fmpz_t} 
 overflows a limb then a multiprecision integer is automatically allocated 
-and instead of storing the actual integer data the \code{long} which 
+and instead of storing the actual integer data the \code{slong} which 
 implements the type becomes an index into a FLINT wide array of 
 \code{mpz_t}'s.
 
@@ -982,7 +982,7 @@ between their output arguments.
 On the other hand, there are versions of these functions whose names are 
 prefixed with a single underscore.  These typically operate on polynomials 
 given in the form of a triple of object of types \code{fmpz *}, 
-\code{fmpz_t}, and \code{long}, containing the numerator, denominator and 
+\code{fmpz_t}, and \code{slong}, containing the numerator, denominator and 
 length, respectively.  In general, these functions expect their input to 
 be normalised, i.e.\ they do not allow zero padding, and to be in lowest 
 terms, and they do not allow their input and output arguments to be aliased.

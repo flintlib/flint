@@ -99,19 +99,19 @@ void fmpz_poly_mat_print(const fmpz_poly_mat_t mat, const char * x)
 *******************************************************************************
 
 void fmpz_poly_mat_randtest(fmpz_poly_mat_t mat, flint_rand_t state,
-        long len, mp_bitcnt_t bits)
+        slong len, mp_bitcnt_t bits)
 
     This is equivalent to applying \code{fmpz_poly_randtest} to all entries
     in the matrix.
 
 void fmpz_poly_mat_randtest_unsigned(fmpz_poly_mat_t mat, flint_rand_t state,
-        long len, mp_bitcnt_t bits)
+        slong len, mp_bitcnt_t bits)
 
     This is equivalent to applying \code{fmpz_poly_randtest_unsigned} to
     all entries in the matrix.
 
 void fmpz_poly_mat_randtest_sparse(fmpz_poly_mat_t A, flint_rand_t state,
-        long len, mp_bitcnt_t bits, float density)
+        slong len, mp_bitcnt_t bits, float density)
 
     Creates a random matrix with the amount of nonzero entries given
     approximately by the \code{density} variable, which should be a fraction
@@ -265,7 +265,7 @@ void fmpz_poly_mat_mul_KS(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
     compatible dimensions for matrix multiplication. Aliasing is allowed.
 
 void fmpz_poly_mat_mullow(fmpz_poly_mat_t C, const fmpz_poly_mat_t A,
-    const fmpz_poly_mat_t B, long len)
+    const fmpz_poly_mat_t B, slong len)
 
     Sets \code{C} to the matrix product of \code{A} and \code{B},
     truncating each entry in the result to length \code{len}.
@@ -303,14 +303,14 @@ void fmpz_poly_mat_pow(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp)
 
 void
 fmpz_poly_mat_pow_trunc(fmpz_poly_mat_t B, const fmpz_poly_mat_t A, ulong exp,
-        long len)
+        slong len)
 
     Sets \code{B} to \code{A} raised to the power \code{exp}, truncating
     all entries to length \code{len}, where \code{A} is a square matrix.
     Uses exponentiation by squaring. Aliasing is allowed.
 
 void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
-                            fmpz_poly_mat_t * const factors, long n)
+                            fmpz_poly_mat_t * const factors, slong n)
 
     Sets \code{res} to the product of the \code{n} matrices given in
     the vector \code{factors}, all of which must be square and of the
@@ -323,7 +323,7 @@ void fmpz_poly_mat_prod(fmpz_poly_mat_t res,
 *******************************************************************************
 
 len_t fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and
@@ -336,7 +336,7 @@ len_t fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
     unnecessary coefficient growth if the entries vary in size.
 
 len_t fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
-                                    long start_row, long end_row, long c)
+                                    slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and
@@ -349,7 +349,7 @@ len_t fmpz_poly_mat_find_pivot_partial(const fmpz_poly_mat_t mat,
     the smallest coefficient bit bound. This heuristic typically reduces
     coefficient growth when the matrix entries vary in size.
 
-len_t fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, long * perm,
+len_t fmpz_poly_mat_fflu(fmpz_poly_mat_t B, fmpz_poly_t den, slong * perm,
                             const fmpz_poly_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -491,7 +491,7 @@ int fmpz_poly_mat_solve_fflu(fmpz_poly_mat_t X, fmpz_poly_t den,
     forward and back substitution.
 
 void fmpz_poly_mat_solve_fflu_precomp(fmpz_poly_mat_t X,
-                    const long * perm,
+                    const slong * perm,
                     const fmpz_poly_mat_t FFLU, const fmpz_poly_mat_t B);
 
     Performs fraction-free forward and back substitution given a precomputed

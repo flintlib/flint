@@ -84,7 +84,7 @@ int test_ZZ_to_fmpz()
 int test_ZZX_to_fmpz_poly()
 {
     fmpz_poly_t f_poly1, f_poly2;
-    long length;
+    slong length;
     mp_bitcnt_t bits;
     flint_rand_t state;
     int i, result;

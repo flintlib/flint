@@ -419,9 +419,9 @@ void _nmod_poly_mulmod(mp_ptr res, mp_srcptr poly1, len_t len1,
 void nmod_poly_mulmod(nmod_poly_t res,
     const nmod_poly_t poly1, const nmod_poly_t poly2, const nmod_poly_t f);
 
-void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, long len1, 
-                              mp_srcptr poly2, long len2, mp_srcptr f,
-                              long lenf, mp_srcptr finv, long lenfinv, nmod_t mod);
+void _nmod_poly_mulmod_preinv(mp_ptr res, mp_srcptr poly1, slong len1, 
+                              mp_srcptr poly2, slong len2, mp_srcptr f,
+                              slong lenf, mp_srcptr finv, slong lenfinv, nmod_t mod);
 
 void
 nmod_poly_mulmod_preinv(nmod_poly_t res, const nmod_poly_t poly1,
@@ -472,8 +472,8 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
 
 void
 _nmod_poly_powmod_ui_binexp_preinv (mp_ptr res, mp_srcptr poly,
-                                    ulong e, mp_srcptr f, long lenf,
-                                    mp_srcptr finv, long lenfinv, nmod_t mod);
+                                    ulong e, mp_srcptr f, slong lenf,
+                                    mp_srcptr finv, slong lenfinv, nmod_t mod);
 
 void
 nmod_poly_powmod_ui_binexp_preinv(nmod_poly_t res, 
@@ -586,14 +586,14 @@ void _nmod_poly_divrem_newton(mp_ptr Q, mp_ptr R,
 void nmod_poly_divrem_newton(nmod_poly_t Q, nmod_poly_t R, 
                                     const nmod_poly_t A, const nmod_poly_t B);
 
-void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, long lenA,
-            mp_srcptr B, long lenB, mp_srcptr Binv, long lenBinv, nmod_t mod);
+void _nmod_poly_div_newton21_preinv (mp_ptr Q, mp_srcptr A, slong lenA,
+            mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod);
 
 void nmod_poly_div_newton21_preinv (nmod_poly_t Q, const nmod_poly_t A,
                                  const nmod_poly_t B, const nmod_poly_t Binv);
 
 void _nmod_poly_divrem_newton21_preinv (mp_ptr Q, mp_ptr R, mp_srcptr A,
- long lenA, mp_srcptr B, long lenB, mp_srcptr Binv, long lenBinv, nmod_t mod);
+ slong lenA, mp_srcptr B, slong lenB, mp_srcptr Binv, slong lenBinv, nmod_t mod);
 
 void nmod_poly_divrem_newton21_preinv(nmod_poly_t Q, nmod_poly_t R,
             const nmod_poly_t A, const nmod_poly_t B, const nmod_poly_t Binv);
@@ -738,9 +738,9 @@ nmod_poly_compose_mod_brent_kung(nmod_poly_t res,
                     const nmod_poly_t h);
 
 void
-_nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, long len1,
-                            mp_srcptr poly2, mp_srcptr poly3, long len3,
-                            mp_srcptr poly3inv, long len3inv, nmod_t mod);
+_nmod_poly_compose_mod_brent_kung_preinv(mp_ptr res, mp_srcptr poly1, slong len1,
+                            mp_srcptr poly2, mp_srcptr poly3, slong len3,
+                            mp_srcptr poly3inv, slong len3inv, nmod_t mod);
 
 void
 nmod_poly_compose_mod_brent_kung_preinv(nmod_poly_t res,

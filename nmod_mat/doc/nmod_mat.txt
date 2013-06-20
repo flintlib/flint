@@ -110,7 +110,7 @@ void nmod_mat_randfull(nmod_mat_t mat, flint_rand_t state)
     of the matrix. This is used to test potential overflow-related bugs.
 
 int nmod_mat_randpermdiag(nmod_mat_t mat, 
-                        mp_limb_t * diag, long n, flint_rand_t state)
+                        mp_limb_t * diag, slong n, flint_rand_t state)
 
     Sets \code{mat} to a random permutation of the diagonal matrix 
     with $n$ leading entries given by the vector \code{diag}. It is 

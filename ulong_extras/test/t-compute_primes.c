@@ -32,7 +32,7 @@
 
 int main()
 {
-    long i, lim = 1000000;
+    slong i, lim = 1000000;
     flint_rand_t state;
     n_primes_t pg;
     mp_limb_t * ref_primes;
@@ -55,7 +55,7 @@ int main()
 
     for (i = 0; i < 250; i++)
     {
-        long n;
+        slong n;
         const mp_limb_t * primes;
         const double * inverses;
 

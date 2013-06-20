@@ -75,7 +75,7 @@ len_t padic_prec(const padic_t op)
 
 *******************************************************************************
 
-void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, long min, long max, 
+void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, 
                     enum padic_print_mode mode)
 
     Initialises the context \code{ctx} with the given data.
@@ -190,7 +190,7 @@ void padic_set(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 void padic_set_si(padic_t rop, slong op, const padic_ctx_t ctx)
 
     Sets the $p$-adic number \code{rop} to the 
-    \code{long} integer \code{op}.
+    \code{slong} integer \code{op}.
 
 void padic_set_ui(padic_t rop, ulong op, const padic_ctx_t ctx)
 
@@ -382,7 +382,7 @@ void padic_pow_si(padic_t rop, const padic_t op, slong e,
     which is defined as one whenever $e = 0$.
 
     Assumes that some computations involving $e$ and the 
-    valuation of \code{op} do not overflow in the \code{long} 
+    valuation of \code{op} do not overflow in the \code{slong} 
     range.
 
     Note that if the input $x = p^v u$ is defined modulo $p^N$ 
@@ -407,11 +407,11 @@ len_t _padic_exp_bound(len_t v, len_t N, const fmpz_t p)
     Assumes that $v < N$.  Moreover, $v$ has to be at least $2$ or $1$, 
     depending on whether $p$ is $2$ or odd.
 
-void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, long v, 
-                                        const fmpz_t p, long N)
+void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v, 
+                                        const fmpz_t p, slong N)
 
-void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, long v, 
-                                     const fmpz_t p, long N)
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, 
+                                     const fmpz_t p, slong N)
 
 void _padic_exp(fmpz_t rop, const fmpz_t u, len_t v, const fmpz_t p, len_t N)
 
@@ -475,13 +475,13 @@ len_t _padic_log_bound(len_t v, len_t N, const fmpz_t p)
 void _padic_log(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
 
 void _padic_log_rectangular(fmpz_t z, 
-                            const fmpz_t y, long v, const fmpz_t p, long N)
+                            const fmpz_t y, slong v, const fmpz_t p, slong N)
 
 void _padic_log_satoh(fmpz_t z, 
-                      const fmpz_t y, long v, const fmpz_t p, long N)
+                      const fmpz_t y, slong v, const fmpz_t p, slong N)
 
 void _padic_log_balanced(fmpz_t z, 
-                         const fmpz_t y, long v, const fmpz_t p, long N)
+                         const fmpz_t y, slong v, const fmpz_t p, slong N)
 
     Computes 
     \begin{equation*}

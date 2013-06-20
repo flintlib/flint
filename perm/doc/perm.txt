@@ -63,7 +63,7 @@ void _perm_inv(len_t *res, const len_t *vec, len_t n)
 
 *******************************************************************************
 
-void _perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, long n)
+void _perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, slong n)
 
     Forms the composition $\pi_1 \circ \pi_2$ of two permutations 
     $\pi_1$ and $\pi_2$.  Here, $\pi_2$ is applied first, that is, 

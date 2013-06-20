@@ -193,7 +193,7 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
 
 void flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                                mp_ptr v, mp_size_t * vsize,
-                               long a, long b, long n, int d)
+                               slong a, slong b, slong n, int d)
 
     Computes \code{(t,tsize)} and \code{(v,vsize)} such that 
     $t/v = H_n = 1 + 1/2 + \dotsb + 1/n$.

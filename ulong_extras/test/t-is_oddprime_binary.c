@@ -33,7 +33,7 @@ int main(void)
 {
    int i, result;
    flint_rand_t state;
-   long cutoff = 100000;
+   slong cutoff = 100000;
    
    printf("is_oddprime_binary....");
    fflush(stdout);

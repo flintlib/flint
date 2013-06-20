@@ -63,7 +63,7 @@ void fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
     Prints the entries of \code{fac} to standard output.
 
 void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
-				 const fmpz_mod_poly_t poly, long exp)
+				 const fmpz_mod_poly_t poly, slong exp)
 
     Inserts the factor \code{poly} with multiplicity \code{exp} into
     the factorisation \code{fac}.
@@ -111,7 +111,7 @@ int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f)
     case, the zero polynomial is not considered squarefree.
 
 int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
-	      flint_rand_t state, const fmpz_mod_poly_t pol, long d)
+	      flint_rand_t state, const fmpz_mod_poly_t pol, slong d)
 
     Probabilistic equal degree factorisation of \code{pol} into
     irreducible factors of degree \code{d}. If it passes, a factor is
@@ -121,14 +121,14 @@ int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
-			      const fmpz_mod_poly_t pol, long d)
+			      const fmpz_mod_poly_t pol, slong d)
 
     Assuming \code{pol} is a product of irreducible factors all of
     degree \code{d}, finds all those factors and places them in factors.
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-		const fmpz_mod_poly_t poly, long **degs)
+		const fmpz_mod_poly_t poly, slong **degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
     of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}

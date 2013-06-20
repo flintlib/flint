@@ -742,7 +742,7 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
 *******************************************************************************
 
 len_t fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                    long start_row, len_t end_row, len_t c)
+                                    slong start_row, len_t end_row, len_t c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and

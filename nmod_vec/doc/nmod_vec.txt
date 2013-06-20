@@ -184,13 +184,13 @@ int _nmod_vec_equal(mp_ptr vec, mp_srcptr vec2, len_t len)
 *******************************************************************************
 
 void _nmod_vec_add(mp_ptr res, mp_srcptr vec1, 
-                        mp_srcptr vec2, long len, nmod_t mod)
+                        mp_srcptr vec2, slong len, nmod_t mod)
 
     Sets \code{(res, len)} to the sum of \code{(vec1, len)} 
     and \code{(vec2, len)}.
 
 void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
-                        mp_srcptr vec2, long len, nmod_t mod)
+                        mp_srcptr vec2, slong len, nmod_t mod)
 
     Sets \code{(res, len)} to the difference of \code{(vec1, len)} 
     and \code{(vec2, len)}.
@@ -200,12 +200,12 @@ void _nmod_vec_neg(mp_ptr res, mp_srcptr vec, len_t len, nmod_t mod)
     Sets \code{(res, len)} to the negation of \code{(vec, len)}.
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-                        long len, mp_limb_t c, nmod_t mod)
+                        slong len, mp_limb_t c, nmod_t mod)
 
     Sets \code{(res, len)} to \code{(vec, len)} multiplied by $c$.
 
 void _nmod_vec_scalar_addmul_nmod(mp_ptr res, mp_srcptr vec, 
-                        long len, mp_limb_t c, nmod_t mod)
+                        slong len, mp_limb_t c, nmod_t mod)
 
     Adds \code{(vec, len)} times $c$ to the vector \code{(res, len)}.
 
@@ -248,7 +248,7 @@ _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2, len_t len, nmod_t mod, int nlimbs)
     unreduced result.
 
 mp_limb_t
-_nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, long offset, long len,
+_nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, slong offset, slong len,
     nmod_t mod, int nlimbs)
 
     Returns the dot product of (\code{vec1}, \code{len}) and the values at

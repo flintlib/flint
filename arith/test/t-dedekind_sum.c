@@ -35,7 +35,7 @@
 /*
     The results in the following random test cases were computed with the
     naive implementation. Doing a live comparison with large values against
-    the naive implementation would take too long.
+    the naive implementation would take too much time.
 */
 static const len_t testdata[][4] =
 {

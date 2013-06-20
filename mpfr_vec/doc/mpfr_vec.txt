@@ -65,12 +65,12 @@ void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, len_t len, mpfr_t c)
     sets \code{res} to the result.
 
 void _mpfr_vec_scalar_mul_2exp(mpfr * res, 
-                               mpfr * vec, long len, mp_bitcnt_t exp)
+                               mpfr * vec, slong len, mp_bitcnt_t exp)
 
     Multiplies the given vector of the given length by \code{2^exp}.
 
 void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-                                          __mpfr_struct * vec2, long len)
+                                          __mpfr_struct * vec2, slong len)
 
    Sets \code{res} to the scalar product of \code{(vec1, len)} with 
     \code{(vec2, len)}. Assumes \code{len > 0}.

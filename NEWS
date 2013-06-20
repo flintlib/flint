@@ -81,7 +81,7 @@ v 1.0.15 -- 15-Oct-08
    * Fixed build bug in longlong.h on s390 platform
 
 v 1.0.16 -- 22-Oct-08
-   * Fixed a segfault when trying to truncate a polynomial to a longer length than it currently is, with the function fmpz_poly_truncate (reported by Craig Citro)
+   * Fixed a segfault when trying to truncate a polynomial to an longer length than it currently is, with the function fmpz_poly_truncate (reported by Craig Citro)
 
 v 1.0.17 -- 30-Nov-08
    * Fixed a segfault caused by left shifting of polynomials with zero limbs allocated in division and pseudo division functions.

@@ -64,7 +64,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, len_t len)
     fmpz_sqrt(res + m - 1, poly + len - 1);
     result = 1;
 
-    /* do long divison style 'square root with remainder' from top to bottom */
+    /* do slong divison style 'square root with remainder' from top to bottom */
     if (len > 1)
     {
         fmpz_t t, u;
