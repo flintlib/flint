@@ -22,6 +22,7 @@
     Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
+#include "flint.h"
 
 #undef ulong /* interferes with system includes, redefined by flint.h below */
 #include <time.h>
