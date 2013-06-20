@@ -29,6 +29,7 @@
 #include <stdio.h>
 
 #include "cxx.h"
+#include "cxx/test/helpers.h"
 
 class skippable_exception
     : public std::runtime_error
@@ -84,15 +85,6 @@ std::string disass(const char* program, const std::string& function)
         throw skippable_exception("cannot find end of function " + function);
     return all.substr(0, len);
 }
-
-#define tassert(expr) do \
-  { \
-    if (!(expr)) \
-      { \
-          std::cout << "FAIL\n" __FILE__ ":" << __LINE__ << ": assertion " #expr " failed\n"; \
-        exit(1); \
-      } \
-  } while (0)
 
 
 extern "C" {

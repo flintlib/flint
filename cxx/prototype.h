@@ -36,6 +36,8 @@
 #include <iosfwd>
 #include <cstdlib>
 
+#include "cxx/mp.h"
+
 namespace flint {
 
 namespace traits {
@@ -272,44 +274,6 @@ struct evaluation;
 //    static void doit(const T& input, temporaries_t temps, return_t* output);
 //};
 } // rules
-
-namespace mp {
-
-template<class T>
-struct not_
-{
-    static const bool val = !T::val;
-};
-
-template<class T, class U>
-struct and_
-{
-    static const bool val = T::val && U::val;
-};
-
-template<bool, class U = void>
-struct enable_if_v
-{
-    typedef U type;
-    static const int val = 0;
-};
-template<class U>
-struct enable_if_v<false, U>
-{ };
-
-template<bool v, class U = void>
-struct disable_if_v : enable_if_v<!v, U> { };
-
-template<class T, class U = void>
-struct enable_if
-    : public enable_if_v<T::val, U>
-{ };
-
-template<class T, class U = void>
-struct disable_if
-    : public disable_if_v<T::val, U>
-{ };
-}
 
 namespace detail{
 template<class T>
