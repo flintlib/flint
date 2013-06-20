@@ -32,14 +32,13 @@ possible the following primitive datatype should be used:
 
 The typical definitions of these in terms of primitive types are:
 
-    | mp_bitcnt_t   | ulong, or ulong long               |
-    | mp_size_t     | long, or long long                                 |
-    | mp_limb_t     | ulong, or ulong long               |
-    | mp_ptr        | mp_limb_t *                                        |
-    | mp_srcptr     | const mp_limb_t *                                  |
-    | slong         | long or long long                                  |
-    | ulong         | ulong or ulong long                |
-    | slong         | long or long long                                  |
+    | mp_bitcnt_t   | ulong, or ulong long                                 |
+    | mp_size_t     | long, or long long                                   |
+    | mp_limb_t     | ulong, or ulong long                                 |
+    | mp_ptr        | mp_limb_t *                                          |
+    | mp_srcptr     | const mp_limb_t *                                    |
+    | slong         | long or long long                                    |
+    | ulong         | ulong or ulong long                                  |
 
 Use of const
 ------------
