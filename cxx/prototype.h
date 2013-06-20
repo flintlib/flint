@@ -27,7 +27,6 @@
 // * formatting
 // * static asserts
 // * contexts
-// * tuple merging
 // * non-explicit ctors
 
 #ifndef CXX_PROTOTYPE_H
@@ -37,44 +36,9 @@
 #include <cstdlib>
 
 #include "cxx/mp.h"
+#include "cxx/traits.h"
 
 namespace flint {
-
-namespace traits {
-struct true_
-{
-    static const bool val = true;
-};
-
-struct false_
-{
-    static const bool val = false;
-};
-
-template<class T> struct is_signed_integer : false_ { };
-template<> struct is_signed_integer<signed char> : true_ { };
-template<> struct is_signed_integer<signed short> : true_ { };
-template<> struct is_signed_integer<signed int> : true_ { };
-template<> struct is_signed_integer<signed long> : true_ { };
-
-template<class T> struct is_unsigned_integer : false_ { };
-template<> struct is_unsigned_integer<unsigned char> : true_ { };
-template<> struct is_unsigned_integer<unsigned short> : true_ { };
-template<> struct is_unsigned_integer<unsigned int> : true_ { };
-template<> struct is_unsigned_integer<unsigned long> : true_ { };
-
-template<class T> struct forwarding {typedef const T& type;};
-template<class T> struct forwarding<T&> {typedef const T& type;};
-template<class T> struct forwarding<const T&> {typedef const T& type;};
-template<class T> struct reference {typedef T& type;};
-template<class T> struct reference<T&> {typedef T& type;};
-template<class T> struct reference<const T&> {typedef const T& type;};
-template<class T> struct make_const {typedef const T type;};
-template<class T> struct make_const<T&> {typedef const T& type;};
-template<class T> struct basetype {typedef T type;};
-template<class T> struct basetype<T&> {typedef T type;};
-template<class T> struct basetype<const T&> {typedef T type;};
-}
 
 template<class Head, class Tail>
 struct tuple
@@ -275,30 +239,7 @@ struct evaluation;
 //};
 } // rules
 
-namespace detail{
-template<class T>
-struct wrap
-{
-    T t;
-};
-}
-
 namespace traits {
-struct no { int data[2]; };
-typedef int yes;
-template<class T> detail::wrap<T> fakeinstance();
-
-// use with care
-template<class To, class From>
-struct _is_convertible
-{
-private:
-    static yes test(...) {return yes();}
-    static no test(To) {return no();}
-public:
-    static const bool val = (sizeof(test(fakeinstance<From>().t)) != sizeof(yes));
-};
-
 template<class T>
 struct is_implemented
     : public mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> >

@@ -28,9 +28,9 @@
 
 namespace flint {
 namespace mp {
-////////////////////////////
-// METAPROGRAMMING HELPERS
-////////////////////////////
+/////////////////////////////////
+// BASIC METAPROGRAMMING HELPERS
+/////////////////////////////////
 // Most of these helpers *compute* something. In this case, they have a static
 // static const member "val" storing the result of the computation. The
 // arguments of the computation are template parameters, and are usually *not*
