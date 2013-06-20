@@ -35,7 +35,7 @@
 
 void
 _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB, 
-                                          const fmpz * A, const fmpz * B, len_t lenB)
+                                          const fmpz * A, const fmpz * B, slong lenB)
 {
     if (lenB <= FLINT_DIVREMLOW_DIVCONQUER_CUTOFF)
     {
@@ -44,8 +44,8 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
     }
     else
     {
-        const len_t n2 = lenB / 2;
-        const len_t n1 = lenB - n2;
+        const slong n2 = lenB / 2;
+        const slong n1 = lenB - n2;
 
         const fmpz * p1 = A + 2 * n2;
         const fmpz * p2;
@@ -81,7 +81,7 @@ _fmpz_poly_divremlow_divconquer_recursive(fmpz * Q, fmpz * QB,
         d1q1 = W + (n2 + 1);
 
         {
-            len_t i;
+            slong i;
             for (i = 0; i < n1 - 1; i++)
                 fmpz_swap(d1q1 + i, W + i);
         }

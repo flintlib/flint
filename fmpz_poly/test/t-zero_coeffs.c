@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a;
-        len_t len;
+        slong len;
 
         fmpz_poly_init(a);
         fmpz_poly_randtest(a, state, n_randint(state, 100), 200);

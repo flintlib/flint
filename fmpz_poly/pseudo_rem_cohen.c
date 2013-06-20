@@ -31,11 +31,11 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, len_t lenA, 
-                            const fmpz * B, len_t lenB)
+_fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, slong lenA, 
+                            const fmpz * B, slong lenB)
 {
     const fmpz * leadB = B + (lenB - 1);
-    len_t e;
+    slong e;
     fmpz_t pow;
 
     if (lenB == 1)
@@ -69,7 +69,7 @@ _fmpz_poly_pseudo_rem_cohen(fmpz * R, const fmpz * A, len_t lenA,
 void
 fmpz_poly_pseudo_rem_cohen(fmpz_poly_t R, const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    len_t lenr;
+    slong lenr;
     fmpz *r;
     
     if (B->length == 0)

@@ -30,9 +30,9 @@
 
 void
 fmpz_poly_evaluate_fmpz_vec(fmpz * res, const fmpz_poly_t f,
-                                const fmpz * a, len_t n)
+                                const fmpz * a, slong n)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < n; i++)
         fmpz_poly_evaluate_fmpz(res + i, f, a + i);

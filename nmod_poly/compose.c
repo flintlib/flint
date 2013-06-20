@@ -27,8 +27,8 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, len_t len1, 
-                               mp_srcptr poly2, len_t len2, nmod_t mod)
+_nmod_poly_compose(mp_ptr res, mp_srcptr poly1, slong len1, 
+                               mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (len1 == 1)
         res[0] = poly1[0];
@@ -43,8 +43,8 @@ _nmod_poly_compose(mp_ptr res, mp_srcptr poly1, len_t len1,
 void nmod_poly_compose(nmod_poly_t res, 
                        const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    const len_t len1 = poly1->length;
-    const len_t len2 = poly2->length;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
     
     if (len1 == 0)
     {
@@ -58,7 +58,7 @@ void nmod_poly_compose(nmod_poly_t res,
     }
     else
     {
-        const len_t lenr = (len1 - 1) * (len2 - 1) + 1;
+        const slong lenr = (len1 - 1) * (len2 - 1) + 1;
         
         if (res != poly1 && res != poly2)
         {

@@ -41,7 +41,7 @@ void fmpz_mod_poly_init(fmpz_mod_poly_t poly, const fmpz_t p)
     the polynomial.  The user is also responsible to clearing the 
     integer~$p$.
 
-void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, len_t alloc)
+void fmpz_mod_poly_init2(fmpz_mod_poly_t poly, const fmpz_t p, slong alloc)
 
     Initialises \code{poly} with space for at least \code{alloc} coefficients 
     and sets the length to zero.  The allocated coefficients are all set to 
@@ -52,14 +52,14 @@ void fmpz_mod_poly_clear(fmpz_mod_poly_t poly)
     Clears the given polynomial, releasing any memory used.  It must 
     be reinitialised in order to be used again.
 
-void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, len_t alloc)
+void fmpz_mod_poly_realloc(fmpz_mod_poly_t poly, slong alloc)
 
     Reallocates the given polynomial to have space for \code{alloc} 
     coefficients.  If \code{alloc} is zero the polynomial is cleared 
     and then reinitialised.  If the current length is greater than 
     \code{alloc} the polynomial is first truncated to length \code{alloc}.
 
-void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, len_t len)
+void fmpz_mod_poly_fit_length(fmpz_mod_poly_t poly, slong len)
 
     If \code{len} is greater than the number of coefficients currently 
     allocated, then the polynomial is reallocated to have space for at 
@@ -77,12 +77,12 @@ void _fmpz_mod_poly_normalise(fmpz_mod_poly_t poly)
     If all coefficients are zero, the length is set to zero.  This function 
     is mainly used internally, as all functions guarantee normalisation.
 
-void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, len_t len)
+void _fmpz_mod_poly_set_length(fmpz_mod_poly_t poly, slong len)
 
     Demotes the coefficients of \code{poly} beyond \code{len} and sets 
     the length of \code{poly} to \code{len}.
 
-void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, len_t len)
+void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, slong len)
 
     If the current length of \code{poly} is greater than \code{len}, it 
     is truncated to have the given length.  Discarded coefficients are 
@@ -94,7 +94,7 @@ void fmpz_mod_poly_truncate(fmpz_mod_poly_t poly, len_t len)
 
 *******************************************************************************
 
-void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, len_t len)
+void fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len)
 
     Sets the polynomial~$f$ to a random polynomial of length up~\code{len}.
 
@@ -121,12 +121,12 @@ fmpz * fmpz_mod_poly_modulus(const fmpz_mod_poly_t poly)
     Returns the modulus of this polynomial.  This function is 
     implemented as a macro.
 
-len_t fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
+slong fmpz_mod_poly_degree(const fmpz_mod_poly_t poly)
 
     Returns the degree of the polynomial.  The degree of the zero 
     polynomial is defined to be $-1$.
 
-len_t fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
+slong fmpz_mod_poly_length(const fmpz_mod_poly_t poly)
 
     Returns the length of the polynomial, which is one more than 
     its degree.
@@ -155,7 +155,7 @@ void fmpz_mod_poly_zero(fmpz_mod_poly_t poly)
 
     Sets \code{poly} to the zero polynomial.
 
-void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, len_t i, len_t j)
+void fmpz_mod_poly_zero_coeffs(fmpz_mod_poly_t poly, slong i, slong j)
 
     Sets the coefficients of $X^k$ for $k \in [i, j)$ in the polynomial 
     to zero.
@@ -205,17 +205,17 @@ int fmpz_mod_poly_is_zero(const fmpz_mod_poly_t poly)
 
 *******************************************************************************
 
-void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, len_t n, const fmpz_t x)
+void fmpz_mod_poly_set_coeff_fmpz(fmpz_mod_poly_t poly, slong n, const fmpz_t x)
 
     Sets the coefficient of $X^n$ in the polynomial to $x$, 
     assuming $n \geq 0$.
 
-void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, len_t n, ulong x)
+void fmpz_mod_poly_set_coeff_ui(fmpz_mod_poly_t poly, slong n, ulong x)
 
     Sets the coefficient of $X^n$ in the polynomial to $x$,
     assuming $n \geq 0$.
 
-void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, len_t n)
+void fmpz_mod_poly_get_coeff_fmpz(fmpz_t x, const fmpz_mod_poly_t poly, slong n)
 
     Sets $x$ to the coefficient of $X^n$ in the polynomial, 
     assumng $n \geq 0$.
@@ -294,7 +294,7 @@ void fmpz_mod_poly_sub(fmpz_mod_poly_t res,
 
     Sets \code{res} to \code{poly1} minus \code{poly2}.
 
-void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, len_t len, const fmpz_t p)
+void _fmpz_mod_poly_neg(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
 
     Sets \code{(res, len)} to the negative of \code{(poly, len)} 
     modulo $p$.
@@ -357,7 +357,7 @@ void fmpz_mod_poly_mullow(fmpz_mod_poly_t res,
     Sets \code{res} to the lowest $n$ coefficients of the product of 
     \code{poly1} and \code{poly2}.
 
-void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, len_t len, const fmpz_t p)
+void _fmpz_mod_poly_sqr(fmpz *res, const fmpz *poly, slong len, const fmpz_t p)
 
     Sets \code{res} to the square of \code{poly}.
 
@@ -682,7 +682,7 @@ void fmpz_mod_poly_make_monic(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly)
 
     Otherwise, if \code{poly} is zero, sets \code{res} to zero.
 
-len_t _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd_euclidean(fmpz *G, const fmpz *A, slong lenA, 
                                            const fmpz *B, slong lenB, 
                                            const fmpz_t invB, const fmpz_t p)
 
@@ -708,7 +708,7 @@ void fmpz_mod_poly_gcd_euclidean(fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
 
-len_t _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd(fmpz *G, const fmpz *A, slong lenA, 
                                  const fmpz *B, slong lenB, 
                                  const fmpz_t invB, const fmpz_t p)
 
@@ -730,7 +730,7 @@ void fmpz_mod_poly_gcd(fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.  Thus, this function assumes that $p$ is prime.
 
-len_t _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
+slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
     const fmpz *A, slong lenA, const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor 
@@ -754,7 +754,7 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.
 
-len_t _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, 
+slong _fmpz_mod_poly_gcd_f(fmpz_t f, fmpz *G, const fmpz *A, slong lenA, 
                           const fmpz *B, slong lenB, const fmpz_t p)
 
     Either sets $f = 1$ and $G$ to the greatest common divisor 
@@ -778,7 +778,7 @@ void fmpz_mod_poly_gcd_f(fmpz_t f, fmpz_mod_poly_t G,
     ring $(\mathbf{Z}/(p \mathbf{Z}))[X]$ if and only if $p$ is a prime 
     number.
 
-len_t _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
+slong _fmpz_mod_poly_xgcd_euclidean(fmpz *G, fmpz *S, fmpz *T, 
                                    const fmpz *A, slong lenA, 
                                    const fmpz *B, slong lenB, 
                                    const fmpz_t invB, const fmpz_t p)
@@ -811,7 +811,7 @@ void fmpz_mod_poly_xgcd_euclidean(fmpz_mod_poly_t G,
     \code{S*A + T*B = G}. The length of \code{S} will be at most 
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
-len_t _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, 
+slong _fmpz_mod_poly_xgcd(fmpz *G, fmpz *S, fmpz *T, 
                          const fmpz *A, slong lenA, 
                          const fmpz *B, slong lenB, 
                          const fmpz_t invB, const fmpz_t p)
@@ -844,7 +844,7 @@ void fmpz_mod_poly_xgcd(fmpz_mod_poly_t G,
     \code{S*A + T*B = G}. The length of \code{S} will be at most 
     \code{lenB} and the length of \code{T} will be at most \code{lenA}.
 
-len_t _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
+slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
                            const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                            const fmpz_t p)
 

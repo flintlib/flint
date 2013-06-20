@@ -28,7 +28,7 @@
 void
 fmpz_mat_neg(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    len_t i;
+    slong i;
 
     if (res->c < 1)
         return;

@@ -31,7 +31,7 @@
 
 int nmod_poly_fread(FILE * f, nmod_poly_t poly)
 {
-    len_t i, length;
+    slong i, length;
     mp_limb_t n;
 
     if (fscanf(f, "%ld %lu", &length, &n) != 2)

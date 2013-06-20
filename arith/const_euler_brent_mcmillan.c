@@ -32,7 +32,7 @@ mpfr_const_euler_brent_mcmillan(mpfr_t res, mpfr_rnd_t rnd)
     fmpq_bsplit_t sum;
     fmpq *ab, *cd, *pq;
     mpfr_t S0, K0, I0, t, u, v;
-    len_t n, nterms1, nterms2, k;
+    slong n, nterms1, nterms2, k;
     mp_bitcnt_t bits, wp;
 
     bits = mpfr_get_prec(res) + 20;

@@ -127,7 +127,7 @@ main(void)
     {
         fmpz_poly_t a, b, c;
         fmpz_t t;
-        len_t j;
+        slong j;
         int square;
 
         fmpz_poly_init(a);

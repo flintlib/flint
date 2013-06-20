@@ -35,7 +35,7 @@
 int main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("bell_number_multi_mod....");
     fflush(stdout);
@@ -44,7 +44,7 @@ int main(void)
 
     for (i = 0; i < 100; i++)
     {
-        len_t n;
+        slong n;
         fmpz_t b1, b2;
 
         fmpz_init(b1);

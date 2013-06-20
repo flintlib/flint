@@ -29,9 +29,9 @@
 #include "fmpz_poly.h"
 
 int
-_fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, len_t len)
+_fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, slong len)
 {
-    len_t i, m;
+    slong i, m;
     int result;
 
     /* the degree must be even */
@@ -105,7 +105,7 @@ _fmpz_poly_sqrt_classical(fmpz * res, const fmpz * poly, len_t len)
 int
 fmpz_poly_sqrt_classical(fmpz_poly_t b, const fmpz_poly_t a)
 {
-    len_t blen, len = a->length;
+    slong blen, len = a->length;
     int result;
 
     if (len % 2 == 0)

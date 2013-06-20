@@ -35,9 +35,9 @@ int main(void)
 {
     fmpz * b1;
     fmpz * b2;
-    len_t n;
+    slong n;
 
-    const len_t maxn = 1000;
+    const slong maxn = 1000;
 
     printf("bell_number_vec....");
     fflush(stdout);

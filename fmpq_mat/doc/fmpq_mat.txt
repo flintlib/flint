@@ -30,7 +30,7 @@
 
 *******************************************************************************
 
-void fmpq_mat_init(fmpq_mat_t mat, len_t rows, len_t cols)
+void fmpq_mat_init(fmpq_mat_t mat, slong rows, slong cols)
 
     Initialises a matrix with the given number of rows and columns for use.
 
@@ -398,7 +398,7 @@ int fmpq_mat_inv(fmpq_mat_t B, const fmpq_mat_t A)
 
 *******************************************************************************
 
-int fmpq_mat_pivot(len_t * perm, fmpq_mat_t mat, len_t r, len_t c)
+int fmpq_mat_pivot(slong * perm, fmpq_mat_t mat, slong r, slong c)
 
     Helper function for row reduction. Returns 1 if the entry of \code{mat}
     at row $r$ and column $c$ is nonzero. Otherwise searches for a nonzero
@@ -407,20 +407,20 @@ int fmpq_mat_pivot(len_t * perm, fmpq_mat_t mat, len_t r, len_t c)
     entries in \code{perm} (unless \code{NULL}) and returns -1. If no
     nonzero pivot entry is found, leaves the inputs unchanged and returns 0.
 
-len_t fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
+slong fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. Performs Gauss-Jordan elimination directly over the rational
     numbers. This algorithm is usually inefficient and is mainly intended
     to be used for testing purposes.
 
-len_t fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
+slong fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. Clears denominators and performs fraction-free Gauss-Jordan
     elimination using \code{fmpz_mat} functions.
 
-len_t fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
+slong fmpq_mat_rref(fmpq_mat_t B, const fmpq_mat_t A)
 
     Sets \code{B} to the reduced row echelon form of \code{A} and returns
     the rank. This function automatically chooses between the classical and

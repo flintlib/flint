@@ -30,7 +30,7 @@ void
 fmpq_mat_get_fmpz_mat_mod_fmpz(fmpz_mat_t dest, const fmpq_mat_t mat,
                                                 const fmpz_t mod)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

@@ -33,7 +33,7 @@ void fmpz_poly_factor_clear(fmpz_poly_factor_t fac)
 {
     if (fac->alloc)
     {
-        len_t i;
+        slong i;
 
         for (i = 0; i < fac->alloc; i++)
         {

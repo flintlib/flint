@@ -53,7 +53,7 @@ const mp_limb_t FLINT_MOEBIUS_ODD[] =
 
 void n_moebius_mu_vec(int * mu, ulong len)
 {
-    len_t k;
+    slong k;
     ulong pi;
     const mp_limb_t * primes;
     mp_limb_t p, q;

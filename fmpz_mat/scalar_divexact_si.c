@@ -28,7 +28,7 @@
 void
 fmpz_mat_scalar_divexact_si(fmpz_mat_t B, const fmpz_mat_t A, slong c)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < A->r; i++)
         for (j = 0; j < A->c; j++)

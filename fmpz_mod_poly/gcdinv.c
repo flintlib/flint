@@ -28,13 +28,13 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-len_t _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
-                           const fmpz *A, len_t lenA, const fmpz *B, len_t lenB, 
+slong _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S, 
+                           const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
                            const fmpz_t p)
 {
     fmpz *T;
     fmpz_t inv;
-    len_t ans;
+    slong ans;
 
     T = _fmpz_vec_init(lenA - 1);
     fmpz_init(inv);
@@ -51,7 +51,7 @@ len_t _fmpz_mod_poly_gcdinv(fmpz *G, fmpz *S,
 void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S, 
                           const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    const len_t lenA = A->length, lenB = B->length;
+    const slong lenA = A->length, lenB = B->length;
 
     if (lenB < 2)
     {
@@ -77,7 +77,7 @@ void fmpz_mod_poly_gcdinv(fmpz_mod_poly_t G, fmpz_mod_poly_t S,
     else
     {
         fmpz *g, *s;
-        len_t lenG;
+        slong lenG;
 
         if (G == A || G == B)
         {

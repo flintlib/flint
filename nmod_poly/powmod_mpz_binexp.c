@@ -58,11 +58,11 @@ n_powmod2_mpz(mp_limb_t a, mpz_srcptr exp, mp_limb_t n, mp_limb_t ninv)
 void
 _nmod_poly_powmod_mpz_binexp(mp_ptr res, mp_srcptr poly, 
                                 mpz_srcptr e, mp_srcptr f,
-                                len_t lenf, nmod_t mod)
+                                slong lenf, nmod_t mod)
 {
     mp_ptr T, Q;
-    len_t lenT, lenQ;
-    len_t i;
+    slong lenT, lenQ;
+    slong i;
 
     if (lenf == 2)
     {
@@ -100,9 +100,9 @@ nmod_poly_powmod_mpz_binexp(nmod_poly_t res,
                            const nmod_poly_t f)
 {
     mp_ptr p;
-    len_t len = poly->length;
-    len_t lenf = f->length;
-    len_t trunc = lenf - 1;
+    slong len = poly->length;
+    slong lenf = f->length;
+    slong trunc = lenf - 1;
     int pcopy = 0;
 
     if (lenf == 0)

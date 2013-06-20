@@ -29,11 +29,11 @@
 #include "fmpz_mod_poly.h"
 
 void _fmpz_mod_poly_rem_basecase(fmpz *R, 
-    const fmpz *A, len_t lenA, const fmpz *B, len_t lenB, 
+    const fmpz *A, slong lenA, const fmpz *B, slong lenB, 
     const fmpz_t invB, const fmpz_t p)
 {
     fmpz_t q;
-    len_t iR;
+    slong iR;
 
     fmpz_init(q);
 
@@ -57,7 +57,7 @@ void _fmpz_mod_poly_rem_basecase(fmpz *R,
 void fmpz_mod_poly_rem_basecase(fmpz_mod_poly_t R, 
     const fmpz_mod_poly_t A, const fmpz_mod_poly_t B)
 {
-    const len_t lenA = A->length, lenB = B->length;
+    const slong lenA = A->length, lenB = B->length;
     fmpz *r;
     fmpz_t invB;
 

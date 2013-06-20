@@ -35,7 +35,7 @@
 int
 main(void)
 {
-    len_t m, n, rep;
+    slong m, n, rep;
     flint_rand_t state;
 
     printf("charpoly....");

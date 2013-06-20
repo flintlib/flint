@@ -33,7 +33,7 @@
 void
 nmod_poly_deflate(nmod_poly_t result, const nmod_poly_t input, ulong deflation)
 {
-    len_t res_length, i;
+    slong res_length, i;
 
     if (deflation == 0)
     {

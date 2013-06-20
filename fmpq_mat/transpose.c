@@ -27,7 +27,7 @@
 
 void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
 {
-    len_t i, j;
+    slong i, j;
 
     if (rop == op)
     {

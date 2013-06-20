@@ -35,7 +35,7 @@ int main(void)
 {
     mp_limb_t n;
     mp_limb_t res1, res2;
-    len_t i, rep;
+    slong i, rep;
     mpz_t mpz_n;
     flint_rand_t state;
     

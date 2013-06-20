@@ -44,7 +44,7 @@ void sample(void * arg, ulong count)
    mp_bitcnt_t bits = info->bits;
    int type = info->type;
    mp_size_t j;
-   len_t i;
+   slong i;
    flint_rand_t state;
    flint_randinit(state);
    

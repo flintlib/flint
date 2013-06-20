@@ -28,7 +28,7 @@
 void
 fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
 {
-    len_t dim = A->r;
+    slong dim = A->r;
 
     if (dim != A->c)
     {
@@ -44,7 +44,7 @@ fmpz_mat_det(fmpz_t det, const fmpz_mat_t A)
         fmpz_mat_det_modular(det, A, 1);
     else
     {
-        len_t bits = fmpz_mat_max_bits(A);
+        slong bits = fmpz_mat_max_bits(A);
 
         if (dim < FLINT_ABS(bits))
             fmpz_mat_det_modular(det, A, 1);

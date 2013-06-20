@@ -83,8 +83,8 @@ _fmpz_poly_pow_binomial(fmpz * res, const fmpz * poly, ulong e)
 void
 fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const len_t len = poly->length;
-    len_t rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if (len != 2)
     {
@@ -103,7 +103,7 @@ fmpz_poly_pow_binomial(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
     
-    rlen = (len_t) e + 1;
+    rlen = (slong) e + 1;
 
     if (res != poly)
     {

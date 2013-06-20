@@ -28,11 +28,11 @@
 #include "flint.h"
 #include "nmod_vec.h"
 
-mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, len_t len)
+mp_bitcnt_t _nmod_vec_max_bits(mp_srcptr vec, slong len)
 {
    mp_bitcnt_t bits = 0;
    mp_limb_t mask   = ~(mp_limb_t) 0;
-   len_t i;
+   slong i;
    
    for (i = 0; i < len; i++)
    {

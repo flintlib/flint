@@ -25,7 +25,7 @@
 
 #include "arith.h"
 
-void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, len_t n)
+void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, slong n)
 {
     if (n < 700)
         _arith_bernoulli_number_vec_recursive(num, den, n);
@@ -35,10 +35,10 @@ void _arith_bernoulli_number_vec(fmpz * num, fmpz * den, len_t n)
         _arith_bernoulli_number_vec_multi_mod(num, den, n);
 }
 
-void arith_bernoulli_number_vec(fmpq * x, len_t n)
+void arith_bernoulli_number_vec(fmpq * x, slong n)
 {
     fmpz * num, * den;
-    len_t i;
+    slong i;
 
     if (n <= 0)
         return;

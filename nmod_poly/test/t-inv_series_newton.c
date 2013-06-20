@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv, prod;
-        len_t m;
+        slong m;
 
         mp_limb_t n;
         do n = n_randtest_not_zero(state);
@@ -84,7 +84,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t q, qinv;
-        len_t m;
+        slong m;
 
         mp_limb_t n;
         do n = n_randtest(state);

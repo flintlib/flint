@@ -30,9 +30,9 @@
 #include "nmod_vec.h"
 
 void _nmod_vec_sub(mp_ptr res, mp_srcptr vec1, 
-				   mp_srcptr vec2, len_t len, nmod_t mod)
+				   mp_srcptr vec2, slong len, nmod_t mod)
 {
-   len_t i;
+   slong i;
    if (mod.norm)
    {
 	  for (i = 0 ; i < len; i++)

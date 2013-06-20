@@ -28,7 +28,7 @@
 void
 fmpz_mat_one(fmpz_mat_t mat)
 {
-    len_t i, n;
+    slong i, n;
 
     fmpz_mat_zero(mat);
     n = FLINT_MIN(mat->r, mat->c);

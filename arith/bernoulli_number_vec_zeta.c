@@ -25,9 +25,9 @@
 
 #include "arith.h"
 
-void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, len_t n)
+void _arith_bernoulli_number_vec_zeta(fmpz * num, fmpz * den, slong n)
 {
-    len_t i;
+    slong i;
 
     /* Go backwards to exploit MPFR cache for pi */
     for (i = n - 1; i >= 0; i--)

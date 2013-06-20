@@ -28,7 +28,7 @@
 void
 fmpz_mat_mul(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B)
 {
-    len_t dim, m, n, k;
+    slong dim, m, n, k;
 
     m = A->r;
     n = A->c;

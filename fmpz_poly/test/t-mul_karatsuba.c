@@ -132,7 +132,7 @@ main(void)
     /* Check _fmpz_poly_mul_karatsuba directly */
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
-        len_t len1, len2;
+        slong len1, len2;
         fmpz_poly_t a, b, out1, out2;
 
         len1 = n_randint(state, 100) + 1;

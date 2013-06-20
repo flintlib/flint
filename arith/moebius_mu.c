@@ -29,7 +29,7 @@
 int arith_moebius_mu(const fmpz_t n)
 {
     fmpz_factor_t factors;
-    len_t i;
+    slong i;
     int mu;
 
     if (fmpz_abs_fits_ui(n))

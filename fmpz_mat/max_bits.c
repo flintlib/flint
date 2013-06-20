@@ -25,10 +25,10 @@
 
 #include "fmpz_mat.h"
 
-len_t
+slong
 fmpz_mat_max_bits(const fmpz_mat_t mat)
 {
-    len_t i;
+    slong i;
     slong bits, row_bits, sign;
 
     sign = 1;

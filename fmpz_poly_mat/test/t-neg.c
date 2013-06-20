@@ -35,7 +35,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("neg....");
     fflush(stdout);
@@ -48,7 +48,7 @@ main(void)
         fmpz_poly_mat_t A, B;
         fmpz_mat_t a, b, c;
         fmpz_t x;
-        len_t m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -98,7 +98,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B;
-        len_t m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

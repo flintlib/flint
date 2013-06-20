@@ -33,7 +33,7 @@
 void
 fmpz_poly_mat_sqr_classical(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 {
-    len_t n = A->r;
+    slong n = A->r;
 
     if (n == 0)
         return;

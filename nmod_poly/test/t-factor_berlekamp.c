@@ -50,7 +50,7 @@ main(void)
         nmod_poly_t pol1, poly, quot, rem;
         nmod_poly_factor_t res;
         mp_limb_t modulus;
-        len_t i, length, num;
+        slong i, length, num;
 
         modulus = n_randtest_prime(state, 0);
 

@@ -32,10 +32,10 @@
 
 void
 _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, len_t n, nmod_t mod)
+                            mp_srcptr xs, mp_srcptr ys, slong n, nmod_t mod)
 {
     mp_ptr P, Q, w;
-    len_t i, j;
+    slong i, j;
 
     if (n == 1)
     {
@@ -76,7 +76,7 @@ _nmod_poly_interpolate_nmod_vec_barycentric(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec_barycentric(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, len_t n)
+                                    mp_srcptr xs, mp_srcptr ys, slong n)
 {
     if (n == 0)
     {

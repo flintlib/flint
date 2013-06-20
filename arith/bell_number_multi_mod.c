@@ -32,7 +32,7 @@ arith_bell_number_multi_mod(fmpz_t res, ulong n)
     fmpz_comb_t comb;
     nmod_t mod;
     mp_ptr primes, residues;
-    len_t k, num_primes;
+    slong k, num_primes;
     mp_bitcnt_t size, prime_bits;
 
     size = arith_bell_number_size(n);

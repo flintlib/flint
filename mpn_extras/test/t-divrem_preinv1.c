@@ -37,7 +37,7 @@ int main(void)
     gmp_randstate_t st;
     flint_rand_t state;
     mp_limb_t d1, d2, inv;
-    len_t s1, s2;
+    slong s1, s2;
     
     printf("divrem_preinv1....");
     fflush(stdout);

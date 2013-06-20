@@ -32,7 +32,7 @@
 
 void
 _fmpq_poly_compose(fmpz * res, fmpz_t den, const fmpz * poly1, const fmpz_t den1, 
-                   len_t len1, const fmpz * poly2, const fmpz_t den2, len_t len2)
+                   slong len1, const fmpz * poly2, const fmpz_t den2, slong len2)
 {
     if (*den2 == 1L)
     {
@@ -60,9 +60,9 @@ void
 fmpq_poly_compose(fmpq_poly_t res, 
                               const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    const len_t len1 = poly1->length;
-    const len_t len2 = poly2->length;
-    len_t lenr;
+    const slong len1 = poly1->length;
+    const slong len2 = poly2->length;
+    slong lenr;
     
     if (len1 == 0L)
     {

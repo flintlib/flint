@@ -39,8 +39,8 @@ fmpz_factor_trial_range(fmpz_factor_t factor, const fmpz_t n, ulong start, ulong
     mpz_t x;
     mp_ptr xd;
     mp_size_t xsize;
-    len_t found;
-    len_t trial_start, trial_stop;
+    slong found;
+    slong trial_start, trial_stop;
     int ret = 1;
 
     if (!COEFF_IS_MPZ(*n))

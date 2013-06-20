@@ -29,7 +29,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_prod(fmpz_t res, const fmpz * vec, len_t len)
+_fmpz_vec_prod(fmpz_t res, const fmpz * vec, slong len)
 {
     if (len <= 1)
     {
@@ -40,7 +40,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, len_t len)
     }
     else if (len <= 3)
     {
-        len_t i;
+        slong i;
 
         fmpz_mul(res, vec, vec + 1);
         for (i = 2; i < len; i++)
@@ -48,7 +48,7 @@ _fmpz_vec_prod(fmpz_t res, const fmpz * vec, len_t len)
     }
     else
     {
-        len_t m = len / 2;
+        slong m = len / 2;
         fmpz_t tmp;
         fmpz_init(tmp);
         _fmpz_vec_prod(res, vec, m);

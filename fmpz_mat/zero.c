@@ -28,7 +28,7 @@
 void
 fmpz_mat_zero(fmpz_mat_t mat)
 {
-    len_t i;
+    slong i;
 
     if (mat->c < 1)
         return;

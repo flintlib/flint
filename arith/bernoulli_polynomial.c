@@ -29,7 +29,7 @@ void arith_bernoulli_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
     fmpz * den;
-    len_t k;
+    slong k;
 
     if (n == 0)
     {

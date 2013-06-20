@@ -27,7 +27,7 @@
 
 void fmpq_mat_zero(fmpq_mat_t mat)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)

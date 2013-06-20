@@ -34,7 +34,7 @@ int
 nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
                     const nmod_poly_mat_t A)
 {
-    len_t n = nmod_poly_mat_nrows(A);
+    slong n = nmod_poly_mat_nrows(A);
 
     if (n == 0)
     {
@@ -74,7 +74,7 @@ nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
     else
     {
         nmod_poly_mat_t LU, I;
-        len_t * perm;
+        slong * perm;
         int result;
 
         perm = _perm_init(n);

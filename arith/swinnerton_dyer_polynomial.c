@@ -31,9 +31,9 @@
 
 /* Bound coefficients using (x + u)^(2^n) and the binomial
    coefficients. TODO: this is about 2x too large... */
-static len_t __bound_prec(ulong n)
+static slong __bound_prec(ulong n)
 {
-    len_t i;
+    slong i;
     double u, N;
 
     N = 1UL << n;
@@ -54,7 +54,7 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
 {
     fmpz *square_roots, *T, *tmp1, *tmp2, *tmp3;
     fmpz_t one;
-    len_t i, j, k, N;
+    slong i, j, k, N;
     slong prec;
 
     if (n == 0)
@@ -104,7 +104,7 @@ void arith_swinnerton_dyer_polynomial(fmpz_poly_t poly, ulong n)
     /* For each level... */
     for (i = 0; i < n; i++)
     {
-        len_t stride = 1UL << i;
+        slong stride = 1UL << i;
 
         for (j = 0; j < N; j += 2*stride)
         {

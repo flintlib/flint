@@ -34,7 +34,7 @@
 
 int main(void)
 {
-    len_t i;
+    slong i;
     flint_rand_t state;
 
     printf("sqr....");
@@ -45,7 +45,7 @@ int main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C;
-        len_t n;
+        slong n;
 
         n = n_randint(state, 20);
 

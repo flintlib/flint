@@ -27,7 +27,7 @@
 
 void fmpq_mat_set(fmpq_mat_t dest, const fmpq_mat_t src)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < src->r; i++)
         for (j = 0; j < src->c; j++)

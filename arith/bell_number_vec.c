@@ -26,7 +26,7 @@
 #include "arith.h"
 
 void
-arith_bell_number_vec(fmpz * res, len_t n)
+arith_bell_number_vec(fmpz * res, slong n)
 {
     if (n < 5000)
         arith_bell_number_vec_recursive(res, n);

@@ -29,10 +29,10 @@
 #include "ulong_extras.h"
 
 void
-nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state, len_t len,
+nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state, slong len,
     float density)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < A->r; i++)
     {
@@ -40,7 +40,7 @@ nmod_poly_mat_randtest_sparse(nmod_poly_mat_t A, flint_rand_t state, len_t len,
         {
             if (n_randint(state, 1000) < density * 1000)
             {
-                len_t l = n_randint(state, len + 1);
+                slong l = n_randint(state, len + 1);
                 l = FLINT_MAX(l, 1);
                 nmod_poly_randtest(nmod_poly_mat_entry(A, i, j), state, l);
             }

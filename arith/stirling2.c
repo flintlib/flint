@@ -25,8 +25,8 @@
 
 #include "arith.h"
 
-void _arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, 
-                                               len_t klen, int kind);
+void _arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, 
+                                               slong klen, int kind);
 
 static __inline__ void
 _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
@@ -38,11 +38,11 @@ _fmpz_addmul_alt(fmpz_t s, fmpz_t t, fmpz_t u, int parity)
 }
 
 static void
-_fmpz_stirling2_powsum(fmpz_t s, len_t n, len_t k)
+_fmpz_stirling2_powsum(fmpz_t s, slong n, slong k)
 {
     fmpz_t t, u;
     fmpz * bc;
-    len_t j, m, max_bc;
+    slong j, m, max_bc;
 
     fmpz_init(t);
     fmpz_init(u);
@@ -85,7 +85,7 @@ _fmpz_stirling2_powsum(fmpz_t s, len_t n, len_t k)
 }
 
 void
-arith_stirling_number_2(fmpz_t s, len_t n, len_t k)
+arith_stirling_number_2(fmpz_t s, slong n, slong k)
 {
     if (n < 0 || k < 0 || k > n)
     {
@@ -127,9 +127,9 @@ arith_stirling_number_2(fmpz_t s, len_t n, len_t k)
 }
 
 void
-arith_stirling_number_2_vec(fmpz * row, len_t n, len_t klen)
+arith_stirling_number_2_vec(fmpz * row, slong n, slong klen)
 {
-    len_t m;
+    slong m;
 
     klen = FLINT_MIN(klen, n+1);
 

@@ -30,7 +30,7 @@
 void
 _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 {
-    len_t i;
+    slong i;
     fmpz * p;
     fmpz_t r;
 

@@ -31,7 +31,7 @@ mp_limb_t
 n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
 {
     mp_limb_t quot;
-    len_t rem;
+    slong rem;
 
     if (a < n)
     {
@@ -57,7 +57,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
 
     if (rem < (mp_limb_signed_t) (-n))
         quot -= (mp_limb_t) ((double) (-rem) * npre);
-    else if (rem >= (len_t) n)
+    else if (rem >= (slong) n)
         quot += (mp_limb_t) ((double) rem * npre);
     else if (rem < 0L)
     {
@@ -71,7 +71,7 @@ n_divrem2_precomp(mp_limb_t * q, mp_limb_t a, mp_limb_t n, double npre)
     }
 
     rem = a - quot * n;
-    if (rem >= (len_t) n)
+    if (rem >= (slong) n)
     {
         (*q) = quot + 1;
         return rem - n;

@@ -29,12 +29,12 @@ void
 _fmpz_mat_mul_multi_mod(fmpz_mat_t C, const fmpz_mat_t A, const fmpz_mat_t B,
     mp_bitcnt_t bits)
 {
-    len_t i, j;
+    slong i, j;
 
     fmpz_comb_t comb;
     fmpz_comb_temp_t comb_temp;
 
-    len_t num_primes;
+    slong num_primes;
     mp_bitcnt_t primes_bits;
     mp_limb_t * primes;
     mp_limb_t * residues;

@@ -34,7 +34,7 @@
 
 int main(void)
 {
-    len_t i;
+    slong i;
     flint_rand_t state;
 
     printf("pow....");
@@ -45,7 +45,7 @@ int main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A, B, C;
-        len_t i, n;
+        slong i, n;
         ulong e;
 
         n = n_randint(state, 10);

@@ -41,7 +41,7 @@ int main()
     fmpz * den1;
     fmpz_t num2;
     fmpz_t den2;
-    len_t n, N;
+    slong n, N;
 
     printf("bernoulli_number....");
     fflush(stdout);
@@ -79,7 +79,7 @@ int main()
     /* Check non underscore versions */
     do
     {
-        len_t N = 100;
+        slong N = 100;
         fmpq * x;
         fmpq_t t;
 

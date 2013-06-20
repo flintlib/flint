@@ -46,7 +46,7 @@ nmod_mat_scalar_mul(nmod_mat_t B, const nmod_mat_t A, mp_limb_t c)
     }
     else
     {
-        len_t i, j;
+        slong i, j;
 
         for (i = 0; i < A->r; i++)
             for (j = 0; j < A->c; j++)

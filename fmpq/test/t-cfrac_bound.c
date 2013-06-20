@@ -46,7 +46,7 @@ main(void)
     {
         fmpq_t x, r;
         fmpz * c;
-        len_t n, bound;
+        slong n, bound;
 
         fmpq_init(x);
         fmpq_init(r);
@@ -54,7 +54,7 @@ main(void)
         /* Test worst case (quotient of Fibonacci numbers) */
         if (n_randint(state, 50) == 1)
         {
-            len_t v = 1 + n_randint(state, 1000);
+            slong v = 1 + n_randint(state, 1000);
             fmpz_fib_ui(fmpq_numref(x), v + 1);
             fmpz_fib_ui(fmpq_denref(x), v);
         }

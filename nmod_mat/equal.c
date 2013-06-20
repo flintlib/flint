@@ -32,7 +32,7 @@
 int
 nmod_mat_equal(const nmod_mat_t mat1, const nmod_mat_t mat2)
 {
-    len_t i, j;
+    slong i, j;
 
     if (mat1->r != mat2->r || mat1->c != mat2->c)
         return 0;

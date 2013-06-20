@@ -30,7 +30,7 @@
 
 *******************************************************************************
 
-void nmod_poly_mat_init(nmod_poly_mat_t mat, len_t rows, len_t cols, mp_limb_t n)
+void nmod_poly_mat_init(nmod_poly_mat_t mat, slong rows, slong cols, mp_limb_t n)
 
     Initialises a matrix with the given number of rows and columns for use.
     The modulus is set to $n$.
@@ -51,11 +51,11 @@ void nmod_poly_mat_clear(nmod_poly_mat_t mat)
 
 *******************************************************************************
 
-len_t nmod_poly_mat_nrows(const nmod_poly_mat_t mat)
+slong nmod_poly_mat_nrows(const nmod_poly_mat_t mat)
 
     Returns the number of rows in \code{mat}.
 
-len_t nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
+slong nmod_poly_mat_ncols(const nmod_poly_mat_t mat)
 
     Returns the number of columns in \code{mat}.
 
@@ -102,7 +102,7 @@ void nmod_poly_mat_print(const nmod_poly_mat_t mat, const char * x)
 
 *******************************************************************************
 
-void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state, len_t len)
+void nmod_poly_mat_randtest(nmod_poly_mat_t mat, flint_rand_t state, slong len)
 
     This is equivalent to applying \code{nmod_poly_randtest} to all entries
     in the matrix.
@@ -172,7 +172,7 @@ int nmod_poly_mat_is_square(const nmod_poly_mat_t mat)
 
 *******************************************************************************
 
-len_t nmod_poly_mat_max_length(const nmod_poly_mat_t A)
+slong nmod_poly_mat_max_length(const nmod_poly_mat_t A)
 
     Returns the maximum polynomial length among all the entries in \code{A}.
 
@@ -292,7 +292,7 @@ void nmod_poly_mat_pow(nmod_poly_mat_t B, const nmod_poly_mat_t A, ulong exp)
 
 *******************************************************************************
 
-len_t nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
+slong nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
                                     slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
@@ -305,7 +305,7 @@ len_t nmod_poly_mat_find_pivot_any(const nmod_poly_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-len_t nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
+slong nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
                                     slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
@@ -318,7 +318,7 @@ len_t nmod_poly_mat_find_pivot_partial(const nmod_poly_mat_t mat,
     typically reduces coefficient growth when the matrix entries
     vary in size.
 
-len_t nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
+slong nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
                             const nmod_poly_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -337,7 +337,7 @@ len_t nmod_poly_mat_fflu(nmod_poly_mat_t B, nmod_poly_t den, slong * perm,
     the sign is decided by the parity of the permutation. Note that the
     determinant is not generally the minimal denominator.
 
-len_t nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
+slong nmod_poly_mat_rref(nmod_poly_mat_t B, nmod_poly_t den,
                             const nmod_poly_mat_t A)
 
     Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
@@ -387,7 +387,7 @@ void nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
     if working over $\mathbb{Z}/p\mathbb{Z}$ where $p < n$),
     this function automatically falls back to \code{nmod_poly_mat_det_fflu}.
 
-len_t nmod_poly_mat_rank(const nmod_poly_mat_t A)
+slong nmod_poly_mat_rank(const nmod_poly_mat_t A)
 
     Returns the rank of \code{A}. Performs fraction-free LU decomposition
     on a copy of \code{A}.
@@ -420,7 +420,7 @@ int nmod_poly_mat_inv(nmod_poly_mat_t Ainv, nmod_poly_t den,
 
 *******************************************************************************
 
-len_t nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
+slong nmod_poly_mat_nullspace(nmod_poly_mat_t res, const nmod_poly_mat_t mat)
 
     Computes the right rational nullspace of the matrix \code{mat} and
     returns the nullity.

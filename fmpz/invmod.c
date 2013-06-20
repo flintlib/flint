@@ -31,7 +31,7 @@
 #include "fmpz.h"
 
 ulong
-z_gcdinv(ulong * inv, len_t a, ulong b)
+z_gcdinv(ulong * inv, slong a, ulong b)
 {
     ulong g, ua = FLINT_ABS(a);
 

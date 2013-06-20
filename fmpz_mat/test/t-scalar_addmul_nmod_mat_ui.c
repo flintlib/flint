@@ -47,7 +47,7 @@ main(void)
     {
         fmpz_mat_t A, B, C;
         nmod_mat_t M;
-        len_t rows, cols;
+        slong rows, cols;
         ulong c;
         ulong mod;
 

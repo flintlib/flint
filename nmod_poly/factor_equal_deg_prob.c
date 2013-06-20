@@ -32,12 +32,12 @@
 
 int
 nmod_poly_factor_equal_deg_prob(nmod_poly_t factor,
-    flint_rand_t state, const nmod_poly_t pol, len_t d)
+    flint_rand_t state, const nmod_poly_t pol, slong d)
 {
     nmod_poly_t a, b, c;
     mpz_t exp;
     int res = 1;
-    len_t i;
+    slong i;
 
     if (pol->length <= 1)
     {

@@ -45,7 +45,7 @@ main(void)
     {
         nmod_poly_t a, b;
         mp_limb_t n = n_randtest_not_zero(state);
-        len_t shift = n_randint(state, 100);
+        slong shift = n_randint(state, 100);
   
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);
@@ -74,7 +74,7 @@ main(void)
     {
         nmod_poly_t a, b, c;
         mp_limb_t n = n_randtest_not_zero(state);
-        len_t shift = n_randint(state, 100);
+        slong shift = n_randint(state, 100);
 
         nmod_poly_init(a, n);
         nmod_poly_init(b, n);

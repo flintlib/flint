@@ -26,7 +26,7 @@
 #include <math.h>
 #include "arith.h"
 
-void arith_landau_function_vec(fmpz * res, len_t len)
+void arith_landau_function_vec(fmpz * res, slong len)
 {
     mp_limb_t p, pmax;
     mp_limb_t pk, pkhi;

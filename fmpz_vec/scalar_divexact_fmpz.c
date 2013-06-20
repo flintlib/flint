@@ -31,7 +31,7 @@
 
 void
 _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
-                               len_t len2, const fmpz_t x)
+                               slong len2, const fmpz_t x)
 {
     fmpz c = *x;
 
@@ -46,7 +46,7 @@ _fmpz_vec_scalar_divexact_fmpz(fmpz * vec1, const fmpz * vec2,
     }
     else
     {
-        len_t i;
+        slong i;
         for (i = 0; i < len2; i++)
             fmpz_divexact(vec1 + i, vec2 + i, x);
     }

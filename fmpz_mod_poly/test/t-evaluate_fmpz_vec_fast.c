@@ -48,7 +48,7 @@ main(void)
         fmpz_mod_poly_t P;
         fmpz * x, * y, * z;
         fmpz_t mod;
-        len_t j, n, npoints;
+        slong j, n, npoints;
 
         fmpz_init(mod);
         

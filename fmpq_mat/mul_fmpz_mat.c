@@ -28,7 +28,7 @@
 void
 fmpq_mat_mul_fmpz_mat(fmpq_mat_t C, const fmpq_mat_t A, const fmpz_mat_t B)
 {
-    len_t i, j;
+    slong i, j;
 
     fmpz_mat_t Aclear;
     fmpz_mat_t Cclear;

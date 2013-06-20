@@ -71,7 +71,7 @@ partitions_remainder_bound_log2(double n, double N)
     return (FLINT_MAX(t1, t2) + 1) * INV_LOG2;
 }
 
-len_t
+slong
 partitions_needed_terms(ulong n)
 {
     slong N;
@@ -113,11 +113,11 @@ log2_ceil(double x)
 {
     /* ceil(log2(n)) = bitcount(n-1);
        this is too large if x is a power of two */
-    return FLINT_BIT_COUNT((len_t) x);
+    return FLINT_BIT_COUNT((slong) x);
 }
 
 static slong
-partitions_prec_bound(ulong n, len_t k, len_t N)
+partitions_prec_bound(ulong n, slong k, slong N)
 {
     slong prec;
 
@@ -185,7 +185,7 @@ mpfr_add_fmpz(mpfr_t c, mpfr_srcptr a, const fmpz_t b)
 
 
 void
-_fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz * f, len_t len,
+_fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz * f, slong len,
                            const mpfr_t a)
 {
     if (len == 0)
@@ -194,7 +194,7 @@ _fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz * f, len_t len,
         mpfr_set_fmpz(res, f);
     else
     {
-        len_t i = len - 1;
+        slong i = len - 1;
         mpfr_t t;
         mpfr_init2(t, mpfr_get_prec(res));
         mpfr_set_fmpz(res, f + i);
@@ -227,7 +227,7 @@ fmpz_poly_evaluate_mpfr(mpfr_t res, const fmpz_poly_t f, const mpfr_t a)
 void
 findroot(mpfr_t x, fmpz_poly_t poly, double x0)
 {
-    len_t i;
+    slong i;
     slong prec, initial_prec, target_prec, guard_bits;
     slong precs[FLINT_BITS];
     fmpz_poly_t poly2;
@@ -271,7 +271,7 @@ findroot(mpfr_t x, fmpz_poly_t poly, double x0)
     mpfr_clear(xn);
 }
 
-void cos_minpoly(fmpz_poly_t poly, len_t p, len_t q)
+void cos_minpoly(fmpz_poly_t poly, slong p, slong q)
 {
     if (p % 2 == 0)
         arith_cos_minpoly(poly, q);
@@ -279,7 +279,7 @@ void cos_minpoly(fmpz_poly_t poly, len_t p, len_t q)
         arith_cos_minpoly(poly, 2 * q);
 }
 
-int use_newton(len_t prec, len_t q)
+int use_newton(slong prec, slong q)
 {
     if (q < 250 && prec > 400 + 4*q*q)
         return 1;
@@ -297,7 +297,7 @@ void mpfr_cos_pi_pq(mpfr_t t, mp_limb_signed_t p, mp_limb_signed_t q)
     if (use_newton(mpfr_get_prec(t), q))
     {
         fmpz_poly_t poly;
-        len_t d;
+        slong d;
         fmpz_poly_init(poly);
         d = n_gcd(q, p);
         q /= d;
@@ -385,7 +385,7 @@ eval_trig_prod(mpfr_t sum, trig_prod_t prod)
 }
 
 void
-sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, len_t k)
+sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, slong k)
 {
     mpfr_t t;
     mpfr_root(ch, ex, k, MPFR_RNDN);
@@ -402,13 +402,13 @@ sinh_cosh_divk_precomp(mpfr_t sh, mpfr_t ch, mpfr_t ex, len_t k)
 
 
 void
-_arith_number_of_partitions_mpfr(mpfr_t x, ulong n, len_t N0, len_t N)
+_arith_number_of_partitions_mpfr(mpfr_t x, ulong n, slong N0, slong N)
 {
     trig_prod_t prod;
     mpfr_t acc, C, t1, t2, t3, t4, exp1;
     mpz_t n24;
     double Cd;
-    len_t k;
+    slong k;
     slong prec, guard_bits;
 #if VERBOSE
     timeit_t t0;

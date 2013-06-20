@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A, B, ker;
     flint_rand_t state;
-    len_t i, m, n, b, d, r, nullity, nulrank;
+    slong i, m, n, b, d, r, nullity, nulrank;
 
     printf("nullspace....");
     fflush(stdout);

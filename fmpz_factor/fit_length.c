@@ -31,7 +31,7 @@
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_fit_length(fmpz_factor_t factor, len_t len)
+_fmpz_factor_fit_length(fmpz_factor_t factor, slong len)
 {
     if (len > factor->alloc)
     {
@@ -39,7 +39,7 @@ _fmpz_factor_fit_length(fmpz_factor_t factor, len_t len)
             len = 2 * factor->alloc;
 
         factor->p = (fmpz *) flint_realloc(factor->p, len * sizeof(fmpz));
-        factor->exp = flint_realloc(factor->exp, len * sizeof(len_t));
+        factor->exp = flint_realloc(factor->exp, len * sizeof(slong));
 
         if (len > factor->alloc)
         {

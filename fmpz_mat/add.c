@@ -28,7 +28,7 @@
 void
 fmpz_mat_add(fmpz_mat_t res, const fmpz_mat_t mat1, const fmpz_mat_t mat2)
 {
-    len_t i;
+    slong i;
 
     if (res->c < 1)
         return;

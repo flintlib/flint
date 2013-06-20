@@ -33,7 +33,7 @@
 #define FLINT_REVERSE_NEWTON_CUTOFF 10
 
 void
-_fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
+_fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
 {
     if (n <= 2)
     {
@@ -42,7 +42,7 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
     }
     else
     {
-        len_t *a, i, k;
+        slong *a, i, k;
         fmpz *T, *U, *V;
 
         T = _fmpz_vec_init(n);
@@ -51,7 +51,7 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
 
         k = n;
         for (i = 1; (1L << i) < k; i++);
-        a = (len_t *) flint_malloc(i * sizeof(len_t));
+        a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = k;
         while (k >= FLINT_REVERSE_NEWTON_CUTOFF)
             a[++i] = (k = (k + 1) / 2);
@@ -79,11 +79,11 @@ _fmpz_poly_revert_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
 }
 
 void
-fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, len_t n)
+fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 {
     fmpz *Qcopy;
     int Qalloc;
-    len_t Qlen = Q->length;
+    slong Qlen = Q->length;
 
     if (Qlen < 2 || !fmpz_is_zero(Q->coeffs) || !fmpz_is_pm1(Q->coeffs + 1))
     {
@@ -99,7 +99,7 @@ fmpz_poly_revert_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, len_t n)
     }
     else
     {
-        len_t i;
+        slong i;
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Qlen; i++)
             Qcopy[i] = Q->coeffs[i];

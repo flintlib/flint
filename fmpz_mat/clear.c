@@ -30,7 +30,7 @@ fmpz_mat_clear(fmpz_mat_t mat)
 {
     if (mat->entries)
     {
-        len_t i;
+        slong i;
         for (i = 0; i < mat->r * mat->c; i++)
             fmpz_clear(mat->entries + i);   /* Clear all coefficients */
         flint_free(mat->entries);     /* Clean up array of entries */

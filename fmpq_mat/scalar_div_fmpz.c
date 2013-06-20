@@ -28,7 +28,7 @@
 void fmpq_mat_scalar_div_fmpz(fmpq_mat_t rop, 
                               const fmpq_mat_t op, const fmpz_t x)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < op->r; i++)
         for (j = 0; j < op->c; j++)

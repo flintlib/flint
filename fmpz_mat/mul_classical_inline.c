@@ -30,8 +30,8 @@ void
 fmpz_mat_mul_classical_inline(fmpz_mat_t C, const fmpz_mat_t A,
                                                 const fmpz_mat_t B)
 {
-    len_t ar, bc, br;
-    len_t i, j, k;
+    slong ar, bc, br;
+    slong i, j, k;
 
     fmpz a, b;
     mpz_t t;

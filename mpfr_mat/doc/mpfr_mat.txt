@@ -30,7 +30,7 @@
 
 *******************************************************************************
 
-void mpfr_mat_init(mpfr_mat_t mat, len_t rows, len_t cols, mpfr_prec_t prec)
+void mpfr_mat_init(mpfr_mat_t mat, slong rows, slong cols, mpfr_prec_t prec)
 
     Initialises a matrix with the given number of rows and columns and the
     given precision for use. The precision is the exact precision of the

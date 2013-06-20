@@ -26,7 +26,7 @@
 #include "arith.h"
 
 void
-arith_bell_number_nmod_vec(mp_ptr b, len_t n, nmod_t mod)
+arith_bell_number_nmod_vec(mp_ptr b, slong n, nmod_t mod)
 {
     if (n < 2000 || mod.n <= n)
         arith_bell_number_nmod_vec_recursive(b, n, mod);

@@ -33,22 +33,22 @@
  extern "C" {
 #endif
 
-__mpfr_struct * _mpfr_vec_init(len_t length, mp_bitcnt_t prec);
+__mpfr_struct * _mpfr_vec_init(slong length, mp_bitcnt_t prec);
 
-void _mpfr_vec_clear(__mpfr_struct * vec, len_t length);
+void _mpfr_vec_clear(__mpfr_struct * vec, slong length);
 
-void _mpfr_vec_zero(mpfr * vec, len_t length);
+void _mpfr_vec_zero(mpfr * vec, slong length);
 
-void _mpfr_vec_set(mpfr * vec1, mpfr * vec2, len_t length);
+void _mpfr_vec_set(mpfr * vec1, mpfr * vec2, slong length);
 
-void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, len_t length);
+void _mpfr_vec_add(mpfr * res, mpfr * vec1, mpfr * vec2, slong length);
 
-void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, len_t length, mp_bitcnt_t exp);
+void _mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, slong length, mp_bitcnt_t exp);
 
-void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, len_t length, mpfr_t c);
+void _mpfr_vec_scalar_mul_mpfr(mpfr * res, mpfr * vec, slong length, mpfr_t c);
 
 void _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1, 
-								    __mpfr_struct * vec2, len_t length);
+								    __mpfr_struct * vec2, slong length);
 
 #ifdef __cplusplus
 }

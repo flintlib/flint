@@ -34,17 +34,17 @@ void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
 
     Initialises a new factor structure.
 
-void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, len_t alloc)
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, slong alloc)
 
     Initialises a new factor structure, providing space for 
     at least \code{alloc} factors.
 
-void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, len_t alloc)
+void fmpz_poly_factor_realloc(fmpz_poly_factor_t fac, slong alloc)
 
     Reallocates the factor structure to provide space for 
     precisely \code{alloc} factors.
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, len_t len)
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, slong len)
 
     Ensures that the factor structure has space for at 
     least \code{len} factors.  This functions takes care 

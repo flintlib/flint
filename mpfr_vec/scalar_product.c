@@ -31,9 +31,9 @@
 
 void
 _mpfr_vec_scalar_product(mpfr_t res, __mpfr_struct * vec1,
-                         __mpfr_struct * vec2, len_t length)
+                         __mpfr_struct * vec2, slong length)
 {
-    len_t i;
+    slong i;
     mpfr_t tmp;
     mpfr_init(tmp);
 

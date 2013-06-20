@@ -31,8 +31,8 @@ void
 nmod_poly_mat_mul_interpolate(nmod_poly_mat_t C, const nmod_poly_mat_t A,
     const nmod_poly_mat_t B)
 {
-    len_t i, j, k;
-    len_t A_len, B_len, len;
+    slong i, j, k;
+    slong A_len, B_len, len;
 
     nmod_mat_t *C_mod, *A_mod, *B_mod;
 

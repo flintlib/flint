@@ -27,7 +27,7 @@
 
 int fmpq_mat_is_integral(const fmpq_mat_t mat)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

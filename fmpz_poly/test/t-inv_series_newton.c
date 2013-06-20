@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c, one;
-        len_t n = n_randint(state, 80) + 1;
+        slong n = n_randint(state, 80) + 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -80,7 +80,7 @@ main(void)
     /* Verify bug fix for the case Q = -1 mod (x) */
     {
         fmpz_poly_t a, b, c, one;
-        len_t n = 1;
+        slong n = 1;
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);

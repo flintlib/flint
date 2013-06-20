@@ -29,13 +29,13 @@
 #include "nmod_mat.h"
 #include "perm.h"
 
-len_t
+slong
 nmod_mat_rref(nmod_mat_t A)
 {
-    len_t i, j, k, n, rank;
-    len_t * pivots;
-    len_t * nonpivots;
-    len_t * P;
+    slong i, j, k, n, rank;
+    slong * pivots;
+    slong * nonpivots;
+    slong * P;
 
     nmod_mat_t U, V;
 
@@ -63,8 +63,8 @@ nmod_mat_rref(nmod_mat_t A)
     nmod_mat_init(U, rank, rank, A->mod.n);
     nmod_mat_init(V, rank, n - rank, A->mod.n);
 
-    pivots = flint_malloc(sizeof(len_t) * rank);
-    nonpivots = flint_malloc(sizeof(len_t) * (n - rank));
+    pivots = flint_malloc(sizeof(slong) * rank);
+    nonpivots = flint_malloc(sizeof(slong) * (n - rank));
 
     for (i = j = k = 0; i < rank; i++)
     {

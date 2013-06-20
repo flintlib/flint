@@ -29,7 +29,7 @@
 void
 fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
 {
-    len_t i, j, k, n;
+    slong i, j, k, n;
     int parity;
     fmpz * diag;
     fmpz_factor_t factor;

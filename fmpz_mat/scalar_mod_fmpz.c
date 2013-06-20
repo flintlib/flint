@@ -28,7 +28,7 @@
 void
 fmpz_mat_scalar_mod_fmpz(fmpz_mat_t B, const fmpz_mat_t A, const fmpz_t m)
 {
-    len_t i, j;
+    slong i, j;
     fmpz_t t;
     fmpz_init(t);
 

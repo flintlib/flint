@@ -28,10 +28,10 @@
 
 /* Computes length-m vector containing |E_{2k}| */
 static void
-__euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, len_t m, nmod_t mod)
+__euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, slong m, nmod_t mod)
 {
     mp_limb_t fac, c;
-    len_t k;
+    slong k;
 
     /* Divide by factorials */
     fac = n_factorial_mod2_preinv(2*(m-1), mod.n, mod.ninv);
@@ -56,7 +56,7 @@ __euler_number_vec_mod_p(mp_ptr res, mp_ptr tmp, len_t m, nmod_t mod)
 
 #define CRT_MAX_RESOLUTION 16
 
-void __euler_number_vec_multi_mod(fmpz * res, len_t n)
+void __euler_number_vec_multi_mod(fmpz * res, slong n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
@@ -65,7 +65,7 @@ void __euler_number_vec_multi_mod(fmpz * res, len_t n)
     mp_ptr * polys;
     mp_ptr temppoly;
     nmod_t mod;
-    len_t i, j, k, m, num_primes, num_primes_k, resolution;
+    slong i, j, k, m, num_primes, num_primes_k, resolution;
     mp_bitcnt_t size, prime_bits;
 
     if (n < 1)
@@ -141,7 +141,7 @@ void __euler_number_vec_multi_mod(fmpz * res, len_t n)
     flint_free(polys);
 }
 
-void arith_euler_number_vec(fmpz * res, len_t n)
+void arith_euler_number_vec(fmpz * res, slong n)
 {
     __euler_number_vec_multi_mod(res, n);
 }

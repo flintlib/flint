@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_clear(__mpfr_struct * vec, len_t length)
+_mpfr_vec_clear(__mpfr_struct * vec, slong length)
 {
-    len_t i;
+    slong i;
     for (i = 0; i < length; i++)
         mpfr_clear(vec + i);
     flint_free(vec);

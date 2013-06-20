@@ -32,8 +32,8 @@
 #include "nmod_poly.h"
 
 mp_limb_t 
-_nmod_poly_resultant_euclidean(mp_srcptr poly1, len_t len1, 
-                               mp_srcptr poly2, len_t len2, nmod_t mod)
+_nmod_poly_resultant_euclidean(mp_srcptr poly1, slong len1, 
+                               mp_srcptr poly2, slong len2, nmod_t mod)
 {
     if (poly1 == poly2)
     {
@@ -59,7 +59,7 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, len_t len1,
         mp_limb_t res = 1;
 
         mp_ptr u, v, r, t, w;
-        len_t l0, l1, l2;
+        slong l0, l1, l2;
         mp_limb_t lc;
 
         w = _nmod_vec_init(3 * len1);
@@ -122,8 +122,8 @@ _nmod_poly_resultant_euclidean(mp_srcptr poly1, len_t len1,
 mp_limb_t 
 nmod_poly_resultant_euclidean(const nmod_poly_t f, const nmod_poly_t g)
 {
-    const len_t len1 = f->length;
-    const len_t len2 = g->length;
+    const slong len1 = f->length;
+    const slong len2 = g->length;
     mp_limb_t r;
 
     if (len1 == 0 || len2 == 0)

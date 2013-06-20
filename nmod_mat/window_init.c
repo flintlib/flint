@@ -33,9 +33,9 @@
 
 void
 nmod_mat_window_init(nmod_mat_t window, const nmod_mat_t mat,
-    len_t r1, len_t c1, len_t r2, len_t c2)
+    slong r1, slong c1, slong r2, slong c2)
 {
-    len_t i;
+    slong i;
     window->entries = NULL;
 
     window->rows = flint_malloc((r2 - r1) * sizeof(mp_limb_t *));

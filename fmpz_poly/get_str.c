@@ -32,9 +32,9 @@
 #include "fmpz_poly.h"
 
 char *
-_fmpz_poly_get_str(const fmpz * poly, len_t len)
+_fmpz_poly_get_str(const fmpz * poly, slong len)
 {
-    len_t i, bound;
+    slong i, bound;
     char *str, *strbase;
 
     if (len == 0)
@@ -45,7 +45,7 @@ _fmpz_poly_get_str(const fmpz * poly, len_t len)
         return str;
     }
 
-    bound = (len_t) (ceil(log10((double) (len + 1))));
+    bound = (slong) (ceil(log10((double) (len + 1))));
     for (i = 0; i < len; i++)
         bound += fmpz_sizeinbase(poly + i, 10) + 1;
     bound += len + 2;

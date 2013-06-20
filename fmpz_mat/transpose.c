@@ -29,7 +29,7 @@ void
 fmpz_mat_transpose(fmpz_mat_t B, const fmpz_mat_t A)
 {
     fmpz tmp;
-    len_t i, j;
+    slong i, j;
 
     if (B->r != A->c || B->c != A->r)
     {

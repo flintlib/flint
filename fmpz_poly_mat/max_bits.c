@@ -28,10 +28,10 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-len_t
+slong
 fmpz_poly_mat_max_bits(const fmpz_poly_mat_t A)
 {
-    len_t i, j, bits, max;
+    slong i, j, bits, max;
     int sign;
 
     max = 0; 

@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly, const fmpz_t den, len_t len, ulong e)
+                    const fmpz * poly, const fmpz_t den, slong len, ulong e)
 {
     _fmpz_poly_pow(rpoly, poly, len, e);
     fmpz_pow_ui(rden, den, e);
@@ -38,7 +38,7 @@ void _fmpq_poly_pow(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
 {
-    len_t len = poly->length, rlen;
+    slong len = poly->length, rlen;
 
     if (e == 0)
     {
@@ -51,7 +51,7 @@ void fmpq_poly_pow(fmpq_poly_t res, const fmpq_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (len_t) e * (len - 1L) + 1L;
+    rlen = (slong) e * (len - 1L) + 1L;
 
     if (res != poly)
     {

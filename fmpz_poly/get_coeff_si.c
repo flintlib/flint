@@ -29,7 +29,7 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-len_t
+slong
 fmpz_poly_get_coeff_si(const fmpz_poly_t poly, slong n)
 {
     return (n < poly->length) ? fmpz_get_si(poly->coeffs + n) : 0L;

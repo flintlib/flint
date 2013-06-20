@@ -34,7 +34,7 @@ void fmpq_poly_clear(fmpq_poly_t poly)
 {
     if (poly->coeffs)
     {
-        len_t i;
+        slong i;
         for (i = 0; i < poly->alloc; i++)
             _fmpz_demote(poly->coeffs + i);
         flint_free(poly->coeffs);

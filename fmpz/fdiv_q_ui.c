@@ -56,7 +56,7 @@ fmpz_fdiv_q_ui(fmpz_t f, const fmpz_t g, ulong h)
             if (r)
                 ++q;
 
-            fmpz_set_si(f, - (len_t) q);
+            fmpz_set_si(f, - (slong) q);
         }
     }
     else                        /* g is large */

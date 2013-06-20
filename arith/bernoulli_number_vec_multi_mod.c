@@ -28,10 +28,10 @@
 
 static void
 __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
-    len_t m, nmod_t mod)
+    slong m, nmod_t mod)
 {
     mp_limb_t fac, c, t;
-    len_t k;
+    slong k;
 
     /* x^2/(cosh(x)-1) = \sum_{k=0}^{\infty} 2(1-2k)/(2k)! B_2k x^(2k) */
 
@@ -60,7 +60,7 @@ __bernoulli_number_vec_mod_p(mp_ptr res, mp_ptr tmp, const fmpz * den,
 
 #define CRT_MAX_RESOLUTION 16
 
-void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, len_t n)
+void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, slong n)
 {
     fmpz_comb_t comb[CRT_MAX_RESOLUTION];
     fmpz_comb_temp_t temp[CRT_MAX_RESOLUTION];
@@ -69,7 +69,7 @@ void _arith_bernoulli_number_vec_multi_mod(fmpz * num, fmpz * den, len_t n)
     mp_ptr * polys;
     mp_ptr temppoly;
     nmod_t mod;
-    len_t i, j, k, m, num_primes, num_primes_k, resolution;
+    slong i, j, k, m, num_primes, num_primes_k, resolution;
     mp_bitcnt_t size, prime_bits;
 
     if (n < 1)

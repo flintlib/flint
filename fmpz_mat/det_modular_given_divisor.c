@@ -51,7 +51,7 @@ fmpz_mat_det_modular_given_divisor(fmpz_t det, const fmpz_mat_t A,
     fmpz_t bound, prod, stable_prod, x, xnew;
     mp_limb_t p, xmod;
     nmod_mat_t Amod;
-    len_t n = A->r;
+    slong n = A->r;
 
     if (n == 0)
     {

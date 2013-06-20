@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, len_t n)
+_fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, slong n)
 {
     if (n == 0)
     {
@@ -37,7 +37,7 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, len_t n)
     }
     else if (n < 20)
     {
-        len_t i, j;
+        slong i, j;
 
         fmpz_one(poly + n);
         fmpz_neg(poly + n - 1, xs);
@@ -53,7 +53,7 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, len_t n)
     }
     else
     {
-        len_t m;
+        slong m;
         fmpz * tmp;
 
         m = (n + 1) / 2;
@@ -69,7 +69,7 @@ _fmpz_poly_product_roots_fmpz_vec(fmpz * poly, const fmpz * xs, len_t n)
 }
 
 void
-fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, len_t n)
+fmpz_poly_product_roots_fmpz_vec(fmpz_poly_t poly, const fmpz * xs, slong n)
 {
     fmpz_poly_fit_length(poly, n + 1);
     _fmpz_poly_product_roots_fmpz_vec(poly->coeffs, xs, n);

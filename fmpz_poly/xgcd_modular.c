@@ -32,8 +32,8 @@
 #include "mpn_extras.h"
 
 void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t, 
-                             const fmpz * poly1, len_t len1, 
-                             const fmpz * poly2, len_t len2)
+                             const fmpz * poly1, slong len1, 
+                             const fmpz * poly2, slong len2)
 {
     mp_ptr G, S, T, A, B, T1, T2;
     fmpz_t prod;
@@ -91,7 +91,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (stabilised) /* CRT has stabilised, probably don't need more xgcds */
         {
-            len_t tlen;
+            slong tlen;
 
             /* Multiply out A*S + B*T to see if it is R mod p */
             _fmpz_vec_get_nmod_vec(S, s, len2, mod);
@@ -152,7 +152,7 @@ void _fmpz_poly_xgcd_modular(fmpz_t r, fmpz * s, fmpz * t,
 
         if (stabilised) 
         {
-            len_t bound1, bound2, bound;
+            slong bound1, bound2, bound;
 
             bound1 = FLINT_BIT_COUNT(len2) 
                     + FLINT_ABS(_fmpz_vec_max_bits(poly1, len1)) 
@@ -181,8 +181,8 @@ fmpz_poly_xgcd_modular(fmpz_t r, fmpz_poly_t s, fmpz_poly_t t,
         fmpz_poly_xgcd_modular(r, t, s, poly2, poly1);
     } else /* len1 >= len2 >= 0 */
     {
-        const len_t len1 = poly1->length;
-        const len_t len2 = poly2->length;
+        const slong len1 = poly1->length;
+        const slong len2 = poly2->length;
         fmpz *S, *T;
         fmpz_poly_t temp1, temp2;
 

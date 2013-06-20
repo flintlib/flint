@@ -27,8 +27,8 @@
 #include "arith.h"
 
 
-static len_t
-_bell_series_cutoff(len_t n)
+static slong
+_bell_series_cutoff(slong n)
 {
     double N, log_N, log_pow, log_fac;
 
@@ -47,12 +47,12 @@ _bell_series_cutoff(len_t n)
 }
 
 static void
-_mpz_bell_bsplit(mpz_t P, mpz_t Q, len_t a, len_t b, len_t n, len_t bmax)
+_mpz_bell_bsplit(mpz_t P, mpz_t Q, slong a, slong b, slong n, slong bmax)
 {
     if (b - a < 20)
     {
         mpz_t u;
-        len_t k;
+        slong k;
         mpz_init(u);
         mpz_set_ui(P, 0UL);
         mpz_set_ui(Q, 0UL);
@@ -69,7 +69,7 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, len_t a, len_t b, len_t n, len_t bmax)
     }
     else
     {
-        len_t m;
+        slong m;
         mpz_t P1, Q2;
         m = (a + b) / 2;
         mpz_init(P1);
@@ -86,7 +86,7 @@ _mpz_bell_bsplit(mpz_t P, mpz_t Q, len_t a, len_t b, len_t n, len_t bmax)
 void
 arith_bell_number_bsplit(fmpz_t b, ulong n)
 {
-    len_t N;
+    slong N;
     mp_bitcnt_t prec;
     mpz_t P, Q;
     mpfr_t Pf, Qf, E, one;

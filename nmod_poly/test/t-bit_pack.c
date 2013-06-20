@@ -89,7 +89,7 @@ main(void)
     {
         fmpz_t f;
         nmod_poly_t A, B;
-        len_t b;
+        slong b;
         mp_limb_t n;
 
         do

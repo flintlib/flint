@@ -28,7 +28,7 @@
 void
 fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    len_t r, c, i, j;
+    slong r, c, i, j;
 
     r = mat->r;
     c = mat->c;

@@ -28,11 +28,11 @@
 #include "fmpz_poly.h"
 #include "fmpz_poly_mat.h"
 
-len_t
+slong
 fmpz_poly_mat_find_pivot_any(const fmpz_poly_mat_t mat,
-                                    len_t start_row, len_t end_row, len_t c)
+                                    slong start_row, slong end_row, slong c)
 {
-    len_t r;
+    slong r;
 
     for (r = start_row; r < end_row; r++)
     {

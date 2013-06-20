@@ -37,7 +37,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("solve_bound....");
     fflush(stdout);
@@ -48,8 +48,8 @@ main(void)
     {
         fmpz_mat_t A, B, X;
         fmpz_t N, D, den;
-        len_t m, n, b1, b2;
-        len_t j, k;
+        slong m, n, b1, b2;
+        slong j, k;
 
         b1 = 1 + n_randint(state, 100);
         b2 = 1 + n_randint(state, 100);

@@ -42,7 +42,7 @@ nmod_poly_inflate(nmod_poly_t result, const nmod_poly_t input, ulong inflation)
     }
     else
     {
-        len_t i, j, res_length = (input->length - 1) * inflation + 1;
+        slong i, j, res_length = (input->length - 1) * inflation + 1;
 
         nmod_poly_fit_length(result, res_length);
 

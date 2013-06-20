@@ -47,7 +47,7 @@
 
 static void
 _padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
-                        const fmpz_t x, len_t a, len_t b)
+                        const fmpz_t x, slong a, slong b)
 {
     if (b - a == 1)
     {
@@ -65,7 +65,7 @@ _padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
     }
     else
     {
-        const len_t m = (a + b) / 2;
+        const slong m = (a + b) / 2;
 
         fmpz_t PR, QR, TR;
 
@@ -99,9 +99,9 @@ _padic_exp_bsplit_series(fmpz_t P, fmpz_t Q, fmpz_t T,
  */
 
 static void
-_padic_exp_bsplit(fmpz_t y, const fmpz_t x, len_t v, const fmpz_t p, len_t N)
+_padic_exp_bsplit(fmpz_t y, const fmpz_t x, slong v, const fmpz_t p, slong N)
 {
-    const len_t n = _padic_exp_bound(v, N, p);
+    const slong n = _padic_exp_bound(v, N, p);
 
     if (n == 1)
     {
@@ -132,12 +132,12 @@ _padic_exp_bsplit(fmpz_t y, const fmpz_t x, len_t v, const fmpz_t p, len_t N)
     }
 }
 
-void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, len_t xv, len_t N)
+void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, slong xv, slong N)
 {
     const fmpz_t p = {2L};
 
     fmpz_t r, t;
-    len_t w;
+    slong w;
 
     fmpz_init(r);
     fmpz_init(t);
@@ -168,11 +168,11 @@ void _padic_exp_balanced_2(fmpz_t rop, const fmpz_t xu, len_t xv, len_t N)
     fmpz_clear(t);
 }
 
-void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, len_t xv, 
-                                       const fmpz_t p, len_t N)
+void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, slong xv, 
+                                       const fmpz_t p, slong N)
 {
     fmpz_t r, t, pw, pN;
-    len_t w;
+    slong w;
 
     fmpz_init(r);
     fmpz_init(t);
@@ -221,8 +221,8 @@ void _padic_exp_balanced_p(fmpz_t rop, const fmpz_t xu, len_t xv,
     TODO:  Take advantage of additional factors of $p$ in $x$.
  */
 
-void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, len_t v, 
-                                     const fmpz_t p, len_t N)
+void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, 
+                                     const fmpz_t p, slong N)
 {
     if (fmpz_equal_ui(p, 2))
         _padic_exp_balanced_2(rop, u, v, N);
@@ -232,8 +232,8 @@ void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, len_t v,
 
 int padic_exp_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 {
-    const len_t N  = padic_prec(rop);
-    const len_t v  = padic_val(op);
+    const slong N  = padic_prec(rop);
+    const slong v  = padic_val(op);
     const fmpz *p = ctx->p;
 
     if (padic_is_zero(op))

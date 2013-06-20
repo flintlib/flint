@@ -26,10 +26,10 @@
 #include "arith.h"
 
 void
-arith_number_of_partitions_vec(fmpz * res, len_t len)
+arith_number_of_partitions_vec(fmpz * res, slong len)
 {
     fmpz * tmp;
-    len_t k, n;
+    slong k, n;
 
     if (len < 1)
         return;

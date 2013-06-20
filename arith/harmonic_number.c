@@ -66,13 +66,13 @@ const mp_limb_t FLINT_HARMONIC_TINY_Q[] =
 };
 
 static void
-_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, len_t n)
+_mpq_harmonic_odd_balanced(fmpz_t num, fmpz_t den, slong n)
 {
     mpz_t p, q;
 
     mp_ptr t, v;
     mp_size_t ts, vs;
-    len_t size;
+    slong size;
 
     if (n <= 0)
     {

@@ -26,9 +26,9 @@
 #include "fmpz_factor.h"
 #include "arith.h"
 
-void arith_ramanujan_tau_series(fmpz_poly_t res, len_t n)
+void arith_ramanujan_tau_series(fmpz_poly_t res, slong n)
 {
-    len_t j, k, jv, kv;
+    slong j, k, jv, kv;
     fmpz_t tmp;
     fmpz_poly_fit_length(res, n);
     _fmpz_vec_zero(res->coeffs, n);
@@ -55,7 +55,7 @@ void _arith_ramanujan_tau(fmpz_t res, fmpz_factor_t factors)
 {
     fmpz_poly_t poly;
     fmpz_t tau_p, p_11, next, this, prev;
-    len_t k, r;
+    slong k, r;
     ulong max_prime;
 
     max_prime = 1UL;

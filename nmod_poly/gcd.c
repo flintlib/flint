@@ -25,10 +25,10 @@
 
 #include "nmod_poly.h"
 
-len_t _nmod_poly_gcd(mp_ptr G, mp_srcptr A, len_t lenA, 
-                              mp_srcptr B, len_t lenB, nmod_t mod)
+slong _nmod_poly_gcd(mp_ptr G, mp_srcptr A, slong lenA, 
+                              mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const len_t cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+    const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
     if (lenA < cutoff)
@@ -46,7 +46,7 @@ void nmod_poly_gcd(nmod_poly_t G,
     }
     else /* lenA >= lenB >= 0 */
     {
-        len_t lenA = A->length, lenB = B->length, lenG;
+        slong lenA = A->length, lenB = B->length, lenG;
         nmod_poly_t tG;
         mp_ptr g;
 

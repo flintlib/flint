@@ -31,7 +31,7 @@ fmpz_mat_det_divisor(fmpz_t d, const fmpz_mat_t A)
 {
     fmpz_mat_t X, B;
     fmpz_t t, u, v, mod;
-    len_t i, n;
+    slong i, n;
     int success;
 
     n = A->r;

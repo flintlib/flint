@@ -28,9 +28,9 @@
 
 void
 _fmpq_set_cfrac_basecase(fmpz_t p, fmpz_t t, fmpz_t q, fmpz_t u,
-    const fmpz * c, len_t n)
+    const fmpz * c, slong n)
 {
-    len_t i;
+    slong i;
 
     fmpz_set(p, c);
     fmpz_one(q);
@@ -47,7 +47,7 @@ _fmpq_set_cfrac_basecase(fmpz_t p, fmpz_t t, fmpz_t q, fmpz_t u,
 }
 
 void
-_fmpq_set_cfrac_divconquer(fmpz_mat_t P, const fmpz * c, len_t n)
+_fmpq_set_cfrac_divconquer(fmpz_mat_t P, const fmpz * c, slong n)
 {
     if (n < 32)
     {
@@ -58,7 +58,7 @@ _fmpq_set_cfrac_divconquer(fmpz_mat_t P, const fmpz * c, len_t n)
     else
     {
         fmpz_mat_t L, R;
-        len_t m = n / 2;
+        slong m = n / 2;
 
         fmpz_mat_init(L, 2, 2);
         fmpz_mat_init(R, 2, 2);
@@ -73,7 +73,7 @@ _fmpq_set_cfrac_divconquer(fmpz_mat_t P, const fmpz * c, len_t n)
 }
 
 void
-fmpq_set_cfrac(fmpq_t x, const fmpz * c, len_t n)
+fmpq_set_cfrac(fmpq_t x, const fmpz * c, slong n)
 {
     if (n <= 64)
     {

@@ -34,7 +34,7 @@
 void
 fmpz_factor_print(const fmpz_factor_t factor)
 {
-    len_t i;
+    slong i;
 
     if (factor->sign == 0)
     {

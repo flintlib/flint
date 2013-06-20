@@ -25,10 +25,10 @@
 
 #include "fmpq_mat.h"
 
-len_t
+slong
 fmpq_mat_rref_classical(fmpq_mat_t B, const fmpq_mat_t A)
 {
-    len_t m, n, i, j, pivot_row, pivot_col, rank;
+    slong m, n, i, j, pivot_row, pivot_col, rank;
 
     m = A->r;
     n = A->c;

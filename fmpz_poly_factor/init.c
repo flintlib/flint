@@ -38,16 +38,16 @@ void fmpz_poly_factor_init(fmpz_poly_factor_t fac)
     fac->alloc = 0;
 }
 
-void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, len_t alloc)
+void fmpz_poly_factor_init2(fmpz_poly_factor_t fac, slong alloc)
 {
     fmpz_init_set_ui(&(fac->c), 1);
 
     if (alloc)
     {
-        len_t i;
+        slong i;
 
         fac->p   = flint_malloc(alloc * sizeof(fmpz_poly_struct));
-        fac->exp = flint_malloc(alloc * sizeof(len_t));
+        fac->exp = flint_malloc(alloc * sizeof(slong));
 
         for (i = 0; i < alloc; i++)
         {

@@ -37,7 +37,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
     int result;
 
     printf("det_divisor....");
@@ -49,7 +49,7 @@ main(void)
     {
         fmpz_mat_t A;
         fmpz_t det, d, q, r;
-        len_t m, bits;
+        slong m, bits;
 
         m = n_randint(state, 15);
         bits = 1 + n_randint(state, 50);

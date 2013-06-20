@@ -33,7 +33,7 @@
 void
 nmod_poly_factor_concat(nmod_poly_factor_t res, const nmod_poly_factor_t fac)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
         nmod_poly_factor_insert(res, fac->p + i, fac->exp[i]);

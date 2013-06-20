@@ -36,7 +36,7 @@ int
 main(void)
 {
     nmod_mat_t A, B, C, I;
-    len_t i, j, m, r;
+    slong i, j, m, r;
     mp_limb_t mod;
     int result;
     flint_rand_t state;

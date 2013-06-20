@@ -38,11 +38,11 @@ int main()
     fmpz_t input, temp;
     mpz_t num1;
     mp_limb_t * output, * output2;
-    len_t i, j, k;
+    slong i, j, k;
     mp_limb_t * primes;
     mp_limb_t prime;
-    len_t num_primes;
-    len_t bits;
+    slong num_primes;
+    slong bits;
     double primes_per_limb;
 
     fmpz_comb_t comb;

@@ -29,9 +29,9 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, len_t n)
+_fmpz_poly_taylor_shift_horner(fmpz * poly, const fmpz_t c, slong n)
 {
-    len_t i, j;
+    slong i, j;
 
     if (*c == 1L)
     {

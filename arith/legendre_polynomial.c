@@ -44,7 +44,7 @@ void _arith_legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
 {
     fmpz * r;
     int odd;
-    len_t k;
+    slong k;
     ulong L;
 
     L = n / 2;

@@ -28,7 +28,7 @@
 void arith_euler_polynomial(fmpq_poly_t poly, ulong n)
 {
     fmpz_t t;
-    len_t k;
+    slong k;
 
     if (n == 0)
     {

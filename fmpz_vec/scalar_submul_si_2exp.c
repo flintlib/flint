@@ -30,10 +30,10 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, len_t len2,
+_fmpz_vec_scalar_submul_si_2exp(fmpz * vec1, const fmpz * vec2, slong len2,
                                 slong c, ulong exp)
 {
-    len_t i;
+    slong i;
     fmpz_t temp;
 
     if (c == 0)

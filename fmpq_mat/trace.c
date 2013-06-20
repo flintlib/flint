@@ -28,7 +28,7 @@
 void
 fmpq_mat_trace(fmpq_t trace, const fmpq_mat_t mat)
 {
-    len_t i, n = fmpq_mat_nrows(mat);
+    slong i, n = fmpq_mat_nrows(mat);
 
     if (n == 0)
         fmpq_zero(trace);

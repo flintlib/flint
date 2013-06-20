@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden, 
-                              const fmpz * poly, const fmpz_t den, len_t len, 
+                              const fmpz * poly, const fmpz_t den, slong len, 
                               slong c)
 {
     fmpz_t gcd;  /* GCD( den, c ) */
@@ -55,7 +55,7 @@ void _fmpq_poly_scalar_mul_si(fmpz * rpoly, fmpz_t rden,
     {
         if (c > LONG_MIN || fmpz_cmp_ui(gcd, - (ulong) LONG_MIN))
         {
-            len_t g = fmpz_get_si(gcd);
+            slong g = fmpz_get_si(gcd);
 
             _fmpz_vec_scalar_mul_si(rpoly, poly, len, c / g);
             fmpz_divexact_si(rden, den, g);

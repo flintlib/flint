@@ -25,12 +25,12 @@
 
 #include "fmpq_mat.h"
 
-len_t
+slong
 fmpq_mat_rref_fraction_free(fmpq_mat_t B, const fmpq_mat_t A)
 {
     fmpz_mat_t Aclear;
     fmpz_t den;
-    len_t rank;
+    slong rank;
 
     if (fmpq_mat_is_empty(A))
         return 0;

@@ -30,10 +30,10 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, len_t len, nmod_t mod)
+_nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, slong len, nmod_t mod)
 {
     mp_ptr tmp;
-    len_t i, n, height;
+    slong i, n, height;
 
     if (len == 0)
         return;
@@ -62,10 +62,10 @@ _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, len_t len, nmod_t mod)
 
 void
 _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    mp_ptr * tree, mp_srcptr weights, len_t len, nmod_t mod)
+    mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod)
 {
     mp_ptr t, u, pa, pb;
-    len_t i, pow, left;
+    slong i, pow, left;
 
     if (len == 0)
         return;
@@ -109,7 +109,7 @@ _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
 
 void
 _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
-                            mp_srcptr xs, mp_srcptr ys, len_t len, nmod_t mod)
+                            mp_srcptr xs, mp_srcptr ys, slong len, nmod_t mod)
 {
     mp_ptr * tree;
     mp_ptr w;
@@ -128,7 +128,7 @@ _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
 
 void
 nmod_poly_interpolate_nmod_vec_fast(nmod_poly_t poly,
-                                    mp_srcptr xs, mp_srcptr ys, len_t n)
+                                    mp_srcptr xs, mp_srcptr ys, slong n)
 {
     if (n == 0)
     {

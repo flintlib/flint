@@ -26,11 +26,11 @@
 #include "fmpz_mat.h"
 
 void
-fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, len_t count)
+fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
 {
-    len_t c, i, j, k;
-    len_t m = mat->r;
-    len_t n = mat->c;
+    slong c, i, j, k;
+    slong m = mat->r;
+    slong n = mat->c;
 
     if (mat->r == 0 || mat->c == 0)
         return;

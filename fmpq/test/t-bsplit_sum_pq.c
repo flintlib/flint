@@ -47,7 +47,7 @@ main(void)
         fmpq *pq;
         fmpq_t s1, s2, pqp;
         fmpq_bsplit_t sum;
-        len_t k, n;
+        slong k, n;
 
         n = n_randint(state, 40);
 

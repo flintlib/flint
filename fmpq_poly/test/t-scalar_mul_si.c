@@ -49,7 +49,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        len_t n = z_randtest(state);
+        slong n = z_randtest(state);
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -107,11 +107,11 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b, c;
-        len_t n1, n2;
+        slong n1, n2;
         ulong m;
 
-        n1 = (len_t) n_randbits(state, FLINT_BITS / 2);
-        n2 = (len_t) n_randbits(state, FLINT_BITS / 2 - 1);
+        n1 = (slong) n_randbits(state, FLINT_BITS / 2);
+        n2 = (slong) n_randbits(state, FLINT_BITS / 2 - 1);
         m = n_randlimb(state);
         if (m & 1UL)
             n1 = -n1;

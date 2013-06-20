@@ -44,7 +44,7 @@ fmpz * padic_unit(const padic_t op)
     Note that this function is implemented as a macro, but it can only be 
     used as an \emph{rvalue}.
 
-len_t padic_val(const padic_t op)
+slong padic_val(const padic_t op)
 
     Returns the valuation part of the $p$-adic number.
 
@@ -52,7 +52,7 @@ len_t padic_val(const padic_t op)
     the expression \code{padic_val(op)} can be used as both an 
     \emph{lvalue} and an \emph{rvalue}.
 
-len_t padic_prec(const padic_t op)
+slong padic_prec(const padic_t op)
 
     Returns the precision of the $p$-adic number.
 
@@ -123,7 +123,7 @@ void padic_init(padic_t rop)
     Initialises the $p$-adic number with the precision set to 
     \code{PADIC_DEFAULT_PREC}, which is defined as~$20$.
 
-void padic_init2(padic_t rop, len_t N)
+void padic_init2(padic_t rop, slong N)
 
     Initialises the $p$-adic number \code{rop} with precision~$N$.
 
@@ -277,7 +277,7 @@ int padic_equal(const padic_t op1, const padic_t op2)
 
 *******************************************************************************
 
-len_t * _padic_lifts_exps(len_t *n, len_t N)
+slong * _padic_lifts_exps(slong *n, slong N)
 
     Given a positive integer $N$ define the sequence 
     $a_0 = N, a_1 = \ceil{a_0/2}, \dotsc, a_{n-1} = \ceil{a_{n-2}/2} = 1$.
@@ -285,7 +285,7 @@ len_t * _padic_lifts_exps(len_t *n, len_t N)
 
     This function sets $n$ and allocates and returns the array~$a$.
 
-void _padic_lifts_pows(fmpz *pow, const len_t *a, len_t n, const fmpz_t p)
+void _padic_lifts_pows(fmpz *pow, const slong *a, slong n, const fmpz_t p)
 
     Given an array~$a$ as computed above, this function 
     computes the corresponding powers of $p$, that is, 
@@ -310,7 +310,7 @@ void padic_mul(padic_t rop, const padic_t op1, const padic_t op2,
 
     Sets \code{rop} to the product of \code{op1} and \code{op2}.
 
-void padic_shift(padic_t rop, const padic_t op, len_t v, const padic_ctx_t ctx)
+void padic_shift(padic_t rop, const padic_t op, slong v, const padic_ctx_t ctx)
 
     Sets \code{rop} to the product of \code{op} and $p^v$.
 
@@ -319,7 +319,7 @@ void padic_div(padic_t rop, const padic_t op1, const padic_t op2,
 
     Sets \code{rop} to the quotient of \code{op1} and \code{op2}.
 
-void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, len_t N)
+void _padic_inv_precompute(padic_inv_t S, const fmpz_t p, slong N)
 
     Pre-computes some data and allocates temporary space for 
     $p$-adic inversion using Hensel lifting.
@@ -343,7 +343,7 @@ void _padic_inv_precomp(fmpz_t rop, const fmpz_t op, padic_inv_t S)
     this function to avoid repeated memory allocations, as used 
     e.g.\ by the function \code{padic_log()}.
 
-void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
+void _padic_inv(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 
     Sets \code{rop} to the inverse of \code{op} modulo $p^N$, 
     assuming that \code{op} is a unit and $N \geq 1$.
@@ -395,7 +395,7 @@ void padic_pow_si(padic_t rop, const padic_t op, slong e,
 
 *******************************************************************************
 
-len_t _padic_exp_bound(len_t v, len_t N, const fmpz_t p)
+slong _padic_exp_bound(slong v, slong N, const fmpz_t p)
 
     Returns an integer $i$ such that for all $j \geq i$ we have 
     $\ord_p(x^j / j!) \geq N$, where $\ord_p(x) = v$.
@@ -413,7 +413,7 @@ void _padic_exp_rectangular(fmpz_t rop, const fmpz_t u, slong v,
 void _padic_exp_balanced(fmpz_t rop, const fmpz_t u, slong v, 
                                      const fmpz_t p, slong N)
 
-void _padic_exp(fmpz_t rop, const fmpz_t u, len_t v, const fmpz_t p, len_t N)
+void _padic_exp(fmpz_t rop, const fmpz_t u, slong v, const fmpz_t p, slong N)
 
     Sets \code{rop} to the $p$-exponential function evaluated at 
     $x = p^v u$, reduced modulo~$p^N$.
@@ -460,7 +460,7 @@ int padic_exp_balanced(padic_t y, const padic_t x, const padic_ctx_t ctx)
 
 *******************************************************************************
 
-len_t _padic_log_bound(len_t v, len_t N, const fmpz_t p)
+slong _padic_log_bound(slong v, slong N, const fmpz_t p)
 
     Returns $b$ such that for all $i \geq b$ we have 
     \begin{equation*}
@@ -472,7 +472,7 @@ len_t _padic_log_bound(len_t v, len_t N, const fmpz_t p)
     odd or $p = 2$, respectively, and also that $N < 2^{f-2}$ 
     where $f$ is \code{FLINT_BITS}.
 
-void _padic_log(fmpz_t z, const fmpz_t y, len_t v, const fmpz_t p, len_t N)
+void _padic_log(fmpz_t z, const fmpz_t y, slong v, const fmpz_t p, slong N)
 
 void _padic_log_rectangular(fmpz_t z, 
                             const fmpz_t y, slong v, const fmpz_t p, slong N)
@@ -551,7 +551,7 @@ int padic_log_balanced(padic_t rop, const padic_t op, const padic_ctx_t ctx)
 
 *******************************************************************************
 
-void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
+void _padic_teichmuller(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 
     Computes the Teichmuller lift of the $p$-adic unit \code{op}, 
     assuming that $N \geq 1$.
@@ -603,7 +603,7 @@ char * padic_get_str(char * str, const padic_t op, const padic_ctx_t ctx)
     the string \code{str} is large enough to hold the representation and 
     it is also the return value.
 
-int _padic_fprint(FILE * file, const fmpz_t u, len_t v, const padic_ctx_t ctx)
+int _padic_fprint(FILE * file, const fmpz_t u, slong v, const padic_ctx_t ctx)
 
 int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 
@@ -612,7 +612,7 @@ int padic_fprint(FILE * file, const padic_t op, const padic_ctx_t ctx)
 
     In the current implementation, always returns $1$.
 
-int _padic_print(const fmpz_t u, len_t v, const padic_ctx_t ctx)
+int _padic_print(const fmpz_t u, slong v, const padic_ctx_t ctx)
 
 int padic_print(const padic_t op, const padic_ctx_t ctx)
 

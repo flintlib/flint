@@ -91,10 +91,10 @@ static const int lookup_table[MAX_32BIT][28] =
 
 /* The coefficients in 2^d * \prod_{i=1}^d (x - cos(a_i)) are
    easily bounded using the binomial theorem. */
-static len_t
-magnitude_bound(len_t d)
+static slong
+magnitude_bound(slong d)
 {
-    len_t res;
+    slong res;
     fmpz_t t;
     fmpz_init(t);
     fmpz_bin_uiui(t, d, d / 2);
@@ -104,7 +104,7 @@ magnitude_bound(len_t d)
 }
 
 static void
-fmpz_mul_or_div_2exp(fmpz_t x, fmpz_t y, len_t s)
+fmpz_mul_or_div_2exp(fmpz_t x, fmpz_t y, slong s)
 {
     if (s >= 0)
         fmpz_mul_2exp(x, y, s);
@@ -116,7 +116,7 @@ fmpz_mul_or_div_2exp(fmpz_t x, fmpz_t y, len_t s)
 /* Balanced product of linear factors (x+alpha_i) using
    fixed-point arithmetic with prec bits */
 static void
-balanced_product(fmpz * c, fmpz * alpha, len_t len, len_t prec)
+balanced_product(fmpz * c, fmpz * alpha, slong len, slong prec)
 {
     if (len == 1)
     {
@@ -135,7 +135,7 @@ balanced_product(fmpz * c, fmpz * alpha, len_t len, len_t prec)
     else
     {
         fmpz *L, *R;
-        len_t i, m;
+        slong i, m;
 
         m = len / 2;
         L = _fmpz_vec_init(len + 2);
@@ -153,9 +153,9 @@ balanced_product(fmpz * c, fmpz * alpha, len_t len, len_t prec)
 }
 
 void
-_arith_cos_minpoly(fmpz * coeffs, len_t d, ulong n)
+_arith_cos_minpoly(fmpz * coeffs, slong d, ulong n)
 {
-    len_t i, j;
+    slong i, j;
     fmpz * alpha;
     fmpz_t half;
     mpfr_t t, u;
@@ -172,7 +172,7 @@ _arith_cos_minpoly(fmpz * coeffs, len_t d, ulong n)
     /* Direct formula for odd primes > 3 */
     if (n_is_prime(n))
     {
-        len_t s = (n - 1) / 2;
+        slong s = (n - 1) / 2;
 
         switch (s % 4)
         {
@@ -196,7 +196,7 @@ _arith_cos_minpoly(fmpz * coeffs, len_t d, ulong n)
 
         for (i = 2; i <= s; i++)
         {
-            len_t b = (s - i) % 2;
+            slong b = (s - i) % 2;
             fmpz_mul2_uiui(coeffs + i, coeffs + i - 2, s+i-b, s+2-b-i);
             fmpz_divexact2_uiui(coeffs + i, coeffs + i, i, i-1);
             fmpz_neg(coeffs + i, coeffs + i);
@@ -236,7 +236,7 @@ _arith_cos_minpoly(fmpz * coeffs, len_t d, ulong n)
     /* Scale and round */
     for (i = 0; i < d + 1; i++)
     {
-        len_t r = d;
+        slong r = d;
         if ((n & (n - 1)) == 0)
             r--;
         fmpz_mul_2exp(coeffs + i, coeffs + i, r);
@@ -259,7 +259,7 @@ arith_cos_minpoly(fmpz_poly_t poly, ulong n)
     }
     else
     {
-        len_t d = (n <= 2) ? 1 : n_euler_phi(n) / 2;
+        slong d = (n <= 2) ? 1 : n_euler_phi(n) / 2;
 
         fmpz_poly_fit_length(poly, d + 1);
         _arith_cos_minpoly(poly->coeffs, d, n);

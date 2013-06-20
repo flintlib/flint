@@ -31,10 +31,10 @@
 #include "fmpz_poly.h"
 #include "fft.h"
 
-void _fmpz_vec_set_fft(fmpz * coeffs_m, len_t length,
-                          mp_limb_t ** coeffs_f, len_t limbs, len_t sign)
+void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
+                          mp_limb_t ** coeffs_f, slong limbs, slong sign)
 {
-   len_t i, size;
+   slong i, size;
    mp_limb_t * data;
    __mpz_struct * mpz_ptr;
 

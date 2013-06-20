@@ -35,9 +35,9 @@
 #include "ulong_extras.h"
 
 static void
-_fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, len_t i)
+_fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, slong i)
 {
-    len_t j;
+    slong j;
     fmpz_t t;
     fmpz_init(t);
     fmpz_one(den);
@@ -57,13 +57,13 @@ _fmpq_mat_get_row(fmpz * rnum, fmpz_t den, fmpq_mat_t A, len_t i)
 
 void
 _fmpq_poly_compose_series_brent_kung(fmpz * res, fmpz_t den, const fmpz * poly1,
-        const fmpz_t den1, len_t len1, const fmpz * poly2,
-        const fmpz_t den2, len_t len2, len_t n)
+        const fmpz_t den1, slong len1, const fmpz * poly2,
+        const fmpz_t den2, slong len2, slong n)
 {
     fmpq_mat_t A, B, C;
     fmpz_t tden, uden, hden;
     fmpz *t, *u, *h, *swap;
-    len_t i, j, m;
+    slong i, j, m;
 
     if (fmpz_is_one(den2))
     {
@@ -167,11 +167,11 @@ _fmpq_poly_compose_series_brent_kung(fmpz * res, fmpz_t den, const fmpz * poly1,
 
 void
 fmpq_poly_compose_series_brent_kung(fmpq_poly_t res, 
-                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, len_t n)
+                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n)
 {
-    len_t len1 = poly1->length;
-    len_t len2 = poly2->length;
-    len_t lenr;
+    slong len1 = poly1->length;
+    slong len2 = poly2->length;
+    slong lenr;
 
     if (len2 != 0 && !fmpz_is_zero(poly2->coeffs))
     {

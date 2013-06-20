@@ -585,7 +585,7 @@ void _fft_mulmod_2expp1(mp_limb_t * r1, mp_limb_t * i1, mp_limb_t * i2,
     require that \code{depth} and \code{w} have been selected as per the 
     wrapper \code{fft_mulmod_2expp1} below.
 
-len_t fft_adjust_limbs(mp_size_t limbs)
+slong fft_adjust_limbs(mp_size_t limbs)
 
     Given a number of limbs, returns a new number of limbs (no more than 
     the next power of 2) which will work with the Nussbaumer code. It is only 

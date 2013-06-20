@@ -32,7 +32,7 @@
 
 *******************************************************************************
 
-void fmpz_mat_init(fmpz_mat_t mat, len_t rows, len_t cols)
+void fmpz_mat_init(fmpz_mat_t mat, slong rows, slong cols)
 
     Initialises a matrix with the given number of rows and columns for use. 
 
@@ -61,7 +61,7 @@ void fmpz_mat_swap(fmpz_mat_t mat1, fmpz_mat_t mat2)
     Swaps two matrices. The dimensions of \code{mat1} and \code{mat2} 
     are allowed to be different.
 
-fmpz * fmpz_mat_entry(fmpz_mat_t mat, len_t i, len_t j)
+fmpz * fmpz_mat_entry(fmpz_mat_t mat, slong i, slong j)
 
     Returns a reference to the entry of \code{mat} at row $i$ and column $j$.
     This reference can be passed as an input or output variable to any
@@ -158,7 +158,7 @@ void fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
     entries to the right of the diagonal in row~$i$ are set to zero. 
 
 int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state, 
-                                                   const fmpz * diag, len_t n)
+                                                   const fmpz * diag, slong n)
 
     Sets \code{mat} to a random permutation of the rows and columns of a
     given diagonal matrix. The diagonal matrix is specified in the form of
@@ -167,7 +167,7 @@ int fmpz_mat_randpermdiag(fmpz_mat_t mat, flint_rand_t state,
     The return value is $0$ or $1$ depending on whether the permutation is
     even or odd.
 
-void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, len_t rank, 
+void fmpz_mat_randrank(fmpz_mat_t mat, flint_rand_t state, slong rank, 
                                                               mp_bitcnt_t bits)
 
     Sets \code{mat} to a random sparse matrix with the given rank, 
@@ -189,7 +189,7 @@ void fmpz_mat_randdet(fmpz_mat_t mat, flint_rand_t state, const fmpz_t det)
     The matrix can be transformed into a dense matrix with unchanged
     determinant by subsequently calling \code{fmpz_mat_randops()}.
 
-void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, len_t count)
+void fmpz_mat_randops(fmpz_mat_t mat, flint_rand_t state, slong count)
 
     Randomises \code{mat} by performing elementary row or column operations.
     More precisely, at most \code{count} random additions or subtractions of
@@ -319,14 +319,14 @@ void fmpz_mat_CRT_ui(fmpz_mat_t res, const fmpz_mat_t mat1,
     with entries satisfying $-mn/2 <= c < mn/2$ (if sign = 1)
     or $0 <= c < mn$ (if sign = 0).
 
-void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, len_t nres, 
+void fmpz_mat_multi_mod_ui_precomp(nmod_mat_t * residues, slong nres, 
     const fmpz_mat_t mat, fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     Sets each of the \code{nres} matrices in \code{residues} to \code{mat}
     reduced modulo the modulus of the respective matrix, given
     precomputed \code{comb} and \code{comb_temp} structures.
 
-void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, len_t nres,
+void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, slong nres,
         const fmpz_mat_t mat)
 
     Sets each of the \code{nres} matrices in \code{residues} to \code{mat}
@@ -337,14 +337,14 @@ void fmpz_mat_multi_mod_ui(nmod_mat_t * residues, len_t nres,
     set of moduli, it is faster to use\\ \code{fmpz_mat_multi_mod_precomp}.
 
 void fmpz_mat_multi_CRT_ui_precomp(fmpz_mat_t mat, nmod_mat_t * const residues,
-    len_t nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
+    slong nres, fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign)
 
     Reconstructs \code{mat} from its images modulo the \code{nres} matrices
     in \code{residues}, given precomputed \code{comb} and \code{comb_temp}
     structures.
 
 void fmpz_mat_multi_CRT_ui(fmpz_mat_t mat, nmod_mat_t * const residues,
-    len_t nres, int sign)
+    slong nres, int sign)
 
     Reconstructs \code{mat} from its images modulo the \code{nres} matrices
     in \code{residues}.
@@ -638,7 +638,7 @@ void fmpz_mat_charpoly(fmpz_poly_t cp, const fmpz_mat_t mat)
 
 *******************************************************************************
 
-len_t fmpz_mat_rank(const fmpz_mat_t A)
+slong fmpz_mat_rank(const fmpz_mat_t A)
 
     Returns the rank, that is, the number of linearly independent columns
     (equivalently, rows), of $A$. The rank is computed by row reducing
@@ -692,7 +692,7 @@ int fmpz_mat_solve_fflu(fmpz_mat_t X, fmpz_t den,
     forward and back substitution.
 
 void fmpz_mat_solve_fflu_precomp(fmpz_mat_t X,
-                    const len_t * perm,
+                    const slong * perm,
                     const fmpz_mat_t FFLU, const fmpz_mat_t B)
 
     Performs fraction-free forward and back substitution given a precomputed
@@ -741,8 +741,8 @@ int fmpz_mat_solve_dixon(fmpz_mat_t X, fmpz_t M, const fmpz_mat_t A,
 
 *******************************************************************************
 
-len_t fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
-                                    slong start_row, len_t end_row, len_t c)
+slong fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
+                                    slong start_row, slong end_row, slong c)
 
     Attempts to find a pivot entry for row reduction.
     Returns a row index $r$ between \code{start_row} (inclusive) and
@@ -754,7 +754,7 @@ len_t fmpz_mat_find_pivot_any(const fmpz_mat_t mat,
     entries in the matrix have roughly the same size, but can lead to
     unnecessary coefficient growth if the entries vary in size.
 
-len_t fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, len_t * perm,
+slong fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, slong * perm,
                             const fmpz_mat_t A, int rank_check)
 
     Uses fraction-free Gaussian elimination to set (\code{B}, \code{den}) to a
@@ -776,7 +776,7 @@ len_t fmpz_mat_fflu(fmpz_mat_t B, fmpz_poly_t den, len_t * perm,
 
     The fraction-free LU decomposition is defined in \citep{NakTurWil1997}.
 
-len_t fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
+slong fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
     Sets (\code{B}, \code{den}) to the reduced row echelon form of \code{A}
     and returns the rank of \code{A}. Aliasing of \code{A} and \code{B}
@@ -803,7 +803,7 @@ len_t fmpz_mat_rref(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 
 *******************************************************************************
 
-len_t fmpz_mat_rref_mod(len_t * perm, fmpz_mat_t A, const fmpz_t p)
+slong fmpz_mat_rref_mod(slong * perm, fmpz_mat_t A, const fmpz_t p)
 
     Uses fraction-free Gauss-Jordan elimination to set \code{A}
     to its reduced row echelon form and returns the rank of \code{A}.
@@ -819,7 +819,7 @@ len_t fmpz_mat_rref_mod(len_t * perm, fmpz_mat_t A, const fmpz_t p)
 
 *******************************************************************************
 
-len_t fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
+slong fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
 
     Computes a basis for the right rational nullspace of $A$ and returns
     the dimension of the nullspace (or nullity). $B$ is set to a matrix with
@@ -839,7 +839,7 @@ len_t fmpz_mat_nullspace(fmpz_mat_t B, const fmpz_mat_t A)
 
 *******************************************************************************
 
-len_t fmpz_mat_rref_fraction_free(len_t * perm, fmpz_mat_t B, fmpz_t den,
+slong fmpz_mat_rref_fraction_free(slong * perm, fmpz_mat_t B, fmpz_t den,
         const fmpz_mat_t A)
 
     Computes an integer matrix \code{B} and an integer \code{den} such that

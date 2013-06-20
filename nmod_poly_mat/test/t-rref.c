@@ -32,9 +32,9 @@
 #include "ulong_extras.h"
 
 /* checks that the rref has the right form */
-int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, len_t rank)
+int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, slong rank)
 {
-    len_t i, j, k, prev_pivot;
+    slong i, j, k, prev_pivot;
 
     /* bottom should be zero */
     for (i = rank; i < A->r; i++)
@@ -75,7 +75,7 @@ int check_rref(const nmod_poly_mat_t A, const nmod_poly_t den, len_t rank)
 int
 main(void)
 {
-    len_t iter;
+    slong iter;
     flint_rand_t state;
 
     printf("rref....");
@@ -87,8 +87,8 @@ main(void)
     {
         nmod_poly_mat_t A, R, B, R2;
         nmod_poly_t den, c, den2;
-        len_t j, k, m, n, deg, rank1, rank2;
-        len_t *perm;
+        slong j, k, m, n, deg, rank1, rank2;
+        slong *perm;
         float density;
         int equal;
         mp_limb_t p;

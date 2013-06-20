@@ -30,9 +30,9 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, len_t len, len_t n)
+_fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, slong len, slong n)
 {
-    len_t i;
+    slong i;
 
     /* Copy in forward order to avoid writing over unshifted coefficients */
     if (res != poly)
@@ -49,7 +49,7 @@ _fmpz_mod_poly_shift_right(fmpz * res, const fmpz * poly, len_t len, len_t n)
 }
 
 void
-fmpz_mod_poly_shift_right(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, len_t n)
+fmpz_mod_poly_shift_right(fmpz_mod_poly_t res, const fmpz_mod_poly_t poly, slong n)
 {
     if (n == 0)
     {

@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 
 fmpz *
-_fmpz_vec_init(len_t len)
+_fmpz_vec_init(slong len)
 {
     return (fmpz *) flint_calloc(len, sizeof(fmpz));
 }

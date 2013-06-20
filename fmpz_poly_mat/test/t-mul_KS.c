@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("mul_KS....");
     fflush(stdout);
@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C, D;
-        len_t m, n, k, bits, deg;
+        slong m, n, k, bits, deg;
 
         m = n_randint(state, 15);
         n = n_randint(state, 15);
@@ -98,7 +98,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        len_t m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);
@@ -138,7 +138,7 @@ main(void)
     for (i = 0; i < 10 * flint_test_multiplier(); i++)
     {
         fmpz_poly_mat_t A, B, C;
-        len_t m, n, bits, deg;
+        slong m, n, bits, deg;
 
         m = n_randint(state, 20);
         n = n_randint(state, 20);

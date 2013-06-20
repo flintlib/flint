@@ -31,9 +31,9 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_set_coeff_si(fmpq_poly_t poly, len_t n, slong x)
+void fmpq_poly_set_coeff_si(fmpq_poly_t poly, slong n, slong x)
 {
-    len_t len = poly->length;
+    slong len = poly->length;
     const int replace = (n < len && !fmpz_is_zero(poly->coeffs + n));
     
     if (!replace && (x == 0L))

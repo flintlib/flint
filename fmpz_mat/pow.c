@@ -28,7 +28,7 @@
 void
 fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
 {
-    len_t d = fmpz_mat_nrows(A);
+    slong d = fmpz_mat_nrows(A);
 
     if (exp <= 2 || d <= 1)
     {
@@ -53,12 +53,12 @@ fmpz_mat_pow(fmpz_mat_t B, const fmpz_mat_t A, ulong exp)
     else
     {
         fmpz_mat_t T, U;
-        len_t i;
+        slong i;
 
         fmpz_mat_init_set(T, A);
         fmpz_mat_init(U, d, d);
 
-        for (i = ((len_t) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
+        for (i = ((slong) FLINT_BIT_COUNT(exp)) - 2; i >= 0; i--)
         {
             fmpz_mat_sqr(U, T);
 

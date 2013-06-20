@@ -35,7 +35,7 @@ nmod_mat_transpose(nmod_mat_t B, const nmod_mat_t A)
 {
     mp_limb_t tmp;
 
-    len_t i, j;
+    slong i, j;
 
     if (B->r != A->c || B->c != A->r)
     {

@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_poly_t f, g;
         fmpz * r;
-        len_t k, n;
+        slong k, n;
 
         fmpz_poly_init(f);
         fmpz_poly_init(g);

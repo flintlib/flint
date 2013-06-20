@@ -33,9 +33,9 @@
 #include "fmpz_mod_poly_factor.h"
 
 void
-fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, len_t len)
+fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, slong len)
 {
-    len_t i;
+    slong i;
 
     fmpz_mod_poly_fit_length(f, len);
 
@@ -48,7 +48,7 @@ fmpz_mod_poly_randtest(fmpz_mod_poly_t f, flint_rand_t state, len_t len)
 
 void
 fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
-                                   flint_rand_t state, len_t len)
+                                   flint_rand_t state, slong len)
 {
     if (len == 0)
     {
@@ -63,7 +63,7 @@ fmpz_mod_poly_randtest_irreducible(fmpz_mod_poly_t f,
 
 void
 fmpz_mod_poly_randtest_not_zero(fmpz_mod_poly_t f,
-                                flint_rand_t state, len_t len)
+                                flint_rand_t state, slong len)
 {
     if (len == 0)
     {

@@ -28,10 +28,10 @@
 #include "ulong_extras.h"
 
 int
-_nmod_poly_is_squarefree(mp_srcptr f, len_t len, nmod_t mod)
+_nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
 {
     mp_ptr fd, g;
-    len_t dlen;
+    slong dlen;
     int res;
 
     if (len <= 2)
