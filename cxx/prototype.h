@@ -37,152 +37,9 @@
 
 #include "cxx/mp.h"
 #include "cxx/traits.h"
+#include "cxx/tuple.h"
 
 namespace flint {
-
-template<class Head, class Tail>
-struct tuple
-{
-    Head head;
-    Tail tail;
-
-    typedef Head head_t;
-
-    typename traits::reference<head_t>::type first() {return head;}
-    typename traits::forwarding<head_t>::type first() const {return head;}
-    typename traits::reference<typename Tail::head_t>::type second() {return tail.head;}
-    typename traits::forwarding<typename Tail::head_t>::type second() const {return tail.head;}
-
-    tuple() {};
-    tuple(typename traits::forwarding<Head>::type h,
-          typename traits::forwarding<Tail>::type t)
-        : head(h), tail(t)
-    {
-    }
-};
-struct empty {};
-
-template<>
-struct tuple<void, void>
-{
-    typedef empty head_t;
-    typedef empty tail_t;
-    empty head;
-    empty tail;
-};
-typedef tuple<void, void> empty_tuple;
-
-namespace mp {
-template<class T1, class T2 = void, class T3 = void>
-struct make_tuple
-{
-    typedef tuple<T1, tuple<T2, tuple<T3, empty_tuple> > > type;
-    static type make(typename traits::forwarding<T1>::type t1,
-              typename traits::forwarding<T2>::type t2,
-              typename traits::forwarding<T3>::type t3)
-    {
-        return type(t1, make_tuple<T2, T3>::make(t2, t3));
-    }
-};
-template<class T1, class T2>
-struct make_tuple<T1, T2, void>
-{
-    typedef tuple<T1, tuple<T2, empty_tuple> > type;
-    static type make(typename traits::forwarding<T1>::type t1,
-              typename traits::forwarding<T2>::type t2)
-    {
-        return type(t1, make_tuple<T2>::make(t2));
-    }
-};
-template<class T1>
-struct make_tuple<T1, void, void>
-{
-    typedef tuple<T1, empty_tuple> type;
-    static type make(typename traits::forwarding<T1>::type t1)
-    {
-        return type(t1, empty_tuple());
-    }
-};
-
-// Create a tuple backing a tuple of points.
-// If Tuple::head_t is the same as Return*, do not back the head
-// and instead feed it in separately.
-template<class Tuple, class Return = void>
-struct back_tuple;
-
-template<class T, class Return>
-struct back_tuple<tuple<T*, empty_tuple>, Return>
-{
-    typedef tuple<T, empty_tuple> type;
-    static void init(tuple<T*, empty_tuple>& to, type& from, Return* ret /* unused */)
-    {
-        to.head = &from.head;
-    }
-};
-template<class Head, class Tail, class Return>
-struct back_tuple<tuple<Head*, Tail>, Return>
-{
-    typedef tuple<Head, typename back_tuple<Tail, empty_tuple>::type> type;
-    static void init(tuple<Head*, Tail>& to, type& from, Return* ret /* unused */)
-    {
-        back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
-        to.head = &from.head;
-    }
-};
-
-template<class T>
-struct back_tuple<tuple<T*, empty_tuple>, T>
-{
-    typedef void type;
-    static void init(tuple<T*, empty_tuple>& to, empty& from, T* ret)
-    {
-        to.head = ret;
-    }
-};
-template<class Head, class Tail>
-struct back_tuple<tuple<Head*, Tail>, Head>
-{
-    typedef typename back_tuple<Tail, void>::type type;
-    static void init(tuple<Head*, Tail>& to, type& from, Head* ret)
-    {
-        to.head = ret;
-        back_tuple<Tail, void>::init(to.tail, from, ret /* unused */ );
-    }
-};
-template<class Return>
-struct back_tuple<empty_tuple, Return>
-{
-    typedef empty_tuple type;
-    static void init(empty_tuple& to, type& from, Return* ret)
-    {
-    }
-};
-
-template<class Tuple1, class Tuple2>
-struct concat_tuple;
-
-template<class Tuple2>
-struct concat_tuple<empty_tuple, Tuple2>
-{
-    typedef Tuple2 type;
-    static Tuple2& get_second(Tuple2& t) {return t;}
-    static void init_first(empty_tuple&, type&) {};
-};
-template<class Head, class Tail, class Tuple2>
-struct concat_tuple<tuple<Head, Tail>, Tuple2>
-{
-    typedef tuple<Head, typename concat_tuple<Tail, Tuple2>::type> type;
-    static Tuple2& get_second(type& t)
-    {
-        return concat_tuple<Tail, Tuple2>::get_second(t.tail);
-    }
-    static void init_first(tuple<Head, Tail>& t, type& o)
-    {
-        t.head = o.head;
-        concat_tuple<Tail, Tuple2>::init_first(t.tail, o.tail);
-    }
-};
-}
 
 namespace operations {
 struct immediate {};
@@ -607,8 +464,7 @@ struct evaluation<
 
     static void doit(const mpz_expression<Op, tuple<Data1, tuple<Data2, empty_tuple> > >& input, temporaries_t temps, return_t* output)
     {
-        tuple<mpz*, typename ev1_t::temporaries_t> temps1;
-        concater::init_first(temps1, temps);
+        tuple<mpz*, typename ev1_t::temporaries_t> temps1 = concater::get_first(temps);
         tuple<mpz*, typename ev2_t::temporaries_t> temps2 = concater::get_second(temps);
         ev1_t::doit(input._data().first(), temps1.tail, temps1.head);
         ev2_t::doit(input._data().second(), temps2.tail, temps2.head);

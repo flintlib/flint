@@ -141,6 +141,6 @@ main(int argc, char** argv)
     std::string ass1 = disass(argv[0], "test1");
     std::string ass2 = disass(argv[0], "test2");
     tassert(count(ass1, "call") == count(ass2, "call"));
-    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.15));
+    tassert(fuzzy_equals(count(ass1, "\n"), count(ass2, "\n"), 0.1));
     std::cout << "PASS" << std::endl;
 }
