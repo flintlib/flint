@@ -65,8 +65,7 @@ struct tuple
     }
 };
 
-template<>
-struct tuple<void, void>
+struct empty_tuple
 {
     struct empty { };
     typedef empty head_t;
@@ -75,7 +74,6 @@ struct tuple<void, void>
     empty tail;
     static const unsigned len = 0;
 };
-typedef tuple<void, void> empty_tuple;
 
 namespace mp {
 
