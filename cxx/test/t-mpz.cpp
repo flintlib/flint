@@ -130,7 +130,7 @@ test2(flint::mpz& out, const flint::mpz& a, const flint::mpz& b,
 }
 }
 
-// TODO catch skippable exception
+// TODO move all codegen stuff to t-codegen
 int
 main(int argc, char** argv)
 {

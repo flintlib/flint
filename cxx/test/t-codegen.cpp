@@ -1,0 +1,260 @@
+/*=============================================================================
+
+    This file is part of FLINT.
+
+    FLINT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    FLINT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with FLINT; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
+
+=============================================================================*/
+/******************************************************************************
+
+    Copyright (C) 2013 Tom Bachmann
+
+******************************************************************************/
+
+#include <iostream>
+#include <stdexcept>
+#include <stdio.h>
+#include <string>
+#include <sstream>
+#include <vector>
+
+#include "cxx/test/helpers.h"
+#include "cxx/tuple.h"
+
+// Exception class to indicate that this test cannot proceed, e.g. because
+// binutils is not installed or because we cannot interpret the disassembled
+// code.
+// This should not cause the test to fail, since it is not portable.
+class skippable_exception
+    : public std::runtime_error
+{
+public:
+    skippable_exception(const std::string& n) : std::runtime_error(n) {}
+};
+
+// Run a command and recver the output.
+std::string exec(const std::string& cmd)
+{
+    FILE* pipe = popen(cmd.c_str(), "r");
+    if (!pipe)
+        throw skippable_exception("cannot execute command" + cmd);
+    char buffer[128];
+    std::string result = "";
+    while(!feof(pipe))
+    {
+        if(fgets(buffer, 128, pipe) != NULL)
+            result += buffer;
+    }
+    pclose(pipe);
+    return result;
+}
+
+// Disassembled a function contained in the binary "program".
+std::string disass(const char* program, const std::string& function)
+{
+    std::string all = exec(std::string("objdump -d ") + program);
+    std::string marker = "<" + function + ">:";
+    std::size_t start = all.find(marker);
+    if(start == std::string::npos)
+        throw skippable_exception("cannot find function " + function);
+    all = all.substr(start + marker.size());
+    std::size_t len = all.find("\n\n");
+    if(len == std::string::npos)
+        throw skippable_exception("cannot find end of function " + function);
+    return all.substr(0, len);
+}
+
+std::vector<std::string>&
+split(const std::string &s, char delim, std::vector<std::string>& elems)
+{
+    std::stringstream ss(s);
+    std::string item;
+    while (std::getline(ss, item, delim))
+    {
+        elems.push_back(item);
+    }
+    return elems;
+}
+std::vector<std::string> lines(const std::string& input)
+{
+    std::vector<std::string> result;
+    return split(input, '\n', result);
+}
+
+// Strip addresses from disassembly, to allow comparison. E.g.
+//
+//  401790:       45 0f be c9             movsbl %r9b,%r9d
+//  401794:       44 89 07                mov    %r8d,(%rdi)
+//
+// -->
+//
+//  45 0f be c9             movsbl %r9b,%r9d
+//  44 89 07                mov    %r8d,(%rdi)
+// 
+std::string stripaddr(const std::string& input)
+{
+    std::string result;
+    std::vector<std::string> ls = lines(input);
+    for(unsigned i = 0;i < ls.size();++i)
+    {
+        if(ls[i] == "")
+            continue;
+        std::size_t pos = ls[i].find(":\t");
+        if(pos == std::string::npos)
+            result += ls[i];
+        else
+            result += ls[i].substr(pos+2);
+        result += '\n';
+    }
+    return result;
+}
+
+// Count the number of occurrences of a substring.
+int count(const std::string& str, const std::string& sub)
+{
+    if(sub.length() == 0)
+        return 0;
+    int count = 0;
+    for(size_t offset = str.find(sub); offset != std::string::npos;
+            offset = str.find(sub, offset + sub.length()))
+        ++count;
+    return count;
+}
+
+// Check if two quantities are equal up to a certain percentage of error.
+template<class T>
+bool fuzzy_equals(T v1, T v2, double perc)
+{
+    double d1 = double(v1);
+    double d2 = double(v2);
+    return d1*(1-perc) <= d2 && d2 <= d1*(1+perc);
+}
+
+using namespace flint;
+using namespace mp;
+
+extern "C" {
+#define DEFINE_FUNC(name, args) \
+void name args __attribute__((__optimize__("no-exceptions"))); \
+void name args 
+
+DEFINE_FUNC(test_tuple_merge_1,
+        (int& o1, int& o2, int& o3, int i1, long i2, char i3, int i4))
+{
+    typedef make_tuple<long, int, char> make3;
+    typedef make_tuple<int, int> make2;
+    typedef merge_tuple<make3::type, make2::type> merge;
+    merge::type merged; // <int, int, char, long>
+    merged.head = i1;
+    merged.tail.head = i4;
+    merged.tail.tail.head = i3;
+    merged.tail.tail.tail.head = i2;
+    make3::type extract = merge::get_first(merged);
+    o1 = extract.head; // i2
+    o2 = extract.tail.head; // i1
+    o3 = extract.tail.tail.head; // i3
+}
+
+DEFINE_FUNC(test_tuple_merge_2,
+        (int& o1, int& o2, int& o3, int i1, long i2, char i3, int i4))
+{
+    o1 = i2;
+    o2 = i1;
+    o3 = i3;
+}
+
+DEFINE_FUNC(test_tuple_concat_1,
+        (tuple<int, make_tuple<int, int, int>::type>& out,
+         const make_tuple<int, int>::type& in1,
+         const make_tuple<int, int>::type& in2))
+{
+    out = concat_tuple<
+        make_tuple<int, int>::type,
+        make_tuple<int, int>::type
+      >::doit(in1, in2);
+}
+
+DEFINE_FUNC(test_tuple_concat_2,
+        (tuple<int, make_tuple<int, int, int>::type>& out,
+         const make_tuple<int, int>::type& in1,
+         const make_tuple<int, int>::type& in2))
+{
+    out.head = in1.head;
+    out.tail.head = in1.tail.head;
+    out.tail.tail.head = in2.head;
+    out.tail.tail.tail.head = in2.tail.head;
+}
+
+DEFINE_FUNC(test_tuple_back_1,
+        (make_tuple<int, long, char>::type& out, int i1, long i2, char i3))
+{
+    typedef make_tuple<int*, long*, char*>::type type;
+    type pointers;
+    back_tuple<type>::init(pointers, out, 0);
+    *pointers.head = i1;
+    *pointers.tail.head = i2;
+    *pointers.tail.tail.head = i3;
+}
+
+DEFINE_FUNC(test_tuple_back_2,
+        (make_tuple<int, long, char>::type& out, int i1, long i2, char i3))
+{
+    out.head = i1;
+    out.tail.head = i2;
+    out.tail.tail.head = i3;
+}
+} // extern "C"
+
+// Global variable, initialized by main.
+const char* program = 0;
+
+void
+test_tuple()
+{
+    std::string ass1 = disass(program, "test_tuple_merge_1");
+    std::string ass2 = disass(program, "test_tuple_merge_2");
+    // XXX is this deterministic?
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+
+    ass1 = disass(program, "test_tuple_concat_1");
+    ass2 = disass(program, "test_tuple_concat_2");
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
+    tassert(count(ass1, "mov") == count(ass2, "mov"));
+    tassert(count(ass1, "call") == count(ass2, "call")); // 0
+
+    ass1 = disass(program, "test_tuple_back_1");
+    ass2 = disass(program, "test_tuple_back_2");
+    // XXX is this deterministic?
+    tassert(stripaddr(ass1) == stripaddr(ass2));
+}
+
+int
+main(int argc, char** argv)
+{
+    std::cout << "codegen....";
+    program = argv[0];
+    try
+    {
+        test_tuple();
+    }
+    catch(skippable_exception e)
+    {
+        std::cout << "SKIP (" << e.what() << ")\n";
+        return 0;
+    }
+    std::cout << "PASS" << std::endl;
+    return 0;
+}
+
