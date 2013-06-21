@@ -28,9 +28,6 @@
 
 #include "cxx/traits.h"
 
-// TODO
-// * tuple merging
-
 namespace flint {
 ///////////////////////////
 // A general tuple class.
@@ -47,6 +44,8 @@ struct tuple
     Tail tail;
 
     typedef Head head_t;
+    typedef Tail tail_t;
+    static const unsigned len = 1 + Tail::len;
 
     // Obtain a reference to head (convenience name for pairs).
     typename traits::reference<head_t>::type first() {return head;}
@@ -74,6 +73,7 @@ struct tuple<void, void>
     typedef empty tail_t;
     empty head;
     empty tail;
+    static const unsigned len = 0;
 };
 typedef tuple<void, void> empty_tuple;
 
@@ -165,8 +165,8 @@ struct back_tuple<empty_tuple, Return>
 
 // Helper to concatenate two tuples.
 //
-// This has one member type, and two static member functions get_second and
-// get_first.
+// This has one member type, and three static member functions get_second,
+// get_first and doit.
 // "type" is a tuple type which can store the data of both Tuple1 and Tuple2.
 // Then, given an element of type "type", get_first and get_second can be used
 // to fill types Tuple1 and Tuple2. Note that get_second can return a constant
@@ -190,6 +190,8 @@ struct concat_tuple<empty_tuple, Tuple2>
     typedef Tuple2 type;
     static const Tuple2& get_second(const Tuple2& t) {return t;}
     static empty_tuple get_first(const Tuple2& t) {return empty_tuple();}
+
+    static type doit(const empty_tuple& t1, const Tuple2& t2) {return t2;}
 };
 // General case: non-empty Tuple1.
 template<class Head, class Tail, class Tuple2>
@@ -205,6 +207,184 @@ struct concat_tuple<tuple<Head, Tail>, Tuple2>
         return tuple<Head, Tail>(
                 o.head,
                 concat_tuple<Tail, Tuple2>::get_first(o.tail));
+    }
+    static type doit(const tuple<Head, Tail>& t1, const Tuple2& t2)
+    {
+        return type(t1.head, concat_tuple<Tail, Tuple2>::doit(t1.tail, t2));
+    }
+};
+
+
+// Merging of tuples
+//
+// This takes two tuples, and computes a tuple type which can store either.
+// As usual, the extraction functions require copying which can be amortized
+// by the compiler.
+//
+template<class Tuple1, class Tuple2>
+struct merge_tuple;
+//{
+//    typedef XYZ type;
+//    Tuple1 get_first(const type& type);
+//    Tuple2 get_second(const type& type);
+//};
+
+// General case
+template<class Head, class Tail, class Tuple2>
+class merge_tuple<tuple<Head, Tail>, Tuple2>
+{
+    typedef merge_tuple<Tail, Tuple2> comp1;
+    typedef merge_tuple<tuple<Head, empty_tuple>, typename comp1::tail_t> comp2;
+    typedef concat_tuple<typename comp1::used_t, typename comp2::type> concater;
+    
+public:
+    typedef typename concater::type type;
+
+    // This is the part of type into which we can still merge.
+    typedef typename comp2::tail_t tail_t;
+
+    typedef typename concat_tuple<
+        typename comp1::used_t,
+        typename comp2::used_t
+      >::type used_t;
+
+private:
+    static typename comp1::type get_tail(const type& input)
+    {
+        typedef concat_tuple<
+            typename comp1::used_t,
+            typename comp1::tail_t
+          > myconcat;
+        return myconcat::doit(concater::get_first(input),
+                    comp2::get_second(concater::get_second(input)));
+    }
+
+public:
+    static tuple<Head, Tail> get_first(const type& input)
+    {
+        Head h = comp2::get_first(concater::get_second(input)).first();
+        return tuple<Head, Tail>(h, comp1::get_first(get_tail(input)));
+    }
+
+    static Tuple2 get_second(const type& input)
+    {
+        return comp1::get_second(get_tail(input));
+    }
+};
+
+// First argument a singleton, no merging
+template<class T, class U, class Tail>
+class merge_tuple<tuple<T, empty_tuple>, tuple<U, Tail> >
+{
+    typedef merge_tuple<tuple<T, empty_tuple>, Tail> comp;
+    typedef concat_tuple<
+        typename comp::used_t,
+        tuple<U, typename comp::tail_t>
+      > concater;
+
+public:
+    typedef typename comp::used_t used_t;
+    typedef tuple<U, typename comp::tail_t> tail_t;
+    typedef typename concater::type type;
+
+private:
+    static typename comp::type get_tail(const type& input)
+    {
+        typedef concat_tuple<
+            typename comp::used_t,
+            typename comp::tail_t
+          > myconcat;
+        return myconcat::doit(concater::get_first(input),
+                concater::get_second(input).tail);
+    }
+
+public:
+    static tuple<T, empty_tuple> get_first(const type& input)
+    {
+        return comp::get_first(get_tail(input));
+    }
+
+    static tuple<U, Tail> get_second(const type& input)
+    {
+        return tuple<U, Tail>(
+                concater::get_second(input).head,
+                comp::get_second(get_tail(input)));
+    }
+};
+
+// First argument a singleton, with merging
+template<class T, class Tail>
+struct merge_tuple<tuple<T, empty_tuple>, tuple<T, Tail> >
+{
+    typedef tuple<T, Tail> type;
+    typedef tuple<T, empty_tuple> used_t;
+    typedef Tail tail_t;
+
+    static tuple<T, empty_tuple> get_first(const type& input)
+    {
+        return make_tuple<T>::make(input.head);
+    }
+
+    static tuple<T, Tail> get_second(const type& input)
+    {
+        return input;
+    }
+};
+
+// Termination case 1
+template<class Tuple2>
+struct merge_tuple<empty_tuple, Tuple2>
+{
+    typedef Tuple2 type;
+    typedef type tail_t;
+    typedef empty_tuple used_t;
+
+    static empty_tuple get_first(const type& input)
+    {
+        return empty_tuple();
+    }
+
+    static Tuple2 get_second(const type& input)
+    {
+        return input;
+    }
+};
+
+// Termination case 2
+template<class Tuple1>
+struct merge_tuple<Tuple1, empty_tuple>
+{
+    typedef Tuple1 type;
+    typedef type tail_t;
+    typedef empty_tuple used_t;
+
+    static Tuple1 get_first(const type& input)
+    {
+        return input;
+    }
+
+    static empty_tuple get_second(const type& input)
+    {
+        return empty_tuple();
+    }
+};
+
+// Termination case 3
+template<class T>
+struct merge_tuple<tuple<T, empty_tuple>, empty_tuple>
+{
+    typedef tuple<T, empty_tuple> type;
+    typedef type tail_t;
+    typedef empty_tuple used_t;
+
+    static empty_tuple get_second(const type& input)
+    {
+        return empty_tuple();
+    }
+
+    static tuple<T, empty_tuple> get_first(const type& input)
+    {
+        return input;
     }
 };
 } // mp

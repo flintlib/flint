@@ -23,6 +23,8 @@
 
 ******************************************************************************/
 
+#include <set>
+
 #include "cxx/test/helpers.h"
 #include "cxx/tuple.h"
 #include "cxx/mp.h"
@@ -46,6 +48,9 @@ test_make()
                 tuple<int, tuple<char, empty_tuple> >
               >::val));
     tassert((equal_types<make1::type, tuple<int, empty_tuple> >::val));
+    tassert(make3::type::len == 3);
+    tassert(make2::type::len == 2);
+    tassert(make1::type::len == 1);
 
     make3::type tup = make3::make(1, 'b', 3);
     tassert(tup.head == 1);
@@ -71,11 +76,18 @@ test_make()
     tassert(reftup.second() == 5);
 }
 
-template<int i>
+template<int i, bool default_ctor = false>
 struct type_n
 {
     int payload;
-    type_n (int p) : payload(p) { };
+    type_n(int p) : payload(p) {};
+};
+template<int i>
+struct type_n<i, true>
+{
+    int payload;
+    type_n(int p) : payload(p) {};
+    type_n() {};
 };
 
 void
@@ -150,6 +162,12 @@ test_concat()
     tassert(first.second().payload == 1);
     tassert(first.tail.second().payload == 2);
 
+    first.first().payload = 17;
+    second.first().payload = 18;
+    concated = concater::doit(first, second);
+    tassert(concated.first().payload == 17);
+    tassert(concated.tail.tail.tail.head.payload == 18);
+
     // Test a few corner cases.
     tassert((equal_types<
                 concat_tuple<empty_tuple, empty_tuple>::type,
@@ -166,6 +184,118 @@ test_concat()
               >::val));
 }
 
+namespace flint{
+namespace detail
+{
+template<class T>
+struct fillit
+{
+    static void doit(T& t, int start)
+    {
+        t.head.payload = start;
+        detail::fillit<typename T::tail_t>::doit(t.tail, ++start);
+    }
+};
+
+template<>
+struct fillit<empty_tuple>
+{
+    static void doit(empty_tuple e, int start)
+    {
+    }
+};
+
+template<class T>
+struct values
+{
+    static void doit(const T& t, std::set<int>& values)
+    {
+        values.insert(t.head.payload);
+        detail::values<typename T::tail_t>::doit(t.tail, values);
+    }
+};
+
+template<>
+struct values<empty_tuple>
+{
+    static void doit(empty_tuple e, std::set<int>& values)
+    {
+    }
+};
+}
+}
+
+template<class T>
+void fillit(T& t, int start = 1)
+{
+    detail::fillit<T>::doit(t, start);
+}
+
+template<class T>
+std::set<int> values(const T& t)
+{
+    std::set<int> ret;
+    detail::values<T>::doit(t, ret);
+    return ret;
+}
+
+void
+test_merge()
+{
+    typedef type_n<0, true> A;
+    typedef type_n<1, true> B;
+    typedef type_n<2, true> C;
+    typedef type_n<3, true> D;
+    typedef type_n<4, true> E;
+
+    // Test that merging tuples <T1, T2, T3> and <U1, U2>
+    // yields something of length n, and that the constitutents can be
+    // recovered. Also do other order.
+#define TEST32n(T1, T2, T3, U1, U2, n) \
+    { \
+        typedef make_tuple<T1, T2, T3> m1; \
+        typedef make_tuple<U1, U2> m2; \
+        typedef merge_tuple<m1::type, m2::type> merge1; \
+        typedef merge_tuple<m2::type, m1::type> merge2; \
+        tassert(merge1::type::len == n); \
+        tassert(merge2::type::len == n); \
+        merge1::type merged1; \
+        { \
+            fillit(merged1); \
+            m1::type n1 = merge1::get_first(merged1); \
+            m2::type n2 = merge1::get_second(merged1); \
+            std::set<int> vals1 = values(n1), vals2 = values(n2); \
+            vals1.insert(vals2.begin(), vals2.end()); \
+            tassert(vals1.size() == n); \
+        } \
+        merge2::type merged2; \
+        { \
+            fillit(merged2); \
+            m2::type n2 = merge2::get_first(merged2); \
+            m1::type n1 = merge2::get_second(merged2); \
+            std::set<int> vals1 = values(n1), vals2 = values(n2); \
+            vals1.insert(vals2.begin(), vals2.end()); \
+            tassert(vals1.size() == n); \
+        } \
+    }
+
+    TEST32n(A, B, C, A, B, 3);
+    TEST32n(A, B, C, B, A, 3);
+    TEST32n(A, B, C, A, C, 3);
+    TEST32n(A, B, C, C, A, 3);
+    TEST32n(A, B, C, C, B, 3);
+    TEST32n(A, B, C, B, C, 3);
+
+    TEST32n(A, B, C, A, D, 4);
+    TEST32n(A, B, C, B, D, 4);
+    TEST32n(A, B, C, C, D, 4);
+    TEST32n(A, B, C, D, A, 4);
+    TEST32n(A, B, C, D, B, 4);
+    TEST32n(A, B, C, D, C, 4);
+
+    TEST32n(A, B, C, D, E, 5);
+}
+
 int
 main()
 {
@@ -174,6 +304,7 @@ main()
     test_make();
     test_back();
     test_concat();
+    test_merge();
 
     std::cout << "PASS" << std::endl;
     return 0;
