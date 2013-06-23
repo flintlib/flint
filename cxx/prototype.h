@@ -192,9 +192,13 @@ template<class Derived, class Operation, class Data>
 class expression
     : public detail::EXPRESSION
 {
-protected:
+private:
     Data data;
 
+    template<class D, class O, class Da>
+    friend class expression;
+
+protected:
     explicit expression(const Data & d) : data(d) {}
 
 public:
@@ -205,7 +209,7 @@ public:
     typedef Data data_t;
     typedef Operation operation_t;
 
-    // XXX private??
+private:
     derived_t& downcast() {return *static_cast<derived_t*>(this);}
     const derived_t& downcast() const {return *static_cast<const derived_t*>(this);}
 
@@ -225,7 +229,7 @@ public:
         T::ev_traits_t::evaluate_into_fresh(downcast(), t.downcast());
     }
 
-    // XXX is this ok if non-implemented (i.e. may the compiler eagerly instantiate)?
+    // NB: the compiler is not allowed to eagerly instantiate!
     expression() {rules::empty_initialization<derived_t>::doit(downcast());}
 
     ~expression() {rules::destruction<derived_t>::doit(downcast());}
@@ -233,7 +237,6 @@ public:
     Data& _data() {return data;}
     const Data& _data() const {return data;}
 
-    // XXX move this stuff below the rules?
     void print(std::ostream& o) const
     {
         rules::print<evaluated_t>::doit(evaluate(), o);
@@ -333,8 +336,11 @@ public:
         return *this;
     }
 
-//protected: // XXX
+protected:
     explicit mpz_expression(const Data& d) : mpz_expression::expression(d) {}
+
+    template<class D, class O, class Da>
+    friend class expression;
 };
 
 } // flint
