@@ -27,7 +27,6 @@
 #define CXX_EXPRESSION_H
 
 // TODO
-// * formatting
 // * static asserts
 
 #include <iosfwd>
@@ -74,6 +73,9 @@ struct empty_initialization : UNIMPLEMENTED { };
 template<class T, class U, class Enable = void>
 struct assignment : UNIMPLEMENTED { };
 
+template<class T, class U, class Enable = void>
+struct equals : UNIMPLEMENTED { };
+
 // If result_is_temporary is true, then the result coincides with the
 // first temporary (provided these have the same type)
 // Priorities 2, 1, 0 can be used to resolve conflicts.
@@ -93,14 +95,6 @@ struct evaluation : UNIMPLEMENTED { };
 namespace traits {
 template<class T>
 struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
-
-template<class T>
-struct is_immediate
-    : _is_convertible<
-          typename basetype<T>::type::operation_t,
-          operations::immediate
-        >
-{ };
 } // traits
 
 namespace mp {
@@ -203,6 +197,32 @@ struct storage_traits<operations::immediate, Expr>
 namespace traits {
 template<class T>
 struct is_expression : _is_convertible<detail::EXPRESSION, T> { };
+
+template<class T>
+struct _is_immediate_expr
+    : _is_convertible<
+          typename basetype<T>::type::operation_t,
+          operations::immediate
+        >
+{ };
+
+// Compute if T is an expression, with operation "immediate"
+template<class T, class Enable = void>
+struct is_immediate_expr : _is_immediate_expr<T> { };
+template<class T>
+struct is_immediate_expr<T,
+  typename mp::enable_if<mp::not_<is_expression<T> > >::type>
+    : mp::false_ { };
+
+// Compute if T is an immediate expression, *or not an expression at all*
+template<class T>
+struct is_immediate
+    : mp::or_<mp::not_<is_expression<T> >, is_immediate_expr<T> > { };
+
+// Compute if T is a non-immediate expression
+template<class T>
+struct is_lazy_expr
+    : mp::and_<is_expression<T>, mp::not_<is_immediate_expr<T> > > { };
 } // traits
 
 template<class Derived, class Operation, class Data>
@@ -211,9 +231,6 @@ class expression
 {
 private:
     Data data;
-
-    template<class D, class O, class Da>
-    friend class expression;
 
 protected:
     explicit expression(const Data & d) : data(d) {}
@@ -249,7 +266,7 @@ public:
                 rules::initialization<derived_t, T> > >::type* = 0,
             typename mp::enable_if<traits::is_expression<T> >::type* = 0)
     {
-        T::ev_traits_t::evaluate_into_fresh(downcast(), t.downcast());
+        T::ev_traits_t::evaluate_into_fresh(downcast(), t);
     }
 
     expression(const expression& e)
@@ -280,13 +297,26 @@ public:
     void set(const T& t,
             typename mp::enable_if<traits::is_expression<T> >::type* = 0)
     {
-        T::ev_traits_t::evaluate_into(downcast(), t.downcast());
+        T::ev_traits_t::evaluate_into(downcast(), t);
     }
     template<class T>
     void set(const T& t,
             typename mp::disable_if<traits::is_expression<T> >::type* = 0)
     {
         rules::assignment<derived_t, T>::doit(downcast(), t);
+    }
+
+    template<class T>
+    bool equals(const T& t,
+            typename mp::enable_if<traits::is_lazy_expr<T> >::type* = 0) const
+    {
+        return equals(T::ev_traits_t::evaluate(downcast(), t));
+    }
+    template<class T>
+    bool equals(const T& t,
+            typename mp::disable_if<traits::is_lazy_expr<T> >::type* = 0) const
+    {
+        return rules::equals<derived_t, T>::get(downcast(), t);
     }
 
 protected:
@@ -304,7 +334,7 @@ protected:
         static new_derived_t
         make(const expression& self, const T& other)
         {
-            return new_derived_t(maker::make(self.downcast(), other.downcast()));
+            return new_derived_t(maker::make(self.downcast(), other));
         }
     };
 
@@ -341,6 +371,33 @@ operator<<(std::ostream& o, const Expr& e)
 {
     e.print(o);
     return o;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_expression<Expr1>, bool>::type
+operator==(const Expr1& e1, const Expr2& e2)
+{
+  return e1.equals(e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<mp::and_<
+        mp::not_<traits::is_expression<Expr1> >,
+        traits::is_expression<Expr2> >,
+    bool>::type
+operator==(const Expr1& e1, const Expr2& e2)
+{
+  return e2.equals(e1);
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<mp::or_<
+        traits::is_expression<Expr1>,
+        traits::is_expression<Expr2> >,
+    bool>::type
+operator!=(const Expr1& e1, const Expr2& e2)
+{
+  return !(e1 == e2);
 }
 
 // TODO other order
@@ -380,18 +437,14 @@ struct copy_initialization<T,
 };
 
 namespace rdetail {
-template<class T, class Enable = void>
+template<class T>
 struct is_evaluation_2_2 : mp::false_ { };
 template<class Data1, class Data2>
-struct is_evaluation_2_2<
-    tuple<Data1, tuple<Data2, empty_tuple> >,
-    typename mp::enable_if<mp::and_<
-        mp::not_<traits::is_immediate<Data1> >,
-        mp::not_<traits::is_immediate<Data2> > > >::type
-  >
-    : mp::true_
-{
-};
+struct is_evaluation_2_2<tuple<Data1, tuple<Data2, empty_tuple> > >
+    : mp::and_<
+          traits::is_lazy_expr<Data1>,
+          traits::is_lazy_expr<Data2>
+        > { };
 } // rdetail
 
 template<class T, bool result_is_temporary>

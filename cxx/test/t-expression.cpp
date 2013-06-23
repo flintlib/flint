@@ -26,9 +26,13 @@
 #include<sstream>
 
 #include "cxx/expression.h"
+#include "cxx/tuple.h"
+
 #include "cxx/test/helpers.h"
 
 using namespace flint;
+using namespace mp;
+using namespace traits;
 
 template<class Operation, class Data>
 class my_expression
@@ -146,6 +150,37 @@ struct assignment<myint, long>
         to._data().extra = 5;
     }
 };
+
+template<>
+struct equals<myint, myint>
+{
+    static bool get(const myint& i1, const myint& i2)
+    {
+        return i1._data().payload == i2._data().payload;
+    }
+};
+
+template<>
+struct equals<myint, int>
+{
+    static bool get(const myint& i1, int i2)
+    {
+        return i1._data().payload == i2;
+    }
+};
+
+// TODO
+template<bool c>
+struct evaluation<my_expression<operations::plus, make_tuple<const myint&, const myint&>::type>, c, 0>
+{
+    typedef myint return_t;
+    typedef empty_tuple temporaries_t;
+    static void doit(const my_expression<operations::plus, tuple<const myint&, tuple<const myint&, empty_tuple> > >& input, temporaries_t temps, return_t* output)
+    {
+        output->_data().payload = input._data().first()._data().payload
+                                + input._data().second()._data().payload;
+    }
+};
 } // rules
 } // flint
 
@@ -199,13 +234,59 @@ test_assignment()
     tassert(a._data().payload == 44 && a._data().extra == 5);
 }
 
+void
+test_traits()
+{
+    typedef myint immediate_expression;
+    typedef int immediate_nonexpression;
+    typedef my_expression<
+        operations::plus,
+        make_tuple<const myint&, const myint&>::type
+      > lazy_expression;
+
+    tassert(is_expression<immediate_expression>::val == true);
+    tassert(is_expression<immediate_nonexpression>::val == false);
+    tassert(is_expression<lazy_expression>::val == true);
+
+    tassert(is_immediate_expr<immediate_expression>::val == true);
+    tassert(is_immediate_expr<immediate_nonexpression>::val == false);
+    tassert(is_immediate_expr<lazy_expression>::val == false);
+
+    tassert(is_immediate<immediate_expression>::val == true);
+    tassert(is_immediate<immediate_nonexpression>::val == true);
+    tassert(is_immediate<lazy_expression>::val == false);
+
+    tassert(is_lazy_expr<immediate_expression>::val == false);
+    tassert(is_lazy_expr<immediate_nonexpression>::val == false);
+    tassert(is_lazy_expr<lazy_expression>::val == true);
+}
+
+void
+test_equals()
+{
+    myint a(3);
+    myint b(4);
+    myint c(3);
+
+    tassert(a != b);
+    tassert(a == c);
+
+    tassert(a == 3);
+    tassert(3 == a);
+
+    tassert(a != 4);
+    tassert(4 != a);
+}
+
 int
 main()
 {
+    test_traits();
     test_initialization();
     test_destruction();
     test_printing();
     test_assignment();
+    test_equals();
 
     // TODO test that certain things *don't* compile?
 
