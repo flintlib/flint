@@ -38,11 +38,13 @@
 namespace flint {
 
 namespace operations {
+// TODO document these
 struct immediate { };
 struct plus { };
 } // operations
 
 namespace rules {
+// TODO document these
 struct no_op
 {
     template<class U>
