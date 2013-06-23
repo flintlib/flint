@@ -76,7 +76,6 @@ struct empty_tuple
 };
 
 namespace mp {
-
 // Helper to conveniently define tuple types, and marshall objects into
 // tuples.
 // Typical usage:

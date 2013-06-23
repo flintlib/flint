@@ -74,11 +74,15 @@ struct empty_initialization : UNIMPLEMENTED { };
 template<class T, class U, class Enable = void>
 struct assignment : UNIMPLEMENTED { };
 
-// TODO priorities
 // If result_is_temporary is true, then the result coincides with the
 // first temporary (provided these have the same type)
-template<class T, bool result_is_temporary, class Enable = void>
-struct evaluation;
+// Priorities 2, 1, 0 can be used to resolve conflicts.
+template<
+    class T,
+    bool result_is_temporary,
+    unsigned priority,
+    class Enable = void>
+struct evaluation : UNIMPLEMENTED { };
 //{
 //    typedef X return_t;
 //    typedef Y temporaries_t; // a tuple of *pointers*
@@ -99,6 +103,28 @@ struct is_immediate
 { };
 } // traits
 
+namespace mp {
+template<class T, bool result_is_temporary>
+struct find_evaluation
+{
+private:
+    typedef rules::evaluation<T, result_is_temporary, 2> r2;
+    typedef rules::evaluation<T, result_is_temporary, 1> r1;
+    typedef rules::evaluation<T, result_is_temporary, 0> r0;
+
+    typedef traits::is_implemented<r2> i2;
+    typedef traits::is_implemented<r1> i1;
+    typedef traits::is_implemented<r0> i0;
+
+public:
+    typedef typename mp::select<void, // TODO
+        i2, r2,
+        i1, r1,
+        i0, r0
+      >::type type;
+};
+} // mp
+
 namespace detail {
 struct EXPRESSION { };
 
@@ -106,8 +132,8 @@ template<class Operation, class Expr>
 struct evaluation_traits
 {
     typedef typename Expr::derived_t derived_t;
-    typedef rules::evaluation<derived_t, false> rule_t;
-    typedef rules::evaluation<derived_t, true> temp_rule_t;
+    typedef typename mp::find_evaluation<derived_t, false>::type rule_t;
+    typedef typename mp::find_evaluation<derived_t, true>::type temp_rule_t;
     typedef typename rule_t::return_t evaluation_return_t;
     typedef evaluation_return_t evaluated_t;
 
@@ -352,8 +378,33 @@ struct copy_initialization<T,
         return tmp._data();
     }
 };
-}
 
+namespace rdetail {
+template<class T, class Enable = void>
+struct is_evaluation_2_2 : mp::false_ { };
+template<class Data1, class Data2>
+struct is_evaluation_2_2<
+    tuple<Data1, tuple<Data2, empty_tuple> >,
+    typename mp::enable_if<mp::and_<
+        mp::not_<traits::is_immediate<Data1> >,
+        mp::not_<traits::is_immediate<Data2> > > >::type
+  >
+    : mp::true_
+{
+};
+} // rdetail
+
+template<class T, bool result_is_temporary>
+struct evaluation<
+    T, result_is_temporary, 0,
+    typename mp::enable_if<mp::and_<
+        traits::is_expression<T>,
+        rdetail::is_evaluation_2_2<typename T::data_t>
+      > >::type
+  >
+{
+};
+} // rules
 } // flint
 
 #endif

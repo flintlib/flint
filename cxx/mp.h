@@ -63,6 +63,35 @@ struct and_ : value_of<T::val && U::val> { };
 template<class T, class U>
 struct or_ : value_of<T::val || U::val> { };
 
+// Compute V1 or V2, depending on C
+template<bool C, class V1, class V2>
+struct if_v {typedef V1 type;};
+template<class V1, class V2>
+struct if_v<false, V1, V2> {typedef V2 type;};
+
+template<class C, class V1, class V2>
+struct if_ : if_v<C::val, V1, V2> { };
+
+// Choose a value depending on a sequence of conditions.
+// This has he same meaning as
+//  int select(bool c1 = false, bool c2 = false, bool c3 = false)
+//  {
+//      if(c1)
+//          return v1;
+//      if(c2)
+//          return v2;
+//      if(c3)
+//          return v3;
+//      return d;
+//  }
+template<class D, class C1 = void, class V1 = void,
+    class C2 = void, class V2 = void,
+    class C3 = void, class V3 = void>
+struct select : if_<C1, V1, typename select<D, C2, V2, C3, V3>::type> { };
+
+template<class D>
+struct select<D,  void, void,  void, void,  void, void> {typedef D type;};
+
 // Conditional template enabling helper. (See below for explanation.)
 template<bool, class U = void>
 struct enable_if_v

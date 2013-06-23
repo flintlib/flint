@@ -30,13 +30,13 @@
 #include "cxx/mp.h"
 
 namespace flint {
-namespace detail{
+namespace detail {
 template<class T>
 struct wrap
 {
     T t;
 };
-}
+} // detail
 
 namespace traits {
 ///////////////////////

@@ -22,7 +22,6 @@
     Copyright (C) 2013 Tom Bachmann
 
 ******************************************************************************/
-
 #include <iostream>
 #include <string>
 #include <stdexcept>

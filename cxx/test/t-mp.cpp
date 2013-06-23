@@ -81,6 +81,34 @@ test_enable_if()
     tassert(test_enable_if_2(unsigned(1)) == 1);
 }
 
+void
+test_if()
+{
+    tassert((equal_types<if_<true_, int, long>::type, int>::val));
+    tassert((equal_types<if_<false_, int, long>::type, long>::val));
+
+    typedef mp::select<bool, false_, int, false_, long, false_, char> s1;
+    tassert((equal_types<s1::type, bool>::val));
+
+    typedef mp::select<bool, true_, int, false_, long, false_, char> s2;
+    tassert((equal_types<s2::type, int>::val));
+
+    typedef mp::select<bool, true_, int, true_, long, false_, char> s3;
+    tassert((equal_types<s3::type, int>::val));
+
+    typedef mp::select<bool, true_, int, true_, long, true_, char> s4;
+    tassert((equal_types<s4::type, int>::val));
+
+    typedef mp::select<bool, false_, int, true_, long, true_, char> s5;
+    tassert((equal_types<s5::type, long>::val));
+
+    typedef mp::select<bool, false_, int, true_, long, false_, char> s6;
+    tassert((equal_types<s6::type, long>::val));
+
+    typedef mp::select<bool, false_, int, false_, long, true_, char> s7;
+    tassert((equal_types<s7::type, char>::val));
+}
+
 int
 main()
 {
@@ -89,6 +117,7 @@ main()
     test_equal_types();
     test_logic();
     test_enable_if();
+    test_if();
 
     std::cout << "PASS" << std::endl;
     return 0;
