@@ -149,12 +149,6 @@ else
 	$(AT)$(foreach dir, $(MOD), mkdir -p build/$(dir)/test; export BUILD_DIR=../build/$(dir); $(MAKE) -f ../Makefile.subdirs -C $(dir) check || exit $$?;)
 endif
 
-define CHECK_TARGET
-check-$(1): library test_helpers.o
-	$(AT)mkdir -p build/$(1)/test; export BUILD_DIR=../build/$(1); $(MAKE) -f ../Makefile.subdirs -C $(1) check || exit $$$$?
-endef
-$(foreach dir, $(BUILD_DIRS), $(eval $(call CHECK_TARGET,$(dir))))
-
 install: library
 	mkdir -p $(DESTDIR)$(PREFIX)/lib
 	mkdir -p $(DESTDIR)$(PREFIX)/include/flint
