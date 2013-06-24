@@ -215,14 +215,6 @@ struct evaluation_traits<operations::immediate, Expr>
         evaluate_into(to, from);
     }
 };
-
-template<class Expr>
-struct storage_traits
-    : mp::if_<
-          traits::is_immediate<Expr>,
-          typename traits::forwarding<Expr>::type,
-          Expr
-        > { };
 } // detail
 
 template<class Derived, class Operation, class Data>
@@ -319,36 +311,14 @@ public:
         return rules::equals<evaluated_t, T>::get(evaluate(), t);
     }
 
-protected:
-    template<class T, class Op>
-    struct helper
+    template<class Op, class NData>
+    struct make_helper
     {
-        typedef mp::make_tuple<
-            typename detail::storage_traits<derived_t>::type,
-            typename detail::storage_traits<T>::type
-          > maker;
-        typedef typename maker::type type;
-        typedef typename Derived::template type<
-            Op, typename maker::type>::result new_derived_t;
-
-        static new_derived_t
-        make(const expression& self, const T& other)
+        typedef typename Derived::template type<Op, NData>::result type;
+        static type make(const NData& ndata)
         {
-            return new_derived_t(maker::make(self.downcast(), other));
+            return type(ndata);
         }
-    };
-
-public:
-    template<class T>
-    typename helper<T, operations::plus>::new_derived_t plus(const T& t) const
-    {
-        return helper<T, operations::plus>::make(*this, t);
-    }
-
-    template<class T>
-    struct return_types
-    {
-        typedef typename helper<T, operations::plus>::new_derived_t plus_return_t;
     };
 };
 
@@ -364,6 +334,34 @@ struct derived_wrapper
 
 
 // operators
+
+namespace detail {
+template<class Expr>
+struct storage_traits
+    : mp::if_<
+          traits::is_immediate<Expr>,
+          typename traits::forwarding<Expr>::type,
+          Expr
+        > { };
+
+template<class Expr1, class Op, class Expr2>
+struct binary_op_helper
+{
+    typedef mp::make_tuple<
+        typename storage_traits<Expr1>::type,
+        typename storage_traits<Expr2>::type
+      > maker;
+    typedef typename maker::type type;
+    typedef typename mp::if_<traits::is_expression<Expr1>, Expr1, Expr2>::type Expr;
+    typedef typename Expr::template make_helper<Op, type> make_helper;
+    typedef typename make_helper::type return_t;
+
+    static return_t make(const Expr1& left, const Expr2& right)
+    {
+        return make_helper::make(maker::make(left, right));
+    }
+};
+}
 
 template<class Expr>
 inline typename mp::enable_if<traits::is_expression<Expr>, std::ostream&>::type
@@ -401,22 +399,13 @@ operator!=(const Expr1& e1, const Expr2& e2)
 }
 
 template<class Expr1, class Expr2>
-inline typename mp::enable_if<
-    traits::is_expression<Expr1>,
-    typename Expr1::template return_types<Expr2>::plus_return_t>::type
-operator+(const Expr1& e1, const Expr2& e2)
-{
-    return e1.plus(e2);
-}
-
-template<class Expr1, class Expr2>
-inline typename mp::enable_if<mp::and_<
-        mp::not_<traits::is_expression<Expr1> >,
+inline typename mp::enable_if<mp::or_<
+        traits::is_expression<Expr1>,
         traits::is_expression<Expr2> >,
-    typename Expr2::template return_types<Expr1>::plus_return_t>::type
+    typename detail::binary_op_helper<Expr1, operations::plus, Expr2>::return_t>::type
 operator+(const Expr1& e1, const Expr2& e2)
 {
-  return e2.plus(e1);
+    return detail::binary_op_helper<Expr1, operations::plus, Expr2>::make(e1, e2);
 }
 
 // default rules

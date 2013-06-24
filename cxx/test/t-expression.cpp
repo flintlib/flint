@@ -208,6 +208,26 @@ struct evaluation<
                                 + input._data().second();
     }
 };
+
+template<class T, bool c>
+struct evaluation<
+    my_expression<
+        operations::plus,
+        tuple<T, tuple<const myint&, empty_tuple> > >,
+    c, 0,
+    typename mp::enable_if<traits::is_integer<T> >::type>
+{
+    typedef myint return_t;
+    typedef empty_tuple temporaries_t;
+    typedef my_expression<
+        operations::plus,
+        typename make_tuple<T, const myint&>::type> expr_t;
+    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
+    {
+        output->_data().payload = input._data().second()._data().payload
+                                + input._data().first();
+    }
+};
 } // rules
 } // flint
 
@@ -319,7 +339,7 @@ test_arithmetic()
     tassert(a + 4 == 7);
     tassert(4 + a == 7);
     tassert(a + 4l == 7);
-    tassert(a + 4u == 7);
+    tassert(4u + a == 7);
 }
 
 int
