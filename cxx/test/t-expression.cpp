@@ -71,12 +71,8 @@ struct data
             *destroyed = true;
     }
 
-    data(const data& d)
-    {
-        payload = d.payload;
-        destroyed = 0;
-        extra = d.extra | 1 << 30;
-    }
+private:
+    data(const data& d);
 };
 
 typedef my_expression<operations::immediate, data> myint;
@@ -321,7 +317,7 @@ test_initialization()
 
     a._data().payload = 17;
     myint b = a;
-    tassert(b._data().payload == 17 && b._data().extra == (1 | 1 << 30));
+    tassert(b._data().payload == 17);
 
     myint c(8);
     tassert(c._data().payload == 8 && c._data().extra == 2);

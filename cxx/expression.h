@@ -56,10 +56,6 @@ struct UNIMPLEMENTED
     static const bool unimplemented_marker = true;
 };
 
-// NB: this is mostly internal
-template<class T, class Enable = void>
-struct copy_initialization : UNIMPLEMENTED { };
-
 template<class T, class From, class Enable = void>
 struct initialization : UNIMPLEMENTED { };
 
@@ -225,6 +221,52 @@ struct evaluation_traits<operations::immediate, Expr, Data>
         evaluate_into(to, from);
     }
 };
+
+// See copy constructor of expression for explanation
+template<class Data, class Enable = void>
+struct copy_initialization_helper
+{
+    Data data;
+
+    copy_initialization_helper(const Data& d) : data(d) {}
+    copy_initialization_helper() {}
+
+    // This does nothing, by design!
+    copy_initialization_helper(const copy_initialization_helper& o) {}
+
+    template<class T, class U>
+    void doit(T& to, const U& from)
+    {
+        rules::destruction<T>::doit(to);
+        rules::initialization<T, U>::doit(to, from);
+    }
+};
+
+template<class T>
+struct should_enable : mp::false_ { };
+template<class Head, class Tail>
+struct should_enable<tuple<Head, Tail> > : mp::true_ { };
+template<class T>
+struct should_enable<T&> : mp::true_ { };
+
+template<class Data>
+struct copy_initialization_helper<Data,
+    typename mp::enable_if<should_enable<Data> >::type>
+{
+    Data data;
+
+    copy_initialization_helper(const Data& d) : data(d) {}
+
+    copy_initialization_helper(const copy_initialization_helper& o)
+        : data(o.data)
+    {
+    }
+
+    template<class T, class U>
+    void doit(T& to, const U& from)
+    {
+    }
+};
 } // detail
 
 template<class Derived, class Operation, class Data>
@@ -232,7 +274,7 @@ class expression
     : public detail::EXPRESSION
 {
 private:
-    Data data;
+    detail::copy_initialization_helper<Data> data;
 
 protected:
     explicit expression(const Data & d) : data(d) {}
@@ -271,9 +313,19 @@ public:
         T::ev_traits_t::evaluate_into_fresh(downcast(), t);
     }
 
+    // We pay here for using the same class for actual data wrappers,
+    // and expression templates. The problem is that Data may not be
+    // default-initialisable (contains reference types), but it may also not
+    // be copy-initialisable (arrays...).
+    // The solution here is to wrap Data into copy_initialization_helper.
+    // If Data is a reference or a tuple (the expression template case),
+    // then data.doit is no-op the copy constructor of data does the work.
+    // If Data is not a reference or tuple, then the copy constructor is no-op,
+    // and doit defrers to rules.
     expression(const expression& e)
-        : data(rules::copy_initialization<derived_t>::get(e.downcast()))
+        : data(e.data)
     {
+        data.doit(downcast(), e.downcast());
     }
 
     // NB: the compiler is not allowed to eagerly instantiate!
@@ -281,8 +333,8 @@ public:
 
     ~expression() {rules::destruction<derived_t>::doit(downcast());}
 
-    Data& _data() {return data;}
-    const Data& _data() const {return data;}
+    Data& _data() {return data.data;}
+    const Data& _data() const {return data.data;}
 
     void print(std::ostream& o) const
     {
@@ -421,31 +473,6 @@ operator+(const Expr1& e1, const Expr2& e2)
 // default rules
 
 namespace rules {
-// Copy initialization is special in that data does not necessarily have
-// a default constructor.
-// TODO could store pointers instead of references.
-template<class T>
-struct copy_initialization<T,
-    typename mp::disable_if<traits::is_immediate<T> >::type>
-{
-    static typename T::data_t get(const T& from)
-    {
-        return typename T::data_t(from._data());
-    }
-};
-
-template<class T>
-struct copy_initialization<T,
-    typename mp::enable_if<traits::is_immediate<T> >::type>
-{
-    static typename T::data_t get(const T& from)
-    {
-        T tmp;
-        initialization<T, T>::doit(tmp, from);
-        return tmp._data();
-    }
-};
-
 // Composite binary operators
 // These rules implement binary operators by implementing both arguments
 // separately, then performing the operation on the evaluated types by
