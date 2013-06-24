@@ -167,64 +167,25 @@ struct equals<myint, int>
     }
 };
 
-// TODO
-template<bool c, class Op, class Data>
-struct evaluation<
-    my_expression<
-        operations::plus,
-        make_tuple<const myint&, const myint&>::type>,
-    Op, Data,
-    c, 0>
+template<>
+struct commutative_binary_expression<myint, operations::plus, myint>
 {
     typedef myint return_t;
-    typedef empty_tuple temporaries_t;
-    typedef my_expression<
-        operations::plus,
-        make_tuple<const myint&, const myint&>::type> expr_t;
-    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
+    static void doit(myint& to, const myint& a1, const myint& a2)
     {
-        output->_data().payload = input._data().first()._data().payload
-                                + input._data().second()._data().payload;
+        to._data().payload = a1._data().payload + a2._data().payload;
     }
 };
 
-template<class T, bool c, class Op, class Data>
-struct evaluation<
-    my_expression<
-        operations::plus,
-        tuple<const myint&, tuple<T, empty_tuple> > >,
-    Op, Data, c, 0,
-    typename mp::enable_if<traits::is_integer<T> >::type>
+template<class T>
+struct commutative_binary_expression<myint,
+    typename mp::enable_if<traits::is_integer<T>, operations::plus>::type,
+    T>
 {
     typedef myint return_t;
-    typedef empty_tuple temporaries_t;
-    typedef my_expression<
-        operations::plus,
-        typename make_tuple<const myint&, T>::type> expr_t;
-    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
+    static void doit(myint& to, const myint& a1, T a2)
     {
-        output->_data().payload = input._data().first()._data().payload
-                                + input._data().second();
-    }
-};
-
-template<class T, bool c, class Op, class Data>
-struct evaluation<
-    my_expression<
-        operations::plus,
-        tuple<T, tuple<const myint&, empty_tuple> > >,
-    Op, Data, c, 0,
-    typename mp::enable_if<traits::is_integer<T> >::type>
-{
-    typedef myint return_t;
-    typedef empty_tuple temporaries_t;
-    typedef my_expression<
-        operations::plus,
-        typename make_tuple<T, const myint&>::type> expr_t;
-    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
-    {
-        output->_data().payload = input._data().second()._data().payload
-                                + input._data().first();
+        to._data().payload = a1._data().payload + a2;
     }
 };
 
@@ -277,6 +238,7 @@ struct equals<mylong, long>
     }
 };
 
+#if 0
 template<bool c, class Op, class Data>
 struct evaluation<
     my_expression<
@@ -294,6 +256,17 @@ struct evaluation<
     {
         output->_data().payload = input._data().first()._data().payload
                                 + input._data().second()._data().payload;
+    }
+};
+#endif
+
+template<>
+struct commutative_binary_expression<mylong, operations::plus, mylong>
+{
+    typedef mylong return_t;
+    static void doit(mylong& to, const mylong& a1, const mylong& a2)
+    {
+        to._data().payload = a1._data().payload + a2._data().payload;
     }
 };
 
@@ -446,6 +419,15 @@ test_arithmetic()
     tassert(al + bl == cl);
     tassert(al + bl == 7l);
     tassert(al + b  == 7l);
+    tassert(a + bl  == 7l);
+    tassert((a + bl) + cl  == 14l);
+    tassert((a + b) + cl  == 14l);
+    tassert((al + b) + c  == 14l);
+    tassert(cl + (a + bl)  == 14l);
+    tassert(cl + (a + b)  == 14l);
+    tassert(c + (al + b)  == 14l);
+    tassert((a + bl) + (cl + d) == 15l);
+    tassert((a + bl) + (c + d) == 15l);
 }
 
 int
