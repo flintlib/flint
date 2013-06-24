@@ -59,6 +59,9 @@ struct not_ : value_of<!T::val> { };
 template<class T, class U>
 struct and_ : value_of<T::val && U::val> { };
 
+template<class T, bool u>
+struct and_c : and_<T, value_of<u> > { };
+
 // Compute logical or of the input values.
 template<class T, class U>
 struct or_ : value_of<T::val || U::val> { };

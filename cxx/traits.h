@@ -65,12 +65,22 @@ template<> struct is_unsigned_integer<unsigned short> : true_ { };
 template<> struct is_unsigned_integer<unsigned int> : true_ { };
 template<> struct is_unsigned_integer<unsigned long> : true_ { };
 
+// Compute if T belongs to the signed or unsigned integer types
+template<class T> struct is_integer
+    : mp::or_<is_unsigned_integer<T>, is_signed_integer<T> > { };
+
 // Compute a type appropriate for forwarding T. This is just the appropriate
 // constant reference type (but avoids things like const (int&)&, which cause
 // syntax errors.
-template<class T> struct forwarding {typedef const T& type;};
+template<class T, class E = void> struct forwarding {typedef const T& type;};
 template<class T> struct forwarding<T&> {typedef const T& type;};
 template<class T> struct forwarding<const T&> {typedef const T& type;};
+
+template<class T>
+struct forwarding<T, typename mp::enable_if<is_integer<T> >::type>
+{
+    typedef T type;
+};
 
 // Compute a typeappropriate for referencing. Usually T&.
 template<class T> struct reference {typedef T& type;};

@@ -171,14 +171,41 @@ struct equals<myint, int>
 
 // TODO
 template<bool c>
-struct evaluation<my_expression<operations::plus, make_tuple<const myint&, const myint&>::type>, c, 0>
+struct evaluation<
+    my_expression<
+        operations::plus,
+        make_tuple<const myint&, const myint&>::type>,
+    c, 0>
 {
     typedef myint return_t;
     typedef empty_tuple temporaries_t;
-    static void doit(const my_expression<operations::plus, tuple<const myint&, tuple<const myint&, empty_tuple> > >& input, temporaries_t temps, return_t* output)
+    typedef my_expression<
+        operations::plus,
+        make_tuple<const myint&, const myint&>::type> expr_t;
+    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
     {
         output->_data().payload = input._data().first()._data().payload
                                 + input._data().second()._data().payload;
+    }
+};
+
+template<class T, bool c>
+struct evaluation<
+    my_expression<
+        operations::plus,
+        tuple<const myint&, tuple<T, empty_tuple> > >,
+    c, 0,
+    typename mp::enable_if<traits::is_integer<T> >::type>
+{
+    typedef myint return_t;
+    typedef empty_tuple temporaries_t;
+    typedef my_expression<
+        operations::plus,
+        typename make_tuple<const myint&, T>::type> expr_t;
+    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
+    {
+        output->_data().payload = input._data().first()._data().payload
+                                + input._data().second();
     }
 };
 } // rules
@@ -278,6 +305,23 @@ test_equals()
     tassert(4 != a);
 }
 
+void
+test_arithmetic()
+{
+    myint a(3);
+    myint b(4);
+    myint c(7);
+
+    tassert((a + b).evaluate() == 7);
+    tassert(a + b == c);
+    tassert(a + b == 7);
+
+    tassert(a + 4 == 7);
+    tassert(4 + a == 7);
+    tassert(a + 4l == 7);
+    tassert(a + 4u == 7);
+}
+
 int
 main()
 {
@@ -287,6 +331,7 @@ main()
     test_printing();
     test_assignment();
     test_equals();
+    test_arithmetic();
 
     // TODO test that certain things *don't* compile?
 

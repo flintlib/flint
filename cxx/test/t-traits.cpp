@@ -50,6 +50,14 @@ test_integrality()
     tassert(is_unsigned_integer<signed int>::val == false);
     tassert(is_unsigned_integer<signed long>::val == false);
     tassert(is_unsigned_integer<newtype>::val == false);
+
+    tassert(is_integer<unsigned char>::val == true);
+    tassert(is_integer<unsigned int>::val == true);
+    tassert(is_integer<unsigned long>::val == true);
+    tassert(is_integer<signed char>::val == true);
+    tassert(is_integer<signed int>::val == true);
+    tassert(is_integer<signed long>::val == true);
+    tassert(is_integer<newtype>::val == false);
 }
 
 void
@@ -57,10 +65,12 @@ test_manipulation()
 {
     using mp::equal_types;
 
-    tassert((equal_types<forwarding<int>::type, const int&>::val));
+    tassert((equal_types<forwarding<int>::type, int>::val));
     tassert((equal_types<forwarding<newtype&>::type, const newtype&>::val));
-    tassert((equal_types<forwarding<const long>::type, const long&>::val));
-    tassert((equal_types<forwarding<const int&>::type, const int&>::val));
+    tassert((equal_types<forwarding<const newtype>::type,
+                const newtype&>::val));
+    tassert((equal_types<forwarding<const newtype&>::type,
+                const newtype&>::val));
 
     tassert((equal_types<reference<int>::type, int&>::val));
     tassert((equal_types<reference<newtype&>::type, newtype&>::val));

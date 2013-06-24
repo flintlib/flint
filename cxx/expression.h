@@ -100,7 +100,7 @@ struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
 } // traits
 
 namespace mp {
-template<class T, bool result_is_temporary>
+template<class T, bool result_is_temporary, unsigned min_prio = 0>
 struct find_evaluation
 {
 private:
@@ -114,16 +114,49 @@ private:
 
 public:
     typedef typename mp::select<void, // TODO
-        i2, r2,
-        i1, r1,
-        i0, r0
+        mp::and_c<i2, min_prio <= 2>, r2,
+        mp::and_c<i1, min_prio <= 1>, r1,
+        mp::and_c<i0, min_prio <= 0>, r0
       >::type type;
 };
 } // mp
 
 namespace detail {
 struct EXPRESSION { };
+}
 
+namespace traits {
+template<class T>
+struct is_expression : _is_convertible<detail::EXPRESSION, T> { };
+
+template<class T>
+struct _is_immediate_expr
+    : _is_convertible<
+          typename basetype<T>::type::operation_t,
+          operations::immediate
+        >
+{ };
+
+// Compute if T is an expression, with operation "immediate"
+template<class T, class Enable = void>
+struct is_immediate_expr : _is_immediate_expr<T> { };
+template<class T>
+struct is_immediate_expr<T,
+  typename mp::enable_if<mp::not_<is_expression<T> > >::type>
+    : mp::false_ { };
+
+// Compute if T is an immediate expression, *or not an expression at all*
+template<class T>
+struct is_immediate
+    : mp::or_<mp::not_<is_expression<T> >, is_immediate_expr<T> > { };
+
+// Compute if T is a non-immediate expression
+template<class T>
+struct is_lazy_expr
+    : mp::and_<is_expression<T>, mp::not_<is_immediate_expr<T> > > { };
+} // traits
+
+namespace detail {
 template<class Operation, class Expr>
 struct evaluation_traits
 {
@@ -183,49 +216,14 @@ struct evaluation_traits<operations::immediate, Expr>
     }
 };
 
-template<class Operation, class Expr>
-struct storage_traits
-{
-    typedef Expr type;
-};
-
 template<class Expr>
-struct storage_traits<operations::immediate, Expr>
-{
-    typedef const Expr& type;
-};
+struct storage_traits
+    : mp::if_<
+          traits::is_immediate<Expr>,
+          typename traits::forwarding<Expr>::type,
+          Expr
+        > { };
 } // detail
-
-namespace traits {
-template<class T>
-struct is_expression : _is_convertible<detail::EXPRESSION, T> { };
-
-template<class T>
-struct _is_immediate_expr
-    : _is_convertible<
-          typename basetype<T>::type::operation_t,
-          operations::immediate
-        >
-{ };
-
-// Compute if T is an expression, with operation "immediate"
-template<class T, class Enable = void>
-struct is_immediate_expr : _is_immediate_expr<T> { };
-template<class T>
-struct is_immediate_expr<T,
-  typename mp::enable_if<mp::not_<is_expression<T> > >::type>
-    : mp::false_ { };
-
-// Compute if T is an immediate expression, *or not an expression at all*
-template<class T>
-struct is_immediate
-    : mp::or_<mp::not_<is_expression<T> >, is_immediate_expr<T> > { };
-
-// Compute if T is a non-immediate expression
-template<class T>
-struct is_lazy_expr
-    : mp::and_<is_expression<T>, mp::not_<is_immediate_expr<T> > > { };
-} // traits
 
 template<class Derived, class Operation, class Data>
 class expression
@@ -312,13 +310,13 @@ public:
     bool equals(const T& t,
             typename mp::enable_if<traits::is_lazy_expr<T> >::type* = 0) const
     {
-        return equals(T::ev_traits_t::evaluate(downcast(), t));
+        return equals(t.evaluate());
     }
     template<class T>
     bool equals(const T& t,
             typename mp::disable_if<traits::is_lazy_expr<T> >::type* = 0) const
     {
-        return rules::equals<derived_t, T>::get(downcast(), t);
+        return rules::equals<evaluated_t, T>::get(evaluate(), t);
     }
 
 protected:
@@ -326,8 +324,8 @@ protected:
     struct helper
     {
         typedef mp::make_tuple<
-            typename detail::storage_traits<Operation, derived_t>::type,
-            typename detail::storage_traits<typename T::operation_t, T>::type
+            typename detail::storage_traits<derived_t>::type,
+            typename detail::storage_traits<T>::type
           > maker;
         typedef typename maker::type type;
         typedef typename Derived::template type<
@@ -402,12 +400,23 @@ operator!=(const Expr1& e1, const Expr2& e2)
   return !(e1 == e2);
 }
 
-// TODO other order
 template<class Expr1, class Expr2>
-inline typename mp::enable_if<traits::is_expression<Expr1>, typename Expr1::template return_types<Expr2>::plus_return_t>::type
+inline typename mp::enable_if<
+    traits::is_expression<Expr1>,
+    typename Expr1::template return_types<Expr2>::plus_return_t>::type
 operator+(const Expr1& e1, const Expr2& e2)
 {
     return e1.plus(e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<mp::and_<
+        mp::not_<traits::is_expression<Expr1> >,
+        traits::is_expression<Expr2> >,
+    typename Expr2::template return_types<Expr1>::plus_return_t>::type
+operator+(const Expr1& e1, const Expr2& e2)
+{
+  return e2.plus(e1);
 }
 
 // default rules
