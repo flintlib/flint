@@ -137,6 +137,7 @@ main(int argc, char** argv)
     //flint::mpz a('a');
     flint::mpz a((short)-4);
     flint::mpz b; b = "7";
+    //std::cout << a + b << std::endl;
     std::string ass1 = disass(argv[0], "test1");
     std::string ass2 = disass(argv[0], "test2");
     tassert(count(ass1, "call") == count(ass2, "call"));

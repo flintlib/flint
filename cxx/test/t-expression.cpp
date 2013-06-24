@@ -80,6 +80,8 @@ struct data
 };
 
 typedef my_expression<operations::immediate, data> myint;
+struct long_data {long payload;};
+typedef my_expression<operations::immediate, long_data> mylong;
 
 namespace flint {
 namespace rules {
@@ -229,6 +231,85 @@ struct evaluation<
                                 + input._data().first();
     }
 };
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Minimal rules for mylong
+/////////////////////////////////////////////////////////////////////////////
+
+template<>
+struct empty_initialization<mylong>
+{
+    static void doit(mylong&)
+    {
+    }
+};
+
+template<>
+struct initialization<mylong, long>
+{
+    static void doit(mylong& to, long from)
+    {
+        to._data().payload = from;
+    }
+};
+
+template<>
+struct initialization<mylong, mylong>
+{
+    static void doit(mylong& to, const mylong& from)
+    {
+        to._data().payload = from._data().payload;
+    }
+};
+
+template<>
+struct equals<mylong, mylong>
+{
+    static bool get(const mylong& i1, const mylong& i2)
+    {
+        return i1._data().payload == i2._data().payload;
+    }
+};
+
+template<>
+struct equals<mylong, long>
+{
+    static bool get(const mylong& i1, long i2)
+    {
+        return i1._data().payload == i2;
+    }
+};
+
+template<bool c, class Op, class Data>
+struct evaluation<
+    my_expression<
+        operations::plus,
+        make_tuple<const mylong&, const mylong&>::type>,
+    Op, Data,
+    c, 0>
+{
+    typedef mylong return_t;
+    typedef empty_tuple temporaries_t;
+    typedef my_expression<
+        operations::plus,
+        make_tuple<const mylong&, const mylong&>::type> expr_t;
+    static void doit(const expr_t& input, temporaries_t temps, return_t* output)
+    {
+        output->_data().payload = input._data().first()._data().payload
+                                + input._data().second()._data().payload;
+    }
+};
+
+template<>
+struct commutative_binary_expression<myint, operations::plus, mylong>
+{
+    typedef mylong return_t;
+    static void doit(mylong& to, const myint& a1, const mylong& a2)
+    {
+        to._data().payload = a1._data().payload + a2._data().payload;
+    }
+};
 } // rules
 } // flint
 
@@ -349,11 +430,33 @@ test_arithmetic()
     tassert((a + d) + (b + e) == 10);
     tassert((3 + d) + (b + e) == 10);
     tassert((3 + d) + (4 + e) == 10);
+
+    tassert(a + (b + c) == 14);
+    tassert(3 + (b + c) == 14);
+    tassert(3 + (4 + c) == 14);
+    tassert(3 + (b + 7) == 14);
+    tassert(a + (b + 7) == 14);
+
+    tassert((b + c) + a == 14);
+    tassert((b + c) + 3 == 14);
+    tassert((4 + c) + 3== 14);
+    tassert((b + 7) + 3== 14);
+    tassert((b + 7) + a== 14);
+
+    mylong al(3l);
+    mylong bl(4l);
+    mylong cl(7l);
+
+    tassert(al + bl == cl);
+    tassert(al + bl == 7l);
+    tassert(al + b  == 7l);
 }
 
 int
 main()
 {
+    std::cout << "expression....";
+
     test_traits();
     test_initialization();
     test_destruction();
@@ -361,6 +464,8 @@ main()
     test_assignment();
     test_equals();
     test_arithmetic();
+
+    std::cout << "PASS" << std::endl;
 
     // TODO test that certain things *don't* compile?
 

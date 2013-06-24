@@ -157,14 +157,13 @@ struct print<mpz>
     }
 };
 
-template<bool result_is_temporary, class Op, class Data>
-struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >, Op, Data, result_is_temporary, 2>
+template<>
+struct commutative_binary_expression<mpz, operations::plus, mpz>
 {
     typedef mpz return_t;
-    typedef empty_tuple temporaries_t;
-    static void doit(const mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >& input, temporaries_t temps, return_t* output)
+    static void doit(mpz& to, const mpz& e1, const mpz& e2)
     {
-        fmpz_add(output->_data(), input._data().first()._data(), input._data().second()._data());
+        fmpz_add(to._data(), e1._data(), e2._data());
     }
 };
 } // rules

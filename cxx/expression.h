@@ -92,6 +92,15 @@ struct evaluation : UNIMPLEMENTED { };
 //    typedef Y temporaries_t; // a tuple of *pointers*
 //    static void doit(const T& input, temporaries_t temps, return_t* output);
 //};
+
+// Convenience helpers, instantiate by evaluation if necessary
+template<class T, class Op, class U>
+struct binary_expression : UNIMPLEMENTED { };
+// typedef X return_t;
+// static void doit(return_t& to, const T&, const U&);
+template<class T, class Op, class U>
+struct commutative_binary_expression : UNIMPLEMENTED { };
+// similarly
 } // rules
 
 namespace traits {
@@ -437,7 +446,15 @@ struct copy_initialization<T,
     }
 };
 
-// TODO make more efficient
+// Composite binary operators
+// These rules implement binary operators by implementing both arguments
+// separately, then performing the operation on the evaluated types by
+// instantiating the appropriate rule again.
+//
+// Hence to evaluate expressions like a + (b + c), it suffices to write
+// rules for composition of two immediates.
+
+// TODO make these more efficient
 template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<
     T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
@@ -483,6 +500,147 @@ struct evaluation<
         *output = binop_helper::make(*temps1.head, *temps2.head);
     }
 };
+
+template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
+struct evaluation<
+    T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
+    typename mp::enable_if<
+        mp::and_<
+            traits::is_immediate<typename traits::basetype<Data1>::type>,
+            traits::is_lazy_expr<Data2> > >::type
+  >
+{
+    typedef typename mp::find_evaluation<
+        Data2,
+        typename Data2::operation_t,
+        typename Data2::data_t,
+        true
+      >::type ev2_t;
+    typedef typename ev2_t::return_t return2_t;
+    typedef typename ev2_t::temporaries_t temporaries2_t;
+    typedef typename traits::basetype<Data1>::type return1_t;
+
+    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
+    typedef typename binop_helper::return_t::evaluated_t return_t;
+
+    typedef tuple<return2_t*, temporaries2_t> temporaries_t;
+
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        ev2_t::doit(input._data().second(), temps.tail, temps.head);
+        *output = binop_helper::make(input._data().first(), *temps.head);
+    }
+};
+
+template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
+struct evaluation<
+    T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
+    typename mp::enable_if<
+        mp::and_<
+            traits::is_immediate<typename traits::basetype<Data2>::type>,
+            traits::is_lazy_expr<Data1> > >::type
+  >
+{
+    typedef typename mp::find_evaluation<
+        Data1,
+        typename Data1::operation_t,
+        typename Data1::data_t,
+        true
+      >::type ev1_t;
+    typedef typename ev1_t::return_t return1_t;
+    typedef typename ev1_t::temporaries_t temporaries1_t;
+    typedef typename traits::basetype<Data2>::type return2_t;
+
+    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
+    typedef typename binop_helper::return_t::evaluated_t return_t;
+
+    typedef tuple<return1_t*, temporaries1_t> temporaries_t;
+
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        ev1_t::doit(input._data().first(), temps.tail, temps.head);
+        *output = binop_helper::make(*temps.head, input._data().second());
+    }
+};
+
+// Automatically invoke binary_expression or commutative_binary_expression
+namespace rdetail {
+template<class Expr1, class Op, class Expr2>
+struct inverted_binary_expression
+{
+  typedef commutative_binary_expression<Expr2, Op, Expr1> wrapped_t;
+  typedef typename wrapped_t::return_t return_t;
+  static void doit(return_t& to, const Expr1& e1, const Expr2& e2)
+  {
+    return wrapped_t::doit(to, e2, e1);
+  }
+};
+
+template<template<class E1, class O, class E2> class BE, class T, class Data1, class Op, class Data2>
+struct binary_expr_helper
+{
+    typedef typename traits::basetype<Data1>::type data1_t;
+    typedef typename traits::basetype<Data2>::type data2_t;
+    typedef BE<data1_t, Op, data2_t> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        wrapped_t::doit(*output, input._data().first(), input._data().second());
+    }
+};
+}
+
+template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
+struct evaluation<
+    T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
+    typename mp::enable_if<
+        mp::and_<
+            traits::is_immediate<typename traits::basetype<Data1>::type>,
+            mp::and_<
+                traits::is_immediate<typename traits::basetype<Data2>::type>,
+                mp::or_<
+                    traits::is_implemented<binary_expression<
+                        typename traits::basetype<Data1>::type,
+                        Op,
+                        typename traits::basetype<Data2>::type
+                      > >,
+                    mp::or_<
+                        traits::is_implemented<commutative_binary_expression<
+                            typename traits::basetype<Data1>::type,
+                            Op,
+                            typename traits::basetype<Data2>::type
+                          > >,
+                        traits::is_implemented<commutative_binary_expression<
+                            typename traits::basetype<Data2>::type,
+                            Op,
+                            typename traits::basetype<Data1>::type
+                          > >
+                      >
+                  >
+              >
+          >
+      >::type>
+    : mp::if_<
+            traits::is_implemented<binary_expression<
+                typename traits::basetype<Data1>::type,
+                Op,
+                typename traits::basetype<Data2>::type
+              > >,
+            rdetail::binary_expr_helper<binary_expression, T, Data1, Op, Data2>,
+            typename mp::if_<
+                traits::is_implemented<commutative_binary_expression<
+                    typename traits::basetype<Data1>::type,
+                    Op,
+                    typename traits::basetype<Data2>::type
+                  > >,
+                rdetail::binary_expr_helper<
+                    commutative_binary_expression, T, Data1, Op, Data2>,
+                rdetail::binary_expr_helper<
+                    rdetail::inverted_binary_expression, T, Data1, Op, Data2>
+              >::type
+          >::type
+{ };
 } // rules
 } // flint
 
