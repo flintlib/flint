@@ -82,7 +82,7 @@ struct equals : UNIMPLEMENTED { };
 // first temporary (provided these have the same type)
 // Priorities 2, 1, 0 can be used to resolve conflicts.
 template<
-    class T,
+    class T, class Op, class Data,
     bool result_is_temporary,
     unsigned priority,
     class Enable = void>
@@ -100,20 +100,21 @@ struct is_implemented : mp::not_<_is_convertible<rules::UNIMPLEMENTED, T> > { };
 } // traits
 
 namespace mp {
-template<class T, bool result_is_temporary, unsigned min_prio = 0>
+template<class T, class Op, class Data,
+    bool result_is_temporary, unsigned min_prio = 0>
 struct find_evaluation
 {
 private:
-    typedef rules::evaluation<T, result_is_temporary, 2> r2;
-    typedef rules::evaluation<T, result_is_temporary, 1> r1;
-    typedef rules::evaluation<T, result_is_temporary, 0> r0;
+    typedef rules::evaluation<T, Op, Data, result_is_temporary, 2> r2;
+    typedef rules::evaluation<T, Op, Data, result_is_temporary, 1> r1;
+    typedef rules::evaluation<T, Op, Data, result_is_temporary, 0> r0;
 
     typedef traits::is_implemented<r2> i2;
     typedef traits::is_implemented<r1> i1;
     typedef traits::is_implemented<r0> i0;
 
 public:
-    typedef typename mp::select<void, // TODO
+    typedef typename mp::select<rules::UNIMPLEMENTED, // TODO
         mp::and_c<i2, min_prio <= 2>, r2,
         mp::and_c<i1, min_prio <= 1>, r1,
         mp::and_c<i0, min_prio <= 0>, r0
@@ -157,12 +158,12 @@ struct is_lazy_expr
 } // traits
 
 namespace detail {
-template<class Operation, class Expr>
+template<class Operation, class Expr, class Data>
 struct evaluation_traits
 {
     typedef typename Expr::derived_t derived_t;
-    typedef typename mp::find_evaluation<derived_t, false>::type rule_t;
-    typedef typename mp::find_evaluation<derived_t, true>::type temp_rule_t;
+    typedef typename mp::find_evaluation<derived_t, Operation, Data, false>::type rule_t;
+    typedef typename mp::find_evaluation<derived_t, Operation, Data, true>::type temp_rule_t;
     typedef typename rule_t::return_t evaluation_return_t;
     typedef evaluation_return_t evaluated_t;
 
@@ -195,8 +196,8 @@ struct evaluation_traits
     }
 };
 
-template<class Expr>
-struct evaluation_traits<operations::immediate, Expr>
+template<class Expr, class Data>
+struct evaluation_traits<operations::immediate, Expr, Data>
 {
     typedef typename Expr::derived_t derived_t;
     typedef typename Expr::derived_t evaluated_t;
@@ -228,7 +229,7 @@ protected:
     explicit expression(const Data & d) : data(d) {}
 
 public:
-    typedef detail::evaluation_traits<Operation, expression> ev_traits_t;
+    typedef detail::evaluation_traits<Operation, expression, Data> ev_traits_t;
     typedef typename Derived::template type<Operation, Data>::result derived_t;
     typedef typename ev_traits_t::evaluated_t evaluated_t;
     typedef typename ev_traits_t::evaluation_return_t evaluation_return_t;
@@ -436,26 +437,51 @@ struct copy_initialization<T,
     }
 };
 
-namespace rdetail {
-template<class T>
-struct is_evaluation_2_2 : mp::false_ { };
-template<class Data1, class Data2>
-struct is_evaluation_2_2<tuple<Data1, tuple<Data2, empty_tuple> > >
-    : mp::and_<
-          traits::is_lazy_expr<Data1>,
-          traits::is_lazy_expr<Data2>
-        > { };
-} // rdetail
-
-template<class T, bool result_is_temporary>
+// TODO make more efficient
+template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<
-    T, result_is_temporary, 0,
-    typename mp::enable_if<mp::and_<
-        traits::is_expression<T>,
-        rdetail::is_evaluation_2_2<typename T::data_t>
-      > >::type
+    T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
+    typename mp::enable_if<
+        mp::and_<
+            traits::is_lazy_expr<Data1>,
+            traits::is_lazy_expr<Data2> > >::type
   >
 {
+    typedef typename mp::find_evaluation<
+        Data1,
+        typename Data1::operation_t,
+        typename Data1::data_t,
+        true
+      >::type ev1_t;
+    typedef typename mp::find_evaluation<
+        Data2,
+        typename Data2::operation_t,
+        typename Data2::data_t,
+        true
+      >::type ev2_t;
+    typedef typename ev1_t::return_t return1_t;
+    typedef typename ev1_t::temporaries_t temporaries1_t;
+    typedef typename ev2_t::return_t return2_t;
+    typedef typename ev2_t::temporaries_t temporaries2_t;
+
+    typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
+    typedef typename binop_helper::return_t::evaluated_t return_t;
+
+    typedef mp::concat_tuple<
+        tuple<return1_t*, typename ev1_t::temporaries_t>,
+        tuple<return2_t*, typename ev2_t::temporaries_t> > concater;
+    typedef typename concater::type temporaries_t;
+
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        tuple<return1_t*, typename ev1_t::temporaries_t> temps1 =
+            concater::get_first(temps);
+        tuple<return2_t*, typename ev2_t::temporaries_t> temps2 =
+            concater::get_second(temps);
+        ev1_t::doit(input._data().first(), temps1.tail, temps1.head);
+        ev2_t::doit(input._data().second(), temps2.tail, temps2.head);
+        *output = binop_helper::make(*temps1.head, *temps2.head);
+    }
 };
 } // rules
 } // flint

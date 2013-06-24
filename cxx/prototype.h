@@ -157,38 +157,14 @@ struct print<mpz>
     }
 };
 
-template<bool result_is_temporary>
-struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >, result_is_temporary, 2>
+template<bool result_is_temporary, class Op, class Data>
+struct evaluation<mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >, Op, Data, result_is_temporary, 2>
 {
     typedef mpz return_t;
     typedef empty_tuple temporaries_t;
     static void doit(const mpz_expression<operations::plus, tuple<const mpz&, tuple<const mpz&, empty_tuple> > >& input, temporaries_t temps, return_t* output)
     {
         fmpz_add(output->_data(), input._data().first()._data(), input._data().second()._data());
-    }
-};
-
-// TODO make more generic
-template<bool result_is_temporary, class Op, class Data1, class Data2>
-struct evaluation<
-    mpz_expression<Op, tuple<Data1, tuple<Data2, empty_tuple> > >,
-    result_is_temporary, 1,
-    typename mp::enable_if<mp::and_<mp::not_<traits::is_immediate<Data1> >,
-                                    mp::not_<traits::is_immediate<Data1> > > >::type>
-{
-    typedef mpz return_t;
-    typedef typename mp::find_evaluation<Data1, true>::type ev1_t;
-    typedef typename mp::find_evaluation<Data2, true>::type ev2_t;
-    typedef mp::concat_tuple<tuple<mpz*, typename ev1_t::temporaries_t>, tuple<mpz*, typename ev2_t::temporaries_t> > concater;
-    typedef typename concater::type temporaries_t;
-
-    static void doit(const mpz_expression<Op, tuple<Data1, tuple<Data2, empty_tuple> > >& input, temporaries_t temps, return_t* output)
-    {
-        tuple<mpz*, typename ev1_t::temporaries_t> temps1 = concater::get_first(temps);
-        tuple<mpz*, typename ev2_t::temporaries_t> temps2 = concater::get_second(temps);
-        ev1_t::doit(input._data().first(), temps1.tail, temps1.head);
-        ev2_t::doit(input._data().second(), temps2.tail, temps2.head);
-        *output = *temps1.head + *temps2.head;
     }
 };
 } // rules

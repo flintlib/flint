@@ -170,11 +170,12 @@ struct equals<myint, int>
 };
 
 // TODO
-template<bool c>
+template<bool c, class Op, class Data>
 struct evaluation<
     my_expression<
         operations::plus,
         make_tuple<const myint&, const myint&>::type>,
+    Op, Data,
     c, 0>
 {
     typedef myint return_t;
@@ -189,12 +190,12 @@ struct evaluation<
     }
 };
 
-template<class T, bool c>
+template<class T, bool c, class Op, class Data>
 struct evaluation<
     my_expression<
         operations::plus,
         tuple<const myint&, tuple<T, empty_tuple> > >,
-    c, 0,
+    Op, Data, c, 0,
     typename mp::enable_if<traits::is_integer<T> >::type>
 {
     typedef myint return_t;
@@ -209,12 +210,12 @@ struct evaluation<
     }
 };
 
-template<class T, bool c>
+template<class T, bool c, class Op, class Data>
 struct evaluation<
     my_expression<
         operations::plus,
         tuple<T, tuple<const myint&, empty_tuple> > >,
-    c, 0,
+    Op, Data, c, 0,
     typename mp::enable_if<traits::is_integer<T> >::type>
 {
     typedef myint return_t;
@@ -331,6 +332,8 @@ test_arithmetic()
     myint a(3);
     myint b(4);
     myint c(7);
+    myint d(1);
+    myint e(2);
 
     tassert((a + b).evaluate() == 7);
     tassert(a + b == c);
@@ -340,6 +343,12 @@ test_arithmetic()
     tassert(4 + a == 7);
     tassert(a + 4l == 7);
     tassert(4u + a == 7);
+
+    tassert((a + 1) + (b + 2) == 10);
+    tassert((a + d) + (b + 2) == 10);
+    tassert((a + d) + (b + e) == 10);
+    tassert((3 + d) + (b + e) == 10);
+    tassert((3 + d) + (4 + e) == 10);
 }
 
 int
