@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 #include "fmpz_poly.h"
 
-void _fmpz_poly_signature(slong * r1, slong * r2, fmpz * poly, slong len)
+void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 {
     fmpz *A, *B, *f, *g, *h, *w;
     slong lenA, lenB;
@@ -136,7 +136,7 @@ void _fmpz_poly_signature(slong * r1, slong * r2, fmpz * poly, slong len)
 	}
 }
 
-void fmpz_poly_signature(slong * r1, slong * r2, fmpz_poly_t poly)
+void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly)
 {
     _fmpz_poly_signature(r1, r2, poly->coeffs, poly->length);
 }

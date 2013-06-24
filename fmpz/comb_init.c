@@ -52,7 +52,7 @@ void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb)
 }
 
 void
-fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, slong num_primes)
+fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
 {
     slong i, j;
     slong n, num;

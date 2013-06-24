@@ -32,7 +32,7 @@
 
 
 void
-__fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
+__fmpz_multi_CRT_ui_sign(fmpz_t output, const fmpz_t input,
     const fmpz_comb_t comb, fmpz_t temp)
 {
     slong n = comb->n;
@@ -65,7 +65,7 @@ __fmpz_multi_CRT_ui_sign(fmpz_t output, fmpz_t input,
     return;
 }
 
-void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t ctemp, int sign)
 {
     slong i, j;

@@ -899,9 +899,9 @@ int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a);
 
 /*  Signature  ***************************************************************/
 
-void _fmpz_poly_signature(slong * r1, slong * r2, fmpz * poly, slong len);
+void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len);
 
-void fmpz_poly_signature(slong * r1, slong * r2, fmpz_poly_t poly);
+void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly);
 
 /*  Input and output  ********************************************************/
 
@@ -1096,7 +1096,7 @@ static __inline__ void fmpz_poly_set_coeff_mpz(fmpz_poly_t poly, slong n,
     fmpz_clear_readonly(t);
 }
 
-static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, fmpz_poly_t poly, slong n)
+static __inline__ void fmpz_poly_get_coeff_mpz(mpz_t x, const fmpz_poly_t poly, slong n)
 {
     fmpz_t t;
     fmpz_init(t);

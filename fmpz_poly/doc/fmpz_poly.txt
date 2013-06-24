@@ -2227,12 +2227,12 @@ int fmpz_poly_sqrt(fmpz_poly_t b, const fmpz_poly_t a)
 
 *******************************************************************************
 
-void _fmpz_poly_signature(slong * r1, slong * r2, fmpz * poly, slong len)
+void _fmpz_poly_signature(slong * r1, slong * r2, const fmpz * poly, slong len)
 
     Computes the signature $(r_1, r_2)$ of the polynomial 
     \code{(poly, len)}.  Assumes that the polynomial is squarefree over~$\Q$.
 
-void fmpz_poly_signature(slong * r1, slong * r2, fmpz_poly_t poly)
+void fmpz_poly_signature(slong * r1, slong * r2, const fmpz_poly_t poly)
 
     Computes the signature $(r_1, r_2)$ of the polynomial \code{poly}, 
     which is assumed to be square-free over~$\Q$.  The values of $r_1$ and 

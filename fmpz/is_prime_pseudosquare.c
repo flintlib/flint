@@ -227,7 +227,7 @@ void fmpz_set_pseudosquare(fmpz_t f, unsigned int i)
    }
 }
 
-int fmpz_is_prime_pseudosquare(fmpz_t n)
+int fmpz_is_prime_pseudosquare(const fmpz_t n)
 {
     unsigned int i, j, m1;
     mp_limb_t p, B, mod8;

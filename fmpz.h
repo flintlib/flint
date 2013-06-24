@@ -241,7 +241,7 @@ double fmpz_get_d(const fmpz_t f);
 
 void fmpz_set_d(fmpz_t f, double c);
 
-int fmpz_set_str(fmpz_t f, char * str, int b);
+int fmpz_set_str(fmpz_t f, const char * str, int b);
 
 void flint_mpz_init_set_readonly(mpz_t z, const fmpz_t f);
 
@@ -442,7 +442,7 @@ void fmpz_sqrt(fmpz_t f, const fmpz_t g);
 
 int fmpz_is_square(const fmpz_t f);
 
-void fmpz_root(fmpz_t r, fmpz_t f, slong n);
+void fmpz_root(fmpz_t r, const fmpz_t f, slong n);
 
 void fmpz_sqrtrem(fmpz_t f, fmpz_t r, const fmpz_t g);
 
@@ -620,13 +620,13 @@ typedef fmpz_comb_temp_struct fmpz_comb_temp_t[1];
 void fmpz_comb_temp_init(fmpz_comb_temp_t temp, const fmpz_comb_t comb);
 void fmpz_comb_temp_clear(fmpz_comb_temp_t temp);
 
-void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, slong num_primes);
+void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes);
 void fmpz_comb_clear(fmpz_comb_t comb);
 
 void fmpz_multi_mod_ui(mp_limb_t * out, const fmpz_t in,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp);
 
-void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp, int sign);
 
 static __inline__ void fmpz_set_ui_smod(fmpz_t f, mp_limb_t x, mp_limb_t m)
@@ -643,7 +643,7 @@ mp_limb_t fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits);
 
 int fmpz_is_probabprime(const fmpz_t p);
 
-int fmpz_is_prime_pseudosquare(fmpz_t n);
+int fmpz_is_prime_pseudosquare(const fmpz_t n);
 
 #ifdef __cplusplus
 }
