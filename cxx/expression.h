@@ -167,8 +167,10 @@ template<class Operation, class Expr, class Data>
 struct evaluation_traits
 {
     typedef typename Expr::derived_t derived_t;
-    typedef typename mp::find_evaluation<derived_t, Operation, Data, false>::type rule_t;
-    typedef typename mp::find_evaluation<derived_t, Operation, Data, true>::type temp_rule_t;
+    typedef typename mp::find_evaluation<
+        derived_t, Operation, Data, false>::type rule_t;
+    typedef typename mp::find_evaluation<
+        derived_t, Operation, Data, true>::type temp_rule_t;
     typedef typename rule_t::return_t evaluation_return_t;
     typedef evaluation_return_t evaluated_t;
 
@@ -414,7 +416,8 @@ struct binary_op_helper
         typename storage_traits<Expr2>::type
       > maker;
     typedef typename maker::type type;
-    typedef typename mp::if_<traits::is_expression<Expr1>, Expr1, Expr2>::type Expr;
+    typedef typename mp::if_<
+        traits::is_expression<Expr1>, Expr1, Expr2>::type Expr;
     typedef typename Expr::template make_helper<Op, type> make_helper;
     typedef typename make_helper::type return_t;
 
@@ -464,7 +467,8 @@ template<class Expr1, class Expr2>
 inline typename mp::enable_if<mp::or_<
         traits::is_expression<Expr1>,
         traits::is_expression<Expr2> >,
-    typename detail::binary_op_helper<Expr1, operations::plus, Expr2>::return_t>::type
+    typename detail::binary_op_helper<
+        Expr1, operations::plus, Expr2>::return_t>::type
 operator+(const Expr1& e1, const Expr2& e2)
 {
     return detail::binary_op_helper<Expr1, operations::plus, Expr2>::make(e1, e2);
@@ -613,7 +617,8 @@ struct inverted_binary_expression
   }
 };
 
-template<template<class E1, class O, class E2> class BE, class T, class Data1, class Op, class Data2>
+template<template<class E1, class O, class E2> class BE,
+    class T, class Data1, class Op, class Data2>
 struct binary_expr_helper
 {
     typedef typename traits::basetype<Data1>::type data1_t;
