@@ -42,8 +42,7 @@ _nmod_poly_sqrt_series(mp_ptr g, mp_srcptr h, slong n, nmod_t mod)
 }
 
 void
-nmod_poly_sqrt_series(nmod_poly_t g, 
-                                 const nmod_poly_t h, slong n)
+nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
 {
     mp_ptr g_coeffs, h_coeffs;
     nmod_poly_t t1;

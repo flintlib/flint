@@ -1841,14 +1841,14 @@ void nmod_poly_sqrt_series(nmod_poly_t g, const nmod_poly_t h, slong n)
     Set $g$ to the series expansion of $\sqrt{h}$ to order $O(x^n)$.
     It is assumed that $h$ has constant term 1.
 
-void _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong n, nmod_t mod)
+int _nmod_poly_sqrt(mp_ptr s, mp_srcptr p, slong n, nmod_t mod)
 
-    If \code{(p, len)} is a perfect square, sets \code{(s, n / 2 + 1)}
+    If \code{(p, n)} is a perfect square, sets \code{(s, n / 2 + 1)}
     to a square root of $p$ and returns 1. Otherwise returns 0.
 
-void nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p, slong n)
+int nmod_poly_sqrt(nmod_poly_t s, const nmod_poly_t p)
 
-    If $p$ is a perfect square, sets $s$ to a square root of $a$
+    If $p$ is a perfect square, sets $s$ to a square root of $p$
     and returns 1. Otherwise returns 0.
 
 *******************************************************************************
@@ -2259,7 +2259,7 @@ void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
     as factors.
 
     Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is ${n * sizeof(slong)}).
+    powers (maximum space required is \code{n * sizeof(long)}).
 
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
                                         const nmod_poly_t f)
