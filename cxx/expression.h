@@ -481,7 +481,7 @@ namespace rules {
 // Hence to evaluate expressions like a + (b + c), it suffices to write
 // rules for composition of two immediates.
 
-// TODO make these more efficient
+// TODO use result_is_temporary
 template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<
     T, Op, tuple<Data1, tuple<Data2, empty_tuple> >, result_is_temporary, 0,
@@ -495,13 +495,13 @@ struct evaluation<
         Data1,
         typename Data1::operation_t,
         typename Data1::data_t,
-        true
+        true // TODO
       >::type ev1_t;
     typedef typename mp::find_evaluation<
         Data2,
         typename Data2::operation_t,
         typename Data2::data_t,
-        true
+        true // TODO
       >::type ev2_t;
     typedef typename ev1_t::return_t return1_t;
     typedef typename ev1_t::temporaries_t temporaries1_t;
@@ -511,20 +511,22 @@ struct evaluation<
     typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
     typedef typename binop_helper::return_t::evaluated_t return_t;
 
-    typedef mp::concat_tuple<
-        tuple<return1_t*, typename ev1_t::temporaries_t>,
-        tuple<return2_t*, typename ev2_t::temporaries_t> > concater;
-    typedef typename concater::type temporaries_t;
+    typedef mp::merge_tuple<temporaries1_t, temporaries2_t> merger1;
+    typedef mp::merge_tuple<
+        typename mp::make_tuple<return2_t*>::type,
+        typename merger1::type> merger2;
+    typedef tuple<return1_t*, typename merger2::type> temporaries_t;
 
     static void doit(const T& input, temporaries_t temps, return_t* output)
     {
-        tuple<return1_t*, typename ev1_t::temporaries_t> temps1 =
-            concater::get_first(temps);
-        tuple<return2_t*, typename ev2_t::temporaries_t> temps2 =
-            concater::get_second(temps);
-        ev1_t::doit(input._data().first(), temps1.tail, temps1.head);
-        ev2_t::doit(input._data().second(), temps2.tail, temps2.head);
-        *output = binop_helper::make(*temps1.head, *temps2.head);
+        temporaries1_t temps1 =
+            merger1::get_first(merger2::get_second(temps.tail));
+        temporaries2_t temps2 =
+            merger1::get_second(merger2::get_second(temps.tail));
+        ev1_t::doit(input._data().first(), temps1, temps.first());
+        ev2_t::doit(input._data().second(), temps2,
+            merger2::get_first(temps.tail).head);
+        *output = binop_helper::make(*temps.first(), *temps.second());
     }
 };
 
@@ -541,7 +543,7 @@ struct evaluation<
         Data2,
         typename Data2::operation_t,
         typename Data2::data_t,
-        true
+        true // TODO
       >::type ev2_t;
     typedef typename ev2_t::return_t return2_t;
     typedef typename ev2_t::temporaries_t temporaries2_t;
@@ -550,12 +552,16 @@ struct evaluation<
     typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
     typedef typename binop_helper::return_t::evaluated_t return_t;
 
-    typedef tuple<return2_t*, temporaries2_t> temporaries_t;
+    typedef mp::merge_tuple<
+        typename mp::make_tuple<return2_t*>::type,
+        temporaries2_t> merger;
+    typedef typename merger::type temporaries_t;
 
     static void doit(const T& input, temporaries_t temps, return_t* output)
     {
-        ev2_t::doit(input._data().second(), temps.tail, temps.head);
-        *output = binop_helper::make(input._data().first(), *temps.head);
+        return2_t* ret2 = merger::get_first(temps).head;;
+        ev2_t::doit(input._data().second(), merger::get_second(temps), ret2);
+        *output = binop_helper::make(input._data().first(), *ret2);
     }
 };
 
@@ -572,7 +578,7 @@ struct evaluation<
         Data1,
         typename Data1::operation_t,
         typename Data1::data_t,
-        true
+        true // TODO
       >::type ev1_t;
     typedef typename ev1_t::return_t return1_t;
     typedef typename ev1_t::temporaries_t temporaries1_t;
@@ -581,12 +587,16 @@ struct evaluation<
     typedef detail::binary_op_helper<return1_t, Op, return2_t> binop_helper;
     typedef typename binop_helper::return_t::evaluated_t return_t;
 
-    typedef tuple<return1_t*, temporaries1_t> temporaries_t;
+    typedef mp::merge_tuple<
+        typename mp::make_tuple<return1_t*>::type,
+        temporaries1_t> merger;
+    typedef typename merger::type temporaries_t;
 
     static void doit(const T& input, temporaries_t temps, return_t* output)
     {
-        ev1_t::doit(input._data().first(), temps.tail, temps.head);
-        *output = binop_helper::make(*temps.head, input._data().second());
+        return1_t* ret1 = merger::get_first(temps).head;
+        ev1_t::doit(input._data().first(), merger::get_second(temps), ret1);
+        *output = binop_helper::make(*ret1, input._data().second());
     }
 };
 
@@ -616,7 +626,7 @@ struct binary_expr_helper
         wrapped_t::doit(*output, input._data().first(), input._data().second());
     }
 };
-}
+} // rdetail
 
 template<class T, bool result_is_temporary, class Op, class Data1, class Data2>
 struct evaluation<

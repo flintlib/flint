@@ -33,6 +33,8 @@
 #include "cxx/test/helpers.h"
 #include "cxx/tuple.h"
 
+#include "cxx/prototype.h"
+
 // Exception class to indicate that this test cannot proceed, e.g. because
 // binutils is not installed or because we cannot interpret the disassembled
 // code.
@@ -116,6 +118,20 @@ std::string stripaddr(const std::string& input)
             result += ls[i];
         else
             result += ls[i].substr(pos+2);
+        result += '\n';
+    }
+    return result;
+}
+
+std::string stripnop(const std::string& input)
+{
+    std::string result;
+    std::vector<std::string> ls = lines(input);
+    for(unsigned i = 0;i < ls.size();++i)
+    {
+        if(ls[i].find("\tnop") != std::string::npos)
+            continue;
+        result += ls[i];
         result += '\n';
     }
     return result;
@@ -215,6 +231,62 @@ DEFINE_FUNC(test_tuple_back_2,
     out.tail.head = i2;
     out.tail.tail.head = i3;
 }
+
+
+DEFINE_FUNC(test_mpz_symadd_1,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out = ((a + b) + (c + d)) + ((a + c) + (b + d));
+}
+
+DEFINE_FUNC(test_mpz_symadd_2,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp1, tmp2, tmp3;
+    fmpz_init(tmp1);
+    fmpz_init(tmp2);
+    fmpz_init(tmp3);
+
+    fmpz_add(tmp1, a._data(), b._data());
+    fmpz_add(tmp2, c._data(), d._data());
+    fmpz_add(tmp3, tmp1, tmp2);
+    fmpz_add(tmp1, a._data(), c._data());
+    fmpz_add(tmp2, b._data(), d._data());
+    fmpz_add(tmp1, tmp1, tmp2);
+    fmpz_add(out._data(), tmp1, tmp3);
+
+    fmpz_clear(tmp1);
+    fmpz_clear(tmp2);
+    fmpz_clear(tmp3);
+}
+
+DEFINE_FUNC(test_mpz_asymadd_1,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out = (a + (((b + (c + (a + b))) + c) + d));
+}
+
+DEFINE_FUNC(test_mpz_asymadd_2,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    fmpz_t tmp;
+    fmpz_init(tmp);
+
+    fmpz_add(tmp, a._data(), b._data());
+    fmpz_add(tmp, c._data(), tmp);
+    fmpz_add(tmp, b._data(), tmp);
+    fmpz_add(tmp, tmp, c._data());
+    fmpz_add(tmp, tmp, d._data());
+    fmpz_add(out._data(), a._data(), tmp);
+
+    fmpz_clear(tmp);
+}
+
+DEFINE_FUNC(test_mpz_asymadd_3,
+        (mpz& out, const mpz& a, const mpz& b, const mpz& c, const mpz& d))
+{
+    out = a + b + c + a + b + c + d;
+}
 } // extern "C"
 
 // Global variable, initialized by main.
@@ -240,6 +312,30 @@ test_tuple()
     tassert(stripaddr(ass1) == stripaddr(ass2));
 }
 
+void
+test_mpz()
+{
+    std::string ass1 = disass(program, "test_mpz_symadd_1");
+    std::string ass2 = disass(program, "test_mpz_symadd_2");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(fuzzy_equals(count(stripnop(ass1), "\n"),
+                count(stripnop(ass2), "\n"), 0.1));
+
+    ass1 = disass(program, "test_mpz_asymadd_1");
+    ass2 = disass(program, "test_mpz_asymadd_2");
+    std::string ass3 = disass(program, "test_mpz_asymadd_3");
+    tassert(count(ass1, "call") == count(ass2, "call"));
+    tassert(count(ass1, "mov") == count(ass2, "mov"));
+    tassert(count(ass3, "call") == count(ass2, "call"));
+    tassert(count(ass3, "mov") == count(ass2, "mov"));
+
+    // This is probably not the best idea.
+    // (Actually the same code is generated, up to jump targets, register names
+    //  and addresses.)
+    tassert(count(ass1, "\n") == count(ass2, "\n"));
+    tassert(count(ass3, "\n") == count(ass2, "\n"));
+}
+
 int
 main(int argc, char** argv)
 {
@@ -248,6 +344,7 @@ main(int argc, char** argv)
     try
     {
         test_tuple();
+        test_mpz();
     }
     catch(skippable_exception e)
     {
