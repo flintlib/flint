@@ -62,14 +62,10 @@ struct data
     int payload;
     bool* destroyed;
     int extra;
+    bool initialized;
 
-    data() : payload(-1), destroyed(0), extra(0) {}
+    data() : payload(-1), destroyed(0), extra(0), initialized(false) {}
 
-    ~data()
-    {
-        if(destroyed)
-            *destroyed = true;
-    }
 
 private:
     data(const data& d);
@@ -82,11 +78,24 @@ typedef my_expression<operations::immediate, long_data> mylong;
 namespace flint {
 namespace rules {
 template<>
+struct destruction<myint>
+{
+    static void doit(myint& to)
+    {
+        tassert(to._data().initialized == true);
+        if(to._data().destroyed)
+            *to._data().destroyed = true;
+    }
+};
+
+template<>
 struct empty_initialization<myint>
 {
     static void doit(myint& v)
     {
         v._data().extra = 42;
+        tassert(v._data().initialized == false);
+        v._data().initialized = true;
     }
 };
 
@@ -95,8 +104,10 @@ struct initialization<myint, myint>
 {
     static void doit(myint& to, const myint& from)
     {
+        tassert(to._data().initialized == false);
         to._data().payload = from._data().payload;
         to._data().extra = 1;
+        to._data().initialized = true;
     }
 };
 
@@ -107,6 +118,8 @@ struct initialization<myint, int>
     {
         to._data().payload = i;
         to._data().extra = 2;
+        tassert(to._data().initialized == false);
+        to._data().initialized = true;
     }
 };
 
@@ -117,6 +130,8 @@ struct initialization<myint, char>
     {
         to._data().payload = i;
         to._data().extra = 3;
+        tassert(to._data().initialized == false);
+        to._data().initialized = true;
     }
 };
 

@@ -76,6 +76,15 @@ struct empty_initialization : UNIMPLEMENTED { };
 template<class T, class U, class Enable = void>
 struct assignment : UNIMPLEMENTED { };
 
+// C-style cmp.
+template<class T, class U, class Enable = void>
+struct cmp : UNIMPLEMENTED { };
+
+// For internal use
+template<class T, class U>
+struct _symmetric_cmp;
+
+// Rule for equals. Implemented in terms of cmp by default.
 template<class T, class U, class Enable = void>
 struct equals : UNIMPLEMENTED { };
 
@@ -244,7 +253,6 @@ struct copy_initialization_helper
     template<class T, class U>
     void doit(T& to, const U& from)
     {
-        rules::destruction<T>::doit(to);
         rules::initialization<T, U>::doit(to, from);
     }
 };
@@ -406,6 +414,23 @@ struct derived_wrapper
     };
 };
 
+namespace mp {
+template<class T, class Enable = void>
+struct evaluation_helper
+{
+    typedef typename traits::basetype<T>::type type;
+    static type get(const type& t) {return t;}
+};
+
+template<class T>
+struct evaluation_helper<T,
+    typename mp::enable_if<traits::is_expression<T> >::type>
+{
+    typedef typename T::evaluated_t type;
+    static type get(const T& t) {return t.evaluate();}
+};
+}
+
 
 // operators
 
@@ -434,6 +459,30 @@ struct binary_op_helper
     static return_t make(const Expr1& left, const Expr2& right)
     {
         return make_helper::make(maker::make(left, right));
+    }
+};
+
+template<class Expr1, class Expr2>
+struct order_op_helper
+{
+    typedef typename mp::evaluation_helper<Expr1>::type ev1_t;
+    typedef typename mp::evaluation_helper<Expr2>::type ev2_t;
+    typedef rules::_symmetric_cmp<ev1_t, ev2_t> scmp;
+
+    typedef mp::enable_if<
+          mp::and_<
+            traits::is_implemented<scmp>,
+            mp::or_<
+                traits::is_expression<Expr1>,
+                traits::is_expression<Expr2>
+              >
+          >,
+          bool> enable;
+
+    static int get(const Expr1& e1, const Expr2& e2)
+    {
+        return scmp::get(mp::evaluation_helper<Expr1>::get(e1),
+            mp::evaluation_helper<Expr2>::get(e2));
     }
 };
 }
@@ -471,6 +520,34 @@ inline typename mp::enable_if<mp::or_<
 operator!=(const Expr1& e1, const Expr2& e2)
 {
   return !(e1 == e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::order_op_helper<Expr1, Expr2>::enable::type
+operator<(const Expr1& e1, const Expr2& e2)
+{
+    return detail::order_op_helper<Expr1, Expr2>::get(e1, e2) < 0;
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::order_op_helper<Expr1, Expr2>::enable::type
+operator<=(const Expr1& e1, const Expr2& e2)
+{
+    return detail::order_op_helper<Expr1, Expr2>::get(e1, e2) <= 0;
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::order_op_helper<Expr1, Expr2>::enable::type
+operator>(const Expr1& e1, const Expr2& e2)
+{
+    return detail::order_op_helper<Expr1, Expr2>::get(e1, e2) > 0;
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::order_op_helper<Expr1, Expr2>::enable::type
+operator>=(const Expr1& e1, const Expr2& e2)
+{
+    return detail::order_op_helper<Expr1, Expr2>::get(e1, e2) >= 0;
 }
 
 template<class Expr1, class Expr2>
@@ -709,6 +786,38 @@ struct print<T,
         if(ff & o.oct)
             base = 8;
         o << v.to_string(base);
+    }
+};
+
+// Automatic equality testing if cmp is implemented
+namespace rdetail {
+template<class T, class U>
+struct cmp_invert
+{
+    static int get(const T& t, const U& u)
+    {
+        return -cmp<U, T>::get(u, t);
+    }
+};
+}
+template<class T, class U>
+struct _symmetric_cmp
+    : mp::if_<traits::is_implemented<cmp<T, U> >,
+          cmp<T, U>,
+          typename mp::if_<traits::is_implemented<cmp<U, T> >,
+              rdetail::cmp_invert<T, U>,
+              UNIMPLEMENTED
+            >::type
+        >::type { };
+
+template<class T, class U>
+struct equals<T, U,
+    typename mp::enable_if<
+        traits::is_implemented<_symmetric_cmp<T, U> > >::type>
+{
+    static bool get(const T& t, const U& u)
+    {
+        return _symmetric_cmp<T, U>::get(t, u) == 0;
     }
 };
 } // rules

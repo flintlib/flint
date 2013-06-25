@@ -228,8 +228,9 @@ struct merge_tuple;
 
 // General case
 template<class Head, class Tail, class Tuple2>
-class merge_tuple<tuple<Head, Tail>, Tuple2>
+struct merge_tuple<tuple<Head, Tail>, Tuple2>
 {
+private:
     typedef merge_tuple<Tail, Tuple2> comp1;
     typedef merge_tuple<tuple<Head, empty_tuple>, typename comp1::tail_t> comp2;
     typedef concat_tuple<typename comp1::used_t, typename comp2::type> concater;
@@ -271,8 +272,9 @@ public:
 
 // First argument a singleton, no merging
 template<class T, class U, class Tail>
-class merge_tuple<tuple<T, empty_tuple>, tuple<U, Tail> >
+struct merge_tuple<tuple<T, empty_tuple>, tuple<U, Tail> >
 {
+private:
     typedef merge_tuple<tuple<T, empty_tuple>, Tail> comp;
     typedef concat_tuple<
         typename comp::used_t,

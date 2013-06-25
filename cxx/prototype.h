@@ -74,7 +74,8 @@ struct initialization<mpz, mpz>
 };
 
 template<class T>
-struct initialization<mpz, T, typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
+struct initialization<mpz, T,
+    typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
 {
     static void doit(mpz& target, T source)
     {
@@ -83,7 +84,8 @@ struct initialization<mpz, T, typename mp::enable_if<traits::is_unsigned_integer
 };
 
 template<class T>
-struct initialization<mpz, T, typename mp::enable_if<traits::is_signed_integer<T> >::type>
+struct initialization<mpz, T,
+    typename mp::enable_if<traits::is_signed_integer<T> >::type>
 {
     static void doit(mpz& target, T source)
     {
@@ -97,12 +99,14 @@ struct assignment<mpz, mpz>
 {
     static void doit(mpz& target, const mpz& source)
     {
+        fmpz_clear(target._data());
         fmpz_set(target._data(), source._data());
     }
 };
 
 template<class T>
-struct assignment<mpz, T, typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
+struct assignment<mpz, T,
+    typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
 {
     static void doit(mpz& target, T source)
     {
@@ -111,7 +115,8 @@ struct assignment<mpz, T, typename mp::enable_if<traits::is_unsigned_integer<T> 
 };
 
 template<class T>
-struct assignment<mpz, T, typename mp::enable_if<traits::is_signed_integer<T> >::type>
+struct assignment<mpz, T,
+    typename mp::enable_if<traits::is_signed_integer<T> >::type>
 {
     static void doit(mpz& target, T source)
     {
@@ -143,6 +148,35 @@ struct destruction<mpz>
     static void doit(mpz& v)
     {
         fmpz_clear(v._data());
+    }
+};
+
+template<>
+struct cmp<mpz, mpz>
+{
+    static int get(const mpz& l, const mpz& r)
+    {
+        return fmpz_cmp(l._data(), r._data());
+    }
+};
+
+template<class T>
+struct cmp<mpz, T,
+    typename mp::enable_if<traits::is_signed_integer<T> >::type>
+{
+    static int get(const mpz& v, const T& t)
+    {
+        return fmpz_cmp_si(v._data(), t);
+    }
+};
+
+template<class T>
+struct cmp<mpz, T,
+    typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
+{
+    static int get(const mpz& v, const T& t)
+    {
+        return fmpz_cmp_ui(v._data(), t);
     }
 };
 

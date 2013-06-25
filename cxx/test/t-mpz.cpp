@@ -50,12 +50,50 @@ test_printing()
     tassert((a + b).to_string() == "16");
 }
 
+void
+test_order()
+{
+    mpz a(0);
+    mpz b(1);
+    mpz c(0);
+    mpz d(-1);
+
+#define TO(xzero, zero, one, mone) \
+    tassert(xzero == zero); \
+    tassert(xzero != one); \
+    tassert(!(xzero == one)); \
+    tassert(!(xzero != zero)); \
+    tassert(xzero < one); \
+    tassert(xzero <= one); \
+    tassert(xzero <= zero); \
+    tassert(!(xzero < zero)); \
+    tassert(!(xzero <= mone)); \
+    tassert(xzero > mone); \
+    tassert(xzero >= mone); \
+    tassert(xzero >= zero); \
+    tassert(!(xzero > zero)); \
+    tassert(!(xzero >= one));
+
+    TO(a, c, b, d);
+    TO(a, 0, 1, -1);
+    TO(a, 0u, 1u, -1);
+    TO(a, (signed short)(0), (signed short)(1), (signed short)(-1));
+    TO(a, (unsigned short)(0), (unsigned short)(1), -1);
+    TO(a, 0l, 1l, -1l);
+    TO(0, c, b, d);
+    TO(0u, c, b, d);
+    TO(0l, c, b, d);
+    TO((short)0, c, b, d);
+    TO((unsigned short)0, c, b, d);
+}
+
 int
 main()
 {
     std::cout << "mpz....";
 
     test_printing();
+    test_order();
 
     std::cout << "PASS" << std::endl;
 }
