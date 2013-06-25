@@ -26,7 +26,7 @@
 #include "fmpz_poly_q.h"
 
 void fmpz_poly_q_pow(fmpz_poly_q_t rop, 
-                     const fmpz_poly_q_t op, unsigned long exp)
+                     const fmpz_poly_q_t op, ulong exp)
 {
     if (exp == 0)
     {

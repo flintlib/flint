@@ -37,7 +37,7 @@ int
 _fmpz_poly_set_str(fmpz * poly, const char *str)
 {
     char * w;
-    len_t i, len;
+    slong i, len;
 
     if (!isdigit(str[0]))
         return -1;
@@ -53,10 +53,10 @@ _fmpz_poly_set_str(fmpz * poly, const char *str)
     /* Find maximal gap between spaces and allocate w */
     {
         const char * s = str;
-        len_t max;
+        slong max;
         for (max = 0; *s != '\0';)
         {
-            len_t cur;
+            slong cur;
             for (s++, cur = 1; *s != ' ' && *s != '\0'; s++, cur++) ;
             if (max < cur)
                 max = cur;
@@ -90,7 +90,7 @@ int
 fmpz_poly_set_str(fmpz_poly_t poly, const char * str)
 {
     int ans;
-    len_t len;
+    slong len;
 
     if (!isdigit(str[0]))
         return -1;

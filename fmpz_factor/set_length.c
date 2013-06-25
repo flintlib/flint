@@ -31,11 +31,11 @@
 #include "fmpz_factor.h"
 
 void
-_fmpz_factor_set_length(fmpz_factor_t factor, len_t newlen)
+_fmpz_factor_set_length(fmpz_factor_t factor, slong newlen)
 {
     if (factor->num > newlen)
     {
-        len_t i;
+        slong i;
         for (i = newlen; i < factor->num; i++)
             _fmpz_demote(factor->p + i); 
     }

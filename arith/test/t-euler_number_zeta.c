@@ -39,7 +39,7 @@ int main()
 {
     fmpz * ress;
     fmpz_t res;
-    len_t n, N;
+    slong n, N;
 
     printf("euler_number_zeta....");
     fflush(stdout);

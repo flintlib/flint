@@ -23,17 +23,12 @@
 
 ******************************************************************************/
 
-#include <math.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "arith.h"
 
 void
-arith_bell_number_vec_recursive(fmpz * b, len_t n)
+arith_bell_number_vec_recursive(fmpz * b, slong n)
 {
-    len_t i, k;
+    slong i, k;
     fmpz * t;
 
     if (n < BELL_NUMBER_TAB_SIZE)

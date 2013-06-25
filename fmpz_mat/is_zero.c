@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 int
 fmpz_mat_is_zero(const fmpz_mat_t mat)
 {
-    len_t j;
+    slong j;
 
     if (mat->r == 0 || mat->c == 0)
         return 1;

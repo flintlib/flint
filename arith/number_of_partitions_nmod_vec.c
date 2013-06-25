@@ -23,24 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <math.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
-#include "ulong_extras.h"
-#include "nmod_vec.h"
-#include "nmod_poly.h"
-
 
 void
-arith_number_of_partitions_nmod_vec(mp_ptr res, len_t len, nmod_t mod)
+arith_number_of_partitions_nmod_vec(mp_ptr res, slong len, nmod_t mod)
 {
     mp_ptr tmp;
     mp_limb_t r;
-    len_t k, n;
+    slong k, n;
 
     r = mod.n - 1UL;
 

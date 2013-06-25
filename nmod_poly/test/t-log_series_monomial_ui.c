@@ -44,7 +44,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, logA, res;
-        len_t n;
+        slong n;
         mp_limb_t mod;
         ulong power;
         mp_limb_t coeff;

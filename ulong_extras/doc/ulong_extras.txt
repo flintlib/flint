@@ -84,7 +84,7 @@ mp_limb_t n_randtest_not_zero(flint_rand_t state)
     As for \code{n_randtest()}, but does not return $0$.
     This function is intended for use in test code. 
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
+mp_limb_t n_randprime(flint_rand_t state, unsigned slong bits, int proved)
 
     Returns a random prime number (proved = 1) or probable prime (proved = 0)
     with \code{bits} bits, where \code{bits} must be at least 2 and
@@ -131,7 +131,7 @@ mp_limb_t n_clog(mp_limb_t n, mp_limb_t b)
 ulong n_revbin(ulong in, ulong bits)
 
     Returns the binary reverse of \code{in}, assuming it is the given 
-    number of bits long, e.g.\ \code{n_revbin(10110, 6)} will return
+    number of bits in length, e.g.\ \code{n_revbin(10110, 6)} will return
     \code{110100}.
 
 int n_sizeinbase(mp_limb_t n, int base)
@@ -487,7 +487,7 @@ mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p)
     Assumes that $p$ is a prime and that $a$ is reduced modulo $p$.
     Returns 0 if $a$ is a quadratic non-residue modulo $p$.
 
-long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
+slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{2^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -498,7 +498,7 @@ long n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
+slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp)
 
     Computes all the square roots of \code{a} modulo \code{p^exp}. The roots 
     are stored in an array which is created and whose address is stored in 
@@ -509,7 +509,7 @@ long n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, long exp)
     returned by the function and the location \code{sqrt} points to is set to 
     NULL. 
 
-long n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
+slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac)
 
     Computes all the square roots of \code{a} modulo \code{m} given the 
     factorisation of \code{m} in \code{fac}. The roots are stored in an array 
@@ -848,7 +848,7 @@ mp_limb_t n_sqrt(mp_limb_t a)
     will be down. Thus the square root may be one too large in some 
     instances. We also have to be careful when the square of this too large 
     value causes an overflow. The same assumptions hold for a single 
-    precision float so long as the square root itself can be represented 
+    precision float provided the square root itself can be represented 
     in a single float, i.e.\ for $a < 281474976710656 = 2^{46}$.
 
 mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
@@ -860,7 +860,7 @@ mp_limb_t n_sqrtrem(mp_limb_t * r, mp_limb_t a)
     will be down. Thus the square root may be one too large in some 
     instances. We also have to be careful when the square of this too 
     large value causes an overflow. The same assumptions hold for a 
-    single precision float so long as the square root itself can be 
+    single precision float provided the square root itself can be 
     represented in a single float, i.e. for \
     $a < 281474976710656 = 2^{46}$. The remainder is computed by 
     subtracting the square of the computed square root from $a$.

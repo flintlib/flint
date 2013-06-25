@@ -23,17 +23,12 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 int
 fmpq_mat_get_fmpz_mat(fmpz_mat_t dest, const fmpq_mat_t mat)
 {
-    len_t i, j;
+    slong i, j;
     
     for (i = 0; i < mat->r; i++)
     {

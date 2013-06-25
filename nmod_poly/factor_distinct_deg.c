@@ -28,11 +28,11 @@
 #include "nmod_poly.h"
 
 void nmod_poly_factor_distinct_deg(nmod_poly_factor_t res,
-                                   const nmod_poly_t poly, len_t **degs)
+                                   const nmod_poly_t poly, slong **degs)
 {
     nmod_poly_t f, g, s, v, vinv, reducedH0, tmp;
     nmod_poly_t *h, *H, *I;
-    len_t i, j, l, m, n, index, d;
+    slong i, j, l, m, n, index, d;
     double beta;
 
     n = nmod_poly_degree(poly);

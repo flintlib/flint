@@ -31,7 +31,7 @@
 
 void
 _fmpq_poly_atan_series(fmpz * g, fmpz_t gden, 
-                           const fmpz * h, const fmpz_t hden, len_t n)
+                           const fmpz * h, const fmpz_t hden, slong n)
 {
     fmpz * t;
     fmpz * u;
@@ -58,10 +58,10 @@ _fmpq_poly_atan_series(fmpz * g, fmpz_t gden,
 
 
 void
-fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t f, len_t n)
+fmpq_poly_atan_series(fmpq_poly_t res, const fmpq_poly_t f, slong n)
 {
     fmpz * f_coeffs;
-    len_t flen = f->length;
+    slong flen = f->length;
 
     if (flen && !fmpz_is_zero(f->coeffs))
     {

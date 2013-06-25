@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("det....");
     fflush(stdout);
@@ -45,7 +45,7 @@ main(void)
     {
         nmod_poly_mat_t A, B, C;
         nmod_poly_t a, b, ab, c;
-        len_t n, deg;
+        slong n, deg;
         mp_limb_t mod;
         float density;
 

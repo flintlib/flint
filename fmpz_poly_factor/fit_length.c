@@ -26,7 +26,7 @@
 
 #include "fmpz_poly_factor.h"
 
-void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, len_t len)
+void fmpz_poly_factor_fit_length(fmpz_poly_factor_t fac, slong len)
 {
     if (len > fac->alloc)
     {

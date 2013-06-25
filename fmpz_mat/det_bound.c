@@ -23,20 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
-#include "nmod_mat.h"
-#include "nmod_vec.h"
-
 
 void
 fmpz_mat_det_bound(fmpz_t bound, const fmpz_mat_t A)
 {
     fmpz_t p, s, t;
-    len_t i, j;
+    slong i, j;
 
     fmpz_init(p);
     fmpz_init(s);

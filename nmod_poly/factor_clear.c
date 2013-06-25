@@ -33,7 +33,7 @@
 void
 nmod_poly_factor_clear(nmod_poly_factor_t fac)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < fac->alloc; i++)
         nmod_poly_clear(fac->p + i);

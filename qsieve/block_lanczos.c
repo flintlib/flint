@@ -58,7 +58,7 @@ static const uint64_t bitmask[64] = {
 };
 
 /*--------------------------------------------------------------------*/
-uint64_t get_null_entry(uint64_t * nullrows, len_t i, len_t l) {
+uint64_t get_null_entry(uint64_t * nullrows, slong i, slong l) {
    
    /* Returns true if the entry with indices i,l is 1 in the
       supplied 64xN matrix. This is used to read the nullspace
@@ -68,7 +68,7 @@ uint64_t get_null_entry(uint64_t * nullrows, len_t i, len_t l) {
 }
 
 /*--------------------------------------------------------------------*/
-void reduce_matrix(qs_t qs_inf, len_t *nrows, len_t *ncols, la_col_t *cols) {
+void reduce_matrix(qs_t qs_inf, slong *nrows, slong *ncols, la_col_t *cols) {
 
 	/* Perform light filtering on the nrows x ncols
 	   matrix specified by cols[]. The processing here is
@@ -84,15 +84,15 @@ void reduce_matrix(qs_t qs_inf, len_t *nrows, len_t *ncols, la_col_t *cols) {
 	   factorizations for which the matrix step will fail 
 	   outright  */
 
-	len_t r, c, i, j, k;
-	len_t passes;
-	len_t *counts;
-	len_t reduced_rows;
-	len_t reduced_cols;
+	slong r, c, i, j, k;
+	slong passes;
+	slong *counts;
+	slong reduced_rows;
+	slong reduced_cols;
 
 	/* count the number of nonzero entries in each row */
 
-	counts = (len_t *)flint_calloc((size_t)*nrows, sizeof(len_t));
+	counts = (slong *)flint_calloc((size_t)*nrows, sizeof(slong));
 	for (i = 0; i < *ncols; i++) {
 		for (j = 0; j < cols[i].weight; j++)
 			counts[cols[i].data[j]]++;
@@ -196,7 +196,7 @@ static void mul_64x64_64x64(uint64_t *a, uint64_t *b, uint64_t *c ) {
 
 	uint64_t ai, bj, accum;
 	uint64_t tmp[64];
-	unsigned long i, j;
+	ulong i, j;
 
 	for (i = 0; i < 64; i++) {
 		j = 0;
@@ -233,7 +233,7 @@ static void precompute_Nx64_64x64(uint64_t *x, uint64_t *c) {
 	   by x[][]. */
 
 	uint64_t accum, xk;
-	unsigned long i, j, k, index;
+	ulong i, j, k, index;
 
 	for (j = 0; j < 8; j++) {
 		for (i = 0; i < 256; i++) {
@@ -257,7 +257,7 @@ static void precompute_Nx64_64x64(uint64_t *x, uint64_t *c) {
 
 /*-------------------------------------------------------------------*/
 static void mul_Nx64_64x64_acc(uint64_t *v, uint64_t *x, uint64_t *c, 
-				uint64_t *y, len_t n) {
+				uint64_t *y, slong n) {
 
 	/* let v[][] be a n x 64 matrix with elements in GF(2), 
 	   represented as an array of n 64-bit words. Let c[][]
@@ -265,7 +265,7 @@ static void mul_Nx64_64x64_acc(uint64_t *v, uint64_t *x, uint64_t *c,
 	   This code multiplies v[][] by the 64x64 matrix 
 	   x[][], then XORs the n x 64 result into y[][] */
 
-    len_t i;
+    slong i;
 	uint64_t word;
 
 	precompute_Nx64_64x64(x, c);
@@ -285,13 +285,13 @@ static void mul_Nx64_64x64_acc(uint64_t *v, uint64_t *x, uint64_t *c,
 
 /*-------------------------------------------------------------------*/
 static void mul_64xN_Nx64(uint64_t *x, uint64_t *y,
-			   uint64_t *c, uint64_t *xy, len_t n) {
+			   uint64_t *c, uint64_t *xy, slong n) {
 
 	/* Let x and y be n x 64 matrices. This routine computes
 	   the 64 x 64 matrix xy[][] given by transpose(x) * y.
 	   c[][] is a 256 x 8 scratch matrix of 64-bit words. */
 
-	len_t i;
+	slong i;
 
 	memset(c, 0, 256 * 8 * sizeof(uint64_t));
 	memset(xy, 0, 64 * sizeof(uint64_t));
@@ -312,7 +312,7 @@ static void mul_64xN_Nx64(uint64_t *x, uint64_t *y,
 
 	for(i = 0; i < 8; i++) {
 
-		unsigned long j;
+		ulong j;
 		uint64_t a0, a1, a2, a3, a4, a5, a6, a7;
 
 		a0 = a1 = a2 = a3 = 0;
@@ -338,8 +338,8 @@ static void mul_64xN_Nx64(uint64_t *x, uint64_t *y,
 }
 
 /*-------------------------------------------------------------------*/
-static len_t find_nonsingular_sub(uint64_t *t, len_t *s, 
-				len_t *last_s, len_t last_dim, 
+static slong find_nonsingular_sub(uint64_t *t, slong *s, 
+				slong *last_s, slong last_dim, 
 				uint64_t *w) {
 
 	/* given a 64x64 matrix t[][] (i.e. sixty-four
@@ -350,9 +350,9 @@ static len_t find_nonsingular_sub(uint64_t *t, len_t *s,
 	     - invert it and copy to w[][]
 	     - enumerate in s[] the columns represented in w[][] */
 
-	len_t i, j;
-	len_t dim;
-	len_t cols[64];
+	slong i, j;
+	slong dim;
+	slong cols[64];
 	uint64_t M[64][2];
 	uint64_t mask, *row_i, *row_j;
 	uint64_t m0, m1;
@@ -485,8 +485,8 @@ static len_t find_nonsingular_sub(uint64_t *t, len_t *s,
 }
 
 /*-------------------------------------------------------------------*/
-void mul_MxN_Nx64(len_t vsize, len_t dense_rows,
-		len_t ncols, la_col_t *A,
+void mul_MxN_Nx64(slong vsize, slong dense_rows,
+		slong ncols, la_col_t *A,
 		uint64_t *x, uint64_t *b) {
 
 	/* Multiply the vector x[] by the matrix A (stored
@@ -494,13 +494,13 @@ void mul_MxN_Nx64(len_t vsize, len_t dense_rows,
 	   refers to the number of uint64_t's allocated for
 	   x[] and b[]; vsize is probably different from ncols */
 
-	len_t i, j;
+	slong i, j;
 
 	memset(b, 0, vsize * sizeof(uint64_t));
 	
 	for (i = 0; i < ncols; i++) {
 		la_col_t *col = A + i;
-		len_t *row_entries = col->data;
+		slong *row_entries = col->data;
 		uint64_t tmp = x[i];
 
 		for (j = 0; j < col->weight; j++) {
@@ -511,12 +511,12 @@ void mul_MxN_Nx64(len_t vsize, len_t dense_rows,
 	if (dense_rows) {
 		for (i = 0; i < ncols; i++) {
 			la_col_t *col = A + i;
-			len_t *row_entries = col->data + col->weight;
+			slong *row_entries = col->data + col->weight;
 			uint64_t tmp = x[i];
 	
 			for (j = 0; j < dense_rows; j++) {
 				if (row_entries[j / 32] & 
-						((len_t)1 << (j % 32))) {
+						((slong)1 << (j % 32))) {
 					b[j] ^= tmp;
 				}
 			}
@@ -525,18 +525,18 @@ void mul_MxN_Nx64(len_t vsize, len_t dense_rows,
 }
 
 /*-------------------------------------------------------------------*/
-void mul_trans_MxN_Nx64(len_t dense_rows, len_t ncols,
+void mul_trans_MxN_Nx64(slong dense_rows, slong ncols,
 			la_col_t *A, uint64_t *x, uint64_t *b) {
 
 	/* Multiply the vector x[] by the transpose of the
 	   matrix A and put the result in b[]. Since A is stored
 	   by columns, this is just a matrix-vector product */
 
-	len_t i, j;
+	slong i, j;
 
 	for (i = 0; i < ncols; i++) {
 		la_col_t *col = A + i;
-		len_t *row_entries = col->data;
+		slong *row_entries = col->data;
 		uint64_t accum = 0;
 
 		for (j = 0; j < col->weight; j++) {
@@ -548,12 +548,12 @@ void mul_trans_MxN_Nx64(len_t dense_rows, len_t ncols,
 	if (dense_rows) {
 		for (i = 0; i < ncols; i++) {
 			la_col_t *col = A + i;
-			len_t *row_entries = col->data + col->weight;
+			slong *row_entries = col->data + col->weight;
 			uint64_t accum = b[i];
 	
 			for (j = 0; j < dense_rows; j++) {
 				if (row_entries[j / 32] &
-						((len_t)1 << (j % 32))) {
+						((slong)1 << (j % 32))) {
 					accum ^= x[j];
 				}
 			}
@@ -563,14 +563,14 @@ void mul_trans_MxN_Nx64(len_t dense_rows, len_t ncols,
 }
 
 /*-----------------------------------------------------------------------*/
-static void transpose_vector(len_t ncols, uint64_t *v, uint64_t **trans) {
+static void transpose_vector(slong ncols, uint64_t *v, uint64_t **trans) {
 
 	/* Hideously inefficent routine to transpose a
 	   vector v[] of 64-bit words into a 2-D array
 	   trans[][] of 64-bit words */
 
-	len_t i, j;
-	len_t col;
+	slong i, j;
+	slong col;
 	uint64_t mask, word;
 
 	for (i = 0; i < ncols; i++) {
@@ -588,7 +588,7 @@ static void transpose_vector(len_t ncols, uint64_t *v, uint64_t **trans) {
 }
 
 /*-----------------------------------------------------------------------*/
-void combine_cols(len_t ncols, 
+void combine_cols(slong ncols, 
 		uint64_t *x, uint64_t *v, 
 		uint64_t *ax, uint64_t *av) {
 
@@ -609,7 +609,7 @@ void combine_cols(len_t ncols,
 	   v[] and av[] can be NULL, in which case the elimination
 	   process assumes 64 dependencies instead of 128 */
 
-	len_t i, j, k, bitpos, col, col_words, num_deps;
+	slong i, j, k, bitpos, col, col_words, num_deps;
 	uint64_t mask;
 	uint64_t *matrix[128], *amatrix[128], *tmp;
 
@@ -705,8 +705,8 @@ void combine_cols(len_t ncols,
 }
 
 /*-----------------------------------------------------------------------*/
-uint64_t * block_lanczos(flint_rand_t state, len_t nrows, 
-			len_t dense_rows, len_t ncols, la_col_t *B) {
+uint64_t * block_lanczos(flint_rand_t state, slong nrows, 
+			slong dense_rows, slong ncols, la_col_t *B) {
 	
 	/* Solve Bx = 0 for some nonzero x; the computed
 	   solution, containing up to 64 of these nullspace
@@ -718,12 +718,12 @@ uint64_t * block_lanczos(flint_rand_t state, len_t nrows,
 	uint64_t *scratch;
 	uint64_t *d, *e, *f, *f2;
 	uint64_t *tmp;
-	len_t s[2][64];
-	len_t i, iter;
-	len_t n = ncols;
-	len_t dim0, dim1;
+	slong s[2][64];
+	slong i, iter;
+	slong n = ncols;
+	slong dim0, dim1;
 	uint64_t mask0, mask1;
-	len_t vsize;
+	slong vsize;
 
 	/* allocate all of the size-n variables. Note that because
 	   B has been preprocessed to ignore singleton rows, the
@@ -900,7 +900,7 @@ uint64_t * block_lanczos(flint_rand_t state, len_t nrows,
 		
 		tmp = vt_a2_v[1]; vt_a2_v[1] = vt_a2_v[0]; vt_a2_v[0] = tmp;
 
-		memcpy(s[1], s[0], 64 * sizeof(len_t));
+		memcpy(s[1], s[0], 64 * sizeof(slong));
 		mask1 = mask0;
 		dim1 = dim0;
 	}

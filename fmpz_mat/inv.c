@@ -23,10 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
 void
@@ -49,7 +45,7 @@ _fmpz_mat_inv_2x2(fmpz ** b, fmpz_t den, fmpz ** const a)
 int
 fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
 {
-    len_t dim = A->r;
+    slong dim = A->r;
 
     if (dim == 0)
     {
@@ -70,7 +66,7 @@ fmpz_mat_inv(fmpz_mat_t B, fmpz_t den, const fmpz_mat_t A)
     else
     {
         fmpz_mat_t I;
-        len_t i;
+        slong i;
         int success;
 
         fmpz_mat_init(I, dim, dim);

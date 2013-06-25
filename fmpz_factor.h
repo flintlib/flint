@@ -39,8 +39,8 @@ typedef struct
     int sign;
     fmpz * p;
     ulong * exp;
-    len_t alloc;
-    len_t num;
+    slong alloc;
+    slong num;
 } fmpz_factor_struct;
 
 typedef fmpz_factor_struct fmpz_factor_t[1];
@@ -54,11 +54,11 @@ void fmpz_factor_clear(fmpz_factor_t factor);
 
 void fmpz_factor_print(const fmpz_factor_t factor);
 
-void _fmpz_factor_fit_length(fmpz_factor_t factor, len_t len);
+void _fmpz_factor_fit_length(fmpz_factor_t factor, slong len);
 
 void _fmpz_factor_append_ui(fmpz_factor_t factor, mp_limb_t p, ulong exp);
 
-void _fmpz_factor_set_length(fmpz_factor_t factor, len_t newlen);
+void _fmpz_factor_set_length(fmpz_factor_t factor, slong newlen);
 
 /* Factoring *****************************************************************/
 

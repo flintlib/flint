@@ -35,9 +35,9 @@ int main(void)
 {
     flint_rand_t state;
     mp_ptr b1, b2;
-    len_t n;
+    slong n;
 
-    const len_t maxn = 3000;
+    const slong maxn = 3000;
 
     printf("bell_number_nmod_vec....");
     fflush(stdout);

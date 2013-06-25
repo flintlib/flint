@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_t a;
         ulong n1, n2;
-        len_t coeff, len;
+        slong coeff, len;
 
         fmpz_poly_init(a);
         len = n_randint(state, 100) + 1;

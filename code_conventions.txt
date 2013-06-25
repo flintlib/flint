@@ -25,21 +25,20 @@ possible the following primitive datatype should be used:
     | mp_limb_t arrays                       | mp_ptr/ mp_srcptr           |
     | ui/ si function constants              | ulong/ slong                |
     | exponents (unsigned/signed)            | ulong/ slong                |
-    | polynomial lengths                     | len_t                       |
-    | number of indeterminates               | len_t                       |
-    | row/ column indices                    | len_t                       |
+    | polynomial lengths                     | slong                       |
+    | number of indeterminates               | slong                       |
+    | row/ column indices                    | slong                       |
     | precision for mpfr types               | mpfr_prec_t                 |
 
 The typical definitions of these in terms of primitive types are:
 
-    | mp_bitcnt_t   | unsigned long, or unsigned long long               |
-    | mp_size_t     | long, or long long                                 |
-    | mp_limb_t     | unsigned long, or unsigned long long               |
-    | mp_ptr        | mp_limb_t *                                        |
-    | mp_srcptr     | const mp_limb_t *                                  |
-    | len_t         | long or long long                                  |
-    | ulong         | unsigned long or unsigned long long                |
-    | slong         | long or long long                                  |
+    | mp_bitcnt_t   | ulong, or ulong long                                 |
+    | mp_size_t     | long, or long long                                   |
+    | mp_limb_t     | ulong, or ulong long                                 |
+    | mp_ptr        | mp_limb_t *                                          |
+    | mp_srcptr     | const mp_limb_t *                                    |
+    | slong         | long or long long                                    |
+    | ulong         | ulong or ulong long                                  |
 
 Use of const
 ------------

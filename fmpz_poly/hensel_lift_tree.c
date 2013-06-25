@@ -29,8 +29,8 @@
 #include "fmpz.h"
 #include "fmpz_poly.h"
 
-void fmpz_poly_hensel_lift_tree(len_t *link, fmpz_poly_t *v, fmpz_poly_t *w, 
-    fmpz_poly_t f, len_t r, const fmpz_t p, len_t e0, len_t e1, len_t inv)
+void fmpz_poly_hensel_lift_tree(slong *link, fmpz_poly_t *v, fmpz_poly_t *w, 
+    fmpz_poly_t f, slong r, const fmpz_t p, slong e0, slong e1, slong inv)
 {
     fmpz_t p0, p1;
 

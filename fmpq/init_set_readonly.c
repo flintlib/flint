@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 void fmpq_init_set_readonly(fmpq_t f, const mpq_t z)

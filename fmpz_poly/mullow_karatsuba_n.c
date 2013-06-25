@@ -32,7 +32,7 @@
 
 void 
 _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                 const fmpz * pol2, fmpz * temp, len_t len);
+                                 const fmpz * pol2, fmpz * temp, slong len);
 
 /*
    Multiplication using truncated karatsuba.
@@ -45,10 +45,10 @@ _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
 
 void
 _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
-                                 const fmpz * pol2, fmpz * temp, len_t len)
+                                 const fmpz * pol2, fmpz * temp, slong len)
 {
-    len_t m1 = len / 2;
-    len_t m2 = len - m1;
+    slong m1 = len / 2;
+    slong m2 = len - m1;
     int odd = (len & 1);
 
     if (len <= 6)
@@ -85,10 +85,10 @@ _fmpz_poly_mullow_kara_recursive(fmpz * out, const fmpz * pol1,
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
-                              const fmpz * poly2, len_t n)
+                              const fmpz * poly2, slong n)
 {
     fmpz *temp;
-    len_t len, loglen = 0;
+    slong len, loglen = 0;
 
     if (n == 1)
     {
@@ -109,11 +109,11 @@ _fmpz_poly_mullow_karatsuba_n(fmpz * res, const fmpz * poly1,
 
 void
 fmpz_poly_mullow_karatsuba_n(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                             const fmpz_poly_t poly2, len_t n)
+                             const fmpz_poly_t poly2, slong n)
 {
-    const len_t len1 = FLINT_MIN(poly1->length, n);
-    const len_t len2 = FLINT_MIN(poly2->length, n);
-    len_t i, lenr;
+    const slong len1 = FLINT_MIN(poly1->length, n);
+    const slong len2 = FLINT_MIN(poly2->length, n);
+    slong i, lenr;
 
     int clear = 0;
     fmpz *copy1, *copy2;

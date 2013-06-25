@@ -41,8 +41,8 @@
 #include "fmpz_poly.h"
 #include "NTL-interface.h"
 
-#define ZZ_SIZE(p) (((long *) (p))[1])
-#define ZZ_DATA(p) ((mp_limb_t *) (((long *) (p)) + 2))
+#define ZZ_SIZE(p) (((slong *) (p))[1])
+#define ZZ_DATA(p) ((mp_limb_t *) (((slong *) (p)) + 2))
 
 NTL_CLIENT
 
@@ -82,7 +82,7 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 {
    mp_limb_t *xp;
    _ntl_gbigint *x = &rop.rep;
-   long lw = fmpz_size(op);
+   slong lw = fmpz_size(op);
    fmpz c = *op;
 
    if (lw == 0) 
@@ -112,7 +112,7 @@ void fmpz_get_ZZ(ZZ& rop, const fmpz_t op)
 
 void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 {
-    const long len = op->length;
+    const slong len = op->length;
 
     if (len == 0)
     {
@@ -120,7 +120,7 @@ void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
     }
     else
     {
-        long i;
+        slong i;
         ZZ *ap;
 
         rop.rep.SetLength(len);
@@ -134,7 +134,7 @@ void fmpz_poly_get_ZZX(ZZX& rop, const fmpz_poly_t op)
 
 void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
 {
-    const long len = deg(op) + 1;
+    const slong len = deg(op) + 1;
 
     if (len == 0)
     {
@@ -142,7 +142,7 @@ void fmpz_poly_set_ZZX(fmpz_poly_t rop, const ZZX& op)
     }
     else
     {
-        long i;
+        slong i;
         const ZZ *ap; 
 
         fmpz_poly_fit_length(rop, len);

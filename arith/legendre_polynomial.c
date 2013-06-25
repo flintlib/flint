@@ -23,12 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
-#include "fmpq_poly.h"
 #include "arith.h"
 
 static __inline__ void __legendre_denom(fmpz_t den, ulong n)
@@ -50,7 +44,7 @@ void _arith_legendre_polynomial(fmpz * coeffs, fmpz_t den, ulong n)
 {
     fmpz * r;
     int odd;
-    len_t k;
+    slong k;
     ulong L;
 
     L = n / 2;

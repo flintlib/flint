@@ -33,7 +33,7 @@ void
 fmpz_cdiv_q_si(fmpz_t f, const fmpz_t g, slong h)
 {
     fmpz c1 = *g;
-    len_t c2 = h;
+    slong c2 = h;
 
     if (h == 0)
     {

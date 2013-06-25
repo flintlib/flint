@@ -31,10 +31,10 @@
 #include "fmpz.h"
 
 static mp_limb_t
-refimpl(len_t * exp, const fmpz_t x, int bits)
+refimpl(slong * exp, const fmpz_t x, int bits)
 {
     fmpz_t t;
-    len_t xbits;
+    slong xbits;
     mp_limb_t m;
 
     xbits = fmpz_bits(x);
@@ -58,7 +58,7 @@ refimpl(len_t * exp, const fmpz_t x, int bits)
 int
 main(void)
 {
-    len_t iter;
+    slong iter;
     flint_rand_t state;
 
     printf("abs_lbound_ui_2exp....");
@@ -69,8 +69,8 @@ main(void)
     for (iter = 0; iter < 10000 * flint_test_multiplier(); iter++)
     {
         fmpz_t x;
-        len_t bits;
-        len_t exp, yexp;
+        slong bits;
+        slong exp, yexp;
         mp_limb_t yman, man;
 
         fmpz_init(x);

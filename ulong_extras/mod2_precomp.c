@@ -31,7 +31,7 @@ mp_limb_t
 n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
 {
     mp_limb_t quot;
-    len_t rem;
+    slong rem;
 
     if (a < n)
         return a;
@@ -50,7 +50,7 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
     
     if (rem < (mp_limb_signed_t) (-n))
         quot -= (mp_limb_t) ((double) (-rem) * npre);
-    else if (rem >= (len_t) n)
+    else if (rem >= (slong) n)
         quot += (mp_limb_t) ((double) rem * npre);
     else if (rem < 0L)
         return rem + n;
@@ -58,7 +58,7 @@ n_mod2_precomp(mp_limb_t a, mp_limb_t n, double npre)
         return rem;
     
     rem = a - quot * n;
-    if (rem >= (len_t) n)
+    if (rem >= (slong) n)
         return rem - n;
     else if (rem < 0L)
         return rem + n;

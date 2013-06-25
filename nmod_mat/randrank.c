@@ -31,9 +31,9 @@
 
 
 void
-nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, len_t rank)
+nmod_mat_randrank(nmod_mat_t mat, flint_rand_t state, slong rank)
 {
-    len_t i;
+    slong i;
     mp_limb_t * diag;
 
     if (rank < 0 || rank > mat->r || rank > mat->c)

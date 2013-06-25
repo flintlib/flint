@@ -23,16 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-len_t
+slong
 fmpz_mat_max_bits(const fmpz_mat_t mat)
 {
-    len_t i, bits, row_bits, sign;
+    slong i;
+    slong bits, row_bits, sign;
 
     sign = 1;
     bits = 0;

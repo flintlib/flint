@@ -28,12 +28,12 @@
 #include "ulong_extras.h"
 #include "fmpz.h"
 
-int fmpz_set_str(fmpz_t f, char * str, int b)
+int fmpz_set_str(fmpz_t f, const char * str, int b)
 {
     int ans;
     mpz_t copy;
 
-    ans = mpz_init_set_str(copy, str, b);
+    ans = mpz_init_set_str(copy, (char *) str, b);
     if (ans == 0)
         fmpz_set_mpz(f, copy);
     mpz_clear(copy);

@@ -23,17 +23,14 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 void
-arith_bell_number_nmod_vec_series(mp_ptr res, len_t n, nmod_t mod)
+arith_bell_number_nmod_vec_series(mp_ptr res, slong n, nmod_t mod)
 {
     mp_limb_t fac, c;
     mp_ptr tmp;
-    len_t k;
+    slong k;
 
     if (n < 1)
         return;

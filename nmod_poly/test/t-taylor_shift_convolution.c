@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         nmod_poly_t f, g;
-        len_t n;
+        slong n;
         mp_limb_t c, mod;
 
         n = n_randint(state, 100);
@@ -79,7 +79,7 @@ main(void)
     {
         nmod_poly_t f, g, h1, h2;
         mp_limb_t mod, c;
-        len_t n;
+        slong n;
 
         n = n_randint(state, 100);
         do {

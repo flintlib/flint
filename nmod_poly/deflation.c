@@ -33,7 +33,7 @@ ulong
 nmod_poly_deflation(const nmod_poly_t input)
 {
     ulong deflation;
-    len_t i, coeff;
+    slong i, coeff;
 
     if (input->length <= 1)
         return input->length;

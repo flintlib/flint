@@ -39,11 +39,11 @@
 
 /* Memory management *********************************************************/
 
-static __inline__ len_t * _perm_init(len_t n)
+static __inline__ slong * _perm_init(slong n)
 {
-    len_t i, *vec;
+    slong i, *vec;
 
-    vec = (len_t *) flint_malloc(n * sizeof(len_t));
+    vec = (slong *) flint_malloc(n * sizeof(slong));
 
     if (!vec)
     {
@@ -57,16 +57,16 @@ static __inline__ len_t * _perm_init(len_t n)
     return vec;
 }
 
-static __inline__ void _perm_clear(len_t * vec)
+static __inline__ void _perm_clear(slong * vec)
 {
     flint_free(vec);
 }
 
 /* Assignment ****************************************************************/
 
-static __inline__ len_t _perm_equal(const len_t *vec1, const len_t *vec2, len_t n)
+static __inline__ slong _perm_equal(const slong *vec1, const slong *vec2, slong n)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < n; i++)
         if (vec1[i] != vec2[i])
@@ -75,30 +75,30 @@ static __inline__ len_t _perm_equal(const len_t *vec1, const len_t *vec2, len_t 
     return 1;
 }
 
-static __inline__ void _perm_set(len_t *res, const len_t *vec, len_t n)
+static __inline__ void _perm_set(slong *res, const slong *vec, slong n)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < n; i++)
         res[i] = vec[i];
 }
 
-static __inline__ void _perm_set_one(len_t *vec, len_t n)
+static __inline__ void _perm_set_one(slong *vec, slong n)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < n; i++)
         vec[i] = i;
 }
 
 static __inline__ void
- _perm_inv(len_t *res, const len_t *vec, len_t n)
+ _perm_inv(slong *res, const slong *vec, slong n)
 {
-    len_t i;
+    slong i;
 
     if (res == vec)
     {
-        len_t *t = (len_t *) flint_malloc(n * sizeof(len_t));
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         if (!t)
         {
@@ -123,13 +123,13 @@ static __inline__ void
 /* Composition ***************************************************************/
 
 static __inline__ void
-_perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, len_t n)
+_perm_compose(slong *res, const slong *vec1, const slong *vec2, slong n)
 {
-    len_t i;
+    slong i;
 
     if (res == vec1)
     {
-        len_t *t = (len_t *) flint_malloc(n * sizeof(len_t));
+        slong *t = (slong *) flint_malloc(n * sizeof(slong));
 
         for (i = 0; i < n; i++)
             t[i] = vec1[i];
@@ -147,17 +147,17 @@ _perm_compose(len_t *res, const len_t *vec1, const len_t *vec2, len_t n)
 
 /* Randomisation *************************************************************/
 
-int _perm_randtest(len_t * vec, len_t n, flint_rand_t state);
+int _perm_randtest(slong * vec, slong n, flint_rand_t state);
 
 /* Parity ********************************************************************/
 
-int _perm_parity(const len_t * vec, len_t n);
+int _perm_parity(const slong * vec, slong n);
 
 /* Input and output **********************************************************/
 
-static __inline__  int _long_vec_print(const len_t * vec, len_t len)
+static __inline__  int _long_vec_print(const slong * vec, slong len)
 {
-    len_t i;
+    slong i;
 
     printf("%ld", len);
     if (len > 0)
@@ -170,9 +170,9 @@ static __inline__  int _long_vec_print(const len_t * vec, len_t len)
     return 1;
 }
 
-static __inline__ int _perm_print(const len_t * vec, len_t n)
+static __inline__ int _perm_print(const slong * vec, slong n)
 {
-    len_t i;
+    slong i;
 
     printf("%ld", n);
     if (n > 0)

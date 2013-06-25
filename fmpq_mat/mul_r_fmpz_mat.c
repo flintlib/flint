@@ -23,19 +23,12 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void
 fmpq_mat_mul_r_fmpz_mat(fmpq_mat_t C, const fmpz_mat_t A, const fmpq_mat_t B)
 {
-    len_t i, j;
+    slong i, j;
 
     fmpz_mat_t Bclear;
     fmpz_mat_t Cclear;

@@ -51,7 +51,7 @@ unsigned int nextindex[] =
 mp_limb_t n_nextprime(mp_limb_t n, int proved)
 {
     mp_limb_t * moduli;
-    unsigned long i, index;
+    ulong i, index;
 
     if (n < 7) 
     {
@@ -93,8 +93,8 @@ mp_limb_t n_nextprime(mp_limb_t n, int proved)
 
     while (1)
     {
-        unsigned long composite = 0;
-        unsigned long diff, acc, pr;
+        ulong composite = 0;
+        ulong diff, acc, pr;
 
         diff = nextmod30[index];
 

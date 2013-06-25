@@ -23,17 +23,13 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 #include "perm.h"
 
 void
 _fmpz_mat_det_bareiss(fmpz_t det, fmpz_mat_t tmp)
 {
-    len_t *perm, n = fmpz_mat_nrows(tmp);
+    slong *perm, n = fmpz_mat_nrows(tmp);
     perm = _perm_init(n);
 
     fmpz_mat_fflu(tmp, det, perm, tmp, 1);

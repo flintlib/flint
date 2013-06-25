@@ -35,9 +35,9 @@
 #include "perm.h"
 
 static void
-fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, len_t col, fmpz_mod_poly_t poly)
+fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, slong col, fmpz_mod_poly_t poly)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < poly->length; i++)
         fmpz_set(fmpz_mat_entry(mat, i, col), poly->coeffs + i);
@@ -49,9 +49,9 @@ fmpz_mod_poly_to_fmpz_mat_col(fmpz_mat_t mat, len_t col, fmpz_mod_poly_t poly)
 
 static void
 fmpz_mat_col_to_fmpz_mod_poly_shifted(fmpz_mod_poly_t poly, fmpz_mat_t mat,
-                                      len_t col, len_t *shift)
+                                      slong col, slong *shift)
 {
-    len_t i, j, rows = mat->r;
+    slong i, j, rows = mat->r;
 
     fmpz_mod_poly_fit_length(poly, rows);
 
@@ -74,7 +74,7 @@ static void
 __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                  flint_rand_t state, const fmpz_mod_poly_t f)
 {
-    const len_t n = fmpz_mod_poly_degree(f);
+    const slong n = fmpz_mod_poly_degree(f);
 
     fmpz_mod_poly_factor_t fac1, fac2;
     fmpz_mod_poly_t x, x_p;
@@ -82,8 +82,8 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     fmpz_mod_poly_t Q, r;
     fmpz_mat_t matrix;
     fmpz_t coeff, p, q, mul, pow;
-    len_t i, nullity, col, row;
-    len_t *shift, *perm;
+    slong i, nullity, col, row;
+    slong *shift, *perm;
     fmpz_mod_poly_t *basis;
 
     if (f->length <= 2)
@@ -155,7 +155,7 @@ __fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
     /* Find a basis for the nullspace */
     basis =
         (fmpz_mod_poly_t *) flint_malloc(nullity * sizeof(fmpz_mod_poly_t));
-    shift = (len_t *) flint_calloc(n, sizeof(len_t));
+    shift = (slong *) flint_calloc(n, sizeof(slong));
 
     col = 1;                    /* first column is always zero */
     row = 0;
@@ -273,7 +273,7 @@ void
 fmpz_mod_poly_factor_berlekamp(fmpz_mod_poly_factor_t factors,
                                const fmpz_mod_poly_t f)
 {
-    len_t i;
+    slong i;
     flint_rand_t r;
     fmpz_mod_poly_t v;
     fmpz_mod_poly_factor_t sq_free;

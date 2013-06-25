@@ -23,19 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
 #include "fmpz_mat.h"
 
-
-len_t
+slong
 fmpz_mat_rank(const fmpz_mat_t A)
 {
     fmpz_mat_t tmp;
     fmpz_t den;
-    len_t rank;
+    slong rank;
 
     if (fmpz_mat_is_empty(A))
         return 0;

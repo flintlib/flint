@@ -32,9 +32,9 @@
 #include "ulong_extras.h"
 
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, len_t start, len_t stop)
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
 {
-    len_t i;
+    slong i;
     const mp_limb_t * primes;
 
     primes = n_primes_arr_readonly(stop);

@@ -105,14 +105,14 @@ do {                                                        \
     }                                                       \
 } while (0)
 
-len_t _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
-                          mp_srcptr A, len_t lenA, mp_srcptr B, len_t lenB, 
+slong _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T, 
+                          mp_srcptr A, slong lenA, mp_srcptr B, slong lenB, 
                           nmod_t mod)
 {
-	const len_t cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
+	const slong cutoff = FLINT_BIT_COUNT(mod.n) <= 8 ? 
                         NMOD_POLY_SMALL_GCD_CUTOFF : NMOD_POLY_GCD_CUTOFF;
 
-    len_t lenG, lenS, lenT;
+    slong lenG, lenS, lenT;
 
     if (lenB == 1)
     {
@@ -127,7 +127,7 @@ len_t _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
         mp_ptr q = _nmod_vec_init(lenA + lenB);
         mp_ptr r = q + lenA;
 
-        len_t lenq, lenr;
+        slong lenq, lenr;
 
         __divrem(q, lenq, r, lenr, A, lenA, B, lenB);
 
@@ -141,7 +141,7 @@ len_t _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
         else
         {
             mp_ptr h, j, v, w, R[4], X;
-            len_t lenh, lenj, lenv, lenw, lenR[4];
+            slong lenh, lenj, lenv, lenw, lenR[4];
             int sgnR;
 
             lenh = lenj = lenB;
@@ -178,7 +178,7 @@ len_t _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                 __divrem(q, lenq, r, lenr, h, lenh, j, lenj);
                 __mul(v, lenv, q, lenq, T, lenT);
                 {
-                    len_t l;
+                    slong l;
                     _nmod_vec_swap(S, T, FLINT_MAX(lenS, lenT));
                     l = lenS;lenS = lenT; lenT = l;
                 }
@@ -193,7 +193,7 @@ len_t _nmod_poly_xgcd_hgcd(mp_ptr G, mp_ptr S, mp_ptr T,
                 if (lenj < cutoff)
                 {
                     mp_ptr u0 = R[0], u1 = R[1];
-                    len_t lenu0 = lenr - 1, lenu1 = lenj - 1;
+                    slong lenu0 = lenr - 1, lenu1 = lenj - 1;
 
                     lenG = _nmod_poly_xgcd_euclidean(G, u0, u1, j, lenj, r, lenr, mod);
                     MPN_NORM(u0, lenu0);
@@ -251,7 +251,7 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
     }
     else  /* lenA >= lenB >= 0 */
     {
-        const len_t lenA = A->length, lenB = B->length;
+        const slong lenA = A->length, lenB = B->length;
         mp_limb_t inv;
 
         if (lenA == 0)  /* lenA = lenB = 0 */
@@ -279,7 +279,7 @@ nmod_poly_xgcd_hgcd(nmod_poly_t G, nmod_poly_t S, nmod_poly_t T,
         else  /* lenA >= lenB >= 2 */
         {
             mp_ptr g, s, t;
-            len_t lenG;
+            slong lenG;
 
             if (G == A || G == B)
             {

@@ -49,9 +49,9 @@ main(void)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
-        len_t len, limbs;
+        slong len, limbs;
         mp_limb_t ** ii, * ptr;
-        len_t i, bt;
+        slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;
@@ -90,9 +90,9 @@ main(void)
     {
         fmpz * a, * b;
         mp_bitcnt_t bits;
-        len_t len, limbs;
+        slong len, limbs;
         mp_limb_t ** ii, * ptr;
-        len_t i, bt;
+        slong i, bt;
 
         bits = n_randint(state, 300) + 1;
         len = n_randint(state, 300) + 1;

@@ -89,7 +89,7 @@ mp_size_t flint_mpn_remove_power_ascending(mp_ptr x, mp_size_t xsize,
     large powers. Because of its high overhead, it should not be used as
     the first stage of trial division.
 
-int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, long start, long stop)
+int flint_mpn_factor_trial(mp_srcptr x, mp_size_t xsize, slong start, slong stop)
 
     Searches for a factor of \code{(x, xsize)} among the primes in positions 
     \code{start, ..., stop-1} of \code{flint_primes}. Returns $i$ if 
@@ -193,7 +193,7 @@ mp_size_t flint_mpn_gcd_full(mp_ptr arrayg,
 
 void flint_mpn_harmonic_odd_balanced(mp_ptr t, mp_size_t * tsize,
                                mp_ptr v, mp_size_t * vsize,
-                               long a, long b, long n, int d)
+                               slong a, slong b, slong n, int d)
 
     Computes \code{(t,tsize)} and \code{(v,vsize)} such that 
     $t/v = H_n = 1 + 1/2 + \dotsb + 1/n$.

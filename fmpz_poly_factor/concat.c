@@ -34,7 +34,7 @@
 void
 fmpz_poly_factor_concat(fmpz_poly_factor_t res, const fmpz_poly_factor_t fac)
 {
-    len_t i;
+    slong i;
 
     fmpz_mul(&(res->c), &(res->c), &(fac->c));
 

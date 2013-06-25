@@ -31,7 +31,7 @@
 void
 nmod_mat_randtril(nmod_mat_t mat, flint_rand_t state, int unit)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
     {

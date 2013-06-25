@@ -31,16 +31,16 @@
 
 void
 _nmod_poly_pow_trunc(mp_ptr res, mp_srcptr poly, 
-                                       ulong e, len_t trunc, nmod_t mod)
+                                       ulong e, slong trunc, nmod_t mod)
 {
     _nmod_poly_pow_trunc_binexp(res, poly, e, trunc, mod);
 }
 
 void
 nmod_poly_pow_trunc(nmod_poly_t res, 
-                           const nmod_poly_t poly, ulong e, len_t trunc)
+                           const nmod_poly_t poly, ulong e, slong trunc)
 {
-    const len_t len = poly->length;
+    const slong len = poly->length;
     mp_ptr p;
     int pcopy = 0;
 

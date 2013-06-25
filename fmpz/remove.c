@@ -28,7 +28,7 @@
 #include "fmpz.h"
 #include "ulong_extras.h"
 
-len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
+slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 {
     fmpz y = *x;
     fmpz q = *f;
@@ -44,11 +44,11 @@ len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
             else
             {
                 ulong z = - (ulong) y;
-                len_t e  = n_remove2_precomp(&z, q, finv);
+                slong e  = n_remove2_precomp(&z, q, finv);
 
                 if (e > 0)
                 {
-                    *x = - (len_t) z;
+                    *x = - (slong) z;
                 }
                 return e;
             }
@@ -80,7 +80,7 @@ len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
                 else
                 {
                     mpz_t r;
-                    len_t e;
+                    slong e;
 
                     mpz_divexact_ui(z, z, q);
                     mpz_init_set_ui(r, q);
@@ -102,7 +102,7 @@ len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
             }
             else
             {
-                len_t e;
+                slong e;
 
                 mpz_divexact(z, z, r);
                 e = 1 + mpz_remove(z, z, r);
@@ -113,7 +113,7 @@ len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
     }
 }
 
-len_t fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
+slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 {
     double finv;
 
@@ -125,7 +125,7 @@ len_t fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     if (rop == f)
     {
-        len_t ans;
+        slong ans;
         fmpz_t t;
 
         fmpz_init(t);

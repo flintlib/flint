@@ -28,12 +28,12 @@
 #include "nmod_poly_mat.h"
 
 
-len_t
+slong
 nmod_poly_mat_rank(const nmod_poly_mat_t A)
 {
     nmod_poly_mat_t tmp;
     nmod_poly_t den;
-    len_t rank;
+    slong rank;
 
     if (nmod_poly_mat_is_empty(A))
         return 0;

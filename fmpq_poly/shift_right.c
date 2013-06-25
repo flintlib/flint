@@ -30,7 +30,7 @@
 #include "fmpq_poly.h"
 
 void
-fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, len_t n)
+fmpq_poly_shift_right(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     if (n == 0)
     {

@@ -33,7 +33,7 @@
 
 void fmpz_poly_factor_print(const fmpz_poly_factor_t fac)
 {
-    len_t i;
+    slong i;
 
     fmpz_print(&(fac->c));
     printf("\n");

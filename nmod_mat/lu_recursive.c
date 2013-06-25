@@ -35,17 +35,17 @@
 
 
 static void
-_apply_permutation(len_t * AP, nmod_mat_t A, len_t * P,
-    len_t n, len_t offset)
+_apply_permutation(slong * AP, nmod_mat_t A, slong * P,
+    slong n, slong offset)
 {
     if (n != 0)
     {
         mp_ptr * Atmp;
-        len_t * APtmp;
-        len_t i;
+        slong * APtmp;
+        slong i;
 
         Atmp = flint_malloc(sizeof(mp_ptr) * n);
-        APtmp = flint_malloc(sizeof(len_t) * n);
+        APtmp = flint_malloc(sizeof(slong) * n);
 
         for (i = 0; i < n; i++) Atmp[i] = A->rows[P[i] + offset];
         for (i = 0; i < n; i++) A->rows[i + offset] = Atmp[i];
@@ -59,12 +59,12 @@ _apply_permutation(len_t * AP, nmod_mat_t A, len_t * P,
 }
 
 
-len_t 
-nmod_mat_lu_recursive(len_t * P, nmod_mat_t A, int rank_check)
+slong 
+nmod_mat_lu_recursive(slong * P, nmod_mat_t A, int rank_check)
 {
-    len_t i, j, m, n, r1, r2, n1;
+    slong i, j, m, n, r1, r2, n1;
     nmod_mat_t A0, A1, A00, A01, A10, A11;
-    len_t * P1;
+    slong * P1;
 
     m = A->r;
     n = A->c;
@@ -80,7 +80,7 @@ nmod_mat_lu_recursive(len_t * P, nmod_mat_t A, int rank_check)
     for (i = 0; i < m; i++)
         P[i] = i;
 
-    P1 = flint_malloc(sizeof(len_t) * m);
+    P1 = flint_malloc(sizeof(slong) * m);
     nmod_mat_window_init(A0, A, 0, 0, m, n1);
     nmod_mat_window_init(A1, A, 0, n1, m, n);
 

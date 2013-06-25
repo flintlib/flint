@@ -23,19 +23,13 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_clear(fmpq_mat_t mat)
 {
     if (mat->entries)
     {
-        len_t i;
+        slong i;
 
         for (i = 0; i < mat->r * mat->c; i++)
             fmpq_clear(mat->entries + i);

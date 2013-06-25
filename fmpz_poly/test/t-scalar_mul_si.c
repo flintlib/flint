@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
-        len_t n = z_randtest(state);
+        slong n = z_randtest(state);
 
         fmpz_poly_init(a);
         fmpz_poly_init(b);
@@ -99,8 +99,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
-        len_t n1 = (len_t) n_randbits(state, (FLINT_BITS - 2) / 2);
-        len_t n2 = (len_t) n_randbits(state, (FLINT_BITS - 2) / 2);
+        slong n1 = (slong) n_randbits(state, (FLINT_BITS - 2) / 2);
+        slong n2 = (slong) n_randbits(state, (FLINT_BITS - 2) / 2);
         if (n_randint(state, 2))
             n1 = -n1;
         if (n_randint(state, 2))

@@ -23,16 +23,11 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void fmpq_mat_randbits(fmpq_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    len_t i, j;
+    slong i, j;
 
     for (i = 0; i < mat->r; i++)
         for (j = 0; j < mat->c; j++)

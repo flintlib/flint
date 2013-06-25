@@ -25,18 +25,14 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_randsimdioph(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits, mp_bitcnt_t bits2)
 {
-    const len_t c = mat->c, r = mat->r;
+    const slong c = mat->c, r = mat->r;
 
-    len_t i, j;
+    slong i, j;
 
     if (c != r)
     {

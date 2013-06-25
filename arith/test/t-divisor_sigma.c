@@ -33,7 +33,7 @@
 
 void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
 {
-    len_t i = 0;
+    slong i = 0;
 
     fmpz_t t;
     fmpz_poly_t p;
@@ -57,7 +57,7 @@ void fmpz_sigma_naive(fmpz_t x, ulong n, ulong k)
 int main(void)
 {
     fmpz_t m, a, b;
-    len_t n, k;
+    slong n, k;
 
     printf("divisor_sigma....");
     fflush(stdout);

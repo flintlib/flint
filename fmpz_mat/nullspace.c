@@ -23,19 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "fmpz_vec.h"
 
-
-len_t
+slong
 fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
 {
-    len_t i, j, k, n, rank, nullity;
-    len_t * pivots;
-    len_t * nonpivots;
+    slong i, j, k, n, rank, nullity;
+    slong * pivots;
+    slong * nonpivots;
     fmpz_mat_t tmp;
     fmpz_t den;
 
@@ -55,8 +50,8 @@ fmpz_mat_nullspace(fmpz_mat_t res, const fmpz_mat_t mat)
     }
     else if (nullity)
     {
-        pivots = flint_malloc(rank * sizeof(len_t));
-        nonpivots = flint_malloc(nullity * sizeof(len_t));
+        pivots = flint_malloc(rank * sizeof(slong));
+        nonpivots = flint_malloc(nullity * sizeof(slong));
 
         for (i = j = k = 0; i < rank; i++)
         {

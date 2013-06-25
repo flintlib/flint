@@ -34,7 +34,7 @@
 
 void
 _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp, 
-                                    const fmpz * A, const fmpz * B, len_t lenB)
+                                    const fmpz * A, const fmpz * B, slong lenB)
 {
     if (lenB <= FLINT_DIV_DIVCONQUER_CUTOFF)
     {
@@ -42,8 +42,8 @@ _fmpz_poly_div_divconquer_recursive(fmpz * Q, fmpz * temp,
     }
     else
     {
-        const len_t n2 = lenB / 2;
-        const len_t n1 = lenB - n2;
+        const slong n2 = lenB / 2;
+        const slong n1 = lenB - n2;
 
         fmpz * q0 = Q;
         fmpz * q1 = Q + n2;

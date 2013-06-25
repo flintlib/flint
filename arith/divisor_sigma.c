@@ -23,20 +23,14 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_factor.h"
 #include "arith.h"
-#include "ulong_extras.h"
+#include "fmpz_factor.h"
 
 /* note: destroys factors! */
 void
 _arith_divisor_sigma(fmpz_t res, const fmpz_factor_t factors, ulong k)
 {
-    len_t i;
+    slong i;
     fmpz * p;
     fmpz_t r;
 

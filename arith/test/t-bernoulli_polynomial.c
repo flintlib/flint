@@ -40,7 +40,7 @@ int main()
     fmpq_poly_t P, Q;
     mpz_t t;
 
-    len_t k, n;
+    slong k, n;
 
     printf("bernoulli_polynomial....");
     fflush(stdout);

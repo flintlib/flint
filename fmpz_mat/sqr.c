@@ -23,9 +23,6 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 #define E fmpz_mat_entry
@@ -33,7 +30,7 @@
 void
 fmpz_mat_sqr(fmpz_mat_t B, const fmpz_mat_t A)
 {
-    len_t n = A->r;
+    slong n = A->r;
 
     if (n == 0)
     {

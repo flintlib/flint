@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 10000; i++)
     {
         fmpz_t p;
-        len_t N;
+        slong N;
         padic_ctx_t ctx;
 
         padic_t a, b;

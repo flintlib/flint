@@ -47,7 +47,7 @@ void sample(void * arg, ulong count)
     fmpz * den;
     bernoulli_vec_t * params = (bernoulli_vec_t *) arg;
     ulong n = params->n;
-    len_t i;
+    slong i;
     int algorithm = params->algorithm;
 
     num = _fmpz_vec_init(n);
@@ -82,11 +82,11 @@ int main(void)
 {
     double min_recursive, min_multi_mod, min_zeta, max;
     bernoulli_vec_t params;
-    len_t n;
+    slong n;
 
     printf("n / recursive / multi_mod / zeta / best [times in us]\n");
 
-    for (n = 2; n <= 10000; n = (len_t) ((double) n * 1.2) + 1)
+    for (n = 2; n <= 10000; n = (slong) ((double) n * 1.2) + 1)
     {
         params.n = n;
 

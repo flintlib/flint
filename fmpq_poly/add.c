@@ -30,11 +30,11 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden, 
-                    const fmpz * poly1, const fmpz_t den1, len_t len1, 
-                    const fmpz * poly2, const fmpz_t den2, len_t len2)
+                    const fmpz * poly1, const fmpz_t den1, slong len1, 
+                    const fmpz * poly2, const fmpz_t den2, slong len2)
 {
-    len_t max = FLINT_MAX(len1, len2);
-    len_t min = FLINT_MIN(len1, len2);
+    slong max = FLINT_MAX(len1, len2);
+    slong min = FLINT_MIN(len1, len2);
     
     fmpz_t d;
     fmpz_init(d);
@@ -92,7 +92,7 @@ void _fmpq_poly_add(fmpz * rpoly, fmpz_t rden,
 
 void fmpq_poly_add(fmpq_poly_t res, const fmpq_poly_t poly1, const fmpq_poly_t poly2)
 {
-    len_t len1 = poly1->length, len2, max;
+    slong len1 = poly1->length, len2, max;
     
     if (poly1 == poly2)  /* Set res = 2 * poly1 */
     {

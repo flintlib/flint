@@ -31,7 +31,7 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp) 
+slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp) 
 {
     mp_limb_t r = (a & 1);
     mp_limb_t * s;
@@ -76,7 +76,7 @@ len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp)
     if (r) /* a is odd */
     {
         mp_limb_t roots[2];
-        len_t i, ex, pow;
+        slong i, ex, pow;
 
         if ((a & 7) != 1) /* check square root exists */
         {
@@ -124,7 +124,7 @@ len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp)
         return 4;        
     } else /* a is even */
     {
-        len_t i, k, num, pow;
+        slong i, k, num, pow;
         
         for (k = 2; k <= exp; k++) /* find highest power of 2 dividing a */
         {
@@ -205,11 +205,11 @@ len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp)
     }
 }
 
-len_t n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, len_t exp) 
+slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, mp_limb_t p, slong exp) 
 {
     mp_limb_t r, ex, pow, k, a1, pinv, powinv;
     mp_limb_t * s;
-    len_t i, num;
+    slong i, num;
 
     if (exp < 0)
     {

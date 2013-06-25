@@ -33,8 +33,8 @@
    Assumes poly1 and poly2 are not length 0 and 0 < n <= len1 + len2 - 1.
  */
 void
-_fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, len_t len1, 
-                                        const fmpz * poly2, len_t len2, len_t n)
+_fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, slong len1, 
+                                        const fmpz * poly2, slong len2, slong n)
 {
     if ((len1 == 1 && len2 == 1) || n == 1) /* Special case if the length of output is 1 */
     {
@@ -42,7 +42,7 @@ _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, len_t len1,
     }
     else                        /* Ordinary case */
     {
-        len_t i;
+        slong i;
 
         /* Set res[i] = poly1[i]*poly2[0] */
         _fmpz_vec_scalar_mul_fmpz(res, poly1, FLINT_MIN(len1, n), poly2);
@@ -62,9 +62,9 @@ _fmpz_poly_mullow_classical(fmpz * res, const fmpz * poly1, len_t len1,
 
 void
 fmpz_poly_mullow_classical(fmpz_poly_t res, const fmpz_poly_t poly1, 
-                                            const fmpz_poly_t poly2, len_t n)
+                                            const fmpz_poly_t poly2, slong n)
 {
-    len_t len_out;
+    slong len_out;
 
     if (poly1->length == 0 || poly2->length == 0 || n == 0)
     {

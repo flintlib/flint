@@ -33,10 +33,10 @@ void
 fmpz_poly_mat_sqr_KS(fmpz_poly_mat_t B, const fmpz_poly_mat_t A)
 {
     fmpz_mat_t AA, BB;
-    len_t i, j, n;
-    len_t A_len;
+    slong i, j, n;
+    slong A_len;
     int signs;
-    len_t A_bits, bit_size;
+    slong A_bits, bit_size;
 
     n = A->r;
 

@@ -46,7 +46,7 @@
 
 extern char version[];
 
-typedef mp_size_t len_t;
+typedef mp_size_t slong;
 
 #define ulong mp_limb_t
 #define slong mp_limb_signed_t
@@ -65,7 +65,7 @@ void flint_free(void * ptr);
     #define FLINT_D_BITS 31
 #endif
 
-#define mp_bitcnt_t unsigned long
+#define mp_bitcnt_t ulong
 
 #if HAVE_TLS
 #define FLINT_TLS_PREFIX __thread
@@ -124,7 +124,7 @@ typedef __mpfr_struct mpfr;
 
 #define FLINT_MAX(x, y) ((x) > (y) ? (x) : (y))
 #define FLINT_MIN(x, y) ((x) > (y) ? (y) : (x))
-#define FLINT_ABS(x) ((len_t)(x) < 0 ? (-(x)) : (x))
+#define FLINT_ABS(x) ((slong)(x) < 0 ? (-(x)) : (x))
 
 #define MP_PTR_SWAP(x, y) \
     do { \
@@ -159,21 +159,21 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_zero(xxx, nnn) \
     do \
     { \
-        len_t ixxx; \
+        slong ixxx; \
         for (ixxx = 0; ixxx < (nnn); ixxx++) \
             (xxx)[ixxx] = 0UL; \
     } while (0)
 
 #define flint_mpn_copyi(xxx, yyy, nnn) \
    do { \
-      len_t ixxx; \
+      slong ixxx; \
       for (ixxx = 0; ixxx < (nnn); ixxx++) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
 
 #define flint_mpn_copyd(xxx, yyy, nnn) \
    do { \
-      len_t ixxx; \
+      slong ixxx; \
       for (ixxx = nnn - 1; ixxx >= 0; ixxx--) \
          (xxx)[ixxx] = (yyy)[ixxx]; \
    } while (0)
@@ -181,7 +181,7 @@ unsigned int FLINT_BIT_COUNT(mp_limb_t x)
 #define flint_mpn_store(xxx, nnn, yyy) \
    do \
    { \
-      len_t ixxx; \
+      slong ixxx; \
       for (ixxx = 0; ixxx < nnn; ixxx++) \
          (xxx)[ixxx] = yyy; \
    } while (0)

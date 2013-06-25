@@ -30,7 +30,7 @@
 #include "fmpz_vec.h"
 
 void
-_fmpz_vec_content(fmpz_t res, const fmpz * vec, len_t len)
+_fmpz_vec_content(fmpz_t res, const fmpz * vec, slong len)
 {
     fmpz_zero(res);
     while (len--)

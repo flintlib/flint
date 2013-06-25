@@ -24,10 +24,6 @@
 ******************************************************************************/
 
 #include <math.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
 
 /* This nice round number precisely fits on 32 bits */

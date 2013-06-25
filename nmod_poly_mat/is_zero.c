@@ -30,7 +30,7 @@
 int
 nmod_poly_mat_is_zero(const nmod_poly_mat_t A)
 {
-    len_t i, j;
+    slong i, j;
 
     if (A->r == 0 || A->c == 0)
         return 1;

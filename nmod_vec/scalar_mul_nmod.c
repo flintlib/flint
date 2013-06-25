@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 
 void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec, 
-				                  len_t len, mp_limb_t c, nmod_t mod)
+				                  slong len, mp_limb_t c, nmod_t mod)
 {
    if (mod.norm >= FLINT_BITS/2) /* products will fit in a limb */
    {
@@ -38,7 +38,7 @@ void _nmod_vec_scalar_mul_nmod(mp_ptr res, mp_srcptr vec,
 	  _nmod_vec_reduce(res, res, len, mod);
    } else /* products may take two limbs */
    {
-	  len_t i;
+	  slong i;
 	  for (i = 0; i < len; i++)
 	  {
          mp_limb_t hi, lo;

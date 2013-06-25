@@ -35,9 +35,9 @@
 
 void 
 _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden, 
-                      const fmpz * poly, const fmpz_t den, len_t n)
+                      const fmpz * poly, const fmpz_t den, slong n)
 {
-    len_t m;
+    slong m;
     fmpz * t, * u;
     fmpz_t tden, uden;
 
@@ -78,7 +78,7 @@ _fmpq_poly_invsqrt_series(fmpz * rpoly, fmpz_t rden,
     _fmpz_vec_clear(u, n);
 }
 
-void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, len_t n)
+void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
     fmpz *copy;
     int alloc;
@@ -102,7 +102,7 @@ void fmpq_poly_invsqrt_series(fmpq_poly_t res, const fmpq_poly_t poly, len_t n)
     }
     else
     {
-        len_t i;
+        slong i;
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];

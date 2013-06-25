@@ -33,7 +33,7 @@
 int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
 {
     int r;
-    len_t i, len;
+    slong i, len;
     mpz_t t;
     mpq_t *a;
 
@@ -46,7 +46,7 @@ int fmpq_poly_fread(FILE * file, fmpq_poly_t poly)
     }
     if (!mpz_fits_slong_p(t))
     {
-        printf("Exception (fmpz_poly_fread). Length does not fit into a len_t.\n");
+        printf("Exception (fmpz_poly_fread). Length does not fit into a slong.\n");
         abort();
     }
     len = mpz_get_si(t);

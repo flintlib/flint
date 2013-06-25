@@ -32,10 +32,10 @@
 #include "ulong_extras.h"
 
 /* compute square roots of a modulo m given factorisation of m */
-len_t n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac) 
+slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac) 
 {
     mp_limb_t m = 1, minv = 1;
-    len_t i, j, num;
+    slong i, j, num;
     mp_limb_t * x, * sn, * ind, ** s;
 
     if (fac->num == 0)

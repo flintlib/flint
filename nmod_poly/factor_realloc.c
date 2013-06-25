@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include "nmod_poly.h"
 
-void nmod_poly_factor_realloc(nmod_poly_factor_t fac, len_t alloc)
+void nmod_poly_factor_realloc(nmod_poly_factor_t fac, slong alloc)
 {
     if (alloc == 0)             /* Clear up, reinitialise */
     {
@@ -37,21 +37,21 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, len_t alloc)
     {
         if (fac->alloc > alloc)
         {
-            len_t i;
+            slong i;
 
             for (i = alloc; i < fac->num; i++)
                 nmod_poly_clear(fac->p + i);
 
             fac->p     = flint_realloc(fac->p, alloc * sizeof(nmod_poly_struct));
-            fac->exp   = flint_realloc(fac->exp, alloc * sizeof(len_t));
+            fac->exp   = flint_realloc(fac->exp, alloc * sizeof(slong));
             fac->alloc = alloc;
         }
         else if (fac->alloc < alloc)
         {
-            len_t i;
+            slong i;
 
             fac->p   = flint_realloc(fac->p, alloc * sizeof(nmod_poly_struct));
-            fac->exp = flint_realloc(fac->exp, alloc * sizeof(len_t));
+            fac->exp = flint_realloc(fac->exp, alloc * sizeof(slong));
 
             for (i = fac->alloc; i < alloc; i++)
             {
@@ -63,10 +63,10 @@ void nmod_poly_factor_realloc(nmod_poly_factor_t fac, len_t alloc)
     }
     else                        /* Nothing allocated already so do it now */
     {
-        len_t i;
+        slong i;
 
         fac->p   = flint_malloc(alloc * sizeof(nmod_poly_struct));
-        fac->exp = flint_calloc(alloc, sizeof(len_t));
+        fac->exp = flint_calloc(alloc, sizeof(slong));
 
         for (i = 0; i < alloc; i++)
             nmod_poly_init_preinv(fac->p + i, 0, 0);

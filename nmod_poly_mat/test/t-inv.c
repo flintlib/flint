@@ -34,7 +34,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("inv....");
     fflush(stdout);
@@ -46,7 +46,7 @@ main(void)
     {
         nmod_poly_mat_t A, Ainv;
         nmod_poly_t den1, den2;
-        len_t n, deg;
+        slong n, deg;
         float density;
         int ns1, ns2, result;
         mp_limb_t mod;
@@ -93,7 +93,7 @@ main(void)
     {
         nmod_poly_mat_t A, Ainv, B, Iden;
         nmod_poly_t den, det;
-        len_t n, deg;
+        slong n, deg;
         float density;
         int nonsingular;
         mp_limb_t mod;

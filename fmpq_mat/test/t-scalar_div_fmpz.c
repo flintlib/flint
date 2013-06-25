@@ -46,7 +46,7 @@ main(void)
         fmpq_mat_t A, B;
         fmpz_t x;
 
-        len_t m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);
@@ -83,7 +83,7 @@ main(void)
         fmpq_mat_t A, B, C, D;
         fmpz_t x;
 
-        len_t m, n, bits;
+        slong m, n, bits;
 
         m = n_randint(state, 10);
         n = n_randint(state, 10);

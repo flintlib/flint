@@ -49,7 +49,7 @@ int main(void)
 {
     fmpz * r;
     fmpz_t t;
-    len_t i, j;
+    slong i, j;
 
     printf("sum_of_squares....");
     fflush(stdout);

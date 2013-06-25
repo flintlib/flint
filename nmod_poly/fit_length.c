@@ -31,7 +31,7 @@
 #include "nmod_poly.h"
 
 void
-nmod_poly_fit_length(nmod_poly_t poly, len_t alloc)
+nmod_poly_fit_length(nmod_poly_t poly, slong alloc)
 {
     if (alloc > poly->alloc)
     {

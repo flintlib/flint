@@ -36,17 +36,17 @@
     For documentation, see fmpz_poly/mul_karatsuba.c
  */
 
-extern void revbin1(fmpz * out, const fmpz * in, len_t len, len_t bits);
+extern void revbin1(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void revbin2(fmpz * out, const fmpz * in, len_t len, len_t bits);
+extern void revbin2(fmpz * out, const fmpz * in, slong len, slong bits);
 
-extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, len_t bits);
+extern void _fmpz_vec_add_rev(fmpz * in1, fmpz * in2, slong bits);
 
 void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
-                                   fmpz * temp, len_t bits)
+                                   fmpz * temp, slong bits)
 {
-    len_t len = (1L << bits);
-    len_t m = len / 2;
+    slong len = (1L << bits);
+    slong m = len / 2;
 
     if (len == 1)
     {
@@ -69,10 +69,10 @@ void _fmpz_poly_sqr_kara_recursive(fmpz * out, fmpz * rev,
     _fmpz_vec_add_rev(out, temp, bits);
 }
 
-void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, len_t len)
+void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, slong len)
 {
     fmpz *rev, *out, *temp;
-    len_t length, loglen = 0;
+    slong length, loglen = 0;
 
     if (len == 1)
     {
@@ -101,7 +101,7 @@ void _fmpz_poly_sqr_karatsuba(fmpz * res, const fmpz * poly, len_t len)
 
 void fmpz_poly_sqr_karatsuba(fmpz_poly_t res, const fmpz_poly_t poly)
 {
-    len_t len;
+    slong len;
 
     if (poly->length == 0)
     {

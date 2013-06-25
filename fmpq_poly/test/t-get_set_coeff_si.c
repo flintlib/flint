@@ -38,7 +38,7 @@ main(void)
     int i, j, result;
     ulong cflags = 0UL;
 
-    len_t n;
+    slong n;
     mpq_t n_mpq;
     flint_rand_t state;
     flint_randinit(state);
@@ -51,10 +51,10 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a;
-        len_t coeff, len;
+        slong coeff, len;
 
         fmpq_poly_init(a);
-        len = (len_t) n_randint(state, 100) + 1;
+        len = (slong) n_randint(state, 100) + 1;
 
         for (j = 0; j < 1000; j++)
         {

@@ -39,15 +39,15 @@
 
 int main(void)
 {
-    const len_t n = 12376;
-    const len_t N = n / 26;
+    const slong n = 12376;
+    const slong N = n / 26;
 
     flint_rand_t state;
 
     clock_t c0, c1;
     double c;
 
-    len_t i;
+    slong i;
     fmpz_t a, m;
     fmpz_mod_poly_t A, B, r, t;
     fmpz_mod_poly_radix_t S;
@@ -102,7 +102,7 @@ int main(void)
     printf("Radix conversion\n");
     printf("----------------\n");
     printf("  Degree of the radix:     %ld\n", fmpz_mod_poly_degree(r));
-    printf("  Bit size of the modulus: %ld\n", (len_t) fmpz_bits(fmpz_mod_poly_modulus(r)));
+    printf("  Bit size of the modulus: %ld\n", (slong) fmpz_bits(fmpz_mod_poly_modulus(r)));
     printf("  Degree of the input:     %ld\n", fmpz_mod_poly_degree(t));
 
     c0 = clock();

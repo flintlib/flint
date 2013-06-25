@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 void
 fmpz_mat_randtest_unsigned(fmpz_mat_t mat, flint_rand_t state, mp_bitcnt_t bits)
 {
-    len_t r, c, i, j;
+    slong r, c, i, j;
 
     r = mat->r;
     c = mat->c;

@@ -23,17 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_poly.h"
 #include "arith.h"
 
 void
 _arith_chebyshev_t_polynomial(fmpz * coeffs, ulong n)
 {
-    len_t k, i, d, m;
+    slong k, i, d, m;
 
     d = n % 2;
 

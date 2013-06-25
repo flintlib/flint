@@ -39,8 +39,8 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
     mpz_t x;
     mp_ptr xd;
     mp_size_t xsize;
-    len_t found;
-    len_t trial_start, trial_stop;
+    slong found;
+    slong trial_start, trial_stop;
 
     if (!COEFF_IS_MPZ(*n))
     {
@@ -104,7 +104,7 @@ fmpz_factor(fmpz_factor_t factor, const fmpz_t n)
             _fmpz_factor_append_ui(factor, p, exp);
             /* printf("added %lu %lu\n", p, exp); */
 
-            /* Continue using only trial division as long as it is successful.
+            /* Continue using only trial division whilst it is successful.
                This allows quickly factoring huge highly composite numbers
                such as factorials, which can arise in some applications. */
             trial_start = found + 1;

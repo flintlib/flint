@@ -47,7 +47,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b;
-        len_t n;
+        slong n;
         ulong exp;
 
         n   = n_randtest(state) % 10;
@@ -79,7 +79,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpz_poly_t a, b, c;
-        len_t n;
+        slong n;
         ulong exp;
 
         n   = n_randtest(state) % 10;

@@ -23,16 +23,11 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void fmpq_mat_transpose(fmpq_mat_t rop, const fmpq_mat_t op)
 {
-    len_t i, j;
+    slong i, j;
 
     if (rop == op)
     {

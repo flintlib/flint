@@ -46,7 +46,7 @@ main(void)
     {
         fmpz_mat_t A;
         nmod_mat_t M, M2;
-        len_t rows, cols;
+        slong rows, cols;
         mp_limb_t mod;
 
         rows = n_randint(state, 50);
@@ -81,8 +81,8 @@ main(void)
     }
 
     flint_randclear(state);
-
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

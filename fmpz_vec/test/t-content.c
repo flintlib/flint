@@ -48,7 +48,7 @@ main(void)
     {
         fmpz_t a, c, d;
         fmpz *f;
-        len_t len = n_randint(state, 100);
+        slong len = n_randint(state, 100);
 
         fmpz_init(a);
         fmpz_init(c);

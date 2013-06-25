@@ -32,9 +32,9 @@
 #include "ulong_extras.h"
 #include "perm.h"
 
-int check_rref_form(len_t * perm, nmod_mat_t A, len_t rank)
+int check_rref_form(slong * perm, nmod_mat_t A, slong rank)
 {
-    len_t i, j, k, prev_pivot;
+    slong i, j, k, prev_pivot;
 
     /* bottom should be zero */
     for (i = rank; i < A->r; i++)
@@ -72,7 +72,7 @@ int
 main(void)
 {
     flint_rand_t state;
-    len_t i;
+    slong i;
 
     printf("rref....");
     fflush(stdout);
@@ -83,8 +83,8 @@ main(void)
     {
         nmod_mat_t A, B, C, D;
         mp_limb_t mod;
-        len_t j, k, m, n, rank1, rank2;
-        len_t *perm;
+        slong j, k, m, n, rank1, rank2;
+        slong *perm;
         int equal;
         mp_limb_t c;
 

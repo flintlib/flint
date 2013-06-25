@@ -35,7 +35,7 @@
 
     In the current implementation, allows aliasing.
  */
-static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
+static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 {
     int ans;
 
@@ -46,7 +46,7 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
     }
     else
     {
-        len_t *e, i, n;
+        slong *e, i, n;
         fmpz *W, *pow, *u;
 
         e = _padic_lifts_exps(&n, N);
@@ -125,7 +125,7 @@ static int _padic_sqrt_p(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
 
     In the current implementation, allows aliasing.
  */
-static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, len_t N)
+static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, slong N)
 {
     if (fmpz_fdiv_ui(op, 8) != 1)
         return 0;
@@ -136,13 +136,13 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, len_t N)
     }
     else
     {
-        len_t *e, i, n;
+        slong *e, i, n;
         fmpz *W, *u;
 
         i = FLINT_CLOG2(N);
 
         /* Compute sequence of exponents */
-        e = flint_malloc((i + 2) * sizeof(len_t));
+        e = flint_malloc((i + 2) * sizeof(slong));
         for (e[i = 0] = N; e[i] > 3; i++)
             e[i + 1] = (e[i] + 3) / 2;
         n = i + 1;
@@ -188,7 +188,7 @@ static int _padic_sqrt_2(fmpz_t rop, const fmpz_t op, len_t N)
     return 1;
 }
 
-int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, len_t N)
+int _padic_sqrt(fmpz_t rop, const fmpz_t op, const fmpz_t p, slong N)
 {
     if (fmpz_equal_ui(p, 2))
     {

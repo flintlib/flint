@@ -29,10 +29,10 @@
 #include "fmpz_poly.h"
 
 void 
-_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, len_t len, 
+_fmpz_poly_evaluate_divconquer_fmpz(fmpz_t res, const fmpz * poly, slong len, 
                                                 const fmpz_t x)
 {
-    len_t c, h, i, k = 1;
+    slong c, h, i, k = 1;
     fmpz *y, *T, *t = res, *u;
 
     h = FLINT_BIT_COUNT(len - 1);  /* 2^{h-1} < len <= 2^h */

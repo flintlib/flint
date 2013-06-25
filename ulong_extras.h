@@ -77,14 +77,14 @@ typedef struct {
 
 typedef struct
 {
-    len_t small_i;
-    len_t small_num;
+    slong small_i;
+    slong small_num;
     unsigned int * small_primes;
 
     mp_limb_t sieve_a;
     mp_limb_t sieve_b;
-    len_t sieve_i;
-    len_t sieve_num;
+    slong sieve_i;
+    slong sieve_num;
     char * sieve;
 }
 n_primes_struct;
@@ -145,7 +145,7 @@ mp_limb_t n_randtest(flint_rand_t state);
 
 mp_limb_t n_randtest_not_zero(flint_rand_t state);
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved);
+mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved);
 
 mp_limb_t n_randtest_prime(flint_rand_t state, int proved);
 
@@ -244,12 +244,12 @@ mp_limb_t n_negmod(mp_limb_t x, mp_limb_t n)
 
 mp_limb_t n_sqrtmod(mp_limb_t a, mp_limb_t p);
 
-len_t n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, len_t exp); 
+slong n_sqrtmod_2pow(mp_limb_t ** sqrt, mp_limb_t a, slong exp); 
 
-len_t n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
-                                              mp_limb_t p, len_t exp);
+slong n_sqrtmod_primepow(mp_limb_t ** sqrt, mp_limb_t a, 
+                                              mp_limb_t p, slong exp);
 
-len_t n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
+slong n_sqrtmodn(mp_limb_t ** sqrt, mp_limb_t a, n_factor_t * fac);
 
 mp_limb_t n_gcd(mp_limb_t x, mp_limb_t y);
 

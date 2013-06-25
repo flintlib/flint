@@ -111,7 +111,7 @@ int main(void)
     fmpz_t p;
     fmpz * v;
 
-    len_t i;
+    slong i;
 
     printf("number_of_partitions....");
     fflush(stdout);

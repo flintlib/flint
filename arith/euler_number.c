@@ -23,12 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include <mpfr.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 void arith_euler_number(fmpz_t res, ulong n)
 {

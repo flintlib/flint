@@ -32,11 +32,11 @@
 /* Assumes poly1 and poly2 are not length 0. */
 void
 _nmod_poly_mul_classical(mp_ptr res, mp_srcptr poly1,
-                         len_t len1, mp_srcptr poly2, len_t len2, nmod_t mod)
+                         slong len1, mp_srcptr poly2, slong len2, nmod_t mod)
 {
-    len_t i;
-    len_t log_len = FLINT_BIT_COUNT(len2);
-    len_t bits = FLINT_BITS - (len_t) mod.norm;
+    slong i;
+    slong log_len = FLINT_BIT_COUNT(len2);
+    slong bits = FLINT_BITS - (slong) mod.norm;
 
     if (2 * bits + log_len <= FLINT_BITS)
     {
@@ -78,7 +78,7 @@ void
 nmod_poly_mul_classical(nmod_poly_t res,
                         const nmod_poly_t poly1, const nmod_poly_t poly2)
 {
-    len_t len_out;
+    slong len_out;
 
     if ((poly1->length == 0) || (poly2->length == 0))
     {

@@ -35,11 +35,11 @@
 static int _check(fmpz_mod_poly_struct **B, 
                   const fmpz_mod_poly_t F, const fmpz_mod_poly_t R)
 {
-    const len_t lenF = F->length;
-    const len_t lenR = R->length;
-    const len_t N = (lenF - 1) / (lenR - 1);
+    const slong lenF = F->length;
+    const slong lenR = R->length;
+    const slong N = (lenF - 1) / (lenR - 1);
 
-    len_t i;
+    slong i;
     int result;
 
     fmpz_mod_poly_t S;
@@ -72,7 +72,7 @@ int main(void)
         fmpz_mod_poly_t f, r;
         fmpz_mod_poly_struct **b;
         fmpz_mod_poly_radix_t D;
-        len_t j, N;
+        slong j, N;
 
         fmpz_init(p);
         fmpz_randtest_unsigned(p, state, 2 * FLINT_BITS);

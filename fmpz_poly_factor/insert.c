@@ -33,9 +33,9 @@
 #include "fmpz_poly_factor.h"
 
 void
-fmpz_poly_factor_insert(fmpz_poly_factor_t fac, const fmpz_poly_t p, len_t exp)
+fmpz_poly_factor_insert(fmpz_poly_factor_t fac, const fmpz_poly_t p, slong exp)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
     {

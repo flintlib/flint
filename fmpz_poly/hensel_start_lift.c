@@ -26,13 +26,13 @@
 
 #include "fmpz_poly_factor.h"
 
-len_t _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, len_t *link, 
+slong _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, slong *link, 
     fmpz_poly_t *v, fmpz_poly_t *w, const fmpz_poly_t f, 
-    const nmod_poly_factor_t local_fac, len_t N)
+    const nmod_poly_factor_t local_fac, slong N)
 {
-    const len_t r = local_fac->num;
+    const slong r = local_fac->num;
 
-    len_t i, preve;
+    slong i, preve;
     fmpz_t p, P;
     fmpz_poly_t monic_f;
 
@@ -72,9 +72,9 @@ len_t _fmpz_poly_hensel_start_lift(fmpz_poly_factor_t lifted_fac, len_t *link,
     fmpz_poly_hensel_build_tree(link, v, w, local_fac);
 
     {
-        len_t *e, n = FLINT_CLOG2(N) + 1;
+        slong *e, n = FLINT_CLOG2(N) + 1;
 
-        e = flint_malloc(n * sizeof(len_t));
+        e = flint_malloc(n * sizeof(slong));
         for (e[i = 0] = N; e[i] > 1; i++)
             e[i + 1] = (e[i] + 1) / 2;
 

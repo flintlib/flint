@@ -30,9 +30,9 @@
 #include "mpfr_vec.h"
 
 void
-_mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, len_t length, mp_bitcnt_t exp)
+_mpfr_vec_scalar_mul_2exp(mpfr * res, mpfr * vec, slong length, mp_bitcnt_t exp)
 {
-    len_t i;
+    slong i;
     for (i = 0; i < length; i++)
         mpfr_mul_2exp(res + i, vec + i, exp, GMP_RNDN);
 }

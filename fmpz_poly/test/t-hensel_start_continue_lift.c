@@ -51,12 +51,12 @@ main(void)
         fmpz_poly_t F, G, H, R;
         nmod_poly_factor_t f_fac;
         fmpz_poly_factor_t F_fac;
-        len_t bits, nbits, n, exp, j, part_exp;
+        slong bits, nbits, n, exp, j, part_exp;
 
-        len_t r;
+        slong r;
         fmpz_poly_t *v, *w;
-        len_t *link;
-        len_t prev_exp;
+        slong *link;
+        slong prev_exp;
 
         bits = n_randint(state, 200) + 1;
         nbits = n_randint(state, FLINT_BITS - 6) + 6;
@@ -108,7 +108,7 @@ main(void)
         r = f_fac->num;
         v = flint_malloc((2*r - 2)*sizeof(fmpz_poly_t));
         w = flint_malloc((2*r - 2)*sizeof(fmpz_poly_t));
-        link = flint_malloc((2*r - 2)*sizeof(len_t));
+        link = flint_malloc((2*r - 2)*sizeof(slong));
 
         for (j = 0; j < 2*r - 2; j++)
         {

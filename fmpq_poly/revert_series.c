@@ -32,7 +32,7 @@
 
 void
 _fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
-        const fmpz * Q, const fmpz_t Qden, len_t n)
+        const fmpz * Q, const fmpz_t Qden, slong n)
 {
     _fmpq_poly_revert_series_lagrange_fast(Qinv, den, Q, Qden, n);
 }
@@ -40,7 +40,7 @@ _fmpq_poly_revert_series(fmpz * Qinv, fmpz_t den,
 
 void
 fmpq_poly_revert_series(fmpq_poly_t res,
-            const fmpq_poly_t poly, len_t n)
+            const fmpq_poly_t poly, slong n)
 {
     fmpz *copy;
     int alloc;
@@ -66,7 +66,7 @@ fmpq_poly_revert_series(fmpq_poly_t res,
     }
     else
     {
-        len_t i;
+        slong i;
         copy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < poly->length; i++)
             copy[i] = poly->coeffs[i];

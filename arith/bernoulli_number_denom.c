@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 #define BERNOULLI_DENOM_MAX_SMALL 178
 
@@ -54,7 +50,7 @@ static const __u32 __bernoulli_denom_small[] =
 
 void arith_bernoulli_number_denom(fmpz_t den, ulong n)
 {
-    len_t i;
+    slong i;
     mp_limb_t p;
     const mp_limb_t * primes;
 

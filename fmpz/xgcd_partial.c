@@ -32,8 +32,8 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
                                     fmpz_t r2, fmpz_t r1, const fmpz_t L)
 {
    fmpz_t q, r;
-   long aa2, aa1, bb2, bb1, rr1, rr2, qq, bb, t1, t2, t3, i;
-   long bits, bits1, bits2;
+   slong aa2, aa1, bb2, bb1, rr1, rr2, qq, bb, t1, t2, t3, i;
+   slong bits, bits1, bits2;
 
    fmpz_init(q); fmpz_init(r);
    

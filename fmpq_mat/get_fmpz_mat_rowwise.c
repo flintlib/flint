@@ -23,20 +23,14 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
-
 
 void
 _fmpq_mat_get_fmpz_mat_rowwise(fmpz_mat_struct ** num, fmpz * den,
-                        const fmpq_mat_struct ** mat, len_t n)
+                        const fmpq_mat_struct ** mat, slong n)
 {
     fmpz_t t, lcm;
-    len_t i, j, k;
+    slong i, j, k;
 
     if (fmpq_mat_is_empty(mat[0]))
         return;

@@ -28,11 +28,11 @@
 #include "fmpz_vec.h"
 #include "fmpz_mod_poly.h"
 
-len_t _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
-                                    const fmpz *A, len_t lenA, 
-                                    const fmpz *B, len_t lenB, const fmpz_t p)
+slong _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G, 
+                                    const fmpz *A, slong lenA, 
+                                    const fmpz *B, slong lenB, const fmpz_t p)
 {
-    len_t lenG = 0;
+    slong lenG = 0;
 
     if (lenB == 1)
     {
@@ -48,9 +48,9 @@ len_t _fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz *G,
     }
     else  /* lenA >= lenB > 1 */
     {
-        const len_t lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
+        const slong lenW = FLINT_MAX(lenA - lenB + 1, lenB) + lenA + 2 * lenB;
         fmpz *Q, *R1, *R2, *R3, *T, *W;
-        len_t lenR2, lenR3;
+        slong lenR2, lenR3;
 
         W  = _fmpz_vec_init(lenW);
         Q  = W;
@@ -110,8 +110,8 @@ void fmpz_mod_poly_gcd_euclidean_f(fmpz_t f, fmpz_mod_poly_t G,
     }
     else /* lenA >= lenB >= 0 */
     {
-        const len_t lenA = A->length, lenB = B->length;
-        len_t lenG;
+        const slong lenA = A->length, lenB = B->length;
+        slong lenG;
         fmpz *g;
 
         if (lenA == 0) /* lenA = lenB = 0 */

@@ -124,7 +124,7 @@ main(void)
     {
         fmpq_poly_t a, b;
         fmpz_t n1;
-        len_t n;
+        slong n;
 
         n = z_randtest(state);
         fmpz_init(n1);

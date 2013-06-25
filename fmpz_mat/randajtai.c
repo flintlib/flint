@@ -25,20 +25,15 @@
    
 ******************************************************************************/
 
-#include <stdlib.h>
-#include <gmp.h>
 #include <math.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
-#include "ulong_extras.h"
 
 void
 fmpz_mat_randajtai(fmpz_mat_t mat, flint_rand_t state, double alpha)
 {
-    const len_t c = mat->c, r = mat->r, d = r;
+    const slong c = mat->c, r = mat->r, d = r;
 
-    len_t i, j;
+    slong i, j;
     fmpz_t tmp;
 
     if (c != r)

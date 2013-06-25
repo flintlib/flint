@@ -38,7 +38,7 @@ int main()
 {
     fmpz * r;
     fmpz_t s, t;
-    len_t k, n;
+    slong k, n;
 
     printf("euler_number_vec....");
     fflush(stdout);

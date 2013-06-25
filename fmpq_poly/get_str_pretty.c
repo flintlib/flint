@@ -32,10 +32,10 @@
 #include "fmpz.h"
 #include "fmpq_poly.h"
 
-char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, len_t len, 
+char * _fmpq_poly_get_str_pretty(const fmpz *poly, const fmpz_t den, slong len, 
                                  const char *var)
 {
-    len_t i;
+    slong i;
     size_t j;
     size_t size;     /* Upper bound on the length          */
     size_t densize;  /* Size of the denominator in base 10 */

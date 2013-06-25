@@ -23,15 +23,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
 #include "arith.h"
 
-
 void
-_arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, len_t klen, int kind)
+_arith_stirling_next_row(fmpz * new, fmpz * prev, slong n, slong klen, int kind)
 {
-    len_t k;
+    slong k;
     fmpz_t t, u;
 
     if (n == 0)
@@ -73,9 +70,9 @@ _arith_stirling_next_row(fmpz * new, fmpz * prev, len_t n, len_t klen, int kind)
 }
 
 static void
-_arith_stirling_mat(fmpz ** rows, len_t r, len_t c, int kind)
+_arith_stirling_mat(fmpz ** rows, slong r, slong c, int kind)
 {
-    len_t i, j;
+    slong i, j;
 
     if (r == 0 || c == 0)
         return;
@@ -93,17 +90,17 @@ _arith_stirling_mat(fmpz ** rows, len_t r, len_t c, int kind)
     }
 }
 
-void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
+void arith_stirling_number_1u_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 0);
 }
 
-void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
+void arith_stirling_number_1_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 1);
 }
 
-void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, len_t n, len_t klen)
+void arith_stirling_number_2_vec_next(fmpz * row, fmpz * prev, slong n, slong klen)
 {
     _arith_stirling_next_row(row, prev, n, klen, 2);
 }

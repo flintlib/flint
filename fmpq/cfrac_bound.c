@@ -23,14 +23,11 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
 
 #define ONE_OVER_LOG2_PHI (1.44042009041255648 + 1e-13)
 
-len_t
+slong
 fmpq_cfrac_bound(const fmpq_t x)
 {
     if (fmpz_is_one(fmpq_denref(x)))

@@ -30,7 +30,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_pow(fmpz * res, const fmpz * poly, len_t len, ulong e)
+_fmpz_poly_pow(fmpz * res, const fmpz * poly, slong len, ulong e)
 {
     if (e < 5UL)
         _fmpz_poly_pow_small(res, poly, len, e);
@@ -50,8 +50,8 @@ _fmpz_poly_pow(fmpz * res, const fmpz * poly, len_t len, ulong e)
 void
 fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
 {
-    const len_t len = poly->length;
-    len_t rlen;
+    const slong len = poly->length;
+    slong rlen;
 
     if ((len < 2) | (e < 3UL))
     {
@@ -72,7 +72,7 @@ fmpz_poly_pow(fmpz_poly_t res, const fmpz_poly_t poly, ulong e)
         return;
     }
 
-    rlen = (len_t) e * (len - 1) + 1;
+    rlen = (slong) e * (len - 1) + 1;
 
     if (res != poly)
     {

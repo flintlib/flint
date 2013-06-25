@@ -132,7 +132,7 @@ main(void)
     {
         fmpq_poly_t a, b;
         mpz_t n1;
-        len_t n;
+        slong n;
 
         n = z_randtest(state);
         mpz_init(n1);

@@ -29,11 +29,11 @@
 #include "fmpz.h"
 #include "fmpz_mod_poly.h"
 
-int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, len_t len, 
+int _fmpz_mod_poly_fprint(FILE * file, const fmpz *poly, slong len, 
                           const fmpz_t p)
 {
     int r;
-    len_t i;
+    slong i;
 
     r = fprintf(file, "%ld ", len);
     if (r <= 0)

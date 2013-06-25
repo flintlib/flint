@@ -35,7 +35,7 @@
 
 int main(void)
 {
-    len_t k;
+    slong k;
 
     printf("const_euler_brent_mcmillan....");
     fflush(stdout);

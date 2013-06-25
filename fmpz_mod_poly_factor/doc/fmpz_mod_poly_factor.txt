@@ -42,12 +42,12 @@ void fmpz_mod_poly_factor_clear(fmpz_mod_poly_factor_t fac)
 
     Frees all memory associated with \code{fac}.
 
-void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, long alloc)
+void fmpz_mod_poly_factor_realloc(fmpz_mod_poly_factor_t fac, slong alloc)
 
     Reallocates the factor structure to provide space for
     precisely \code{alloc} factors.
 
-void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, long len)
+void fmpz_mod_poly_factor_fit_length(fmpz_mod_poly_factor_t fac, slong len)
 
     Ensures that the factor structure has space for at
     least \code{len} factors.  This functions takes care
@@ -63,7 +63,7 @@ void fmpz_mod_poly_factor_print(const fmpz_mod_poly_factor_t fac)
     Prints the entries of \code{fac} to standard output.
 
 void fmpz_mod_poly_factor_insert(fmpz_mod_poly_factor_t fac,
-				 const fmpz_mod_poly_t poly, long exp)
+				 const fmpz_mod_poly_t poly, slong exp)
 
     Inserts the factor \code{poly} with multiplicity \code{exp} into
     the factorisation \code{fac}.
@@ -81,7 +81,7 @@ void fmpz_mod_poly_factor_concat(fmpz_mod_poly_factor_t res,
 
     Does not support aliasing between \code{res} and \code{fac}.
 
-void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, long exp)
+void fmpz_mod_poly_factor_pow(fmpz_mod_poly_factor_t fac, slong exp)
 
     Raises \code{fac} to the power \code{exp}.
 
@@ -99,7 +99,7 @@ int fmpz_mod_poly_is_irreducible_rabin(const fmpz_mod_poly_t f)
     Returns 1 if the polynomial \code{f} is irreducible, otherwise returns 0.
     Uses Rabin irreducibility test.
 
-int _fmpz_mod_poly_is_squarefree(const fmpz * f, long len, const fmpz_t p)
+int _fmpz_mod_poly_is_squarefree(const fmpz * f, slong len, const fmpz_t p)
 
     Returns 1 if \code{(f, len)} is squarefree, and 0 otherwise. As a
     special case, the zero polynomial is not considered squarefree.
@@ -111,7 +111,7 @@ int fmpz_mod_poly_is_squarefree(const fmpz_mod_poly_t f)
     case, the zero polynomial is not considered squarefree.
 
 int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
-	      flint_rand_t state, const fmpz_mod_poly_t pol, long d)
+	      flint_rand_t state, const fmpz_mod_poly_t pol, slong d)
 
     Probabilistic equal degree factorisation of \code{pol} into
     irreducible factors of degree \code{d}. If it passes, a factor is
@@ -121,14 +121,14 @@ int fmpz_mod_poly_factor_equal_deg_prob(fmpz_mod_poly_t factor,
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void fmpz_mod_poly_factor_equal_deg(fmpz_mod_poly_factor_t factors,
-			      const fmpz_mod_poly_t pol, long d)
+			      const fmpz_mod_poly_t pol, slong d)
 
     Assuming \code{pol} is a product of irreducible factors all of
     degree \code{d}, finds all those factors and places them in factors.
     Requires that \code{pol} be monic, non-constant and squarefree.
 
 void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
-		const fmpz_mod_poly_t poly, long **degs)
+		const fmpz_mod_poly_t poly, slong **degs)
 
     Factorises a monic non-constant squarefree polymnomial \code{poly}
     of degree n into factors ${f[d]} such that for ${1 \leq d \leq n}
@@ -138,7 +138,7 @@ void fmpz_mod_poly_factor_distinct_deg(fmpz_mod_poly_factor_t res,
     as factors.
 
     Requires that \code{degs} have enough space for irreducible polynomials'
-    powers (maximum space required is ${n * sizeof(long)}).
+    powers (maximum space required is ${n * sizeof(slong)}).
 
 void fmpz_mod_poly_factor_squarefree(fmpz_mod_poly_factor_t res,
 				      const fmpz_mod_poly_t f)

@@ -24,9 +24,7 @@
 ******************************************************************************/
 
 #include <math.h>
-#include "flint.h"
 #include "arith.h"
-#include "ulong_extras.h"
 
 double arith_euler_number_size(ulong n)
 {

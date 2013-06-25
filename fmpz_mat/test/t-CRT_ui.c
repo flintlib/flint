@@ -45,7 +45,7 @@ main(void)
 
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
-        len_t bits, prime_bits, rows, cols, num_primes, j;
+        slong bits, prime_bits, rows, cols, num_primes, j;
         fmpz_t mod;
         fmpz_mat_t A, B, C;
         nmod_mat_t Amod;
@@ -114,6 +114,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

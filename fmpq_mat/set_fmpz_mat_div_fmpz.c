@@ -23,18 +23,13 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_mat.h"
-#include "fmpq.h"
 #include "fmpq_mat.h"
 
 void
 fmpq_mat_set_fmpz_mat_div_fmpz(fmpq_mat_t X, const fmpz_mat_t Xnum,
                                                 const fmpz_t den)
 {
-    len_t i, j;
+    slong i, j;
 
     if (fmpz_is_one(den))
     {

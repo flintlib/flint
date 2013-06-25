@@ -32,16 +32,16 @@
 
 void
 _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
-                         ulong e, len_t trunc, const fmpz_t p)
+                         ulong e, slong trunc, const fmpz_t p)
 {
     _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, p);
 }
 
 void
 fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
-                  const fmpz_mod_poly_t poly, ulong e, len_t trunc)
+                  const fmpz_mod_poly_t poly, ulong e, slong trunc)
 {
-    const len_t len = poly->length;
+    const slong len = poly->length;
     fmpz * q;
     int qcopy = 0;
 

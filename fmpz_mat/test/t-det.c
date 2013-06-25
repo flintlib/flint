@@ -38,7 +38,7 @@ main(void)
 {
     fmpz_mat_t A;
     flint_rand_t state;
-    len_t i, m;
+    slong i, m;
 
     fmpz_t det, result;
 
@@ -106,6 +106,7 @@ main(void)
 
     flint_randclear(state);
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

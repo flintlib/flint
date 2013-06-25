@@ -29,7 +29,7 @@
 #include "fmpz_poly.h"
 
 void
-_fmpz_poly_content(fmpz_t res, const fmpz * poly, len_t len)
+_fmpz_poly_content(fmpz_t res, const fmpz * poly, slong len)
 {
     fmpz_zero(res);
     while (len--)

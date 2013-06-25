@@ -32,7 +32,7 @@
 
 void fmpz_init(fmpz_t f)
 
-    A small \code{fmpz_t} is initialised, i.e.\ just a \code{long}.  
+    A small \code{fmpz_t} is initialised, i.e.\ just a \code{slong}.  
     The value is set to zero.
 
 void fmpz_init2(fmpz_t f, ulong limbs)
@@ -41,7 +41,7 @@ void fmpz_init2(fmpz_t f, ulong limbs)
     number of limbs.
 
     If \code{limbs} is zero then a small \code{fmpz_t} is allocated, 
-    i.e.\ just a \code{long}.  The value is also set to zero.  It is 
+    i.e.\ just a \code{slong}.  The value is also set to zero.  It is 
     not necessary to call this function except to save time.  A call 
     to \code{fmpz_init} will do just fine.
 
@@ -117,13 +117,13 @@ void fmpz_randtest_mod_signed(fmpz_t f, flint_rand_t state, const fmpz_t m)
 
 slong fmpz_get_si(const fmpz_t f)
 
-    Returns $f$ as a \code{signed long}.  The result is undefined
-    if $f$ does not fit into a \code{long}.
+    Returns $f$ as a \code{slong}.  The result is undefined
+    if $f$ does not fit into a \code{slong}.
 
 ulong fmpz_get_ui(const fmpz_t f)
 
-    Returns $f$ as an \code{unsigned long}.  The result is undefined
-    if $f$ does not fit into an \code{unsigned long} or is negative.
+    Returns $f$ as an \code{ulong}.  The result is undefined
+    if $f$ does not fit into an \code{ulong} or is negative.
 
 void fmpz_set_d(fmpz_t f, double c)
 
@@ -137,7 +137,7 @@ double fmpz_get_d(const fmpz_t f)
     \code{f} cannot be represented exactly. The outcome is undefined
     if \code{f} is too large to fit in the normal range of a double.
 
-double fmpz_get_d_2exp(len_t * exp, const fmpz_t f)
+double fmpz_get_d_2exp(slong * exp, const fmpz_t f)
 
     Returns $f$ as a normalized \code{double} along with a $2$-exponent 
     \code{exp}, i.e.\ if $r$ is the return value then \code{f = r * 2^exp}, 
@@ -158,15 +158,15 @@ char * fmpz_get_str(char * str, int b, const fmpz_t f)
 
 void fmpz_set_si(fmpz_t f, slong val)
 
-    Sets $f$ to the given \code{signed long} value.
+    Sets $f$ to the given \code{slong} value.
 
 void fmpz_set_ui(fmpz_t f, ulong val)
 
-    Sets $f$ to the given \code{unsigned long} value.
+    Sets $f$ to the given \code{ulong} value.
 
 void fmpz_neg_ui(fmpz_t f, ulong val)
 
-    Sets $f$ to the given \code{unsigned long} value, and then negates $f$.
+    Sets $f$ to the given \code{ulong} value, and then negates $f$.
 
 void fmpz_set_uiui(fmpz_t f, mp_limb_t hi, mp_limb_t lo)
 
@@ -182,7 +182,7 @@ void fmpz_set_mpz(fmpz_t f, const mpz_t x)
 
     Sets $f$ to the given \code{mpz_t} value.
 
-int fmpz_set_str(fmpz_t f, char * str, int b)
+int fmpz_set_str(fmpz_t f, const char * str, int b)
 
     Sets $f$ to the value given in the null-terminated string \code{str}, 
     in base~$b$. The base~$b$ can vary between $2$ and $62$, inclusive. 
@@ -377,11 +377,11 @@ void fmpz_one(fmpz_t f)
 int fmpz_abs_fits_ui(const fmpz_t f)
 
     Returns whether the absolute value of $f$ 
-    fits into an \code{unsigned long}.
+    fits into an \code{ulong}.
 
 int fmpz_fits_si(const fmpz_t f)
 
-    Returns whether the value of $f$ fits into a \code{long}.
+    Returns whether the value of $f$ fits into a \code{slong}.
 
 void fmpz_setbit(fmpz_t f, ulong i)
 
@@ -391,14 +391,14 @@ int fmpz_tstbit(const fmpz_t f, ulong i)
 
     Test bit index~$i$ of $f$ and return $0$ or $1$, accordingly.
 
-mp_limb_t fmpz_abs_lbound_ui_2exp(len_t * exp, const fmpz_t x, int bits)
+mp_limb_t fmpz_abs_lbound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 
     For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits and
     sets \code{exp} to an exponent $e$, such that $|x| \ge m 2^e$. The number
     of bits must be between 1 and \code{FLINT_BITS} inclusive.
     The mantissa is guaranteed to be correctly rounded.
 
-mp_limb_t fmpz_abs_ubound_ui_2exp(len_t * exp, const fmpz_t x, int bits)
+mp_limb_t fmpz_abs_ubound_ui_2exp(slong * exp, const fmpz_t x, int bits)
 
     For nonzero $x$, returns a mantissa $m$ with exactly \code{bits} bits
     and sets \code{exp} to an exponent $e$, such that $|x| \le m 2^e$.
@@ -486,7 +486,7 @@ void fmpz_add(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_add_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g + x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g + x$ where $x$ is an \code{ulong}.
 
 void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -494,7 +494,7 @@ void fmpz_sub(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_sub_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g - x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g - x$ where $x$ is an \code{ulong}.
 
 void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -502,16 +502,16 @@ void fmpz_mul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_mul_si(fmpz_t f, const fmpz_t g, slong x)
 
-    Sets $f$ to $g \times x$ where $x$ is a \code{signed long}.
+    Sets $f$ to $g \times x$ where $x$ is a \code{slong}.
 
 void fmpz_mul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_mul2_uiui(fmpz_t f, const fmpz_t g, ulong x, ulong y)
 
     Sets $f$ to $g \times x \times y$ where $x$ and $y$ are of type
-    \code{unsigned long}.
+    \code{ulong}.
 
 void fmpz_mul_2exp(fmpz_t f, const fmpz_t g, ulong e)
 
@@ -523,7 +523,7 @@ void fmpz_addmul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_addmul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $f + g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $f + g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -531,7 +531,7 @@ void fmpz_submul(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
 void fmpz_submul_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $f - g \times x$ where $x$ is an \code{unsigned long}.
+    Sets $f$ to $f - g \times x$ where $x$ is an \code{ulong}.
 
 void fmpz_cdiv_q(fmpz_t f, const fmpz_t g, const fmpz_t h)
 
@@ -662,17 +662,17 @@ void fmpz_mod(fmpz_t f, const fmpz_t g, const fmpz_t h)
 ulong fmpz_mod_ui(fmpz_t f, const fmpz_t g, ulong x)
 
     Sets $f$ to $g$ reduced modulo $x$ where $x$ is an 
-    \code{unsigned long}.  If $x$ is $0$ an exception will result.
+    \code{ulong}.  If $x$ is $0$ an exception will result.
 
 ulong fmpz_fdiv_ui(const fmpz_t g, ulong x)
 
     Returns the remainder of $g$ modulo $x$ where $x$ is an 
-    \code{unsigned long}, without changing $g$.  If $x$ is $0$ an
+    \code{ulong}, without changing $g$.  If $x$ is $0$ an
     exception will result.
 
 void fmpz_pow_ui(fmpz_t f, const fmpz_t g, ulong x)
 
-    Sets $f$ to $g^x$ where $x$ is an \code{unsigned long}.  If 
+    Sets $f$ to $g^x$ where $x$ is an \code{ulong}.  If 
     $x$ is $0$ and $g$ is $0$, then $f$ will be set to $1$.
 
 void fmpz_powm_ui(fmpz_t f, const fmpz_t g, ulong e, const fmpz_t m)
@@ -687,23 +687,23 @@ void fmpz_powm(fmpz_t f, const fmpz_t g, const fmpz_t e, const fmpz_t m)
 
     Assumes that $m \neq 0$, raises an \code{abort} signal otherwise.
 
-len_t fmpz_clog(const fmpz_t x, const fmpz_t b)
+slong fmpz_clog(const fmpz_t x, const fmpz_t b)
 
-len_t fmpz_clog_ui(const fmpz_t x, ulong b)
+slong fmpz_clog_ui(const fmpz_t x, ulong b)
 
     Returns $\ceil{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
-    the return value fits into a signed \code{long}.
+    the return value fits into a signed \code{slong}.
 
-len_t fmpz_flog(const fmpz_t x, const fmpz_t b)
+slong fmpz_flog(const fmpz_t x, const fmpz_t b)
 
-len_t fmpz_flog_ui(const fmpz_t x, ulong b)
+slong fmpz_flog_ui(const fmpz_t x, ulong b)
 
     Returns $\floor{\log_b x}$.
 
     Assumes that $x \geq 1$ and $b \geq 2$ and that 
-    the return value fits into a signed \code{long}.
+    the return value fits into a signed \code{slong}.
 
 double fmpz_dlog(const fmpz_t x)
 
@@ -736,20 +736,20 @@ int fmpz_is_square(const fmpz_t f)
 
     Returns nonzero if $f$ is a perfect square and zero otherwise.
 
-void fmpz_root(fmpz_t r, fmpz_t f, len_t n)
+void fmpz_root(fmpz_t r, const fmpz_t f, slong n)
 
     Set $r$ to the integer part of the $n$-th root of $f$. Requires that
     $n > 0$ and that if $n$ is even then $f$ be non-negative, otherwise an 
-    exception is raides.
+    exception is raised.
 
 void fmpz_fac_ui(fmpz_t f, ulong n)
 
-    Sets $f$ to the factorial $n!$ where $n$ is an \code{unsigned long}.
+    Sets $f$ to the factorial $n!$ where $n$ is an \code{ulong}.
 
 void fmpz_fib_ui(fmpz_t f, ulong n)
 
     Sets $f$ to the Fibonacci number $F_n$ where $n$ is an
-    \code{unsigned long}.
+    \code{ulong}.
 
 void fmpz_bin_uiui(fmpz_t f, ulong n, ulong k)
 
@@ -830,7 +830,7 @@ void fmpz_xgcd_partial(fmpz_t co2, fmpz_t co1,
 
 *******************************************************************************
 
-len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
+slong _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Removes all factors $f$ from $x$ and returns the number of such.
 
@@ -840,7 +840,7 @@ len_t _fmpz_remove(fmpz_t x, const fmpz_t f, double finv)
 
     Does not support aliasing.
 
-len_t fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
+slong fmpz_remove(fmpz_t rop, const fmpz_t op, const fmpz_t f)
 
     Remove all occurrences of the factor $f > 1$ from the 
     integer \code{op} and sets \code{rop} to the resulting 
@@ -1010,7 +1010,7 @@ void fmpz_multi_CRT_ui_unsigned(fmpz_t output, const mp_limb_t * residues,
     \code{temp} is temporary space which must be provided by 
     \code{fmpz_comb_temp_init} and cleared by \code{fmpz_comb_temp_clear}.
 
-void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
+void fmpz_multi_CRT_ui(fmpz_t output, mp_srcptr residues,
     const fmpz_comb_t comb, fmpz_comb_temp_t temp)
 
     This function takes a set of residues modulo the list of primes
@@ -1024,7 +1024,7 @@ void fmpz_multi_CRT_ui(fmpz_t output, const mp_limb_t * residues,
     space which must be provided by \code{fmpz_comb_temp_init} and 
     cleared by \code{fmpz_comb_temp_clear}.
 
-void fmpz_comb_init(fmpz_comb_t comb, mp_limb_t * primes, len_t num_primes)
+void fmpz_comb_init(fmpz_comb_t comb, mp_srcptr primes, slong num_primes)
 
     Initialises a \code{comb} structure for multimodular reduction and 
     recombination.  The array \code{primes} is assumed to contain 
@@ -1064,7 +1064,7 @@ int fmpz_is_probabprime(const fmpz_t p)
     Subsequent calls to the same function do not increase the probability of
     the number being prime.
 
-int fmpz_is_prime_pseudosquare(fmpz_t n)
+int fmpz_is_prime_pseudosquare(const fmpz_t n)
 
     Return $0$ is $n$ is composite. If $n$ is too large (greater than about
     $94$ bits) the function fails silently and returns $-1$, otherwise, if 

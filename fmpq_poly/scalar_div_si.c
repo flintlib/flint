@@ -31,7 +31,7 @@
 #include "fmpq_poly.h"
 
 void _fmpq_poly_scalar_div_si(fmpz * rpoly, fmpz_t rden, const fmpz * poly,
-                              const fmpz_t den, len_t len, slong c)
+                              const fmpz_t den, slong len, slong c)
 {
     if (c == 1)
     {

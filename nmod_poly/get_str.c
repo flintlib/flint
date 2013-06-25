@@ -33,14 +33,14 @@
 
 char * nmod_poly_get_str(const nmod_poly_t poly)
 {
-    len_t i;
+    slong i;
     char * buf, * ptr;
 
     /* estimate for the length, n and three spaces */
 #if FLINT64
-    len_t size = 21*2 + 1;
+    slong size = 21*2 + 1;
 #else
-    len_t size = 11*2 + 1;
+    slong size = 11*2 + 1;
 #endif
 
     for (i = 0; i < poly->length; i++)

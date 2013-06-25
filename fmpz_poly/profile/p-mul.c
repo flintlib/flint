@@ -97,7 +97,7 @@ main(void)
     
     for (len = lenlo, j = 0; len <= lenhi; len += lenh, j++)
     {
-        len_t s[nalgs];
+        slong s[nalgs];
         
         for (bits = bitslo, i = 0; bits <= bitshi; bits += bitsh, i++)
         {
@@ -115,7 +115,7 @@ main(void)
                    Construct random polynomials f and g
                  */
                 {
-                    len_t k;
+                    slong k;
                     for (k = 0; k < len; k++)
                     {
                         fmpz_randbits(f->coeffs + k, state, bits);
@@ -169,7 +169,7 @@ main(void)
                 X[i][j] = 2;
         }
         {
-           len_t sum = 0, c;
+           slong sum = 0, c;
            for (c = 0; c < nalgs; c++)
               sum += s[c];
            printf("len = %d, time = %ldms\n", len, sum), fflush(stdout);

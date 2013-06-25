@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
-                       const fmpz * A, len_t lenA, const fmpz * B, len_t lenB)
+                       const fmpz * A, slong lenA, const fmpz * B, slong lenB)
 {
     if (lenB < 6)
         _fmpz_poly_divrem_basecase(Q, R, A, lenA, B, lenB);
@@ -42,7 +42,7 @@ void _fmpz_poly_divrem(fmpz * Q, fmpz * R,
 void fmpz_poly_divrem(fmpz_poly_t Q, fmpz_poly_t R,
                       const fmpz_poly_t A, const fmpz_poly_t B)
 {
-    const len_t lenA = A->length, lenB = B->length;
+    const slong lenA = A->length, lenB = B->length;
     fmpz *q, *r;
 
     if (lenB == 0)

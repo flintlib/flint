@@ -43,10 +43,10 @@
 #define MUL3(xx,yy,zz) n_mulmod2_preinv(xx,\
     n_mulmod2_preinv(yy,zz,mod.n,mod.ninv),mod.n,mod.ninv);
 
-void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, len_t len, nmod_t mod)
+void _nmod_poly_integral(mp_ptr x_int, mp_srcptr x, slong len, nmod_t mod)
 {
     mp_limb_t r;
-    len_t k = len - 1;
+    slong k = len - 1;
 
     while (k > 0)
     {

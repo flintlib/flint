@@ -23,21 +23,16 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
-
 
 void _fmpq_canonicalise(fmpz_t num, fmpz_t den)
 {
     fmpz_t u;
 
-    if (*den == 1L)
+    if (fmpz_is_one(den))
         return;
 
-    if (*num == 0L)
+    if (fmpz_is_zero(num))
     {
         fmpz_one(den);
         return;
@@ -63,5 +58,5 @@ void _fmpq_canonicalise(fmpz_t num, fmpz_t den)
 
 void fmpq_canonicalise(fmpq_t res)
 {
-    _fmpq_canonicalise(&res->num, &res->den);
+    _fmpq_canonicalise(fmpq_numref(res), fmpq_denref(res));
 }

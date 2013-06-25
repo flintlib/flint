@@ -32,9 +32,9 @@
 
 void
 _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
-                                    len_t hlen, len_t n, nmod_t mod)
+                                    slong hlen, slong n, nmod_t mod)
 {
-    len_t j, k;
+    slong j, k;
     mp_ptr a;
     mp_limb_t s;
 
@@ -56,9 +56,9 @@ _nmod_poly_exp_series_basecase(mp_ptr f, mp_srcptr h,
 }
 
 void
-nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, len_t n)
+nmod_poly_exp_series_basecase(nmod_poly_t f, const nmod_poly_t h, slong n)
 {
-    len_t hlen;
+    slong hlen;
 
     nmod_poly_fit_length(f, n);
     hlen = h->length;

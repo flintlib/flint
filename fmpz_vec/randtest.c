@@ -33,9 +33,9 @@
 
 void
 _fmpz_vec_randtest(fmpz * f, flint_rand_t state, 
-                   len_t len, mp_bitcnt_t bits)
+                   slong len, mp_bitcnt_t bits)
 {
-    len_t i, sparseness;
+    slong i, sparseness;
 
     if (n_randint(state, 2))
     {
@@ -58,9 +58,9 @@ _fmpz_vec_randtest(fmpz * f, flint_rand_t state,
 
 void
 _fmpz_vec_randtest_unsigned(fmpz * f, flint_rand_t state, 
-                            len_t len, mp_bitcnt_t bits)
+                            slong len, mp_bitcnt_t bits)
 {
-    len_t i, sparseness;
+    slong i, sparseness;
 
     if (n_randint(state, 2))
     {

@@ -44,8 +44,8 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz_mat_t A;
-        len_t rows = n_randint(state, 10);
-        len_t cols = n_randint(state, 10);
+        slong rows = n_randint(state, 10);
+        slong cols = n_randint(state, 10);
 
         fmpz_mat_init(A, rows, cols);
 

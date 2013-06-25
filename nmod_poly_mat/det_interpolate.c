@@ -32,7 +32,7 @@
 void
 nmod_poly_mat_det_interpolate(nmod_poly_t det, const nmod_poly_mat_t A)
 {
-    len_t i, l, n, len;
+    slong i, l, n, len;
 
     nmod_mat_t X;
     mp_ptr x, d;

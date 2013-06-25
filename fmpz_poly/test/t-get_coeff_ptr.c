@@ -45,7 +45,7 @@ main(void)
     {
         fmpz_poly_t A;
         fmpz_t a;
-        len_t n = n_randint(state, 100);
+        slong n = n_randint(state, 100);
 
         fmpz_poly_init(A);
         fmpz_poly_randtest(A, state, n_randint(state, 100), 100);

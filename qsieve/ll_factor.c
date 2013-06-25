@@ -42,9 +42,9 @@ mp_limb_t qsieve_ll_factor(mp_limb_t hi, mp_limb_t lo)
 {
     qs_t qs_inf;
     mp_limb_t factor = 0, t;
-    len_t rels_found = 0;
+    slong rels_found = 0;
     char * sieve;
-    len_t ncols, nrows, i, count;
+    slong ncols, nrows, i, count;
     uint64_t * nullrows;
     uint64_t mask;
     flint_rand_t state;

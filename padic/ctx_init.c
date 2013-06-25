@@ -25,7 +25,7 @@
 
 #include "padic.h"
 
-void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, len_t min, len_t max, 
+void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, slong min, slong max, 
                     enum padic_print_mode mode)
 {
     if (!(0 <= min && min <= max))
@@ -43,7 +43,7 @@ void padic_ctx_init(padic_ctx_t ctx, const fmpz_t p, len_t min, len_t max,
 
     if (max - min > 0)
     {
-        len_t i, len = max - min;
+        slong i, len = max - min;
 
         ctx->pow = _fmpz_vec_init(len);
 

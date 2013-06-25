@@ -45,7 +45,7 @@ main(void)
         fmpq_mat_t A, B, C;
         fmpq_t a, b, ab, c;
 
-        len_t n, bits;
+        slong n, bits;
 
         n = n_randint(state, 10);
         bits = 1 + n_randint(state, 100);
@@ -98,8 +98,8 @@ main(void)
     }
 
     flint_randclear(state);
-
     _fmpz_cleanup();
+    n_cleanup_primes();
     printf("PASS\n");
     return 0;
 }

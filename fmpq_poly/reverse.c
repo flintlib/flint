@@ -29,9 +29,9 @@
 #include "fmpz_vec.h"
 #include "fmpq_poly.h"
 
-void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, len_t n)
+void fmpq_poly_reverse(fmpq_poly_t res, const fmpq_poly_t poly, slong n)
 {
-    len_t len = FLINT_MIN(n, poly->length);
+    slong len = FLINT_MIN(n, poly->length);
 
     if (len == 0)
     {

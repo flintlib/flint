@@ -31,7 +31,7 @@
 #include "fmpz_poly.h"
 
 /* Assumes len > 0. */
-void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, len_t len)
+void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, slong len)
 {
     if (len == 1)  /* Special case */
     {
@@ -39,7 +39,7 @@ void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, len_t len)
     }
     else   /* Ordinary case */
     {
-        len_t i;
+        slong i;
 
         _fmpz_vec_scalar_mul_fmpz(rop, op, len, op);
 
@@ -58,7 +58,7 @@ void _fmpz_poly_sqr_classical(fmpz *rop, const fmpz *op, len_t len)
 
 void fmpz_poly_sqr_classical(fmpz_poly_t rop, const fmpz_poly_t op)
 {
-    len_t len;
+    slong len;
 
     if (op->length == 0)
     {

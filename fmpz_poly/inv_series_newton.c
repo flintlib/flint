@@ -33,7 +33,7 @@
 #define FMPZ_POLY_INV_NEWTON_CUTOFF  32
 
 void 
-_fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
+_fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, slong n)
 {
     if (n == 1)  /* Q is +-1 */
     {
@@ -41,15 +41,15 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
     }
     else
     {
-        const len_t alloc = FLINT_MAX(n, 3 * FMPZ_POLY_INV_NEWTON_CUTOFF);
-        len_t *a, i, m;
+        const slong alloc = FLINT_MAX(n, 3 * FMPZ_POLY_INV_NEWTON_CUTOFF);
+        slong *a, i, m;
         fmpz *W;
 
         W = _fmpz_vec_init(alloc);
 
         for (i = 1; (1L << i) < n; i++) ;
 
-        a = (len_t *) flint_malloc(i * sizeof(len_t));
+        a = (slong *) flint_malloc(i * sizeof(slong));
         a[i = 0] = n;
         while (n >= FMPZ_POLY_INV_NEWTON_CUTOFF)
             a[++i] = (n = (n + 1) / 2);
@@ -80,7 +80,7 @@ _fmpz_poly_inv_series_newton(fmpz * Qinv, const fmpz * Q, len_t n)
     }
 }
 
-void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, len_t n)
+void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, slong n)
 {
     fmpz *Qcopy;
     int Qalloc;
@@ -92,7 +92,7 @@ void fmpz_poly_inv_series_newton(fmpz_poly_t Qinv, const fmpz_poly_t Q, len_t n)
     }
     else
     {
-        len_t i;
+        slong i;
         Qcopy = (fmpz *) flint_malloc(n * sizeof(fmpz));
         for (i = 0; i < Q->length; i++)
             Qcopy[i] = Q->coeffs[i];

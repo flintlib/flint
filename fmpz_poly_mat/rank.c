@@ -30,12 +30,12 @@
 #include "fmpz_poly_mat.h"
 
 
-len_t
+slong
 fmpz_poly_mat_rank(const fmpz_poly_mat_t A)
 {
     fmpz_poly_mat_t tmp;
     fmpz_poly_t den;
-    len_t rank;
+    slong rank;
 
     if (fmpz_poly_mat_is_empty(A))
         return 0;

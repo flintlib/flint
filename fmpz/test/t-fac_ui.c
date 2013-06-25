@@ -34,7 +34,7 @@
 int
 main(void)
 {
-    len_t i, n;
+    slong i, n;
     fmpz_t x;
     fmpz_t y;
 

@@ -33,7 +33,7 @@
 #include "ulong_extras.h"
 
 
-mp_limb_t n_randprime(flint_rand_t state, unsigned long bits, int proved)
+mp_limb_t n_randprime(flint_rand_t state, ulong bits, int proved)
 {
     mp_limb_t rand;
 

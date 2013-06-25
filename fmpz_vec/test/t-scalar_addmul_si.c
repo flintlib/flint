@@ -48,7 +48,7 @@ main(void)
     for (i = 0; i < 1000 * flint_test_multiplier(); i++)
     {
         fmpz *a, *b, *c, *d;
-        len_t len, x;
+        slong len, x;
 
         len = n_randint(state, 100);
 

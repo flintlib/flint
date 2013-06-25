@@ -31,10 +31,10 @@
 #include "nmod_poly.h"
 #include "ulong_extras.h"
 
-void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, len_t lenA, 
-                                     mp_srcptr B, len_t lenB, nmod_t mod)
+void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, slong lenA, 
+                                     mp_srcptr B, slong lenB, nmod_t mod)
 {
-    const len_t lenQ = lenA - lenB + 1;
+    const slong lenQ = lenA - lenB + 1;
     mp_ptr Arev, Brev;
 
     Arev = _nmod_vec_init(2 * lenQ);
@@ -62,7 +62,7 @@ void _nmod_poly_div_newton(mp_ptr Q, mp_srcptr A, len_t lenA,
 void nmod_poly_div_newton(nmod_poly_t Q, const nmod_poly_t A,
                                          const nmod_poly_t B)
 {
-    const len_t lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
+    const slong lenA = A->length, lenB = B->length, lenQ = lenA - lenB + 1;
 
     mp_ptr q;
 

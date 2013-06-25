@@ -23,11 +23,7 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpq.h"
-#include "ulong_extras.h"
 
 void fmpq_mul_fmpz(fmpq_t res, const fmpq_t op, const fmpz_t x)
 {

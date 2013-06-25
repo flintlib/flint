@@ -39,10 +39,10 @@ int main()
     mpz_t num1;
     mp_limb_t * output, * output2;
     double primes_per_limb;
-    len_t i, j, k;
-    len_t bits;
+    slong i, j, k;
+    slong bits;
 
-    len_t num_primes;
+    slong num_primes;
     mp_limb_t * primes;
     mp_limb_t prime;
 

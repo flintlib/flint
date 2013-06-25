@@ -47,7 +47,7 @@ static void check(fmpz_t x, int expected)
 int
 main(void)
 {
-    len_t i;
+    slong i;
     fmpz_t x;
 
     printf("fits_si....");

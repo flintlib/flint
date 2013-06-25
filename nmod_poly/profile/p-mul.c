@@ -32,14 +32,14 @@
 
 typedef struct
 {
-   len_t n;
+   slong n;
 } info_t;
 
 void sample(void * arg, ulong count)
 {
    info_t * info = (info_t *) arg;
-   len_t n = info->n, i, j;
-   len_t scale;
+   slong n = info->n, i, j;
+   slong scale;
 
    flint_rand_t state;
    flint_randinit(state);
@@ -85,7 +85,7 @@ int main(void)
 {
    double min, max;
    info_t info;
-   len_t k, scale;
+   slong k, scale;
 
    for (k = 2; k <= 30; k++)
    {

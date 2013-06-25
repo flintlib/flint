@@ -44,10 +44,10 @@
     On failure, a negative number is returned.''
  */
 
-int _fmpz_vec_fprint(FILE * file, const fmpz * vec, len_t len)
+int _fmpz_vec_fprint(FILE * file, const fmpz * vec, slong len)
 {
     int r;
-    len_t i;
+    slong i;
 
     r = fprintf(file, "%li", len);
     if ((len > 0) && (r > 0))

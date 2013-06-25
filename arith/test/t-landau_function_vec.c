@@ -40,7 +40,7 @@ static const mp_limb_t known[] = {
 int main(void)
 {
     fmpz * res;
-    len_t k, n;
+    slong k, n;
 
     printf("landau_function_vec....");
     fflush(stdout);

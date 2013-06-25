@@ -32,7 +32,7 @@
 int main(void)
 {
     flint_rand_t state;
-    len_t j, k, l;
+    slong j, k, l;
 
     printf("primes_jump_after....");
     fflush(stdout);

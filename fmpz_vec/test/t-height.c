@@ -47,7 +47,7 @@ main(void)
     {
         fmpz *a;
         fmpz_t h;
-        len_t len, bits, bits2;
+        slong len, bits, bits2;
 
         fmpz_init(h);
 

@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include <stdio.h>
-#include <gmp.h>
-#include "flint.h"
-#include "fmpz.h"
 #include "fmpz_mat.h"
 
 int 
 fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
 {
-    len_t r, c, i, j;
+    slong r, c, i, j;
     int byte_count;
     mpz_t t;
 
@@ -48,7 +44,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     if (!mpz_fits_slong_p(t))
     {
         printf("Exception (fmpz_mat_fread). "
-               "Number of rows does not fit into a len_t.\n");
+               "Number of rows does not fit into a slong.\n");
         abort();
     }
     r = mpz_get_si(t);
@@ -64,7 +60,7 @@ fmpz_mat_fread(FILE* file, fmpz_mat_t mat)
     if (!mpz_fits_slong_p(t))
     {
         printf("Exception (fmpz_mat_fread). "
-               "Number of columns does not fit into a len_t.\n");
+               "Number of columns does not fit into a slong.\n");
         abort();
     }
     c = mpz_get_si(t);

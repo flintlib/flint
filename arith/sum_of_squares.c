@@ -23,20 +23,14 @@
 
 ******************************************************************************/
 
-#include <gmp.h>
-#include "flint.h"
-#include "ulong_extras.h"
-#include "fmpz.h"
 #include "fmpz_factor.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
 
 static void
 sum_of_two_squares(fmpz_t r, const fmpz_t n)
 {
     fmpz_factor_t fac;
-    len_t i;
+    slong i;
 
     fmpz_factor_init(fac);
     fmpz_factor(fac, n);
@@ -84,10 +78,10 @@ sum_of_four_squares(fmpz_t r, const fmpz_t n)
 }
 
 static void
-sum_of_squares_recursive(fmpz_t r, len_t k, ulong n)
+sum_of_squares_recursive(fmpz_t r, slong k, ulong n)
 {
     fmpz_t t, u;
-    len_t i, j;
+    slong i, j;
 
     fmpz_init(t);
     fmpz_init(u);
@@ -110,7 +104,7 @@ sum_of_squares_recursive(fmpz_t r, len_t k, ulong n)
 }
 
 static void
-sum_of_squares_series(fmpz_t r, ulong k, len_t n)
+sum_of_squares_series(fmpz_t r, ulong k, slong n)
 {
     fmpz * t;
 

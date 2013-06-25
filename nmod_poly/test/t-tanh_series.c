@@ -45,7 +45,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, tanhA, B;
-        len_t n;
+        slong n;
         mp_limb_t mod;
 
         do { mod = n_randtest_prime(state, 0); } while (mod == 2);
@@ -85,7 +85,7 @@ main(void)
     for (i = 0; i < 100 * flint_test_multiplier(); i++)
     {
         nmod_poly_t A, B;
-        len_t n;
+        slong n;
         mp_limb_t mod;
         mod = n_randtest_prime(state, 0);
         n = n_randtest(state) % 50;

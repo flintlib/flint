@@ -22,6 +22,7 @@
     Copyright 2007 William Hart and David Harvey
 
 ******************************************************************************/
+#include "flint.h"
 
 #undef ulong /* interferes with system includes, redefined by flint.h below */
 #include <time.h>
@@ -33,13 +34,13 @@ void  GetSystemTimeAsFileTime(FILETIME*);
 static __inline__ int gettimeofday(struct timeval * p, void * tz)
 {
    union {
-      long long ns100; 
+      slong slong ns100; 
       FILETIME ft;
    } now;
 
     GetSystemTimeAsFileTime(&(now.ft));
-    p->tv_usec=(long)((now.ns100 / 10LL) % 1000000LL );
-    p->tv_sec= (long)((now.ns100-(116444736000000000LL))/10000000LL);
+    p->tv_usec=(slong)((now.ns100 / 10LL) % 1000000LL );
+    p->tv_sec= (slong)((now.ns100-(116444736000000000LL))/10000000LL);
 	
     return 0;
 }
@@ -60,8 +61,8 @@ int gettimeofday(struct timeval * p, void * tz);
 
 typedef struct
 {
-    long cpu;
-    long wall;
+    slong cpu;
+    slong wall;
 } timeit_t[1];
 
 static __inline__
@@ -162,7 +163,7 @@ void prof_stop()
    stop_clock(0);
 }
 
-typedef void (*profile_target_t)(void* arg, unsigned long count);
+typedef void (*profile_target_t)(void* arg, ulong count);
 
 void prof_repeat(double* min, double* max, profile_target_t target, void* arg);
 

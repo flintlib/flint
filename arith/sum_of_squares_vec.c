@@ -23,16 +23,12 @@
 
 ******************************************************************************/
 
-#include "flint.h"
-#include "fmpz.h"
-#include "fmpz_vec.h"
-#include "fmpz_poly.h"
 #include "arith.h"
 
 static void
-theta3_qexp(fmpz * r, len_t n)
+theta3_qexp(fmpz * r, slong n)
 {
-    len_t i, j;
+    slong i, j;
 
     _fmpz_vec_zero(r, n);
 
@@ -44,9 +40,9 @@ theta3_qexp(fmpz * r, len_t n)
 }
 
 static void
-theta3_qexp_squared(fmpz * r, len_t n)
+theta3_qexp_squared(fmpz * r, slong n)
 {
-    len_t i, j, x, y;
+    slong i, j, x, y;
 
     _fmpz_vec_zero(r, n);
 
@@ -62,7 +58,7 @@ theta3_qexp_squared(fmpz * r, len_t n)
 }
 
 void
-arith_sum_of_squares_vec(fmpz * r, ulong k, len_t n)
+arith_sum_of_squares_vec(fmpz * r, ulong k, slong n)
 {
     if (k == 0 || n <= 1)
     {

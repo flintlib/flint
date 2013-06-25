@@ -28,9 +28,9 @@
 #include "flint.h"
 #include "ulong_extras.h"
 
-int _perm_randtest(len_t *vec, len_t n, flint_rand_t state)
+int _perm_randtest(slong *vec, slong n, flint_rand_t state)
 {
-    len_t i, j, t;
+    slong i, j, t;
 
     int parity = 0;
 

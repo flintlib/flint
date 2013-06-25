@@ -34,7 +34,7 @@
 void
 nmod_poly_factor_print(const nmod_poly_factor_t fac)
 {
-    len_t i;
+    slong i;
 
     for (i = 0; i < fac->num; i++)
     {

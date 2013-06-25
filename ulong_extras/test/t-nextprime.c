@@ -35,7 +35,7 @@ int main(void)
 {
     mp_limb_t n;
     mp_limb_t res1, res2;
-    len_t i, rep;
+    slong i, rep;
     mpz_t mpz_n;
     flint_rand_t state;
     
@@ -60,7 +60,7 @@ int main(void)
 
     for (rep = 0; rep < 10000 * flint_test_multiplier(); rep++)
     {
-        unsigned long bits = n_randint(state, FLINT_D_BITS-1)+1;
+        ulong bits = n_randint(state, FLINT_D_BITS-1)+1;
         n = n_randtest(state) % ((1UL<<bits) - 1UL) + 1; 
         mpz_set_ui(mpz_n, n);
 

@@ -24,8 +24,8 @@ main(void)
     for (i = 0; i < 100; i++)
     {
         fmpz_poly_q_t a;
-        len_t len1 = n_randint(state, 50);
-        len_t len2 = n_randint(state, 50);
+        slong len1 = n_randint(state, 50);
+        slong len2 = n_randint(state, 50);
         mp_bitcnt_t bits1 = n_randint(state, 50);
         mp_bitcnt_t bits2 = n_randint(state, 50);
 

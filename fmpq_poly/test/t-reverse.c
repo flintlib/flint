@@ -46,7 +46,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        len_t n;
+        slong n;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);
@@ -74,7 +74,7 @@ main(void)
     for (i = 0; i < 200 * flint_test_multiplier(); i++)
     {
         fmpq_poly_t a, b;
-        len_t j, len, n;
+        slong j, len, n;
 
         fmpq_poly_init(a);
         fmpq_poly_init(b);

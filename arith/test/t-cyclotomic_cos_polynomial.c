@@ -97,7 +97,7 @@ static const short testdata[] = {
 int main()
 {
     fmpz_poly_t p;
-    len_t n;
+    slong n;
 
     printf("cyclotomic_cos_polynomial....");
     fflush(stdout);
