@@ -108,12 +108,12 @@ int fmpq_poly_is_canonical(const fmpq_poly_t poly)
 
 *******************************************************************************
 
-slong fmpq_poly_degree(fmpq_poly_t poly)
+slong fmpq_poly_degree(const fmpq_poly_t poly)
 
     Returns the degree of \code{poly}, which is one less than its length, as 
     a \code{slong}.
 
-slong fmpq_poly_length(fmpq_poly_t poly)
+slong fmpq_poly_length(const fmpq_poly_t poly)
 
     Returns the length of \code{poly}.
 
@@ -613,11 +613,13 @@ void fmpq_poly_mullow(fmpq_poly_t res,
     Sets \code{res} to the product of \code{poly1} and \code{poly2}, 
     truncated to length~$n$.
 
-void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, 
+                                                          const fmpq_poly_t op2)
 
     Adds the product of \code{op1} and \code{op2} to \code{rop}.
 
-void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, 
+                                                          const fmpq_poly_t op2)
 
     Subtracts the product of \code{op1} and \code{op2} from \code{rop}.
 

@@ -91,13 +91,13 @@ fmpq_poly_get_numerator(fmpz_poly_t res, const fmpq_poly_t poly)
 /*  Polynomial parameters  ***************************************************/
 
 static __inline__
-slong fmpq_poly_degree(fmpq_poly_t poly)
+slong fmpq_poly_degree(const fmpq_poly_t poly)
 {
     return poly->length - 1;
 }
 
 static __inline__
-slong fmpq_poly_length(fmpq_poly_t poly)
+slong fmpq_poly_length(const fmpq_poly_t poly)
 {
     return poly->length;
 }
@@ -304,7 +304,7 @@ void fmpq_poly_mullow(fmpq_poly_t res,
                    const fmpq_poly_t poly1, const fmpq_poly_t poly2, slong n);
 
 static __inline__ 
-void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t op2)
 {
     fmpq_poly_t t;
 
@@ -315,7 +315,7 @@ void fmpq_poly_addmul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
 }
 
 static __inline__ 
-void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, fmpq_poly_t op2)
+void fmpq_poly_submul(fmpq_poly_t rop, const fmpq_poly_t op1, const fmpq_poly_t op2)
 {
     fmpq_poly_t t;
 
