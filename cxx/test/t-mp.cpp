@@ -46,9 +46,9 @@ test_logic()
     tassert((and_<false_, true_>::val == false));
     tassert((and_<false_, false_>::val == false));
 
-    tassert((and_c<true_, true>::val == true));
-    tassert((and_c<false_, true>::val == false));
-    tassert((and_c<false_, false>::val == false));
+    tassert((and_v<true_, true>::val == true));
+    tassert((and_v<false_, true>::val == false));
+    tassert((and_v<false_, false>::val == false));
 
     tassert((or_<true_, true_>::val == true));
     tassert((or_<false_, true_>::val == true));

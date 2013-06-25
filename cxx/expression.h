@@ -120,9 +120,9 @@ private:
 
 public:
     typedef typename mp::select<rules::UNIMPLEMENTED, // TODO
-        mp::and_c<i2, min_prio <= 2>, r2,
-        mp::and_c<i1, min_prio <= 1>, r1,
-        mp::and_c<i0, min_prio <= 0>, r0
+        mp::and_v<i2, min_prio <= 2>, r2,
+        mp::and_v<i1, min_prio <= 1>, r1,
+        mp::and_v<i0, min_prio <= 0>, r0
       >::type type;
 };
 } // mp
