@@ -294,6 +294,9 @@ test_merge()
     TEST32n(A, B, C, D, C, 4);
 
     TEST32n(A, B, C, D, E, 5);
+
+    typedef merge_tuple<empty_tuple, empty_tuple> emptymerge;
+    tassert((equal_types<emptymerge::type, empty_tuple>::val));
 }
 
 int

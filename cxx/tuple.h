@@ -384,6 +384,18 @@ struct merge_tuple<tuple<T, empty_tuple>, empty_tuple>
         return input;
     }
 };
+
+// Termination case 4
+template<>
+struct merge_tuple<empty_tuple, empty_tuple>
+{
+    typedef empty_tuple type;
+    typedef empty_tuple tail_t;
+    typedef empty_tuple used_t;
+
+    static empty_tuple get_first(const type& input) {return empty_tuple();}
+    static empty_tuple get_second(const type& input) {return empty_tuple();}
+};
 } // mp
 } // flint
 
