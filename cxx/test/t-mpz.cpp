@@ -23,6 +23,7 @@
 
 ******************************************************************************/
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <stdexcept>
 #include <stdio.h>
@@ -30,13 +31,31 @@
 #include "cxx.h"
 #include "cxx/test/helpers.h"
 
+using namespace flint;
+
+void
+test_printing()
+{
+    mpz a(31);
+
+    tassert(a.to_string() == "31");
+    tassert(a.to_string(2) == "11111");
+
+    std::ostringstream oss;
+    oss << a << '\n' << std::oct << a << '\n'
+        << std::hex << a << '\n' << std::dec << a;
+    tassert(oss.str() == "31\n37\n1f\n31");
+
+    mpz b(-15);
+    tassert((a + b).to_string() == "16");
+}
+
 int
 main()
 {
     std::cout << "mpz....";
-    //flint::mpz a('a');
-    flint::mpz a((short)-4);
-    flint::mpz b; b = "8";
-    std::cout << a + b << std::endl;
+
+    test_printing();
+
     std::cout << "PASS" << std::endl;
 }

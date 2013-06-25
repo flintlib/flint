@@ -100,6 +100,9 @@ test_convertibility()
     tassert((_is_convertible<sub, newtype>::val == false));
     tassert((_is_convertible<sub, sub>::val == true));
     tassert((_is_convertible<int, int>::val == true));
+
+    // Test the HACK.
+    tassert((_is_convertible<int, void(int)>::val == false));
 }
 
 int

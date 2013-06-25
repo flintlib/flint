@@ -147,13 +147,14 @@ struct destruction<mpz>
 };
 
 template<>
-struct print<mpz>
+struct to_string<mpz>
 {
-    static void doit(const mpz& v, std::ostream& o)
+    static std::string get(const mpz& v, int base)
     {
-        char* str = fmpz_get_str(0, 10, v._data());
-        o << str;
+        char* str = fmpz_get_str(0, base, v._data());
+        std::string res(str);
         std::free(str);
+        return res;
     }
 };
 

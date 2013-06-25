@@ -30,6 +30,7 @@
 // * static asserts
 
 #include <iosfwd>
+#include <string>
 
 #include "cxx/mp.h"
 #include "cxx/traits.h"
@@ -61,6 +62,10 @@ struct initialization : UNIMPLEMENTED { };
 
 template<class T, class Enable = void>
 struct print : UNIMPLEMENTED { };
+
+template<class T, class Enable = void>
+struct to_string : UNIMPLEMENTED { };
+// static std::string get(const T&, int base)
 
 template<class T, class Enable = void>
 struct destruction : no_op { };
@@ -341,6 +346,11 @@ public:
     void print(std::ostream& o) const
     {
         rules::print<evaluated_t>::doit(evaluate(), o);
+    }
+
+    std::string to_string(int base = 10) const
+    {
+        return rules::to_string<evaluated_t>::get(evaluate(), base);
     }
 
     typename traits::make_const<evaluation_return_t>::type evaluate() const
@@ -683,6 +693,24 @@ struct evaluation<
               >::type
           >::type
 { };
+
+
+// Automatic printing if to_string is implemented
+template<class T>
+struct print<T,
+    typename mp::enable_if<traits::is_implemented<to_string<T> > >::type>
+{
+    static void doit(const T& v, std::ostream& o)
+    {
+        int base = 10;
+        std::ios_base::fmtflags ff = o.flags();
+        if(ff & o.hex)
+            base = 16;
+        if(ff & o.oct)
+            base = 8;
+        o << v.to_string(base);
+    }
+};
 } // rules
 } // flint
 

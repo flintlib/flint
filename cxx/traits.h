@@ -111,6 +111,10 @@ private:
 public:
     static const bool val = (sizeof(test(fakeinstance<From>().t)) != sizeof(yes));
 };
+
+// XXX HACK
+template<class To, class A, class B>
+struct _is_convertible<To, A(B)> : false_ { };
 } // traits
 } // flint
 
