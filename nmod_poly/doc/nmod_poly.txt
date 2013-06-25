@@ -1082,7 +1082,7 @@ void nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys, const nmod_poly_t poly,
     Uses Horner's method iteratively.
 
 void _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
-    long plen, mp_ptr * tree, long len, nmod_t mod)
+    long plen, const mp_ptr * tree, long len, nmod_t mod)
 
     Evaluates (\code{poly}, \code{plen}) at the \code{len} values given
     by the precomputed subproduct tree \code{tree}.
@@ -1148,14 +1148,14 @@ void nmod_poly_interpolate_nmod_vec(nmod_poly_t poly,
     values \code{ys}. The values in \code{xs} and \code{ys} should be
     reduced modulo the modulus, and all \code{xs} must be distinct.
 
-void _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, long len,
-        nmod_t mod)
+void _nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, 
+        long len, nmod_t mod)
 
     Sets \code{w} to the barycentric interpolation weights for fast
     Lagrange interpolation with respect to a given subproduct tree.
 
 void _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    mp_ptr * tree, mp_srcptr weights, long len, nmod_t mod)
+    const mp_ptr * tree, mp_srcptr weights, long len, nmod_t mod)
 
     Performs interpolation using the fast Lagrange interpolation
     algorithm, generating a temporary subproduct tree.
@@ -2222,7 +2222,7 @@ int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
     special case, the zero polynomial is not considered squarefree.
     There are no restrictions on the length.
 
-int nmod_poly_is_squarefree(nmod_poly_t f)
+int nmod_poly_is_squarefree(const nmod_poly_t f)
 
     Returns 1 if \code{f} is squarefree, and 0 otherwise. As a special
     case, the zero polynomial is not considered squarefree.

@@ -54,7 +54,7 @@ _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod)
 }
 
 int
-nmod_poly_is_squarefree(nmod_poly_t f)
+nmod_poly_is_squarefree(const nmod_poly_t f)
 {
     return _nmod_poly_is_squarefree(f->coeffs, f->length, f->mod);
 }

@@ -40,7 +40,7 @@ static __inline__ void _nmod_poly_rem_2(mp_ptr r, mp_srcptr a, slong al,
 
 void
 _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
-    slong plen, mp_ptr * tree, slong len, nmod_t mod)
+    slong plen, const mp_ptr * tree, slong len, nmod_t mod)
 {
     slong height, i, j, pow, left;
     slong tree_height;

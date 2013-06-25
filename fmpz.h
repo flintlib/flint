@@ -596,7 +596,7 @@ void fmpz_CRT_ui(fmpz_t out, const fmpz_t r1, const fmpz_t m1,
 
 typedef struct
 {
-    mp_limb_t * primes;
+    mp_limb_t const * primes;
     slong num_primes;
     slong n;         /* we have 2^n >= num_primes > 2^(n-1) */
     fmpz ** comb;   /* Array of arrays of products */

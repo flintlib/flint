@@ -31,7 +31,7 @@
 #include "nmod_vec.h"
 
 void
-fmpz_multi_mod_ui_basecase(mp_limb_t * out, fmpz_t in, mp_limb_t * primes,
+fmpz_multi_mod_ui_basecase(mp_limb_t * out, const fmpz_t in, mp_srcptr primes,
                            slong num_primes)
 {
     slong i;

@@ -638,7 +638,7 @@ void nmod_poly_evaluate_nmod_vec_iter(mp_ptr ys,
 
 void
 _nmod_poly_evaluate_nmod_vec_fast_precomp(mp_ptr vs, mp_srcptr poly,
-    slong plen, mp_ptr * tree, slong len, nmod_t mod);
+    slong plen, const mp_ptr * tree, slong len, nmod_t mod);
 
 void _nmod_poly_evaluate_nmod_vec_fast(mp_ptr ys, mp_srcptr coeffs, slong len,
     mp_srcptr xs, slong n, nmod_t mod);
@@ -683,9 +683,9 @@ void _nmod_poly_interpolate_nmod_vec_fast(mp_ptr poly,
 
 void
 _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod);
+    const mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod);
 
-void _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree,
+void _nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree,
     slong len, nmod_t mod);
 
 /* Composition  **************************************************************/
@@ -1025,7 +1025,7 @@ int nmod_poly_is_irreducible(const nmod_poly_t f);
 
 int _nmod_poly_is_squarefree(mp_srcptr f, slong len, nmod_t mod);
 
-int nmod_poly_is_squarefree(nmod_poly_t f);
+int nmod_poly_is_squarefree(const nmod_poly_t f);
 
 void nmod_poly_factor_cantor_zassenhaus(nmod_poly_factor_t res,
     const nmod_poly_t f);

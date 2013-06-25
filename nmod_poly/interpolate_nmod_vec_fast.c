@@ -30,7 +30,7 @@
 #include "nmod_poly.h"
 
 void
-_nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, slong len, nmod_t mod)
+_nmod_poly_interpolation_weights(mp_ptr w, const mp_ptr * tree, slong len, nmod_t mod)
 {
     mp_ptr tmp;
     slong i, n, height;
@@ -62,7 +62,7 @@ _nmod_poly_interpolation_weights(mp_ptr w, mp_ptr * tree, slong len, nmod_t mod)
 
 void
 _nmod_poly_interpolate_nmod_vec_fast_precomp(mp_ptr poly, mp_srcptr ys,
-    mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod)
+    const mp_ptr * tree, mp_srcptr weights, slong len, nmod_t mod)
 {
     mp_ptr t, u, pa, pb;
     slong i, pow, left;
