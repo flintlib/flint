@@ -39,7 +39,7 @@ Kedlaya, William Stein, Kate Minola, Robert Bradshaw, Serge Torres, Dan
 Grayson, Bob Smith, Antony Vennard, Frederic Chyzak, Julien
 Puydt and many others.
 
-Ralph Hemmecke made available an autotools build for FLINT.
+Ralf Hemmecke made available an autotools build for FLINT.
 
 Numerous people have contributed to wrapping FLINT in Sage and debugging, 
 including Mike Hansen, Jean-Pierre Flori, Burcin Erocal, Robert Bradshaw,
