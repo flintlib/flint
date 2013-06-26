@@ -958,7 +958,9 @@ struct equals<T, U,
 // HELPER MACROS
 ////////////////////////////////////////////////////////////////////////
 
-// To be called in namespace flint!
+// This set of macros should be called in namespace flint.
+
+// Introduce a new binary operation called "name"
 #define FLINT_DEFINE_BINOP(name) \
 namespace operations { \
 struct name { }; \
@@ -970,17 +972,7 @@ name(const T1& t1, const T2& t2) \
     return detail::binary_op_helper<T1, operations::name, T2>::make(t1, t2); \
 }
 
-// To be called in any namespace
-#define FLINT_DEFINE_BINOP_HERE(name) \
-template<class T1, class T2> \
-inline typename ::flint::detail::binary_op_helper<\
-    T1, ::flint::operations::name, T2>::enable::type \
-name(const T1& t1, const T2& t2) \
-{ \
-  return ::flint::detail::binary_op_helper< \
-      T1, ::flint::operations::name, T2>::make(t1, t2); \
-}
-
+// Introduce a new unary operation called "name"
 #define FLINT_DEFINE_UNOP(name) \
 namespace operations { \
 struct name { }; \
@@ -993,6 +985,19 @@ name(const T1& t1) \
 }
 
 // To be called in any namespace
+
+// Make the binary operation "name" available in current namespace
+#define FLINT_DEFINE_BINOP_HERE(name) \
+template<class T1, class T2> \
+inline typename ::flint::detail::binary_op_helper<\
+    T1, ::flint::operations::name, T2>::enable::type \
+name(const T1& t1, const T2& t2) \
+{ \
+  return ::flint::detail::binary_op_helper< \
+      T1, ::flint::operations::name, T2>::make(t1, t2); \
+}
+
+// Make the unary operation "name" available in current namespace
 #define FLINT_DEFINE_UNOP_HERE(name) \
 template<class T1> \
 inline typename ::flint::detail::unary_op_helper<\
@@ -1002,7 +1007,10 @@ name(const T1& t1) \
   return ::flint::detail::unary_op_helper< ::flint::operations::name, T1>::make(t1); \
 }
 
-// To be called in namespace flint::rules
+// These macros should be called in namespace flint::rules
+
+// Specialise a getter called "name". The getter has one argument called "from"
+// of type "fromtype", and "eval" which should yield "totype". 
 #define FLINT_DEFINE_GET(name, totype, fromtype, eval) \
 template<> \
 struct name<totype, fromtype> \
@@ -1013,6 +1021,7 @@ struct name<totype, fromtype> \
     } \
 };
 
+// Specialise a doit rule called "name"
 #define FLINT_DEFINE_DOIT(name, totype, fromtype, eval) \
 template<> \
 struct name<totype, fromtype> \
@@ -1023,6 +1032,8 @@ struct name<totype, fromtype> \
     } \
 };
 
+// Specialise a doit rule called "name" which yields totype. It will
+// accept any type "T" which satisfies "cond".
 #define FLINT_DEFINE_DOIT_COND(name, totype, cond, eval) \
 template<class T> \
 struct name<totype, T, typename mp::enable_if<cond >::type> \
@@ -1033,6 +1044,7 @@ struct name<totype, T, typename mp::enable_if<cond >::type> \
     } \
 };
 
+// Specialise the unary expression rule type->type.
 #define FLINT_DEFINE_UNARY_EXPR(name, type, eval) \
 template<> \
 struct unary_expression<operations::name, type> \
@@ -1044,6 +1056,7 @@ struct unary_expression<operations::name, type> \
     } \
 };
 
+// Specialise the binary expression rule (type, type) -> type
 #define FLINT_DEFINE_BINARY_EXPR(name, type, eval) \
 template<> \
 struct binary_expression<type, operations::name, type> \
@@ -1055,6 +1068,8 @@ struct binary_expression<type, operations::name, type> \
     } \
 };
 
+// Specialise the commutative binary expression rule (Type, T) -> Type,
+// where T must satisfy "cond".
 #define FLINT_DEFINE_CBINARY_EXPR_COND(name, Type, cond, eval) \
 template<class T> \
 struct commutative_binary_expression<Type, \
@@ -1067,6 +1082,8 @@ struct commutative_binary_expression<Type, \
     } \
 };
 
+// Specialise the (non-commutative) binary expression rule (Type, T) -> Type,
+// where T must satisfy "cond".
 #define FLINT_DEFINE_BINARY_EXPR_COND(name, Type, cond, eval) \
 template<class T> \
 struct binary_expression<Type, \
