@@ -42,7 +42,7 @@ namespace operations {
 // TODO document these
 // unary operations
 struct immediate { };
-struct unary_minus { };
+struct negate { };
 
 // binary operations
 struct plus { };
@@ -643,10 +643,10 @@ operator%(const Expr1& e1, const Expr2& e2)
 }
 
 template<class Expr>
-inline typename detail::unary_op_helper<Expr, operations::unary_minus>::enable::type
+inline typename detail::unary_op_helper<Expr, operations::negate>::enable::type
 operator-(const Expr& e)
 {
-    return detail::unary_op_helper<Expr, operations::unary_minus>::make(e);
+    return detail::unary_op_helper<Expr, operations::negate>::make(e);
 }
 
 // default rules

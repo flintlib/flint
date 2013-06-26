@@ -125,7 +125,31 @@ test_initialisation_assignment()
 void
 test_arithmetic()
 {
-    // TODO
+#define TAC(seven, three) \
+    tassert(seven + three == 10); \
+    tassert(seven * three == 21);
+
+#define TA(seven, three) \
+    TAC(seven, three); \
+    tassert(seven - three == 4); \
+    tassert(seven / three == 2); \
+    tassert(seven % three == 1)
+
+    TA(mpz(7), mpz(3));
+    TA(mpz(7), 3u);
+    TAC(7ul, mpz(3));
+
+    // test signed builtins (only div and mul)
+    tassert(-7 * mpz(3) == -21);
+    tassert(mpz(7) * (-3l) == -21);
+    tassert(mpz(21) / -3 == -7);
+
+    // test composite arithmetic
+    mpz a(3), b(7);
+    tassert(3*(a + b) - (b + (a - 4u)) + ((-(a - b)) % (b / 2)) == 25);
+
+    // test unary minus
+    tassert(-a == -3);
 }
 
 int

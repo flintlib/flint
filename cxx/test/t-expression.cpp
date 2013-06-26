@@ -255,7 +255,7 @@ struct binary_expression<myint, operations::modulo, myint>
 };
 
 template<>
-struct unary_expression<operations::unary_minus, myint>
+struct unary_expression<operations::negate, myint>
 {
     typedef myint return_t;
     static void doit(myint& to, const myint& from)
@@ -458,6 +458,8 @@ test_equals()
 
     tassert(a != 4);
     tassert(4 != a);
+
+    tassert((a + b) == (a + 4));
 }
 
 void

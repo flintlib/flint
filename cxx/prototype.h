@@ -239,6 +239,141 @@ struct commutative_binary_expression<mpz, operations::plus, mpz>
         fmpz_add(to._data(), e1._data(), e2._data());
     }
 };
+
+template<class T>
+struct commutative_binary_expression<mpz,
+    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::plus>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_add_ui(to._data(), e1._data(), e2);
+    }
+};
+
+template<>
+struct commutative_binary_expression<mpz, operations::times, mpz>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const mpz& e2)
+    {
+        fmpz_mul(to._data(), e1._data(), e2._data());
+    }
+};
+
+template<class T>
+struct commutative_binary_expression<mpz,
+    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::times>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_mul_ui(to._data(), e1._data(), e2);
+    }
+};
+
+template<class T>
+struct commutative_binary_expression<mpz,
+    typename mp::enable_if<traits::is_signed_integer<T>, operations::times>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_mul_si(to._data(), e1._data(), e2);
+    }
+};
+
+template<>
+struct binary_expression<mpz, operations::minus, mpz>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const mpz& e2)
+    {
+        fmpz_sub(to._data(), e1._data(), e2._data());
+    }
+};
+
+template<class T>
+struct binary_expression<mpz,
+    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::minus>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_sub_ui(to._data(), e1._data(), e2);
+    }
+};
+
+template<>
+struct binary_expression<mpz, operations::divided_by, mpz>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const mpz& e2)
+    {
+        fmpz_fdiv_q(to._data(), e1._data(), e2._data());
+    }
+};
+
+template<class T>
+struct binary_expression<mpz,
+    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::divided_by>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_fdiv_q_ui(to._data(), e1._data(), e2);
+    }
+};
+
+template<class T>
+struct binary_expression<mpz,
+    typename mp::enable_if<traits::is_signed_integer<T>, operations::divided_by>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_fdiv_q_si(to._data(), e1._data(), e2);
+    }
+};
+
+// TODO this interpretation of mod is not the same as for builtin types!
+template<>
+struct binary_expression<mpz, operations::modulo, mpz>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const mpz& e2)
+    {
+        fmpz_mod(to._data(), e1._data(), e2._data());
+    }
+};
+
+template<class T>
+struct binary_expression<mpz,
+    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::modulo>::type,
+    T>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& e1, const T& e2)
+    {
+        fmpz_mod_ui(to._data(), e1._data(), e2);
+    }
+};
+
+template<>
+struct unary_expression<operations::negate, mpz>
+{
+    typedef mpz return_t;
+    static void doit(mpz& to, const mpz& from)
+    {
+        fmpz_neg(to._data(), from._data());
+    }
+};
 } // rules
 } // flint
 
