@@ -31,7 +31,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+_fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
                          ulong e, slong trunc, const fmpz_t p)
 {
     _fmpz_mod_poly_pow_trunc_binexp(res, poly, e, trunc, p);

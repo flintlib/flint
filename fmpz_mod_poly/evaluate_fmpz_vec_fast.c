@@ -33,13 +33,13 @@
 
 void
 _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, const fmpz * poly,
-    slong plen, fmpz_poly_struct ** tree, slong len, const fmpz_t mod)
+    slong plen, fmpz_poly_struct * const * tree, slong len, const fmpz_t mod)
 {
     slong height, i, j, pow, left;
     slong tree_height;
     fmpz_t temp, inv;
     fmpz * t, * u, * pb, * pc, * swap;
-    fmpz_poly_struct * pa;
+    fmpz_poly_struct const * pa;
 
     fmpz_init(temp);
     fmpz_init(inv);

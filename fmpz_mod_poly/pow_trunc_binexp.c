@@ -32,7 +32,7 @@
 #include "fmpz_mod_poly.h"
 
 void
-_fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+_fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
                                 ulong e, slong trunc, const fmpz_t p)
 {
     ulong bit = ~((~0UL) >> 1);

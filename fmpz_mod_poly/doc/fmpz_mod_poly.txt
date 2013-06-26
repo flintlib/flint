@@ -402,7 +402,7 @@ void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e)
     Computes \code{res = poly^e}.  If $e$ is zero, returns one, 
     so that in particular \code{0^0 = 1}.
 
-void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+void _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
 			      ulong e, slong trunc, const fmpz_t p)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}
@@ -419,7 +419,7 @@ void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
     to the power \code{e}. This is equivalent to doing a powering
     followed by a truncation.
 
-void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
 				     ulong e, slong trunc, const fmpz_t p)
 
     Sets \code{res} to the low \code{trunc} coefficients of \code{poly}

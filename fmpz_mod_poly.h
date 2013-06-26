@@ -274,13 +274,13 @@ void _fmpz_mod_poly_pow(fmpz *rop, const fmpz *op, slong len, ulong e,
 
 void fmpz_mod_poly_pow(fmpz_mod_poly_t rop, const fmpz_mod_poly_t op, ulong e);
 
-void _fmpz_mod_poly_pow_trunc(fmpz * res, fmpz * poly,
+void _fmpz_mod_poly_pow_trunc(fmpz * res, const fmpz * poly,
                               ulong e, slong trunc, const fmpz_t p);
 
 void fmpz_mod_poly_pow_trunc(fmpz_mod_poly_t res,
                        const fmpz_mod_poly_t poly, ulong e, slong trunc);
 
-void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, fmpz * poly,
+void _fmpz_mod_poly_pow_trunc_binexp(fmpz * res, const fmpz * poly,
                                      ulong e, slong trunc, const fmpz_t p);
 
 void fmpz_mod_poly_pow_trunc_binexp(fmpz_mod_poly_t res,
@@ -514,7 +514,7 @@ void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
                         const fmpz_mod_poly_t poly, const fmpz * xs, slong n);
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, 
-              const fmpz * poly, slong plen, fmpz_poly_struct ** tree, 
+              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, 
                                                  slong len, const fmpz_t mod);
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, 
