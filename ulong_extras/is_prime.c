@@ -29,7 +29,13 @@
 
 int n_is_prime(mp_limb_t n)
 {
-#if !FLINT64
+    return n_is_probabprime(n);
+    /* flint's "BPSW" checked against Feitma and Galway's database [1] 
+       up to 2^64 by Dana Jacobsen.
+       [1]  http://www.janfeitsma.nl/math/psp2/database
+    */
+
+/*#if !FLINT64
     return n_is_probabprime(n);
 #else
     int isprime;
@@ -42,5 +48,6 @@ int n_is_prime(mp_limb_t n)
     if (isprime != -1) return isprime;
 
     return n_is_prime_pseudosquare(n);
-#endif
+#endif*/
+
 }
