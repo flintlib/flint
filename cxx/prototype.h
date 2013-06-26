@@ -33,6 +33,7 @@
 // * contexts
 
 #include "cxx/expression.h"
+#include "cxx/stdmath.h"
 
 #include "fmpz.h"
 
@@ -81,35 +82,15 @@ struct destruction<mpz>
         fmpz_clear(v._data());
     }
 };
-template<>
-struct initialization<mpz, mpz>
-{
-    static void doit(mpz& target, const mpz& source)
-    {
-        fmpz_init_set(target._data(), source._data());
-    }
-};
 
-template<class T>
-struct initialization<mpz, T,
-    typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
-{
-    static void doit(mpz& target, T source)
-    {
-        fmpz_init_set_ui(target._data(), source);
-    }
-};
+FLINT_DEFINE_DOIT(initialization, mpz, mpz,
+        fmpz_init_set(to._data(), from._data()))
 
-template<class T>
-struct initialization<mpz, T,
-    typename mp::enable_if<traits::is_signed_integer<T> >::type>
-{
-    static void doit(mpz& target, T source)
-    {
-        fmpz_init(target._data());
-        fmpz_set_si(target._data(), source);
-    }
-};
+FLINT_DEFINE_DOIT_COND(initialization, mpz, traits::is_unsigned_integer<T>,
+        fmpz_init_set_ui(to._data(), from))
+
+FLINT_DEFINE_DOIT_COND(initialization, mpz, traits::is_signed_integer<T>,
+        fmpz_init(to._data());fmpz_set_si(to._data(), from))
 
 // TODO should expression automatically deduce this from the assignment
 // implementation (or the other way round)?
@@ -124,34 +105,13 @@ struct initialization<mpz, char[n]>
     }
 };
 
-template<>
-struct assignment<mpz, mpz>
-{
-    static void doit(mpz& target, const mpz& source)
-    {
-        fmpz_set(target._data(), source._data());
-    }
-};
+FLINT_DEFINE_DOIT(assignment, mpz, mpz, fmpz_set(to._data(), from._data()))
 
-template<class T>
-struct assignment<mpz, T,
-    typename mp::enable_if<traits::is_unsigned_integer<T> >::type>
-{
-    static void doit(mpz& target, T source)
-    {
-        fmpz_set_ui(target._data(), source);
-    }
-};
+FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_unsigned_integer<T>,
+        fmpz_set_ui(to._data(), from))
 
-template<class T>
-struct assignment<mpz, T,
-    typename mp::enable_if<traits::is_signed_integer<T> >::type>
-{
-    static void doit(mpz& target, T source)
-    {
-        fmpz_set_si(target._data(), source);
-    }
-};
+FLINT_DEFINE_DOIT_COND(assignment, mpz, traits::is_signed_integer<T>,
+        fmpz_set_si(to._data(), from))
 
 template<int n>
 struct assignment<mpz, char[n]>
@@ -203,177 +163,48 @@ struct to_string<mpz>
     }
 };
 
-template<>
-struct conversion<slong, mpz>
-{
-    static slong get(const mpz& from)
-    {
-        return fmpz_get_si(from._data());
-    }
-};
+FLINT_DEFINE_GET(conversion, slong, mpz, fmpz_get_si(from._data()))
+FLINT_DEFINE_GET(conversion, ulong, mpz, fmpz_get_ui(from._data()))
+FLINT_DEFINE_GET(conversion, double, mpz, fmpz_get_d(from._data()))
 
-template<>
-struct conversion<ulong, mpz>
-{
-    static slong get(const mpz& from)
-    {
-        return fmpz_get_ui(from._data());
-    }
-};
+FLINT_DEFINE_BINARY_EXPR(plus, mpz,
+        fmpz_add(to._data(), e1._data(), e2._data()))
 
-template<>
-struct conversion<double, mpz>
-{
-    static double get(const mpz& from)
-    {
-        return fmpz_get_d(from._data());
-    }
-};
+FLINT_DEFINE_CBINARY_EXPR_COND(plus, mpz, traits::is_unsigned_integer<T>,
+        fmpz_add_ui(to._data(), e1._data(), e2))
 
-template<>
-struct commutative_binary_expression<mpz, operations::plus, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const mpz& e2)
-    {
-        fmpz_add(to._data(), e1._data(), e2._data());
-    }
-};
+FLINT_DEFINE_BINARY_EXPR(times, mpz,
+        fmpz_mul(to._data(), e1._data(), e2._data()))
 
-template<class T>
-struct commutative_binary_expression<mpz,
-    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::plus>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_add_ui(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_unsigned_integer<T>,
+        fmpz_mul_ui(to._data(), e1._data(), e2))
 
-template<>
-struct commutative_binary_expression<mpz, operations::times, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const mpz& e2)
-    {
-        fmpz_mul(to._data(), e1._data(), e2._data());
-    }
-};
+FLINT_DEFINE_CBINARY_EXPR_COND(times, mpz, traits::is_signed_integer<T>,
+        fmpz_mul_si(to._data(), e1._data(), e2))
 
-template<class T>
-struct commutative_binary_expression<mpz,
-    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::times>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_mul_ui(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_BINARY_EXPR(minus, mpz,
+        fmpz_sub(to._data(), e1._data(), e2._data()))
 
-template<class T>
-struct commutative_binary_expression<mpz,
-    typename mp::enable_if<traits::is_signed_integer<T>, operations::times>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_mul_si(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_BINARY_EXPR_COND(minus, mpz, traits::is_unsigned_integer<T>,
+        fmpz_sub_ui(to._data(), e1._data(), e2))
 
-template<>
-struct binary_expression<mpz, operations::minus, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const mpz& e2)
-    {
-        fmpz_sub(to._data(), e1._data(), e2._data());
-    }
-};
+FLINT_DEFINE_BINARY_EXPR(divided_by, mpz,
+        fmpz_fdiv_q(to._data(), e1._data(), e2._data()))
 
-template<class T>
-struct binary_expression<mpz,
-    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::minus>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_sub_ui(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_unsigned_integer<T>,
+        fmpz_fdiv_q_ui(to._data(), e1._data(), e2))
 
-template<>
-struct binary_expression<mpz, operations::divided_by, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const mpz& e2)
-    {
-        fmpz_fdiv_q(to._data(), e1._data(), e2._data());
-    }
-};
-
-template<class T>
-struct binary_expression<mpz,
-    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::divided_by>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_fdiv_q_ui(to._data(), e1._data(), e2);
-    }
-};
-
-template<class T>
-struct binary_expression<mpz,
-    typename mp::enable_if<traits::is_signed_integer<T>, operations::divided_by>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_fdiv_q_si(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_BINARY_EXPR_COND(divided_by, mpz, traits::is_signed_integer<T>,
+        fmpz_fdiv_q_si(to._data(), e1._data(), e2))
 
 // TODO this interpretation of mod is not the same as for builtin types!
-template<>
-struct binary_expression<mpz, operations::modulo, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const mpz& e2)
-    {
-        fmpz_mod(to._data(), e1._data(), e2._data());
-    }
-};
+FLINT_DEFINE_BINARY_EXPR(modulo, mpz,
+        fmpz_mod(to._data(), e1._data(), e2._data()))
 
-template<class T>
-struct binary_expression<mpz,
-    typename mp::enable_if<traits::is_unsigned_integer<T>, operations::modulo>::type,
-    T>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& e1, const T& e2)
-    {
-        fmpz_mod_ui(to._data(), e1._data(), e2);
-    }
-};
+FLINT_DEFINE_BINARY_EXPR_COND(modulo, mpz, traits::is_unsigned_integer<T>,
+        fmpz_mod_ui(to._data(), e1._data(), e2))
 
-template<>
-struct unary_expression<operations::negate, mpz>
-{
-    typedef mpz return_t;
-    static void doit(mpz& to, const mpz& from)
-    {
-        fmpz_neg(to._data(), from._data());
-    }
-};
+FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._data(), from._data()))
 } // rules
 } // flint
 

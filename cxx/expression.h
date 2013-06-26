@@ -953,4 +953,127 @@ struct equals<T, U,
 } // rules
 } // flint
 
+
+////////////////////////////////////////////////////////////////////////
+// HELPER MACROS
+////////////////////////////////////////////////////////////////////////
+
+// To be called in namespace flint!
+#define FLINT_DEFINE_BINOP(name) \
+namespace rules { \
+struct name { }; \
+} \
+template<class T1, class T2> \
+inline typename detail::binop_helper<T1, operations::name, T2>::enable::type \
+name(const T1& t1, const T2& t2) \
+{ \
+    return detail::binop_helper<T1, operations::name, T2>::make(t1, t2); \
+}
+
+// To be called in any namespace
+#define FLINT_DEFINE_BINOP_HERE(name) \
+template<class T1, class T2> \
+inline typename ::flint::detail::binop_helper<T1, operations::name, T2>::enable::type \
+name(const T1& t1, const T2& t2) \
+{ \
+  return ::flint::detail::binop_helper<T1, operations::name, T2>::make(t1, t2); \
+}
+
+#define FLINT_DEFINE_UNOP(name) \
+namespace rules { \
+struct name { }; \
+} \
+template<class T1> \
+inline typename detail::unop_helper<operations::name, T1>::enable::type \
+name(const T1& t1) \
+{ \
+    return detail::unop_helper<operations::name, T1>::make(t1); \
+}
+
+// To be called in any namespace
+#define FLINT_DEFINE_UNOP_HERE(name) \
+template<class T1> \
+inline typename ::flint::detail::unop_helper<operations::name, T1>::enable::type \
+name(const T1& t1) \
+{ \
+  return ::flint::detail::unop_helper<operations::name, T1>::make(t1); \
+}
+
+// To be called in namespace flint::rules
+#define FLINT_DEFINE_GET(name, totype, fromtype, eval) \
+template<> \
+struct name<totype, fromtype> \
+{ \
+    static totype get(const fromtype& from) \
+    { \
+        return eval; \
+    } \
+};
+
+#define FLINT_DEFINE_DOIT(name, totype, fromtype, eval) \
+template<> \
+struct name<totype, fromtype> \
+{ \
+    static void doit(totype& to, const fromtype& from) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_DOIT_COND(name, totype, cond, eval) \
+template<class T> \
+struct name<totype, T, typename mp::enable_if<cond >::type> \
+{ \
+    static void doit(totype& to, const T& from) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_UNARY_EXPR(name, type, eval) \
+template<> \
+struct unary_expression<operations::name, type> \
+{ \
+    typedef type return_t; \
+    static void doit(type& to, const type& from) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_BINARY_EXPR(name, type, eval) \
+template<> \
+struct binary_expression<type, operations::name, type> \
+{ \
+    typedef type return_t; \
+    static void doit(type& to, const type& e1, const type& e2) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_CBINARY_EXPR_COND(name, Type, cond, eval) \
+template<class T> \
+struct commutative_binary_expression<Type, \
+    typename mp::enable_if<cond, operations::name>::type, T> \
+{ \
+    typedef Type return_t; \
+    static void doit(Type& to, const Type& e1, const T& e2) \
+    { \
+        eval; \
+    } \
+};
+
+#define FLINT_DEFINE_BINARY_EXPR_COND(name, Type, cond, eval) \
+template<class T> \
+struct binary_expression<Type, \
+    typename mp::enable_if<cond, operations::name>::type, T> \
+{ \
+    typedef Type return_t; \
+    static void doit(Type& to, const Type& e1, const T& e2) \
+    { \
+        eval; \
+    } \
+};
+
 #endif
