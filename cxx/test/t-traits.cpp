@@ -58,6 +58,15 @@ test_integrality()
     tassert(is_integer<signed int>::val == true);
     tassert(is_integer<signed long>::val == true);
     tassert(is_integer<newtype>::val == false);
+
+    tassert(fits_into_slong<unsigned char>::val == true);
+    tassert(fits_into_slong<unsigned short>::val == true);
+    tassert(fits_into_slong<unsigned long>::val == false);
+    tassert(fits_into_slong<signed char>::val == true);
+    tassert(fits_into_slong<signed short>::val == true);
+    tassert(fits_into_slong<signed int>::val == true);
+    tassert(fits_into_slong<signed long>::val == true);
+    tassert(fits_into_slong<newtype>::val == false);
 }
 
 void

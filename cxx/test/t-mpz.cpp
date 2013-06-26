@@ -152,6 +152,26 @@ test_arithmetic()
     tassert(-a == -3);
 }
 
+void
+test_functions()
+{
+    mpz a(2);
+    mpz b(16);
+
+    tassert(pow(a, 4u) == 16);
+    tassert(root(b, 4) == 2);
+    tassert(root(b, (unsigned short)4) == 2);
+    tassert(sqrt(b) == 4);
+    tassert(sqrt(a) == 1);
+
+    // check namespace std
+    tassert(std::pow(a, 4u) == 16);
+    tassert(std::sqrt(b) == 4);
+
+    // check a composite expression
+    tassert(2u + sqrt(a + a) == 4);
+}
+
 int
 main()
 {
@@ -162,8 +182,10 @@ main()
     test_conversion();
     test_initialisation_assignment();
     test_arithmetic();
+    test_functions();
 
     // TODO test counts of allocated temporaries
+    // TODO test that certain things *don't* compile?
 
     std::cout << "PASS" << std::endl;
 }

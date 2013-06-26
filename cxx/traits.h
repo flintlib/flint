@@ -65,6 +65,17 @@ template<> struct is_unsigned_integer<unsigned short> : true_ { };
 template<> struct is_unsigned_integer<unsigned int> : true_ { };
 template<> struct is_unsigned_integer<unsigned long> : true_ { };
 
+// Compute if T can always losslessly be converted into signed long
+// TODO should we use slong here instead of long?
+template<class T> struct fits_into_slong
+    : mp::or_<
+          is_signed_integer<T>,
+          mp::and_v<
+              is_unsigned_integer<T>,
+              sizeof(T) < sizeof(long)
+            >
+        > { };
+
 // Compute if T belongs to the signed or unsigned integer types
 template<class T> struct is_integer
     : mp::or_<is_unsigned_integer<T>, is_signed_integer<T> > { };

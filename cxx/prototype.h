@@ -205,6 +205,13 @@ FLINT_DEFINE_BINARY_EXPR_COND(modulo, mpz, traits::is_unsigned_integer<T>,
         fmpz_mod_ui(to._data(), e1._data(), e2))
 
 FLINT_DEFINE_UNARY_EXPR(negate, mpz, fmpz_neg(to._data(), from._data()))
+
+// standard math functions (c/f stdmath.h)
+FLINT_DEFINE_BINARY_EXPR_COND(pow, mpz, traits::is_unsigned_integer<T>,
+        fmpz_pow_ui(to._data(), e1._data(), e2))
+FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
+        fmpz_root(to._data(), e1._data(), e2))
+FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
 } // rules
 } // flint
 

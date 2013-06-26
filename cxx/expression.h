@@ -499,7 +499,7 @@ struct binary_op_helper
     }
 };
 
-template<class Expr, class Op>
+template<class Op, class Expr>
 struct unary_op_helper
 {
     typedef tuple<typename storage_traits<Expr>::type, empty_tuple> type;
@@ -643,10 +643,10 @@ operator%(const Expr1& e1, const Expr2& e2)
 }
 
 template<class Expr>
-inline typename detail::unary_op_helper<Expr, operations::negate>::enable::type
+inline typename detail::unary_op_helper<operations::negate, Expr>::enable::type
 operator-(const Expr& e)
 {
-    return detail::unary_op_helper<Expr, operations::negate>::make(e);
+    return detail::unary_op_helper<operations::negate, Expr>::make(e);
 }
 
 // default rules
@@ -790,7 +790,7 @@ struct evaluation<T, Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
     typedef typename ev_t::return_t interm_t;
     typedef typename ev_t::temporaries_t interm_temps_t;
 
-    typedef detail::unary_op_helper<interm_t, Op> unop_helper;
+    typedef detail::unary_op_helper<Op, interm_t> unop_helper;
     typedef typename unop_helper::return_t::evaluated_t return_t;
     typedef mp::merge_tuple<
         typename mp::make_tuple<interm_t*>::type,
@@ -960,43 +960,46 @@ struct equals<T, U,
 
 // To be called in namespace flint!
 #define FLINT_DEFINE_BINOP(name) \
-namespace rules { \
+namespace operations { \
 struct name { }; \
 } \
 template<class T1, class T2> \
-inline typename detail::binop_helper<T1, operations::name, T2>::enable::type \
+inline typename detail::binary_op_helper<T1, operations::name, T2>::enable::type \
 name(const T1& t1, const T2& t2) \
 { \
-    return detail::binop_helper<T1, operations::name, T2>::make(t1, t2); \
+    return detail::binary_op_helper<T1, operations::name, T2>::make(t1, t2); \
 }
 
 // To be called in any namespace
 #define FLINT_DEFINE_BINOP_HERE(name) \
 template<class T1, class T2> \
-inline typename ::flint::detail::binop_helper<T1, operations::name, T2>::enable::type \
+inline typename ::flint::detail::binary_op_helper<\
+    T1, ::flint::operations::name, T2>::enable::type \
 name(const T1& t1, const T2& t2) \
 { \
-  return ::flint::detail::binop_helper<T1, operations::name, T2>::make(t1, t2); \
+  return ::flint::detail::binary_op_helper< \
+      T1, ::flint::operations::name, T2>::make(t1, t2); \
 }
 
 #define FLINT_DEFINE_UNOP(name) \
-namespace rules { \
+namespace operations { \
 struct name { }; \
 } \
 template<class T1> \
-inline typename detail::unop_helper<operations::name, T1>::enable::type \
+inline typename detail::unary_op_helper<operations::name, T1>::enable::type \
 name(const T1& t1) \
 { \
-    return detail::unop_helper<operations::name, T1>::make(t1); \
+    return detail::unary_op_helper<operations::name, T1>::make(t1); \
 }
 
 // To be called in any namespace
 #define FLINT_DEFINE_UNOP_HERE(name) \
 template<class T1> \
-inline typename ::flint::detail::unop_helper<operations::name, T1>::enable::type \
+inline typename ::flint::detail::unary_op_helper<\
+    ::flint::operations::name, T1>::enable::type \
 name(const T1& t1) \
 { \
-  return ::flint::detail::unop_helper<operations::name, T1>::make(t1); \
+  return ::flint::detail::unary_op_helper< ::flint::operations::name, T1>::make(t1); \
 }
 
 // To be called in namespace flint::rules
