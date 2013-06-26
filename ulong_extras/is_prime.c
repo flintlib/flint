@@ -29,25 +29,18 @@
 
 int n_is_prime(mp_limb_t n)
 {
-    return n_is_probabprime(n);
     /* flint's "BPSW" checked against Feitma and Galway's database [1] 
        up to 2^64 by Dana Jacobsen.
        [1]  http://www.janfeitsma.nl/math/psp2/database
     */
 
-/*#if !FLINT64
+#if !FLINT64
     return n_is_probabprime(n);
 #else
     int isprime;
     if (n < 10000000000000000UL)
         return n_is_probabprime(n);
-
-    if (!n_is_probabprime(n)) return 0;
-
-    isprime = n_is_prime_pocklington(n, 100);
-    if (isprime != -1) return isprime;
-
-    return n_is_prime_pseudosquare(n);
-#endif*/
-
+    else 
+        return n_is_probabprime_BPSW(n);
+#endif
 }
