@@ -183,6 +183,15 @@ struct equals<myint, int>
 };
 
 template<>
+struct conversion<int, myint>
+{
+    static int get(const myint& from)
+    {
+        return from._data().payload;
+    }
+};
+
+template<>
 struct commutative_binary_expression<myint, operations::plus, myint>
 {
     typedef myint return_t;
@@ -230,6 +239,15 @@ template<>
 struct initialization<mylong, mylong>
 {
     static void doit(mylong& to, const mylong& from)
+    {
+        to._data().payload = from._data().payload;
+    }
+};
+
+template<>
+struct initialization<mylong, myint>
+{
+    static void doit(mylong& to, const myint& from)
     {
         to._data().payload = from._data().payload;
     }
@@ -445,6 +463,28 @@ test_arithmetic()
     tassert((a + bl) + (c + d) == 15l);
 }
 
+template<class T, class U>
+bool typed_equals(const T&, const U&)
+{
+    return false;
+}
+
+template<class T>
+bool typed_equals(const T& a, const T& b)
+{
+    return a == b;
+}
+
+void
+test_conversion()
+{
+    myint a(4);
+    mylong b(4l);
+    tassert(typed_equals(a.to<int>(), 4));
+    tassert(typed_equals(a.to<mylong>(), b));
+    tassert(typed_equals((a + a).to<int>(), 8));
+}
+
 int
 main()
 {
@@ -457,6 +497,7 @@ main()
     test_assignment();
     test_equals();
     test_arithmetic();
+    test_conversion();
 
     std::cout << "PASS" << std::endl;
 

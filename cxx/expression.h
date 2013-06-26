@@ -88,6 +88,15 @@ struct _symmetric_cmp;
 template<class T, class U, class Enable = void>
 struct equals : UNIMPLEMENTED { };
 
+template<class To, class From, class Enable = void>
+struct conversion
+{
+    static To get(const From& from)
+    {
+        return To(from);
+    }
+};
+
 // If result_is_temporary is true, then the result coincides with the
 // first temporary (provided these have the same type)
 // Priorities 2, 1, 0 can be used to resolve conflicts.
@@ -359,6 +368,12 @@ public:
     std::string to_string(int base = 10) const
     {
         return rules::to_string<evaluated_t>::get(evaluate(), base);
+    }
+
+    template<class T>
+    T to() const
+    {
+        return rules::conversion<T, evaluated_t>::get(evaluate());
     }
 
     typename traits::make_const<evaluation_return_t>::type evaluate() const
