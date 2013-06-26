@@ -87,6 +87,16 @@ test_order()
     TO((unsigned short)0, c, b, d);
 }
 
+void
+test_conversion()
+{
+    mpz a(4);
+    tassert(a.to<slong>() == 4);
+    tassert(a.to<ulong>() == 4);
+    tassert(a.to<double>() == 4.0);
+    // NB: to_string is tested in test_printing
+}
+
 int
 main()
 {
@@ -94,6 +104,7 @@ main()
 
     test_printing();
     test_order();
+    test_conversion();
 
     std::cout << "PASS" << std::endl;
 }

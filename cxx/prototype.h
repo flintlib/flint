@@ -193,6 +193,33 @@ struct to_string<mpz>
 };
 
 template<>
+struct conversion<slong, mpz>
+{
+    static slong get(const mpz& from)
+    {
+        return fmpz_get_si(from._data());
+    }
+};
+
+template<>
+struct conversion<ulong, mpz>
+{
+    static slong get(const mpz& from)
+    {
+        return fmpz_get_ui(from._data());
+    }
+};
+
+template<>
+struct conversion<double, mpz>
+{
+    static double get(const mpz& from)
+    {
+        return fmpz_get_d(from._data());
+    }
+};
+
+template<>
 struct commutative_binary_expression<mpz, operations::plus, mpz>
 {
     typedef mpz return_t;
