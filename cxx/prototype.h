@@ -212,7 +212,64 @@ FLINT_DEFINE_BINARY_EXPR_COND(pow, mpz, traits::is_unsigned_integer<T>,
 FLINT_DEFINE_BINARY_EXPR_COND(root, mpz, traits::fits_into_slong<T>,
         fmpz_root(to._data(), e1._data(), e2))
 FLINT_DEFINE_UNARY_EXPR(sqrt, mpz, fmpz_sqrt(to._data(), from._data()))
+
+// TODO ternary rules
 } // rules
+
+
+///////////////////////////////////////////////////////////////////////////
+// FUNCTIONS
+///////////////////////////////////////////////////////////////////////////
+namespace traits {
+template<class T, class Enable = void>
+struct is_mpz
+    : mp::equal_types<typename T::evaluated_t, mpz> { };
+template<class T>
+struct is_mpz<T, typename mp::disable_if<traits::is_expression<T> >::type>
+    : false_ { };
+} // traits
+namespace mp {
+template<class Out, class T1, class T2 = void>
+struct enable_all_mpz
+    : mp::enable_if<mp::and_<traits::is_mpz<T1>, traits::is_mpz<T2> >, Out> { };
+template<class Out, class T>
+struct enable_all_mpz<Out, T, void>
+    : mp::enable_if<traits::is_mpz<T>, Out> { };
+} // mp
+
+// These functions evaluate immediately and do not yield mpzs
+
+template<class T1, class T2>
+inline typename mp::enable_all_mpz<bool, T1, T2>::type
+divisible(const T1& t1, const T2& t2)
+{
+    return fmpz_divisible(t1.evaluate()._data(), t2.evaluate()._data());
+}
+template<class T1, class T2>
+inline typename mp::enable_if<mp::and_<
+    traits::is_mpz<T1>, traits::fits_into_slong<T2> >, bool>::type
+divisible(const T1& t1, const T2& t2)
+{
+    return fmpz_divisible_si(t1.evaluate()._data(), t2);
+}
+
+// TODO should this be lazy?
+inline mpz fac(ulong n)
+{
+    mpz ret;
+    fmpz_fac_ui(ret._data(), n);
+    return ret;
+}
+
+// These functions are evaluated lazily
+FLINT_DEFINE_BINOP(rfac)
+namespace rules {
+FLINT_DEFINE_BINARY_EXPR_COND(rfac, mpz, traits::is_unsigned_integer<T>,
+        fmpz_rfac_ui(to._data(), e1._data(), e2))
+
+// TODO many more functions
+} // rules
+
 } // flint
 
 #endif

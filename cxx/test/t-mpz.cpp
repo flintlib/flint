@@ -163,6 +163,7 @@ test_functions()
     tassert(root(b, (unsigned short)4) == 2);
     tassert(sqrt(b) == 4);
     tassert(sqrt(a) == 1);
+    tassert(rfac(a, 3u) == 2*3*4);
 
     // check namespace std
     tassert(std::pow(a, 4u) == 16);
@@ -170,6 +171,29 @@ test_functions()
 
     // check a composite expression
     tassert(2u + sqrt(a + a) == 4);
+
+    // check immediate functions
+    tassert(divisible(b, a + a));
+    tassert(divisible(b, a + a + 2u) == false);
+    tassert(divisible(a + a, (unsigned short)2));
+    tassert(divisible(-a + b, 3) == false);
+    tassert(fac(4u) == 4*3*2);
+}
+
+template<class T>
+void assert_is_mpz(const T&)
+{
+    tassert(traits::is_mpz<T>::val);
+}
+struct newtype { };
+void
+test_traits()
+{
+    tassert(traits::is_mpz<mpz>::val == true);
+    tassert(traits::is_mpz<int>::val == false);
+    assert_is_mpz(mpz(1) + mpz(2));
+    tassert((traits::is_mpz<mpz_expression<
+                operations::immediate, newtype> >::val == false));
 }
 
 int
@@ -183,9 +207,11 @@ main()
     test_initialisation_assignment();
     test_arithmetic();
     test_functions();
+    test_traits();
 
     // TODO test counts of allocated temporaries
     // TODO test that certain things *don't* compile?
+    // TODO test enable_all_mpz
 
     std::cout << "PASS" << std::endl;
 }
