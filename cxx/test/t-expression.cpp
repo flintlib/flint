@@ -359,7 +359,7 @@ test_assignment()
     myint b(43);
     a = b;
     tassert(a._data().payload == 43);
-    // tassert(a._data().extra == 4); // this won't happen because of copy init
+    tassert(a._data().extra == 4);
 
     a = 44l;
     tassert(a._data().payload == 44 && a._data().extra == 5);

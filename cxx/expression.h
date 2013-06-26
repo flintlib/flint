@@ -357,6 +357,12 @@ public:
 
     ~expression() {rules::destruction<derived_t>::doit(downcast());}
 
+    expression& operator=(const expression& o)
+    {
+        this->set(o.downcast());
+        return *this;
+    }
+
     Data& _data() {return data.data;}
     const Data& _data() const {return data.data;}
 

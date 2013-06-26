@@ -97,6 +97,31 @@ test_conversion()
     // NB: to_string is tested in test_printing
 }
 
+void
+test_initialisation_assignment()
+{
+    mpz a(4), b(4l), c(4u), d("4");
+    mpz e(a);
+    mpz f, g, h, i;
+    f = 4;
+    g = 4l;
+    h = 4u;
+    i = "4";
+    tassert(a == b && a == c&& a == d && a == e && a == f && a == g && a == h
+            && a == i);
+
+    // test deep copying of (f)mpz with more than one digit
+    a = "100000000000000000000";
+    b = a;
+    tassert(a._data()[0] != b._data()[0]);
+    mpz j(a);
+    tassert(a._data()[0] != j._data()[0]);
+    tassert(a == b && a == j);
+
+    // just here to test our assumptions on data format
+    tassert(c._data()[0] == d._data()[0]);
+}
+
 int
 main()
 {
@@ -105,6 +130,7 @@ main()
     test_printing();
     test_order();
     test_conversion();
+    test_initialisation_assignment();
 
     std::cout << "PASS" << std::endl;
 }

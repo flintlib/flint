@@ -65,6 +65,23 @@ typedef mpz_expression<operations::immediate, fmpz_t> mpz;
 
 namespace rules {
 template<>
+struct empty_initialization<mpz>
+{
+    static void doit(mpz& v)
+    {
+        fmpz_init(v._data());
+    }
+};
+
+template<>
+struct destruction<mpz>
+{
+    static void doit(mpz& v)
+    {
+        fmpz_clear(v._data());
+    }
+};
+template<>
 struct initialization<mpz, mpz>
 {
     static void doit(mpz& target, const mpz& source)
@@ -94,12 +111,24 @@ struct initialization<mpz, T,
     }
 };
 
+// TODO should expression automatically deduce this from the assignment
+// implementation (or the other way round)?
+template<int n>
+struct initialization<mpz, char[n]>
+{
+    static void doit(mpz& target, const char* source)
+    {
+        fmpz_init(target._data());
+        // TODO what about different bases
+        fmpz_set_str(target._data(), const_cast<char*>(source), 10);
+    }
+};
+
 template<>
 struct assignment<mpz, mpz>
 {
     static void doit(mpz& target, const mpz& source)
     {
-        fmpz_clear(target._data());
         fmpz_set(target._data(), source._data());
     }
 };
@@ -130,24 +159,6 @@ struct assignment<mpz, char[n]>
     static void doit(mpz& target, const char* source)
     {
         fmpz_set_str(target._data(), const_cast<char*>(source), 10);
-    }
-};
-
-template<>
-struct empty_initialization<mpz>
-{
-    static void doit(mpz& v)
-    {
-        fmpz_init(v._data());
-    }
-};
-
-template<>
-struct destruction<mpz>
-{
-    static void doit(mpz& v)
-    {
-        fmpz_clear(v._data());
     }
 };
 
