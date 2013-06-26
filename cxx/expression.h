@@ -40,8 +40,16 @@ namespace flint {
 
 namespace operations {
 // TODO document these
+// unary operations
 struct immediate { };
+struct unary_minus { };
+
+// binary operations
 struct plus { };
+struct minus { };
+struct times { };
+struct divided_by { };
+struct modulo { };
 } // operations
 
 namespace rules {
@@ -477,6 +485,12 @@ struct binary_op_helper
     typedef typename Expr::template make_helper<Op, type> make_helper;
     typedef typename make_helper::type return_t;
 
+    typedef mp::enable_if<mp::or_<
+            traits::is_expression<Expr1>,
+            traits::is_expression<Expr2> >,
+        return_t
+      > enable;
+
     static return_t make(const Expr1& left, const Expr2& right)
     {
         return make_helper::make(maker::make(left, right));
@@ -572,14 +586,43 @@ operator>=(const Expr1& e1, const Expr2& e2)
 }
 
 template<class Expr1, class Expr2>
-inline typename mp::enable_if<mp::or_<
-        traits::is_expression<Expr1>,
-        traits::is_expression<Expr2> >,
-    typename detail::binary_op_helper<
-        Expr1, operations::plus, Expr2>::return_t>::type
+inline typename detail::binary_op_helper<
+    Expr1, operations::plus, Expr2>::enable::type
 operator+(const Expr1& e1, const Expr2& e2)
 {
     return detail::binary_op_helper<Expr1, operations::plus, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::minus, Expr2>::enable::type
+operator-(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::minus, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::times, Expr2>::enable::type
+operator*(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::times, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::divided_by, Expr2>::enable::type
+operator/(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::divided_by, Expr2>::make(e1, e2);
+}
+
+template<class Expr1, class Expr2>
+inline typename detail::binary_op_helper<
+    Expr1, operations::modulo, Expr2>::enable::type
+operator%(const Expr1& e1, const Expr2& e2)
+{
+    return detail::binary_op_helper<Expr1, operations::modulo, Expr2>::make(e1, e2);
 }
 
 // default rules

@@ -213,6 +213,46 @@ struct commutative_binary_expression<myint,
     }
 };
 
+template<>
+struct commutative_binary_expression<myint, operations::times, myint>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& a1, const myint& a2)
+    {
+        to._data().payload = a1._data().payload * a2._data().payload;
+    }
+};
+
+template<>
+struct binary_expression<myint, operations::minus, myint>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& a1, const myint& a2)
+    {
+        to._data().payload = a1._data().payload - a2._data().payload;
+    }
+};
+
+template<>
+struct binary_expression<myint, operations::divided_by, myint>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& a1, const myint& a2)
+    {
+        to._data().payload = a1._data().payload / a2._data().payload;
+    }
+};
+
+template<>
+struct binary_expression<myint, operations::modulo, myint>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& a1, const myint& a2)
+    {
+        to._data().payload = a1._data().payload % a2._data().payload;
+    }
+};
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Minimal rules for mylong
@@ -422,11 +462,18 @@ test_arithmetic()
     tassert(a + b == c);
     tassert(a + b == 7);
 
+    tassert(a - b == -1);
+    tassert(a * b == 12);
+    tassert(c / e == 3);
+    tassert(c % e == 1);
+
+    // Test arithmetic with immediates
     tassert(a + 4 == 7);
     tassert(4 + a == 7);
     tassert(a + 4l == 7);
     tassert(4u + a == 7);
 
+    // Test composite arithmetic
     tassert((a + 1) + (b + 2) == 10);
     tassert((a + d) + (b + 2) == 10);
     tassert((a + d) + (b + e) == 10);
@@ -445,6 +492,7 @@ test_arithmetic()
     tassert((b + 7) + 3== 14);
     tassert((b + 7) + a== 14);
 
+    // Test mixed arithmetic
     mylong al(3l);
     mylong bl(4l);
     mylong cl(7l);
