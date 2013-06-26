@@ -51,7 +51,8 @@ public:
     }
 
 protected:
-    explicit my_expression(const Data& d) : my_expression::expression(d) {}
+    explicit my_expression(const Data& d)
+        : my_expression::expression(d) {}
 
     template<class D, class O, class Da>
     friend class flint::expression;
@@ -250,6 +251,16 @@ struct binary_expression<myint, operations::modulo, myint>
     static void doit(myint& to, const myint& a1, const myint& a2)
     {
         to._data().payload = a1._data().payload % a2._data().payload;
+    }
+};
+
+template<>
+struct unary_expression<operations::unary_minus, myint>
+{
+    typedef myint return_t;
+    static void doit(myint& to, const myint& from)
+    {
+        to._data().payload = - from._data().payload;
     }
 };
 
@@ -466,6 +477,7 @@ test_arithmetic()
     tassert(a * b == 12);
     tassert(c / e == 3);
     tassert(c % e == 1);
+    tassert(-a == -3);
 
     // Test arithmetic with immediates
     tassert(a + 4 == 7);
@@ -491,6 +503,11 @@ test_arithmetic()
     tassert((4 + c) + 3== 14);
     tassert((b + 7) + 3== 14);
     tassert((b + 7) + a== 14);
+
+    // test combining unary and binary arithmetic
+    tassert(-(-a) == 3);
+    tassert(-(a - b) == b - a);
+    tassert(-((-a) + (-b)) == a + b);
 
     // Test mixed arithmetic
     mylong al(3l);

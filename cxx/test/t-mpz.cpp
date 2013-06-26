@@ -122,6 +122,12 @@ test_initialisation_assignment()
     tassert(c._data()[0] == d._data()[0]);
 }
 
+void
+test_arithmetic()
+{
+    // TODO
+}
+
 int
 main()
 {
@@ -131,6 +137,9 @@ main()
     test_order();
     test_conversion();
     test_initialisation_assignment();
+    test_arithmetic();
+
+    // TODO test counts of allocated temporaries
 
     std::cout << "PASS" << std::endl;
 }

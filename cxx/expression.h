@@ -128,6 +128,9 @@ struct binary_expression : UNIMPLEMENTED { };
 template<class T, class Op, class U>
 struct commutative_binary_expression : UNIMPLEMENTED { };
 // similarly
+
+template<class Op, class T>
+struct unary_expression : UNIMPLEMENTED { };
 } // rules
 
 namespace traits {
@@ -278,8 +281,6 @@ template<class T>
 struct should_enable : mp::false_ { };
 template<class Head, class Tail>
 struct should_enable<tuple<Head, Tail> > : mp::true_ { };
-template<class T>
-struct should_enable<T&> : mp::true_ { };
 
 template<class Data>
 struct copy_initialization_helper<Data,
@@ -287,7 +288,8 @@ struct copy_initialization_helper<Data,
 {
     Data data;
 
-    copy_initialization_helper(const Data& d) : data(d) {}
+    copy_initialization_helper(const Data& d)
+        : data(d) {}
 
     copy_initialization_helper(const copy_initialization_helper& o)
         : data(o.data)
@@ -309,7 +311,7 @@ private:
     detail::copy_initialization_helper<Data> data;
 
 protected:
-    explicit expression(const Data & d) : data(d) {}
+    explicit expression(const Data& d) : data(d) {}
 
 public:
     typedef detail::evaluation_traits<Operation, expression, Data> ev_traits_t;
@@ -497,6 +499,21 @@ struct binary_op_helper
     }
 };
 
+template<class Expr, class Op>
+struct unary_op_helper
+{
+    typedef tuple<typename storage_traits<Expr>::type, empty_tuple> type;
+    typedef typename Expr::template make_helper<Op, type> make_helper;
+    typedef typename make_helper::type return_t;
+
+    typedef mp::enable_if<traits::is_expression<Expr>, return_t> enable;
+
+    static return_t make(const Expr& e)
+    {
+        return make_helper::make(type(e, empty_tuple()));
+    }
+};
+
 template<class Expr1, class Expr2>
 struct order_op_helper
 {
@@ -623,6 +640,13 @@ inline typename detail::binary_op_helper<
 operator%(const Expr1& e1, const Expr2& e2)
 {
     return detail::binary_op_helper<Expr1, operations::modulo, Expr2>::make(e1, e2);
+}
+
+template<class Expr>
+inline typename detail::unary_op_helper<Expr, operations::unary_minus>::enable::type
+operator-(const Expr& e)
+{
+    return detail::unary_op_helper<Expr, operations::unary_minus>::make(e);
 }
 
 // default rules
@@ -755,6 +779,32 @@ struct evaluation<
     }
 };
 
+template<class T, class Op, class Data, bool result_is_temporary>
+struct evaluation<T, Op, tuple<Data, empty_tuple>, result_is_temporary, 0,
+    typename mp::enable_if<traits::is_lazy_expr<Data> >::type>
+{
+    typedef typename mp::find_evaluation<
+        Data, typename Data::operation_t, typename Data::data_t,
+        true // TODO
+      >::type ev_t;
+    typedef typename ev_t::return_t interm_t;
+    typedef typename ev_t::temporaries_t interm_temps_t;
+
+    typedef detail::unary_op_helper<interm_t, Op> unop_helper;
+    typedef typename unop_helper::return_t::evaluated_t return_t;
+    typedef mp::merge_tuple<
+        typename mp::make_tuple<interm_t*>::type,
+        interm_temps_t> merger;
+    typedef typename merger::type temporaries_t;
+
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        interm_t* interm = merger::get_first(temps).head;
+        ev_t::doit(input._data().head, merger::get_second(temps), interm);
+        *output = unop_helper::make(*interm);
+    }
+};
+
 // Automatically invoke binary_expression or commutative_binary_expression
 namespace rdetail {
 template<class Expr1, class Op, class Expr2>
@@ -834,6 +884,22 @@ struct evaluation<
               >::type
           >::type
 { };
+
+
+// Automatically invoke unary_expression
+template<class T, bool result_is_temporary, class Op, class Data>
+struct evaluation<T, Op, tuple<const Data&, empty_tuple>, result_is_temporary, 0,
+    typename mp::enable_if<
+        traits::is_implemented<unary_expression<Op, Data> > >::type>
+{
+    typedef unary_expression<Op, Data> wrapped_t;
+    typedef typename wrapped_t::return_t return_t;
+    typedef empty_tuple temporaries_t;
+    static void doit(const T& input, temporaries_t temps, return_t* output)
+    {
+        wrapped_t::doit(*output, input._data().head);
+    }
+};
 
 
 // Automatic printing if to_string is implemented
