@@ -297,6 +297,9 @@ test_merge()
 
     typedef merge_tuple<empty_tuple, empty_tuple> emptymerge;
     tassert((equal_types<emptymerge::type, empty_tuple>::val));
+
+    typedef merge_tuple<make_tuple<A, B, C>::type, empty_tuple> anothermerge;
+    tassert((equal_types<anothermerge::type, make_tuple<C, B, A>::type>::val));
 }
 
 int

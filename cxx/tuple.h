@@ -349,6 +349,7 @@ struct merge_tuple<empty_tuple, Tuple2>
     }
 };
 
+#if 0
 // Termination case 2
 template<class Tuple1>
 struct merge_tuple<Tuple1, empty_tuple>
@@ -367,6 +368,7 @@ struct merge_tuple<Tuple1, empty_tuple>
         return empty_tuple();
     }
 };
+#endif
 
 // Termination case 3
 template<class T>
