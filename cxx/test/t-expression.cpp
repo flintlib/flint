@@ -73,8 +73,32 @@ private:
 };
 
 typedef my_expression<operations::immediate, data> myint;
+
+template<class Operation, class Data>
+class my_expression2
+    : public expression<derived_wrapper<my_expression2>, Operation, Data>
+{
+public:
+    my_expression2() {};
+    template<class T>
+    explicit my_expression2(const T& t) : my_expression2::expression(t) {}
+
+    template<class T>
+    my_expression2& operator=(const T& t)
+    {
+        this->set(t);
+        return *this;
+    }
+
+protected:
+    explicit my_expression2(const Data& d)
+        : my_expression2::expression(d) {}
+
+    template<class D, class O, class Da>
+    friend class flint::expression;
+};
 struct long_data {long payload;};
-typedef my_expression<operations::immediate, long_data> mylong;
+typedef my_expression2<operations::immediate, long_data> mylong;
 
 namespace flint {
 namespace rules {
