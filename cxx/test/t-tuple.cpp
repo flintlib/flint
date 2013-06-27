@@ -131,6 +131,9 @@ test_back()
     tassert((equal_types<back_tuple<empty_tuple>::type, empty_tuple>::val));
     typedef tuple<int*, empty_tuple> tup1_t;
     tassert((equal_types<back_tuple<tup1_t, int>::type, empty_tuple>::val));
+
+    typedef back_tuple<make3p::type, B> backB;
+    backB::init(pointers, backing, 0);
 }
 
 void

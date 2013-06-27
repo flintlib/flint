@@ -130,10 +130,10 @@ struct back_tuple;
 template<class Head, class Tail, class Return>
 struct back_tuple<tuple<Head*, Tail>, Return>
 {
-    typedef tuple<Head, typename back_tuple<Tail, empty_tuple>::type> type;
+    typedef tuple<Head, typename back_tuple<Tail, void>::type> type;
     static void init(tuple<Head*, Tail>& to, type& from, Return* ret /* unused */)
     {
-        back_tuple<Tail, Return>::init(to.tail, from.tail, ret);
+        back_tuple<Tail, void>::init(to.tail, from.tail, ret);
         to.head = &from.head;
     }
 };
