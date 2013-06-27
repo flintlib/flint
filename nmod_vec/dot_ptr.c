@@ -30,7 +30,7 @@
 #include "nmod_vec.h"
 
 mp_limb_t
-_nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, slong offset,
+_nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
                             slong len, nmod_t mod, int nlimbs)
 {
     mp_limb_t res;

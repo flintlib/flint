@@ -297,7 +297,7 @@ int _nmod_vec_dot_bound_limbs(slong len, nmod_t mod);
 mp_limb_t _nmod_vec_dot(mp_srcptr vec1, mp_srcptr vec2,
     slong len, nmod_t mod, int nlimbs);
 
-mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, mp_ptr * const vec2, slong offset,
+mp_limb_t _nmod_vec_dot_ptr(mp_srcptr vec1, const mp_ptr * vec2, slong offset,
     slong len, nmod_t mod, int nlimbs);
 
 #ifdef __cplusplus

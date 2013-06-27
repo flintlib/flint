@@ -108,7 +108,7 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
                                  const fmpz * coeffs_m, slong l, slong length);
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                               mp_limb_t ** const coeffs_f, slong limbs, slong sign);
+                               const mp_ptr * coeffs_f, slong limbs, slong sign);
 
 /*  Assignment and basic manipulation  ***************************************/
 

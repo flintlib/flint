@@ -32,7 +32,7 @@
 #include "fft.h"
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                          mp_limb_t ** const coeffs_f, slong limbs, slong sign)
+                          const mp_ptr * coeffs_f, slong limbs, slong sign)
 {
    slong i, size;
    mp_limb_t * data;
