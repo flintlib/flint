@@ -174,7 +174,7 @@ slong _fmpz_vec_get_fft(mp_limb_t ** coeffs_f,
     coefficient with an additional limb for overflow. 
 
 void _fmpz_vec_set_fft(fmpz * coeffs_m, slong length,
-                      mp_limb_t ** coeffs_f, slong limbs, slong sign)
+                      mp_limb_t ** const coeffs_f, slong limbs, slong sign)
 
     Convert an fft vector \code{coeffs_f} of the given \code{length} 
     to a vector of \code{fmpz}'s. Each is assumed to be the given 

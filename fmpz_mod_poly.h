@@ -514,7 +514,7 @@ void fmpz_mod_poly_evaluate_fmpz_vec_iter(fmpz * ys,
                         const fmpz_mod_poly_t poly, const fmpz * xs, slong n);
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast_precomp(fmpz * vs, 
-              const fmpz * poly, slong plen, fmpz_poly_struct * const * tree, 
+              const fmpz * poly, slong plen, fmpz_poly_struct ** const tree, 
                                                  slong len, const fmpz_t mod);
 
 void _fmpz_mod_poly_evaluate_fmpz_vec_fast(fmpz * ys, 
