@@ -101,7 +101,7 @@ struct initialization<mpz, char[n]>
     {
         fmpz_init(target._data());
         // TODO what about different bases
-        fmpz_set_str(target._data(), const_cast<char*>(source), 10);
+        fmpz_set_str(target._data(), source, 10);
     }
 };
 
