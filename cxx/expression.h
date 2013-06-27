@@ -648,6 +648,46 @@ operator-(const Expr& e)
     return detail::unary_op_helper<operations::negate, Expr>::make(e);
 }
 
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator+=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 + e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator-=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 - e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator*=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 * e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator/=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 / e2);
+    return e1;
+}
+
+template<class Expr1, class Expr2>
+inline typename mp::enable_if<traits::is_immediate_expr<Expr1>, Expr1&>::type
+operator%=(Expr1& e1, const Expr2& e2)
+{
+    e1.set(e1 % e2);
+    return e1;
+}
+
 // default rules
 
 namespace rules {

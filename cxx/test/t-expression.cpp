@@ -579,6 +579,19 @@ test_conversion()
     tassert(typed_equals((a + a).to<int>(), 8));
 }
 
+void
+test_assignment_arith()
+{
+    myint a(1);
+    myint b(2);
+    a += b;
+    tassert(a == 3 && b == 2);
+    a += a*b;
+    tassert(a == 9);
+    a += 1;
+    tassert(a == 10);
+}
+
 int
 main()
 {
@@ -592,6 +605,7 @@ main()
     test_equals();
     test_arithmetic();
     test_conversion();
+    test_assignment_arith();
 
     std::cout << "PASS" << std::endl;
 

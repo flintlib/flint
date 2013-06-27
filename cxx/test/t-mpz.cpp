@@ -150,6 +150,23 @@ test_arithmetic()
 
     // test unary minus
     tassert(-a == -3);
+
+    // test assignment arithmetic
+#define TAA(op, res) \
+    { \
+        mpz tmp1(10), tmp2(10), tmp3(10); \
+        mpz three(3); \
+        tmp1 op three; \
+        tmp2 op 3u; \
+        tmp3 op three*1; \
+        tassert(tmp1 == res); \
+        tassert(tmp2 == res); \
+        tassert(tmp3 == res); \
+    }
+    TAA(+=, 13);
+    TAA(*=, 30);
+    TAA(/=, 3);
+    TAA(%=, 1);
 }
 
 void
