@@ -172,11 +172,11 @@ DEFINE_FUNC(test_tuple_merge_1,
     typedef make_tuple<long, int, char> make3;
     typedef make_tuple<int, int> make2;
     typedef merge_tuple<make3::type, make2::type> merge;
-    merge::type merged; // <int, int, char, long>
-    merged.head = i1;
-    merged.tail.head = i4;
-    merged.tail.tail.head = i3;
-    merged.tail.tail.tail.head = i2;
+    merge::type merged; // <char, int, long, int>
+    merged.head = i3;
+    merged.tail.head = i1;
+    merged.tail.tail.head = i2;
+    merged.tail.tail.tail.head = i4;
     make3::type extract = merge::get_first(merged);
     o1 = extract.head; // i2
     o2 = extract.tail.head; // i1

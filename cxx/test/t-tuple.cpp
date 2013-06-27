@@ -285,6 +285,7 @@ test_merge()
     TEST32n(A, B, C, C, A, 3);
     TEST32n(A, B, C, C, B, 3);
     TEST32n(A, B, C, B, C, 3);
+    TEST32n(A, A, A, A, A, 3);
 
     TEST32n(A, B, C, A, D, 4);
     TEST32n(A, B, C, B, D, 4);
@@ -292,14 +293,16 @@ test_merge()
     TEST32n(A, B, C, D, A, 4);
     TEST32n(A, B, C, D, B, 4);
     TEST32n(A, B, C, D, C, 4);
+    TEST32n(A, A, A, A, B, 4);
 
     TEST32n(A, B, C, D, E, 5);
+    TEST32n(A, A, A, B, B, 5);
 
     typedef merge_tuple<empty_tuple, empty_tuple> emptymerge;
     tassert((equal_types<emptymerge::type, empty_tuple>::val));
 
-    typedef merge_tuple<make_tuple<A, B, C>::type, empty_tuple> anothermerge;
-    tassert((equal_types<anothermerge::type, make_tuple<C, B, A>::type>::val));
+    typedef merge_tuple<make_tuple<A, A>::type, empty_tuple> anothermerge;
+    tassert(anothermerge::type::len == 2);
 }
 
 int

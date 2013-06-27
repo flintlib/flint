@@ -147,6 +147,7 @@ test_arithmetic()
     // test composite arithmetic
     mpz a(3), b(7);
     tassert(3*(a + b) - (b + (a - 4u)) + ((-(a - b)) % (b / 2)) == 25);
+    tassert(a*b + a*a + b*b == 21+9+49);
 
     // test unary minus
     tassert(-a == -3);
@@ -226,6 +227,7 @@ test_temporaries()
     tassert(count_temporaries(a + b) == 0);
     tassert(count_temporaries(a + b + c + a + b + c) == 1);
     tassert(count_temporaries(((a * c) + (b % a)) * ((b + c) + (c * a))) == 3);
+    //tassert(count_temporaries((a/b) + (a/c) + (b/c) + (c/b)) == 3);
 }
 
 int

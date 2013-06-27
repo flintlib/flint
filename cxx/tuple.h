@@ -227,10 +227,11 @@ struct merge_tuple;
 //};
 
 // General case
+// NB: tail is *always* a sub-tuple of the second argument!
 template<class Head, class Tail, class Tuple2>
 struct merge_tuple<tuple<Head, Tail>, Tuple2>
 {
-private:
+public:
     typedef merge_tuple<Tail, Tuple2> comp1;
     typedef merge_tuple<tuple<Head, empty_tuple>, typename comp1::tail_t> comp2;
     typedef concat_tuple<typename comp1::used_t, typename comp2::type> concater;
@@ -375,8 +376,9 @@ template<class T>
 struct merge_tuple<tuple<T, empty_tuple>, empty_tuple>
 {
     typedef tuple<T, empty_tuple> type;
-    typedef type tail_t;
-    typedef empty_tuple used_t;
+    typedef empty_tuple tail_t;
+    // NB: we "use" T here - it cannot be merged into it any longer!
+    typedef type used_t;
 
     static empty_tuple get_second(const type& input)
     {
