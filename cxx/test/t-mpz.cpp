@@ -214,6 +214,20 @@ test_traits()
                 operations::immediate, newtype> >::val == false));
 }
 
+template<class T>
+unsigned count_temporaries(const T&)
+{
+    return T::ev_traits_t::rule_t::temporaries_t::len;
+}
+void
+test_temporaries()
+{
+    mpz a, b, c;
+    tassert(count_temporaries(a + b) == 0);
+    tassert(count_temporaries(a + b + c + a + b + c) == 1);
+    tassert(count_temporaries(((a * c) + (b % a)) * ((b + c) + (c * a))) == 3);
+}
+
 int
 main()
 {
@@ -226,6 +240,7 @@ main()
     test_arithmetic();
     test_functions();
     test_traits();
+    test_temporaries();
 
     // TODO test counts of allocated temporaries
     // TODO test that certain things *don't* compile?
